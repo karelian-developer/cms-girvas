@@ -3,9 +3,9 @@
 /**
  * CMS GIRVAS (https://www.cms-girvas.ru/)
  * 
- * @link        https://github.com/Andrey-Shestakov/cms-girvas Путь до репозитория системы
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
  * @copyright   Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
- * @license     https://github.com/Andrey-Shestakov/cms-girvas/LICENSE.md
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
 if (!defined('IS_NOT_HACKED')) {
@@ -18,7 +18,7 @@ if (!isset($system_core)) {
   die('CMS system core not initialized.');
 }
 
-if ($system_core->urlp->get_path(1) != 'client' && $system_core->urlp->get_path(2) != 'ip-address' && $system_core->urlp->get_path(1) != 'install') {
+if ($system_core->urlp->get_path(1) != 'client' && $system_core->urlp->get_path(2) != 'ip-address' && $system_core->urlp->get_path(2) != 'locales' && $system_core->urlp->get_path(1) != 'locale' && $system_core->urlp->get_path(1) != 'install') {
   if (isset($_COOKIE['_grv_rest'])) {
     $address = str_replace('.', '', $_SERVER['REMOTE_ADDR']);
     
@@ -50,30 +50,6 @@ if (defined('IS_NOT_HACKED')) {
   // Client API
   if ($system_core->urlp->get_path(1) == 'client') {
     $api_file_path = sprintf('%s/api/client.api.php', CMS_ROOT_DIRECTORY);
-    include_once($api_file_path);
-  }
-
-  // 
-  if ($system_core->urlp->get_path(1) == 'concert') {
-    $api_file_path = sprintf('%s/api/concert.api.php', CMS_ROOT_DIRECTORY);
-    include_once($api_file_path);
-  }
-
-  // 
-  if ($system_core->urlp->get_path(1) == 'concerts') {
-    $api_file_path = sprintf('%s/api/concerts.api.php', CMS_ROOT_DIRECTORY);
-    include_once($api_file_path);
-  }
-
-  // 
-  if ($system_core->urlp->get_path(1) == 'mediabox') {
-    $api_file_path = sprintf('%s/api/mediabox.api.php', CMS_ROOT_DIRECTORY);
-    include_once($api_file_path);
-  }
-
-  // 
-  if ($system_core->urlp->get_path(1) == 'feedback') {
-    $api_file_path = sprintf('%s/api/feedback.api.php', CMS_ROOT_DIRECTORY);
     include_once($api_file_path);
   }
 

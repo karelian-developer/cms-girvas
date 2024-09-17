@@ -8,9 +8,9 @@
  * необходимых объектов, таких как: шаблон системы, локализация системы, парсер адресной строки,
  * сборщик шаблона, клиент и так далее.
  * 
- * @link        https://github.com/Garbalo/cms-girvas Путь до репозитория системы
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
  * @copyright   Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
- * @license     https://github.com/Garbalo/cms-girvas/LICENSE.md
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
 namespace core\PHPLibrary {
@@ -41,7 +41,7 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.0-4 Alpha';
+    public const CMS_VERSION = '0.1.0-5 Alpha';
     public const CMS_DEVELOPER_TITLE = 'Garbalo (IE SHESTAKOV A.R.)';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
     public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
