@@ -8,6 +8,15 @@
 
 'use strict';
 
+/**
+ * Класс интерактивного элемента "Выпадающий список"
+ * 
+ * Интерактивный вариант выпадающего списка позволяет имитировать работу
+ * стандартного выпадающего списка HTML-разметки элемента "Select". При
+ * использовании данного элемента создается элемент "Select", после чего
+ * он скрывается и его работу имитируют отдельные элементы, позволяющие
+ * стилизовать выпадающий список любым способом посредством JavaScript или CSS.
+ */
 export class Choices {
   constructor() {
     this.element = null;
@@ -20,18 +29,48 @@ export class Choices {
     this.assembled = null;
   }
 
+  /**
+   * Установить индекс выбранного элемента
+   * 
+   * @param {Number} index 
+   */
   setItemSelectedIndex(index) {
     this.itemSelectedIndex = index;
   }
 
+  /**
+   * Получить массив элементов
+   * 
+   * @returns 
+   */
   getItems() {
     return this.items;
   }
 
+  /**
+   * Получить значение выбранного элемента
+   * 
+   * @returns 
+   */
+  getValue() {
+    return (this.elementSelect != null) ? this.elementSelect.value : null;
+  }
+
+  /**
+   * Установить имя элемента
+   * 
+   * @param {String} value 
+   */
   setName(value) {
     this.name = value;
   }
 
+  /**
+   * Добавить элемент выборки
+   * 
+   * @param {any} label 
+   * @param {any} value 
+   */
   addItem(label, value) {
     this.items.push({
       'label': label,
@@ -39,14 +78,11 @@ export class Choices {
     });
   }
 
-  // getItemLabel(index) {
-  //   let item = this.items[index];
-  //   let element = document.createElement('div');
-  //   element.append(item.label);
-
-
-  // }
-
+  /**
+   * Сборка интерактивного элемента
+   * @param {HTMLSelectElement} elementSelect 
+   * @returns 
+   */
   assemblyInteractive(elementSelect) {
     let selectContainerElement = document.createElement('div');
     selectContainerElement.classList.add('interactive__select-imitation');
@@ -125,6 +161,11 @@ export class Choices {
     return selectContainerElement;
   }
 
+  /**
+   * Сборка элемента "Select"
+   * 
+   * @returns 
+   */
   assemblySelect() {
     let element = document.createElement('select');
     element.classList.add('interactive__select');
@@ -133,6 +174,13 @@ export class Choices {
     return element;
   }
 
+  /**
+   * Сборка элемента "Option"
+   * 
+   * @param {HTMLSelectElement} choicesItem 
+   * @param {Boolean} isSelected 
+   * @returns 
+   */
   assemblyOption(choicesItem, isSelected = false) {
     let element = document.createElement('option');
 
@@ -145,14 +193,10 @@ export class Choices {
     return element;
   }
 
+  /**
+   * Итоговая сборка интерактивного элемента
+   */
   assembly() {
-    // this.items.sort((a, b) => {
-    //   if (a.value[0] > b.value[0]) return -1;
-    //   if (a.value[0] < b.value[0]) return 1;
-
-    //   return b.value[1] < a.value[1] ? 1 : -1;
-    // });
-
     this.elementSelect = this.assemblySelect();
     this.elementInteractive = this.assemblyInteractive(this.elementSelect);
 
