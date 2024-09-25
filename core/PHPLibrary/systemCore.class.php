@@ -41,7 +41,7 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.2-2 Альфа';
+    public const CMS_VERSION = '0.1.2-3 Альфа';
     public const CMS_DEVELOPER_TITLE = 'Garbalo (IE SHESTAKOV A.R.)';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
     public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
@@ -531,7 +531,7 @@ namespace core\PHPLibrary {
     public static function core_rest_cookie_is_valid(int $value, string $ip) : bool {
       $ip = str_replace('.', '', $ip);
 
-      if ($value != (int)(((int)$ip * (round(asin(1) * strlen($ip)) << 3)) . strtotime(date('Y/m/d 00:00:00.0')))) {
+      if ($value == (int)(((int)$ip * (round(asin(1) * strlen($ip)) << 3)) . strtotime(date('Y/m/d 00:00:00.0')))) {
         return true;
       }
 
