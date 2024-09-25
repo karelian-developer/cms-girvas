@@ -41,7 +41,7 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.1 Альфа';
+    public const CMS_VERSION = '0.1.2 Альфа';
     public const CMS_DEVELOPER_TITLE = 'Garbalo (IE SHESTAKOV A.R.)';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
     public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
@@ -458,7 +458,9 @@ namespace core\PHPLibrary {
     /**
      * Парсинг HTTP-запроса
      *
-     * @param  mixed $input_string
+     * @param  string $input_string
+     * @param  string $content_type
+     * 
      * @return void
      */
     public static function parse_raw_http_request(string $input_string, string $content_type) {
@@ -494,6 +496,80 @@ namespace core\PHPLibrary {
       }   
       
       return $data_array;
+    }
+
+    /**
+     * Получение куки REST API ядра
+     *
+     * @return int
+     */
+    public static function get_core_rest_cookie() : int {
+      if (isset($_COOKIE['_grv_rest'])) {
+        return (is_numeric($_COOKIE['_grv_rest'])) ? (int)$_COOKIE['_grv_rest'] : 0;
+      }
+
+      return 0;
+    }
+
+    /**
+     * Проверка существования куки REST API ядра
+     *
+     * @return bool
+     */
+    public static function core_rest_cookie_exists() : bool {
+      return (isset($_COOKIE['_grv_rest'])) ? true : false;
+    }
+
+    /**
+     * Проверка валидации куки REST API ядра
+     *
+     * @param  int $value
+     * @param  string $ip
+     * 
+     * @return bool
+     */
+    public static function core_rest_cookie_is_valid(int $value, string $ip) : bool {
+      $ip = str_replace('.', '', $ip);
+
+      if ($value != (int)(((int)$ip * (round(asin(1) * strlen($ip)) << 3)) . strtotime(date('Y/m/d 00:00:00.0')))) {
+        return true;
+      }
+
+      return false;
+    }
+
+    /**
+     * Аварийное завершение работы ядра
+     * 
+     * ВНИМАНИЕ! Вызов данного метода оборвет выполнение
+     * последующего кода и выведет сообщение об ошибке.
+     *
+     * @param  int $reason_id
+     * @param  int $status_code
+     * 
+     * @return bool
+     */
+    public static function abnormal_termination_of_work(int $reason_id, int $status_code, bool $is_json = false) : void {
+      if ($reason_id === 1) {
+        $message = 'An attempted hacker attack has been detected.';
+      }
+
+      $message = (isset($message)) ? $message : 'The system core has terminated abnormally for an unknown reason.';
+
+      $output_data = (isset($output_data)) ? $output_data : [];
+      $output_data = (is_array($output_data)) ? $output_data : [];
+
+      http_response_code($status_code);
+
+      if ($is_json) {
+        die(json_encode([
+          'message' => $message,
+          'statusCode' => $status_code,
+          'outputData' => $output_data
+        ]));
+      }
+
+      die($message);
     }
 
   }
