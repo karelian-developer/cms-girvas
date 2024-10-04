@@ -17,6 +17,7 @@ namespace core\PHPLibrary\Database\QueryBuilder {
     public QueryBuilder $query_builder;
     private array $columns = [];
     public string $table_name = '';
+    public string $table_prefix = '';
     public ClauseReturning|null $clause_returning = null;
     public string $assembled = '';
 
@@ -48,11 +49,13 @@ namespace core\PHPLibrary\Database\QueryBuilder {
     /**
      * Назначить имя таблицы
      *
-     * @param  mixed $table_name
+     * @param  string $name
+     * @param  string $prefix
      * @return void
      */
-    public function set_table(string $table_name) : void {
-      $this->table_name = $table_name;
+    public function set_table(string $name, string $prefix = '') : void {
+      $this->table_name = $name;
+      $this->table_prefix = $prefix;
     }
     
     /**
@@ -68,8 +71,10 @@ namespace core\PHPLibrary\Database\QueryBuilder {
         if ($database_configurations['scheme'] != '') {
           $table_fullname .= sprintf('%s.', $database_configurations['scheme']);
         }
-        if ($database_configurations['prefix'] != '') {
-          $table_fullname .= sprintf('%s_', $database_configurations['prefix']);
+
+        if ($database_configurations['prefix'] != '' || $this->table_prefix != '') {
+          $table_prefix = ($this->table_prefix == '') ? $database_configurations['prefix'] : $this->table_prefix;
+          $table_fullname .= sprintf('%s_', $table_prefix);
         }
       }
 

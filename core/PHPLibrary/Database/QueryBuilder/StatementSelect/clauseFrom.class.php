@@ -50,12 +50,15 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect {
 
       foreach ($this->tables as $table) {
         $table_fullname = '';
+        
         if (!is_null($database_configurations)) {
           if ($database_configurations['scheme'] != '') {
             $table_fullname .= sprintf('%s.', $database_configurations['scheme']);
           }
-          if ($database_configurations['prefix'] != '') {
-            $table_fullname .= sprintf('%s_', $database_configurations['prefix']);
+
+          if ($database_configurations['prefix'] != '' || $table->get_prefix() != '') {
+            $table_prefix = ($table->get_prefix() == '') ? $database_configurations['prefix'] : $table->get_prefix();
+            $table_fullname .= sprintf('%s_', $table_prefix);
           }
         }
 

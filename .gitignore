@@ -11,6 +11,7 @@
 /api/concert/
 /api/concerts/
 kozyrev-media.json
+/core/PHPLibrary/Game
 /core/PHPLibrary/concert.class.php
 /core/PHPLibrary/concerts.class.php
 /core/PHPLibrary/service.class.php

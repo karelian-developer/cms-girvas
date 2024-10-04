@@ -11,7 +11,8 @@
 namespace core\PHPLibrary\Database\QueryBuilder\StatementDelete\ClauseFrom {
 
   class Table {
-    private string $name;
+    private string $name = '';
+    private string $prefix = '';
     
     /**
      * __construct
@@ -40,6 +41,25 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementDelete\ClauseFrom {
      */
     public function get_name() : string {
       return $this->name;
+    }
+    
+    /**
+     * set_prefix
+     *
+     * @param  string $value
+     * @return void
+     */
+    private function set_prefix(string $value) : void {
+      $this->prefix = $value;
+    }
+    
+    /**
+     * get_prefix
+     *
+     * @return string
+     */
+    public function get_prefix() : string {
+      return $this->prefix;
     }
 
   }
