@@ -34,8 +34,8 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementDelete {
      * @param  mixed $table_name
      * @return void
      */
-    public function add_table(string $table_name) : void {
-      $this->tables[$table_name] = new Table($table_name);
+    public function add_table(string $table_name, string $prefix = '') : void {
+      $this->tables[$table_name] = new Table($table_name, $prefix);
     }
     
     /**

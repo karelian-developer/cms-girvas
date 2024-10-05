@@ -34,8 +34,8 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect {
      * @param  mixed $table_name
      * @return void
      */
-    public function add_table(string $table_name) : void {
-      $this->tables[$table_name] = new Table($table_name);
+    public function add_table(string $table_name, string $prefix = '') : void {
+      $this->tables[$table_name] = new Table($table_name, $prefix);
     }
     
     /**
@@ -50,7 +50,7 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect {
 
       foreach ($this->tables as $table) {
         $table_fullname = '';
-        
+
         if (!is_null($database_configurations)) {
           if ($database_configurations['scheme'] != '') {
             $table_fullname .= sprintf('%s.', $database_configurations['scheme']);

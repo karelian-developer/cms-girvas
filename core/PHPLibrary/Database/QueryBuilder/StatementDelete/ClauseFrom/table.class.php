@@ -17,11 +17,12 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementDelete\ClauseFrom {
     /**
      * __construct
      *
-     * @param  mixed $table_name
+     * @param  mixed $name
      * @return void
      */
-    public function __construct(string $table_name) {
-      $this->set_name($table_name);
+    public function __construct(string $name, string $prefix) {
+      $this->set_name($name);
+      $this->set_prefix($prefix);
     }
     
     /**
