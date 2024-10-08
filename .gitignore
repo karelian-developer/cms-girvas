@@ -18,6 +18,7 @@ kozyrev-media.json
 /core/PHPLibrary/Page/Admin/concerts.class.php
 /core/PHPLibrary/Page/Admin/mediabox.class.php
 /core/configuration.php
+/locales/*/game
 /templates/*
 !/templates/default
 !/templates/admin

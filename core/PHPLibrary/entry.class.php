@@ -422,11 +422,11 @@ namespace core\PHPLibrary {
     /**
      * Проверка наличия записи по идентификационному номеру
      *
-     * @param  mixed $system_core
-     * @param  mixed $entry_name
-     * @return Entry
+     * @param  SystemCore $system_core
+     * @param  int $id
+     * @return bool
      */
-    public static function exists_by_id(SystemCore $system_core, int $entry_id) : bool {
+    public static function exists_by_id(SystemCore $system_core, int $id) : bool {
       $query_builder = new DatabaseQueryBuilder($system_core);
       $query_builder->set_statement_select();
       $query_builder->statement->add_selections(['1']);
@@ -441,7 +441,7 @@ namespace core\PHPLibrary {
 
       $database_connection = $system_core->database_connector->database->connection;
       $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':id', $entry_id, \PDO::PARAM_INT);
+      $database_query->bindParam(':id', $id, \PDO::PARAM_INT);
 			$database_query->execute();
 
       return ($database_query->fetchColumn()) ? true : false;

@@ -103,6 +103,17 @@
             <div class="admin-navigation-list__item-label">{LANG:MAIN_NAVIGATION_TEMPLATES_LABEL}</div>
           </a>
         </li>
+        <li class="admin-navigation-list__item item item_templates" role="mainNavigationTemplates">
+          <a href="/admin/analytics" class="admin-navigation-list__item-link" title="{LANG:MAIN_NAVIGATION_ANALYTICS_LABEL}">
+            <svg class="admin-navigation-list__item-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 64 64" style="enable-background:new 0 0 64 64;" xml:space="preserve">
+              <rect x="34" y="20.3" width="12" height="43.7"/>
+              <rect x="50" y="9.1" width="14" height="54.9"/>
+              <rect y="26.5" width="14" height="37.4"/>
+              <rect x="18" y="11.6" width="12" height="52.4"/>
+            </svg>
+            <div class="admin-navigation-list__item-label">{LANG:MAIN_NAVIGATION_ANALYTICS_LABEL}</div>
+          </a>
+        </li>
         <li class="admin-navigation-list__item item item_settings" role="mainNavigationSettings">
           <a href="/admin/settings" class="admin-navigation-list__item-link" title="{LANG:MAIN_NAVIGATION_SETTINGS_CMS_LABEL}">
             <svg class="admin-navigation-list__item-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 64 64" style="enable-background:new 0 0 64 64;" xml:space="preserve">

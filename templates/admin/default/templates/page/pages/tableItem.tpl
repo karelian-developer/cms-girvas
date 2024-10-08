@@ -7,6 +7,16 @@
   <td class="table__cell" rowspan="2">
     <ul class="table-pages-static__item-buttons-list buttons-list list-reset">
       <li class="buttons-list__item">
+        <button class="table-pages-static__item-button" role="page-static-analytics">
+          <svg class="table-pages-static__item-button-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 64 64" xml:space="preserve">
+            <rect x="34" y="20.3" width="12" height="43.7"/>
+            <rect x="50" y="9.1" width="14" height="54.9"/>
+            <rect y="26.5" width="14" height="37.4"/>
+            <rect x="18" y="11.6" width="12" height="52.4"/>
+          </svg>
+        </button>
+      </li>
+      <li class="buttons-list__item">
         <button class="table-pages-static__item-button" role="page-static-edit">
           <svg class="table-pages-static__item-button-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 64 64" xml:space="preserve">
             <rect x="17.5" y="16.3" transform="matrix(0.7071 0.7071 -0.7071 0.7071 33.6798 -9.1993)" width="20.9" height="39.6"/>

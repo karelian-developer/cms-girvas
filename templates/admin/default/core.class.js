@@ -7,7 +7,6 @@
 'use strict';
 
 import {Interactive} from "../../../core/JSLibrary/interactive.class.js";
-import {ConcertBlock} from "./core/JSCore/page/concerts/concertBlock.class.js";
 
 export class Core {
   constructor(CMSCore) {

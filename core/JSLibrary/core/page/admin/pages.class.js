@@ -49,6 +49,10 @@ export class PagePages {
               window.location.href = `./page/${pageStaticID}`;
             }
             
+            if (button.getAttribute('role') == 'page-static-analytics') {
+              window.open(`/admin/analytics/page/${pageStaticID}`, '_blank');
+            }
+            
             if (button.getAttribute('role') == 'page-static-view') {
               window.open(`/page/${pageStaticName}`, '_blank');
             }
