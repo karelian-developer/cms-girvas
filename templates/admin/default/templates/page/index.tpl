@@ -103,7 +103,7 @@
               </div>
             </div>
           </div>
-          <a href="#" class="steps-list__item-link">{LANG:PAGE_INDEX_HOVER_LABEL}</a>
+          <a href="/admin/analytics" class="steps-list__item-link">{LANG:PAGE_INDEX_HOVER_LABEL}</a>
         </li>
         <li class="steps-list__item">
           <div class="steps-list__item-wrapper">
