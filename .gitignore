@@ -10,6 +10,7 @@
 /api/mediabox/
 /api/concert/
 /api/concerts/
+/api/game/
 kozyrev-media.json
 /core/PHPLibrary/Game
 /core/PHPLibrary/concert.class.php

@@ -25,13 +25,22 @@ namespace core\PHPLibrary {
     }
         
     /**
+     * Получить элемент пути URL
+     *
+     * @param  int $path_index Индекс элемента массива пути
+     * @return string|null
+     */
+    public function get_path(int $path_index) : string|null {
+      return (isset($this->path[$path_index])) ? $this->path[$path_index] : null;
+    }
+        
+    /**
      * Получить массив элементов пути URL
      *
-     * @param  mixed $path_index Индекс элемента массива пути
      * @return array
      */
-    public function get_path(int $path_index) : mixed {
-      return (isset($this->path[$path_index])) ? $this->path[$path_index] : null;
+    public function get_pathes() : array {
+      return (isset($this->path)) ? $this->path : [];
     }
         
     /**

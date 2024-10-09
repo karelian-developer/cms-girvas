@@ -39,16 +39,14 @@ if (defined('IS_NOT_HACKED')) {
   if ($system_core->urlp->get_path(1) == 'client') {
     $api_file_path = sprintf('%s/api/client.api.php', CMS_ROOT_DIRECTORY);
     include_once($api_file_path);
-  }
 
   // Installation API
-  if ($system_core->urlp->get_path(1) == 'install') {
+  } else if ($system_core->urlp->get_path(1) == 'install') {
     $api_file_path = sprintf('%s/api/installation.api.php', CMS_ROOT_DIRECTORY);
     include_once($api_file_path);
-  }
-
+  
   // Metrics API
-  if ($system_core->urlp->get_path(1) == 'metrics' && $system_core::core_rest_cookie_exists()) {
+  } else if ($system_core->urlp->get_path(1) == 'metrics' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -60,10 +58,9 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'metrics' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
-  }
 
   // Media Files API
-  if ($system_core->urlp->get_path(1) == 'media' && $system_core::core_rest_cookie_exists()) {
+  } else if ($system_core->urlp->get_path(1) == 'media' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -75,10 +72,9 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'media' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
-  }
-
+  
   // Modules API
-  if ($system_core->urlp->get_path(1) == 'module' && $system_core::core_rest_cookie_exists()) {
+  } else if ($system_core->urlp->get_path(1) == 'module' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -90,10 +86,9 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'module' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
-  }
 
   // Users API
-  if ($system_core->urlp->get_path(1) == 'user' && $system_core::core_rest_cookie_exists()) {
+  } else if ($system_core->urlp->get_path(1) == 'user' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -105,10 +100,9 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'user' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
-  }
 
   // Users Group API
-  if ($system_core->urlp->get_path(1) == 'usersGroup' && $system_core::core_rest_cookie_exists()) {
+  } else if ($system_core->urlp->get_path(1) == 'usersGroup' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -120,10 +114,9 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'usersGroup' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
-  }
 
   // Users Groups API
-  if ($system_core->urlp->get_path(1) == 'usersGroups' && $system_core::core_rest_cookie_exists()) {
+  } else if ($system_core->urlp->get_path(1) == 'usersGroups' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -133,10 +126,9 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'usersGroups' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
-  }
 
   // Entries API
-  if ($system_core->urlp->get_path(1) == 'entry' && $system_core::core_rest_cookie_exists()) {
+  } else if ($system_core->urlp->get_path(1) == 'entry' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -148,10 +140,9 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'entry' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
-  }
 
   // Pages static API
-  if ($system_core->urlp->get_path(1) == 'pageStatic' && $system_core::core_rest_cookie_exists()) {
+  } else if ($system_core->urlp->get_path(1) == 'pageStatic' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -163,10 +154,9 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'pageStatic' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
-  }
 
   // Settings API
-  if ($system_core->urlp->get_path(1) == 'settings' && $system_core::core_rest_cookie_exists()) {
+  } else if ($system_core->urlp->get_path(1) == 'settings' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -178,10 +168,9 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'settings' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
-  }
 
   // Templates API
-  if ($system_core->urlp->get_path(1) == 'template' && $system_core::core_rest_cookie_exists()) {
+  } else if ($system_core->urlp->get_path(1) == 'template' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -193,10 +182,9 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'template' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
-  }
 
   // WebChannel API
-  if ($system_core->urlp->get_path(1) == 'webChannel' && $system_core::core_rest_cookie_exists()) {
+  } else if ($system_core->urlp->get_path(1) == 'webChannel' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -208,10 +196,9 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'webChannel' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
-  }
 
   // WebChannels API
-  if ($system_core->urlp->get_path(1) == 'webChannels' && $system_core::core_rest_cookie_exists()) {
+  } else if ($system_core->urlp->get_path(1) == 'webChannels' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -223,10 +210,9 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'webChannels' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
-  }
 
   // Utils API
-  if ($system_core->urlp->get_path(1) == 'utils' && $system_core::core_rest_cookie_exists()) {
+  } else if ($system_core->urlp->get_path(1) == 'utils' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -238,27 +224,27 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'utils' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
-  }
 
-  if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'dms-available') {
+  // ...
+  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'dms-available') {
     $handler_output_data['charsets'] = ['UTF-8', 'UTF-16', 'Windows-1252', 'ISO-8859'];
-  }
-
-  if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'charset') {
+  
+  // Получение текущей кодировки
+  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'charset') {
     $charset = ($system_core->configurator->exists_database_entry_value('base_site_charset')) ? $system_core->configurator->get_database_entry_value('base_site_charset') : 'UTF-8';
     $handler_output_data['charset'] = $charset;
-  }
-
-  if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'charsets') {
+  
+  // Получение перечня кодировок
+  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'charsets') {
     $handler_output_data['charsets'] = ['UTF-8', 'UTF-16', 'Windows-1252', 'ISO-8859'];
-  }
-
-  if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'ew-status') {
+  
+  // Получение статуса технических работ
+  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'ew-status') {
     $ew_status = ($system_core->configurator->exists_database_entry_value('base_engineering_works_status')) ? $system_core->configurator->get_database_entry_value('base_engineering_works_status') : 'off';
     $handler_output_data['status'] = ($ew_status == 'on') ? 'on' : 'off';
-  }
-
-  if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'timezone') {
+  
+  // Получение текущего временной зоны
+  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'timezone') {
     $timezone_name = ($system_core->configurator->exists_database_entry_value('base_timezone')) ? $system_core->configurator->get_database_entry_value('base_timezone') : date_default_timezone_get();
     $timezone_utc = new DateTimeImmutable('now', new DateTimeZone($timezone_name));
 
@@ -266,9 +252,9 @@ if (defined('IS_NOT_HACKED')) {
       'name' => $timezone_name,
       'utc' => $timezone_utc->format('P')
     ];
-  }
-
-  if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'timezones') {
+  
+  // Получение списка временных зон
+  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'timezones') {
     $timezones = [];
     $timezone_names_array = DateTimeZone::listIdentifiers();
     foreach ($timezone_names_array as $timezone_name) {
@@ -281,9 +267,9 @@ if (defined('IS_NOT_HACKED')) {
     }
 
     $handler_output_data['timezones'] = $timezones;
-  }
-
-  if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'profile' && $system_core::core_rest_cookie_exists()) {
+  
+  // Получение дополнительной информации по профилю пользователя
+  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'profile' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -314,9 +300,10 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'profile' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
-  }
-
-  if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'locale') {
+  
+  // Получить текущую локализацию
+  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'locale') {
+    // Базовая локализация
     if ($system_core->urlp->get_path(2) == 'base') {
       $cms_locale_setted = (!is_null($system_core->configurator->get_database_entry_value('base_locale'))) ? $system_core->configurator->get_database_entry_value('base_locale') : 'en_US';
       $cms_locale = new \core\PHPLibrary\SystemCore\Locale($system_core, $cms_locale_setted);
@@ -329,6 +316,7 @@ if (defined('IS_NOT_HACKED')) {
       ];
     }
 
+    // Локализация административной панели
     if ($system_core->urlp->get_path(2) == 'admin') {
       $cms_locale_setted = (!is_null($system_core->configurator->get_database_entry_value('base_admin_locale'))) ? $system_core->configurator->get_database_entry_value('base_admin_locale') : 'en_US';
       $cms_locale = new \core\PHPLibrary\SystemCore\Locale($system_core, $cms_locale_setted);
@@ -340,9 +328,9 @@ if (defined('IS_NOT_HACKED')) {
         'iso639_2' => $cms_locale->get_iso_639_2(),
       ];
     }
-  }
-
-  if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'locales') {
+  
+  // Получить перечень доступных локализаций
+  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'locales') {
     $handler_output_data['locales'] = [];
     $cms_locales_names = $system_core->get_array_locales_names();
     if (count($cms_locales_names) > 0) {
@@ -366,9 +354,9 @@ if (defined('IS_NOT_HACKED')) {
       $handler_message = 'Данные по локализациям не были получены, поскольку они не обнаружены в системе.';
       $handler_status_code = 0;
     }
-  }
-
-  if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'entries' && $system_core::core_rest_cookie_exists()) {
+  
+  // Получить перечень записей
+  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'entries' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
@@ -394,6 +382,47 @@ if (defined('IS_NOT_HACKED')) {
     }
   } else if ($system_core->urlp->get_path(1) == 'entries' && !$system_core::core_rest_cookie_exists()) {
     $system_core::abnormal_termination_of_work(1, 403, true);
+
+  // Попытка инициализации персонализированного обработчика
+  } else {
+    if ($system_core->urlp->get_path(1) != null) {
+
+      /**
+       * Рекурсивный поиск файла обработчика в директории API
+       */
+      $recursion_handler_connect = function(\core\PHPLibrary\SystemCore $system_core, array $pathes, int $index) use (&$recursion_handler_connect) : string|null {
+        $handlers_root_directory_path = sprintf('%s/api', CMS_ROOT_DIRECTORY);
+
+        $files_array = array_diff(scandir($handlers_root_directory_path), ['.', '..']);
+        foreach ($files_array as $file_index => $file_name) {
+          if (array_key_last($pathes) != $index) {
+            if ($file_name == $pathes[$index]) {
+
+              $url_pathes = $system_core->urlp->get_pathes();
+              return $recursion_handler_connect($system_core, $url_pathes, $index + 1);
+            }
+          } else {
+            $handler_file_name = sprintf('%s.api.php', $pathes[$index]);
+            $handler_file_path = sprintf('%s/%s/%s', $handlers_root_directory_path, implode('/', array_slice($pathes, 1, count($pathes) - 2)), $handler_file_name);
+            
+            if (file_exists($handler_file_path)) {
+              return $handler_file_path;
+            }
+
+            break;
+          }
+        }
+
+        return null;
+      };
+
+      $url_pathes = $system_core->urlp->get_pathes();
+      $handler_connection_result = $recursion_handler_connect($system_core, $url_pathes, 1);
+      
+      if ($handler_connection_result != null) {
+        include_once($handler_connection_result);
+      }
+    }
   }
 
   /** @var string $handler_message Сообщение обработчика */
