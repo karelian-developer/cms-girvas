@@ -26,6 +26,19 @@
         </div>
       </td>
     </tr>
+    <tr class="table__row">
+      <td class="table__cell cell">
+        <div class="cell__title">{LANG:PAGE_SETTINGS_SETTING_SEO_ROBOTS_TXT_TITLE}</div>
+        <div class="cell__description">
+          <div class="page__phar-block">{LANG:PAGE_SETTINGS_SETTING_SEO_ROBOTS_TXT_DESCRIPTION}</div>
+        </div>
+      </td>
+      <td class="table__cell cell">
+        <div class="page__phar-block">
+          <textarea class="form__textarea" name="setting_{SETTINGS_NAME}_robots_txt" id="" cols="30" rows="10">{SETTING_SITE_ROBOTS_TXT_VALUE}</textarea>
+        </div>
+      </td>
+    </tr>
   </table>
   <div class="form__bottom-panel" id="SYSTEM_E3724126170"></div>
 </form>

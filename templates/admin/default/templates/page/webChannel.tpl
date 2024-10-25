@@ -7,7 +7,7 @@
   <div class="page__content">
     <form class="form form_webchannel page__web-channel-editor-form web-channel-editor-form" action="/handler/webChannel">
       <input name="web_channel_id" type="hidden" value="{WEB_CHANNEL_ID}">
-      <table class="table">
+      <table class="table table_feed">
         <tr class="table__row">
           <td class="table__cell cell">
             <div class="cell__title">{LANG:PAGE_WEB_CHANNEL_TECHNICAL_NAME_TITLE}</div>

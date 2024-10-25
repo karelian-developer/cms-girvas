@@ -6,44 +6,64 @@
  * @license     https://github.com/Andrey-Shestakov/cms-girvas/LICENSE.md
  */
 
- .form.form_entries-category > .table {
+ .form.form_entries-category > .table_entries-category {
   margin-bottom: 10px;
 }
+
+.form.form_user .table_entries-category tr > td:first-child {
+  width: calc(100% - 300px);
+}
+
+.form.form_user .table_entries-category tr > td:last-child {
+  width: 400px;
+}
+
 .form.form_entries-category .table__cell {
+  box-sizing: border-box;
   vertical-align: top;
 }
+
 .form.form_entries-category .table__cell:last-child {
   width: 400px;
 }
+
 .form.form_entries-category .cell__title {
   font-weight: 700;
   text-transform: uppercase;
   margin-bottom: 10px;
 }
+
 .form.form_entries-category input,
 .form.form_entries-category select,
 .form.form_entries-category textarea {
   width: 100%;
 }
+
 .form.form_entries-category input:not(:nth-last-child()),
 .form.form_entries-category select:not(:nth-last-child()),
 .form.form_entries-category textarea:not(:nth-last-child()) {
   margin-bottom: 10px;
 }
+
 .form.form_entries-category textarea {
   resize: vertical;
+  min-height: 100px;
 }
+
 .form.form_entries-category .form__input[type="submit"] {
   width: fit-content;
   float: right;
 }
+
 .form.form_entries-category .interactive__select-imitation {
   width: 100% !important;
 }
+
 .form.form_entries-category .form__bottom-panel {
   display: flex;
   justify-content: flex-end;
 }
+
 .form.form_entries-category .form__bottom-panel > * {
   &:not(:last-child) {
     margin-right: 10px;

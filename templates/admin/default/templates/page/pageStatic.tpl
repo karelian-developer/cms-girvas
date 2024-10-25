@@ -7,7 +7,7 @@
   <div class="page__content">
     <form class="form form_page-static page-static-form" action="/handler/pageStatic">
       <input name="page_static_id" type="hidden" value="{PAGE_STATIC_ID}">
-      <table class="table">
+      <table class="table table_page-static">
         <tr class="table__row">
           <td class="table__cell cell">
             <div class="cell__title">{LANG:PAGE_STATIC_PAGE_INPUT_TECH_NAME_LABEL}</div>

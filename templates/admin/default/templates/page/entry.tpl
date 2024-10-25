@@ -7,7 +7,7 @@
   <div class="page__content">
     <form id="SYSTEM_F0648538658" class="form form_entry entry-form" action="/handler/entry">
       <input name="entry_id" type="hidden" value="{ENTRY_ID}">
-      <table class="table">
+      <table class="table table_entry">
         <tr class="table__row">
           <td class="table__cell cell">
             <div class="cell__title">{LANG:PAGE_ENTRY_INPUT_TECH_NAME_LABEL}</div>

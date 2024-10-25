@@ -6,50 +6,71 @@
  * @license     https://github.com/Andrey-Shestakov/cms-girvas/LICENSE.md
  */
 
- .form.form_user .table_user {
+.form.form_user .table_user {
   margin-bottom: 10px;
 }
+
+.form.form_user .table_user tr > td:first-child {
+  width: calc(100% - 300px);
+}
+
+.form.form_user .table_user tr > td:last-child {
+  width: 400px;
+}
+
 .form.form_user .table__cell {
+  box-sizing: border-box;
   vertical-align: top;
 }
+
 .form.form_user .cell__title {
   font-weight: 700;
   text-transform: uppercase;
   margin-bottom: 10px;
 }
+
 .form.form_user input,
 .form.form_user select,
 .form.form_user textarea {
   width: 100%;
 }
+
 .form.form_user input:not(:nth-last-child()),
 .form.form_user select:not(:nth-last-child()),
 .form.form_user textarea:not(:nth-last-child()) {
   margin-bottom: 10px;
 }
+
 .form.form_user textarea {
   resize: vertical;
+  min-height: 100px;
 }
+
 .form.form_user .form__input[type="submit"] {
   width: fit-content;
   float: right;
 }
+
 .form.form_user .cell_additional-fields-title-container > .cell__title {
   display: flex;
   justify-content: space-between;
   margin-bottom: 0;
 }
+
 .form.form_user .cell_additional-fields-title-container .cell__title-value {
   display: flex;
   align-items: center;
 }
+
 .form.form_user .interactive__select-imitation {
   width: 100%;
 }
+
 .form.form_user .form__bottom-panel {
   display: flex;
   justify-content: end;
 }
+
 .form.form_user .form__bottom-panel > *[cmsg-interactive-uid]:not(:last-child) {
   margin-right: 10px;
 }

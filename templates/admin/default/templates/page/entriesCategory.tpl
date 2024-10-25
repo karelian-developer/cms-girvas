@@ -7,7 +7,7 @@
   <div class="page__content">
     <form class="form form_entries-category page__entries-category-form entries-category-form" action="/handler/entry/category">
       <input name="entries_category_id" type="hidden" value="{ENTRIES_CATEGORY_ID}">
-      <table class="table">
+      <table class="table table_entries-category">
         <tr class="table__row">
           <td class="table__cell cell">
             <div class="cell__title">{LANG:PAGE_ENTRIES_CATEGORY_INPUT_TECH_NAME_LABEL}</div>

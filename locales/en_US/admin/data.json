@@ -375,6 +375,8 @@
   "PAGE_SETTINGS_SETTING_SEO_SITE_DESCRIPTION_DESCRIPTION": "The site description must accurately reflect the essence of its content and also include keywords.",
   "PAGE_SETTINGS_SETTING_SEO_KEYWORDS_TITLE": "Keywords",
   "PAGE_SETTINGS_SETTING_SEO_KEYWORDS_DESCRIPTION": "Keywords should help your site be found in search engines. To select keywords, we recommend using the following services: &laquo;<a href=\"https://wordstat.yandex.ru/\" target=\"_blank\">Yandex&nbsp;Wordstat</a>&raquo; and &laquo;<a href=\"https://trends.google.com/\" target=\"_blank\">Google&nbsp;Trends</a>&raquo;.",
+  "PAGE_SETTINGS_SETTING_SEO_ROBOTS_TXT_TITLE": "Contents of robots.txt file",
+  "PAGE_SETTINGS_SETTING_SEO_ROBOTS_TXT_DESCRIPTION": "Robots.txt is a text file that contains site indexing parameters for search engine robots. In robots.txt, you can limit the indexing of site pages by robots, which can reduce the load on the site and speed up its operation. [<a href=\"https://yandex.ru/support/webmaster/controlling-robot/robots-txt.html\" target=\"_blank\">More</a>]",
   "PAGE_SETTINGS_SETTING_SEO_INPUT_KEYWORDS_PLACEHOLDER": "Girvas Volcano, Republic of Karelia, Fishing in the village of Nadvoitsy",
   "PAGE_SETTINGS_SETTING_USERS_ADDITIONAL_FIELDS_TITLE": "Additional profile fields",
   "PAGE_SETTINGS_SETTING_USERS_ADDITIONAL_FIELDS_TABLE_COLUMN_TYPE_FIELD_TITLE": "Field type",

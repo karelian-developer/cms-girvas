@@ -6,60 +6,84 @@
  * @license     https://github.com/Andrey-Shestakov/cms-girvas/LICENSE.md
  */
 
- .form.form_settings .table_settings {
+.form.form_settings .table_settings {
   margin-bottom: 10px;
 }
+
+.form.form_settings .table_settings tr > td:first-child {
+  width: calc(100% - 300px);
+}
+
+.form.form_settings .table_settings tr > td:last-child {
+  width: 400px;
+}
+
 .form.form_settings .table__cell {
+  box-sizing: border-box;
   vertical-align: top;
 }
+
 .form.form_settings .cell__title {
   font-weight: 700;
   text-transform: uppercase;
   margin-bottom: 10px;
 }
+
 .form.form_settings input,
 .form.form_settings select,
 .form.form_settings textarea {
   width: 100%;
 }
+
 .form.form_settings input:not(:nth-last-child()),
 .form.form_settings select:not(:nth-last-child()),
 .form.form_settings textarea:not(:nth-last-child()) {
   margin-bottom: 10px;
 }
+
 .form.form_settings textarea {
   resize: vertical;
+  min-height: 100px;
 }
+
 .form.form_settings .form__input[type="submit"] {
   width: fit-content;
   float: right;
 }
+
 .form.form_settings .interactive__select-imitation {
   width: 100% !important;
 }
+
 #TC6474389682 .interactive__select-imitation {
   margin-bottom: 10px;
 }
+
 .form.form_settings .cell_additional-fields-title-container > .cell__title {
   display: flex;
   justify-content: space-between;
   margin-bottom: 0;
 }
+
 .form.form_settings .cell_additional-fields-title-container .cell__title-value {
   display: flex;
   align-items: center;
 }
+
 .form.form_settings .form__bottom-panel {
   display: flex;
   justify-content: end;
 }
+
 .form.form_settings .form__bottom-panel > *[cmsg-interactive-uid]:not(:last-child) {
   margin-right: 10px;
 }
+
 .form.form_settings [role="additional-field"] *[cmsg-interactive-uid] {
   margin: 0 auto;
   width: fit-content;
 }
+
 .form.form_settings [role="additional-field"] .button__icon {
   fill: var(--common-secondary-color-6);
   width: 16px;

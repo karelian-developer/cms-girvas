@@ -6,10 +6,60 @@
  * @license     https://github.com/Andrey-Shestakov/cms-girvas/LICENSE.md
  */
 
+.form.form_webchannel .table_feed {
+  margin-bottom: 10px;
+}
+
+.form.form_webchannel .table_feed tr > td:first-child {
+  width: calc(100% - 300px);
+}
+
+.form.form_webchannel .table_feed tr > td:last-child {
+  width: 400px;
+}
+
+.form.form_webchannel .table__cell {
+  box-sizing: border-box;
+  vertical-align: top;
+}
+
+.form.form_webchannel .cell__title {
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.form.form_webchannel input,
+.form.form_webchannel select,
+.form.form_webchannel textarea {
+  width: 100%;
+}
+
+.form.form_webchannel input:not(:nth-last-child()),
+.form.form_webchannel select:not(:nth-last-child()),
+.form.form_webchannel textarea:not(:nth-last-child()) {
+  margin-bottom: 10px;
+}
+
+.form.form_webchannel textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form.form_webchannel .form__input[type="submit"] {
+  width: fit-content;
+  float: right;
+}
+
+.form.form_webchannel .interactive__select-imitation {
+  width: 100%;
+}
+
 .form.form_webchannel .form__bottom-panel {
   display: flex;
   justify-content: end;
 }
+
 .form.form_webchannel .form__bottom-panel > *[cmsg-interactive-uid]:not(:last-child) {
   margin-right: 10px;
 }

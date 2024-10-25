@@ -9,35 +9,53 @@
  .form.form_user-group .table_user-group {
   margin-bottom: 10px;
 }
+
+.form.form_user .table_user-group tr > td:first-child {
+  width: calc(100% - 300px);
+}
+
+.form.form_user .table_user-group tr > td:last-child {
+  width: 400px;
+}
+
 .form.form_user-group .table__cell {
+  box-sizing: border-box;
   vertical-align: top;
 }
+
 .form.form_user-group .cell__title {
   font-weight: 700;
   text-transform: uppercase;
   margin-bottom: 10px;
 }
+
 .form.form_user-group input,
 .form.form_user-group select,
 .form.form_user-group textarea {
   width: 100%;
 }
+
 .form.form_user-group input:not(:nth-last-child()),
 .form.form_user-group select:not(:nth-last-child()),
 .form.form_user-group textarea:not(:nth-last-child()) {
   margin-bottom: 10px;
 }
+
 .form.form_user-group textarea {
   resize: vertical;
+  min-height: 100px;
 }
+
 .form.form_user-group .form__input[type="submit"] {
   width: fit-content;
   float: right;
 }
+
 .form.form_user-group .form__bottom-panel {
   display: flex;
   justify-content: end;
 }
+
 .form.form_user-group .form__bottom-panel > *[cmsg-interactive-uid]:not(:last-child) {
   margin-right: 10px;
 }

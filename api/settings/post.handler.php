@@ -28,6 +28,17 @@ if ($system_core->client->is_logged(2)) {
         if (preg_match('/^setting_([a-z0-9_]+)$/', $setting_name, $matches, PREG_OFFSET_CAPTURE)) {
           $setting_name = $matches[1][0];
 
+          if ($setting_name == 'seo_robots_txt') {
+            $file_robots_txt_path = sprintf('%s/robots.txt', CMS_ROOT_DIRECTORY);
+
+            $file_robots_txt = fopen($file_robots_txt_path, 'w+');
+            fwrite($file_robots_txt, $setting_value);
+            fclose($file_robots_txt);
+            chmod($file_robots_txt_path, 0664);
+
+            continue;
+          }
+
           if ($setting_name == 'users_additional_field_title' && isset($_POST['_users_additional_fields_locale'])) {
             if ($system_core->configurator->exists_database_entry_value($setting_name)) {
               $fields_titles = json_decode($system_core->configurator->get_database_entry_value($setting_name), true);

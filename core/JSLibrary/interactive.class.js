@@ -10,6 +10,7 @@
 
 
 import {Button} from './interactive/button.class.js';
+import {Input} from './interactive/input.class.js';
 import {Choices} from './interactive/choices.class.js';
 import {Schedule} from './interactive/schedule.class.js';
 import {Modal} from './interactive/modal.class.js';
@@ -44,6 +45,7 @@ export class Interactive {
 
     switch (interactiveName) {
       case 'button': this.target = new Button(); break;
+      case 'input': this.target = new Input(); break;
       case 'choices': this.target = new Choices(); break;
       case 'schedule': this.target = new Schedule(data.canvasElement, data.type); break;
       case 'form': this.target = new Form(); break;
