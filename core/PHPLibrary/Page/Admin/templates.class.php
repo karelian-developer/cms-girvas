@@ -70,6 +70,8 @@ namespace core\PHPLibrary\Page\Admin {
 
       $templates_count_total = 0;
 
+      $templates_list_items_transformed_array = [];
+
       if ($this->system_core->urlp->get_path(2) == 'repository') {
         $ch = curl_init('https://repository.cms-girvas.ru/templates');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -77,8 +79,6 @@ namespace core\PHPLibrary\Page\Admin {
         curl_close($ch);
 
         if (isset($curl_result['outputData'])) {
-          $templates_list_items_transformed_array = [];
-
           if (count($curl_result['outputData']) > 0) {
             $templates_count_total = count($curl_result['outputData']);
             $curl_result['outputData'] = array_slice($curl_result['outputData'], $pagination_item_current * $pagination_items_on_page, $pagination_items_on_page);
@@ -99,15 +99,11 @@ namespace core\PHPLibrary\Page\Admin {
               ]));
             }
           }
-        } else {
-          $templates_list_items_transformed_array = [];
         }
-
       } elseif ($this->system_core->urlp->get_path(2) == 'local' || is_null($this->system_core->urlp->get_path(2))) {
-
-        $templates_list_items_transformed_array = [];
         $uploaded_templates_names = $this->system_core->get_array_uploaded_templates_names();
         $uploaded_templates_names = array_diff($uploaded_templates_names, ['admin', 'install']);
+
         if (count($uploaded_templates_names) > 0) {
           $templates_count_total = count($uploaded_templates_names);
           $uploaded_templates_names = array_slice($uploaded_templates_names, $pagination_item_current * $pagination_items_on_page, $pagination_items_on_page);
@@ -152,7 +148,7 @@ namespace core\PHPLibrary\Page\Admin {
           'PAGE_TEMPLATES_PAGINATION' => $pagination->assembled,
           'ADMIN_PANEL_PAGE_NAME' => 'templates',
           'TEMPLATES_LIST' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/templates/list.tpl', [
-            'TEMPLATES_LIST_ITEMS' => implode($templates_list_items_transformed_array)
+            'TEMPLATES_LIST_ITEMS' => implode('', $templates_list_items_transformed_array)
           ])
         ]);
       }

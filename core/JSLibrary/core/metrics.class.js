@@ -8,6 +8,7 @@
 
 'use strict';
 
+import {Interactive} from '../interactive.class.js';
 import {Client} from './client.class.js';
 
 export class Metrics {
@@ -35,6 +36,14 @@ export class Metrics {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
 
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     });
   }
 
@@ -77,6 +86,14 @@ export class Metrics {
       }
 
       return [];
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     });
   }
 

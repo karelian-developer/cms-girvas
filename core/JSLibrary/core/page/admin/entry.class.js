@@ -32,6 +32,14 @@ export class PageEntry {
     }).then((data) => {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     }).then((localeData) => {
       let contentTextareaElement = document.querySelector('[role="entryContent"]');
       let descriptionTextareaElement = document.querySelector('[role="entryDescription"]');
@@ -403,6 +411,14 @@ export class PageEntry {
           interactiveNotificationLoading.target.show();
           
           return fetch('/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
+        }, (rejectionReason) => {
+          let interactiveNotification = new Interactive('notification');
+          interactiveNotification.target.isPopup = true;
+          interactiveNotification.target.setStatusCode(0);
+          interactiveNotification.target.setContent(rejectionReason);
+          interactiveNotification.target.assembly();
+    
+          interactiveNotification.target.show();
         }).then((response) => {
           return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data1) => {
@@ -425,6 +441,14 @@ export class PageEntry {
             let interactiveContainer = document.querySelector('#TC6474389611');
             interactiveContainer.append(interactiveCategoriesChoices.target.element);
           }
+        }, (rejectionReason) => {
+          let interactiveNotification = new Interactive('notification');
+          interactiveNotification.target.isPopup = true;
+          interactiveNotification.target.setStatusCode(0);
+          interactiveNotification.target.setContent(rejectionReason);
+          interactiveNotification.target.assembly();
+    
+          interactiveNotification.target.show();
         });
       }
 

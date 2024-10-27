@@ -170,6 +170,14 @@ export class Request {
       console.log(data);
 
       return data;
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     });
   }
 }

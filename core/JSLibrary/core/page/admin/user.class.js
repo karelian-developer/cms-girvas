@@ -29,6 +29,14 @@ export class PageUser {
     }).then((data) => {
       locales = data.outputData.locales;
       return fetch('/handler/usersGroups' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
@@ -41,11 +49,27 @@ export class PageUser {
       interactiveChoicesUsersGroups.target.setName('user_group_id');
 
       return fetch('/handler/user/' + searchParams.getPathPart(3) + '?localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
       userData = data.outputData.user;
       return window.CMSCore.locales.admin.getData();
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     }).then((localeData) => {
       let userPasswordInput = document.querySelector('[role="userFormInputUserPassword"]');
       let userPasswordRepeatInput = document.querySelector('[role="userFormInputUserPasswordRepeat"]');
@@ -233,6 +257,14 @@ export class PageUser {
 
       let interactiveChoicesUsersGroupsContainer = document.querySelector('#SYSTEM_E6372840180');
       interactiveChoicesUsersGroupsContainer.append(interactiveChoicesUsersGroups.target.element);
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     });
   }
 }

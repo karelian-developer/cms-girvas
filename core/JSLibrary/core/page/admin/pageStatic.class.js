@@ -30,6 +30,14 @@ export class PagePageStatic {
     }).then((data) => {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     }).then((localeData) => {
       let contentTextareaElement = document.querySelector('[role="pageStaticContent"]');
       let descriptionTextareaElement = document.querySelector('[role="pageStaticDescription"]');
@@ -390,6 +398,14 @@ export class PagePageStatic {
       interactiveContainer.append(this.buttons.unpublish.target.element);
       interactiveContainer.append(this.buttons.publish.target.element);
       interactiveContainer.append(this.buttons.save.target.element);
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     });
   }
 }

@@ -14,6 +14,7 @@ import {Client} from './core/client.class.js';
 import {Metrics} from './core/metrics.class.js';
 import {URLParser} from './urlParser.class.js';
 import {Form as StaticForm} from './form.class.js';
+import {Interactive} from './interactive.class.js';
 
 export class Core {
   // ¯\_(ツ)_/¯
@@ -75,6 +76,14 @@ export class Core {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
       this.locales.admin = new Locale(data.outputData.locale.name, 'admin');
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     });
   }
   

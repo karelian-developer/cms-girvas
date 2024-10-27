@@ -31,6 +31,14 @@ export class PageWebChannel {
     }).then((data) => {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     }).then((localeData) => {
       let urlInputElement = document.querySelector('[role="feedURL"]');
 
@@ -304,6 +312,14 @@ export class PageWebChannel {
       let interactiveFormPanelContainer = document.querySelector('#SYSTEM_E3724126170');
       interactiveFormPanelContainer.append(this.buttons.delete.target.element);
       interactiveFormPanelContainer.append(this.buttons.save.target.element);
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     });
   }
 }

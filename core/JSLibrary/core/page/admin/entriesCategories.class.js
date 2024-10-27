@@ -24,6 +24,14 @@ export class PageEntriesCategories {
     }).then((data) => {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     }).then((localeData) => {
 
       let interactiveCreatePageButton = new Interactive('button');
@@ -83,6 +91,14 @@ export class PageEntriesCategories {
           });
         }
       }
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     });
   }
 }

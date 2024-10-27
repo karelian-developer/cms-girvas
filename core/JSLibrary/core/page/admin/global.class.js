@@ -49,6 +49,14 @@ export class PageGlobal {
     }).then((data) => {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     }).then((localeData) => {
       let mainNavigationItemExitElement = document.querySelector('[role="mainNavigationExit"]');
       if (mainNavigationItemExitElement != null) {
@@ -128,6 +136,14 @@ export class PageGlobal {
         globalButtonsContainerElement.append(this.buttons.checkVersion.target.element);
         globalButtonsContainerElement.append(this.buttons.toSite.target.element);
       }
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     });
   }
 }

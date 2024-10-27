@@ -55,7 +55,7 @@ export class InstallationMaster {
         this.nextStepIndex();
 
         fetch('/handler/install?stepIndex=1&mode=install', {method: 'GET'}).then((response) => {
-          return response.json();
+          return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
           let resultHTML = data.outputData.html;
 
@@ -69,6 +69,14 @@ export class InstallationMaster {
             let installationPages = document.querySelectorAll('[data-page-index]');
             installationPages[this.getStepIndex()].appendChild(dynamicDiv);
           }
+        }, (rejectionReason) => {
+          let interactiveNotification = new Interactive('notification');
+          interactiveNotification.target.isPopup = true;
+          interactiveNotification.target.setStatusCode(0);
+          interactiveNotification.target.setContent(rejectionReason);
+          interactiveNotification.target.assembly();
+    
+          interactiveNotification.target.show();
         });
 
         this.buildPanel();
@@ -83,7 +91,7 @@ export class InstallationMaster {
         event.preventDefault();
 
         fetch('/handler/install?stepIndex=1&mode=install', {method: 'GET'}).then((response) => {
-          return response.json();
+          return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
           let resultHTML = data.outputData.html;
 
@@ -99,6 +107,14 @@ export class InstallationMaster {
 
           let installationPages = document.querySelectorAll('[data-page-index]');
           installationPages[this.getStepIndex()].appendChild(dynamicDiv);
+        }, (rejectionReason) => {
+          let interactiveNotification = new Interactive('notification');
+          interactiveNotification.target.isPopup = true;
+          interactiveNotification.target.setStatusCode(0);
+          interactiveNotification.target.setContent(rejectionReason);
+          interactiveNotification.target.assembly();
+    
+          interactiveNotification.target.show();
         });
       });
 
@@ -112,7 +128,7 @@ export class InstallationMaster {
         event.preventDefault();
 
         fetch('/handler/install?stepIndex=2&mode=install', {method: 'GET'}).then((response) => {
-          return response.json();
+          return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
           let resultHTML = data.outputData.html;
 
@@ -128,6 +144,14 @@ export class InstallationMaster {
 
           let installationPages = document.querySelectorAll('[data-page-index]');
           installationPages[this.getStepIndex()].appendChild(dynamicDiv);
+        }, (rejectionReason) => {
+          let interactiveNotification = new Interactive('notification');
+          interactiveNotification.target.isPopup = true;
+          interactiveNotification.target.setStatusCode(0);
+          interactiveNotification.target.setContent(rejectionReason);
+          interactiveNotification.target.assembly();
+    
+          interactiveNotification.target.show();
         });
       });
 
@@ -141,7 +165,7 @@ export class InstallationMaster {
         event.preventDefault();
 
         fetch('/handler/install?stepIndex=3&mode=install', {method: 'GET'}).then((response) => {
-          return response.json();
+          return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
           let resultHTML = data.outputData.html;
 
@@ -157,6 +181,14 @@ export class InstallationMaster {
 
           let installationPages = document.querySelectorAll('[data-page-index]');
           installationPages[this.getStepIndex()].appendChild(dynamicDiv);
+        }, (rejectionReason) => {
+          let interactiveNotification = new Interactive('notification');
+          interactiveNotification.target.isPopup = true;
+          interactiveNotification.target.setStatusCode(0);
+          interactiveNotification.target.setContent(rejectionReason);
+          interactiveNotification.target.assembly();
+    
+          interactiveNotification.target.show();
         });
       });
 
@@ -170,7 +202,7 @@ export class InstallationMaster {
         event.preventDefault();
 
         fetch('/handler/install?stepIndex=4&mode=install', {method: 'GET'}).then((response) => {
-          return response.json();
+          return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
           let resultHTML = data.outputData.html;
 
@@ -186,6 +218,14 @@ export class InstallationMaster {
 
           let installationPages = document.querySelectorAll('[data-page-index]');
           installationPages[this.getStepIndex()].appendChild(dynamicDiv);
+        }, (rejectionReason) => {
+          let interactiveNotification = new Interactive('notification');
+          interactiveNotification.target.isPopup = true;
+          interactiveNotification.target.setStatusCode(0);
+          interactiveNotification.target.setContent(rejectionReason);
+          interactiveNotification.target.assembly();
+    
+          interactiveNotification.target.show();
         });
       });
 
@@ -202,7 +242,7 @@ export class InstallationMaster {
         let formData = new FormData(formTarget);
 
         fetch('/handler/install?stepIndex=5&mode=install&' + new URLSearchParams(formData).toString(), {method: 'GET'}).then((response) => {
-          return response.json();
+          return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
           let resultHTML = data.outputData.html;
 
@@ -220,6 +260,14 @@ export class InstallationMaster {
           installationPages[this.getStepIndex()].appendChild(dynamicDiv);
 
           this.buttons.nextStepIndex.target.enable();
+        }, (rejectionReason) => {
+          let interactiveNotification = new Interactive('notification');
+          interactiveNotification.target.isPopup = true;
+          interactiveNotification.target.setStatusCode(0);
+          interactiveNotification.target.setContent(rejectionReason);
+          interactiveNotification.target.assembly();
+    
+          interactiveNotification.target.show();
         });
       });
 
@@ -233,7 +281,7 @@ export class InstallationMaster {
         event.preventDefault();
 
         fetch('/handler/install?stepIndex=6&mode=install', {method: 'GET'}).then((response) => {
-          return response.json();
+          return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
           let resultHTML = data.outputData.html;
 
@@ -251,6 +299,14 @@ export class InstallationMaster {
           installationPages[this.getStepIndex()].appendChild(dynamicDiv);
 
           this.buttons.nextStepIndex.target.enable();
+        }, (rejectionReason) => {
+          let interactiveNotification = new Interactive('notification');
+          interactiveNotification.target.isPopup = true;
+          interactiveNotification.target.setStatusCode(0);
+          interactiveNotification.target.setContent(rejectionReason);
+          interactiveNotification.target.assembly();
+    
+          interactiveNotification.target.show();
         });
       });
 
@@ -261,7 +317,7 @@ export class InstallationMaster {
       fetch('/handler/locales', {
         method: 'GET'
       }).then((response) => {
-        return response.json();
+        return (response.ok) ? response.json() : Promise.reject(response);
       }).then((data) => {
         let locales = data.outputData.locales;
         let interactiveLocalesChoices = new Interactive('choices');
@@ -299,12 +355,20 @@ export class InstallationMaster {
 
         interactiveLocalesContainerElement.append(interactiveLocalesChoices.target.element);
         interactiveLocalesAPContainerElement.append(interactiveLocalesAPChoices.target.element);
+      }, (rejectionReason) => {
+        let interactiveNotification = new Interactive('notification');
+        interactiveNotification.target.isPopup = true;
+        interactiveNotification.target.setStatusCode(0);
+        interactiveNotification.target.setContent(rejectionReason);
+        interactiveNotification.target.assembly();
+  
+        interactiveNotification.target.show();
       });
 
       fetch('/handler/timezones', {
         method: 'GET'
       }).then((response) => {
-        return response.json();
+        return (response.ok) ? response.json() : Promise.reject(response);
       }).then((data) => {
         let timezones = data.outputData.timezones;
 
@@ -322,6 +386,14 @@ export class InstallationMaster {
         interactiveChoicesSettingsTimezone.assembly();
 
         document.querySelector('#E85485302313').prepend(interactiveChoicesSettingsTimezone.target.element);
+      }, (rejectionReason) => {
+        let interactiveNotification = new Interactive('notification');
+        interactiveNotification.target.isPopup = true;
+        interactiveNotification.target.setStatusCode(0);
+        interactiveNotification.target.setContent(rejectionReason);
+        interactiveNotification.target.assembly();
+  
+        interactiveNotification.target.show();
       });
 
       this.buttons.updateData = new Interactive('button');
@@ -334,7 +406,7 @@ export class InstallationMaster {
         let formData = new FormData(formTarget);
         
         fetch('/handler/install/set-locales-and-timezone', {method: 'POST', body: formData}).then((response) => {
-          return response.json();
+          return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
           let resultHTML = data.outputData.html;
 
@@ -352,6 +424,14 @@ export class InstallationMaster {
           installationPages[this.getStepIndex()].appendChild(dynamicDiv);
 
           this.buttons.nextStepIndex.target.enable();
+        }, (rejectionReason) => {
+          let interactiveNotification = new Interactive('notification');
+          interactiveNotification.target.isPopup = true;
+          interactiveNotification.target.setStatusCode(0);
+          interactiveNotification.target.setContent(rejectionReason);
+          interactiveNotification.target.assembly();
+    
+          interactiveNotification.target.show();
         });
       });
 
@@ -369,7 +449,7 @@ export class InstallationMaster {
         let formData = new FormData(formTarget);
         
         fetch('/handler/install/set-metadata', {method: 'POST', body: formData}).then((response) => {
-          return response.json();
+          return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
           let resultHTML = data.outputData.html;
 
@@ -387,6 +467,14 @@ export class InstallationMaster {
           installationPages[this.getStepIndex()].appendChild(dynamicDiv);
 
           this.buttons.nextStepIndex.target.enable();
+        }, (rejectionReason) => {
+          let interactiveNotification = new Interactive('notification');
+          interactiveNotification.target.isPopup = true;
+          interactiveNotification.target.setStatusCode(0);
+          interactiveNotification.target.setContent(rejectionReason);
+          interactiveNotification.target.assembly();
+    
+          interactiveNotification.target.show();
         });
       });
 
@@ -404,7 +492,7 @@ export class InstallationMaster {
         let formData = new FormData(formTarget);
         
         fetch('/handler/install/create-admin', {method: 'POST', body: formData}).then((response) => {
-          return response.json();
+          return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
           let resultHTML = data.outputData.html;
 
@@ -422,6 +510,14 @@ export class InstallationMaster {
           installationPages[this.getStepIndex()].appendChild(dynamicDiv);
 
           this.buttons.nextStepIndex.target.enable();
+        }, (rejectionReason) => {
+          let interactiveNotification = new Interactive('notification');
+          interactiveNotification.target.isPopup = true;
+          interactiveNotification.target.setStatusCode(0);
+          interactiveNotification.target.setContent(rejectionReason);
+          interactiveNotification.target.assembly();
+    
+          interactiveNotification.target.show();
         });
       });
 
@@ -435,7 +531,7 @@ export class InstallationMaster {
         event.preventDefault();
 
         fetch('/handler/install/generate-secret-key', {method: 'POST'}).then((response) => {
-          return response.json();
+          return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
           let resultHTML = data.outputData.html;
 
@@ -453,6 +549,14 @@ export class InstallationMaster {
           installationPages[this.getStepIndex()].appendChild(dynamicDiv);
 
           this.buttons.nextStepIndex.target.enable();
+        }, (rejectionReason) => {
+          let interactiveNotification = new Interactive('notification');
+          interactiveNotification.target.isPopup = true;
+          interactiveNotification.target.setStatusCode(0);
+          interactiveNotification.target.setContent(rejectionReason);
+          interactiveNotification.target.assembly();
+    
+          interactiveNotification.target.show();
         });
       });
 
@@ -469,7 +573,7 @@ export class InstallationMaster {
 
           if (this.getStepIndex() == 2) {
             fetch('/handler/install?stepIndex=2&mode=install', {method: 'GET'}).then((response) => {
-              return response.json();
+              return (response.ok) ? response.json() : Promise.reject(response);
             }).then((data) => {
               let resultHTML = data.outputData.html;
     
@@ -485,12 +589,20 @@ export class InstallationMaster {
     
               let installationPages = document.querySelectorAll('[data-page-index]');
               installationPages[this.getStepIndex()].appendChild(dynamicDiv);
+            }, (rejectionReason) => {
+              let interactiveNotification = new Interactive('notification');
+              interactiveNotification.target.isPopup = true;
+              interactiveNotification.target.setStatusCode(0);
+              interactiveNotification.target.setContent(rejectionReason);
+              interactiveNotification.target.assembly();
+        
+              interactiveNotification.target.show();
             });
           }
 
           if (this.getStepIndex() == 3) {
             fetch('/handler/install?stepIndex=3&mode=install', {method: 'GET'}).then((response) => {
-              return response.json();
+              return (response.ok) ? response.json() : Promise.reject(response);
             }).then((data) => {
               let resultHTML = data.outputData.html;
     
@@ -506,12 +618,20 @@ export class InstallationMaster {
     
               let installationPages = document.querySelectorAll('[data-page-index]');
               installationPages[this.getStepIndex()].appendChild(dynamicDiv);
+            }, (rejectionReason) => {
+              let interactiveNotification = new Interactive('notification');
+              interactiveNotification.target.isPopup = true;
+              interactiveNotification.target.setStatusCode(0);
+              interactiveNotification.target.setContent(rejectionReason);
+              interactiveNotification.target.assembly();
+        
+              interactiveNotification.target.show();
             });
           }
 
           if (this.getStepIndex() == 4) {
             fetch('/handler/install?stepIndex=4&mode=install', {method: 'GET'}).then((response) => {
-              return response.json();
+              return (response.ok) ? response.json() : Promise.reject(response);
             }).then((data) => {
               let resultHTML = data.outputData.html;
     
@@ -527,6 +647,14 @@ export class InstallationMaster {
     
               let installationPages = document.querySelectorAll('[data-page-index]');
               installationPages[this.getStepIndex()].appendChild(dynamicDiv);
+            }, (rejectionReason) => {
+              let interactiveNotification = new Interactive('notification');
+              interactiveNotification.target.isPopup = true;
+              interactiveNotification.target.setStatusCode(0);
+              interactiveNotification.target.setContent(rejectionReason);
+              interactiveNotification.target.assembly();
+        
+              interactiveNotification.target.show();
             });
           }
 

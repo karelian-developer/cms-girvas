@@ -32,6 +32,14 @@ export class PageEntriesCategory {
     }).then((data) => {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     }).then((localeData) => {
       let descriptionTextareaElement = document.querySelector('[role="entriesCategoryDescription"]');
       let titleInputElement = document.querySelector('[role="entriesCategoryTitle"]');
@@ -141,6 +149,14 @@ export class PageEntriesCategory {
         }
 
         return fetch('/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
+      }, (rejectionReason) => {
+        let interactiveNotification = new Interactive('notification');
+        interactiveNotification.target.isPopup = true;
+        interactiveNotification.target.setStatusCode(0);
+        interactiveNotification.target.setContent(rejectionReason);
+        interactiveNotification.target.assembly();
+  
+        interactiveNotification.target.show();
       }).then((response) => {
         return (response.ok) ? response.json() : Promise.reject(response);
       }).then((data1) => {
@@ -165,6 +181,14 @@ export class PageEntriesCategory {
           interactiveContainer.innerHTML = '';
           interactiveContainer.append(interactiveParentChoices.target.element);
         }
+      }, (rejectionReason) => {
+        let interactiveNotification = new Interactive('notification');
+        interactiveNotification.target.isPopup = true;
+        interactiveNotification.target.setStatusCode(0);
+        interactiveNotification.target.setContent(rejectionReason);
+        interactiveNotification.target.assembly();
+  
+        interactiveNotification.target.show();
       });
 
       this.buttons.save = new Interactive('button');
@@ -254,6 +278,14 @@ export class PageEntriesCategory {
       let interactiveContainer = document.querySelector('#SYSTEM_E3724126170');
       interactiveContainer.append(this.buttons.delete.target.element);
       interactiveContainer.append(this.buttons.save.target.element);
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     });
   }
 }

@@ -71,6 +71,14 @@ export class PageGlobal {
       }
 
       return window.CMSCore.locales.base.getData();
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     }).then((localeData) => {
       let profileNavigationItemExitElement = document.querySelector('[role="profileNavigationExit"]');
       if (profileNavigationItemExitElement != null) {
@@ -206,6 +214,14 @@ export class PageGlobal {
           });
         }
       });
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
     });
   }
 }

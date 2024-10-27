@@ -14,7 +14,9 @@ ini_set('display_startup_errors', 1);
 
 date_default_timezone_set('Europe/Moscow');
 
-define('CMS_ROOT_DIRECTORY', $_SERVER['DOCUMENT_ROOT']);
+// Абсолютный путь до корневой директории CMS
+define('CMS_ROOT_DIRECTORY', preg_replace('/[\/]*$/', '', $_SERVER['DOCUMENT_ROOT']));
+// ‿︵‿ヽ(°□° )ノ︵‿︵
 define('IS_NOT_HACKED', true);
 
 require_once(sprintf('%s/core/PHPLibrary/systemCore.class.php', CMS_ROOT_DIRECTORY));
@@ -91,20 +93,14 @@ if ($system_core->urlp->get_path(0) == 'handler') {
 
       $email_sender->send();
 
-      
-
       echo 'Your password reseted!';
-    
     } else {
       echo 'Application is out of date!';
     }
-
   } else {
     echo 'Request is not exists!';
   }
-
 } else {
-
   if ($system_core->urlp->get_param('mode') != 'install' && file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
     if ($system_core->configurator->get_database_entry_value('security_allowed_admin_ip_status') == 'on' && $system_core->urlp->get_path(0) == 'admin') {
       $allowed_ips = json_decode($system_core->configurator->get_database_entry_value('security_allowed_admin_ip'), true);
@@ -118,7 +114,6 @@ if ($system_core->urlp->get_path(0) == 'handler') {
   $template = $system_core->get_template();
   $template->assembly_global_variables();
   echo $template->core->assembled;
-
 }
 
 ?>
