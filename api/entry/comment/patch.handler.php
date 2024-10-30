@@ -124,6 +124,7 @@ if ($system_core->client->is_logged(1) || $system_core->client->is_logged(2)) {
       if (isset($_PATCH['comment_is_hidden']) || isset($_PATCH['comment_hidden_reason'])) {
         $comment_is_hidden = $_PATCH['comment_is_hidden'];
         $comment_hidden_reason = (isset($_PATCH['comment_hidden_reason'])) ? $_PATCH['comment_hidden_reason'] : '';
+        $comment_hidden_reason = htmlspecialchars(strip_tags($comment_hidden_reason));
 
         if ($client_user_group->permission_check($client_user_group::PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT)) {
           $comment_data['metadata']['is_hidden'] = ($comment_is_hidden == 'on') ? true : false;
