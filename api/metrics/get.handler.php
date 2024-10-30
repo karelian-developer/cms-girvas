@@ -17,8 +17,6 @@ use \core\PHPLibrary\Metrics as Metrics;
 use \core\PHPLibrary\Metrics\Session as MetricsSession;
 
 $client_ip = $system_core->client->get_ip_address();
-$metrics_token = $handler_headers['Metrics-Token'];
-
 $metrics = new Metrics($system_core);
 
 if (isset($_GET['time'])) {

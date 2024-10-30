@@ -37,6 +37,7 @@ export class Metrics {
     }).then((data) => {
 
     }, (rejectionReason) => {
+      console.log(rejectionReason);
       let interactiveNotification = new Interactive('notification');
       interactiveNotification.target.isPopup = true;
       interactiveNotification.target.setStatusCode(0);

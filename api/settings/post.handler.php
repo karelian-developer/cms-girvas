@@ -42,10 +42,19 @@ if ($system_core->client->is_logged(2)) {
           if ($setting_name == 'users_additional_field_title' && isset($_POST['_users_additional_fields_locale'])) {
             if ($system_core->configurator->exists_database_entry_value($setting_name)) {
               $fields_titles = json_decode($system_core->configurator->get_database_entry_value($setting_name), true);
-              $fields_titles[$_POST['_users_additional_fields_locale']] = $setting_value;
+              
+              foreach ($setting_value as $key => $value) {
+                $fields_titles[$_POST['_users_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+              }
+
               $setting_value = $fields_titles;
             } else {
-              $setting_value = [$_POST['_users_additional_fields_locale'] => $setting_value];
+              $fields_titles = [];
+              foreach ($setting_value as $key => $value) {
+                $fields_titles[$_POST['_users_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+              }
+
+              $setting_value = $fields_titles;
             }
 
             $users_additional_fields_count += 1;
@@ -54,13 +63,28 @@ if ($system_core->client->is_logged(2)) {
           if ($setting_name == 'users_additional_field_description' && isset($_POST['_users_additional_fields_locale'])) {
             if ($system_core->configurator->exists_database_entry_value($setting_name)) {
               $fields_descriptions = json_decode($system_core->configurator->get_database_entry_value($setting_name), true);
-              $fields_descriptions[$_POST['_users_additional_fields_locale']] = $setting_value;
+              
+              foreach ($setting_value as $key => $value) {
+                $fields_descriptions[$_POST['_users_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+              }
+
               $setting_value = $fields_descriptions;
             } else {
-              $setting_value = [$_POST['_users_additional_fields_locale'] => $setting_value];
+              $fields_descriptions = [];
+              foreach ($setting_value as $key => $value) {
+                $fields_descriptions[$_POST['_users_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+              }
+              
+              $setting_value = $fields_descriptions;
             }
 
             $users_additional_fields_count += 1;
+          }
+
+          if ($setting_name == 'users_additional_field_type' || $setting_name == 'users_additional_field_name') {
+            foreach ($setting_value as $key => $value) {
+              $setting_value[$key] = htmlspecialchars(str_replace('\'', '"', $value));
+            }
           }
 
           if (is_array($setting_value)) $setting_value = json_encode($setting_value);
@@ -70,6 +94,10 @@ if ($system_core->client->is_logged(2)) {
             case 'security_allowed_emails': $setting_value = (!empty($setting_value)) ? json_encode(preg_split('/\s*\,\s*/', $setting_value)) : json_encode([]); break;
             case 'seo_site_keywords': $setting_value = (!empty($setting_value)) ? json_encode(preg_split('/\s*\,\s*/', $setting_value)) : json_encode([]); break;
             case 'security_premoderation_words_filter_list': $setting_value = (!empty($setting_value)) ? json_encode(preg_split('/\s*\,\s*/', $setting_value)) : json_encode([]); break;
+            case 'users_additional_field_title': $setting_value = $setting_value; break;
+            case 'users_additional_field_description': $setting_value = $setting_value; break;
+            case 'users_additional_field_type': $setting_value = $setting_value; break;
+            case 'users_additional_field_name': $setting_value = $setting_value; break;
             default: $setting_value = htmlspecialchars(str_replace('\'', '"', $setting_value));
           }
 

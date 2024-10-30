@@ -53,13 +53,7 @@ if (defined('IS_NOT_HACKED')) {
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
       $api_file_path = sprintf('%s/api/metrics.api.php', CMS_ROOT_DIRECTORY);
       include_once($api_file_path);
-    } else {
-      $system_core::abnormal_termination_of_work(1, 403, true);
     }
-  } else if ($system_core->urlp->get_path(1) == 'metrics' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-
-  // Media Files API
   } else if ($system_core->urlp->get_path(1) == 'media' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
@@ -67,13 +61,7 @@ if (defined('IS_NOT_HACKED')) {
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
       $api_file_path = sprintf('%s/api/media.api.php', CMS_ROOT_DIRECTORY);
       include_once($api_file_path);
-    } else {
-      $system_core::abnormal_termination_of_work(1, 403, true);
     }
-  } else if ($system_core->urlp->get_path(1) == 'media' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-  
-  // Modules API
   } else if ($system_core->urlp->get_path(1) == 'module' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
@@ -81,13 +69,7 @@ if (defined('IS_NOT_HACKED')) {
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
       $api_file_path = sprintf('%s/api/module.api.php', CMS_ROOT_DIRECTORY);
       include_once($api_file_path);
-    } else {
-      $system_core::abnormal_termination_of_work(1, 403, true);
     }
-  } else if ($system_core->urlp->get_path(1) == 'module' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-
-  // Users API
   } else if ($system_core->urlp->get_path(1) == 'user' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
@@ -95,13 +77,7 @@ if (defined('IS_NOT_HACKED')) {
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
       $api_file_path = sprintf('%s/api/user.api.php', CMS_ROOT_DIRECTORY);
       include_once($api_file_path);
-    } else {
-      $system_core::abnormal_termination_of_work(1, 403, true);
     }
-  } else if ($system_core->urlp->get_path(1) == 'user' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-
-  // Users Group API
   } else if ($system_core->urlp->get_path(1) == 'usersGroup' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
@@ -109,13 +85,7 @@ if (defined('IS_NOT_HACKED')) {
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
       $api_file_path = sprintf('%s/api/usersGroup.api.php', CMS_ROOT_DIRECTORY);
       include_once($api_file_path);
-    } else {
-      $system_core::abnormal_termination_of_work(1, 403, true);
     }
-  } else if ($system_core->urlp->get_path(1) == 'usersGroup' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-
-  // Users Groups API
   } else if ($system_core->urlp->get_path(1) == 'usersGroups' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
@@ -124,10 +94,6 @@ if (defined('IS_NOT_HACKED')) {
       $api_file_path = sprintf('%s/api/usersGroups.api.php', CMS_ROOT_DIRECTORY);
       include_once($api_file_path);
     }
-  } else if ($system_core->urlp->get_path(1) == 'usersGroups' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-
-  // Entries API
   } else if ($system_core->urlp->get_path(1) == 'entry' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
@@ -135,13 +101,7 @@ if (defined('IS_NOT_HACKED')) {
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
       $api_file_path = sprintf('%s/api/entry.api.php', CMS_ROOT_DIRECTORY);
       include_once($api_file_path);
-    } else {
-      $system_core::abnormal_termination_of_work(1, 403, true);
     }
-  } else if ($system_core->urlp->get_path(1) == 'entry' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-
-  // Pages static API
   } else if ($system_core->urlp->get_path(1) == 'pageStatic' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
@@ -149,13 +109,7 @@ if (defined('IS_NOT_HACKED')) {
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
       $api_file_path = sprintf('%s/api/pageStatic.api.php', CMS_ROOT_DIRECTORY);
       include_once($api_file_path);
-    } else {
-      $system_core::abnormal_termination_of_work(1, 403, true);
     }
-  } else if ($system_core->urlp->get_path(1) == 'pageStatic' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-
-  // Settings API
   } else if ($system_core->urlp->get_path(1) == 'settings' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
@@ -163,13 +117,7 @@ if (defined('IS_NOT_HACKED')) {
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
       $api_file_path = sprintf('%s/api/settings.api.php', CMS_ROOT_DIRECTORY);
       include_once($api_file_path);
-    } else {
-      $system_core::abnormal_termination_of_work(1, 403, true);
     }
-  } else if ($system_core->urlp->get_path(1) == 'settings' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-
-  // Templates API
   } else if ($system_core->urlp->get_path(1) == 'template' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
@@ -177,13 +125,7 @@ if (defined('IS_NOT_HACKED')) {
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
       $api_file_path = sprintf('%s/api/template.api.php', CMS_ROOT_DIRECTORY);
       include_once($api_file_path);
-    } else {
-      $system_core::abnormal_termination_of_work(1, 403, true);
     }
-  } else if ($system_core->urlp->get_path(1) == 'template' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-
-  // WebChannel API
   } else if ($system_core->urlp->get_path(1) == 'webChannel' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
@@ -191,13 +133,7 @@ if (defined('IS_NOT_HACKED')) {
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
       $api_file_path = sprintf('%s/api/webChannel.api.php', CMS_ROOT_DIRECTORY);
       include_once($api_file_path);
-    } else {
-      $system_core::abnormal_termination_of_work(1, 403, true);
     }
-  } else if ($system_core->urlp->get_path(1) == 'webChannel' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-
-  // WebChannels API
   } else if ($system_core->urlp->get_path(1) == 'webChannels' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
@@ -205,13 +141,7 @@ if (defined('IS_NOT_HACKED')) {
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
       $api_file_path = sprintf('%s/api/webChannels.api.php', CMS_ROOT_DIRECTORY);
       include_once($api_file_path);
-    } else {
-      $system_core::abnormal_termination_of_work(1, 403, true);
     }
-  } else if ($system_core->urlp->get_path(1) == 'webChannels' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-
-  // Utils API
   } else if ($system_core->urlp->get_path(1) == 'utils' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
@@ -219,13 +149,7 @@ if (defined('IS_NOT_HACKED')) {
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
       $api_file_path = sprintf('%s/api/utils.api.php', CMS_ROOT_DIRECTORY);
       include_once($api_file_path);
-    } else {
-      $system_core::abnormal_termination_of_work(1, 403, true);
     }
-  } else if ($system_core->urlp->get_path(1) == 'utils' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-
-  // ...
   } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'dms-available') {
     $handler_output_data['charsets'] = ['UTF-8', 'UTF-16', 'Windows-1252', 'ISO-8859'];
   
@@ -295,12 +219,7 @@ if (defined('IS_NOT_HACKED')) {
 
         $handler_output_data['additionalFields'] = $fields;
       }
-    } else {
-      $system_core::abnormal_termination_of_work(1, 403, true);
     }
-  } else if ($system_core->urlp->get_path(1) == 'profile' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-  
   // Получить текущую локализацию
   } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'locale') {
     // Базовая локализация
@@ -377,12 +296,7 @@ if (defined('IS_NOT_HACKED')) {
           ]);
         }
       }
-    } else {
-      $system_core::abnormal_termination_of_work(1, 403, true);
     }
-  } else if ($system_core->urlp->get_path(1) == 'entries' && !$system_core::core_rest_cookie_exists()) {
-    $system_core::abnormal_termination_of_work(1, 403, true);
-
   // Попытка инициализации персонализированного обработчика
   } else {
     if ($system_core->urlp->get_path(1) != null) {
