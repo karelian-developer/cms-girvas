@@ -100,7 +100,7 @@ namespace core\PHPLibrary\Page\Admin {
         $updated_date_timestamp = date('d.m.Y H:i:s', $entries_category_object->get_updated_unix_timestamp());
 
         $entries_category_title = $entries_category_object->get_title($entries_categories_locale_default->get_name());
-        $entries_category_title = htmlspecialchars($entries_category_title);
+        $entries_category_title = strip_tags($entries_category_title);
 
         array_push($entries_categories_table_items_assembled, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entriesCategories/tableItem.tpl', [
           'ENTRIES_CATEGORY_ID' => $entries_category_object->get_id(),

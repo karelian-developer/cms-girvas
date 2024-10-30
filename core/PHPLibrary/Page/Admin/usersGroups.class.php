@@ -92,7 +92,8 @@ namespace core\PHPLibrary\Page\Admin {
 
         /** @var string Заголовок группы пользователей */
         $users_group_title = (!empty($user_group_object->get_title($cms_locale_name))) ? $user_group_object->get_title($cms_locale_name) : $user_group_object->get_title($cms_locale_setted_name);
-
+        $users_group_title = strip_tags($users_group_title);
+        
         $user_group_created_date_timestamp = date('d.m.Y H:i:s', $user_group_object->get_created_unix_timestamp());
         $user_group_updated_date_timestamp = date('d.m.Y H:i:s', $user_group_object->get_updated_unix_timestamp());
 

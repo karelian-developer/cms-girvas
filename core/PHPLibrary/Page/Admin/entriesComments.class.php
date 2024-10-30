@@ -103,10 +103,6 @@ namespace core\PHPLibrary\Page\Admin {
       $pagination = new Pagination($this->system_core, count($entries_comments_array), $pagination_items_on_page, $pagination_item_current);
       $pagination->assembly();
       
-      $parsedown = new Parsedown();
-      $parsedown->setSafeMode(true);
-      $parsedown->setMarkupEscaped(true);
-
       $comments_table_items_assembled = [];
       if (!empty($entries_comments_array)) {
         foreach ($entries_comments_array as $comment_index => $comment) {
@@ -116,9 +112,9 @@ namespace core\PHPLibrary\Page\Admin {
           array_push($comments_table_items_assembled, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entriesComments/tableItem.tpl', [
             'COMMENT_ID' => $comment->get_id(),
             'COMMENT_IS_HIDDEN_STATUS' => ($comment->is_hidden()) ? 'true' : 'false',
-            'COMMENT_HIDDEN_REASON' => $comment->get_hidden_reason(),
+            'COMMENT_HIDDEN_REASON' => strip_tags($comment->get_hidden_reason()),
             'COMMENT_INDEX' => $comment_index + 1,
-            'COMMENT_CONTENT' => $parsedown->text($comment->get_content()),
+            'COMMENT_CONTENT' => strip_tags($comment->get_content()),
             'COMMENT_CREATED_DATE_TIMESTAMP' => $created_date_timestamp,
             'COMMENT_UPDATED_DATE_TIMESTAMP' => $updated_date_timestamp
           ]));

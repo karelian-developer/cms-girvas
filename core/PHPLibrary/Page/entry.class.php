@@ -139,7 +139,7 @@ namespace core\PHPLibrary\Page {
               $entry_comment_author_group = $entry_comment_author->get_group();
               $entry_comment_author_group->init_data(['texts']);
 
-              $entry_comment_content = $parsedown->text($entry_comment->get_content());
+              $entry_comment_content = strip_tags($entry_comment->get_content());
 
               array_push($entry_comments_transformed_array, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entry/comment.tpl', [
                 'COMMENT_ID' => $entry_comment->get_id(),
@@ -148,7 +148,7 @@ namespace core\PHPLibrary\Page {
                 'COMMENT_AUTHOR_LOGIN' => $entry_comment_author->get_login(),
                 'COMMENT_AUTHOR_AVATAR_URL' => $entry_comment_author->get_avatar_url(64),
                 'COMMENT_AUTHOR_GROUP_TITLE' => $entry_comment_author_group->get_title($cms_base_locale_name),
-                'COMMENT_CONTENT' => ($entry_comment->is_hidden()) ? sprintf('%s: %s', $locale_data['PAGE_ENTRY_COMMENT_HIDE_LABEL'], $entry_comment->get_hidden_reason()) : $entry_comment_content
+                'COMMENT_CONTENT' => ($entry_comment->is_hidden()) ? sprintf('%s: %s', $locale_data['PAGE_ENTRY_COMMENT_HIDE_LABEL'], strip_tags($entry_comment->get_hidden_reason())) : $entry_comment_content
               ]));
 
               $entry_comment_index++;
@@ -164,6 +164,8 @@ namespace core\PHPLibrary\Page {
              * @var string Заголовок записи
              */
             $entry_title = (!empty($entry->get_title($cms_base_locale_name))) ? $entry->get_title($cms_base_locale_name) : $entry->get_title($cms_base_locale_setted_name);
+            $entry_title = strip_tags($entry_title);
+            
             /**
              * @var string Содержание записи
              */

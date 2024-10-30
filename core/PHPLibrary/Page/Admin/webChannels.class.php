@@ -103,6 +103,8 @@ namespace core\PHPLibrary\Page\Admin {
 
         $feed_id = $feed_object->get_id();
         $feed_title = $feed_object->get_title($feeds_locale_default->get_name());
+        $feed_title = strip_tags($feed_title);
+
         $feed_name = $feed_object->get_name();
         $feed_type_title = FeedBuilder::get_type_title($feed_object->get_type_id());
         $feed_index_current = $feed_index + 1;

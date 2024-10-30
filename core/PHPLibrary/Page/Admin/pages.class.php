@@ -94,8 +94,8 @@ namespace core\PHPLibrary\Page\Admin {
         $page_static_title = $page_static_object->get_title($pages_static_locale_default->get_name());
         $page_static_description = $page_static_object->get_description($pages_static_locale_default->get_name());
 
-        $page_static_title = htmlspecialchars($page_static_title);
-        $page_static_description = htmlspecialchars($page_static_description);
+        $page_static_title = strip_tags($page_static_title);
+        $page_static_description = strip_tags($page_static_description);
 
         array_push($pages_static_table_items_assembled_array, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/pages/tableItem.tpl', [
           'PAGE_STATIC_ID' => $page_static_object->get_id(),

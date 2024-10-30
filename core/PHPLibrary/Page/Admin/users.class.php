@@ -102,11 +102,12 @@ namespace core\PHPLibrary\Page\Admin {
         $user_updated_date_timestamp = date('d.m.Y H:i:s', $user_object->get_updated_unix_timestamp());
 
         $users_group_title = $user_group_object->get_title($users_locale_default->get_name());
+        $users_group_title = strip_tags($users_group_title);
 
         array_push($users_table_items_assembled_array, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/users/tableItem.tpl', [
           'USER_ID' => $user_object->get_id(),
           'USER_INDEX' => $user_number,
-          'USER_LOGIN' => $user_object->get_login(),
+          'USER_LOGIN' => strip_tags($user_object->get_login()),
           'USER_GROUP_TITLE' => $users_group_title,
           'USER_EMAIL' => $user_object->get_email(),
           'USER_CREATED_DATE_TIMESTAMP' => $user_created_date_timestamp,

@@ -105,6 +105,7 @@ namespace core\PHPLibrary\Page {
              * @var string Заголовок статической страницы
              */
             $page_static_title = (!empty($page_static->get_title($cms_base_locale_name))) ? $page_static->get_title($cms_base_locale_name) : $page_static->get_title($cms_base_locale_setted_name);
+            $page_static_title = strip_tags($page_static_title);
             /**
              * @var string Содержание статической страницы
              */

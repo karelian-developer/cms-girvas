@@ -127,9 +127,9 @@ namespace core\PHPLibrary\Page\Admin {
         $entry_description = $entry_object->get_description($entries_locale_default->get_name());
         $entry_category_title = $entry_category_object->get_title($cms_locale_name);
 
-        $entry_title = htmlspecialchars($entry_title);
-        $entry_description = htmlspecialchars($entry_description);
-        $entry_category_title = htmlspecialchars($entry_category_title);
+        $entry_title = strip_tags($entry_title);
+        $entry_description = strip_tags($entry_description);
+        $entry_category_title = strip_tags($entry_category_title);
 
         array_push($entries_table_items_assembled_array, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entries/tableItem.tpl', [
           'ENTRY_ID' => $entry_object->get_id(),
