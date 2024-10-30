@@ -170,7 +170,7 @@ namespace core\PHPLibrary\Page {
              * @var string Содержание записи
              */
             $entry_content = (!empty($entry->get_content($cms_base_locale_name))) ? $entry->get_content($cms_base_locale_name) : $entry->get_content($cms_base_locale_setted_name);
-
+            
             $entry_created_date_timestamp = date('d.m.Y H:i:s', $entry->get_created_unix_timestamp());
             $entry_published_date_timestamp = date('d.m.Y H:i:s', $entry->get_published_unix_timestamp());
             $entry_updated_date_timestamp = date('d.m.Y H:i:s', $entry->get_updated_unix_timestamp());

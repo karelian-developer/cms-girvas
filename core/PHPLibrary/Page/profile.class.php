@@ -104,14 +104,14 @@ namespace core\PHPLibrary\Page {
                 array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile/editor/fieldTextarea.tpl', [
                   'FIELD_NAME' => $fields_names[$field_index],
                   'FIELD_TITLE' => $fields_titles[$cms_base_locale_name][$field_index],
-                  'FIELD_VALUE' => (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? $profile_user->get_additional_field_data($field_name_transformed) : ''
+                  'FIELD_VALUE' => (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? strip_tags($profile_user->get_additional_field_data($field_name_transformed)) : ''
                 ]));
               } else {
                 array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile/editor/fieldInput.tpl', [
                   'FIELD_NAME' => $fields_names[$field_index],
                   'FIELD_TYPE' => $fields_types[$field_index],
                   'FIELD_TITLE' => $fields_titles[$cms_base_locale_name][$field_index],
-                  'FIELD_VALUE' => (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? $profile_user->get_additional_field_data($field_name_transformed) : ''
+                  'FIELD_VALUE' => (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? strip_tags($profile_user->get_additional_field_data($field_name_transformed)) : ''
                 ]));
               }
             }
@@ -143,7 +143,7 @@ namespace core\PHPLibrary\Page {
 
               array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile/additionalField.tpl', [
                 'FIELD_TITLE' => $fields_titles[$cms_base_locale_name][$field_index],
-                'FIELD_VALUE' => (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? $profile_user->get_additional_field_data($field_name_transformed) : ''
+                'FIELD_VALUE' => (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? strip_tags($profile_user->get_additional_field_data($field_name_transformed)) : ''
               ]));
             }
 

@@ -70,8 +70,10 @@ namespace core\PHPLibrary\Page {
         
         /** @var string Заголовок записи */
         $entry_title = (!empty($entry_object->get_title($cms_base_locale_name))) ? $entry_object->get_title($cms_base_locale_name) : $entry_object->get_title($cms_base_locale_setted_name);
+        $entry_title = strip_tags($entry_title); 
         /** @var string Описание записи */
         $entry_description = (!empty($entry_object->get_description($cms_base_locale_name))) ? $entry_object->get_description($cms_base_locale_name) : $entry_object->get_description($cms_base_locale_setted_name);
+        $entry_description = strip_tags($entry_description); 
 
         $entry_created_date_timestamp = date('d.m.Y H:i:s', $entry_object->get_created_unix_timestamp());
         $entry_published_date_timestamp = date('d.m.Y H:i:s', $entry_object->get_published_unix_timestamp());
@@ -98,6 +100,7 @@ namespace core\PHPLibrary\Page {
         $entry_updated_date_timestamp_iso_8601_without_date = date('H:i:s', $entry_object->get_updated_unix_timestamp());
 
         $entry_category_title = $entry_category_object->get_title($cms_base_locale_name);
+        $entry_category_title = strip_tags($entry_category_title); 
 
         if ($entry_object->is_published() && $entry_category_object->is_showed_on_index_page()) {
           array_push($entries_array_templates, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/index/entriesList/item.tpl', [

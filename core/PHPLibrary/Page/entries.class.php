@@ -122,12 +122,13 @@ namespace core\PHPLibrary\Page {
 
           /** @var string Заголовок записи */
           $entry_title = (!empty($entry_object->get_title($cms_base_locale_name))) ? $entry_object->get_title($cms_base_locale_name) : $entry_object->get_title($cms_base_locale_setted_name);
-          $entry_title = strip_tags($entry_title);
+          $entry_title = strip_tags($entry_title); 
           /** @var string Описание записи */
           $entry_description = (!empty($entry_object->get_description($cms_base_locale_name))) ? $entry_object->get_description($cms_base_locale_name) : $entry_object->get_description($cms_base_locale_setted_name);
           $entry_description = strip_tags($entry_description);
           /** @var string Содержание записи */
           $entry_content = (!empty($entry_object->get_content($cms_base_locale_name))) ? $entry_object->get_content($cms_base_locale_name) : $entry_object->get_content($cms_base_locale_setted_name);
+          $entry_content = strip_tags($entry_content);
 
           $entry_created_date_timestamp = date('d.m.Y H:i:s', $entry_object->get_created_unix_timestamp());
           $entry_published_date_timestamp = date('d.m.Y H:i:s', $entry_object->get_published_unix_timestamp());
@@ -155,6 +156,7 @@ namespace core\PHPLibrary\Page {
 
           $entry_category = $entry_object->get_category();
           $entry_category_title = $entry_category->get_title($cms_base_locale_name);
+          $entry_category_title = strip_tags($entry_category_title);
 
           if (!empty($entry_title) && !empty($entry_description) && !empty($entry_content)) {
             array_push($entries_array_templates, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entries/entriesList/item.tpl', [
