@@ -122,7 +122,7 @@ namespace core\PHPLibrary\Page {
 
           /** @var string Заголовок записи */
           $entry_title = (!empty($entry_object->get_title($cms_base_locale_name))) ? $entry_object->get_title($cms_base_locale_name) : $entry_object->get_title($cms_base_locale_setted_name);
-          $entry_title = strip_tags($entry_title)
+          $entry_title = strip_tags($entry_title);
           /** @var string Описание записи */
           $entry_description = (!empty($entry_object->get_description($cms_base_locale_name))) ? $entry_object->get_description($cms_base_locale_name) : $entry_object->get_description($cms_base_locale_setted_name);
           $entry_description = strip_tags($entry_description);
