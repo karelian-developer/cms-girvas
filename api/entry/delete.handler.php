@@ -29,7 +29,7 @@ if ($system_core->client->is_logged(2)) {
       $entries = new Entries($system_core);
 
       if (EntryCategory::exists_by_id($system_core, $entries_category_id)) {
-        if ($entries->get_count_by_category_id($entries_category_id) > 0) {
+        if ($entries->get_count_by_category_id($entries_category_id) == 0) {
           $entries_category = new EntryCategory($system_core, $entries_category_id);
           $entries_category_is_deleted = $entries_category->delete();
 

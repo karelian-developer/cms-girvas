@@ -30,7 +30,7 @@ if ($system_core->client->is_logged(2)) {
         $user_group = new UserGroup($system_core, $user_group_id);
         $users = new Users($system_core);
 
-        if ($users->get_count_by_group_id($user_group_id) > 0) {
+        if ($users->get_count_by_group_id($user_group_id) == 0) {
           if ($user_group_id > 4) {
             $user_group_is_deleted = $user_group->delete();
             if ($user_group_is_deleted) {
