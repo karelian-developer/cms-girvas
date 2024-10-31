@@ -20,8 +20,8 @@ if (array_key_exists('Metrics-Token', $handler_headers)) {
   $client_ip = $system_core->client->get_ip_address();
   $metrics_token = $handler_headers['Metrics-Token'];
   $metrics_timestamp = (is_numeric($_POST['time'])) ? strtotime(date('Y/m/d', $_POST['time'])) : strtotime(date('Y/m/d', time()));
-  $metrics_current_url = $_POST['current_url'];
-  $metrics_referrer_url = $_POST['referrer_url'];
+  $metrics_current_url = strip_tags(str_replace('\'', '', $_POST['current_url']));
+  $metrics_referrer_url = strip_tags(str_replace('\'', '', $_POST['referrer_url']));
   $metrics_is_visited_new = (bool)$_POST['is_visited_new'];
 
   $metrics = new Metrics($system_core);

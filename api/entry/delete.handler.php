@@ -15,6 +15,7 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
+use \core\PHPLibrary\Entries as Entries;
 
 if ($system_core->client->is_logged(2)) {
   $client_user = $system_core->client->get_user(2);
@@ -25,16 +26,22 @@ if ($system_core->client->is_logged(2)) {
   if ($system_core->urlp->get_path(2) == 'category') {
     if ($client_user_group->permission_check($client_user_group::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT)) {
       $entries_category_id = (is_numeric($_DELETE['entries_category_id'])) ? (int)$_DELETE['entries_category_id'] : 0;
+      $entries = new Entries($system_core);
 
       if (EntryCategory::exists_by_id($system_core, $entries_category_id)) {
-        $entries_category = new EntryCategory($system_core, $entries_category_id);
-        $entries_category_is_deleted = $entries_category->delete();
+        if ($entries->get_count_by_category_id($entries_category_id) > 0) {
+          $entries_category = new EntryCategory($system_core, $entries_category_id);
+          $entries_category_is_deleted = $entries_category->delete();
 
-        if ($entries_category_is_deleted) {
-          $handler_message = 'Категория записей успешно удалена.';
-          $handler_status_code = 1;
+          if ($entries_category_is_deleted) {
+            $handler_message = 'Категория записей успешно удалена.';
+            $handler_status_code = 1;
+          } else {
+            $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN'));
+            $handler_status_code = 0;
+          }
         } else {
-          $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN'));
+          $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ENTRIES_CATEGORY_ERROR_DELETION_EXISTS_ENTRIES'));
           $handler_status_code = 0;
         }
       }

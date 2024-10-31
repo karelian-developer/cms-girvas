@@ -42,7 +42,7 @@ namespace core\PHPLibrary\Page\Admin {
       switch ($error_code) {
         case 404:
           $this->error_title = $locale_data['PAGE_ERROR_404_TITLE'];
-          $this->error_desription = sprintf($locale_data['PAGE_ERROR_404_DESCRIPTION'], urldecode($_SERVER['REQUEST_URI']));
+          $this->error_desription = sprintf($locale_data['PAGE_ERROR_404_DESCRIPTION'], strip_tags(urldecode($_SERVER['REQUEST_URI'])));
           break;
         case 500:
           $this->error_title = $locale_data['PAGE_ERROR_500_TITLE'];

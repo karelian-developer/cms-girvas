@@ -60,6 +60,35 @@ namespace core\PHPLibrary {
     }
         
     /**
+     * Получить количество пользователей для определенной группы
+     *
+     * @param  int $group_id
+     * 
+     * @return int
+     */
+    public function get_count_by_group_id(int $group_id) : int {
+      $query_builder = new DatabaseQueryBuilder($this->system_core);
+      $query_builder->set_statement_select();
+      $query_builder->statement->add_selections(['count(*)']);
+      $query_builder->statement->set_clause_from();
+      $query_builder->statement->clause_from->add_table('users');
+      $query_builder->statement->clause_from->assembly();
+      $query_builder->statement->set_clause_where();
+      $query_builder->statement->clause_where->add_condition('(metadata::jsonb->>\'group_id\')::int = :group_id');
+
+      $query_builder->statement->clause_where->assembly();
+      $query_builder->statement->assembly();
+
+      $database_connection = $this->system_core->database_connector->database->connection;
+      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $database_query->bindParam(':group_id', $group_id, \PDO::PARAM_INT);
+			$database_query->execute();
+
+      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+      return ($result) ? $result['count'] : 0;
+    }
+        
+    /**
      * Получить общее количество
      *
      * @return int

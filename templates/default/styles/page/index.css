@@ -44,22 +44,27 @@
 }
 
 .entries-list-container__list-item .item__article {
-  padding-top: 177px;
-  height: 217px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
 }
 
 .entries-list-container__list-item .article__title {
+  white-space: nowrap;
   font-size: 14px;
   font-weight: 700;
   color: inherit;
   text-transform: uppercase;
+  max-width: 75ch;
+  overflow: hidden;
 }
 
 .entries-list-container__list-item .article__description {
   opacity: 0;
   visibility: hidden;
-  padding-top: 10px;
-  font-size: 14px;
+  padding-top: 0;
+  font-size: 0;
   font-weight: 400;
   color: inherit;
 }
@@ -117,33 +122,31 @@
 }
 
 @keyframes entries-group-animation-block {
-  from {
-      height: 47px;
-      top: 130px;
-  }
+  from {}
 
   to {
-      height: 177px;
-      top: 0;
+    height: calc(100% - 40px);
+    top: 0;
   }
 }
 
 @keyframes entries-group-hidden-text {
   from {
-      opacity: 0;
+    font-size: 14px;
+    padding-top: 0;
+    opacity: 0;
   }
 
   to {
-      visibility: visible;
-      opacity: 1;
+    visibility: visible;
+    font-size: 14px;
+    padding-top: 10px;
+    opacity: 1;
   }
 }
 
 .article__interactive-block {
-  position: absolute;
   width: 100%;
-  height: 47px;
-  top: 130px;
   padding: 17px 15px;
   opacity: 0.85;
   color: var(--primary-color-2);
@@ -161,23 +164,23 @@
   outline: none;
 }
 
-.article__interactive-block:focus-visible .article__description {
+.item__article:focus-visible .article__description {
   animation: entries-group-hidden-text .7s ease-in-out 1 forwards
 }
 
-.article__interactive-block:focus {
+.item__article:focus .article__interactive-block {
   animation: entries-group-animation-block .2s linear 1 forwards;
   opacity: 1;
   background-color: var(--dark-gray-color);
   color: var(--container-and-text-white-color);
 }
 
-.article__interactive-block:focus .article__description {
+.item__article:focus .article__description {
   visibility: visible;
   opacity: 1;
 }
 
-.article__interactive-block:hover {
+.item__article:hover .article__interactive-block {
   animation: entries-group-animation-block .2s linear 1 forwards;
 }
 

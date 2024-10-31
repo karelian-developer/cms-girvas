@@ -121,6 +121,7 @@ namespace templates\default {
         
         $this->template->add_script(['src' => 'common.js'], true);
         $this->template->add_script(['src' => 'core.class.js', 'type' => 'module'], true);
+        $this->template->add_script(['src' => 'core.class.js', 'type' => 'module']);
 
         $profile_link = ($this->template->system_core->client->is_logged(1)) ? sprintf('<a class="header__nav-link display-block" href="/profile"><span class="header__nav-span">%s</span></a>', $locale_data['DEFAULT_TEXT_PROFILE']) : sprintf('<a id="SYSTEM_GE_IMC_00000001" class="header__nav-link display-block" href="#"><span class="header__nav-span">%s</span></a>', $locale_data['DEFAULT_TEXT_LOGIN']);
         $registration_link = (!$this->template->system_core->client->is_logged(1)) ? sprintf('<a class="header__nav-link display-block" href="/registration"><span class="header__nav-span">%s</span></a>', $locale_data['DEFAULT_TEXT_REGISTRATION']) : '';
