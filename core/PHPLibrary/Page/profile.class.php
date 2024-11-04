@@ -158,6 +158,8 @@ namespace core\PHPLibrary\Page {
                 'USER_SURNAME' => $profile_user->get_surname(),
                 'USER_PATRONYMIC' => $profile_user->get_patronymic(),
                 'USER_BIRTHDATE' => date('d.m.Y', $profile_user->get_birthdate_unix_timestamp()),
+                'USER_BIRTHDATE_MINIMUM' => date('Y-m-d', time() - 3155760000),
+                'USER_BIRTHDATE_MAXIMUM' => date('Y-m-d', time() - 441763200),
                 'PROFILE_ADDITIONAL_FIELDS' => implode($additional_fields_elements)
               ])
             ]);

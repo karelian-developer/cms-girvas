@@ -17,7 +17,7 @@
           </td>
           <td class="table__cell cell">
             <div class="page__phar-block">
-              <input name="entry_name" type="text" class="form__input entry-form__input" value="{ENTRY_NAME}" placeholder="my-first-entry" role="entryURL">
+              <input name="entry_name" type="text" class="form__input entry-form__input" value="{ENTRY_NAME}" placeholder="my-first-entry" role="entryURL" required>
             </div>
           </td>
         </tr>
@@ -30,7 +30,7 @@
           </td>
           <td class="table__cell cell">
             <div class="page__phar-block">
-              <input name="entry_title_rus" type="text" class="form__input entry-form__input" role="entryTitle" value="{ENTRY_TITLE}" placeholder="{LANG:PAGE_ENTRY_INPUT_TITLE_LABEL}">
+              <input name="entry_title_rus" type="text" class="form__input entry-form__input" role="entryTitle" value="{ENTRY_TITLE}" placeholder="{LANG:PAGE_ENTRY_INPUT_TITLE_LABEL}" required>
             </div>
           </td>
         </tr>
@@ -43,7 +43,7 @@
           </td>
           <td class="table__cell cell">
             <div class="page__phar-block">
-              <textarea name="entry_description_rus" class="form__textarea entry-form__textarea" role="entryDescription" placeholder="{LANG:PAGE_ENTRY_INPUT_DESCRIPTION_LABEL}">{ENTRY_DESCRIPTION}</textarea>
+              <textarea name="entry_description_rus" class="form__textarea entry-form__textarea" role="entryDescription" placeholder="{LANG:PAGE_ENTRY_INPUT_DESCRIPTION_LABEL}" required>{ENTRY_DESCRIPTION}</textarea>
             </div>
           </td>
         </tr>

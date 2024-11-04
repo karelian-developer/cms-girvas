@@ -17,7 +17,7 @@
           </td>
           <td class="table__cell cell">
             <div class="page__phar-block">
-              <input name="page_static_name" typde="text" class="form__input page-static-form__input" value="{PAGE_STATIC_NAME}" placeholder="my-first-page" role="pageStaticURL">
+              <input name="page_static_name" typde="text" class="form__input page-static-form__input" value="{PAGE_STATIC_NAME}" placeholder="my-first-page" role="pageStaticURL" required>
             </div>
           </td>
         </tr>
@@ -30,7 +30,7 @@
           </td>
           <td class="table__cell cell">
             <div class="page__phar-block">
-              <input name="page_static_title_rus" type="text" class="form__input page-static-form__input" role="pageStaticTitle" value="{PAGE_STATIC_TITLE}" placeholder="{LANG:PAGE_STATIC_PAGE_INPUT_TITLE_LABEL}">
+              <input name="page_static_title_rus" type="text" class="form__input page-static-form__input" role="pageStaticTitle" value="{PAGE_STATIC_TITLE}" placeholder="{LANG:PAGE_STATIC_PAGE_INPUT_TITLE_LABEL}" required>
             </div>
           </td>
         </tr>
@@ -43,7 +43,7 @@
           </td>
           <td class="table__cell cell">
             <div class="page__phar-block">
-              <textarea name="page_static_description_rus" class="form__textarea page-static-form__textarea" role="pageStaticDescription" placeholder="{LANG:PAGE_STATIC_PAGE_INPUT_DESCRIPTION_LABEL}">{PAGE_STATIC_DESCRIPTION}</textarea>
+              <textarea name="page_static_description_rus" class="form__textarea page-static-form__textarea" role="pageStaticDescription" placeholder="{LANG:PAGE_STATIC_PAGE_INPUT_DESCRIPTION_LABEL}" required>{PAGE_STATIC_DESCRIPTION}</textarea>
             </div>
           </td>
         </tr>

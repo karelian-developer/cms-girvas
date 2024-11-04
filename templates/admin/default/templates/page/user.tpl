@@ -92,7 +92,7 @@
             </div>
           </td>
           <td class="table__cell cell">
-            <div class="page__phar-block"><input name="user_birthdate" type="date" class="form__input user-editor-form__input" value="{USER_BIRTHDATE}" role="userFormInputBirthdate"></div>
+            <div class="page__phar-block"><input name="user_birthdate" type="date" class="form__input user-editor-form__input" value="{USER_BIRTHDATE}" role="userFormInputBirthdate" min="{USER_BIRTHDATE_MINIMUM}" max="{USER_BIRTHDATE_MAXIMUM}"></div>
           </td>
         </tr>
         <tr class="table__row">

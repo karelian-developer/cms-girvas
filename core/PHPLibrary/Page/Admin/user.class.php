@@ -126,6 +126,8 @@ namespace core\PHPLibrary\Page\Admin {
         'USER_SURNAME' => (!is_null($user)) ? $user->get_surname() : '',
         'USER_PATRONYMIC' => (!is_null($user)) ? $user->get_patronymic() : '',
         'USER_BIRTHDATE' => (!is_null($user)) ? date('Y-m-d', $user->get_birthdate_unix_timestamp()) : 0,
+        'USER_BIRTHDATE_MINIMUM' => date('Y-m-d', time() - 3155760000),
+        'USER_BIRTHDATE_MAXIMUM' => date('Y-m-d', time() - 441763200),
         'USER_ADDITIONAL_FIELDS' => implode($additional_fields_elements),
         'USER_FORM_METHOD' => (!is_null($user)) ? 'PATCH' : 'PUT'
       ]);

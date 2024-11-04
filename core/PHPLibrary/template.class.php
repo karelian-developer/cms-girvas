@@ -85,6 +85,7 @@ namespace core\PHPLibrary {
     public function init() : mixed {
       $this->add_style(['href' => 'normalize.css', 'rel' => 'stylesheet', 'is_core' => true]);
       $this->add_style(['href' => 'default-colors-scheme.css', 'rel' => 'stylesheet', 'is_core' => true]);
+      $this->add_style(['href' => 'default-base.css', 'rel' => 'stylesheet', 'is_core' => true]);
       $this->add_style(['href' => 'default-fonts.css', 'rel' => 'stylesheet', 'is_core' => true]);
       $this->add_style(['href' => 'default-forms.css', 'rel' => 'stylesheet', 'is_core' => true]);
       $this->add_style(['href' => 'default-tables.css', 'rel' => 'stylesheet', 'is_core' => true]);
