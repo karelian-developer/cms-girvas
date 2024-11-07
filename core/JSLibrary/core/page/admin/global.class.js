@@ -85,6 +85,14 @@ export class PageGlobal {
       }
 
       if (globalButtonsContainerElement != null) {
+        // Кнопка "Сайт производителя"
+        this.buttons.siteDeveloper = new Interactive('button');
+        this.buttons.siteDeveloper.target.setLabel(localeData.BUTTON_SITE_DEVELOPER);
+        this.buttons.siteDeveloper.target.setCallback((event) => {
+          event.preventDefault();
+          window.open('https://www.garbalo.com', '_blank');
+        });
+
         // Кнопка "Проверить обновления"
         this.buttons.checkVersion = new Interactive('button');
         this.buttons.checkVersion.target.setLabel(localeData.BUTTON_CHECK_UPDATES);
@@ -130,9 +138,11 @@ export class PageGlobal {
           window.open('/', '_blank');
         });
 
+        this.buttons.siteDeveloper.assembly();
         this.buttons.checkVersion.assembly();
         this.buttons.toSite.assembly();
 
+        globalButtonsContainerElement.append(this.buttons.siteDeveloper.target.element);
         globalButtonsContainerElement.append(this.buttons.checkVersion.target.element);
         globalButtonsContainerElement.append(this.buttons.toSite.target.element);
       }

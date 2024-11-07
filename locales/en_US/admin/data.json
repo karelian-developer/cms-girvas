@@ -44,6 +44,7 @@
   "BUTTON_NEW_WEB_CHANNEL_LABEL": "New web channel",
   "BUTTON_GO_TO_SITE": "Go to website",
   "BUTTON_CHECK_UPDATES": "Check for updates",
+  "BUTTON_SITE_DEVELOPER": "Developer's website",
   "MODAL_ENTRY_DELETE_TITLE": "Deleting an entry",
   "MODAL_ENTRY_DELETE_DESCRIPTION": "Are you sure you want to delete the entry? The action cannot be undone.",
   "MODAL_ENTRIES_CATEGORY_DELETE_TITLE": "Deleting an entries category",

@@ -69,7 +69,7 @@ namespace core\PHPLibrary\Page {
 
       if ($this->system_core->client->is_logged(1)) {
         $user = $this->system_core->client->get_user(1);
-        $user->init_data(['login']);
+        $user->init_data(['login', 'metadata']);
         
         $profile_user_login = (!is_null($this->system_core->urlp->get_path(1))) ? $this->system_core->urlp->get_path(1) : $user->get_login();
         
@@ -84,6 +84,9 @@ namespace core\PHPLibrary\Page {
         }
         
         if (!is_null($profile_user)) {
+          $user_group = $user->get_group();
+          $user_group->init_data(['permissions']);
+
           $fields_types = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_type')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_type'), true) : [];
           $fields_titles = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_title')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_title'), true) : [];
           $fields_names = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_name')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_name'), true) : [];
@@ -91,45 +94,53 @@ namespace core\PHPLibrary\Page {
           $additional_fields_elements = [];
 
           if ($this->system_core->urlp->get_param('event') == 'edit') {
-            foreach ($fields_types as $field_index => $field_type) {
-              $field_name_exploded = explode('_', $fields_names[$field_index]);
-              foreach ($field_name_exploded as $string_index => $string) {
-                if ($string_index > 0) {
-                  $field_name_exploded[$string_index] = ucfirst($string);
+            if ($user_group->permission_check($user_group::PERMISSION_ADMIN_USERS_MANAGEMENT) || $user->get_id() == $profile_user->get_id()) {
+              foreach ($fields_types as $field_index => $field_type) {
+                $field_name_exploded = explode('_', $fields_names[$field_index]);
+                foreach ($field_name_exploded as $string_index => $string) {
+                  if ($string_index > 0) {
+                    $field_name_exploded[$string_index] = ucfirst($string);
+                  }
+                }
+                $field_name_transformed = implode($field_name_exploded);
+
+                if ($field_type == 'textarea') {
+                  array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile/editor/fieldTextarea.tpl', [
+                    'FIELD_NAME' => $fields_names[$field_index],
+                    'FIELD_TITLE' => $fields_titles[$cms_base_locale_name][$field_index],
+                    'FIELD_VALUE' => (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? strip_tags($profile_user->get_additional_field_data($field_name_transformed)) : ''
+                  ]));
+                } else {
+                  array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile/editor/fieldInput.tpl', [
+                    'FIELD_NAME' => $fields_names[$field_index],
+                    'FIELD_TYPE' => $fields_types[$field_index],
+                    'FIELD_TITLE' => $fields_titles[$cms_base_locale_name][$field_index],
+                    'FIELD_VALUE' => (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? strip_tags($profile_user->get_additional_field_data($field_name_transformed)) : ''
+                  ]));
                 }
               }
-              $field_name_transformed = implode($field_name_exploded);
 
-              if ($field_type == 'textarea') {
-                array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile/editor/fieldTextarea.tpl', [
-                  'FIELD_NAME' => $fields_names[$field_index],
-                  'FIELD_TITLE' => $fields_titles[$cms_base_locale_name][$field_index],
-                  'FIELD_VALUE' => (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? strip_tags($profile_user->get_additional_field_data($field_name_transformed)) : ''
-                ]));
-              } else {
-                array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile/editor/fieldInput.tpl', [
-                  'FIELD_NAME' => $fields_names[$field_index],
-                  'FIELD_TYPE' => $fields_types[$field_index],
-                  'FIELD_TITLE' => $fields_titles[$cms_base_locale_name][$field_index],
-                  'FIELD_VALUE' => (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? strip_tags($profile_user->get_additional_field_data($field_name_transformed)) : ''
-                ]));
-              }
+              $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page.tpl', [
+                'PAGE_NAME' => 'profile-editor',
+                'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile/editor.tpl', [
+                  'USER_ID' => $profile_user->get_id(),
+                  'USER_LOGIN' => $profile_user->get_login(),
+                  'USER_AVATAR_URL' => $profile_user->get_avatar_url(128),
+                  'USER_EMAIL' => $profile_user->get_email(),
+                  'USER_NAME' => $profile_user->get_name(),
+                  'USER_SURNAME' => $profile_user->get_surname(),
+                  'USER_PATRONYMIC' => $profile_user->get_patronymic(),
+                  'USER_BIRTHDATE' => date('Y-m-d', $profile_user->get_birthdate_unix_timestamp()),
+                  'PROFILE_ADDITIONAL_FIELDS' => implode($additional_fields_elements)
+                ])
+              ]);
+            } else {
+              http_response_code(404);
+
+              $page_error = new PageError($this->system_core, $this->page, 404);
+              $page_error->assembly();
+              $this->assembled = $page_error->assembled;
             }
-
-            $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page.tpl', [
-              'PAGE_NAME' => 'profile-editor',
-              'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile/editor.tpl', [
-                'USER_ID' => $profile_user->get_id(),
-                'USER_LOGIN' => $profile_user->get_login(),
-                'USER_AVATAR_URL' => $profile_user->get_avatar_url(128),
-                'USER_EMAIL' => $profile_user->get_email(),
-                'USER_NAME' => $profile_user->get_name(),
-                'USER_SURNAME' => $profile_user->get_surname(),
-                'USER_PATRONYMIC' => $profile_user->get_patronymic(),
-                'USER_BIRTHDATE' => date('Y-m-d', $profile_user->get_birthdate_unix_timestamp()),
-                'PROFILE_ADDITIONAL_FIELDS' => implode($additional_fields_elements)
-              ])
-            ]);
           } else {
             foreach ($fields_types as $field_index => $field_type) {
               $field_name_exploded = explode('_', $fields_names[$field_index]);

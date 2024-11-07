@@ -44,6 +44,7 @@
   "BUTTON_NEW_WEB_CHANNEL_LABEL": "Новый веб-канал",
   "BUTTON_GO_TO_SITE": "Перейти на сайт",
   "BUTTON_CHECK_UPDATES": "Проверить обновления",
+  "BUTTON_SITE_DEVELOPER": "Сайт производителя",
   "MODAL_ENTRY_DELETE_TITLE": "Удаление записи",
   "MODAL_ENTRY_DELETE_DESCRIPTION": "Вы действительно хотите удалить запись? Действие отменить будет нельзя.",
   "MODAL_ENTRIES_CATEGORY_DELETE_TITLE": "Удаление категории записей",

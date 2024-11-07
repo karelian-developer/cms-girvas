@@ -93,6 +93,7 @@ namespace core\PHPLibrary\Page\Admin {
                 'TEMPLATE_DESCRIPTION' => $parsedown->text($template_data['metadata']['description']),
                 'TEMPLATE_CREATED_TIMESTAMP' => date('d.m.Y', $template_data['metadata']['createdUnixTimestamp']),
                 'TEMPLATE_AUTHOR' => $template_data['metadata']['authorName'],
+                'TEMPLATE_LINK' => sprintf('/admin/templates/repository/%s', $template->get_name()),
                 'TEMPLATE_PREVIEW_URL' => $template_data['previews'][0],
                 'TEMPLATE_INSTALLED_STATUS' => $template_installed_status,
                 'TEMPLATE_CATEGORY_NAME' => (isset($template_data['metadata']['categoryName'])) ? $template_data['metadata']['categoryName'] : 'default'
@@ -120,7 +121,7 @@ namespace core\PHPLibrary\Page\Admin {
                 'TEMPLATE_CREATED_TIMESTAMP' => date('d.m.Y', $template->get_core_created_unix_timestamp()),
                 'TEMPLATE_AUTHOR' => $template->get_author_name(),
                 'TEMPLATE_PREVIEW_URL' => $template->get_preview_url(),
-                'TEMPLATE_PAGE_URL' => sprintf('/admin/template/%s', $template->get_name()),
+                'TEMPLATE_LINK' => sprintf('/admin/template/%s', $template->get_name()),
                 'TEMPLATE_INSTALLED_STATUS' => $template_installed_status,
                 'TEMPLATE_CATEGORY_NAME' => $template->get_category_name(),
               ]));

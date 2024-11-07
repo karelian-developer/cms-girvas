@@ -96,6 +96,7 @@ namespace core\PHPLibrary\Page\Admin {
                   'MODULE_DESCRIPTION' => $parsedown->text($module_data['metadata']['description']),
                   'MODULE_CREATED_TIMESTAMP' => date('d.m.Y', $module_data['metadata']['createdUnixTimestamp']),
                   'MODULE_AUTHOR' => $module_data['metadata']['authorName'],
+                  'MODULE_LINK' => sprintf('/admin/modules/repository/%s', $module->get_name()),
                   'MODULE_PREVIEW_URL' => $module_data['previews'][0],
                   'MODULE_INSTALLED_STATUS' => $module_installed_status,
                   'MODULE_ENABLED_STATUS' => $module_enabled_status
