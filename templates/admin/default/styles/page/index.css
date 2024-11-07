@@ -1,19 +1,17 @@
 /**
  * CMS GIRVAS (https://www.cms-girvas.ru/)
  * 
- * @link        https://github.com/Andrey-Shestakov/cms-girvas Путь до репозитория системы
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
  * @copyright   Copyright (c) 2021 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
- * @license     https://github.com/Andrey-Shestakov/cms-girvas/LICENSE.md
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
- .page__content-phar:first-child {
-  margin-bottom: 20px;
-}
 .main__page.page_index .steps-list {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
 }
+
 .main__page.page_index .steps-list__item {
   position: relative;
   display: flex;
@@ -22,24 +20,29 @@
   margin-right: 20px;
   margin-bottom: 20px;
 }
+
 @media (max-width: 1199px) {
   .main__page.page_index .steps-list__item {
     margin-right: 0;
     flex: 0 0 100%;
   }
 }
+
 @media (max-width: 1399px) and (min-width: 1200px) {
   .main__page.page_index .steps-list__item {
     flex: 0 0 calc(50% - 10px);
   }
+
   .main__page.page_index .steps-list__item:nth-child(2n) {
     margin-right: 0;
   }
+
   .main__page.page_index .steps-list__item:nth-last-child(1),
   .main__page.page_index .steps-list__item:nth-last-child(2) {
     margin-bottom: 0;
   }
 }
+
 @media (min-width: 1400px) {
   .main__page.page_index .steps-list__item {
     flex: 0 0 calc((100% / 3) - ((20px * 2) / 3));
@@ -53,23 +56,28 @@
     margin-bottom: 0;
   }
 }
+
 .main__page.page_index .steps-list__item-wrapper {
   display: flex;
   flex-grow: 1;
   background-color: var(--admin-panel-main-page-index-step-background-color);
   padding: 20px;
 }
+
 .main__page.page_index .steps-list__item-icon-container {
   margin-right: 20px;
   flex: 0 0 48px;
 }
+
 .main__page.page_index .steps-list__item-icon {
   fill: var(--admin-panel-main-page-index-step-icon-color);
   width: 100%;
 }
+
 .main__page.page_index .steps-list__item-label-container {
   flex-grow: 1;
 }
+
 .main__page.page_index .steps-list__item-label-title {
   font-size: 18px;
   font-weight: 900;
@@ -78,10 +86,12 @@
   margin-top: 0;
   margin-bottom: 10px;
 }
+
 .main__page.page_index .steps-list__item-label-description {
   font-size: 14px;
   color: var(--admin-panel-main-page-index-step-label-description-font-color);
 }
+
 .main__page.page_index .steps-list__item-link {
   position: absolute;
   display: flex;
@@ -100,29 +110,35 @@
   opacity: 0;
   transition: opacity .2s;
 }
+
 .main__page.page_index .steps-list__item-link:hover,
 .main__page.page_index .steps-list__item-link:focus {
   backdrop-filter: blur(4px);
   opacity: 1;
 }
+
 .main__page.page_index .step-description__phar {
   margin-top: 0;
   margin-bottom: 10px;
 }
+
 .main__page.page_index .step-description__phar:last-child {
   margin-bottom: 0;
 }
+
 .main__page-aside .web-channel-items-list .web-channel-item {
   box-sizing: border-box;
   border-bottom: 1px dashed #EAEAEA;
   padding-bottom: 20px;
   margin-bottom: 20px;
 }
+
 .main__page-aside .web-channel-items-list .web-channel-item:last-child {
   border: 0;
   padding-bottom: unset;
   margin-bottom: unset;
 }
+
 .main__page-aside .web-channel-items-list .web-channel-item__title {
   text-transform: uppercase;
   font-weight: 700;
@@ -130,10 +146,12 @@
   margin-top: 0;
   margin-bottom: 10px;
 }
+
 .main__page-aside .web-channel-items-list .web-channel-item__title-link {
   text-decoration: none;
   color: inherit;
 }
+
 .main__page-aside .web-channel-items-list .web-channel-item__description-container {
   font-size: 14px;
 }

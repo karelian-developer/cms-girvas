@@ -1,44 +1,51 @@
 /**
  * CMS GIRVAS (https://www.cms-girvas.ru/)
  * 
- * @link        https://github.com/Andrey-Shestakov/cms-girvas Путь до репозитория системы
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
  * @copyright   Copyright (c) 2021 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
- * @license     https://github.com/Andrey-Shestakov/cms-girvas/LICENSE.md
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
 .main__page-wrapper {
   display: flex;
 }
+
 @media (max-width: 991px) {
   .main__page-wrapper {
     flex-direction: column;
   }
 }
+
 .main__page {
   box-sizing: border-box;
   flex-grow: 1;
   padding-top: 20px;
   padding-bottom: 20px;
 }
+
 @media (min-width: 992px) {
   .main__page {
     padding-right: 20px;
   }
 }
+
 .main__page-aside {
   padding-bottom: 20px;
 }
+
 @media (max-width: 991px) {
   .main__page-aside {
     flex: 0 0 100%;
   }
 }
+
 @media (min-width: 992px) {
   .main__page-aside {
     padding-top: 20px;
     flex: 0 0 400px;
   }
 }
+
 .main__page-aside .page-aside__block {
   box-sizing: border-box;
   box-shadow: 0 0 10px var(--admin-panel-main-page-title-shadow-color);
@@ -46,9 +53,11 @@
   padding: 20px;
   margin-bottom: 20px;
 }
+
 .main__page-aside .page-aside__block:last-child {
   margin-bottom: 0;
 }
+
 .main__page-aside .page-aside__block-title {
   background-color: var(--admin-panel-main-aside-block-background-color);
   font-size: 18px;
@@ -58,10 +67,12 @@
   margin-top: 0;
   margin-bottom: 10px;
 }
+
 .main__page-aside .page-aside__block-content {
   font-size: 14px;
   color: var(--admin-panel-main-aside-block-content-font-color);
 }
+
 .page__title {
   display: flex;
   align-items: center;
@@ -71,6 +82,7 @@
   text-transform: uppercase;
   margin: 0;
 }
+
 .page__title-container {
   display: flex;
   justify-content: space-between;
@@ -81,18 +93,22 @@
   margin-top: 0;
   margin-bottom: 20px;
 }
+
 .page__pagination {
   box-sizing: border-box;
   box-shadow: 0 0 10px var(--admin-panel-main-page-content-shadow-color);
   background-color: var(--admin-panel-main-page-content-background-color);
 }
+
 .page__pagination:not(:last-child) {
   margin-bottom: 20px;
 }
+
 .page__pagination .pagination-list,
 .page__pagination .pagination-list__item {
   display: flex;
 }
+
 .page__pagination .pagination-list__item .pagination-list__item-link {
   background-color: var(--common-main-color-1);
   color: var(--common-main-color-4);
@@ -100,41 +116,68 @@
   padding: 10px 20px;
   transition: color .2s, background-color .2s;
 }
+
 .page__pagination .pagination-list__item .pagination-list__item-link:hover {
   background-color: var(--common-main-color-2);
   color: var(--common-main-color-5);
 }
+
 .page__pagination .pagination-list__item .pagination-list__item-link:active,
 .page__pagination .pagination-list__item .pagination-list__item-link:focus,
 .page__pagination .pagination-list__item.pagination-list__item_active .pagination-list__item-link {
   background-color: var(--common-main-color-4);
   color: var(--common-main-color-2);
 }
-.page__content {
+
+.page__content, .page__notice {
   box-sizing: border-box;
   box-shadow: 0 0 10px var(--admin-panel-main-page-content-shadow-color);
   background-color: var(--admin-panel-main-page-content-background-color);
   padding: 20px;
 }
+
 .page__content:not(:last-child) {
   margin-bottom: 20px;
 }
-.page__content-phar {
+
+.page__notice.notice_red {
+  background-color: var(--common-secondary-color-5);
+  color: var(--common-secondary-color-6);
+}
+
+.page__notice.notice_yellow {
+  background-color: var(--common-secondary-color-10);
+  color: var(--common-secondary-color-11);
+}
+
+.page__notice.notice_blue {
+  background-color: var(--common-secondary-color-2);
+  color: var(--common-secondary-color-3);
+}
+
+.page__content-phar,
+.page__notice-phar {
+  font-size: 14px;
   margin-top: 0;
   margin-bottom: 10px;
 }
-.page__content-phar:last-child {
+
+.page__content-phar:last-child,
+.page__notice-phar:last-child {
   margin-bottom: 0;
 }
+
 .page__navigation {
   box-sizing: border-box;
   box-shadow: 0 0 10px var(--admin-panel-main-page-navigation-shadow-color);
   background-color: var(--admin-panel-main-page-navigation-background-color);
   margin-bottom: 20px;
 }
+
 .page__navigation .navigation__list {
   display: flex;
 }
+
 .page__navigation .navigation-item__link {
   display: block;
   background-color: var(--admin-panel-main-page-navigation-item-link-background-color);
@@ -146,35 +189,44 @@
   padding: 10px;
   transition: color .2s, background-color .2s;
 }
+
 .page__navigation .navigation-item__link:hover {
   background-color: var(--admin-panel-main-page-navigation-item-link-background-color--hover);
   color: var(--admin-panel-main-page-navigation-item-link-font-color--hover);
 }
+
 .page__navigation .navigation-item__link:focus {
   background-color: var(--admin-panel-main-page-navigation-item-link-background-color--focus);
   color: var(--admin-panel-main-page-navigation-item-link-font-color--focus);
 }
+
 .page__navigation .navigation-item__link_is-active,
 .page__navigation .navigation-item__link:active {
   background-color: var(--admin-panel-main-page-navigation-item-link-background-color--active);
   color: var(--admin-panel-main-page-navigation-item-link-font-color--active);
 }
+
 .page__phar {
   margin-top: 0;
   margin-bottom: 10px;
 }
+
 .page__phar:last-child {
   margin-bottom: 0px;
 }
+
 .page__phar-block {
   margin-bottom: 10px;
 }
+
 .page__phar-block:last-child {
   margin-bottom: 0px;
 }
+
 .page__interactive-container {
   display: flex;
 }
+
 .page__interactive-container > .interactive {
   margin-right: 10px;
 
@@ -182,10 +234,12 @@
     margin-right: 0;
   }
 }
+
 .page-aside__block-content .block-content__phar {
   margin-top: 0;
   margin-bottom: 10px;
 }
+
 .page-aside__block-content .block-content__phar:last-child {
   margin-bottom: 0px;
 }

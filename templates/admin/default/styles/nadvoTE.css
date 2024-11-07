@@ -1,19 +1,21 @@
 /**
  * CMS GIRVAS (https://www.cms-girvas.ru/)
  * 
- * @link        https://github.com/Andrey-Shestakov/cms-girvas Путь до репозитория системы
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
  * @copyright   Copyright (c) 2021 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
- * @license     https://github.com/Andrey-Shestakov/cms-girvas/LICENSE.md
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
 :root {
   --nadvo-te-button-background-color: #EAEAEA;
   --nadvo-te-button-icon-color: #232323;
 }
+
 .nadvo-te {
   display: flex;
   flex-direction: column;
 }
+
 .nadvo-te__toolbar-list {
   display: flex;
   flex-wrap: wrap;
@@ -21,6 +23,7 @@
   padding: 0;
   margin: 0;
 }
+
 .nadvo-te__toolbar-button {
   display: flex;
   justify-content: center;
@@ -32,10 +35,12 @@
   width: 32px;
   height: 32px;
 }
+
 .nadvo-te__toolbar-button-icon {
   fill: var(--nadvo-te-button-icon-color);
   width: 100%;
 }
+
 .nadvo-te__textarea-visual {
   display: none;
   box-sizing: border-box;
@@ -44,17 +49,21 @@
   height: 400px;
   overflow-y: scroll;
 }
+
 .nadvo-te__textarea-visual_is-showed {
   display: block;
 }
+
 .nadvo-te__textarea {
   display: block;
   height: 400px;
   resize: none;
 }
+
 .nadvo-te__textarea_is-hidden {
   display: none;
 }
+
 .nadvo-te__textarea-visual p,
 .nadvo-te__textarea-visual h1,
 .nadvo-te__textarea-visual h2,
