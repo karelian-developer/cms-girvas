@@ -32,7 +32,7 @@ namespace core\PHPLibrary {
    * @property-read string CMS_CORE_JS_LIBRARY_PATH Полный путь до JavaScript-библиотеки CMS
    * @property-read string CMS_CORE_TS_LIBRARY_PATH Полный путь до TypeScript-библиотеки CMS
    * @property      array $configuration Массив с конфигурациями CMS
-   * @property      URLParser $urlp Объект класса URLParser
+   * @property      URLParser $urlp Объект класса URLParser 
    */
   final class SystemCore {
     public const CMS_CORE_PATH = 'core';

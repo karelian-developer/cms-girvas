@@ -39,7 +39,7 @@
                       <div class="page__phar-block">Укажите доменное имя, с которым будет работать Ваш веб-сайт. Это необходимо для правильной переадресации.</div>
                     </div>
                   </td>
-                  <td class="table__cell cell">
+                  <td class="table__cell cell" >
                     <input name="domain" type="text" class="form__input" value="{CONFIGURATION_DATABASE_DOMAIN}" placeholder="example.ru">
                   </td>
                 </tr>

@@ -1,4 +1,4 @@
-<header class="header">
+<header class="header" >
   <section class="header__section section">
     <div class="header__container container">
       <div class="header__brand-container">

@@ -45,7 +45,7 @@
 .interactive .interactive__select-imitation .select-imitation__droped-list.droped-list_is-showed {
   height: auto;
   opacity: 1;
-  z-index: 1;
+  z-index: 1; 
   overflow-x: hidden;
 }
 .interactive .interactive__select-imitation .droped-list__item {
