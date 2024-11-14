@@ -47,10 +47,10 @@
 }
 
 .main__page-aside .page-aside__block {
+  position: relative;
   box-sizing: border-box;
   box-shadow: 0 0 10px var(--admin-panel-main-page-title-shadow-color);
   background-color: var(--admin-panel-main-aside-block-background-color);
-  padding: 20px;
   margin-bottom: 20px;
 }
 
@@ -59,18 +59,35 @@
 }
 
 .main__page-aside .page-aside__block-title {
-  background-color: var(--admin-panel-main-aside-block-background-color);
+  display: flex;
+  align-items: center;
+  background-color: var(--common-main-color-2);
   font-size: 18px;
   font-weight: 900;
-  color: var(--admin-panel-main-aside-block-title-font-colorr);
+  color: var(--common-main-color-4);
   text-transform: uppercase;
-  margin-top: 0;
-  margin-bottom: 10px;
+  padding-left: 40px;
+  padding-right: 20px;
+  margin: 0;
+  height: 45px;
+}
+
+.main__page-aside .page-aside__block-title::after {
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+  background-color: var(--common-main-color-6);
+  position: absolute;
+  display: block;
+  width: 20px;
+  height: 45px;
+  top: 0;
+  left: 0;
+  content: '';
 }
 
 .main__page-aside .page-aside__block-content {
   font-size: 14px;
   color: var(--admin-panel-main-aside-block-content-font-color);
+  padding: 20px;
 }
 
 .page__title {
@@ -78,18 +95,43 @@
   align-items: center;
   font-size: 18px;
   font-weight: 900;
-  color: var(--admin-panel-main-page-title-font-color);
+  color: var(--common-main-color-4);
   text-transform: uppercase;
   margin: 0;
 }
 
+.page__title::after {
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  background-color: var(--common-main-color-6);
+  left: 0;
+  top: 0;
+}
+
+.page__title::before {
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+  background-color: var(--common-main-color-2);
+  left: 0;
+  bottom: 0;
+}
+
+.page__title::after, .page__title::before {
+  position: absolute;
+  content: '';
+  width: 50px;
+  height: 100%;
+}
+
 .page__title-container {
+  position: relative;
   display: flex;
   justify-content: space-between;
   box-sizing: border-box;
   box-shadow: 0 0 10px var(--admin-panel-main-page-title-shadow-color);
   background-color: var(--admin-panel-main-page-title-background-color);
-  padding: 20px;
+  padding-left: 70px;
+  padding-right: 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
   margin-top: 0;
   margin-bottom: 20px;
 }

@@ -32,6 +32,7 @@ import {PageWebChannel as PageAdminWebChannel} from './page/admin/webChannel.cla
 import {PageWebChannels as PageAdminWebChannels} from './page/admin/webChannels.class.js';
 import {PageGlobal as PageAdminGlobal} from './page/admin/global.class.js';
 import {PageGlobal as PageDefaultGlobal} from './page/global.class.js';
+import {Interactive} from '../interactive.class.js';
 import {URLParser} from "../urlParser.class.js";
 
 export class Page {
@@ -78,6 +79,16 @@ export class Page {
     if (this.target != null) {
       this.init();
     }
+  }
+
+  showPopupNotification(message, code = -1) {
+    let interactiveNotification = new Interactive('notification');
+    interactiveNotification.target.isPopup = true;
+    interactiveNotification.target.setStatusCode(code);
+    interactiveNotification.target.setContent(message);
+    interactiveNotification.target.assembly();
+
+    interactiveNotification.target.show();
   }
 
   init() {

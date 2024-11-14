@@ -2,18 +2,21 @@
   padding-left: 40px;
   padding-right: 40px;
 }
+
 .header__brand-container {
   flex: 0 0 128px;
 }
+
 .header__brand {
   fill: var(--common-main-color-4);
 }
+
 .header__container {
   display: flex;
   padding-top: 20px;
   padding-bottom: 20px;
-  border-bottom: 4px solid var(--common-main-color-4);
 }
+
 .header__title-container {
   display: flex;
   flex-direction: column;
@@ -21,11 +24,39 @@
   flex-grow: 1;
   padding-left: 40px;
 }
+
 .header__title {
   font-size: 18px;
   margin: 0;
 }
+
 .header__copyright-container .copyright-container__phar {
   font-size: 14px;
   margin: 0;
+}
+
+.header__installer-progress {
+  display: flex;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.header__installer-progress > .installer-progress__item {
+  background-color: var(--common-main-color-6);
+  padding: 0;
+  flex-grow: 1;
+  height: 6px;
+}
+
+.header__installer-progress > .installer-progress__item:not(:last-child) {
+  border-right: 2px solid var(--common-main-color-2);
+}
+
+.header__installer-progress > .installer-progress__item.item_completed {
+  background-color: var(--common-secondary-color-9);
+}
+
+.header__installer-progress > .installer-progress__item.item_current {
+  background-color: var(--common-secondary-color-8);
 }

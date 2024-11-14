@@ -15,15 +15,22 @@ export class InstallationMaster {
     this.setStepIndex(0);
     this.setStepsCount(stepsCount);
     this.buttons = {};
+    this.progressItems = [];
     
+    let installationProgress = document.querySelector('[role="installer-progress"]');
     let installationPages = document.querySelectorAll('[data-page-index]');
     installationPages.forEach((element, elementIndex) => {
       element.style.display = (elementIndex == 0) ? 'block' : 'none';
+
+      let installationProgressItem = document.createElement('li');
+      installationProgressItem.classList.add('installer-progress__item');
+      if (elementIndex == 0) {
+        installationProgressItem.classList.add('item_current');
+      }
+
+      this.progressItems.push(installationProgressItem);
+      installationProgress.appendChild(installationProgressItem);
     });
-  }
-
-  generateRequestAPI() {
-
   }
 
   buildPanel() {
@@ -717,6 +724,15 @@ export class InstallationMaster {
     let stepsCount = this.getStepsCount();
 
     if (stepIndex < stepsCount - 1) {
+      if (typeof(this.progressItems[stepIndex]) != 'undefined') {
+        this.progressItems[stepIndex].classList.add('item_completed');
+      }
+
+      if (typeof(this.progressItems[stepIndex + 1]) != 'undefined') {
+        this.progressItems[stepIndex].classList.remove('item_current');
+        this.progressItems[stepIndex + 1].classList.add('item_current');
+      }
+
       this.setStepIndex(stepIndex + 1);
     }
 

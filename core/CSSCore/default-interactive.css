@@ -127,6 +127,7 @@
   width: 16px;
 }
 .interactive .interactive__button-label {
+  display: flex;
   font-size: 14px;
   font-weight: 700;
   color: var(--interactive-button-font-color);

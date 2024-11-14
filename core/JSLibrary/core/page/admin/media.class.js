@@ -68,27 +68,25 @@ export class PageMedia {
       document.body.appendChild(interactiveModal.target.element);
       interactiveModal.target.show();
     });
+    
     buttons.delete.assembly();
 
     buttons.link = new Interactive('button');
     buttons.link.target.setLabel(PageMedia.buttonIcons.link);
     buttons.link.target.setCallback((event) => {
-      let interactiveNotification;
-
       event.preventDefault();
       navigator.clipboard.writeText(fileURL);
-        
-      interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setContent(localeData.POPUP_SLIDE_RELATIVE_LINK_COPIED);
-      interactiveNotification.target.assembly();
 
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(this.localeData.POPUP_SLIDE_RELATIVE_LINK_COPIED, 1);
     });
+
     buttons.link.assembly();
 
-    element.append(buttons.delete.target.element);
-    element.append(buttons.link.target.element);
+    let elementControllerElement = element.querySelector('[role="controller-panel"]');
+    if (elementControllerElement != null) {
+      elementControllerElement.appendChild(buttons.delete.target.element);
+      elementControllerElement.appendChild(buttons.link.target.element);
+    }
   }
 
   uploadFile(inputElement, fileIndex) {
@@ -155,13 +153,7 @@ export class PageMedia {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
       this.localeData = localeData;
 
@@ -180,13 +172,7 @@ export class PageMedia {
 
       interactiveContainerPagePanelElement.append(this.buttons.upload.target.element);
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }
