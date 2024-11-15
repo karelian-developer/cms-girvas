@@ -34,6 +34,8 @@ export class ToolLink extends Tool {
       inputLinkLabelElement.classList.add('form__input');
       inputLinkLabelElement.style.width = '100%';
       inputLinkLabelElement.style.marginBottom = '10px';
+      inputLinkLabelElement.value = stringSelection;
+      
       let inputLinkElement = document.createElement('input');
       inputLinkElement.classList.add('form__input');
       inputLinkElement.setAttribute('placeholder', 'https://www.site.ru/...');

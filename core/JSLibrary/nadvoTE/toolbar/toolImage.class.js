@@ -143,7 +143,7 @@ export class ToolImage extends Tool {
       modalBodyContent.append(mediaContainerElement);
       modalBodyContent.append(inputsGroupContainer);
 
-      this.modal = new Interactive('modal', {title: "Вставить изображение", content: modalBodyContent, width: 'calc(100% - 400px)'});
+      this.modal = new Interactive('modal', {title: "Вставить изображение", content: modalBodyContent, width: window.innerWidth - 400});
       
       let self = this;
       this.modal.target.onClose(() => {
@@ -185,7 +185,7 @@ export class ToolImage extends Tool {
         interactiveButtonUpload.target.setCallback(() => {
           inputFilesElement.click();
         });
-        interactiveButtonUpload.target.assembly();
+        interactiveButtonUpload.assembly();
 
         let interactiveButtonNavPrev = new Interactive('button');
         interactiveButtonNavPrev.target.setLabel('<');
@@ -205,7 +205,7 @@ export class ToolImage extends Tool {
             });
           }
         });
-        interactiveButtonNavPrev.target.assembly();
+        interactiveButtonNavPrev.assembly();
 
         let interactiveButtonNavNext = new Interactive('button');
         interactiveButtonNavNext.target.setLabel('>');
@@ -226,7 +226,7 @@ export class ToolImage extends Tool {
           });
 
         });
-        interactiveButtonNavNext.target.assembly();
+        interactiveButtonNavNext.assembly();
 
         mediaListItemUploadElement.appendChild(interactiveButtonUpload.target.element);
         mediaListElement.appendChild(mediaListItemUploadElement);
