@@ -15,7 +15,12 @@
 }
 
 .form.form_settings .table_settings tr > td:last-child {
-  width: 400px;
+  box-sizing: border-box;
+  width: fit-content;
+}
+
+.form.form_settings .table[role="profile-table-additional-fields"] tr[role="additional-field"] > td:last-child  {
+  padding: 0 10px;
 }
 
 .form.form_settings .table__cell {
@@ -27,6 +32,10 @@
   font-weight: 700;
   text-transform: uppercase;
   margin-bottom: 10px;
+}
+
+.form.form_settings .table[role="profile-table-additional-fields"] .cell__title  {
+  margin-bottom: 0;
 }
 
 .form.form_settings input,

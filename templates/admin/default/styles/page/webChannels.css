@@ -9,12 +9,15 @@
 .table-web-channels__item-buttons-list {
   display: flex;
 }
+
 .buttons-list__item {
   margin-right: 10px;
 }
+
 .buttons-list__item:last-child {
   margin-right: 0;
 }
+
 .table-web-channels__item-button {
   display: flex;
   box-sizing: border-box;
@@ -25,7 +28,18 @@
   height: 16px;
   cursor: pointer;
 }
-.table-web-channels__item-button-icon {
-  fill: var(--admin-panel-main-page-web-channels-table-icon-color);
+
+.table-users-groups__item-button-icon {
+  fill: var(--common-main-color-4);
   width: 100%;
+  transition: fill .2s;
+}
+
+.table-web-channels__item-button:hover .table-web-channels__item-button-icon,
+.table-web-channels__item-button:focus .table-web-channels__item-button-icon {
+  fill: var(--common-secondary-color-3);
+}
+
+.table-web-channels__item-button:active .table-web-channels__item-button-icon {
+  fill: var(--common-main-color-5);
 }

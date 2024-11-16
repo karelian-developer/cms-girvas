@@ -49,8 +49,8 @@
 .main__page-aside .page-aside__block {
   position: relative;
   box-sizing: border-box;
-  box-shadow: 0 0 10px var(--admin-panel-main-page-title-shadow-color);
-  background-color: var(--admin-panel-main-aside-block-background-color);
+  box-shadow: 0 0 5px 1px var(--common-main-color-4--opacity-0-2);
+  background-color: var(--common-main-color-1);
   margin-bottom: 20px;
 }
 
@@ -61,7 +61,7 @@
 .main__page-aside .page-aside__block-title {
   display: flex;
   align-items: center;
-  background-color: var(--common-main-color-2);
+  background-color: var(--common-main-color-8);
   font-size: 18px;
   font-weight: 900;
   color: var(--common-main-color-4);
@@ -126,8 +126,8 @@
   display: flex;
   justify-content: space-between;
   box-sizing: border-box;
-  box-shadow: 0 0 10px var(--admin-panel-main-page-title-shadow-color);
-  background-color: var(--admin-panel-main-page-title-background-color);
+  box-shadow: 0 0 5px 1px var(--common-main-color-4--opacity-0-2);
+  background-color: var(--common-main-color-1);
   padding-left: 70px;
   padding-right: 20px;
   padding-top: 20px;
@@ -138,8 +138,8 @@
 
 .page__pagination {
   box-sizing: border-box;
-  box-shadow: 0 0 10px var(--admin-panel-main-page-content-shadow-color);
-  background-color: var(--admin-panel-main-page-content-background-color);
+  box-shadow: 0 0 5px 1px var(--common-main-color-4--opacity-0-2);
+  background-color: var(--common-main-color-1);
 }
 
 .page__pagination:not(:last-child) {
@@ -173,8 +173,8 @@
 
 .page__content, .page__notice {
   box-sizing: border-box;
-  box-shadow: 0 0 10px var(--admin-panel-main-page-content-shadow-color);
-  background-color: var(--admin-panel-main-page-content-background-color);
+  box-shadow: 0 0 5px 1px var(--common-main-color-4--opacity-0-2);
+  background-color: var(--common-main-color-1);
   padding: 20px;
 }
 
@@ -211,8 +211,8 @@
 
 .page__navigation {
   box-sizing: border-box;
-  box-shadow: 0 0 10px var(--admin-panel-main-page-navigation-shadow-color);
-  background-color: var(--admin-panel-main-page-navigation-background-color);
+  box-shadow: 0 0 5px 1px var(--common-main-color-4--opacity-0-2);
+  background-color: var(--common-main-color-1);
   margin-bottom: 20px;
 }
 

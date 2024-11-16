@@ -58,7 +58,7 @@ export class PageEntries {
             }
             
             if (button.getAttribute('role') == 'entry-view') {
-              window.open(`/admin/${entryName}`, '_blank');
+              window.open(`/entry/${entryName}`, '_blank');
             }
             
             if (button.getAttribute('role') == 'entry-analytics') {

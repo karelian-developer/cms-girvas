@@ -1,6 +1,6 @@
 <tr class="table__row table-pages-static__item" data-page-static-id="{PAGE_STATIC_ID}" data-name="{PAGE_STATIC_NAME}" data-is-published="{PAGE_STATIC_PUBLISHED_STATUS}">
   <td class="table__cell" rowspan="2" style="width: fit-content;">#{PAGE_STATIC_INDEX}</td>
-  <td class="table__cell" style="font-weight: 700;">{PAGE_STATIC_TITLE}</td>
+  <td class="table__cell" style="font-weight: 700;"><a href="/admin/page/{PAGE_STATIC_ID}">{PAGE_STATIC_TITLE}</a></td>
   <td class="table__cell" rowspan="2">{PAGE_STATIC_CREATED_DATE_TIMESTAMP}</td>
   <td class="table__cell" rowspan="2">{PAGE_STATIC_PUBLISHED_DATE_TIMESTAMP}</td>
   <td class="table__cell" rowspan="2">{PAGE_STATIC_UPDATED_DATE_TIMESTAMP}</td>

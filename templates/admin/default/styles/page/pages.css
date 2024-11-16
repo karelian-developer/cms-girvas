@@ -17,12 +17,15 @@
 .table-pages-static__item-buttons-list {
   display: flex;
 }
+
 .buttons-list__item {
   margin-right: 10px;
 }
+
 .buttons-list__item:last-child {
   margin-right: 0;
 }
+
 .table-pages-static__item-button {
   display: flex;
   box-sizing: border-box;
@@ -33,7 +36,18 @@
   height: 16px;
   cursor: pointer;
 }
+
 .table-pages-static__item-button-icon {
-  fill: var(--admin-panel-main-page-pages-table-icon-color);
+  fill: var(--common-main-color-4);
   width: 100%;
+  transition: fill .2s;
+}
+
+.table-pages-static__item-button:hover .table-pages-static__item-button-icon,
+.table-pages-static__item-button:focus .table-pages-static__item-button-icon {
+  fill: var(--common-secondary-color-3);
+}
+
+.table-pages-static__item-button:active .table-pages-static__item-button-icon {
+  fill: var(--common-main-color-5);
 }

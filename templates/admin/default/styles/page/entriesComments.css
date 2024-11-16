@@ -6,24 +6,30 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
- .table-entries-comments__item[data-comment-is-hidden="true"] {
+.table-entries-comments__item[data-comment-is-hidden="true"] {
   background-color: var(--common-secondary-color-4);
 }
+
 .table-entries-comments__item[data-comment-is-hidden="false"] .cell__block-phar_hidden-reason {
   display: none;
 }
+
 .table-entries-comments__item-buttons-list {
   display: flex;
 }
+
 .buttons-list__item {
   margin-right: 10px;
 }
+
 .buttons-list__item:last-child {
   margin-right: 0;
 }
+
 .table-entries-comments__item[data-comment-is-hidden="false"] .cell__block-phar:first-child {
   margin-bottom: 0;
 }
+
 .table-entries-comments__item-button {
   display: flex;
   box-sizing: border-box;
@@ -34,7 +40,18 @@
   height: 16px;
   cursor: pointer;
 }
+
 .table-entries-comments__item-button-icon {
-  fill: var(--admin-panel-main-page-entries-table-icon-color);
+  fill: var(--common-main-color-4);
   width: 100%;
+  transition: fill .2s;
+}
+
+.table-entries-comments__item-button:hover .table-entries-comments__item-button-icon,
+.table-entries-comments__item-button:focus .table-entries-comments__item-button-icon {
+  fill: var(--common-secondary-color-3);
+}
+
+.table-entries-comments__item-button:active .table-entries-comments__item-button-icon {
+  fill: var(--common-main-color-5);
 }

@@ -17,12 +17,15 @@
 .table-entries__item-buttons-list {
   display: flex;
 }
+
 .buttons-list__item {
   margin-right: 10px;
 }
+
 .buttons-list__item:last-child {
   margin-right: 0;
 }
+
 .table-entries__item-button {
   display: flex;
   box-sizing: border-box;
@@ -33,7 +36,18 @@
   height: 16px;
   cursor: pointer;
 }
+
 .table-entries__item-button-icon {
-  fill: var(--admin-panel-main-page-entries-table-icon-color);
+  fill: var(--common-main-color-4);
   width: 100%;
+  transition: fill .2s;
+}
+
+.table-entries__item-button:hover .table-entries__item-button-icon,
+.table-entries__item-button:focus .table-entries__item-button-icon {
+  fill: var(--common-secondary-color-3);
+}
+
+.table-entries__item-button:active .table-entries__item-button-icon {
+  fill: var(--common-main-color-5);
 }

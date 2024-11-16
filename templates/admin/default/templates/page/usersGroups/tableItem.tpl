@@ -1,6 +1,6 @@
 <tr class="table__row table-users-groups__item" data-user-group-id="{USER_GROUP_ID}">
   <td class="table__cell" style="width: fit-content;">#{USER_GROUP_INDEX}</td>
-  <td class="table__cell">{USER_GROUP_TITLE}</td>
+  <td class="table__cell"><a href="/admin/userGroup/{USER_GROUP_ID}">{USER_GROUP_TITLE}</a></td>
   <td class="table__cell">{USER_GROUP_USERS_COUNT}</td>
   <td class="table__cell">{USER_GROUP_CREATED_DATE_TIMESTAMP}</td>
   <td class="table__cell">{USER_GROUP_UPDATED_DATE_TIMESTAMP}</td>

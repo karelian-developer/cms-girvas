@@ -50,12 +50,17 @@ export class PageWebChannels {
 
       for (let tableItem of tableItems) {
         let webChannelID = tableItem.getAttribute('data-web-channel-id');
+        let webChannelName = tableItem.getAttribute('data-web-channel-name');
         let buttons = tableItem.querySelectorAll('button[role]');
         
         for (let button of buttons) {
           button.addEventListener('click', (event) => {
             if (button.getAttribute('role') == 'web-channel-edit') {
               window.location.href = `./webChannel/${webChannelID}`;
+            }
+            
+            if (button.getAttribute('role') == 'web-channel-view') {
+              window.open(`/feed/${webChannelName}`, '_blank');
             }
 
             if (button.getAttribute('role') == 'web-channel-remove') {

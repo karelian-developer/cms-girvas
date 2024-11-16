@@ -110,6 +110,7 @@ export class ToolImage extends Tool {
 
       let inputFilesElement = document.createElement('input');
       inputFilesElement.setAttribute('type', 'file');
+      inputFilesElement.setAttribute('accept', 'image/png, image/jpeg, image/gif, image/webp, image/avif');
       inputFilesElement.setAttribute('multiple', 'multiple');
       inputFilesElement.style.display = 'none';
       inputFilesElement.addEventListener('change', (event) => {

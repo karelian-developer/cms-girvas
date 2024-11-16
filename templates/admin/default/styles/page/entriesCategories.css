@@ -6,15 +6,18 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
- .table-entries-categories__item-buttons-list {
+.table-entries-categories__item-buttons-list {
   display: flex;
 }
+
 .buttons-list__item {
   margin-right: 10px;
 }
+
 .buttons-list__item:last-child {
   margin-right: 0;
 }
+
 .table-entries-categories__item-button {
   display: flex;
   box-sizing: border-box;
@@ -25,7 +28,18 @@
   height: 16px;
   cursor: pointer;
 }
+
 .table-entries-categories__item-button-icon {
-  fill: var(--admin-panel-main-page-entries-table-icon-color);
+  fill: var(--common-main-color-4);
   width: 100%;
+  transition: fill .2s;
+}
+
+.table-entries-categories__item-button:hover .table-entries-categories__item-button-icon,
+.table-entries-categories__item-button:focus .table-entries-categories__item-button-icon {
+  fill: var(--common-secondary-color-3);
+}
+
+.table-entries-categories__item-button:active .table-entries-categories__item-button-icon {
+  fill: var(--common-main-color-5);
 }

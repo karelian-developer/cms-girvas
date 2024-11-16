@@ -139,40 +139,42 @@ export class PageMedia {
   }
 
   init() {
-    let searchParams = new URLParser();
-
     let locales;
     let interactiveContainerPagePanelElement = document.querySelector('#E8548530785');
+
     let mediaUploaderInput = document.querySelector('.form__input_file');
+    if (mediaUploaderInput != null) {
+      mediaUploaderInput.setAttribute('accept', 'image/png, image/jpeg, image/gif, image/webp, image/avif');
 
-    this.initUploaderInput(mediaUploaderInput);
+      this.initUploaderInput(mediaUploaderInput);
 
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
-      this.localeData = localeData;
+      fetch('/handler/locales', {method: 'GET'}).then((response) => {
+        return (response.ok) ? response.json() : Promise.reject(response);
+      }).then((data) => {
+        locales = data.outputData.locales;
+        return window.CMSCore.locales.admin.getData();
+      }, (rejectionReason) => {
+        this.page.showPopupNotification(rejectionReason, 0);
+      }).then((localeData) => {
+        this.localeData = localeData;
 
-      let listElements = document.querySelectorAll('.media-list__item');
-      for (let listElement of listElements) {
-        this.initMediaElement(listElement);
-      }
+        let listElements = document.querySelectorAll('.media-list__item');
+        for (let listElement of listElements) {
+          this.initMediaElement(listElement);
+        }
 
-      this.buttons.upload = new Interactive('button');
-      this.buttons.upload.target.setLabel(this.localeData.BUTTON_UPLOAD_LABEL);
-      this.buttons.upload.target.setCallback((event) => {
-        event.preventDefault();
-        mediaUploaderInput.click();
+        this.buttons.upload = new Interactive('button');
+        this.buttons.upload.target.setLabel(this.localeData.BUTTON_UPLOAD_LABEL);
+        this.buttons.upload.target.setCallback((event) => {
+          event.preventDefault();
+          mediaUploaderInput.click();
+        });
+        this.buttons.upload.assembly();
+
+        interactiveContainerPagePanelElement.append(this.buttons.upload.target.element);
+      }, (rejectionReason) => {
+        this.page.showPopupNotification(rejectionReason, 0);
       });
-      this.buttons.upload.assembly();
-
-      interactiveContainerPagePanelElement.append(this.buttons.upload.target.element);
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    });
+    }
   }
 }

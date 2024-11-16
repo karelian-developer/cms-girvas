@@ -6,6 +6,11 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
+::selection {
+  background-color: var(--common-secondary-color-3);
+  color: var(--common-main-color-7);
+}
+
 html {
   font-family: 'Roboto', 'Helvetica', 'sans-serif';
   height: 100%;
@@ -26,6 +31,26 @@ code {
   background-color: var(--common-main-color-2);
   color: var(--common-main-color-4);
   padding: 0 5px;
+}
+
+a {
+  background-color: var(--common-main-color-1--opacity-0-0);
+  color: var(--common-secondary-color-3);
+  transition: color .2s, background-color .2s;
+}
+
+a:hover {
+  color: var(--common-main-color-5);
+}
+
+a:focus,
+a:active {
+  background-color: var(--common-secondary-color-3);
+  color: var(--common-main-color-7);
+}
+
+a:active {
+  text-decoration: none;
 }
 
 .container {
