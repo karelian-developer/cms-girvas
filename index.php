@@ -12,8 +12,6 @@ ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
-date_default_timezone_set('Europe/Moscow');
-
 // Абсолютный путь до корневой директории CMS
 define('CMS_ROOT_DIRECTORY', preg_replace('/[\/]*$/', '', $_SERVER['DOCUMENT_ROOT']));
 // ‿︵‿ヽ(°□° )ノ︵‿︵

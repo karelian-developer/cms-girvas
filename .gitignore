@@ -4,6 +4,7 @@
 /modules/*
 !/modules/README.md
 /OLD/
+/api/rowney
 /api/concert.api.php
 /api/concerts.api.php
 /api/mediabox.api.php
@@ -13,6 +14,7 @@
 /api/game/
 kozyrev-media.json
 /core/PHPLibrary/Game
+/core/PHPLibrary/Minecraft
 /core/PHPLibrary/concert.class.php
 /core/PHPLibrary/concerts.class.php
 /core/PHPLibrary/service.class.php

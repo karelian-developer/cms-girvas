@@ -16,11 +16,12 @@
 
 .form.form_settings .table_settings tr > td:last-child {
   box-sizing: border-box;
-  width: fit-content;
+  width: 300px;
 }
 
 .form.form_settings .table[role="profile-table-additional-fields"] tr[role="additional-field"] > td:last-child  {
   padding: 0 10px;
+  width: fit-content;
 }
 
 .form.form_settings .table__cell {

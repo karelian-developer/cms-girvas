@@ -41,10 +41,11 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.13 Альфа';
+    public const CMS_VERSION = '0.1.14 Альфа';
     public const CMS_DEVELOPER_TITLE = 'Garbalo (IE SHESTAKOV A.R.)';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
     public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
+    public string $scp_scripts_hash, $scp_styles_hash;
 
     /** 
      * @var \core\PHPLibrary\SystemCore\Configurator Конфигуратор системы
@@ -246,6 +247,11 @@ namespace core\PHPLibrary {
       require_once(sprintf('%s/%s/SystemCore/fileConnector.interface.php', CMS_ROOT_DIRECTORY, self::CMS_CORE_PHP_LIBRARY_PATH));
       require_once(sprintf('%s/%s/SystemCore/fileConnector.class.php', CMS_ROOT_DIRECTORY, self::CMS_CORE_PHP_LIBRARY_PATH));
 
+      $bytes = random_bytes(16);
+      $this->scp_scripts_hash = bin2hex($bytes);
+      $bytes = random_bytes(16);
+      $this->scp_styles_hash = bin2hex($bytes);
+
       $file_connector = new SystemCoreFileConnector($this);
       $file_connector->set_start_directory(self::CMS_CORE_PHP_LIBRARY_PATH);
       $file_connector->set_current_directory(self::CMS_CORE_PHP_LIBRARY_PATH);
@@ -271,8 +277,49 @@ namespace core\PHPLibrary {
 
       $this->configurator = new SystemCoreConfigurator($this);
 
+      if ($_SERVER['HTTPS'] != 'on' && $this->configurator->get('ssl_perm_redirect')) {
+        $https_redirect = sprintf('https://%s%s', $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']);
+        header("HTTP/1.1 301 Moved Permanently");
+        header(sprintf('Location: %s', $https_redirect));
+        exit();
+      }
+
+      date_default_timezone_set($this->configurator->get_site_timezone());
+
       if ($this->urlp->get_path(0) != 'install' && $this->urlp->get_path(1) != 'install') {
         $this->database_connector = new SystemCoreDatabaseConnector($this, $this->configurator);
+      }
+
+      header(sprintf('Content-Security-Policy: %s', $this->configurator->get_security_scp()));
+      header('Referrer-Policy: strict-origin-when-cross-origin');
+      header('X-Content-Type-Options: nosniff');
+
+      if ($this->configurator->get('ssl_is_enabled')) {
+        $hsts_vars = [];
+
+        if ($this->configurator->exists('ssl_hsts_max_age')) {
+          if (is_integer($this->configurator->get('ssl_hsts_max_age'))) {
+            array_push($hsts_vars, sprintf('max-age=%d', $this->configurator->get('ssl_hsts_max_age')));
+          }
+        }
+
+        if ($this->configurator->exists('ssl_hsts_include_subdomains')) {
+          if (is_bool($this->configurator->get('ssl_hsts_include_subdomains'))) {
+            if ($this->configurator->get('ssl_hsts_include_subdomains') === true) {
+              array_push($hsts_vars, 'includeSubDomains');
+            }
+          }
+        }
+
+        if ($this->configurator->exists('ssl_hsts_preload')) {
+          if (is_bool($this->configurator->get('ssl_hsts_preload'))) {
+            if ($this->configurator->get('ssl_hsts_preload') === true) {
+              array_push($hsts_vars, 'preload');
+            }
+          }
+        }
+
+        header(sprintf('Strict-Transport-Security: %s;', implode('; ', $hsts_vars)));
       }
 
       $this->client = new Client($this);

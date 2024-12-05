@@ -106,6 +106,7 @@ namespace core\PHPLibrary\Page\Admin {
       /** @var string $site_page Содержимое шаблона страницы */
       $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/settings.tpl', [
         'PAGE_NAVIGATION' => $page_navigation_transformed,
+        'ADMIN_PANEL_PAGE_NAME' => 'settings',
         'SETTINGS_TITLE' => (isset($settings_title)) ? $settings_title : $locale_data['PAGE_SETTINGS_GROUP_NOT_FOUND_TITLE'],
         'SETTINGS_DESCRIPTION' => (isset($settings_description)) ? $settings_description : $locale_data['PAGE_SETTINGS_GROUP_NOT_FOUND_DESCRIPTION'],
         'SETTINGS_FORM' => TemplateCollector::assembly($settings->assembled, [])

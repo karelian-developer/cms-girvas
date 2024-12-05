@@ -1,4 +1,4 @@
-<form class="form form_settings">
+<form class="form form_settings form_settings-seo">
   <table class="table table_settings">
     <tr class="table__row">
       <td class="table__cell cell">

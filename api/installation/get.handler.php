@@ -365,6 +365,17 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       fwrite($file, '  \'password_hashing_algorithm\' => PASSWORD_ARGON2ID,' . PHP_EOL);
       fwrite($file, '  \'session_expires\' => 86400,' . PHP_EOL);
       fwrite($file, '  \'session_admin_expires\' => 86400,' . PHP_EOL);
+      fwrite($file, '  \'ssl_csp\' => [' . PHP_EOL);
+      fwrite($file, '    \'default-src \\\'self\\\'\',' . PHP_EOL);
+      fwrite($file, '    \'style-src \\\'unsafe-inline\\\' {DOMAIN}\',' . PHP_EOL);
+      fwrite($file, '    \'script-src \\\'unsafe-inline\\\' \\\'nonce-{SCRIPT_HASH}\\\'\',' . PHP_EOL);
+      fwrite($file, '    \'script-src-elem {DOMAIN}\',' . PHP_EOL);
+      fwrite($file, '    \'manifest-src \\\'self\\\'\'' . PHP_EOL);
+      fwrite($file, '  ],' . PHP_EOL);
+      fwrite($file, '  \'ssl_perm_redirect\' => false,' . PHP_EOL);
+      fwrite($file, '  \'ssl_hsts_max_age\' => 63072000,' . PHP_EOL);
+      fwrite($file, '  \'ssl_hsts_include_subdomains\' => false,' . PHP_EOL);
+      fwrite($file, '  \'ssl_hsts_preload\' => false,' . PHP_EOL);
       fwrite($file, '];' . PHP_EOL);
       fwrite($file, PHP_EOL);
       fwrite($file, '?>');

@@ -29,6 +29,10 @@ $configuration = [
   'password_hashing_algorithm' => PASSWORD_DEFAULT,
   'session_expires' => 86400,
   'session_admin_expires' => 86400,
+  'ssl_perm_redirect' => false,
+  'ssl_hsts_max_age' => 63072000,
+  'ssl_hsts_include_subdomains' => false,
+  'ssl_hsts_preload' => false
 ];
 
 ?>
