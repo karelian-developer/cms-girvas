@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 
+Disallow: /admin
 Disallow: /registration
 Disallow: /entries?*
 Disallow: /entries/*?*

@@ -368,8 +368,8 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       fwrite($file, '  \'ssl_csp\' => [' . PHP_EOL);
       fwrite($file, '    \'default-src \\\'self\\\'\',' . PHP_EOL);
       fwrite($file, '    \'style-src \\\'unsafe-inline\\\' {DOMAIN}\',' . PHP_EOL);
-      fwrite($file, '    \'script-src \\\'unsafe-inline\\\' \\\'nonce-{SCRIPT_HASH}\\\'\',' . PHP_EOL);
-      fwrite($file, '    \'script-src-elem {DOMAIN}\',' . PHP_EOL);
+      fwrite($file, '    \'script-src \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN}\',' . PHP_EOL);
+      fwrite($file, '    \'script-src-elem \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN}\',' . PHP_EOL);
       fwrite($file, '    \'manifest-src \\\'self\\\'\'' . PHP_EOL);
       fwrite($file, '  ],' . PHP_EOL);
       fwrite($file, '  \'ssl_perm_redirect\' => false,' . PHP_EOL);

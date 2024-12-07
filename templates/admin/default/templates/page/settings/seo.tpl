@@ -2,6 +2,23 @@
   <table class="table table_settings">
     <tr class="table__row">
       <td class="table__cell cell">
+        <div class="cell__title">{LANG:PAGE_SETTINGS_SETTING_PERMANENT_REDIRECT_WWW_TITLE}</div>
+        <div class="cell__description">
+          <div class="page__phar-block">{LANG:PAGE_SETTINGS_SETTING_PERMANENT_REDIRECT_WWW_DESCRIPTION}</div>
+        </div>
+      </td>
+      <td class="table__cell cell">
+        <div class="page__phar-block">
+          <div class="form__checkbox-container checkbox-container">
+            <input type="hidden" name="setting_{SETTINGS_NAME}_permanent_redirect_www_status" id="I1474308101" value="{SETTING_PERMANENT_REDIRECT_WWW_STATUS_VALUE}">
+            <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308801" type="checkbox" {SETTING_PERMANENT_REDIRECT_WWW_CHECKED_VALUE} data-status-block="I1474308101">
+            <label class="checkbox-container__label form__label" for="I1474308801"></label>
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr class="table__row">
+      <td class="table__cell cell">
         <div class="cell__title">{LANG:PAGE_SETTINGS_SETTING_SEO_SITE_DESCRIPTION_TITLE}</div>
         <div class="cell__description">
           <div class="page__phar-block">{LANG:PAGE_SETTINGS_SETTING_SEO_SITE_DESCRIPTION_DESCRIPTION}</div>

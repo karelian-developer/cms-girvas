@@ -41,9 +41,9 @@ export class PageSettings {
 
       interactiveNotification.target.show();
     }).then((localeData) => {
-      if (searchParams.getPathPart(3) == 'security') {
-        let logicBlocks = document.querySelectorAll('[type="checkbox"]');
-        logicBlocks.forEach((element, elementIndex) => {
+      let checkboxesInputsElements = document.querySelectorAll('[type="checkbox"]');
+      if (checkboxesInputsElements.length > 0) {
+        checkboxesInputsElements.forEach((element, elementIndex) => {
           let logicBlockTargetElement;
 
           if (element.hasAttribute('data-logic-block')) {
@@ -72,34 +72,6 @@ export class PageSettings {
       }
 
       if (searchParams.getPathPart(3) == null || searchParams.getPathPart(3) == 'base') {
-        let logicBlocks = document.querySelectorAll('[type="checkbox"]');
-        logicBlocks.forEach((element, elementIndex) => {
-          let logicBlockTargetElement;
-
-          if (element.hasAttribute('data-logic-block')) {
-            let logicBlock = element.getAttribute('data-logic-block');
-            logicBlockTargetElement = document.getElementById(logicBlock);
-
-            if (!element.checked) {
-              logicBlockTargetElement.setAttribute('disabled', 'disabled');
-            }
-          }
-
-          let statusBlock = element.getAttribute('data-status-block');
-          let statusBlockTargetElement = document.getElementById(statusBlock);
-          element.addEventListener('change', (event) => {
-            statusBlockTargetElement.value = (!element.checked) ? 'off' : 'on';
-
-            if (element.hasAttribute('data-logic-block')) {
-              if (logicBlockTargetElement.hasAttribute('disabled')) {
-                logicBlockTargetElement.removeAttribute('disabled');
-              } else {
-                logicBlockTargetElement.setAttribute('disabled', 'disabled');
-              }
-            }
-          });
-        });
-
         let timezones, charsets, timezoneSelected, charsetSelected;
         let interactiveChoicesSettingsTimezone = new Interactive('choices');
         let interactiveChoicesSettingsCharset = new Interactive('choices');

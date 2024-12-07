@@ -29,6 +29,14 @@ $configuration = [
   'password_hashing_algorithm' => PASSWORD_DEFAULT,
   'session_expires' => 86400,
   'session_admin_expires' => 86400,
+  'www_perm_redirect' => false,
+  'ssl_csp' => [
+    'default-src \'self\'',
+    'style-src \'unsafe-inline\' {DOMAIN}',
+    'script-src \'unsafe-inline\' \'nonce-{SCRIPT_HASH}\'',
+    'script-src-elem {DOMAIN}',
+    'manifest-src \'self\''
+  ],
   'ssl_perm_redirect' => false,
   'ssl_hsts_max_age' => 63072000,
   'ssl_hsts_include_subdomains' => false,

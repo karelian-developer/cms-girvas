@@ -51,11 +51,15 @@ namespace core\PHPLibrary\Page\Admin\Settings {
       $file_robots_txt_path = sprintf('%s/robots.txt', CMS_ROOT_DIRECTORY);
       $file_robots_txt_content = (file_exists($file_robots_txt_path)) ? file_get_contents($file_robots_txt_path) : '';
       
+      $setting_permanent_redirect_www_status_value = $this->system_core->configurator->get_permanent_redirect_to_www_status();
+
       $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, $form_template_path, [
         'SETTINGS_NAME' => $this->name,
         'SETTING_SITE_DESCRIPTION_VALUE' => ($this->system_core->configurator->exists_database_entry_value('seo_site_description')) ? $this->system_core->configurator->get_database_entry_value('seo_site_description') : '',
         'SETTING_SITE_KEYWORDS_VALUE' => ($this->system_core->configurator->exists_database_entry_value('seo_site_keywords')) ? implode(', ', json_decode($this->system_core->configurator->get_database_entry_value('seo_site_keywords'), true)) : '',
-        'SETTING_SITE_ROBOTS_TXT_VALUE' => $file_robots_txt_content
+        'SETTING_SITE_ROBOTS_TXT_VALUE' => $file_robots_txt_content,
+        'SETTING_PERMANENT_REDIRECT_WWW_STATUS_VALUE' => ($setting_permanent_redirect_www_status_value) ? 'on' : 'off',
+        'SETTING_PERMANENT_REDIRECT_WWW_CHECKED_VALUE' => ($setting_permanent_redirect_www_status_value) ? 'checked' : '',
       ]);
     }
 

@@ -12,7 +12,8 @@
 /api/concert/
 /api/concerts/
 /api/game/
-kozyrev-media.json
+/kozyrev-media.json
+/feedback.php
 /core/PHPLibrary/Game
 /core/PHPLibrary/Minecraft
 /core/PHPLibrary/concert.class.php
@@ -40,4 +41,4 @@ kozyrev-media.json
 /core/PHPLibrary/Page/Admin/feedback.class.php
 /api/feedback/
 /api/feedback.api.php
-.gitignore
+/.gitignore

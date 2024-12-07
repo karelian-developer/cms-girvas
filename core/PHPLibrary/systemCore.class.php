@@ -41,7 +41,7 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.14 Альфа';
+    public const CMS_VERSION = '0.1.15 Альфа';
     public const CMS_DEVELOPER_TITLE = 'Garbalo (IE SHESTAKOV A.R.)';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
     public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
@@ -277,18 +277,36 @@ namespace core\PHPLibrary {
 
       $this->configurator = new SystemCoreConfigurator($this);
 
+      // Подключение к базе данных
+      if ($this->urlp->get_path(0) != 'install' && $this->urlp->get_path(1) != 'install') {
+        $this->database_connector = new SystemCoreDatabaseConnector($this, $this->configurator);
+      }
+
+      // Ядро перенаправляет клиент на HTTPS-протокол, в случае, если в CMS включена принудительная
+      // переадресация на этот порт.
       if ($_SERVER['HTTPS'] != 'on' && $this->configurator->get('ssl_perm_redirect')) {
-        $https_redirect = sprintf('https://%s%s', $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']);
+        // Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена в настройках CMS.
+        if ($this->configurator->get_permanent_redirect_to_www_status() && !preg_match('/^www\./', $_SERVER['HTTP_HOST'])) {
+          $https_redirect = sprintf('https://www.%s%s', $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']);
+        } else {
+          $https_redirect = sprintf('https://%s%s', $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']);
+        }
+
         header("HTTP/1.1 301 Moved Permanently");
         header(sprintf('Location: %s', $https_redirect));
         exit();
       }
-
-      date_default_timezone_set($this->configurator->get_site_timezone());
-
-      if ($this->urlp->get_path(0) != 'install' && $this->urlp->get_path(1) != 'install') {
-        $this->database_connector = new SystemCoreDatabaseConnector($this, $this->configurator);
+      
+      // Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена в настройках CMS.
+      if ($this->configurator->get_permanent_redirect_to_www_status() && !preg_match('/^www\./', $_SERVER['HTTP_HOST'])) {
+        $http_redirect = sprintf('http://www.%s%s', $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']);
+        header("HTTP/1.1 301 Moved Permanently");
+        header(sprintf('Location: %s', $http_redirect));
+        exit();
       }
+
+      // Указываем серверу, что будем использовать временную зону для расчета времени, указанную в настройках CMS. 
+      date_default_timezone_set($this->configurator->get_site_timezone());
 
       header(sprintf('Content-Security-Policy: %s', $this->configurator->get_security_scp()));
       header('Referrer-Policy: strict-origin-when-cross-origin');

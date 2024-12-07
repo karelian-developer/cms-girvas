@@ -386,6 +386,8 @@
   "PAGE_SETTINGS_SETTING_SEO_INPUT_KEYWORDS_PLACEHOLDER": "Вулкан Гирвас, Республика Карелия, Ловля рыбы в поселке Надвоицы",
   "PAGE_SETTINGS_SETTING_SEO_ROBOTS_TXT_TITLE": "Содержимое файла robots.txt",
   "PAGE_SETTINGS_SETTING_SEO_ROBOTS_TXT_DESCRIPTION": "Robots.txt &mdash; это текстовый файл, который содержит параметры индексирования сайта для роботов поисковых систем. В robots.txt можно ограничить индексирование роботами страниц сайта, что может снизить нагрузку на сайт и ускорить его работу. [<a href=\"https://yandex.ru/support/webmaster/controlling-robot/robots-txt.html\" target=\"_blank\">Подробнее</a>]",
+  "PAGE_SETTINGS_SETTING_PERMANENT_REDIRECT_WWW_TITLE": "Принудительная переадресация на поддомен WWW",
+  "PAGE_SETTINGS_SETTING_PERMANENT_REDIRECT_WWW_DESCRIPTION": "Принудительная переадресация на поддомен может помочь с оптимизацией сайта для поисковых роботов в том случае, если необходимо считать поддомен WWW главным адресом Вашего сайта. К примеру, если Вы используете сервис-инструмент веб-мастера в &laquo;Яндекс&raquo;, то это будет полезно для реализации переезда сайта на поддомен WWW, как на главный адрес.",
   "PAGE_SETTINGS_SETTING_USERS_ADDITIONAL_FIELDS_TITLE": "Дополнительные поля профиля",
   "PAGE_SETTINGS_SETTING_USERS_ADDITIONAL_FIELDS_TABLE_COLUMN_TYPE_FIELD_TITLE": "Тип поля",
   "PAGE_SETTINGS_SETTING_USERS_ADDITIONAL_FIELDS_TABLE_COLUMN_NAME_TITLE": "Наименование",

