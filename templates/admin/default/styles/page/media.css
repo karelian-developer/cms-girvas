@@ -27,6 +27,7 @@
 }
 
 .media-list__item > .controller-panel {
+  box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;

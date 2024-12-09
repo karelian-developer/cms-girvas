@@ -128,7 +128,7 @@
               </div>
             </div>
           </div>
-          <a href="#" class="steps-list__item-link">{LANG:PAGE_INDEX_HOVER_LABEL}</a>
+          <a href="https://doc.garbalo.com/projects/cms-girvas/exploitation.pdf" class="steps-list__item-link" target="_blank">{LANG:PAGE_INDEX_HOVER_LABEL}</a>
         </li>
       </ul>
     </div>

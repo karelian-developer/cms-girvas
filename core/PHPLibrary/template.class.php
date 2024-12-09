@@ -359,10 +359,18 @@ namespace core\PHPLibrary {
           'CMS_COPYRIGHT' => $this->system_core::get_copyright_string()
         ];
         
+        // Сборка локализации по общим данным (глобальные языковые переменные)
         $this->core->assembled = TemplateCollector::assembly_locale($this->core->assembled, $this->system_core->locale);
         $this->core->assembled = TemplateCollector::assembly_locale($this->core->assembled, $this->locale);
+
+        // Сборка локализации на основе реестра (глобальные языковые переменные) с парсингом MarkDown-разметки
+        $this->core->assembled = TemplateCollector::assembly_locale_markdown($this->core->assembled, $this->system_core->locale);
+        $this->core->assembled = TemplateCollector::assembly_locale_markdown($this->core->assembled, $this->locale);
+
+        // Внедрение значений глобальных шаблонных переменных
         $this->core->assembled = TemplateCollector::assembly($this->core->assembled, $template_tags_array);
         
+        // Вычищаем память
         unset($template_tags_array);
 
         $document_assembled_encoded = mb_encode_numericentity($this->core->assembled, [0x80, 0x10FFFF, 0, ~0], 'UTF-8');

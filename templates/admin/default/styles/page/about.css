@@ -1,0 +1,28 @@
+.main__page-aside .web-channel-items-list .web-channel-item {
+  box-sizing: border-box;
+  border-bottom: 1px dashed #EAEAEA;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.main__page-aside .web-channel-items-list .web-channel-item:last-child {
+  border: 0;
+  padding-bottom: unset;
+  margin-bottom: unset;
+}
+
+.main__page-aside .web-channel-items-list .web-channel-item__title {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 14px;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.main__page-aside .web-channel-items-list .web-channel-item__title-link {
+  text-decoration: none;
+}
+
+.main__page-aside .web-channel-items-list .web-channel-item__description-container {
+  font-size: 14px;
+}

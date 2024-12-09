@@ -79,7 +79,7 @@ a:active {
 .admin-panel__navigation {
   position: relative;
   display: block;
-  background-color: var(--admin-panel-navigation-background-color);
+  background-color: var(--common-main-color-4);
   flex: 0 0 64px;
   z-index: 10;
 }
@@ -205,7 +205,8 @@ a:active {
 .admin-navigation-list__item-link:hover,
 .admin-navigation-list__item-link:focus,
 .admin-navigation-list__item-link:active {
-  background-color: var(--common-main-color-5);
+  background-color: var(--common-main-color-7);
+  box-shadow: 0 0 10px var(--common-main-color-1--opacity-0-8);
 }
 
 .admin-navigation-list__item[role="mainNavigationExit"] .admin-navigation-list__item-link:hover,
@@ -213,6 +214,18 @@ a:active {
 .admin-navigation-list__item[role="mainNavigationExit"] .admin-navigation-list__item-link:active,
 .admin-navigation-list__item[role="mainNavigationExit"] .admin-navigation-list__item-label {
   background-color: var(--common-secondary-color-6) !important;
+}
+
+.admin-navigation-list__item[role="mainNavigationExit"] .admin-navigation-list__item-link:hover .admin-navigation-list__item-icon,
+.admin-navigation-list__item[role="mainNavigationExit"] .admin-navigation-list__item-link:focus .admin-navigation-list__item-icon,
+.admin-navigation-list__item[role="mainNavigationExit"] .admin-navigation-list__item-link:active .admin-navigation-list__item-icon {
+  fill: var(--common-main-color-2);
+}
+
+.admin-navigation-list__item[role="mainNavigationExit"] .admin-navigation-list__item-link:hover .admin-navigation-list__item-label,
+.admin-navigation-list__item[role="mainNavigationExit"] .admin-navigation-list__item-link:focus .admin-navigation-list__item-label,
+.admin-navigation-list__item[role="mainNavigationExit"] .admin-navigation-list__item-link:active .admin-navigation-list__item-label {
+  color: var(--common-main-color-2);
 }
 
 .admin-navigation-list__item-icon,
@@ -223,19 +236,30 @@ a:active {
   height: 32px;
 }
 
+.admin-navigation-list__item .admin-navigation-list__item-icon {
+  transition: fill .2s;
+}
+
+.admin-navigation-list__item .admin-navigation-list__item-link:hover .admin-navigation-list__item-icon,
+.admin-navigation-list__item .admin-navigation-list__item-link:focus .admin-navigation-list__item-icon,
+.admin-navigation-list__item .admin-navigation-list__item-link:active .admin-navigation-list__item-icon {
+  fill: var(--common-main-color-4);
+}
+
 .admin-navigation-list__item-label {
-  display: none;
+  position: absolute;
+  display: block;
   box-sizing: border-box;
-  background-color: var(--common-main-color-4);
+  background-color: var(--common-main-color-7);
   font-size: 16px;
   font-weight: 700;
-  color: var(--common-main-color-2);
+  color: var(--common-main-color-4);
   text-transform: uppercase;
   width: 0;
   height: fit-content;
   overflow-x: hidden;
   opacity: 0;
-  transition: opacity .2s;
+  transition: opacity .2s, width .2s, padding .2s;
 }
 
 @media (max-width: 1199px) {
@@ -243,9 +267,9 @@ a:active {
   .admin-navigation-list__item:focus .admin-navigation-list__item-label,
   .admin-navigation-list__item:active .admin-navigation-list__item-label {
     display: flex;
-    position: absolute;
     box-sizing: border-box;
-    background-color: var(--common-main-color-5);
+    background-color: var(--common-main-color-7);
+    border-bottom: 4px solid var(--common-main-color-4);
     padding: 16px;
     left: 0;
     top: 64px;
@@ -254,18 +278,20 @@ a:active {
 
 @media (min-width: 1200px) {
   .admin-navigation-list__item-label {
-    position: absolute;
     align-items: center;
-    background-color: var(--common-main-color-5);
-    padding: 16px;
+    background-color: var(--common-main-color-7);
+    border-right: 4px solid var(--common-main-color-4);
+    padding: 0;
     height: 100%;
     left: 64px;
     top: 0;
   }
+
   .admin-navigation-list__item:hover .admin-navigation-list__item-label,
   .admin-navigation-list__item:focus .admin-navigation-list__item-label,
   .admin-navigation-list__item:active .admin-navigation-list__item-label {
     display: flex;
+    padding: 16px;
   }
 }
 

@@ -164,12 +164,42 @@ namespace core\PHPLibrary\SystemCore {
     }
 
     /**
+     * Проверить наличие файла с реестром локализации в формате JSON
+     * 
+     * @return bool
+     */
+    public function exists_file_registry_json() : bool {
+      return file_exists($this->get_file_data_json_path());
+    }
+
+    /**
+     * Получить абсолютный путь до файла с реестром локализации в формате JSON
+     * 
+     * @return string
+     */
+    public function get_file_registry_json_path() : string {
+      return sprintf('%s/registry.json', $this->get_data_path());
+    }
+
+    /**
      * Получить данные локализации
      * 
      * @return array
      */
     public function get_data() : array|bool|null {
       $file_path = $this->get_file_data_json_path();
+      $file_content = (file_exists($file_path)) ? file_get_contents($file_path) : '{}';
+
+      return json_decode($file_content, true);
+    }
+
+    /**
+     * Получить данные реестра локализации
+     * 
+     * @return array
+     */
+    public function get_registry_array() : array {
+      $file_path = $this->get_file_registry_json_path();
       $file_content = (file_exists($file_path)) ? file_get_contents($file_path) : '{}';
 
       return json_decode($file_content, true);

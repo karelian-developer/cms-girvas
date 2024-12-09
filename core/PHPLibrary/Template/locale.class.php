@@ -19,6 +19,12 @@ namespace core\PHPLibrary\Template {
     private string $core_path;
     private string $data_path;
 
+    /**
+     * __construct
+     * 
+     * @param SystemCore $system_core
+     * @param string $name
+     */
     public function __construct(Template $template, string $name) {
       $this->system_core = $template->system_core;
       $this->template = $template;
@@ -30,14 +36,31 @@ namespace core\PHPLibrary\Template {
       $this->set_data_path($locale_data_path);
     }
 
+    /**
+     * Получить URL до иконки локализации
+     * 
+     * @return string
+     */
     public function get_icon_url() : string {
       return sprintf('/templates/%s/locales/%s/icons/16.png', $this->template->get_name(), $this->get_name());
     }
   
+    /**
+     * Установить наименование локализации
+     * 
+     * @param string $value
+     * 
+     * @return void
+     */
     private function set_name(string $value) : void {
       $this->name = $value;
     }
   
+    /**
+     * Получить наименование локализации
+     * 
+     * @return string
+     */
     public function get_name() : string {
       return $this->name;
     }
@@ -80,34 +103,87 @@ namespace core\PHPLibrary\Template {
       return $this->data_path;
     }
 
+    /**
+     * Получить заголовок локализации
+     * 
+     * @return string
+     */
     public function get_title() : string {
       $metadata = $this->get_metadata();
       return (isset($metadata['title'])) ? $metadata['title'] : '';
     }
 
+    /**
+     * Получить имя автора локализации
+     * 
+     * @return string
+     */
     public function get_author_name() : string {
       $metadata = $this->get_metadata();
       return (isset($metadata['authorName'])) ? $metadata['authorName'] : '';
     }
 
+    /**
+     * Получить код локализации стандарта ISO-639-1
+     * 
+     * @return string
+     */
     public function get_iso_639_1() : string {
       $metadata = $this->get_metadata();
       return (isset($metadata['iso639_1'])) ? $metadata['iso639_1'] : '';
     }
 
+    /**
+     * Получить код локализации стандарта ISO-639-2
+     * 
+     * @return string
+     */
     public function get_iso_639_2() : string {
       $metadata = $this->get_metadata();
       return (isset($metadata['iso639_2'])) ? $metadata['iso639_2'] : '';
     }
 
+    /**
+     * Проверить наличие файла с данными локализации в формате JSON
+     * 
+     * @return bool
+     */
     public function exists_file_data_json() : bool {
       return file_exists($this->get_file_data_json_path());
     }
 
+    /**
+     * Получить абсолютный путь до файла с данными локализации в формате JSON
+     * 
+     * @return string
+     */
     public function get_file_data_json_path() : string {
       return sprintf('%s/data.json', $this->get_data_path());
     }
 
+    /**
+     * Проверить наличие файла с реестром локализации в формате JSON
+     * 
+     * @return bool
+     */
+    public function exists_file_registry_json() : bool {
+      return file_exists($this->get_file_data_json_path());
+    }
+
+    /**
+     * Получить абсолютный путь до файла с реестром локализации в формате JSON
+     * 
+     * @return string
+     */
+    public function get_file_registry_json_path() : string {
+      return sprintf('%s/registry.json', $this->get_data_path());
+    }
+
+    /**
+     * Получить данные локализации
+     * 
+     * @return array
+     */
     public function get_data() : array|bool|null {
       $file_path = $this->get_file_data_json_path();
       $file_content = (file_exists($file_path)) ? file_get_contents($file_path) : '{}';
@@ -115,19 +191,53 @@ namespace core\PHPLibrary\Template {
       return json_decode($file_content, true);
     }
 
+    /**
+     * Получить данные реестра локализации
+     * 
+     * @return array
+     */
+    public function get_registry_array() : array {
+      $file_path = $this->get_file_registry_json_path();
+      $file_content = (file_exists($file_path)) ? file_get_contents($file_path) : '{}';
+
+      return json_decode($file_content, true);
+    }
+
+    /**
+     * Получить одиночное значение из данных локализации
+     * 
+     * @param string $key
+     * 
+     * @return string
+     */
     public function get_single_value_by_key(string $key) : string {
       $locale_data = $this->get_data();
       return (isset($locale_data[$key])) ? $locale_data[$key] : '[ ??? ]';
     }
 
+    /**
+     * Проверить наличие файла с метаданными локализации в формате JSON
+     * 
+     * @return bool
+     */
     public function exists_file_metadata_json() : bool {
       return file_exists($this->get_file_metadata_json_path());
     }
 
+    /**
+     * Получить абсолютный путь до файла с метаданными локализации в формате JSON
+     * 
+     * @return string
+     */
     public function get_file_metadata_json_path() : string {
       return sprintf('%s/metadata.json', $this->get_core_path());
     }
 
+    /**
+     * Получить метаданные локализации
+     * 
+     * @return array
+     */
     public function get_metadata() : array|null {
       $file_path = $this->get_file_metadata_json_path();
       $file_content = file_get_contents($file_path);

@@ -95,12 +95,12 @@
 .main__page.page_index .steps-list__item-link {
   position: absolute;
   display: flex;
-  backdrop-filter: blur(0);
   justify-content: center;
   align-items: center;
+  background-color: unset;
   font-size: 16px;
   font-weight: 900;
-  color: var(--admin-panel-main-aside-block-link-font-color);
+  color: var(--common-secondary-color-3);
   text-transform: uppercase;
   text-decoration: none;
   width: 100%;
@@ -109,12 +109,18 @@
   top: 0;
   opacity: 0;
   transition: opacity .2s;
+  backdrop-filter: blur(0);
 }
 
 .main__page.page_index .steps-list__item-link:hover,
 .main__page.page_index .steps-list__item-link:focus {
-  backdrop-filter: blur(4px);
+  background-color: unset;
+  backdrop-filter: blur(6px);
   opacity: 1;
+}
+
+.main__page.page_index .steps-list__item-link:focus {
+  outline: 2px solid var(--common-secondary-color-3);
 }
 
 .main__page.page_index .step-description__phar {

@@ -10,6 +10,7 @@
 
 namespace core\PHPLibrary\Template {
   use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+  use \core\PHPLibrary\Parsedown as Parsedown;
   use \core\PHPLibrary\Template as Template;
   use \core\PHPLibrary\Template\Locale as TemplateLocale;
   use \core\PHPLibrary\Module\Locale as ModuleLocale;
@@ -17,6 +18,7 @@ namespace core\PHPLibrary\Template {
   final class Collector {
     private const TEMPLATE_TAG_PATTERN = '/\{([a-zA-Z0-9_]+)\}/';
     private const TEMPLATE_TAG_LANG_PATTERN = '/\{LANG\:([a-zA-Z0-9_]+)\}/';
+    private const TEMPLATE_TAG_LANG_MARKDOWN_PATTERN = '/\{LANG\:MD\:([a-zA-Z0-9_]+)\}/';
     private const TEMPLATE_LOGIC_IF_PATTERN = '/\{\?IF\:([a-zA-Z0-9_]+)([=<>!]+)([a-zA-Z0-9_]+)\?\}(.*)\{\?ENDIF\?\}/is';
     private const TEMPLATE_LOGIC_IF_ELSE_PATTERN = '/\{\?IF\:([a-zA-Z0-9_]+)([=<>!]+)([a-zA-Z0-9_]+)\?\}(.*){\?ELSE\?\}(.*)\{\?ENDIF\?\}/is';
     private Template $template;
@@ -31,6 +33,14 @@ namespace core\PHPLibrary\Template {
       $this->template = $template;
     }
 
+    /**
+     * Сборка элементов link-стилей для последующего встраивания в секцию HEAD
+     * 
+     * @param Template $template
+     * @param array $styles_array
+     * 
+     * @return string
+     */
     public static function assembly_styles(Template $template, array $styles_array) : string {
       /** @var array $styles_assembled Массив стилей страницы, прошедших сборку */
       $styles_assembled = [];
@@ -62,6 +72,15 @@ namespace core\PHPLibrary\Template {
       return implode($styles_assembled);
     }
 
+
+    /**
+     * Сборка элементов-скриптов для последующего встраивания в секцию HEAD
+     * 
+     * @param Template $template
+     * @param array $scripts_array
+     * 
+     * @return string
+     */
     public static function assembly_scripts(Template $template, array $scripts_array) : string {
       /** @var array $styles_assembled Массив стилей страницы, прошедших сборку */
       $scripts_assembled = [];
@@ -97,6 +116,14 @@ namespace core\PHPLibrary\Template {
       return implode($scripts_assembled);
     }
 
+    /**
+     * Сборка шаблона на основе общих данных локализации
+     * 
+     * @param string $template_string
+     * @param SystemCoreLocale|TemplateLocale|ModuleLocale $locale
+     * 
+     * @return string
+     */
     public static function assembly_locale(string $template_string, SystemCoreLocale|TemplateLocale|ModuleLocale $locale) : string {
       $template_transformed = $template_string;
 
@@ -105,6 +132,41 @@ namespace core\PHPLibrary\Template {
         foreach ($locale_data as $string_name => $string_value) {
           if (preg_match(self::TEMPLATE_TAG_LANG_PATTERN, $template_transformed)) {
             $template_transformed = str_replace("{LANG:{$string_name}}", $string_value, $template_transformed);
+          }
+        }
+      }
+
+      return $template_transformed;
+    }
+
+    /**
+     * Сборка шаблона на основе файлов с разметкой MarkDown на основе реестра локализации
+     * 
+     * @param string $template_string
+     * @param SystemCoreLocale|TemplateLocale|ModuleLocale $locale
+     * 
+     * @return string
+     */
+    public static function assembly_locale_markdown(string $template_string, SystemCoreLocale|TemplateLocale|ModuleLocale $locale) : string {
+      $template_transformed = $template_string;
+      $locale_registry_array = $locale->get_registry_array();
+      $locale_core_path = $locale->get_data_path();
+      if (!empty($locale_registry_array)) {
+        foreach ($locale_registry_array as $name => $value) {
+          if (preg_match(self::TEMPLATE_TAG_LANG_MARKDOWN_PATTERN, $template_transformed)) {
+            $file_markdown_path = sprintf('%s/%s', $locale_core_path, $value);
+            
+            if (file_exists($file_markdown_path)) {
+              /**
+               * @var Parsedown Парсер markdown-разметки
+               */
+              $parsedown = new Parsedown();
+              $parsedown->setSafeMode(true);
+              $parsedown->setMarkupEscaped(true);
+
+              $file_markdown_content = file_get_contents($file_markdown_path);
+              $template_transformed = str_replace("{LANG:MD:{$name}}", $parsedown->text($file_markdown_content), $template_transformed);
+            }
           }
         }
       }
