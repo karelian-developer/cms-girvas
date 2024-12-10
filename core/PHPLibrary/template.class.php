@@ -12,6 +12,8 @@ namespace core\PHPLibrary {
   use \core\PHPLibrary\SystemCore as SystemCore;
   use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
   use \core\PHPLibrary\SystemCore\FileConnector as SystemCoreFileConnector;
+  use \core\PHPLibrary\Template\EnumMetadata as TemplateEnumMetadata;
+  use \core\PHPLibrary\Template\EnumWeight as TemplateEnumWeight;
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
   use \core\PHPLibrary\Template\Locale as TemplateLocale;
 
@@ -123,30 +125,79 @@ namespace core\PHPLibrary {
       return $this->name;
     }
 
+    /**
+     * Получить заголовок шаблона
+     */
     public function get_title() : string {
       $metadata = $this->get_metadata();
       return (isset($metadata['title'])) ? $metadata['title'] : '';
     }
 
+    /**
+     * Получить описание шаблона
+     *
+     * @return string
+     */
     public function get_description() : string {
       $metadata = $this->get_metadata();
       return (isset($metadata['description'])) ? $metadata['description'] : '';
     }
 
+    /**
+     * Получить имя автора шаблона
+     *
+     * @return string
+     */
     public function get_author_name() : string {
       $metadata = $this->get_metadata();
       return (isset($metadata['authorName'])) ? $metadata['authorName'] : '';
     }
 
+    /**
+     * Получить имя дизайнера шаблона
+     *
+     * @return string
+     */
+    public function get_author_designer_name() : string {
+      $metadata = $this->get_metadata();
+      return (isset($metadata['authorDesignerName'])) ? $metadata['authorDesignerName'] : '';
+    }
+
+    /**
+     * Получить имя дизайнера шаблона
+     *
+     * @return string
+     */
+    public function get_author_layout_name() : string {
+      $metadata = $this->get_metadata();
+      return (isset($metadata['authorLayoutName'])) ? $metadata['authorLayoutName'] : '';
+    }
+
+    /**
+     * Получить имя категории шаблона
+     *
+     * @return string
+     */
     public function get_category_name() : string {
       $metadata = $this->get_metadata();
       return (isset($metadata['categoryName'])) ? $metadata['categoryName'] : 'default';
+    }
+
+    /**
+     * Получить величину размера шаблона
+     *
+     * @return int
+     */
+    public function get_size_value() : int {
+      $metadata = $this->get_metadata();
+      return (isset($metadata['size'])) ? (int)$metadata['size'] : '';
     }
     
     /**
      * Назначить наименование категории шаблона
      *
      * @param  mixed $template_name Наименование шаблона
+     * 
      * @return void
      */
     public function set_category(string $template_category) : void {
@@ -166,6 +217,7 @@ namespace core\PHPLibrary {
      * Назначить наименование шаблона
      *
      * @param  mixed $template_name Наименование шаблона
+     * 
      * @return void
      */
     public function set_name(string $template_name) : void {
@@ -194,6 +246,7 @@ namespace core\PHPLibrary {
      * Назначить путь до шаблона
      *
      * @param  string $template_path Путь до шаблона
+     * 
      * @return void
      */
     public function set_path(string $template_path) : void {
@@ -204,24 +257,43 @@ namespace core\PHPLibrary {
      * Назначить URL до шаблона
      *
      * @param  string $template_url Путь до шаблона
+     * 
      * @return void
      */
     public function set_url(string $template_url) : void {
       $this->url = $template_url;
     }
 
+    /**
+     * Получить URL превью шаблона
+     */
     public function get_preview_url() : string {
       return sprintf('/%s/preview.png', $this->get_url());
     }
 
+    /**
+     * Получить путь до скриншотов шаблона
+     *
+     * @return string
+     */
     public function get_screenshots_path() : string {
       return sprintf('%s/screenshots', $this->get_path());
     }
 
+    /**
+     * Получить URL скриншотов шаблона
+     *
+     * @return string
+     */
     public function get_screenshots_url() : string {
       return sprintf('/%s/screenshots', $this->get_url());
     }
 
+    /**
+     * Получить массив скриншотов шаблона
+     *
+     * @return array
+     */
     public function get_screenshots_array() : array {
       $screenshots_path = $this->get_screenshots_path();
       return array_diff(scandir($screenshots_path), ['.', '..']);
@@ -274,6 +346,48 @@ namespace core\PHPLibrary {
     private function get_important_files() : array {
       return $this->important_files;
     }
+
+    /**
+     * Получить вес шаблона в байтах
+     * 
+     * @param TemplateEnumWeight $enum_weight
+     * 
+     * @return float
+     */
+    public static function get_weight(Template $template, TemplateEnumWeight $enum_weight) : float {
+      $template_path = $template->get_path();
+      $total_weight = 0;
+      
+      $directory_files = array_diff(scandir($template_path), ['.', '..']);
+      $callback_function = function(string $path, array $files, $callback, &$total_weight) : void {
+        foreach ($files as $file) {
+          $file_path = sprintf('%s/%s', $path, $file);
+
+          if (is_dir($file_path)) {
+            $directory_files = array_diff(scandir($file_path), ['.', '..']);
+            $callback($file_path, $directory_files, $callback, $total_weight);
+          } else {
+            $total_weight += filesize($file_path);
+          }
+        }
+      };
+
+      $callback_function($template_path, $directory_files, $callback_function, $total_weight);
+
+      $total_weight = match ($enum_weight) {
+        TemplateEnumWeight::BYTES => $total_weight,
+        TemplateEnumWeight::KILOBYTES => $total_weight / 1024,
+        TemplateEnumWeight::MEGABYTES => $total_weight / (1024 ^ 2),
+        TemplateEnumWeight::GIGABYTES => $total_weight / (1024 ^ 3),
+        TemplateEnumWeight::TERABYTES => $total_weight / (1024 ^ 4),
+        TemplateEnumWeight::PETABYTES => $total_weight / (1024 ^ 5),
+        TemplateEnumWeight::EXABYTES => $total_weight / (1024 ^ 6),
+        TemplateEnumWeight::ZETTABYTES => $total_weight / (1024 ^ 7),
+        TemplateEnumWeight::YOTTABYTES => $total_weight / (1024 ^ 8),
+      };
+
+      return $total_weight;
+    }
     
     /**
      * Проверка наличия обязательных файлов у шаблона
@@ -312,12 +426,42 @@ namespace core\PHPLibrary {
 
     /**
      * Добавить каноническую ссылку
+     *
+     * @param string $href
+     *
+     * @return void
      */
     public function add_link_canonical(string $href) : void {
       array_push($this->head_links, [
         'rel' => 'canonical',
         'href' => $href
       ]);
+    }
+
+    /**
+     * Получение имени ячейки метаданных
+     * 
+     * @param TemplateEnumMetadata $enum_metadata
+     * 
+     * @return string
+     */
+    public static function get_metadata_name(TemplateEnumMetadata $enum_metadata) : string {
+      return match ($enum_metadata) {
+        TemplateEnumMetadata::AUTHOR_NAME => 'authorName',
+        TemplateEnumMetadata::AUTHOR_CODE_NAME => 'authorCodeName',
+        TemplateEnumMetadata::AUTHOR_CODE_SERVER_NAME => 'authorCodeServerName',
+        TemplateEnumMetadata::AUTHOR_CODE_CLIENT_NAME => 'authorCodeClientName',
+        TemplateEnumMetadata::AUTHOR_DESIGNER_NAME => 'authorDesignerName',
+        TemplateEnumMetadata::AUTHOR_LAYOUT_NAME => 'authorLayoutName',
+        TemplateEnumMetadata::AUTHOR_SITE_LINK => 'authorSiteLink',
+        TemplateEnumMetadata::AUTHOR_SOCIAL_VK_LINK => 'authorSocialVKLink',
+        TemplateEnumMetadata::AUTHOR_SOCIAL_OK_LINK => 'authorSocialOKLink',
+        TemplateEnumMetadata::CATEGORY_NAME => 'categoryName',
+        TemplateEnumMetadata::WEIGHT => 'size',
+        TemplateEnumMetadata::DATETIME_CREATED_UNIX => 'datetimeCreatedUnix',
+        TemplateEnumMetadata::DATETIME_UPDATED_UNIX => 'datetimeUpdatedUnix',
+        TemplateEnumMetadata::VERSION => 'version'
+      };
     }
 
     /**
@@ -493,6 +637,11 @@ namespace core\PHPLibrary {
       return sprintf('%s/core.class.php', $this->get_path());
     }
 
+    /**
+     * Получить временную отметку создания ядра шаблона
+     *
+     * @return int
+     */
     public function get_core_created_unix_timestamp() : int {
       $path = $this->get_core_path();
       return filectime($path);
@@ -514,6 +663,7 @@ namespace core\PHPLibrary {
      * Получить объект ядра шаблона
      *
      * @param  mixed $template_class
+     * 
      * @return mixed
      */
     public function get_core_object(string $template_class) : mixed {
@@ -534,14 +684,29 @@ namespace core\PHPLibrary {
       return file_exists($file_path);
     }
 
+    /**
+     * Проверить наличие файла JSON метаданных шаблона
+     * 
+     * @return bool
+     */
     public function exists_file_metadata_json() : bool {
       return file_exists($this->get_file_metadata_json_path());
     }
 
+    /**
+     * Получить путь до файла JSON метаданных шаблона
+     * 
+     * @return string
+     */
     public function get_file_metadata_json_path() : string {
       return sprintf('%s/metadata.json', $this->get_path());
     }
 
+    /**
+     * Получить метаданные шаблона
+     * 
+     * @return array|null
+     */
     public function get_metadata() : array|null {
       $file_path = $this->get_file_metadata_json_path();
       $file_content = file_get_contents($file_path);
@@ -549,14 +714,29 @@ namespace core\PHPLibrary {
       return json_decode($file_content, true);
     }
 
+    /**
+     * Получить путь до файла README.md шаблона
+     * 
+     * @return string
+     */
     public function get_file_readme_md_path() : string {
       return sprintf('%s/README.md', $this->get_path());
     }
 
+    /**
+     * Получить содержимое файла README.md шаблона
+     * 
+     * @return string
+     */
     public function get_content_file_readme_md() : string {
       return ($this->exists_file_readme_md()) ? file_get_contents($this->get_file_readme_md_path()) : '';
     }
 
+    /**
+     * Проверить наличие файла README.md шаблона
+     * 
+     * @return bool
+     */
     public function exists_file_readme_md() : bool {
       return file_exists($this->get_file_readme_md_path());
     }

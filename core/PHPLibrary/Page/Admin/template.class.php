@@ -12,20 +12,56 @@ namespace core\PHPLibrary\Page\Admin {
   use \core\PHPLibrary\InterfacePage as InterfacePage;
   use \core\PHPLibrary\SystemCore as SystemCore;
   use \core\PHPLibrary\Template as Template;
+  use \core\PHPLibrary\Template\EnumMetadata as TemplateEnumMetadata;
+  use \core\PHPLibrary\Template\EnumWeight as TemplateEnumWeight;
   use \core\PHPLibrary\Parsedown as Parsedown;
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
   use \core\PHPLibrary\Page as Page;
 
   class PageTemplate implements InterfacePage {
+    /** @property SystemCore Объект системного ядра*/
     public SystemCore $system_core;
+
+    /** @property Page Объект страницы */
     public Page $page;
+
+    /** @property array Массив разрешенных типов метаданных */
+    public array $allowed_metadata = [
+      TemplateEnumMetadata::AUTHOR_NAME,
+      TemplateEnumMetadata::AUTHOR_CODE_NAME,
+      TemplateEnumMetadata::AUTHOR_CODE_SERVER_NAME,
+      TemplateEnumMetadata::AUTHOR_CODE_CLIENT_NAME,
+      TemplateEnumMetadata::AUTHOR_DESIGNER_NAME,
+      TemplateEnumMetadata::AUTHOR_LAYOUT_NAME,
+      TemplateEnumMetadata::AUTHOR_SITE_LINK,
+      TemplateEnumMetadata::AUTHOR_SOCIAL_VK_LINK,
+      TemplateEnumMetadata::AUTHOR_SOCIAL_OK_LINK,
+      TemplateEnumMetadata::CATEGORY_NAME,
+      TemplateEnumMetadata::WEIGHT,
+      TemplateEnumMetadata::DATETIME_CREATED_UNIX,
+      TemplateEnumMetadata::DATETIME_UPDATED_UNIX,
+      TemplateEnumMetadata::VERSION
+    ];
+    
+    /** @property string Итоговая сборка шаблона в виде строки */
     public string $assembled = '';
 
+    /**
+     * __construct
+     * 
+     * @return void
+     */
     public function __construct(SystemCore $system_core, Page $page) {
       $this->system_core = $system_core;
       $this->page = $page;
     }
 
+
+    /**
+     * Сборка шаблона
+     * 
+     * @return void
+     */
     public function assembly() : void {
       $this->system_core->template->add_style(['href' => 'styles/page/template.css', 'rel' => 'stylesheet']);
 
@@ -75,8 +111,8 @@ namespace core\PHPLibrary\Page\Admin {
           $template_description = file_get_contents($template_data['readme_url']);
           $template_description = (!empty($template_description)) ? $parsedown->text($template_description) : $locale_data['DEFAULT_TEXT_DESCRIPTION_NOT_FOUND'];
 
-          if (count($template_data['previews']) > 0) {
-            foreach ($template_data['previews'] as $screenshot_url) {
+          if (count($template_data['screenshots']) > 0) {
+            foreach ($template_data['screenshots'] as $screenshot_url) {
               array_push($template_screenshots_list_items, TemplateCollector::assembly('<li class="gallery__item"><img class="gallery__item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
                 'TEMPLATE_SCREENSHOT_URL' => $screenshot_url
               ]));
@@ -109,18 +145,65 @@ namespace core\PHPLibrary\Page\Admin {
       }
 
       if ($template_exists) {
-        $allowed_metadata = ['authorName'];
+        foreach ($this->allowed_metadata as $enum_metadata) {
+          /** @var string Имя ячейки метаданных */
+          $metadata_name = Template::get_metadata_name($enum_metadata);
 
-        foreach ($template_metadata as $metadata_name => $metadata_value) {
-          if (in_array($metadata_name, $allowed_metadata)) {
-            $metadata_title = $metadata_name;
-            switch ($metadata_name) {
-              case 'authorName': $metadata_title = $locale_data['PAGE_TEMPLATE_AUTHOR_LABEL']; break;
+          if (array_key_exists($metadata_name, $template_metadata) || $enum_metadata === TemplateEnumMetadata::WEIGHT) {
+            $get_metadata_value = function (Template $template, array $template_metadata, TemplateEnumMetadata $enum_metadata) {
+              $metadata_name = Template::get_metadata_name($enum_metadata);
+              
+              if ($enum_metadata === TemplateEnumMetadata::WEIGHT && $this->system_core->urlp->get_path(2) != 'repository') {
+                $template_weight = Template::get_weight($template, TemplateEnumWeight::BYTES); 
+                
+                if ($template_weight < 1024) {
+                  return sprintf('%s B', $template_weight);
+                }
+                
+                if ($template_weight >= 1024 && $template_weight < 1024 ^ 2) {
+                  return sprintf('%s KB', round($template_weight / 1024, 2));
+                }
+
+                if ($template_weight >= 1024 ^ 2 && $template_weight < 1024 ^ 3) {
+                  return sprintf('%s MB', round($template_weight / (1024 ^ 2), 2));
+                }
+
+                if ($template_weight >= 1024 ^ 3) {
+                  return sprintf('%s GB', round($template_weight / (1024 ^ 3), 2));
+                }
+              }
+
+              return isset($template_metadata[$metadata_name]) ? $template_metadata[$metadata_name] : '[???]';
+            };
+
+            /** @var string Заголовок ячейки метаданных */
+            $metadata_title = match ($enum_metadata) {
+              TemplateEnumMetadata::AUTHOR_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_NAME_LABEL'),
+              TemplateEnumMetadata::AUTHOR_CODE_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_CODE_NAME_LABEL'),
+              TemplateEnumMetadata::AUTHOR_CODE_SERVER_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_CODE_SERVER_NAME_LABEL'),
+              TemplateEnumMetadata::AUTHOR_CODE_CLIENT_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_CODE_CLIENT_NAME_LABEL'),
+              TemplateEnumMetadata::AUTHOR_DESIGNER_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_DESIGNER_NAME_LABEL'),
+              TemplateEnumMetadata::AUTHOR_LAYOUT_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_LAYOUT_NAME_LABEL'),
+              TemplateEnumMetadata::AUTHOR_SITE_LINK => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_SITE_LINK_LABEL'),
+              TemplateEnumMetadata::AUTHOR_SOCIAL_VK_LINK => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_SOCIAL_VK_LINK_LABEL'),
+              TemplateEnumMetadata::AUTHOR_SOCIAL_OK_LINK => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_SOCIAL_OK_LINK_LABEL'),
+              TemplateEnumMetadata::CATEGORY_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_CATEGORY_NAME_LABEL'),
+              TemplateEnumMetadata::WEIGHT => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_SIZE_LABEL'),
+              TemplateEnumMetadata::DATETIME_CREATED_UNIX => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_DATETIME_CREATED_UNIX_LABEL'),
+              TemplateEnumMetadata::DATETIME_UPDATED_UNIX => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_DATETIME_UPDATED_UNIX_LABEL'),
+              TemplateEnumMetadata::VERSION => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_VERSION_LABEL')
+            };
+
+            switch ($enum_metadata) {
+              case TemplateEnumMetadata::AUTHOR_SITE_LINK: $metadata_value_template = '<li class="template__metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>'; break;
+              case TemplateEnumMetadata::AUTHOR_SOCIAL_VK_LINK: $metadata_value_template = '<li class="template__metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>'; break;
+              case TemplateEnumMetadata::AUTHOR_SOCIAL_OK_LINK: $metadata_value_template = '<li class="template__metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>'; break;
+              default: $metadata_value_template = '<li class="template__metadata-item"><b>{METADATA_TITLE}:</b> {METADATA_VALUE}</li>';
             }
 
-            array_push($template_metadata_items_transformed, TemplateCollector::assembly('<li class="template__metadata-item"><b>{METADATA_TITLE}:</b> {METADATA_VALUE}</li>', [
+            array_push($template_metadata_items_transformed, TemplateCollector::assembly($metadata_value_template, [
               'METADATA_TITLE' => $metadata_title,
-              'METADATA_VALUE' => $metadata_value
+              'METADATA_VALUE' => $get_metadata_value($template, $template_metadata, $enum_metadata)
             ]));
           }
         }

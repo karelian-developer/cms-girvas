@@ -16,6 +16,46 @@ export class PageModule {
     this.page = page;
   }
 
+  initGallery(galleryElement) {
+    let controllerElement = galleryElement.querySelector('[role="controller"]');
+    let slidesListElement = galleryElement.querySelector('ul');
+    if (controllerElement != null && slidesListElement != null) {
+      let slidesListItemsElements = slidesListElement.querySelectorAll('li');
+      let controllerButtonElements = controllerElement.querySelectorAll('button');
+      if (controllerButtonElements.length > 0) {
+        controllerButtonElements.forEach((element) => {
+          element.addEventListener('click', (event) => {
+            event.preventDefault();
+
+            let computedStyle = window.getComputedStyle(slidesListItemsElements[0]);
+            let computedStyleMarginLeft = Number(computedStyle.getPropertyValue('margin-left').replace(/px/, ''));
+            let computedStyleWidth = Number(computedStyle.getPropertyValue('width').replace(/px/, ''));
+
+            if (element.getAttribute('role') == 'controller-left') {
+              if (computedStyleMarginLeft < 0) {
+                computedStyleMarginLeft += computedStyleWidth;
+              } else {
+                computedStyleMarginLeft = (computedStyleWidth * (slidesListItemsElements.length - 1)) * -1;
+              }
+
+              slidesListItemsElements[0].style.marginLeft = `${computedStyleMarginLeft}px`;
+            }
+
+            if (element.getAttribute('role') == 'controller-right') {
+              if ((computedStyleMarginLeft * -1) >= computedStyleWidth * (slidesListItemsElements.length - 1)) {
+                computedStyleMarginLeft = 0;
+              } else {
+                computedStyleMarginLeft -= computedStyleWidth;
+              }
+
+              slidesListItemsElements[0].style.marginLeft = `${computedStyleMarginLeft}px`;
+            }
+          });
+        });
+      }
+    }
+  }
+
   init() {
     let searchParams = new URLParser(), locales;
     let buttons = {enable: null, disable: null, install: null, delete: null};
@@ -42,6 +82,11 @@ export class PageModule {
     }).then((localeData) => {
 
       if (searchParams.getPathPart(2) != null) {
+        let pageGalleryElement = moduleBlock.querySelector('[role="gallery"]');
+        if (pageGalleryElement != null) {
+          this.initGallery(pageGalleryElement); 
+        }
+
         buttons.enable = new Interactive('button');
         buttons.enable.target.setLabel(localeData.BUTTON_ENABLE_LABEL);
         buttons.enable.target.setCallback(() => {

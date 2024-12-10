@@ -1,5 +1,9 @@
 {
-  "title": "GIRVAS LITE",
+  "title": "GIRVAS: Lite",
   "description": "Минималистичный **стартовый** шаблон для **CMS GIRVAS**. Отлично подойдет для небольшого блога на **любую тематику**.",
-  "authorName": "Andrey Shestakov (Drelagas)"
+  "authorDesignerName": "Андрей Шестаков (Drelagas)",
+  "authorLayoutName": "Александр Авдеев",
+  "authorSiteLink": "https://www.garbalo.com",
+  "authorSocialVKLink": "https://vk.com/garbalo",
+  "version": "1.0.0"
 }

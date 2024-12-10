@@ -6,10 +6,11 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
- .page.page_templates .templates-list {
+.page.page_templates .templates-list {
   display: flex;
   flex-wrap: wrap;
 }
+
 .page.page_templates .templates-list .list__item {
   display: flex;
   flex-direction: column;
@@ -35,27 +36,35 @@
     }
   }
 }
+
 .page.page_templates .templates-list .item__icon-container {
   background-color: var(--common-main-color-4);
+  background-size: cover;
+  background-position: center center;
   height: 180px;
 }
+
 .page.page_templates .templates-list .item__body-container {
   flex-grow: 1;
   padding: 10px;
 }
+
 .page.page_templates .templates-list .item__title {
   font-size: 16px;
   font-weight: 700;
   margin-top: 0;
   margin-bottom: 10px;
 }
+
 .page.page_templates .templates-list .item__title-link {
   text-decoration: none;
   color: inherit;
 }
+
 .page.page_templates .templates-list .item__description {
   font-size: 14px;
 }
+
 .page.page_templates .templates-list .item__footer-container {
   display: flex;
   justify-content: flex-end;
@@ -63,9 +72,15 @@
   border-top: 1px solid var(--common-main-color-2);
   padding: 10px;
 }
+
 .page.page_templates .templates-list .item__footer-container .interactive {
   margin-right: 10px;
 }
+
 .page.page_templates .templates-list .item__footer-container .interactive:last-child {
   margin-right: 0;
+}
+
+.page.page_templates .templates-list .item__footer-container .interactive .interactive__button-label {
+  font-size: 12px;
 }

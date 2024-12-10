@@ -1,3 +1,13 @@
+/* ==========================================================================================
+=> CMS GIRVAS (https://www.cms-girvas.ru/)
+=>
+=> Типовая стилизация интерактивных элементов, генерируемых CMS "GIRVAS"
+=>
+=> @link      https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
+=> @copyright Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+=> @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+============================================================================================= */
+
 .interactive .interactive__select-imitation {
   display: flex;
   position: relative;
@@ -5,11 +15,13 @@
   border: 1px solid #EAEAEA;
   width: 150px;
 }
+
 .interactive .interactive__select-imitation .select-imitation__selected-item-container {
   box-sizing: border-box;
   flex-grow: 1;
   height: 32px;
 }
+
 .interactive .interactive__select-imitation .select-imitation__selected-item {
   display: flex;
   align-items: center;
@@ -17,6 +29,7 @@
   padding: 0 10px;
   height: 100%;
 }
+
 .interactive .interactive__select-imitation .select-imitation__button {
   display: flex;
   box-sizing: border-box;
@@ -27,6 +40,7 @@
   height: 32px;
   cursor: pointer;
 }
+
 .interactive .interactive__select-imitation .select-imitation__droped-list {
   display: flex;
   flex-direction: column;
@@ -42,12 +56,14 @@
   opacity: 0;
   transition: opacity .2s;
 }
+
 .interactive .interactive__select-imitation .select-imitation__droped-list.droped-list_is-showed {
   height: auto;
   opacity: 1;
   z-index: 1; 
   overflow-x: hidden;
 }
+
 .interactive .interactive__select-imitation .droped-list__item {
   display: flex;
   box-sizing: border-box;
@@ -57,23 +73,29 @@
   padding: 10px;
   cursor: pointer;
 }
+
 .interactive .interactive__select-imitation .droped-list__item:hover {
   background-color: #EAEAEA;
 }
+
 .interactive .interactive__select-imitation .select-imitation__button-icon {
   width: 16px;
   transition: transform .2s;
 }
+
 .interactive .interactive__select-imitation .select-imitation__droped-list:not(.droped-list_is-showed) + .select-imitation__button .select-imitation__button-icon  {
   transform: rotateZ(0deg);
 }
+
 .interactive .interactive__select-imitation .select-imitation__droped-list.droped-list_is-showed + .select-imitation__button .select-imitation__button-icon  {
   transform: rotateZ(180deg);
 }
+
 .interactive .interactive__select-imitation .droped-list__item img,
 .interactive .interactive__select-imitation .select-imitation__selected-item img {
   margin-right: 10px;
 }
+
 .interactive .interactive__button {
   display: flex;
   background-color: var(--primary-color-3);
@@ -86,91 +108,119 @@
   transition: background-color .2s, color .2s;
   cursor: pointer;
 }
+
 .interactive .interactive__button[disabled] {
   color: var(--common-main-color-6);
 }
+
 .interactive .interactive__button:not([disabled]):hover {
   background-color: var(--secondary-color-2);
 }
+
 .interactive .interactive__button:not([disabled]):focus {
   background-color: var(--secondary-color-2);
 }
+
 .interactive .interactive__button:not([disabled]):active {
   background-color: var(--secondary-color-3);
 }
+
 .interactive .interactive__button_red {
   background-color: var(--secondary-color-5);
 }
+
 .interactive .interactive__button_red:not([disabled]):hover {
   background-color: var(--secondary-color-6);
 }
+
 .interactive .interactive__button_red:not([disabled]):focus {
   background-color: var(--secondary-color-6);
 }
+
 .interactive .interactive__button_red:not([disabled]):active {
   background-color: var(--secondary-color-5);
 }
+
 .interactive .interactive__button_green {
   background-color: var(--secondary-color-8);
 }
+
 .interactive .interactive__button_green:not([disabled]):hover {
   background-color: var(--secondary-color-9);
 }
+
 .interactive .interactive__button_green:not([disabled]):focus {
   background-color: var(--secondary-color-9);
 }
+
 .interactive .interactive__button_green:not([disabled]):active {
   background-color: var(--secondary-color-8);
 }
+
 .interactive .interactive__button-icon {
   margin-right: 10px;
   width: 16px;
 }
+
 .interactive .interactive__button-label {
   display: flex;
   font-size: 14px;
   font-weight: 700;
   color: var(--interactive-button-font-color);
 }
+
 .interactive .interactive__button:not([disabled]):hover .interactive__button-label {
   color: var(--secondary-color-3);
 }
+
 .interactive .interactive__button:not([disabled]):focus .interactive__button-label {
   color: var(--secondary-color-3);
 }
+
 .interactive .interactive__button:not([disabled]):active .interactive__button-label {
   color: var(--primary-color-3);
 }
+
 .interactive .interactive__button_red .interactive__button-label {
   color: var(--secondary-color-6);
 }
+
 .interactive .interactive__button_red[disabled] .interactive__button-label {
   color: var(--secondary-color-13);
 }
+
 .interactive .interactive__button_red:not([disabled]):hover .interactive__button-label {
   color: var(--primary-color-4);
 }
+
 .interactive .interactive__button_red:not([disabled]):focus .interactive__button-label {
   color: var(--primary-color-4);
 }
+
 .interactive .interactive__button_red:not([disabled]):active .interactive__button-label {
   color: var(--secondary-color-6);
 }
+
 .interactive .interactive__button_green .interactive__button-label {
   color: var(--secondary-color-9);
 }
+
 .interactive .interactive__button_green[disabled] .interactive__button-label {
   color: var(--secondary-color-14);
 }
+
 .interactive .interactive__button_green:not([disabled]):hover .interactive__button-label {
   color: var(--primary-color-4);
 }
+
 .interactive .interactive__button_green:not([disabled]):focus .interactive__button-label {
   color: var(--primary-color-4);
 }
+
 .interactive .interactive__button_green:not([disabled]):active .interactive__button-label {
   color: var(--secondary-color-9);
 }
+
 .interactive .interactive__modal-wrapper {
   position: fixed;
   display: flex;
@@ -184,34 +234,45 @@
   z-index: 100;
   backdrop-filter: blur(5px);
 }
+
 .interactive .interactive__modal {
   display: flex;
   flex-direction: column;
   background-color: var(--primary-color-4);
   box-shadow: 0 0 10px var(--primary-color-2--opacity-0-2);
-  max-width: calc(100% - 400px);
 }
-@media (min-width: 400px) {
+
+@media (min-width: 600px) {
   .interactive .interactive__modal {
     max-width: calc(100% - 400px);
   }
 }
+
+@media (min-width: 400px) and (max-width: 599px) {
+  .interactive .interactive__modal {
+    max-width: calc(100% - 100px);
+  }
+}
+
 @media (max-width: 399px) {
   .interactive .interactive__modal {
     max-width: 100%;
   }
 }
+
 .interactive .interactive__modal .modal__header-container {
   display: flex;
   background-color: var(--primary-color-2);
   color: var(--primary-color-3);
 }
+
 .interactive .interactive__modal .modal__header-label {
   flex-grow: 1;
   font-size: 14px;
   font-weight: 700;
   padding: 10px;
 }
+
 .interactive .interactive__modal .modal__header-button {
   display: flex;
   align-items: center;
@@ -222,29 +283,36 @@
   padding: 0 10px;
   height: 100%;
 }
+
 .interactive .interactive__modal .modal__header-button .interactive__button-label {
   color: inherit;
 }
+
 .interactive .interactive__modal .modal__body-container {
   font-size: 14px;
   padding: 10px;
 }
+
 .interactive .interactive__modal .modal__body-container > *:not(:last-child) {
   margin-bottom: 10px;
 }
+
 .interactive .interactive__modal .modal__body-container form input,
 .interactive .interactive__modal .modal__body-container form textarea,
 .interactive .interactive__modal .modal__body-container form select {
   width: 100%;
 }
+
 .interactive .interactive__modal .modal__body-container form input:not(:last-child),
 .interactive .interactive__modal .modal__body-container form textarea:not(:last-child),
 .interactive .interactive__modal .modal__body-container form select:not(:last-child) {
   margin-bottom: 10px;
 }
+
 .interactive .interactive__modal .modal__body-container form textarea {
   resize: none;
 }
+
 .interactive .interactive__modal .modal__footer-container {
   display: flex;
   justify-content: center;
@@ -253,6 +321,7 @@
   padding-top: 0;
   padding-bottom: 10px;
 }
+
 .interactive .interactive__modal .modal__footer-container .interactive {
   margin-right: 10px;
 }
@@ -264,12 +333,15 @@
   .interactive .interactive__modal .modal__footer-container {
     flex-direction: column;
   }
+
   .interactive .interactive__modal .modal__footer-container .interactive__button {
     width: 100%;
   }
+
   .interactive .interactive__modal .modal__footer-container > *[cmsg-interactive-uid] {
     margin-right: 0;
   }
+
   .interactive .interactive__modal .modal__footer-container > *[cmsg-interactive-uid]:not(:last-child) {
     margin-bottom: 10px;
   }
@@ -282,6 +354,7 @@
   padding: 0 40px;
   width: 100%;
 }
+
 #SYSTEM_MODAL_6438654856 .media-list__item {
   position: relative;
   background-size: cover;

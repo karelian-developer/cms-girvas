@@ -10,6 +10,8 @@
 
 namespace core\PHPLibrary {  
   use \core\PHPLibrary\Module\Locale as ModuleLocale;
+  use \core\PHPLibrary\Module\EnumMetadata as ModuleEnumMetadata;
+  use \core\PHPLibrary\Module\EnumWeight as ModuleEnumWeight;
 
   /**
    * Модуль CMS
@@ -56,7 +58,7 @@ namespace core\PHPLibrary {
       $this->locale = $cms_base_locale;
 
       $module_path = sprintf('%s/modules/%s', CMS_ROOT_DIRECTORY, $name);
-      $module_url = sprintf('modules/%s', CMS_ROOT_DIRECTORY, $name);
+      $module_url = sprintf('modules/%s', $name);
 
       $this->set_path($module_path);
       $this->set_url($module_url);
@@ -174,6 +176,74 @@ namespace core\PHPLibrary {
     public function get_author_name() : string {
       $metadata = $this->get_metadata();
       return (isset($metadata['authorName'])) ? $metadata['authorName'] : '';
+    }
+
+    /**
+     * Получить вес модуля в байтах
+     * 
+     * @param ModuleEnumWeight $enum_weight
+     * 
+     * @return float
+     */
+    public static function get_weight(Module $module, ModuleEnumWeight $enum_weight) : float {
+      $module_path = $module->get_path();
+      $total_weight = 0;
+      
+      $directory_files = array_diff(scandir($module_path), ['.', '..']);
+      $callback_function = function(string $path, array $files, $callback, &$total_weight) : void {
+        foreach ($files as $file) {
+          $file_path = sprintf('%s/%s', $path, $file);
+
+          if (is_dir($file_path)) {
+            $directory_files = array_diff(scandir($file_path), ['.', '..']);
+            $callback($file_path, $directory_files, $callback, $total_weight);
+          } else {
+            $total_weight += filesize($file_path);
+          }
+        }
+      };
+
+      $callback_function($module_path, $directory_files, $callback_function, $total_weight);
+
+      $total_weight = match ($enum_weight) {
+        ModuleEnumWeight::BYTES => $total_weight,
+        ModuleEnumWeight::KILOBYTES => $total_weight / 1024,
+        ModuleEnumWeight::MEGABYTES => $total_weight / (1024 ^ 2),
+        ModuleEnumWeight::GIGABYTES => $total_weight / (1024 ^ 3),
+        ModuleEnumWeight::TERABYTES => $total_weight / (1024 ^ 4),
+        ModuleEnumWeight::PETABYTES => $total_weight / (1024 ^ 5),
+        ModuleEnumWeight::EXABYTES => $total_weight / (1024 ^ 6),
+        ModuleEnumWeight::ZETTABYTES => $total_weight / (1024 ^ 7),
+        ModuleEnumWeight::YOTTABYTES => $total_weight / (1024 ^ 8),
+      };
+
+      return $total_weight;
+    }
+
+    /**
+     * Получение имени ячейки метаданных
+     * 
+     * @param ModuleEnumMetadata $enum_metadata
+     * 
+     * @return string
+     */
+    public static function get_metadata_name(ModuleEnumMetadata $enum_metadata) : string {
+      return match ($enum_metadata) {
+        ModuleEnumMetadata::AUTHOR_NAME => 'authorName',
+        ModuleEnumMetadata::AUTHOR_CODE_NAME => 'authorCodeName',
+        ModuleEnumMetadata::AUTHOR_CODE_SERVER_NAME => 'authorCodeServerName',
+        ModuleEnumMetadata::AUTHOR_CODE_CLIENT_NAME => 'authorCodeClientName',
+        ModuleEnumMetadata::AUTHOR_DESIGNER_NAME => 'authorDesignerName',
+        ModuleEnumMetadata::AUTHOR_LAYOUT_NAME => 'authorLayoutName',
+        ModuleEnumMetadata::AUTHOR_SITE_LINK => 'authorSiteLink',
+        ModuleEnumMetadata::AUTHOR_SOCIAL_VK_LINK => 'authorSocialVKLink',
+        ModuleEnumMetadata::AUTHOR_SOCIAL_OK_LINK => 'authorSocialOKLink',
+        ModuleEnumMetadata::CATEGORY_NAME => 'categoryName',
+        ModuleEnumMetadata::WEIGHT => 'size',
+        ModuleEnumMetadata::DATETIME_CREATED_UNIX => 'datetimeCreatedUnix',
+        ModuleEnumMetadata::DATETIME_UPDATED_UNIX => 'datetimeUpdatedUnix',
+        ModuleEnumMetadata::VERSION => 'version'
+      };
     }
     
     /**

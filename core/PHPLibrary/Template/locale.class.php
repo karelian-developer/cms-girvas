@@ -22,7 +22,7 @@ namespace core\PHPLibrary\Template {
     /**
      * __construct
      * 
-     * @param SystemCore $system_core
+     * @param Template $template
      * @param string $name
      */
     public function __construct(Template $template, string $name) {
@@ -189,6 +189,22 @@ namespace core\PHPLibrary\Template {
       $file_content = (file_exists($file_path)) ? file_get_contents($file_path) : '{}';
 
       return json_decode($file_content, true);
+    }
+
+    /**
+     * Получить значение элемента локализации
+     * 
+     * @param array $data
+     * @param string $name
+     * 
+     * @return array
+     */
+    public static function get_data_value(array $data, string $name) : string {
+      if (array_key_exists($name, $data)) {
+        return $data[$name];
+      }
+
+      return sprintf('<span style="background-color: red;color: white;">[%s]</span>', $name);
     }
 
     /**

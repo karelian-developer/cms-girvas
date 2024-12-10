@@ -194,6 +194,22 @@ namespace core\PHPLibrary\SystemCore {
     }
 
     /**
+     * Получить значение элемента локализации
+     * 
+     * @param array $data
+     * @param string $name
+     * 
+     * @return array
+     */
+    public static function get_data_value(array $data, string $name) : string {
+      if (array_key_exists($name, $data)) {
+        return $data[$name];
+      }
+
+      return sprintf('<span style="background-color: red;color: white;">[%s]</span>', $name);
+    }
+
+    /**
      * Получить данные реестра локализации
      * 
      * @return array

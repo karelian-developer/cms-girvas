@@ -87,16 +87,22 @@ namespace core\PHPLibrary\Page\Admin {
               $template = new Template($this->system_core, $template_name);
               $template_installed_status = ($template->exists_file_metadata_json()) ? 'installed' : 'not-installed';
 
+              $template_metadata_title = isset($template_data['metadata']['title']) ? $template_data['metadata']['title'] : 'Anonymous Template';
+              $template_metadata_description = isset($template_data['metadata']['description']) ? $template_data['metadata']['description'] : 'Without description.';
+              $template_metadata_datetime_created_unix = isset($template_data['metadata']['createdUnixTimestamp']) ? $template_data['metadata']['createdUnixTimestamp'] : 0;
+              $template_metadata_author_name = isset($template_data['metadata']['authorName']) ? $template_data['metadata']['authorName'] : 'Anonymous';
+              $template_metadata_category_name = isset($template_data['metadata']['categoryName']) ? $template_data['metadata']['categoryName'] : 'default';
+
               array_push($templates_list_items_transformed_array, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/templates/listItem.tpl', [
                 'TEMPLATE_NAME' => $template_name,
-                'TEMPLATE_TITLE' => $template_data['metadata']['title'],
-                'TEMPLATE_DESCRIPTION' => $parsedown->text($template_data['metadata']['description']),
-                'TEMPLATE_CREATED_TIMESTAMP' => date('d.m.Y', $template_data['metadata']['createdUnixTimestamp']),
-                'TEMPLATE_AUTHOR' => $template_data['metadata']['authorName'],
+                'TEMPLATE_TITLE' => $template_metadata_title,
+                'TEMPLATE_DESCRIPTION' => $parsedown->text($template_metadata_description),
+                'TEMPLATE_CREATED_TIMESTAMP' => date('d.m.Y', $template_metadata_datetime_created_unix),
+                'TEMPLATE_AUTHOR_NAME' => $template_metadata_author_name,
                 'TEMPLATE_LINK' => sprintf('/admin/templates/repository/%s', $template->get_name()),
-                'TEMPLATE_PREVIEW_URL' => $template_data['previews'][0],
+                'TEMPLATE_PREVIEW_URL' => $template_data['preview'],
                 'TEMPLATE_INSTALLED_STATUS' => $template_installed_status,
-                'TEMPLATE_CATEGORY_NAME' => (isset($template_data['metadata']['categoryName'])) ? $template_data['metadata']['categoryName'] : 'default'
+                'TEMPLATE_CATEGORY_NAME' => $template_metadata_category_name
               ]));
             }
           }

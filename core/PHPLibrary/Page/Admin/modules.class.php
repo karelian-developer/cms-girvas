@@ -90,16 +90,23 @@ namespace core\PHPLibrary\Page\Admin {
                 $module_installed_status = ($module->exists_file_metadata_json()) ? 'installed' : 'not-installed';
                 $module_enabled_status = ($module->is_enabled()) ? 'enabled' : 'disabled';
 
+                $module_metadata_title = isset($module_data['metadata']['title']) ? $module_data['metadata']['title'] : 'Anonymous Module';
+                $module_metadata_description = isset($module_data['metadata']['description']) ? $module_data['metadata']['description'] : 'Without description.';
+                $module_metadata_datetime_created_unix = isset($module_data['metadata']['datetimeCreatedUnix']) ? $module_data['metadata']['datetimeCreatedUnix'] : 0;
+                $module_metadata_author_name = isset($module_data['metadata']['authorName']) ? $module_data['metadata']['authorName'] : 'Anonymous';
+                $module_metadata_category_name = isset($module_data['metadata']['categoryName']) ? $module_data['metadata']['categoryName'] : 'default';
+
                 array_push($modules_list_items_transformed_array, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/modules/listItem.tpl', [
                   'MODULE_NAME' => $module_name,
-                  'MODULE_TITLE' => $module_data['metadata']['title'],
-                  'MODULE_DESCRIPTION' => $parsedown->text($module_data['metadata']['description']),
-                  'MODULE_CREATED_TIMESTAMP' => date('d.m.Y', $module_data['metadata']['createdUnixTimestamp']),
-                  'MODULE_AUTHOR' => $module_data['metadata']['authorName'],
+                  'MODULE_TITLE' => $module_metadata_title,
+                  'MODULE_DESCRIPTION' => $parsedown->text($module_metadata_description),
+                  'MODULE_CREATED_TIMESTAMP' => date('d.m.Y', $module_metadata_datetime_created_unix),
+                  'MODULE_AUTHOR_NAME' => $module_metadata_author_name,
                   'MODULE_LINK' => sprintf('/admin/modules/repository/%s', $module->get_name()),
-                  'MODULE_PREVIEW_URL' => $module_data['previews'][0],
+                  'MODULE_PREVIEW_URL' => $module_data['preview'],
                   'MODULE_INSTALLED_STATUS' => $module_installed_status,
-                  'MODULE_ENABLED_STATUS' => $module_enabled_status
+                  'MODULE_ENABLED_STATUS' => $module_enabled_status,
+                  'TEMPLATE_CATEGORY_NAME' => $module_metadata_category_name
                 ]));
               }
             }
@@ -128,7 +135,7 @@ namespace core\PHPLibrary\Page\Admin {
                 'MODULE_DESCRIPTION' => $parsedown->text($module->get_description()),
                 'MODULE_CREATED_TIMESTAMP' => date('d.m.Y', $module->get_core_created_unix_timestamp()),
                 'MODULE_AUTHOR' => $module->get_author_name(),
-                //'MODULE_PREVIEW_URL' => $module->get_preview_url(),
+                'MODULE_PREVIEW_URL' => $module->get_preview_url(),
                 'MODULE_LINK' => sprintf('/admin/module/%s', $module->get_name()),
                 'MODULE_INSTALLED_STATUS' => $module_installed_status,
                 'MODULE_ENABLED_STATUS' => $module_enabled_status

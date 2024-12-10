@@ -1,10 +1,17 @@
-/**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
- * 
- * @link        https://github.com/Andrey-Shestakov/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
- * @license     https://github.com/Andrey-Shestakov/cms-girvas/LICENSE.md
- */
+/* ==========================================================================================
+=> CMS GIRVAS (https://www.cms-girvas.ru/)
+=>
+=> Типовой набор шрифтов CMS
+=>
+=> @link      https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
+=> @copyright Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+=> @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+============================================================================================= */
+
+/* ==========================================================================================
+  В типовой набор входит семейство шрифта Roboto на основании лицензии провообладателя.
+  Лицензия: https://www.apache.org/licenses/LICENSE-2.0
+============================================================================================= */
 
 @font-face {
   font-family: 'Roboto';

@@ -1,3 +1,13 @@
+/* ==========================================================================================
+=> CMS GIRVAS (https://www.cms-girvas.ru/)
+=>
+=> Типовая базовая стилизация
+=>
+=> @link      https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
+=> @copyright Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+=> @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+============================================================================================= */
+
 pre, p {
   margin-top: 0;
 }
@@ -7,8 +17,42 @@ pre:not(:last-child), p:not(:last-child) {
 }
 
 pre {
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  font-size: 12px;
+  max-width: 100%;
+}
+
+pre > code {
   display: block;
-  width: calc(100% - 40px);
-  height: fit-content;
-  overflow-x: scroll;
+  color: var(--primary-color-2);
+  padding-left: 10px;
+  border-left: 4px dashed var(--primary-color-3);
+}
+
+pre > code::before {
+  display: block;
+  background-color: var(--primary-color-3);
+  text-transform: uppercase;
+  color: var(--primary-color-2);
+  content: 'code';
+  padding: 5px 10px;
+  margin-bottom: 10px;
+}
+
+pre > code.language-xml::before {
+  content: 'xml';
+}
+
+pre > code.language-html::before {
+  content: 'html';
+}
+
+pre > code.language-css::before {
+  content: 'css';
+}
+
+pre > code.language-bash::before {
+  content: 'bash';
 }
