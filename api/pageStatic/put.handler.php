@@ -69,7 +69,7 @@ if ($system_core->client->is_logged(2)) {
             $textarea_value = preg_replace('/<script(.*?)>(.*?)<\/script>/is', '', $textarea_value);
             $textarea_value = str_replace('\'', '"', $textarea_value);
             
-            $texts[$cms_locale->get_name()]['keywords'] = preg_split('/\h*[\,]+\h*/', htmlspecialchars(str_replace('\'', '"', $textarea_value)), -1, PREG_SPLIT_NO_EMPTY);
+            $texts[$cms_locale->get_name()]['keywords'] = preg_split('/\h*[\,]+\h*/', $textarea_value, -1, PREG_SPLIT_NO_EMPTY);
           }
         }
       }
