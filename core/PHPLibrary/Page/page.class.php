@@ -91,8 +91,8 @@ namespace core\PHPLibrary\Page {
             $this->page->breadcrumbs->assembly();
 
             $this->system_core->configurator->set_meta_title($page_static->get_title($cms_base_locale_name));
-            $this->system_core->configurator->set_meta_description($page_static->get_description($cms_base_locale_name));
-            $this->system_core->configurator->set_meta_keywrords($page_static->get_keywords($cms_base_locale_name));
+            $this->system_core->configurator->set_meta_description(str_replace('"', '&quot;', $page_static->get_description($cms_base_locale_name)));
+            $this->system_core->configurator->set_meta_keywrords(str_replace('"', '&quot;', $page_static->get_keywords($cms_base_locale_name)));
 
             /**
              * @var Parsedown Парсер markdown-разметки

@@ -9,7 +9,9 @@
 'use strict';
 
 export class ElementTextarea {
-  constructor(element = null) {
+  constructor(interactiveFormObject, element = null) {
+    this.interactiveFormObject = interactiveFormObject;
+    
     this.element = element;
   }
 

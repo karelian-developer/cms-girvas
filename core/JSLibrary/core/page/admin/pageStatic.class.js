@@ -109,6 +109,8 @@ export class PagePageStatic {
         let utils = new Utils();
         /** @var {UString} */
         let uString = utils.createString(inputValue);
+        uString.source = uString.source.toLowerCase();
+        uString.source = uString.source.replace(/[^a-z0-9\-]/, '');
 
         event.target.value = uString.translitToEN(true);
       });
@@ -142,6 +144,18 @@ export class PagePageStatic {
           }
         });
       });
+
+      this.buttons.viewOnSite = new Interactive('button');
+      this.buttons.viewOnSite.target.setLabel(localeData.BUTTON_VIEW_ON_SITE_LABEL);
+      this.buttons.viewOnSite.target.setCallback((event) => {
+        event.preventDefault();
+
+        let pageURL = urlInputElement.value;
+        let pageLocaleName = interactiveChoicesSelectElement.value;
+
+        window.open(`/page/${pageURL}?locale=${pageLocaleName}`, '_blank');
+      });
+      this.buttons.viewOnSite.assembly();
 
       this.buttons.save = new Interactive('button');
       this.buttons.save.target.setLabel('Сохранить');
@@ -272,6 +286,7 @@ export class PagePageStatic {
       this.buttons.unpublish.assembly();
 
       if (searchParams.getPathPart(3) == null) {
+        this.buttons.viewOnSite.target.element.style.display = 'none';
         this.buttons.unpublish.target.element.style.display = 'none';
         this.buttons.publish.target.element.style.display = 'none';
         this.buttons.delete.target.element.style.display = 'none';
@@ -373,11 +388,15 @@ export class PagePageStatic {
             previewBlockContentContainerElement.appendChild(previewImageContainerElement);
             previewBlockContentContainerElement.appendChild(previewFormElement);
 
+            this.buttons.viewOnSite.target.element.style.display = 'flex';
             this.buttons.unpublish.target.element.style.display = (pageData.isPublished) ? 'flex' : 'none';
             this.buttons.publish.target.element.style.display = (pageData.isPublished) ? 'none' : 'flex';
             this.buttons.delete.target.element.style.display = 'flex';
             this.buttons.save.target.element.style.display = 'flex';
+
+            interactiveContainerElement.append(this.buttons.viewOnSite.target.element);
           } else {
+            this.buttons.viewOnSite.target.element.style.display = 'none';
             this.buttons.unpublish.target.element.style.display = 'none';
             this.buttons.publish.target.element.style.display = 'none';
             this.buttons.delete.target.element.style.display = 'none';

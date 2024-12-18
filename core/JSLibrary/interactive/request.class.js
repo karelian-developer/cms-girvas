@@ -20,7 +20,9 @@ export class Request {
    * @param {*} method 
    * @param {*} url 
    */
-  constructor(method, url, data = undefined) {
+  constructor(interactiveObject, method, url, data = undefined) {
+    this.interactiveObject = interactiveObject;
+
     this.setMethod(method);
     this.setURL(url);
 

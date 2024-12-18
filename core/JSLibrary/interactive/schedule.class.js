@@ -13,7 +13,9 @@ import {Legend} from './schedule/legend.class.js';
 import {Linear as ScheduleLinear} from './schedule/types/linear.class.js';
 
 export class Schedule {
-  constructor(canvas, type = 'linear') {
+  constructor(interactiveObject, canvas, type = 'linear') {
+    this.interactiveObject = interactiveObject;
+
     this.dataCollision = {x: 0, y: 0};
     this.mouseCollision = false;
     this.mouse = {x: 0, y: 0};

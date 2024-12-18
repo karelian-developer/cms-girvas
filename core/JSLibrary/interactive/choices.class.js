@@ -18,7 +18,9 @@
  * стилизовать выпадающий список любым способом посредством JavaScript или CSS.
  */
 export class Choices {
-  constructor() {
+  constructor(interactiveObject) {
+    this.interactiveObject = interactiveObject;
+
     this.element = null;
     this.elementSelect = null;
     this.elementInteractive = null;
@@ -116,8 +118,17 @@ export class Choices {
     dropedListContainerElement.classList.add('droped-list');
     dropedListContainerElement.classList.add('list-reset');
 
+    selectedItemContainerElement.addEventListener('click', (event) => {
+      event.preventDefault();
+      this.collapseOther();
+
+      dropedListContainerElement.classList.toggle('droped-list_is-showed');
+    });
+
     selectContainerButton.addEventListener('click', (event) => {
       event.preventDefault();
+      this.collapseOther();
+
       dropedListContainerElement.classList.toggle('droped-list_is-showed');
     });
 
@@ -217,5 +228,27 @@ export class Choices {
     element.append(this.elementInteractive);
 
     this.element = element;
+  }
+
+  /**
+   * Сворачивание других открытых выпадающих списков
+   */
+  collapseOther() {
+    let interactiveObjectUID = this.interactiveObject.id;
+    let classModificatorInteractiveChoiceName = `interactive_${this.constructor.name.toLocaleLowerCase()}`;
+    let interactiveChoicesOther = document.querySelectorAll(`.${classModificatorInteractiveChoiceName}`);
+    
+    if (interactiveChoicesOther.length > 0) {
+      interactiveChoicesOther.forEach((element) => {
+        let interactiveElementUID = element.getAttribute('cmsg-interactive-uid');
+
+        if (interactiveElementUID != interactiveObjectUID) {
+          let oDropedListContainerElement = element.querySelector('.select-imitation__droped-list');
+          if (oDropedListContainerElement != null) {
+            oDropedListContainerElement.classList.remove('droped-list_is-showed');
+          }
+        }
+      });
+    }
   }
 }

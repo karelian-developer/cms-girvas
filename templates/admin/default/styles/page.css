@@ -401,6 +401,7 @@
 
 .page__interactive-container {
   display: flex;
+  align-items: center;
 }
 
 .page__interactive-container > .interactive {

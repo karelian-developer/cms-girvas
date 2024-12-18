@@ -9,7 +9,9 @@
 'use strict';
 
 export class Button {
-  constructor() {
+  constructor(interactiveObject) {
+    this.interactiveObject = interactiveObject;
+    
     this.element = null;
     this.label = null;
     this.iconUrl = null;

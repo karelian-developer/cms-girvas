@@ -104,6 +104,8 @@ export class PageEntriesCategory {
         let utils = new Utils();
         /** @var {UString} */
         let uString = utils.createString(inputValue);
+        uString.source = uString.source.toLowerCase();
+        uString.source = uString.source.replace(/[^a-z0-9\-]/, '');
 
         event.target.value = uString.translitToEN(true);
       });

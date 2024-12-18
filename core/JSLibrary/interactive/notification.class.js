@@ -9,7 +9,9 @@
 'use strict';
 
 export class Notification {
-  constructor() {
+  constructor(interactiveObject) {
+    this.interactiveObject = interactiveObject;
+
     this.element = null;
     this.title = '';
     this.content = '';

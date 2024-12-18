@@ -100,22 +100,24 @@ export class PageEntry {
 
       interactiveLocaleChoices.assembly();
 
-      let interactiveContainerElement = document.querySelector('#E8548530785');
-      interactiveContainerElement.append(interactiveLocaleChoices.target.element);
+      let interactiveHeaderContainerElement = document.querySelector('#E8548530785');
+      interactiveHeaderContainerElement.append(interactiveLocaleChoices.target.element);
 
       urlInputElement.addEventListener('input', (event) => {
         /** @var {String} */
         let inputValue = event.target.value;
-
+        
         /** @var {Utils} */
         let utils = new Utils();
         /** @var {UString} */
         let uString = utils.createString(inputValue);
+        uString.source = uString.source.toLowerCase();
+        uString.source = uString.source.replace(/[^a-z0-9\-]/, '');
 
         event.target.value = uString.translitToEN(true);
       });
 
-      let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
+      let interactiveChoicesSelectElement = interactiveHeaderContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
         locales.forEach((locale, localeIndex) => {
           if (locale.name == event.target.value) {
@@ -142,6 +144,18 @@ export class PageEntry {
           }
         });
       });
+
+      this.buttons.viewOnSite = new Interactive('button');
+      this.buttons.viewOnSite.target.setLabel(localeData.BUTTON_VIEW_ON_SITE_LABEL);
+      this.buttons.viewOnSite.target.setCallback((event) => {
+        event.preventDefault();
+
+        let entryURL = urlInputElement.value;
+        let entryLocaleName = interactiveChoicesSelectElement.value;
+
+        window.open(`/entry/${entryURL}?locale=${entryLocaleName}`, '_blank');
+      });
+      this.buttons.viewOnSite.assembly();
 
       this.buttons.save = new Interactive('button');
       this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
@@ -295,6 +309,7 @@ export class PageEntry {
           }
         });
 
+        this.buttons.viewOnSite.target.element.style.display = 'none';
         this.buttons.unpublish.target.element.style.display = 'none';
         this.buttons.publish.target.element.style.display = 'none';
         this.buttons.delete.target.element.style.display = 'none';
@@ -392,11 +407,13 @@ export class PageEntry {
             previewBlockContentContainerElement.appendChild(previewImageContainerElement);
             previewBlockContentContainerElement.appendChild(previewFormElement);
 
+            this.buttons.viewOnSite.target.element.style.display = 'flex';
             this.buttons.unpublish.target.element.style.display = (entryData.isPublished) ? 'flex' : 'none';
             this.buttons.publish.target.element.style.display = (entryData.isPublished) ? 'none' : 'flex';
             this.buttons.delete.target.element.style.display = 'flex';
             this.buttons.save.target.element.style.display = 'flex';
           } else {
+            this.buttons.viewOnSite.target.element.style.display = 'none';
             this.buttons.unpublish.target.element.style.display = 'none';
             this.buttons.publish.target.element.style.display = 'none';
             this.buttons.delete.target.element.style.display = 'none';
@@ -440,6 +457,7 @@ export class PageEntry {
     
             let interactiveContainer = document.querySelector('#TC6474389611');
             interactiveContainer.append(interactiveCategoriesChoices.target.element);
+            interactiveHeaderContainerElement.append(this.buttons.viewOnSite.target.element);
           }
         }, (rejectionReason) => {
           let interactiveNotification = new Interactive('notification');
@@ -452,11 +470,11 @@ export class PageEntry {
         });
       }
 
-      let interactiveContainer = document.querySelector('#SYSTEM_E3724126170');
-      interactiveContainer.append(this.buttons.delete.target.element);
-      interactiveContainer.append(this.buttons.unpublish.target.element);
-      interactiveContainer.append(this.buttons.publish.target.element);
-      interactiveContainer.append(this.buttons.save.target.element);
+      let interactiveFooterContainer = document.querySelector('#SYSTEM_E3724126170');
+      interactiveFooterContainer.append(this.buttons.delete.target.element);
+      interactiveFooterContainer.append(this.buttons.unpublish.target.element);
+      interactiveFooterContainer.append(this.buttons.publish.target.element);
+      interactiveFooterContainer.append(this.buttons.save.target.element);
     });
   }
 }

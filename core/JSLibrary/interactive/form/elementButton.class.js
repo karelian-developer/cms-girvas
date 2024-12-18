@@ -11,7 +11,9 @@
 import {Interactive} from "../../interactive.class.js";
 
 export class ElementButton {
-  constructor(element = null) {
+  constructor(interactiveFormObject, element = null) {
+    this.interactiveFormObject = interactiveFormObject;
+    
     this.element = element;
     this.stringLabel = 'Click';
     this.iconLabel = '???';

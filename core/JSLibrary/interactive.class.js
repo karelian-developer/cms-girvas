@@ -44,15 +44,15 @@ export class Interactive {
     }
 
     switch (interactiveName) {
-      case 'button': this.target = new Button(); break;
-      case 'input': this.target = new Input(); break;
-      case 'choices': this.target = new Choices(); break;
-      case 'schedule': this.target = new Schedule(data.canvasElement, data.type); break;
-      case 'form': this.target = new Form(); break;
-      case 'modal': this.target = new Modal(data.title, data.content, data.description, data.width); break;
-      case 'request': this.target = new Request(data.method, data.url, data.data); break;
-      case 'notification': this.target = new Notification(); break;
-      case 'slider': this.target = new Slider(); break;
+      case 'button': this.target = new Button(this); break;
+      case 'input': this.target = new Input(this); break;
+      case 'choices': this.target = new Choices(this); break;
+      case 'schedule': this.target = new Schedule(this, data.canvasElement, data.type); break;
+      case 'form': this.target = new Form(this); break;
+      case 'modal': this.target = new Modal(this, data.title, data.content, data.description, data.width); break;
+      case 'request': this.target = new Request(this, data.method, data.url, data.data); break;
+      case 'notification': this.target = new Notification(this); break;
+      case 'slider': this.target = new Slider(this); break;
     }
 
     if (typeof(window.CMSCore) != 'undefined') {
@@ -83,8 +83,10 @@ export class Interactive {
   assembly() {
     this.target.assembly();
     this.target.element.setAttribute('cmsg-interactive-uid', this.id);
-
+    
     this.target.element.classList.add(`interactive`);
-    this.target.element.classList.add(`interactive_${this.target.constructor.name.toLocaleLowerCase()}`);
+
+    let classModificatorName = `interactive_${this.target.constructor.name.toLocaleLowerCase()}`;
+    this.target.element.classList.add(classModificatorName);
   }
 }

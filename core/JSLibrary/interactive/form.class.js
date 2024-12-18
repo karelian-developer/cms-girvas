@@ -23,7 +23,9 @@ export class Form {
    * 
    * @param {*} element 
    */
-  constructor(element = null) {
+  constructor(interactiveObject, element = null) {
+    this.interactiveObject = interactiveObject;
+
     this.element = element;
     this.successCallback = (data) => {};
     this.failCallback = (error) => {};
@@ -118,7 +120,7 @@ export class Form {
    * @returns {ElementTextarea}
    */
   createElementTextarea(attributes = {}) {
-    let element = new ElementTextarea();
+    let element = new ElementTextarea(this);
     element.init(attributes);
     return element;
   }
@@ -130,7 +132,7 @@ export class Form {
    * @returns {ElementInput}
    */
   createElementInput(attributes = {}) {
-    let element = new ElementInput();
+    let element = new ElementInput(this);
     element.init(attributes);
     return element;
   }
@@ -142,7 +144,7 @@ export class Form {
    * @returns {ElementButton}
    */
   createElementButton(attributes = {}) {
-    let element = new ElementButton();
+    let element = new ElementButton(this);
     element.init(attributes);
     return element;
   }

@@ -91,7 +91,7 @@ export class PageEntriesComments {
               elementForm.classList.add('form');
               let elementTextarea = document.createElement('textarea');
               elementTextarea.classList.add('form__textarea');
-              elementTextarea.style.width = '300px';
+              elementTextarea.style.width = '100%';
               elementTextarea.setAttribute('name', 'comment_hidden_reason');
               elementTextarea.setAttribute('placeholder', localeData.MODAL_COMMENT_HIDE_REASON_PLACEHOLDER);
               elementForm.append(elementTextarea);

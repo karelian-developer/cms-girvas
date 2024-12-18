@@ -90,8 +90,8 @@ namespace core\PHPLibrary\Page {
             $entry_category_title = $entry_category->get_title($cms_base_locale_name);
 
             $this->system_core->configurator->set_meta_title($entry->get_title($cms_base_locale_name));
-            $this->system_core->configurator->set_meta_description($entry->get_description($cms_base_locale_name));
-            $this->system_core->configurator->set_meta_keywrords($entry->get_keywords($cms_base_locale_name));
+            $this->system_core->configurator->set_meta_description(str_replace('"', '&quot;', $entry->get_description($cms_base_locale_name)));
+            $this->system_core->configurator->set_meta_keywrords(str_replace('"', '&quot;', $entry->get_keywords($cms_base_locale_name)));
 
             $this->page->breadcrumbs->add($locale_data['PAGE_ENTRY_BREADCRUMPS_ALL_ENTRIES_LABEL'], '/entries');
             $this->page->breadcrumbs->add($entry_category_title, sprintf('/entries/%s', $entry_category->get_name()));

@@ -11,7 +11,9 @@
 import {Interactive} from "../interactive.class.js";
 
 export class Modal {
-  constructor(modalTitle, modalDescription, modalContent, modalWidth) {
+  constructor(interactiveObject, modalTitle, modalDescription, modalContent, modalWidth) {
+    this.interactiveObject = interactiveObject;
+
     this.title = modalTitle;
     this.description = modalDescription;
     this.content = modalContent;

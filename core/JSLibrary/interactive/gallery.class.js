@@ -9,7 +9,9 @@
 'use strict';
 
 export class Gallery {
-  constructor() {
+  constructor(interactiveObject) {
+    this.interactiveObject = interactiveObject;
+
     this.element = null;
     this.items = [];
     this.assembled = null;

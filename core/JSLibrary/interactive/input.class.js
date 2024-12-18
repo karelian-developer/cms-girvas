@@ -9,7 +9,9 @@
 'use strict';
 
 export class Input {
-  constructor() {
+  constructor(interactiveObject) {
+    this.interactiveObject = interactiveObject;
+
     this.element = null;
     this.value = null;
     this.type = null;

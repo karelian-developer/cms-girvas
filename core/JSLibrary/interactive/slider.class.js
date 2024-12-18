@@ -11,7 +11,9 @@
 import {Item} from './slider/item.class.js';
 
 export class Slider {
-  constructor() {
+  constructor(interactiveObject) {
+    this.interactiveObject = interactiveObject;
+
     this.element = null;
     this.items = [];
     this.slideCurrentIndex = 0;
