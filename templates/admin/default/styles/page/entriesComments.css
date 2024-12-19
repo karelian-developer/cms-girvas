@@ -55,3 +55,7 @@
 .table-entries-comments__item-button:active .table-entries-comments__item-button-icon {
   fill: var(--common-main-color-5);
 }
+
+.table-entries-comments__item .cell__block-phar_hidden-reason {
+  word-break: break-word;
+}

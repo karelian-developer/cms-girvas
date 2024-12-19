@@ -22,7 +22,7 @@
         <div class="header__copyright-container copyright-container">
           <p class="copyright-container__phar"><b>Разработчик:</b> ИП Шестаков А.Р. & &laquo;Garbalo&raquo;</p>
           <p class="copyright-container__phar"><b>Версия CMS:</b> {CMS_VERSION}</p>
-          <p class="copyright-container__phar">&copy;&nbsp;2021&nbsp;&mdash;;&nbsp;2024</p>
+          <p class="copyright-container__phar">&copy;&nbsp;2021&nbsp;&mdash;&nbsp;2025</p>
         </div>
       </div>
     </div>

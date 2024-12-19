@@ -41,7 +41,7 @@ export class InstallationMaster {
       delete this.buttons[buttonName];
     }
 
-    if (this.getStepIndex() > 0) {
+    if (this.getStepIndex() > 0 && this.getStepIndex() < this.stepsCount - 1) {
       this.buttons.prevStepIndex = new Interactive('button');
       this.buttons.prevStepIndex.target.setLabel('Назад');
       this.buttons.prevStepIndex.target.setCallback((event) => {
@@ -752,6 +752,11 @@ export class InstallationMaster {
     let stepIndex = this.getStepIndex();
     
     if (stepIndex > 0) {
+      if (typeof(this.progressItems[stepIndex + 1]) != 'undefined') {
+        this.progressItems[stepIndex].classList.remove('item_current');
+        this.progressItems[stepIndex - 1].classList.add('item_current');
+      }
+
       this.setStepIndex(stepIndex - 1);
     }
 
