@@ -33,10 +33,15 @@ if ($system_core->client->is_logged(2)) {
       $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
     } else {
       if (file_exists($template->get_path())) {
-        $system_core::recursive_files_remove($template->get_path());
+        if ($template_name == $template->get_name() && $template_category == $template->get_category_name()) {
+          $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_TEMPLATE_ERROR_FORBIDDEN_DELETE_INSTALLED_TEMPLATE')) : $handler_message;
+          $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+        } else {
+          $system_core::recursive_files_remove($template->get_path());
 
-        $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS') : $handler_message;
-        $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+          $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS') : $handler_message;
+          $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+        }
       } else {
         $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_TEMPLATE_ERROR_NOT_FOUND')) : $handler_message;
         $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;

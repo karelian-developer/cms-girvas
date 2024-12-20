@@ -52,6 +52,7 @@
   "API_TEMPLATE_ALREADY_UPLOADED": "The template has already been downloaded.",
   "API_TEMPLATE_ERROR_ARCHIVE_NOT_FOUND": "Template archive not found.",
   "API_TEMPLATE_ERROR_REPOSITORY_DATA_NOT_GETTED": "The template was not found in the repository.",
+  "API_TEMPLATE_ERROR_FORBIDDEN_DELETE_INSTALLED_TEMPLATE": "The template cannot be deleted because it is currently installed. Please install another template and then delete this one.",
   "API_USER_ERROR_NOT_FOUND": "User is not found.",
   "API_USER_ERROR_CANNOT_REMOVE_SUPERUSER": "Cannot remove superuser.",
   "API_USER_ERROR_INVALID_EMAIL": "The email is not in the correct format.",

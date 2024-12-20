@@ -54,6 +54,7 @@
   "API_TEMPLATE_ALREADY_UPLOADED": "Шаблон уже загружен.",
   "API_TEMPLATE_ERROR_ARCHIVE_NOT_FOUND": "Архив шаблона не обнаружен.",
   "API_TEMPLATE_ERROR_REPOSITORY_DATA_NOT_GETTED": "Шаблон в репозитории не обнаружен.",
+  "API_TEMPLATE_ERROR_FORBIDDEN_DELETE_INSTALLED_TEMPLATE": "Невозможно удалить шаблон, так как он на данный момент установлен. Установите другой шаблон, а потом удалите этот.",
   "API_USER_ERROR_NOT_FOUND": "Пользователь не найден.",
   "API_USER_ERROR_CANNOT_REMOVE_SUPERUSER": "Невозможно удалить суперпользователя.",
   "API_USER_ERROR_INVALID_EMAIL": "E-Mail имеет неверный формат.",

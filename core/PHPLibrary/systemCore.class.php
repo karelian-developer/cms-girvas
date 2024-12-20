@@ -41,7 +41,7 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.19 Альфа';
+    public const CMS_VERSION = '0.1.20 Альфа';
     public const CMS_DEVELOPER_TITLE = 'Garbalo (IE SHESTAKOV A.R.)';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
     public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
@@ -412,7 +412,12 @@ namespace core\PHPLibrary {
 
         $template->core->assembled = $template->get_core_assembled();
       } else {
-        $handler_locale_name = (!is_null($this->urlp->get_param('localeMessage'))) ? $this->urlp->get_param('localeMessage') : 'en_US';
+        if (is_null($this->urlp->get_param('localeMessage'))) {
+          $handler_locale_name = ($this->configurator->exists_database_entry_value('base_locale')) ? $this->configurator->get_database_entry_value('base_locale') : 'en_US';
+        } else {
+          $handler_locale_name = $this->urlp->get_param('localeMessage');
+        }
+        
         $this->locale = new SystemCoreLocale($this, $handler_locale_name, 'handler');
       }
       
