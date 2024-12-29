@@ -81,6 +81,11 @@ namespace core\PHPLibrary\Page\Admin {
           $settings->set_description('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_BASE_DESCRIPTION}');
         }
 
+        if ($settings_name == 'files') {
+          $settings->set_title('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_FILES_TITLE}');
+          $settings->set_description('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_FILES_DESCRIPTION}');
+        }
+
         if ($settings_name == 'seo') {
           $settings->set_title('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_SEO_TITLE}');
           $settings->set_description('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_SEO_DESCRIPTION}');

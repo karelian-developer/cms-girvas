@@ -173,6 +173,88 @@ namespace core\PHPLibrary\SystemCore {
     }
 
     /**
+     * Получить максимальный вес загружаемого файла
+     * 
+     * @return int
+     */
+    public function get_upload_file_weight_max() : int {
+      return ($this->exists_database_entry_value('files_upload_file_weight_max')) ? (int)$this->get_database_entry_value('files_upload_file_weight_max') : 0;
+    }
+
+    /**
+     * Получить максимальную ширину загружаемого изображения
+     * 
+     * @return int
+     */
+    public function get_upload_file_image_width_max() : int {
+      return ($this->exists_database_entry_value('files_upload_file_image_width_max')) ? (int)$this->get_database_entry_value('files_upload_file_image_width_max') : 0;
+    }
+
+    /**
+     * Получить максимальную ширину загружаемого изображения
+     * 
+     * @return int
+     */
+    public function get_upload_file_image_height_max() : int {
+      return ($this->exists_database_entry_value('files_upload_file_image_height_max')) ? (int)$this->get_database_entry_value('files_upload_file_image_height_max') : 0;
+    }
+
+    /**
+     * Получить максимальный вес загружаемого аватара
+     * 
+     * @return int
+     */
+    public function get_upload_file_image_avatar_weight_max() : int {
+      return ($this->exists_database_entry_value('files_upload_file_image_avatar_weight_max')) ? (int)$this->get_database_entry_value('files_upload_file_image_avatar_weight_max') : 0;
+    }
+
+    /**
+     * Получить максимальную ширину загружаемого аватара
+     * 
+     * @return int
+     */
+    public function get_upload_file_image_avatar_width_max() : int {
+      return ($this->exists_database_entry_value('files_upload_file_image_avatar_width_max')) ? (int)$this->get_database_entry_value('files_upload_file_image_avatar_width_max') : 0;
+    }
+
+    /**
+     * Получить максимальную высоту загружаемого аватара
+     * 
+     * @return int
+     */
+    public function get_upload_file_image_avatar_height_max() : int {
+      return ($this->exists_database_entry_value('files_upload_file_image_avatar_height_max')) ? (int)$this->get_database_entry_value('files_upload_file_image_avatar_height_max') : 0;
+    }
+
+    /**
+     * Получить статус настройки автоматической конвертации изображений
+     * 
+     * @param bool $is_bool
+     * 
+     * @return string
+     */
+    public function get_auto_convert_file_image_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('files_auto_convert_file_image_status')) {
+          return ($this->get_database_entry_value('files_auto_convert_file_image_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('files_auto_convert_file_image_status')) ? $this->get_database_entry_value('files_auto_convert_file_image_status') : 'off';
+    }
+
+    /**
+     * Получить расширение для автоматический конвертации изображения
+     * 
+     * @return string
+     */
+    public function get_auto_convert_file_image_extension() : string {
+      return ($this->exists_database_entry_value('files_auto_convert_file_image_extension')) ? $this->get_database_entry_value('files_auto_convert_file_image_extension') : '';
+    }
+
+    /**
      * Получить правило SCP веб-сайта из базы данных
      * 
      * @return string

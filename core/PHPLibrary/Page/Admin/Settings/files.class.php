@@ -1,0 +1,110 @@
+<?php
+
+/**
+ * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
+ * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ */
+
+
+namespace core\PHPLibrary\Page\Admin\Settings {
+  use \core\PHPLibrary\SystemCore as SystemCore;
+  use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+  use \core\PHPLibrary\Template as Template;
+  use \core\PHPLibrary\Template\Collector as TemplateCollector;
+
+  class SettingsFiles {
+    const FORM_PATH = 'templates/page/settings';
+
+    public SystemCore $system_core;
+    public string $title;
+    public string $name;
+    public string $description;
+    public string $assembled = '';
+
+    /**
+     * __construct
+     * 
+     * @param SystemCore $system_core
+     * @param string $name
+     */
+    public function __construct(SystemCore $system_core, string $name) {
+      $this->system_core = $system_core;
+      $this->name = $name;
+    }
+
+    /**
+     * Установить заголовок
+     * 
+     * @param string $value
+     */
+    public function set_title(string $value) : void {
+      $this->title = $value;
+    }
+
+    /**
+     * Установить описание
+     * 
+     * @param string $value
+     */
+    public function set_description(string $value) : void {
+      $this->description = $value;
+    }
+
+    /**
+     * Получить заголовок
+     * 
+     * @return string
+     */
+    public function get_title() : string {
+      return $this->title;
+    }
+
+    /**
+     * Получить описание
+     * 
+     * @return string
+     */
+    public function get_description() : string {
+      return $this->description;
+    }
+
+    /**
+     * Сборка
+     * 
+     * @param array $template_values
+     */
+    public function assembly(array $template_values = []) : void {
+      $form_template_path = sprintf('%s/%s.tpl', self::FORM_PATH, $this->name);
+      
+      $setting_auto_convert_file_image_status_value = $this->system_core->configurator->get_auto_convert_file_image_status();
+
+      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, $form_template_path, [
+        'SETTINGS_NAME' => $this->name,
+        // Максимальный вес файла
+        'SETTING_UPLOAD_FILE_WEIGHT_MAX_VALUE' => $this->system_core->configurator->get_upload_file_weight_max(),
+        // Максимальная ширина изображения
+        'SETTING_UPLOAD_FILE_IMAGE_WIDTH_MAX_VALUE' => $this->system_core->configurator->get_upload_file_image_width_max(),
+        // Максимальная высота изображения
+        'SETTING_UPLOAD_FILE_IMAGE_HEIGHT_MAX_VALUE' => $this->system_core->configurator->get_upload_file_image_height_max(),
+        // Максимальный вес изображения аватара
+        'SETTING_UPLOAD_FILE_IMAGE_AVATAR_WEIGHT_MAX_VALUE' => $this->system_core->configurator->get_upload_file_image_avatar_weight_max(),
+        // Максимальная ширина изображения аватара
+        'SETTING_UPLOAD_FILE_IMAGE_AVATAR_WIDTH_MAX_VALUE' => $this->system_core->configurator->get_upload_file_image_avatar_width_max(),
+        // Максимальная высота изображения аватара
+        'SETTING_UPLOAD_FILE_IMAGE_AVATAR_HEIGHT_MAX_VALUE' => $this->system_core->configurator->get_upload_file_image_avatar_height_max(),
+        // Формат изображения для автоматической конвертации
+        'SETTING_AUTO_CONVERT_FILE_IMAGE_FORMAT_VALUE' => $this->system_core->configurator->get_auto_convert_file_image_extension(),
+        // Статус автоматической конвертации изображения
+        'SETTING_AUTO_CONVERT_FILE_IMAGE_STATUS_VALUE' => $setting_auto_convert_file_image_status_value,
+        'SETTING_AUTO_CONVERT_FILE_IMAGE_CHECKED_VALUE' => ($setting_auto_convert_file_image_status_value == 'on') ? 'checked' : '',
+      ]);
+    }
+
+  }
+
+}
+
+?>

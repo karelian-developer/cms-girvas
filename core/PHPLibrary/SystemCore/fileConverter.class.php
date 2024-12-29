@@ -149,7 +149,7 @@ namespace core\PHPLibrary\SystemCore {
             $converted_result = $this->convert_avif_to_webp($file_source_path, $file_output_path, $delete_old_file);
           }
 
-          if (($file_extension == $file_extension)) {
+          if (($file_extension == $convert_to_extension)) {
             if (file_exists($file_source_path)) {
               $file_renamed = rename($file_source_path, $file_output_path);
 

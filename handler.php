@@ -158,6 +158,11 @@ if (defined('IS_NOT_HACKED')) {
     $charset = ($system_core->configurator->exists_database_entry_value('base_site_charset')) ? $system_core->configurator->get_database_entry_value('base_site_charset') : 'UTF-8';
     $handler_output_data['charset'] = $charset;
   
+  // Получение расширения, в которое производится конвертация
+  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'file-auto-convert-image-extension') {
+    $extension = ($system_core->configurator->exists_database_entry_value('files_auto_convert_file_image_extension')) ? $system_core->configurator->get_database_entry_value('files_auto_convert_file_image_extension') : 'webp';
+    $handler_output_data['extension'] = $extension;
+
   // Получение перечня кодировок
   } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'charsets') {
     $handler_output_data['charsets'] = ['UTF-8', 'UTF-16', 'Windows-1252', 'ISO-8859'];

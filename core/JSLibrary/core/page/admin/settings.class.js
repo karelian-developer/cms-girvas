@@ -206,6 +206,32 @@ export class PageSettings {
         });
       }
 
+      if (searchParams.getPathPart(3) == 'files') {
+        let extension;
+        let interactiveChoicesSettingsAutoConvertImageExtension = new Interactive('choices');
+
+        fetch('/handler/file-auto-convert-image-extension', {
+          method: 'GET'
+        }).then((response) => {
+          return (response.ok) ? response.json() : Promise.reject(response);
+        }).then((data) => {
+          extension = data.outputData.extension;
+
+          ['webp', 'avif'].forEach((element, elementIndex) => {
+            interactiveChoicesSettingsAutoConvertImageExtension.target.addItem(element.toUpperCase(), element);
+
+            if (element == extension) {
+              interactiveChoicesSettingsAutoConvertImageExtension.target.setItemSelectedIndex(elementIndex);
+            }
+          });
+
+          interactiveChoicesSettingsAutoConvertImageExtension.target.setName('setting_files_auto_convert_file_image_extension');
+          interactiveChoicesSettingsAutoConvertImageExtension.assembly();
+
+          document.querySelector('#TC7499045295').prepend(interactiveChoicesSettingsAutoConvertImageExtension.target.element);
+        });
+      }
+
       if (searchParams.getPathPart(3) == 'users') {
         let buttons = {addField: null};
 
