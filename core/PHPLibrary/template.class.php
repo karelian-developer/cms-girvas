@@ -16,6 +16,7 @@ namespace core\PHPLibrary {
   use \core\PHPLibrary\Template\EnumWeight as TemplateEnumWeight;
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
   use \core\PHPLibrary\Template\Locale as TemplateLocale;
+  use \DOMDocument as DOMDocument;
 
   final class Template {
     public SystemCore $system_core;
@@ -108,6 +109,7 @@ namespace core\PHPLibrary {
           /** @var InterfaceCore $core Объект класса, имплементированного от InterfaceCore */
           $this->core = $core;
           $this->core->assembly();
+
           return true;
         }
       }

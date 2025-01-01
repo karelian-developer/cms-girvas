@@ -16,12 +16,17 @@
 namespace core\PHPLibrary {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
   use \core\PHPLibrary\SystemCore\Configurator as SystemCoreConfigurator;
+  use \core\PHPLibrary\SystemCore\Header as SystemCoreHeader;
+  use \core\PHPLibrary\SystemCore\Header\HTTPReferrerPolicy as SystemCoreHeaderHTTPReferrerPolicy;
+  use \core\PHPLibrary\SystemCore\Header\EnumHTTPReferrerPolicy as SystemCoreHeaderEnumHTTPReferrerPolicy;
+  use \core\PHPLibrary\SystemCore\EnumHeader as SystemCoreEnumHeader;
   use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
   use \core\PHPLibrary\SystemCore\DatabaseConnector as SystemCoreDatabaseConnector;
   use \core\PHPLibrary\SystemCore\FileConnector as SystemCoreFileConnector;
   use \core\PHPLibrary\SystemCore\Report as SystemCoreReport;
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
   use \core\PHPLibrary\Client as Client;
+  use \DOMDocument as DOMDocument;
   
   /**
    * Class SystemCore
@@ -41,7 +46,7 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.21 Альфа';
+    public const CMS_VERSION = '0.1.22 Альфа';
     public const CMS_DEVELOPER_TITLE = 'Garbalo (IE SHESTAKOV A.R.)';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
     public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
@@ -244,29 +249,43 @@ namespace core\PHPLibrary {
      * @return void
      */
     private function init() {
+      // Принудительное подключение класса файлового подключателя
       require_once(sprintf('%s/%s/SystemCore/fileConnector.interface.php', CMS_ROOT_DIRECTORY, self::CMS_CORE_PHP_LIBRARY_PATH));
       require_once(sprintf('%s/%s/SystemCore/fileConnector.class.php', CMS_ROOT_DIRECTORY, self::CMS_CORE_PHP_LIBRARY_PATH));
 
+      /** @var string Равномерно выбранные случайные байты */
       $bytes = random_bytes(16);
+
+      /** @var string Случайная хэш-строка для идентификации ранее встроенных скриптов */
       $this->scp_scripts_hash = bin2hex($bytes);
+
+      /** @var string Равномерно выбранные случайные байты */
       $bytes = random_bytes(16);
+
+      /** @var string Случайная хэш-строка для идентификации ранее встроенных стилей (CSS) */
       $this->scp_styles_hash = bin2hex($bytes);
 
+      /** @var SystemCoreFileConnector Объект файлового подключателя */
       $file_connector = new SystemCoreFileConnector($this);
       $file_connector->set_start_directory(self::CMS_CORE_PHP_LIBRARY_PATH);
       $file_connector->set_current_directory(self::CMS_CORE_PHP_LIBRARY_PATH);
+
       // Подключение файлов с перечислениями
       $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.enum\.php$/');
       $file_connector->reset_current_directory();
+
       // Подключение файлов с интерфейсами
       $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.interface\.php$/');
       $file_connector->reset_current_directory();
+
       // Подключение файлов с классами
       $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.class\.php$/');
       $file_connector->reset_current_directory();
 
+      /** @var null Переменная для будущего объекта шаблона */
       $template = null;
 
+      // Инициализация URL-парсера
       $this->init_url_parser();
 
       // Если настройка системы не была произведена и пользователь не находится на странице инсталлятора,
@@ -275,10 +294,12 @@ namespace core\PHPLibrary {
         header('location: /install');
       }
 
+      /** @var SystemCoreConfigurator Объект конфигуратора системного ядра */
       $this->configurator = new SystemCoreConfigurator($this);
 
       // Подключение к базе данных
       if ($this->urlp->get_path(0) != 'install' && $this->urlp->get_path(1) != 'install') {
+        /** @var SystemCoreDatabaseConnector Объект подключения к базе данных */
         $this->database_connector = new SystemCoreDatabaseConnector($this, $this->configurator);
       }
 
@@ -287,31 +308,38 @@ namespace core\PHPLibrary {
       if ($_SERVER['HTTPS'] != 'on' && $this->configurator->get('ssl_perm_redirect')) {
         // Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена в настройках CMS.
         if ($this->configurator->get_permanent_redirect_to_www_status() && !preg_match('/^www\./', $_SERVER['HTTP_HOST'])) {
+          /** @var string Адрес для переадресации по HTTPS-протоколу (поддомен www) */
           $https_redirect = sprintf('https://www.%s%s', $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']);
         } else {
+          /** @var string Адрес для переадресации по HTTPS-протоколу */
           $https_redirect = sprintf('https://%s%s', $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']);
         }
 
-        header("HTTP/1.1 301 Moved Permanently");
-        header(sprintf('Location: %s', $https_redirect));
+        // Сообщаем браузеру, что это принудительная переадресация
+        SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_RESPONSE_CODE, 301);
+        SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_LOCATION, $https_redirect);
         exit();
       }
       
       // Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена в настройках CMS.
       if ($this->configurator->get_permanent_redirect_to_www_status() && !preg_match('/^www\./', $_SERVER['HTTP_HOST'])) {
+        /** @var string Адрес для переадресации по HTTP-протоколу (поддомен www) */
         $http_redirect = sprintf('http://www.%s%s', $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']);
-        header("HTTP/1.1 301 Moved Permanently");
-        header(sprintf('Location: %s', $http_redirect));
+        
+        // Сообщаем браузеру, что это принудительная переадресация
+        SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_RESPONSE_CODE, 301);
+        SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_LOCATION, $http_redirect);
         exit();
       }
 
       // Указываем серверу, что будем использовать временную зону для расчета времени, указанную в настройках CMS. 
       date_default_timezone_set($this->configurator->get_site_timezone());
 
-      header(sprintf('Content-Security-Policy: %s', $this->configurator->get_security_scp()));
+      // Сообщаем браузеру, что для сайта деятсвуют особые правила безопасности
+      SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_CONTENT_SECURITY_POLICY, $this->configurator->get_security_scp());
       header('Referrer-Policy: strict-origin-when-cross-origin');
       header('X-Content-Type-Options: nosniff');
-
+      
       if ($this->configurator->get('ssl_is_enabled')) {
         $hsts_vars = [];
 
@@ -340,12 +368,14 @@ namespace core\PHPLibrary {
         header(sprintf('Strict-Transport-Security: %s;', implode('; ', $hsts_vars)));
       }
 
+      /** @var Client Объект клиента */
       $this->client = new Client($this);
 
       if ($this->urlp->get_path(0) == 'install' && $this->urlp->get_path(1) != 'install') {
         $install_locale = (!is_null($this->urlp->get_param('locale'))) ? $this->urlp->get_param('locale') : 'en_US';
       }
 
+      /** @var array Массив установленных модулей в системе */
       $modules_installed = Modules::get_installed_modules_array();
       if (!empty($modules_installed)) {
         foreach ($modules_installed as $index => $folder_name) {
@@ -372,6 +402,7 @@ namespace core\PHPLibrary {
         }
       }
 
+      /** @var array Массив установленных модулей в системе */
       $modules_installed = Modules::get_installed_modules_array();
       if (!empty($this->modules)) {
         foreach ($this->modules as $name => $module_core) {
@@ -409,8 +440,7 @@ namespace core\PHPLibrary {
 
         $template = $this->get_template();
         $template->init();
-
-        $template->core->assembled = $template->get_core_assembled();
+        
       } else {
         if (is_null($this->urlp->get_param('localeMessage'))) {
           $handler_locale_name = ($this->configurator->exists_database_entry_value('base_locale')) ? $this->configurator->get_database_entry_value('base_locale') : 'en_US';
@@ -421,19 +451,56 @@ namespace core\PHPLibrary {
         $this->locale = new SystemCoreLocale($this, $handler_locale_name, 'handler');
       }
       
+      if (!is_null($template)) {
+        $template->core->assembled = $template->get_core_assembled();
+      }
+
       $modules_installed = Modules::get_installed_modules_array();
       if (!empty($this->modules)) {
         foreach ($this->modules as $name => $module_core) {
           $module = new Module($this, $name);
+          
           if ($module->is_installed() && $module->is_enabled()) {
             if (!is_null($template)) {
               $template->core->assembled = TemplateCollector::assembly_locale($template->core->assembled, $module->locale);
             }
+          }
+
+          unset($module);
+        }
+      }
+
+      if (!is_null($template)) {
+        $dom_document = new DOMDocument();
+        @$dom_document->loadHTML($template->core->assembled);
+
+        $script_elements = $dom_document->getElementsByTagName('script');
+        foreach ($script_elements as $script_element) {
+          $script_element->setAttribute('nonce', $this->scp_scripts_hash);
+        }
+
+        $style_elements = $dom_document->getElementsByTagName('style');
+        foreach ($style_elements as $style_element) {
+          $style_element->setAttribute('nonce', $this->scp_styles_hash);
+        }
+
+        $template->core->source = $dom_document;
+      }
+
+      if (!empty($this->modules)) {
+        foreach ($this->modules as $name => $module_core) {
+          $module = new Module($this, $name);
+          
+          if ($module->is_installed() && $module->is_enabled()) {
             $module_core->init();
           }
 
           unset($module);
         }
+      }
+
+      if (!is_null($template)) {
+        $template->core->assembled = $dom_document->saveHTML();
       }
     }
     

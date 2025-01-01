@@ -149,6 +149,10 @@ if ($system_core->client->is_logged(2)) {
       if (!is_null($entry)) {
         $entry->init_data(['texts']);
 
+        // Обновление дополнительной информации
+        $entry_additional_data['category_id'] = $entry_category_id;
+        $entry->update($entry_additional_data);
+
         $sc_report = \core\PHPLibrary\SystemCore\Report::create($system_core, \core\PHPLibrary\SystemCore\Report::REPORT_TYPE_ID_AP_ENTRY_CREATED, [
           'clientIP' => $system_core->client->get_ip_address(),
           'entryTitle' => $entry->get_title(),

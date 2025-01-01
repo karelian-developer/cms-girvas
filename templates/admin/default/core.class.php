@@ -17,10 +17,12 @@ namespace templates\admin\default {
   use \core\PHPLibrary\User as User;
   use \core\PHPLibrary\Users as Users;
   use \core\PHPLibrary\Client\Session as ClientSession;
+  use \DOMDocument as DOMDocument;
 
   final class Core implements \core\PHPLibrary\Template\InterfaceCore {
     private \core\PHPLibrary\Template $template;
-    public string $assembled;
+    public string $assembled = '';
+    public DOMDocument|null $source = null;
     
     /**
      * __construct

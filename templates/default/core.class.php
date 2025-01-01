@@ -11,11 +11,13 @@
 namespace templates\default {
   use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
+  use \DOMDocument as DOMDocument;
 
   final class Core implements \core\PHPLibrary\Template\InterfaceCore {
     private \core\PHPLibrary\Template $template;
     private SystemCoreLocale $locale;
-    public string $assembled;
+    public string $assembled = '';
+    public DOMDocument|null $source = null;
     
     /**
      * __construct
