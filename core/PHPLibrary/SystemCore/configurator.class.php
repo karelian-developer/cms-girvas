@@ -255,6 +255,169 @@ namespace core\PHPLibrary\SystemCore {
     }
 
     /**
+     * Получить статус возможности загрузки аватаров пользователей
+     * 
+     * @param bool $is_bool
+     * 
+     * @return string|bool
+     */
+    public function get_users_upload_avatar_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('users_upload_avatar_status')) {
+          return ($this->get_database_entry_value('users_upload_avatar_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('users_upload_avatar_status')) ? $this->get_database_entry_value('users_upload_avatar_status') : 'off';
+    }
+
+    /**
+     * Получить минимальное количество символов для логина пользователя
+     * 
+     * @return int
+     */
+    public function get_users_login_length_min() : int {
+      return ($this->exists_database_entry_value('users_login_length_min')) ? (int)$this->get_database_entry_value('users_login_length_min') : 4;
+    }
+
+    /**
+     * Получить максимальное количество символов для логина пользователя
+     * 
+     * @return int
+     */
+    public function get_users_login_length_max() : int {
+      return ($this->exists_database_entry_value('users_login_length_max')) ? (int)$this->get_database_entry_value('users_login_length_max') : 0;
+    }
+
+    /**
+     * Получить статус возможности редактирования логинов пользователей
+     * 
+     * @param bool $is_bool
+     * 
+     * @return string|bool
+     */
+    public function get_users_login_edit_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('users_login_edit_status')) {
+          return ($this->get_database_entry_value('users_login_edit_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('users_login_edit_status')) ? $this->get_database_entry_value('users_login_edit_status') : 'off';
+    }
+
+    /**
+     * Получить статус возможности использования специальных символов в логине
+     * 
+     * @param bool $is_bool
+     * 
+     * @return string|bool
+     */
+    public function get_users_login_special_symbols_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('users_login_special_symbols_status')) {
+          return ($this->get_database_entry_value('users_login_special_symbols_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('users_login_special_symbols_status')) ? $this->get_database_entry_value('users_login_special_symbols_status') : 'off';
+    }
+
+    /**
+     * Получить статус учета регистра символов в логине пользователя
+     * 
+     * @param bool $is_bool
+     * 
+     * @return string|bool
+     */
+    public function get_users_login_register_accounting_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('users_login_register_accounting_status')) {
+          return ($this->get_database_entry_value('users_login_register_accounting_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('users_login_register_accounting_status')) ? $this->get_database_entry_value('users_login_register_accounting_status') : 'off';
+    }
+
+    /**
+     * Получить минимальное количество символов для пароля пользователя
+     * 
+     * @return int
+     */
+    public function get_users_password_length_min() : int {
+      return ($this->exists_database_entry_value('users_password_length_min')) ? (int)$this->get_database_entry_value('users_password_length_min') : 6;
+    }
+
+    /**
+     * Получить максимальное количество символов для пароля пользователя
+     * 
+     * @return int
+     */
+    public function get_users_password_length_max() : int {
+      return ($this->exists_database_entry_value('users_password_length_max')) ? (int)$this->get_database_entry_value('users_password_length_max') : 0;
+    }
+
+    /**
+     * Получить статус возможности использования специальных символов в пароле
+     * 
+     * @param bool $is_bool
+     * 
+     * @return string|bool
+     */
+    public function get_users_password_special_symbols_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('users_password_special_symbols_status')) {
+          return ($this->get_database_entry_value('users_password_special_symbols_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('users_password_special_symbols_status')) ? $this->get_database_entry_value('users_password_special_symbols_status') : 'off';
+    }
+
+    /**
+     * Получить статус использования фильтра для логинов
+     * 
+     * @param bool $is_bool
+     * 
+     * @return string|bool
+     */
+    public function get_users_logins_blacklist_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('users_logins_blacklist_status')) {
+          return ($this->get_database_entry_value('users_logins_blacklist_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('users_logins_blacklist_status')) ? $this->get_database_entry_value('users_logins_blacklist_status') : 'off';
+    }
+
+    /**
+     * Получить список заблокированных логинов для пользователей в виде строки
+     * 
+     * @return string|array
+     */
+    public function get_users_logins_blacklist(bool $is_array = false) : string|array {
+      if (!$is_array) {
+        return ($this->exists_database_entry_value('users_logins_blacklist')) ? implode(', ', json_decode($this->get_database_entry_value('users_logins_blacklist'), true)) : implode(', ', ['cms_girvas', 'garbalo', 'cms', 'girvas', 'admin', 'administrator', 'moder', 'moderator']);
+      }
+      
+      return json_decode($this->get_database_entry_value('users_logins_blacklist'), true);
+    }
+
+    /**
      * Получить правило SCP веб-сайта из базы данных
      * 
      * @return string

@@ -25,6 +25,18 @@ if ($system_core->client->is_logged(2)) {
   if ($client_user_group->permission_check($client_user_group::PERMISSION_ADMIN_USERS_MANAGEMENT)) {
     $user_creation_allowed = true;
 
+    if ($system_core->configurator->get_users_login_special_symbols_status(true)) {
+      $login_regular = '[a-zA-Z0-9\!\@\#\$\%\&]+';
+    } else {
+      $login_regular = '[a-zA-Z0-9]+';
+    }
+
+    if ($system_core->configurator->get_users_password_special_symbols_status(true)) {
+      $password_regular = '[a-zA-Z0-9\!\@\#\$\%\&]+';
+    } else {
+      $password_regular = '[a-zA-Z0-9]+';
+    }
+
     $user_login = isset($_PUT['user_login']) ? htmlspecialchars(str_replace('\'', '"', $_PUT['user_login'])) : '';
     $user_email = isset($_PUT['user_email']) ? str_replace('\'', '"', $_PUT['user_email']) : '';
     $user_name = isset($_PUT['user_name']) ? htmlspecialchars(str_replace('\'', '"', $_PUT['user_name'])) : '';
@@ -33,9 +45,102 @@ if ($system_core->client->is_logged(2)) {
     $user_birthdate = isset($_PUT['user_birthdate']) ? $_PUT['user_birthdate'] : 0;
     $user_group_id = isset($_PUT['user_group_id']) ? (int)$_PUT['user_group_id'] : 4;
     $user_password = isset($_PUT['user_password']) ? str_replace('\'', '"', $_PUT['user_password']) : '';
-    $user_password_repeat = isset($_PUT['user_password_repeat']) ? str_replace('\'', '"', $_PUT['user_password']) : '';
+    $user_password_repeat = isset($_PUT['user_password_repeat']) ? str_replace('\'', '"', $_PUT['user_password_repeat']) : '';
+    
+    if (isset($_PUT['user_login'])) {
+      if ($system_core->configurator->get_users_logins_blacklist_status(true)) {
+        $logins_blacklist_array = $system_core->configurator->get_users_logins_blacklist(true);
 
-    if (User::exists_by_login($system_core, $user_login)) {
+        foreach ($logins_blacklist_array as $login) {
+          if ($system_core->configurator->get_users_login_register_accounting_status(true)) {
+            if (preg_match(sprintf('/^%s$/', $user_login), $login)) {
+              $user_creation_allowed = false;
+
+              $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST')) : $handler_message;
+              $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+            }
+          } else {
+            if (preg_match(sprintf('/^%s$/i', $user_login), $login)) {
+              $user_creation_allowed = false;
+
+              $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST')) : $handler_message;
+              $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+            }
+          }
+        }
+      }
+
+      if ($user_creation_allowed) {
+        if ($system_core->configurator->get_users_login_register_accounting_status(true)) {
+          if (!preg_match(sprintf('/^%s$/i', $login_regular), $user_login)) {
+            $user_creation_allowed = false;
+
+            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_LOGIN')) : $handler_message;
+            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+          }
+        } else {
+          if (!preg_match(sprintf('/^%s$/', $login_regular), $user_login)) {
+            $user_creation_allowed = false;
+
+            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_LOGIN')) : $handler_message;
+            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+          }
+        }
+      }
+
+      if ($user_creation_allowed) {
+        if ($system_core->configurator->get_users_login_length_max() > 0) {
+          if (strlen($user_login) > $system_core->configurator->get_users_login_length_max()) {
+            $user_creation_allowed = false;
+
+            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', sprintf($system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_LARGE'), $system_core->configurator->get_users_login_length_max())) : $handler_message;
+            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+          }
+        }
+      }
+
+      if ($user_creation_allowed) {
+        if (strlen($user_login) < $system_core->configurator->get_users_login_length_min()) {
+          $user_creation_allowed = false;
+
+          $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', sprintf($system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_SMALL'), $system_core->configurator->get_users_login_length_min())) : $handler_message;
+          $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+        }
+      }
+    }
+
+    if (isset($_PUT['user_password'])) {
+      if ($user_creation_allowed) {
+        if ($system_core->configurator->get_users_password_length_max() > 0) {
+          if (strlen($user_password) > $system_core->configurator->get_users_password_length_max()) {
+            $user_creation_allowed = false;
+
+            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', sprintf($system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_LARGE'), $system_core->configurator->get_users_password_length_max())) : $handler_message;
+            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+          }
+        }
+      }
+
+      if ($user_creation_allowed) {
+        if (strlen($user_password) < $system_core->configurator->get_users_password_length_min()) {
+          $user_creation_allowed = false;
+
+          $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', sprintf($system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_SMALL'), $system_core->configurator->get_users_password_length_min())) : $handler_message;
+          $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+        }
+      }
+
+      if ($user_creation_allowed) {
+        if (!preg_match(sprintf('/^%s$/i', $password_regular), $user_password)) {
+          $user_creation_allowed = false;
+
+          $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_PASSWORD')) : $handler_message;
+          $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+        }
+      }
+    }
+
+    if (User::exists_by_login($system_core, $user_login, $system_core->configurator->get_users_login_register_accounting_status(true))) {
       $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_LOGIN_ALREADY_EXISTS')) : $handler_message;
       $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
       $user_creation_allowed = false;

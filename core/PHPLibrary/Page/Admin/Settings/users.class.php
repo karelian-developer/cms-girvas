@@ -48,8 +48,32 @@ namespace core\PHPLibrary\Page\Admin\Settings {
     public function assembly(array $template_values = []) {
       $form_template_path = sprintf('%s/%s.tpl', self::FORM_PATH, $this->name);
       
+      $setting_upload_avatar_status_value = $this->system_core->configurator->get_users_upload_avatar_status();
+      $setting_login_edit_status_value = $this->system_core->configurator->get_users_login_edit_status();
+      $setting_login_special_symbols_status_value = $this->system_core->configurator->get_users_login_special_symbols_status();
+      $setting_login_register_accounting_status_value = $this->system_core->configurator->get_users_login_register_accounting_status();
+      $setting_password_special_symbols_status_value = $this->system_core->configurator->get_users_password_special_symbols_status();
+      $setting_logins_blacklist_status_value = $this->system_core->configurator->get_users_logins_blacklist_status();
+
       $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, $form_template_path, [
         'SETTINGS_NAME' => $this->name,
+        'SETTING_USERS_UPLOAD_AVATAR_STATUS_VALUE' => $setting_upload_avatar_status_value,
+        'SETTING_USERS_UPLOAD_AVATAR_CHECKED_VALUE' => ($setting_upload_avatar_status_value == 'on') ? 'checked' : '',
+        'SETTING_LOGIN_LENGTH_MIN_VALUE' => $this->system_core->configurator->get_users_login_length_min(),
+        'SETTING_LOGIN_LENGTH_MAX_VALUE' => $this->system_core->configurator->get_users_login_length_max(),
+        'SETTING_USERS_LOGIN_EDIT_STATUS_VALUE' => $setting_login_edit_status_value,
+        'SETTING_USERS_LOGIN_EDIT_CHECKED_VALUE' => ($setting_login_edit_status_value == 'on') ? 'checked' : '',
+        'SETTING_USERS_LOGIN_SPECIAL_SYMBOLS_STATUS_VALUE' => $setting_login_special_symbols_status_value,
+        'SETTING_USERS_LOGIN_SPECIAL_SYMBOLS_CHECKED_VALUE' => ($setting_login_special_symbols_status_value == 'on') ? 'checked' : '',
+        'SETTING_USERS_LOGIN_REGISTER_ACCOUNTING_STATUS_VALUE' => $setting_login_register_accounting_status_value,
+        'SETTING_USERS_LOGIN_REGISTER_ACCOUNTING_CHECKED_VALUE' => ($setting_login_register_accounting_status_value == 'on') ? 'checked' : '',
+        'SETTING_PASSWORD_LENGTH_MIN_VALUE' => $this->system_core->configurator->get_users_password_length_min(),
+        'SETTING_PASSWORD_LENGTH_MAX_VALUE' => $this->system_core->configurator->get_users_password_length_max(),
+        'SETTING_USERS_PASSWORD_SPECIAL_SYMBOLS_STATUS_VALUE' => $setting_password_special_symbols_status_value,
+        'SETTING_USERS_PASSWORD_SPECIAL_SYMBOLS_CHECKED_VALUE' => ($setting_password_special_symbols_status_value == 'on') ? 'checked' : '',
+        'SETTING_USERS_LOGINS_BLACKLIST_STATUS_VALUE' => $setting_logins_blacklist_status_value,
+        'SETTING_USERS_LOGINS_BLACKLIST_CHECKED_VALUE' => ($setting_logins_blacklist_status_value == 'on') ? 'checked' : '',
+        'SETTING_LOGINS_BLACKLIST_VALUE' => $this->system_core->configurator->get_users_logins_blacklist()
       ]);
     }
 

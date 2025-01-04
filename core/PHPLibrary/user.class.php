@@ -467,11 +467,13 @@ namespace core\PHPLibrary {
     /**
      * Проверить существование пользователя по логину
      *
-     * @param  mixed $system_core
-     * @param  string $user_login
+     * @param mixed $system_core
+     * @param string $user_login
+     * @param bool $register_accounting
+     * 
      * @return void
      */
-    public static function exists_by_login(SystemCore $system_core, string $user_login) : bool {
+    public static function exists_by_login(SystemCore $system_core, string $user_login, bool $register_accounting = false) : bool {
       $query_builder = new DatabaseQueryBuilder($system_core);
       $query_builder->set_statement_select();
       $query_builder->statement->add_selections(['1']);
@@ -479,12 +481,17 @@ namespace core\PHPLibrary {
       $query_builder->statement->clause_from->add_table('users');
       $query_builder->statement->clause_from->assembly();
       $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('LOWER(login) = :login');
+
+      if (!$register_accounting) {
+        $query_builder->statement->clause_where->add_condition('LOWER(login) = :login');
+        $user_login = strtolower($user_login);
+      } else {
+        $query_builder->statement->clause_where->add_condition('login = :login');
+      }
+
       $query_builder->statement->clause_where->assembly();
       $query_builder->statement->set_clause_limit(1);
       $query_builder->statement->assembly();
-
-      $user_login = strtolower($user_login);
 
       $database_connection = $system_core->database_connector->database->connection;
       $database_query = $database_connection->prepare($query_builder->statement->assembled);

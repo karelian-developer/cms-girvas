@@ -34,81 +34,179 @@ if ($system_core->urlp->get_path(2) == 'registration') {
   if (!$system_core->client->is_logged(1)) {
     if ($system_core->configurator->get_database_entry_value('security_allowed_users_registration_status') == 'on') {
       if (isset($_POST['user_login']) && isset($_POST['user_email']) && isset($_POST['user_password']) && isset($_POST['user_password_repeat'])) {
+        $error_is_detected = false;
         $user_login = $_POST['user_login'];
-        $user_email = $_POST['user_email'];
+
+        if ($system_core->configurator->get_users_login_special_symbols_status(true)) {
+          $login_regular = '[a-zA-Z0-9\!\@\#\$\%\&]+';
+        } else {
+          $login_regular = '[a-zA-Z0-9]+';
+        }
+
+        if ($system_core->configurator->get_users_password_special_symbols_status(true)) {
+          $password_regular = '[a-zA-Z0-9\!\@\#\$\%\&]+';
+        } else {
+          $password_regular = '[a-zA-Z0-9]+';
+        }
+        
+        // Проверка: включен ли черный список логинов
+        if ($system_core->configurator->get_users_logins_blacklist_status(true)) {
+          $logins_blacklist_array = $system_core->configurator->get_users_logins_blacklist(true);
+
+          foreach ($logins_blacklist_array as $login) {
+            if ($system_core->configurator->get_users_login_register_accounting_status(true)) {
+              if (preg_match(sprintf('/^%s$/', $user_login), $login)) {
+                $error_is_detected = true;
+
+                $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST')) : $handler_message;
+                $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+              }
+            } else {
+              if (preg_match(sprintf('/^%s$/i', $user_login), $login)) {
+                $error_is_detected = true;
+
+                $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST')) : $handler_message;
+                $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+              }
+            }
+          }
+        } else {
+          if ($system_core->configurator->get_users_login_register_accounting_status(true)) {
+            if (!preg_match(sprintf('/^%s$/', $login_regular), $user_login)) {
+              $error_is_detected = true;
+
+              $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_LOGIN')) : $handler_message;
+              $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+            }
+          } else {
+            if (!preg_match(sprintf('/^%s$/i', $login_regular), $user_login)) {
+              $error_is_detected = true;
+
+              $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_LOGIN')) : $handler_message;
+              $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+            }
+          }
+        }
+
+        if (!$error_is_detected) {
+          if ($system_core->configurator->get_users_login_length_max() > 0) {
+            if (strlen($user_login) > $system_core->configurator->get_users_login_length_max()) {
+              $error_is_detected = true;
+
+              $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', sprintf($system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_LARGE'), $system_core->configurator->get_users_login_length_max())) : $handler_message;
+              $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+            }
+          }
+        }
+
+        if (!$error_is_detected) {
+          if (strlen($user_login) < $system_core->configurator->get_users_login_length_min()) {
+            $error_is_detected = true;
+
+            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', sprintf($system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_SMALL'), $system_core->configurator->get_users_login_length_min())) : $handler_message;
+            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+          }
+        }
+
         $user_password = $_POST['user_password'];
-        $user_password_repeat = $_POST['user_password_repeat'];
 
-        if (preg_match('/^[a-z0-9\_]{4,}$/i', $user_login)) {
+        if (!$error_is_detected) {
+          if ($system_core->configurator->get_users_password_length_max() > 0) {
+            if (strlen($user_password) > $system_core->configurator->get_users_password_length_max()) {
+              $error_is_detected = true;
+
+              $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', sprintf($system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_LARGE'), $system_core->configurator->get_users_password_length_max())) : $handler_message;
+              $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+            }
+          }
+        }
+
+        if (!$error_is_detected) {
+          if (strlen($user_password) < $system_core->configurator->get_users_password_length_min()) {
+            $error_is_detected = true;
+
+            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', sprintf($system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_SMALL'), $system_core->configurator->get_users_password_length_min())) : $handler_message;
+            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+          }
+        }
+
+        if (!$error_is_detected) {
+          if (!preg_match(sprintf('/^%s$/i', $password_regular), $user_password)) {
+            $error_is_detected = true;
+
+            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_PASSWORD')) : $handler_message;
+            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+          }
+        }
+
+        if (!$error_is_detected) {
+          $user_email = $_POST['user_email'];
+          $user_password_repeat = $_POST['user_password_repeat'];
+
           if (preg_match('/^[\w\-\.]{1,30}@([\w\-]{1,63}\.){1,2}[\w\-]{2,4}$/i', $user_email)) {
-            if (preg_match('/^[a-z0-9\_\$\%\&\#\@\?]{6,}$/i', $user_password)) {
-              if ($user_password == $user_password_repeat) {
-                if (!User::exists_by_login($system_core, $user_login)) {
-                  if (!User::exists_by_email($system_core, $user_email)) {
-                    $allowed_emails = [];
-                    if ($system_core->configurator->exists_database_entry_value('security_allowed_emails')) {
-                      $allowed_emails = $system_core->configurator->get_database_entry_value('security_allowed_emails');
-                      $allowed_emails = json_decode($allowed_emails, true);
-                    }
+            if ($user_password == $user_password_repeat) {
+              if (!User::exists_by_login($system_core, $user_login, $system_core->configurator->get_users_login_register_accounting_status(true))) {
+                if (!User::exists_by_email($system_core, $user_email)) {
+                  $allowed_emails = [];
+                  if ($system_core->configurator->exists_database_entry_value('security_allowed_emails')) {
+                    $allowed_emails = $system_core->configurator->get_database_entry_value('security_allowed_emails');
+                    $allowed_emails = json_decode($allowed_emails, true);
+                  }
 
-                    if ($system_core->configurator->exists_database_entry_value('security_allowed_emails_status')) {
-                      $allowed_emails_status = $system_core->configurator->get_database_entry_value('security_allowed_emails_status');
-                    } else {
-                      $allowed_emails_status = 'off';
-                    }
+                  if ($system_core->configurator->exists_database_entry_value('security_allowed_emails_status')) {
+                    $allowed_emails_status = $system_core->configurator->get_database_entry_value('security_allowed_emails_status');
+                  } else {
+                    $allowed_emails_status = 'off';
+                  }
+                  
+                  $user_email_exploded = explode('@', $user_email);
+
+                  if (empty($allowed_emails) || in_array($user_email_exploded[1], $allowed_emails) || $allowed_emails_status == 'off') {
+                    $user = User::create($system_core, $user_login, $user_email, $user_password);
                     
-                    $user_email_exploded = explode('@', $user_email);
+                    if (!is_null($user)) {
+                      $template_base_name = ($system_core->configurator->exists_database_entry_value('base_template')) ? $system_core->configurator->get_database_entry_value('base_template') : 'default';
 
-                    if (empty($allowed_emails) || in_array($user_email_exploded[1], $allowed_emails) || $allowed_emails_status == 'off') {
-                      $user = User::create($system_core, $user_login, $user_email, $user_password);
-                      
-                      if (!is_null($user)) {
-                        $template_base_name = ($system_core->configurator->exists_database_entry_value('base_template')) ? $system_core->configurator->get_database_entry_value('base_template') : 'default';
+                      $template = new \core\PHPLibrary\Template($system_core, $template_base_name);
+                      $registration_submit = $user->create_registration_submit();
 
-                        $template = new \core\PHPLibrary\Template($system_core, $template_base_name);
-                        $registration_submit = $user->create_registration_submit();
+                      if (is_array($registration_submit)) {
+                        $site_title = (empty($system_core->configurator->get_meta_title())) ? $system_core->configurator->get_site_title() : $system_core->configurator->get_meta_title();
 
-                        if (is_array($registration_submit)) {
-                          $site_title = (empty($system_core->configurator->get_meta_title())) ? $system_core->configurator->get_site_title() : $system_core->configurator->get_meta_title();
+                        $email_sender = new \core\PHPLibrary\EmailSender($system_core);
+                        $email_sender_system_sender_email = \core\PHPLibrary\EmailSender::get_system_sender_email($system_core);
+                        $email_sender->set_from_user($site_title, $email_sender_system_sender_email);
+                        $email_sender->set_to_user_email($user_email);
+                        $email_sender->add_header(sprintf('From: %s <%s>', $site_title, $email_sender_system_sender_email));
+                        $email_sender->add_header(sprintf("\r\nX-Mailer: PHP/%s", phpversion()));
+                        $email_sender->add_header("\r\nMIME-Version: 1.0");
+                        $email_sender->add_header("\r\nContent-type: text/html; charset=UTF-8");
 
-                          $email_sender = new \core\PHPLibrary\EmailSender($system_core);
-                          $email_sender_system_sender_email = \core\PHPLibrary\EmailSender::get_system_sender_email($system_core);
-                          $email_sender->set_from_user($site_title, $email_sender_system_sender_email);
-                          $email_sender->set_to_user_email($user_email);
-                          $email_sender->add_header(sprintf('From: %s <%s>', $site_title, $email_sender_system_sender_email));
-                          $email_sender->add_header(sprintf("\r\nX-Mailer: PHP/%s", phpversion()));
-                          $email_sender->add_header("\r\nMIME-Version: 1.0");
-                          $email_sender->add_header("\r\nContent-type: text/html; charset=UTF-8");
+                        $email_sender->set_subject($system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_EMAIL_SUBJECT'));
+                        $email_sender->set_content(\core\PHPLibrary\Template\Collector::assembly_file_content($template, 'templates/email/default.tpl', [
+                          'EMAIL_TITLE' => $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_EMAIL_TITLE'),
+                          'EMAIL_CONTENT' => sprintf($system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_EMAIL_CONTENT'), $user_login, sprintf('%s/registration?submit=%s', $system_core->get_site_url(), $registration_submit['submit_token']), sprintf('%s/registration?refusal=%s', $system_core->get_site_url(), $registration_submit['refusal_token'])),
+                          'EMAIL_COPYRIGHT' => $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_EMAIL_COPYRIGHT')
+                        ]));
 
-                          $email_sender->set_subject($system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_EMAIL_SUBJECT'));
-                          $email_sender->set_content(\core\PHPLibrary\Template\Collector::assembly_file_content($template, 'templates/email/default.tpl', [
-                            'EMAIL_TITLE' => $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_EMAIL_TITLE'),
-                            'EMAIL_CONTENT' => sprintf($system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_EMAIL_CONTENT'), $user_login, sprintf('%s/registration?submit=%s', $system_core->get_site_url(), $registration_submit['submit_token']), sprintf('%s/registration?refusal=%s', $system_core->get_site_url(), $registration_submit['refusal_token'])),
-                            'EMAIL_COPYRIGHT' => $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_EMAIL_COPYRIGHT')
-                          ]));
-
-                          $email_sender->send();
-                          
-                          $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_SENDED_SUCCESS') : $handler_message;
-                          $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
-                        } else {
-                          $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN')) : $handler_message;
-                          $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
-                        }
+                        $email_sender->send();
+                        
+                        $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_SENDED_SUCCESS') : $handler_message;
+                        $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
                       } else {
                         $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN')) : $handler_message;
                         $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
                       }
                     } else {
-                      $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_ERROR_EMAIL_IS_NOT_ALLOWED')) : $handler_message;
+                      $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN')) : $handler_message;
                       $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
                     }
                   } else {
-                    $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_ERROR_EMAIL_ALREADY_EXISTS')) : $handler_message;
+                    $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_ERROR_EMAIL_IS_NOT_ALLOWED')) : $handler_message;
                     $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
                   }
                 } else {
-                  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_ERROR_LOGIN_ALREADY_EXISTS')) : $handler_message;
+                  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_ERROR_EMAIL_ALREADY_EXISTS')) : $handler_message;
                   $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
                 }
               } else {
@@ -116,7 +214,7 @@ if ($system_core->urlp->get_path(2) == 'registration') {
                 $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
               }
             } else {
-              $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_ERROR_INVALID_PASSWORD')) : $handler_message;
+              $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_ERROR_LOGIN_ALREADY_EXISTS')) : $handler_message;
               $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
             }
           } else {
@@ -124,7 +222,7 @@ if ($system_core->urlp->get_path(2) == 'registration') {
             $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
           }
         } else {
-          $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_ERROR_INVALID_LOGIN')) : $handler_message;
+          $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN')) : $handler_message;
           $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
         }
       } else {
