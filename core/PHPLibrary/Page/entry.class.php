@@ -14,6 +14,7 @@ namespace core\PHPLibrary\Page {
   use \core\PHPLibrary\Page as Page;
   use \core\PHPLibrary\Parsedown as Parsedown;
   use \core\PHPLibrary\Entry as Entry;
+  use \core\PHPLibrary\User as User;
   use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
 
@@ -133,11 +134,15 @@ namespace core\PHPLibrary\Page {
             $entry_comment_index = 1;
             foreach ($entry_comments_array as $entry_comment) {
               $entry_comment->init_data(['entry_id', 'author_id', 'content', 'created_unix_timestamp', 'updated_unix_timestamp', 'metadata']);
+              
               $entry_comment_author = $entry_comment->get_author();
-              $entry_comment_author->init_data(['login', 'metadata']);
 
-              $entry_comment_author_group = $entry_comment_author->get_group();
-              $entry_comment_author_group->init_data(['texts']);
+              if ($entry_comment_author != null) {
+                $entry_comment_author->init_data(['login', 'metadata']);
+
+                $entry_comment_author_group = $entry_comment_author->get_group();
+                $entry_comment_author_group->init_data(['texts']);
+              }
 
               $entry_comment_content = strip_tags($entry_comment->get_content());
 
@@ -145,9 +150,9 @@ namespace core\PHPLibrary\Page {
                 'COMMENT_ID' => $entry_comment->get_id(),
                 'COMMENT_INDEX' => $entry_comment_index,
                 'COMMENT_CREATED_DATE_TIMESTAMP' => date('d.m.Y H:i:s', $entry_comment->get_created_unix_timestamp()),
-                'COMMENT_AUTHOR_LOGIN' => $entry_comment_author->get_login(),
-                'COMMENT_AUTHOR_AVATAR_URL' => $entry_comment_author->get_avatar_url(64),
-                'COMMENT_AUTHOR_GROUP_TITLE' => $entry_comment_author_group->get_title($cms_base_locale_name),
+                'COMMENT_AUTHOR_LOGIN' => ($entry_comment_author != null) ? $entry_comment_author->get_login() : '{LANG:DEFAULT_TEXT_USER_DELETED}',
+                'COMMENT_AUTHOR_AVATAR_URL' => ($entry_comment_author != null) ? $entry_comment_author->get_avatar_url(64) : User::get_avatar_default_url($this->system_core, 64),
+                'COMMENT_AUTHOR_GROUP_TITLE' => ($entry_comment_author != null) ? $entry_comment_author_group->get_title($cms_base_locale_name) : '',
                 'COMMENT_CONTENT' => ($entry_comment->is_hidden()) ? sprintf('%s: %s', $locale_data['PAGE_ENTRY_COMMENT_HIDE_LABEL'], strip_tags($entry_comment->get_hidden_reason())) : $entry_comment_content
               ]));
 

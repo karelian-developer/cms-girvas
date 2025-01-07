@@ -40,6 +40,114 @@ export class Form {
    * Инициализация элемента формы
    */
   initFormElement() {
+    let inputTipsAll = [], inputsArray = this.element.querySelectorAll('input');
+
+    let inputTips = this.element.querySelectorAll('.input-tip');
+    let inputsGroupTips = this.element.querySelectorAll('.inputs-group-tip');
+
+    if (inputsArray.length > 0) {
+      inputsArray.forEach((element) => {
+        if (element.hasAttribute('cmsg-password-checker')) {
+          let passwordProgressLevelElement = document.createElement('div');
+          let passwordProgressLevelContainerElement = document.createElement('div');
+
+          passwordProgressLevelContainerElement.append(passwordProgressLevelElement);
+
+          passwordProgressLevelContainerElement.style.height = '5px';
+          passwordProgressLevelContainerElement.style.width = '100%';
+          passwordProgressLevelContainerElement.style.position = 'absolute';
+          passwordProgressLevelContainerElement.style.bottom = '-5px';
+
+          passwordProgressLevelElement.style.height = '100%';
+          passwordProgressLevelElement.style.width = '25%';
+          passwordProgressLevelElement.style.backgroundColor = 'red';
+          
+          element.after(passwordProgressLevelContainerElement);
+
+          element.addEventListener('input', (event) => {
+            let passwordPoints = 0;
+
+            if (event.target.value.length >= 6) {
+              passwordPoints += 5;
+            }
+
+            if (event.target.value.match(/[a-z]/)) {
+              passwordPoints += 5;
+            }
+
+            if (event.target.value.match(/[A-Z]/)) {
+              passwordPoints += 5;
+            }
+
+            if (event.target.value.match(/[0-9]/)) {
+              passwordPoints += 5;
+            }
+
+            if (event.target.value.match(/[\!\@\#\$\%\&]/)) {
+              passwordPoints += 10;
+            }
+
+            if (passwordPoints >= 5 && passwordPoints < 15) {
+              passwordProgressLevelElement.style.width = '25%';
+              passwordProgressLevelElement.style.backgroundColor = 'red';
+            }
+
+            if (passwordPoints >= 15 && passwordPoints < 20) {
+              passwordProgressLevelElement.style.width = '50%';
+              passwordProgressLevelElement.style.backgroundColor = 'orange';
+            }
+
+            if (passwordPoints >= 20 && passwordPoints < 30) {
+              passwordProgressLevelElement.style.width = '75%';
+              passwordProgressLevelElement.style.backgroundColor = 'yellow';
+            }
+
+            if (passwordPoints >= 30) {
+              passwordProgressLevelElement.style.width = '100%';
+              passwordProgressLevelElement.style.backgroundColor = 'green';
+            }
+          });
+        }
+      });
+    }
+
+    if (inputTips.length > 0) {
+      inputTips.forEach((element) => {
+        inputTipsAll.push(element);
+      });
+    }
+    if (inputsGroupTips.length > 0) {
+      inputsGroupTips.forEach((element) => {
+        inputTipsAll.push(element);
+      });
+    }
+
+    if (inputTipsAll.length > 0) {
+      inputTipsAll.forEach((element) => {
+        let elementRole = element.getAttribute('role');
+        if (elementRole == 'passwords-show') {
+          let elementParentElement = element.parentElement;
+          elementParentElement.style.position = 'relative';
+
+          let inputsPasswordElements = elementParentElement.querySelectorAll('input[type="password"]');
+
+          if (inputsPasswordElements.length > 0) {
+            inputsPasswordElements.forEach((inputElement) => {
+              element.addEventListener('click', (event) => {
+                let inputElementType = inputElement.getAttribute('type');
+
+                if (inputElementType == 'password') {
+                  inputElement.setAttribute('type', 'text');
+                } else {
+                  inputElement.setAttribute('type', 'password');
+                }
+              });
+            });
+          }
+        }
+      });
+    }
+
     this.element.addEventListener('submit', (event) => {
       event.preventDefault();
       this.send(event);

@@ -13,9 +13,11 @@
   box-shadow: inset 0 -108px 100px var(--common-main-color-1);
   flex: 0 0 100%;
 }
+
 .main__container {
   flex: 0 0 100%;
 }
+
 @media (max-width: 1199px) {
   .main__container {
     box-sizing: border-box;
@@ -23,32 +25,38 @@
     justify-content: center;
   }
 }
+
 .main__auth-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 @media (max-width: 399px) {
   .main__auth-section {
     padding: 0 30px;
   }
 }
+
 @media (max-width: 1199px) {
   .main__auth-section {
     flex-direction: column;
     width: fit-content;
   }
 }
+
 @media (max-width: 399px) {
   .main__brand-image {
     width: 60%;
   }
 }
+
 @media (min-width: 400px) and (max-width: 1199px) {
   .main__brand-image {
     width: 200px;
   }
 }
+
 @media (max-width: 1199px) {
   .main__brand-container {
     display: flex;
@@ -56,11 +64,13 @@
     margin-bottom: 20px;
     width: 100%;
   }
+
   .main__form-auth-container {
     max-width: 400px;
     width: 100%;
   }
 }
+
 @media (min-width: 1200px) {
   .main__brand-container {
     flex: 0 0 400px;
@@ -69,6 +79,7 @@
     flex: 0 0 400px;
   }
 }
+
 .main__form-auth {
   box-sizing: border-box;
   background-color: var(--main-admin-auth-form-background-color);
@@ -76,6 +87,7 @@
   padding: 30px 40px;
   margin-bottom: 20px;
 }
+
 .main__form-title {
   color: var(--main-admin-auth-form-title-font-color);
   text-transform: uppercase;
@@ -84,32 +96,63 @@
   margin-top: 0;
   margin-bottom: 20px;
 }
+
 @media (max-width: 767px) {
   .main__form-title {
     font-size: 18px;
   }
 }
+
 @media (min-width: 768px) {
   .main__form-title {
     font-size: 24px;
   }
 }
+
+.form__input-container,
+.form-auth__inputs-group {
+  position: relative;
+}
+
+.form__input-container:not(:last-child),
+.form-auth__inputs-group:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.form__input-container > .form__input-tip,
+.form-auth__inputs-group > .form__inputs-group-tip {
+  position: absolute;
+  font-size: 12px;
+  height: 15px;
+  top: -15px;
+  right: 0;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.form__input-container:hover > .form__input-tip,
+.form-auth__inputs-group:hover > .form__inputs-group-tip {
+  opacity: 1;
+}
+
 .form-auth__inputs-group {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin-bottom: 10px;
 }
+
 .form-auth__input {
   box-sizing: border-box;
   outline: 0;
 }
+
 .form-auth__input_text,
 .form-auth__input_password,
 .form-auth__input.form-auth__input_access-code {
   padding: 10px;
   transition: background-color .2s, border-color .2s, color .2s;
 }
+
 @media (max-width: 767px) {
   .form-auth__input_text,
   .form-auth__input_password,
@@ -117,6 +160,7 @@
     font-size: 14px;
   }
 }
+
 @media (min-width: 768px) {
   .form-auth__input_text,
   .form-auth__input_password,
@@ -124,59 +168,70 @@
     font-size: 16px;
   }
 }
+
 .form-auth__input_text {
   background-color: var(--main-admin-auth-form-input-text-background-color);
   border: 1px solid var(--main-admin-auth-form-input-text-border-color);
-  margin-bottom: 10px;
   width: 100%;
 }
+
 .form-auth__input_text:hover {
   background-color: var(--main-admin-auth-form-input-text-background-color--hover);
   border: 1px solid var(--main-admin-auth-form-input-text-border-color--hover);
 }
+
 .form-auth__input_text:focus {
   background-color: var(--main-admin-auth-form-input-text-background-color--focus);
   border: 1px solid var(--main-admin-auth-form-input-text-border-color--focus);
 }
+
 .form-auth__input_text:active {
   background-color: var(--main-admin-auth-form-input-text-background-color--active);
   border: 1px solid var(--main-admin-auth-form-input-text-border-color--active);
 }
+
 .form-auth__input_password {
   background-color: var(--main-admin-auth-form-input-password-background-color);
   border: 1px solid var(--main-admin-auth-form-input-password-border-color);
-  margin-bottom: 10px;
   width: 100%;
 }
+
 .form-auth__input_password:hover {
   background-color: var(--main-admin-auth-form-input-password-background-color--hover);
   border: 1px solid var(--main-admin-auth-form-input-password-border-color--hover);
 }
+
 .form-auth__input_password:focus {
   background-color: var(--main-admin-auth-form-input-password-background-color--focus);
   border: 1px solid var(--main-admin-auth-form-input-password-border-color--focus);
 }
+
 .form-auth__input_password:active {
   background-color: var(--main-admin-auth-form-input-password-background-color--active);
   border: 1px solid var(--main-admin-auth-form-input-password-border-color--active);
 }
+
 .form-auth__input.form-auth__input_access-code {
   background-color: var(--main-admin-auth-form-input-access-code-background-color);
   border: 1px solid var(--main-admin-auth-form-input-access-code-border-color);
   max-width: calc(25% - 8px);
 }
+
 .form-auth__input.form-auth__input_access-code:hover {
   background-color: var(--main-admin-auth-form-input-access-code-background-color--hover);
   border: 1px solid var(--main-admin-auth-form-input-access-code-border-color--hover);
 }
+
 .form-auth__input.form-auth__input_access-code:focus {
   background-color: var(--main-admin-auth-form-input-access-code-background-color--focus);
   border: 1px solid var(--main-admin-auth-form-input-access-code-border-color--focus);
 }
+
 .form-auth__input.form-auth__input_access-code:active {
   background-color: var(--main-admin-auth-form-input-access-code-background-color--active);
   border: 1px solid var(--main-admin-auth-form-input-access-code-border-color--active);
 }
+
 .form-auth__input.form-auth__input_submit {
   background-color: var(--main-admin-auth-form-input-submit-background-color);
   font-weight: 700;
@@ -189,28 +244,34 @@
   cursor: pointer;
   transition: background-color .2s, color .2s;
 }
+
 @media (max-width: 767px) {
   .form-auth__input.form-auth__input_submit {
     font-size: 14px;
   }
 }
+
 @media (min-width: 768px) {
   .form-auth__input.form-auth__input_submit {
     font-size: 16px;
   }
 }
+
 .form-auth__input.form-auth__input_submit:hover {
   background-color: var(--main-admin-auth-form-input-submit-background-color--hover);
   color: var(--main-admin-auth-form-input-submit-font-color--hover);
 }
+
 .form-auth__input.form-auth__input_submit:focus {
   background-color: var(--main-admin-auth-form-input-submit-background-color--focus);
   color: var(--main-admin-auth-form-input-submit-font-color--focus);
 }
+
 .form-auth__input.form-auth__input_submit:active {
   background-color: var(--main-admin-auth-form-input-submit-background-color--active);
   color: var(--main-admin-auth-form-input-submit-font-color--active);
 }
+
 .main__auth-footer {
   font-size: 14px;
   color: var(--main-admin-auth-footer-font-color);

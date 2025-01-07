@@ -26,15 +26,15 @@ if ($system_core->client->is_logged(2)) {
     $user_creation_allowed = true;
 
     if ($system_core->configurator->get_users_login_special_symbols_status(true)) {
-      $login_regular = '[a-zA-Z0-9\!\@\#\$\%\&]+';
+      $login_regular = '[a-zA-Z0-9\_\-\!\@\#\$\%\&]+';
     } else {
-      $login_regular = '[a-zA-Z0-9]+';
+      $login_regular = '[a-zA-Z0-9\_\-]+';
     }
 
     if ($system_core->configurator->get_users_password_special_symbols_status(true)) {
-      $password_regular = '[a-zA-Z0-9\!\@\#\$\%\&]+';
+      $password_regular = '[a-zA-Z0-9\_\-\!\@\#\$\%\&]+';
     } else {
-      $password_regular = '[a-zA-Z0-9]+';
+      $password_regular = '[a-zA-Z0-9\_\-]+';
     }
 
     $user_login = isset($_PUT['user_login']) ? htmlspecialchars(str_replace('\'', '"', $_PUT['user_login'])) : '';

@@ -89,6 +89,7 @@ namespace core\PHPLibrary\Page {
 
           $fields_types = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_type')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_type'), true) : [];
           $fields_titles = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_title')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_title'), true) : [];
+          $fields_descriptions = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_description')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_description'), true) : [];
           $fields_names = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_name')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_name'), true) : [];
 
           $additional_fields_elements = [];
@@ -96,26 +97,28 @@ namespace core\PHPLibrary\Page {
           if ($this->system_core->urlp->get_param('event') == 'edit') {
             if ($user_group->permission_check($user_group::PERMISSION_ADMIN_USERS_MANAGEMENT) || $user->get_id() == $profile_user->get_id()) {
               foreach ($fields_types as $field_index => $field_type) {
-                $field_name_exploded = explode('_', $fields_names[$field_index]);
-                foreach ($field_name_exploded as $string_index => $string) {
-                  if ($string_index > 0) {
-                    $field_name_exploded[$string_index] = ucfirst($string);
-                  }
-                }
+                $field_name_exploded = (isset($fields_names[$field_index])) ? explode('_', $fields_names[$field_index]) : [];
                 $field_name_transformed = implode($field_name_exploded);
 
-                if ($field_type == 'textarea') {
-                  array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile/editor/fieldTextarea.tpl', [
-                    'FIELD_NAME' => $fields_names[$field_index],
-                    'FIELD_TITLE' => $fields_titles[$cms_base_locale_name][$field_index],
-                    'FIELD_VALUE' => (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? strip_tags($profile_user->get_additional_field_data($field_name_transformed)) : ''
-                  ]));
-                } else {
+                $field_name = (isset($fields_names[$field_index])) ? $fields_names[$field_index] : '';
+                $field_title = (isset($fields_titles[$cms_base_locale_name][$field_index])) ? $fields_titles[$cms_base_locale_name][$field_index] : '';
+                $field_description = (isset($fields_descriptions[$cms_base_locale_name][$field_index])) ? $fields_descriptions[$cms_base_locale_name][$field_index] : '';
+                $field_value = (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? strip_tags($profile_user->get_additional_field_data($field_name_transformed)) : '';
+                $field_type = (isset($fields_types[$field_index])) ? $fields_types[$field_index] : 'text';
+
+                if ($field_title != '') {
+                  foreach ($field_name_exploded as $string_index => $string) {
+                    if ($string_index > 0) {
+                      $field_name_exploded[$string_index] = ucfirst($string);
+                    }
+                  }
+
                   array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile/editor/fieldInput.tpl', [
-                    'FIELD_NAME' => $fields_names[$field_index],
-                    'FIELD_TYPE' => $fields_types[$field_index],
-                    'FIELD_TITLE' => $fields_titles[$cms_base_locale_name][$field_index],
-                    'FIELD_VALUE' => (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? strip_tags($profile_user->get_additional_field_data($field_name_transformed)) : ''
+                    'FIELD_NAME' => $field_name,
+                    'FIELD_TYPE' => ($field_type == 'textarea') ? '' : $field_type,
+                    'FIELD_TITLE' => $field_title,
+                    'FIELD_DESCRIPTION' => $field_description,
+                    'FIELD_VALUE' => $field_value
                   ]));
                 }
               }

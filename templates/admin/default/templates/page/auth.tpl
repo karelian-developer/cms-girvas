@@ -15,17 +15,25 @@
         </svg>
       </div>
       <div class="main__form-auth-container">
-        <form action="/handler/utils/authorization?method=admin" class="main__form-auth" method="POST">
+        <form action="/handler/utils/authorization?method=admin" class="main__form-auth form" method="POST">
           <h1 class="main__form-title form-auth">{LANG:MAIN_AUTHORIZATION_BLOCK_TITLE}</h1>
-          <input name="user_login" type="text" class="form-auth__input form-auth__input_text" placeholder="{LANG:MAIN_AUTHORIZATION_FORM_INPUT_LOGIN_PLACEHOLDER}" required>
-          <input name="user_password" type="password" class="form-auth__input form-auth__input_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required>
+          <div class="form__input-container input-container">
+            <input name="user_login" type="text" class="form-auth__input form-auth__input_text" placeholder="{LANG:MAIN_AUTHORIZATION_FORM_INPUT_LOGIN_PLACEHOLDER}" required>
+          </div>
+          <div class="form__input-container input-container">
+            <div class="form__input-tip input-tip" role="passwords-show">{LANG:BUTTON_SHOW_HIDE_LABEL}</div>
+            <input name="user_password" type="password" class="form-auth__input form-auth__input_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" required>
+          </div>
           <div class="form-auth__inputs-group">
+            <div class="form__inputs-group-tip inputs-group-tip" role="passwords-show">{LANG:BUTTON_SHOW_HIDE_LABEL}</div>
             <input name="admin_access-code[]" type="password" class="form-auth__input form-auth__input_access-code" placeholder="&#8226;&#8226;&#8226;&#8226;" maxlength="4" minlength="4" required>
             <input name="admin_access-code[]" type="password" class="form-auth__input form-auth__input_access-code" placeholder="&#8226;&#8226;&#8226;&#8226;" maxlength="4" minlength="4" required>
             <input name="admin_access-code[]" type="password" class="form-auth__input form-auth__input_access-code" placeholder="&#8226;&#8226;&#8226;&#8226;" maxlength="4" minlength="4" required>
             <input name="admin_access-code[]" type="password" class="form-auth__input form-auth__input_access-code" placeholder="&#8226;&#8226;&#8226;&#8226;" maxlength="4" minlength="4" required>
           </div>
-          <input class="form-auth__input form-auth__input_submit" type="submit" value="{LANG:MAIN_AUTHORIZATION_FORM_BUTTON_SUBMIT_PLACEHOLDER}">
+          <div class="form__input-container input-container">
+            <input class="form-auth__input form-auth__input_submit" type="submit" value="{LANG:MAIN_AUTHORIZATION_FORM_BUTTON_SUBMIT_PLACEHOLDER}">
+          </div>
         </form>
         <div class="main__auth-footer">{LANG:FOOTER_CMS_COPYRIGHT}</div>
       </div>

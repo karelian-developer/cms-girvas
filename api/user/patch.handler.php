@@ -74,9 +74,9 @@ if ($system_core->client->is_logged(1) || $system_core->client->is_logged(2)) {
 
           if ($user_update_is_allowed) {
             if ($system_core->configurator->get_users_login_special_symbols_status(true)) {
-              $login_regular = '[a-zA-Z0-9\!\@\#\$\%\&]+';
+              $login_regular = '[a-zA-Z0-9\_\-\!\@\#\$\%\&]+';
             } else {
-              $login_regular = '[a-zA-Z0-9]+';
+              $login_regular = '[a-zA-Z0-9\_\-]+';
             }
 
             if ($system_core->configurator->get_users_login_register_accounting_status(true)) {
@@ -129,9 +129,9 @@ if ($system_core->client->is_logged(1) || $system_core->client->is_logged(2)) {
 
         if (isset($user_password) && isset($user_password_repeat)) {
           if ($system_core->configurator->get_users_password_special_symbols_status(true)) {
-            $password_regular = '[a-zA-Z0-9\!\@\#\$\%\&]+';
+            $password_regular = '[a-zA-Z0-9\_\-\!\@\#\$\%\&]+';
           } else {
-            $password_regular = '[a-zA-Z0-9]+';
+            $password_regular = '[a-zA-Z0-9\_\-]+';
           }
           
           if ($user_update_is_allowed) {

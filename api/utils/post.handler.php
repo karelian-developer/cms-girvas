@@ -38,15 +38,15 @@ if ($system_core->urlp->get_path(2) == 'registration') {
         $user_login = $_POST['user_login'];
 
         if ($system_core->configurator->get_users_login_special_symbols_status(true)) {
-          $login_regular = '[a-zA-Z0-9\!\@\#\$\%\&]+';
+          $login_regular = '[a-zA-Z0-9\_\-\!\@\#\$\%\&]+';
         } else {
-          $login_regular = '[a-zA-Z0-9]+';
+          $login_regular = '[a-zA-Z0-9\_\-]+';
         }
 
         if ($system_core->configurator->get_users_password_special_symbols_status(true)) {
-          $password_regular = '[a-zA-Z0-9\!\@\#\$\%\&]+';
+          $password_regular = '[a-zA-Z0-9\_\-\!\@\#\$\%\&]+';
         } else {
-          $password_regular = '[a-zA-Z0-9]+';
+          $password_regular = '[a-zA-Z0-9\_\-]+';
         }
         
         // Проверка: включен ли черный список логинов

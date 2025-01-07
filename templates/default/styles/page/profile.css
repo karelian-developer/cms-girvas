@@ -156,3 +156,26 @@
   width: 128px;
   height: 128px;
 }
+
+.form__input-container {
+  position: relative;
+  width: fit-content;
+}
+
+.form__input-container:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.form__input-container > .form__input-tip {
+  position: absolute;
+  font-size: 12px;
+  height: 15px;
+  top: -15px;
+  right: 0;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.form__input-container:hover > .form__input-tip {
+  opacity: 1;
+}

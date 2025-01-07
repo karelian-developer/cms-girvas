@@ -15,7 +15,9 @@
             </div>
           </td>
           <td class="table__cell cell">
-            <div class="page__phar-block"><input name="user_login" type="text" class="form__input user-editor-form__input" value="{USER_LOGIN}" placeholder="user2311" required role="userFormInputLogin"></div>
+            <div class="page__phar-block">
+              <input name="user_login" type="text" class="form__input user-editor-form__input" value="{USER_LOGIN}" placeholder="user2311" required role="userFormInputLogin">
+            </div>
           </td>
         </tr>
         <tr class="table__row">
@@ -26,7 +28,9 @@
             </div>
           </td>
           <td class="table__cell cell">
-            <div class="page__phar-block"><input name="user_email" type="email" class="form__input user-editor-form__input" value="{USER_EMAIL}" placeholder="user@mail.ru" required role="userFormInputEmail"></div>
+            <div class="page__phar-block form__input-container">
+              <input name="user_email" type="email" class="form__input user-editor-form__input" value="{USER_EMAIL}" placeholder="user@mail.ru" required role="userFormInputEmail">
+            </div>
           </td>
         </tr>
         <tr class="table__row">
@@ -37,7 +41,10 @@
             </div>
           </td>
           <td class="table__cell cell">
-            <div class="page__phar-block"><input name="user_password" type="password" class="form__input user-editor-form__input" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" role="userFormInputUserPassword"></div>
+            <div class="page__phar-block form__input-container" style="position: relative;">
+              <div class="form__input-tip input-tip" role="passwords-show">{LANG:BUTTON_SHOW_HIDE_LABEL}</div>
+              <input name="user_password" type="password" class="form__input user-editor-form__input" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" role="userFormInputUserPassword" cmsg-password-checker>
+            </div>
           </td>
         </tr>
         <tr class="table__row">
@@ -48,7 +55,10 @@
             </div>
           </td>
           <td class="table__cell cell">
-            <div class="page__phar-block"><input name="user_password_repeat" type="password" class="form__input user-editor-form__input" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" role="userFormInputUserPasswordRepeat"></div>
+            <div class="page__phar-block form__input-container">
+              <div class="form__input-tip input-tip" role="passwords-show">{LANG:BUTTON_SHOW_HIDE_LABEL}</div>
+              <input name="user_password_repeat" type="password" class="form__input user-editor-form__input" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" role="userFormInputUserPasswordRepeat">
+            </div>
           </td>
         </tr>
         <tr class="table__row">
@@ -59,7 +69,9 @@
             </div>
           </td>
           <td class="table__cell cell">
-            <div class="page__phar-block"><input name="user_name" type="text" class="form__input user-editor-form__input" value="{USER_NAME}" placeholder="Ivan" role="userFormInputName"></div>
+            <div class="page__phar-block form__input-container">
+              <input name="user_name" type="text" class="form__input user-editor-form__input" value="{USER_NAME}" placeholder="Ivan" role="userFormInputName">
+            </div>
           </td>
         </tr>
         <tr class="table__row">
@@ -70,7 +82,9 @@
             </div>
           </td>
           <td class="table__cell cell">
-            <div class="page__phar-block"><input name="user_surname" type="text" class="form__input user-editor-form__input" value="{USER_SURNAME}" placeholder="Ivanov" role="userFormInputSurname"></div>
+            <div class="page__phar-block form__input-container">
+              <input name="user_surname" type="text" class="form__input user-editor-form__input" value="{USER_SURNAME}" placeholder="Ivanov" role="userFormInputSurname">
+            </div>
           </td>
         </tr>
         <tr class="table__row">
@@ -81,7 +95,9 @@
             </div>
           </td>
           <td class="table__cell cell">
-            <div class="page__phar-block"><input name="user_patronymic" type="text" class="form__input user-editor-form__input" value="{USER_PATRONYMIC}" placeholder="Ivanovich" role="userFormInputPatronymic"></div>
+            <div class="page__phar-block form__input-container">
+              <input name="user_patronymic" type="text" class="form__input user-editor-form__input" value="{USER_PATRONYMIC}" placeholder="Ivanovich" role="userFormInputPatronymic">
+            </div>
           </td>
         </tr>
         <tr class="table__row">
@@ -92,7 +108,9 @@
             </div>
           </td>
           <td class="table__cell cell">
-            <div class="page__phar-block"><input name="user_birthdate" type="date" class="form__input user-editor-form__input" value="{USER_BIRTHDATE}" role="userFormInputBirthdate" min="{USER_BIRTHDATE_MINIMUM}" max="{USER_BIRTHDATE_MAXIMUM}"></div>
+            <div class="page__phar-block form__input-container">
+              <input name="user_birthdate" type="date" class="form__input user-editor-form__input" value="{USER_BIRTHDATE}" role="userFormInputBirthdate" min="{USER_BIRTHDATE_MINIMUM}" max="{USER_BIRTHDATE_MAXIMUM}">
+            </div>
           </td>
         </tr>
         <tr class="table__row">
