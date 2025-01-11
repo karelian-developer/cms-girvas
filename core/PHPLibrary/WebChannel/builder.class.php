@@ -51,7 +51,7 @@ namespace core\PHPLibrary\WebChannel {
      * @return void
      */
     public function set_language(string $locale_name) : void {
-      $this->language = str_replace('_', '-', strtolower($locale_name));
+      $this->web_channel->set_language($locale_name);
     }
     
     /**
@@ -60,7 +60,7 @@ namespace core\PHPLibrary\WebChannel {
      * @return string
      */
     public function get_language() : string {
-      return $this->language;
+      return $this->web_channel->language;
     }
 
     public static function get_type_enum(int $type_id) : EnumSpecification|null {

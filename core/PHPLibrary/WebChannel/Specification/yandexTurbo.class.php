@@ -10,6 +10,7 @@
 
 namespace core\PHPLibrary\WebChannel\Specification {
   use \DOMElement as DOMElement;
+  use \DOMImplementation as DOMImplementation;
   use \core\PHPLibrary\SystemCore as SystemCore;
   use \core\PHPLibrary\WebChannel\Builder as WebChannelBuilder;
   use \core\PHPLibrary\WebChannel\InterfaceSpecification as InterfaceSpecification;
@@ -44,15 +45,19 @@ namespace core\PHPLibrary\WebChannel\Specification {
     }
 
     public function set_language(string $value) : void {
-      $this->language = str_replace('_', '-', strtolower($value));
+      preg_match('/([a-z]+)\_[A-Z]+/', $value, $matches);
+      $this->language = $matches[1];
     }
 
     public function add_item(array $data) : void {
       array_push($this->items, [
         'title' => $data['title'],
         'description' => $data['description'],
+        'content' => $data['content'],
+        'preview_url' => $data['preview_url'],
         'link' => $data['link'],
-        'pubdate' => date('D, d M Y H:i:s T', $data['pubdate'])
+        'pubdate' => date('D, d M Y H:i:s O', $data['pubdate']),
+        'author' => $data['author']
       ]);
     }
 
@@ -76,91 +81,70 @@ namespace core\PHPLibrary\WebChannel\Specification {
       return $this->items;
     }
 
-    public function assembly_rss() : DOMElement|bool {
-      $element_rss = $this->builder->document->createElement('rss');
+    public function assembly() : void {
+      $rss_element = $this->builder->document->createElement('rss');
+      $rss_element->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:yandex', 'http://news.yandex.ru');
+      $rss_element->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:media', 'http://search.yahoo.com/mrss/');
+      $rss_element->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:turbo', 'http://turbo.yandex.ru');
+      $rss_element->setAttribute('version', '2.0');
 
-      $element_rss_attribute_version = $this->builder->document->createAttribute('version');
-      $element_rss_attribute_version->value = '2.0';
+      $channel_element = $this->builder->document->createElement('channel');
+      $channel_title_element = $this->builder->document->createElement('title', $this->get_title());
+      $channel_link_element = $this->builder->document->createElement('link', $this->system_core->get_cms_link());
+      $channel_description_element = $this->builder->document->createElement('description', $this->get_description());
+      $channel_language_element = $this->builder->document->createElement('language', $this->get_language());
+      $channel_turbo_analytics_element = $this->builder->document->createElementNS('http://turbo.yandex.ru', 'turbo:analytics');
+      $channel_turbo_adnetwork_element = $this->builder->document->createElementNS('http://turbo.yandex.ru', 'turbo:adNetwork');
 
-      $element_rss_attribute_turbo = $this->builder->document->createAttributeNS('http://turbo.yandex.ru', 'turbo:attr');
-      $element_rss_attribute_yandex = $this->builder->document->createAttributeNS('http://news.yandex.ru', 'yandex:attr');
+      $channel_element->appendChild($channel_title_element);
+      $channel_element->appendChild($channel_link_element);
+      $channel_element->appendChild($channel_description_element);
+      $channel_element->appendChild($channel_language_element);
+      //$channel_element->appendChild($channel_turbo_analytics_element);
+      //$channel_element->appendChild($channel_turbo_adnetwork_element);
 
-      $element_rss->appendChild($element_rss_attribute_yandex);
-      $element_rss->appendChild($element_rss_attribute_turbo);
-      $element_rss->appendChild($element_rss_attribute_version);
+      if (count($this->items) > 0) {
+        foreach ($this->items as $item) {
+          $item_element = $this->builder->document->createElement('item');
+          $item_element->setAttribute('turbo', 'true');
+          
+          $item_turbo_extended_html_element = $this->builder->document->createElementNS('http://turbo.yandex.ru', 'turbo:extendedHtml', 'true');
+          $item_link_element = $this->builder->document->createElement('link', $item['link']);
+          //$item_turbo_source_element = $this->builder->document->createElementNS('http://turbo.yandex.ru', 'turbo:source', 'true');
+          //$item_turbo_topic_element = $this->builder->document->createElementNS('http://turbo.yandex.ru', 'turbo:topic', 'true');
+          $item_pudate_element = $this->builder->document->createElement('pubDate', $item['pubdate']);
+          $item_author_element = $this->builder->document->createElement('author', $item['author']);
 
-      return $element_rss;
-    }
+          $item_yandex_related_element = $this->builder->document->createElementNS('http://news.yandex.ru', 'yandex:related');
+          $item_turbo_content_element = $this->builder->document->createElementNS('http://turbo.yandex.ru', 'turbo:content');
+          
+          $item_content_header = sprintf('<header><h1>%s</h1>', $item['title']);
+          
+          if ($item['preview_url'] != '') {
+            $item_content_header .= sprintf('<figure><img src="%s"></figure>', $item['preview_url']);
+          }
 
-    public function assembly_channel() : DOMElement|bool {
-      $site_title = ($this->system_core->configurator->exists_database_entry_value('base_site_title')) ? $this->system_core->configurator->get_database_entry_value('base_site_title') : sprintf('%s %s', $this->system_core::CMS_TITLE, $this->system_core::CMS_VERSION);
-      $site_description = ($this->system_core->configurator->exists_database_entry_value('seo_site_description')) ? $this->system_core->configurator->get_database_entry_value('seo_site_description') : 'Description is not exists';
-      $site_link = sprintf('https://%s', $this->system_core->configurator->get('domain'));
+          $item_content_header .= sprintf('</header>', $item['preview_url']);
 
-      $channel_title = (!empty($this->get_title())) ? $this->get_title() : $site_title;
-      $channel_description = (!empty($this->get_description())) ? $this->get_description() : $site_description;
-      $channel_link = (!empty($this->get_link())) ? $this->get_link() : $site_link;
+          $item_turbo_content_cdata_element = $this->builder->document->createCDATASection($item_content_header . $item['content']);
 
-      $element_channel = $this->builder->document->createElement('channel');
-      $element_channel_title = $this->builder->document->createElement('title', $channel_title);
-      $element_channel_link = $this->builder->document->createElement('link', $channel_link);
-      $element_channel_description = $this->builder->document->createElement('description', $channel_description);
-      $element_channel_language = $this->builder->document->createElement('language', $this->builder->get_language());
-      $element_channel_lastbuilddate = $this->builder->document->createElement('lastBuildDate', date('D, d M Y H:i:s T', time()));
-      $element_channel_docs = $this->builder->document->createElement('docs', 'http://blogs.law.harvard.edu/tech/rss');
-      $element_channel_generator = $this->builder->document->createElement('generator', 'CMS GIRVAS: Web Channel Builder');
+          $item_turbo_content_element->appendChild($item_turbo_content_cdata_element);
 
-      $element_channel->appendChild($element_channel_title);
-      $element_channel->appendChild($element_channel_link);
-      $element_channel->appendChild($element_channel_description);
-      $element_channel->appendChild($element_channel_lastbuilddate);
-      $element_channel->appendChild($element_channel_docs);
-      $element_channel->appendChild($element_channel_generator);
+          $item_element->appendChild($item_turbo_extended_html_element);
+          $item_element->appendChild($item_link_element);
+          //$item_element->appendChild($item_turbo_source_element);
+          //$item_element->appendChild($item_turbo_topic_element);
+          $item_element->appendChild($item_pudate_element);
+          $item_element->appendChild($item_author_element);
+          $item_element->appendChild($item_yandex_related_element);
+          $item_element->appendChild($item_turbo_content_element);
 
-      $items = $this->items;
-      usort($items, function ($a, $b) {
-        $a_pubdate_unix = strtotime($a['pubdate']);
-        $b_pubdate_unix = strtotime($b['pubdate']);
-
-        if ($a_pubdate_unix == $b_pubdate_unix) {
-          return 0;
+          $channel_element->appendChild($item_element);
         }
-
-        return ($a_pubdate_unix > $b_pubdate_unix) ? -1 : 1;
-      });
-
-      $element_channel_pubdate = $this->builder->document->createElement('pubDate', $items[0]['pubdate']);
-      $element_channel->appendChild($element_channel_pubdate);
-
-      unset($items);
-
-      foreach ($this->items as $item) {
-        $element_item_description_cdata = $this->builder->document->createCDATASection($item['description']);
-
-        $element_item_title = $this->builder->document->createElement('title', $item['title']);
-        $element_item_content = $this->builder->document->createElementNS('http://search.yahoo.com/mrss/', 'turbo:content', '');
-        $element_item_link = $this->builder->document->createElement('link', $item['link']);
-        $element_item_pubdate = $this->builder->document->createElement('pubDate', $item['pubdate']);
-        $element_item_content->appendChild($element_item_description_cdata);
-
-        $element_item = $this->builder->document->createElement('item');
-        $element_item->setAttribute('turbo', 'true');
-        $element_item->appendChild($element_item_title);
-        $element_item->appendChild($element_item_content);
-        $element_item->appendChild($element_item_link);
-        $element_item->appendChild($element_item_pubdate);
-        $element_channel->appendChild($element_item);
       }
 
-      return $element_channel;
-    }
-
-    public function assembly() : void {
-      $element_rss = $this->assembly_rss();
-      $element_channel = $this->assembly_channel();
-
-      $element_rss->appendChild($element_channel);
-      $this->builder->document->appendChild($element_rss);
+      $rss_element->appendChild($channel_element);
+      $this->builder->document->appendChild($rss_element);
 
       $this->builder->assembled = $this->builder->document->saveXML();
     }

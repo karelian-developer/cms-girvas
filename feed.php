@@ -46,13 +46,26 @@ if (defined('IS_NOT_HACKED')) {
         $entries_array = $entries->get_by_category_id($web_channel->get_entries_category_id());
       }
 
+      /**
+       * @var Parsedown Парсер markdown-разметки
+       */
+      $parsedown = new \core\PHPLibrary\Parsedown();
+      $parsedown->setSafeMode(true);
+      $parsedown->setMarkupEscaped(true);
+
       foreach ($entries_array as $entry) {
-        $entry->init_data(['name', 'texts', 'updated_unix_timestamp']);
+        $entry->init_data(['name', 'metadata', 'texts', 'updated_unix_timestamp']);
+
+        $entry_author = $entry->get_author();
+
         $web_channel_builder->web_channel->add_item([
           'title' => $entry->get_title($cms_base_locale_name),
           'description' => $entry->get_description($cms_base_locale_name),
+          'content' => $parsedown->text($entry->get_content($cms_base_locale_name)),
+          'preview_url' => $entry->get_preview_url(),
           'link' => sprintf('https://%s/entry/%s', $system_core->configurator->get('domain'), $entry->get_name()),
           'pubdate' => $entry->get_updated_unix_timestamp(),
+          'author' => ($entry_author != null) ? $entry_author->get_login() : 'User Unknown'
         ]);
       }
 

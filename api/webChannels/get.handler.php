@@ -21,7 +21,7 @@ if ($system_core->urlp->get_path(2) == 'types') {
     ['id' => 1, 'name' => FeedBuilder::get_type_name(1), 'title' => FeedBuilder::get_type_title(1)],
     ['id' => 2, 'name' => FeedBuilder::get_type_name(2), 'title' => FeedBuilder::get_type_title(2)],
     ['id' => 3, 'name' => FeedBuilder::get_type_name(3), 'title' => FeedBuilder::get_type_title(3)],
-    //['id' => 4, 'name' => FeedBuilder::get_type_name(4), 'title' => FeedBuilder::get_type_title(4)]
+    ['id' => 4, 'name' => FeedBuilder::get_type_name(4), 'title' => FeedBuilder::get_type_title(4)]
   ];
 }
 

@@ -20,7 +20,7 @@ namespace core\PHPLibrary\SystemCore\Header {
         EnumHTTPReferrerPolicy::STRICT_ORIGIN => 'strict-origin',
         EnumHTTPReferrerPolicy::STRICT_ORIGIN_WHEN_CROSS_ORIGIN => 'strict-origin-when-cross-origin',
         EnumHTTPReferrerPolicy::UNSAFE_URL => 'unsafe-url'
-      }
+      };
     }
   }
 }
