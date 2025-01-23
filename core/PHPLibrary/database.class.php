@@ -137,9 +137,11 @@ namespace core\PHPLibrary {
     /**
      * Подключиться к базе данных
      * 
+     * @param bool $error_is_json
+     * 
      * @return [type]
      */
-    public function connect() {
+    public function connect(bool $error_is_json = false) {
       /** @var string $database_name Наименование базы данных */
       $database_name = $this->get_database_name();
       /** @var string $database_user Пользователь базы данных */
@@ -159,9 +161,21 @@ namespace core\PHPLibrary {
       $database_connection_query_modified = sprintf($database_connection_query, $database_host, $database_name);
 
       try {
-        $this->connection = new PDO($database_connection_query_modified, $database_user, $database_password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING]);
+        $this->connection = new PDO($database_connection_query_modified, $database_user, $database_password);
+        $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       } catch (PDOException $exception) {
-        echo $exception->getMessage();
+        if (!$error_is_json) {
+          die($exception->getMessage());
+        } else {
+          die(json_encode([
+            'message' => $exception->getMessage(),
+            'statusCode' => 0,
+            'outputData' => [
+              'html' => $exception->getMessage()
+            ]
+          // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+          ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        }
       }
     }
 

@@ -10,6 +10,7 @@
 
 namespace core\PHPLibrary {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+  use \PDOException as PDOException;
 
   #[\AllowDynamicProperties]
   /**
@@ -391,10 +392,19 @@ namespace core\PHPLibrary {
       /** @var int $user_id Идентификационный номер записи */
       $user_id = $this->get_id();
 
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':id', $user_id, \PDO::PARAM_INT);
-			$database_query->execute();
+      try {
+        $database_connection = $this->system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':id', $user_id, \PDO::PARAM_INT);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       $result = $database_query->fetch(\PDO::FETCH_ASSOC);
       return ($result) ? $result : null;
@@ -422,10 +432,19 @@ namespace core\PHPLibrary {
 
       $user_login = strtolower($user_login);
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':login', $user_login, \PDO::PARAM_STR);
-			$database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':login', $user_login, \PDO::PARAM_STR);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       $result = $database_query->fetch(\PDO::FETCH_ASSOC);
       
@@ -454,10 +473,19 @@ namespace core\PHPLibrary {
 
       $user_email = strtolower($user_email);
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':email', $user_email, \PDO::PARAM_STR);
-			$database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':email', $user_email, \PDO::PARAM_STR);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       $result = $database_query->fetch(\PDO::FETCH_ASSOC);
       
@@ -493,10 +521,19 @@ namespace core\PHPLibrary {
       $query_builder->statement->set_clause_limit(1);
       $query_builder->statement->assembly();
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':login', $user_login, \PDO::PARAM_STR);
-			$database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':login', $user_login, \PDO::PARAM_STR);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
       
       return ($database_query->fetchColumn()) ? true : false;
     }
@@ -523,10 +560,19 @@ namespace core\PHPLibrary {
 
       $user_email = strtolower($user_email);
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':email', $user_email, \PDO::PARAM_STR);
-			$database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':email', $user_email, \PDO::PARAM_STR);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
       
       return ($database_query->fetchColumn()) ? true : false;
     }
@@ -551,10 +597,19 @@ namespace core\PHPLibrary {
       $query_builder->statement->set_clause_limit(1);
       $query_builder->statement->assembly();
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':id', $user_id, \PDO::PARAM_INT);
-			$database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':id', $user_id, \PDO::PARAM_INT);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       return ($database_query->fetchColumn()) ? true : false;
     }
@@ -575,10 +630,19 @@ namespace core\PHPLibrary {
       $query_builder->statement->clause_where->assembly();
       $query_builder->statement->assembly();
 
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-			$execute = $database_query->execute();
+      try {
+        $database_connection = $this->system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
+        $execute = $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       return ($execute) ? true : false;
     }
@@ -626,17 +690,26 @@ namespace core\PHPLibrary {
       $user_metadata_json = json_encode($user_default_metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
       $email_is_submitted = false;
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':login', $user_login, \PDO::PARAM_STR);
-      $database_query->bindParam(':email', $user_email, \PDO::PARAM_STR);
-      $database_query->bindParam(':password_hash', $user_password_hash, \PDO::PARAM_STR);
-      $database_query->bindParam(':security_hash', $user_security_hash, \PDO::PARAM_STR);
-      $database_query->bindParam(':created_unix_timestamp', $user_created_unix_timestamp, \PDO::PARAM_INT);
-      $database_query->bindParam(':updated_unix_timestamp', $user_updated_unix_timestamp, \PDO::PARAM_INT);
-      $database_query->bindParam(':metadata', $user_metadata_json, \PDO::PARAM_STR);
-      $database_query->bindParam(':email_is_submitted', $email_is_submitted, \PDO::PARAM_BOOL);
-			$execute = $database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':login', $user_login, \PDO::PARAM_STR);
+        $database_query->bindParam(':email', $user_email, \PDO::PARAM_STR);
+        $database_query->bindParam(':password_hash', $user_password_hash, \PDO::PARAM_STR);
+        $database_query->bindParam(':security_hash', $user_security_hash, \PDO::PARAM_STR);
+        $database_query->bindParam(':created_unix_timestamp', $user_created_unix_timestamp, \PDO::PARAM_INT);
+        $database_query->bindParam(':updated_unix_timestamp', $user_updated_unix_timestamp, \PDO::PARAM_INT);
+        $database_query->bindParam(':metadata', $user_metadata_json, \PDO::PARAM_STR);
+        $database_query->bindParam(':email_is_submitted', $email_is_submitted, \PDO::PARAM_BOOL);
+        $execute = $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       if ($execute) {
         $result = $database_query->fetch(\PDO::FETCH_ASSOC);
@@ -686,25 +759,34 @@ namespace core\PHPLibrary {
       /** @var int $user_updated_unix_timestamp Текущее время в UNIX-формате */
       $user_updated_unix_timestamp = time();
 
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      
-      foreach ($data as $data_name => $data_value) {
-        if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'metadata'])) {
-          switch (gettype($data_value)) {
-            case 'boolean': $data_value_type = \PDO::PARAM_INT; break;
-            case 'integer': $data_value_type = \PDO::PARAM_INT; break;
-            case 'string': $data_value_type = \PDO::PARAM_STR; break;
-            case 'null': $data_value_type = \PDO::PARAM_NULL; break;
+      try {
+        $database_connection = $this->system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        
+        foreach ($data as $data_name => $data_value) {
+          if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'metadata'])) {
+            switch (gettype($data_value)) {
+              case 'boolean': $data_value_type = \PDO::PARAM_INT; break;
+              case 'integer': $data_value_type = \PDO::PARAM_INT; break;
+              case 'string': $data_value_type = \PDO::PARAM_STR; break;
+              case 'null': $data_value_type = \PDO::PARAM_NULL; break;
+            }
+            
+            $database_query->bindParam(':' . $data_name, $data[$data_name], $data_value_type);
           }
-          
-          $database_query->bindParam(':' . $data_name, $data[$data_name], $data_value_type);
         }
+        
+        $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
+        $database_query->bindParam(':updated_unix_timestamp', $user_updated_unix_timestamp, \PDO::PARAM_INT);
+        $execute = $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
-      
-      $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-      $database_query->bindParam(':updated_unix_timestamp', $user_updated_unix_timestamp, \PDO::PARAM_INT);
-			$execute = $database_query->execute();
 
       return ($execute) ? true : false;
     }
@@ -731,13 +813,22 @@ namespace core\PHPLibrary {
       $refusal_token = md5(sprintf('[%d]%d => refusal', $this->id, $request_time));
       $registration_submit_created_unix_timestamp = time();
       
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':user_id', $this->id, \PDO::PARAM_INT);
-      $database_query->bindParam(':submit_token', $submit_token, \PDO::PARAM_STR);
-      $database_query->bindParam(':refusal_token', $refusal_token, \PDO::PARAM_STR);
-      $database_query->bindParam(':created_unix_timestamp', $registration_submit_created_unix_timestamp, \PDO::PARAM_INT);
-			$execute = $database_query->execute();
+      try {
+        $database_connection = $this->system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':user_id', $this->id, \PDO::PARAM_INT);
+        $database_query->bindParam(':submit_token', $submit_token, \PDO::PARAM_STR);
+        $database_query->bindParam(':refusal_token', $refusal_token, \PDO::PARAM_STR);
+        $database_query->bindParam(':created_unix_timestamp', $registration_submit_created_unix_timestamp, \PDO::PARAM_INT);
+        $execute = $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       if ($execute) {
         return [
@@ -771,10 +862,19 @@ namespace core\PHPLibrary {
       $query_builder->statement->set_clause_limit(1);
       $query_builder->statement->assembly();
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':submit_token', $token, \PDO::PARAM_STR);
-			$database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':submit_token', $token, \PDO::PARAM_STR);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       $result = $database_query->fetch(\PDO::FETCH_ASSOC);
       
@@ -803,10 +903,19 @@ namespace core\PHPLibrary {
       $query_builder->statement->set_clause_limit(1);
       $query_builder->statement->assembly();
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':refusal_token', $token, \PDO::PARAM_STR);
-			$database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':refusal_token', $token, \PDO::PARAM_STR);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       $result = $database_query->fetch(\PDO::FETCH_ASSOC);
       
@@ -834,10 +943,19 @@ namespace core\PHPLibrary {
       $query_builder->statement->set_clause_limit(1);
       $query_builder->statement->assembly();
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':submit_token', $token, \PDO::PARAM_STR);
-			$database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':submit_token', $token, \PDO::PARAM_STR);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       return ($database_query->fetchColumn()) ? true : false;
     }
@@ -863,10 +981,19 @@ namespace core\PHPLibrary {
       $query_builder->statement->set_clause_limit(1);
       $query_builder->statement->assembly();
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':refusal_token', $token, \PDO::PARAM_STR);
-			$database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':refusal_token', $token, \PDO::PARAM_STR);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       return ($database_query->fetchColumn()) ? true : false;
     }
@@ -917,10 +1044,19 @@ namespace core\PHPLibrary {
       $query_builder->statement->clause_where->assembly();
       $query_builder->statement->assembly();
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':submit_token', $token, \PDO::PARAM_STR);
-			$execute = $database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':submit_token', $token, \PDO::PARAM_STR);
+        $execute = $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       return ($execute) ? true : false;
     }

@@ -54,10 +54,18 @@ namespace core\PHPLibrary\SystemCore {
       }
       $query_builder->statement->assembly();
 
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      //$this->system_core->database_connector->database->bindParam(':id', $entry_id, \PDO::PARAM_INT);
-			$database_query->execute();
+      try {
+        $database_connection = $this->system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       $result_array = [];
       $results = $database_query->fetchAll(\PDO::FETCH_ASSOC);
@@ -104,9 +112,18 @@ namespace core\PHPLibrary\SystemCore {
       }
       $query_builder->statement->assembly();
 
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-			$database_query->execute();
+      try {
+        $database_connection = $this->system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       $result_array = [];
       $results = $database_query->fetchAll(\PDO::FETCH_ASSOC);

@@ -13,6 +13,7 @@ namespace core\PHPLibrary {
   use \core\PHPLibrary\Pages as Pages;
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
   use \core\PHPLibrary\Metrics\Session as MetricsSession;
+  use \PDOException as PDOException;
 
   /**
    * Метрики CMS
@@ -87,11 +88,20 @@ namespace core\PHPLibrary {
       $query_builder->statement->clause_where->assembly();
       $query_builder->statement->assembly();
 
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':date_start', $timestamp_start, \PDO::PARAM_INT);
-      $database_query->bindParam(':date_end', $timestamp_end, \PDO::PARAM_INT);
-			$database_query->execute();
+      try {
+        $database_connection = $this->system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':date_start', $timestamp_start, \PDO::PARAM_INT);
+        $database_query->bindParam(':date_end', $timestamp_end, \PDO::PARAM_INT);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       $sessions = [];
       $results = $database_query->fetchAll(\PDO::FETCH_ASSOC);

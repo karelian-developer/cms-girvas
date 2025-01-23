@@ -11,6 +11,7 @@
 namespace core\PHPLibrary\SystemCore {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
   use \core\PHPLibrary\SystemCore as SystemCore;
+  use \PDOException as PDOException;
 
   /**
    * Class Configurator
@@ -460,15 +461,24 @@ namespace core\PHPLibrary\SystemCore {
       $query_builder->statement->clause_where->assembly();
       $query_builder->statement->assembly();
 
-      $database_connection = (!is_null($this->system_core->database_connector)) ? $this->system_core->database_connector->database->connection : null;
-      
-      if (!is_null($database_connection)) {
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
-        $database_query->execute();
+      try {
+        $database_connection = (!is_null($this->system_core->database_connector)) ? $this->system_core->database_connector->database->connection : null;
+        
+        if (!is_null($database_connection)) {
+          $database_query = $database_connection->prepare($query_builder->statement->assembled);
+          $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
+          $database_query->execute();
 
-        $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-        return ($result) ? $result['value'] : null;
+          $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+          return ($result) ? $result['value'] : null;
+        }
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
       return null;
@@ -494,14 +504,23 @@ namespace core\PHPLibrary\SystemCore {
       $query_builder->statement->set_clause_limit(1);
       $query_builder->statement->assembly();
 
-      $database_connection = (!is_null($this->system_core->database_connector)) ? $this->system_core->database_connector->database->connection : null;
-      
-      if (!is_null($database_connection)) {
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
-        $database_query->execute();
+      try {
+        $database_connection = (!is_null($this->system_core->database_connector)) ? $this->system_core->database_connector->database->connection : null;
+        
+        if (!is_null($database_connection)) {
+          $database_query = $database_connection->prepare($query_builder->statement->assembled);
+          $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
+          $database_query->execute();
 
-        return ($database_query->fetchColumn()) ? true : false;
+          return ($database_query->fetchColumn()) ? true : false;
+        }
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
       return false;
@@ -523,15 +542,24 @@ namespace core\PHPLibrary\SystemCore {
       $query_builder->statement->add_column('value');
       $query_builder->statement->assembly();
 
-      $database_connection = (!is_null($this->system_core->database_connector)) ? $this->system_core->database_connector->database->connection : null;
-      
-      if (!is_null($database_connection)) {
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
-        $database_query->bindParam(':value', $value, \PDO::PARAM_STR);
-        $execute = $database_query->execute();
+      try {
+        $database_connection = (!is_null($this->system_core->database_connector)) ? $this->system_core->database_connector->database->connection : null;
+        
+        if (!is_null($database_connection)) {
+          $database_query = $database_connection->prepare($query_builder->statement->assembled);
+          $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
+          $database_query->bindParam(':value', $value, \PDO::PARAM_STR);
+          $execute = $database_query->execute();
 
-        return ($execute) ? true : false;
+          return ($execute) ? true : false;
+        }
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
       return false;
@@ -557,15 +585,24 @@ namespace core\PHPLibrary\SystemCore {
       $query_builder->statement->clause_where->assembly();
       $query_builder->statement->assembly();
 
-      $database_connection = (!is_null($this->system_core->database_connector)) ? $this->system_core->database_connector->database->connection : null;
-      
-      if (!is_null($database_connection)) {
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
-        $database_query->bindParam(':value', $value, \PDO::PARAM_STR);
-        $execute = $database_query->execute();
+      try {
+        $database_connection = (!is_null($this->system_core->database_connector)) ? $this->system_core->database_connector->database->connection : null;
+        
+        if (!is_null($database_connection)) {
+          $database_query = $database_connection->prepare($query_builder->statement->assembled);
+          $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
+          $database_query->bindParam(':value', $value, \PDO::PARAM_STR);
+          $execute = $database_query->execute();
 
-        return ($execute) ? true : false;
+          return ($execute) ? true : false;
+        }
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
       return false;

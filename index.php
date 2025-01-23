@@ -17,6 +17,10 @@ define('CMS_ROOT_DIRECTORY', preg_replace('/[\/]*$/', '', $_SERVER['DOCUMENT_ROO
 // ‿︵‿ヽ(°□° )ノ︵‿︵
 define('IS_NOT_HACKED', true);
 
+if (PHP_VERSION_ID < 80200) {
+  die(sprintf('PHP version is too old (you have %s). CMS "GIRVAS" works on PHP version 8.2.0 and higher.', phpversion()));
+}
+
 require_once(sprintf('%s/core/PHPLibrary/systemCore.class.php', CMS_ROOT_DIRECTORY));
 
 $system_core = new \core\PHPLibrary\SystemCore();

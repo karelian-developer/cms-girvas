@@ -418,265 +418,281 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
     $db_scheme = $database_configurations['scheme'];
     $db_prefix = ($db_prefix != '') ? $db_prefix . '_' : '';
     $db_scheme = ($db_scheme != '') ? $db_scheme . '.' : '';
+    
+    try {
+      // =======================
+      // ТАБЛИЦА КОНФИГУРАЦИЙ
+      // =======================
 
-    // =======================
-    // ТАБЛИЦА КОНФИГУРАЦИЙ
-    // =======================
+      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
+      $query_builder->set_statement_create_table();
+      $query_builder->statement->set_check_exists(true);
+      $query_builder->statement->set_table_name('configurations');
+      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $query_builder->statement->add_column('name', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('value', 'text');
+      $query_builder->statement->add_column('texts', $json_data_type_dms);
+      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->assembly();
 
-    $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-    $query_builder->set_statement_create_table();
-    $query_builder->statement->set_check_exists(true);
-    $query_builder->statement->set_table_name('configurations');
-    $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-    $query_builder->statement->add_column('name', 'text', 'NOT NULL');
-    $query_builder->statement->add_column('value', 'text');
-    $query_builder->statement->add_column('texts', $json_data_type_dms);
-    $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->assembly();
+      $database_connection = $database_connector->database->connection;
+      $database_query = $database_connection->prepare($query_builder->statement->assembled);
 
-    $database_connection = $database_connector->database->connection;
-    $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $execute = $database_query->execute();
 
-    $execute = $database_query->execute();
+      // =======================
+      // ТАБЛИЦА ЗАПИСЕЙ
+      // =======================
 
-    // =======================
-    // ТАБЛИЦА ЗАПИСЕЙ
-    // =======================
+      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
+      $query_builder->set_statement_create_table();
+      $query_builder->statement->set_check_exists(true);
+      $query_builder->statement->set_table_name('entries');
+      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $query_builder->statement->add_column('category_id', 'bigint', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('author_id', 'bigint', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('texts', $json_data_type_dms);
+      $query_builder->statement->add_column('metadata', $json_data_type_dms);
+      $query_builder->statement->add_column('name', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->assembly();
 
-    $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-    $query_builder->set_statement_create_table();
-    $query_builder->statement->set_check_exists(true);
-    $query_builder->statement->set_table_name('entries');
-    $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-    $query_builder->statement->add_column('category_id', 'bigint', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('author_id', 'bigint', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('texts', $json_data_type_dms);
-    $query_builder->statement->add_column('metadata', $json_data_type_dms);
-    $query_builder->statement->add_column('name', 'text', 'NOT NULL');
-    $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->assembly();
+      $database_connection = $database_connector->database->connection;
+      $database_query = $database_connection->prepare($query_builder->statement->assembled);
 
-    $database_connection = $database_connector->database->connection;
-    $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $execute = $database_query->execute();
 
-    $execute = $database_query->execute();
+      // =======================
+      // ТАБЛИЦА КАТЕГОРИЙ ЗАПИСЕЙ
+      // =======================
 
-    // =======================
-    // ТАБЛИЦА КАТЕГОРИЙ ЗАПИСЕЙ
-    // =======================
+      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
+      $query_builder->set_statement_create_table();
+      $query_builder->statement->set_check_exists(true);
+      $query_builder->statement->set_table_name('entries_categories');
+      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $query_builder->statement->add_column('parent_id', 'bigint', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('texts', $json_data_type_dms);
+      $query_builder->statement->add_column('metadata', $json_data_type_dms);
+      $query_builder->statement->add_column('name', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->assembly();
 
-    $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-    $query_builder->set_statement_create_table();
-    $query_builder->statement->set_check_exists(true);
-    $query_builder->statement->set_table_name('entries_categories');
-    $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-    $query_builder->statement->add_column('parent_id', 'bigint', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('texts', $json_data_type_dms);
-    $query_builder->statement->add_column('metadata', $json_data_type_dms);
-    $query_builder->statement->add_column('name', 'text', 'NOT NULL');
-    $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->assembly();
+      $database_connection = $database_connector->database->connection;
+      $database_query = $database_connection->prepare($query_builder->statement->assembled);
 
-    $database_connection = $database_connector->database->connection;
-    $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $execute = $database_query->execute();
 
-    $execute = $database_query->execute();
+      // =======================
+      // ТАБЛИЦА КОММЕНТАРИЕВ ЗАПИСЕЙ
+      // =======================
 
-    // =======================
-    // ТАБЛИЦА КОММЕНТАРИЕВ ЗАПИСЕЙ
-    // =======================
+      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
+      $query_builder->set_statement_create_table();
+      $query_builder->statement->set_check_exists(true);
+      $query_builder->statement->set_table_name('entries_comments');
+      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $query_builder->statement->add_column('entry_id', 'bigint', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('author_id', 'bigint', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('content', 'text');
+      $query_builder->statement->add_column('metadata', $json_data_type_dms);
+      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->assembly();
 
-    $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-    $query_builder->set_statement_create_table();
-    $query_builder->statement->set_check_exists(true);
-    $query_builder->statement->set_table_name('entries_comments');
-    $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-    $query_builder->statement->add_column('entry_id', 'bigint', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('author_id', 'bigint', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('content', 'text');
-    $query_builder->statement->add_column('metadata', $json_data_type_dms);
-    $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->assembly();
+      $database_connection = $database_connector->database->connection;
+      $database_query = $database_connection->prepare($query_builder->statement->assembled);
 
-    $database_connection = $database_connector->database->connection;
-    $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $execute = $database_query->execute();
 
-    $execute = $database_query->execute();
+      // =======================
+      // ТАБЛИЦА СТАТИЧЕСКИХ СТРАНИЦ
+      // =======================
 
-    // =======================
-    // ТАБЛИЦА СТАТИЧЕСКИХ СТРАНИЦ
-    // =======================
+      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
+      $query_builder->set_statement_create_table();
+      $query_builder->statement->set_check_exists(true);
+      $query_builder->statement->set_table_name('pages_static');
+      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $query_builder->statement->add_column('name', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('texts', $json_data_type_dms);
+      $query_builder->statement->add_column('author_id', 'bigint');
+      $query_builder->statement->add_column('metadata', $json_data_type_dms);
+      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->assembly();
 
-    $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-    $query_builder->set_statement_create_table();
-    $query_builder->statement->set_check_exists(true);
-    $query_builder->statement->set_table_name('pages_static');
-    $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-    $query_builder->statement->add_column('name', 'text', 'NOT NULL');
-    $query_builder->statement->add_column('texts', $json_data_type_dms);
-    $query_builder->statement->add_column('author_id', 'bigint');
-    $query_builder->statement->add_column('metadata', $json_data_type_dms);
-    $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->assembly();
+      $database_connection = $database_connector->database->connection;
+      $database_query = $database_connection->prepare($query_builder->statement->assembled);
 
-    $database_connection = $database_connector->database->connection;
-    $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $execute = $database_query->execute();
 
-    $execute = $database_query->execute();
+      // =======================
+      // ТАБЛИЦА ОТЧЕТОВ
+      // =======================
 
-    // =======================
-    // ТАБЛИЦА ОТЧЕТОВ
-    // =======================
+      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
+      $query_builder->set_statement_create_table();
+      $query_builder->statement->set_check_exists(true);
+      $query_builder->statement->set_table_name('reports');
+      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $query_builder->statement->add_column('variables', $json_data_type_dms);
+      $query_builder->statement->add_column('metadata', $json_data_type_dms);
+      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->assembly();
 
-    $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-    $query_builder->set_statement_create_table();
-    $query_builder->statement->set_check_exists(true);
-    $query_builder->statement->set_table_name('reports');
-    $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-    $query_builder->statement->add_column('variables', $json_data_type_dms);
-    $query_builder->statement->add_column('metadata', $json_data_type_dms);
-    $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->assembly();
+      $database_connection = $database_connector->database->connection;
+      $database_query = $database_connection->prepare($query_builder->statement->assembled);
 
-    $database_connection = $database_connector->database->connection;
-    $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $execute = $database_query->execute();
 
-    $execute = $database_query->execute();
+      // =======================
+      // ТАБЛИЦА ПОЛЬЗОВАТЕЛЕЙ
+      // =======================
 
-    // =======================
-    // ТАБЛИЦА ПОЛЬЗОВАТЕЛЕЙ
-    // =======================
+      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
+      $query_builder->set_statement_create_table();
+      $query_builder->statement->set_check_exists(true);
+      $query_builder->statement->set_table_name('users');
+      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $query_builder->statement->add_column('login', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('email', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('password_hash', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('security_hash', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('metadata', $json_data_type_dms);
+      $query_builder->statement->add_column('email_is_submitted', 'boolean', 'NOT NULL DEFAULT false');
+      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->assembly();
 
-    $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-    $query_builder->set_statement_create_table();
-    $query_builder->statement->set_check_exists(true);
-    $query_builder->statement->set_table_name('users');
-    $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-    $query_builder->statement->add_column('login', 'text', 'NOT NULL');
-    $query_builder->statement->add_column('email', 'text', 'NOT NULL');
-    $query_builder->statement->add_column('password_hash', 'text', 'NOT NULL');
-    $query_builder->statement->add_column('security_hash', 'text', 'NOT NULL');
-    $query_builder->statement->add_column('metadata', $json_data_type_dms);
-    $query_builder->statement->add_column('email_is_submitted', 'boolean', 'NOT NULL DEFAULT false');
-    $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->assembly();
+      $database_connection = $database_connector->database->connection;
+      $database_query = $database_connection->prepare($query_builder->statement->assembled);
 
-    $database_connection = $database_connector->database->connection;
-    $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $execute = $database_query->execute();
 
-    $execute = $database_query->execute();
+      // =======================
+      // ТАБЛИЦА ГРУПП ПОЛЬЗОВАТЕЛЕЙ
+      // =======================
 
-    // =======================
-    // ТАБЛИЦА ГРУПП ПОЛЬЗОВАТЕЛЕЙ
-    // =======================
+      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
+      $query_builder->set_statement_create_table();
+      $query_builder->statement->set_check_exists(true);
+      $query_builder->statement->set_table_name('users_groups');
+      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $query_builder->statement->add_column('name', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('texts', $json_data_type_dms);
+      $query_builder->statement->add_column('permissions', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('metadata', $json_data_type_dms);
+      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->assembly();
 
-    $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-    $query_builder->set_statement_create_table();
-    $query_builder->statement->set_check_exists(true);
-    $query_builder->statement->set_table_name('users_groups');
-    $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-    $query_builder->statement->add_column('name', 'text', 'NOT NULL');
-    $query_builder->statement->add_column('texts', $json_data_type_dms);
-    $query_builder->statement->add_column('permissions', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('metadata', $json_data_type_dms);
-    $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->assembly();
+      $database_connection = $database_connector->database->connection;
+      $database_query = $database_connection->prepare($query_builder->statement->assembled);
 
-    $database_connection = $database_connector->database->connection;
-    $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $execute = $database_query->execute();
 
-    $execute = $database_query->execute();
+      // =======================
+      // ТАБЛИЦА ЗАЯВОК НА ПОДТВЕРЖДЕНИЕ РЕГИСТРАЦИИ
+      // =======================
 
-    // =======================
-    // ТАБЛИЦА ЗАЯВОК НА ПОДТВЕРЖДЕНИЕ РЕГИСТРАЦИИ
-    // =======================
+      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
+      $query_builder->set_statement_create_table();
+      $query_builder->statement->set_check_exists(true);
+      $query_builder->statement->set_table_name('users_registration_submits');
+      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $query_builder->statement->add_column('user_id', 'bigint', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('submit_token', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('refusal_token', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->assembly();
 
-    $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-    $query_builder->set_statement_create_table();
-    $query_builder->statement->set_check_exists(true);
-    $query_builder->statement->set_table_name('users_registration_submits');
-    $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-    $query_builder->statement->add_column('user_id', 'bigint', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('submit_token', 'text', 'NOT NULL');
-    $query_builder->statement->add_column('refusal_token', 'text', 'NOT NULL');
-    $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->assembly();
+      $database_connection = $database_connector->database->connection;
+      $database_query = $database_connection->prepare($query_builder->statement->assembled);
 
-    $database_connection = $database_connector->database->connection;
-    $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $execute = $database_query->execute();
 
-    $execute = $database_query->execute();
+      // =======================
+      // ТАБЛИЦА СЕССИЙ ПОЛЬЗОВАТЕЛЕЙ
+      // =======================
 
-    // =======================
-    // ТАБЛИЦА СЕССИЙ ПОЛЬЗОВАТЕЛЕЙ
-    // =======================
+      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
+      $query_builder->set_statement_create_table();
+      $query_builder->statement->set_check_exists(true);
+      $query_builder->statement->set_table_name('users_sessions');
+      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $query_builder->statement->add_column('user_id', 'bigint', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('token', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('user_ip', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('type_id', 'integer', 'NOT NULL DEFAULT 1');
+      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->assembly();
 
-    $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-    $query_builder->set_statement_create_table();
-    $query_builder->statement->set_check_exists(true);
-    $query_builder->statement->set_table_name('users_sessions');
-    $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-    $query_builder->statement->add_column('user_id', 'bigint', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('token', 'text', 'NOT NULL');
-    $query_builder->statement->add_column('user_ip', 'text', 'NOT NULL');
-    $query_builder->statement->add_column('type_id', 'integer', 'NOT NULL DEFAULT 1');
-    $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->assembly();
+      $database_connection = $database_connector->database->connection;
+      $database_query = $database_connection->prepare($query_builder->statement->assembled);
 
-    $database_connection = $database_connector->database->connection;
-    $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $execute = $database_query->execute();
 
-    $execute = $database_query->execute();
+      // =======================
+      // ТАБЛИЦА ВЕБ-КАНАЛОВ
+      // =======================
 
-    // =======================
-    // ТАБЛИЦА ВЕБ-КАНАЛОВ
-    // =======================
+      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
+      $query_builder->set_statement_create_table();
+      $query_builder->statement->set_check_exists(true);
+      $query_builder->statement->set_table_name('web_channels');
+      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $query_builder->statement->add_column('name', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('entries_category_id', 'bigint', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('type_id', 'integer', 'NOT NULL DEFAULT 1');
+      $query_builder->statement->add_column('texts', $json_data_type_dms);
+      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->assembly();
 
-    $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-    $query_builder->set_statement_create_table();
-    $query_builder->statement->set_check_exists(true);
-    $query_builder->statement->set_table_name('web_channels');
-    $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-    $query_builder->statement->add_column('name', 'text', 'NOT NULL');
-    $query_builder->statement->add_column('entries_category_id', 'bigint', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('type_id', 'integer', 'NOT NULL DEFAULT 1');
-    $query_builder->statement->add_column('texts', $json_data_type_dms);
-    $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->assembly();
+      $database_connection = $database_connector->database->connection;
+      $database_query = $database_connection->prepare($query_builder->statement->assembled);
 
-    $database_connection = $database_connector->database->connection;
-    $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $execute = $database_query->execute();
 
-    $execute = $database_query->execute();
+      // =======================
+      // ТАБЛИЦА МЕТРИКИ
+      // =======================
 
-    // =======================
-    // ТАБЛИЦА МЕТРИКИ
-    // =======================
+      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
+      $query_builder->set_statement_create_table();
+      $query_builder->statement->set_check_exists(true);
+      $query_builder->statement->set_table_name('metrics');
+      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $query_builder->statement->add_column('date', 'integer', 'NOT NULL');
+      $query_builder->statement->add_column('data', $json_data_type_dms);
+      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->assembly();
 
-    $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-    $query_builder->set_statement_create_table();
-    $query_builder->statement->set_check_exists(true);
-    $query_builder->statement->set_table_name('metrics');
-    $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-    $query_builder->statement->add_column('date', 'integer', 'NOT NULL');
-    $query_builder->statement->add_column('data', $json_data_type_dms);
-    $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-    $query_builder->statement->assembly();
+      $database_connection = $database_connector->database->connection;
+      $database_query = $database_connection->prepare($query_builder->statement->assembled);
 
-    $database_connection = $database_connector->database->connection;
-    $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $execute = $database_query->execute();
+    } catch (\PDOException $exception) {
+      $tip_block->setAttribute('class', 'tip tip_red');
+      $tip_block->nodeValue = $exception->getMessage();
 
-    $execute = $database_query->execute();
+      $dom_document->appendChild($tip_block);
+
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => [
+          'html' => $dom_document->saveHTML()
+        ]
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
 
     // =======================
     // ПЕРВИЧНОЕ НАПОЛНЕНИЕ БАЗЫ ДАННЫХ

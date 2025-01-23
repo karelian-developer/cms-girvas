@@ -31,14 +31,16 @@ if ($system_core->client->is_logged(1) || $system_core->client->is_logged(2)) {
 
         $user_data = [];
 
+        $user_update_is_allowed = false;
+
         if (isset($_PATCH['user_is_block'])) {
           if (!isset($user_data['metadata'])) $user_data['metadata'] = [];
           $user_data['metadata']['isBlocked'] = (int)$_PATCH['user_is_block'];
+          $user_update_is_allowed = true;
         }
 
         if (isset($_PATCH['user_login'])) {
           $user_login = htmlspecialchars(str_replace('\'', '"', $_PATCH['user_login']));
-          $user_update_is_allowed = false;
 
           if ($system_core->configurator->get_users_login_edit_status(true) && $user_id == $client_user->get_id()) {
             $user_update_is_allowed = true;

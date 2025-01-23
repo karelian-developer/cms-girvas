@@ -292,6 +292,8 @@ export class InstallationMaster {
         }).then((data) => {
           let resultHTML = data.outputData.html;
 
+          console.log(data.outputData);
+
           let tableSystemsElement = document.querySelector('[role="cms-dms-tables-generate"]');
 
           if (tableSystemsElement) {

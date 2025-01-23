@@ -34,7 +34,8 @@ namespace core\PHPLibrary\SystemCore {
       $this->database->set_database_password($database_configurations['password']);
       
       if (!$is_test) {
-        @$this->database->connect();
+        $error_is_json = ($system_core->urlp->get_path(0) == 'handler') ? true : false;
+        @$this->database->connect($error_is_json);
       }
     }
 

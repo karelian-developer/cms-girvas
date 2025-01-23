@@ -11,6 +11,7 @@
 namespace core\PHPLibrary\SystemCore {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
   use \core\PHPLibrary\SystemCore as SystemCore;
+  use \PDOException as PDOException;
 
   if (!defined('IS_NOT_HACKED')) {
 		die('Unauthorized access attempt detected!');
@@ -206,12 +207,21 @@ namespace core\PHPLibrary\SystemCore {
       $metadata_json = json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
       $variables_json = json_encode($variables, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':variables', $variables_json, \PDO::PARAM_STR);
-      $database_query->bindParam(':metadata', $metadata_json, \PDO::PARAM_STR);
-      $database_query->bindParam(':created_unix_timestamp', $created_unix_timestamp, \PDO::PARAM_INT);
-      $execute = $database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':variables', $variables_json, \PDO::PARAM_STR);
+        $database_query->bindParam(':metadata', $metadata_json, \PDO::PARAM_STR);
+        $database_query->bindParam(':created_unix_timestamp', $created_unix_timestamp, \PDO::PARAM_INT);
+        $execute = $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       if ($execute) {
         $result = $database_query->fetch(\PDO::FETCH_ASSOC);
@@ -242,10 +252,19 @@ namespace core\PHPLibrary\SystemCore {
       /** @var int Идентификационный номер записи */
       $id = $this->get_id();
 
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':id', $id, \PDO::PARAM_INT);
-			$database_query->execute();
+      try {
+        $database_connection = $this->system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':id', $id, \PDO::PARAM_INT);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       $result = $database_query->fetch(\PDO::FETCH_ASSOC);
       return ($result) ? $result : null;

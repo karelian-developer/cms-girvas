@@ -154,8 +154,8 @@
           </p>
         </div>
         <div class="main__page page" data-page-index="6">
-          <p class="page__phar">Выберите доступную СУБД, а мастер-установщик сгенерирует для Вас таблицы для подключенной базы данных. Это не займет много времени!</p>
-          <p class="page__phar" role="cms-dms-selector"></p>
+          <p class="page__phar">Мастер-установщик сгенерирует для Вас таблицы для подключенной базы данных. Это не займет много времени! Нажмите на кнопку "Сгенерировать таблицы" ниже.</p>
+          <p class="page__phar" role="cms-dms-tables-generate"></p>
         </div>
         <div class="main__page page" data-page-index="7">
           <p class="page__phar">Осталось еще немного! Предлагаем Вам настроить язык и часовой пояс.</p>

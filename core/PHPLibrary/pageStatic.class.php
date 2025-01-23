@@ -10,6 +10,7 @@
 
 namespace core\PHPLibrary {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+  use \PDOException as PDOException;
 
   #[\AllowDynamicProperties]
   class PageStatic {
@@ -299,10 +300,19 @@ namespace core\PHPLibrary {
       /** @var int $page_static_id Идентификационный номер страницы */
       $page_static_id = $this->get_id();
 
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':id', $page_static_id, \PDO::PARAM_INT);
-			$database_query->execute();
+      try {
+        $database_connection = $this->system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':id', $page_static_id, \PDO::PARAM_INT);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       $result = $database_query->fetch(\PDO::FETCH_ASSOC);
       return ($result) ? $result : null;
@@ -328,10 +338,19 @@ namespace core\PHPLibrary {
       $query_builder->statement->set_clause_limit(1);
       $query_builder->statement->assembly();
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':name', $page_static_name, \PDO::PARAM_STR);
-			$database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':name', $page_static_name, \PDO::PARAM_STR);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       $result = $database_query->fetch(\PDO::FETCH_ASSOC);
       return ($result) ? new PageStatic($system_core, (int)$result['id']) : null;
@@ -357,10 +376,19 @@ namespace core\PHPLibrary {
       $query_builder->statement->set_clause_limit(1);
       $query_builder->statement->assembly();
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':name', $page_static_name, \PDO::PARAM_STR);
-			$database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':name', $page_static_name, \PDO::PARAM_STR);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       return ($database_query->fetchColumn()) ? true : false;
     }
@@ -385,10 +413,19 @@ namespace core\PHPLibrary {
       $query_builder->statement->set_clause_limit(1);
       $query_builder->statement->assembly();
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':id', $page_static_id, \PDO::PARAM_INT);
-			$database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':id', $page_static_id, \PDO::PARAM_INT);
+        $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       return ($database_query->fetchColumn()) ? true : false;
     }
@@ -409,10 +446,19 @@ namespace core\PHPLibrary {
       $query_builder->statement->clause_where->assembly();
       $query_builder->statement->assembly();
 
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-			$execute = $database_query->execute();
+      try {
+        $database_connection = $this->system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
+        $execute = $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       return ($execute) ? true : false;
     }
@@ -447,15 +493,24 @@ namespace core\PHPLibrary {
       $texts_json = (!empty($texts)) ? json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
       $metadata_json = (!empty($metadata)) ? json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':author_id', $author_id, \PDO::PARAM_INT);
-      $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
-      $database_query->bindParam(':texts', $texts_json, \PDO::PARAM_STR);
-      $database_query->bindParam(':metadata', $metadata_json, \PDO::PARAM_STR);
-      $database_query->bindParam(':created_unix_timestamp', $page_static_created_unix_timestamp, \PDO::PARAM_INT);
-      $database_query->bindParam(':updated_unix_timestamp', $page_static_updated_unix_timestamp, \PDO::PARAM_INT);
-      $execute = $database_query->execute();
+      try {
+        $database_connection = $system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $database_query->bindParam(':author_id', $author_id, \PDO::PARAM_INT);
+        $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
+        $database_query->bindParam(':texts', $texts_json, \PDO::PARAM_STR);
+        $database_query->bindParam(':metadata', $metadata_json, \PDO::PARAM_STR);
+        $database_query->bindParam(':created_unix_timestamp', $page_static_created_unix_timestamp, \PDO::PARAM_INT);
+        $database_query->bindParam(':updated_unix_timestamp', $page_static_updated_unix_timestamp, \PDO::PARAM_INT);
+        $execute = $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       if ($execute) {
         $result = $database_query->fetch(\PDO::FETCH_ASSOC);
@@ -517,25 +572,34 @@ namespace core\PHPLibrary {
       /** @var int $page_static_updated_unix_timestamp Текущее время в UNIX-формате */
       $page_static_updated_unix_timestamp = time();
 
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      error_log($query_builder->statement->assembled);
-      foreach ($data as $data_name => $data_value) {
-        if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'texts', 'metadata'])) {
-          switch (gettype($data_value)) {
-            case 'boolean': $data_value_type = \PDO::PARAM_BOOL; break;
-            case 'integer': $data_value_type = \PDO::PARAM_INT; break;
-            case 'string': $data_value_type = \PDO::PARAM_STR; break;
-            case 'null': $data_value_type = \PDO::PARAM_NULL; break;
+      try {
+        $database_connection = $this->system_core->database_connector->database->connection;
+        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        error_log($query_builder->statement->assembled);
+        foreach ($data as $data_name => $data_value) {
+          if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'texts', 'metadata'])) {
+            switch (gettype($data_value)) {
+              case 'boolean': $data_value_type = \PDO::PARAM_BOOL; break;
+              case 'integer': $data_value_type = \PDO::PARAM_INT; break;
+              case 'string': $data_value_type = \PDO::PARAM_STR; break;
+              case 'null': $data_value_type = \PDO::PARAM_NULL; break;
+            }
+
+            $database_query->bindParam(':' . $data_name, $data[$data_name], $data_value_type);
           }
-
-          $database_query->bindParam(':' . $data_name, $data[$data_name], $data_value_type);
         }
-      }
 
-      $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-      $database_query->bindParam(':updated_unix_timestamp', $page_static_updated_unix_timestamp, \PDO::PARAM_INT);
-			$execute = $database_query->execute();
+        $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
+        $database_query->bindParam(':updated_unix_timestamp', $page_static_updated_unix_timestamp, \PDO::PARAM_INT);
+        $execute = $database_query->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
 
       return ($execute) ? true : false;
     }
