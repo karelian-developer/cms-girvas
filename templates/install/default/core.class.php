@@ -11,10 +11,13 @@
 namespace templates\install\default {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
+  use \DOMDocument as DOMDocument;
 
+  #[\AllowDynamicProperties]
   final class Core implements \core\PHPLibrary\Template\InterfaceCore {
     private \core\PHPLibrary\Template $template;
     public string $assembled;
+    public DOMDocument|null $source = null;
     
     /**
      * __construct

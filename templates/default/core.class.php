@@ -13,6 +13,7 @@ namespace templates\default {
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
   use \DOMDocument as DOMDocument;
 
+  #[\AllowDynamicProperties]
   final class Core implements \core\PHPLibrary\Template\InterfaceCore {
     private \core\PHPLibrary\Template $template;
     private SystemCoreLocale $locale;

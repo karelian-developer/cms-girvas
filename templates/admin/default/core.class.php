@@ -19,6 +19,7 @@ namespace templates\admin\default {
   use \core\PHPLibrary\Client\Session as ClientSession;
   use \DOMDocument as DOMDocument;
 
+  #[\AllowDynamicProperties]
   final class Core implements \core\PHPLibrary\Template\InterfaceCore {
     private \core\PHPLibrary\Template $template;
     public string $assembled = '';
