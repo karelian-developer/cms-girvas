@@ -46,7 +46,7 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.27 Альфа';
+    public const CMS_VERSION = '0.1.27-1 Альфа';
     public const CMS_DEVELOPER_TITLE = 'Garbalo (IE SHESTAKOV A.R.)';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
     public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
@@ -317,9 +317,12 @@ namespace core\PHPLibrary {
         $this->database_connector = new SystemCoreDatabaseConnector($this, $this->configurator);
       }
 
+      /** @var string Проверка статуса HTTPS-протокола */
+      $server_https_status = (isset($_SERVER["HTTPS"])) ? strtolower($_SERVER["HTTPS"]) : 'off';
+
       // Ядро перенаправляет клиент на HTTPS-протокол, в случае, если в CMS включена принудительная
       // переадресация на этот порт.
-      if ($_SERVER['HTTPS'] != 'on' && $this->configurator->get('ssl_perm_redirect')) {
+      if ($server_https_status != 'on' && $this->configurator->get('ssl_perm_redirect')) {
         // Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена в настройках CMS.
         if ($this->configurator->get_permanent_redirect_to_www_status() && !preg_match('/^www\./', $_SERVER['HTTP_HOST'])) {
           /** @var string Адрес для переадресации по HTTPS-протоколу (поддомен www) */

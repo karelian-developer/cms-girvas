@@ -23,6 +23,7 @@
 /core/PHPLibrary/Page/Admin/mediabox.class.php
 /core/configuration.php
 /locales/*/game
+/locales/*/.git
 /templates/*
 !/templates/default
 !/templates/admin

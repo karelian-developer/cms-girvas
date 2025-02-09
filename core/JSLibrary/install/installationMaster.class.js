@@ -518,7 +518,9 @@ export class InstallationMaster {
           let installationPages = document.querySelectorAll('[data-page-index]');
           installationPages[this.getStepIndex()].appendChild(dynamicDiv);
 
-          this.buttons.nextStepIndex.target.enable();
+          if (data.statusCode == 1) {
+            this.buttons.nextStepIndex.target.enable();
+          }
         }, (rejectionReason) => {
           let interactiveNotification = new Interactive('notification');
           interactiveNotification.target.isPopup = true;
