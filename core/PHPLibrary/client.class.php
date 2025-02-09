@@ -135,13 +135,14 @@ namespace core\PHPLibrary {
      */
     public static function create_cookie(SystemCore $system_core, string $name, ClientSession $session, int $expires) : bool {
       $domain_for_cookies = $system_core->configurator->get('domain_cookies');
+      $user_session_is_secure = ($system_core->configurator->get('ssl_is_enabled')) ? true : false;
       
       if (!is_null($domain_for_cookies)) {
         return setcookie($name, $session->get_token(), [
           'expires' => $expires,
           'path' => '/',
           'domain' => $domain_for_cookies,
-          'secure' => true,
+          'secure' => $user_session_is_secure,
           'httponly' => true
         ]);
       }

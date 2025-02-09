@@ -278,11 +278,13 @@ if ($system_core->urlp->get_path(2) == 'authorization' && $system_core->urlp->ge
             $user_session->init_data(['updated_unix_timestamp', 'token']);
             $user_session_expires = $user_session->get_updated_unix_timestamp() + $system_core->configurator->get('session_expires');
 
+            $user_session_is_secure = ($system_core->configurator->get('ssl_is_enabled')) ? true : false;
+
             setcookie('_grv_utoken', $user_session->get_token(), [
               'expires' => $user_session_expires,
               'path' => '/',
               'domain' => $system_core->configurator->get('domain_cookies'),
-              'secure' => true,
+              'secure' => $user_session_is_secure,
               'httponly' => true
             ]);
 
