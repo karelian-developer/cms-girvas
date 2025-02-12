@@ -74,7 +74,7 @@
   "MODAL_WEB_CHANNEL_DELETE_TITLE": "Удаление веб-канала",
   "MODAL_WEB_CHANNEL_DELETE_DESCRIPTION": "Вы действительно хотите удалить веб-канал? Действие отменить будет нельзя.",
   "PAGE_ANALYTICS_TITLE": "Аналитика",
-  "PAGE_ANALYTICS_BLOCK_SITE_VISITS_TITLE": "Динамика помещаемости веб-сайта",
+  "PAGE_ANALYTICS_BLOCK_SITE_VISITS_TITLE": "Динамика посещаемости веб-сайта",
   "PAGE_ANALYTICS_BLOCK_ENTRIES_VIEWS_TITLE": "Просмотры записей",
   "PAGE_ANALYTICS_BLOCK_PAGES_VIEWS_TITLE": "Просмотры статических страниц",
   "PAGE_ANALYTICS_TABLE_COLUMN_TITLE_TITLE": "Заголовок",

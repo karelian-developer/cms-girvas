@@ -153,8 +153,8 @@ namespace core\PHPLibrary\Page\Admin {
             $get_metadata_value = function (Template $template, array $template_metadata, TemplateEnumMetadata $enum_metadata) {
               $metadata_name = Template::get_metadata_name($enum_metadata);
               
-              if ($enum_metadata === TemplateEnumMetadata::WEIGHT && $this->system_core->urlp->get_path(2) != 'repository') {
-                $template_weight = Template::get_weight($template, TemplateEnumWeight::BYTES); 
+              if ($enum_metadata === TemplateEnumMetadata::WEIGHT) {
+                $template_weight = ($this->system_core->urlp->get_path(2) != 'repository') ? Template::get_weight($template, TemplateEnumWeight::BYTES) : $template_metadata[$metadata_name];
                 
                 if ($template_weight < 1024) {
                   return sprintf('%s B', $template_weight);
@@ -171,6 +171,10 @@ namespace core\PHPLibrary\Page\Admin {
                 if ($template_weight >= 1024 ^ 3) {
                   return sprintf('%s GB', round($template_weight / (1024 ^ 3), 2));
                 }
+              }
+
+              if ($enum_metadata === TemplateEnumMetadata::DATETIME_CREATED_UNIX || $enum_metadata === TemplateEnumMetadata::DATETIME_UPDATED_UNIX) {
+                return date('d.m.Y', $template_metadata[$metadata_name]);
               }
 
               return isset($template_metadata[$metadata_name]) ? $template_metadata[$metadata_name] : '[???]';
