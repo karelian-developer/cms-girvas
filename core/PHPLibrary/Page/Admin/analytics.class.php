@@ -98,7 +98,7 @@ namespace core\PHPLibrary\Page\Admin {
       $table_element->appendChild($table_row_header_element);
 
       if (!empty($entries)) {
-        $locale_default = $this->system_core->get_cms_locale('base');
+        $locale_default = $this->system_core->get_cms_locale('admin');
 
         $entry_index = 1;
         foreach ($entries as $entry) {
@@ -208,7 +208,7 @@ namespace core\PHPLibrary\Page\Admin {
       $table_element->appendChild($table_row_header_element);
 
       if (!empty($pages)) {
-        $locale_default = $this->system_core->get_cms_locale('base');
+        $locale_default = $this->system_core->get_cms_locale('admin');
 
         $page_index = 1;
         foreach ($pages as $page) {
@@ -273,19 +273,6 @@ namespace core\PHPLibrary\Page\Admin {
       // Добавление таблицы стилей для страницы
       $this->system_core->template->add_style(['href' => 'styles/page/analytics.css', 'rel' => 'stylesheet']);
       
-      $cms_locale_setted_name = $this->system_core->configurator->get_database_entry_value('base_admin_locale');
-      $url_locale_setted_name = $this->system_core->urlp->get_param('locale');
-      $cookie_locale_setted_name = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
-      
-      $cms_locale_name = (!is_null($url_locale_setted_name)) ? $url_locale_setted_name : $cookie_locale_setted_name;
-      $cms_locale_name = (!is_null($cms_locale_name)) ? $cms_locale_name : $cms_locale_setted_name;
-      $cms_locale = new SystemCoreLocale($this->system_core, $cms_locale_name, 'admin');
-      if (!$cms_locale->exists_file_data_json()) {
-        $cms_locale = new SystemCoreLocale($this->system_core, $cms_locale_setted_name, 'admin');
-        $cms_locale_name = $cms_locale_setted_name;
-      }
-
-      $this->system_core->locale = $cms_locale;
       $locale_data = $this->system_core->locale->get_data();
 
       if ($this->system_core->urlp->get_path(2) == 'entry' && !is_null($this->system_core->urlp->get_path(3))) {
@@ -332,7 +319,7 @@ namespace core\PHPLibrary\Page\Admin {
         /** @var array Преобразованные элементы навигации */
         $navigations_items_transformed = [];
         array_push($navigations_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/item.tpl', [
-          'NAVIGATION_ITEM_TITLE' => sprintf('< %s', $locale_data['PAGE_ENTRIES_NAVIGATION_INDEX_LABEL']),
+          'NAVIGATION_ITEM_TITLE' => sprintf('< %s', '{LANG:PAGE_ENTRIES_NAVIGATION_INDEX_LABEL}'),
           'NAVIGATION_ITEM_URL' => '/admin',
           'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
         ]));

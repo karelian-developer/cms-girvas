@@ -46,40 +46,28 @@ namespace core\PHPLibrary\Page\Admin {
       // Добавление таблицы стилей для страницы
       $this->system_core->template->add_style(['href' => 'styles/page/entries.css', 'rel' => 'stylesheet']);
       
-      $cms_locale_setted_name = $this->system_core->configurator->get_database_entry_value('base_admin_locale');
-      $url_locale_setted_name = $this->system_core->urlp->get_param('locale');
-      $cookie_locale_setted_name = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
-      
-      $cms_locale_name = (!is_null($url_locale_setted_name)) ? $url_locale_setted_name : $cookie_locale_setted_name;
-      $cms_locale_name = (!is_null($cms_locale_name)) ? $cms_locale_name : $cms_locale_setted_name;
-      $cms_locale = new SystemCoreLocale($this->system_core, $cms_locale_name, 'admin');
-      if (!$cms_locale->exists_file_data_json()) {
-        $cms_locale = new SystemCoreLocale($this->system_core, $cms_locale_setted_name, 'admin');
-        $cms_locale_name = $cms_locale_setted_name;
-      }
-
-      $this->system_core->locale = $cms_locale;
       $locale_data = $this->system_core->locale->get_data();
+      $cms_locale_name = $this->system_core->locale->get_name();
 
       /** @var array Преобразованные элементы навигации */
       $navigations_items_transformed = [];
       array_push($navigations_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/item.tpl', [
-        'NAVIGATION_ITEM_TITLE' => sprintf('< %s', $locale_data['PAGE_ENTRIES_NAVIGATION_INDEX_LABEL']),
+        'NAVIGATION_ITEM_TITLE' => sprintf('< %s', '{LANG:PAGE_ENTRIES_NAVIGATION_INDEX_LABEL}'),
         'NAVIGATION_ITEM_URL' => '/admin',
         'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
       ]));
       array_push($navigations_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/item.tpl', [
-        'NAVIGATION_ITEM_TITLE' => $locale_data['PAGE_ENTRIES_NAVIGATION_ENTRIES_LABEL'],
+        'NAVIGATION_ITEM_TITLE' => '{LANG:PAGE_ENTRIES_NAVIGATION_ENTRIES_LABEL}',
         'NAVIGATION_ITEM_URL' => '/admin/entries',
         'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => 'navigation-item__link_is-active'
       ]));
       array_push($navigations_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/item.tpl', [
-        'NAVIGATION_ITEM_TITLE' => $locale_data['PAGE_ENTRIES_NAVIGATION_CATEGORIES_LABEL'],
+        'NAVIGATION_ITEM_TITLE' => '{LANG:PAGE_ENTRIES_NAVIGATION_CATEGORIES_LABEL}',
         'NAVIGATION_ITEM_URL' => '/admin/entriesCategories',
         'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
       ]));
       array_push($navigations_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/item.tpl', [
-        'NAVIGATION_ITEM_TITLE' => $locale_data['PAGE_ENTRIES_NAVIGATION_COMMENTS_LABEL'],
+        'NAVIGATION_ITEM_TITLE' => '{LANG:PAGE_ENTRIES_NAVIGATION_COMMENTS_LABEL}',
         'NAVIGATION_ITEM_URL' => '/admin/entriesComments',
         'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
       ]));
@@ -100,7 +88,7 @@ namespace core\PHPLibrary\Page\Admin {
       $entries_table_items_assembled_array = [];
 
       $entries = new Entries($this->system_core);
-      $entries_locale_default = $this->system_core->get_cms_locale('base');
+      $entries_locale_default = $this->system_core->get_cms_locale('admin');
       
       $entries_array_objects = $entries->get_all([
         'limit' => [$pagination_items_on_page, $pagination_item_current * $pagination_items_on_page]

@@ -374,6 +374,8 @@
   "PAGE_SETTINGS_SETTINGS_GROUP_SECURITY_DESCRIPTION": "Security issues are very important in our time, so pay more attention to this factor.",
   "PAGE_SETTINGS_SETTINGS_GROUP_USERS_TITLE": "Users",
   "PAGE_SETTINGS_SETTINGS_GROUP_USERS_DESCRIPTION": "Here you can set up a system for working with users.",
+  "PAGE_SETTINGS_SETTINGS_GROUP_FILES_TITLE": "Files",
+  "PAGE_SETTINGS_SETTINGS_GROUP_FILES_DESCRIPTION": "Here you can set up a system for working with files.",
   "PAGE_SETTINGS_SETTING_ON": "Enabled",
   "PAGE_SETTINGS_SETTING_OFF": "Disabled",
   "PAGE_SETTINGS_SETTING_BASE_TITLE_TITLE": "Site name",

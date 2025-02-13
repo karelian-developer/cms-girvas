@@ -47,25 +47,12 @@ namespace core\PHPLibrary\Page\Admin\Analytics {
       // Добавление таблицы стилей для страницы
       $this->system_core->template->add_style(['href' => 'styles/page/analytics.css', 'rel' => 'stylesheet']);
       
-      $cms_locale_setted_name = $this->system_core->configurator->get_database_entry_value('base_admin_locale');
-      $url_locale_setted_name = $this->system_core->urlp->get_param('locale');
-      $cookie_locale_setted_name = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
-      
-      $cms_locale_name = (!is_null($url_locale_setted_name)) ? $url_locale_setted_name : $cookie_locale_setted_name;
-      $cms_locale_name = (!is_null($cms_locale_name)) ? $cms_locale_name : $cms_locale_setted_name;
-      $cms_locale = new SystemCoreLocale($this->system_core, $cms_locale_name, 'admin');
-      if (!$cms_locale->exists_file_data_json()) {
-        $cms_locale = new SystemCoreLocale($this->system_core, $cms_locale_setted_name, 'admin');
-        $cms_locale_name = $cms_locale_setted_name;
-      }
-
-      $this->system_core->locale = $cms_locale;
       $locale_data = $this->system_core->locale->get_data();
 
       /** @var array Преобразованные элементы навигации */
       $navigations_items_transformed = [];
       array_push($navigations_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/item.tpl', [
-        'NAVIGATION_ITEM_TITLE' => sprintf('< %s', $locale_data['PAGE_ENTRY_NAVIGATION_BACK_LABEL']),
+        'NAVIGATION_ITEM_TITLE' => sprintf('< %s', '{LANG:PAGE_ENTRY_NAVIGATION_BACK_LABEL'),
         'NAVIGATION_ITEM_URL' => '/admin/entries',
         'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
       ]));
@@ -80,7 +67,7 @@ namespace core\PHPLibrary\Page\Admin\Analytics {
         $page_navigation_transformed = '';
       }
 
-      $locale_default = $this->system_core->get_cms_locale('base');
+      $locale_default = $this->system_core->get_cms_locale('admin');
       $page_static_title = $this->page_static->get_title($locale_default->get_name());
       $page_static_title = (!empty($page_static_title)) ? $page_static_title : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $locale_default->get_name());
 
