@@ -52,7 +52,7 @@ namespace core\PHPLibrary\WebChannel\Specification {
         'title' => $data['title'],
         'description' => $data['description'],
         'link' => $data['link'],
-        'pubdate' => date('D, d M Y H:i:s T', $data['pubdate'])
+        'pubdate' => date('D, d M Y H:i:s O', $data['pubdate'])
       ]);
     }
 
