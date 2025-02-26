@@ -13,15 +13,55 @@ namespace core\PHPLibrary\Page\Admin {
   use \core\PHPLibrary\SystemCore as SystemCore;
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
   use \core\PHPLibrary\Page as Page;
+  use \core\PHPLibrary\TraitPage as TraitPage;
 
   class PageSettings implements InterfacePage {
+    use TraitPage;
+
+    const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_SETTINGS_NAVIGATION_%s_LABEL';
+
     public SystemCore $system_core;
     public Page $page;
     public string $assembled = '';
+    public array $navigation_subsections_array = [
+      'index' => [
+        'name' => 'index',
+        'iconName' => 'index',
+        'link' => '/',
+        'permanent' => true,
+        'isActive' => false
+      ],
+    ];
 
     public function __construct(SystemCore $system_core, Page $page) {
       $this->system_core = $system_core;
       $this->page = $page;
+    }
+
+    /**
+     * Инициализация подразделов
+     * 
+     * @return void
+     */
+    public function init_subnavigation() : void {
+      $template_source =& $this->system_core->template->core->source;
+
+      $available_settings_categories_array = $this->get_available_settings_categories_array();
+      if (!empty($available_settings_categories_array)) {
+        $settings_name = (!is_null($this->system_core->urlp->get_path(2))) ? $this->system_core->urlp->get_path(2) : 'base';
+
+        foreach ($available_settings_categories_array as $available_setting_category) {
+          $this->navigation_subsections_array[$available_setting_category] = [
+            'name' => $available_setting_category,
+            'iconName' => sprintf('settingsGroup%s', ucfirst($available_setting_category)),
+            'link' => sprintf('/settings/%s', $available_setting_category),
+            'permanent' => true,
+            'isActive' => ($settings_name == $available_setting_category) ? true : false
+          ];
+        }
+      }
+
+      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
     }
 
     public function get_available_settings_categories_array() : array {
@@ -44,30 +84,6 @@ namespace core\PHPLibrary\Page\Admin {
 
       $locale_data = $this->system_core->locale->get_data();
       $settings_name = (!is_null($this->system_core->urlp->get_path(2))) ? $this->system_core->urlp->get_path(2) : 'base';
-
-      $available_settings_transformed = [];
-      $available_settings_categories_array = $this->get_available_settings_categories_array();
-      if (!empty($available_settings_categories_array)) {
-        foreach ($available_settings_categories_array as $available_setting_category) {
-          $item_class_is_active = ($settings_name == $available_setting_category) ? 'navigation-item__link_is-active' : '';
-          
-          array_push($available_settings_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/item.tpl', [
-            'NAVIGATION_ITEM_TITLE' => sprintf('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_%s_TITLE}', mb_strtoupper($available_setting_category)),
-            'NAVIGATION_ITEM_URL' => sprintf('/admin/settings/%s', $available_setting_category),
-            'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => $item_class_is_active
-          ]));
-        }
-      }
-
-      if (!empty($available_settings_transformed)) {
-        $page_navigation_transformed = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal.tpl', [
-          'NAVIGATION_LIST' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/list.tpl', [
-            'NAVIGATION_ITEMS' => implode($available_settings_transformed)
-          ])
-        ]);
-      } else {
-        $page_navigation_transformed = '';
-      }
 
       $settings_core_path = sprintf('%s/core/PHPLibrary/Page/Admin/Settings/%s.class.php', $this->system_core->get_cms_path(), $settings_name);
       if (file_exists($settings_core_path)) {
@@ -110,7 +126,6 @@ namespace core\PHPLibrary\Page\Admin {
 
       /** @var string $site_page Содержимое шаблона страницы */
       $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/settings.tpl', [
-        'PAGE_NAVIGATION' => $page_navigation_transformed,
         'ADMIN_PANEL_PAGE_NAME' => 'settings',
         'SETTINGS_TITLE' => (isset($settings_title)) ? $settings_title : $locale_data['PAGE_SETTINGS_GROUP_NOT_FOUND_TITLE'],
         'SETTINGS_DESCRIPTION' => (isset($settings_description)) ? $settings_description : $locale_data['PAGE_SETTINGS_GROUP_NOT_FOUND_DESCRIPTION'],

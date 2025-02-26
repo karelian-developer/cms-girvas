@@ -354,7 +354,7 @@
   display: flex;
 }
 
-.page__navigation .navigation-item__link {
+.page__navigation .item__link {
   display: block;
   background-color: var(--admin-panel-main-page-navigation-item-link-background-color);
   text-transform: uppercase;
@@ -366,18 +366,18 @@
   transition: color .2s, background-color .2s;
 }
 
-.page__navigation .navigation-item__link:hover {
+.page__navigation .item__link:hover {
   background-color: var(--admin-panel-main-page-navigation-item-link-background-color--hover);
   color: var(--admin-panel-main-page-navigation-item-link-font-color--hover);
 }
 
-.page__navigation .navigation-item__link:focus {
+.page__navigation .item__link:focus {
   background-color: var(--admin-panel-main-page-navigation-item-link-background-color--focus);
   color: var(--admin-panel-main-page-navigation-item-link-font-color--focus);
 }
 
-.page__navigation .navigation-item__link_is-active,
-.page__navigation .navigation-item__link:active {
+.page__navigation .item.item_is-active .item__link,
+.page__navigation .item__link:active {
   background-color: var(--admin-panel-main-page-navigation-item-link-background-color--active);
   color: var(--admin-panel-main-page-navigation-item-link-font-color--active);
 }

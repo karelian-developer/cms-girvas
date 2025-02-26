@@ -15,16 +15,54 @@ namespace core\PHPLibrary\Page\Admin {
   use \core\PHPLibrary\Module as Module;
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
   use \core\PHPLibrary\Page as Page;
+  use \core\PHPLibrary\TraitPage as TraitPage;
   use \core\PHPLibrary\Pagination as Pagination;
 
   class PageModules implements InterfacePage {
+    use TraitPage;
+
+    const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_MODULES_NAVIGATION_%s_LABEL';
+
     public SystemCore $system_core;
     public Page $page;
     public string $assembled = '';
+    public array $navigation_subsections_array = [
+      'index' => [
+        'name' => 'index',
+        'iconName' => 'index',
+        'link' => '/',
+        'permanent' => true,
+        'isActive' => false
+      ],
+      'local' => [
+        'name' => 'local',
+        'iconName' => 'local',
+        'link' => '/modules/local',
+        'permanent' => true,
+        'isActive' => false
+      ],
+      'repository' => [
+        'name' => 'repository',
+        'iconName' => 'repository',
+        'link' => '/modules/repository',
+        'permanent' => true,
+        'isActive' => false
+      ]
+    ];
 
     public function __construct(SystemCore $system_core, Page $page) {
       $this->system_core = $system_core;
       $this->page = $page;
+    }
+
+    /**
+     * Инициализация подразделов
+     * 
+     * @return void
+     */
+    public function init_subnavigation() : void {
+      $template_source =& $this->system_core->template->core->source;
+      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
     }
 
     public function assembly() : void {
@@ -35,34 +73,8 @@ namespace core\PHPLibrary\Page\Admin {
       $parsedown = new Parsedown();
 
       $subpage_name = (!is_null($this->system_core->urlp->get_path(2))) ? $this->system_core->urlp->get_path(2) : 'local';
-
-      $navigations_items_transformed = [];
-      $navigations_items = ['local', 'repository'];
-
-      array_push($navigations_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/item.tpl', [
-        'NAVIGATION_ITEM_TITLE' => sprintf('< %s', $locale_data['PAGE_MODULES_NAVIGATION_INDEX_LABEL']),
-        'NAVIGATION_ITEM_URL' => '/admin',
-        'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
-      ]));
-
-      foreach ($navigations_items as $navigation_item) {
-        $item_class_is_active = ($subpage_name == $navigation_item) ? 'navigation-item__link_is-active' : '';
-
-        array_push($navigations_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/item.tpl', [
-          'NAVIGATION_ITEM_TITLE' => sprintf('{LANG:TEMPLATES_PAGE_%s_TITLE}', mb_strtoupper($navigation_item)),
-          'NAVIGATION_ITEM_URL' => sprintf('/admin/modules/%s', $navigation_item),
-          'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => $item_class_is_active
-        ]));
-      }
-
-      if (!empty($navigations_items_transformed)) {
-        $page_navigation_transformed = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal.tpl', [
-          'NAVIGATION_LIST' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/list.tpl', [
-            'NAVIGATION_ITEMS' => implode($navigations_items_transformed)
-          ])
-        ]);
-      } else {
-        $page_navigation_transformed = '';
+      if (isset($this->navigation_subsections_array[$subpage_name])) {
+        $this->navigation_subsections_array[$subpage_name]['isActive'] = true;
       }
 
       $pagination_item_current = (!is_null($this->system_core->urlp->get_param('pageNumber'))) ? (int)$this->system_core->urlp->get_param('pageNumber') : 0;
@@ -160,7 +172,6 @@ namespace core\PHPLibrary\Page\Admin {
       } else {
         /** @var string $assembled Содержимое шаблона страницы */
         $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/modules.tpl', [
-          'PAGE_NAVIGATION' => $page_navigation_transformed,
           'PAGE_MODULES_PAGINATION' => $pagination->assembled,
           'ADMIN_PANEL_PAGE_NAME' => 'modules',
           'MODULES_LIST' => (!empty($modules_list_items_transformed_array)) ? TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/modules/list.tpl', [

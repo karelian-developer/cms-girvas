@@ -2,5 +2,6 @@
   "title": "Русский",
   "authorName": "Andrey Shestakov (Drelagas)",
   "iso639_1": "ru",
-  "iso639_2": "rus"
+  "iso639_2": "rus",
+  "version": "1.0.1"
 }

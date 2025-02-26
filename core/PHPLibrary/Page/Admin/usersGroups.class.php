@@ -15,68 +15,67 @@ namespace core\PHPLibrary\Page\Admin {
   use \core\PHPLibrary\UsersGroups as UsersGroups;
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
   use \core\PHPLibrary\Page as Page;
+  use \core\PHPLibrary\TraitPage as TraitPage;
   use \core\PHPLibrary\Pagination as Pagination;
 
   class PageUsersGroups implements InterfacePage {
+    use TraitPage;
+
+    const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_USERS_GROUPS_NAVIGATION_%s_LABEL';
+
     public SystemCore $system_core;
     public Page $page;
     public string $assembled = '';
+    public array $navigation_subsections_array = [
+      'index' => [
+        'name' => 'index',
+        'iconName' => 'index',
+        'link' => '/',
+        'permanent' => true,
+        'isActive' => false
+      ],
+      'users' => [
+        'name' => 'users',
+        'iconName' => 'users',
+        'link' => '/users',
+        'permanent' => false,
+        'isActive' => false
+      ],
+      'groups' => [
+        'name' => 'groups',
+        'iconName' => 'usersGroups',
+        'link' => '/usersGroups',
+        'permanent' => false,
+        'isActive' => true
+      ],
+    ];
 
     public function __construct(SystemCore $system_core, Page $page) {
       $this->system_core = $system_core;
       $this->page = $page;
     }
 
+    /**
+     * Инициализация подразделов
+     * 
+     * @return void
+     */
+    public function init_subnavigation() : void {
+      $template_source =& $this->system_core->template->core->source;
+      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
+    }
+
     public function assembly() : void {
       $this->system_core->template->add_style(['href' => 'styles/page/usersGroups.css', 'rel' => 'stylesheet']);
 
-      $cms_locale_setted_name = $this->system_core->configurator->get_database_entry_value('base_admin_locale');
-      $url_locale_setted_name = $this->system_core->urlp->get_param('locale');
-      $cookie_locale_setted_name = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
-      
-      $cms_locale_name = (!is_null($url_locale_setted_name)) ? $url_locale_setted_name : $cookie_locale_setted_name;
-      $cms_locale_name = (!is_null($cms_locale_name)) ? $cms_locale_name : $cms_locale_setted_name;
-      $cms_locale = new SystemCoreLocale($this->system_core, $cms_locale_name, 'admin');
-      if (!$cms_locale->exists_file_data_json()) {
-        $cms_locale = new SystemCoreLocale($this->system_core, $cms_locale_setted_name, 'admin');
-        $cms_locale_name = $cms_locale_setted_name;
-      }
-
-      $this->system_core->locale = $cms_locale;
       $locale_data = $this->system_core->locale->get_data();
-
-      $navigations_items_transformed = [];
-      array_push($navigations_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/item.tpl', [
-        'NAVIGATION_ITEM_TITLE' => sprintf('< %s', $locale_data['PAGE_USERS_NAVIGATION_INDEX_LABEL']),
-        'NAVIGATION_ITEM_URL' => '/admin',
-        'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
-      ]));
-      array_push($navigations_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/item.tpl', [
-        'NAVIGATION_ITEM_TITLE' => $locale_data['PAGE_USERS_NAVIGATION_USERS_LABEL'],
-        'NAVIGATION_ITEM_URL' => '/admin/users',
-        'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
-      ]));
-      array_push($navigations_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/item.tpl', [
-        'NAVIGATION_ITEM_TITLE' => $locale_data['PAGE_USERS_NAVIGATION_GROUPS_LABEL'],
-        'NAVIGATION_ITEM_URL' => '/admin/usersGroups',
-        'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => 'navigation-item__link_is-active'
-      ]));
-
-      if (!empty($navigations_items_transformed)) {
-        $page_navigation_transformed = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal.tpl', [
-          'NAVIGATION_LIST' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/list.tpl', [
-            'NAVIGATION_ITEMS' => implode($navigations_items_transformed)
-          ])
-        ]);
-      } else {
-        $page_navigation_transformed = '';
-      }
 
       $pagination_item_current = (!is_null($this->system_core->urlp->get_param('pageNumber'))) ? (int)$this->system_core->urlp->get_param('pageNumber') : 0;
       $pagination_items_on_page = 12;
 
       $users_groups_table_items_assembled_array = [];
       $users_groups = new UsersGroups($this->system_core);
+      $users_groups_locale_default = $this->system_core->get_cms_locale('admin');
       $users_groups_array_objects = $users_groups->get_all([
         'limit' => [$pagination_items_on_page, $pagination_item_current * $pagination_items_on_page]
       ]);
@@ -91,7 +90,7 @@ namespace core\PHPLibrary\Page\Admin {
         $user_group_object->init_data(['id', 'texts', 'name', 'metadata', 'created_unix_timestamp', 'updated_unix_timestamp']);
 
         /** @var string Заголовок группы пользователей */
-        $users_group_title = (!empty($user_group_object->get_title($cms_locale_name))) ? $user_group_object->get_title($cms_locale_name) : $user_group_object->get_title($cms_locale_setted_name);
+        $users_group_title = $user_group_object->get_title($users_groups_locale_default->get_name());
         $users_group_title = strip_tags($users_group_title);
         
         $user_group_created_date_timestamp = date('d.m.Y H:i:s', $user_group_object->get_created_unix_timestamp());
@@ -112,7 +111,6 @@ namespace core\PHPLibrary\Page\Admin {
 
       /** @var string $site_page Содержимое шаблона страницы */
       $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/usersGroups.tpl', [
-        'PAGE_NAVIGATION' => $page_navigation_transformed,
         'PAGE_USERS_GROUPS_PAGINATION' => $pagination->assembled,
         'ADMIN_PANEL_PAGE_NAME' => 'users-groups',
         'ADMIN_PANEL_USERS_GROUPS_TABLE' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/usersGroups/table.tpl', [

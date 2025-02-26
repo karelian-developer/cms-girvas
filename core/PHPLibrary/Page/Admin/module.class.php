@@ -18,8 +18,13 @@ namespace core\PHPLibrary\Page\Admin {
   use \core\PHPLibrary\Parsedown as Parsedown;
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
   use \core\PHPLibrary\Page as Page;
+  use \core\PHPLibrary\TraitPage as TraitPage;
 
   class PageModule implements InterfacePage {
+    use TraitPage;
+
+    const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_MODULE_NAVIGATION_%s_LABEL';
+
     /** @property SystemCore Объект системного ядра*/
     public SystemCore $system_core;
 
@@ -46,6 +51,15 @@ namespace core\PHPLibrary\Page\Admin {
 
     /** @property string Итоговая сборка шаблона в виде строки */
     public string $assembled = '';
+    public array $navigation_subsections_array = [
+      'back' => [
+        'name' => 'back',
+        'iconName' => 'back',
+        'link' => '/modules',
+        'permanent' => true,
+        'isActive' => false
+      ],
+    ];
 
     /**
      * __construct
@@ -58,6 +72,16 @@ namespace core\PHPLibrary\Page\Admin {
     }
 
     /**
+     * Инициализация подразделов
+     * 
+     * @return void
+     */
+    public function init_subnavigation() : void {
+      $template_source =& $this->system_core->template->core->source;
+      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
+    }
+
+    /**
      * Сборка шаблона
      * 
      * @return void
@@ -66,23 +90,6 @@ namespace core\PHPLibrary\Page\Admin {
       $this->system_core->template->add_style(['href' => 'styles/page/module.css', 'rel' => 'stylesheet']);
       
       $locale_data = $this->system_core->locale->get_data();
-
-      $navigations_items_transformed = [];
-      array_push($navigations_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/item.tpl', [
-        'NAVIGATION_ITEM_TITLE' => sprintf('< %s', $locale_data['PAGE_MODULE_NAVIGATION_BACK_LABEL']),
-        'NAVIGATION_ITEM_URL' => ($this->system_core->urlp->get_path(2) == 'repository') ? '/admin/modules/repository' : '/admin/modules',
-        'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
-      ]));
-
-      if (!empty($navigations_items_transformed)) {
-        $page_navigation_transformed = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal.tpl', [
-          'NAVIGATION_LIST' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/list.tpl', [
-            'NAVIGATION_ITEMS' => implode($navigations_items_transformed)
-          ])
-        ]);
-      } else {
-        $page_navigation_transformed = '';
-      }
 
       $module_name = ($this->system_core->urlp->get_path(2) == 'repository') ? $this->system_core->urlp->get_path(3) : $this->system_core->urlp->get_path(2);
       $module = new Module($this->system_core, $module_name);
@@ -232,7 +239,6 @@ namespace core\PHPLibrary\Page\Admin {
         $parsedown = new Parsedown();
 
         $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/module.tpl', [
-          'PAGE_NAVIGATION' => $page_navigation_transformed,
           'ADMIN_PANEL_PAGE_NAME' => 'module',
           'MODULE_NAME' => $module_name,
           'MODULE_TITLE' => $module_title,

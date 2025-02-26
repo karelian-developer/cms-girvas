@@ -228,6 +228,168 @@ namespace core\PHPLibrary\SystemCore {
     }
 
     /**
+     * Получить статус состояния раздела "Записи"
+     * 
+     * @return string|bool
+     */
+    public function get_section_entries_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('base_section_entries_status')) {
+          return ($this->get_database_entry_value('base_section_entries_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('base_section_entries_status')) ? $this->get_database_entry_value('base_section_entries_status') : 'off';
+    }
+
+    /**
+     * Получить статус состояния раздела "Статические страницы"
+     * 
+     * @return string|bool
+     */
+    public function get_section_static_pages_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('base_section_static_pages_status')) {
+          return ($this->get_database_entry_value('base_section_static_pages_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('base_section_static_pages_status')) ? $this->get_database_entry_value('base_section_static_pages_status') : 'off';
+    }
+
+    /**
+     * Получить статус состояния раздела "Модули"
+     * 
+     * @return string|bool
+     */
+    public function get_section_modules_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('base_section_modules_status')) {
+          return ($this->get_database_entry_value('base_section_modules_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('base_section_modules_status')) ? $this->get_database_entry_value('base_section_modules_status') : 'off';
+    }
+
+    /**
+     * Получить статус состояния раздела "Шаблоны"
+     * 
+     * @return string|bool
+     */
+    public function get_section_templates_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('base_section_templates_status')) {
+          return ($this->get_database_entry_value('base_section_templates_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('base_section_templates_status')) ? $this->get_database_entry_value('base_section_templates_status') : 'off';
+    }
+
+    /**
+     * Получить статус состояния раздела "Пользователи"
+     * 
+     * @return string|bool
+     */
+    public function get_section_users_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('base_section_users_status')) {
+          return ($this->get_database_entry_value('base_section_users_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('base_section_users_status')) ? $this->get_database_entry_value('base_section_users_status') : 'off';
+    }
+
+    /**
+     * Получить статус состояния раздела "Медиа"
+     * 
+     * @return string|bool
+     */
+    public function get_section_media_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('base_section_media_status')) {
+          return ($this->get_database_entry_value('base_section_media_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('base_section_media_status')) ? $this->get_database_entry_value('base_section_media_status') : 'off';
+    }
+
+    /**
+     * Получить статус состояния раздела "Фиды"
+     * 
+     * @return string|bool
+     */
+    public function get_section_feeds_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('base_section_feeds_status')) {
+          return ($this->get_database_entry_value('base_section_feeds_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('base_section_feeds_status')) ? $this->get_database_entry_value('base_section_feeds_status') : 'off';
+    }
+
+    /**
+     * Получить статус состояния раздела "Аналитика"
+     * 
+     * @return string|bool
+     */
+    public function get_section_analytics_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('base_section_analytics_status')) {
+          return ($this->get_database_entry_value('base_section_analytics_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('base_section_analytics_status')) ? $this->get_database_entry_value('base_section_analytics_status') : 'off';
+    }
+
+    /**
+     * Получить статус состояния технических работ
+     * 
+     * @return string|bool
+     */
+    public function get_engineering_works_status(bool $is_bool = false) : string|bool {
+      if ($is_bool) {
+        if ($this->exists_database_entry_value('base_engineering_works_status')) {
+          return ($this->get_database_entry_value('base_engineering_works_status') == 'on') ? true : false;
+        }
+
+        return false;
+      }
+
+      return ($this->exists_database_entry_value('base_engineering_works_status')) ? $this->get_database_entry_value('base_engineering_works_status') : 'off';
+    }
+
+    /**
+     * Получить причину закрытия сайта на технические работы
+     * 
+     * @return string
+     */
+    public function get_engineering_works_text() : string {
+      return ($this->exists_database_entry_value('base_engineering_works_text')) ? (string)$this->get_database_entry_value('base_engineering_works_text') : '';
+    }
+
+    /**
      * Получить статус настройки автоматической конвертации изображений
      * 
      * @param bool $is_bool

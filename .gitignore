@@ -22,6 +22,7 @@
 /core/PHPLibrary/Page/Admin/concerts.class.php
 /core/PHPLibrary/Page/Admin/mediabox.class.php
 /core/configuration.php
+/locales/fi_FI
 /locales/*/game
 /locales/*/.git
 /templates/*

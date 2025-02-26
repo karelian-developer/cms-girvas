@@ -1,0 +1,7 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 64 64" style="enable-background:new 0 0 64 64;" xml:space="preserve">
+  <rect width="25.9" height="25.9"/>
+  <rect x="38.1" y="38.1" width="25.9" height="25.9"/>
+  <path d="M20.3,20.3v23.3h23.3V20.3H20.3z M37.7,37.7H26.3V26.3h11.4V37.7z"/>
+  <path d="M40.7,0v23.3H64V0H40.7z M58,17.4H46.6V6H58V17.4z"/>
+  <path d="M0,40.7V64h23.3V40.7H0z M17.4,58H6V46.6h11.4V58z"/>
+</svg>

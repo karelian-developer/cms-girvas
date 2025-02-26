@@ -1,0 +1,9 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 64 64" style="enable-background:new 0 0 64 64;" xml:space="preserve">
+  <rect x="8.2" y="48.5" width="15.5" height="15.5"/>
+  <rect x="48.5" y="7.5" width="15.5" height="15.5"/>
+  <rect x="48.5" y="48.5" width="15.5" height="15.5"/>
+  <rect x="13.7" y="31.9" width="4.4" height="16.7"/>
+  <rect x="54" y="22.9" width="4.4" height="25.6"/>
+  <rect x="38" y="6.9" transform="matrix(-1.836970e-16 1 -1 -1.836970e-16 55.3883 -24.982)" class="st0" width="4.4" height="16.7"/>
+  <path d="M0,0v31.9h31.9V0H0z M23.7,23.7H8.2V8.2h15.5V23.7z"/>
+</svg>

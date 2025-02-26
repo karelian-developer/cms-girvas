@@ -39,7 +39,7 @@ export class PageGlobal {
     let navigationBurgerElement = document.querySelector('[role="mainNavigationBurger"]');
     if (navigationBurgerElement != null) {
       navigationBurgerElement.addEventListener('click', (event) => {
-        navigationBurgerElement.classList.toggle('admin-navigation__burger_is-active');
+        navigationBurgerElement.classList.toggle('burger_is-active');
       });
     }
 

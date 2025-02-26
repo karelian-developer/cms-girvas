@@ -28,8 +28,8 @@ import {PageUser as PageAdminUser} from './page/admin/user.class.js';
 import {PageUsers as PageAdminUsers} from './page/admin/users.class.js';
 import {PageUsersGroup as PageAdminUsersGroup} from './page/admin/usersGroup.class.js';
 import {PageUsersGroups as PageAdminUsersGroups} from './page/admin/usersGroups.class.js';
-import {PageWebChannel as PageAdminWebChannel} from './page/admin/webChannel.class.js';
-import {PageWebChannels as PageAdminWebChannels} from './page/admin/webChannels.class.js';
+import {PageFeed as PageAdminFeed} from './page/admin/feed.class.js';
+import {PageFeeds as PageAdminFeeds} from './page/admin/feeds.class.js';
 import {PageGlobal as PageAdminGlobal} from './page/admin/global.class.js';
 import {PageGlobal as PageDefaultGlobal} from './page/global.class.js';
 import {Interactive} from '../interactive.class.js';
@@ -70,8 +70,8 @@ export class Page {
         case 'users': this.target = new PageAdminUsers(this, params); break;
         case 'usersGroup': this.target = new PageAdminUsersGroup(this, params); break;
         case 'usersGroups': this.target = new PageAdminUsersGroups(this, params); break;
-        case 'webChannel': this.target = new PageAdminWebChannel(this, params); break;
-        case 'webChannels': this.target = new PageAdminWebChannels(this, params); break;
+        case 'feed': this.target = new PageAdminFeed(this, params); break;
+        case 'feeds': this.target = new PageAdminFeeds(this, params); break;
         case 'global': this.target = new PageAdminGlobal(this, params); break;
       }
     }

@@ -24,6 +24,80 @@ namespace templates\admin\default {
     private \core\PHPLibrary\Template $template;
     public string $assembled = '';
     public DOMDocument|null $source = null;
+    public array $navigation_sections_array = [
+      'index' => [
+        'name' => 'index',
+        'iconName' => 'index',
+        'link' => '/',
+        'permanent' => true
+      ],
+      'entries' => [
+        'name' => 'entries',
+        'iconName' => 'entries',
+        'link' => '/entries',
+        'permanent' => false
+      ],
+      'static_pages' => [
+        'name' => 'pages',
+        'iconName' => 'pages',
+        'link' => '/pages',
+        'permanent' => false
+      ],
+      'media' => [
+        'name' => 'media',
+        'iconName' => 'media',
+        'link' => '/media',
+        'permanent' => false
+      ],
+      'users' => [
+        'name' => 'users',
+        'iconName' => 'users',
+        'link' => '/users',
+        'permanent' => false
+      ],
+      'feeds' => [
+        'name' => 'feeds',
+        'iconName' => 'feeds',
+        'link' => '/feeds',
+        'permanent' => false
+      ],
+      'modules' => [
+        'name' => 'modules',
+        'iconName' => 'modules',
+        'link' => '/modules',
+        'permanent' => false
+      ],
+      'templates' => [
+        'name' => 'templates',
+        'iconName' => 'templates',
+        'link' => '/templates',
+        'permanent' => false
+      ],
+      'analytics' => [
+        'name' => 'analytics',
+        'iconName' => 'analytics',
+        'link' => '/analytics',
+        'permanent' => false
+      ],
+      'settings' => [
+        'name' => 'settings_cms',
+        'iconName' => 'settings',
+        'link' => '/settings',
+        'permanent' => true
+      ],
+      'about' => [
+        'name' => 'about_cms',
+        'iconName' => 'about',
+        'link' => '/about',
+        'permanent' => true
+      ],
+      'exit' => [
+        'name' => 'exit_cms',
+        'iconName' => 'exit',
+        'link' => '#',
+        'permanent' => true
+      ]
+    ];
     
     /**
      * __construct
@@ -33,6 +107,84 @@ namespace templates\admin\default {
      */
     public function __construct(\core\PHPLibrary\Template $template) {
       $this->template = $template;
+    }
+
+    /**
+     * Получить абсолютный путь SVG-файла иконки раздела
+     * 
+     * @param string $navigation_item_name
+     * @return string
+     */
+    private function get_main_navigation_icon_path(string $navigation_item_name) : string {
+      $template_path = $this->template->get_path();
+      return sprintf('%s/images/icons/mainNavigation/%s.svg', $template_path, $navigation_item_name);
+    }
+
+    /**
+     * Инициализация главной навигации
+     * 
+     * @return void
+     */
+    public function init_main_navigation() : void {
+      if (!is_null($this->source)) {
+        $element_system_ap_main_navigation = $this->source->getElementById('SYSTEM_AP_MAIN_NAVIGATION');
+        if (!is_null($element_system_ap_main_navigation)) {
+          $list_element = $element_system_ap_main_navigation->ownerDocument->createElement('ul');
+          $list_element->setAttribute('class', 'navigation__list list list-reset');
+
+          if (count($this->navigation_sections_array) > 0) {
+            foreach ($this->navigation_sections_array as $navigation_section_index => $navigation_section_data) {
+              $navigation_section_name = $navigation_section_data['name'];
+              $navigation_section_link = $navigation_section_data['link'];
+              $navigation_section_icon_name = $navigation_section_data['iconName'];
+              $navigation_section_permanent_status = $navigation_section_data['permanent'];
+              
+              $section_allowed = false;
+
+              if (!$navigation_section_permanent_status) {
+                $method_section_checker_name = sprintf('get_section_%s_status', $navigation_section_index);
+                
+                if (method_exists($this->template->system_core->configurator, $method_section_checker_name)) {
+                  if ($this->template->system_core->configurator->{$method_section_checker_name}(true)) {
+                    $section_allowed = true;
+                  }
+                } else {
+                  $section_allowed = true;
+                }
+              } else {
+                $section_allowed = true;
+              }
+
+              if ($section_allowed) {
+                $item_title = sprintf('{LANG:MAIN_NAVIGATION_%s_LABEL}', strtoupper($navigation_section_name));
+                $item_title = TemplateCollector::assembly_locale($item_title, $this->template->system_core->locale);
+                
+                $item_element = $element_system_ap_main_navigation->ownerDocument->createElement('li');
+                $link_element = $element_system_ap_main_navigation->ownerDocument->createElement('a');
+                $label_element = $element_system_ap_main_navigation->ownerDocument->createElement('div', $item_title);
+                
+                $item_element->setAttribute('class', sprintf('list__item item item_%s', $navigation_section_name));
+                $link_element->setAttribute('class', 'item__link link');
+                $link_element->setAttribute('href', sprintf('/admin%s', $navigation_section_link));
+                $link_element->setAttribute('title', $item_title);
+                $label_element->setAttribute('class', 'item__label label');
+                
+                $svg_element = new DOMDocument();
+                $svg_element->load($this->get_main_navigation_icon_path($navigation_section_icon_name));
+                $svg_imported_element = $this->source->importNode($svg_element->documentElement, true);
+                $svg_imported_element->setAttribute('class', 'item__icon icon');
+
+                $link_element->appendChild($svg_imported_element);
+                $link_element->appendChild($label_element);
+                $item_element->appendChild($link_element);
+                $list_element->appendChild($item_element);
+              }
+            }
+
+            $element_system_ap_main_navigation->appendChild($list_element);
+          }
+        }
+      }
     }
     
     /**

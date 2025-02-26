@@ -46,7 +46,7 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.27-5 Альфа';
+    public const CMS_VERSION = '0.1.28 Альфа';
     public const CMS_DEVELOPER_TITLE = 'Garbalo (IE SHESTAKOV A.R.)';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
     public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
@@ -85,6 +85,10 @@ namespace core\PHPLibrary {
      * @var array Массив элементов пути до инициализированной страницы
      */
     public array $page_dir_array = [];
+    /**
+     * @var array Объект текущей страницы
+     */
+    public mixed $page = null;
     
     /**
      * __construct
@@ -232,10 +236,10 @@ namespace core\PHPLibrary {
           $current_dir = str_replace('/', '\\', $current_dir);
           
           $class = sprintf('\\core\\PHPLibrary\\Page\\%s', $current_dir);
-          $page_object = new $class($this, new Page($this, $current_dir_array));
-          
+          $this->page = new $class($this, new Page($this, $current_dir_array));
+
           if ($current_dir_array[0] == $this->template->get_category()) unset($current_dir_array[0]);
-          $current_dir_array[array_key_last($current_dir_array)] = &$page_object;
+          $current_dir_array[array_key_last($current_dir_array)] =& $this->page;
           $current_dir_final_array = $current_dir_array;
           break;
         }
@@ -249,7 +253,8 @@ namespace core\PHPLibrary {
         $this->template->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
         
         $class = sprintf('\\core\\PHPLibrary\\Page\\PageError', $current_dir);
-        $current_dir_final_array[array_key_last($current_dir_final_array)] = new $class($this, new Page($this, $current_dir_final_array), 404);
+        $this->page = new $class($this, new Page($this, $current_dir_final_array), 404);
+        $current_dir_final_array[array_key_last($current_dir_final_array)] =& $this->page;
       }
 
       $this->page_dir_array = $current_dir_final_array;
@@ -290,6 +295,10 @@ namespace core\PHPLibrary {
 
       // Подключение файлов с интерфейсами
       $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.interface\.php$/');
+      $file_connector->reset_current_directory();
+
+      // Подключение файлов с трейтами
+      $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.trait\.php$/');
       $file_connector->reset_current_directory();
 
       // Подключение файлов с классами
@@ -502,6 +511,18 @@ namespace core\PHPLibrary {
         }
 
         $template->core->source = $dom_document;
+
+        if ($this->urlp->get_path(0) == 'admin') {
+          if (method_exists($template->core, 'init_main_navigation')) {
+            $template->core->init_main_navigation();
+          }
+
+          if (!is_null($this->page)) {
+            if (method_exists($this->page, 'init_subnavigation')) {
+              $this->page->init_subnavigation();
+            }
+          }
+        }
       }
 
       if (!empty($this->modules)) {
