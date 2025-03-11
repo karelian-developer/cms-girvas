@@ -300,6 +300,53 @@ if (defined('IS_NOT_HACKED')) {
             'description' => $entry_category->get_description($entries_categories_locale),
           ]);
         }
+      } else if ($system_core->urlp->get_path(2) == 'additional-fields' && is_null($system_core->urlp->get_path(3))) {
+        $cms_locale_setted = $system_core->configurator->get_database_entry_value('base_locale');
+        $fields_locale = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $cms_locale_setted;
+
+        $fields_types = ($system_core->configurator->exists_database_entry_value('entries_additional_field_type')) ? json_decode($system_core->configurator->get_database_entry_value('entries_additional_field_type'), true) : [];
+        $fields_titles = ($system_core->configurator->exists_database_entry_value('entries_additional_field_title')) ? json_decode($system_core->configurator->get_database_entry_value('entries_additional_field_title'), true) : [];
+        $fields_descriptions = ($system_core->configurator->exists_database_entry_value('entries_additional_field_description')) ? json_decode($system_core->configurator->get_database_entry_value('entries_additional_field_description'), true) : [];
+        $fields_names = ($system_core->configurator->exists_database_entry_value('entries_additional_field_name')) ? json_decode($system_core->configurator->get_database_entry_value('entries_additional_field_name'), true) : [];
+        
+        $fields = [];
+        foreach ($fields_types as $field_index => $field_type) {
+          array_push($fields, [
+            'type' => $field_type,
+            'title' => isset($fields_titles[$fields_locale]) ? $fields_titles[$fields_locale][$field_index] : '',
+            'description' => isset($fields_descriptions[$fields_locale]) ? $fields_descriptions[$fields_locale][$field_index] : '',
+            'name' => $fields_names[$field_index]
+          ]);
+        }
+
+        $handler_output_data['additionalFields'] = $fields;
+      }
+    }
+  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'pages' && $system_core::core_rest_cookie_exists()) {
+    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
+    $client_ip = $system_core->client->get_ip_address();
+
+    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
+      if ($system_core->urlp->get_path(2) == 'additional-fields' && is_null($system_core->urlp->get_path(3))) {
+        $cms_locale_setted = $system_core->configurator->get_database_entry_value('base_locale');
+        $fields_locale = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $cms_locale_setted;
+
+        $fields_types = ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_type')) ? json_decode($system_core->configurator->get_database_entry_value('static_pages_additional_field_type'), true) : [];
+        $fields_titles = ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_title')) ? json_decode($system_core->configurator->get_database_entry_value('static_pages_additional_field_title'), true) : [];
+        $fields_descriptions = ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_description')) ? json_decode($system_core->configurator->get_database_entry_value('static_pages_additional_field_description'), true) : [];
+        $fields_names = ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_name')) ? json_decode($system_core->configurator->get_database_entry_value('static_pages_additional_field_name'), true) : [];
+        
+        $fields = [];
+        foreach ($fields_types as $field_index => $field_type) {
+          array_push($fields, [
+            'type' => $field_type,
+            'title' => isset($fields_titles[$fields_locale]) ? $fields_titles[$fields_locale][$field_index] : '',
+            'description' => isset($fields_descriptions[$fields_locale]) ? $fields_descriptions[$fields_locale][$field_index] : '',
+            'name' => $fields_names[$field_index]
+          ]);
+        }
+
+        $handler_output_data['additionalFields'] = $fields;
       }
     }
   // Попытка инициализации персонализированного обработчика

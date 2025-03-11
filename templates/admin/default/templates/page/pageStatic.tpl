@@ -78,6 +78,14 @@
     <div class="page-aside__block-content block-content"></div>
   </article>
   <article class="page-aside__block">
+    <h2 class="page-aside__block-title">{LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TITLE}</h2>
+    <div class="page-aside__block-content block-content">
+      <div class="additional-data" role="additional-data">
+        {PAGE_STATIC_ADDITIONAL_FIELDS}
+      </div>
+    </div>
+  </article>
+  <article class="page-aside__block">
     <h2 class="page-aside__block-title">{LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_ABOUT_TITLE}</h2>
     <div class="page-aside__block-content block-content">
       <div class="note-block note-block_blue">

@@ -39,8 +39,33 @@ namespace core\PHPLibrary\Page\Admin {
 
       $media_files = array_slice($media_files, $pagination_item_current * $pagination_items_on_page, $pagination_items_on_page);
 
+      $media_files_data = [];
+      foreach ($media_files as $file) {
+        /** @var string */
+        $file_path = sprintf('%s/%s', $media_files_path, $file);
+        $file_url = $file;
+        
+        array_push($media_files_data, [
+          'file_url' => $file_url,
+          'created_unix_timestamp' => filemtime($file_path)
+        ]);
+      }
+
+      usort($media_files_data, function($a, $b) {
+        if ($a['created_unix_timestamp'] == $b['created_unix_timestamp']) {
+          return 0;
+        }
+    
+        return ($a['created_unix_timestamp'] > $b['created_unix_timestamp']) ? -1 : 1;
+      });
+
+      $media_files_sorted = [];
+      foreach ($media_files_data as $file_data) {
+        array_push($media_files_sorted, $file_data['file_url']);
+      }
+
       $media_files_transformed = [];
-      foreach ($media_files as $media_file) {
+      foreach ($media_files_sorted as $media_file) {
         $media_file_url = sprintf('/uploads/media/%s', $media_file);
         array_push($media_files_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/media/listItem.tpl', [
           'MEDIA_FILE_URL' => $media_file_url,

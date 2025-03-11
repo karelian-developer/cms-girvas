@@ -250,6 +250,40 @@ namespace core\PHPLibrary {
     }
 
     /**
+     * Получить данные по дополнительному полю
+     * 
+     * @param string $field_name
+     * 
+     * @return mixed
+     */
+    public function get_additional_field_data(string $field_name) : mixed {
+      if (property_exists($this, 'metadata')) {
+        $metadata_array = json_decode($this->metadata, true);
+        if (isset($metadata_array['additionalFields'])) {
+          return (isset($metadata_array['additionalFields'][$field_name])) ? $metadata_array['additionalFields'][$field_name] : null;
+        }
+      }
+
+      return null;
+    }
+
+    /**
+     * Получить данные по дополнительным полям
+     * 
+     * @return array
+     */
+    public function get_additional_fields_data() : array {
+      if (property_exists($this, 'metadata')) {
+        /** @var array Массив метаданных */
+        $metadata_array = json_decode($this->metadata, true);
+        
+        return (isset($metadata_array['additionalFields'])) ? $metadata_array['additionalFields'] : [];
+      }
+
+      return [];
+    }
+
+    /**
      * Получить URL дефолтной заставки
      * 
      * @param SystemCore $system_core

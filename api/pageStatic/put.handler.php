@@ -81,11 +81,36 @@ if ($system_core->client->is_logged(2)) {
       $page_creation_allowed = false;
     }
 
+    foreach ($_PUT as $key => $value) {
+      if (preg_match('/^page_static\_additional\_field\_([a-z0-9\_]+)$/i', $key, $key_matches, PREG_OFFSET_CAPTURE) && !empty($value)) {
+        if (!isset($page_static_data)) $page_static_data = [];
+        if (!isset($page_static_data['metadata'])) $page_static_data['metadata'] = [];
+        if (!isset($page_static_data['metadata']['additionalFields'])) $page_static_data['metadata']['additionalFields'] = [];
+        
+        $value_name_parts = explode('_', $key_matches[1][0]);
+        foreach ($value_name_parts as $part_index => $part) {
+          if ($part_index > 0) {
+            $value_name_parts[$part_index] = ucfirst($part);
+          }
+        }
+
+        if (is_bool($value)) $value = (int)$value;
+
+        $page_static_data['metadata']['additionalFields'][implode($value_name_parts)] = htmlspecialchars(str_replace('\'', '"', $value));
+      }
+    }
+
     if ($page_creation_allowed) {
       $client_session = $system_core->client->get_session(2, ['user_id']);
       
       $page_static = PageStatic::create($system_core, $page_static_name, $client_session->get_user_id(), $texts);
       if (!is_null($page_static)) {
+        $page_static->init_data(['*']);
+
+        if (isset($page_static_data)) {
+          $page_static->update($page_static_data);
+        }
+
         $handler_output_data['pageStatic'] = [];
         $handler_output_data['pageStatic']['id'] = $page_static->get_id();
 

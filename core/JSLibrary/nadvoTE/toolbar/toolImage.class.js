@@ -103,6 +103,7 @@ export class ToolImage extends Tool {
   initClickEvent() {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
+      let stringSelection = this.editor.getSelectionString();
 
       let modalBodyContent = document.createElement('div');
       let mediaContainerElement = document.createElement('div');
@@ -126,6 +127,8 @@ export class ToolImage extends Tool {
       inputImageLabelElement.classList.add('form__input');
       inputImageLabelElement.style.width = '100%';
       inputImageLabelElement.style.marginBottom = '10px';
+      inputImageLabelElement.value = stringSelection;
+
       let inputImageLinkElement = document.createElement('input');
       inputImageLinkElement.classList.add('form__input');
       inputImageLinkElement.setAttribute('placeholder', '../image.webp');

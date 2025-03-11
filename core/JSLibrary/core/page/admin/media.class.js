@@ -114,12 +114,27 @@ export class PageMedia {
         listItemElement.setAttribute('data-file-name', fileName);
         listItemElement.setAttribute('data-file-url', fileURL);
 
-        this.initMediaElement(listItemElement);
+        let listItemControllerContainerElement = document.createElement('div');
+        listItemControllerContainerElement.classList.add('item__controller-panel');
+        listItemControllerContainerElement.classList.add('controller-panel');
+        listItemControllerContainerElement.setAttribute('role', 'controller-panel');
+
+        let listItemTitleContainerElement = document.createElement('div');
+        listItemTitleContainerElement.classList.add('item__title-container');
+
+        let listItemTitleElement = document.createElement('div');
+        listItemTitleElement.classList.add('item__title');
+        listItemTitleElement.innerText = fileName;
+
+        listItemElement.appendChild(listItemControllerContainerElement);
+        listItemTitleContainerElement.appendChild(listItemTitleElement);
+        listItemElement.appendChild(listItemTitleContainerElement);
 
         let mediaListElement = document.querySelector('#E9453667589');
         let mediaListItems = mediaListElement.querySelectorAll('li');
-        
         mediaListItems[0].before(listItemElement);
+
+        this.initMediaElement(listItemElement);
       }
 
       if (data.statusCode == 1 && fileIndex < (inputElement.files.length - 1)) {

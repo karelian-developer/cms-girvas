@@ -95,6 +95,22 @@ if ($system_core->client->is_logged(2)) {
           }
         }
 
+        foreach ($_PATCH as $name => $value) {
+          if (preg_match('/^page_static_additional_field_([a-z0-9_]+)$/', $name, $matches, PREG_OFFSET_CAPTURE)) {
+            if (!isset($page_static_data['metadata']['additionalFields'])) $page_static_data['metadata']['additionalFields'] = [];
+            
+            $field_name = $matches[1][0];
+            $field_name_transformed = '';
+
+            $field_name_parts = explode('_', $field_name);
+            for ($i = 0; $i < count($field_name_parts); $i++) {
+              $field_name_transformed .= ($i > 0) ? ucfirst($field_name_parts[$i]) : $field_name_parts[$i];
+            }
+
+            $page_static_data['metadata']['additionalFields'][$field_name_transformed] = htmlspecialchars(str_replace('\'', '"', $value));
+          }
+        }
+
         $page_static_is_published = isset($page_static_data['metadata']['is_published']) ? $page_static_data['metadata']['is_published'] : 0;
 
         // Если происходит публикация страницы, то необходимо удостовериться, что
@@ -106,7 +122,7 @@ if ($system_core->client->is_logged(2)) {
           /** @var string */
           $base_locale_name = $base_locale->get_name();
 
-          $page_static->init_data(['texts']);
+          $page_static->init_data(['texts', 'metadata']);
 
           /** @var string Заголовок записи */
           $page_static_title_default = $page_static->get_title($base_locale_name);

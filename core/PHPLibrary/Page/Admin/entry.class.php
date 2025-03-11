@@ -15,6 +15,7 @@ namespace core\PHPLibrary\Page\Admin {
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
   use \core\PHPLibrary\Page as Page;
   use \core\PHPLibrary\TraitPage as TraitPage;
+  use \DOMDocument as DOMDocument;
 
   class PageEntry implements InterfacePage {
     use TraitPage;
@@ -61,7 +62,83 @@ namespace core\PHPLibrary\Page\Admin {
         $entry = (Entry::exists_by_id($this->system_core, $entry_id)) ? new Entry($this->system_core, $entry_id) : null;
         
         if (!is_null($entry)) {
-          $entry->init_data(['id', 'texts', 'name']);
+          $entry->init_data(['id', 'texts', 'name', 'metadata']);
+        }
+      }
+
+      /** ===================
+       *  Дополнительные поля
+       *  ===================
+       */
+
+      /** @var array Типы полей */
+      $fields_types = ($this->system_core->configurator->exists_database_entry_value('entries_additional_field_type')) ? json_decode($this->system_core->configurator->get_database_entry_value('entries_additional_field_type'), true) : [];
+      /** @var array Заголовки полей */
+      $fields_titles = ($this->system_core->configurator->exists_database_entry_value('entries_additional_field_title')) ? json_decode($this->system_core->configurator->get_database_entry_value('entries_additional_field_title'), true) : [];
+      /** @var array Описания полей */
+      $fields_descriptions = ($this->system_core->configurator->exists_database_entry_value('entries_additional_field_description')) ? json_decode($this->system_core->configurator->get_database_entry_value('entries_additional_field_description'), true) : [];
+      /** @var array Имена полей */
+      $fields_names = ($this->system_core->configurator->exists_database_entry_value('entries_additional_field_name')) ? json_decode($this->system_core->configurator->get_database_entry_value('entries_additional_field_name'), true) : [];
+      /** @var string Имя языкового базового пакета CMS */
+      $cms_locale_setted = $this->system_core->configurator->get_database_entry_value('base_locale');
+
+      $additional_fields_elements = [];
+      foreach ($fields_types as $field_index => $field_type) {
+        $field_name_exploded = explode('_', $fields_names[$field_index]);
+
+        foreach ($field_name_exploded as $string_index => $string) {
+          if ($string_index > 0) {
+            $field_name_exploded[$string_index] = ucfirst($string);
+          }
+        }
+
+        $field_name_transformed = implode($field_name_exploded);
+
+        if ($field_type == 'textarea') {
+          if (!is_null($entry)) {
+            $field_value = (!is_null($entry->get_additional_field_data($fields_names[$field_index]))) ? $entry->get_additional_field_data($fields_names[$field_index]) : '';
+          }
+
+          /** @var DOMDocument */
+          $dom_document = new DOMDocument('1.0', 'UTF-8');
+
+          $element_value = (isset($field_value)) ? $field_value : '';
+          $element = $dom_document->createElement('textarea', $element_value);
+          $element->setAttribute('name', sprintf('entry_additional_field_%s', $fields_names[$field_index]));
+
+          $dom_document->appendChild($element);
+
+          $dom_document_string = $dom_document->saveHTML($element);
+
+          array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entry/form/field.tpl', [
+            'FIELD_DESCRIPTION' => $fields_descriptions[$cms_locale_setted][$field_index],
+            'FIELD_TITLE' => $fields_titles[$cms_locale_setted][$field_index],
+            'FIELD_INPUT' => $dom_document_string
+          ]));
+
+        } else {
+          if (!is_null($entry)) {
+            $field_value = (!is_null($entry->get_additional_field_data($fields_names[$field_index]))) ? $entry->get_additional_field_data($fields_names[$field_index]) : '';
+          }
+
+          /** @var DOMDocument */
+          $dom_document = new DOMDocument('1.0', 'UTF-8');
+
+          $element_value = (isset($field_value)) ? $field_value : '';
+          $element = $dom_document->createElement('input');
+          $element->setAttribute('name', sprintf('entry_additional_field_%s', $fields_names[$field_index]));
+          $element->setAttribute('type', $fields_types[$field_index]);
+          $element->setAttribute('value', $element_value);
+
+          $dom_document->appendChild($element);
+
+          $dom_document_string = $dom_document->saveHTML($element);
+
+          array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entry/form/field.tpl', [
+            'FIELD_DESCRIPTION' => $fields_descriptions[$cms_locale_setted][$field_index],
+            'FIELD_TITLE' => $fields_titles[$cms_locale_setted][$field_index],
+            'FIELD_INPUT' => $dom_document_string
+          ]));
         }
       }
 
@@ -96,6 +173,7 @@ namespace core\PHPLibrary\Page\Admin {
         'ENTRY_CONTENT' => (!is_null($entry)) ? $entry->get_content() : '',
         'ENTRY_KEYWORDS' => (!is_null($entry)) ? implode(', ', $entry->get_keywords()) : '',
         'ENTRY_NAME' => (!is_null($entry)) ? $entry->get_name() : '',
+        'ENTRY_ADDITIONAL_FIELDS' => implode($additional_fields_elements),
         'ENTRY_FORM_METHOD' => (!is_null($entry)) ? 'PATCH' : 'PUT'
       ]);
     }

@@ -117,6 +117,16 @@ namespace core\PHPLibrary\Page\Admin {
           $settings->set_description('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_USERS_DESCRIPTION}');
         }
 
+        if ($settings_name == 'entries') {
+          $settings->set_title('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_ENTRIES_TITLE}');
+          $settings->set_description('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_ENTRIES_DESCRIPTION}');
+        }
+
+        if ($settings_name == 'pages') {
+          $settings->set_title('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_STATIC_PAGES_TITLE}');
+          $settings->set_description('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_STATIC_PAGES_DESCRIPTION}');
+        }
+
         $settings_title = $settings->get_title();
         $settings_description = $settings->get_description();
         $settings->assembly();

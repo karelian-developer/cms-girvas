@@ -170,6 +170,22 @@ if ($system_core->client->is_logged(2)) {
             }
           }
 
+          foreach ($_PATCH as $name => $value) {
+            if (preg_match('/^entry_additional_field_([a-z0-9_]+)$/', $name, $matches, PREG_OFFSET_CAPTURE)) {
+              if (!isset($entry_data['metadata']['additionalFields'])) $entry_data['metadata']['additionalFields'] = [];
+              
+              $field_name = $matches[1][0];
+              $field_name_transformed = '';
+  
+              $field_name_parts = explode('_', $field_name);
+              for ($i = 0; $i < count($field_name_parts); $i++) {
+                $field_name_transformed .= ($i > 0) ? ucfirst($field_name_parts[$i]) : $field_name_parts[$i];
+              }
+  
+              $entry_data['metadata']['additionalFields'][$field_name_transformed] = htmlspecialchars(str_replace('\'', '"', $value));
+            }
+          }
+
           $entry_is_published = isset($entry_data['metadata']['is_published']) ? $entry_data['metadata']['is_published'] : 0;
 
           // Если происходит публикация записи, то необходимо удостовериться, что

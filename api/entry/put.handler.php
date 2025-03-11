@@ -144,14 +144,33 @@ if ($system_core->client->is_logged(2)) {
         }
       }
 
+      foreach ($_PUT as $key => $value) {
+        if (preg_match('/^entry\_additional\_field\_([a-z0-9\_]+)$/i', $key, $key_matches, PREG_OFFSET_CAPTURE) && !empty($value)) {
+          if (!isset($entry_data)) $entry_data = [];
+          if (!isset($entry_data['metadata'])) $entry_data['metadata'] = [];
+          if (!isset($entry_data['metadata']['additionalFields'])) $entry_data['metadata']['additionalFields'] = [];
+          
+          $value_name_parts = explode('_', $key_matches[1][0]);
+          foreach ($value_name_parts as $part_index => $part) {
+            if ($part_index > 0) {
+              $value_name_parts[$part_index] = ucfirst($part);
+            }
+          }
+  
+          if (is_bool($value)) $value = (int)$value;
+  
+          $entry_data['metadata']['additionalFields'][implode($value_name_parts)] = htmlspecialchars(str_replace('\'', '"', $value));
+        }
+      }
+
       $client_session = $system_core->client->get_session(2, ['user_id']);
       $entry = Entry::create($system_core, $entry_name, $client_session->get_user_id(), 1, $texts);
       if (!is_null($entry)) {
         $entry->init_data(['texts']);
 
         // Обновление дополнительной информации
-        $entry_additional_data['category_id'] = $entry_category_id;
-        $entry->update($entry_additional_data);
+        $entry_data['category_id'] = $entry_category_id;
+        $entry->update($entry_data);
 
         $sc_report = \core\PHPLibrary\SystemCore\Report::create($system_core, \core\PHPLibrary\SystemCore\Report::REPORT_TYPE_ID_AP_ENTRY_CREATED, [
           'clientIP' => $system_core->client->get_ip_address(),

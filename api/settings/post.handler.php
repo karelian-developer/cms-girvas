@@ -22,7 +22,13 @@ if ($system_core->client->is_logged(2)) {
   if ($client_user_group->permission_check($client_user_group::PERMISSION_ADMIN_SETTINGS_MANAGEMENT)) {
     if (!empty($_POST)) {
 
+      /** @var int Количество пользовательских полей для пользователей */
       $users_additional_fields_count = 0;
+      /** @var int Количество пользовательских полей для записей */
+      $entries_additional_fields_count = 0;
+      /** @var int Количество пользовательских полей для статических страниц */
+      $static_pages_additional_fields_count = 0;
+      /** @var bool Статус обнаружения ошибок */
       $error_is_detected = false;
 
       if (!$error_is_detected) {
@@ -149,6 +155,102 @@ if ($system_core->client->is_logged(2)) {
               }
             }
 
+            if ($setting_name == 'entries_additional_field_title' && isset($_POST['_entries_additional_fields_locale'])) {
+              if ($system_core->configurator->exists_database_entry_value($setting_name)) {
+                $fields_titles = json_decode($system_core->configurator->get_database_entry_value($setting_name), true);
+                
+                foreach ($setting_value as $key => $value) {
+                  $fields_titles[$_POST['_entries_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                }
+
+                $setting_value = $fields_titles;
+              } else {
+                $fields_titles = [];
+                foreach ($setting_value as $key => $value) {
+                  $fields_titles[$_POST['_entries_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                }
+
+                $setting_value = $fields_titles;
+              }
+
+              $entries_additional_fields_count += 1;
+            }
+
+            if ($setting_name == 'entries_additional_field_description' && isset($_POST['_entries_additional_fields_locale'])) {
+              if ($system_core->configurator->exists_database_entry_value($setting_name)) {
+                $fields_descriptions = json_decode($system_core->configurator->get_database_entry_value($setting_name), true);
+                
+                foreach ($setting_value as $key => $value) {
+                  $fields_descriptions[$_POST['_entries_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                }
+
+                $setting_value = $fields_descriptions;
+              } else {
+                $fields_descriptions = [];
+                foreach ($setting_value as $key => $value) {
+                  $fields_descriptions[$_POST['_entries_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                }
+                
+                $setting_value = $fields_descriptions;
+              }
+
+              $entries_additional_fields_count += 1;
+            }
+
+            if ($setting_name == 'entries_additional_field_type' || $setting_name == 'entries_additional_field_name') {
+              foreach ($setting_value as $key => $value) {
+                $setting_value[$key] = htmlspecialchars(str_replace('\'', '"', $value));
+              }
+            }
+
+            if ($setting_name == 'static_pages_additional_field_title' && isset($_POST['_static_pages_additional_fields_locale'])) {
+              if ($system_core->configurator->exists_database_entry_value($setting_name)) {
+                $fields_titles = json_decode($system_core->configurator->get_database_entry_value($setting_name), true);
+                
+                foreach ($setting_value as $key => $value) {
+                  $fields_titles[$_POST['_static_pages_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                }
+
+                $setting_value = $fields_titles;
+              } else {
+                $fields_titles = [];
+                foreach ($setting_value as $key => $value) {
+                  $fields_titles[$_POST['_static_pages_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                }
+
+                $setting_value = $fields_titles;
+              }
+
+              $static_pages_additional_fields_count += 1;
+            }
+
+            if ($setting_name == 'static_pages_additional_field_description' && isset($_POST['_static_pages_additional_fields_locale'])) {
+              if ($system_core->configurator->exists_database_entry_value($setting_name)) {
+                $fields_descriptions = json_decode($system_core->configurator->get_database_entry_value($setting_name), true);
+                
+                foreach ($setting_value as $key => $value) {
+                  $fields_descriptions[$_POST['_static_pages_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                }
+
+                $setting_value = $fields_descriptions;
+              } else {
+                $fields_descriptions = [];
+                foreach ($setting_value as $key => $value) {
+                  $fields_descriptions[$_POST['_static_pages_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                }
+                
+                $setting_value = $fields_descriptions;
+              }
+
+              $static_pages_additional_fields_count += 1;
+            }
+
+            if ($setting_name == 'static_pages_additional_field_type' || $setting_name == 'static_pages_additional_field_name') {
+              foreach ($setting_value as $key => $value) {
+                $setting_value[$key] = htmlspecialchars(str_replace('\'', '"', $value));
+              }
+            }
+
             if (is_array($setting_value)) $setting_value = json_encode($setting_value);
 
             switch ($setting_name) {
@@ -161,6 +263,14 @@ if ($system_core->client->is_logged(2)) {
               case 'users_additional_field_description': $setting_value = $setting_value; break;
               case 'users_additional_field_type': $setting_value = $setting_value; break;
               case 'users_additional_field_name': $setting_value = $setting_value; break;
+              case 'entries_additional_field_title': $setting_value = $setting_value; break;
+              case 'entries_additional_field_description': $setting_value = $setting_value; break;
+              case 'entries_additional_field_type': $setting_value = $setting_value; break;
+              case 'entries_additional_field_name': $setting_value = $setting_value; break;
+              case 'static_pages_additional_field_title': $setting_value = $setting_value; break;
+              case 'static_pages_additional_field_description': $setting_value = $setting_value; break;
+              case 'static_pages_additional_field_type': $setting_value = $setting_value; break;
+              case 'static_pages_additional_field_name': $setting_value = $setting_value; break;
               default: $setting_value = htmlspecialchars(str_replace('\'', '"', $setting_value));
             }
 
@@ -175,6 +285,22 @@ if ($system_core->client->is_logged(2)) {
         if ($users_additional_fields_count == 0 && isset($_POST['_users_additional_fields_locale'])) {
           foreach (['users_additional_field_title', 'users_additional_field_description', 'users_additional_field_name', 'users_additional_field_type'] as $index => $name) {
             if ($system_core->configurator->exists_database_entry_value('users_additional_field_title')) {
+              $system_core->configurator->update_database_entry_value($name, json_encode([]));
+            }
+          }
+        }
+
+        if ($entries_additional_fields_count == 0 && isset($_POST['_entries_additional_fields_locale'])) {
+          foreach (['entries_additional_field_title', 'entries_additional_field_description', 'entries_additional_field_name', 'entries_additional_field_type'] as $index => $name) {
+            if ($system_core->configurator->exists_database_entry_value('entries_additional_field_title')) {
+              $system_core->configurator->update_database_entry_value($name, json_encode([]));
+            }
+          }
+        }
+
+        if ($static_pages_additional_fields_count == 0 && isset($_POST['_static_pages_additional_fields_locale'])) {
+          foreach (['static_pages_additional_field_title', 'static_pages_additional_field_description', 'static_pages_additional_field_name', 'static_pages_additional_field_type'] as $index => $name) {
+            if ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_title')) {
               $system_core->configurator->update_database_entry_value($name, json_encode([]));
             }
           }

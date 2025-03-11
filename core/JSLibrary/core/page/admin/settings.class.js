@@ -315,6 +315,172 @@ export class PageSettings {
         tableAdditionalFieldsButtonContainer.append(buttons.addField.target.element);
       }
 
+      if (searchParams.getPathPart(3) == 'entries') {
+        let buttons = {addField: null};
+
+        let interactiveChoicesFieldsLocale = new Interactive('choices');
+
+        interactiveChoicesFieldsLocale.target.setName('_entries_additional_fields_locale');
+
+        let tableAdditionalFields = document.querySelector('[role="table-additional-fields"]');
+        let tableAdditionalFieldsButtonContainer = document.querySelector('[role="add-field"]');
+        
+        buttons.addField = new Interactive('button');
+        buttons.addField.target.setLabel(localeData.BUTTON_NEW_FIELD_LABEL);
+        buttons.addField.target.setCallback((event) => {
+          event.preventDefault();
+
+          this.addEntriesAdditionalField(localeData, tableAdditionalFieldsButtonContainer);
+        });
+        buttons.addField.assembly();
+
+        locales.forEach((locale, localeIndex) => {
+          let localeIconImageElement = document.createElement('img');
+          let localeLabelElement = document.createElement('span');
+          let localeTemplate = document.createElement('template');
+
+          localeIconImageElement.setAttribute('src', locale.iconURL);
+          localeIconImageElement.setAttribute('alt', locale.title);
+
+          localeLabelElement.innerText = locale.title;
+          localeTemplate.innerHTML += localeIconImageElement.outerHTML;
+          localeTemplate.innerHTML += localeLabelElement.outerHTML;
+
+          interactiveChoicesFieldsLocale.target.addItem(localeTemplate.innerHTML, locale.name);
+
+          if (locale.name === window.CMSCore.locales.admin.name) {
+            interactiveChoicesFieldsLocale.target.setItemSelectedIndex(localeIndex);
+          }
+        });
+
+        interactiveChoicesFieldsLocale.assembly();
+        
+        let interactiveChoicesFieldsLocaleSelectElement = interactiveChoicesFieldsLocale.target.element.querySelector('select');
+        interactiveChoicesFieldsLocaleSelectElement.addEventListener('change', (event) => {
+          fetch('/handler/entries/additional-fields?locale=' + interactiveChoicesFieldsLocaleSelectElement.value + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
+            return (response.ok) ? response.json() : Promise.reject(response);
+          }).then((data1) => {
+            let additionalFields = document.querySelectorAll('[role="additional-field"]');
+            additionalFields.forEach((element) => {
+              element.remove();
+            })
+
+            let fields = data1.outputData.additionalFields;
+            fields.forEach((field) => {
+              this.addEntriesAdditionalField(localeData, tableAdditionalFieldsButtonContainer, {
+                type: field.type,
+                title: field.title,
+                description: field.description,
+                name: field.name
+              });
+            });
+          });
+        });
+
+        let profileAdditionalFieldsLocaleContainer = document.querySelector('[role="additional-fields-locale"]');
+        profileAdditionalFieldsLocaleContainer.append(interactiveChoicesFieldsLocale.target.element);
+
+        // Получаем все установленные языковые пакеты
+        fetch('/handler/entries/additional-fields?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
+          return (response.ok) ? response.json() : Promise.reject(response);
+        }).then((data) => {
+          let fields = data.outputData.additionalFields;
+          fields.forEach((field) => {
+            this.addEntriesAdditionalField(localeData, tableAdditionalFieldsButtonContainer, {
+              type: field.type,
+              title: field.title,
+              description: field.description,
+              name: field.name
+            });
+          });
+        });
+
+        tableAdditionalFieldsButtonContainer.append(buttons.addField.target.element);
+      }
+
+      if (searchParams.getPathPart(3) == 'pages') {
+        let buttons = {addField: null};
+
+        let interactiveChoicesFieldsLocale = new Interactive('choices');
+
+        interactiveChoicesFieldsLocale.target.setName('_static_pages_additional_fields_locale');
+
+        let tableAdditionalFields = document.querySelector('[role="table-additional-fields"]');
+        let tableAdditionalFieldsButtonContainer = document.querySelector('[role="add-field"]');
+        
+        buttons.addField = new Interactive('button');
+        buttons.addField.target.setLabel(localeData.BUTTON_NEW_FIELD_LABEL);
+        buttons.addField.target.setCallback((event) => {
+          event.preventDefault();
+
+          this.addStaticPagesAdditionalField(localeData, tableAdditionalFieldsButtonContainer);
+        });
+        buttons.addField.assembly();
+
+        locales.forEach((locale, localeIndex) => {
+          let localeIconImageElement = document.createElement('img');
+          let localeLabelElement = document.createElement('span');
+          let localeTemplate = document.createElement('template');
+
+          localeIconImageElement.setAttribute('src', locale.iconURL);
+          localeIconImageElement.setAttribute('alt', locale.title);
+
+          localeLabelElement.innerText = locale.title;
+          localeTemplate.innerHTML += localeIconImageElement.outerHTML;
+          localeTemplate.innerHTML += localeLabelElement.outerHTML;
+
+          interactiveChoicesFieldsLocale.target.addItem(localeTemplate.innerHTML, locale.name);
+
+          if (locale.name === window.CMSCore.locales.admin.name) {
+            interactiveChoicesFieldsLocale.target.setItemSelectedIndex(localeIndex);
+          }
+        });
+
+        interactiveChoicesFieldsLocale.assembly();
+        
+        let interactiveChoicesFieldsLocaleSelectElement = interactiveChoicesFieldsLocale.target.element.querySelector('select');
+        interactiveChoicesFieldsLocaleSelectElement.addEventListener('change', (event) => {
+          fetch('/handler/pages/additional-fields?locale=' + interactiveChoicesFieldsLocaleSelectElement.value + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
+            return (response.ok) ? response.json() : Promise.reject(response);
+          }).then((data1) => {
+            let additionalFields = document.querySelectorAll('[role="additional-field"]');
+            additionalFields.forEach((element) => {
+              element.remove();
+            })
+
+            let fields = data1.outputData.additionalFields;
+            fields.forEach((field) => {
+              this.addStaticPagesAdditionalField(localeData, tableAdditionalFieldsButtonContainer, {
+                type: field.type,
+                title: field.title,
+                description: field.description,
+                name: field.name
+              });
+            });
+          });
+        });
+
+        let profileAdditionalFieldsLocaleContainer = document.querySelector('[role="additional-fields-locale"]');
+        profileAdditionalFieldsLocaleContainer.append(interactiveChoicesFieldsLocale.target.element);
+
+        // Получаем все установленные языковые пакеты
+        fetch('/handler/pages/additional-fields?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
+          return (response.ok) ? response.json() : Promise.reject(response);
+        }).then((data) => {
+          let fields = data.outputData.additionalFields;
+          fields.forEach((field) => {
+            this.addStaticPagesAdditionalField(localeData, tableAdditionalFieldsButtonContainer, {
+              type: field.type,
+              title: field.title,
+              description: field.description,
+              name: field.name
+            });
+          });
+        });
+
+        tableAdditionalFieldsButtonContainer.append(buttons.addField.target.element);
+      }
+
       this.buttons.save = new Interactive('button');
       this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
       this.buttons.save.target.setCallback((event) => {
@@ -402,6 +568,188 @@ export class PageSettings {
     interactiveChoicesTypeField.target.addItem('Date', 'date');
     interactiveChoicesTypeField.target.addItem('Text', 'textarea');
     interactiveChoicesTypeField.target.setName('setting_users_additional_field_type[]');
+
+    if (typeof data.type != 'undefined') {
+      switch (data.type) {
+        case 'text': interactiveChoicesTypeField.target.setItemSelectedIndex(0); break;
+        case 'number': interactiveChoicesTypeField.target.setItemSelectedIndex(1); break;
+        case 'date': interactiveChoicesTypeField.target.setItemSelectedIndex(2); break;
+        case 'textarea': interactiveChoicesTypeField.target.setItemSelectedIndex(3); break;
+        default: interactiveChoicesTypeField.target.setItemSelectedIndex(0);
+      }
+    }
+
+    let buttons = {delete: null};
+    buttons.delete = new Interactive('button');
+    buttons.delete.target.setLabel(PageSettings.buttonIcons.trash);
+    buttons.delete.target.setCallback((event) => {
+      event.preventDefault();
+      tableRow.remove();
+    });
+
+    buttons.delete.assembly();
+
+    interactiveChoicesTypeField.assembly();
+
+    if (typeof data.title != 'undefined') {
+      additionalFieldInputTitle.value = data.title;
+    }
+
+    if (typeof data.name != 'undefined') {
+      additionalFieldInputName.value = data.name;
+    }
+
+    if (typeof data.description != 'undefined') {
+      additionalFieldInputDescription.innerText = data.description;
+    }
+
+    tableCellTypeField.append(interactiveChoicesTypeField.target.element);
+    tableCellTitleField.append(additionalFieldInputTitle);
+    tableCellNameField.append(additionalFieldInputName);
+    tableCellDescriptionField.append(additionalFieldInputDescription);
+    tableCellEventField.append(buttons.delete.target.element);
+
+    tableRow.append(tableCellTypeField);
+    tableRow.append(tableCellTitleField);
+    tableRow.append(tableCellNameField);
+    tableRow.append(tableCellDescriptionField);
+    tableRow.append(tableCellEventField);
+
+    container.parentElement.before(tableRow);
+  }
+
+  addEntriesAdditionalField(localeData, container, data = {}) {
+    let tableRow = document.createElement('tr');
+    let tableCellTypeField = document.createElement('td');
+    let tableCellTitleField = document.createElement('td');
+    let tableCellNameField = document.createElement('td');
+    let tableCellDescriptionField = document.createElement('td');
+    let tableCellEventField = document.createElement('td');
+    let additionalFieldInputTitle = document.createElement('input');
+    let additionalFieldInputName = document.createElement('input');
+    let additionalFieldInputDescription = document.createElement('textarea');
+    
+    tableRow.setAttribute('role', 'additional-field');
+    additionalFieldInputTitle.setAttribute('type', 'text');
+    additionalFieldInputTitle.setAttribute('name', 'setting_entries_additional_field_title[]');
+    additionalFieldInputTitle.setAttribute('placeholder', 'My field');
+    additionalFieldInputTitle.setAttribute('required', 'required');
+    additionalFieldInputName.setAttribute('pattern', '[a-z0-9_]+');
+    additionalFieldInputName.setAttribute('type', 'text');
+    additionalFieldInputName.setAttribute('name', 'setting_entries_additional_field_name[]');
+    additionalFieldInputName.setAttribute('placeholder', 'my_field');
+    additionalFieldInputName.setAttribute('required', 'required');
+    additionalFieldInputDescription.setAttribute('name', 'setting_entries_additional_field_description[]');
+    additionalFieldInputDescription.setAttribute('placeholder', localeData.SETTINGS_PAGE_SETTING_USERS_ADDITIONAL_FIELD_DESCRIPTION_PLACEHOLDER);
+    
+    tableRow.classList.add('table__row');
+    tableCellTypeField.classList.add('table__cell');
+    tableCellTitleField.classList.add('table__cell');
+    tableCellNameField.classList.add('table__cell');
+    tableCellDescriptionField.classList.add('table__cell');
+    additionalFieldInputTitle.classList.add('form__input');
+    additionalFieldInputTitle.classList.add('form__input_text');
+    additionalFieldInputName.classList.add('form__input');
+    additionalFieldInputName.classList.add('form__input_text');
+    additionalFieldInputDescription.classList.add('form__textarea');
+
+    let interactiveChoicesTypeField = new Interactive('choices');
+    interactiveChoicesTypeField.target.addItem('String', 'text');
+    interactiveChoicesTypeField.target.addItem('Number', 'number');
+    interactiveChoicesTypeField.target.addItem('Date', 'date');
+    interactiveChoicesTypeField.target.addItem('Text', 'textarea');
+    interactiveChoicesTypeField.target.setName('setting_entries_additional_field_type[]');
+
+    if (typeof data.type != 'undefined') {
+      switch (data.type) {
+        case 'text': interactiveChoicesTypeField.target.setItemSelectedIndex(0); break;
+        case 'number': interactiveChoicesTypeField.target.setItemSelectedIndex(1); break;
+        case 'date': interactiveChoicesTypeField.target.setItemSelectedIndex(2); break;
+        case 'textarea': interactiveChoicesTypeField.target.setItemSelectedIndex(3); break;
+        default: interactiveChoicesTypeField.target.setItemSelectedIndex(0);
+      }
+    }
+
+    let buttons = {delete: null};
+    buttons.delete = new Interactive('button');
+    buttons.delete.target.setLabel(PageSettings.buttonIcons.trash);
+    buttons.delete.target.setCallback((event) => {
+      event.preventDefault();
+      tableRow.remove();
+    });
+
+    buttons.delete.assembly();
+
+    interactiveChoicesTypeField.assembly();
+
+    if (typeof data.title != 'undefined') {
+      additionalFieldInputTitle.value = data.title;
+    }
+
+    if (typeof data.name != 'undefined') {
+      additionalFieldInputName.value = data.name;
+    }
+
+    if (typeof data.description != 'undefined') {
+      additionalFieldInputDescription.innerText = data.description;
+    }
+
+    tableCellTypeField.append(interactiveChoicesTypeField.target.element);
+    tableCellTitleField.append(additionalFieldInputTitle);
+    tableCellNameField.append(additionalFieldInputName);
+    tableCellDescriptionField.append(additionalFieldInputDescription);
+    tableCellEventField.append(buttons.delete.target.element);
+
+    tableRow.append(tableCellTypeField);
+    tableRow.append(tableCellTitleField);
+    tableRow.append(tableCellNameField);
+    tableRow.append(tableCellDescriptionField);
+    tableRow.append(tableCellEventField);
+
+    container.parentElement.before(tableRow);
+  }
+
+  addStaticPagesAdditionalField(localeData, container, data = {}) {
+    let tableRow = document.createElement('tr');
+    let tableCellTypeField = document.createElement('td');
+    let tableCellTitleField = document.createElement('td');
+    let tableCellNameField = document.createElement('td');
+    let tableCellDescriptionField = document.createElement('td');
+    let tableCellEventField = document.createElement('td');
+    let additionalFieldInputTitle = document.createElement('input');
+    let additionalFieldInputName = document.createElement('input');
+    let additionalFieldInputDescription = document.createElement('textarea');
+    
+    tableRow.setAttribute('role', 'additional-field');
+    additionalFieldInputTitle.setAttribute('type', 'text');
+    additionalFieldInputTitle.setAttribute('name', 'setting_static_pages_additional_field_title[]');
+    additionalFieldInputTitle.setAttribute('placeholder', 'My field');
+    additionalFieldInputTitle.setAttribute('required', 'required');
+    additionalFieldInputName.setAttribute('pattern', '[a-z0-9_]+');
+    additionalFieldInputName.setAttribute('type', 'text');
+    additionalFieldInputName.setAttribute('name', 'setting_static_pages_additional_field_name[]');
+    additionalFieldInputName.setAttribute('placeholder', 'my_field');
+    additionalFieldInputName.setAttribute('required', 'required');
+    additionalFieldInputDescription.setAttribute('name', 'setting_static_pages_additional_field_description[]');
+    additionalFieldInputDescription.setAttribute('placeholder', localeData.SETTINGS_PAGE_SETTING_USERS_ADDITIONAL_FIELD_DESCRIPTION_PLACEHOLDER);
+    
+    tableRow.classList.add('table__row');
+    tableCellTypeField.classList.add('table__cell');
+    tableCellTitleField.classList.add('table__cell');
+    tableCellNameField.classList.add('table__cell');
+    tableCellDescriptionField.classList.add('table__cell');
+    additionalFieldInputTitle.classList.add('form__input');
+    additionalFieldInputTitle.classList.add('form__input_text');
+    additionalFieldInputName.classList.add('form__input');
+    additionalFieldInputName.classList.add('form__input_text');
+    additionalFieldInputDescription.classList.add('form__textarea');
+
+    let interactiveChoicesTypeField = new Interactive('choices');
+    interactiveChoicesTypeField.target.addItem('String', 'text');
+    interactiveChoicesTypeField.target.addItem('Number', 'number');
+    interactiveChoicesTypeField.target.addItem('Date', 'date');
+    interactiveChoicesTypeField.target.addItem('Text', 'textarea');
+    interactiveChoicesTypeField.target.setName('setting_static_pages_additional_field_type[]');
 
     if (typeof data.type != 'undefined') {
       switch (data.type) {

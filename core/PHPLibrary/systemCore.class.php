@@ -46,7 +46,7 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.28 Альфа';
+    public const CMS_VERSION = '0.1.29 Альфа';
     public const CMS_DEVELOPER_TITLE = 'Garbalo (IE SHESTAKOV A.R.)';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
     public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
@@ -655,10 +655,10 @@ namespace core\PHPLibrary {
         // parse uploaded files
         if (strpos($block, 'application/octet-stream') !== false) {
           // match "name", then everything after "stream" (optional) except for prepending newlines 
-          preg_match('/name=\"([^\"]*)\".*stream[\n|\r]+([^\n\r].*)?$/s', $block, $matches);
+          preg_match('/name=\"([^\"]*)\".*stream[\n|\r]+(.*)?$/s', $block, $matches);
         } else {
           // match "name" and optional value in between newline sequences
-          preg_match('/name=\"([^\"]*)\"[\n|\r]+([^\n\r].*)?\r$/s', $block, $matches);
+          preg_match('/name=\"([^\"]*)\"[\n|\r]+(.*)?\r$/s', $block, $matches);
         }
 
         if (isset($matches[2])) {

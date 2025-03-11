@@ -16,22 +16,26 @@ if (!defined('IS_NOT_HACKED')) {
 if ($system_core->client->is_logged(2)) {
   $handler_output_data['dom'] = [];
 
+  /** @var string */
   $media_files_path = sprintf('%s/uploads/media', $system_core->get_cms_path());
+  /** @var array */
   $media_files = array_diff(scandir($media_files_path), ['.', '..']);
-
-  $files = [];
+  /** @var array */
+  $files_data = [];
 
   foreach ($media_files as $file) {
+    /** @var string */
     $file_path = sprintf('%s/%s', $media_files_path, $file);
+    /** @var string */
     $file_url = $file;
     
-    array_push($files, [
+    array_push($files_data, [
       'file_url' => $file_url,
       'created_unix_timestamp' => filemtime($file_path)
     ]);
   }
 
-  usort($files, function($a, $b) {
+  usort($files_data, function($a, $b) {
     if ($a['created_unix_timestamp'] == $b['created_unix_timestamp']) {
       return 0;
     }
@@ -39,15 +43,13 @@ if ($system_core->client->is_logged(2)) {
     return ($a['created_unix_timestamp'] > $b['created_unix_timestamp']) ? -1 : 1;
   });
 
-  $media_files = [];
-  foreach ($files as $file) {
-    error_log(date('Y-m-d H:i:s', $file['created_unix_timestamp']));
-    array_push($media_files, $file['file_url']);
+  $media_files_sorted = [];
+  foreach ($files_data as $file_data) {
+    array_push($media_files_sorted, $file_data['file_url']);
   }
 
   $media_files_transformed = [];
-
-  foreach ($media_files as $media_file) {
+  foreach ($media_files_sorted as $media_file) {
     array_push($media_files_transformed, sprintf('/uploads/media/%s', $media_file));
   }
 

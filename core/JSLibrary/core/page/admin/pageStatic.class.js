@@ -159,7 +159,7 @@ export class PagePageStatic {
       this.buttons.viewOnSite.assembly();
 
       this.buttons.save = new Interactive('button');
-      this.buttons.save.target.setLabel('Сохранить');
+      this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
       this.buttons.save.target.setCallback((event) => {
         event.preventDefault();
         
@@ -168,6 +168,14 @@ export class PagePageStatic {
 
         if (form.target.checkRequiredFields()) {
           let formData = new FormData(elementForm);
+          
+          let additionalDataContainerElement = document.querySelector('[role="additional-data"]');
+          if (additionalDataContainerElement != null) {
+            let additionalDataInputs = additionalDataContainerElement.querySelectorAll('input');
+            additionalDataInputs.forEach((element) => {
+              formData.append(element.name, element.value);
+            });
+          }
 
           let request = new Interactive('request', {
             method: (searchParams.getPathPart(3) == null) ? 'PUT' : 'PATCH',
