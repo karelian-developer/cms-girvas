@@ -16,6 +16,10 @@
   width: 150px;
 }
 
+.interactive .interactive__select-imitation.select-imitation_is-disclosed {
+  flex-direction: column;
+}
+
 .interactive .interactive__select-imitation .select-imitation__selected-item-container {
   box-sizing: border-box;
   flex-grow: 1;
@@ -57,6 +61,12 @@
   transition: opacity .2s;
 }
 
+.interactive .interactive__select-imitation.select-imitation_is-disclosed .select-imitation__droped-list {
+  position: unset;
+  height: unset;
+  opacity: unset;
+}
+
 .interactive .interactive__select-imitation .select-imitation__droped-list.droped-list_is-showed {
   height: auto;
   opacity: 1;
@@ -72,6 +82,10 @@
   font-size: 14px;
   padding: 10px;
   cursor: pointer;
+}
+
+.interactive .interactive__select-imitation.select-imitation_is-disclosed .droped-list__item.item_is-selected {
+  background-color: #EAEAEA;
 }
 
 .interactive .interactive__select-imitation .droped-list__item:hover {
@@ -94,6 +108,67 @@
 .interactive .interactive__select-imitation .droped-list__item img,
 .interactive .interactive__select-imitation .select-imitation__selected-item img {
   margin-right: 10px;
+}
+
+.interactive .interactive__data-searcher {
+  position: relative;
+  width: fit-content;
+}
+
+.interactive .interactive__data-searcher .data-searcher__input {
+  box-sizing: border-box;
+  font-size: 14px;
+  border-width: 1px;
+  border-style: solid;
+  outline: 0;
+  padding: 10px;
+  transition: background-color .2s, border-color .2s;
+}
+
+.interactive .interactive__data-searcher .data-searcher__inputt {
+  background-color: var(--primary-color-4);
+  border-color: var(--primary-color-2);
+}
+
+.interactive .interactive__data-searcher .data-searcher__input:hover {
+  border-color: var(--primary-color-1);
+}
+
+.interactive .interactive__data-searcher .data-searcher__input:focus {
+  border-color: var(--primary-color-1);
+}
+
+.interactive .interactive__data-searcher .data-searcher__input:active {
+  border-color: var(--primary-color-1);
+}
+
+.interactive .interactive__data-searcher .data-searcher__options-list {
+  position: absolute;
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  border-left: 1px solid var(--primary-color-3);
+  border-right: 1px solid var(--primary-color-3);
+  width: 100%;
+  max-height: 190px;
+  top: 100%;
+  z-index: 1;
+  overflow-y: scroll;
+}
+
+.interactive .interactive__data-searcher .data-searcher__options-list > .item {
+  box-sizing: border-box;
+  background-color: #FFFFFF;
+  font-size: 14px;
+  border-bottom: 1px solid var(--primary-color-3);
+  padding: 10px;
+}
+
+.interactive .interactive__data-searcher .data-searcher__options-list > .item > .label {
+  word-break: break-all;
 }
 
 .interactive .interactive__button {

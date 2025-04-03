@@ -46,8 +46,8 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.29 Альфа';
-    public const CMS_DEVELOPER_TITLE = 'Garbalo (IE SHESTAKOV A.R.)';
+    public const CMS_VERSION = '0.1.30 Альфа';
+    public const CMS_DEVELOPER_TITLE = 'Карельский разработчик (IE SHESTAKOV A.R.)';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
     public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
     public string $scp_scripts_hash, $scp_styles_hash;
@@ -321,7 +321,7 @@ namespace core\PHPLibrary {
       $this->configurator = new SystemCoreConfigurator($this);
 
       // Подключение к базе данных
-      if ($this->urlp->get_path(0) != 'install' && $this->urlp->get_path(1) != 'install') {
+      if ($this->urlp->get_path(0) != 'install' && $this->urlp->get_path(1) != 'install' && $this->urlp->get_param('installation-mode') != 'true') {
         /** @var SystemCoreDatabaseConnector Объект подключения к базе данных */
         $this->database_connector = new SystemCoreDatabaseConnector($this, $this->configurator);
       }
@@ -442,16 +442,11 @@ namespace core\PHPLibrary {
       }
 
       if ($this->urlp->get_path(0) != 'handler' && $this->urlp->get_path(0) != 'feed') {
-
         if ($this->urlp->get_path(0) != 'install') {
-          
           $template_base_name = ($this->configurator->exists_database_entry_value('base_template')) ? $this->configurator->get_database_entry_value('base_template') : 'default';
           $cms_base_locale_name = ($this->configurator->exists_database_entry_value('base_locale')) ? $this->configurator->get_database_entry_value('base_locale') : 'en_US';
           $cms_admin_locale_name = ($this->configurator->exists_database_entry_value('base_admin_locale')) ? $this->configurator->get_database_entry_value('base_admin_locale') : 'en_US';
-        
         }
-
-        $install_locale = ($this->urlp->get_param('locale') != null) ? $this->urlp->get_param('locale') : 'ru_RU';
 
         if ($this->urlp->get_path(0) == 'install' && !file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
           $this->set_template(new Template($this, 'default', 'install'));
@@ -468,13 +463,18 @@ namespace core\PHPLibrary {
         $template->init();
         
       } else {
-        if (is_null($this->urlp->get_param('localeMessage'))) {
-          $handler_locale_name = ($this->configurator->exists_database_entry_value('base_locale')) ? $this->configurator->get_database_entry_value('base_locale') : 'en_US';
+        if ($this->urlp->get_path(1) == 'install') {
+          $locale_name = (!is_null($this->urlp->get_param('locale'))) ? $this->urlp->get_param('locale') : 'en_US';
+          $this->locale = new SystemCoreLocale($this, $locale_name, 'handler');
         } else {
-          $handler_locale_name = $this->urlp->get_param('localeMessage');
+          if (is_null($this->urlp->get_param('localeMessage'))) {
+            $locale_name = ($this->configurator->exists_database_entry_value('base_locale')) ? $this->configurator->get_database_entry_value('base_locale') : 'en_US';
+          } else {
+            $locale_name = $this->urlp->get_param('localeMessage');
+          }
         }
-        
-        $this->locale = new SystemCoreLocale($this, $handler_locale_name, 'handler');
+
+        $this->locale = new SystemCoreLocale($this, $locale_name, 'handler');
       }
       
       if (!is_null($template)) {

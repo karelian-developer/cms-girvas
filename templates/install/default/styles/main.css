@@ -31,7 +31,10 @@
 }
 
 .main__page-container {
-  background-color: var(--common-main-color-6);
+  background-image: url('../images/background-bar.png');
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: contain;
   padding-left: 120px;
 }
 
@@ -45,6 +48,24 @@
   min-height: 290px;
 }
 
+.main__page a {
+  background-color: var(--empty);
+  color: var(--common-secondary-color-3);
+  text-decoration: underline;
+  transition: background-color .2s, color .2s;
+}
+
+.main__page a:hover,
+.main__page a:focus {
+  color: var(--common-main-color-5);
+}
+
+.main__page a:active {
+  background-color: var(--common-secondary-color-2);
+  color: var(--common-secondary-color-3);
+}
+
+.main__page > p,
 .main__page .page__phar,
 .main__page .page__list {
   font-size: 14px;

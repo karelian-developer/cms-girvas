@@ -27,12 +27,18 @@
 
 .header__title {
   font-size: 18px;
-  margin: 0;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .header__copyright-container .copyright-container__phar {
   font-size: 14px;
-  margin: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.header__copyright-container .copyright-container__phar:nth-last-child(2) {
+  margin-bottom: 5px;
 }
 
 .header__installer-progress {

@@ -1,0 +1,1 @@
+The installer will **set** the time zone and locale for the system. Select the required options below and apply them.

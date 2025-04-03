@@ -1,0 +1,14 @@
+{
+  "STAGE_ABOUT_ACQUAINTANCE": "markdown/stage/acquaintanceContent.md",
+  "STAGE_COMPATIBILITY_CHECK": "markdown/stage/compatibilityCheck.md",
+  "STAGE_CHECKING_INTEGRITY": "markdown/stage/checkingIntegrity.md",
+  "STAGE_CHECKING_ACCESS_RIGHTS": "markdown/stage/checkingAccessRights.md",
+  "STAGE_CHECKING_PDO_DRIVERS": "markdown/stage/checkingPDODrivers.md",
+  "STAGE_GENERATING_LOCAL_CONFIGURATIONS": "markdown/stage/generatingLocalConfigurations.md",
+  "STAGE_GENERATING_DATABASE_TABLES": "markdown/stage/generatingDatabaseTables.md",
+  "STAGE_CONFIGURING_LOCALIZATION_AND_TIME": "markdown/stage/configuringLocalizationAndTime.md",
+  "STAGE_WEBSITE_METADATA": "markdown/stage/websiteMetadata.md",
+  "STAGE_CREATING_AN_ADMINISTRATOR_ACCOUNT": "markdown/stage/creatingAdministratorAccount.md",
+  "STAGE_GENERATING_A_SECRET_KEY": "markdown/stage/generatingSecretKey.md",
+  "STAGE_FINISHING": "markdown/stage/finishing.md"
+}

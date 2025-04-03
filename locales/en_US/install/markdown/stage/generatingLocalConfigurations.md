@@ -1,0 +1,1 @@
+The current step will allow you to configure **local configurations** of the system. Carefully fill out the form below and follow the prompts for the form fields.

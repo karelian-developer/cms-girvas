@@ -1,0 +1,1 @@
+The installation wizard will generate tables in the database. Click the "Generate tables" button.

@@ -95,11 +95,12 @@ namespace templates\install\default {
       $this->template->add_style(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
       
       $this->template->add_script(['src' => 'interactive.class.js', 'type' => 'module'], true);
-      $this->template->add_script(['src' => 'install/common.js', 'type' => 'module'], true);
 
       $this->template->add_style(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
       $this->template->add_style(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
       $this->template->add_style(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
+
+      $this->template->add_script(['src' => 'core.class.js', 'type' => 'module']);
 
       /** @var string $this->assembled Итоговый шаблон в виде строки */
       $this->assembled = TemplateCollector::assembly($this->assembly_document(), [

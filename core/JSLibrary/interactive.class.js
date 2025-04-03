@@ -18,6 +18,7 @@ import {Form} from './interactive/form.class.js';
 import {Request} from './interactive/request.class.js';
 import {Notification} from './interactive/notification.class.js';
 import {Slider} from './interactive/slider.class.js';
+import {DataSearcher} from './interactive/dataSearcher.class.js';
 
 export class Interactive {
   constructor(interactiveName, interactiveParams = {}) {
@@ -43,16 +44,21 @@ export class Interactive {
       data.data = (Object.hasOwn(interactiveParams, 'data')) ? interactiveParams.data : undefined;
     }
 
+    if (interactiveName == 'choices') {
+      data.isDisclosed = (Object.hasOwn(interactiveParams, 'isDisclosed')) ? interactiveParams.isDisclosed : false;
+    }
+
     switch (interactiveName) {
       case 'button': this.target = new Button(this); break;
       case 'input': this.target = new Input(this); break;
-      case 'choices': this.target = new Choices(this); break;
+      case 'choices': this.target = new Choices(this, data.isDisclosed); break;
       case 'schedule': this.target = new Schedule(this, data.canvasElement, data.type); break;
       case 'form': this.target = new Form(this); break;
       case 'modal': this.target = new Modal(this, data.title, data.content, data.description, data.width); break;
       case 'request': this.target = new Request(this, data.method, data.url, data.data); break;
       case 'notification': this.target = new Notification(this); break;
       case 'slider': this.target = new Slider(this); break;
+      case 'dataSearcher': this.target = new DataSearcher(this); break;
     }
 
     if (typeof(window.CMSCore) != 'undefined') {

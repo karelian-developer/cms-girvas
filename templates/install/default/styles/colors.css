@@ -1,4 +1,5 @@
 :root {
+  --empty: rgba(0, 0, 0, 0);
   --common-main-color-1: #FFFFFF;
   --common-main-color-1--opacity-0-4: rgba(255, 255, 255, .4);
   --common-main-color-1--opacity-0-8: rgba(255, 255, 255, .8);

@@ -18,8 +18,9 @@
  * стилизовать выпадающий список любым способом посредством JavaScript или CSS.
  */
 export class Choices {
-  constructor(interactiveObject) {
+  constructor(interactiveObject, isDisclosed = false) {
     this.interactiveObject = interactiveObject;
+    this.isDisclosed = isDisclosed;
 
     this.element = null;
     this.elementSelect = null;
@@ -90,65 +91,104 @@ export class Choices {
     selectContainerElement.classList.add('interactive__select-imitation');
     selectContainerElement.classList.add('select-imitation');
 
+    if (this.isDisclosed) {
+      selectContainerElement.classList.add('select-imitation_is-disclosed');
+    }
+
     let selectedItemContainerElement = document.createElement('div');
-    selectedItemContainerElement.classList.add('select-imitation__selected-item-container');
+    let selectContainerButton, selectContainerButtonIcon;
 
-    let selectContainerButton = document.createElement('button');
-    selectContainerButton.classList.add('select-imitation__button');
+    if (!this.isDisclosed) {
+      selectedItemContainerElement.classList.add('select-imitation__selected-item-container');
 
-    let selectContainerButtonIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    selectContainerButtonIcon.setAttribute('version', '1.1');
-    selectContainerButtonIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    selectContainerButtonIcon.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
-    selectContainerButtonIcon.setAttribute('x', '0px');
-    selectContainerButtonIcon.setAttribute('y', '0px');
-    selectContainerButtonIcon.setAttribute('viewBox', '0 0 64 64');
-    selectContainerButtonIcon.setAttribute('xml:space', 'preserve');
+      selectContainerButton = document.createElement('button');
+      selectContainerButton.classList.add('select-imitation__button');
 
-    selectContainerButtonIcon.classList.add('select-imitation__button-icon');
+      selectContainerButtonIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      selectContainerButtonIcon.setAttribute('version', '1.1');
+      selectContainerButtonIcon.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      selectContainerButtonIcon.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+      selectContainerButtonIcon.setAttribute('x', '0px');
+      selectContainerButtonIcon.setAttribute('y', '0px');
+      selectContainerButtonIcon.setAttribute('viewBox', '0 0 64 64');
+      selectContainerButtonIcon.setAttribute('xml:space', 'preserve');
+
+      selectContainerButtonIcon.classList.add('select-imitation__button-icon');
+    }
 
     let iconPolygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
     iconPolygon.setAttribute('points', '0,29 32,48 64,29 64,16 32,34.7 0,16');
-
-    selectContainerButtonIcon.append(iconPolygon);
-    selectContainerButton.append(selectContainerButtonIcon);
+    
+    if (!this.isDisclosed) {
+      selectContainerButtonIcon.append(iconPolygon);
+      selectContainerButton.append(selectContainerButtonIcon);
+    }
 
     let dropedListContainerElement = document.createElement('ul');
     dropedListContainerElement.classList.add('select-imitation__droped-list');
     dropedListContainerElement.classList.add('droped-list');
     dropedListContainerElement.classList.add('list-reset');
 
-    selectedItemContainerElement.addEventListener('click', (event) => {
-      event.preventDefault();
-      this.collapseOther();
+    if (!this.isDisclosed) {
+      selectedItemContainerElement.addEventListener('click', (event) => {
+        event.preventDefault();
+        this.collapseOther();
 
-      dropedListContainerElement.classList.toggle('droped-list_is-showed');
-    });
+        dropedListContainerElement.classList.toggle('droped-list_is-showed');
+      });
+    }
 
-    selectContainerButton.addEventListener('click', (event) => {
-      event.preventDefault();
-      this.collapseOther();
+    if (!this.isDisclosed) {
+      selectContainerButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        this.collapseOther();
 
-      dropedListContainerElement.classList.toggle('droped-list_is-showed');
-    });
+        dropedListContainerElement.classList.toggle('droped-list_is-showed');
+      });
+    }
 
     let choicesItems = this.getItems();
     choicesItems.forEach((item, itemIndex) => {
       let isSelected = (itemIndex == this.itemSelectedIndex) ? true : false;
+      if (this.isDisclosed) {
+        isSelected = false;
+      }
 
       if (!isSelected) {
         let dropedListItemContainerElement = document.createElement('li');
         dropedListItemContainerElement.classList.add('droped-list__item');
+        dropedListItemContainerElement.classList.add('item');
+
+        if (this.isDisclosed && itemIndex == 0) {
+          dropedListItemContainerElement.classList.add('item_is-selected');
+        }
+
         dropedListItemContainerElement.setAttribute('data-option-value', item.value);
 
         dropedListItemContainerElement.addEventListener('click', (event) => {
           this.itemSelectedIndex = itemIndex;
           elementSelect.value = item.value;
           elementSelect.dispatchEvent(new Event('change'));
-          selectContainerElement.innerHTML = '';
 
-          let newAssembledInteractive = this.assemblyInteractive(elementSelect);
-          selectContainerElement.replaceWith(newAssembledInteractive);
+          dropedListItemContainerElement.classList.add('item_is-selected');
+          
+          let listItemsOtherElements = dropedListContainerElement.querySelectorAll('li');
+          if (listItemsOtherElements.length > 0) {
+            listItemsOtherElements.forEach((element) => {
+              let itemValue = element.getAttribute('data-option-value');
+
+              if (itemValue != item.value) {
+                element.classList.remove('item_is-selected');
+              }
+            });
+          }
+
+          if (!this.isDisclosed) {
+            selectContainerElement.innerHTML = '';
+
+            let newAssembledInteractive = this.assemblyInteractive(elementSelect);
+            selectContainerElement.replaceWith(newAssembledInteractive);
+          }
         });
 
         dropedListItemContainerElement.innerHTML = item.label;
@@ -164,10 +204,16 @@ export class Choices {
         selectedItemContainerElement.append(selectedItemElement);
       }
     });
- 
-    selectContainerElement.append(selectedItemContainerElement);
+    
+    if (!this.isDisclosed) {
+      selectContainerElement.append(selectedItemContainerElement);
+    }
+
     selectContainerElement.append(dropedListContainerElement);
-    selectContainerElement.append(selectContainerButton);
+
+    if (!this.isDisclosed) {
+      selectContainerElement.append(selectContainerButton);
+    }
 
     return selectContainerElement;
   }

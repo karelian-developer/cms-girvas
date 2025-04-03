@@ -255,6 +255,8 @@ if (defined('IS_NOT_HACKED')) {
   
   // Получить перечень доступных локализаций
   } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'locales') {
+    $locale_selected = $system_core->urlp->get_param('locale');
+
     $handler_output_data['locales'] = [];
     $cms_locales_names = $system_core->get_array_locales_names();
     if (count($cms_locales_names) > 0) {

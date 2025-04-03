@@ -1,0 +1,3 @@
+The installation wizard **analyzed** your system and displayed the following results in the table.
+
+Please note that the table contains **all directories** where the system will **write** additional information, **download** modules and templates, and **save** backup copies. Therefore, you need to make sure that these directories are available. If the directories from the table are missing, they must be created **with write rights** for the user on whose behalf your web server is running.
