@@ -142,7 +142,7 @@ namespace core\PHPLibrary\Page\Admin {
 
           $module_screenshots_files_array = $module->get_screenshots_array();
           if (count($module_screenshots_files_array) > 0) {
-            $module_screenshots_url = $template->get_screenshots_url();
+            $module_screenshots_url = $module->get_screenshots_url();
             foreach ($module_screenshots_files_array as $screenshot_file) {
               array_push($module_screenshots_list_items, TemplateCollector::assembly('<li class="gallery__item"><img class="gallery__item-image" src="{MODULE_SCREENSHOT_URL}"></li>', [
                 'MODULE_SCREENSHOT_URL' => sprintf('%s/%s', $module_screenshots_url, $screenshot_file)
@@ -191,9 +191,9 @@ namespace core\PHPLibrary\Page\Admin {
             /** @var string Заголовок ячейки метаданных */
             $metadata_title = match ($enum_metadata) {
               ModuleEnumMetadata::AUTHOR_NAME => $module->system_core->locale::get_data_value($locale_data, 'PAGE_MODULE_AUTHOR_NAME_LABEL'),
-              ModuleEnumMetadata::AUTHOR_CODE_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_MODULE_AUTHOR_CODE_NAME_LABEL'),
-              ModuleEnumMetadata::AUTHOR_CODE_SERVER_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_MODULE_AUTHOR_CODE_SERVER_NAME_LABEL'),
-              ModuleEnumMetadata::AUTHOR_CODE_CLIENT_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_MODULE_AUTHOR_CODE_CLIENT_NAME_LABEL'),
+              ModuleEnumMetadata::AUTHOR_CODE_NAME => $module->system_core->locale::get_data_value($locale_data, 'PAGE_MODULE_AUTHOR_CODE_NAME_LABEL'),
+              ModuleEnumMetadata::AUTHOR_CODE_SERVER_NAME => $module->system_core->locale::get_data_value($locale_data, 'PAGE_MODULE_AUTHOR_CODE_SERVER_NAME_LABEL'),
+              ModuleEnumMetadata::AUTHOR_CODE_CLIENT_NAME => $module->system_core->locale::get_data_value($locale_data, 'PAGE_MODULE_AUTHOR_CODE_CLIENT_NAME_LABEL'),
               ModuleEnumMetadata::AUTHOR_DESIGNER_NAME => $module->system_core->locale::get_data_value($locale_data, 'PAGE_MODULE_AUTHOR_DESIGNER_NAME_LABEL'),
               ModuleEnumMetadata::AUTHOR_LAYOUT_NAME => $module->system_core->locale::get_data_value($locale_data, 'PAGE_MODULE_AUTHOR_LAYOUT_NAME_LABEL'),
               ModuleEnumMetadata::AUTHOR_SITE_LINK => $module->system_core->locale::get_data_value($locale_data, 'PAGE_MODULE_AUTHOR_SITE_LINK_LABEL'),
