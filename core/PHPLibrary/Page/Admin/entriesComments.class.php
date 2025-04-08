@@ -23,7 +23,7 @@ namespace core\PHPLibrary\Page\Admin {
   class PageEntriesComments implements InterfacePage {
     use TraitPage;
 
-    const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_COMMENTS_NAVIGATION_%s_LABEL';
+    const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_NAVIGATION_%s_LABEL';
 
     public SystemCore $system_core;
     public Page $page;
@@ -56,6 +56,13 @@ namespace core\PHPLibrary\Page\Admin {
         'link' => '/entriesComments',
         'permanent' => true,
         'isActive' => true
+      ],
+      'samples' => [
+        'name' => 'samples',
+        'iconName' => 'entriesSamples',
+        'link' => '/entriesSamples',
+        'permanent' => false,
+        'isActive' => false
       ]
     ];
 

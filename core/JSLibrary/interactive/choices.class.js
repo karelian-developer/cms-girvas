@@ -21,6 +21,7 @@ export class Choices {
   constructor(interactiveObject, isDisclosed = false) {
     this.interactiveObject = interactiveObject;
     this.isDisclosed = isDisclosed;
+    this.isMultiple = false;
 
     this.element = null;
     this.elementSelect = null;
@@ -71,13 +72,15 @@ export class Choices {
   /**
    * Добавить элемент выборки
    * 
-   * @param {any} label 
+   * @param {string} label 
    * @param {any} value 
+   * @param {bool} isSelected
    */
-  addItem(label, value) {
+  addItem(label, value, isSelected = false) {
     this.items.push({
       'label': label,
-      'value': value
+      'value': value,
+      'isSelected': isSelected
     });
   }
 
@@ -159,33 +162,50 @@ export class Choices {
         dropedListItemContainerElement.classList.add('droped-list__item');
         dropedListItemContainerElement.classList.add('item');
 
-        if (this.isDisclosed && itemIndex == 0) {
+        if (this.isDisclosed && item.isSelected) {
           dropedListItemContainerElement.classList.add('item_is-selected');
         }
 
         dropedListItemContainerElement.setAttribute('data-option-value', item.value);
 
         dropedListItemContainerElement.addEventListener('click', (event) => {
-          this.itemSelectedIndex = itemIndex;
-          elementSelect.value = item.value;
+          if (!this.isMultiple) {
+            this.itemSelectedIndex = itemIndex;
+            elementSelect.value = item.value;
+          } else {
+            for (let option of elementSelect.options) {
+              if (option.value == item.value || (event.ctrlKey)) {
+                option.selected = true;
+              } else {
+                if (!event.ctrlKey) {
+                  option.selected = false;
+                }
+              }
+            };
+
+            console.log(elementSelect.options);
+          }
+
           elementSelect.dispatchEvent(new Event('change'));
 
           dropedListItemContainerElement.classList.add('item_is-selected');
           
-          let listItemsOtherElements = dropedListContainerElement.querySelectorAll('li');
-          if (listItemsOtherElements.length > 0) {
-            listItemsOtherElements.forEach((element) => {
-              let itemValue = element.getAttribute('data-option-value');
+          if (!this.isMultiple || (this.isMultiple && !event.ctrlKey)) {
+            let listItemsOtherElements = dropedListContainerElement.querySelectorAll('li');
+            if (listItemsOtherElements.length > 0) {
+              listItemsOtherElements.forEach((element) => {
+                let itemValue = element.getAttribute('data-option-value');
 
-              if (itemValue != item.value) {
-                element.classList.remove('item_is-selected');
-              }
-            });
-          }
+                if (itemValue != item.value) {
+                  element.classList.remove('item_is-selected');
+                }
+              });
+            }
+          } 
 
-          if (!this.isDisclosed) {
+          if ((!this.isDisclosed && this.isMultiple) || (!this.isDisclosed && !this.isMultiple)) {
             selectContainerElement.innerHTML = '';
-
+            
             let newAssembledInteractive = this.assemblyInteractive(elementSelect);
             selectContainerElement.replaceWith(newAssembledInteractive);
           }
@@ -227,6 +247,10 @@ export class Choices {
     let element = document.createElement('select');
     element.classList.add('interactive__select');
     element.style.display = 'none';
+    
+    if (this.isMultiple) {
+      element.setAttribute('multiple', '');
+    }
 
     return element;
   }
@@ -242,7 +266,7 @@ export class Choices {
     let element = document.createElement('option');
 
     if (isSelected && !element.hasAttribute('selected')) {
-      element.setAttribute('selected', 'selected');
+      element.setAttribute('selected', '');
     }
 
     element.setAttribute('value', choicesItem.value);
@@ -259,8 +283,17 @@ export class Choices {
 
     let choicesItemIndex = 0;
     for (let choicesItem of this.getItems()) {
-      let isSelected = (choicesItemIndex == this.itemSelectedIndex) ? true : false;
-      this.elementSelect.append(this.assemblyOption(choicesItem, isSelected));
+      let isSelected;
+      
+      if (this.isMultiple) {
+        isSelected = (choicesItem.isSelected) ? true : false;
+      } else {
+        isSelected = (choicesItemIndex == this.itemSelectedIndex) ? true : false;
+      }
+      
+      let selectOptionElement = this.assemblyOption(choicesItem, isSelected);
+      
+      this.elementSelect.append(selectOptionElement);
 
       choicesItemIndex++;
     }

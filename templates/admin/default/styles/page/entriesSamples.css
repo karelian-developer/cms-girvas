@@ -1,0 +1,45 @@
+/**
+ * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
+ * @copyright   Copyright (c) 2021 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ */
+
+.table-entries-samples__item-buttons-list {
+  display: flex;
+}
+
+.buttons-list__item {
+  margin-right: 10px;
+}
+
+.buttons-list__item:last-child {
+  margin-right: 0;
+}
+
+.table-entries-samples__item-button {
+  display: flex;
+  box-sizing: border-box;
+  background: none;
+  border: 0;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.table-entries-samples__item-button-icon {
+  fill: var(--common-main-color-4);
+  width: 100%;
+  transition: fill .2s;
+}
+
+.table-entries-samples__item-button:hover .table-entries-samples__item-button-icon,
+.table-entries-samples__item-button:focus .table-entries-samples__item-button-icon {
+  fill: var(--common-secondary-color-3);
+}
+
+.table-entries-samples__item-button:active .table-entries-samples__item-button-icon {
+  fill: var(--common-main-color-5);
+}

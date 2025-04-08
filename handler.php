@@ -102,6 +102,14 @@ if (defined('IS_NOT_HACKED')) {
       $api_file_path = sprintf('%s/api/entry.api.php', CMS_ROOT_DIRECTORY);
       include_once($api_file_path);
     }
+  } else if ($system_core->urlp->get_path(1) == 'entries' && $system_core::core_rest_cookie_exists()) {
+    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
+    $client_ip = $system_core->client->get_ip_address();
+
+    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
+      $api_file_path = sprintf('%s/api/entries.api.php', CMS_ROOT_DIRECTORY);
+      include_once($api_file_path);
+    }
   } else if ($system_core->urlp->get_path(1) == 'pageStatic' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();

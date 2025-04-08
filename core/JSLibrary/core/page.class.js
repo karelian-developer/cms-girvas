@@ -16,6 +16,8 @@ import {PageEntries as PageAdminEntries} from './page/admin/entries.class.js';
 import {PageEntriesCategory as PageAdminEntriesCategory} from './page/admin/entriesCategory.class.js';
 import {PageEntriesCategories as PageAdminEntriesCategories} from './page/admin/entriesCategories.class.js';
 import {PageEntriesComments as PageAdminEntriesComments} from './page/admin/entriesComments.class.js';
+import {PageEntriesSample as PageAdminEntriesSample} from './page/admin/entriesSample.class.js';
+import {PageEntriesSamples as PageAdminEntriesSamples} from './page/admin/entriesSamples.class.js';
 import {PagePages as PageAdminPages} from './page/admin/pages.class.js';
 import {PagePageStatic as PageAdminPageStatic} from './page/admin/pageStatic.class.js';
 import {PageMedia as PageAdminMedia} from './page/admin/media.class.js';
@@ -58,6 +60,8 @@ export class Page {
         case 'entriesCategory': this.target = new PageAdminEntriesCategory(this, params); break;
         case 'entriesCategories': this.target = new PageAdminEntriesCategories(this, params); break;
         case 'entriesComments': this.target = new PageAdminEntriesComments(this, params); break;
+        case 'entriesSample': this.target = new PageAdminEntriesSample(this, params); break;
+        case 'entriesSamples': this.target = new PageAdminEntriesSamples(this, params); break;
         case 'pages': this.target = new PageAdminPages(this, params); break;
         case 'pageStatic': this.target = new PageAdminPageStatic(this, params); break;
         case 'media': this.target = new PageAdminMedia(this, params); break;

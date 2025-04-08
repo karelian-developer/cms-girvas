@@ -107,6 +107,8 @@ export class Core {
           if (this.searchParams.getPathPart(2) == 'entriesCategory') this.pages.admin.entriesCategory = new Page(this, 'admin', 'entriesCategory');
           if (this.searchParams.getPathPart(2) == 'entriesCategories') this.pages.admin.entriesCategories = new Page(this, 'admin', 'entriesCategories');
           if (this.searchParams.getPathPart(2) == 'entriesComments') this.pages.admin.entriesComments = new Page(this, 'admin', 'entriesComments');
+          if (this.searchParams.getPathPart(2) == 'entriesSample') this.pages.admin.entriesSample = new Page(this, 'admin', 'entriesSample');
+          if (this.searchParams.getPathPart(2) == 'entriesSamples') this.pages.admin.entriesSamples = new Page(this, 'admin', 'entriesSamples');
           if (this.searchParams.getPathPart(2) == 'pages') this.pages.admin.pages = new Page(this, 'admin', 'pages');
           if (this.searchParams.getPathPart(2) == 'page') this.pages.admin.pageStatic = new Page(this, 'admin', 'pageStatic');
           if (this.searchParams.getPathPart(2) == 'media') this.pages.admin.media = new Page(this, 'admin', 'media');

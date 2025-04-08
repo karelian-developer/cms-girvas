@@ -13,7 +13,7 @@ namespace core\PHPLibrary {
   use \PDOException as PDOException;
 
   #[\AllowDynamicProperties]
-  class EntryCategory {
+  class EntriesSample {
     private readonly SystemCore $system_core;
     private int $id;
 
@@ -80,25 +80,7 @@ namespace core\PHPLibrary {
     }
     
     /**
-     * Получить ID родительской категории
-     *
-     * @return int
-     */
-    public function get_parent_id() : int {
-      return (property_exists($this, 'parent_id')) ? $this->parent_id : 0;
-    }
-    
-    /**
-     * Получить родительскую категории
-     *
-     * @return EntryCategory|null
-     */
-    public function get_parent() : EntryCategory|null {
-      return ($this->get_parent_id() != 0) ? new EntryCategory($this->system_core, $this->get_parent_id()) : null;
-    }
-    
-    /**
-     * Получить заголовок записи
+     * Получить заголовок выборки
      *
      * @param  mixed $locale_name Наименование локализации
      * @return string
@@ -115,23 +97,7 @@ namespace core\PHPLibrary {
     }
 
     /**
-     * Отображается ли категория на стартовой странице
-     *
-     * @return bool
-     */
-    public function is_showed_on_index_page() : bool {
-      if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['isShowedOnIndexPage'])) {
-          return (bool)$metadata_array['isShowedOnIndexPage'];
-        }
-      }
-
-      return true;
-    }
-
-    /**
-     * Получить описание записи
+     * Получить описание выборки
      *
      * @param  mixed $locale_name Наименование локализации
      * @return string
@@ -150,32 +116,125 @@ namespace core\PHPLibrary {
     /**
      * Получить имя
      *
-     * @return void
+     * @return string
      */
-    public function get_name() {
+    public function get_name() : string {
       return (property_exists($this, 'name')) ? $this->name : '';
     }
     
     /**
-     * Получить URL до категории с записями
+     * Получить шаблонную переменную выборки
      *
-     * @return void
+     * @return string
      */
-    public function get_url() {
-      return sprintf('/entries/%s', $this->get_name());
+    public function get_template_var() : string {
+      return sprintf('{ENTRIES_SAMPLE:%s}', strtoupper($this->get_name()));
     }
-    
+
     /**
-     * Получить массив объектов записей
-     *
+     * Получить лимит на записи для выборки
+     * 
+     * @return int
+     */
+    public function get_limit_count() : int {
+      if (property_exists($this, 'metadata')) {
+        $array = json_decode($this->metadata, true);
+
+        if (isset($array['limitCount'])) {
+          return (is_int($array['limitCount'])) ? $array['limitCount'] : 0;
+        }
+      }
+
+      return 0;
+    }
+
+    /**
+     * Получить ID сортировки выборки
+     * 
+     * @return int
+     */
+    public function get_sort_type_id() : int {
+      if (property_exists($this, 'metadata')) {
+        $array = json_decode($this->metadata, true);
+
+        if (isset($array['sortTypeID'])) {
+          return (is_int($array['sortTypeID'])) ? $array['sortTypeID'] : 1;
+        }
+      }
+
+      return 1;
+    }
+
+    /**
+     * Получить массив ID категорий для выборки
+     * 
+     * @return array
+     */
+    public function get_categories_ids() : array {
+      if (property_exists($this, 'metadata')) {
+        $array = json_decode($this->metadata, true);
+
+        if (isset($array['categoriesIDs'])) {
+          return $array['categoriesIDs'];
+        }
+      }
+
+      return [];
+    }
+
+    /**
+     * Получить массив объектов категорий для выборки
+     * 
+     * @return array
+     */
+    public function get_categories() : array {
+      $ids_array = $this->get_categories_ids();
+
+      if (count($ids_array) > 0) {
+        $entries_categories_array = [];
+
+        foreach ($ids_array as $id) {
+          if (EntryCategory::exists_by_id($this->system_core, $id)) {
+            $entries_category = new EntryCategory($this->system_core, $id);
+            array_push($entries_categories_array, $entries_category);
+          }
+        }
+
+        return $entries_categories_array;
+      }
+
+      return [];
+    }
+
+    /**
+     * Получить массив объектов записей для выборки
+     * 
      * @return array
      */
     public function get_entries() : array {
-      return (new Entries($this->system_core))->get_by_category_id($this->id);
+      $entries_categories_array = $this->get_categories();
+
+      if (count($entries_categories_array) > 0) {
+        $entries_array = [];
+
+        foreach ($entries_categories_array as $entries_category) {
+          $entries_category_array = $entries_category->get_entries();
+          
+          if (count($entries_category_array) > 0) {
+            foreach ($entries_category_array as $entry) {
+              array_push($entries_array, $entry);
+            }
+          }
+        }
+        
+        return $entries_array;
+      }
+
+      return [];
     }
     
     /**
-     * Получить данные колонок записи в базе данных
+     * Получить данные колонок в базе данных
      *
      * @param  array $columns
      * @return void
@@ -185,20 +244,20 @@ namespace core\PHPLibrary {
       $query_builder->set_statement_select();
       $query_builder->statement->add_selections($columns);
       $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries_categories');
+      $query_builder->statement->clause_from->add_table('entries_samples');
       $query_builder->statement->clause_from->assembly();
       $query_builder->statement->set_clause_where();
       $query_builder->statement->clause_where->add_condition('id = :id');
       $query_builder->statement->clause_where->assembly();
       $query_builder->statement->assembly();
       
-      /** @var int $entry_id Идентификационный номер записи */
-      $entry_id = $this->get_id();
+      /** @var int $id Идентификационный номер */
+      $id = $this->get_id();
 
       try {
         $database_connection = $this->system_core->database_connector->database->connection;
         $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $entry_id, \PDO::PARAM_INT);
+        $database_query->bindParam(':id', $id, \PDO::PARAM_INT);
         $database_query->execute();
       } catch (PDOException $exception) {
         die(json_encode([
@@ -214,18 +273,18 @@ namespace core\PHPLibrary {
     }
 
     /**
-     * Проверка наличия категории записи по идентификационному номеру
+     * Проверка наличия выборки по идентификационному номеру
      *
      * @param  SystemCore $system_core
-     * @param  int $category_id
+     * @param  int $id
      * @return bool
      */
-    public static function exists_by_id(SystemCore $system_core, int $category_id) : bool {
+    public static function exists_by_id(SystemCore $system_core, int $id) : bool {
       $query_builder = new DatabaseQueryBuilder($system_core);
       $query_builder->set_statement_select();
       $query_builder->statement->add_selections(['1']);
       $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries_categories');
+      $query_builder->statement->clause_from->add_table('entries_samples');
       $query_builder->statement->clause_from->assembly();
       $query_builder->statement->set_clause_where();
       $query_builder->statement->clause_where->add_condition('id = :id');
@@ -236,7 +295,7 @@ namespace core\PHPLibrary {
       try {
         $database_connection = $system_core->database_connector->database->connection;
         $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $category_id, \PDO::PARAM_INT);
+        $database_query->bindParam(':id', $id, \PDO::PARAM_INT);
         $database_query->execute();
       } catch (PDOException $exception) {
         die(json_encode([
@@ -251,18 +310,18 @@ namespace core\PHPLibrary {
     }
 
     /**
-     * Проверка наличия категории записи по имени
+     * Проверка наличия выборки по имени
      *
      * @param  SystemCore $system_core
-     * @param  string $category_name
+     * @param  string $name
      * @return bool
      */
-    public static function exists_by_name(SystemCore $system_core, string $category_name) : bool {
+    public static function exists_by_name(SystemCore $system_core, string $name) : bool {
       $query_builder = new DatabaseQueryBuilder($system_core);
       $query_builder->set_statement_select();
       $query_builder->statement->add_selections(['1']);
       $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries_categories');
+      $query_builder->statement->clause_from->add_table('entries_samples');
       $query_builder->statement->clause_from->assembly();
       $query_builder->statement->set_clause_where();
       $query_builder->statement->clause_where->add_condition('name = :name');
@@ -273,7 +332,7 @@ namespace core\PHPLibrary {
       try {
         $database_connection = $system_core->database_connector->database->connection;
         $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':name', $category_name, \PDO::PARAM_STR);
+        $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
         $database_query->execute();
       } catch (PDOException $exception) {
         die(json_encode([
@@ -291,15 +350,15 @@ namespace core\PHPLibrary {
      * Получить объект категории записи по имени
      *
      * @param  SystemCore $system_core
-     * @param  string $category_name
+     * @param  string $name
      * @return EntryCategory
      */
-    public static function get_by_name(SystemCore $system_core, string $category_name) : EntryCategory|null {
+    public static function get_by_name(SystemCore $system_core, string $name) : EntriesSample|null {
       $query_builder = new DatabaseQueryBuilder($system_core);
       $query_builder->set_statement_select();
       $query_builder->statement->add_selections(['id']);
       $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries_categories');
+      $query_builder->statement->clause_from->add_table('entries_samples');
       $query_builder->statement->clause_from->assembly();
       $query_builder->statement->set_clause_where();
       $query_builder->statement->clause_where->add_condition('name = :name');
@@ -310,7 +369,7 @@ namespace core\PHPLibrary {
       try {
         $database_connection = $system_core->database_connector->database->connection;
         $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':name', $category_name, \PDO::PARAM_STR);
+        $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
         $database_query->execute();
       } catch (PDOException $exception) {
         die(json_encode([
@@ -322,35 +381,33 @@ namespace core\PHPLibrary {
       }
 
       $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-      return ($result) ? new EntryCategory($system_core, (int)$result['id']) : null;
+      return ($result) ? new EntriesSample($system_core, (int)$result['id']) : null;
     }
 
     /**
-     * Создание новой категории записей
+     * Создание новой выборки
      *
      * @param  SystemCore $system_core
      * @param  string $name
-     * @param  int $parent_id
      * @param  array $texts
      * @param  array $metadata
-     * @return EntryCategory|null
+     * @return EntriesSample|null
      */
-    public static function create(SystemCore $system_core, string $name, int $parent_id, array $texts, array $metadata = []) : EntryCategory|null {
+    public static function create(SystemCore $system_core, string $name, array $texts, array $metadata = []) : EntriesSample|null {
       $query_builder = new DatabaseQueryBuilder($system_core);
       $query_builder->set_statement_insert();
-      $query_builder->statement->set_table('entries_categories');
+      $query_builder->statement->set_table('entries_samples');
       $query_builder->statement->add_column('name');
       $query_builder->statement->add_column('texts');
       $query_builder->statement->add_column('metadata');
       $query_builder->statement->add_column('created_unix_timestamp');
       $query_builder->statement->add_column('updated_unix_timestamp');
-      $query_builder->statement->add_column('parent_id');
       $query_builder->statement->set_clause_returning();
       $query_builder->statement->clause_returning->add_column('id');
       $query_builder->statement->assembly();
 
-      $entry_created_unix_timestamp = time();
-      $entry_updated_unix_timestamp = $entry_created_unix_timestamp;
+      $created_unix_timestamp = time();
+      $updated_unix_timestamp = $created_unix_timestamp;
 
       $texts_json = (!empty($texts)) ? json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
       $metadata_json = (!empty($metadata)) ? json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
@@ -358,12 +415,11 @@ namespace core\PHPLibrary {
       try {
         $database_connection = $system_core->database_connector->database->connection;
         $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':parent_id', $parent_id, \PDO::PARAM_INT);
         $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
         $database_query->bindParam(':texts', $texts_json, \PDO::PARAM_STR);
         $database_query->bindParam(':metadata', $metadata_json, \PDO::PARAM_STR);
-        $database_query->bindParam(':created_unix_timestamp', $entry_created_unix_timestamp, \PDO::PARAM_INT);
-        $database_query->bindParam(':updated_unix_timestamp', $entry_updated_unix_timestamp, \PDO::PARAM_INT);
+        $database_query->bindParam(':created_unix_timestamp', $created_unix_timestamp, \PDO::PARAM_INT);
+        $database_query->bindParam(':updated_unix_timestamp', $updated_unix_timestamp, \PDO::PARAM_INT);
         $execute = $database_query->execute();
       } catch (PDOException $exception) {
         die(json_encode([
@@ -376,14 +432,14 @@ namespace core\PHPLibrary {
 
       if ($execute) {
         $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-        return ($result) ? new EntryCategory($system_core, $result['id']) : null;
+        return ($result) ? new EntriesSample($system_core, $result['id']) : null;
       }
 
       return null;
     }
 
     /**
-     * Обновление существующей категории записей
+     * Обновление существующей выборки
      *
      * @param  array $data Массив данных
      * @return bool
@@ -391,7 +447,7 @@ namespace core\PHPLibrary {
     public function update(array $data) : bool {
       $query_builder = new DatabaseQueryBuilder($this->system_core);
       $query_builder->set_statement_update();
-      $query_builder->statement->set_table('entries_categories');
+      $query_builder->statement->set_table('entries_samples');
       $query_builder->statement->set_clause_set();
 
       foreach ($data as $data_name => $data_value) {
@@ -467,7 +523,7 @@ namespace core\PHPLibrary {
     }
     
     /**
-     * Удаление существующей категории записей
+     * Удаление существующей выборки
      *
      * @return bool
      */
@@ -475,7 +531,7 @@ namespace core\PHPLibrary {
       $query_builder = new DatabaseQueryBuilder($this->system_core);
       $query_builder->set_statement_delete();
       $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries_categories');
+      $query_builder->statement->clause_from->add_table('entries_samples');
       $query_builder->statement->clause_from->assembly();
       $query_builder->statement->set_clause_where();
       $query_builder->statement->clause_where->add_condition('id = :id');

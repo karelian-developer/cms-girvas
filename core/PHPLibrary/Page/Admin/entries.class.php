@@ -58,6 +58,13 @@ namespace core\PHPLibrary\Page\Admin {
         'link' => '/entriesComments',
         'permanent' => false,
         'isActive' => false
+      ],
+      'samples' => [
+        'name' => 'samples',
+        'iconName' => 'entriesSamples',
+        'link' => '/entriesSamples',
+        'permanent' => false,
+        'isActive' => false
       ]
     ];
 
