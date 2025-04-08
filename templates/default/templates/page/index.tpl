@@ -12,4 +12,10 @@
       </p>
     </div>
   </div>
+  <div class="sidebar__block block">
+    <h2 class="block__title title">Последние новости</h2>
+    <div class="block__content content">
+      {ENTRIES_SAMPLE_LAST_NEWS}
+    </div>
+  </div>
 </aside>

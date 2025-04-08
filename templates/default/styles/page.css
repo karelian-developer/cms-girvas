@@ -146,6 +146,30 @@
   }
 }
 
+.block__sample {
+  display: flex;
+  flex-direction: column;
+}
+
+.block__sample .item:not(:last-child) {
+  padding: 5px 0;
+  border-bottom: 2px dashed var(--primary-color-3);
+}
+
+.block__sample .item .link {
+  color: var(--primary-color-2);
+  transition: color .2s;
+}
+
+.block__sample .item .link:hover,
+.block__sample .item .link:focus {
+  color: var(--primary-color-1);
+}
+
+.block__sample .item .link:active {
+  text-decoration: underline;
+}
+
 .page__article {
   flex-grow: 1;
   padding: 24px;

@@ -518,6 +518,27 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       $execute = $database_query->execute();
 
       // =======================
+      // ТАБЛИЦА ВЫБОРОК ЗАПИСЕЙ
+      // =======================
+
+      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
+      $query_builder->set_statement_create_table();
+      $query_builder->statement->set_check_exists(true);
+      $query_builder->statement->set_table_name('entries_samples');
+      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $query_builder->statement->add_column('texts', $json_data_type_dms);
+      $query_builder->statement->add_column('metadata', $json_data_type_dms);
+      $query_builder->statement->add_column('name', 'text', 'NOT NULL');
+      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $query_builder->statement->assembly();
+
+      $database_connection = $database_connector->database->connection;
+      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+
+      $execute = $database_query->execute();
+
+      // =======================
       // ТАБЛИЦА СТАТИЧЕСКИХ СТРАНИЦ
       // =======================
 
@@ -756,6 +777,23 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
     $first_entry->update(['metadata' => ['is_published' => true]]);
     $first_entry->update(['metadata' => ['preview_url' => '/uploads/media/example.webp']]);
 
+    $first_entries_sample_texts = [
+      'en_US' => [
+        'title' => 'Last news',
+        'description' => 'Last news on site'
+      ],
+      'ru_RU' => [
+        'title' => 'Последние новости',
+        'description' => 'Последние новости на сайте'
+      ]
+    ];
+
+    $first_entries_sample = \core\PHPLibrary\EntriesSample::create($system_core, 'last-news', $first_entries_sample_texts, [
+      'limitCount' => 6,
+      'sortTypeID' => 2,
+      'categoriesIDs' => [1]
+    ]);
+
     $first_users_group_texts = [
       'en_US' => ['title' => 'Administrator'],
       'ru_RU' => ['title' => 'Администратор']
@@ -780,7 +818,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
     $second_users_group = \core\PHPLibrary\UserGroup::create($system_core, 'moder', $second_users_group_texts, 115585);
     $thirty_users_group = \core\PHPLibrary\UserGroup::create($system_core, 'editor', $thirty_users_group_texts, 130049);
     $fourty_users_group = \core\PHPLibrary\UserGroup::create($system_core, 'user', $fourty_users_group_texts, 114688);
-
+    
     $system_core->configurator->insert_database_entry_value('base_template', 'default');
     $system_core->configurator->insert_database_entry_value('base_site_title', 'CMS GIRVAS');
     $system_core->configurator->insert_database_entry_value('base_engineering_works_status', 'off');
