@@ -3,17 +3,11 @@
 </div>
 <aside class="sidebar" role="siteSidebarRight">
   <div class="sidebar__block block">
-    <h2 class="block__title title">Наименование блока</h2>
-    <div class="block__content content">
-      <p>
-        Но&nbsp;интерактивные прототипы могут быть указаны как претенденты на&nbsp;роль ключевых
-        факторов! Учитывая ключевые сценарии поведения, дальнейшее развитие различных форм деятельности
-        создаёт предпосылки для направлений прогрессивного развития.
-      </p>
-    </div>
+    <h2 class="block__title title">{LANG:DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_TITLE}</h2>
+    <div class="block__content content">{LANG:DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_DESCRIPTION}</div>
   </div>
   <div class="sidebar__block block">
-    <h2 class="block__title title">Последние новости</h2>
+    <h2 class="block__title title">{LANG:DEFAULT_INDEX_SIDEBAR_BLOCK_LAST_NEWS_TITLE}</h2>
     <div class="block__content content">
       {ENTRIES_SAMPLE_LAST_NEWS}
     </div>

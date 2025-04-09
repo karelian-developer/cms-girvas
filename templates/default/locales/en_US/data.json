@@ -1,10 +1,14 @@
 {
-  "DEFAULT_FOOTER_META_LINK_LICENSE_AGREEMENT": "License agreement",
-  "DEFAULT_FOOTER_META_LINK_TERMS_OF_USE": "Terms of use",
-  "DEFAULT_FOOTER_META_LINK_COOKIE_ABOUT": "About the use of Cookies",
+  "DEFAULT_FOOTER_META_LINK_LICENSE_AGREEMENT": "License Agreement",
+  "DEFAULT_FOOTER_META_LINK_TERMS_OF_USE": "User Agreement",
+  "DEFAULT_FOOTER_META_LINK_COOKIE_ABOUT": "About the Use of Cookies",
+  "DEFAULT_FOOTER_CMS_DESCRIPTION": "The GIRVAS content management system is a multi-profile, multi-lingual, free, open-source content management system from the Karelian Developer Enterprise.",
   "DEFAULT_TEXT_PROFILE": "Profile",
-  "DEFAULT_TEXT_LOGIN": "Log in",
+  "DEFAULT_TEXT_LOGIN": "Login",
   "DEFAULT_TEXT_REGISTRATION": "Registration",
   "DEFAULT_TEXT_EXIT": "Exit",
-  "DEFAULT_FOOTER_CMS_DESCRIPTION": "CMS GIRVAS is a multidisciplinary, multilingual, free, open source content management system from Karelian developers Garbalo."
+  "DEFAULT_TEXT_READ": "Read",
+  "DEFAULT_INDEX_SIDEBAR_BLOCK_LAST_NEWS_TITLE": "Latest News",
+  "DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_TITLE": "Example Block",
+  "DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_DESCRIPTION": "This is the content of a simple block"
 }

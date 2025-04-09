@@ -2,9 +2,13 @@
   "DEFAULT_FOOTER_META_LINK_LICENSE_AGREEMENT": "Лицензионное соглашение",
   "DEFAULT_FOOTER_META_LINK_TERMS_OF_USE": "Пользовательское соглашение",
   "DEFAULT_FOOTER_META_LINK_COOKIE_ABOUT": "Об использовании Cookie",
+  "DEFAULT_FOOTER_CMS_DESCRIPTION": "Система управления содержимым «ГИРВАС» — многопрофильная мультиязычная бесплатная система управления содержимым с открытым исходным кодом от Предприятия «Карельский разработчик».",
   "DEFAULT_TEXT_PROFILE": "Профиль",
   "DEFAULT_TEXT_LOGIN": "Войти",
   "DEFAULT_TEXT_REGISTRATION": "Регистрация",
   "DEFAULT_TEXT_EXIT": "Выход",
-  "DEFAULT_FOOTER_CMS_DESCRIPTION": "CMS «GIRVAS» — многопрофильная мультиязычная бесплатная система управления содержимым с открытым исходным кодом от карельских разработчиков «Garbalo»."
+  "DEFAULT_TEXT_READ": "Читать",
+  "DEFAULT_INDEX_SIDEBAR_BLOCK_LAST_NEWS_TITLE": "Последние новости",
+  "DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_TITLE": "Пример блока",
+  "DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_DESCRIPTION": "Это содержимое простого блока"
 }

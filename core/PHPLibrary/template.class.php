@@ -505,6 +505,7 @@ namespace core\PHPLibrary {
           'CMS_PRODUCT_SITE_LINK' => $this->system_core::CMS_PRODUCT_SITE_LINK,
           'CMS_DEVELOPER_SITE_LINK' => $this->system_core::CMS_DEVELOPER_SITE_LINK,
           'CMS_DEVELOPER_TITLE' => $this->system_core::CMS_DEVELOPER_TITLE,
+          'CMS_REESTR_DIGITAL_GOV_LINK' => $this->system_core::CMS_REESTR_DIGITAL_GOV_LINK,
           'CMS_COPYRIGHT' => $this->system_core::get_copyright_string()
         ];
         
@@ -529,7 +530,31 @@ namespace core\PHPLibrary {
               if (count($entries_objects_array) > 0) {
                 foreach ($entries_objects_array as $entry) {
                   $entry->init_data(['name', 'texts', 'metadata', 'category_id', 'created_unix_timestamp', 'updated_unix_timestamp']);
-                  
+                }
+              }
+
+              $entries_sort_variables_methods = [
+                1 => 'get_published_unix_timestamp',
+                2 => 'get_created_unix_timestamp',
+                3 => 'get_views_count',
+                4 => 'get_comments_count',
+                5 => 'get_relevance_points',
+              ];
+
+              $entries_sample_sort_type_id = $entries_sample->get_sort_type_id();
+              
+              if (array_key_exists($entries_sample_sort_type_id, $entries_sort_variables_methods)) {
+                $entries_sort_variable_method = $entries_sort_variables_methods[$entries_sample_sort_type_id];
+                $is_reverse = true;
+
+                usort($entries_objects_array, function($a, $b) use ($entries_sort_variable_method, $is_reverse) {
+                    $result = $a->$entries_sort_variable_method() <=> $b->$entries_sort_variable_method();
+                    return ($is_reverse) ? -$result : $result;
+                });
+              }
+
+              if (count($entries_objects_array) > 0) {
+                foreach ($entries_objects_array as $entry) {
                   $entry_category = $entry->get_category();
                   $entry_category_title = $entry_category->get_title($cms_locale_name);
 
@@ -587,12 +612,17 @@ namespace core\PHPLibrary {
 
               $template_sample_name_var = strtoupper(str_replace('-', '_', $entries_sample->get_name()));
               $template_tags_array[sprintf('ENTRIES_SAMPLE_%s', $template_sample_name_var)] = TemplateCollector::assembly_file_content($this->system_core->template, sprintf('%s/wrapper.tpl', $template_sample_path), [
-                'SAMPLE_ENTRIES_LIST' => implode('', $entries_assembled)
+                'SAMPLE_ENTRIES_LIST' => implode('', $entries_assembled),
+                'SAMPLE_TITLE' => $entries_sample->get_title($cms_locale_name),
+                'SAMPLE_DESCRIPTION' => $entries_sample->get_description($cms_locale_name)
               ]);
             }
           }
         }
 
+        // Внедрение значений глобальных шаблонных переменных
+        $this->core->assembled = TemplateCollector::assembly($this->core->assembled, $template_tags_array);
+        
         // Сборка локализации по общим данным (глобальные языковые переменные)
         $this->core->assembled = TemplateCollector::assembly_locale($this->core->assembled, $this->system_core->locale);
         $this->core->assembled = TemplateCollector::assembly_locale($this->core->assembled, $this->locale);
@@ -601,9 +631,6 @@ namespace core\PHPLibrary {
         $this->core->assembled = TemplateCollector::assembly_locale_markdown($this->core->assembled, $this->system_core->locale);
         $this->core->assembled = TemplateCollector::assembly_locale_markdown($this->core->assembled, $this->locale);
 
-        // Внедрение значений глобальных шаблонных переменных
-        $this->core->assembled = TemplateCollector::assembly($this->core->assembled, $template_tags_array);
-        
         // Вычищаем память
         unset($template_tags_array);
 

@@ -398,6 +398,18 @@ namespace core\PHPLibrary {
       $entry_comments = new EntryComments($this->system_core);
       return $entry_comments->get_count_by_entry_id($this->id);
     }
+
+    /**
+     * Получить очки релевантности
+     * 
+     * @return float
+     */
+    public function get_relevance_points() : float {
+      $views_count = $this->get_views_count();
+      $comments_count = $this->get_comments_count();
+
+      return ($views_count * 0.5) + ($comments_count * 2);
+    }
     
     /**
      * Получить объект записи по его наименованию
