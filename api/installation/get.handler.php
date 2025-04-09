@@ -394,7 +394,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       chmod($config_file_path, 0664);
     }
 
-    switch ($_GET['database_dms']) {
+    switch (strval($_GET['database_dms'])) {
       case 'DMS::PostgreSQL': $json_data_type_dms = 'jsonb'; break;
       default: $json_data_type_dms = 'json';
     }
@@ -419,6 +419,11 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
   if ($system_core->urlp->get_param('stepIndex') == 6) {
     $database_connector = new \core\PHPLibrary\SystemCore\DatabaseConnector($system_core, $system_core->configurator);
     $database_configurations = $system_core->configurator->get('database');
+
+    switch ($database_configurations['dms']->get_string()) {
+      case 'PostgreSQL': $json_data_type_dms = 'jsonb'; break;
+      default: $json_data_type_dms = 'json';
+    }
 
     $dom_document = new \DOMDocument();
     $tip_block = $dom_document->createElement('div');

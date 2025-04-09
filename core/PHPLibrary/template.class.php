@@ -509,7 +509,7 @@ namespace core\PHPLibrary {
           'CMS_COPYRIGHT' => $this->system_core::get_copyright_string()
         ];
         
-        if ($this->system_core->urlp->get_param('mode') != 'install') {
+        if ($this->system_core->urlp->get_param('mode') != 'install' && $this->system_core->urlp->get_path(0) != 'install') {
           $entries_samples = new EntriesSamples($this->system_core);
           $entries_samples_objects_array = $entries_samples->get_all();
           if (count($entries_samples_objects_array) > 0) {
