@@ -343,6 +343,14 @@
   margin-bottom: 0;
 }
 
+.page__content-block {
+  font-size: 14px;
+}
+
+.page__content-block:not(:last-child) {
+  margin-bottom: 10px;
+}
+
 .page__navigation {
   box-sizing: border-box;
   box-shadow: 0 0 5px 1px var(--common-main-color-4--opacity-0-2);

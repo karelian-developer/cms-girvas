@@ -16,6 +16,7 @@ namespace templates\admin\default {
   use \core\PHPLibrary\Entries\Database as EntriesDatabase;
   use \core\PHPLibrary\User as User;
   use \core\PHPLibrary\Users as Users;
+  use \core\PHPLibrary\UserGroup as UserGroup;
   use \core\PHPLibrary\Client\Session as ClientSession;
   use \DOMDocument as DOMDocument;
 
@@ -29,73 +30,85 @@ namespace templates\admin\default {
         'name' => 'index',
         'iconName' => 'index',
         'link' => '/',
-        'permanent' => true
+        'permanent' => true,
+        'role' => ''
       ],
       'entries' => [
         'name' => 'entries',
         'iconName' => 'entries',
         'link' => '/entries',
-        'permanent' => false
+        'permanent' => false,
+        'role' => ''
       ],
       'static_pages' => [
         'name' => 'pages',
         'iconName' => 'pages',
         'link' => '/pages',
-        'permanent' => false
+        'permanent' => false,
+        'role' => ''
       ],
       'media' => [
         'name' => 'media',
         'iconName' => 'media',
         'link' => '/media',
-        'permanent' => false
+        'permanent' => false,
+        'role' => ''
       ],
       'users' => [
         'name' => 'users',
         'iconName' => 'users',
         'link' => '/users',
-        'permanent' => false
+        'permanent' => false,
+        'role' => ''
       ],
       'feeds' => [
         'name' => 'feeds',
         'iconName' => 'feeds',
         'link' => '/feeds',
-        'permanent' => false
+        'permanent' => false,
+        'role' => ''
       ],
       'modules' => [
         'name' => 'modules',
         'iconName' => 'modules',
         'link' => '/modules',
-        'permanent' => false
+        'permanent' => false,
+        'role' => ''
       ],
       'templates' => [
         'name' => 'templates',
         'iconName' => 'templates',
         'link' => '/templates',
-        'permanent' => false
+        'permanent' => false,
+        'role' => ''
       ],
       'analytics' => [
         'name' => 'analytics',
         'iconName' => 'analytics',
         'link' => '/analytics',
-        'permanent' => false
+        'permanent' => false,
+        'role' => ''
       ],
       'settings' => [
         'name' => 'settings_cms',
         'iconName' => 'settings',
         'link' => '/settings',
-        'permanent' => true
+        'permanent' => true,
+        'role' => ''
       ],
       'about' => [
         'name' => 'about_cms',
         'iconName' => 'about',
         'link' => '/about',
-        'permanent' => true
+        'permanent' => true,
+        'role' => ''
       ],
       'exit' => [
         'name' => 'exit_cms',
         'iconName' => 'exit',
-        'link' => '#',
-        'permanent' => true
+        'link' => '/',
+        'permanent' => true,
+        'role' => 'mainNavigationExit'
       ]
     ];
     
@@ -138,6 +151,7 @@ namespace templates\admin\default {
               $navigation_section_link = $navigation_section_data['link'];
               $navigation_section_icon_name = $navigation_section_data['iconName'];
               $navigation_section_permanent_status = $navigation_section_data['permanent'];
+              $navigation_section_role = $navigation_section_data['role'];
               
               $section_allowed = false;
 
@@ -164,6 +178,11 @@ namespace templates\admin\default {
                 $label_element = $element_system_ap_main_navigation->ownerDocument->createElement('div', $item_title);
                 
                 $item_element->setAttribute('class', sprintf('list__item item item_%s', $navigation_section_name));
+
+                if ($navigation_section_role != '') {
+                  $item_element->setAttribute('role', $navigation_section_role); 
+                }
+
                 $link_element->setAttribute('class', 'item__link link');
                 $link_element->setAttribute('href', sprintf('/admin%s', $navigation_section_link));
                 $link_element->setAttribute('title', $item_title);
@@ -194,6 +213,22 @@ namespace templates\admin\default {
      * @return string
      */
     public function assembly_header(array $template_replaces = []) : string {
+      /** @var User Объект авторизованного пользователя */
+      $client_user = $this->template->system_core->client->get_user(2);
+      $client_user->init_data(['login', 'metadata']);
+
+      /** @var UserGroup Объект группы пользователя */
+      $client_user_group = $client_user->get_group();
+      $client_user_group->init_data(['texts']);
+
+      /** @var string Техническое имя локализации шаблона */
+      $template_locale_name = $this->template->locale->get_name();
+
+      /** @var string Логин пользователя */
+      $template_replaces['CLIENT_USER_LOGIN'] = $client_user->get_login();
+      /** @var string Логин пользователя */
+      $template_replaces['CLIENT_USER_GROUP_TITLE'] = $client_user_group->get_title($template_locale_name);
+
       return TemplateCollector::assembly_file_content($this->template, 'templates/header.tpl', $template_replaces);
     }
     

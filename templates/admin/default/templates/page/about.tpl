@@ -4,7 +4,7 @@
     <div id="E8548530785" class="page__interactive-container"></div>
   </div>
   <div class="page__content">
-    {LANG:MD:PAGE_ABOUT_CONTENT}
+    <div class="page__content-block">{LANG:MD:PAGE_ABOUT_CONTENT}</div>
   </div>
 </article>
 <aside class="main__page-aside page-aside">

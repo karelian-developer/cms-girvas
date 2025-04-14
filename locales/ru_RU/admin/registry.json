@@ -1,4 +1,5 @@
 {
   "PAGE_ABOUT_CONTENT": "markdown/page/aboutContent.md",
+  "PAGE_INDEX_CONTENT": "markdown/page/indexContent.md",
   "PAGE_ENTRIES_SAMPLES_SIDEBAR_BLOCK_ABOUT_DESCRIPTION": "markdown/page/entries/samplesSidebarAboutContent.md"
 }

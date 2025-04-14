@@ -46,7 +46,8 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.31-3 Альфа';
+    public const CMS_VERSION = '0.1.32';
+    public const CMS_STAGE_DEVELOPING = 'alpha';
     public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
     public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
@@ -117,6 +118,15 @@ namespace core\PHPLibrary {
      */
     public function get_cms_version() : string {
       return self::CMS_VERSION;
+    }
+
+    /**
+     * Получить наименование стадии разработки
+     * 
+     * @return string
+     */
+    public function get_cms_stage_developing() : string {
+      return self::CMS_STAGE_DEVELOPING;
     }
 
     /**
@@ -454,9 +464,9 @@ namespace core\PHPLibrary {
           $this->locale = new SystemCoreLocale($this, $install_locale, 'install');
         } else {
           switch ($this->urlp->get_path(0)) {
-            case 'admin': $this->set_template(new Template($this, 'default', 'admin')); $this->locale = new SystemCoreLocale($this, $cms_admin_locale_name, 'admin'); break;
+            case 'admin': $this->locale = new SystemCoreLocale($this, $cms_admin_locale_name, 'admin'); $this->set_template(new Template($this, 'default', 'admin')); break;
             case 'install': die('CMS is already installed.');
-            default: $this->set_template(new Template($this, $template_base_name)); $this->locale = new SystemCoreLocale($this, $cms_base_locale_name, 'base'); break;
+            default: $this->locale = new SystemCoreLocale($this, $cms_base_locale_name, 'base'); $this->set_template(new Template($this, $template_base_name)); break;
           }
         }
 

@@ -12,7 +12,6 @@
   background-color: var(--admin-panel-header-background-color);
   border-top: 1px solid var(--admin-panel-header-border-color);
   border-bottom: 1px solid var(--admin-panel-header-border-color);
-  height: 64px;
   box-shadow: 0 0 10px var(--admin-panel-header-shadow-color);
   top: 0;
   z-index: 1;
@@ -35,13 +34,18 @@
 .header__container {
   display: flex;
   justify-content: space-between;
-  height: 100%;
 }
 
 @media (max-width: 800px) {
   .header__container {
-    flex-direction: column;
+    flex-wrap: wrap;
     align-items: center;
+  }
+}
+
+@media (max-width: 400px) {
+  .header__container {
+    flex-direction: column;
   }
 }
 
@@ -50,11 +54,13 @@
   display: flex;
   padding-top: 10px;
   padding-bottom: 10px;
+  margin-right: 10px;
   height: 100%;
 }
 
 @media (max-width: 800px) {
   .header__brand-container {
+    margin-right: unset;
     flex: 0 0 64px;
   }
 }
@@ -62,12 +68,80 @@
 .header__brand-image {
   height: 100%;
 }
+
+.header__system {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+@media (max-width: 400px) {
+  .header__system {
+    width: 100%;
+  }
+}
+
+.header__system .system__info {
+  box-sizing: border-box;
+  background-color: var(--common-main-color-2);
+  font-size: 12px;
+  border: 1px solid var(--common-main-color-6);
+  padding: 5px 10px;
+  max-width: 250px;
+}
+
+@media (max-width: 400px) {
+  .header__system .system__info {
+    width: 100%;
+    max-width: unset;
+  }
+}
+
+.header__system .system__info .info__data {
+  display: flex;
+}
+
+.header__system .system__info .info__data:not(:last-child) {
+  margin-bottom: 5px;
+}
+
+.header__system .system__info .info__data > * {
+  box-sizing: border-box;
+  word-break: break-word;
+}
+
+.header__system .system__info .info__data > *:first-child {
+  padding-right: 2px;
+  width: 40%;
+}
+
+.header__system .system__info .info__data > *:last-child {
+  padding-left: 2px;
+  width: 60%;
+}
+
+.header__system .system__info .data__label {
+  font-weight: 700;
+}
+
+.header__system .system__info .data__label::after {
+  font-size: 12px;
+  font-weight: 700;
+  content: ':';
+}
+
 .header__buttons-container {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   flex-grow: 1;
 }
+
+@media (max-width: 800px) {
+  .header__buttons-container {
+    justify-content: center;
+  }
+}
+
 .header__buttons-container > *:not(:last-child) {
   margin-right: 10px;
 }

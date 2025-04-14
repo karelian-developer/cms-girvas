@@ -35,7 +35,7 @@ export class PageGlobal {
   init() {
     let searchParams = new URLParser(), locales;
     let globalButtonsContainerElement = document.querySelector('#SYSTEM_E3724126421');
-
+    
     let navigationBurgerElement = document.querySelector('[role="mainNavigationBurger"]');
     if (navigationBurgerElement != null) {
       navigationBurgerElement.addEventListener('click', (event) => {
@@ -105,17 +105,20 @@ export class PageGlobal {
               url: `https://repository.cms-girvas.ru/system-checker?currentVersion=${data}`
             });
 
+            request.target.showingNotification = false;
+
             request.target.send().then((data1) => {
-              if (data1.statusCode == 1 && data1.outputData.hasOwnProperty('needToUpdate')) {
+              if (data1.outputData.hasOwnProperty('needToUpdate')) {
                 let needToUpdate = data1.outputData.needToUpdate;
-                let lastVersion = data1.outputData.lastVersion;
+                let lastVersionTitle = data1.outputData.title;
+                let lastVersionPostURL = data1.outputData.postURL;
   
                 let interactiveNotificationLoading = new Interactive('notification');
                 interactiveNotificationLoading.target.isPopup = true;
 
                 if (needToUpdate) {
                   interactiveNotificationLoading.target.setStatusCode(1);
-                  interactiveNotificationLoading.target.setContent(`${localeData.UPDATE_CHECKER_NEW_VERSION} [${data} => ${lastVersion}]`);
+                  interactiveNotificationLoading.target.setContent(`${localeData.UPDATE_CHECKER_NEW_VERSION} [${data} => ${lastVersionTitle}]: <a href="${lastVersionPostURL}" target="_blank">${lastVersionPostURL}</a>`);
                 } else {
                   interactiveNotificationLoading.target.setStatusCode(-1);
                   interactiveNotificationLoading.target.setContent(localeData.UPDATE_CHECKER_CURRENT_VERSION);

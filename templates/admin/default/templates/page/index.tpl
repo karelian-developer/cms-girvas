@@ -5,8 +5,8 @@
     <div id="E8548530785" class="page__interactive-container"></div>
   </div>
   <div class="page__content">
-    <p class="page__content-phar">{LANG:PAGE_INDEX_THANKS}</p>
-    <div class="page-content-block page-content-block_welcome">
+    <div class="page__content-block">{LANG:MD:PAGE_INDEX_CONTENT}</div>
+    <div class="page__content-block page__content-block_welcome">
       <ul class="steps-list list-reset">
         <li class="steps-list__item">
           <div class="steps-list__item-wrapper">

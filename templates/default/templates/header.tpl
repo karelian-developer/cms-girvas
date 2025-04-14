@@ -1,8 +1,8 @@
 <header class="header">
   <div class="header__container container">
     <div class="header__logo-block">
-      <a class="header__logo-link display-block" href="/" title="CMS GIRVAS">
-        <img src="{SITE_TEMPLATE_URL}/images/header-logo.png" alt="Логотип CMS GIRVAS">
+      <a class="header__logo-link display-block" href="/" title="{CMS_TITLE}">
+        <img src="{SITE_TEMPLATE_URL}/images/header-logo.png" alt="Логотип {CMS_TITLE}">
       </a>
     </div>
     <nav class="header__nav"> 

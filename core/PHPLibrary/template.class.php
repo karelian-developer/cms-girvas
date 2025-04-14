@@ -54,29 +54,25 @@ namespace core\PHPLibrary {
      * @param  mixed $template_category Категория шаблона
      * @return void
      */
-    public function __construct(SystemCore $system_core, string $template_name = 'default', string $template_category = 'default') {
-      /** @var SystemCore $this->system_core Объект класса SystemCore */
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $system_core, string $template_name = 'default', string $template_category = 'base') {
+      // Установка технического имени шаблона
       $this->set_name($template_name);
-
-      $cms_base_locale_setted_name = $system_core->configurator->get_database_entry_value('base_locale');
-      $url_base_locale_setted_name = $system_core->urlp->get_param('locale');
-      $cookie_base_locale_setted_name = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
-
-      $cms_base_locale_name = (!is_null($url_base_locale_setted_name)) ? $url_base_locale_setted_name : $cookie_base_locale_setted_name;
-      $cms_base_locale_name = (!is_null($cms_base_locale_name)) ? $cms_base_locale_name : $cms_base_locale_setted_name;
-      $cms_base_locale_name = (is_null($cms_base_locale_name)) ? 'en_US' : $cms_base_locale_name;
-      $cms_base_locale = new TemplateLocale($this, $cms_base_locale_name);
-      if (!$cms_base_locale->exists_file_data_json()) {
-        $cms_base_locale = new TemplateLocale($this, $cms_base_locale_name);
-      }
-
-      $this->locale = $cms_base_locale;
-
-      $template_path = ($template_category != 'default') ? sprintf('%s/templates/%s/%s', CMS_ROOT_DIRECTORY, $template_category, $template_name) : sprintf('%s/templates/%s', CMS_ROOT_DIRECTORY, $template_name);
-      $template_url = ($template_category != 'default') ? sprintf('templates/%s/%s', $template_category, $template_name) : sprintf('templates/%s', $template_name);
+      // Установка категории шаблона
       $this->set_category($template_category);
+
+      /** @var SystemCore Объект системного ядра */
+      $this->system_core = $system_core;
+      /** @var TemplateLocale Объект локализации шаблона */
+      $this->locale = new TemplateLocale($this, $this->system_core->locale->get_name());
+
+      /** @var string Абсолютный путь до корневой директории шаблона */
+      $template_path = ($template_category != 'base') ? sprintf('%s/templates/%s/%s', CMS_ROOT_DIRECTORY, $template_category, $template_name) : sprintf('%s/templates/%s', CMS_ROOT_DIRECTORY, $template_name);
+      /** @var string Относительный URL до корневой директории шаблона */
+      $template_url = ($template_category != 'base') ? sprintf('templates/%s/%s', $template_category, $template_name) : sprintf('templates/%s', $template_name);
+      
+      // Установка абсолютного пути до шаблона
       $this->set_path($template_path);
+      // Установка относительного URL до шаблона
       $this->set_url($template_url);
     }
     
@@ -494,12 +490,16 @@ namespace core\PHPLibrary {
           'SITE_STYLES' => TemplateCollector::assembly_styles($this, $this->get_styles()),
           // Скрипты веб-страницы в DOM-элементе HEAD
           'SITE_SCRIPTS' => TemplateCollector::assembly_scripts($this, $this->get_scripts()),
-          'SITE_TEMPLATE_URL' => ($template_category != 'default') ? sprintf('/templates/%s/%s', $template_category, $this->get_name()) : sprintf('/templates/%s', $this->get_name()),
+          'SITE_TEMPLATE_URL' => ($template_category != 'base') ? sprintf('/templates/%s/%s', $template_category, $this->get_name()) : sprintf('/templates/%s', $this->get_name()),
           'SITE_TITLE' => $site_title,
           'SITE_DESCRIPTION' => $site_description,
           'SITE_KEYWORDS' => $site_keywords,
           'SITE_CHARSET' => $site_charset,
           'CMS_VERSION' => $this->system_core->get_cms_version(),
+          'CMS_VERSION_LABEL' => TemplateCollector::assembly(sprintf('{CMS_VERSION} {LANG:VERSION_%s_LABEL}', str_replace('-', '_', strtoupper($this->system_core->get_cms_stage_developing()))), [
+            'CMS_VERSION' => $this->system_core->get_cms_version(),
+          ]),
+          'CMS_STAGE_DEVELOPING' => $this->system_core->get_cms_stage_developing(),
           'CMS_TITLE' => $this->system_core->get_cms_title(),
           'CMS_DOMAIN' => $this->system_core->get_cms_domain(),
           'CMS_PRODUCT_SITE_LINK' => $this->system_core::CMS_PRODUCT_SITE_LINK,
@@ -508,7 +508,7 @@ namespace core\PHPLibrary {
           'CMS_REESTR_DIGITAL_GOV_LINK' => $this->system_core::CMS_REESTR_DIGITAL_GOV_LINK,
           'CMS_COPYRIGHT' => $this->system_core::get_copyright_string()
         ];
-        
+
         if ($this->system_core->urlp->get_param('mode') != 'install' && $this->system_core->urlp->get_path(0) != 'install') {
           $entries_samples = new EntriesSamples($this->system_core);
           $entries_samples_objects_array = $entries_samples->get_all();
@@ -663,7 +663,7 @@ namespace core\PHPLibrary {
                 }
 
                 if (!$style_is_core) {
-                  $style_href = ($this->get_category() != 'default') ? sprintf('/templates/%s/%s/%s', $this->get_category(), $this->get_name(), $element_data['href']) : sprintf('/templates/%s/%s', $this->get_name(), $element_data['href']);
+                  $style_href = ($this->get_category() != 'base') ? sprintf('/templates/%s/%s/%s', $this->get_category(), $this->get_name(), $element_data['href']) : sprintf('/templates/%s/%s', $this->get_name(), $element_data['href']);
                 }
 
                 $attribute_rel = $document->createAttribute('rel');
@@ -687,7 +687,7 @@ namespace core\PHPLibrary {
             foreach ($head_scripts as $element_index => $element_data) {
               $element_script = $document->createElement('script');
 
-              if ($this->get_category() != 'default') {
+              if ($this->get_category() != 'base') {
                 $script_url = (!$element_data['is_cms_core']) ? sprintf('/templates/%s/%s/%s', $this->get_category(), $this->get_name(), $element_data['src']) : sprintf('/core/JSLibrary/%s', $element_data['src']);
               } else {
                 $script_url = (!$element_data['is_cms_core']) ? sprintf('/templates/%s/%s', $this->get_name(), $element_data['src']) : sprintf('/core/JSLibrary/%s', $element_data['src']);
@@ -773,7 +773,7 @@ namespace core\PHPLibrary {
       /** @var string $template_name Наименование шаблона */
       $template_name = $this->get_name();
       $template_category = $this->get_category();
-      return ($template_category != 'default') ? sprintf('\\templates\\%s\\%s\\Core', $template_category, $template_name) :  sprintf('\\templates\\%s\\Core', $template_name);
+      return ($template_category != 'base') ? sprintf('\\templates\\%s\\%s\\Core', $template_category, $template_name) :  sprintf('\\templates\\%s\\Core', $template_name);
     }
     
     /**

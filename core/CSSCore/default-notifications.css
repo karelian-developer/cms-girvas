@@ -78,3 +78,7 @@
   color: var(--primary-color-4);
   border-left: 12px solid var(--secondary-color-12);
 }
+
+.notification a {
+  color: inherit;
+}
