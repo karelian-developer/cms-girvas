@@ -30,7 +30,8 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       [sprintf('%s dom', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('dom', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
       [sprintf('%s mbstring', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('mbstring', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
       [sprintf('%s json', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('json', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s zip', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('zip', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))]
+      [sprintf('%s zip', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('zip', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s intl', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('intl', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))]
     ];
 
     $table_cells_font_color = [
@@ -42,7 +43,8 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       (in_array('dom', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
       (in_array('mbstring', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
       (in_array('json', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('zip', $php_loaded_extensions) ? '#209A20' : '#9A2020')
+      (in_array('zip', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
+      (in_array('intl', $php_loaded_extensions) ? '#209A20' : '#9A2020')
     ];
 
     $table = $dom_document->createElement('table');
@@ -349,7 +351,18 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
     }
 
     if (!file_exists($config_file_path)) {
+      $domain = (isset($_GET['domain'])) ? idn_to_ascii($_GET['domain']) : '';
+      $domain_email = (isset($_GET['domain_email'])) ? idn_to_ascii($_GET['domain_email']) : '';
+      $domain_cookies = (isset($_GET['domain_cookies'])) ? idn_to_ascii($_GET['domain_cookies']) : '';
       $domain_ssl_status = (isset($_GET['domain_ssl_status'])) ? 'true' : 'false';
+
+      $database_dms = (isset($_GET['database_dms'])) ? addslashes($_GET['database_dms']) : '';
+      $database_prefix = (isset($_GET['database_prefix'])) ? addslashes($_GET['database_prefix']) : '';
+      $database_scheme = (isset($_GET['database_scheme'])) ? addslashes($_GET['database_scheme']) : '';
+      $database_host = (isset($_GET['database_host'])) ? addslashes($_GET['database_host']) : '';
+      $database_user = (isset($_GET['database_user'])) ? addslashes($_GET['database_user']) : '';
+      $database_pass = (isset($_GET['database_dms'])) ? addslashes($_GET['database_pass']) : '';
+      $database_name = (isset($_GET['database_name'])) ? addslashes($_GET['database_name']) : '';
       
       $system_salt = bin2hex(openssl_random_pseudo_bytes(10));
 
@@ -359,18 +372,18 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       fwrite($file, 'use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;' . PHP_EOL);
       fwrite($file, PHP_EOL);
       fwrite($file, '$configuration = [' . PHP_EOL);
-      fwrite($file, sprintf('  \'domain\' => \'%s\',', $_GET['domain']) . PHP_EOL);
-      fwrite($file, sprintf('  \'domain_email\' => \'%s\',', $_GET['domain_email']) . PHP_EOL);
-      fwrite($file, sprintf('  \'domain_cookies\' => \'%s\',', $_GET['domain_cookies']) . PHP_EOL);
+      fwrite($file, sprintf('  \'domain\' => \'%s\',', $domain) . PHP_EOL);
+      fwrite($file, sprintf('  \'domain_email\' => \'%s\',', $domain_email) . PHP_EOL);
+      fwrite($file, sprintf('  \'domain_cookies\' => \'%s\',', $domain_cookies) . PHP_EOL);
       fwrite($file, sprintf('  \'ssl_is_enabled\' => %s,', $domain_ssl_status) . PHP_EOL);
       fwrite($file, '  \'database\' => [' . PHP_EOL);
-      fwrite($file, sprintf('    \'dms\' => %s,', $_GET['database_dms']) . PHP_EOL);
-      fwrite($file, sprintf('    \'prefix\' => \'%s\',', $_GET['database_prefix']) . PHP_EOL);
-      fwrite($file, sprintf('    \'scheme\' => \'%s\',', $_GET['database_scheme']) . PHP_EOL);
-      fwrite($file, sprintf('    \'host\' => \'%s\',', $_GET['database_host']) . PHP_EOL);
-      fwrite($file, sprintf('    \'user\' => \'%s\',', $_GET['database_user']) . PHP_EOL);
-      fwrite($file, sprintf('    \'password\' => \'%s\',', $_GET['database_pass']) . PHP_EOL);
-      fwrite($file, sprintf('    \'name\' => \'%s\',', $_GET['database_name']) . PHP_EOL);
+      fwrite($file, sprintf('    \'dms\' => %s,', $database_dms) . PHP_EOL);
+      fwrite($file, sprintf('    \'prefix\' => \'%s\',', $database_prefix) . PHP_EOL);
+      fwrite($file, sprintf('    \'scheme\' => \'%s\',', $database_scheme) . PHP_EOL);
+      fwrite($file, sprintf('    \'host\' => \'%s\',', $database_host) . PHP_EOL);
+      fwrite($file, sprintf('    \'user\' => \'%s\',', $database_user) . PHP_EOL);
+      fwrite($file, sprintf('    \'password\' => \'%s\',', $database_pass) . PHP_EOL);
+      fwrite($file, sprintf('    \'name\' => \'%s\',', $database_name) . PHP_EOL);
       fwrite($file, '  ],' . PHP_EOL);
       fwrite($file, sprintf('  \'system_salt\' => \'%s\',', $system_salt) . PHP_EOL);
       fwrite($file, '  \'password_hashing_algorithm\' => PASSWORD_ARGON2ID,' . PHP_EOL);

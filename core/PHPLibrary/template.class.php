@@ -62,8 +62,11 @@ namespace core\PHPLibrary {
 
       /** @var SystemCore Объект системного ядра */
       $this->system_core = $system_core;
-      /** @var TemplateLocale Объект локализации шаблона */
-      $this->locale = new TemplateLocale($this, $this->system_core->locale->get_name());
+
+      if ($this->system_core->urlp->get_path(0) != 'install') {
+        /** @var TemplateLocale Объект локализации шаблона */
+        $this->locale = new TemplateLocale($this, $this->system_core->locale->get_name());
+      }
 
       /** @var string Абсолютный путь до корневой директории шаблона */
       $template_path = ($template_category != 'base') ? sprintf('%s/templates/%s/%s', CMS_ROOT_DIRECTORY, $template_category, $template_name) : sprintf('%s/templates/%s', CMS_ROOT_DIRECTORY, $template_name);
@@ -625,11 +628,17 @@ namespace core\PHPLibrary {
         
         // Сборка локализации по общим данным (глобальные языковые переменные)
         $this->core->assembled = TemplateCollector::assembly_locale($this->core->assembled, $this->system_core->locale);
-        $this->core->assembled = TemplateCollector::assembly_locale($this->core->assembled, $this->locale);
+
+        if ($this->system_core->urlp->get_path(0) != 'install') {
+          $this->core->assembled = TemplateCollector::assembly_locale($this->core->assembled, $this->locale);
+        }
 
         // Сборка локализации на основе реестра (глобальные языковые переменные) с парсингом MarkDown-разметки
         $this->core->assembled = TemplateCollector::assembly_locale_markdown($this->core->assembled, $this->system_core->locale);
-        $this->core->assembled = TemplateCollector::assembly_locale_markdown($this->core->assembled, $this->locale);
+
+        if ($this->system_core->urlp->get_path(0) != 'install') {
+          $this->core->assembled = TemplateCollector::assembly_locale_markdown($this->core->assembled, $this->locale);
+        }
 
         // Вычищаем память
         unset($template_tags_array);

@@ -187,6 +187,13 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
   if ($system_core->urlp->get_path(2) == 'finish') {
     $installed_empty_file_path = sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY);
 
+    $client_ip_address = $system_core->client->get_ip_address();
+
+    $client_user = $system_core->client->get_user();
+    $client_user->init_data(['email']);
+
+    $client_user_email = $client_user->get_email();
+
     if (!file_exists($installed_empty_file_path)) {
       $file = fopen($installed_empty_file_path, 'w');
       fclose($file);
@@ -195,15 +202,16 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       curl_setopt($ch, CURLOPT_URL,"https://cms-girvas.ru/feedback.php?type=install");
       curl_setopt($ch, CURLOPT_POST, true);
       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
-        'ip' => $_SERVER['REMOTE_ADDR'],
+        'ip' => $client_ip_address,
         'domain' => $system_core->configurator->get('domain'),
         'system_salt' => $system_core->configurator->get('system_salt'),
         'php_version' => phpversion(),
-        'server_software' => $_SERVER['SERVER_SOFTWARE']
+        'server_software' => $_SERVER['SERVER_SOFTWARE'],
+        'admin_email' => $client_user_email
       ]));
 
       curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Installation-Hash: ' . hash('sha256', sprintf('{GIRVAS:HASH$INSTALL$%s$%s$%s}', $_SERVER['REMOTE_ADDR'], $system_core->configurator->get('domain'), $system_core->configurator->get('system_salt')))
+        'Installation-Hash: ' . hash('sha256', sprintf('{GIRVAS:HASH$INSTALL$%s$%s$%s}', $client_ip_address, $system_core->configurator->get('domain'), $system_core->configurator->get('system_salt')))
       ]);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 

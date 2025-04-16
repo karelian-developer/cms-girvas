@@ -28,7 +28,7 @@
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_LABEL": "Domain Name",
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_DESCRIPTION": "Please specify the domain name that your website will work with. This is necessary for correct redirection.",
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_COOKIE_LABEL": "Domain Name for Cookie",
-  "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_COOKIE_DESCRIPTION": "Please specify a specific domain name for generating Cookie. If the domain name of your website is the same as the domain name for which you want to generate Cookie, then specify the domain name of your website here.",
+  "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_COOKIE_DESCRIPTION": "If you need to create a cookie for the base domain with their access on all subdomains, then specify your base domain here. If you want the cookie to be available only on the base domain, then leave the field blank. If you need to make the cookie available only for a subdomain, specify it.",
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_EMAIL_LABEL": "Domain name for E-Mail",
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_EMAIL_DESCRIPTION": "Specify the domain name from which system emails will be sent.",
   "INSTALLER_LOCAL_CONFIGURATION_USING_SSL_LABEL": "Using SSL",

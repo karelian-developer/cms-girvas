@@ -28,7 +28,7 @@
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_LABEL": "Доменное имя",
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_DESCRIPTION": "Укажите доменное имя, с которым будет работать Ваш веб-сайт. Это необходимо для правильной переадресации.",
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_COOKIE_LABEL": "Доменное имя для Cookie",
-  "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_COOKIE_DESCRIPTION": "Укажите специфическое доменное имя для генерации Cookie. Если доменное имя Вашего веб-сайта совпадает с доменным именем для которого необходимо генерировать Cookie, то укажите здесь доменное имя Вашего веб-сайта.",
+  "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_COOKIE_DESCRIPTION": "Если необходимо создавать Cookie для базового домена с возможностью их доступа на всех поддоменах, то укажите здесь Ваш базовый домен. Если хотите, чтобы Cookie был доступен только на базовом домене, то оставьте поле пустым. В случае, если нужно Cookie сделать доступным только для поддомена - укажите его.",
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_EMAIL_LABEL": "Доменное имя для E-Mail",
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_EMAIL_DESCRIPTION": "Укажите доменное имя, с которого будут отправляться системные электронные письма.",
   "INSTALLER_LOCAL_CONFIGURATION_USING_SSL_LABEL": "Использование SSL",

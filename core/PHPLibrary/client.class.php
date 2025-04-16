@@ -27,7 +27,7 @@ namespace core\PHPLibrary {
     public function __construct(SystemCore $system_core) {
       $this->system_core = $system_core;
 
-      $this->set_ip_address($_SERVER['REMOTE_ADDR']);
+      $this->set_ip_address();
     }
 
     /**
@@ -36,8 +36,18 @@ namespace core\PHPLibrary {
      * @param  mixed $value
      * @return void
      */
-    private function set_ip_address(string $value) : void {
-      $this->ip_address = $value;
+    private function set_ip_address() : void {
+      $ip = '';
+
+      if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ip = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
+      } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+      } else {
+        $ip = $_SERVER['REMOTE_ADDR'];
+      }
+
+      $this->ip_address = filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
     }
 
     /**
