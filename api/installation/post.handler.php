@@ -189,7 +189,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
 
     $client_ip_address = $system_core->client->get_ip_address();
 
-    $client_user = $system_core->client->get_user();
+    $client_user = $system_core->client->get_user(2);
     $client_user->init_data(['email']);
 
     $client_user_email = $client_user->get_email();

@@ -181,7 +181,7 @@ namespace core\PHPLibrary {
      */
     public function get_category_name() : string {
       $metadata = $this->get_metadata();
-      return (isset($metadata['categoryName'])) ? $metadata['categoryName'] : 'default';
+      return (isset($metadata['categoryName'])) ? $metadata['categoryName'] : 'base';
     }
 
     /**
@@ -625,7 +625,7 @@ namespace core\PHPLibrary {
 
         // Внедрение значений глобальных шаблонных переменных
         $this->core->assembled = TemplateCollector::assembly($this->core->assembled, $template_tags_array);
-        
+
         // Сборка локализации по общим данным (глобальные языковые переменные)
         $this->core->assembled = TemplateCollector::assembly_locale($this->core->assembled, $this->system_core->locale);
 
@@ -806,7 +806,7 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function exists_core_file() : bool {
-      $file_path = ($this->get_category() == 'default') ? sprintf('%s/core.class.php', $this->get_path()) : sprintf('%s/%s/core.class.php', $this->get_path(), $this->get_category());
+      $file_path = ($this->get_category() == 'base') ? sprintf('%s/core.class.php', $this->get_path()) : sprintf('%s/%s/core.class.php', $this->get_path(), $this->get_category());
       return file_exists($file_path);
     }
 

@@ -46,7 +46,7 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.33';
+    public const CMS_VERSION = '0.1.33-1';
     public const CMS_STAGE_DEVELOPING = 'alpha';
     public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -404,9 +404,6 @@ namespace core\PHPLibrary {
 
         header(sprintf('Strict-Transport-Security: %s;', implode('; ', $hsts_vars)));
       }
-
-      /** @var Client Объект клиента */
-      $this->client = new Client($this);
 
       if ($this->urlp->get_path(0) == 'install' && $this->urlp->get_path(1) != 'install') {
         $install_locale = (!is_null($this->urlp->get_param('locale'))) ? $this->urlp->get_param('locale') : 'en_US';
