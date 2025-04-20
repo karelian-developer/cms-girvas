@@ -739,7 +739,7 @@ export class InstallationMaster {
             }
 
             if (this.getStepIndex() == 4) {
-              fetch(`/handler/install?stepIndex=4&mode=install&locale=${localeName}`, {method: 'GET'}).then((response) => {
+              fetch(`/handler/install?stepIndex=4&locale=${localeName}&installation-mode=true`, {method: 'GET'}).then((response) => {
                 return (response.ok) ? response.json() : Promise.reject(response);
               }).then((data) => {
                 let resultHTML = data.outputData.html;
@@ -768,7 +768,7 @@ export class InstallationMaster {
             }
 
             if (this.getStepIndex() == 11) {
-              fetch(`/handler/install/finish?locale=${localeName}&installation-mode=true`, {method: 'POST'});
+              fetch(`/handler/install/finish?locale=${localeName}`, {method: 'POST'});
             }
 
             this.buildPanel();

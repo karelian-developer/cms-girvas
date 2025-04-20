@@ -37,6 +37,24 @@ namespace core\PHPLibrary {
      * @return void
      */
     private function set_ip_address() : void {
+      $this->ip_address = self::get_real_ip_address();
+    }
+
+    /**
+     * Получить IP-адрес клиента
+     *
+     * @return string
+     */
+    public function get_ip_address() : string {
+      return $this->ip_address;
+    }
+
+    /**
+     * Получить IP-адрес клиента
+     *
+     * @return string
+     */
+    public static function get_real_ip_address() : string {
       $ip = '';
 
       if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -47,16 +65,7 @@ namespace core\PHPLibrary {
         $ip = $_SERVER['REMOTE_ADDR'];
       }
 
-      $this->ip_address = filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
-    }
-
-    /**
-     * Получить IP-адрес клиента
-     *
-     * @return string
-     */
-    public function get_ip_address() : string {
-      return $this->ip_address;
+      return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
     }
 
     /**

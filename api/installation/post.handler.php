@@ -187,9 +187,12 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
   if ($system_core->urlp->get_path(2) == 'finish') {
     $installed_empty_file_path = sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY);
 
-    $client_ip_address = $system_core->client->get_ip_address();
+    $client_ip_address = \core\PHPLibrary\Client::get_real_ip_address();
 
-    $client_user = $system_core->client->get_user(2);
+    $system_core->database_connector = new \core\PHPLibrary\SystemCore\DatabaseConnector($system_core, $system_core->configurator);
+    $system_core->client = new \core\PHPLibrary\Client($system_core);
+
+    $client_user = new \core\PHPLibrary\User($system_core, 1);
     $client_user->init_data(['email']);
 
     $client_user_email = $client_user->get_email();
