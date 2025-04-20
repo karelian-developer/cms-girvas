@@ -1,4 +1,8 @@
 {
+  "VERSION_PRE_ALPHA_LABEL": "Pre-Alpha",
+  "VERSION_ALPHA_LABEL": "Alpha",
+  "VERSION_VOITSY_LABEL": "Voitsy",
+  "VERSION_SHUYA_LABEL": "Shuya",
   "BUTTON_BACK_LABEL": "Back",
   "BUTTON_NEXT_LABEL": "Next",
   "BUTTON_SUBMIT_AND_CONTINUE_LABEL": "Accept and continue",
