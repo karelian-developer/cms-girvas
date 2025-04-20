@@ -1,4 +1,8 @@
 {
+  "VERSION_PRE_ALPHA_LABEL": "Пре-альфа",
+  "VERSION_ALPHA_LABEL": "Альфа",
+  "VERSION_VOITSY_LABEL": "Воицы",
+  "VERSION_SHUYA_LABEL": "Шуя",
   "BUTTON_BACK_LABEL": "Назад",
   "BUTTON_NEXT_LABEL": "Далее",
   "BUTTON_SUBMIT_AND_CONTINUE_LABEL": "Принять и продолжить",
