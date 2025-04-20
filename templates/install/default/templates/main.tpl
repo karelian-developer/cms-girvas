@@ -30,7 +30,7 @@
         </div>
         <div class="main__page page" data-page-index="5">
           {LANG:MD:STAGE_GENERATING_LOCAL_CONFIGURATIONS}
-          <p class="page__phar">
+          <div class="page__phar">
             <form class="form" role="form-database">
               <table class="table">
                 <tr class="table__row">
@@ -40,7 +40,7 @@
                       <div class="page__phar-block">{LANG:INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_DESCRIPTION}</div>
                     </div>
                   </td>
-                  <td class="table__cell cell" >
+                  <td class="table__cell cell">
                     <input name="domain" type="text" class="form__input" value="{CONFIGURATION_DATABASE_DOMAIN}" placeholder="example.ru">
                   </td>
                 </tr>
@@ -152,7 +152,7 @@
                 </tr>
               </table>
             </form>
-          </p>
+          </div>
         </div>
         <div class="main__page page" data-page-index="6">
           {LANG:MD:STAGE_GENERATING_DATABASE_TABLES}
@@ -160,7 +160,7 @@
         </div>
         <div class="main__page page" data-page-index="7">
           {LANG:MD:STAGE_CONFIGURING_LOCALIZATION_AND_TIME}
-          <p class="page__phar">
+          <div class="page__phar">
             <form class="form" role="form-locale">
               <table class="table">
                 <tr class="table__row">
@@ -198,12 +198,12 @@
                 </tr>
               </table>
             </form>
-          </p>
+          </div>
           <p class="page__phar" role="cms-locale-and-timezone"></p>
         </div>
         <div class="main__page page" data-page-index="8">
           {LANG:MD:STAGE_WEBSITE_METADATA}
-          <p class="page__phar">
+          <div class="page__phar">
             <form class="form" role="form-metadata">
               <table class="table">
                 <tr class="table__row">
@@ -247,12 +247,12 @@
                 </tr>
               </table>
             </form>
-          </p>
+          </div>
           <p class="page__phar" role="cms-metadata"></p>
         </div>
         <div class="main__page page" data-page-index="9">
           {LANG:MD:STAGE_CREATING_AN_ADMINISTRATOR_ACCOUNT}
-          <p class="page__phar">
+          <div class="page__phar">
             <form class="form" role="form-admin-create">
               <table class="table">
                 <tr class="table__row">
@@ -306,7 +306,7 @@
                 </tr>
               </table>
             </form>
-          </p>
+          </div>
           <p class="page__phar" role="cms-admin-create"></p>
         </div>
         <div class="main__page page" data-page-index="10">

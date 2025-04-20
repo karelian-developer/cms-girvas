@@ -140,8 +140,6 @@ export class DataSearcher {
     });
 
     document.addEventListener('click', (event) => {
-      event.preventDefault();
-
       if (event.target != inputSearchElement && event.target != optionsContainerElement) {
         optionsContainerElement.style.display = 'none';
       }

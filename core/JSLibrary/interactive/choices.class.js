@@ -169,6 +169,8 @@ export class Choices {
         dropedListItemContainerElement.setAttribute('data-option-value', item.value);
 
         dropedListItemContainerElement.addEventListener('click', (event) => {
+          event.preventDefault();
+
           if (!this.isMultiple) {
             this.itemSelectedIndex = itemIndex;
             elementSelect.value = item.value;
@@ -182,8 +184,6 @@ export class Choices {
                 }
               }
             };
-
-            console.log(elementSelect.options);
           }
 
           elementSelect.dispatchEvent(new Event('change'));
