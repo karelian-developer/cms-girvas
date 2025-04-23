@@ -495,8 +495,8 @@ namespace core\PHPLibrary {
         $system_core_template_category_name = (isset($system_core_template_category_name)) ? $system_core_template_category_name : 'base';
         $system_core_template_name = (isset($system_core_template_name)) ? $system_core_template_name : 'default';
 
-        $this->set_template(new Template($this, $system_core_template_name, $system_core_template_category_name));
         $this->locale = new SystemCoreLocale($this, $system_core_locale_name, $system_core_template_category_name);
+        $this->set_template(new Template($this, $system_core_template_name, $system_core_template_category_name));
 
         $template = $this->get_template();
         $template->init();
