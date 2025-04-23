@@ -589,6 +589,7 @@ namespace core\PHPLibrary {
                     'ENTRY_NAME' => $entry->get_name(),
                     'ENTRY_TITLE' => $entry->get_title($cms_locale_name),
                     'ENTRY_DESCRIPTION' => $entry->get_description($cms_locale_name),
+                    'ENTRY_URL' => $entry->get_url(),
                     'ENTRY_CATEGORY_TITLE' => $entry_category_title,
                     'ENTRY_CATEGORY_URL' => $entry_category->get_url(),
                     'ENTRY_CREATED_DATE_TIMESTAMP' => $entry_created_date_timestamp,
