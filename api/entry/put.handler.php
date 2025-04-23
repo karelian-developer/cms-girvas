@@ -54,7 +54,7 @@ if ($system_core->client->is_logged(2)) {
               $input_value = preg_replace('/<script(.*?)>(.*?)<\/script>/is', '', $input_value);
               $input_value = str_replace('\'', '"', $input_value);
   
-              $texts[$cms_locale->get_name()]['description'] = $textarea_value;
+              $texts[$cms_locale->get_name()]['description'] = $input_value;
             }
           }
         }
