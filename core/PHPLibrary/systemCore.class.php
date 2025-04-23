@@ -471,13 +471,10 @@ namespace core\PHPLibrary {
           $system_core_locale_name = $install_locale;
           $system_core_template_category_name = 'install';
         } else {
-          if (!isset($system_core_locale_name)) {
-            if ($cms_locale_url_param != null && SystemCoreLocale::exists($this, $system_core_locale_name)) {
-              $system_core_locale_name = $cms_locale_url_param;
-            } else {
-              if ($cms_locale_cookie != null && SystemCoreLocale::exists($this, $system_core_locale_name)) {
-                $system_core_locale_name = $cms_locale_cookie;
-              }
+          $checked_locale_name = $cms_locale_url_param ?? $cms_locale_cookie;
+          if ($checked_locale_name !== null) {
+            if (SystemCoreLocale::exists($this, $checked_locale_name)) {
+              $system_core_locale_name = $checked_locale_name;
             }
           }
 
