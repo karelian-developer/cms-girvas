@@ -13,7 +13,11 @@ namespace core\PHPLibrary\SystemCore {
 
   final class Locale {
     public SystemCore $system_core;
+
     public const DEFAULT_LOCALE_NAME = 'en_US';
+    public const LOCALE_CORE_PATH_PATTERN = '%s/locales/%s';
+    public const LOCALE_DATA_PATH_PATTERN = '%s/locales/%s/%s';
+
     private string $name;
     private string $core_path;
     private string $data_path;
@@ -262,6 +266,17 @@ namespace core\PHPLibrary\SystemCore {
 
       return json_decode($file_content, true);
     }
+
+    /**
+     * Получить статус наличия локализации в системе
+     * 
+     * @return bool
+     */
+    public static function exists(SystemCore $system_core, string $locale_name) : bool {
+      /** @var string Абсолютный путь до директории локализации */
+      $locale_core_path = sprintf(self::LOCALE_CORE_PATH_PATTERN, $system_core->get_cms_path(), $locale_name);
+      return file_exists($locale_core_path);
+    } 
   }
 }
 

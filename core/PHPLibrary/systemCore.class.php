@@ -46,7 +46,7 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.34';
+    public const CMS_VERSION = '0.1.34-1';
     public const CMS_STAGE_DEVELOPING = 'alpha';
     public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -324,8 +324,12 @@ namespace core\PHPLibrary {
 
       // Если настройка системы не была произведена и пользователь не находится на странице инсталлятора,
       // то его необходимо перенаправить на страницу инсталлятора.
-      if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY)) && $this->urlp->get_path(0) != 'install' && $this->urlp->get_path(0) != 'handler') {
+      if (!self::system_is_install() && $this->urlp->get_path(0) != 'install' && $this->urlp->get_path(0) != 'handler') {
         header('location: /install');
+      }
+
+      if ($this->is_location_installer_active() && self::system_is_install()) {
+        die('This system is already installed!');
       }
 
       /** @var SystemCoreConfigurator Объект конфигуратора системного ядра */
@@ -452,23 +456,50 @@ namespace core\PHPLibrary {
         }
       }
 
-      if ($this->urlp->get_path(0) != 'handler' && $this->urlp->get_path(0) != 'feed') {
-        if ($this->urlp->get_path(0) != 'install') {
+      if (!$this->is_location_handler_active() && !$this->is_location_feed_active()) {
+        if (!$this->is_location_installer_active()) {
           $template_base_name = ($this->configurator->exists_database_entry_value('base_template')) ? $this->configurator->get_database_entry_value('base_template') : 'default';
+          $template_admin_name = ($this->configurator->exists_database_entry_value('admin_template')) ? $this->configurator->get_database_entry_value('admin_template') : 'default';
+        }
+        
+        /** @var string Имя локализации, определенное куки "locale" */
+        $cms_locale_cookie = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
+        /** @var string Имя локализации, определенное параметром адресной строки параметром "locale" */
+        $cms_locale_url_param = ($this->urlp->get_param('locale') != null) ? $this->urlp->get_param('locale') : null;
+
+        if ($this->is_location_installer_active() && !self::system_is_install()) {
+          $system_core_locale_name = $install_locale;
+          $system_core_template_category_name = 'install';
+        } else {
+          if (!isset($system_core_locale_name)) {
+            if ($cms_locale_url_param != null && SystemCoreLocale::exists($this, $system_core_locale_name)) {
+              $system_core_locale_name = $cms_locale_url_param;
+            } else {
+              if ($cms_locale_cookie != null && SystemCoreLocale::exists($this, $system_core_locale_name)) {
+                $system_core_locale_name = $cms_locale_cookie;
+              }
+            }
+          }
+
           $cms_base_locale_name = ($this->configurator->exists_database_entry_value('base_locale')) ? $this->configurator->get_database_entry_value('base_locale') : 'en_US';
           $cms_admin_locale_name = ($this->configurator->exists_database_entry_value('base_admin_locale')) ? $this->configurator->get_database_entry_value('base_admin_locale') : 'en_US';
-        }
 
-        if ($this->urlp->get_path(0) == 'install' && !file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
-          $this->set_template(new Template($this, 'default', 'install'));
-          $this->locale = new SystemCoreLocale($this, $install_locale, 'install');
-        } else {
-          switch ($this->urlp->get_path(0)) {
-            case 'admin': $this->locale = new SystemCoreLocale($this, $cms_admin_locale_name, 'admin'); $this->set_template(new Template($this, 'default', 'admin')); break;
-            case 'install': die('CMS is already installed.');
-            default: $this->locale = new SystemCoreLocale($this, $cms_base_locale_name, 'base'); $this->set_template(new Template($this, $template_base_name)); break;
+          if ($this->is_location_administrative_panel_active()) {
+            $system_core_template_category_name = 'admin';
+            $system_core_template_name = $template_admin_name;<div class=""></div>
+            $system_core_locale_name = (isset($system_core_locale_name)) ? $system_core_locale_name : $cms_admin_locale_name;
+          } else {
+            $system_core_template_category_name = 'base';
+            $system_core_template_name = $template_base_name;
+            $system_core_locale_name = (isset($system_core_locale_name)) ? $system_core_locale_name : $cms_base_locale_name;
           }
         }
+
+        $system_core_template_category_name = (isset($system_core_template_category_name)) ? $system_core_template_category_name : 'base';
+        $system_core_template_name = (isset($system_core_template_name)) ? $system_core_template_name : 'default';
+
+        $this->set_template(new Template($this, $system_core_template_name, $system_core_template_category_name));
+        $this->locale = new SystemCoreLocale($this, $system_core_locale_name, $system_core_template_category_name);
 
         $template = $this->get_template();
         $template->init();
@@ -599,6 +630,42 @@ namespace core\PHPLibrary {
      */
     public function get_site_url() : string {
       return ($this->configurator->get('ssl_is_enabled')) ? sprintf('https://%s', $this->configurator->get('domain')) : sprintf('http://%s', $this->configurator->get('domain'));
+    }
+
+    /**
+     * Проверка активности инсталлятора (по локации клиента)
+     * 
+     * @return bool
+     */
+    public function is_location_installer_active() {
+      return ($this->urlp->get_path(0) == 'install') ? true : false;
+    }
+
+    /**
+     * Проверка активности административной панели (по локации клиента)
+     * 
+     * @return bool
+     */
+    public function is_location_administrative_panelf_active() {
+      return ($this->urlp->get_path(0) == 'admin') ? true : false;
+    }
+
+    /**
+     * Проверка активности обработчика (по локации клиента)
+     * 
+     * @return bool
+     */
+    public function is_location_handler_active() {
+      return ($this->urlp->get_path(0) == 'handler') ? true : false;
+    }
+
+    /**
+     * Проверка активности фида (по локации клиента)
+     * 
+     * @return bool
+     */
+    public function is_location_feed_active() {
+      return ($this->urlp->get_path(0) == 'feed') ? true : false;
     }
     
     /**
@@ -758,6 +825,16 @@ namespace core\PHPLibrary {
       die($message);
     }
 
+    /**
+     * Проверить статус установки системы
+     * 
+     * @return bool
+     */
+    public static function system_is_install() : bool {
+      /** @var string Абсолютный путь до файла-пустышки "INSTALLED" */
+      $file_installed_path = sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY);
+      return file_exists($file_installed_path);
+    }
   }
 
 }
