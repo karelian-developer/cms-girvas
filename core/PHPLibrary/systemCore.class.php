@@ -486,7 +486,7 @@ namespace core\PHPLibrary {
 
           if ($this->is_location_administrative_panel_active()) {
             $system_core_template_category_name = 'admin';
-            $system_core_template_name = $template_admin_name;<div class=""></div>
+            $system_core_template_name = $template_admin_name;
             $system_core_locale_name = (isset($system_core_locale_name)) ? $system_core_locale_name : $cms_admin_locale_name;
           } else {
             $system_core_template_category_name = 'base';
