@@ -456,9 +456,17 @@ namespace core\PHPLibrary {
         }
       }
 
+      // ============================================================
+      // Инициализация локализации системного ядра
+      // ============================================================
+
+      // Проверка активности локаций обработчика и фида
       if (!$this->is_location_handler_active() && !$this->is_location_feed_active()) {
+        // Проверка активности локации инсталлятора
         if (!$this->is_location_installer_active()) {
+          /** @var string Наименование шаблона сайта */
           $template_base_name = ($this->configurator->exists_database_entry_value('base_template')) ? $this->configurator->get_database_entry_value('base_template') : 'default';
+          /** @var string Наименование шаблона административной панели */
           $template_admin_name = ($this->configurator->exists_database_entry_value('admin_template')) ? $this->configurator->get_database_entry_value('admin_template') : 'default';
         }
         
@@ -467,38 +475,63 @@ namespace core\PHPLibrary {
         /** @var string Имя локализации, определенное параметром адресной строки параметром "locale" */
         $cms_locale_url_param = ($this->urlp->get_param('locale') != null) ? $this->urlp->get_param('locale') : null;
 
+        // Проверка активности локации инсталлятора и статуса установки системы
         if ($this->is_location_installer_active() && !self::system_is_install()) {
+          /** @var string Наименование локализации */
           $system_core_locale_name = $install_locale;
+          /** @var string Наименование категории шаблона системного ядра */
           $system_core_template_category_name = 'install';
         } else {
+          // Определяем приоритетную локализацию системного ядра
+          /** @var string Наименование локализации */
           $checked_locale_name = $cms_locale_url_param ?? $cms_locale_cookie;
+          // Если приоритетная локализация выбрана...
           if ($checked_locale_name !== null) {
+            // Проверяем наличие локализации в системе
             if (SystemCoreLocale::exists($this, $checked_locale_name)) {
+              /** @var string Наименование локализации */
               $system_core_locale_name = $checked_locale_name;
             }
           }
 
+          /** @var string Наименование локализации сайта */
           $cms_base_locale_name = ($this->configurator->exists_database_entry_value('base_locale')) ? $this->configurator->get_database_entry_value('base_locale') : 'en_US';
+          /** @var string Наименование локализации административной панели */
           $cms_admin_locale_name = ($this->configurator->exists_database_entry_value('base_admin_locale')) ? $this->configurator->get_database_entry_value('base_admin_locale') : 'en_US';
 
+          // Проверка активности административной панели
           if ($this->is_location_administrative_panel_active()) {
+            /** @var string Наименование категории шаблона системного ядра */
             $system_core_template_category_name = 'admin';
+            /** @var string Наименование шаблона системного ядра */
             $system_core_template_name = $template_admin_name;
+            /** @var string Наименование локализации */
             $system_core_locale_name = (isset($system_core_locale_name)) ? $system_core_locale_name : $cms_admin_locale_name;
           } else {
+            /** @var string Наименование категории шаблона системного ядра */
             $system_core_template_category_name = 'base';
+            /** @var string Наименование шаблона системного ядра */
             $system_core_template_name = $template_base_name;
+            /** @var string Наименование локализации */
             $system_core_locale_name = (isset($system_core_locale_name)) ? $system_core_locale_name : $cms_base_locale_name;
           }
         }
 
+        // Если по какой-то причине имена категории шаблона и самого шаблона не определены,
+        // то необходимо установить типовые значения.
+        /** @var string Наименование категории шаблона системного ядра */
         $system_core_template_category_name = (isset($system_core_template_category_name)) ? $system_core_template_category_name : 'base';
+        /** @var string Наименование шаблона системного ядра */
         $system_core_template_name = (isset($system_core_template_name)) ? $system_core_template_name : 'default';
 
+        /** @var SystemCoreLocale Объект локализации системного ядра */
         $this->locale = new SystemCoreLocale($this, $system_core_locale_name, $system_core_template_category_name);
+        // Устанавливаем объект шаблона для системного ядра
         $this->set_template(new Template($this, $system_core_template_name, $system_core_template_category_name));
 
+        /** @var Template Объект шаблона системного ядра */
         $template = $this->get_template();
+        // Инициализация шаблона системного ядра
         $template->init();
         
       } else {
