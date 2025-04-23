@@ -643,7 +643,7 @@ namespace core\PHPLibrary {
      * 
      * @return bool
      */
-    public function is_location_administrative_panelf_active() {
+    public function is_location_administrative_panel_active() {
       return ($this->urlp->get_path(0) == 'admin') ? true : false;
     }
 
