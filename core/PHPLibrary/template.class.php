@@ -473,9 +473,9 @@ namespace core\PHPLibrary {
     public function get_core_assembled() : string {
       if (isset($this->core->assembled)) {
         if ($this->system_core->urlp->get_param('mode') == 'install') {
-          $site_title = 'Installation | CMS GIRVAS';
-          $site_description = '';
-          $site_keywords = '';
+          $site_title = sprintf('Installation | %s', SystemCore::CMS_TITLE);
+          $site_description = 'This site is not installed yet, but will be soon.';
+          $site_keywords = 'girvas';
           $site_charset = 'UTF-8';
         } else {
           $locale_data = $this->system_core->locale->get_data();
@@ -586,10 +586,12 @@ namespace core\PHPLibrary {
                   $entry_updated_date_timestamp_iso_8601_without_date = date('H:i:s', $entry->get_updated_unix_timestamp());
 
                   array_push($entries_assembled, TemplateCollector::assembly_file_content($this->system_core->template, sprintf('%s/item.tpl', $template_sample_path), [
+                    'ENTRY_ID' => $entry->get_id(),
                     'ENTRY_NAME' => $entry->get_name(),
                     'ENTRY_TITLE' => $entry->get_title($cms_locale_name),
                     'ENTRY_DESCRIPTION' => $entry->get_description($cms_locale_name),
                     'ENTRY_URL' => $entry->get_url(),
+                    'ENTRY_PREVIEW_URL' => ($entry->get_preview_url() != '') ? $entry->get_preview_url() : Entry::get_preview_default_url($this->system_core, 512),
                     'ENTRY_CATEGORY_TITLE' => $entry_category_title,
                     'ENTRY_CATEGORY_URL' => $entry_category->get_url(),
                     'ENTRY_CREATED_DATE_TIMESTAMP' => $entry_created_date_timestamp,
