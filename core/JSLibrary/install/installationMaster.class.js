@@ -442,7 +442,7 @@ export class InstallationMaster {
         }).then((response) => {
           return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
-          if (!this.stepsData[this.getStepIndex()].isBuilded) {
+          if (!this.stepsData[this.getStepIndex() - 1].isBuilded) {
             let locales = data.outputData.locales;
             let interactiveLocalesChoices = new Interactive('choices');
             let interactiveLocalesAPChoices = new Interactive('choices');
