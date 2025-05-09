@@ -436,50 +436,48 @@ export class InstallationMaster {
         this.buttons.updateData.assembly();
       }
 
-      if (this.getStepIndex() == 7) {
+      if (this.getStepIndex() == 7 && !this.stepsData[this.getStepIndex()].isBuilded) {
         fetch(`/handler/locales?locale=${localeName}&installation-mode=true`, {
           method: 'GET'
         }).then((response) => {
           return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
-          if (!this.stepsData[this.getStepIndex() - 1].isBuilded) {
-            let locales = data.outputData.locales;
-            let interactiveLocalesChoices = new Interactive('choices');
-            let interactiveLocalesAPChoices = new Interactive('choices');
+          let locales = data.outputData.locales;
+          let interactiveLocalesChoices = new Interactive('choices');
+          let interactiveLocalesAPChoices = new Interactive('choices');
 
-            locales.forEach((locale, localeIndex) => {
-              let localeTitle = locale.title;
-              let localeIconURL = locale.iconURL;
-              let localeName = locale.name;
-              let localeISO639_2 = locale.iso639_2;
+          locales.forEach((locale, localeIndex) => {
+            let localeTitle = locale.title;
+            let localeIconURL = locale.iconURL;
+            let localeName = locale.name;
+            let localeISO639_2 = locale.iso639_2;
 
-              let localeIconImageElement = document.createElement('img');
-              localeIconImageElement.setAttribute('src', localeIconURL);
-              localeIconImageElement.setAttribute('alt', localeTitle);
+            let localeIconImageElement = document.createElement('img');
+            localeIconImageElement.setAttribute('src', localeIconURL);
+            localeIconImageElement.setAttribute('alt', localeTitle);
 
-              let localeLabelElement = document.createElement('span');
-              localeLabelElement.innerText = localeTitle;
+            let localeLabelElement = document.createElement('span');
+            localeLabelElement.innerText = localeTitle;
 
-              let localeTemplate = document.createElement('template');
-              localeTemplate.innerHTML += localeIconImageElement.outerHTML;
-              localeTemplate.innerHTML += localeLabelElement.outerHTML;
+            let localeTemplate = document.createElement('template');
+            localeTemplate.innerHTML += localeIconImageElement.outerHTML;
+            localeTemplate.innerHTML += localeLabelElement.outerHTML;
 
-              interactiveLocalesChoices.target.addItem(localeTemplate.innerHTML, localeName);
-              interactiveLocalesAPChoices.target.addItem(localeTemplate.innerHTML, localeName);
-            });
+            interactiveLocalesChoices.target.addItem(localeTemplate.innerHTML, localeName);
+            interactiveLocalesAPChoices.target.addItem(localeTemplate.innerHTML, localeName);
+          });
 
-            interactiveLocalesChoices.target.setName('setting_base_locale');
-            interactiveLocalesAPChoices.target.setName('setting_admin_locale');
+          interactiveLocalesChoices.target.setName('setting_base_locale');
+          interactiveLocalesAPChoices.target.setName('setting_admin_locale');
 
-            interactiveLocalesChoices.assembly();
-            interactiveLocalesAPChoices.assembly();
+          interactiveLocalesChoices.assembly();
+          interactiveLocalesAPChoices.assembly();
 
-            let interactiveLocalesContainerElement = document.querySelector('#E85485302311');
-            let interactiveLocalesAPContainerElement = document.querySelector('#E85485302312');
+          let interactiveLocalesContainerElement = document.querySelector('#E85485302311');
+          let interactiveLocalesAPContainerElement = document.querySelector('#E85485302312');
 
-            interactiveLocalesContainerElement.append(interactiveLocalesChoices.target.element);
-            interactiveLocalesAPContainerElement.append(interactiveLocalesAPChoices.target.element);
-          }
+          interactiveLocalesContainerElement.append(interactiveLocalesChoices.target.element);
+          interactiveLocalesAPContainerElement.append(interactiveLocalesAPChoices.target.element);
         }, (rejectionReason) => {
           let interactiveNotification = new Interactive('notification');
           interactiveNotification.target.isPopup = true;
