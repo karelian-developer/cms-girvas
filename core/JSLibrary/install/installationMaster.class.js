@@ -24,12 +24,24 @@ export class InstallationMaster {
 
     this.setStepsCount(stepsCount);
     this.buttons = {};
+    this.stepsData = [];
     this.progressItems = [];
     
     let installationProgress = document.querySelector('[role="installer-progress"]');
     let installationPages = document.querySelectorAll('[data-page-index]');
 
     if (this.searchParams.getParam('locale') != null) {
+      for (let stepIndex = 0; stepIndex < installationPages.length; stepIndex++) {
+        let stepID = elementIndex + 1;
+        let isBuilded = (elementIndex == 0) ? true : false;
+
+        this.stepsData.push({
+          id: stepID,
+          isBuilded: isBuilded,
+          isCompleted: false
+        });
+      }
+
       installationPages.forEach((element, elementIndex) => {
         element.style.display = (elementIndex == 0) ? 'block' : 'none';
 
@@ -430,42 +442,44 @@ export class InstallationMaster {
         }).then((response) => {
           return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
-          let locales = data.outputData.locales;
-          let interactiveLocalesChoices = new Interactive('choices');
-          let interactiveLocalesAPChoices = new Interactive('choices');
+          if (!this.stepsData[this.getStepIndex()].isBuilded) {
+            let locales = data.outputData.locales;
+            let interactiveLocalesChoices = new Interactive('choices');
+            let interactiveLocalesAPChoices = new Interactive('choices');
 
-          locales.forEach((locale, localeIndex) => {
-            let localeTitle = locale.title;
-            let localeIconURL = locale.iconURL;
-            let localeName = locale.name;
-            let localeISO639_2 = locale.iso639_2;
+            locales.forEach((locale, localeIndex) => {
+              let localeTitle = locale.title;
+              let localeIconURL = locale.iconURL;
+              let localeName = locale.name;
+              let localeISO639_2 = locale.iso639_2;
 
-            let localeIconImageElement = document.createElement('img');
-            localeIconImageElement.setAttribute('src', localeIconURL);
-            localeIconImageElement.setAttribute('alt', localeTitle);
+              let localeIconImageElement = document.createElement('img');
+              localeIconImageElement.setAttribute('src', localeIconURL);
+              localeIconImageElement.setAttribute('alt', localeTitle);
 
-            let localeLabelElement = document.createElement('span');
-            localeLabelElement.innerText = localeTitle;
+              let localeLabelElement = document.createElement('span');
+              localeLabelElement.innerText = localeTitle;
 
-            let localeTemplate = document.createElement('template');
-            localeTemplate.innerHTML += localeIconImageElement.outerHTML;
-            localeTemplate.innerHTML += localeLabelElement.outerHTML;
+              let localeTemplate = document.createElement('template');
+              localeTemplate.innerHTML += localeIconImageElement.outerHTML;
+              localeTemplate.innerHTML += localeLabelElement.outerHTML;
 
-            interactiveLocalesChoices.target.addItem(localeTemplate.innerHTML, localeName);
-            interactiveLocalesAPChoices.target.addItem(localeTemplate.innerHTML, localeName);
-          });
+              interactiveLocalesChoices.target.addItem(localeTemplate.innerHTML, localeName);
+              interactiveLocalesAPChoices.target.addItem(localeTemplate.innerHTML, localeName);
+            });
 
-          interactiveLocalesChoices.target.setName('setting_base_locale');
-          interactiveLocalesAPChoices.target.setName('setting_admin_locale');
+            interactiveLocalesChoices.target.setName('setting_base_locale');
+            interactiveLocalesAPChoices.target.setName('setting_admin_locale');
 
-          interactiveLocalesChoices.assembly();
-          interactiveLocalesAPChoices.assembly();
+            interactiveLocalesChoices.assembly();
+            interactiveLocalesAPChoices.assembly();
 
-          let interactiveLocalesContainerElement = document.querySelector('#E85485302311');
-          let interactiveLocalesAPContainerElement = document.querySelector('#E85485302312');
+            let interactiveLocalesContainerElement = document.querySelector('#E85485302311');
+            let interactiveLocalesAPContainerElement = document.querySelector('#E85485302312');
 
-          interactiveLocalesContainerElement.append(interactiveLocalesChoices.target.element);
-          interactiveLocalesAPContainerElement.append(interactiveLocalesAPChoices.target.element);
+            interactiveLocalesContainerElement.append(interactiveLocalesChoices.target.element);
+            interactiveLocalesAPContainerElement.append(interactiveLocalesAPChoices.target.element);
+          }
         }, (rejectionReason) => {
           let interactiveNotification = new Interactive('notification');
           interactiveNotification.target.isPopup = true;
@@ -679,6 +693,7 @@ export class InstallationMaster {
           this.buttons.nextStepIndex.target.setCallback((event) => {
             event.preventDefault();
             this.nextStepIndex(localeData);
+            this.stepsData[stepIndex].isCompleted = true;
 
             if (this.getStepIndex() == 2) {
               fetch(`/handler/install?stepIndex=2&locale=${localeName}&installation-mode=true`, {method: 'GET'}).then((response) => {
@@ -775,7 +790,9 @@ export class InstallationMaster {
           });
 
           if (this.getStepIndex() >= 5 && this.buttons.hasOwnProperty('nextStepIndex')) {
-            this.buttons.nextStepIndex.target.disable();
+            if (!this.stepsData[this.getStepIndex()].isBuilded) {
+              this.buttons.nextStepIndex.target.disable();
+            }
           }
 
           this.buttons.nextStepIndex.assembly();
@@ -786,6 +803,8 @@ export class InstallationMaster {
         buttonsPanel.appendChild(this.buttons[buttonName].target.element);
       }
     });
+
+    this.stepsData[this.getStepIndex()].isBuilded = true;
   }
 
   setStepIndex(index) {
@@ -829,6 +848,7 @@ export class InstallationMaster {
     if (stepIndex < stepsCount - 1) {
       if (typeof(this.progressItems[stepIndex]) != 'undefined') {
         this.progressItems[stepIndex].classList.add('item_completed');
+        this.stepsData[stepIndex].isBuilded = true;
       }
 
       if (typeof(this.progressItems[stepIndex + 1]) != 'undefined') {
