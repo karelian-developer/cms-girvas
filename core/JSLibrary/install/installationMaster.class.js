@@ -692,8 +692,8 @@ export class InstallationMaster {
           this.buttons.nextStepIndex.target.setLabel(localeData.BUTTON_NEXT_LABEL);
           this.buttons.nextStepIndex.target.setCallback((event) => {
             event.preventDefault();
+            this.stepsData[this.getStepIndex()].isCompleted = true;
             this.nextStepIndex(localeData);
-            this.stepsData[stepIndex].isCompleted = true;
 
             if (this.getStepIndex() == 2) {
               fetch(`/handler/install?stepIndex=2&locale=${localeName}&installation-mode=true`, {method: 'GET'}).then((response) => {
