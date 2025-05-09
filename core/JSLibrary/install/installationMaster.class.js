@@ -803,8 +803,6 @@ export class InstallationMaster {
         buttonsPanel.appendChild(this.buttons[buttonName].target.element);
       }
     });
-
-    this.stepsData[this.getStepIndex()].isBuilded = true;
   }
 
   setStepIndex(index) {
@@ -856,6 +854,7 @@ export class InstallationMaster {
         this.progressItems[stepIndex + 1].classList.add('item_current');
       }
 
+      this.stepsData[this.getStepIndex()].isBuilded = true;
       this.setStepIndex(stepIndex + 1);
     }
 
