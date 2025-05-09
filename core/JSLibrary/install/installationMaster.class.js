@@ -32,8 +32,8 @@ export class InstallationMaster {
 
     if (this.searchParams.getParam('locale') != null) {
       for (let stepIndex = 0; stepIndex < installationPages.length; stepIndex++) {
-        let stepID = elementIndex + 1;
-        let isBuilded = (elementIndex == 0) ? true : false;
+        let stepID = stepIndex + 1;
+        let isBuilded = (stepIndex == 0) ? true : false;
 
         this.stepsData.push({
           id: stepID,
@@ -854,7 +854,7 @@ export class InstallationMaster {
         this.progressItems[stepIndex + 1].classList.add('item_current');
       }
 
-      this.stepsData[this.getStepIndex()].isBuilded = true;
+      this.stepsData[stepIndex].isBuilded = true;
       this.setStepIndex(stepIndex + 1);
     }
 
