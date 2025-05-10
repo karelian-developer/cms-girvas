@@ -24,7 +24,17 @@ export class TextareaVisual {
     let iFrameElement = this.editor.createElementIFrame();
 
     this.editor.fetchJSON('/handler/template?categoryName=base', {method: 'GET'}).then((data) => {
-      console.log(data);
+      let templateName = data.outputData.template.name;
+      let templateCategoryName = data.outputData.template.categoryName;
+      let templateURL = (templateCategoryName == 'base') ? `/templates/${templateName}` : `/templates/${templateCategoryName}/${templateName}`;
+      let entryStyleURL = `${templateURL}/styles/page/entry.css`;
+
+      let linkElement = document.createElement('link');
+      linkElement.rel = 'stylesheet';
+      linkElement.href = entryStyleURL;
+
+      let iFrameElementDocument = iFrameElement.contentDocument || iFrameElement.contentWindow.document;
+      iFrameElementDocument.head.appendChild(linkElement);
     });
 
     this.element.append(iFrameElement);

@@ -80,7 +80,8 @@ if ($system_core->urlp->get_path(2) == null && $system_core->urlp->get_param('ca
   $template_name = ($system_core->configurator->exists_database_entry_value($template_config_name)) ? $system_core->configurator->get_database_entry_value($template_config_name) : 'default';
 
   $handler_output_data['template'] = [
-    'name' => $template_name
+    'name' => $template_name,
+    'categoryName' => $template_category_name
   ];
 
   $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS') : $handler_message;
