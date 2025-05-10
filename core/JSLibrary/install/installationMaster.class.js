@@ -853,7 +853,7 @@ export class InstallationMaster {
       }
 
       this.setStepIndex(stepIndex + 1);
-      this.stepsData[stepIndex + 1].isBuilded = true;
+      this.stepsData[stepIndex].isBuilded = true;
     }
 
     let installationPages = document.querySelectorAll('[data-page-index]');
