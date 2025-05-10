@@ -37,8 +37,10 @@ export class ToolPreview extends Tool {
         }).then((response) => {
           return response.json();
         }).then((data) => {
-          let iFrameElement = this.editor.textareaVisual.element.querySelector('body');
-          iFrameElement.innerHTML = data.outputData.parsedown;
+          let iFrameElement = this.editor.textareaVisual.element;
+          let iFrameElementDocument = iFrameElement.contentDocument || iFrameElement.contentWindow.document;
+
+          iFrameElementDocument.body.innerHTML = data.outputData.parsedown;
         }).catch((error) => {
           console.error(error);
         });
