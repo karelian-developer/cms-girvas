@@ -123,8 +123,6 @@
   "API_INSTALLATION_NAME_LABEL": "Name",
   "API_INSTALLATION_EXPECTATION_LABEL": "Expectation",
   "API_INSTALLATION_FACT_LABEL": "Fact",
-  "API_INSTALLATION_DIRECTORY_FOUND_LABEL": "Directory found",
-  "API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL": "Directory not found",
   "API_INSTALLATION_DRIVER_PDO_LABEL": "PDO driver",
   "API_INSTALLATION_DRIVER_PDO_STATUS_LABEL": "Status",
   "API_INSTALLATION_CONFIGURATION_FILE_CREATED": "The configuration file has been successfully created.",
@@ -136,5 +134,8 @@
   "API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_LOGIN": "The login is in an incorrect format.",
   "API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_PASSWORD": "The password is not in the correct format or does not meet security requirements.",
   "API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_REPEAT_PASSWORD": "The specified passwords do not match.",
-  "API_INSTALLATION_SECRET_KEY_LABEL": "The secret key"
+  "API_INSTALLATION_SECRET_KEY_LABEL": "The secret key",
+  "API_INSTALLATION_DIRECTORY_FOUND_LABEL": "Directory found",
+  "API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL": "Directory not found",
+  "API_INSTALLATION_SITE_TITLE_OR_DESCRIPTION_IS_EMPTY": "The site title or description is empty."
 }

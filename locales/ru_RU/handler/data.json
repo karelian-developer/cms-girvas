@@ -140,5 +140,6 @@
   "API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_REPEAT_PASSWORD": "Указанные пароли не совпадают.",
   "API_INSTALLATION_SECRET_KEY_LABEL": "Секретный ключ",
   "API_INSTALLATION_DIRECTORY_FOUND_LABEL": "Директория найдена",
-  "API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL": "Директория не найдена"
+  "API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL": "Директория не найдена",
+  "API_INSTALLATION_SITE_TITLE_OR_DESCRIPTION_IS_EMPTY": "Название сайта или его описание пусты."
 }

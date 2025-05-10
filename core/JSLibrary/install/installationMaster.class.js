@@ -396,6 +396,13 @@ export class InstallationMaster {
         this.buttons.updateData.assembly();
       }
 
+      /**
+       * ШАГ МАСТЕРА-УСТАНОВЩИКА: №8
+       * 
+       * Цели шага:
+       * - Выбор локализации сайта и административной панели
+       * - Выбор временной зоны для расчета времени
+       */
       if (this.getStepIndex() == 7) {
         // Если сборка страница шага еще не осуществлялась ранее,
         // то делаем запросы к внутреннему API для получения списков
@@ -498,38 +505,54 @@ export class InstallationMaster {
         this.buttons.updateData.assembly();
       }
 
+      /**
+       * ШАГ МАСТЕРА-УСТАНОВЩИКА: №9
+       * 
+       * Цели шага:
+       * - Назначение наименования сайту
+       * - Назначение описания сайту
+       * - Назначение ключевых слов сайту
+       */
       if (this.getStepIndex() == 8) {
         this.buttons.updateData = new Interactive('button');
         this.buttons.updateData.target.setLabel(localeData.BUTTON_APPLY_LABEL);
         this.buttons.updateData.target.setCallback((event) => {
           event.preventDefault();
 
+          /** @type {HTMLFormElement} */
           let formTarget = document.querySelector('[role="form-metadata"]');
-          /** @type {FormData} */
-          let formData = new FormData(formTarget);
-          
-          fetch(`/handler/install/set-metadata?locale=${localeName}&installation-mode=true`, {method: 'POST', body: formData}).then((response) => {
-            return (response.ok) ? response.json() : Promise.reject(response);
-          }).then((data) => {
-            let resultHTML = data.outputData.html;
-
-            let tableSystemsElement = document.querySelector('[role="cms-metadata"]');
-
-            if (tableSystemsElement) {
-              tableSystemsElement.remove();
-            }
+          if (formTarget !== null) {
+            /** @type {FormData} */
+            let formData = new FormData(formTarget);
             
-            let dynamicDiv = document.createElement('div');
-            dynamicDiv.setAttribute('role', 'cms-metadata');
-            dynamicDiv.innerHTML = resultHTML;
+            // Применение данных из формы
+            fetch(`/handler/install/set-metadata?locale=${localeName}&installation-mode=true`, {method: 'POST', body: formData}).then((response) => {
+              return (response.ok) ? response.json() : Promise.reject(response);
+            }).then((data) => {
+              let resultHTML = data.outputData.html;
+              let statusCode = data.statusCode;
 
-            let installationPages = document.querySelectorAll('[data-page-index]');
-            installationPages[this.getStepIndex()].appendChild(dynamicDiv);
+              let tableSystemsElement = document.querySelector('[role="cms-metadata"]');
 
-            this.buttons.nextStepIndex.target.enable();
-          }, (rejectionReason) => {
-            this.showPopupNotification(rejectionReason, 0);
-          });
+              if (tableSystemsElement) {
+                tableSystemsElement.remove();
+              }
+              
+              let dynamicDiv = document.createElement('div');
+              dynamicDiv.setAttribute('role', 'cms-metadata');
+              dynamicDiv.innerHTML = resultHTML;
+
+              /** @type {NodeList} */
+              let installationPages = document.querySelectorAll('[data-page-index]');
+              installationPages[this.getStepIndex()].appendChild(dynamicDiv);
+
+              if (statusCode === 1) {
+                this.buttons.nextStepIndex.target.enable();
+              }
+            }, (rejectionReason) => {
+              this.showPopupNotification(rejectionReason, 0);
+            });
+          }
         });
 
         this.buttons.updateData.assembly();

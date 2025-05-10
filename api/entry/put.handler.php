@@ -43,7 +43,7 @@ if ($system_core->client->is_logged(2)) {
 
             if (array_key_exists($entries_category_title_input_name, $_PUT)) {
               $input_value = $_PUT[$entries_category_title_input_name];
-              $input_value = preg_replace('/<script(.*?)>(.*?)<\/script>/is', '', $input_value);
+              $input_value = strip_tags($input_value);
               $input_value = str_replace('\'', '"', $input_value);
   
               $texts[$cms_locale->get_name()]['title'] = $input_value;
@@ -51,7 +51,7 @@ if ($system_core->client->is_logged(2)) {
 
             if (array_key_exists($entries_category_description_textarea_name, $_PUT)) {
               $input_value = $_PUT[$entries_category_description_textarea_name];
-              $input_value = preg_replace('/<script(.*?)>(.*?)<\/script>/is', '', $input_value);
+              $input_value = strip_tags($input_value);
               $input_value = str_replace('\'', '"', $input_value);
   
               $texts[$cms_locale->get_name()]['description'] = $input_value;
@@ -111,7 +111,7 @@ if ($system_core->client->is_logged(2)) {
 
             if (array_key_exists($entry_title_input_name, $_PUT)) {
               $input_value = $_PUT[$entry_title_input_name];
-              $input_value = preg_replace('/<script(.*?)>(.*?)<\/script>/is', '', $input_value);
+              $input_value = strip_tags($input_value);
               $input_value = str_replace('\'', '"', $input_value);
   
               $texts[$cms_locale->get_name()]['title'] = $input_value;
@@ -119,7 +119,7 @@ if ($system_core->client->is_logged(2)) {
 
             if (array_key_exists($entry_description_textarea_name, $_PUT)) {
               $textarea_value = $_PUT[$entry_description_textarea_name];
-              $textarea_value = preg_replace('/<script(.*?)>(.*?)<\/script>/is', '', $textarea_value);
+              $textarea_value = strip_tags($textarea_value);
               $textarea_value = str_replace('\'', '"', $textarea_value);
   
               $texts[$cms_locale->get_name()]['description'] = $textarea_value;
@@ -127,7 +127,7 @@ if ($system_core->client->is_logged(2)) {
             
             if (array_key_exists($entry_content_textarea_name, $_PUT)) {
               $textarea_value = $_PUT[$entry_content_textarea_name];
-              $textarea_value = preg_replace('/<script(.*?)>(.*?)<\/script>/is', '', $textarea_value);
+              $textarea_value = strip_tags($textarea_value, '<table><tr><td><th><b><u><i><hr>');
               $textarea_value = str_replace('\'', '"', $textarea_value);
   
               $texts[$cms_locale->get_name()]['content'] = $textarea_value;
@@ -135,7 +135,7 @@ if ($system_core->client->is_logged(2)) {
 
             if (array_key_exists($entry_keywords_textarea_name, $_PUT)) {
               $textarea_value = $_PUT[$entry_keywords_textarea_name];
-              $textarea_value = preg_replace('/<script(.*?)>(.*?)<\/script>/is', '', $textarea_value);
+              $textarea_value = strip_tags($textarea_value);
               $textarea_value = str_replace('\'', '"', $textarea_value);
 
               $texts[$cms_locale->get_name()]['keywords'] = preg_split('/\h*[\,]+\h*/', $textarea_value, -1, PREG_SPLIT_NO_EMPTY);

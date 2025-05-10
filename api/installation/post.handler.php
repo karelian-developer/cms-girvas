@@ -51,35 +51,57 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
   if ($system_core->urlp->get_path(2) == 'set-metadata') {
     $dom_document = new \DOMDocument();
     $tip_block = $dom_document->createElement('div');
+
+    $site_title = trim($_POST['site_title']);
+    $site_title = strip_tags($site_title);
+    $site_title = str_replace('\'', '"', $site_title);
+
+    $site_description = trim($_POST['site_description']);
+    $site_description = strip_tags($site_description);
+    $site_description = str_replace('\'', '"', $site_description);
+
+    $site_keywords = trim($_POST['site_keywords']);
+    $site_keywords = strip_tags($site_keywords);
+    $site_keywords = str_replace('\'', '"', $site_keywords);
+    $site_keywords = preg_split('/\s*\,\s*/', $site_keywords);
     
-    $system_core->database_connector = new \core\PHPLibrary\SystemCore\DatabaseConnector($system_core, $system_core->configurator);
+    if (!empty($site_title) && !empty($site_description)) {
+      $system_core->database_connector = new \core\PHPLibrary\SystemCore\DatabaseConnector($system_core, $system_core->configurator);
 
-    if ($system_core->configurator->exists_database_entry_value('base_site_title')) {
-      $system_core->configurator->update_database_entry_value('base_site_title', $_POST['site_title']);
+      if ($system_core->configurator->exists_database_entry_value('base_site_title')) {
+        $system_core->configurator->update_database_entry_value('base_site_title', $site_title);
+      } else {
+        $system_core->configurator->insert_database_entry_value('base_site_title', $site_title);
+      }
+
+      if ($system_core->configurator->exists_database_entry_value('seo_site_description')) {
+        $system_core->configurator->update_database_entry_value('seo_site_description', $site_description);
+      } else {
+        $system_core->configurator->insert_database_entry_value('seo_site_description', $site_description);
+      }
+
+      if ($system_core->configurator->exists_database_entry_value('seo_site_keywords')) {
+        $system_core->configurator->update_database_entry_value('seo_site_keywords', json_encode($site_keywords));
+      } else {
+        $system_core->configurator->insert_database_entry_value('seo_site_keywords', json_encode($site_keywords));
+      }
+
+      $tip_block->setAttribute('class', 'tip tip_green');
+      $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_POST_DATA_SUCCESS');
+
+      $handler_message = $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+      $handler_status_code = 1;
     } else {
-      $system_core->configurator->insert_database_entry_value('base_site_title', $_POST['site_title']);
-    }
+      $tip_block->setAttribute('class', 'tip tip_red');
+      $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_SITE_TITLE_OR_DESCRIPTION_IS_EMPTY');
 
-    if ($system_core->configurator->exists_database_entry_value('seo_site_description')) {
-      $system_core->configurator->update_database_entry_value('seo_site_description', $_POST['site_description']);
-    } else {
-      $system_core->configurator->insert_database_entry_value('seo_site_description', $_POST['site_description']);
+      $handler_message = $system_core->locale->get_single_value_by_key('API_INSTALLATION_SITE_TITLE_OR_DESCRIPTION_IS_EMPTY');
+      $handler_status_code = 0;
     }
-
-    if ($system_core->configurator->exists_database_entry_value('seo_site_keywords')) {
-      $system_core->configurator->update_database_entry_value('seo_site_keywords', json_encode(preg_split('/\s*\,\s*/', $_POST['site_keywords'])));
-    } else {
-      $system_core->configurator->insert_database_entry_value('seo_site_keywords', json_encode(preg_split('/\s*\,\s*/', $_POST['site_keywords'])));
-    }
-
-    $tip_block->setAttribute('class', 'tip tip_green');
-    $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_POST_DATA_SUCCESS');
 
     $dom_document->appendChild($tip_block);
 
     $handler_output_data['html'] = $dom_document->saveHTML();
-    $handler_message = $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
-    $handler_status_code = 1;
   }
 
   if ($system_core->urlp->get_path(2) == 'create-admin') {
