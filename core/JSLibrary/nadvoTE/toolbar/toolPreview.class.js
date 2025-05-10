@@ -24,7 +24,7 @@ export class ToolPreview extends Tool {
 
   resizePreviewIFrame(element) {
     let elementDocument = element.contentDocument || element.contentWindow.document;
-    elementDocument.style.height = elementDocument.documentElement.scrollHeight + 'px';
+    element.style.height = elementDocument.documentElement.scrollHeight + 'px';
   }
 
   initClickEvent() {
@@ -45,7 +45,7 @@ export class ToolPreview extends Tool {
           let iFrameWrapperElement = this.editor.textareaVisual.element;
           let iFrameElement = iFrameWrapperElement.querySelector('iframe');
           iFrameElement.setAttribute('scrolling', 'no');
-          
+
           let iFrameElementDocument = iFrameElement.contentDocument || iFrameElement.contentWindow.document;
 
           iFrameElementDocument.body.innerHTML = data.outputData.parsedown;
