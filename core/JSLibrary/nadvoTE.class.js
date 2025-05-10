@@ -75,4 +75,8 @@ export class NadvoTE {
   getSelectionString() {
     return window.getSelection().toString();
   }
+
+  async fetchJSON(url, data) {
+    return fetch(url, data).then(response => response.ok ? response.json() : Promise.reject(response));
+  }
 }

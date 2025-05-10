@@ -23,6 +23,10 @@ export class TextareaVisual {
 
     let iFrameElement = this.editor.createElementIFrame();
 
+    this.editor.fetchJSON('/handler/template?categoryName=base', {method: 'GET'}).then((data) => {
+      console.log(data);
+    });
+
     this.element.append(iFrameElement);
   }
 }
