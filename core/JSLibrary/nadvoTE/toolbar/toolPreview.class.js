@@ -38,7 +38,7 @@ export class ToolPreview extends Tool {
           return response.json();
         }).then((data) => {
           let iFrameWrapperElement = this.editor.textareaVisual.element;
-          let iFrameElement = iFrameWrapperElement.queryselector('iframe');
+          let iFrameElement = iFrameWrapperElement.querySelector('iframe');
           let iFrameElementDocument = iFrameElement.contentDocument || iFrameElement.contentWindow.document;
 
           iFrameElementDocument.body.innerHTML = data.outputData.parsedown;
