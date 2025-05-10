@@ -71,13 +71,7 @@ export class InstallationMaster {
         }).then((data) => {
           return data.outputData.locales;
         }, (rejectionReason) => {
-          let interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(rejectionReason);
-          interactiveNotification.target.assembly();
-    
-          interactiveNotification.target.show();
+          this.showPopupNotification(rejectionReason, 0);
         }).then((locales) => {
           locales.forEach((locale, localeIndex) => {
             let localeTitle = locale.title;
@@ -121,6 +115,16 @@ export class InstallationMaster {
     return fetch(url, data).then(response => response.ok ? response.json() : Promise.reject(response));
   }
 
+  showPopupNotification(message, statusCode = -1) {
+    let interactiveElement = new Interactive('notification');
+    interactiveElement.target.isPopup = true;
+    interactiveElement.target.setStatusCode(statusCode);
+    interactiveElement.target.setContent(message);
+    interactiveElement.target.assembly();
+
+    interactiveElement.target.show();
+  }
+
   buildPanel() {
     let localeName = (this.searchParams.getParam('locale') != null) ? this.searchParams.getParam('locale') : 'en_US';
     let locale = new Locale(localeName, 'install');
@@ -129,13 +133,7 @@ export class InstallationMaster {
     locale.getData().then((data) => {
       localeData = data;
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.showPopupNotification(rejectionReason, 0);
     }).then(() => {
       let buttonsPanel = document.querySelector('[role="installation-buttons-panel"]');
       buttonsPanel.innerHTML = '';
@@ -197,13 +195,7 @@ export class InstallationMaster {
               installationPages[this.getStepIndex()].appendChild(dynamicDiv);
             }
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
 
           this.buildPanel();
@@ -235,13 +227,7 @@ export class InstallationMaster {
             let installationPages = document.querySelectorAll('[data-page-index]');
             installationPages[this.getStepIndex()].appendChild(dynamicDiv);
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -272,13 +258,7 @@ export class InstallationMaster {
             let installationPages = document.querySelectorAll('[data-page-index]');
             installationPages[this.getStepIndex()].appendChild(dynamicDiv);
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -309,13 +289,7 @@ export class InstallationMaster {
             let installationPages = document.querySelectorAll('[data-page-index]');
             installationPages[this.getStepIndex()].appendChild(dynamicDiv);
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0)
           });
         });
 
@@ -346,13 +320,7 @@ export class InstallationMaster {
             let installationPages = document.querySelectorAll('[data-page-index]');
             installationPages[this.getStepIndex()].appendChild(dynamicDiv);
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -388,13 +356,7 @@ export class InstallationMaster {
 
             this.buttons.nextStepIndex.target.enable();
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -427,13 +389,7 @@ export class InstallationMaster {
 
             this.buttons.nextStepIndex.target.enable();
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -497,13 +453,7 @@ export class InstallationMaster {
             interactiveLocalesAPContainerElement.append(interactiveLocalesAPChoices.target.element);
             document.querySelector('#E85485302313').prepend(interactiveDataSearcher.target.element);
           }).catch((rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         }
 
@@ -541,13 +491,7 @@ export class InstallationMaster {
 
             this.buttons.nextStepIndex.target.enable();
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -584,13 +528,7 @@ export class InstallationMaster {
 
             this.buttons.nextStepIndex.target.enable();
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -629,13 +567,7 @@ export class InstallationMaster {
               this.buttons.nextStepIndex.target.enable();
             }
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -668,13 +600,7 @@ export class InstallationMaster {
 
             this.buttons.nextStepIndex.target.enable();
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -709,13 +635,7 @@ export class InstallationMaster {
                 let installationPages = document.querySelectorAll('[data-page-index]');
                 installationPages[this.getStepIndex()].appendChild(dynamicDiv);
               }, (rejectionReason) => {
-                let interactiveNotification = new Interactive('notification');
-                interactiveNotification.target.isPopup = true;
-                interactiveNotification.target.setStatusCode(0);
-                interactiveNotification.target.setContent(rejectionReason);
-                interactiveNotification.target.assembly();
-          
-                interactiveNotification.target.show();
+                this.showPopupNotification(rejectionReason, 0);
               });
             }
 
@@ -738,13 +658,7 @@ export class InstallationMaster {
                 let installationPages = document.querySelectorAll('[data-page-index]');
                 installationPages[this.getStepIndex()].appendChild(dynamicDiv);
               }, (rejectionReason) => {
-                let interactiveNotification = new Interactive('notification');
-                interactiveNotification.target.isPopup = true;
-                interactiveNotification.target.setStatusCode(0);
-                interactiveNotification.target.setContent(rejectionReason);
-                interactiveNotification.target.assembly();
-          
-                interactiveNotification.target.show();
+                this.showPopupNotification(rejectionReason, 0);
               });
             }
 
@@ -767,13 +681,7 @@ export class InstallationMaster {
                 let installationPages = document.querySelectorAll('[data-page-index]');
                 installationPages[this.getStepIndex()].appendChild(dynamicDiv);
               }, (rejectionReason) => {
-                let interactiveNotification = new Interactive('notification');
-                interactiveNotification.target.isPopup = true;
-                interactiveNotification.target.setStatusCode(0);
-                interactiveNotification.target.setContent(rejectionReason);
-                interactiveNotification.target.assembly();
-          
-                interactiveNotification.target.show();
+                this.showPopupNotification(rejectionReason, 0);
               });
             }
 
