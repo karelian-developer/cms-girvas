@@ -117,6 +117,10 @@ export class InstallationMaster {
     }
   }
 
+  async fetchJSON(url, data) {
+    return fetch(url, data).then(response => response.ok ? response.json() : Promise.reject(response));
+  }
+
   buildPanel() {
     let localeName = (this.searchParams.getParam('locale') != null) ? this.searchParams.getParam('locale') : 'en_US';
     let locale = new Locale(localeName, 'install');
@@ -436,85 +440,78 @@ export class InstallationMaster {
         this.buttons.updateData.assembly();
       }
 
-      if (this.getStepIndex() == 7 && !this.stepsData[this.getStepIndex()].isBuilded) {
-        fetch(`/handler/locales?locale=${localeName}&installation-mode=true`, {
-          method: 'GET'
-        }).then((response) => {
-          return (response.ok) ? response.json() : Promise.reject(response);
-        }).then((data) => {
-          let locales = data.outputData.locales;
-          let interactiveLocalesChoices = new Interactive('choices');
-          let interactiveLocalesAPChoices = new Interactive('choices');
+      if (this.getStepIndex() == 7) {
+        // Если сборка страница шага еще не осуществлялась ранее,
+        // то делаем запросы к внутреннему API для получения списков
+        // локализаций системы для формирования выпадающих списков
+        if (!this.stepsData[this.getStepIndex()].isBuilded) {
+          Promise.all([
+            fetchJSON(`/handler/locales?locale=${localeName}&installation-mode=true`, {method: 'GET'}),
+            fetchJSON(`/handler/timezones?locale=${localeName}&installation-mode=true`, {method: 'GET'})
+          ]).then(([localesData, timezonesData]) => {
+            let locales = localesData.outputData.locales;
+            let timezones = timezonesData.outputData.timezones;
 
-          locales.forEach((locale, localeIndex) => {
-            let localeTitle = locale.title;
-            let localeIconURL = locale.iconURL;
-            let localeName = locale.name;
-            let localeISO639_2 = locale.iso639_2;
+            let interactiveLocalesChoices = new Interactive('choices');
+            let interactiveLocalesAPChoices = new Interactive('choices');
+            let interactiveDataSearcher = new Interactive('dataSearcher');
 
-            let localeIconImageElement = document.createElement('img');
-            localeIconImageElement.setAttribute('src', localeIconURL);
-            localeIconImageElement.setAttribute('alt', localeTitle);
+            locales.forEach((locale, localeIndex) => {
+              let localeTitle = locale.title;
+              let localeIconURL = locale.iconURL;
+              let localeName = locale.name;
+              let localeISO639_2 = locale.iso639_2;
 
-            let localeLabelElement = document.createElement('span');
-            localeLabelElement.innerText = localeTitle;
+              let localeIconImageElement = document.createElement('img');
+              localeIconImageElement.setAttribute('src', localeIconURL);
+              localeIconImageElement.setAttribute('alt', localeTitle);
 
-            let localeTemplate = document.createElement('template');
-            localeTemplate.innerHTML += localeIconImageElement.outerHTML;
-            localeTemplate.innerHTML += localeLabelElement.outerHTML;
+              let localeLabelElement = document.createElement('span');
+              localeLabelElement.innerText = localeTitle;
 
-            interactiveLocalesChoices.target.addItem(localeTemplate.innerHTML, localeName);
-            interactiveLocalesAPChoices.target.addItem(localeTemplate.innerHTML, localeName);
+              let localeTemplate = document.createElement('template');
+              localeTemplate.innerHTML += localeIconImageElement.outerHTML;
+              localeTemplate.innerHTML += localeLabelElement.outerHTML;
+
+              interactiveLocalesChoices.target.addItem(localeTemplate.innerHTML, localeName);
+              interactiveLocalesAPChoices.target.addItem(localeTemplate.innerHTML, localeName);
+            });
+
+            timezones.forEach((timezone) => {
+              interactiveDataSearcher.target.addItem(`${timezone.name} (${timezone.utc})`, timezone.name);
+            });
+
+            interactiveDataSearcher.target.inputValueElementData.name = 'setting_base_timezone';
+
+            interactiveLocalesChoices.target.setName('setting_base_locale');
+            interactiveLocalesAPChoices.target.setName('setting_admin_locale');
+
+            interactiveLocalesChoices.assembly();
+            interactiveLocalesAPChoices.assembly();
+            interactiveDataSearcher.assembly();
+
+            let interactiveLocalesContainerElement = document.querySelector('#E85485302311');
+            let interactiveLocalesAPContainerElement = document.querySelector('#E85485302312');
+
+            interactiveLocalesContainerElement.append(interactiveLocalesChoices.target.element);
+            interactiveLocalesAPContainerElement.append(interactiveLocalesAPChoices.target.element);
+            document.querySelector('#E85485302313').prepend(interactiveDataSearcher.target.element);
+          }).catch((rejectionReason) => {
+            let interactiveNotification = new Interactive('notification');
+            interactiveNotification.target.isPopup = true;
+            interactiveNotification.target.setStatusCode(0);
+            interactiveNotification.target.setContent(rejectionReason);
+            interactiveNotification.target.assembly();
+      
+            interactiveNotification.target.show();
           });
+        }
 
-          interactiveLocalesChoices.target.setName('setting_base_locale');
-          interactiveLocalesAPChoices.target.setName('setting_admin_locale');
-
-          interactiveLocalesChoices.assembly();
-          interactiveLocalesAPChoices.assembly();
-
-          let interactiveLocalesContainerElement = document.querySelector('#E85485302311');
-          let interactiveLocalesAPContainerElement = document.querySelector('#E85485302312');
-
-          interactiveLocalesContainerElement.append(interactiveLocalesChoices.target.element);
-          interactiveLocalesAPContainerElement.append(interactiveLocalesAPChoices.target.element);
-        }, (rejectionReason) => {
-          let interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(rejectionReason);
-          interactiveNotification.target.assembly();
-    
-          interactiveNotification.target.show();
-        });
-
-        fetch(`/handler/timezones?locale=${localeName}&installation-mode=true`, {
-          method: 'GET'
-        }).then((response) => {
-          return (response.ok) ? response.json() : Promise.reject(response);
-        }).then((data) => {
-          let timezones = data.outputData.timezones;
-
-          let interactiveDataSearcher = new Interactive('dataSearcher');
-          timezones.forEach((timezone) => {
-            interactiveDataSearcher.target.addItem(`${timezone.name} (${timezone.utc})`, timezone.name);
-          });
-
-          interactiveDataSearcher.target.inputValueElementData.name = 'setting_base_timezone';
-
-          interactiveDataSearcher.assembly();
-
-          document.querySelector('#E85485302313').prepend(interactiveDataSearcher.target.element);
-        }, (rejectionReason) => {
-          let interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(rejectionReason);
-          interactiveNotification.target.assembly();
-    
-          interactiveNotification.target.show();
-        });
-
+        /** 
+         * Интерактивный элемент "Кнопка"
+         * Действие: применение данных
+         * @type {Interactive}
+         */
         this.buttons.updateData = new Interactive('button');
         this.buttons.updateData.target.setLabel('Применить');
         this.buttons.updateData.target.setCallback((event) => {
