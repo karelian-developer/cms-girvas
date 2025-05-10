@@ -61,6 +61,10 @@ export class NadvoTE {
     return document.createElement('li');
   }
 
+  createElementIFrame() {
+    return document.createElement('iframe');
+  }
+
   createElementButton(content) {
     let element = document.createElement('button');
     element.innerHTML = content;
