@@ -54,6 +54,13 @@
   display: block;
 }
 
+.nadvo-te__textarea-visual > .iframe {
+  box-sizing: border-box;
+  border: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
 .nadvo-te__textarea {
   display: block;
   height: 400px;

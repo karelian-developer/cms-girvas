@@ -20,8 +20,11 @@ export class TextareaVisual {
   init() {
     this.element = this.editor.createElementDiv();
     this.element.classList.add('nadvo-te__textarea-visual');
+    this.element.classList.add('textarea-visual');
 
     let iFrameElement = this.editor.createElementIFrame();
+    iFrameElement.classList.add('textarea-visual__iframe');
+    iFrameElement.classList.add('iframe');
 
     this.editor.fetchJSON('/handler/template?categoryName=base', {method: 'GET'}).then((data) => {
       let templateName = data.outputData.template.name;
