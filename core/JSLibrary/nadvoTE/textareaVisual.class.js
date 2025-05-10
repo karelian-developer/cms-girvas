@@ -27,14 +27,26 @@ export class TextareaVisual {
       let templateName = data.outputData.template.name;
       let templateCategoryName = data.outputData.template.categoryName;
       let templateURL = (templateCategoryName == 'base') ? `/templates/${templateName}` : `/templates/${templateCategoryName}/${templateName}`;
-      let entryStyleURL = `${templateURL}/styles/nadvoTE/preview.css`;
-
-      let linkElement = document.createElement('link');
-      linkElement.rel = 'stylesheet';
-      linkElement.href = entryStyleURL;
+      let iFrameTargetStylesURLs = [
+        `/core/CSSCore/normalize.css`,
+        `/core/CSSCore/default-colors-scheme.css`,
+        `/core/CSSCore/default-base.css`,
+        `/core/CSSCore/default-fonts.css`,
+        `/core/CSSCore/default-tables.css`,
+        `${templateURL}/styles/fonts.css`,
+        `${templateURL}/styles/colors.css`,
+        `${templateURL}/styles/nadvoTE/preview.css`
+      ];
 
       let iFrameElementDocument = iFrameElement.contentDocument || iFrameElement.contentWindow.document;
-      iFrameElementDocument.head.appendChild(linkElement);
+
+      iFrameTargetStylesURLs.forEach(url => {
+        let linkElement = document.createElement('link');
+        linkElement.rel = 'stylesheet';
+        linkElement.href = url;
+
+        iFrameElementDocument.head.appendChild(linkElement);
+      });
     });
 
     this.element.append(iFrameElement);
