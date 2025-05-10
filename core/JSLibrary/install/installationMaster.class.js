@@ -852,8 +852,8 @@ export class InstallationMaster {
         this.progressItems[stepIndex + 1].classList.add('item_current');
       }
 
-      this.stepsData[stepIndex].isBuilded = true;
       this.setStepIndex(stepIndex + 1);
+      this.stepsData[stepIndex + 1].isBuilded = true;
     }
 
     let installationPages = document.querySelectorAll('[data-page-index]');
