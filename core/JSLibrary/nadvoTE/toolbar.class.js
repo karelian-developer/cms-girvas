@@ -48,6 +48,10 @@ export class Toolbar {
           optionItemInteractiveElement = buttonTest.target.element;
           optionItemInteractiveElement.firstChild.classList.add('nadvo-te__toolbar-button');
         }
+
+        if (optionItem.name === 'preview') {
+          optionItemElement.style.marginLeft = 'auto';
+        }
         
         switch (optionItem.name) {
           case 'bold': this.tools.bold = new ToolBold(this.editor, optionItemInteractiveElement); break;
