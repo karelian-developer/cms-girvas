@@ -27,7 +27,7 @@ export class TextareaVisual {
       let templateName = data.outputData.template.name;
       let templateCategoryName = data.outputData.template.categoryName;
       let templateURL = (templateCategoryName == 'base') ? `/templates/${templateName}` : `/templates/${templateCategoryName}/${templateName}`;
-      let entryStyleURL = `${templateURL}/styles/page/entry.css`;
+      let entryStyleURL = `${templateURL}/styles/nadvoTE/preview.css`;
 
       let linkElement = document.createElement('link');
       linkElement.rel = 'stylesheet';
