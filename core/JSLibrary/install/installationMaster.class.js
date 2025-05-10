@@ -446,8 +446,8 @@ export class InstallationMaster {
         // локализаций системы для формирования выпадающих списков
         if (!this.stepsData[this.getStepIndex()].isBuilded) {
           Promise.all([
-            fetchJSON(`/handler/locales?locale=${localeName}&installation-mode=true`, {method: 'GET'}),
-            fetchJSON(`/handler/timezones?locale=${localeName}&installation-mode=true`, {method: 'GET'})
+            this.fetchJSON(`/handler/locales?locale=${localeName}&installation-mode=true`, {method: 'GET'}),
+            this.fetchJSON(`/handler/timezones?locale=${localeName}&installation-mode=true`, {method: 'GET'})
           ]).then(([localesData, timezonesData]) => {
             let locales = localesData.outputData.locales;
             let timezones = timezonesData.outputData.timezones;
