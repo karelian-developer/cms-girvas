@@ -785,7 +785,7 @@ export class InstallationMaster {
           });
 
           if (this.getStepIndex() >= 5 && this.buttons.hasOwnProperty('nextStepIndex')) {
-            if (!this.stepsData[this.getStepIndex()].isBuilded) {
+            if (!this.stepsData[this.getStepIndex()].isCompleted) {
               this.buttons.nextStepIndex.target.disable();
             }
           }
