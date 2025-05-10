@@ -800,6 +800,11 @@ export class InstallationMaster {
       for (let buttonName in this.buttons) {
         buttonsPanel.appendChild(this.buttons[buttonName].target.element);
       }
+
+      this.stepsData[this.getStepIndex()].isBuilded = true;
+
+      console.log(this.stepsData[this.getStepIndex()]);
+      console.log(`Index install step: ${this.getStepIndex()}`);
     });
   }
 
@@ -844,7 +849,6 @@ export class InstallationMaster {
     if (stepIndex < stepsCount - 1) {
       if (typeof(this.progressItems[stepIndex]) != 'undefined') {
         this.progressItems[stepIndex].classList.add('item_completed');
-        this.stepsData[stepIndex].isBuilded = true;
       }
 
       if (typeof(this.progressItems[stepIndex + 1]) != 'undefined') {
@@ -853,7 +857,6 @@ export class InstallationMaster {
       }
 
       this.setStepIndex(stepIndex + 1);
-      this.stepsData[stepIndex].isBuilded = true;
     }
 
     let installationPages = document.querySelectorAll('[data-page-index]');
