@@ -98,8 +98,8 @@ namespace core\PHPLibrary\Page {
              * @var Parsedown Парсер markdown-разметки
              */
             $parsedown = new Parsedown();
-            $parsedown->setSafeMode(true);
-            $parsedown->setMarkupEscaped(true);
+            //$parsedown->setSafeMode(true);
+            //$parsedown->setMarkupEscaped(true);
 
             /**
              * @var string Заголовок статической страницы
