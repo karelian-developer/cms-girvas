@@ -25,14 +25,14 @@ if ($system_core->urlp->get_path(2) == 'assembly') {
     $template_category = $_GET['templateCategory'];
     
     switch ($template_category) {
-      case 'default': $template_config_name = 'base_template'; $locale_name = ($system_core->configurator->exists_database_entry_value('base_locale')) ? $system_core->configurator->get_database_entry_value('base_locale') : 'en_US'; break;
+      case 'base': $template_config_name = 'base_template'; $locale_name = ($system_core->configurator->exists_database_entry_value('base_locale')) ? $system_core->configurator->get_database_entry_value('base_locale') : 'en_US'; break;
       case 'admin': $template_config_name = 'base_admin_template'; $locale_name = ($system_core->configurator->exists_database_entry_value('base_admin_locale')) ? $system_core->configurator->get_database_entry_value('base_admin_locale') : 'en_US'; break;
       case 'install': $template_config_name = 'base_install_template'; $locale_name = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : 'en_US'; break;
       default: $template_config_name = sprintf('%s_template', $template_category); break;
     }
 
     switch ($template_category) {
-      case 'default': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'base'); break;
+      case 'base': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'base'); break;
       case 'admin': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'admin'); break;
       case 'install': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'install'); break;
       default: $system_core->locale = sprintf('%s_template', $template_category); break;
@@ -64,14 +64,14 @@ if ($system_core->urlp->get_path(2) == null && $system_core->urlp->get_param('ca
   $template_category_name = $system_core->urlp->get_param('categoryName');
     
   switch ($template_category_name) {
-    case 'default': $template_config_name = 'base_template'; $locale_name = ($system_core->configurator->exists_database_entry_value('base_locale')) ? $system_core->configurator->get_database_entry_value('base_locale') : 'en_US'; break;
+    case 'base': $template_config_name = 'base_template'; $locale_name = ($system_core->configurator->exists_database_entry_value('base_locale')) ? $system_core->configurator->get_database_entry_value('base_locale') : 'en_US'; break;
     case 'admin': $template_config_name = 'base_admin_template'; $locale_name = ($system_core->configurator->exists_database_entry_value('base_admin_locale')) ? $system_core->configurator->get_database_entry_value('base_admin_locale') : 'en_US'; break;
     case 'install': $template_config_name = 'base_install_template'; $locale_name = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : 'en_US'; break;
     default: $template_config_name = sprintf('%s_template', $template_category_name); break;
   }
 
   switch ($template_category_name) {
-    case 'default': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'base'); break;
+    case 'base': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'base'); break;
     case 'admin': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'admin'); break;
     case 'install': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'install'); break;
     default: $system_core->locale = sprintf('%s_template', $template_category_name); break;
