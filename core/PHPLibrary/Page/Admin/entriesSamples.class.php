@@ -155,7 +155,7 @@ namespace core\PHPLibrary\Page\Admin {
       $table->appendChild($table_row_header);
 
       foreach ($entries_samples_array_objects as $entries_sample_index => $entries_sample_object) {
-        $entries_sample_object->init_data(['id', 'texts', 'name', 'created_unix_timestamp', 'updated_unix_timestamp']);
+        $entries_sample_object->init_data(['id', 'texts', 'name', 'metadata', 'created_unix_timestamp', 'updated_unix_timestamp']);
 
         /** @var string Дата создания выборки в формате d.m.Y H:i:s */
         $created_date_timestamp = date('d.m.Y H:i:s', $entries_sample_object->get_created_unix_timestamp());
