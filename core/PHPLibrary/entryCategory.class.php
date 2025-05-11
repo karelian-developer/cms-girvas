@@ -168,10 +168,13 @@ namespace core\PHPLibrary {
     /**
      * Получить массив объектов записей
      *
+     * @param  array $params_array
+     * @param  bool $only_published
+     * 
      * @return array
      */
-    public function get_entries() : array {
-      return (new Entries($this->system_core))->get_by_category_id($this->id);
+    public function get_entries(array $params_array = [], $only_published = false) : array {
+      return (new Entries($this->system_core))->get_by_category_id($this->id, $params_array, $only_published);
     }
     
     /**

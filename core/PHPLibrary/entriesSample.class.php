@@ -209,16 +209,19 @@ namespace core\PHPLibrary {
     /**
      * Получить массив объектов записей для выборки
      * 
+     * @param  array $params_array
+     * @param  bool $only_published
+     * 
      * @return array
      */
-    public function get_entries() : array {
+    public function get_entries(array $params_array = [], $only_published = false) : array {
       $entries_categories_array = $this->get_categories();
 
       if (count($entries_categories_array) > 0) {
         $entries_array = [];
 
         foreach ($entries_categories_array as $entries_category) {
-          $entries_category_array = $entries_category->get_entries();
+          $entries_category_array = $entries_category->get_entries($params_array, $only_published);
           
           if (count($entries_category_array) > 0) {
             foreach ($entries_category_array as $entry) {
