@@ -232,6 +232,16 @@ namespace core\PHPLibrary {
 
       return [];
     }
+
+    /**
+     * Получить количество объектов записей для выборки
+     * 
+     * @return int
+     */
+    public function get_entries_count() : int {
+      $entries = $this->get_entries();
+      return count($entries);
+    }
     
     /**
      * Получить данные колонок в базе данных

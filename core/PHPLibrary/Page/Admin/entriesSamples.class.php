@@ -166,8 +166,8 @@ namespace core\PHPLibrary\Page\Admin {
         $entries_sample_title = $entries_sample_object->get_title($locale_default->get_name());
         $entries_sample_title = strip_tags($entries_sample_title);
         
-        /** @var int Количество выборок */
-        $entries_samples_count = count($entries_samples_array_objects);
+        /** @var int Количество записей в выборке */
+        $entries_sample_count = $entries_sample_object->get_entries_count();
 
         /** @var DOMElement $table_row_item DOM-элемент строки */
         $table_row_item = $dom_document_samples_table->createElement('tr');
@@ -204,7 +204,7 @@ namespace core\PHPLibrary\Page\Admin {
           }
 
           if ($i == 2) {
-            $table_cells_item[$i]->nodeValue = $entries_samples_count;
+            $table_cells_item[$i]->nodeValue = $entries_sample_count;
           }
 
           if ($i == 3) {
