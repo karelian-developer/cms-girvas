@@ -1,13 +1,12 @@
-<article class="main__article article article_page" data-page-id="{PAGE_ID}">
-  <h1 class="article__title title">{PAGE_TITLE}</h1>
-  <div class="article__content-container content-container">
-    <div class="article__content content">
-      {PAGE_CONTENT}
-    </div>
-    <div class="article__metadata metadata">
-      <div class="metadata__publishdate publishdate">
-        <time class="publishdate__value value" datetime="{PAGE_CREATED_DATE_TIMESTAMP_ISO_8601}">{PAGE_CREATED_DATE_TIMESTAMP}</time>
-      </div>
-    </div>
+<article class="page__article article" role="page">
+  <h2 class="article__title">{PAGE_TITLE}</h2>
+  <div class="article__content">
+    {PAGE_CONTENT}
   </div>
 </article>
+<aside class="sidebar" role="siteSidebarRight">
+  <div class="sidebar__block block">
+    <h2 class="block__title title">{LANG:DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_TITLE}</h2>
+    <div class="block__content content">{LANG:DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_DESCRIPTION}</div>
+  </div>
+</aside>
