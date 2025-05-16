@@ -81,7 +81,8 @@
     <h2 class="page-aside__block-title">{LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_PERSONAL_TEMPLATE_TITLE}</h2>
     <div class="page-aside__block-content block-content">
       <div class="block__input-container input-container">
-        <input class="block__input input input_text" type="text" name="page_static_template_path" pattern="^(?!.*(?:\.\./|\./))[a-zA-Z0-9/]+[a-zA-Z0-9_.-]*\.tpl$" placeholder="static/snowka.tpl">
+        {LANG:MD:PAGE_PAGE_STATIC_SIDEBAR_BLOCK_PERSONAL_TEMPLATE_TIP}
+        <input class="block__input input input_text" type="text" name="page_static_template_path" pattern="^(?!.*(?:\.\./|\./))[a-zA-Z0-9/]+[a-zA-Z0-9_.-]*\.tpl$" placeholder="page/static/snowka.tpl">
       </div>
     </div>
   </article>
