@@ -100,7 +100,7 @@ if ($system_core->client->is_logged(2)) {
               $file_robots_txt_path = sprintf('%s/robots.txt', CMS_ROOT_DIRECTORY);
 
               try {
-                $file_robots_txt = fopen($file_robots_txt_path, 'w+');
+                $file_robots_txt = @fopen($file_robots_txt_path, 'w+');
                 if ($file_robots_txt === false) {
                   $exception_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED'));
                   throw new Exception($exception_message);
