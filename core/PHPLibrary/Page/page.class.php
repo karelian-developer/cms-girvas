@@ -170,7 +170,7 @@ namespace core\PHPLibrary\Page {
             }
 
             /** @var string Путь до персонального шаблона */
-            $personal_template_path = ($page_static->exists_personal_template_file()) ? sprintf('templates/%', $page_static->get_personal_template_path()) : 'templates/page/static.tpl';
+            $personal_template_path = ($page_static->exists_personal_template_file()) ? sprintf('templates/%s', $page_static->get_personal_template_path()) : 'templates/page/static.tpl';
 
             $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page.tpl', [
               'PAGE_NAME' => 'static',
