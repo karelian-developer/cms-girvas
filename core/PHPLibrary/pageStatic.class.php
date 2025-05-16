@@ -306,7 +306,7 @@ namespace core\PHPLibrary {
     public function exists_personal_template_file() : bool {
       if (property_exists($this, 'metadata')) {
         /** @var string Путь до персонального шаблона */
-        $template_path = $this->get_personal_template_path();
+        $template_path = sprintf('%s/templates/%s', $this->system_core->template->get_path(), $this->get_personal_template_path());
         return file_exists($template_path);
       }
 
