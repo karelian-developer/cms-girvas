@@ -284,6 +284,36 @@ namespace core\PHPLibrary {
     }
 
     /**
+     * Получить путь до персонального шаблона
+     * 
+     * @return string
+     */
+    public function get_personal_template_path() : string|null {
+      if (property_exists($this, 'metadata')) {
+        /** @var array Метаданные в виде массива */
+        $metadata_array = json_decode($this->metadata, true);
+        return (isset($metadata_array['personalTemplatePath'])) ? $metadata_array['personalTemplatePath'] : 'templates/page/static.tpl';
+      }
+
+      return 'templates/page/static.tpl';
+    }
+
+    /**
+     * Проверить наличие файла персонального шаблона
+     * 
+     * @return bool
+     */
+    public function exists_personal_template_file() : bool {
+      if (property_exists($this, 'metadata')) {
+        /** @var string Путь до персонального шаблона */
+        $template_path = $this->get_personal_template_path();
+        return file_exists($template_path);
+      }
+
+      return false;
+    }
+
+    /**
      * Получить URL дефолтной заставки
      * 
      * @param SystemCore $system_core

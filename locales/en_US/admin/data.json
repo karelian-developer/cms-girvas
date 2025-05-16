@@ -286,6 +286,7 @@
   "PAGE_STATIC_PAGE_SIDEBAR_BLOCK_ABOUT_TITLE": "About static pages",
   "PAGE_STATIC_PAGE_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_1": "<b>Static page</b> &mdash; is a web page whose content remains unchanged and does not depend on user actions.",
   "PAGE_STATIC_PAGE_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_2": "Static pages are important for a website so that they can load quickly and provide stable content display. They can also be used to create core website pages such as About Us, Contact Us, and Services, which help users easily find information about a company or products. It's important to consider that static pages can be used in combination with dynamic elements to create a more interactive user experience.",
+  "PAGE_STATIC_PAGE_SIDEBAR_BLOCK_PERSONAL_TEMPLATE_TITLE": "The path to a personal template",
   "PAGE_REPORTS_TITLE": "System reports",
   "PAGE_REPORTS_NAVIGATION_INDEX_LABEL": "Dashboard",
   "PAGE_REPORTS_COMMON_TITLE": "Common events",

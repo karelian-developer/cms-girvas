@@ -98,6 +98,10 @@ if ($system_core->client->is_logged(2)) {
 
         $page_static_data['metadata']['additionalFields'][implode($value_name_parts)] = htmlspecialchars(str_replace('\'', '"', $value));
       }
+
+      if ($key === 'page_static_template_path') {
+        $page_static_data['metadata']['personalTemplatePath'] = htmlspecialchars(str_replace('\'', '"', trim($value)));
+      }
     }
 
     if ($page_creation_allowed) {

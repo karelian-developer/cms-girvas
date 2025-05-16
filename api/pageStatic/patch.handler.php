@@ -109,6 +109,10 @@ if ($system_core->client->is_logged(2)) {
 
             $page_static_data['metadata']['additionalFields'][$field_name_transformed] = htmlspecialchars(str_replace('\'', '"', $value));
           }
+
+          if ($key === 'page_static_template_path') {
+            $page_static_data['metadata']['personalTemplatePath'] = htmlspecialchars(str_replace('\'', '"', trim($value)));
+          }
         }
 
         $page_static_is_published = isset($page_static_data['metadata']['is_published']) ? $page_static_data['metadata']['is_published'] : 0;

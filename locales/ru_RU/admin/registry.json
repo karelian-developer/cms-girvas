@@ -1,5 +1,6 @@
 {
   "PAGE_ABOUT_CONTENT": "markdown/page/aboutContent.md",
   "PAGE_INDEX_CONTENT": "markdown/page/indexContent.md",
-  "PAGE_ENTRIES_SAMPLES_SIDEBAR_BLOCK_ABOUT_DESCRIPTION": "markdown/page/entries/samplesSidebarAboutContent.md"
+  "PAGE_ENTRIES_SAMPLES_SIDEBAR_BLOCK_ABOUT_DESCRIPTION": "markdown/page/entries/samplesSidebarAboutContent.md",
+  "PAGE_PAGE_STATIC_SIDEBAR_BLOCK_PERSONAL_TEMPLATE_TIP": "markdown/page/pageStatic/sidebarPersonalTemplateTip.md"
 }
