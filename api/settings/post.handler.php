@@ -99,10 +99,21 @@ if ($system_core->client->is_logged(2)) {
             if ($setting_name == 'seo_robots_txt') {
               $file_robots_txt_path = sprintf('%s/robots.txt', CMS_ROOT_DIRECTORY);
 
-              $file_robots_txt = fopen($file_robots_txt_path, 'w+');
-              fwrite($file_robots_txt, $setting_value);
-              fclose($file_robots_txt);
-              chmod($file_robots_txt_path, 0664);
+              try {
+                $file_robots_txt = fopen($file_robots_txt_path, 'w+');
+                if ($file_robots_txt === false) {
+                  $exception_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED'));
+                  throw new Exception($exception_message);
+                }
+
+                fwrite($file_robots_txt, $setting_value);
+                fclose($file_robots_txt);
+                chmod($file_robots_txt_path, 0664);
+              } catch (Exception $exception) {
+                $exception_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED'));
+                $handler_message = (!isset($handler_message)) ? $exception_message : $handler_message;
+                $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+              }
 
               continue;
             }

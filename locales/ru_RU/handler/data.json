@@ -97,6 +97,7 @@
   "API_SETTINGS_USERS_PASSWORD_LENGTH_MIN_TOO_SMALL": "Минимальное количество символов слишком маленькое. Длина пароля должна составлять не менее 6 символов по требованиям безопасности.",
   "API_SETTINGS_USERS_PASSWORD_LENGTH_MAX_TOO_SMALL": "Максимальное количество символов слишком маленькое. Длина пароля не может быть отрицательной.",
   "API_SETTINGS_USERS_PASSWORD_LENGTH_MIN_LARGE_MAX": "Минимальное количество символов не может быть больше максимального. Математическое нарушение.",
+  "API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED": "У сервера нет доступа к robots.txt, проверьте права.",
   "API_UTILS_SECRET_CODES_GENERATED_SUCCESS": "Секретные коды для доступа в административную панель успешно обновлены.",
   "API_UTILS_PARSEDOWN_TRANSFORMED_SUCCESS": "Текст успешно преобразован.",
   "API_UTILS_USER_REGISTRATION_SENDED_SUCCESS": "Регистрация успешно завершена. На Ваш почтовый адрес выслано уведомление со ссылкой на страницу с активацией аккаунта.",

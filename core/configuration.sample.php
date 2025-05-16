@@ -35,7 +35,8 @@ $configuration = [
     'style-src \'unsafe-inline\' {DOMAIN}',
     'script-src \'unsafe-inline\' \'nonce-{SCRIPT_HASH}\'',
     'script-src-elem {DOMAIN}',
-    'manifest-src \'self\''
+    'manifest-src \'self\'',
+    'img-src \'self\' data:'
   ],
   'ssl_perm_redirect' => false,
   'ssl_hsts_max_age' => 63072000,
