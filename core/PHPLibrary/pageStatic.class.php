@@ -288,11 +288,13 @@ namespace core\PHPLibrary {
      * 
      * @return string
      */
-    public function get_personal_template_path() : string|null {
+    public function get_personal_template_path() : string {
       if (property_exists($this, 'metadata')) {
         /** @var array Метаданные в виде массива */
         $metadata_array = json_decode($this->metadata, true);
-        return (isset($metadata_array['personalTemplatePath'])) ? $metadata_array['personalTemplatePath'] : 'templates/page/static.tpl';
+        if (isset($metadata_array['personalTemplatePath'])) {
+          return (!empty($metadata_array['personalTemplatePath'])) ? $metadata_array['personalTemplatePath'] : 'templates/page/static.tpl';
+        }
       }
 
       return 'templates/page/static.tpl';
