@@ -262,6 +262,14 @@ if ($system_core->client->is_logged(2)) {
               }
             }
 
+            if ($setting_name == 'setting_static_pages_additional_field_category_id') {
+              foreach ($setting_value as $key => $value) {
+                if (is_numeric($value)) {
+                  $setting_value[$key] = ($value > 0) ? (int)$value : 1;
+                }
+              }
+            }
+
             if (is_array($setting_value)) $setting_value = json_encode($setting_value);
 
             switch ($setting_name) {

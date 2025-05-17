@@ -621,6 +621,7 @@ export class PageSettings {
   addEntriesAdditionalField(localeData, container, data = {}) {
     let tableRow = document.createElement('tr');
     let tableCellTypeField = document.createElement('td');
+    let tableCellCategoryField = document.createElement('td');
     let tableCellTitleField = document.createElement('td');
     let tableCellNameField = document.createElement('td');
     let tableCellDescriptionField = document.createElement('td');
@@ -644,6 +645,7 @@ export class PageSettings {
     
     tableRow.classList.add('table__row');
     tableCellTypeField.classList.add('table__cell');
+    tableCellCategoryField.classList.add('table__cell');
     tableCellTitleField.classList.add('table__cell');
     tableCellNameField.classList.add('table__cell');
     tableCellDescriptionField.classList.add('table__cell');
@@ -669,6 +671,29 @@ export class PageSettings {
         default: interactiveChoicesTypeField.target.setItemSelectedIndex(0);
       }
     }
+
+    let requestGetEntriesCategories = new Interactive('request', {
+      method: 'GET',
+      url: '/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name,
+    });
+
+    requestGetEntriesCategories.target.showingNotification = false;
+    requestGetEntriesCategories.target.send().then((data) => {
+      let interactiveChoicesCategoryField = new Interactive('choices');
+
+      if (data.statusCode == 1 && data.outputData.hasOwnProperty('entriesCategories')) {
+        let entriesCategories = data.outputData.entriesCategories;
+        
+        entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
+          interactiveChoicesCategoryField.target.addItem(entriesCategory.title, entriesCategory.id);
+        });
+        
+        interactiveChoicesCategoryField.target.setName('setting_entries_additional_field_category_id[]');
+        interactiveChoicesCategoryField.assembly();
+
+        tableCellCategoryField.append(interactiveChoicesCategoryField.target.element);
+      }
+    });
 
     let buttons = {delete: null};
     buttons.delete = new Interactive('button');
@@ -701,6 +726,7 @@ export class PageSettings {
     tableCellEventField.append(buttons.delete.target.element);
 
     tableRow.append(tableCellTypeField);
+    tableRow.append(tableCellCategoryField);
     tableRow.append(tableCellTitleField);
     tableRow.append(tableCellNameField);
     tableRow.append(tableCellDescriptionField);
