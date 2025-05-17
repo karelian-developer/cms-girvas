@@ -89,6 +89,7 @@
   <article class="page-aside__block block">
     <h2 class="page-aside__block-title">{LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TITLE}</h2>
     <div class="page-aside__block-content block-content">
+      {LANG:MD:PAGE_PAGE_STATIC_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TIP}
       <div class="additional-data" role="additional-data">
         {PAGE_STATIC_ADDITIONAL_FIELDS}
       </div>
