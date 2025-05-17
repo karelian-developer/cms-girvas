@@ -328,7 +328,7 @@ export class PageEntry {
                   if (sidebarBlockAdditionaFieldsElement !== null) {
                     let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
                     fieldsArrayElements.forEach((element) => {
-                      let fieldInputElement = fieldsArrayElements.querySelector('input, textarea');
+                      let fieldInputElement = element.querySelector('input, textarea');
 
                       if (fieldInputElement.getAttribute('data-category-id') == field.categoryID) {
                         sidebarBlockAdditionaFieldsElement.style.display = 'block';
