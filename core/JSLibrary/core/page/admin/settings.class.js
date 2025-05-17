@@ -663,7 +663,7 @@ export class PageSettings {
     interactiveChoicesTypeField.target.addItem('Date', 'date');
     interactiveChoicesTypeField.target.addItem('Text', 'textarea');
     interactiveChoicesTypeField.target.setName('setting_entries_additional_field_type[]');
-
+    
     if (typeof data.type != 'undefined') {
       switch (data.type) {
         case 'text': interactiveChoicesTypeField.target.setItemSelectedIndex(0); break;
@@ -680,16 +680,16 @@ export class PageSettings {
     });
 
     requestGetEntriesCategories.target.showingNotification = false;
-    requestGetEntriesCategories.target.send().then((data) => {
+    requestGetEntriesCategories.target.send().then((responseData) => {
       let interactiveChoicesCategoryField = new Interactive('choices');
 
-      if (data.statusCode == 1 && data.outputData.hasOwnProperty('entriesCategories')) {
-        let entriesCategories = data.outputData.entriesCategories;
+      if (responseData.statusCode == 1 && responseData.outputData.hasOwnProperty('entriesCategories')) {
+        let entriesCategories = responseData.outputData.entriesCategories;
         
         entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
           interactiveChoicesCategoryField.target.addItem(entriesCategory.title, entriesCategory.id);
 
-          if (entriesCategory.id == data.id) {
+          if (entriesCategory.id == ) {
             interactiveChoicesCategoryField.target.setItemSelectedIndex(entriesCategoryIndex);
           }
         });
