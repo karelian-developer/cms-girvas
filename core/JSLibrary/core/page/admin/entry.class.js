@@ -486,6 +486,32 @@ export class PageEntry {
             let interactiveContainer = document.querySelector('#TC6474389611');
             interactiveContainer.append(interactiveCategoriesChoices.target.element);
             interactiveHeaderContainerElement.append(this.buttons.viewOnSite.target.element);
+
+            let interactiveCategoriesChoicesSelectElement = interactiveCategoriesChoices.target.element.querySelector('select');
+            interactiveCategoriesChoicesSelectElement.addEventListener('change', (event) => {
+              fetch('/handler/entries/additional-fields?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
+                return (response.ok) ? response.json() : Promise.reject(response);
+              }).then((responseEntryAdditionalFields) => {
+                let fields = responseEntryAdditionalFields.outputData.additionalFields;
+                
+                fields.forEach((field) => {
+                  let sidebarBlockAdditionaFieldsElement = document.querySelector('#SYSTEM_E3754926185');
+                  if (sidebarBlockAdditionaFieldsElement !== null) {
+                    
+                    let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
+                    fieldsArrayElements.forEach((element) => {
+                      let fieldInputElement = element.querySelector('input, textarea');
+
+                      if (fieldInputElement.getAttribute('data-category-id') == interactiveCategoriesChoices.target.getValue()) {
+                        element.style.display = 'block';
+                      } else {
+                        element.style.display = 'none';
+                      }
+                    });
+                  }
+                });
+              });
+            });
           }
         }, (rejectionReason) => {
           let interactiveNotification = new Interactive('notification');
