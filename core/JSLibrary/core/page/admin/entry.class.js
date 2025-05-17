@@ -330,6 +330,9 @@ export class PageEntry {
                     fieldsArrayElements.forEach((element) => {
                       let fieldInputElement = element.querySelector('input, textarea');
 
+                      console.log(fieldInputElement.getAttribute('data-category-id'));
+                      console.log(field.categoryID);
+
                       if (fieldInputElement.getAttribute('data-category-id') == field.categoryID) {
                         sidebarBlockAdditionaFieldsElement.style.display = 'block';
                       } else {
