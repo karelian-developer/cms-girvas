@@ -312,9 +312,23 @@ export class PageEntry {
             
             interactiveCategoriesChoices.target.setName('entry_category_id');
             interactiveCategoriesChoices.assembly();
-    
+            
             let interactiveContainer = document.querySelector('#TC6474389611');
             interactiveContainer.append(interactiveCategoriesChoices.target.element);
+
+            let interactiveCategoriesChoicesSelectElement = interactiveCategoriesChoices.target.element.querySelector('select');
+            interactiveCategoriesChoicesSelectElement.addEventListener('change', (event) => {
+              fetch('/handler/entries/additional-fields?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
+                return (response.ok) ? response.json() : Promise.reject(response);
+              }).then((data) => {
+                let fields = data.outputData.additionalFields;
+                fields.forEach((field) => {
+                  if (interactiveCategoriesChoicesSelectElement.value == field.categoryID) {
+                    console.log(field);
+                  }
+                });
+              });
+            });
           }
         });
 
