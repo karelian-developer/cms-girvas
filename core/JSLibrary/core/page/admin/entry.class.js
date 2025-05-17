@@ -317,6 +317,7 @@ export class PageEntry {
             interactiveContainer.append(interactiveCategoriesChoices.target.element);
 
             let interactiveCategoriesChoicesSelectElement = interactiveCategoriesChoices.target.element.querySelector('select');
+            console.log(interactiveCategoriesChoicesSelectElement);
             interactiveCategoriesChoicesSelectElement.addEventListener('change', (event) => {
               fetch('/handler/entries/additional-fields?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
                 return (response.ok) ? response.json() : Promise.reject(response);
