@@ -322,9 +322,11 @@ export class PageEntry {
                 return (response.ok) ? response.json() : Promise.reject(response);
               }).then((responseEntryAdditionalFields) => {
                 let fields = responseEntryAdditionalFields.outputData.additionalFields;
-                console.log(interactiveCategoriesChoices.target.getValue());
+                let selectElement = interactiveCategoriesChoices.target.element.querySelector('select');
+
+                console.log(selectElement.value);
                 fields.forEach((field) => {
-                  if (interactiveCategoriesChoices.target.getValue() == field.categoryID) {
+                  if (selectElement.value == field.categoryID) {
                     console.log(field);
                   }
                 });
