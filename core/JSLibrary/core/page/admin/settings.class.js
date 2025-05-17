@@ -689,10 +689,7 @@ export class PageSettings {
         entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
           interactiveChoicesCategoryField.target.addItem(entriesCategory.title, entriesCategory.id);
 
-          console.log(entriesCategory.id);
-          console.log(data.categoryID);
-
-          if (entriesCategory.id == data.categoryID) {
+          if (entriesCategory.id == data.id) {
             interactiveChoicesCategoryField.target.setItemSelectedIndex(entriesCategoryIndex);
           }
         });
