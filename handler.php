@@ -294,6 +294,8 @@ if (defined('IS_NOT_HACKED')) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
+    echo 'asdasd';
+
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
       if ($system_core->urlp->get_path(2) == 'categories' && is_null($system_core->urlp->get_path(3))) {
         $entries_categories_object = new \core\PHPLibrary\EntriesCategories($system_core);
