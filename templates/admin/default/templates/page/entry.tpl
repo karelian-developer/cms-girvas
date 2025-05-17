@@ -88,7 +88,7 @@
     <h2 class="page-aside__block-title">{LANG:PAGE_ENTRY_SIDEBAR_BLOCK_COVER_TITLE}</h2>
     <div class="page-aside__block-content block-content"></div>
   </article>
-  <article class="page-aside__block">
+  <article id="SYSTEM_E3754926185" class="page-aside__block">
     <h2 class="page-aside__block-title">{LANG:PAGE_ENTRY_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TITLE}</h2>
     <div class="page-aside__block-content block-content">
       <div class="additional-data" role="additional-data">

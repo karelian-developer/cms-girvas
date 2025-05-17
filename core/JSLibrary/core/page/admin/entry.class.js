@@ -322,12 +322,20 @@ export class PageEntry {
                 return (response.ok) ? response.json() : Promise.reject(response);
               }).then((responseEntryAdditionalFields) => {
                 let fields = responseEntryAdditionalFields.outputData.additionalFields;
-                let selectElement = interactiveCategoriesChoices.target.element.querySelector('select');
-
-                console.log(selectElement.value);
+                
                 fields.forEach((field) => {
-                  if (selectElement.value == field.categoryID) {
-                    console.log(field);
+                  let sidebarBlockAdditionaFieldsElement = document.querySelector('#SYSTEM_E3754926185');
+                  if (sidebarBlockAdditionaFieldsElement !== null) {
+                    let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
+                    fieldsArrayElements.forEach((element) => {
+                      let fieldInputElement = fieldsArrayElements.querySelector('input, textarea');
+
+                      if (fieldInputElement.getAttribute('data-category-id') == field.categoryID) {
+                        sidebarBlockAdditionaFieldsElement.style.display = 'block';
+                      } else {
+                        sidebarBlockAdditionaFieldsElement.style.display = 'none';
+                      }
+                    });
                   }
                 });
               });
