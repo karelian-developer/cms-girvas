@@ -369,6 +369,7 @@ export class PageSettings {
             fields.forEach((field) => {
               this.addEntriesAdditionalField(localeData, tableAdditionalFieldsButtonContainer, {
                 type: field.type,
+                categoryID: field.categoryID,
                 title: field.title,
                 description: field.description,
                 name: field.name

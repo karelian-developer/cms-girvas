@@ -311,7 +311,6 @@ if (defined('IS_NOT_HACKED')) {
           ]);
         }
       } else if ($system_core->urlp->get_path(2) == 'additional-fields' && is_null($system_core->urlp->get_path(3))) {
-        echo 'test';
         $cms_locale_setted = $system_core->configurator->get_database_entry_value('base_locale');
         $fields_locale = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $cms_locale_setted;
 
