@@ -332,9 +332,9 @@ export class PageEntry {
                       let fieldInputElement = element.querySelector('input, textarea');
 
                       if (fieldInputElement.getAttribute('data-category-id') == interactiveCategoriesChoices.target.getValue()) {
-                        sidebarBlockAdditionaFieldsElement.style.display = 'block';
+                        element.style.display = 'block';
                       } else {
-                        sidebarBlockAdditionaFieldsElement.style.display = 'none';
+                        element.style.display = 'none';
                       }
                     });
                   }
