@@ -153,7 +153,7 @@ namespace core\PHPLibrary\Page\Admin {
         'PAGE_STATIC_KEYWORDS' => (!is_null($page_static)) ? implode(', ', $page_static->get_keywords()) : '',
         'PAGE_STATIC_NAME' => (!is_null($page_static)) ? $page_static->get_name() : '',
         'PAGE_STATIC_ADDITIONAL_FIELDS' => implode($additional_fields_elements),
-        'PAGE_STATIC_PERSONAL_TEMPLATE_PATH' => $page_static->get_personal_template_path(),
+        'PAGE_STATIC_PERSONAL_TEMPLATE_PATH' => (!is_null($page_static)) ? $page_static->get_personal_template_path() : '',
         'PAGE_STATIC_FORM_METHOD' => (!is_null($page_static)) ? 'PATCH' : 'PUT'
       ]);
     }
