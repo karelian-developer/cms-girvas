@@ -107,6 +107,7 @@ namespace core\PHPLibrary\Page\Admin {
           $element_value = (isset($field_value)) ? $field_value : '';
           $element = $dom_document->createElement('textarea', $element_value);
           $element->setAttribute('name', sprintf('entry_additional_field_%s', $fields_names[$field_index]));
+          $element->setAttribute('data-category-id', $fields_categories_ids[$field_index]);
 
           $dom_document->appendChild($element);
 
