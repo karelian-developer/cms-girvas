@@ -285,6 +285,7 @@ if ($system_core->client->is_logged(2)) {
               case 'entries_additional_field_title': $setting_value = $setting_value; break;
               case 'entries_additional_field_description': $setting_value = $setting_value; break;
               case 'entries_additional_field_type': $setting_value = $setting_value; break;
+              case 'entries_additional_field_category_id': $setting_value = $setting_value; break;
               case 'entries_additional_field_name': $setting_value = $setting_value; break;
               case 'static_pages_additional_field_title': $setting_value = $setting_value; break;
               case 'static_pages_additional_field_description': $setting_value = $setting_value; break;
@@ -310,7 +311,7 @@ if ($system_core->client->is_logged(2)) {
         }
 
         if ($entries_additional_fields_count == 0 && isset($_POST['_entries_additional_fields_locale'])) {
-          foreach (['entries_additional_field_title', 'entries_additional_field_description', 'entries_additional_field_name', 'entries_additional_field_type'] as $index => $name) {
+          foreach (['entries_additional_field_title', 'entries_additional_field_description', 'entries_additional_field_name', 'entries_additional_field_type', 'entries_additional_field_category_id'] as $index => $name) {
             if ($system_core->configurator->exists_database_entry_value('entries_additional_field_title')) {
               $system_core->configurator->update_database_entry_value($name, json_encode([]));
             }
@@ -318,7 +319,7 @@ if ($system_core->client->is_logged(2)) {
         }
 
         if ($static_pages_additional_fields_count == 0 && isset($_POST['_static_pages_additional_fields_locale'])) {
-          foreach (['static_pages_additional_field_title', 'static_pages_additional_field_description', 'static_pages_additional_field_name', 'static_pages_additional_field_type'] as $index => $name) {
+          foreach (['static_pages_additional_field_title', 'static_pages_additional_field_description', 'static_pages_additional_field_name', 'static_pages_additional_field_type', 'static_pages_additional_field_type'] as $index => $name) {
             if ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_title')) {
               $system_core->configurator->update_database_entry_value($name, json_encode([]));
             }
