@@ -302,9 +302,9 @@ export class PageEntry {
 
         request.target.showingNotification = false;
 
-        request.target.send().then((data) => {
-          if (data.statusCode == 1 && data.outputData.hasOwnProperty('entriesCategories')) {
-            let entriesCategories = data.outputData.entriesCategories;
+        request.target.send().then((responseEntryCategories) => {
+          if (responseEntryCategories.statusCode == 1 && responseEntryCategories.outputData.hasOwnProperty('entriesCategories')) {
+            let entriesCategories = responseEntryCategories.outputData.entriesCategories;
             
             entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
               interactiveCategoriesChoices.target.addItem(entriesCategory.title, entriesCategory.id);
@@ -320,8 +320,8 @@ export class PageEntry {
             interactiveCategoriesChoicesSelectElement.addEventListener('change', (event) => {
               fetch('/handler/entries/additional-fields?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
                 return (response.ok) ? response.json() : Promise.reject(response);
-              }).then((data) => {
-                let fields = data.outputData.additionalFields;
+              }).then((responseEntryAdditionalFields) => {
+                let fields = responseEntryAdditionalFields.outputData.additionalFields;
                 fields.forEach((field) => {
                   if (interactiveCategoriesChoicesSelectElement.value == field.categoryID) {
                     console.log(field);
