@@ -326,15 +326,12 @@ export class PageEntry {
                 fields.forEach((field) => {
                   let sidebarBlockAdditionaFieldsElement = document.querySelector('#SYSTEM_E3754926185');
                   if (sidebarBlockAdditionaFieldsElement !== null) {
-                    console.log(sidebarBlockAdditionaFieldsElement);
+                    
                     let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
                     fieldsArrayElements.forEach((element) => {
                       let fieldInputElement = element.querySelector('input, textarea');
 
-                      console.log(fieldInputElement.getAttribute('data-category-id'));
-                      console.log(field.categoryID);
-
-                      if (fieldInputElement.getAttribute('data-category-id') == field.categoryID) {
+                      if (fieldInputElement.getAttribute('data-category-id') == interactiveCategoriesChoices.target.getValue()) {
                         sidebarBlockAdditionaFieldsElement.style.display = 'block';
                       } else {
                         sidebarBlockAdditionaFieldsElement.style.display = 'none';
