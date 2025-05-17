@@ -388,6 +388,7 @@ export class PageSettings {
           fields.forEach((field) => {
             this.addEntriesAdditionalField(localeData, tableAdditionalFieldsButtonContainer, {
               type: field.type,
+              categoryID: field.categoryID,
               title: field.title,
               description: field.description,
               name: field.name
@@ -686,6 +687,10 @@ export class PageSettings {
         
         entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
           interactiveChoicesCategoryField.target.addItem(entriesCategory.title, entriesCategory.id);
+
+          if (entriesCategory.id == data.categoryID) {
+            interactiveChoicesCategoryField.target.setItemSelectedIndex(entriesCategoryIndex);
+          }
         });
         
         interactiveChoicesCategoryField.target.setName('setting_entries_additional_field_category_id[]');
