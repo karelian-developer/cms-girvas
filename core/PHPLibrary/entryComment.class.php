@@ -36,7 +36,7 @@ namespace core\PHPLibrary {
      * @param  mixed $columns
      * @return void
      */
-    public function init_data(array $columns = ['*']) {
+    public function init_data(array $columns = ['*']) : void {
       $columns_data = $this->get_database_columns_data($columns);
       foreach ($columns_data as $column_name => $column_data) {
         $this->{$column_name} = $column_data;
