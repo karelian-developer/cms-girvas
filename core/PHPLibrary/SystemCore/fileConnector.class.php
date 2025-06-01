@@ -82,7 +82,7 @@ namespace core\PHPLibrary\SystemCore {
     public function connect_file(string $file_path) : bool {
       /** @var string $file_path Полный путь до подключаемого файла */
       if (file_exists($file_path)) {
-        require_once($file_path);
+        require_once $file_path;
         return true;
       }
 

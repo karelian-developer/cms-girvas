@@ -10,10 +10,11 @@
 
 namespace core\PHPLibrary {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+  use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
   use \PDOException as PDOException;
 
   #[\AllowDynamicProperties]
-  class PageStatic {
+  class PageStatic implements EntityTypeContent  {
     private readonly SystemCore $system_core;
     private int $id;
     private int $category_id;

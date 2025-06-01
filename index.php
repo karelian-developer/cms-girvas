@@ -10,7 +10,6 @@
 
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
 
 // Абсолютный путь до корневой директории CMS
 define('CMS_ROOT_DIRECTORY', preg_replace('/[\/]*$/', '', $_SERVER['DOCUMENT_ROOT']));
@@ -21,25 +20,25 @@ if (PHP_VERSION_ID < 80200) {
   die(sprintf('PHP version is too old (you have %s). CMS "GIRVAS" works on PHP version 8.2.0 and higher.', phpversion()));
 }
 
-require_once(sprintf('%s/core/PHPLibrary/systemCore.class.php', CMS_ROOT_DIRECTORY));
+require_once CMS_ROOT_DIRECTORY . '/core/PHPLibrary/systemCore.class.php';
 
 $system_core = new \core\PHPLibrary\SystemCore();
 
 if ($system_core->urlp->get_path(0) == 'handler') {
 
-  include_once(sprintf('%s/handler.php', CMS_ROOT_DIRECTORY));
+  include_once CMS_ROOT_DIRECTORY . '/handler.php';
 
 } else if ($system_core->urlp->get_path(0) == 'sitemap') {
 
-  include_once(sprintf('%s/sitemap.php', CMS_ROOT_DIRECTORY));
+  include_once CMS_ROOT_DIRECTORY . '/sitemap.php';
 
 } else if ($system_core->urlp->get_path(0) == 'rss') {
 
-  include_once(sprintf('%s/rss.php', CMS_ROOT_DIRECTORY));
+  include_once CMS_ROOT_DIRECTORY . '/rss.php';
 
 } else if ($system_core->urlp->get_path(0) == 'feed') {
 
-  include_once(sprintf('%s/feed.php', CMS_ROOT_DIRECTORY));
+  include_once CMS_ROOT_DIRECTORY . '/feed.php';
 
 } else if ($system_core->urlp->get_path(0) == 'password-reset') {
 
@@ -103,9 +102,11 @@ if ($system_core->urlp->get_path(0) == 'handler') {
     echo 'Request is not exists!';
   }
 } else {
-  if ($system_core->urlp->get_param('mode') != 'install' && file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
+  if ($system_core->urlp->get_param('mode') != 'install' && file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     if ($system_core->configurator->get_database_entry_value('security_allowed_admin_ip_status') == 'on' && $system_core->urlp->get_path(0) == 'admin') {
+      /** @var array Массив разрешенных IP-адресов */
       $allowed_ips = json_decode($system_core->configurator->get_database_entry_value('security_allowed_admin_ip'), true);
+      
       if (!in_array($_SERVER['REMOTE_ADDR'], $allowed_ips)) {
         http_response_code(503);
         die('An attempted hacker attack has been detected.');
