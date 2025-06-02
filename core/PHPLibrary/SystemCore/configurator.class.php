@@ -587,7 +587,7 @@ namespace core\PHPLibrary\SystemCore {
      */
     public function get_security_scp() : string {
       $domain_address = sprintf('%s://%s', ($this->get('ssl_is_enabled')) ? 'https' : 'http', $this->get('domain'));
-      $domain_aliases = implode(' ', $this->get('domain_aliases'));
+      $domain_aliases = (is_array($this->get('domain_aliases'))) ? implode(' ', $this->get('domain_aliases')) : '';
 
       $csp = ($this->exists('ssl_csp')) ? $this->get('ssl_csp') : '';
       if (is_array($csp)) $csp = implode('; ', $csp);
