@@ -403,9 +403,9 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       fwrite($file, '  \'session_admin_expires\' => 86400,' . PHP_EOL);
       fwrite($file, '  \'ssl_csp\' => [' . PHP_EOL);
       fwrite($file, '    \'default-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com \',' . PHP_EOL);
-      fwrite($file, '    \'style-src \\\'unsafe-inline\\\' {DOMAIN} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
-      fwrite($file, '    \'script-src \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
-      fwrite($file, '    \'script-src-elem \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
+      fwrite($file, '    \'style-src \\\'unsafe-inline\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
+      fwrite($file, '    \'script-src \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
+      fwrite($file, '    \'script-src-elem \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
       fwrite($file, '    \'manifest-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\'' . PHP_EOL);
       fwrite($file, '  ],' . PHP_EOL);
       fwrite($file, '  \'ssl_perm_redirect\' => false,' . PHP_EOL);
