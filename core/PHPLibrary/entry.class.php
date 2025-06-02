@@ -614,7 +614,9 @@ namespace core\PHPLibrary {
 
       if ($execute) {
         $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-        return ($result) ? FactoryContent::create($system_core, 'entry', $result['id']) : null;
+        return ($result) ? FactoryContent::create($system_core, 'entry', [
+          'id' => $result['id']
+        ]) : null;
       }
 
       return null;
