@@ -31,6 +31,8 @@
   "INSTALLER_VERSION_CMS_LABEL": "System version",
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_LABEL": "Domain Name",
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_DESCRIPTION": "Please specify the domain name that your website will work with. This is necessary for correct redirection.",
+  "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_ALIASES_LABEL": "Domain name aliases",
+  "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_ALIASES_DESCRIPTION": "List the aliases (alternatives) of your domain name separated by commas. For example, if you use the local domain localhost, then you need to specify in the alias 127.0.0.1, 192.168.1.1 (if this is a local address), etc.",
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_COOKIE_LABEL": "Domain Name for Cookie",
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_COOKIE_DESCRIPTION": "If you need to create a cookie for the base domain with their access on all subdomains, then specify your base domain here. If you want the cookie to be available only on the base domain, then leave the field blank. If you need to make the cookie available only for a subdomain, specify it.",
   "INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_EMAIL_LABEL": "Domain name for E-Mail",

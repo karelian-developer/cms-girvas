@@ -18,6 +18,7 @@
 
 $configuration = [
   'domain' => 'example.com',
+  'domain_aliases' => ['127.0.0.1', 'localhost'],
   'domain_email' => 'example.com',
   'domain_cookies' => 'example.com',
   'database' => ['host' => '', 'user' => '', 'password' => '', 'name' => '', 'scheme' => '', 'prefix' => ''],
@@ -32,9 +33,9 @@ $configuration = [
   'www_perm_redirect' => false,
   'ssl_csp' => [
     'default-src \'self\'',
-    'style-src \'unsafe-inline\' {DOMAIN}',
+    'style-src \'unsafe-inline\' {DOMAIN} {DOMAIN_ALIASES}',
     'script-src \'unsafe-inline\' \'nonce-{SCRIPT_HASH}\'',
-    'script-src-elem {DOMAIN}',
+    'script-src-elem {DOMAIN} {DOMAIN_ALIASES}',
     'manifest-src \'self\'',
     'img-src \'self\' data:'
   ],

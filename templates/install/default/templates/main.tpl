@@ -46,6 +46,18 @@
                 </tr>
                 <tr class="table__row">
                   <td class="table__cell cell">
+                    <div class="cell__title">{LANG:INSTALLER_LOCAL_CONFIGURATION_DOMAIN_ALIASES_LABEL}</div>
+                    <div class="cell__description">
+                      <div class="page__phar-block">{LANG:INSTALLER_LOCAL_CONFIGURATION_DOMAIN_ALIASES_DESCRIPTION}</div>
+                    </div>
+                  </td>
+                  <td class="table__cell cell">
+                    <textarea name="domain_aliases" class="form__textarea"></textarea>
+                    <input name="domain_aliases" type="text" class="form__input" value="{CONFIGURATION_DATABASE_DOMAIN}" placeholder="localhost, 127.0.0.1, ...">
+                  </td>
+                </tr>
+                <tr class="table__row">
+                  <td class="table__cell cell">
                     <div class="cell__title">{LANG:INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_COOKIE_LABEL}</div>
                     <div class="cell__description">
                       <div class="page__phar-block">{LANG:INSTALLER_LOCAL_CONFIGURATION_DOMAIN_NAME_FOR_COOKIE_DESCRIPTION}</div>
