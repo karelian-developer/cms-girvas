@@ -41,7 +41,7 @@
                     </div>
                   </td>
                   <td class="table__cell cell">
-                    <input name="domain" type="text" class="form__input" value="{CONFIGURATION_DATABASE_DOMAIN}" placeholder="example.ru">
+                    <input name="domain" type="text" class="form__input" value="{CONFIGURATION_DOMAIN}" placeholder="example.ru">
                   </td>
                 </tr>
                 <tr class="table__row">
@@ -52,8 +52,7 @@
                     </div>
                   </td>
                   <td class="table__cell cell">
-                    <textarea name="domain_aliases" class="form__textarea"></textarea>
-                    <input name="domain_aliases" type="text" class="form__input" value="{CONFIGURATION_DATABASE_DOMAIN}" placeholder="localhost, 127.0.0.1, ...">
+                    <textarea name="domain_aliases" class="form__textarea">{CONFIGURATION_DOMAIN_ALIASES}</textarea>
                   </td>
                 </tr>
                 <tr class="table__row">
