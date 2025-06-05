@@ -172,7 +172,7 @@ export class PageGlobal {
             });
 
             interactiveModal.target.addButton(localeData.BUTTON_AUTHORIZATION_LABEL, () => {
-              if (authForm.checkRequiredFields()) {
+              if (authForm.target.checkRequiredFields()) {
                 authForm.target.send();
               }
             });
