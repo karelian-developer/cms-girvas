@@ -15,6 +15,7 @@
   "DEFAULT_TEXT_LOG_IN": "Войти",
   "DEFAULT_TEXT_REGISTRATION": "Регистрация",
   "DEFAULT_TEXT_USER_DELETED": "Пользователь удален",
+  "DEFAULT_TEXT_USER_AUTHORIZATION_AGREEMENT": "Я даю свое согласие на обработку моих персональных данных в соответствии с <a href=\"/page/document--privacy-policy\" target=\"_blank\">Политикой конфиденциальности</a> и принимаю <a href=\"/page/document--user-agreement\" target=\"_blank\">Пользовательское соглашение</a>.",
   "BUTTON_SEND_LABEL": "Отправить",
   "BUTTON_LOAD_MORE_COMMENTS_LABEL": "Загрузить еще комментарии",
   "BUTTON_LOAD_ANSWERS_COMMENTS_LABEL": "Загрузить ответы",

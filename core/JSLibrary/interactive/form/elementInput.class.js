@@ -16,33 +16,26 @@ export class ElementInput {
   }
 
   init(attributes = {}) {
-    let element = document.createElement('input');
+    const element = document.createElement('input');
+    const elementAttributes = ['id', 'name', 'type', 'placeholder', 'role'];
+    
+    elementAttributes.forEach(attribute => {
+      if (attributes[attribute] !== undefined) {
+        element.setAttribute(attribute, attributes[attribute]);
+      }
+    });
 
-    if (typeof attributes.id != 'undefined') {
-      element.setAttribute('id', attributes.id);
-    }
-
-    if (typeof attributes.name != 'undefined') {
-      element.setAttribute('name', attributes.name);
-    }
-
-    if (typeof attributes.type != 'undefined') {
-      element.setAttribute('type', attributes.type);
-    }
-
-    if (typeof attributes.placeholder != 'undefined') {
-      element.setAttribute('placeholder', attributes.placeholder);
-    }
-
-    if (typeof attributes.role != 'undefined') {
-      element.setAttribute('role', attributes.role);
+    if (attributes.required !== undefined) {
+      if (attributes.required) {
+        element.setAttribute('required', '');
+      }
     }
 
     element.classList.add('form__input');
 
     if (element.hasAttribute('type')) {
-      let elementType = element.getAttribute('type');
-      element.classList.add(`form__input_${elementType.toLowerCase()}`);
+      const elementType = element.getAttribute('type').toLowerCase();
+      element.classList.add(`form__input_${elementType}`);
     }
 
     this.element = element;

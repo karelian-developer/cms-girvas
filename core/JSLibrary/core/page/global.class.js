@@ -120,7 +120,8 @@ export class PageGlobal {
             
             authFormInputLogin.init({
               name: 'user_login',
-              type: 'text'
+              type: 'text',
+              required: true
             });
 
             authFormInputLogin.element.placeholder = localeData.MODAL_AUTHORIZATION_INPUT_LOGIN_PLACEHOLDER;
@@ -129,12 +130,36 @@ export class PageGlobal {
             let authFormInputPassword = authForm.target.createElementInput();
             authFormInputPassword.init({
               name: 'user_password',
-              type: 'password'
+              type: 'password',
+              required: true
             });
             authFormInputPassword.element.placeholder = localeData.MODAL_AUTHORIZATION_INPUT_PASSWORD_PLACEHOLDER;
 
+            /** @type {ElementInput} */
+            let authFormInputCheckbox = authForm.target.createElementInput();
+            authFormInputCheckbox.init({
+              name: 'user_agreement',
+              type: 'checkbox',
+              required: true
+            });
+
             authForm.target.element.firstChild.append(authFormInputLogin.element);
             authForm.target.element.firstChild.append(authFormInputPassword.element);
+
+            let agreementContainerElement = document.createElement('div');
+            agreementContainerElement.classList.add('form__checkbox-container');
+            agreementContainerElement.classList.add('checkbox-container');
+
+            agreementContainerElement.append(authFormInputCheckbox.element);
+
+            let agreementLabelContainerElement = document.createElement('div');
+            agreementLabelContainerElement.classList.add('checkbox-container__label');
+            agreementLabelContainerElement.classList.add('label');
+            agreementLabelContainerElement.innerHTML = localeData.DEFAULT_TEXT_USER_AUTHORIZATION_AGREEMENT;
+
+            agreementContainerElement.append(agreementLabelContainerElement);
+
+            authForm.target.element.firstChild.append(agreementContainerElement);
 
             /** Модальное окно для создания запроса на авторизацию
              * @type {Interactive}
@@ -146,7 +171,9 @@ export class PageGlobal {
             });
 
             interactiveModal.target.addButton(localeData.BUTTON_AUTHORIZATION_LABEL, () => {
-              authForm.target.send();
+              if (authForm.checkRequiredFields()) {
+                authForm.target.send();
+              }
             });
 
             // Добавление кнопки "Восстановление пароля/Забыл пароль"
