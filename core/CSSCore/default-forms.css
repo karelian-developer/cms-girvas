@@ -149,11 +149,11 @@
   display: flex;
 }
 
-.form__input-container_flex-checkbox > input[type="checkbox"] {
+.form__input-container.input-container_flex-checkbox > input[type="checkbox"] {
   margin-right: 5px;
 }
 
-.form__input-container_flex-checkbox > .label {
+.form__input-container.input-container_flex-checkbox > .label {
   font-style: italic;
   font-size: 12px;
 }
