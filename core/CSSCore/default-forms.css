@@ -145,7 +145,7 @@
   position: relative;
 }
 
-.form__input-container_flex-checkbox {
+.form__input-container.input-container_flex-checkbox {
   display: flex;
 }
 
