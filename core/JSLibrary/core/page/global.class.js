@@ -138,7 +138,7 @@ export class PageGlobal {
             /** @type {ElementInput} */
             let authFormInputCheckbox = authForm.target.createElementInput();
             authFormInputCheckbox.init({
-              name: 'user_agreement',
+              name: 'user_remember_me',
               type: 'checkbox',
               required: true
             });
@@ -146,21 +146,21 @@ export class PageGlobal {
             authForm.target.element.firstChild.append(authFormInputLogin.element);
             authForm.target.element.firstChild.append(authFormInputPassword.element);
 
-            let agreementContainerElement = document.createElement('div');
-            agreementContainerElement.classList.add('form__input-container');
-            agreementContainerElement.classList.add('input-container');
-            agreementContainerElement.classList.add('input-container_flex-checkbox');
+            let rememberContainerElement = document.createElement('div');
+            rememberContainerElement.classList.add('form__input-container');
+            rememberContainerElement.classList.add('input-container');
+            rememberContainerElement.classList.add('input-container_flex-checkbox');
 
-            agreementContainerElement.append(authFormInputCheckbox.element);
+            rememberContainerElement.append(authFormInputCheckbox.element);
 
-            let agreementLabelContainerElement = document.createElement('div');
-            agreementLabelContainerElement.classList.add('input-container__label');
-            agreementLabelContainerElement.classList.add('label');
-            agreementLabelContainerElement.innerHTML = localeData.DEFAULT_TEXT_USER_AUTHORIZATION_AGREEMENT;
+            let rememberLabelContainerElement = document.createElement('div');
+            rememberLabelContainerElement.classList.add('input-container__label');
+            rememberLabelContainerElement.classList.add('label');
+            rememberLabelContainerElement.innerHTML = localeData.DEFAULT_TEXT_USER_AUTHORIZATION_REMEMBER_ME;
 
-            agreementContainerElement.append(agreementLabelContainerElement);
+            rememberContainerElement.append(rememberLabelContainerElement);
 
-            authForm.target.element.firstChild.append(agreementContainerElement);
+            authForm.target.element.firstChild.append(rememberContainerElement);
 
             /** Модальное окно для создания запроса на авторизацию
              * @type {Interactive}
