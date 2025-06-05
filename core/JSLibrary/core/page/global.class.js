@@ -139,8 +139,7 @@ export class PageGlobal {
             let authFormInputCheckbox = authForm.target.createElementInput();
             authFormInputCheckbox.init({
               name: 'user_remember_me',
-              type: 'checkbox',
-              required: true
+              type: 'checkbox'
             });
 
             authForm.target.element.firstChild.append(authFormInputLogin.element);

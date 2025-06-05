@@ -245,6 +245,8 @@ if ($system_core->urlp->get_path(2) == 'authorization' && $system_core->urlp->ge
     $user_login = (isset($_POST['user_login'])) ? $_POST['user_login'] : null;
     /** @var string|null $user_password */
     $user_password = (isset($_POST['user_password'])) ? $_POST['user_password'] : null;
+    /** @var bool $user_remember_me */
+    $user_remember_me = isset($_POST['user_remember_me']);
 
     if (!is_null($user_login) && !is_null($user_password)) {
       /** @var User|null $user */
@@ -281,7 +283,7 @@ if ($system_core->urlp->get_path(2) == 'authorization' && $system_core->urlp->ge
             $user_session_is_secure = ($system_core->configurator->get('ssl_is_enabled')) ? true : false;
 
             setcookie('_grv_utoken', $user_session->get_token(), [
-              'expires' => $user_session_expires,
+              'expires' => ($user_remember_me) ? $user_session_expires : 0,
               'path' => '/',
               'domain' => $system_core->configurator->get('domain_cookies'),
               'secure' => $user_session_is_secure,
@@ -325,6 +327,8 @@ if ($system_core->urlp->get_path(2) == 'authorization' && $system_core->urlp->ge
     $user_login = (isset($_POST['user_login'])) ? $_POST['user_login'] : null;
     /** @var string|null $user_password */
     $user_password = (isset($_POST['user_password'])) ? $_POST['user_password'] : null;
+    /** @var bool $user_remember_me */
+    $user_remember_me = isset($_POST['user_remember_me']);
     $admin_access_codes = (isset($_POST['admin_access-code'])) ? $_POST['admin_access-code'] : [];
 
     if (!is_null($user_login) && !is_null($user_password) && !empty($admin_access_codes)) {
@@ -395,14 +399,14 @@ if ($system_core->urlp->get_path(2) == 'authorization' && $system_core->urlp->ge
               $user_session_base->init_data(['updated_unix_timestamp', 'token']);
               $user_session_base_expires = $user_session_base->get_updated_unix_timestamp() + $system_core->configurator->get('session_expires');
 
-              $system_core->client::create_cookie($system_core, '_grv_utoken', $user_session_base, $user_session_base_expires);
+              $system_core->client::create_cookie($system_core, '_grv_utoken', $user_session_base, ($user_remember_me) ? $user_session_base_expires : 0);
             }
 
             if (!is_null($user_session_admin)) {
               $user_session_admin->init_data(['updated_unix_timestamp', 'token']);
               $user_session_admin_expires = $user_session_admin->get_updated_unix_timestamp() + $system_core->configurator->get('session_expires');
 
-              $system_core->client::create_cookie($system_core, '_grv_atoken', $user_session_admin, $user_session_admin_expires);
+              $system_core->client::create_cookie($system_core, '_grv_atoken', $user_session_admin, ($user_remember_me) ? $user_session_admin_expires : 0);
 
               $sc_report = \core\PHPLibrary\SystemCore\Report::create($system_core, \core\PHPLibrary\SystemCore\Report::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS, [
                 'clientIP' => $system_core->client->get_ip_address(),
