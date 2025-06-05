@@ -151,11 +151,14 @@
 
 .form__input-container.input-container_flex-checkbox > input[type="checkbox"] {
   margin-right: 10px;
+  margin-bottom: 0 !important;
   width: fit-content !important;
   height: fit-content !important;
 }
 
 .form__input-container.input-container_flex-checkbox > .label {
+  display: flex;
+  align-items: center;
   font-style: italic;
   font-size: 12px;
 }
