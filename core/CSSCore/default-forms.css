@@ -151,8 +151,8 @@
 
 .form__input-container.input-container_flex-checkbox > input[type="checkbox"] {
   margin-right: 10px;
-  width: fit-content;
-  height: fit-content;
+  width: fit-content !important;
+  height: fit-content !important;
 }
 
 .form__input-container.input-container_flex-checkbox > .label {
