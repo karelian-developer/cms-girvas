@@ -140,3 +140,20 @@
   background-color: #232323;
   left: calc(100% - 32px - 4px);
 }
+
+.form__input-container {
+  position: relative;
+}
+
+.form__input-container_flex-checkbox {
+  display: flex;
+}
+
+.form__input-container_flex-checkbox > input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.form__input-container_flex-checkbox > .label {
+  font-style: italic;
+  font-size: 12px;
+}

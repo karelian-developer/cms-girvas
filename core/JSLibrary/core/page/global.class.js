@@ -147,13 +147,14 @@ export class PageGlobal {
             authForm.target.element.firstChild.append(authFormInputPassword.element);
 
             let agreementContainerElement = document.createElement('div');
-            agreementContainerElement.classList.add('form__checkbox-container');
-            agreementContainerElement.classList.add('checkbox-container');
+            agreementContainerElement.classList.add('form__input-container');
+            agreementContainerElement.classList.add('input-container');
+            agreementContainerElement.classList.add('input-container_flex-checkbox');
 
             agreementContainerElement.append(authFormInputCheckbox.element);
 
             let agreementLabelContainerElement = document.createElement('div');
-            agreementLabelContainerElement.classList.add('checkbox-container__label');
+            agreementLabelContainerElement.classList.add('input-container__label');
             agreementLabelContainerElement.classList.add('label');
             agreementLabelContainerElement.innerHTML = localeData.DEFAULT_TEXT_USER_AUTHORIZATION_AGREEMENT;
 
