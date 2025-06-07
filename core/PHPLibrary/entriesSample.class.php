@@ -10,10 +10,11 @@
 
 namespace core\PHPLibrary {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+  use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
   use \PDOException as PDOException;
 
   #[\AllowDynamicProperties]
-  class EntriesSample {
+  class EntriesSample implements EntityTypeContent  {
     private readonly SystemCore $system_core;
     private int $id;
 
@@ -34,7 +35,7 @@ namespace core\PHPLibrary {
      * @param  mixed $columns
      * @return void
      */
-    public function init_data(array $columns = ['*']) {
+    public function init_data(array $columns = ['*']) : void {
       $columns_data = $this->get_database_columns_data($columns);
       foreach ($columns_data as $column_name => $column_data) {
         $this->{$column_name} = $column_data;
@@ -209,16 +210,19 @@ namespace core\PHPLibrary {
     /**
      * Получить массив объектов записей для выборки
      * 
+     * @param  array $params_array
+     * @param  bool $only_published
+     * 
      * @return array
      */
-    public function get_entries() : array {
+    public function get_entries(array $params_array = [], $only_published = false) : array {
       $entries_categories_array = $this->get_categories();
 
       if (count($entries_categories_array) > 0) {
         $entries_array = [];
 
         foreach ($entries_categories_array as $entries_category) {
-          $entries_category_array = $entries_category->get_entries();
+          $entries_category_array = $entries_category->get_entries($params_array, $only_published);
           
           if (count($entries_category_array) > 0) {
             foreach ($entries_category_array as $entry) {
@@ -231,6 +235,16 @@ namespace core\PHPLibrary {
       }
 
       return [];
+    }
+
+    /**
+     * Получить количество объектов записей для выборки
+     * 
+     * @return int
+     */
+    public function get_entries_count() : int {
+      $entries = $this->get_entries();
+      return count($entries);
     }
     
     /**

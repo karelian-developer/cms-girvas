@@ -57,6 +57,10 @@
             <input name="admin_access-code[]" type="password" class="form-auth__input form-auth__input_access-code" placeholder="&#8226;&#8226;&#8226;&#8226;" maxlength="4" minlength="4" required>
             <input name="admin_access-code[]" type="password" class="form-auth__input form-auth__input_access-code" placeholder="&#8226;&#8226;&#8226;&#8226;" maxlength="4" minlength="4" required>
           </div>
+          <div class="form__input-container input-container input-container_flex-checkbox">
+            <input name="user_remember_me" type="checkbox" class="form__input form__input_checkbox">
+            <div class="input-container__label label">{LANG:DEFAULT_TEXT_USER_AUTHORIZATION_REMEMBER_ME}</div>
+          </div>
           <div class="form__input-container input-container">
             <input class="form-auth__input form-auth__input_submit" type="submit" value="{LANG:MAIN_AUTHORIZATION_FORM_BUTTON_SUBMIT_PLACEHOLDER}">
           </div>

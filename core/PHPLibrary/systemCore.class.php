@@ -46,7 +46,7 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.35-1';
+    public const CMS_VERSION = '0.1.36';
     public const CMS_STAGE_DEVELOPING = 'alpha';
     public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -280,8 +280,8 @@ namespace core\PHPLibrary {
      */
     private function init() {
       // Принудительное подключение класса файлового подключателя
-      require_once(sprintf('%s/%s/SystemCore/fileConnector.interface.php', CMS_ROOT_DIRECTORY, self::CMS_CORE_PHP_LIBRARY_PATH));
-      require_once(sprintf('%s/%s/SystemCore/fileConnector.class.php', CMS_ROOT_DIRECTORY, self::CMS_CORE_PHP_LIBRARY_PATH));
+      require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/fileConnector.interface.php';
+      require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/fileConnector.class.php';
 
       /** @var string Равномерно выбранные случайные байты */
       $bytes = random_bytes(16);
@@ -353,10 +353,10 @@ namespace core\PHPLibrary {
         // Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена в настройках CMS.
         if ($this->configurator->get_permanent_redirect_to_www_status() && !preg_match('/^www\./', $_SERVER['HTTP_HOST'])) {
           /** @var string Адрес для переадресации по HTTPS-протоколу (поддомен www) */
-          $https_redirect = sprintf('https://www.%s%s', $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']);
+          $https_redirect = 'https://www.' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         } else {
           /** @var string Адрес для переадресации по HTTPS-протоколу */
-          $https_redirect = sprintf('https://%s%s', $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']);
+          $https_redirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         }
 
         // Сообщаем браузеру, что это принудительная переадресация
@@ -368,7 +368,7 @@ namespace core\PHPLibrary {
       // Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена в настройках CMS.
       if ($this->configurator->get_permanent_redirect_to_www_status() && !preg_match('/^www\./', $_SERVER['HTTP_HOST'])) {
         /** @var string Адрес для переадресации по HTTP-протоколу (поддомен www) */
-        $http_redirect = sprintf('http://www.%s%s', $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI']);
+        $http_redirect = 'http://www.' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         
         // Сообщаем браузеру, что это принудительная переадресация
         SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_RESPONSE_CODE, 301);
@@ -420,8 +420,13 @@ namespace core\PHPLibrary {
       $modules_installed = Modules::get_installed_modules_array();
       if (!empty($modules_installed)) {
         foreach ($modules_installed as $index => $folder_name) {
-          $module_path = sprintf('%s/%s', Modules::get_absolute_modules_path(), $folder_name);
+          /** @var string Абсолютный путь до директории с модулями */
+          $modules_path = Modules::get_absolute_modules_path();
+          /** @var string Абсолютный путь до директории с модулем */
+          $module_path = $modules_path . '/' . $folder_name;
+          /** @var Module Объект модуля */
           $module = new Module($this, $folder_name);
+
           if ($module->is_enabled()) {
             $file_connector->set_start_directory($module_path);
             $file_connector->set_current_directory($module_path);
@@ -447,7 +452,9 @@ namespace core\PHPLibrary {
       $modules_installed = Modules::get_installed_modules_array();
       if (!empty($this->modules)) {
         foreach ($this->modules as $name => $module_core) {
+          /** @var Module Объект модуля */
           $module = new Module($this, $name);
+
           if ($module->is_installed() && $module->is_enabled()) {
             $module_core->preparation();
           }

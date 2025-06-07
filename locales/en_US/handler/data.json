@@ -95,6 +95,7 @@
   "API_SETTINGS_USERS_PASSWORD_LENGTH_MIN_TOO_SMALL": "The minimum number of characters is too small. The password must be at least 6 characters long for security reasons.",
   "API_SETTINGS_USERS_PASSWORD_LENGTH_MAX_TOO_SMALL": "The maximum number of characters is too small. The length password cannot be negative.",
   "API_SETTINGS_USERS_PASSWORD_LENGTH_MIN_LARGE_MAX": "The minimum number of characters cannot be greater than the maximum. Math violation.",
+  "API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED": "The server does not have access to robots.txt, check the rights.",
   "API_UTILS_SECRET_CODES_GENERATED_SUCCESS": "Secret codes for accessing the administration panel have been successfully updated.",
   "API_UTILS_PARSEDOWN_TRANSFORMED_SUCCESS": "The text has been successfully converted.",
   "API_UTILS_USER_REGISTRATION_SENDED_SUCCESS": "Registration successfully completed. A notification has been sent to your email address with a link to the account activation page.",
@@ -111,6 +112,7 @@
   "API_UTILS_USER_REGISTRATION_ERROR_INVALID_REPEAT_PASSWORD": "The specified passwords do not match.",
   "API_UTILS_USER_REGISTRATION_ERROR_DISABLED": "Registration on the site is disabled.",
   "API_UTILS_USER_REGISTRATION_ERROR_AUTHORIZATION_ALREADY": "Registration is not available because you are already logged in to the system.",
+  "API_UTILS_USER_REGISTRATION_ERROR_AGREEMENT": "It is impossible to continue registration due to the lack of your consent to the processing of your personal data.",
   "API_UTILS_USER_AUTHORIZATION_SUCCESS": "Authorization was successful.",
   "API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND": "A user with such data was not found.",
   "API_UTILS_USER_AUTHORIZATION_ERROR_AUTHORIZATION_ALREADY": "Authorization is not available because you are already authorized in the system.",
@@ -123,8 +125,6 @@
   "API_INSTALLATION_NAME_LABEL": "Name",
   "API_INSTALLATION_EXPECTATION_LABEL": "Expectation",
   "API_INSTALLATION_FACT_LABEL": "Fact",
-  "API_INSTALLATION_DIRECTORY_FOUND_LABEL": "Directory found",
-  "API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL": "Directory not found",
   "API_INSTALLATION_DRIVER_PDO_LABEL": "PDO driver",
   "API_INSTALLATION_DRIVER_PDO_STATUS_LABEL": "Status",
   "API_INSTALLATION_CONFIGURATION_FILE_CREATED": "The configuration file has been successfully created.",
@@ -136,5 +136,8 @@
   "API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_LOGIN": "The login is in an incorrect format.",
   "API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_PASSWORD": "The password is not in the correct format or does not meet security requirements.",
   "API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_REPEAT_PASSWORD": "The specified passwords do not match.",
-  "API_INSTALLATION_SECRET_KEY_LABEL": "The secret key"
+  "API_INSTALLATION_SECRET_KEY_LABEL": "The secret key",
+  "API_INSTALLATION_DIRECTORY_FOUND_LABEL": "Directory found",
+  "API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL": "Directory not found",
+  "API_INSTALLATION_SITE_TITLE_OR_DESCRIPTION_IS_EMPTY": "The site title or description is empty."
 }

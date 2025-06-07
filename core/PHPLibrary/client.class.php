@@ -21,7 +21,7 @@ namespace core\PHPLibrary {
     /**
      * __construct
      *
-     * @param  mixed $system_core
+     * @param  SystemCore $system_core
      * @return void
      */
     public function __construct(SystemCore $system_core) {
@@ -50,7 +50,7 @@ namespace core\PHPLibrary {
     }
 
     /**
-     * Получить IP-адрес клиента
+     * Получить реальный IP-адрес клиента
      *
      * @return string
      */
@@ -143,7 +143,7 @@ namespace core\PHPLibrary {
     }
 
     /**
-     * Создать Cookie
+     * Создать Cookie (Устаревшее)
      * 
      * @param SystemCore $system_core
      * @param string $name
@@ -170,7 +170,7 @@ namespace core\PHPLibrary {
     }
     
     /**
-     * Удалить Cookie
+     * Удалить Cookie (Устаревшее)
      * 
      * @param string $name
      * 

@@ -19,14 +19,15 @@ if (!isset($system_core)) {
 }
 
 if (defined('IS_NOT_HACKED')) {
-  header(sprintf('Access-Control-Allow-Origin: %s', $system_core->configurator->get('domain')));
+  header('Access-Control-Allow-Origin: ' . $system_core->configurator->get('domain'));
 
   $handler_headers = apache_request_headers();
+  $php_input_content = file_get_contents('php://input');
 
   switch ($_SERVER['REQUEST_METHOD']) {
-    case 'PATCH': $_PATCH = $system_core::parse_raw_http_request(file_get_contents('php://input'), $_SERVER['CONTENT_TYPE']); break;
-    case 'PUT': $_PUT = $system_core::parse_raw_http_request(file_get_contents('php://input'), $_SERVER['CONTENT_TYPE']); break;
-    case 'DELETE': $_DELETE = $system_core::parse_raw_http_request(file_get_contents('php://input'), $_SERVER['CONTENT_TYPE']); break;
+    case 'PATCH': $_PATCH = $system_core::parse_raw_http_request($php_input_content, $_SERVER['CONTENT_TYPE']); break;
+    case 'PUT': $_PUT = $system_core::parse_raw_http_request($php_input_content, $_SERVER['CONTENT_TYPE']); break;
+    case 'DELETE': $_DELETE = $system_core::parse_raw_http_request($php_input_content, $_SERVER['CONTENT_TYPE']); break;
   }
 
   $handler_output_data = [];
@@ -37,13 +38,13 @@ if (defined('IS_NOT_HACKED')) {
 
   // Client API
   if ($system_core->urlp->get_path(1) == 'client') {
-    $api_file_path = sprintf('%s/api/client.api.php', CMS_ROOT_DIRECTORY);
-    include_once($api_file_path);
+    $api_file_path = CMS_ROOT_DIRECTORY . '/api/client.api.php';
+    include_once $api_file_path;
 
   // Installation API
   } else if ($system_core->urlp->get_path(1) == 'install') {
-    $api_file_path = sprintf('%s/api/installation.api.php', CMS_ROOT_DIRECTORY);
-    include_once($api_file_path);
+    $api_file_path = CMS_ROOT_DIRECTORY . '/api/installation.api.php';
+    include_once $api_file_path;
   
   // Metrics API
   } else if ($system_core->urlp->get_path(1) == 'metrics' && $system_core::core_rest_cookie_exists()) {
@@ -51,112 +52,112 @@ if (defined('IS_NOT_HACKED')) {
     $client_ip = $system_core->client->get_ip_address();
 
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = sprintf('%s/api/metrics.api.php', CMS_ROOT_DIRECTORY);
-      include_once($api_file_path);
+      $api_file_path = CMS_ROOT_DIRECTORY . '/api/metrics.api.php';
+      include_once $api_file_path;
     }
   } else if ($system_core->urlp->get_path(1) == 'media' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = sprintf('%s/api/media.api.php', CMS_ROOT_DIRECTORY);
-      include_once($api_file_path);
+      $api_file_path = CMS_ROOT_DIRECTORY . '/api/media.api.php';
+      include_once $api_file_path;
     }
   } else if ($system_core->urlp->get_path(1) == 'module' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = sprintf('%s/api/module.api.php', CMS_ROOT_DIRECTORY);
-      include_once($api_file_path);
+      $api_file_path = CMS_ROOT_DIRECTORY . '/api/module.api.php';
+      include_once $api_file_path;
     }
   } else if ($system_core->urlp->get_path(1) == 'user' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = sprintf('%s/api/user.api.php', CMS_ROOT_DIRECTORY);
-      include_once($api_file_path);
+      $api_file_path = CMS_ROOT_DIRECTORY . '/api/user.api.php';
+      include_once $api_file_path;
     }
   } else if ($system_core->urlp->get_path(1) == 'usersGroup' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = sprintf('%s/api/usersGroup.api.php', CMS_ROOT_DIRECTORY);
-      include_once($api_file_path);
+      $api_file_path = CMS_ROOT_DIRECTORY . '/api/usersGroup.api.php';
+      include_once $api_file_path;
     }
   } else if ($system_core->urlp->get_path(1) == 'usersGroups' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = sprintf('%s/api/usersGroups.api.php', CMS_ROOT_DIRECTORY);
-      include_once($api_file_path);
+      $api_file_path = CMS_ROOT_DIRECTORY . '/api/usersGroups.api.php';
+      include_once $api_file_path;
     }
   } else if ($system_core->urlp->get_path(1) == 'entry' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = sprintf('%s/api/entry.api.php', CMS_ROOT_DIRECTORY);
-      include_once($api_file_path);
+      $api_file_path = CMS_ROOT_DIRECTORY . '/api/entry.api.php';
+      include_once $api_file_path;
     }
   } else if ($system_core->urlp->get_path(1) == 'entries' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = sprintf('%s/api/entries.api.php', CMS_ROOT_DIRECTORY);
-      include_once($api_file_path);
+      $api_file_path = CMS_ROOT_DIRECTORY . '/api/entries.api.php';
+      include_once $api_file_path;
     }
   } else if ($system_core->urlp->get_path(1) == 'pageStatic' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = sprintf('%s/api/pageStatic.api.php', CMS_ROOT_DIRECTORY);
-      include_once($api_file_path);
+      $api_file_path = CMS_ROOT_DIRECTORY . '/api/pageStatic.api.php';
+      include_once $api_file_path;
     }
   } else if ($system_core->urlp->get_path(1) == 'settings' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = sprintf('%s/api/settings.api.php', CMS_ROOT_DIRECTORY);
-      include_once($api_file_path);
+      $api_file_path = CMS_ROOT_DIRECTORY . '/api/settings.api.php';
+      include_once $api_file_path;
     }
   } else if ($system_core->urlp->get_path(1) == 'template' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = sprintf('%s/api/template.api.php', CMS_ROOT_DIRECTORY);
-      include_once($api_file_path);
+      $api_file_path = CMS_ROOT_DIRECTORY . '/api/template.api.php';
+      include_once $api_file_path;
     }
   } else if ($system_core->urlp->get_path(1) == 'feed' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = sprintf('%s/api/feed.api.php', CMS_ROOT_DIRECTORY);
-      include_once($api_file_path);
+      $api_file_path = CMS_ROOT_DIRECTORY . '/api/feed.api.php';
+      include_once $api_file_path;
     }
   } else if ($system_core->urlp->get_path(1) == 'feeds' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = sprintf('%s/api/feeds.api.php', CMS_ROOT_DIRECTORY);
-      include_once($api_file_path);
+      $api_file_path = CMS_ROOT_DIRECTORY . '/api/feeds.api.php';
+      include_once $api_file_path;
     }
   } else if ($system_core->urlp->get_path(1) == 'utils' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();
 
     if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = sprintf('%s/api/utils.api.php', CMS_ROOT_DIRECTORY);
-      include_once($api_file_path);
+      $api_file_path = CMS_ROOT_DIRECTORY . '/api/utils.api.php';
+      include_once $api_file_path;
     }
   } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'dms-available') {
     $handler_output_data['charsets'] = ['UTF-8', 'UTF-16', 'Windows-1252', 'ISO-8859'];
@@ -289,49 +290,6 @@ if (defined('IS_NOT_HACKED')) {
       $handler_status_code = 0;
     }
   
-  // Получить перечень записей
-  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'entries' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
-
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      if ($system_core->urlp->get_path(2) == 'categories' && is_null($system_core->urlp->get_path(3))) {
-        $entries_categories_object = new \core\PHPLibrary\EntriesCategories($system_core);
-        $entries_categories_locale = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $system_core->configurator->get_database_entry_value('base_locale');
-
-        $handler_output_data['entriesCategories'] = [];
-        foreach ($entries_categories_object->get_all() as $entry_category) {
-          $entry_category->init_data(['name', 'parent_id', 'texts']);
-          array_push($handler_output_data['entriesCategories'], [
-            'id' => $entry_category->get_id(),
-            'parent_id' => $entry_category->get_parent_id(),
-            'name' => $entry_category->get_name(),
-            'title' => $entry_category->get_title($entries_categories_locale),
-            'description' => $entry_category->get_description($entries_categories_locale),
-          ]);
-        }
-      } else if ($system_core->urlp->get_path(2) == 'additional-fields' && is_null($system_core->urlp->get_path(3))) {
-        $cms_locale_setted = $system_core->configurator->get_database_entry_value('base_locale');
-        $fields_locale = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $cms_locale_setted;
-
-        $fields_types = ($system_core->configurator->exists_database_entry_value('entries_additional_field_type')) ? json_decode($system_core->configurator->get_database_entry_value('entries_additional_field_type'), true) : [];
-        $fields_titles = ($system_core->configurator->exists_database_entry_value('entries_additional_field_title')) ? json_decode($system_core->configurator->get_database_entry_value('entries_additional_field_title'), true) : [];
-        $fields_descriptions = ($system_core->configurator->exists_database_entry_value('entries_additional_field_description')) ? json_decode($system_core->configurator->get_database_entry_value('entries_additional_field_description'), true) : [];
-        $fields_names = ($system_core->configurator->exists_database_entry_value('entries_additional_field_name')) ? json_decode($system_core->configurator->get_database_entry_value('entries_additional_field_name'), true) : [];
-        
-        $fields = [];
-        foreach ($fields_types as $field_index => $field_type) {
-          array_push($fields, [
-            'type' => $field_type,
-            'title' => isset($fields_titles[$fields_locale]) ? $fields_titles[$fields_locale][$field_index] : '',
-            'description' => isset($fields_descriptions[$fields_locale]) ? $fields_descriptions[$fields_locale][$field_index] : '',
-            'name' => $fields_names[$field_index]
-          ]);
-        }
-
-        $handler_output_data['additionalFields'] = $fields;
-      }
-    }
   } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'pages' && $system_core::core_rest_cookie_exists()) {
     $system_core_rest_cookie = $system_core::get_core_rest_cookie();
     $client_ip = $system_core->client->get_ip_address();

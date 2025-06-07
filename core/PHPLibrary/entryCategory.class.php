@@ -10,10 +10,11 @@
 
 namespace core\PHPLibrary {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+  use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
   use \PDOException as PDOException;
 
   #[\AllowDynamicProperties]
-  class EntryCategory {
+  class EntryCategory implements EntityTypeContent {
     private readonly SystemCore $system_core;
     private int $id;
 
@@ -34,7 +35,7 @@ namespace core\PHPLibrary {
      * @param  mixed $columns
      * @return void
      */
-    public function init_data(array $columns = ['*']) {
+    public function init_data(array $columns = ['*']) : void {
       $columns_data = $this->get_database_columns_data($columns);
       foreach ($columns_data as $column_name => $column_data) {
         $this->{$column_name} = $column_data;
@@ -168,10 +169,13 @@ namespace core\PHPLibrary {
     /**
      * Получить массив объектов записей
      *
+     * @param  array $params_array
+     * @param  bool $only_published
+     * 
      * @return array
      */
-    public function get_entries() : array {
-      return (new Entries($this->system_core))->get_by_category_id($this->id);
+    public function get_entries(array $params_array = [], $only_published = false) : array {
+      return (new Entries($this->system_core))->get_by_category_id($this->id, $params_array, $only_published);
     }
     
     /**

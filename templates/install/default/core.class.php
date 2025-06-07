@@ -47,10 +47,15 @@ namespace templates\install\default {
      */
     public function assembly_main(array $template_replaces = []) : string {
       $domain_configuration = $this->template->system_core->configurator->get('domain');
+      
+      $domain_aliases_configuration = $this->template->system_core->configurator->get('domain_aliases');
+      $domain_aliases_configuration = (is_array($domain_aliases_configuration)) ? implode(', ', $domain_aliases_configuration) : '';
+
       $database_configurations = $this->template->system_core->configurator->get('database');
       $database_configurations = (is_null($database_configurations)) ? [] : $database_configurations;
 
-      $template_replaces['CONFIGURATION_DATABASE_DOMAIN'] = ($domain_configuration != null) ? $domain_configuration : '';
+      $template_replaces['CONFIGURATION_DOMAIN'] = ($domain_configuration != null) ? $domain_configuration : '';
+      $template_replaces['CONFIGURATION_DOMAIN_ALIASES'] = ($domain_aliases_configuration != null) ? $domain_aliases_configuration : '';
       $template_replaces['CONFIGURATION_DATABASE_SCHEME'] = (array_key_exists('scheme', $database_configurations)) ? $database_configurations['scheme'] : '';
       $template_replaces['CONFIGURATION_DATABASE_PREFIX'] = (array_key_exists('prefix', $database_configurations)) ? $database_configurations['prefix'] : '';
       $template_replaces['CONFIGURATION_DATABASE_HOST'] = (array_key_exists('host', $database_configurations)) ? $database_configurations['host'] : '';

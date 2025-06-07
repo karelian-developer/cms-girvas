@@ -98,8 +98,8 @@ namespace core\PHPLibrary\Page {
              * @var Parsedown Парсер markdown-разметки
              */
             $parsedown = new Parsedown();
-            $parsedown->setSafeMode(true);
-            $parsedown->setMarkupEscaped(true);
+            //$parsedown->setSafeMode(true);
+            //$parsedown->setMarkupEscaped(true);
 
             /**
              * @var string Заголовок статической страницы
@@ -169,9 +169,12 @@ namespace core\PHPLibrary\Page {
               }
             }
 
+            /** @var string Путь до персонального шаблона */
+            $personal_template_path = ($page_static->exists_personal_template_file()) ? sprintf('templates/%s', $page_static->get_personal_template_path()) : 'templates/page/static.tpl';
+
             $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page.tpl', [
               'PAGE_NAME' => 'static',
-              'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/static.tpl', $page_content_tags)
+              'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->system_core->template, $personal_template_path, $page_content_tags)
             ]);
           } else {
             http_response_code(404);

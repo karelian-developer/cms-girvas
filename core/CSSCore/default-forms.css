@@ -140,3 +140,23 @@
   background-color: #232323;
   left: calc(100% - 32px - 4px);
 }
+
+.form__input-container {
+  position: relative;
+}
+
+.form__input-container.input-container_flex-checkbox {
+  display: flex;
+}
+
+.form__input-container.input-container_flex-checkbox > input[type="checkbox"] {
+  margin-right: 10px;
+  margin-bottom: 0 !important;
+  width: fit-content !important;
+  height: fit-content !important;
+}
+
+.form__input-container.input-container_flex-checkbox > .label {
+  font-style: italic;
+  font-size: 12px;
+}

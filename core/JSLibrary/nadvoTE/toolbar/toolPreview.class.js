@@ -22,6 +22,11 @@ export class ToolPreview extends Tool {
     this.initClickEvent();
   }
 
+  resizePreviewIFrame(element) {
+    let elementDocument = element.contentDocument || element.contentWindow.document;
+    element.style.height = elementDocument.documentElement.scrollHeight + 'px';
+  }
+
   initClickEvent() {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
@@ -37,7 +42,14 @@ export class ToolPreview extends Tool {
         }).then((response) => {
           return response.json();
         }).then((data) => {
-          this.editor.textareaVisual.element.innerHTML = data.outputData.parsedown;
+          let iFrameWrapperElement = this.editor.textareaVisual.element;
+          let iFrameElement = iFrameWrapperElement.querySelector('iframe');
+          iFrameElement.setAttribute('scrolling', 'no');
+
+          let iFrameElementDocument = iFrameElement.contentDocument || iFrameElement.contentWindow.document;
+
+          iFrameElementDocument.body.innerHTML = data.outputData.parsedown;
+          this.resizePreviewIFrame(iFrameElement);
         }).catch((error) => {
           console.error(error);
         });

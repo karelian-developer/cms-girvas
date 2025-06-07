@@ -61,6 +61,10 @@ export class NadvoTE {
     return document.createElement('li');
   }
 
+  createElementIFrame() {
+    return document.createElement('iframe');
+  }
+
   createElementButton(content) {
     let element = document.createElement('button');
     element.innerHTML = content;
@@ -70,5 +74,9 @@ export class NadvoTE {
   
   getSelectionString() {
     return window.getSelection().toString();
+  }
+
+  async fetchJSON(url, data) {
+    return fetch(url, data).then(response => response.ok ? response.json() : Promise.reject(response));
   }
 }

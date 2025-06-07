@@ -10,10 +10,11 @@
 
 namespace core\PHPLibrary {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+  use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
   use \PDOException as PDOException;
 
   #[\AllowDynamicProperties]
-  class EntryComment {
+  class EntryComment implements EntityTypeContent {
     private readonly SystemCore $system_core;
     private int $id;
     
@@ -35,7 +36,7 @@ namespace core\PHPLibrary {
      * @param  mixed $columns
      * @return void
      */
-    public function init_data(array $columns = ['*']) {
+    public function init_data(array $columns = ['*']) : void {
       $columns_data = $this->get_database_columns_data($columns);
       foreach ($columns_data as $column_name => $column_data) {
         $this->{$column_name} = $column_data;

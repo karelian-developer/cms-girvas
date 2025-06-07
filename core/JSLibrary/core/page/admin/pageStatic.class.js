@@ -169,8 +169,13 @@ export class PagePageStatic {
         if (form.target.checkRequiredFields()) {
           let formData = new FormData(elementForm);
           
+          let inputPersonalTemplatePath = document.querySelector('[name="page_static_template_path"]');
+          if (inputPersonalTemplatePath !== null) {
+            formData.append(inputPersonalTemplatePath.name, inputPersonalTemplatePath.value);
+          }
+
           let additionalDataContainerElement = document.querySelector('[role="additional-data"]');
-          if (additionalDataContainerElement != null) {
+          if (additionalDataContainerElement !== null) {
             let additionalDataInputs = additionalDataContainerElement.querySelectorAll('input');
             additionalDataInputs.forEach((element) => {
               formData.append(element.name, element.value);

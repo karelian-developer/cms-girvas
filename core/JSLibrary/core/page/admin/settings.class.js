@@ -369,6 +369,7 @@ export class PageSettings {
             fields.forEach((field) => {
               this.addEntriesAdditionalField(localeData, tableAdditionalFieldsButtonContainer, {
                 type: field.type,
+                categoryID: field.categoryID,
                 title: field.title,
                 description: field.description,
                 name: field.name
@@ -388,6 +389,7 @@ export class PageSettings {
           fields.forEach((field) => {
             this.addEntriesAdditionalField(localeData, tableAdditionalFieldsButtonContainer, {
               type: field.type,
+              categoryID: field.categoryID,
               title: field.title,
               description: field.description,
               name: field.name
@@ -621,6 +623,7 @@ export class PageSettings {
   addEntriesAdditionalField(localeData, container, data = {}) {
     let tableRow = document.createElement('tr');
     let tableCellTypeField = document.createElement('td');
+    let tableCellCategoryField = document.createElement('td');
     let tableCellTitleField = document.createElement('td');
     let tableCellNameField = document.createElement('td');
     let tableCellDescriptionField = document.createElement('td');
@@ -644,6 +647,7 @@ export class PageSettings {
     
     tableRow.classList.add('table__row');
     tableCellTypeField.classList.add('table__cell');
+    tableCellCategoryField.classList.add('table__cell');
     tableCellTitleField.classList.add('table__cell');
     tableCellNameField.classList.add('table__cell');
     tableCellDescriptionField.classList.add('table__cell');
@@ -659,7 +663,7 @@ export class PageSettings {
     interactiveChoicesTypeField.target.addItem('Date', 'date');
     interactiveChoicesTypeField.target.addItem('Text', 'textarea');
     interactiveChoicesTypeField.target.setName('setting_entries_additional_field_type[]');
-
+    
     if (typeof data.type != 'undefined') {
       switch (data.type) {
         case 'text': interactiveChoicesTypeField.target.setItemSelectedIndex(0); break;
@@ -669,6 +673,33 @@ export class PageSettings {
         default: interactiveChoicesTypeField.target.setItemSelectedIndex(0);
       }
     }
+
+    let requestGetEntriesCategories = new Interactive('request', {
+      method: 'GET',
+      url: '/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name,
+    });
+
+    requestGetEntriesCategories.target.showingNotification = false;
+    requestGetEntriesCategories.target.send().then((responseData) => {
+      let interactiveChoicesCategoryField = new Interactive('choices');
+
+      if (responseData.statusCode == 1 && responseData.outputData.hasOwnProperty('entriesCategories')) {
+        let entriesCategories = responseData.outputData.entriesCategories;
+        
+        entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
+          interactiveChoicesCategoryField.target.addItem(entriesCategory.title, entriesCategory.id);
+
+          if (entriesCategory.id == data.categoryID) {
+            interactiveChoicesCategoryField.target.setItemSelectedIndex(entriesCategoryIndex);
+          }
+        });
+        
+        interactiveChoicesCategoryField.target.setName('setting_entries_additional_field_category_id[]');
+        interactiveChoicesCategoryField.assembly();
+
+        tableCellCategoryField.append(interactiveChoicesCategoryField.target.element);
+      }
+    });
 
     let buttons = {delete: null};
     buttons.delete = new Interactive('button');
@@ -701,6 +732,7 @@ export class PageSettings {
     tableCellEventField.append(buttons.delete.target.element);
 
     tableRow.append(tableCellTypeField);
+    tableRow.append(tableCellCategoryField);
     tableRow.append(tableCellTitleField);
     tableRow.append(tableCellNameField);
     tableRow.append(tableCellDescriptionField);

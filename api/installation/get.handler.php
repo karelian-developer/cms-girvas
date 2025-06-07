@@ -352,6 +352,17 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
 
     if (!file_exists($config_file_path)) {
       $domain = (isset($_GET['domain'])) ? idn_to_ascii($_GET['domain']) : '';
+
+      $domain_aliases = (isset($_GET['domain_aliases'])) ? trim($_GET['domain_aliases']) : '';
+      $domain_aliases_array = explode(',', $domain_aliases);
+      if (count($domain_aliases_array) > 0) {
+        foreach ($domain_aliases_array as $domain_aliase_index => $domain_aliase) {
+          $domain_aliases_array[$domain_aliase_index] = '\'' . idn_to_ascii(trim($domain_aliase) . '\'');
+        }
+      }
+
+      $domain_aliases = implode(', ', $domain_aliases_array);
+      
       $domain_email = (isset($_GET['domain_email'])) ? idn_to_ascii($_GET['domain_email']) : '';
       $domain_cookies = (isset($_GET['domain_cookies'])) ? idn_to_ascii($_GET['domain_cookies']) : '';
       $domain_ssl_status = (isset($_GET['domain_ssl_status'])) ? 'true' : 'false';
@@ -373,6 +384,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       fwrite($file, PHP_EOL);
       fwrite($file, '$configuration = [' . PHP_EOL);
       fwrite($file, sprintf('  \'domain\' => \'%s\',', $domain) . PHP_EOL);
+      fwrite($file, sprintf('  \'domain_aliases\' => [%s],', $domain_aliases) . PHP_EOL);
       fwrite($file, sprintf('  \'domain_email\' => \'%s\',', $domain_email) . PHP_EOL);
       fwrite($file, sprintf('  \'domain_cookies\' => \'%s\',', $domain_cookies) . PHP_EOL);
       fwrite($file, sprintf('  \'ssl_is_enabled\' => %s,', $domain_ssl_status) . PHP_EOL);
@@ -391,9 +403,9 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       fwrite($file, '  \'session_admin_expires\' => 86400,' . PHP_EOL);
       fwrite($file, '  \'ssl_csp\' => [' . PHP_EOL);
       fwrite($file, '    \'default-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com \',' . PHP_EOL);
-      fwrite($file, '    \'style-src \\\'unsafe-inline\\\' {DOMAIN} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
-      fwrite($file, '    \'script-src \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
-      fwrite($file, '    \'script-src-elem \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
+      fwrite($file, '    \'style-src \\\'unsafe-inline\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
+      fwrite($file, '    \'script-src \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
+      fwrite($file, '    \'script-src-elem \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
       fwrite($file, '    \'manifest-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\'' . PHP_EOL);
       fwrite($file, '  ],' . PHP_EOL);
       fwrite($file, '  \'ssl_perm_redirect\' => false,' . PHP_EOL);

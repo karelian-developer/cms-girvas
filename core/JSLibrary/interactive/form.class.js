@@ -105,8 +105,14 @@ export class Form {
     });
 
     arrayElements.forEach((element) => {
-      if (element.value.trim() == '') {
-        emptyFieldDetected = true;
+      if ((element.type === 'checkbox' || element.type === 'radio')) {
+        if (!element.checked) {
+          emptyFieldDetected = true;
+        }
+      } else {
+        if (element.value.trim() === '') {
+          emptyFieldDetected = true;
+        }
       }
     });
 

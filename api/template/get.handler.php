@@ -17,19 +17,22 @@ use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\Collector as TemplateCollector;
 
+/**
+ * Сборка шаблона по запросу
+ */
 if ($system_core->urlp->get_path(2) == 'assembly') {
   if (isset($_GET['templateCategory']) && isset($_GET['templateFilePath'])) {
     $template_category = $_GET['templateCategory'];
     
     switch ($template_category) {
-      case 'default': $template_config_name = 'base_template'; $locale_name = ($system_core->configurator->exists_database_entry_value('base_locale')) ? $system_core->configurator->get_database_entry_value('base_locale') : 'en_US'; break;
+      case 'base': $template_config_name = 'base_template'; $locale_name = ($system_core->configurator->exists_database_entry_value('base_locale')) ? $system_core->configurator->get_database_entry_value('base_locale') : 'en_US'; break;
       case 'admin': $template_config_name = 'base_admin_template'; $locale_name = ($system_core->configurator->exists_database_entry_value('base_admin_locale')) ? $system_core->configurator->get_database_entry_value('base_admin_locale') : 'en_US'; break;
       case 'install': $template_config_name = 'base_install_template'; $locale_name = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : 'en_US'; break;
       default: $template_config_name = sprintf('%s_template', $template_category); break;
     }
 
     switch ($template_category) {
-      case 'default': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'base'); break;
+      case 'base': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'base'); break;
       case 'admin': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'admin'); break;
       case 'install': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'install'); break;
       default: $system_core->locale = sprintf('%s_template', $template_category); break;
@@ -52,6 +55,37 @@ if ($system_core->urlp->get_path(2) == 'assembly') {
     $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS') : $handler_message;
     $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
   }
+}
+
+/**
+ * Получение данных о текущем шаблоне для конкретной категории
+ */
+if ($system_core->urlp->get_path(2) == null && $system_core->urlp->get_param('categoryName') != null) {
+  $template_category_name = $system_core->urlp->get_param('categoryName');
+    
+  switch ($template_category_name) {
+    case 'base': $template_config_name = 'base_template'; $locale_name = ($system_core->configurator->exists_database_entry_value('base_locale')) ? $system_core->configurator->get_database_entry_value('base_locale') : 'en_US'; break;
+    case 'admin': $template_config_name = 'base_admin_template'; $locale_name = ($system_core->configurator->exists_database_entry_value('base_admin_locale')) ? $system_core->configurator->get_database_entry_value('base_admin_locale') : 'en_US'; break;
+    case 'install': $template_config_name = 'base_install_template'; $locale_name = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : 'en_US'; break;
+    default: $template_config_name = sprintf('%s_template', $template_category_name); break;
+  }
+
+  switch ($template_category_name) {
+    case 'base': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'base'); break;
+    case 'admin': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'admin'); break;
+    case 'install': $system_core->locale = new SystemCoreLocale($system_core, $locale_name, 'install'); break;
+    default: $system_core->locale = sprintf('%s_template', $template_category_name); break;
+  }
+
+  $template_name = ($system_core->configurator->exists_database_entry_value($template_config_name)) ? $system_core->configurator->get_database_entry_value($template_config_name) : 'default';
+
+  $handler_output_data['template'] = [
+    'name' => $template_name,
+    'categoryName' => $template_category_name
+  ];
+
+  $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS') : $handler_message;
+  $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
 }
 
 ?>

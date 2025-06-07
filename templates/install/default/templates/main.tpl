@@ -41,7 +41,18 @@
                     </div>
                   </td>
                   <td class="table__cell cell">
-                    <input name="domain" type="text" class="form__input" value="{CONFIGURATION_DATABASE_DOMAIN}" placeholder="example.ru">
+                    <input name="domain" type="text" class="form__input" value="{CONFIGURATION_DOMAIN}" placeholder="example.ru">
+                  </td>
+                </tr>
+                <tr class="table__row">
+                  <td class="table__cell cell">
+                    <div class="cell__title">{LANG:INSTALLER_LOCAL_CONFIGURATION_DOMAIN_ALIASES_LABEL}</div>
+                    <div class="cell__description">
+                      <div class="page__phar-block">{LANG:INSTALLER_LOCAL_CONFIGURATION_DOMAIN_ALIASES_DESCRIPTION}</div>
+                    </div>
+                  </td>
+                  <td class="table__cell cell">
+                    <textarea name="domain_aliases" class="form__textarea">{CONFIGURATION_DOMAIN_ALIASES}</textarea>
                   </td>
                 </tr>
                 <tr class="table__row">

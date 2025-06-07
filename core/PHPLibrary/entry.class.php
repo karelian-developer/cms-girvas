@@ -10,10 +10,12 @@
 
 namespace core\PHPLibrary {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+  use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
+  use \core\PHPLibrary\Factories\Content as FactoryContent;
   use \PDOException as PDOException;
 
   #[\AllowDynamicProperties]
-  class Entry {
+  class Entry implements EntityTypeContent {
     private readonly SystemCore $system_core;
     private int $id;
     private int $category_id;
@@ -37,7 +39,7 @@ namespace core\PHPLibrary {
      * @param  mixed $columns
      * @return void
      */
-    public function init_data(array $columns = ['*']) {
+    public function init_data(array $columns = ['*']) : void {
       $columns_data = $this->get_database_columns_data($columns);
       foreach ($columns_data as $column_name => $column_data) {
         $this->{$column_name} = $column_data;
@@ -612,7 +614,9 @@ namespace core\PHPLibrary {
 
       if ($execute) {
         $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-        return ($result) ? new Entry($system_core, $result['id']) : null;
+        return ($result) ? FactoryContent::create($system_core, 'entry', [
+          'id' => $result['id']
+        ]) : null;
       }
 
       return null;

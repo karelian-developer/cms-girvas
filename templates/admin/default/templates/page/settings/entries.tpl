@@ -13,6 +13,7 @@
         <table class="table" role="table-additional-fields">
           <tr class="table__row">
             <th class="table__cell"><div class="cell__title">{LANG:PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_TYPE_FIELD_TITLE}</div></th>
+            <th class="table__cell"><div class="cell__title">{LANG:PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_CATEGORY_FIELD_TITLE}</div></th>
             <th class="table__cell"><div class="cell__title">{LANG:PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_NAME_TITLE}</div></th>
             <th class="table__cell"><div class="cell__title">{LANG:PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_TECHNICAL_NAME_TITLE}</div></th>
             <th class="table__cell"><div class="cell__title">{LANG:PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_DESCRIPTION_TITLE}</div></th>

@@ -73,6 +73,8 @@ namespace core\PHPLibrary\Page\Admin {
 
       /** @var array Типы полей */
       $fields_types = ($this->system_core->configurator->exists_database_entry_value('entries_additional_field_type')) ? json_decode($this->system_core->configurator->get_database_entry_value('entries_additional_field_type'), true) : [];
+      /** @var array Категории полей */
+      $fields_categories_ids = ($this->system_core->configurator->exists_database_entry_value('entries_additional_field_category_id')) ? json_decode($this->system_core->configurator->get_database_entry_value('entries_additional_field_category_id'), true) : [];
       /** @var array Заголовки полей */
       $fields_titles = ($this->system_core->configurator->exists_database_entry_value('entries_additional_field_title')) ? json_decode($this->system_core->configurator->get_database_entry_value('entries_additional_field_title'), true) : [];
       /** @var array Описания полей */
@@ -105,6 +107,7 @@ namespace core\PHPLibrary\Page\Admin {
           $element_value = (isset($field_value)) ? $field_value : '';
           $element = $dom_document->createElement('textarea', $element_value);
           $element->setAttribute('name', sprintf('entry_additional_field_%s', $fields_names[$field_index]));
+          $element->setAttribute('data-category-id', $fields_categories_ids[$field_index]);
 
           $dom_document->appendChild($element);
 
@@ -128,6 +131,7 @@ namespace core\PHPLibrary\Page\Admin {
           $element = $dom_document->createElement('input');
           $element->setAttribute('name', sprintf('entry_additional_field_%s', $fields_names[$field_index]));
           $element->setAttribute('type', $fields_types[$field_index]);
+          $element->setAttribute('data-category-id', $fields_categories_ids[$field_index]);
           $element->setAttribute('value', $element_value);
 
           $dom_document->appendChild($element);

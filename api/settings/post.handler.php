@@ -99,10 +99,21 @@ if ($system_core->client->is_logged(2)) {
             if ($setting_name == 'seo_robots_txt') {
               $file_robots_txt_path = sprintf('%s/robots.txt', CMS_ROOT_DIRECTORY);
 
-              $file_robots_txt = fopen($file_robots_txt_path, 'w+');
-              fwrite($file_robots_txt, $setting_value);
-              fclose($file_robots_txt);
-              chmod($file_robots_txt_path, 0664);
+              try {
+                $file_robots_txt = @fopen($file_robots_txt_path, 'w+');
+                if ($file_robots_txt === false) {
+                  $exception_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED'));
+                  throw new Exception($exception_message);
+                }
+
+                fwrite($file_robots_txt, $setting_value);
+                fclose($file_robots_txt);
+                chmod($file_robots_txt_path, 0664);
+              } catch (Exception $exception) {
+                $exception_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED'));
+                $handler_message = (!isset($handler_message)) ? $exception_message : $handler_message;
+                $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+              }
 
               continue;
             }
@@ -251,6 +262,14 @@ if ($system_core->client->is_logged(2)) {
               }
             }
 
+            if ($setting_name == 'setting_static_pages_additional_field_category_id') {
+              foreach ($setting_value as $key => $value) {
+                if (is_numeric($value)) {
+                  $setting_value[$key] = ($value > 0) ? (int)$value : 1;
+                }
+              }
+            }
+
             if (is_array($setting_value)) $setting_value = json_encode($setting_value);
 
             switch ($setting_name) {
@@ -266,6 +285,7 @@ if ($system_core->client->is_logged(2)) {
               case 'entries_additional_field_title': $setting_value = $setting_value; break;
               case 'entries_additional_field_description': $setting_value = $setting_value; break;
               case 'entries_additional_field_type': $setting_value = $setting_value; break;
+              case 'entries_additional_field_category_id': $setting_value = $setting_value; break;
               case 'entries_additional_field_name': $setting_value = $setting_value; break;
               case 'static_pages_additional_field_title': $setting_value = $setting_value; break;
               case 'static_pages_additional_field_description': $setting_value = $setting_value; break;
@@ -291,7 +311,7 @@ if ($system_core->client->is_logged(2)) {
         }
 
         if ($entries_additional_fields_count == 0 && isset($_POST['_entries_additional_fields_locale'])) {
-          foreach (['entries_additional_field_title', 'entries_additional_field_description', 'entries_additional_field_name', 'entries_additional_field_type'] as $index => $name) {
+          foreach (['entries_additional_field_title', 'entries_additional_field_description', 'entries_additional_field_name', 'entries_additional_field_type', 'entries_additional_field_category_id'] as $index => $name) {
             if ($system_core->configurator->exists_database_entry_value('entries_additional_field_title')) {
               $system_core->configurator->update_database_entry_value($name, json_encode([]));
             }
@@ -299,7 +319,7 @@ if ($system_core->client->is_logged(2)) {
         }
 
         if ($static_pages_additional_fields_count == 0 && isset($_POST['_static_pages_additional_fields_locale'])) {
-          foreach (['static_pages_additional_field_title', 'static_pages_additional_field_description', 'static_pages_additional_field_name', 'static_pages_additional_field_type'] as $index => $name) {
+          foreach (['static_pages_additional_field_title', 'static_pages_additional_field_description', 'static_pages_additional_field_name', 'static_pages_additional_field_type', 'static_pages_additional_field_type'] as $index => $name) {
             if ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_title')) {
               $system_core->configurator->update_database_entry_value($name, json_encode([]));
             }

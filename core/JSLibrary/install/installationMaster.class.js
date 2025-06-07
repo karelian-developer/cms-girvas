@@ -24,12 +24,24 @@ export class InstallationMaster {
 
     this.setStepsCount(stepsCount);
     this.buttons = {};
+    this.stepsData = [];
     this.progressItems = [];
     
     let installationProgress = document.querySelector('[role="installer-progress"]');
     let installationPages = document.querySelectorAll('[data-page-index]');
 
     if (this.searchParams.getParam('locale') != null) {
+      for (let stepIndex = 0; stepIndex < installationPages.length; stepIndex++) {
+        let stepID = stepIndex + 1;
+        let isBuilded = (stepIndex == 0) ? true : false;
+
+        this.stepsData.push({
+          id: stepID,
+          isBuilded: isBuilded,
+          isCompleted: false
+        });
+      }
+
       installationPages.forEach((element, elementIndex) => {
         element.style.display = (elementIndex == 0) ? 'block' : 'none';
 
@@ -59,13 +71,7 @@ export class InstallationMaster {
         }).then((data) => {
           return data.outputData.locales;
         }, (rejectionReason) => {
-          let interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(rejectionReason);
-          interactiveNotification.target.assembly();
-    
-          interactiveNotification.target.show();
+          this.showPopupNotification(rejectionReason, 0);
         }).then((locales) => {
           locales.forEach((locale, localeIndex) => {
             let localeTitle = locale.title;
@@ -105,6 +111,20 @@ export class InstallationMaster {
     }
   }
 
+  async fetchJSON(url, data) {
+    return fetch(url, data).then(response => response.ok ? response.json() : Promise.reject(response));
+  }
+
+  showPopupNotification(message, statusCode = -1) {
+    let interactiveElement = new Interactive('notification');
+    interactiveElement.target.isPopup = true;
+    interactiveElement.target.setStatusCode(statusCode);
+    interactiveElement.target.setContent(message);
+    interactiveElement.target.assembly();
+
+    interactiveElement.target.show();
+  }
+
   buildPanel() {
     let localeName = (this.searchParams.getParam('locale') != null) ? this.searchParams.getParam('locale') : 'en_US';
     let locale = new Locale(localeName, 'install');
@@ -113,13 +133,7 @@ export class InstallationMaster {
     locale.getData().then((data) => {
       localeData = data;
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.showPopupNotification(rejectionReason, 0);
     }).then(() => {
       let buttonsPanel = document.querySelector('[role="installation-buttons-panel"]');
       buttonsPanel.innerHTML = '';
@@ -181,13 +195,7 @@ export class InstallationMaster {
               installationPages[this.getStepIndex()].appendChild(dynamicDiv);
             }
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
 
           this.buildPanel();
@@ -219,13 +227,7 @@ export class InstallationMaster {
             let installationPages = document.querySelectorAll('[data-page-index]');
             installationPages[this.getStepIndex()].appendChild(dynamicDiv);
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -256,13 +258,7 @@ export class InstallationMaster {
             let installationPages = document.querySelectorAll('[data-page-index]');
             installationPages[this.getStepIndex()].appendChild(dynamicDiv);
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -293,13 +289,7 @@ export class InstallationMaster {
             let installationPages = document.querySelectorAll('[data-page-index]');
             installationPages[this.getStepIndex()].appendChild(dynamicDiv);
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0)
           });
         });
 
@@ -330,13 +320,7 @@ export class InstallationMaster {
             let installationPages = document.querySelectorAll('[data-page-index]');
             installationPages[this.getStepIndex()].appendChild(dynamicDiv);
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -372,13 +356,7 @@ export class InstallationMaster {
 
             this.buttons.nextStepIndex.target.enable();
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -411,98 +389,86 @@ export class InstallationMaster {
 
             this.buttons.nextStepIndex.target.enable();
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
         this.buttons.updateData.assembly();
       }
 
+      /**
+       * ШАГ МАСТЕРА-УСТАНОВЩИКА: №8
+       * 
+       * Цели шага:
+       * - Выбор локализации сайта и административной панели
+       * - Выбор временной зоны для расчета времени
+       */
       if (this.getStepIndex() == 7) {
-        fetch(`/handler/locales?locale=${localeName}&installation-mode=true`, {
-          method: 'GET'
-        }).then((response) => {
-          return (response.ok) ? response.json() : Promise.reject(response);
-        }).then((data) => {
-          let locales = data.outputData.locales;
-          let interactiveLocalesChoices = new Interactive('choices');
-          let interactiveLocalesAPChoices = new Interactive('choices');
+        // Если сборка страница шага еще не осуществлялась ранее,
+        // то делаем запросы к внутреннему API для получения списков
+        // локализаций системы для формирования выпадающих списков
+        if (!this.stepsData[this.getStepIndex()].isBuilded) {
+          Promise.all([
+            this.fetchJSON(`/handler/locales?locale=${localeName}&installation-mode=true`, {method: 'GET'}),
+            this.fetchJSON(`/handler/timezones?locale=${localeName}&installation-mode=true`, {method: 'GET'})
+          ]).then(([localesData, timezonesData]) => {
+            let locales = localesData.outputData.locales;
+            let timezones = timezonesData.outputData.timezones;
 
-          locales.forEach((locale, localeIndex) => {
-            let localeTitle = locale.title;
-            let localeIconURL = locale.iconURL;
-            let localeName = locale.name;
-            let localeISO639_2 = locale.iso639_2;
+            let interactiveLocalesChoices = new Interactive('choices');
+            let interactiveLocalesAPChoices = new Interactive('choices');
+            let interactiveDataSearcher = new Interactive('dataSearcher');
 
-            let localeIconImageElement = document.createElement('img');
-            localeIconImageElement.setAttribute('src', localeIconURL);
-            localeIconImageElement.setAttribute('alt', localeTitle);
+            locales.forEach((locale, localeIndex) => {
+              let localeTitle = locale.title;
+              let localeIconURL = locale.iconURL;
+              let localeName = locale.name;
+              let localeISO639_2 = locale.iso639_2;
 
-            let localeLabelElement = document.createElement('span');
-            localeLabelElement.innerText = localeTitle;
+              let localeIconImageElement = document.createElement('img');
+              localeIconImageElement.setAttribute('src', localeIconURL);
+              localeIconImageElement.setAttribute('alt', localeTitle);
 
-            let localeTemplate = document.createElement('template');
-            localeTemplate.innerHTML += localeIconImageElement.outerHTML;
-            localeTemplate.innerHTML += localeLabelElement.outerHTML;
+              let localeLabelElement = document.createElement('span');
+              localeLabelElement.innerText = localeTitle;
 
-            interactiveLocalesChoices.target.addItem(localeTemplate.innerHTML, localeName);
-            interactiveLocalesAPChoices.target.addItem(localeTemplate.innerHTML, localeName);
+              let localeTemplate = document.createElement('template');
+              localeTemplate.innerHTML += localeIconImageElement.outerHTML;
+              localeTemplate.innerHTML += localeLabelElement.outerHTML;
+
+              interactiveLocalesChoices.target.addItem(localeTemplate.innerHTML, localeName);
+              interactiveLocalesAPChoices.target.addItem(localeTemplate.innerHTML, localeName);
+            });
+
+            timezones.forEach((timezone) => {
+              interactiveDataSearcher.target.addItem(`${timezone.name} (${timezone.utc})`, timezone.name);
+            });
+
+            interactiveDataSearcher.target.inputValueElementData.name = 'setting_base_timezone';
+
+            interactiveLocalesChoices.target.setName('setting_base_locale');
+            interactiveLocalesAPChoices.target.setName('setting_admin_locale');
+
+            interactiveLocalesChoices.assembly();
+            interactiveLocalesAPChoices.assembly();
+            interactiveDataSearcher.assembly();
+
+            let interactiveLocalesContainerElement = document.querySelector('#E85485302311');
+            let interactiveLocalesAPContainerElement = document.querySelector('#E85485302312');
+
+            interactiveLocalesContainerElement.append(interactiveLocalesChoices.target.element);
+            interactiveLocalesAPContainerElement.append(interactiveLocalesAPChoices.target.element);
+            document.querySelector('#E85485302313').prepend(interactiveDataSearcher.target.element);
+          }).catch((rejectionReason) => {
+            this.showPopupNotification(rejectionReason, 0);
           });
+        }
 
-          interactiveLocalesChoices.target.setName('setting_base_locale');
-          interactiveLocalesAPChoices.target.setName('setting_admin_locale');
-
-          interactiveLocalesChoices.assembly();
-          interactiveLocalesAPChoices.assembly();
-
-          let interactiveLocalesContainerElement = document.querySelector('#E85485302311');
-          let interactiveLocalesAPContainerElement = document.querySelector('#E85485302312');
-
-          interactiveLocalesContainerElement.append(interactiveLocalesChoices.target.element);
-          interactiveLocalesAPContainerElement.append(interactiveLocalesAPChoices.target.element);
-        }, (rejectionReason) => {
-          let interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(rejectionReason);
-          interactiveNotification.target.assembly();
-    
-          interactiveNotification.target.show();
-        });
-
-        fetch(`/handler/timezones?locale=${localeName}&installation-mode=true`, {
-          method: 'GET'
-        }).then((response) => {
-          return (response.ok) ? response.json() : Promise.reject(response);
-        }).then((data) => {
-          let timezones = data.outputData.timezones;
-
-          let interactiveDataSearcher = new Interactive('dataSearcher');
-          timezones.forEach((timezone) => {
-            interactiveDataSearcher.target.addItem(`${timezone.name} (${timezone.utc})`, timezone.name);
-          });
-
-          interactiveDataSearcher.target.inputValueElementData.name = 'setting_base_timezone';
-
-          interactiveDataSearcher.assembly();
-
-          document.querySelector('#E85485302313').prepend(interactiveDataSearcher.target.element);
-        }, (rejectionReason) => {
-          let interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(rejectionReason);
-          interactiveNotification.target.assembly();
-    
-          interactiveNotification.target.show();
-        });
-
+        /** 
+         * Интерактивный элемент "Кнопка"
+         * Действие: применение данных
+         * @type {Interactive}
+         */
         this.buttons.updateData = new Interactive('button');
         this.buttons.updateData.target.setLabel('Применить');
         this.buttons.updateData.target.setCallback((event) => {
@@ -532,57 +498,61 @@ export class InstallationMaster {
 
             this.buttons.nextStepIndex.target.enable();
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
         this.buttons.updateData.assembly();
       }
 
+      /**
+       * ШАГ МАСТЕРА-УСТАНОВЩИКА: №9
+       * 
+       * Цели шага:
+       * - Назначение наименования сайту
+       * - Назначение описания сайту
+       * - Назначение ключевых слов сайту
+       */
       if (this.getStepIndex() == 8) {
         this.buttons.updateData = new Interactive('button');
         this.buttons.updateData.target.setLabel(localeData.BUTTON_APPLY_LABEL);
         this.buttons.updateData.target.setCallback((event) => {
           event.preventDefault();
 
+          /** @type {HTMLFormElement} */
           let formTarget = document.querySelector('[role="form-metadata"]');
-          /** @type {FormData} */
-          let formData = new FormData(formTarget);
-          
-          fetch(`/handler/install/set-metadata?locale=${localeName}&installation-mode=true`, {method: 'POST', body: formData}).then((response) => {
-            return (response.ok) ? response.json() : Promise.reject(response);
-          }).then((data) => {
-            let resultHTML = data.outputData.html;
-
-            let tableSystemsElement = document.querySelector('[role="cms-metadata"]');
-
-            if (tableSystemsElement) {
-              tableSystemsElement.remove();
-            }
+          if (formTarget !== null) {
+            /** @type {FormData} */
+            let formData = new FormData(formTarget);
             
-            let dynamicDiv = document.createElement('div');
-            dynamicDiv.setAttribute('role', 'cms-metadata');
-            dynamicDiv.innerHTML = resultHTML;
+            // Применение данных из формы
+            fetch(`/handler/install/set-metadata?locale=${localeName}&installation-mode=true`, {method: 'POST', body: formData}).then((response) => {
+              return (response.ok) ? response.json() : Promise.reject(response);
+            }).then((data) => {
+              let resultHTML = data.outputData.html;
+              let statusCode = data.statusCode;
 
-            let installationPages = document.querySelectorAll('[data-page-index]');
-            installationPages[this.getStepIndex()].appendChild(dynamicDiv);
+              let tableSystemsElement = document.querySelector('[role="cms-metadata"]');
 
-            this.buttons.nextStepIndex.target.enable();
-          }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
-          });
+              if (tableSystemsElement) {
+                tableSystemsElement.remove();
+              }
+              
+              let dynamicDiv = document.createElement('div');
+              dynamicDiv.setAttribute('role', 'cms-metadata');
+              dynamicDiv.innerHTML = resultHTML;
+
+              /** @type {NodeList} */
+              let installationPages = document.querySelectorAll('[data-page-index]');
+              installationPages[this.getStepIndex()].appendChild(dynamicDiv);
+
+              if (statusCode === 1) {
+                this.buttons.nextStepIndex.target.enable();
+              }
+            }, (rejectionReason) => {
+              this.showPopupNotification(rejectionReason, 0);
+            });
+          }
         });
 
         this.buttons.updateData.assembly();
@@ -620,13 +590,7 @@ export class InstallationMaster {
               this.buttons.nextStepIndex.target.enable();
             }
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -659,13 +623,7 @@ export class InstallationMaster {
 
             this.buttons.nextStepIndex.target.enable();
           }, (rejectionReason) => {
-            let interactiveNotification = new Interactive('notification');
-            interactiveNotification.target.isPopup = true;
-            interactiveNotification.target.setStatusCode(0);
-            interactiveNotification.target.setContent(rejectionReason);
-            interactiveNotification.target.assembly();
-      
-            interactiveNotification.target.show();
+            this.showPopupNotification(rejectionReason, 0);
           });
         });
 
@@ -678,6 +636,7 @@ export class InstallationMaster {
           this.buttons.nextStepIndex.target.setLabel(localeData.BUTTON_NEXT_LABEL);
           this.buttons.nextStepIndex.target.setCallback((event) => {
             event.preventDefault();
+            this.stepsData[this.getStepIndex()].isCompleted = true;
             this.nextStepIndex(localeData);
 
             if (this.getStepIndex() == 2) {
@@ -699,13 +658,7 @@ export class InstallationMaster {
                 let installationPages = document.querySelectorAll('[data-page-index]');
                 installationPages[this.getStepIndex()].appendChild(dynamicDiv);
               }, (rejectionReason) => {
-                let interactiveNotification = new Interactive('notification');
-                interactiveNotification.target.isPopup = true;
-                interactiveNotification.target.setStatusCode(0);
-                interactiveNotification.target.setContent(rejectionReason);
-                interactiveNotification.target.assembly();
-          
-                interactiveNotification.target.show();
+                this.showPopupNotification(rejectionReason, 0);
               });
             }
 
@@ -728,13 +681,7 @@ export class InstallationMaster {
                 let installationPages = document.querySelectorAll('[data-page-index]');
                 installationPages[this.getStepIndex()].appendChild(dynamicDiv);
               }, (rejectionReason) => {
-                let interactiveNotification = new Interactive('notification');
-                interactiveNotification.target.isPopup = true;
-                interactiveNotification.target.setStatusCode(0);
-                interactiveNotification.target.setContent(rejectionReason);
-                interactiveNotification.target.assembly();
-          
-                interactiveNotification.target.show();
+                this.showPopupNotification(rejectionReason, 0);
               });
             }
 
@@ -757,13 +704,7 @@ export class InstallationMaster {
                 let installationPages = document.querySelectorAll('[data-page-index]');
                 installationPages[this.getStepIndex()].appendChild(dynamicDiv);
               }, (rejectionReason) => {
-                let interactiveNotification = new Interactive('notification');
-                interactiveNotification.target.isPopup = true;
-                interactiveNotification.target.setStatusCode(0);
-                interactiveNotification.target.setContent(rejectionReason);
-                interactiveNotification.target.assembly();
-          
-                interactiveNotification.target.show();
+                this.showPopupNotification(rejectionReason, 0);
               });
             }
 
@@ -775,7 +716,9 @@ export class InstallationMaster {
           });
 
           if (this.getStepIndex() >= 5 && this.buttons.hasOwnProperty('nextStepIndex')) {
-            this.buttons.nextStepIndex.target.disable();
+            if (!this.stepsData[this.getStepIndex()].isCompleted) {
+              this.buttons.nextStepIndex.target.disable();
+            }
           }
 
           this.buttons.nextStepIndex.assembly();
@@ -785,6 +728,11 @@ export class InstallationMaster {
       for (let buttonName in this.buttons) {
         buttonsPanel.appendChild(this.buttons[buttonName].target.element);
       }
+
+      this.stepsData[this.getStepIndex()].isBuilded = true;
+
+      console.log(this.stepsData[this.getStepIndex()]);
+      console.log(`Index install step: ${this.getStepIndex()}`);
     });
   }
 

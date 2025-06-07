@@ -10,10 +10,11 @@
 
 namespace core\PHPLibrary {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+  use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
   use \PDOException as PDOException;
 
   #[\AllowDynamicProperties]
-  class PageStatic {
+  class PageStatic implements EntityTypeContent  {
     private readonly SystemCore $system_core;
     private int $id;
     private int $category_id;
@@ -37,7 +38,7 @@ namespace core\PHPLibrary {
      * @param  mixed $columns
      * @return void
      */
-    public function init_data(array $columns = ['*']) {
+    public function init_data(array $columns = ['*']) : void {
       $columns_data = $this->get_database_columns_data($columns);
       foreach ($columns_data as $column_name => $column_data) {
         $this->{$column_name} = $column_data;
@@ -281,6 +282,38 @@ namespace core\PHPLibrary {
       }
 
       return [];
+    }
+
+    /**
+     * Получить путь до персонального шаблона
+     * 
+     * @return string
+     */
+    public function get_personal_template_path() : string {
+      if (property_exists($this, 'metadata')) {
+        /** @var array Метаданные в виде массива */
+        $metadata_array = json_decode($this->metadata, true);
+        if (isset($metadata_array['personalTemplatePath'])) {
+          return (!empty($metadata_array['personalTemplatePath'])) ? $metadata_array['personalTemplatePath'] : 'templates/page/static.tpl';
+        }
+      }
+
+      return 'templates/page/static.tpl';
+    }
+
+    /**
+     * Проверить наличие файла персонального шаблона
+     * 
+     * @return bool
+     */
+    public function exists_personal_template_file() : bool {
+      if (property_exists($this, 'metadata')) {
+        /** @var string Путь до персонального шаблона */
+        $template_path = sprintf('%s/templates/%s', $this->system_core->template->get_path(), $this->get_personal_template_path());
+        return file_exists($template_path);
+      }
+
+      return false;
     }
 
     /**

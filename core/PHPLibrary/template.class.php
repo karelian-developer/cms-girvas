@@ -529,7 +529,7 @@ namespace core\PHPLibrary {
               $template_sample_path = sprintf('templates/samples/%s', $template_name_camel_case($entries_sample->get_name()));
 
               $entries_assembled = [];
-              $entries_objects_array = $entries_sample->get_entries();
+              $entries_objects_array = $entries_sample->get_entries([], true);
               if (count($entries_objects_array) > 0) {
                 foreach ($entries_objects_array as $entry) {
                   $entry->init_data(['name', 'texts', 'metadata', 'category_id', 'created_unix_timestamp', 'updated_unix_timestamp']);

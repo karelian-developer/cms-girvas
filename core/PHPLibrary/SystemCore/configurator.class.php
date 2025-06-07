@@ -587,12 +587,14 @@ namespace core\PHPLibrary\SystemCore {
      */
     public function get_security_scp() : string {
       $domain_address = sprintf('%s://%s', ($this->get('ssl_is_enabled')) ? 'https' : 'http', $this->get('domain'));
-      
+      $domain_aliases = (is_array($this->get('domain_aliases'))) ? implode(' ', $this->get('domain_aliases')) : '';
+
       $csp = ($this->exists('ssl_csp')) ? $this->get('ssl_csp') : '';
       if (is_array($csp)) $csp = implode('; ', $csp);
 
       $csp = str_replace('{SCRIPT_HASH}', $this->system_core->scp_scripts_hash, $csp);
       $csp = str_replace('{DOMAIN}', $domain_address, $csp);
+      $csp = str_replace('{DOMAIN_ALIASES}', $domain_aliases, $csp);
       return str_replace('&quot;', '\'', $csp);
     }
 
