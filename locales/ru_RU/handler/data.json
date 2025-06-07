@@ -114,6 +114,7 @@
   "API_UTILS_USER_REGISTRATION_ERROR_INVALID_REPEAT_PASSWORD": "Указанные пароли не совпадают.",
   "API_UTILS_USER_REGISTRATION_ERROR_DISABLED": "Регистрация на сайте отключена.",
   "API_UTILS_USER_REGISTRATION_ERROR_AUTHORIZATION_ALREADY": "Регистрация недоступна, поскольку Вы уже авторизованы в системе.",
+  "API_UTILS_USER_REGISTRATION_ERROR_AGREEMENT": "Невозможно продолжить регистрацию из-за отсутствия Вашего согласия на обработку Ваших персональных данных.",
   "API_UTILS_USER_AUTHORIZATION_SUCCESS": "Авторизация прошла успешно.",
   "API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND": "Пользователь с такими данными не обнаружен.",
   "API_UTILS_USER_AUTHORIZATION_ERROR_AUTHORIZATION_ALREADY": "Авторизация недоступна, поскольку Вы уже авторизованы в системе.",

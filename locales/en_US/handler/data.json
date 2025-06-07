@@ -112,6 +112,7 @@
   "API_UTILS_USER_REGISTRATION_ERROR_INVALID_REPEAT_PASSWORD": "The specified passwords do not match.",
   "API_UTILS_USER_REGISTRATION_ERROR_DISABLED": "Registration on the site is disabled.",
   "API_UTILS_USER_REGISTRATION_ERROR_AUTHORIZATION_ALREADY": "Registration is not available because you are already logged in to the system.",
+  "API_UTILS_USER_REGISTRATION_ERROR_AGREEMENT": "It is impossible to continue registration due to the lack of your consent to the processing of your personal data.",
   "API_UTILS_USER_AUTHORIZATION_SUCCESS": "Authorization was successful.",
   "API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND": "A user with such data was not found.",
   "API_UTILS_USER_AUTHORIZATION_ERROR_AUTHORIZATION_ALREADY": "Authorization is not available because you are already authorized in the system.",

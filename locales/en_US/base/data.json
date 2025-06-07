@@ -31,6 +31,7 @@
   "BUTTON_SUBMIT_LABEL": "Submit",
   "BUTTON_ANSWER_LABEL": "Answer",
   "BUTTON_AUTHORIZATION_LABEL": "Authorization",
+  "BUTTON_REGISTRATION_LABEL": "Registration",
   "BUTTON_RECOVERY_LABEL": "Recovery",
   "BUTTON_RESET_LABEL": "Reset",
   "MODAL_COOKIE_SITE_USING_TITLE": "Use of cookies",
