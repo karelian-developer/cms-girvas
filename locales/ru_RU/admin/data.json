@@ -4,6 +4,7 @@
   "VERSION_VOITSY_LABEL": "Воицы",
   "VERSION_SHUYA_LABEL": "Шуя",
   "DEFAULT_TEXT_DESCRIPTION_NOT_FOUND": "Описание отсутствует.",
+  "DEFAULT_TEXT_USER_AUTHORIZATION_REMEMBER_ME": "Запомнить меня на этом устройстве.",
   "MAIN_NAVIGATION_INDEX_LABEL": "Дашборд",
   "MAIN_NAVIGATION_ENTRIES_LABEL": "Записи",
   "MAIN_NAVIGATION_PAGES_LABEL": "Страницы",
