@@ -61,11 +61,11 @@ namespace core\PHPLibrary {
       $this->set_category($themeCategory);
 
       /** @var SystemCore Объект системного ядра */
-      $this->system_core = $CMSCore;
+      $this->CMSCore = $CMSCore;
 
-      if ($this->system_core->urlp->get_path(0) != 'install') {
+      if ($this->CMSCore->urlp->get_path(0) != 'install') {
         /** @var TemplateLocale Объект локализации шаблона */
-        $this->locale = new TemplateLocale($this, $this->system_core->locale->get_name());
+        $this->locale = new TemplateLocale($this, $this->CMSCore->locale->get_name());
       }
 
       /** @var string Абсолютный путь до корневой директории шаблона */
@@ -434,7 +434,7 @@ namespace core\PHPLibrary {
      * @return void
      */
     public function add_link_canonical(string $href) : void {
-      array_push($this->head_links, [
+      array_push($this->headLinks, [
         'rel' => 'canonical',
         'href' => $href
       ]);
@@ -474,7 +474,7 @@ namespace core\PHPLibrary {
     public function get_core_assembled() : string {
       if (isset($this->core->assembled)) {
         /** @var bool Режим установщика */
-        $isInstallationMode = $this->system_core->urlp->get_param('mode') === 'install';
+        $isInstallationMode = $this->CMSCore->urlp->get_param('mode') === 'install';
 
         if ($isInstallationMode) {
           $siteTitle = 'Installation | ' . SystemCore::CMS_TITLE;
@@ -482,17 +482,17 @@ namespace core\PHPLibrary {
           $siteKeywords = 'girvas';
           $siteCharset = 'UTF-8';
         } else {
-          $localeData = $this->system_core->locale->get_data();
-          $systemLocaleName = $this->system_core->locale->get_name();
+          $localeData = $this->CMSCore->locale->get_data();
+          $systemLocaleName = $this->CMSCore->locale->get_name();
 
-          $systemConfigurator = $this->system_core->configurator;
+          $systemConfigurator = $this->CMSCore->configurator;
           $siteTitle = $systemConfigurator->get_meta_title() ?: $systemConfigurator->get_site_title();
           $siteDescription = $systemConfigurator->get_meta_description() ?: $systemConfigurator->get_site_description();
           $siteKeywords = $systemConfigurator->get_meta_keywords_imploded() ?: $systemConfigurator->get_site_keywords();
           $siteCharset = $systemConfigurator->get_site_charset();
         }
 
-        $systemStageDevelopingLabel = str_replace('-', '_', strtoupper($this->system_core->get_cms_stage_developing()));
+        $systemStageDevelopingLabel = str_replace('-', '_', strtoupper($this->CMSCore->get_cms_stage_developing()));
 
         $themeCategory = $this->get_category();
         $themeVariablesArray = [
@@ -505,22 +505,22 @@ namespace core\PHPLibrary {
           'SITE_DESCRIPTION' => $siteDescription,
           'SITE_KEYWORDS' => $siteKeywords,
           'SITE_CHARSET' => $siteCharset,
-          'CMS_VERSION' => $this->system_core->get_cms_version(),
+          'CMS_VERSION' => $this->CMSCore->get_cms_version(),
           'CMS_VERSION_LABEL' => TemplateCollector::assembly(sprintf('{CMS_VERSION} {LANG:VERSION_%s_LABEL}', $systemStageDevelopingLabel), [
-            'CMS_VERSION' => $this->system_core->get_cms_version(),
+            'CMS_VERSION' => $this->CMSCore->get_cms_version(),
           ]),
-          'CMS_STAGE_DEVELOPING' => $this->system_core->get_cms_stage_developing(),
-          'CMS_TITLE' => $this->system_core->get_cms_title(),
-          'CMS_DOMAIN' => $this->system_core->get_cms_domain(),
-          'CMS_PRODUCT_SITE_LINK' => $this->system_core::CMS_PRODUCT_SITE_LINK,
-          'CMS_DEVELOPER_SITE_LINK' => $this->system_core::CMS_DEVELOPER_SITE_LINK,
-          'CMS_DEVELOPER_TITLE' => $this->system_core::CMS_DEVELOPER_TITLE,
-          'CMS_REESTR_DIGITAL_GOV_LINK' => $this->system_core::CMS_REESTR_DIGITAL_GOV_LINK,
-          'CMS_COPYRIGHT' => $this->system_core::get_copyright_string()
+          'CMS_STAGE_DEVELOPING' => $this->CMSCore->get_cms_stage_developing(),
+          'CMS_TITLE' => $this->CMSCore->get_cms_title(),
+          'CMS_DOMAIN' => $this->CMSCore->get_cms_domain(),
+          'CMS_PRODUCT_SITE_LINK' => $this->CMSCore::CMS_PRODUCT_SITE_LINK,
+          'CMS_DEVELOPER_SITE_LINK' => $this->CMSCore::CMS_DEVELOPER_SITE_LINK,
+          'CMS_DEVELOPER_TITLE' => $this->CMSCore::CMS_DEVELOPER_TITLE,
+          'CMS_REESTR_DIGITAL_GOV_LINK' => $this->CMSCore::CMS_REESTR_DIGITAL_GOV_LINK,
+          'CMS_COPYRIGHT' => $this->CMSCore::get_copyright_string()
         ];
 
-        if (!$isInstallationMode && $this->system_core->urlp->get_path(0) !== 'install') {
-          $entriesSamples = new EntriesSamples($this->system_core);
+        if (!$isInstallationMode && $this->CMSCore->urlp->get_path(0) !== 'install') {
+          $entriesSamples = new EntriesSamples($this->CMSCore);
           $entriesSamplesArray = $entriesSamples->get_all();
 
           foreach ($entriesSamplesArray as $entriesSample) {
@@ -594,13 +594,13 @@ namespace core\PHPLibrary {
               $entryPublishedDateTimestampISO8601WithoutDate = date('H:i:s', $entryPublishedUnixTimestamp);
               $entryUpdatedDateTimestampISO8601WithoutDate = date('H:i:s', $entryUpdatedUnixTimestamp);
 
-              array_push($entriesAssembled, TemplateCollector::assembly_file_content($this->system_core->template, sprintf('%s/item.tpl', $themeSamplePath), [
+              array_push($entriesAssembled, TemplateCollector::assembly_file_content($this->CMSCore->template, sprintf('%s/item.tpl', $themeSamplePath), [
                 'ENTRY_ID' => $entry->get_id(),
                 'ENTRY_NAME' => $entry->get_name(),
                 'ENTRY_TITLE' => $entry->get_title($systemLocaleName),
                 'ENTRY_DESCRIPTION' => $entry->get_description($systemLocaleName),
                 'ENTRY_URL' => $entry->get_url(),
-                'ENTRY_PREVIEW_URL' => ($entry->get_preview_url() != '') ? $entry->get_preview_url() : Entry::get_preview_default_url($this->system_core, 512),
+                'ENTRY_PREVIEW_URL' => ($entry->get_preview_url() != '') ? $entry->get_preview_url() : Entry::get_preview_default_url($this->CMSCore, 512),
                 'ENTRY_CATEGORY_TITLE' => $entryCategoryTitle,
                 'ENTRY_CATEGORY_URL' => $entryCategory->get_url(),
                 'ENTRY_CREATED_DATE_TIMESTAMP' => $entryCreatedDateTimestamp,
@@ -625,7 +625,7 @@ namespace core\PHPLibrary {
             }
 
             $themeSampleNameVariable = strtoupper(str_replace('-', '_', $entriesSample->get_name()));
-            $themeVariablesArray['ENTRIES_SAMPLE_' . $themeSampleNameVariable] = TemplateCollector::assembly_file_content($this->system_core->template, $themeSamplePath . '/wrapper.tpl', [
+            $themeVariablesArray['ENTRIES_SAMPLE_' . $themeSampleNameVariable] = TemplateCollector::assembly_file_content($this->CMSCore->template, $themeSamplePath . '/wrapper.tpl', [
               'SAMPLE_ENTRIES_LIST' => implode('', $entriesAssembled),
               'SAMPLE_TITLE' => $entriesSample->get_title($systemLocaleName),
               'SAMPLE_DESCRIPTION' => $entriesSample->get_description($systemLocaleName)
@@ -637,16 +637,16 @@ namespace core\PHPLibrary {
         $this->core->assembled = TemplateCollector::assembly($this->core->assembled, $themeVariablesArray);
 
         // Сборка локализации по общим данным (глобальные языковые переменные)
-        $this->core->assembled = TemplateCollector::assembly_locale($this->core->assembled, $this->system_core->locale);
+        $this->core->assembled = TemplateCollector::assembly_locale($this->core->assembled, $this->CMSCore->locale);
 
-        if ($this->system_core->urlp->get_path(0) !== 'install') {
+        if ($this->CMSCore->urlp->get_path(0) !== 'install') {
           $this->core->assembled = TemplateCollector::assembly_locale($this->core->assembled, $this->locale);
         }
 
         // Сборка локализации на основе реестра (глобальные языковые переменные) с парсингом MarkDown-разметки
-        $this->core->assembled = TemplateCollector::assembly_locale_markdown($this->core->assembled, $this->system_core->locale);
+        $this->core->assembled = TemplateCollector::assembly_locale_markdown($this->core->assembled, $this->CMSCore->locale);
 
-        if ($this->system_core->urlp->get_path(0) !== 'install') {
+        if ($this->CMSCore->urlp->get_path(0) !== 'install') {
           $this->core->assembled = TemplateCollector::assembly_locale_markdown($this->core->assembled, $this->locale);
         }
 
@@ -732,7 +732,7 @@ namespace core\PHPLibrary {
 
 
         if (isset($elementHead[0])) {
-          foreach ($this->head_links as $elementData) {
+          foreach ($this->headLinks as $elementData) {
             $elementLink = $document->createElement('link');
             
             if (isset($elementData['rel']) && isset($elementData['href'])) {
