@@ -19,7 +19,7 @@ namespace core\PHPLibrary {
   use \DOMDocument as DOMDocument;
 
   final class Template {
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public TemplateLocale $locale;
     public mixed $core;
     private string $path;
@@ -30,9 +30,9 @@ namespace core\PHPLibrary {
     private array $styles = [];
     private array $scripts = [];
 
-    private array $head_links = [];
+    private array $headLinks = [];
 
-    private array $important_files = [
+    private array $importantFiles = [
       'templates/html.tpl',
       'templates/header.tpl',
       'templates/main.tpl',
@@ -44,24 +44,24 @@ namespace core\PHPLibrary {
       'metadata.json'
     ];
 
-    private array $global_variables = [];
+    private array $globalVars = [];
     
     /**
      * __construct
      *
-     * @param  SystemCore $system_core Объект SystemCore
-     * @param  mixed $template_name Наименование шаблона
+     * @param  SystemCore $CMSCore Объект SystemCore
+     * @param  mixed $themeName Наименование шаблона
      * @param  mixed $themeCategory Категория шаблона
      * @return void
      */
-    public function __construct(SystemCore $system_core, string $template_name = 'default', string $themeCategory = 'base') {
+    public function __construct(SystemCore $CMSCore, string $themeName = 'default', string $themeCategory = 'base') {
       // Установка технического имени шаблона
-      $this->set_name($template_name);
+      $this->set_name($themeName);
       // Установка категории шаблона
       $this->set_category($themeCategory);
 
       /** @var SystemCore Объект системного ядра */
-      $this->system_core = $system_core;
+      $this->system_core = $CMSCore;
 
       if ($this->system_core->urlp->get_path(0) != 'install') {
         /** @var TemplateLocale Объект локализации шаблона */
@@ -69,14 +69,14 @@ namespace core\PHPLibrary {
       }
 
       /** @var string Абсолютный путь до корневой директории шаблона */
-      $template_path = ($themeCategory != 'base') ? sprintf('%s/templates/%s/%s', CMS_ROOT_DIRECTORY, $themeCategory, $template_name) : sprintf('%s/templates/%s', CMS_ROOT_DIRECTORY, $template_name);
+      $themePath = ($themeCategory != 'base') ? sprintf('%s/templates/%s/%s', CMS_ROOT_DIRECTORY, $themeCategory, $themeName) : sprintf('%s/templates/%s', CMS_ROOT_DIRECTORY, $themeName);
       /** @var string Относительный URL до корневой директории шаблона */
-      $template_url = ($themeCategory != 'base') ? sprintf('templates/%s/%s', $themeCategory, $template_name) : sprintf('templates/%s', $template_name);
+      $themeURL = ($themeCategory != 'base') ? sprintf('templates/%s/%s', $themeCategory, $themeName) : sprintf('templates/%s', $themeName);
       
       // Установка абсолютного пути до шаблона
-      $this->set_path($template_path);
+      $this->set_path($themePath);
       // Установка относительного URL до шаблона
-      $this->set_url($template_url);
+      $this->set_url($themeURL);
     }
     
     /**
@@ -94,15 +94,15 @@ namespace core\PHPLibrary {
       $this->add_style(['href' => 'default-interactive.css', 'rel' => 'stylesheet', 'is_core' => true]);
       $this->add_style(['href' => 'default-notifications.css', 'rel' => 'stylesheet', 'is_core' => true]);
 
-      /** @var string $core_path Путь до файла ядра шаблона */
-      $core_path = $this->get_core_path();
-      /** @var string $core_class Класс ядра шаблона */
-      $core_class = $this->get_core_class();
-      if (file_exists($core_path)) {
-        require_once($core_path);
+      /** @var string $corePath Путь до файла ядра шаблона */
+      $corePath = $this->get_core_path();
+      /** @var string $coreClass Класс ядра шаблона */
+      $coreClass = $this->get_core_class();
+      if (file_exists($corePath)) {
+        require_once($corePath);
         
         /** @var InterfaceCore $core Объект класса, имплементированного от InterfaceCore */
-        $core = $this->get_core_object($core_class);
+        $core = $this->get_core_object($coreClass);
 
         if (!is_null($core)) {
           /** @var InterfaceCore $core Объект класса, имплементированного от InterfaceCore */
@@ -114,7 +114,7 @@ namespace core\PHPLibrary {
       }
 
       // Если ядро не было найдено - завершаем работу с ошибкой
-      die(sprintf('Template core "%s" is not exists!', $core_class));
+      die(sprintf('Template core "%s" is not exists!', $coreClass));
     }
     
     /**
@@ -197,7 +197,7 @@ namespace core\PHPLibrary {
     /**
      * Назначить наименование категории шаблона
      *
-     * @param  mixed $template_name Наименование шаблона
+     * @param  mixed $themeName Наименование шаблона
      * 
      * @return void
      */
@@ -217,12 +217,12 @@ namespace core\PHPLibrary {
     /**
      * Назначить наименование шаблона
      *
-     * @param  mixed $template_name Наименование шаблона
+     * @param  mixed $themeName Наименование шаблона
      * 
      * @return void
      */
-    public function set_name(string $template_name) : void {
-      $this->name = $template_name;
+    public function set_name(string $themeName) : void {
+      $this->name = $themeName;
     }
     
     /**
@@ -246,23 +246,23 @@ namespace core\PHPLibrary {
     /**
      * Назначить путь до шаблона
      *
-     * @param  string $template_path Путь до шаблона
+     * @param  string $themePath Путь до шаблона
      * 
      * @return void
      */
-    public function set_path(string $template_path) : void {
-      $this->path = $template_path;
+    public function set_path(string $themePath) : void {
+      $this->path = $themePath;
     }
     
     /**
      * Назначить URL до шаблона
      *
-     * @param  string $template_url Путь до шаблона
+     * @param  string $themeURL Путь до шаблона
      * 
      * @return void
      */
-    public function set_url(string $template_url) : void {
-      $this->url = $template_url;
+    public function set_url(string $themeURL) : void {
+      $this->url = $themeURL;
     }
 
     /**
@@ -296,8 +296,8 @@ namespace core\PHPLibrary {
      * @return array
      */
     public function get_screenshots_array() : array {
-      $screenshots_path = $this->get_screenshots_path();
-      return array_diff(scandir($screenshots_path), ['.', '..']);
+      $screenshotsPath = $this->get_screenshots_path();
+      return array_diff(scandir($screenshotsPath), ['.', '..']);
     }
     
     /**
@@ -321,22 +321,22 @@ namespace core\PHPLibrary {
     /**
      * Добавить стиль в массив стилей
      *
-     * @param  mixed $style_data
+     * @param  mixed $data
      * @return void
      */
-    public function add_style(array $style_data) : void {
-      array_push($this->styles, $style_data);
+    public function add_style(array $data) : void {
+      array_push($this->styles, $data);
     }
     
     /**
      * Добавить скрипт в массив стилей
      *
-     * @param  mixed $script_data
+     * @param  mixed $data
      * @return void
      */
-    public function add_script(array $script_data, bool $is_cms_core = false) : void {
-      $script_data['is_cms_core'] = $is_cms_core;
-      array_push($this->scripts, $script_data);
+    public function add_script(array $data, bool $isCMSCore = false) : void {
+      $data['is_cms_core'] = $isCMSCore;
+      array_push($this->scripts, $data);
     }
     
     /**
@@ -351,43 +351,43 @@ namespace core\PHPLibrary {
     /**
      * Получить вес шаблона в байтах
      * 
-     * @param TemplateEnumWeight $enum_weight
+     * @param TemplateEnumWeight $enumWeight
      * 
      * @return float
      */
-    public static function get_weight(Template $template, TemplateEnumWeight $enum_weight) : float {
-      $template_path = $template->get_path();
-      $total_weight = 0;
+    public static function get_weight(Template $theme, TemplateEnumWeight $enumWeight) : float {
+      $themePath = $theme->get_path();
+      $totalWeight = 0;
       
-      $directory_files = array_diff(scandir($template_path), ['.', '..']);
-      $callback_function = function(string $path, array $files, $callback, &$total_weight) : void {
+      $directoryFiles = array_diff(scandir($themePath), ['.', '..']);
+      $callbackFunction = function(string $path, array $files, $callback, &$totalWeight) : void {
         foreach ($files as $file) {
-          $file_path = sprintf('%s/%s', $path, $file);
+          $filePath = sprintf('%s/%s', $path, $file);
 
-          if (is_dir($file_path)) {
-            $directory_files = array_diff(scandir($file_path), ['.', '..']);
-            $callback($file_path, $directory_files, $callback, $total_weight);
+          if (is_dir($filePath)) {
+            $directoryFiles = array_diff(scandir($filePath), ['.', '..']);
+            $callback($filePath, $directoryFiles, $callback, $totalWeight);
           } else {
-            $total_weight += filesize($file_path);
+            $totalWeight += filesize($filePath);
           }
         }
       };
 
-      $callback_function($template_path, $directory_files, $callback_function, $total_weight);
+      $callbackFunction($themePath, $directoryFiles, $callbackFunction, $totalWeight);
 
-      $total_weight = match ($enum_weight) {
-        TemplateEnumWeight::BYTES => $total_weight,
-        TemplateEnumWeight::KILOBYTES => $total_weight / 1024,
-        TemplateEnumWeight::MEGABYTES => $total_weight / (1024 ^ 2),
-        TemplateEnumWeight::GIGABYTES => $total_weight / (1024 ^ 3),
-        TemplateEnumWeight::TERABYTES => $total_weight / (1024 ^ 4),
-        TemplateEnumWeight::PETABYTES => $total_weight / (1024 ^ 5),
-        TemplateEnumWeight::EXABYTES => $total_weight / (1024 ^ 6),
-        TemplateEnumWeight::ZETTABYTES => $total_weight / (1024 ^ 7),
-        TemplateEnumWeight::YOTTABYTES => $total_weight / (1024 ^ 8),
+      $totalWeight = match ($enumWeight) {
+        TemplateEnumWeight::BYTES => $totalWeight,
+        TemplateEnumWeight::KILOBYTES => $totalWeight / 1024,
+        TemplateEnumWeight::MEGABYTES => $totalWeight / (1024 ^ 2),
+        TemplateEnumWeight::GIGABYTES => $totalWeight / (1024 ^ 3),
+        TemplateEnumWeight::TERABYTES => $totalWeight / (1024 ^ 4),
+        TemplateEnumWeight::PETABYTES => $totalWeight / (1024 ^ 5),
+        TemplateEnumWeight::EXABYTES => $totalWeight / (1024 ^ 6),
+        TemplateEnumWeight::ZETTABYTES => $totalWeight / (1024 ^ 7),
+        TemplateEnumWeight::YOTTABYTES => $totalWeight / (1024 ^ 8),
       };
 
-      return $total_weight;
+      return $totalWeight;
     }
     
     /**
@@ -396,11 +396,12 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function important_files_exists() : bool {
-      $template_path = $this->get_path();
-      $important_files = $this->get_important_files();
-      foreach ($important_files as $important_file) {
-        $file_path = sprintf('%s/%s', $template_path, $important_file);
-        if (!file_exists($file_path)) {
+      $themePath = $this->get_path();
+      $importantFiles = $this->get_important_files();
+
+      foreach ($importantFiles as $file) {
+        $filePath = $themePath . '/' . $file;
+        if (!file_exists($filePath)) {
           return false;
         }
       }
@@ -442,12 +443,12 @@ namespace core\PHPLibrary {
     /**
      * Получение имени ячейки метаданных
      * 
-     * @param TemplateEnumMetadata $enum_metadata
+     * @param TemplateEnumMetadata $enumMetadata
      * 
      * @return string
      */
-    public static function get_metadata_name(TemplateEnumMetadata $enum_metadata) : string {
-      return match ($enum_metadata) {
+    public static function get_metadata_name(TemplateEnumMetadata $enumMetadata) : string {
+      return match ($enumMetadata) {
         TemplateEnumMetadata::AUTHOR_NAME => 'authorName',
         TemplateEnumMetadata::AUTHOR_CODE_NAME => 'authorCodeName',
         TemplateEnumMetadata::AUTHOR_CODE_SERVER_NAME => 'authorCodeServerName',
@@ -562,32 +563,36 @@ namespace core\PHPLibrary {
             }
 
             foreach ($entriesArray as $entry) {
-              $entry_category = $entry->get_category();
-              $entry_category_title = $entry_category->get_title($systemLocaleName);
+              $entryCategory = $entry->get_category();
+              $entryCategoryTitle = $entryCategory->get_title($systemLocaleName);
 
-              $entry_created_date_timestamp = date('d.m.Y H:i:s', $entry->get_created_unix_timestamp());
-              $entry_published_date_timestamp = date('d.m.Y H:i:s', $entry->get_published_unix_timestamp());
-              $entry_updated_date_timestamp = date('d.m.Y H:i:s', $entry->get_updated_unix_timestamp());
+              $entryCreatedUnixTimestamp = $entry->get_created_unix_timestamp();
+              $entryPublishedUnixTimestamp = $entry->get_published_unix_timestamp();
+              $entryUpdatedUnixTimestamp = $entry->get_updated_unix_timestamp();
 
-              $entry_created_date_timestamp_without_time = date('d.m.Y', $entry->get_created_unix_timestamp());
-              $entry_published_date_timestamp_without_time = date('d.m.Y', $entry->get_published_unix_timestamp());
-              $entry_updated_date_timestamp_without_time = date('d.m.Y', $entry->get_updated_unix_timestamp());
+              $entryCreatedDateTimestamp = date('d.m.Y H:i:s', $entryCreatedUnixTimestamp);
+              $entryPublishedDateTimestamp = date('d.m.Y H:i:s', $entryPublishedUnixTimestamp);
+              $entryUpdatedDateTimestamp = date('d.m.Y H:i:s', $entryUpdatedUnixTimestamp);
+
+              $entryCreatedDateTimestampWithoutTime = date('d.m.Y', $entryCreatedUnixTimestamp);
+              $entryPublishedDateTimestampWithoutTime = date('d.m.Y', $entryPublishedUnixTimestamp);
+              $entryUpdatedDateTimestampWithoutTime = date('d.m.Y', $entryUpdatedUnixTimestamp);
       
-              $entry_created_date_timestamp_without_date = date('H:i:s', $entry->get_created_unix_timestamp());
-              $entry_published_date_timestamp_without_date = date('H:i:s', $entry->get_published_unix_timestamp());
-              $entry_updated_date_timestamp_without_date = date('H:i:s', $entry->get_updated_unix_timestamp());
+              $entryCreatedDateTimestampWithoutDate = date('H:i:s', $entryCreatedUnixTimestamp);
+              $entryPublishedDateTimestampWithoutDate = date('H:i:s', $entryPublishedUnixTimestamp);
+              $entryUpdatedDateTimestampWithoutDate = date('H:i:s', $entryUpdatedUnixTimestamp);
 
-              $entry_created_date_timestamp_iso_8601 = date('Y-m-dH:i:s', $entry->get_created_unix_timestamp());
-              $entry_published_date_timestamp_iso_8601 = date('Y-m-dH:i:s', $entry->get_published_unix_timestamp());
-              $entry_updated_date_timestamp_iso_8601 = date('Y-m-dH:i:s', $entry->get_updated_unix_timestamp());
+              $entryCreatedDateTimestampISO8601 = date('Y-m-dH:i:s', $entryCreatedUnixTimestamp);
+              $entryPublishedDateTimestampISO8601 = date('Y-m-dH:i:s', $entryPublishedUnixTimestamp);
+              $entryUpdatedDateTimestampISO8601 = date('Y-m-dH:i:s', $entryUpdatedUnixTimestamp);
 
-              $entry_created_date_timestamp_iso_8601_without_time = date('Y-m-d', $entry->get_created_unix_timestamp());
-              $entry_published_date_timestamp_iso_8601_without_time = date('Y-m-d', $entry->get_published_unix_timestamp());
-              $entry_updated_date_timestamp_iso_8601_without_time = date('Y-m-d', $entry->get_updated_unix_timestamp());
+              $entryCreatedDateTimestampISO8601WithoutTime = date('Y-m-d', $entryCreatedUnixTimestamp);
+              $entryPublishedDateTimestampISO8601WithoutTime = date('Y-m-d', $entryPublishedUnixTimestamp);
+              $entryUpdatedDateTimestampISO8601WithoutTime = date('Y-m-d', $entryUpdatedUnixTimestamp);
       
-              $entry_created_date_timestamp_iso_8601_without_date = date('H:i:s', $entry->get_created_unix_timestamp());
-              $entry_published_date_timestamp_iso_8601_without_date = date('H:i:s', $entry->get_published_unix_timestamp());
-              $entry_updated_date_timestamp_iso_8601_without_date = date('H:i:s', $entry->get_updated_unix_timestamp());
+              $entryCreatedDateTimestampISO8601WithoutDate = date('H:i:s', $entryCreatedUnixTimestamp);
+              $entryPublishedDateTimestampISO8601WithoutDate = date('H:i:s', $entryPublishedUnixTimestamp);
+              $entryUpdatedDateTimestampISO8601WithoutDate = date('H:i:s', $entryUpdatedUnixTimestamp);
 
               array_push($entriesAssembled, TemplateCollector::assembly_file_content($this->system_core->template, sprintf('%s/item.tpl', $themeSamplePath), [
                 'ENTRY_ID' => $entry->get_id(),
@@ -596,31 +601,31 @@ namespace core\PHPLibrary {
                 'ENTRY_DESCRIPTION' => $entry->get_description($systemLocaleName),
                 'ENTRY_URL' => $entry->get_url(),
                 'ENTRY_PREVIEW_URL' => ($entry->get_preview_url() != '') ? $entry->get_preview_url() : Entry::get_preview_default_url($this->system_core, 512),
-                'ENTRY_CATEGORY_TITLE' => $entry_category_title,
-                'ENTRY_CATEGORY_URL' => $entry_category->get_url(),
-                'ENTRY_CREATED_DATE_TIMESTAMP' => $entry_created_date_timestamp,
-                'ENTRY_PUBLISHED_DATE_TIMESTAMP' => ($entry->get_published_unix_timestamp() > 0) ? $entry_published_date_timestamp : '-',
-                'ENTRY_UPDATED_DATE_TIMESTAMP' => $entry_updated_date_timestamp,
-                'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_TIME' => $entry_created_date_timestamp_without_time,
-                'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_TIME' => ($entry->get_published_unix_timestamp() > 0) ? $entry_published_date_timestamp_without_time : '-',
-                'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_TIME' => $entry_updated_date_timestamp_without_time,
-                'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_DATE' => $entry_created_date_timestamp_without_date,
-                'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_DATE' => ($entry->get_published_unix_timestamp() > 0) ? $entry_published_date_timestamp_without_date : '-',
-                'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_DATE' => $entry_updated_date_timestamp_without_date,
-                'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601' => $entry_created_date_timestamp_iso_8601,
-                'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601' => $entry_published_date_timestamp_iso_8601,
-                'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601' => $entry_updated_date_timestamp_iso_8601,
-                'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $entry_created_date_timestamp_iso_8601_without_time,
-                'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $entry_published_date_timestamp_iso_8601_without_time,
-                'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $entry_updated_date_timestamp_iso_8601_without_time,
-                'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entry_created_date_timestamp_iso_8601_without_date,
-                'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entry_published_date_timestamp_iso_8601_without_date,
-                'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entry_updated_date_timestamp_iso_8601_without_date
+                'ENTRY_CATEGORY_TITLE' => $entryCategoryTitle,
+                'ENTRY_CATEGORY_URL' => $entryCategory->get_url(),
+                'ENTRY_CREATED_DATE_TIMESTAMP' => $entryCreatedDateTimestamp,
+                'ENTRY_PUBLISHED_DATE_TIMESTAMP' => ($entryPublishedUnixTimestamp > 0) ? $entryPublishedDateTimestamp : '-',
+                'ENTRY_UPDATED_DATE_TIMESTAMP' => $entryUpdatedDateTimestamp,
+                'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_TIME' => $entryCreatedDateTimestampWithoutTime,
+                'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_TIME' => ($entryPublishedUnixTimestamp > 0) ? $entryPublishedDateTimestampWithoutTime : '-',
+                'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_TIME' => $entryUpdatedDateTimestampWithoutTime,
+                'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_DATE' => $entryCreatedDateTimestampWithoutDate,
+                'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_DATE' => ($entryPublishedUnixTimestamp > 0) ? $entryPublishedDateTimestampWithoutDate : '-',
+                'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_DATE' => $entryUpdatedDateTimestampWithoutDate,
+                'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601' => $entryCreatedDateTimestampISO8601,
+                'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601' => $entryPublishedDateTimestampISO8601,
+                'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601' => $entryUpdatedDateTimestampISO8601,
+                'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $entryCreatedDateTimestampISO8601WithoutTime,
+                'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $entryPublishedDateTimestampISO8601WithoutTime,
+                'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $entryUpdatedDateTimestampISO8601WithoutTime,
+                'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entryCreatedDateTimestampISO8601WithoutDate,
+                'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entryPublishedDateTimestampISO8601WithoutDate,
+                'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entryUpdatedDateTimestampISO8601WithoutDate
               ]));
             }
 
-            $template_sample_name_var = strtoupper(str_replace('-', '_', $entriesSample->get_name()));
-            $themeVariablesArray[sprintf('ENTRIES_SAMPLE_%s', $template_sample_name_var)] = TemplateCollector::assembly_file_content($this->system_core->template, $themeSamplePath . '/wrapper.tpl', [
+            $themeSampleNameVariable = strtoupper(str_replace('-', '_', $entriesSample->get_name()));
+            $themeVariablesArray['ENTRIES_SAMPLE_' . $themeSampleNameVariable] = TemplateCollector::assembly_file_content($this->system_core->template, $themeSamplePath . '/wrapper.tpl', [
               'SAMPLE_ENTRIES_LIST' => implode('', $entriesAssembled),
               'SAMPLE_TITLE' => $entriesSample->get_title($systemLocaleName),
               'SAMPLE_DESCRIPTION' => $entriesSample->get_description($systemLocaleName)
@@ -634,121 +639,121 @@ namespace core\PHPLibrary {
         // Сборка локализации по общим данным (глобальные языковые переменные)
         $this->core->assembled = TemplateCollector::assembly_locale($this->core->assembled, $this->system_core->locale);
 
-        if ($this->system_core->urlp->get_path(0) != 'install') {
+        if ($this->system_core->urlp->get_path(0) !== 'install') {
           $this->core->assembled = TemplateCollector::assembly_locale($this->core->assembled, $this->locale);
         }
 
         // Сборка локализации на основе реестра (глобальные языковые переменные) с парсингом MarkDown-разметки
         $this->core->assembled = TemplateCollector::assembly_locale_markdown($this->core->assembled, $this->system_core->locale);
 
-        if ($this->system_core->urlp->get_path(0) != 'install') {
+        if ($this->system_core->urlp->get_path(0) !== 'install') {
           $this->core->assembled = TemplateCollector::assembly_locale_markdown($this->core->assembled, $this->locale);
         }
 
         // Вычищаем память
         unset($themeVariablesArray);
+        unset($entriesAssembled);
 
-        $document_assembled_encoded = mb_encode_numericentity($this->core->assembled, [0x80, 0x10FFFF, 0, ~0], 'UTF-8');
+        $documentAssembledEncoded = mb_encode_numericentity($this->core->assembled, [0x80, 0x10FFFF, 0, ~0], 'UTF-8');
 
         libxml_use_internal_errors(true);
 
-        $document = new \DOMDocument();
-        $document->loadHTML($document_assembled_encoded);
+        $document = new DOMDocument();
+        $document->loadHTML($documentAssembledEncoded);
 
-        $element_head = $document->getElementsByTagName('head');
+        $elementHead = $document->getElementsByTagName('head');
 
         /**
          * Добавление стилей в секцию HEAD
          */
 
-        $head_styles = $this->get_styles();
-        if (isset($element_head[0])) {
-          if (count($head_styles) > 0) {
-            foreach ($head_styles as $element_index => $element_data) {
-              $element_link = $document->createElement('link');
+        $headStyles = $this->get_styles();
+        if (isset($elementHead[0])) {
+          foreach ($headStyles as $elementData) {
+            $elementLink = $document->createElement('link');
 
-              if (isset($element_data['rel']) && isset($element_data['href'])) {
-                $style_is_core = false;
-                if (array_key_exists('is_core', $element_data)) {
-                  if ($element_data['is_core'] == true) {
-                    $style_is_core = true;
-                    $style_href = sprintf('/core/CSSCore/%s', $element_data['href']);
-                  }
+            if (isset($elementData['rel']) && isset($elementData['href'])) {
+              $styleIsCore = false;
+              if (array_key_exists('is_core', $elementData)) {
+                if ($elementData['is_core'] === true) {
+                  $styleIsCore = true;
+                  $styleHref = '/core/CSSCore/' . $elementData['href'];
                 }
-
-                if (!$style_is_core) {
-                  $style_href = ($this->get_category() != 'base') ? sprintf('/templates/%s/%s/%s', $this->get_category(), $this->get_name(), $element_data['href']) : sprintf('/templates/%s/%s', $this->get_name(), $element_data['href']);
-                }
-
-                $attribute_rel = $document->createAttribute('rel');
-                $attribute_rel->value = $element_data['rel'];
-
-                $attribute_href = $document->createAttribute('href');
-                $attribute_href->value = $style_href;
-                
-                $element_link->appendChild($attribute_rel);
-                $element_link->appendChild($attribute_href);
               }
 
-              $element_head[0]->appendChild($element_link);
-            }
-          }
-        }
+              if (!$styleIsCore) {
+                $themeName = $this->get_name();
+                $themeCategoryName = $this->get_category();
 
-        $head_scripts = $this->get_scripts();
-        if (isset($element_head[0])) {
-          if (count($head_scripts) > 0) {
-            foreach ($head_scripts as $element_index => $element_data) {
-              $element_script = $document->createElement('script');
-
-              if ($this->get_category() != 'base') {
-                $script_url = (!$element_data['is_cms_core']) ? sprintf('/templates/%s/%s/%s', $this->get_category(), $this->get_name(), $element_data['src']) : sprintf('/core/JSLibrary/%s', $element_data['src']);
-              } else {
-                $script_url = (!$element_data['is_cms_core']) ? sprintf('/templates/%s/%s', $this->get_name(), $element_data['src']) : sprintf('/core/JSLibrary/%s', $element_data['src']);
+                $styleHrefIsNotBase = '/template/' . $themeCategoryName . '/' . $themeName . '/' . $elementData['href'];
+                $styleHrefIsBase = '/template/' . $themeName . '/' . $elementData['href'];
+                $styleHref = ($themeCategoryName !== 'base') ? $styleHrefIsNotBase : $styleHrefIsBase;
               }
 
-              if (array_key_exists('src', $element_data)) {
-                foreach ($element_data as $attribute_name => $attribute_value) {
-                  if ($attribute_name != 'is_cms_core') {
-                    $attribute = $document->createAttribute($attribute_name);
-                    $attribute->value = ($attribute_name != 'src') ? $attribute_value : $script_url;
-                    
-                    $element_script->appendChild($attribute);
-                  }
-                }
+              $attributeRel = $document->createAttribute('rel');
+              $attributeRel->value = $elementData['rel'];
 
-                $element_head[0]->appendChild($element_script);
-              }
-            }
-          }
-        }
-
-
-        if (isset($element_head[0])) {
-          if (count($this->head_links) > 0) {
-            foreach ($this->head_links as $element_index => $element_data) {
-              $element_link = $document->createElement('link');
+              $attributeHref = $document->createAttribute('href');
+              $attributeHref->value = $styleHref;
               
-              if (isset($element_data['rel']) && isset($element_data['href'])) {
-                if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
-                  $protocol = 'https';
-                }
-                else {
-                  $protocol = 'http';
-                }
+              $elementLink->appendChild($attributeRel);
+              $elementLink->appendChild($attributeHref);
+            }
 
-                $attribute_rel = $document->createAttribute('rel');
-                $attribute_rel->value = $element_data['rel'];
+            $elementHead[0]->appendChild($elementLink);
+          }
+        }
 
-                $attribute_href = $document->createAttribute('href');
-                $attribute_href->value = sprintf('%s://%s%s', $protocol, $_SERVER['HTTP_HOST'], $element_data['href']);
-                
-                $element_link->appendChild($attribute_rel);
-                $element_link->appendChild($attribute_href);
+        $headScripts = $this->get_scripts();
+        if (isset($elementHead[0])) {
+          foreach ($headScripts as $elementData) {
+            $elementScript = $document->createElement('script');
+
+            if ($this->get_category() != 'base') {
+              $scriptURL = (!$elementData['is_cms_core']) ? sprintf('/templates/%s/%s/%s', $this->get_category(), $this->get_name(), $elementData['src']) : sprintf('/core/JSLibrary/%s', $elementData['src']);
+            } else {
+              $scriptURL = (!$elementData['is_cms_core']) ? sprintf('/templates/%s/%s', $this->get_name(), $elementData['src']) : sprintf('/core/JSLibrary/%s', $elementData['src']);
+            }
+
+            if (array_key_exists('src', $elementData)) {
+              foreach ($elementData as $attributeName => $attributeValue) {
+                if ($attributeName != 'is_cms_core') {
+                  $attribute = $document->createAttribute($attributeName);
+                  $attribute->value = ($attributeName != 'src') ? $attributeValue : $scriptURL;
+                  
+                  $elementScript->appendChild($attribute);
+                }
               }
 
-              $element_head[0]->appendChild($element_link);
+              $elementHead[0]->appendChild($elementScript);
             }
+          }
+        }
+
+
+        if (isset($elementHead[0])) {
+          foreach ($this->head_links as $elementData) {
+            $elementLink = $document->createElement('link');
+            
+            if (isset($elementData['rel']) && isset($elementData['href'])) {
+              if (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] == 'on' || $_SERVER['HTTPS'] == 1) || isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
+                $protocol = 'https';
+              }
+              else {
+                $protocol = 'http';
+              }
+
+              $attributeRel = $document->createAttribute('rel');
+              $attributeRel->value = $elementData['rel'];
+
+              $attributeHref = $document->createAttribute('href');
+              $attributeHref->value = sprintf('%s://%s%s', $protocol, $_SERVER['HTTP_HOST'], $elementData['href']);
+              
+              $elementLink->appendChild($attributeRel);
+              $elementLink->appendChild($attributeHref);
+            }
+
+            $elementHead[0]->appendChild($elementLink);
           }
         }
 
@@ -784,22 +789,22 @@ namespace core\PHPLibrary {
      * @return string
      */
     private function get_core_class() : string {
-      /** @var string $template_name Наименование шаблона */
-      $template_name = $this->get_name();
+      /** @var string $themeName Наименование шаблона */
+      $themeName = $this->get_name();
       $themeCategory = $this->get_category();
-      return ($themeCategory != 'base') ? sprintf('\\templates\\%s\\%s\\Core', $themeCategory, $template_name) :  sprintf('\\templates\\%s\\Core', $template_name);
+      return ($themeCategory != 'base') ? sprintf('\\templates\\%s\\%s\\Core', $themeCategory, $themeName) :  sprintf('\\templates\\%s\\Core', $themeName);
     }
     
     /**
      * Получить объект ядра шаблона
      *
-     * @param  mixed $template_class
+     * @param  mixed $themeClass
      * 
      * @return mixed
      */
-    public function get_core_object(string $template_class) : mixed {
-      if (class_exists($template_class)) {
-        return new $template_class($this);
+    public function get_core_object(string $themeClass) : mixed {
+      if (class_exists($themeClass)) {
+        return new $themeClass($this);
       }
 
       return null;
@@ -811,8 +816,8 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function exists_core_file() : bool {
-      $file_path = ($this->get_category() == 'base') ? sprintf('%s/core.class.php', $this->get_path()) : sprintf('%s/%s/core.class.php', $this->get_path(), $this->get_category());
-      return file_exists($file_path);
+      $filePath = ($this->get_category() == 'base') ? sprintf('%s/core.class.php', $this->get_path()) : sprintf('%s/%s/core.class.php', $this->get_path(), $this->get_category());
+      return file_exists($filePath);
     }
 
     /**
@@ -839,10 +844,10 @@ namespace core\PHPLibrary {
      * @return array|null
      */
     public function get_metadata() : array|null {
-      $file_path = $this->get_file_metadata_json_path();
-      $file_content = file_get_contents($file_path);
+      $filePath = $this->get_file_metadata_json_path();
+      $fileContent = file_get_contents($filePath);
 
-      return json_decode($file_content, true);
+      return json_decode($fileContent, true);
     }
 
     /**
