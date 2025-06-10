@@ -13,27 +13,27 @@ namespace core\PHPLibrary\Template {
   use \core\PHPLibrary\Template as Template;
 
   final class Locale {
-    public SystemCore $system_core;
-    public Template $template;
+    public SystemCore $CMSCore;
+    public Template $theme;
     private string $name;
-    private string $core_path;
-    private string $data_path;
+    private string $corePath;
+    private string $dataPath;
 
     /**
      * __construct
      * 
-     * @param Template $template
+     * @param Template $theme
      * @param string $name
      */
-    public function __construct(Template $template, string $name) {
-      $this->system_core = $template->system_core;
-      $this->template = $template;
+    public function __construct(Template $theme, string $name) {
+      $this->system_core = $theme->system_core;
+      $this->template = $theme;
       $this->set_name($name);
 
-      $locale_core_path = sprintf('%s/templates/%s/locales/%s', $this->system_core->get_cms_path(), $template->get_name(), $name);
-      $locale_data_path = sprintf('%s/templates/%s/locales/%s', $this->system_core->get_cms_path(), $template->get_name(), $name);
-      $this->set_core_path($locale_core_path);
-      $this->set_data_path($locale_data_path);
+      $corePath = sprintf('%s/templates/%s/locales/%s', $this->system_core->get_cms_path(), $theme->get_name(), $name);
+      $dataPath = sprintf('%s/templates/%s/locales/%s', $this->system_core->get_cms_path(), $theme->get_name(), $name);
+      $this->set_core_path($corePath);
+      $this->set_data_path($dataPath);
     }
 
     /**
@@ -185,10 +185,10 @@ namespace core\PHPLibrary\Template {
      * @return array
      */
     public function get_data() : array|bool|null {
-      $file_path = $this->get_file_data_json_path();
-      $file_content = (file_exists($file_path)) ? file_get_contents($file_path) : '{}';
+      $filePath = $this->get_file_data_json_path();
+      $fileContent = (file_exists($filePath)) ? file_get_contents($filePath) : '{}';
 
-      return json_decode($file_content, true);
+      return json_decode($fileContent, true);
     }
 
     /**
@@ -213,10 +213,10 @@ namespace core\PHPLibrary\Template {
      * @return array
      */
     public function get_registry_array() : array {
-      $file_path = $this->get_file_registry_json_path();
-      $file_content = (file_exists($file_path)) ? file_get_contents($file_path) : '{}';
+      $filePath = $this->get_file_registry_json_path();
+      $fileContent = (file_exists($filePath)) ? file_get_contents($filePath) : '{}';
 
-      return json_decode($file_content, true);
+      return json_decode($fileContent, true);
     }
 
     /**
@@ -227,8 +227,8 @@ namespace core\PHPLibrary\Template {
      * @return string
      */
     public function get_single_value_by_key(string $key) : string {
-      $locale_data = $this->get_data();
-      return (isset($locale_data[$key])) ? $locale_data[$key] : '[ ??? ]';
+      $data = $this->get_data();
+      return (isset($data[$key])) ? $data[$key] : '[ ??? ]';
     }
 
     /**
@@ -255,10 +255,10 @@ namespace core\PHPLibrary\Template {
      * @return array
      */
     public function get_metadata() : array|null {
-      $file_path = $this->get_file_metadata_json_path();
-      $file_content = file_get_contents($file_path);
+      $filePath = $this->get_file_metadata_json_path();
+      $fileContent = file_get_contents($filePath);
 
-      return json_decode($file_content, true);
+      return json_decode($fileContent, true);
     }
   }
 }
