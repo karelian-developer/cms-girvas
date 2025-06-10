@@ -10,32 +10,33 @@
 
 namespace core\PHPLibrary {
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
+  use \DOMDocument as DOMDocument;
 
   if (!defined('IS_NOT_HACKED')) {
 		die('Unauthorized access attempt detected!');
 	}
 
   class Pagination {
-    private readonly SystemCore $system_core;
-    private int $items_total_count;
-    private int $items_in_page_count;
-    private int $item_current;
+    private readonly SystemCore $CMSCore;
+    private int $itemsTotalCount;
+    private int $itemsInPageCount;
+    private int $itemCurrent;
     public string $assembled = '';
     
     /**
      * __construct
      *
-     * @param  SystemCore $system_core
-     * @param  int $items_total_count
-     * @param  int $items_in_page_count
-     * @param  int $item_current
+     * @param  SystemCore $CMSCore
+     * @param  int $itemsTotalCount
+     * @param  int $itemsInPageCount
+     * @param  int $itemCurrent
      * @return void
      */
-    public function __construct(SystemCore $system_core, int $items_total_count, int $items_in_page_count, int $item_current = 0) {
-      $this->system_core = $system_core;
-      $this->items_total_count = $items_total_count;
-      $this->items_in_page_count = $items_in_page_count;
-      $this->item_current = $item_current;
+    public function __construct(SystemCore $CMSCore, int $itemsTotalCount, int $itemsInPageCount, int $itemCurrent = 0) {
+      $this->CMSCore = $CMSCore;
+      $this->itemsTotalCount = $itemsTotalCount;
+      $this->itemsInPageCount = $itemsInPageCount;
+      $this->itemCurrent = $itemCurrent;
     }
     
     /**
@@ -44,7 +45,7 @@ namespace core\PHPLibrary {
      * @return int
      */
     public function get_pages_count() : int {
-      return ceil($this->items_total_count / $this->items_in_page_count);
+      return ceil($this->itemsTotalCount / $this->itemsInPageCount);
     }
     
     /**
@@ -52,21 +53,61 @@ namespace core\PHPLibrary {
      *
      * @return void
      */
-    public function assembly() {
-      $pagination_items = [];
-      for ($item_i = 0; $item_i < $this->get_pages_count(); $item_i++) {
-        $item_class = ($this->item_current == $item_i) ? 'pagination-list__item pagination-list__item_active' : 'pagination-list__item';
-        array_push($pagination_items, sprintf('<li class="%s"><a class="pagination-list__item-link" href="?pageNumber=%d">%d</a></li>', $item_class, $item_i, $item_i + 1));
+    public function assembly() : void {
+      $paginationItems = [];
+
+      $DOMDocument = new DOMDocument();
+
+      $ulElement = $DOMDocument->createElement('ul');
+      $ulElement->setAttribute('class', 'pagination-list list-reset');
+
+      if ($this->itemCurrent > 0) {
+        for ($itemIndex = 0; $itemIndex < 2; $itemIndex++) {
+          $pageNumber = $itemIndex === 0 ? 0 : $this->itemCurrent - 1;
+
+          $liElement = $DOMDocument->createElement('li');
+          $liElement->setAttribute('class', 'pagination-list__item item');
+
+          $aElement = $DOMDocument->createElement('a', $itemIndex === 0 ? '&#10094;&#10094;' : '&#10094;');
+          $aElement->setAttribute('class', 'pagination-list__item-link item-link');
+          $aElement->setAttribute('href', '?pageNumber=' . (string)$pageNumber);
+
+          $liElement->appendChild($aElement);
+          $ulElement->appendChild($liElement);
+        }
       }
 
-      if ($this->item_current > 0) array_unshift($pagination_items, sprintf('<li class="pagination-list__item"><a class="pagination-list__item-link" href="?pageNumber=%d">&#10094;</a></li>', $this->item_current - 1));
-      if ($this->item_current > 0) array_unshift($pagination_items, sprintf('<li class="pagination-list__item"><a class="pagination-list__item-link" href="?pageNumber=%d">&#10094;&#10094;</a></li>', 0));
-      if ($this->item_current < ($this->get_pages_count() - 1)) array_push($pagination_items, sprintf('<li class="pagination-list__item"><a class="pagination-list__item-link" href="?pageNumber=%d">&#10095;</a></li>', $this->item_current + 1));
-      if ($this->item_current < ($this->get_pages_count() - 1)) array_push($pagination_items, sprintf('<li class="pagination-list__item"><a class="pagination-list__item-link" href="?pageNumber=%d">&#10095;&#10095;</a></li>', $this->get_pages_count() - 1));
+      for ($itemIndex = 0; $itemIndex < $this->get_pages_count(); $itemIndex++) {
+        $itemClass = ($this->itemCurrent == $itemIndex) ? 'pagination-list__item pagination-list__item_active' : 'pagination-list__item';
+        $pageNumber = $itemIndex + 1;
 
-      $this->assembled = TemplateCollector::assembly('<ul class="pagination-list list-reset">{PAGINATION_ITEMS}</ul>', [
-        'PAGINATION_ITEMS' => implode($pagination_items)
-      ]);
+        $aElement = $DOMDocument->createElement('a', $itemIndex + 1);
+        $aElement->setAttribute('class', 'pagination-list__item-link item-link');
+        $aElement->setAttribute('href', '?pageNumber=' . (string)$pageNumber);
+
+        $liElement = $DOMDocument->createElement('li');
+        $liElement->setAttribute('class', $itemClass);
+      }
+
+      if ($this->itemCurrent < ($this->get_pages_count() - 1)) {
+        for ($itemIndex = 0; $itemIndex < 2; $itemIndex++) {
+          $pageNumber = $itemIndex === 0 ? $this->itemCurrent + 1 : $this->get_pages_count() - 1;
+
+          $liElement = $DOMDocument->createElement('li');
+          $liElement->setAttribute('class', 'pagination-list__item item');
+
+          $aElement = $DOMDocument->createElement('a', $itemIndex === 0 ? '&#10095;&#10095;' : '&#10095;');
+          $aElement->setAttribute('class', 'pagination-list__item-link item-link');
+          $aElement->setAttribute('href', '?pageNumber=' . (string)$pageNumber);
+
+          $liElement->appendChild($aElement);
+          $ulElement->appendChild($liElement);
+        }
+      }
+
+      $DOMDocument->appendChild($ulElement);
+
+      $this->assembled = $DOMDocument->saveHTML();
     }
 
   }

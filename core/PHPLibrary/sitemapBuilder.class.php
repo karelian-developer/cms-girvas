@@ -16,17 +16,17 @@ namespace core\PHPLibrary {
    */
   final class SitemapBuilder {
     private DOMDocument $document;
-    private SystemCore $system_core;
+    private SystemCore $CMSCore;
     private array $urls = [];
     public string $assembled = '';
 
     /**
      * __construct
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      */
-    public function __construct(SystemCore $system_core) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore) {
+      $this->CMSCore = $CMSCore;
       $this->document = new DOMDocument('1.0', 'UTF-8');
     }
 
@@ -34,16 +34,16 @@ namespace core\PHPLibrary {
      * Добавить URL
      * 
      * @param string $loc
-     * @param int $lastmod_unix
+     * @param int $lastmodUnix
      * @param string $changefreq
      * @param float $priority
      * 
      * @return void
      */
-    public function add_url(string $loc, int $lastmod_unix, string $changefreq, float $priority) : void {
+    public function add_url(string $loc, int $lastmodUnix, string $changefreq, float $priority) : void {
       array_push($this->urls, [
         'loc' => $loc,
-        'lastmod' => date('Y-m-d', $lastmod_unix),
+        'lastmod' => date('Y-m-d', $lastmodUnix),
         'changefreq' => $changefreq,
         'priority' => $priority
       ]);
@@ -55,27 +55,27 @@ namespace core\PHPLibrary {
      * @return void
      */
     public function assembly() : void {
-      $element_urlset = $this->document->createElement('urlset');
-      $element_urlset_attribute_xmlns = $this->document->createAttribute('xmlns');
-      $element_urlset_attribute_xmlns->value = 'https://www.sitemaps.org/schemas/sitemap/0.9';
-      $element_urlset->appendChild($element_urlset_attribute_xmlns);
+      $elementURLSet = $this->document->createElement('urlset');
+      $elementURLSetAttributeXMLns = $this->document->createAttribute('xmlns');
+      $elementURLSetAttributeXMLns->value = 'https://www.sitemaps.org/schemas/sitemap/0.9';
+      $elementURLSet->appendChild($elementURLSetAttributeXMLns);
 
       foreach ($this->urls as $url) {
-        $element_url = $this->document->createElement('url');
-        $element_loc = $this->document->createElement('loc', $url['loc']);
-        $element_lastmod = $this->document->createElement('lastmod', $url['lastmod']);
-        $element_changefreq = $this->document->createElement('changefreq', $url['changefreq']);
-        $element_priority = $this->document->createElement('priority', $url['priority']);
+        $elementURL = $this->document->createElement('url');
+        $elementLoc = $this->document->createElement('loc', $url['loc']);
+        $elementLastmod = $this->document->createElement('lastmod', $url['lastmod']);
+        $elementChangefreq = $this->document->createElement('changefreq', $url['changefreq']);
+        $elementPriority = $this->document->createElement('priority', $url['priority']);
 
-        $element_url->appendChild($element_loc);
-        $element_url->appendChild($element_lastmod);
-        $element_url->appendChild($element_changefreq);
-        $element_url->appendChild($element_priority);
+        $elementURL->appendChild($elementLoc);
+        $elementURL->appendChild($elementLastmod);
+        $elementURL->appendChild($elementChangefreq);
+        $elementURL->appendChild($elementPriority);
 
-        $element_urlset->appendChild($element_url);
+        $elementURLSet->appendChild($elementURL);
       }
 
-      $this->document->appendChild($element_urlset);
+      $this->document->appendChild($elementURLSet);
       $this->assembled = $this->document->saveXML();
     }
   }
