@@ -685,8 +685,8 @@ namespace core\PHPLibrary {
                 $themeName = $this->get_name();
                 $themeCategoryName = $this->get_category();
 
-                $styleHrefIsNotBase = '/template/' . $themeCategoryName . '/' . $themeName . '/' . $elementData['href'];
-                $styleHrefIsBase = '/template/' . $themeName . '/' . $elementData['href'];
+                $styleHrefIsNotBase = '/templates/' . $themeCategoryName . '/' . $themeName . '/' . $elementData['href'];
+                $styleHrefIsBase = '/templates/' . $themeName . '/' . $elementData['href'];
                 $styleHref = ($themeCategoryName !== 'base') ? $styleHrefIsNotBase : $styleHrefIsBase;
               }
 
@@ -710,9 +710,9 @@ namespace core\PHPLibrary {
             $elementScript = $document->createElement('script');
 
             if ($this->get_category() != 'base') {
-              $scriptURL = (!$elementData['is_cms_core']) ? sprintf('/templates/%s/%s/%s', $this->get_category(), $this->get_name(), $elementData['src']) : sprintf('/core/JSLibrary/%s', $elementData['src']);
+              $scriptURL = (!$elementData['is_cms_core']) ? '/templates/' . $this->get_category() . '/' . $this->get_name() . '/' . $elementData['src'] : '/core/JSLibrary/' . $elementData['src'];
             } else {
-              $scriptURL = (!$elementData['is_cms_core']) ? sprintf('/templates/%s/%s', $this->get_name(), $elementData['src']) : sprintf('/core/JSLibrary/%s', $elementData['src']);
+              $scriptURL = (!$elementData['is_cms_core']) ? '/templates/' . $this->get_name() . '/' . $elementData['src'] : '/core/JSLibrary/' . $elementData['src'];
             }
 
             if (array_key_exists('src', $elementData)) {
