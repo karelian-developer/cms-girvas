@@ -87,6 +87,9 @@ namespace core\PHPLibrary {
 
         $liElement = $DOMDocument->createElement('li');
         $liElement->setAttribute('class', $itemClass);
+        
+        $liElement->appendChild($aElement);
+        $ulElement->appendChild($liElement);
       }
 
       if ($this->itemCurrent < ($this->get_pages_count() - 1)) {
@@ -96,7 +99,7 @@ namespace core\PHPLibrary {
           $liElement = $DOMDocument->createElement('li');
           $liElement->setAttribute('class', 'pagination-list__item item');
 
-          $aElement = $DOMDocument->createElement('a', $itemIndex === 0 ? '&#10095;&#10095;' : '&#10095;');
+          $aElement = $DOMDocument->createElement('a', $itemIndex === 0 ? '&#10095;' : '&#10095;&#10095;');
           $aElement->setAttribute('class', 'pagination-list__item-link item-link');
           $aElement->setAttribute('href', '?pageNumber=' . (string)$pageNumber);
 
