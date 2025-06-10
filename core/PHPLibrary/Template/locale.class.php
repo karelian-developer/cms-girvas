@@ -72,7 +72,7 @@ namespace core\PHPLibrary\Template {
      * @return void
      */
     public function set_core_path(string $path) : void {
-      $this->core_path = $path;
+      $this->corePath = $path;
     }
     
     /**
@@ -81,7 +81,7 @@ namespace core\PHPLibrary\Template {
      * @return string
      */
     public function get_core_path() : string {
-      return $this->core_path;
+      return $this->corePath;
     }
     
     /**
@@ -91,7 +91,7 @@ namespace core\PHPLibrary\Template {
      * @return void
      */
     public function set_data_path(string $path) : void {
-      $this->data_path = $path;
+      $this->dataPath = $path;
     }
     
     /**
@@ -100,7 +100,7 @@ namespace core\PHPLibrary\Template {
      * @return string
      */
     public function get_data_path() : string {
-      return $this->data_path;
+      return $this->dataPath;
     }
 
     /**
