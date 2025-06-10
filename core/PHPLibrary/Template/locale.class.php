@@ -27,7 +27,7 @@ namespace core\PHPLibrary\Template {
      */
     public function __construct(Template $theme, string $name) {
       $this->CMSCore = $theme->CMSCore;
-      $this->template = $theme;
+      $this->theme = $theme;
       $this->set_name($name);
 
       $corePath = sprintf('%s/templates/%s/locales/%s', $this->CMSCore->get_cms_path(), $theme->get_name(), $name);
@@ -42,7 +42,7 @@ namespace core\PHPLibrary\Template {
      * @return string
      */
     public function get_icon_url() : string {
-      return sprintf('/templates/%s/locales/%s/icons/16.png', $this->template->get_name(), $this->get_name());
+      return sprintf('/templates/%s/locales/%s/icons/16.png', $this->theme->get_name(), $this->get_name());
     }
   
     /**
