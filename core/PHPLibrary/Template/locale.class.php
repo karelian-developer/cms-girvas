@@ -26,12 +26,12 @@ namespace core\PHPLibrary\Template {
      * @param string $name
      */
     public function __construct(Template $theme, string $name) {
-      $this->system_core = $theme->system_core;
+      $this->CMSCore = $theme->CMSCore;
       $this->template = $theme;
       $this->set_name($name);
 
-      $corePath = sprintf('%s/templates/%s/locales/%s', $this->system_core->get_cms_path(), $theme->get_name(), $name);
-      $dataPath = sprintf('%s/templates/%s/locales/%s', $this->system_core->get_cms_path(), $theme->get_name(), $name);
+      $corePath = sprintf('%s/templates/%s/locales/%s', $this->CMSCore->get_cms_path(), $theme->get_name(), $name);
+      $dataPath = sprintf('%s/templates/%s/locales/%s', $this->CMSCore->get_cms_path(), $theme->get_name(), $name);
       $this->set_core_path($corePath);
       $this->set_data_path($dataPath);
     }
