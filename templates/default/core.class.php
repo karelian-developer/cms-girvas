@@ -15,7 +15,7 @@ namespace templates\default {
 
   #[\AllowDynamicProperties]
   final class Core implements \core\PHPLibrary\Template\InterfaceCore {
-    private \core\PHPLibrary\Template $template;
+    private \core\PHPLibrary\Template $theme;
     private SystemCoreLocale $locale;
     public string $assembled = '';
     public DOMDocument|null $source = null;
@@ -23,15 +23,15 @@ namespace templates\default {
     /**
      * __construct
      *
-     * @param  mixed $template
+     * @param  mixed $theme
      * @return void
      */
-    public function __construct(\core\PHPLibrary\Template $template) {
-      $this->template = $template;
+    public function __construct(\core\PHPLibrary\Template $theme) {
+      $this->theme = $theme;
     }
 
-    public function assembly_page_index(array $template_replaces = []) : string {
-      return TemplateCollector::assembly_file_content($this->template, 'templates/page/index.tpl', [
+    public function assembly_page_index(array $themeVars = []) : string {
+      return TemplateCollector::assembly_file_content($this->theme, 'templates/page/index.tpl', [
         'PAGE_NAME' => 'index',
         'ENTRIES_LIST' => ''
       ]);
@@ -40,60 +40,57 @@ namespace templates\default {
     /**
      * Сборка заглушки сайта
      *
-     * @param  mixed $template_replaces Массив тегами шаблона и их значениями
+     * @param  mixed $themeVars Массив с переменами темы и их значениями
      * @return string
      */
-    public function assembly_plug(array $template_replaces = []) : string {
-      return TemplateCollector::assembly_file_content($this->template, 'templates/plug.tpl', $template_replaces);
+    public function assembly_plug(array $themeVars = []) : string {
+      return TemplateCollector::assembly_file_content($this->theme, 'templates/plug.tpl', $themeVars);
     }
     
     /**
      * Сборка шапки сайта
      *
-     * @param  mixed $template_replaces Массив тегами шаблона и их значениями
+     * @param  mixed $themeVars Массив с переменами темы и их значениями
      * @return string
      */
-    public function assembly_header(array $template_replaces = []) : string {
-      return TemplateCollector::assembly_file_content($this->template, 'templates/header.tpl', $template_replaces);
+    public function assembly_header(array $themeVars = []) : string {
+      return TemplateCollector::assembly_file_content($this->theme, 'templates/header.tpl', $themeVars);
     }
     
     /**
      * Сборка главной секции сайта
      *
-     * @param  mixed $template_replaces Массив тегами шаблона и их значениями
+     * @param  mixed $themeVars Массив с переменами темы и их значениями
      * @return string
      */
-    public function assembly_main(array $template_replaces = []) : string {
-      $this->template->system_core->init_page($this->template->system_core->urlp->get_path_string());
-      $site_page = $this->template->system_core->get_inited_page();
-      $site_page->assembly();
+    public function assembly_main(array $themeVars = []) : string {
+      $this->theme->CMSCore->init_page($this->theme->CMSCore->urlp->get_path_string());
+      $sitePage = $this->theme->CMSCore->get_inited_page();
+      $sitePage->assembly();
       
-      $template_replaces['SITE_PAGE'] = TemplateCollector::assembly($site_page->assembled, []);
+      $themeVars['SITE_PAGE'] = TemplateCollector::assembly($sitePage->assembled, []);
 
-      return TemplateCollector::assembly_file_content($this->template, 'templates/main.tpl', $template_replaces);
+      return TemplateCollector::assembly_file_content($this->theme, 'templates/main.tpl', $themeVars);
     }
     
     /**
      * Сборка подвала сайта
      *
-     * @param  mixed $template_replaces Массив тегами шаблона и их значениями
+     * @param  mixed $themeVars Массив с переменами темы и их значениями
      * @return string
      */
-    public function assembly_footer(array $template_replaces = []) : string {
-      return TemplateCollector::assembly_file_content($this->template, 'templates/footer.tpl', $template_replaces);
+    public function assembly_footer(array $themeVars = []) : string {
+      return TemplateCollector::assembly_file_content($this->theme, 'templates/footer.tpl', $themeVars);
     }
     
     /**
      * Сборка основной части документа
      *
-     * @param  mixed $template_replaces Массив тегами шаблона и их значениями
+     * @param  mixed $themeVars Массив с переменами темы и их значениями
      * @return string
      */
-    public function assembly_document(array $template_replaces = []) : string {
-      /** @var string $assembled Содержимое шаблона */
-      $assembled;
-
-      return TemplateCollector::assembly_file_content($this->template, 'templates/html.tpl', $template_replaces);
+    public function assembly_document(array $themeVars = []) : string {
+      return TemplateCollector::assembly_file_content($this->theme, 'templates/html.tpl', $themeVars);
     }
     
     /**
@@ -102,40 +99,40 @@ namespace templates\default {
      * @return void
      */
     public function assembly() : void {
-      $this->template->add_style(['href' => 'styles/colors.css', 'rel' => 'stylesheet']);
-      $this->template->add_style(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
+      $this->theme->add_style(['href' => 'styles/colors.css', 'rel' => 'stylesheet']);
+      $this->theme->add_style(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
 
-      $locale_data = $this->template->locale->get_data();
+      $localeData = $this->theme->locale->get_data();
 
-      $client_is_logged = $this->template->system_core->client->is_logged(1);
-      $client_user = ($client_is_logged) ? $this->template->system_core->client->get_user(1) : null;
+      $clientIsLogged = $this->theme->CMSCore->client->is_logged(1);
+      $user = ($clientIsLogged) ? $this->theme->CMSCore->client->get_user(1) : null;
       
-      if ($client_user != null) {
-        $client_user->init_data(['metadata']);
+      if ($user != null) {
+        $user->init_data(['metadata']);
       }
 
-      $client_user_group_id = ($client_user != null) ? $client_user->get_group_id() : 0;
+      $userGroupID = ($user != null) ? $user->get_group_id() : 0;
 
-      if ($this->template->system_core->configurator->get_database_entry_value('base_engineering_works_status') == 'off' || $client_user_group_id == 1) {
-        $this->template->add_style(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
-        $this->template->add_style(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
-        $this->template->add_style(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
-        $this->template->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+      if ($this->theme->CMSCore->configurator->get_database_entry_value('base_engineering_works_status') == 'off' || $userGroupID == 1) {
+        $this->theme->add_style(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
+        $this->theme->add_style(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
+        $this->theme->add_style(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
+        $this->theme->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
         
-        $this->template->add_script(['src' => 'common.js'], true);
-        $this->template->add_script(['src' => 'core.class.js', 'type' => 'module'], true);
-        $this->template->add_script(['src' => 'core.class.js', 'type' => 'module']);
+        $this->theme->add_script(['src' => 'common.js'], true);
+        $this->theme->add_script(['src' => 'core.class.js', 'type' => 'module'], true);
+        $this->theme->add_script(['src' => 'core.class.js', 'type' => 'module']);
 
-        $profile_link = ($this->template->system_core->client->is_logged(1)) ? sprintf('<a class="header__nav-link display-block" href="/profile"><span class="header__nav-span">%s</span></a>', $locale_data['DEFAULT_TEXT_PROFILE']) : sprintf('<a id="SYSTEM_GE_IMC_00000001" class="header__nav-link display-block" href="#"><span class="header__nav-span">%s</span></a>', $locale_data['DEFAULT_TEXT_LOGIN']);
-        $registration_link = (!$this->template->system_core->client->is_logged(1)) ? sprintf('<a class="header__nav-link display-block" href="/registration"><span class="header__nav-span">%s</span></a>', $locale_data['DEFAULT_TEXT_REGISTRATION']) : '';
-        $exit_link = ($this->template->system_core->client->is_logged(1)) ? sprintf('<a class="header__nav-link display-block" href="#" role="profileNavigationExit"><span class="header__nav-span">%s</span></a>', $locale_data['DEFAULT_TEXT_EXIT']) : '';
+        $profileLink = ($this->theme->CMSCore->client->is_logged(1)) ? sprintf('<a class="header__nav-link display-block" href="/profile"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_PROFILE']) : sprintf('<a id="SYSTEM_GE_IMC_00000001" class="header__nav-link display-block" href="#"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_LOGIN']);
+        $registrationLink = (!$this->theme->CMSCore->client->is_logged(1)) ? sprintf('<a class="header__nav-link display-block" href="/registration"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_REGISTRATION']) : '';
+        $exitLink = ($this->theme->CMSCore->client->is_logged(1)) ? sprintf('<a class="header__nav-link display-block" href="#" role="profileNavigationExit"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_EXIT']) : '';
 
         /** @var string $this->assembled Итоговый шаблон в виде строки */
         $this->assembled = TemplateCollector::assembly($this->assembly_document(), [
           'SITE_HEADER' => $this->assembly_header([
-            'NAVIGATION_PROFILE_LINK' => $profile_link,
-            'NAVIGATION_REGISTRATION_LINK' => $registration_link,
-            'NAVIGATION_EXIT_LINK' => $exit_link
+            'NAVIGATION_PROFILE_LINK' => $profileLink,
+            'NAVIGATION_REGISTRATION_LINK' => $registrationLink,
+            'NAVIGATION_EXIT_LINK' => $exitLink
           ]),
           'SITE_MAIN' => $this->assembly_main(),
           'SITE_FOOTER' => $this->assembly_footer()
@@ -144,7 +141,7 @@ namespace templates\default {
         $this->assembled = TemplateCollector::assembly($this->assembly_document(), [
           'SITE_HEADER' => '',
           'SITE_MAIN' => TemplateCollector::assembly($this->assembly_plug(), [
-            'SITE_CLOSED_REASON' => $this->template->system_core->configurator->get_database_entry_value('base_engineering_works_text')
+            'SITE_CLOSED_REASON' => $this->theme->CMSCore->configurator->get_database_entry_value('base_engineering_works_text')
           ]),
           'SITE_FOOTER' => ''
         ]);

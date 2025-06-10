@@ -22,10 +22,10 @@ namespace templates\admin\default {
 
   #[\AllowDynamicProperties]
   final class Core implements \core\PHPLibrary\Template\InterfaceCore {
-    private \core\PHPLibrary\Template $template;
+    private \core\PHPLibrary\Template $theme;
     public string $assembled = '';
     public DOMDocument|null $source = null;
-    public array $navigation_sections_array = [
+    public array $navigationSections = [
       'index' => [
         'name' => 'index',
         'iconName' => 'index',
@@ -115,22 +115,22 @@ namespace templates\admin\default {
     /**
      * __construct
      *
-     * @param  mixed $template
+     * @param  mixed $theme
      * @return void
      */
-    public function __construct(\core\PHPLibrary\Template $template) {
-      $this->template = $template;
+    public function __construct(\core\PHPLibrary\Template $theme) {
+      $this->theme = $theme;
     }
 
     /**
      * Получить абсолютный путь SVG-файла иконки раздела
      * 
-     * @param string $navigation_item_name
+     * @param string $navigationItemName
      * @return string
      */
-    private function get_main_navigation_icon_path(string $navigation_item_name) : string {
-      $template_path = $this->template->get_path();
-      return sprintf('%s/images/icons/mainNavigation/%s.svg', $template_path, $navigation_item_name);
+    private function get_main_navigation_icon_path(string $navigationItemName) : string {
+      $themePath = $this->theme->get_path();
+      return sprintf('%s/images/icons/mainNavigation/%s.svg', $themePath, $navigationItemName);
     }
 
     /**
@@ -140,67 +140,67 @@ namespace templates\admin\default {
      */
     public function init_main_navigation() : void {
       if (!is_null($this->source)) {
-        $element_system_ap_main_navigation = $this->source->getElementById('SYSTEM_AP_MAIN_NAVIGATION');
-        if (!is_null($element_system_ap_main_navigation)) {
-          $list_element = $element_system_ap_main_navigation->ownerDocument->createElement('ul');
-          $list_element->setAttribute('class', 'navigation__list list list-reset');
+        $elementCMSAPMainNavigation = $this->source->getElementById('SYSTEM_AP_MAIN_NAVIGATION');
+        if (!is_null($elementCMSAPMainNavigation)) {
+          $listElement = $elementCMSAPMainNavigation->ownerDocument->createElement('ul');
+          $listElement->setAttribute('class', 'navigation__list list list-reset');
 
-          if (count($this->navigation_sections_array) > 0) {
-            foreach ($this->navigation_sections_array as $navigation_section_index => $navigation_section_data) {
-              $navigation_section_name = $navigation_section_data['name'];
-              $navigation_section_link = $navigation_section_data['link'];
-              $navigation_section_icon_name = $navigation_section_data['iconName'];
-              $navigation_section_permanent_status = $navigation_section_data['permanent'];
-              $navigation_section_role = $navigation_section_data['role'];
+          if (count($this->navigationSections) > 0) {
+            foreach ($this->navigationSections as $navigationSectionIndex => $navigationSectionData) {
+              $navigationSectionName = $navigationSectionData['name'];
+              $navigationSectionLink = $navigationSectionData['link'];
+              $navigationSectionIconName = $navigationSectionData['iconName'];
+              $navigationSectionPermanentStatus = $navigationSectionData['permanent'];
+              $navigationSectionRole = $navigationSectionData['role'];
               
-              $section_allowed = false;
+              $sectionAllowed = false;
 
-              if (!$navigation_section_permanent_status) {
-                $method_section_checker_name = sprintf('get_section_%s_status', $navigation_section_index);
+              if (!$navigationSectionPermanentStatus) {
+                $methodSectionCheckerName = sprintf('get_section_%s_status', $navigationSectionIndex);
                 
-                if (method_exists($this->template->system_core->configurator, $method_section_checker_name)) {
-                  if ($this->template->system_core->configurator->{$method_section_checker_name}(true)) {
-                    $section_allowed = true;
+                if (method_exists($this->theme->CMSCore->configurator, $methodSectionCheckerName)) {
+                  if ($this->theme->CMSCore->configurator->{$methodSectionCheckerName}(true)) {
+                    $sectionAllowed = true;
                   }
                 } else {
-                  $section_allowed = true;
+                  $sectionAllowed = true;
                 }
               } else {
-                $section_allowed = true;
+                $sectionAllowed = true;
               }
 
-              if ($section_allowed) {
-                $item_title = sprintf('{LANG:MAIN_NAVIGATION_%s_LABEL}', strtoupper($navigation_section_name));
-                $item_title = TemplateCollector::assembly_locale($item_title, $this->template->system_core->locale);
+              if ($sectionAllowed) {
+                $itemTitle = sprintf('{LANG:MAIN_NAVIGATION_%s_LABEL}', strtoupper($navigationSectionName));
+                $itemTitle = TemplateCollector::assembly_locale($itemTitle, $this->theme->CMSCore->locale);
                 
-                $item_element = $element_system_ap_main_navigation->ownerDocument->createElement('li');
-                $link_element = $element_system_ap_main_navigation->ownerDocument->createElement('a');
-                $label_element = $element_system_ap_main_navigation->ownerDocument->createElement('div', $item_title);
+                $itemElement = $elementCMSAPMainNavigation->ownerDocument->createElement('li');
+                $linkElement = $elementCMSAPMainNavigation->ownerDocument->createElement('a');
+                $labelElement = $elementCMSAPMainNavigation->ownerDocument->createElement('div', $itemTitle);
                 
-                $item_element->setAttribute('class', sprintf('list__item item item_%s', $navigation_section_name));
+                $itemElement->setAttribute('class', sprintf('list__item item item_%s', $navigationSectionName));
 
-                if ($navigation_section_role != '') {
-                  $item_element->setAttribute('role', $navigation_section_role); 
+                if ($navigationSectionRole != '') {
+                  $itemElement->setAttribute('role', $navigationSectionRole); 
                 }
 
-                $link_element->setAttribute('class', 'item__link link');
-                $link_element->setAttribute('href', sprintf('/admin%s', $navigation_section_link));
-                $link_element->setAttribute('title', $item_title);
-                $label_element->setAttribute('class', 'item__label label');
+                $linkElement->setAttribute('class', 'item__link link');
+                $linkElement->setAttribute('href', sprintf('/admin%s', $navigationSectionLink));
+                $linkElement->setAttribute('title', $itemTitle);
+                $labelElement->setAttribute('class', 'item__label label');
                 
-                $svg_element = new DOMDocument();
-                $svg_element->load($this->get_main_navigation_icon_path($navigation_section_icon_name));
-                $svg_imported_element = $this->source->importNode($svg_element->documentElement, true);
-                $svg_imported_element->setAttribute('class', 'item__icon icon');
+                $SVGElement = new DOMDocument();
+                $SVGElement->load($this->get_main_navigation_icon_path($navigationSectionIconName));
+                $SVGImportedElement = $this->source->importNode($SVGElement->documentElement, true);
+                $SVGImportedElement->setAttribute('class', 'item__icon icon');
 
-                $link_element->appendChild($svg_imported_element);
-                $link_element->appendChild($label_element);
-                $item_element->appendChild($link_element);
-                $list_element->appendChild($item_element);
+                $linkElement->appendChild($SVGImportedElement);
+                $linkElement->appendChild($labelElement);
+                $itemElement->appendChild($linkElement);
+                $listElement->appendChild($itemElement);
               }
             }
 
-            $element_system_ap_main_navigation->appendChild($list_element);
+            $elementCMSAPMainNavigation->appendChild($listElement);
           }
         }
       }
@@ -209,78 +209,78 @@ namespace templates\admin\default {
     /**
      * Сборка шапки сайта
      *
-     * @param  mixed $template_replaces Массив тегами шаблона и их значениями
+     * @param  mixed $themeReplaces Массив тегами шаблона и их значениями
      * @return string
      */
-    public function assembly_header(array $template_replaces = []) : string {
+    public function assembly_header(array $themeReplaces = []) : string {
       /** @var User Объект авторизованного пользователя */
-      $client_user = $this->template->system_core->client->get_user(2);
-      $client_user->init_data(['login', 'metadata']);
+      $user = $this->theme->CMSCore->client->get_user(2);
+      $user->init_data(['login', 'metadata']);
 
       /** @var UserGroup Объект группы пользователя */
-      $client_user_group = $client_user->get_group();
-      $client_user_group->init_data(['texts']);
+      $userGroup = $user->get_group();
+      $userGroup->init_data(['texts']);
 
       /** @var string Техническое имя локализации шаблона */
-      $template_locale_name = $this->template->locale->get_name();
+      $themeLocaleName = $this->theme->locale->get_name();
 
       /** @var string Логин пользователя */
-      $template_replaces['CLIENT_USER_LOGIN'] = $client_user->get_login();
+      $themeReplaces['CLIENT_USER_LOGIN'] = $user->get_login();
       /** @var string Логин пользователя */
-      $template_replaces['CLIENT_USER_GROUP_TITLE'] = $client_user_group->get_title($template_locale_name);
+      $themeReplaces['CLIENT_USER_GROUP_TITLE'] = $userGroup->get_title($themeLocaleName);
 
-      return TemplateCollector::assembly_file_content($this->template, 'templates/header.tpl', $template_replaces);
+      return TemplateCollector::assembly_file_content($this->theme, 'templates/header.tpl', $themeReplaces);
     }
     
     /**
      * Сборка главной секции сайта
      *
-     * @param  mixed $template_replaces Массив тегами шаблона и их значениями
+     * @param  mixed $themeReplaces Массив тегами шаблона и их значениями
      * @return string
      */
-    public function assembly_main(array $template_replaces = []) : string {
-      $this->template->system_core->init_page(ltrim($_SERVER['REQUEST_URI'], '/'));
-      $site_page = $this->template->system_core->get_inited_page();
-      $site_page->assembly();
+    public function assembly_main(array $themeReplaces = []) : string {
+      $this->theme->CMSCore->init_page(ltrim($_SERVER['REQUEST_URI'], '/'));
+      $sitePage = $this->theme->CMSCore->get_inited_page();
+      $sitePage->assembly();
       
-      $template_replaces['ADMIN_PANEL_PAGE_WRAPPER'] = TemplateCollector::assembly_file_content($this->template, 'templates/page.tpl', [
-        'ADMIN_PANEL_PAGE' => $site_page->assembled,
+      $themeReplaces['ADMIN_PANEL_PAGE_WRAPPER'] = TemplateCollector::assembly_file_content($this->theme, 'templates/page.tpl', [
+        'ADMIN_PANEL_PAGE' => $sitePage->assembled,
       ]);
 
-      return TemplateCollector::assembly_file_content($this->template, 'templates/main.tpl', $template_replaces);
+      return TemplateCollector::assembly_file_content($this->theme, 'templates/main.tpl', $themeReplaces);
     }
     
     /**
      * Сборка подвала сайта
      *
-     * @param  mixed $template_replaces Массив тегами шаблона и их значениями
+     * @param  mixed $themeReplaces Массив тегами шаблона и их значениями
      * @return string
      */
-    public function assembly_footer(array $template_replaces = []) : string {
-      return TemplateCollector::assembly_file_content($this->template, 'templates/footer.tpl', $template_replaces);
+    public function assembly_footer(array $themeReplaces = []) : string {
+      return TemplateCollector::assembly_file_content($this->theme, 'templates/footer.tpl', $themeReplaces);
     }
     
     /**
      * Сборка основной части документа
      *
-     * @param  mixed $template_replaces Массив тегами шаблона и их значениями
+     * @param  mixed $themeReplaces Массив тегами шаблона и их значениями
      * @return string
      */
-    public function assembly_document(array $template_replaces = []) : string {
+    public function assembly_document(array $themeReplaces = []) : string {
       /** @var string $assembled Содержимое шаблона */
       $assembled;
 
-      if ($this->template->system_core->client->is_logged(2)) {
-        $template_content = TemplateCollector::assembly_file_content($this->template, 'templates/documentBase.tpl', $template_replaces);
+      if ($this->theme->CMSCore->client->is_logged(2)) {
+        $themeContent = TemplateCollector::assembly_file_content($this->theme, 'templates/documentBase.tpl', $themeReplaces);
       } else {
-        $template_content = TemplateCollector::assembly_file_content($this->template, 'templates/documentAuth.tpl', $template_replaces);
+        $themeContent = TemplateCollector::assembly_file_content($this->theme, 'templates/documentAuth.tpl', $themeReplaces);
       }
 
-      return $template_content;
+      return $themeContent;
     }
 
-    public function assembly_auth_admin_page(array $template_replaces = []) : string {
-      return TemplateCollector::assembly_file_content($this->template, 'templates/page/auth.tpl', $template_replaces);
+    public function assembly_auth_admin_page(array $themeReplaces = []) : string {
+      return TemplateCollector::assembly_file_content($this->theme, 'templates/page/auth.tpl', $themeReplaces);
     }
     
     /**
@@ -289,30 +289,30 @@ namespace templates\admin\default {
      * @return void
      */
     public function assembly() : void {
-      $this->template->add_style(['href' => 'styles/normalize.css', 'rel' => 'stylesheet']);
-      $this->template->add_style(['href' => 'styles/fonts.css', 'rel' => 'stylesheet']);
-      $this->template->add_style(['href' => 'styles/colors.css', 'rel' => 'stylesheet']);
-      $this->template->add_style(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
-      $this->template->add_style(['href' => 'styles/table.css', 'rel' => 'stylesheet']);
-      $this->template->add_style(['href' => 'styles/form.css', 'rel' => 'stylesheet']);
-      $this->template->add_style(['href' => 'styles/modal.css', 'rel' => 'stylesheet']);
-      $this->template->add_style(['href' => 'styles/interactive.css', 'rel' => 'stylesheet']);
-      $this->template->add_style(['href' => 'styles/notification.css', 'rel' => 'stylesheet']);
+      $this->theme->add_style(['href' => 'styles/normalize.css', 'rel' => 'stylesheet']);
+      $this->theme->add_style(['href' => 'styles/fonts.css', 'rel' => 'stylesheet']);
+      $this->theme->add_style(['href' => 'styles/colors.css', 'rel' => 'stylesheet']);
+      $this->theme->add_style(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
+      $this->theme->add_style(['href' => 'styles/table.css', 'rel' => 'stylesheet']);
+      $this->theme->add_style(['href' => 'styles/form.css', 'rel' => 'stylesheet']);
+      $this->theme->add_style(['href' => 'styles/modal.css', 'rel' => 'stylesheet']);
+      $this->theme->add_style(['href' => 'styles/interactive.css', 'rel' => 'stylesheet']);
+      $this->theme->add_style(['href' => 'styles/notification.css', 'rel' => 'stylesheet']);
       
-      $this->template->add_script(['src' => 'interactive.class.js', 'type' => 'module'], true);
-      $this->template->add_script(['src' => 'common.js'], true);
-      $this->template->add_script(['src' => 'core.class.js', 'type' => 'module'], true);
-      $this->template->add_script(['src' => 'core.class.js', 'type' => 'module']);
+      $this->theme->add_script(['src' => 'interactive.class.js', 'type' => 'module'], true);
+      $this->theme->add_script(['src' => 'common.js'], true);
+      $this->theme->add_script(['src' => 'core.class.js', 'type' => 'module'], true);
+      $this->theme->add_script(['src' => 'core.class.js', 'type' => 'module']);
 
 
-      /** @var string $user_ip IP-адрес пользователя */
-      $user_ip = $_SERVER['REMOTE_ADDR'];
+      /** @var string $userIP IP-адрес пользователя */
+      $userIP = $_SERVER['REMOTE_ADDR'];
 
-      if ($this->template->system_core->client->is_logged(2)) {
-        $this->template->add_style(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
-        $this->template->add_style(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
-        $this->template->add_style(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
-        $this->template->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+      if ($this->theme->CMSCore->client->is_logged(2)) {
+        $this->theme->add_style(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
+        $this->theme->add_style(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
+        $this->theme->add_style(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
+        $this->theme->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
 
         /** @var string $this->assembled Итоговый шаблон в виде строки */
         $this->assembled = TemplateCollector::assembly($this->assembly_document(), [
@@ -321,7 +321,7 @@ namespace templates\admin\default {
           'ADMIN_PANEL_FOOTER' => $this->assembly_footer()
         ]);
       } else {
-        $this->template->add_style(['href' => 'styles/page/auth.css', 'rel' => 'stylesheet']);
+        $this->theme->add_style(['href' => 'styles/page/auth.css', 'rel' => 'stylesheet']);
 
         $this->assembled = TemplateCollector::assembly($this->assembly_document(), [
           'ADMIN_PANEL_HEADER' => '',
