@@ -85,7 +85,7 @@ namespace core\PHPLibrary\Database\QueryBuilder {
 
     public function assembly() : void {
       $this->assembled .= 'ALTER TABLE ';
-      $this->assembled .= trim($tableName) ?? 'column_undefined';
+      $this->assembled .= trim($this->tableName) ?? 'column_undefined';
 
       if ($this->event === 'renameColumn') {
         $this->assembled .= ' RENAME COLUMN ' . $this->data['oldName'] . 'TO' . $this->data['newName'];
