@@ -339,7 +339,7 @@ namespace core\PHPLibrary\Client {
         if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp'])) {
           $valueTypeName = gettype($value);
 
-          $valueType = match () {
+          $valueType = match ($valueTypeName) {
             'boolean' => \PDO::PARAM_INT,
             'integer' => \PDO::PARAM_INT,
             'string' => \PDO::PARAM_STR,
