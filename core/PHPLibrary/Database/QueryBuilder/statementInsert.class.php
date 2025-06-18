@@ -68,13 +68,13 @@ namespace core\PHPLibrary\Database\QueryBuilder {
       
       $tableFullname = '';
       if (!is_null($databaseConfigurations)) {
-        if ($databaseConfigurations['scheme'] != '') {
+        if ($databaseConfigurations['scheme'] !== '') {
           $tableFullname .= sprintf('%s.', $databaseConfigurations['scheme']);
         }
 
-        if ($databaseConfigurations['prefix'] != '' || $this->tablePrefix != '') {
-          $tablePrefix = ($this->tablePrefix == '') ? $databaseConfigurations['prefix'] : $this->tablePrefix;
-          $tableFullname .= sprintf('%s_', $tablePrefix);
+        if ($databaseConfigurations['prefix'] !== '' || $this->tablePrefix !== '') {
+          $tablePrefix = $this->tablePrefix === '' ? $databaseConfigurations['prefix'] : $this->tablePrefix;
+          $tableFullname .= $tablePrefix . '_';
         }
       }
 
@@ -92,13 +92,17 @@ namespace core\PHPLibrary\Database\QueryBuilder {
       $queryArray = [];
 
       $columnsValues = [];
-      foreach ($this->columns as $columnName) {
+      foreach ($this->columns as $index => $columnName) {
+        if (!preg_match('/\"[a-z0-9_]+\"/i', $columnName)) {
+          $this->columns[$index] = '"' . $columnName . '"';
+        }
+
         array_push($columnsValues, ':' . $columnName);
       }
 
       array_push($queryArray, sprintf('(%s) VALUES (%s)', implode(', ', $this->columns), implode(', ', $columnsValues)));
 
-      if (!is_null($this->clauseReturning)) {
+      if ($this->clauseReturning !== null) {
         $this->clauseReturning->assembly();
         array_push($queryArray, $this->clauseReturning->assembled);
       }
