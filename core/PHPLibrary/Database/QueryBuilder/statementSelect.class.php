@@ -43,7 +43,7 @@ namespace core\PHPLibrary\Database\QueryBuilder {
      */
     public function add_selections(array $selections) : void {
       foreach ($selections as $index => $selection) {
-        if (!preg_match('/\"[a-z0-9_]\"/i', $selection) && is_numeric($selection) && $selection !== '*') {
+        if (!preg_match('/\"[a-z0-9_]+\"/i', $selection) && is_numeric($selection) && $selection !== '*') {
           $selections[$index] = '"' . $selection . '"';
         }
       }
