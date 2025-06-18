@@ -221,10 +221,10 @@ namespace core\PHPLibrary {
      * Проверка наличия категории записи по идентификационному номеру
      *
      * @param  SystemCore $CMSCore
-     * @param  int $category_id
+     * @param  int $categoryID
      * @return bool
      */
-    public static function exists_by_id(SystemCore $CMSCore, int $category_id) : bool {
+    public static function exists_by_id(SystemCore $CMSCore, int $categoryID) : bool {
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
       $queryBuilder->set_statement_select();
       $queryBuilder->statement->add_selections(['1']);
@@ -240,7 +240,7 @@ namespace core\PHPLibrary {
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;
         $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-        $databaseQuery->bindParam(':id', $category_id, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':id', $categoryID, \PDO::PARAM_INT);
         $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([

@@ -538,7 +538,7 @@ namespace core\PHPLibrary {
             $entriesArray = $entriesSample->get_entries([], true);
             if (count($entriesArray) > 0) {
               foreach ($entriesArray as $entry) {
-                $entry->init_data(['name', 'texts', 'metadata', 'category_id', 'created_unix_timestamp', 'updated_unix_timestamp']);
+                $entry->init_data(['name', 'texts', 'metadata', 'categoryID', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
               }
             }
 
