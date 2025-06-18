@@ -94,7 +94,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public function get_password_hash() : string {
-      return (property_exists($this, 'passwordHash')) ? $this->password_hash : '';
+      return (property_exists($this, 'passwordHash')) ? $this->passwordHash : '';
     }
 
     /**
@@ -103,7 +103,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public function get_security_hash() : string {
-      return (property_exists($this, 'securityHash')) ? $this->security_hash : '';
+      return (property_exists($this, 'securityHash')) ? $this->securityHash : '';
     }
 
     /**
