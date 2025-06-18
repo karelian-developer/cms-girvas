@@ -9,6 +9,7 @@
  */
 
 namespace core\PHPLibrary\SystemCore {
+  use \core\PHPLibrary\SystemCore as CMSCore;
   use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as EnumFileFormat;
 
   final class FileConverter {
@@ -21,24 +22,11 @@ namespace core\PHPLibrary\SystemCore {
      * __construct
      *
      * @param  mixed $CMSCore Объект SystemCore
-     * @param  EnumFileFormat $format_from
-     * @param  EnumFileFormat $format_to
+     * 
      * @return void
      */
-    public function __construct(\core\PHPLibrary\SystemCore $CMSCore) {
+    public function __construct(CMSCore $CMSCore) {
       $this->CMSCore = $CMSCore;
-
-      // $this->convert_from = match ($format_from) {
-      //   EnumFileFormat::JPG => $this->convert_from = 'jpeg',
-      //   EnumFileFormat::PNG => $this->convert_from = 'png',
-      //   EnumFileFormat::WEBP => $this->convert_from = 'webp',
-      // };
-
-      // $this->convert_to = match ($format_to) {
-      //   EnumFileFormat::JPG => $this->convert_to = 'jpeg',
-      //   EnumFileFormat::PNG => $this->convert_to = 'png',
-      //   EnumFileFormat::WEBP => $this->convert_to = 'webp',
-      // };
     }
     
     /**
@@ -72,7 +60,7 @@ namespace core\PHPLibrary\SystemCore {
           default => ''
         };
 
-        if ($convertToExtension ==== '') return false;
+        if ($convertToExtension === '') return false;
 
         $fileOutputName = $fileOutputName . '.' . $convertToExtension;
         $fileOutputPath = $fileOutputFolderPath . '/' . $fileOutputName;

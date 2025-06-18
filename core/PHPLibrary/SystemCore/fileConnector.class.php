@@ -41,7 +41,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return void
      */
     public function set_start_directory(string $directory) : void {
-      $this->start_directory = $directory;
+      $this->startDirectory = $directory;
     }
     
     /**
@@ -50,7 +50,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_start_directory() : string {
-      return $this->start_directory;
+      return $this->startDirectory;
     }
     
     /**
@@ -60,7 +60,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return void
      */
     public function set_current_directory(string $directory) : void {
-      $this->current_directory = $directory;
+      $this->currentDirectory = $directory;
     }
     
     /**
@@ -69,7 +69,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_current_directory() : string {
-      return $this->current_directory;
+      return $this->currentDirectory;
     }
 
     
