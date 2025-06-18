@@ -83,10 +83,10 @@ namespace core\PHPLibrary\Template {
       $document = new DOMDocument();
 
       foreach ($scriptsArray as $scriptData) {
-        $isCMSCore = $scriptData['isCMSCore'];
-        $src = $scriptData['src'];
+        $isCMSCore = $scriptData['isCMSCore'] ?? false;
+        $src = $scriptData['src'] ?? '';
 
-        if ($theme->get_category() != 'default') {
+        if ($theme->get_category() !== 'default') {
           $scriptURL = $isCMSCore ? '/templates/' . $theme->get_category() . '/' . $theme->get_name() . '/' . $src : '/core/JSLibrary/' . $src;
         } else {
           $scriptURL = $isCMSCore ? '/templates/' . $theme->get_name() . '/' . $src : '/core/JSLibrary/' . $src;
@@ -96,11 +96,11 @@ namespace core\PHPLibrary\Template {
           $scriptElement = $document->createElement('script');
 
           foreach ($scriptData as $attributeName => $attributeValue) {
-            if ($attributeName != 'isCMSCore' && $attributeName != 'src') {
+            if ($attributeName !== 'isCMSCore' && $attributeName !== 'src') {
               $scriptElement->setAttribute($attributeName, $attributeValue);
             }
 
-            if ($attributeName == 'src') {
+            if ($attributeName === 'src') {
               $scriptElement->setAttribute($attributeName, $attributeValue);
             }
           }

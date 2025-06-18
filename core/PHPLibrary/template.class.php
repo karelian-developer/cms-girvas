@@ -594,7 +594,7 @@ namespace core\PHPLibrary {
               $entryPublishedDateTimestampISO8601WithoutDate = date('H:i:s', $entryPublishedUnixTimestamp);
               $entryUpdatedDateTimestampISO8601WithoutDate = date('H:i:s', $entryUpdatedUnixTimestamp);
 
-              array_push($entriesAssembled, TemplateCollector::assembly_file_content($this->CMSCore->template, sprintf('%s/item.tpl', $themeSamplePath), [
+              array_push($entriesAssembled, TemplateCollector::assembly_file_content($this->CMSCore->theme, sprintf('%s/item.tpl', $themeSamplePath), [
                 'ENTRY_ID' => $entry->get_id(),
                 'ENTRY_NAME' => $entry->get_name(),
                 'ENTRY_TITLE' => $entry->get_title($systemLocaleName),
@@ -625,7 +625,7 @@ namespace core\PHPLibrary {
             }
 
             $themeSampleNameVariable = strtoupper(str_replace('-', '_', $entriesSample->get_name()));
-            $themeVariablesArray['ENTRIES_SAMPLE_' . $themeSampleNameVariable] = TemplateCollector::assembly_file_content($this->CMSCore->template, $themeSamplePath . '/wrapper.tpl', [
+            $themeVariablesArray['ENTRIES_SAMPLE_' . $themeSampleNameVariable] = TemplateCollector::assembly_file_content($this->CMSCore->theme, $themeSamplePath . '/wrapper.tpl', [
               'SAMPLE_ENTRIES_LIST' => implode('', $entriesAssembled),
               'SAMPLE_TITLE' => $entriesSample->get_title($systemLocaleName),
               'SAMPLE_DESCRIPTION' => $entriesSample->get_description($systemLocaleName)
