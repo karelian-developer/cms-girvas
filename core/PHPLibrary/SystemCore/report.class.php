@@ -212,7 +212,7 @@ namespace core\PHPLibrary\SystemCore {
         $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
         $databaseQuery->bindParam(':variables', $variablesJSON, \PDO::PARAM_STR);
         $databaseQuery->bindParam(':metadata', $metadataJSON, \PDO::PARAM_STR);
-        $databaseQuery->bindParam(':created_unix_timestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
         $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([

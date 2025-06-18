@@ -527,7 +527,7 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      return ($execute) ? true : false;
+      return $execute ? true : false;
     }
         
     /**
@@ -557,16 +557,16 @@ namespace core\PHPLibrary {
       $createdUnixTimestamp = time();
       $updatedUnixTimestamp = $createdUnixTimestamp;
 
-      $texts_json = (!empty($texts)) ? json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
-      $metadata_json = (!empty($metadata)) ? json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
+      $texts = (!empty($texts)) ? json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
+      $metadata = (!empty($metadata)) ? json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
 
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;
         $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
         $databaseQuery->bindParam(':authorID', $authorID, \PDO::PARAM_INT);
         $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
-        $databaseQuery->bindParam(':texts', $texts_json, \PDO::PARAM_STR);
-        $databaseQuery->bindParam(':metadata', $metadata_json, \PDO::PARAM_STR);
+        $databaseQuery->bindParam(':texts', $texts, \PDO::PARAM_STR);
+        $databaseQuery->bindParam(':metadata', $metadata, \PDO::PARAM_STR);
         $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
         $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
         $execute = $databaseQuery->execute();
