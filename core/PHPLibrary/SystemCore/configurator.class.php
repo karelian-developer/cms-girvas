@@ -588,16 +588,16 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_security_scp() : string {
-      $domainAddress = sprintf('%s://%s', ($this->get('SSLIsEnabled')) ? 'https' : 'http', $this->get('domain'));
-      $domainAliases = (is_array($this->get('domainAliases'))) ? implode(' ', $this->get('domainAliases')) : '';
+      $domainAddress = sprintf('%s://%s', $this->get('SSLIsEnabled') ? 'https' : 'http', $this->get('domain'));
+      $domainAliases = is_array($this->get('domainAliases')) ? implode(' ', $this->get('domainAliases')) : '';
 
-      $csp = ($this->exists('ssl_csp')) ? $this->get('ssl_csp') : '';
-      if (is_array($csp)) $csp = implode('; ', $csp);
+      $CSP = $this->exists('SSLCSP') ? $this->get('SSLCSP') : '';
+      if (is_array($CSP)) $CSP = implode('; ', $CSP);
 
-      $csp = str_replace('{SCRIPT_HASH}', $this->CMSCore->scp_scripts_hash, $csp);
-      $csp = str_replace('{DOMAIN}', $domainAddress, $csp);
-      $csp = str_replace('{DOMAIN_ALIASES}', $domainAliases, $csp);
-      return str_replace('&quot;', '\'', $csp);
+      $CSP = str_replace('{SCRIPT_HASH}', $this->CMSCore->CSPScriptsHash, $CSP);
+      $CSP = str_replace('{DOMAIN}', $domainAddress, $CSP);
+      $CSP = str_replace('{DOMAIN_ALIASES}', $domainAliases, $CSP);
+      return str_replace('&quot;', '\'', $CSP);
     }
 
     /**
@@ -607,7 +607,7 @@ namespace core\PHPLibrary\SystemCore {
      */
     public function get_permanent_redirect_to_www_status() : bool {
       $value = $this->exists_database_entry_value('seo_permanent_redirect_www_status') ? $this->get_database_entry_value('seo_permanent_redirect_www_status') : 'off';
-      return $value === 'on' ? true : false;
+      return $value === 'on';
     }
 
     /**
@@ -678,7 +678,7 @@ namespace core\PHPLibrary\SystemCore {
           $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
           $databaseQuery->execute();
 
-          return ($databaseQuery->fetchColumn()) ? true : false;
+          return $databaseQuery->fetchColumn() ? true : false;
         }
       } catch (PDOException $exception) {
         die(json_encode([
@@ -709,7 +709,7 @@ namespace core\PHPLibrary\SystemCore {
       $queryBuilder->statement->assembly();
 
       try {
-        $databaseConnection = (!is_null($this->CMSCore->databaseConnector)) ? $this->CMSCore->databaseConnector->database->connection : null;
+        $databaseConnection = !is_null($this->CMSCore->databaseConnector) ? $this->CMSCore->databaseConnector->database->connection : null;
         
         if (!is_null($databaseConnection)) {
           $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
@@ -717,7 +717,7 @@ namespace core\PHPLibrary\SystemCore {
           $databaseQuery->bindParam(':value', $value, \PDO::PARAM_STR);
           $execute = $databaseQuery->execute();
 
-          return ($execute) ? true : false;
+          return $execute ? true : false;
         }
       } catch (PDOException $exception) {
         die(json_encode([
@@ -752,7 +752,7 @@ namespace core\PHPLibrary\SystemCore {
       $queryBuilder->statement->assembly();
 
       try {
-        $databaseConnection = (!is_null($this->CMSCore->databaseConnector)) ? $this->CMSCore->databaseConnector->database->connection : null;
+        $databaseConnection = !is_null($this->CMSCore->databaseConnector) ? $this->CMSCore->databaseConnector->database->connection : null;
         
         if (!is_null($databaseConnection)) {
           $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
@@ -760,7 +760,7 @@ namespace core\PHPLibrary\SystemCore {
           $databaseQuery->bindParam(':value', $value, \PDO::PARAM_STR);
           $execute = $databaseQuery->execute();
 
-          return ($execute) ? true : false;
+          return $execute ? true : false;
         }
       } catch (PDOException $exception) {
         die(json_encode([
@@ -781,7 +781,7 @@ namespace core\PHPLibrary\SystemCore {
      */
     private function get_file_data() : array {
       require_once CMS_ROOT_DIRECTORY . '/' . self::FILE_PATH;
-      return isset($configuration) ? $configuration : [];
+      return $configuration ?? [];
     }
     
     /**
@@ -802,7 +802,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return mixed
      */
     public function get(string $name) : mixed {
-      return (array_key_exists($name, $this->data)) ? $this->data[$name] : null;
+      return array_key_exists($name, $this->data) ? $this->data[$name] : null;
     }
 
     /**

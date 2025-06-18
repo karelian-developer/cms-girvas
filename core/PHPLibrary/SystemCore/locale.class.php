@@ -20,8 +20,8 @@ namespace core\PHPLibrary\SystemCore {
     public const LOCALE_DATA_PATH_PATTERN = '%s/locales/%s/%s';
 
     private string $name;
-    private string $core_path;
-    private string $data_path;
+    private string $corePath;
+    private string $dataPath;
 
     /**
      * __construct
