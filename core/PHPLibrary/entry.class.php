@@ -121,7 +121,7 @@ namespace core\PHPLibrary {
      * @return int
      */
     public function get_author_id() : int {
-      return (property_exists($this, 'authorID')) ? $this->author_id : 0;
+      return (property_exists($this, 'authorID')) ? $this->authorID : 0;
     }
 
     /**
