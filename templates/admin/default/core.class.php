@@ -156,7 +156,7 @@ namespace templates\admin\default {
               $sectionAllowed = false;
 
               if (!$navigationSectionPermanentStatus) {
-                $methodSectionCheckerName = 'get_section_' . (string) $navigationSectionIndex . '_status');
+                $methodSectionCheckerName = 'get_section_' . (string) $navigationSectionIndex . '_status';
                 
                 if (method_exists($this->theme->CMSCore->configurator, $methodSectionCheckerName)) {
                   if ($this->theme->CMSCore->configurator->{$methodSectionCheckerName}(true)) {
@@ -179,7 +179,7 @@ namespace templates\admin\default {
                 
                 $itemElement->setAttribute('class', 'list__item item item_' . $navigationSectionName);
 
-                if ($navigationSectionRole != '') {
+                if ($navigationSectionRole !== '') {
                   $itemElement->setAttribute('role', $navigationSectionRole); 
                 }
 
