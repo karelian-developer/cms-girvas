@@ -88,7 +88,7 @@ namespace core\PHPLibrary\Database\QueryBuilder {
       $this->assembled .= trim($this->tableName) ?? 'column_undefined';
 
       if ($this->event === 'renameColumn') {
-        $this->assembled .= ' RENAME COLUMN ' . $this->data['oldName'] . 'TO' . $this->data['newName'];
+        $this->assembled .= ' RENAME COLUMN ' . $this->data['oldName'] . ' TO ' . $this->data['newName'];
       }
 
       if ($this->event === 'modifyColumn') {
