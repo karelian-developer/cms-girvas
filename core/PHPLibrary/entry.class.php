@@ -325,7 +325,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public static function get_preview_default_url(SystemCore $CMSCore, int $size) : string {
-      return '/' . $CMSCore->template->get_url() . '/images/entry/default_' . (string)$size . '.png';
+      return '/' . $CMSCore->theme->get_url() . '/images/entry/default_' . (string) $size . '.png';
     }
     
     /**
@@ -373,7 +373,7 @@ namespace core\PHPLibrary {
 			$databaseQuery->execute();
 
       $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return ($result) ? $result : null;
+      return $result ? $result : null;
     }
     
     /**
@@ -589,8 +589,8 @@ namespace core\PHPLibrary {
       $metadata['previewURL'] = '';
       $metadata['isPublished'] = false;
 
-      $texts = json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-      $metadata = json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      $texts = (!empty($texts)) ? json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
+      $metadata = (!empty($metadata)) ? json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
 
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;

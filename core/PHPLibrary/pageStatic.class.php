@@ -325,7 +325,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public static function get_preview_default_url(SystemCore $CMSCore, int $size) : string {
-      return sprintf('/%s/images/pageStatic/default_%d.png', $CMSCore->theme->get_url(), $size);
+      return '/' . $CMSCore->theme->get_url() . '/images/pageStatic/default_' . (string) $size . '.png';
     }
     
     /**
@@ -343,7 +343,7 @@ namespace core\PHPLibrary {
      * @return void
      */
     public function get_url() {
-      return sprintf('/page/%s', $this->get_name());
+      return '/page/' . $this->get_name();
     }
     
     /**
@@ -382,7 +382,7 @@ namespace core\PHPLibrary {
       }
 
       $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return ($result) ? $result : null;
+      return $result ? $result : null;
     }
     
     /**
@@ -554,8 +554,8 @@ namespace core\PHPLibrary {
       $queryBuilder->statement->clauseReturning->add_column('id');
       $queryBuilder->statement->assembly();
 
-      $page_static_created_unix_timestamp = time();
-      $updatedUnixTimestamp = $page_static_created_unix_timestamp;
+      $createdUnixTimestamp = time();
+      $updatedUnixTimestamp = $createdUnixTimestamp;
 
       $texts_json = (!empty($texts)) ? json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
       $metadata_json = (!empty($metadata)) ? json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
@@ -567,7 +567,7 @@ namespace core\PHPLibrary {
         $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
         $databaseQuery->bindParam(':texts', $texts_json, \PDO::PARAM_STR);
         $databaseQuery->bindParam(':metadata', $metadata_json, \PDO::PARAM_STR);
-        $databaseQuery->bindParam(':createdUnixTimestamp', $page_static_created_unix_timestamp, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
         $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
         $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
