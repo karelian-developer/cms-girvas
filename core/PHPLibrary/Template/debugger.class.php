@@ -11,10 +11,10 @@
 namespace core\PHPLibrary\Template {
 
   final class Debugger {
-    private \core\PHPLibrary\Template $template;
+    private \core\PHPLibrary\Template $theme;
 
-    public function __construct(\core\PHPLibrary\Template $template) {
-      $this->template = $template;
+    public function __construct(\core\PHPLibrary\Template $theme) {
+      $this->theme = $theme;
     }
   }
 }

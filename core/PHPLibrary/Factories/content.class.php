@@ -18,24 +18,24 @@ namespace core\PHPLibrary\Factories {
   use \core\PHPLibrary\PageStatic as EntityPageStatic;
 
   class Content {
-    private SystemCore $systemCore;
+    private SystemCore $CMSCore;
 
     /**
      * Создать контентную сущность
      * 
-     * @param SystemCore $systemCore
+     * @param SystemCore $CMSCore
      * @param string $type
      * @param array $data
      * 
      * @return EntityTypeContent
      */
-    public static function create(SystemCore $systemCore, string $type, array $data = []) : EntityTypeContent {
+    public static function create(SystemCore $CMSCore, string $type, array $data = []) : EntityTypeContent {
       return match($type) {
-        'entry' => new EntityEntry($systemCore, $data['id']),
-        'entryCategory' => new EntityEntryCategory($systemCore, $data['id']),
-        'entryComment' => new EntityEntryComment($systemCore, $data['id']),
-        'entrySample' => new EntityEntrySample($systemCore, $data['id']),
-        'pageStatic' => new EntityPageStatic($systemCore, $data['id']),
+        'entry' => new EntityEntry($CMSCore, $data['id']),
+        'entryCategory' => new EntityEntryCategory($CMSCore, $data['id']),
+        'entryComment' => new EntityEntryComment($CMSCore, $data['id']),
+        'entrySample' => new EntityEntrySample($CMSCore, $data['id']),
+        'pageStatic' => new EntityPageStatic($CMSCore, $data['id']),
         default => throw new Exception('Entity is not exists')
       };
     }

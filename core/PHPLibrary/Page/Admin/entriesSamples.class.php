@@ -24,10 +24,10 @@ namespace core\PHPLibrary\Page\Admin {
 
     const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_NAVIGATION_%s_LABEL';
 
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Page $page;
     public string $assembled = '';
-    public array $navigation_subsections_array = [
+    public array $navigationSubsections = [
       'index' => [
         'name' => 'index',
         'iconName' => 'index',
@@ -65,8 +65,8 @@ namespace core\PHPLibrary\Page\Admin {
       ]
     ];
 
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
     }
 
@@ -76,46 +76,48 @@ namespace core\PHPLibrary\Page\Admin {
      * @return void
      */
     public function init_subnavigation() : void {
-      $template_source =& $this->system_core->template->core->source;
-      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
+      $themeSource =& $this->CMSCore->theme->core->source;
+      $this->init_admin_panel_subnavigation($this->CMSCore, $themeSource);
     }
 
     public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page/entriesSamples.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/entriesSamples.css', 'rel' => 'stylesheet']);
       
-      $locale_data = $this->system_core->locale->get_data();
+      $localeData = $this->CMSCore->locale->get_data();
+      $localeName = $this->CMSCore->locale->get_name();
 
       /** @var int Текущий номер страницы */
-      $pagination_item_current = (!is_null($this->system_core->urlp->get_param('pageNumber'))) ? (int)$this->system_core->urlp->get_param('pageNumber') : 0;
+      $paginationItemCurrent = (!is_null($this->CMSCore->urlp->get_param('pageNumber'))) ? (int)$this->CMSCore->urlp->get_param('pageNumber') : 0;
       /** @var int Максимальное количество элементов на странице */
-      $pagination_items_on_page = 12;
+      $paginationItemsOnPage = 12;
 
       // $entries_categories_table_items_assembled = [];
-      $entries_samples = new EntriesSamples($this->system_core);
-      $locale_default = $this->system_core->get_cms_locale('admin');
+      $entriesSamples = new EntriesSamples($this->CMSCore);
+      $entriesSamplesLocale = $this->CMSCore->get_cms_locale('admin');
+      $entriesSamplesLocaleName = $entriesSamplesLocale->get_name();
 
       /** @var array Массив объектов выборок */
-      $entries_samples_array_objects = $entries_samples->get_all([
-        'limit' => [$pagination_items_on_page, $pagination_item_current * $pagination_items_on_page]
+      $entriesSamplesObjects = $entriesSamples->get_all([
+        'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
       ]);
 
-      $pagination = new Pagination($this->system_core, $entries_samples->get_count_total(), $pagination_items_on_page, $pagination_item_current);
+      $pagination = new Pagination($this->CMSCore, $entriesSamples->get_count_total(), $paginationItemsOnPage, $paginationItemCurrent);
       $pagination->assembly();
 
-      unset($entries_samples);
+      unset($entriesSamples);
 
       /** @var DOMDocument $dom_document Конструктор DOM-документа */
-      $dom_document_samples_table = new DOMDocument();
+      $document = new DOMDocument();
       
-      /** @var DOMElement $table DOM-элемент таблицы */
-      $table = $dom_document_samples_table->createElement('table');
-      $table->setAttribute('class', 'table');
+      /** @var DOMElement $tableElement DOM-элемент таблицы */
+      $tableElement = $document->createElement('table');
+      $tableElement->setAttribute('class', 'table');
       
-      /** @var DOMElement $table_row_header DOM-элемент строки с заголовками колонок таблицы */
-      $table_row_header = $dom_document_samples_table->createElement('tr');
+      /** @var DOMElement $tableRowHeaderElement DOM-элемент строки с заголовками колонок таблицы */
+      $tableRowHeaderElement = $document->createElement('tr');
 
-      /** @var array $table_cells_headers массив для DOM-элементов с заголовками колонок таблицы */
-      $table_cells_headers = [];
+      /** @var array $tableCellsHeadersElements массив для DOM-элементов с заголовками колонок таблицы */
+      $tableCellsHeadersElements = [];
 
       // Генерация ячеек для строки с заголовками колонок таблицы
       for ($i = 0; $i < 6; $i++) {
@@ -128,52 +130,53 @@ namespace core\PHPLibrary\Page\Admin {
          * 5 => Панель
          */
 
-        /** @var DOMElement $table_cells_headers[] DOM-элемент ячейки с заголовком колонки таблицы */
-        $table_cells_headers[] = $dom_document_samples_table->createElement('th');
+        /** @var DOMElement $tableCellsHeadersElements[] DOM-элемент ячейки с заголовком колонки таблицы */
+        $tableCellsHeadersElements[] = $document->createElement('th');
       }
 
       /* Перебор каждого DOM-элемента с заголовками колонок таблицы
        * для последующего назначения необходимых классов и стилей CSS
        */
-      foreach ($table_cells_headers as $table_cell) {
-        $table_cell->setAttribute('class', 'table__cell table__cell_header');
-        $table_cell->setAttribute('style', 'font-weight: 700;');
+      foreach ($tableCellsHeadersElements as $tableCellElement) {
+        $tableCellElement->setAttribute('class', 'table__cell table__cell_header');
+        $tableCellElement->setAttribute('style', 'font-weight: 700;');
       }
 
       // Присвоение значений заголовкам колонок таблицы
-      $table_cells_headers[1]->nodeValue = $this->system_core->locale->get_single_value_by_key('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_TITLE_LABEL');
-      $table_cells_headers[2]->nodeValue = $this->system_core->locale->get_single_value_by_key('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_COUNT_LABEL');
-      $table_cells_headers[3]->nodeValue = $this->system_core->locale->get_single_value_by_key('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_CREATED_DATE_TIMESTAMP_LABEL');
-      $table_cells_headers[4]->nodeValue = $this->system_core->locale->get_single_value_by_key('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_UPDATED_DATE_TIMESTAMP_LABEL');
+      $tableCellsHeadersElements[1]->nodeValue = $this->CMSCore->locale->get_single_value_by_key('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_TITLE_LABEL');
+      $tableCellsHeadersElements[2]->nodeValue = $this->CMSCore->locale->get_single_value_by_key('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_COUNT_LABEL');
+      $tableCellsHeadersElements[3]->nodeValue = $this->CMSCore->locale->get_single_value_by_key('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_CREATED_DATE_TIMESTAMP_LABEL');
+      $tableCellsHeadersElements[4]->nodeValue = $this->CMSCore->locale->get_single_value_by_key('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_UPDATED_DATE_TIMESTAMP_LABEL');
 
-      // Добавление DOM-элементов в DOM-элемент $table_row_header
-      foreach ($table_cells_headers as $table_cell_index => $table_cell) {
-        $table_row_header->appendChild($table_cells_headers[$table_cell_index]);
+      // Добавление DOM-элементов в DOM-элемент $tableRowHeaderElement
+      foreach ($tableCellsHeadersElements as $index => $element) {
+        $tableRowHeaderElement->appendChild($tableCellsHeadersElements[$index]);
       }
       
-      // Добавление DOM-элемента в DOM-элемент $table
-      $table->appendChild($table_row_header);
+      // Добавление DOM-элемента в DOM-элемент $tableElement
+      $tableElement->appendChild($tableRowHeaderElement);
 
-      foreach ($entries_samples_array_objects as $entries_sample_index => $entries_sample_object) {
-        $entries_sample_object->init_data(['id', 'texts', 'name', 'metadata', 'created_unix_timestamp', 'updated_unix_timestamp']);
+      foreach ($entriesSamplesObjects as $index => $object) {
+        $object->init_data(['id', 'texts', 'name', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+        $objectID = $object->get_id();
 
         /** @var string Дата создания выборки в формате d.m.Y H:i:s */
-        $created_date_timestamp = date('d.m.Y H:i:s', $entries_sample_object->get_created_unix_timestamp());
+        $createdUnixTimestamp = date('d.m.Y H:i:s', $object->get_created_unix_timestamp());
         /** @var string Дата обновления выборки в формате d.m.Y H:i:s */
-        $updated_date_timestamp = date('d.m.Y H:i:s', $entries_sample_object->get_updated_unix_timestamp());
+        $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->get_updated_unix_timestamp());
 
         /** @var string Заголовок выборки */
-        $entries_sample_title = $entries_sample_object->get_title($locale_default->get_name());
-        $entries_sample_title = strip_tags($entries_sample_title);
+        $entriesSampleTitle = $object->get_title($entriesSamplesLocaleName);
+        $entriesSampleTitle = strip_tags($entriesSampleTitle);
         
         /** @var int Количество записей в выборке */
-        $entries_sample_count = $entries_sample_object->get_entries_count();
+        $entriesSampleEntriesCount = $object->get_entries_count();
 
-        /** @var DOMElement $table_row_item DOM-элемент строки */
-        $table_row_item = $dom_document_samples_table->createElement('tr');
+        /** @var DOMElement $tableRowItemElement DOM-элемент строки */
+        $tableRowItemElement = $document->createElement('tr');
 
-        /** @var array $table_cells_item массив для DOM-элементов со значениями для колонок */
-        $table_cells_item = [];
+        /** @var array $tableCellsItemElements массив для DOM-элементов со значениями для колонок */
+        $tableCellsItemElements = [];
 
         // Генерация ячеек для строки с заголовками колонок таблицы
         for ($i = 0; $i < 6; $i++) {
@@ -186,47 +189,47 @@ namespace core\PHPLibrary\Page\Admin {
           * 5 => Панель
           */
 
-          /** @var DOMElement $table_cells_item[] DOM-элемент ячейки */
-          $table_cells_item[] = $dom_document_samples_table->createElement('td');
-          $table_cells_item[$i]->setAttribute('class', 'table__cell table__cell');
+          /** @var DOMElement $tableCellsItemElements[] DOM-элемент ячейки */
+          $tableCellsItemElements[] = $document->createElement('td');
+          $tableCellsItemElements[$i]->setAttribute('class', 'table__cell table__cell');
 
           if ($i == 0) {
-            $table_cells_item[$i]->nodeValue = $entries_sample_index + 1;
+            $tableCellsItemElements[$i]->nodeValue = $index + 1;
           }
 
           if ($i == 1) {
-            $table_cell_link = $dom_document_samples_table->createElement('a');
-            $table_cell_link->setAttribute('href', sprintf('/admin/entriesSample/%d', $entries_sample_object->get_id()));
-            $table_cell_link->setAttribute('target', '_blank');
-            $table_cell_link->nodeValue = $entries_sample_title;
+            $tableCellLinkElement = $document->createElement('a');
+            $tableCellLinkElement->setAttribute('href', '/admin/entriesSample/' . (string)$objectID);
+            $tableCellLinkElement->setAttribute('target', '_blank');
+            $tableCellLinkElement->nodeValue = $entriesSampleTitle;
 
-            $table_cells_item[$i]->appendChild($table_cell_link);
+            $tableCellsItemElements[$i]->appendChild($tableCellLinkElement);
           }
 
           if ($i == 2) {
-            $table_cells_item[$i]->nodeValue = $entries_sample_count;
+            $tableCellsItemElements[$i]->nodeValue = $entriesSampleEntriesCount;
           }
 
           if ($i == 3) {
-            $table_cells_item[$i]->nodeValue = $created_date_timestamp;
+            $tableCellsItemElements[$i]->nodeValue = $createdUnixTimestamp;
           }
 
           if ($i == 4) {
-            $table_cells_item[$i]->nodeValue = $updated_date_timestamp;
+            $tableCellsItemElements[$i]->nodeValue = $updatedUnixTimestamp;
           }
 
-          $table_row_item->appendChild($table_cells_item[$i]);
+          $tableRowItemElement->appendChild($tableCellsItemElements[$i]);
         }
 
-        $table->appendChild($table_row_item);
+        $tableElement->appendChild($tableRowItemElement);
       }
 
       // Добавление DOM-элемента в конструктор DOM-документ
-      $dom_document_samples_table->appendChild($table);
+      $document->appendChild($tableElement);
 
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entriesSamples.tpl', [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entriesSamples.tpl', [
         'PAGE_ENTRIES_SAMPLES_PAGINATION' => $pagination->assembled,
-        'PAGE_ENTRIES_SAMPLES_TABLE' => $dom_document_samples_table->saveHTML()
+        'PAGE_ENTRIES_SAMPLES_TABLE' => $document->saveHTML()
       ]);
     }
   }

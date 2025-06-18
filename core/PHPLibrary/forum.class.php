@@ -19,17 +19,17 @@ namespace core\PHPLibrary {
   #[\AllowDynamicProperties]
   final class Forum {
     /** @var SystemCore|null Объект системного ядра */
-    public SystemCore|null $system_core = null;
+    public SystemCore|null $CMSCore = null;
 
     /**
      * __construct
      *
-     * @param  SystemCore $system_core
+     * @param  SystemCore $CMSCore
      * @param  string $name
      * @return void
      */
-    public function __construct(SystemCore $system_core) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore) {
+      $this->CMSCore = $CMSCore;
     }
 
     public function get_categories() {

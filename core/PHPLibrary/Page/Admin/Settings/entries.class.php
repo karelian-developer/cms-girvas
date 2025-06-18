@@ -18,14 +18,14 @@ namespace core\PHPLibrary\Page\Admin\Settings {
   class SettingsEntries {
     const FORM_PATH = 'templates/page/settings';
 
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public string $title;
     public string $name;
     public string $description;
     public string $assembled = '';
 
-    public function __construct(SystemCore $system_core, string $name) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, string $name) {
+      $this->CMSCore = $CMSCore;
       $this->name = $name;
     }
 
@@ -45,10 +45,10 @@ namespace core\PHPLibrary\Page\Admin\Settings {
       return $this->description;
     }
 
-    public function assembly(array $template_values = []) {
-      $form_template_path = sprintf('%s/%s.tpl', self::FORM_PATH, $this->name);
+    public function assembly(array $templateValues = []) {
+      $formTemplatePath = self::FORM_PATH . '/' . $this->name . '.tpl';
       
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, $form_template_path, [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, $formTemplatePath, [
         'SETTINGS_NAME' => $this->name
       ]);
     }

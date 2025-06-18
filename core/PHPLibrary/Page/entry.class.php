@@ -19,19 +19,19 @@ namespace core\PHPLibrary\Page {
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
 
   class PageEntry implements InterfacePage {
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Page $page;
     public string $assembled = '';
 
     /**
      * __construct
      *
-     * @param  SystemCore $system_core
+     * @param  SystemCore $CMSCore
      * @param  Page $page
      * @return void
      */
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
     }
     
@@ -41,229 +41,212 @@ namespace core\PHPLibrary\Page {
      * @return void
      */
     public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-      $this->system_core->template->add_style(['href' => 'styles/page/entry.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/entry.css', 'rel' => 'stylesheet']);
 
-      $cms_base_locale_setted_name = $this->system_core->configurator->get_database_entry_value('base_locale');
-      $url_base_locale_setted_name = $this->system_core->urlp->get_param('locale');
-      $cookie_base_locale_setted_name = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
-      
-      $cms_base_locale_name = (!is_null($url_base_locale_setted_name)) ? $url_base_locale_setted_name : $cookie_base_locale_setted_name;
-      $cms_base_locale_name = (!is_null($cms_base_locale_name)) ? $cms_base_locale_name : $cms_base_locale_setted_name;
-      $cms_base_locale = new SystemCoreLocale($this->system_core, $cms_base_locale_name);
-      if (!$cms_base_locale->exists_file_data_json()) {
-        $cms_base_locale = new SystemCoreLocale($this->system_core, $cms_base_locale_setted_name);
-        $cms_base_locale_name = $cms_base_locale_setted_name;
-      }
+      $localeData = $this->CMSCore->locale->get_data();
+      $localeName = $this->CMSCore->locale->get_name();
 
-      $this->system_core->locale = $cms_base_locale;
-      $locale_data = $this->system_core->locale->get_data();
+      if (!is_null($this->CMSCore->urlp->get_path(1))) {
+        $entryName = urldecode($this->CMSCore->urlp->get_path(1));
 
-      if (!is_null($this->system_core->urlp->get_path(1))) {
-        $entry_name = urldecode($this->system_core->urlp->get_path(1));
+        if (Entry::exists_by_name($this->CMSCore, $entryName)) {
+          $entry = Entry::get_by_name($this->CMSCore, $entryName);
+          $entry->init_data(['id', 'categoryID', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
 
-        if (Entry::exists_by_name($this->system_core, $entry_name)) {
-          $entry = Entry::get_by_name($this->system_core, $entry_name);
-          $entry->init_data(['id', 'category_id', 'texts', 'name', 'created_unix_timestamp', 'updated_unix_timestamp', 'metadata']);
+          if ($this->CMSCore->urlp->get_param('locale') === $localeName) {
+            $this->CMSCore->theme->add_link_canonical('/entry/' . $entry->get_name());
+          }
 
-          if (!is_null($url_base_locale_setted_name)) {
-            if ($url_base_locale_setted_name == $cms_base_locale_setted_name) {
-              $this->system_core->template->add_link_canonical(sprintf('/entry/%s', $entry->get_name()));
+          $isVisible = false;
+
+          $clientIsLogged = $this->CMSCore->client->is_logged(1);
+          $clientUser = $clientIsLogged ? $this->CMSCore->client->get_user(1) : null;
+
+          $isVisible = $entry->is_published() ? true : false;
+          if (!$isVisible) {
+            if ($clientUser != null) {
+              $isVisible = ($clientUser->get_id() === 1 || $clientUser->get_group_id() === 1) ? true : false;
             }
           }
 
-          $entry_is_visible = false;
-
-          $client_is_logged = $this->system_core->client->is_logged(1);
-          $client_user = ($client_is_logged) ? $this->system_core->client->get_user(1) : null;
-
-          $entry_is_visible = ($entry->is_published()) ? true : false;
-          if (!$entry_is_visible) {
-            if ($client_user != null) {
-              $entry_is_visible = ($client_user->get_id() == 1 || $client_user->get_group_id() == 1) ? true : false;
-            }
-          }
-
-          if ($entry_is_visible) {
+          if ($isVisible) {
             http_response_code(200);
 
-            $entry_category = $entry->get_category();
-            $entry_category_title = $entry_category->get_title($cms_base_locale_name);
+            $category = $entry->get_category();
+            $categoryTitle = $category->get_title($localeName);
 
-            $this->system_core->configurator->set_meta_title($entry->get_title($cms_base_locale_name));
-            $this->system_core->configurator->set_meta_description(str_replace('"', '&quot;', $entry->get_description($cms_base_locale_name)));
-            $this->system_core->configurator->set_meta_keywrords(str_replace('"', '&quot;', $entry->get_keywords($cms_base_locale_name)));
+            $this->CMSCore->configurator->set_meta_title($entry->get_title($localeName));
+            $this->CMSCore->configurator->set_meta_description(str_replace('"', '&quot;', $entry->get_description($localeName)));
+            $this->CMSCore->configurator->set_meta_keywrords(str_replace('"', '&quot;', $entry->get_keywords($localeName)));
 
-            $this->page->breadcrumbs->add($locale_data['PAGE_ENTRY_BREADCRUMPS_ALL_ENTRIES_LABEL'], '/entries');
-            $this->page->breadcrumbs->add($entry_category_title, sprintf('/entries/%s', $entry_category->get_name()));
-            $this->page->breadcrumbs->add($entry->get_title($cms_base_locale_name), sprintf('/entry/%s', $entry->get_name()));
+            $this->page->breadcrumbs->add($localeData['PAGE_ENTRY_BREADCRUMPS_ALL_ENTRIES_LABEL'], '/entries');
+            $this->page->breadcrumbs->add($categoryTitle, '/entries/' . $category->get_name());
+            $this->page->breadcrumbs->add($entry->get_title($localeName), '/entry/' . $entry->get_name());
             $this->page->breadcrumbs->assembly();
 
             /**
              * @var Parsedown Парсер markdown-разметки
              */
             $parsedown = new Parsedown();
-            //$parsedown->setSafeMode(true);
-            //$parsedown->setMarkupEscaped(true);
 
-            //sortColumn=created_unix_timestamp&sortType=desc
-            $entry_comments_array = $entry->get_comments([
+            $commentsArray = $entry->get_comments([
               'limit' => [2, 0],
               'order_by' => [
-                'column' => 'created_unix_timestamp',
+                'column' => 'createdUnixTimestamp',
                 'sort' => 'desc'
               ],
               'parent_id' => 0
             ]);
-            foreach ($entry_comments_array as $entry_comment) {
-              $entry_comment->init_data(['created_unix_timestamp']);
+            foreach ($commentsArray as $entryComment) {
+              $entryComment->init_data(['createdUnixTimestamp']);
             }
 
-            usort($entry_comments_array, function ($a, $b) {
-              $a_cut = $a->get_created_unix_timestamp();
-              $b_cut = $b->get_created_unix_timestamp();
+            usort($commentsArray, function ($a, $b) {
+              $aCut = $a->get_created_unix_timestamp();
+              $bCut = $b->get_created_unix_timestamp();
 
-              if ($a_cut != $b_cut) {
-                return ($a_cut > $b_cut) ? -1 : 1;
+              if ($aCut != $bCut) {
+                return ($aCut > $bCut) ? -1 : 1;
               }
 
               return 0;
             });
 
-            $entry_comments_transformed_array = [];
-            $entry_comment_index = 1;
-            foreach ($entry_comments_array as $entry_comment) {
-              $entry_comment->init_data(['entry_id', 'author_id', 'content', 'created_unix_timestamp', 'updated_unix_timestamp', 'metadata']);
+            $entryCommentsTransformedArray = [];
+            $entryCommentIndex = 1;
+            foreach ($commentsArray as $entryComment) {
+              $entryComment->init_data(['entry_id', 'authorID', 'content', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
               
-              $entry_comment_author = $entry_comment->get_author();
+              $entryCommentAuthor = $entryComment->get_author();
 
-              if ($entry_comment_author != null) {
-                $entry_comment_author->init_data(['login', 'metadata']);
+              if ($entryCommentAuthor !== null) {
+                $entryCommentAuthor->init_data(['login', 'metadata']);
 
-                $entry_comment_author_group = $entry_comment_author->get_group();
-                $entry_comment_author_group->init_data(['texts']);
+                $entryCommentAuthorGroup = $entryCommentAuthor->get_group();
+                $entryCommentAuthorGroup->init_data(['texts']);
               }
 
-              $entry_comment_content = strip_tags($entry_comment->get_content());
+              $entryCommentContent = strip_tags($entryComment->get_content());
 
-              array_push($entry_comments_transformed_array, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entry/comment.tpl', [
-                'COMMENT_ID' => $entry_comment->get_id(),
-                'COMMENT_INDEX' => $entry_comment_index,
-                'COMMENT_CREATED_DATE_TIMESTAMP' => date('d.m.Y H:i:s', $entry_comment->get_created_unix_timestamp()),
-                'COMMENT_AUTHOR_LOGIN' => ($entry_comment_author != null) ? $entry_comment_author->get_login() : '{LANG:DEFAULT_TEXT_USER_DELETED}',
-                'COMMENT_AUTHOR_AVATAR_URL' => ($entry_comment_author != null) ? $entry_comment_author->get_avatar_url(64) : User::get_avatar_default_url($this->system_core, 64),
-                'COMMENT_AUTHOR_GROUP_TITLE' => ($entry_comment_author != null) ? $entry_comment_author_group->get_title($cms_base_locale_name) : '',
-                'COMMENT_CONTENT' => ($entry_comment->is_hidden()) ? sprintf('%s: %s', $locale_data['PAGE_ENTRY_COMMENT_HIDE_LABEL'], strip_tags($entry_comment->get_hidden_reason())) : $entry_comment_content
+              array_push($entryCommentsTransformedArray, TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entry/comment.tpl', [
+                'COMMENT_ID' => $entryComment->get_id(),
+                'COMMENT_INDEX' => $entryCommentIndex,
+                'COMMENT_CREATED_DATE_TIMESTAMP' => date('d.m.Y H:i:s', $entryComment->get_created_unix_timestamp()),
+                'COMMENT_AUTHOR_LOGIN' => ($entryCommentAuthor != null) ? $entryCommentAuthor->get_login() : '{LANG:DEFAULT_TEXT_USER_DELETED}',
+                'COMMENT_AUTHOR_AVATAR_URL' => ($entryCommentAuthor != null) ? $entryCommentAuthor->get_avatar_url(64) : User::get_avatar_default_url($this->CMSCore, 64),
+                'COMMENT_AUTHOR_GROUP_TITLE' => ($entryCommentAuthor != null) ? $entryCommentAuthorGroup->get_title($localeName) : '',
+                'COMMENT_CONTENT' => ($entryComment->is_hidden()) ? sprintf('%s: %s', $localeData['PAGE_ENTRY_COMMENT_HIDE_LABEL'], strip_tags($entryComment->get_hidden_reason())) : $entryCommentContent
               ]));
 
-              $entry_comment_index++;
+              $entryCommentIndex++;
             }
 
-            if (count($entry_comments_array) > 0) {
-              $entry_comments_transformed = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entry/commentsList.tpl', [
-                'COMMENTS_ITEMS' => implode($entry_comments_transformed_array)
+            if (count($commentsArray) > 0) {
+              $entryCommentsTransformed = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entry/commentsList.tpl', [
+                'COMMENTS_ITEMS' => implode($entryCommentsTransformedArray)
               ]);
             }
 
             /**
              * @var string Заголовок записи
              */
-            $entry_title = (!empty($entry->get_title($cms_base_locale_name))) ? $entry->get_title($cms_base_locale_name) : $entry->get_title($cms_base_locale_setted_name);
-            $entry_title = strip_tags($entry_title);
+            $entryTitle = $entry->get_title($localeName);
+            $entryTitle = strip_tags($entryTitle);
             
             /**
              * @var string Содержание записи
              */
-            $entry_content = (!empty($entry->get_content($cms_base_locale_name))) ? $entry->get_content($cms_base_locale_name) : $entry->get_content($cms_base_locale_setted_name);
+            $entry_content = $entry->get_content($localeName);
             
-            $entry_created_date_timestamp = date('d.m.Y H:i:s', $entry->get_created_unix_timestamp());
-            $entry_published_date_timestamp = date('d.m.Y H:i:s', $entry->get_published_unix_timestamp());
-            $entry_updated_date_timestamp = date('d.m.Y H:i:s', $entry->get_updated_unix_timestamp());
+            $createdDateTimestamp = date('d.m.Y H:i:s', $entry->get_created_unix_timestamp());
+            $publishedDateTimestamp = date('d.m.Y H:i:s', $entry->get_published_unix_timestamp());
+            $updatedDateTimestamp = date('d.m.Y H:i:s', $entry->get_updated_unix_timestamp());
 
-            $entry_created_date_timestamp_without_time = date('d.m.Y', $entry->get_created_unix_timestamp());
-            $entry_published_date_timestamp_without_time = date('d.m.Y', $entry->get_published_unix_timestamp());
-            $entry_updated_date_timestamp_without_time = date('d.m.Y', $entry->get_updated_unix_timestamp());
+            $createdDateTimestampWithoutTime = date('d.m.Y', $entry->get_created_unix_timestamp());
+            $publishedDateTimestampWithoutTime = date('d.m.Y', $entry->get_published_unix_timestamp());
+            $updatedDateTimestampWithoutTime = date('d.m.Y', $entry->get_updated_unix_timestamp());
     
-            $entry_created_date_timestamp_without_date = date('H:i:s', $entry->get_created_unix_timestamp());
-            $entry_published_date_timestamp_without_date = date('H:i:s', $entry->get_published_unix_timestamp());
-            $entry_updated_date_timestamp_without_date = date('H:i:s', $entry->get_updated_unix_timestamp());
+            $createdDateTimestampWithoutDate = date('H:i:s', $entry->get_created_unix_timestamp());
+            $publishedDateTimestampWithoutDate = date('H:i:s', $entry->get_published_unix_timestamp());
+            $updatedDateTimestampWithoutDate = date('H:i:s', $entry->get_updated_unix_timestamp());
 
-            $entry_created_date_timestamp_iso_8601 = date('Y-m-dH:i:s', $entry->get_created_unix_timestamp());
-            $entry_published_date_timestamp_iso_8601 = date('Y-m-dH:i:s', $entry->get_published_unix_timestamp());
-            $entry_updated_date_timestamp_iso_8601 = date('Y-m-dH:i:s', $entry->get_updated_unix_timestamp());
+            $createdDateTimestampISO8601 = date('Y-m-dH:i:s', $entry->get_created_unix_timestamp());
+            $publishedDateTimestampISO8601 = date('Y-m-dH:i:s', $entry->get_published_unix_timestamp());
+            $updatedDateTimestampISO8601 = date('Y-m-dH:i:s', $entry->get_updated_unix_timestamp());
 
-            $entry_created_date_timestamp_iso_8601_without_time = date('Y-m-d', $entry->get_created_unix_timestamp());
-            $entry_published_date_timestamp_iso_8601_without_time = date('Y-m-d', $entry->get_published_unix_timestamp());
-            $entry_updated_date_timestamp_iso_8601_without_time = date('Y-m-d', $entry->get_updated_unix_timestamp());
+            $createdDateTimestampISO8601WithoutTime = date('Y-m-d', $entry->get_created_unix_timestamp());
+            $publishedDateTimestampISO8601WithoutTime = date('Y-m-d', $entry->get_published_unix_timestamp());
+            $updatedDateTimestampISO8601WithoutTime = date('Y-m-d', $entry->get_updated_unix_timestamp());
     
-            $entry_created_date_timestamp_iso_8601_without_date = date('H:i:s', $entry->get_created_unix_timestamp());
-            $entry_published_date_timestamp_iso_8601_without_date = date('H:i:s', $entry->get_published_unix_timestamp());
-            $entry_updated_date_timestamp_iso_8601_without_date = date('H:i:s', $entry->get_updated_unix_timestamp());
+            $createdDateTimestampISO8601WithoutDate = date('H:i:s', $entry->get_created_unix_timestamp());
+            $publishedDateTimestampISO8601WithoutDate = date('H:i:s', $entry->get_published_unix_timestamp());
+            $updatedDateTimestampISO8601WithoutDate = date('H:i:s', $entry->get_updated_unix_timestamp());
 
-            $page_content_tags = [
+            $pageTemplateVariables = [
               'ENTRY_ID' => $entry->get_id(),
               'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
-              'ENTRY_TITLE' => $entry_title,
+              'ENTRY_TITLE' => $entryTitle,
               'ENTRY_CONTENT' => $parsedown->text($entry_content),
-              'ENTRY_PREVIEW_URL' => ($entry->get_preview_url() != '') ? $entry->get_preview_url() : Entry::get_preview_default_url($this->system_core, 1024),
-              'ENTRY_CATEGORY_TITLE' => $entry_category_title,
-              'ENTRY_CATEGORY_URL' => $entry_category->get_url(),
-              'ENTRY_COMMENTS_LIST' => (count($entry_comments_array) > 0) ? $entry_comments_transformed : $locale_data['PAGE_ENTRY_COMMENTS_NOT_FOUND_LABEL'],
-              'ENTRY_CREATED_DATE_TIMESTAMP' => $entry_created_date_timestamp,
-              'ENTRY_PUBLISHED_DATE_TIMESTAMP' => ($entry->get_published_unix_timestamp() > 0) ? $entry_published_date_timestamp : '-',
-              'ENTRY_UPDATED_DATE_TIMESTAMP' => $entry_updated_date_timestamp,
-              'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_TIME' => $entry_created_date_timestamp_without_time,
-              'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_TIME' => ($entry->get_published_unix_timestamp() > 0) ? $entry_published_date_timestamp_without_time : '-',
-              'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_TIME' => $entry_updated_date_timestamp_without_time,
-              'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_DATE' => $entry_created_date_timestamp_without_date,
-              'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_DATE' => ($entry->get_published_unix_timestamp() > 0) ? $entry_published_date_timestamp_without_date : '-',
-              'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_DATE' => $entry_updated_date_timestamp_without_date,
-              'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601' => $entry_created_date_timestamp_iso_8601,
-              'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601' => $entry_published_date_timestamp_iso_8601,
-              'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601' => $entry_updated_date_timestamp_iso_8601,
-              'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $entry_created_date_timestamp_iso_8601_without_time,
-              'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $entry_published_date_timestamp_iso_8601_without_time,
-              'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $entry_updated_date_timestamp_iso_8601_without_time,
-              'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entry_created_date_timestamp_iso_8601_without_date,
-              'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entry_published_date_timestamp_iso_8601_without_date,
-              'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entry_updated_date_timestamp_iso_8601_without_date
+              'ENTRY_PREVIEW_URL' => ($entry->get_preview_url() != '') ? $entry->get_preview_url() : Entry::get_preview_default_url($this->CMSCore, 1024),
+              'ENTRY_CATEGORY_TITLE' => $categoryTitle,
+              'ENTRY_CATEGORY_URL' => $category->get_url(),
+              'ENTRY_COMMENTS_LIST' => (count($commentsArray) > 0) ? $entryCommentsTransformed : $localeData['PAGE_ENTRY_COMMENTS_NOT_FOUND_LABEL'],
+              'ENTRY_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
+              'ENTRY_PUBLISHED_DATE_TIMESTAMP' => ($entry->get_published_unix_timestamp() > 0) ? $publishedDateTimestamp : '-',
+              'ENTRY_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp,
+              'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_TIME' => $createdDateTimestampWithoutTime,
+              'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_TIME' => ($entry->get_published_unix_timestamp() > 0) ? $publishedDateTimestampWithoutTime : '-',
+              'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_TIME' => $updatedDateTimestampWithoutTime,
+              'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_DATE' => $createdDateTimestampWithoutDate,
+              'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_DATE' => ($entry->get_published_unix_timestamp() > 0) ? $publishedDateTimestampWithoutDate : '-',
+              'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_DATE' => $updatedDateTimestampWithoutDate,
+              'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601' => $createdDateTimestampISO8601,
+              'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601' => $publishedDateTimestampISO8601,
+              'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601' => $updatedDateTimestampISO8601,
+              'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $createdDateTimestampISO8601WithoutTime,
+              'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $publishedDateTimestampISO8601WithoutTime,
+              'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $updatedDateTimestampISO8601WithoutTime,
+              'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $createdDateTimestampISO8601WithoutDate,
+              'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $publishedDateTimestampISO8601WithoutDate,
+              'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $updatedDateTimestampISO8601WithoutDate
             ];
 
-            $additional_fields_data = $entry->get_additional_fields_data();
-            if (count($additional_fields_data) > 0) {
-              foreach ($additional_fields_data as $field_data_name => $field_data) {
-                $tag_name = sprintf('ENTRY_ADDITIONAL_DATA_%s', strtoupper($field_data_name));
-                $page_content_tags[$tag_name] = $field_data;
+            $additionalFieldsData = $entry->get_additional_fields_data();
+            if (count($additionalFieldsData) > 0) {
+              foreach ($additionalFieldsData as $name => $data) {
+                $variableName = sprintf('ENTRY_ADDITIONAL_DATA_%s', strtoupper($name));
+                $pageTemplateVariables[$variableName] = $data;
               }
             }
 
             /**
              * @property string Собранный шаблон в виде строки
              */
-            $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page.tpl', [
+            $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page.tpl', [
               'PAGE_NAME' => 'entry',
-              'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entry.tpl', $page_content_tags)
+              'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entry.tpl', $pageTemplateVariables)
             ]);
           } else {
             http_response_code(404);
   
-            $page_error = new PageError($this->system_core, $this->page, 404);
-            $page_error->assembly();
-            $this->assembled = $page_error->assembled;
+            $pageError = new PageError($this->CMSCore, $this->page, 404);
+            $pageError->assembly();
+            $this->assembled = $pageError->assembled;
           }
         } else {
           http_response_code(404);
 
-          $page_error = new PageError($this->system_core, $this->page, 404);
-          $page_error->assembly();
-          $this->assembled = $page_error->assembled;
+          $pageError = new PageError($this->CMSCore, $this->page, 404);
+          $pageError->assembly();
+          $this->assembled = $pageError->assembled;
         }
       } else {
         http_response_code(404);
 
-        $page_error = new PageError($this->system_core, $this->page, 404);
-        $page_error->assembly();
-        $this->assembled = $page_error->assembled;
+        $pageError = new PageError($this->CMSCore, $this->page, 404);
+        $pageError->assembly();
+        $this->assembled = $pageError->assembled;
       }
     }
 

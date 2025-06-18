@@ -16,19 +16,19 @@ namespace core\PHPLibrary\Database\QueryBuilder {
 
 
   final class StatementDelete implements InterfaceStatement {
-    public QueryBuilder $query_builder;
-    public ClauseFrom|null $clause_from = null;
-    public ClauseWhere|null $clause_where = null;
+    public QueryBuilder $queryBuilder;
+    public ClauseFrom|null $clauseFrom = null;
+    public ClauseWhere|null $clauseWhere = null;
     public string $assembled = '';
 
     /**
      * __construct
      *
-     * @param  mixed $query_builder
+     * @param  mixed $queryBuilder
      * @return void
      */
-    public function __construct(QueryBuilder $query_builder) {
-      $this->query_builder = $query_builder;
+    public function __construct(QueryBuilder $queryBuilder) {
+      $this->queryBuilder = $queryBuilder;
     }
     
     /**
@@ -37,7 +37,7 @@ namespace core\PHPLibrary\Database\QueryBuilder {
      * @return void
      */
     public function set_clause_from() : void {
-      $this->clause_from = new ClauseFrom($this);
+      $this->clauseFrom = new ClauseFrom($this);
     }
     
     /**
@@ -46,7 +46,7 @@ namespace core\PHPLibrary\Database\QueryBuilder {
      * @return void
      */
     public function set_clause_where() : void {
-      $this->clause_where = new ClauseWhere($this);
+      $this->clauseWhere = new ClauseWhere($this);
     }
 
     /**
@@ -55,19 +55,19 @@ namespace core\PHPLibrary\Database\QueryBuilder {
      * @return void
      */
     public function assembly() : void {
-      $query_array = [];
+      $queryArray = [];
 
-      if (!is_null($this->clause_from)) {
-        $this->clause_from->assembly();
-        array_push($query_array, $this->clause_from->assembled);
+      if (!is_null($this->clauseFrom)) {
+        $this->clauseFrom->assembly();
+        array_push($queryArray, $this->clauseFrom->assembled);
       }
 
-      if (!is_null($this->clause_where)) {
-        $this->clause_where->assembly();
-        array_push($query_array, $this->clause_where->assembled);
+      if (!is_null($this->clauseWhere)) {
+        $this->clauseWhere->assembly();
+        array_push($queryArray, $this->clauseWhere->assembled);
       }
 
-      $this->assembled = sprintf('DELETE %s;', implode(' ', $query_array));
+      $this->assembled = sprintf('DELETE %s;', implode(' ', $queryArray));
     }
   }
 }

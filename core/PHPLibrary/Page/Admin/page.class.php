@@ -22,10 +22,10 @@ namespace core\PHPLibrary\Page\Admin {
 
     const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_STATIC_PAGE_NAVIGATION_%s_LABEL';
 
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Page $page;
     public string $assembled = '';
-    public array $navigation_subsections_array = [
+    public array $navigationSubsections = [
       'back' => [
         'name' => 'back',
         'iconName' => 'back',
@@ -35,8 +35,8 @@ namespace core\PHPLibrary\Page\Admin {
       ],
     ];
 
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
     }
 
@@ -46,23 +46,24 @@ namespace core\PHPLibrary\Page\Admin {
      * @return void
      */
     public function init_subnavigation() : void {
-      $template_source =& $this->system_core->template->core->source;
-      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
+      $themeSource =& $this->CMSCore->theme->core->source;
+      $this->init_admin_panel_subnavigation($this->CMSCore, $themeSource);
     }
 
     public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page/pageStatic.css', 'rel' => 'stylesheet']);
-      $this->system_core->template->add_style(['href' => 'styles/nadvoTE.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/pageStatic.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/nadvoTE.css', 'rel' => 'stylesheet']);
 
-      $locale_data = $this->system_core->locale->get_data();
+      $localeData = $this->CMSCore->locale->get_data();
+      $localeName = $this->CMSCore->locale->get_name();
 
-      $page_static = null;
-      if (!is_null($this->system_core->urlp->get_path(2))) {
-        $page_static_id = (is_numeric($this->system_core->urlp->get_path(2))) ? (int)$this->system_core->urlp->get_path(2) : 0;
-        $page_static = (PageStatic::exists_by_id($this->system_core, $page_static_id)) ? new PageStatic($this->system_core, $page_static_id) : null;
+      $pageStatic = null;
+      if (!is_null($this->CMSCore->urlp->get_path(2))) {
+        $pageStaticID = is_numeric($this->CMSCore->urlp->get_path(2)) ? (int)$this->CMSCore->urlp->get_path(2) : 0;
+        $pageStatic = PageStatic::exists_by_id($this->CMSCore, $pageStaticID) ? new PageStatic($this->CMSCore, $pageStaticID) : null;
         
-        if (!is_null($page_static)) {
-          $page_static->init_data(['id', 'texts', 'metadata', 'name']);
+        if (!is_null($pageStatic)) {
+          $pageStatic->init_data(['id', 'texts', 'metadata', 'name']);
         }
       }
 
@@ -72,89 +73,87 @@ namespace core\PHPLibrary\Page\Admin {
        */
 
       /** @var array Типы полей */
-      $fields_types = ($this->system_core->configurator->exists_database_entry_value('static_pages_additional_field_type')) ? json_decode($this->system_core->configurator->get_database_entry_value('static_pages_additional_field_type'), true) : [];
+      $fieldsTypes = $this->CMSCore->configurator->exists_database_entry_value('static_pages_additional_field_type') ? json_decode($this->CMSCore->configurator->get_database_entry_value('static_pages_additional_field_type'), true) : [];
       /** @var array Заголовки полей */
-      $fields_titles = ($this->system_core->configurator->exists_database_entry_value('static_pages_additional_field_title')) ? json_decode($this->system_core->configurator->get_database_entry_value('static_pages_additional_field_title'), true) : [];
+      $fieldsTitles = $this->CMSCore->configurator->exists_database_entry_value('static_pages_additional_field_title') ? json_decode($this->CMSCore->configurator->get_database_entry_value('static_pages_additional_field_title'), true) : [];
       /** @var array Описания полей */
-      $fields_descriptions = ($this->system_core->configurator->exists_database_entry_value('static_pages_additional_field_description')) ? json_decode($this->system_core->configurator->get_database_entry_value('static_pages_additional_field_description'), true) : [];
+      $fieldsDescriptions = $this->CMSCore->configurator->exists_database_entry_value('static_pages_additional_field_description') ? json_decode($this->CMSCore->configurator->get_database_entry_value('static_pages_additional_field_description'), true) : [];
       /** @var array Имена полей */
-      $fields_names = ($this->system_core->configurator->exists_database_entry_value('static_pages_additional_field_name')) ? json_decode($this->system_core->configurator->get_database_entry_value('static_pages_additional_field_name'), true) : [];
-      /** @var string Имя языкового базового пакета CMS */
-      $cms_locale_setted = $this->system_core->configurator->get_database_entry_value('base_locale');
+      $fieldsNames = $this->CMSCore->configurator->exists_database_entry_value('static_pages_additional_field_name') ? json_decode($this->CMSCore->configurator->get_database_entry_value('static_pages_additional_field_name'), true) : [];
 
-      $additional_fields_elements = [];
-      foreach ($fields_types as $field_index => $field_type) {
-        $field_name_exploded = explode('_', $fields_names[$field_index]);
+      $additionaFieldsElements = [];
+      foreach ($fieldsTypes as $index => $type) {
+        $fieldNameExploded = explode('_', $fieldsNames[$index]);
 
-        foreach ($field_name_exploded as $string_index => $string) {
-          if ($string_index > 0) {
-            $field_name_exploded[$string_index] = ucfirst($string);
+        foreach ($fieldNameExploded as $stringIndex => $string) {
+          if ($stringIndex > 0) {
+            $fieldNameExploded[$stringIndex] = ucfirst($string);
           }
         }
 
-        $field_name_transformed = implode($field_name_exploded);
+        $fieldNameTransformed = implode($fieldNameExploded);
 
-        if ($field_type == 'textarea') {
+        if ($type === 'textarea') {
           if (!is_null($entry)) {
-            $field_value = (!is_null($page_static->get_additional_field_data($fields_names[$field_index]))) ? $page_static->get_additional_field_data($fields_names[$field_index]) : '';
+            $fieldValue = !is_null($pageStatic->get_additional_field_data($fieldsNames[$index])) ? $pageStatic->get_additional_field_data($fieldsNames[$index]) : '';
           }
 
           /** @var DOMDocument */
-          $dom_document = new DOMDocument('1.0', 'UTF-8');
+          $document = new DOMDocument('1.0', 'UTF-8');
 
-          $element_value = (isset($field_value)) ? $field_value : '';
-          $element = $dom_document->createElement('textarea', $element_value);
-          $element->setAttribute('name', sprintf('page_static_additional_field_%s', $fields_names[$field_index]));
+          $elementValue = isset($fieldValue) ? $fieldValue : '';
+          $element = $document->createElement('textarea', $elementValue);
+          $element->setAttribute('name', 'page_static_additional_field_' . $fieldsNames[$index]);
 
-          $dom_document->appendChild($element);
+          $document->appendChild($element);
 
-          $dom_document_string = $dom_document->saveHTML($element);
+          $documentString = $document->saveHTML($element);
 
-          array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entry/form/field.tpl', [
-            'FIELD_DESCRIPTION' => $fields_descriptions[$cms_locale_setted][$field_index],
-            'FIELD_TITLE' => $fields_titles[$cms_locale_setted][$field_index],
-            'FIELD_INPUT' => $dom_document_string
+          array_push($additionaFieldsElements, TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
+            'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
+            'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
+            'FIELD_INPUT' => $documentString
           ]));
 
         } else {
-          if (!is_null($page_static)) {
-            $field_value = (!is_null($page_static->get_additional_field_data($fields_names[$field_index]))) ? $page_static->get_additional_field_data($fields_names[$field_index]) : '';
+          if (!is_null($pageStatic)) {
+            $fieldValue = !is_null($pageStatic->get_additional_field_data($fieldsNames[$index])) ? $pageStatic->get_additional_field_data($fieldsNames[$index]) : '';
           }
 
           /** @var DOMDocument */
-          $dom_document = new DOMDocument('1.0', 'UTF-8');
+          $document = new DOMDocument('1.0', 'UTF-8');
 
-          $element_value = (isset($field_value)) ? $field_value : '';
-          $element = $dom_document->createElement('input');
-          $element->setAttribute('name', sprintf('page_static_additional_field_%s', $fields_names[$field_index]));
-          $element->setAttribute('type', $fields_types[$field_index]);
-          $element->setAttribute('value', $element_value);
+          $elementValue = (isset($fieldValue)) ? $fieldValue : '';
+          $element = $document->createElement('input');
+          $element->setAttribute('name', 'page_static_additional_field_' . $fieldsNames[$index]);
+          $element->setAttribute('type', $fieldsTypes[$index]);
+          $element->setAttribute('value', $elementValue);
 
-          $dom_document->appendChild($element);
+          $document->appendChild($element);
 
-          $dom_document_string = $dom_document->saveHTML($element);
+          $documentString = $document->saveHTML($element);
 
-          array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entry/form/field.tpl', [
-            'FIELD_DESCRIPTION' => $fields_descriptions[$cms_locale_setted][$field_index],
-            'FIELD_TITLE' => $fields_titles[$cms_locale_setted][$field_index],
-            'FIELD_INPUT' => $dom_document_string
+          array_push($additionaFieldsElements, TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
+            'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
+            'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
+            'FIELD_INPUT' => $documentString
           ]));
         }
       }
 
       /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/pageStatic.tpl', [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/pageStatic.tpl', [
         'ADMIN_PANEL_PAGE_NAME' => 'page-static',
-        'PAGE_STATIC_EDITOR' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/pageStatic/editor.tpl', []),
-        'PAGE_STATIC_ID' => (!is_null($page_static)) ? $page_static->get_id() : 0,
-        'PAGE_STATIC_TITLE' => (!is_null($page_static)) ? $page_static->get_title() : '',
-        'PAGE_STATIC_DESCRIPTION' => (!is_null($page_static)) ? $page_static->get_description() : '',
-        'PAGE_STATIC_CONTENT' => (!is_null($page_static)) ? $page_static->get_content() : '',
-        'PAGE_STATIC_KEYWORDS' => (!is_null($page_static)) ? implode(', ', $page_static->get_keywords()) : '',
-        'PAGE_STATIC_NAME' => (!is_null($page_static)) ? $page_static->get_name() : '',
-        'PAGE_STATIC_ADDITIONAL_FIELDS' => implode($additional_fields_elements),
-        'PAGE_STATIC_PERSONAL_TEMPLATE_PATH' => (!is_null($page_static)) ? $page_static->get_personal_template_path() : '',
-        'PAGE_STATIC_FORM_METHOD' => (!is_null($page_static)) ? 'PATCH' : 'PUT'
+        'PAGE_STATIC_EDITOR' => TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/pageStatic/editor.tpl', []),
+        'PAGE_STATIC_ID' => !is_null($pageStatic) ? $pageStatic->get_id() : 0,
+        'PAGE_STATIC_TITLE' => !is_null($pageStatic) ? $pageStatic->get_title($localeName) : '',
+        'PAGE_STATIC_DESCRIPTION' => !is_null($pageStatic) ? $pageStatic->get_description($localeName) : '',
+        'PAGE_STATIC_CONTENT' => !is_null($pageStatic) ? $pageStatic->get_content($localeName) : '',
+        'PAGE_STATIC_KEYWORDS' => !is_null($pageStatic) ? implode(', ', $pageStatic->get_keywords($localeName)) : '',
+        'PAGE_STATIC_NAME' => !is_null($pageStatic) ? $pageStatic->get_name() : '',
+        'PAGE_STATIC_ADDITIONAL_FIELDS' => implode($additionaFieldsElements),
+        'PAGE_STATIC_PERSONAL_TEMPLATE_PATH' => !is_null($pageStatic) ? $pageStatic->get_personal_template_path() : '',
+        'PAGE_STATIC_FORM_METHOD' => !is_null($pageStatic) ? 'PATCH' : 'PUT'
       ]);
     }
 

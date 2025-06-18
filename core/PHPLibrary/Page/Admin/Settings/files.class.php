@@ -18,7 +18,7 @@ namespace core\PHPLibrary\Page\Admin\Settings {
   class SettingsFiles {
     const FORM_PATH = 'templates/page/settings';
 
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public string $title;
     public string $name;
     public string $description;
@@ -27,11 +27,11 @@ namespace core\PHPLibrary\Page\Admin\Settings {
     /**
      * __construct
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param string $name
      */
-    public function __construct(SystemCore $system_core, string $name) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, string $name) {
+      $this->CMSCore = $CMSCore;
       $this->name = $name;
     }
 
@@ -74,32 +74,32 @@ namespace core\PHPLibrary\Page\Admin\Settings {
     /**
      * Сборка
      * 
-     * @param array $template_values
+     * @param array $templateValues
      */
-    public function assembly(array $template_values = []) : void {
-      $form_template_path = sprintf('%s/%s.tpl', self::FORM_PATH, $this->name);
+    public function assembly(array $templateValues = []) : void {
+      $formTemplatePath = self::FORM_PATH . '/' . $this->name . '.tpl';
       
-      $setting_auto_convert_file_image_status_value = $this->system_core->configurator->get_auto_convert_file_image_status();
+      $settingAutoConvertFileImageStatusValue = $this->CMSCore->configurator->get_auto_convert_file_image_status();
 
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, $form_template_path, [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, $formTemplatePath, [
         'SETTINGS_NAME' => $this->name,
         // Максимальный вес файла
-        'SETTING_UPLOAD_FILE_WEIGHT_MAX_VALUE' => $this->system_core->configurator->get_upload_file_weight_max(),
+        'SETTING_UPLOAD_FILE_WEIGHT_MAX_VALUE' => $this->CMSCore->configurator->get_upload_file_weight_max(),
         // Максимальная ширина изображения
-        'SETTING_UPLOAD_FILE_IMAGE_WIDTH_MAX_VALUE' => $this->system_core->configurator->get_upload_file_image_width_max(),
+        'SETTING_UPLOAD_FILE_IMAGE_WIDTH_MAX_VALUE' => $this->CMSCore->configurator->get_upload_file_image_width_max(),
         // Максимальная высота изображения
-        'SETTING_UPLOAD_FILE_IMAGE_HEIGHT_MAX_VALUE' => $this->system_core->configurator->get_upload_file_image_height_max(),
+        'SETTING_UPLOAD_FILE_IMAGE_HEIGHT_MAX_VALUE' => $this->CMSCore->configurator->get_upload_file_image_height_max(),
         // Максимальный вес изображения аватара
-        'SETTING_UPLOAD_FILE_IMAGE_AVATAR_WEIGHT_MAX_VALUE' => $this->system_core->configurator->get_upload_file_image_avatar_weight_max(),
+        'SETTING_UPLOAD_FILE_IMAGE_AVATAR_WEIGHT_MAX_VALUE' => $this->CMSCore->configurator->get_upload_file_image_avatar_weight_max(),
         // Максимальная ширина изображения аватара
-        'SETTING_UPLOAD_FILE_IMAGE_AVATAR_WIDTH_MAX_VALUE' => $this->system_core->configurator->get_upload_file_image_avatar_width_max(),
+        'SETTING_UPLOAD_FILE_IMAGE_AVATAR_WIDTH_MAX_VALUE' => $this->CMSCore->configurator->get_upload_file_image_avatar_width_max(),
         // Максимальная высота изображения аватара
-        'SETTING_UPLOAD_FILE_IMAGE_AVATAR_HEIGHT_MAX_VALUE' => $this->system_core->configurator->get_upload_file_image_avatar_height_max(),
+        'SETTING_UPLOAD_FILE_IMAGE_AVATAR_HEIGHT_MAX_VALUE' => $this->CMSCore->configurator->get_upload_file_image_avatar_height_max(),
         // Формат изображения для автоматической конвертации
-        'SETTING_AUTO_CONVERT_FILE_IMAGE_FORMAT_VALUE' => $this->system_core->configurator->get_auto_convert_file_image_extension(),
+        'SETTING_AUTO_CONVERT_FILE_IMAGE_FORMAT_VALUE' => $this->CMSCore->configurator->get_auto_convert_file_image_extension(),
         // Статус автоматической конвертации изображения
-        'SETTING_AUTO_CONVERT_FILE_IMAGE_STATUS_VALUE' => $setting_auto_convert_file_image_status_value,
-        'SETTING_AUTO_CONVERT_FILE_IMAGE_CHECKED_VALUE' => ($setting_auto_convert_file_image_status_value == 'on') ? 'checked' : '',
+        'SETTING_AUTO_CONVERT_FILE_IMAGE_STATUS_VALUE' => $settingAutoConvertFileImageStatusValue,
+        'SETTING_AUTO_CONVERT_FILE_IMAGE_CHECKED_VALUE' => $settingAutoConvertFileImageStatusValue === 'on' ? 'checked' : '',
       ]);
     }
 

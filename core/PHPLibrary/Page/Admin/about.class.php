@@ -18,94 +18,94 @@ namespace core\PHPLibrary\Page\Admin {
   use \core\PHPLibrary\Feed\Importer as FeedImporter;
 
   class PageAbout implements InterfacePage {
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Page $page;
     public string $assembled = '';
 
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
     }
 
     public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page/about.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/about.css', 'rel' => 'stylesheet']);
       
-      $locale_data = $this->system_core->locale->get_data();
+      $localeData = $this->CMSCore->locale->get_data();
 
-      $feed_importer = new FeedImporter($this->system_core, 'https://www.cms-girvas.ru/feed/last-news');
-      $feed_xml = $feed_importer->get([
+      $feedImporter = new FeedImporter($this->CMSCore, 'https://www.cms-girvas.ru/feed/last-news');
+      $feedXML = $feedImporter->get([
         'ssl' => [
           'verify_peer' => false,
           'verify_peer_name' => false
         ]
       ]);
-      $feed_items_assembled = [];
+      $feedItemsAssembled = [];
 
-      if (isset($feed_xml->channel->item) && $feed_xml != false) {
-        $count_max = 3; $item_index = 0;
-        foreach ($feed_xml->channel->item as $item) {
-          array_push($feed_items_assembled, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/index/feed/listItem.tpl', [
+      if (isset($feedXML->channel->item) && $feedXML != false) {
+        $countMax = 3; $itemIndex = 0;
+        foreach ($feedXML->channel->item as $item) {
+          array_push($feedItemsAssembled, TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/index/feed/listItem.tpl', [
             'ITEM_TITLE' => $item->title,
             'ITEM_DESCRIPTION' => $item->description,
             'ITEM_LINK' => $item->link
           ]));
 
-          if ($item_index == $count_max - 1) break;
-          $item_index++;
+          if ($itemIndex == $countMax - 1) break;
+          $itemIndex++;
         }
       }
 
-      unset($feed_importer);
-      unset($feed_xml);
+      unset($feedImporter);
+      unset($feedXML);
 
-      $feed_last_news_list = $locale_data['PAGE_INDEX_SIDEBAR_BLOCK_WEB_CHANNEL_ENTRIES_NOT_FOUND_LABEL'];
-      if (count($feed_items_assembled) > 0) {
-        $feed_last_news_list = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/index/feed/list.tpl', [
-          'WEB_CHANNEL_ITEMS' => implode($feed_items_assembled)
+      $feedLastNewsList = $localeData['PAGE_INDEX_SIDEBAR_BLOCK_WEB_CHANNEL_ENTRIES_NOT_FOUND_LABEL'];
+      if (count($feedItemsAssembled) > 0) {
+        $feedLastNewsList = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/index/feed/list.tpl', [
+          'WEB_CHANNEL_ITEMS' => implode($feedItemsAssembled)
         ]);
       }
 
-      $feed_importer = new FeedImporter($this->system_core, 'https://www.cms-girvas.ru/feed/last-releases');
-      $feed_xml = $feed_importer->get([
+      $feedImporter = new FeedImporter($this->CMSCore, 'https://www.cms-girvas.ru/feed/last-releases');
+      $feedXML = $feedImporter->get([
         'ssl' => [
           'verify_peer' => false,
           'verify_peer_name' => false
         ]
       ]);
-      $feed_items_assembled = [];
+      $feedItemsAssembled = [];
       
-      if (!is_bool($feed_xml)) {
-        $count_max = 3; $item_index = 0;
+      if (!is_bool($feedXML)) {
+        $countMax = 3; $itemIndex = 0;
         
-        foreach ($feed_xml->channel as $channel) {
+        foreach ($feedXML->channel as $channel) {
           foreach ($channel->item as $item) {
-            array_push($feed_items_assembled, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/index/feed/listItem.tpl', [
+            array_push($feedItemsAssembled, TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/index/feed/listItem.tpl', [
               'ITEM_TITLE' => $item->title,
               'ITEM_DESCRIPTION' => $item->description,
               'ITEM_LINK' => $item->link
             ]));
 
-            if ($item_index == $count_max - 1) break;
-            $item_index++;
+            if ($itemIndex == $countMax - 1) break;
+            $itemIndex++;
           }
         }
       }
 
-      unset($feed_importer);
-      unset($feed_xml);
+      unset($feedImporter);
+      unset($feedXML);
 
-      $feed_last_releases_list = $locale_data['PAGE_INDEX_SIDEBAR_BLOCK_WEB_CHANNEL_ENTRIES_NOT_FOUND_LABEL'];
-      if (count($feed_items_assembled) > 0) {
-        $feed_last_releases_list = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/index/feed/list.tpl', [
-          'WEB_CHANNEL_ITEMS' => implode($feed_items_assembled)
+      $feedLastReleasesList = $localeData['PAGE_INDEX_SIDEBAR_BLOCK_WEB_CHANNEL_ENTRIES_NOT_FOUND_LABEL'];
+      if (count($feedItemsAssembled) > 0) {
+        $feedLastReleasesList = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/index/feed/list.tpl', [
+          'WEB_CHANNEL_ITEMS' => implode($feedItemsAssembled)
         ]);
       }
 
       /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/about.tpl', [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/about.tpl', [
         'ADMIN_PANEL_PAGE_NAME' => 'about',
-        'WEB_CHANNEL_LATEST_NEWS_LIST' => $feed_last_news_list,
-        'WEB_CHANNEL_LATEST_RELEASES_LIST' => $feed_last_releases_list,
+        'WEB_CHANNEL_LATEST_NEWS_LIST' => $feedLastNewsList,
+        'WEB_CHANNEL_LATEST_RELEASES_LIST' => $feedLastReleasesList,
       ]);
     }
   }

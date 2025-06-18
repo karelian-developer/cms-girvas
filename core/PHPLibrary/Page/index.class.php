@@ -18,19 +18,19 @@ namespace core\PHPLibrary\Page {
   use \core\PHPLibrary\Page as Page;
 
   class PageIndex implements InterfacePage {
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Page $page;
     public string $assembled = '';
 
     /**
      * __construct
      *
-     * @param  SystemCore $system_core
+     * @param  SystemCore $CMSCore
      * @param  Page $page
      * @return void
      */
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
     }
     
@@ -40,113 +40,99 @@ namespace core\PHPLibrary\Page {
      * @return void
      */
     public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-      $this->system_core->template->add_style(['href' => 'styles/page/index.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/index.css', 'rel' => 'stylesheet']);
 
-      $cms_base_locale_setted_name = $this->system_core->configurator->get_database_entry_value('base_locale');
-      $url_base_locale_setted_name = $this->system_core->urlp->get_param('locale');
-      $cookie_base_locale_setted_name = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
-      
-      $cms_base_locale_name = (!is_null($url_base_locale_setted_name)) ? $url_base_locale_setted_name : $cookie_base_locale_setted_name;
-      $cms_base_locale_name = (!is_null($cms_base_locale_name)) ? $cms_base_locale_name : $cms_base_locale_setted_name;
-      $cms_base_locale = new SystemCoreLocale($this->system_core, $cms_base_locale_name);
-      if (!$cms_base_locale->exists_file_data_json()) {
-        $cms_base_locale = new SystemCoreLocale($this->system_core, $cms_base_locale_setted_name);
-        $cms_base_locale_name = $cms_base_locale_setted_name;
-      }
-
-      $this->system_core->locale = $cms_base_locale;
-      $locale_data = $this->system_core->locale->get_data();
+      $localeData = $this->CMSCore->locale->get_data();
+      $localeName = $this->CMSCore->locale->get_name();
 
       /** @var Entries $entries Объект класса Entries */
-      $entries = new Entries($this->system_core);
-      $entries_array_objects = $entries->get_all(['limit' => [6, 0]]);
+      $entries = new Entries($this->CMSCore);
+      $entriesObjects = $entries->get_all(['limit' => [6, 0]]);
       unset($entries);
 
-      $entries_array_templates = [];
-      foreach ($entries_array_objects as $entry_object) {
-        $entry_object->init_data(['id', 'category_id', 'texts', 'name', 'created_unix_timestamp', 'updated_unix_timestamp', 'metadata']);
-        $entry_category_object = $entry_object->get_category(['texts', 'name', 'metadata']);
+      $entriesArrayTemplates = [];
+      foreach ($entriesObjects as $entryObject) {
+        $entryObject->init_data(['id', 'categoryID', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
+        $categoryObject = $entryObject->get_category(['texts', 'name', 'metadata']);
         
         /** @var string Заголовок записи */
-        $entry_title = (!empty($entry_object->get_title($cms_base_locale_name))) ? $entry_object->get_title($cms_base_locale_name) : $entry_object->get_title($cms_base_locale_setted_name);
-        $entry_title = strip_tags($entry_title); 
+        $entryTitle = $entryObject->get_title($localeName);
+        $entryTitle = strip_tags($entryTitle); 
         /** @var string Описание записи */
-        $entry_description = (!empty($entry_object->get_description($cms_base_locale_name))) ? $entry_object->get_description($cms_base_locale_name) : $entry_object->get_description($cms_base_locale_setted_name);
-        $entry_description = strip_tags($entry_description); 
+        $entryDescription = $entryObject->get_description($localeName);
+        $entryDescription = strip_tags($entryDescription); 
 
-        $entry_created_date_timestamp = date('d.m.Y H:i:s', $entry_object->get_created_unix_timestamp());
-        $entry_published_date_timestamp = date('d.m.Y H:i:s', $entry_object->get_published_unix_timestamp());
-        $entry_updated_date_timestamp = date('d.m.Y H:i:s', $entry_object->get_updated_unix_timestamp());
+        $createdDateTimestamp = date('d.m.Y H:i:s', $entryObject->get_created_unix_timestamp());
+        $publishedDateTimestamp = date('d.m.Y H:i:s', $entryObject->get_published_unix_timestamp());
+        $updatedDateTimestamp = date('d.m.Y H:i:s', $entryObject->get_updated_unix_timestamp());
 
-        $entry_created_date_timestamp_without_time = date('d.m.Y', $entry_object->get_created_unix_timestamp());
-        $entry_published_date_timestamp_without_time = date('d.m.Y', $entry_object->get_published_unix_timestamp());
-        $entry_updated_date_timestamp_without_time = date('d.m.Y', $entry_object->get_updated_unix_timestamp());
+        $createdDateTimestampWithoutTime = date('d.m.Y', $entryObject->get_created_unix_timestamp());
+        $publishedDateTimestampWithoutTime = date('d.m.Y', $entryObject->get_published_unix_timestamp());
+        $updatedDateTimestampWithoutTime = date('d.m.Y', $entryObject->get_updated_unix_timestamp());
 
-        $entry_created_date_timestamp_without_date = date('H:i:s', $entry_object->get_created_unix_timestamp());
-        $entry_published_date_timestamp_without_date = date('H:i:s', $entry_object->get_published_unix_timestamp());
-        $entry_updated_date_timestamp_without_date = date('H:i:s', $entry_object->get_updated_unix_timestamp());
+        $createdDateTimestampWithoutDate = date('H:i:s', $entryObject->get_created_unix_timestamp());
+        $publishedDateTimestampWithoutDate = date('H:i:s', $entryObject->get_published_unix_timestamp());
+        $updatedDateTimestampWithoutDate = date('H:i:s', $entryObject->get_updated_unix_timestamp());
 
-        $entry_created_date_timestamp_iso_8601 = date('Y-m-dH:i:s', $entry_object->get_created_unix_timestamp());
-        $entry_published_date_timestamp_iso_8601 = date('Y-m-dH:i:s', $entry_object->get_published_unix_timestamp());
-        $entry_updated_date_timestamp_iso_8601 = date('Y-m-dH:i:s', $entry_object->get_updated_unix_timestamp());
+        $createdDateTimestampISO8601 = date('Y-m-dH:i:s', $entryObject->get_created_unix_timestamp());
+        $publishedDateTimestampISO8601 = date('Y-m-dH:i:s', $entryObject->get_published_unix_timestamp());
+        $updatedDateTimestampISO8601 = date('Y-m-dH:i:s', $entryObject->get_updated_unix_timestamp());
 
-        $entry_created_date_timestamp_iso_8601_without_time = date('Y-m-d', $entry_object->get_created_unix_timestamp());
-        $entry_published_date_timestamp_iso_8601_without_time = date('Y-m-d', $entry_object->get_published_unix_timestamp());
-        $entry_updated_date_timestamp_iso_8601_without_time = date('Y-m-d', $entry_object->get_updated_unix_timestamp());
+        $createdDateTimestampISO8601WithoutTime = date('Y-m-d', $entryObject->get_created_unix_timestamp());
+        $publishedDateTimestampISO8601WithoutTime = date('Y-m-d', $entryObject->get_published_unix_timestamp());
+        $updatedDateTimestampISO8601WithoutTime = date('Y-m-d', $entryObject->get_updated_unix_timestamp());
 
-        $entry_created_date_timestamp_iso_8601_without_date = date('H:i:s', $entry_object->get_created_unix_timestamp());
-        $entry_published_date_timestamp_iso_8601_without_date = date('H:i:s', $entry_object->get_published_unix_timestamp());
-        $entry_updated_date_timestamp_iso_8601_without_date = date('H:i:s', $entry_object->get_updated_unix_timestamp());
+        $createdDateTimestampISO8601WithoutDate = date('H:i:s', $entryObject->get_created_unix_timestamp());
+        $publishedDateTimestampISO8601WithoutDate = date('H:i:s', $entryObject->get_published_unix_timestamp());
+        $updatedDateTimestampISO8601WithoutDate = date('H:i:s', $entryObject->get_updated_unix_timestamp());
 
-        $entry_category_title = $entry_category_object->get_title($cms_base_locale_name);
-        $entry_category_title = strip_tags($entry_category_title); 
+        $categoryTitle = $categoryObject->get_title($localeName);
+        $categoryTitle = strip_tags($categoryTitle); 
 
-        if ($entry_object->is_published() && $entry_category_object->is_showed_on_index_page()) {
-          array_push($entries_array_templates, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/index/entriesList/item.tpl', [
-            'ENTRY_ID' => $entry_object->get_id(),
-            'ENTRY_TITLE' => $entry_title,
-            'ENTRY_DESCRIPTION' => $entry_description,
-            'ENTRY_URL' => $entry_object->get_url(),
-            'ENTRY_PREVIEW_URL' => ($entry_object->get_preview_url() != '') ? $entry_object->get_preview_url() : Entry::get_preview_default_url($this->system_core, 512),
-            'ENTRY_CATEGORY_TITLE' => $entry_category_title,
-            'ENTRY_CATEGORY_URL' => $entry_category_object->get_url(),
-            'ENTRY_CREATED_DATE_TIMESTAMP' => $entry_created_date_timestamp,
-            'ENTRY_PUBLISHED_DATE_TIMESTAMP' => ($entry_object->get_published_unix_timestamp() > 0) ? $entry_published_date_timestamp : '-',
-            'ENTRY_UPDATED_DATE_TIMESTAMP' => $entry_updated_date_timestamp,
-            'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_TIME' => $entry_created_date_timestamp_without_time,
-            'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_TIME' => ($entry_object->get_published_unix_timestamp() > 0) ? $entry_published_date_timestamp_without_time : '-',
-            'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_TIME' => $entry_updated_date_timestamp_without_time,
-            'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_DATE' => $entry_created_date_timestamp_without_date,
-            'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_DATE' => ($entry_object->get_published_unix_timestamp() > 0) ? $entry_published_date_timestamp_without_date : '-',
-            'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_DATE' => $entry_updated_date_timestamp_without_date,
-            'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601' => $entry_created_date_timestamp_iso_8601,
-            'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601' => $entry_published_date_timestamp_iso_8601,
-            'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601' => $entry_updated_date_timestamp_iso_8601,
-            'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $entry_created_date_timestamp_iso_8601_without_time,
-            'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $entry_published_date_timestamp_iso_8601_without_time,
-            'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $entry_updated_date_timestamp_iso_8601_without_time,
-            'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entry_created_date_timestamp_iso_8601_without_date,
-            'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entry_published_date_timestamp_iso_8601_without_date,
-            'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entry_updated_date_timestamp_iso_8601_without_date
+        if ($entryObject->is_published() && $categoryObject->is_showed_on_index_page()) {
+          array_push($entriesArrayTemplates, TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/index/entriesList/item.tpl', [
+            'ENTRY_ID' => $entryObject->get_id(),
+            'ENTRY_TITLE' => $entryTitle,
+            'ENTRY_DESCRIPTION' => $entryDescription,
+            'ENTRY_URL' => $entryObject->get_url(),
+            'ENTRY_PREVIEW_URL' => $entryObject->get_preview_url() !== '' ? $entryObject->get_preview_url() : Entry::get_preview_default_url($this->CMSCore, 512),
+            'ENTRY_CATEGORY_TITLE' => $categoryTitle,
+            'ENTRY_CATEGORY_URL' => $categoryObject->get_url(),
+            'ENTRY_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
+            'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $entryObject->get_published_unix_timestamp() > 0 ? $publishedDateTimestamp : '-',
+            'ENTRY_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp,
+            'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_TIME' => $createdDateTimestampWithoutTime,
+            'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_TIME' => $entryObject->get_published_unix_timestamp() > 0 ? $publishedDateTimestampWithoutTime : '-',
+            'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_TIME' => $updatedDateTimestampWithoutTime,
+            'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_DATE' => $createdDateTimestampWithoutDate,
+            'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_DATE' => $entryObject->get_published_unix_timestamp() > 0 ? $publishedDateTimestampWithoutDate : '-',
+            'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_DATE' => $updatedDateTimestampWithoutDate,
+            'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601' => $createdDateTimestampISO8601,
+            'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601' => $publishedDateTimestampISO8601,
+            'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601' => $updatedDateTimestampISO8601,
+            'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $createdDateTimestampISO8601WithoutTime,
+            'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $publishedDateTimestampISO8601WithoutTime,
+            'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $updatedDateTimestampISO8601WithoutTime,
+            'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $createdDateTimestampISO8601WithoutDate,
+            'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $publishedDateTimestampISO8601WithoutDate,
+            'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $updatedDateTimestampISO8601WithoutDate
           ]));
         }
-
-        unset($entry_data);
       }
 
-      unset($entries_array_objects);
+      unset($entriesObjects);
 
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page.tpl', [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page.tpl', [
         'PAGE_NAME' => 'index',
-        'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/index.tpl', [
-          'ENTRIES_LIST' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/index/entriesList/list.tpl', [
-            'ENTRIES_LIST_ITEMS' => implode($entries_array_templates)
+        'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/index.tpl', [
+          'ENTRIES_LIST' => TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/index/entriesList/list.tpl', [
+            'ENTRIES_LIST_ITEMS' => implode($entriesArrayTemplates)
           ])
         ])
       ]);
 
-      unset($entries_array_templates);
+      unset($entriesArrayTemplates);
     }
 
   }

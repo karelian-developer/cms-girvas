@@ -8,27 +8,27 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary {  
+namespace core\PHPLibrary {
   /**
    * Templates
    * 
    * Класс для работы с несколькими шаблонами CMS
    * 
-   * @author Andrey Shestakov <drelagas.new@gmail.com>
-   * @version 0.0.1
+   * @author Andrey Shestakov <drelagas.new@yandex.ru>
+   * @version 0.0.1-1
    */
   class Timestamp {
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     private int $time;
 
     /**
      * __construct
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param int $time
      */
-    public function __construct(SystemCore $system_core, int $time) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, int $time) {
+      $this->CMSCore = $CMSCore;
       $this->set_time($time);
     }
 

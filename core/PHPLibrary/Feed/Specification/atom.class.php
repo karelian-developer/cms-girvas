@@ -18,7 +18,7 @@ namespace core\PHPLibrary\Feed\Specification {
     const TYPE_NAME = 'atom';
     const TYPE_TITLE = 'Atom';
 
-    private SystemCore $system_core;
+    private SystemCore $CMSCore;
     private FeedBuilder $builder;
     public string $title = '';
     public string $description = '';
@@ -26,9 +26,9 @@ namespace core\PHPLibrary\Feed\Specification {
     public string $language;
     public array $items = [];
 
-    public function __construct(SystemCore $system_core, FeedBuilder $web_channel_builder) {
-      $this->system_core = $system_core;
-      $this->builder = $web_channel_builder;
+    public function __construct(SystemCore $CMSCore, FeedBuilder $feedBuilder) {
+      $this->CMSCore = $CMSCore;
+      $this->builder = $feedBuilder;
     }
 
     public function set_title(string $value) : void {
@@ -77,74 +77,74 @@ namespace core\PHPLibrary\Feed\Specification {
     }
 
     public function assembly_feed() : DOMElement|bool {
-      $site_title = ($this->system_core->configurator->exists_database_entry_value('base_site_title')) ? $this->system_core->configurator->get_database_entry_value('base_site_title') : sprintf('%s %s', $this->system_core::CMS_TITLE, $this->system_core::CMS_VERSION);
-      $site_description = ($this->system_core->configurator->exists_database_entry_value('seo_site_description')) ? $this->system_core->configurator->get_database_entry_value('seo_site_description') : 'Description is not exists';
-      $site_link = sprintf('https://%s', $this->system_core->configurator->get('domain'));
+      $siteTitle = $this->CMSCore->configurator->exists_database_entry_value('base_site_title') ? $this->CMSCore->configurator->get_database_entry_value('base_site_title') : $this->CMSCore::CMS_TITLE . ' ' . $this->CMSCore::CMS_VERSION;
+      $siteDescription = $this->CMSCore->configurator->exists_database_entry_value('seo_site_description') ? $this->CMSCore->configurator->get_database_entry_value('seo_site_description') : 'Description is not exists';
+      $siteLink = 'https://' . $this->CMSCore->configurator->get('domain');
 
-      $channel_title = (!empty($this->get_title())) ? $this->get_title() : $site_title;
-      $channel_description = (!empty($this->get_description())) ? $this->get_description() : $site_description;
-      $channel_link = (!empty($this->get_link())) ? $this->get_link() : $site_link;
+      $channelTitle = !empty($this->get_title()) ? $this->get_title() : $siteTitle;
+      $channelDescription = !empty($this->get_description()) ? $this->get_description() : $siteDescription;
+      $channelLink = !empty($this->get_link()) ? $this->get_link() : $siteLink;
 
-      $element_feed = $this->builder->document->createElement('feed');
-      $element_feed_attribute_xmlns = $this->builder->document->createAttribute('xmlns');
-      $element_feed_attribute_xmlns->value = 'http://www.w3.org/2005/Atom';
+      $feedElement = $this->builder->document->createElement('feed');
+      $feedElementAttributeXMLns = $this->builder->document->createAttribute('xmlns');
+      $feedElementAttributeXMLns->value = 'http://www.w3.org/2005/Atom';
 
-      $element_feed->appendChild($element_feed_attribute_xmlns);
+      $feedElement->appendChild($feedElementAttributeXMLns);
 
-      $element_feed_title = $this->builder->document->createElement('title', $channel_title);
-      $element_feed_link = $this->builder->document->createElement('link');
-      $element_feed_link_attribute_href = $this->builder->document->createAttribute('href');
-      $element_feed_link_attribute_href->value = $channel_link;
-      $element_feed_generator = $this->builder->document->createElement('generator', 'CMS GIRVAS: Web Channel Builder');
-      $element_feed_rights = $this->builder->document->createElement('rights', 'Copyright (c) 2023, www.garbalo.com');
+      $feedTitleElement = $this->builder->document->createElement('title', $channelTitle);
+      $feedLinkElement = $this->builder->document->createElement('link');
+      $feedLinkElementAttributeHref = $this->builder->document->createAttribute('href');
+      $feedLinkElementAttributeHref->value = $channelLink;
+      $feedGeneratorElement = $this->builder->document->createElement('generator', 'CMS GIRVAS: Web Channel Builder');
+      $feedRightsElement = $this->builder->document->createElement('rights', 'Copyright (c) 2025, www.garbalo.com');
 
-      $element_feed_link->appendChild($element_feed_link_attribute_href);
-      $element_feed->appendChild($element_feed_title);
-      $element_feed->appendChild($element_feed_link);
-      $element_feed->appendChild($element_feed_generator);
-      $element_feed->appendChild($element_feed_rights);
+      $feedLinkElement->appendChild($feedLinkElementAttributeHref);
+      $feedElement->appendChild($feedTitleElement);
+      $feedElement->appendChild($feedLinkElement);
+      $feedElement->appendChild($feedGeneratorElement);
+      $feedElement->appendChild($feedRightsElement);
 
       $items = $this->items;
       usort($items, function ($a, $b) {
-        $a_pubdate_unix = strtotime($a['pubdate']);
-        $b_pubdate_unix = strtotime($b['pubdate']);
+        $aPubdateUnix = strtotime($a['pubdate']);
+        $bPubdateUnix = strtotime($b['pubdate']);
 
-        if ($a_pubdate_unix == $b_pubdate_unix) {
+        if ($aPubdateUnix == $bPubdateUnix) {
           return 0;
         }
 
-        return ($a_pubdate_unix > $b_pubdate_unix) ? -1 : 1;
+        return ($aPubdateUnix > $bPubdateUnix) ? -1 : 1;
       });
 
-      $element_feed_updated = $this->builder->document->createElement('updated', $items[0]['pubdate']);
-      $element_feed->appendChild($element_feed_updated);
+      $feedUpdatedElement = $this->builder->document->createElement('updated', $items[0]['pubdate']);
+      $feedElement->appendChild($feedUpdatedElement);
 
       unset($items);
 
       foreach ($this->items as $item) {
-        $element_entry = $this->builder->document->createElement('entry');
-        $element_entry_title = $this->builder->document->createElement('title', $item['title']);
-        $element_entry_summary = $this->builder->document->createElement('summary', $item['description']);
-        $element_entry_link = $this->builder->document->createElement('link');
-        $element_entry_link_attribute_href = $this->builder->document->createAttribute('href');
-        $element_entry_link_attribute_href->value = $item['link'];
-        $element_entry_updated = $this->builder->document->createElement('updated', $item['pubdate']);
+        $entryElement = $this->builder->document->createElement('entry');
+        $entryTitleElement = $this->builder->document->createElement('title', $item['title']);
+        $entrySummaryElement = $this->builder->document->createElement('summary', $item['description']);
+        $entryLinkElement = $this->builder->document->createElement('link');
+        $entryLinkElementAttributeHref = $this->builder->document->createAttribute('href');
+        $entryLinkElementAttributeHref->value = $item['link'];
+        $entryUpdatedElement = $this->builder->document->createElement('updated', $item['pubdate']);
 
-        $element_entry->appendChild($element_entry_title);
-        $element_entry_link->appendChild($element_entry_link_attribute_href);
-        $element_entry->appendChild($element_entry_link);
-        $element_entry->appendChild($element_entry_summary);
+        $entryElement->appendChild($entryTitleElement);
+        $entryLinkElement->appendChild($entryLinkElementAttributeHref);
+        $entryElement->appendChild($entryLinkElement);
+        $entryElement->appendChild($entrySummaryElement);
 
-        $element_feed->appendChild($element_entry);
+        $feedElement->appendChild($entryElement);
       }
 
-      return $element_feed;
+      return $feedElement;
     }
 
     public function assembly() : void {
-      $element_feed = $this->assembly_feed();
+      $feedElement = $this->assembly_feed();
 
-      $this->builder->document->appendChild($element_feed);
+      $this->builder->document->appendChild($feedElement);
 
       $this->builder->assembled = $this->builder->document->saveXML();
     }

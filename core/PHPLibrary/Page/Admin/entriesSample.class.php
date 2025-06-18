@@ -22,10 +22,10 @@ namespace core\PHPLibrary\Page\Admin {
 
     const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_SAMPLE_NAVIGATION_%s_LABEL';
 
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Page $page;
     public string $assembled = '';
-    public array $navigation_subsections_array = [
+    public array $navigationSubsections = [
       'back' => [
         'name' => 'back',
         'iconName' => 'back',
@@ -35,8 +35,8 @@ namespace core\PHPLibrary\Page\Admin {
       ],
     ];
 
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
     }
 
@@ -46,34 +46,35 @@ namespace core\PHPLibrary\Page\Admin {
      * @return void
      */
     public function init_subnavigation() : void {
-      $template_source =& $this->system_core->template->core->source;
-      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
+      $themeSource =& $this->CMSCore->theme->core->source;
+      $this->init_admin_panel_subnavigation($this->CMSCore, $themeSource);
     }
 
     public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page/entriesSample.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/entriesSample.css', 'rel' => 'stylesheet']);
       
-      $locale_data = $this->system_core->locale->get_data();
+      $localeData = $this->CMSCore->locale->get_data();
+      $localeName = $this->CMSCore->locale->get_name();
 
-      $entries_sample = null;
-      if (!is_null($this->system_core->urlp->get_path(2))) {
-        $entries_sample_id = (is_numeric($this->system_core->urlp->get_path(2))) ? (int)$this->system_core->urlp->get_path(2) : 0;
-        $entries_sample = (EntriesSample::exists_by_id($this->system_core, $entries_sample_id)) ? new EntriesSample($this->system_core, $entries_sample_id) : null;
+      $entriesSample = null;
+      if (!is_null($this->CMSCore->urlp->get_path(2))) {
+        $entriesSampleID = is_numeric($this->CMSCore->urlp->get_path(2)) ? (int)$this->CMSCore->urlp->get_path(2) : 0;
+        $entriesSample = EntriesSample::exists_by_id($this->CMSCore, $entriesSampleID) ? new EntriesSample($this->CMSCore, $entriesSampleID) : null;
         
-        if (!is_null($entries_sample)) {
-          $entries_sample->init_data(['id', 'texts', 'name', 'metadata']);
+        if (!is_null($entriesSample)) {
+          $entriesSample->init_data(['id', 'texts', 'name', 'metadata']);
         }
       }
       
       /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entriesSample.tpl', [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entriesSample.tpl', [
         'ADMIN_PANEL_PAGE_NAME' => 'entries-category',
-        'ENTRIES_SAMPLE_ID' => (!is_null($entries_sample)) ? $entries_sample->get_id() : 0,
-        'ENTRIES_SAMPLE_TITLE' => (!is_null($entries_sample)) ? $entries_sample->get_title() : '',
-        'ENTRIES_SAMPLE_DESCRIPTION' => (!is_null($entries_sample)) ? $entries_sample->get_description() : '',
-        'ENTRIES_SAMPLE_NAME' => (!is_null($entries_sample)) ? $entries_sample->get_name() : '',
-        'ENTRIES_SAMPLE_LIMIT_COUNT' => (!is_null($entries_sample)) ? $entries_sample->get_limit_count() : '',
-        'ENTRIES_SAMPLE_FORM_METHOD' => (!is_null($entries_sample)) ? 'PATCH' : 'PUT'
+        'ENTRIES_SAMPLE_ID' => !is_null($entriesSample) ? $entriesSample->get_id() : 0,
+        'ENTRIES_SAMPLE_TITLE' => !is_null($entriesSample) ? $entriesSample->get_title($localeName) : '',
+        'ENTRIES_SAMPLE_DESCRIPTION' => !is_null($entriesSample) ? $entriesSample->get_description($localeName) : '',
+        'ENTRIES_SAMPLE_NAME' => !is_null($entriesSample) ? $entriesSample->get_name() : '',
+        'ENTRIES_SAMPLE_LIMIT_COUNT' => !is_null($entriesSample) ? $entriesSample->get_limit_count() : '',
+        'ENTRIES_SAMPLE_FORM_METHOD' => !is_null($entriesSample) ? 'PATCH' : 'PUT'
       ]);
     }
 

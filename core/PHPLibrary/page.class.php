@@ -12,7 +12,7 @@ namespace core\PHPLibrary {
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
 
   class Page {
-    private SystemCore $system_core;
+    private SystemCore $CMSCore;
     public PageBreadcrumbs $breadcrumbs;
     private string $name;
     public string $assembled = '';
@@ -20,13 +20,13 @@ namespace core\PHPLibrary {
     /**
      * __construct
      *
-     * @param  SystemCore $system_core
+     * @param  SystemCore $CMSCore
      * @param  string $name
      * @return void
      */
-    public function __construct(SystemCore $system_core, array $dir_exploded) {
-      $this->set_system_core($system_core);
-      $this->breadcrumbs = new PageBreadcrumbs($system_core);
+    public function __construct(SystemCore $CMSCore, array $dir_exploded) {
+      $this->set_system_core($CMSCore);
+      $this->breadcrumbs = new PageBreadcrumbs($CMSCore);
     }
 
     /**
@@ -52,21 +52,21 @@ namespace core\PHPLibrary {
     /**
      * Назначить объект шаблона
      *
-     * @param  Template $template
+     * @param  Template $theme
      * @return void
      */
-    private function set_template(Template $template) : void {
-      $this->template = $template;
+    private function set_template(Template $theme) : void {
+      $this->theme = $theme;
     }
 
     /**
      * Назначить объект системного ядра
      *
-     * @param  Template $template
+     * @param  Template $theme
      * @return void
      */
-    private function set_system_core(SystemCore $system_core) : void {
-      $this->system_core = $system_core;
+    private function set_system_core(SystemCore $CMSCore) : void {
+      $this->CMSCore = $CMSCore;
     }
     
     /**
@@ -75,14 +75,14 @@ namespace core\PHPLibrary {
      * @return void
      */
     private function assembly() : string {
-      /** @var string $template_path Путь до шаблона */
-      $template_path = $this->template->get_path();
+      /** @var string $themePath Путь до шаблона */
+      $themePath = $this->theme->get_path();
 
-      if (file_exists(sprintf('%s/page.tpl', $template_path))) {
-        $page_template_path = sprintf('%s/page/%s.tpl', $template_path, $this->get_name());
-        if (file_exists($page_template_path)) {
-          $page_template = file_get_contents($page_template_path);
-          return TemplateCollector::assembly($page_template, [
+      if (file_exists(sprintf('%s/page.tpl', $themePath))) {
+        $pageThemePath = sprintf('%s/page/%s.tpl', $themePath, $this->get_name());
+        if (file_exists($pageThemePath)) {
+          $pageTheme = file_get_contents($pageThemePath);
+          return TemplateCollector::assembly($pageTheme, [
             'PAGE_NAME' => $this->get_name(),
           ]);
         }

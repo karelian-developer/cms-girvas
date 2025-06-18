@@ -21,19 +21,19 @@ namespace core\PHPLibrary\Forum {
   #[\AllowDynamicProperties]
   final class Section {
     /** @var SystemCore|null Объект системного ядра */
-    public SystemCore|null $system_core = null;
+    public SystemCore|null $CMSCore = null;
     /** @var Forum|null Объект форума */
     public Forum|null $forum = null;
 
     /**
      * __construct
      *
-     * @param  SystemCore $system_core
+     * @param  SystemCore $CMSCore
      * @param  string $name
      * @return void
      */
-    public function __construct(SystemCore $system_core, Forum $forum) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Forum $forum) {
+      $this->CMSCore = $CMSCore;
       $this->forum = $forum;
     }
 

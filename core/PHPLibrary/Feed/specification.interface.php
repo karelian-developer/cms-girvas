@@ -13,7 +13,7 @@ namespace core\PHPLibrary\Feed {
   use \core\PHPLibrary\Feed\Builder as FeedBuilder;
 
   interface InterfaceSpecification {
-    public function __construct(SystemCore $system_core, FeedBuilder $web_channel_builder);
+    public function __construct(SystemCore $CMSCore, FeedBuilder $feedBuilder);
     public function set_title(string $value) : void;
     public function set_description(string $value) : void;
     public function set_language(string $value) : void;

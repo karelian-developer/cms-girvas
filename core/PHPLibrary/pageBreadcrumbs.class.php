@@ -12,17 +12,17 @@ namespace core\PHPLibrary {
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
 
   final class PageBreadcrumbs {
-    private SystemCore $system_core;
+    private SystemCore $CMSCore;
     private array $array = [];
     public string $assembled = '';
 
     /**
      * __construct
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      */
-    public function __construct(SystemCore $system_core) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore) {
+      $this->CMSCore = $CMSCore;
     }
 
     /**
@@ -34,13 +34,13 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function add(string $title, string $url) : bool {
-      $array_items_count_start = count($this->array);
-      $array_items_count = array_push($this->array, [
+      $arrayItemsCountStart = count($this->array);
+      $arrayItemsCount = array_push($this->array, [
         'title' => $title,
         'url' => $url
       ]);
 
-      if ($array_items_count > $array_items_count_start) {
+      if ($arrayItemsCount > $arrayItemsCountStart) {
         return true;
       }
 
@@ -63,27 +63,27 @@ namespace core\PHPLibrary {
      */
     public function assembly() : void {
       /** @var array Массив преобразованных элементов */
-      $breadcrumbs_items_transformed = [];
+      $breadcrumbsItemsTransformed = [];
       /** @var string Преобразованный массив элементов в TPL-шаблон */
-      $breadcrumbs_list_transformed = '';
+      $breadcrumbsListTransformed = '';
 
       if (count($this->get_array()) > 0) {
-        foreach ($this->get_array() as $breadcrumb_index => $breadcrumb_data) {
-          array_push($breadcrumbs_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/breadcrumps/listItem.tpl', [
-            'BREADCRUMP_URL' => $breadcrumb_data['url'],
-            'BREADCRUMP_TITLE' => $breadcrumb_data['title'],
-            'BREADCRUMP_META_POSITION' => $breadcrumb_index + 1
+        foreach ($this->get_array() as $index => $data) {
+          array_push($breadcrumbsItemsTransformed, TemplateCollector::assembly_file_content($this->CMSCore->template, 'templates/page/breadcrumps/listItem.tpl', [
+            'BREADCRUMP_URL' => $data['url'],
+            'BREADCRUMP_TITLE' => $data['title'],
+            'BREADCRUMP_META_POSITION' => $index + 1
           ]));
         }
       }
 
-      if (count($breadcrumbs_items_transformed) > 0) {
-        $breadcrumbs_list_transformed = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/breadcrumps/list.tpl', [
-          'BREADCRUMPS_ITEMS' => implode($breadcrumbs_items_transformed)
+      if (count($breadcrumbsItemsTransformed) > 0) {
+        $breadcrumbsListTransformed = TemplateCollector::assembly_file_content($this->CMSCore->template, 'templates/page/breadcrumps/list.tpl', [
+          'BREADCRUMPS_ITEMS' => implode($breadcrumbsItemsTransformed)
         ]);
       }
 
-      $this->assembled = $breadcrumbs_list_transformed;
+      $this->assembled = $breadcrumbsListTransformed;
     }
 
   }

@@ -18,15 +18,15 @@ namespace core\PHPLibrary\Database {
 
   class QueryBuilder {
     public StatementCreateTable|StatementSelect|StatementInsert|StatementUpdate|StatementDelete $statement;
-    public readonly SystemCore $system_core;
+    public readonly SystemCore $CMSCore;
 
     /**
      * __construct
      *
      * @return void
      */
-    public function __construct(SystemCore $system_core) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore) {
+      $this->CMSCore = $CMSCore;
     }
     
     /**

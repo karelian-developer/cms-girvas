@@ -26,7 +26,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public static function get_absolute_modules_path() : string {
-      return sprintf('%s/%s', CMS_ROOT_DIRECTORY, self::RELATIVE_MODULES_PATH);
+      return CMS_ROOT_DIRECTORY . '/' . self::RELATIVE_MODULES_PATH;
     }
 
     /**
@@ -35,17 +35,19 @@ namespace core\PHPLibrary {
      * @return array
      */
     public static function get_installed_modules_array() : array {
-      $modules_array = array_diff(scandir(self::get_absolute_modules_path()), ['.', '..']);
-      if (!empty($modules_array)) {
-        foreach ($modules_array as $module_name) {
-          $module_path = sprintf('%s/%s', self::get_absolute_modules_path(), $module_name);
-          if (!file_exists(sprintf('%s/installed', $module_path))) {
-            $modules_array = array_diff($modules_array, [$module_name]);
+      $pathAbsolute = self::get_absolute_modules_path();
+      $modules = array_diff(scandir($pathAbsolute), ['.', '..']);
+      
+      if (!empty($modules)) {
+        foreach ($modules as $name) {
+          $path = $pathAbsolute . '/' . $name;
+          if (!file_exists($path . '/installed')) {
+            $modules = array_diff($modules, [$name]);
           }
         }
       }
 
-      return $modules_array;
+      return $modules;
     }
   }
 }

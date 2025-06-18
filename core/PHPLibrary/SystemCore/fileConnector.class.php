@@ -11,18 +11,18 @@
 namespace core\PHPLibrary\SystemCore {
 
   final class FileConnector implements InterfaceFileConnector {
-    private mixed $system_core = null;
-    private string $current_directory = '';
-    private string $start_directory = '';
+    private mixed $CMSCore = null;
+    private string $currentDirectory = '';
+    private string $startDirectory = '';
         
     /**
      * __construct
      *
-     * @param  mixed $system_core Объект SystemCore
+     * @param  mixed $CMSCore Объект SystemCore
      * @return void
      */
-    public function __construct(\core\PHPLibrary\SystemCore $system_core) {
-      $this->system_core = $system_core;
+    public function __construct(\core\PHPLibrary\SystemCore $CMSCore) {
+      $this->CMSCore = $CMSCore;
     }
     
     /**
@@ -76,13 +76,12 @@ namespace core\PHPLibrary\SystemCore {
     /**
      * Подключение файла
      *
-     * @param  mixed $file_path
+     * @param  mixed $path
      * @return bool
      */
-    public function connect_file(string $file_path) : bool {
-      /** @var string $file_path Полный путь до подключаемого файла */
-      if (file_exists($file_path)) {
-        require_once $file_path;
+    public function connect_file(string $path) : bool {
+      if (file_exists($path)) {
+        require_once $path;
         return true;
       }
 
@@ -93,31 +92,31 @@ namespace core\PHPLibrary\SystemCore {
     /**
      * Рекурсивное подключение файлов
      *
-     * @param  mixed $file_name_pattern Шаблон (regex) наименования шаблона
+     * @param  mixed $fileNamePattern Шаблон (regex) наименования шаблона
      * @param  int $level Уровень вложенности
      * @return bool
      */
-    public function connect_files_recursive(string $file_name_pattern, int $level = 0) : void {
-      /** @var string $files_path Полный путь до файлов */
-      $files_path = $this->get_current_directory();
-      /** @var array $files_list Массив файлов */
-      $files_list = array_diff(scandir(sprintf($files_path)), ['..', '.']);
-      foreach ($files_list as $file_name) {
+    public function connect_files_recursive(string $fileNamePattern, int $level = 0) : void {
+      /** @var string $filesPath Полный путь до файлов */
+      $filesPath = $this->get_current_directory();
+      /** @var array $filesList Массив файлов */
+      $filesList = array_diff(scandir(sprintf($filesPath)), ['..', '.']);
+      foreach ($filesList as $fileName) {
         if ($level == 0) {
           $this->reset_current_directory();
         }
         
-        /** @var string $file_path Полный путь до файла */
-        $file_path = sprintf('%s/%s', $files_path, $file_name);
+        /** @var string $filePath Полный путь до файла */
+        $filePath = sprintf('%s/%s', $filesPath, $fileName);
         
-        if (preg_match($file_name_pattern, $file_name)) {
+        if (preg_match($fileNamePattern, $fileName)) {
           // Подключаем файл
-          $this->connect_file($file_path);
+          $this->connect_file($filePath);
         } else {
-          if (is_dir($file_path)) {
-            $this->set_current_directory($file_path);
+          if (is_dir($filePath)) {
+            $this->set_current_directory($filePath);
             // Погружаемся во вложенную папку для последующих подключений
-            $this->connect_files_recursive($file_name_pattern, $level + 1);
+            $this->connect_files_recursive($fileNamePattern, $level + 1);
           }
         }
       }

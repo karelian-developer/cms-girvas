@@ -17,56 +17,56 @@ use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
 use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as EnumFileFormat;
 use \GdImage as GdImage;
 
-if ($system_core->client->is_logged(2)) {
-  $client_user = $system_core->client->get_user(2);
-  $client_user->init_data(['metadata']);
-  $client_user_group = $client_user->get_group();
-  $client_user_group->init_data(['permissions']);
+if ($CMSCore->client->is_logged(2)) {
+  $clientUser = $CMSCore->client->get_user(2);
+  $clientUser->init_data(['metadata']);
+  $clientUserGroup = $clientUser->get_group();
+  $clientUserGroup->init_data(['permissions']);
 
   // Проверка прав пользователя на доступ к данному действию
-  if ($client_user_group->permission_check($client_user_group::PERMISSION_EDITOR_MEDIA_FILES_MANAGEMENT)) {
+  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_EDITOR_MEDIA_FILES_MANAGEMENT)) {
     // Проверка передачи файлов (действительно ли они были переданы в массиве)
     if (!empty($_FILES)) {
       /** @var array Массив передаваемых файлов для отладки */
-      $handler_output_data['debug_files'] = $_FILES;
+      $handlerOutputData['debug_files'] = $_FILES;
 
       /** @var string Расширение передаваемого файла */
-      $uploaded_file_extention = pathinfo($_FILES['mediaFile']['name'], PATHINFO_EXTENSION);
+      $fileUploadedExtension = pathinfo($_FILES['mediaFile']['name'], PATHINFO_EXTENSION);
       
       /** @var array Массив разрешенных расширений передаваемых файлов */
-      $file_extention_allowed = ['png', 'gif', 'jpg', 'jpeg', 'webp'];
+      $fileExtensionsAllowed = ['png', 'gif', 'jpg', 'jpeg', 'webp'];
 
       /** @var string Путь до загружаемых файлов */
-      $uploaded_dir_path = sprintf('%s/uploads/media', CMS_ROOT_DIRECTORY);
+      $filesDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
 
       /* Проверка наличия директории для загружаемых файлов
        * Если директория отсутствует, то ее необходимо создать. */
-      if (!file_exists($uploaded_dir_path)) {
-        mkdir($uploaded_dir_path, 0777);
+      if (!file_exists($filesDirectoryPath)) {
+        mkdir($filesDirectoryPath, 0777);
       }
 
       // Проверка наличия директории для загружаемых файлов
-      if (file_exists($uploaded_dir_path)) {
+      if (file_exists($filesDirectoryPath)) {
         // Проверка соответствия расширения массиву разрешенных расширений загружаемых файлов
-        if (in_array($uploaded_file_extention, $file_extention_allowed)) {
+        if (in_array($fileUploadedExtension, $fileExtensionsAllowed)) {
           // Проверка величины файла на соответствие ограничениям
-          if ($system_core->configurator->get_upload_file_weight_max() >= filesize($_FILES['mediaFile']['tmp_name']) / 1024 || $system_core->configurator->get_upload_file_weight_max() == 0) {
+          if ($CMSCore->configurator->get_upload_file_weight_max() >= filesize($_FILES['mediaFile']['tmp_name']) / 1024 || $CMSCore->configurator->get_upload_file_weight_max() == 0) {
             /** @var string Путь до загружаемых файлов */
-            $file_uploaded_folder_path = sprintf('%s/uploads/media', CMS_ROOT_DIRECTORY);
+            $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
             /** @var string MIME-тип загружаемого файла */
-            $file_mime_type = mime_content_type($_FILES['mediaFile']['tmp_name']);
+            $fileMIMEType = mime_content_type($_FILES['mediaFile']['tmp_name']);
 
-            if (preg_match('/^image\//', $file_mime_type)) {
-              preg_match('/^image\/([a-z]+)/', $file_mime_type, $matches);
+            if (preg_match('/^image\//', $fileMIMEType)) {
+              preg_match('/^image\/([a-z]+)/', $fileMIMEType, $matches);
               /** @var EnumFileFormat Расширение файла */
-              $file_extension_enum = match ($matches[1]) {
+              $fileExtensionEnum = match ($matches[1]) {
                 'jpeg' => EnumFileFormat::JPG,
                 'png' => EnumFileFormat::PNG,
                 'webp' => EnumFileFormat::WEBP,
                 'avif' => EnumFileFormat::AVIF
               };
               /** @var GdImage Изображение, созданное из загружаемого файла */
-              $file_image = match ($file_extension_enum) {
+              $image = match ($fileExtensionEnum) {
                 EnumFileFormat::JPG => imagecreatefromjpeg($_FILES['mediaFile']['tmp_name']),
                 EnumFileFormat::PNG => imagecreatefrompng($_FILES['mediaFile']['tmp_name']),
                 EnumFileFormat::WEBP => imagecreatefromwebp($_FILES['mediaFile']['tmp_name']),
@@ -74,82 +74,82 @@ if ($system_core->client->is_logged(2)) {
               };
 
               /** @var int Ширина изображения */
-              $file_image_width = imagesx($file_image);
+              $imageWidth = imagesx($image);
               /** @var int Высота изображения */
-              $file_image_height = imagesy($file_image);
+              $imageHeight = imagesy($image);
 
               // Уничтожаем изображение
-              imagedestroy($file_image);
+              imagedestroy($image);
 
               // Проверка ширины изображения на соответствие ограничениям
-              if ($file_image_width <= $system_core->configurator->get_upload_file_image_width_max() || $system_core->configurator->get_upload_file_image_width_max() == 0) {
+              if ($imageWidth <= $CMSCore->configurator->get_upload_file_image_width_max() || $CMSCore->configurator->get_upload_file_image_width_max() === 0) {
                 // Проверка высоты изображения на соответствие ограничениям
-                if ($file_image_height <= $system_core->configurator->get_upload_file_image_height_max() || $system_core->configurator->get_upload_file_image_height_max() == 0) {
+                if ($imageHeight <= $CMSCore->configurator->get_upload_file_image_height_max() || $CMSCore->configurator->get_upload_file_image_height_max() === 0) {
                   
-                  if ($system_core->configurator->get_auto_convert_file_image_status(true)) {
-                    $file_converted_extension_enum = match ($system_core->configurator->get_auto_convert_file_image_extension()) {
+                  if ($CMSCore->configurator->get_auto_convert_file_image_status(true)) {
+                    $fileExtensionConvertedEnum = match ($CMSCore->configurator->get_auto_convert_file_image_extension()) {
                       'webp' => EnumFileFormat::WEBP,
                       'avif' => EnumFileFormat::AVIF
                     };
                   } else {
-                    $file_converted_extension_enum = $file_extension_enum;
+                    $fileExtensionConvertedEnum = $fileExtensionEnum;
                   }
                   
                   /** @var FileConverter Объект-конвектор файлов */
-                  $file_converter = new FileConverter($system_core);
+                  $fileConverter = new FileConverter($CMSCore);
                   /** @var array Конвертированный файл */
-                  $file_converted = $file_converter->convert($_FILES['mediaFile'], $file_uploaded_folder_path, $file_converted_extension_enum, true);
+                  $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true);
                   
                   /** @var array Данные конвертированного файла */
-                  $file_data = [];
+                  $fileData = [];
                   // URL до конвертированного файла
-                  $file_data['url'] = sprintf('/uploads/media/%s', $file_converted['file_name']);
+                  $fileData['url'] = '/uploads/media/' . $fileConverted['file_name'];
                   // Полное наименование конвертированного файла
-                  $file_data['fullname'] = $file_converted['file_name'];
+                  $fileData['fullname'] = $fileConverted['file_name'];
 
                   // Передача данных о загруженном файле в глобальную переменную обработчика
-                  $handler_output_data['file'] = $file_data;
+                  $handlerOutputData['file'] = $fileData;
 
-                  if (is_array($file_converted)) {
-                    $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_POST_FILES_SUCCESS') : $handler_message;
-                    $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+                  if (is_array($fileConverted)) {
+                    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_POST_FILES_SUCCESS');
+                    $handlerStatusCode = $handlerStatusCode ?? 1;
                   } else {
-                    $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN')) : $handler_message;
-                    $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+                    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+                    $handlerStatusCode = $handlerStatusCode ?? 0;
                   }
                 } else {
-                  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', sprintf($system_core->locale->get_single_value_by_key('API_FILE_ERROR_TOO_HEIGHT_IMAGE'), $system_core->configurator->get_upload_file_image_height_max())) : $handler_message;
-                  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->get_single_value_by_key('API_FILE_ERROR_TOO_HEIGHT_IMAGE'), $CMSCore->configurator->get_upload_file_image_height_max());
+                  $handlerStatusCode = $handlerStatusCode ?? 0;
                 }
               } else {
-                $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', sprintf($system_core->locale->get_single_value_by_key('API_FILE_ERROR_TOO_WIDTH_IMAGE'), $system_core->configurator->get_upload_file_image_width_max())) : $handler_message;
-                $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->get_single_value_by_key('API_FILE_ERROR_TOO_WIDTH_IMAGE'), $CMSCore->configurator->get_upload_file_image_width_max());
+                $handlerStatusCode = $handlerStatusCode ?? 0;
               }
             }
           } else {
-            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', sprintf($system_core->locale->get_single_value_by_key('API_FILE_ERROR_HEAVY_FILE'), $system_core->configurator->get_upload_file_weight_max())) : $handler_message;
-            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+            $handlerMessage = $handlerMessage ?? sprintf('API ERROR: %s', sprintf($CMSCore->locale->get_single_value_by_key('API_FILE_ERROR_HEAVY_FILE'), $CMSCore->configurator->get_upload_file_weight_max()));
+            $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
-          $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_FILE_ERROR_INVALID_EXTENSION')) : $handler_message;
-          $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+          $handlerMessage = $handlerMessage ?? sprintf('API ERROR: %s', $CMSCore->locale->get_single_value_by_key('API_FILE_ERROR_INVALID_EXTENSION'));
+          $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_FILE_ERROR_DIRECTORY_NOT_FOUND')) : $handler_message;
-        $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+        $handlerMessage = $handlerMessage ?? sprintf('API ERROR: %s', $CMSCore->locale->get_single_value_by_key('API_FILE_ERROR_DIRECTORY_NOT_FOUND'));
+        $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
-      $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN')) : $handler_message;
-      $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+      $handlerMessage = $handlerMessage ?? sprintf('API ERROR: %s', $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN'));
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS'));
-    $handler_status_code = 0;
+    $handlerMessage = sprintf('API ERROR: %s', $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS'));
+    $handlerStatusCode = 0;
   }
 } else {
   http_response_code(401);
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? sprintf('API ERROR: %s', $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION'));
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
 
 ?>

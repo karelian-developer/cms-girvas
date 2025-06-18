@@ -25,10 +25,10 @@ namespace core\PHPLibrary\Page\Admin {
 
     const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_NAVIGATION_%s_LABEL';
 
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Page $page;
     public string $assembled = '';
-    public array $navigation_subsections_array = [
+    public array $navigationSubsections = [
       'index' => [
         'name' => 'index',
         'iconName' => 'index',
@@ -66,8 +66,8 @@ namespace core\PHPLibrary\Page\Admin {
       ]
     ];
 
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
     }
 
@@ -77,79 +77,80 @@ namespace core\PHPLibrary\Page\Admin {
      * @return void
      */
     public function init_subnavigation() : void {
-      $template_source =& $this->system_core->template->core->source;
-      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
+      $themeSource =& $this->CMSCore->theme->core->source;
+      $this->init_admin_panel_subnavigation($this->CMSCore, $themeSource);
     }
 
     public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page/entriesComments.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/entriesComments.css', 'rel' => 'stylesheet']);
       
-      $locale_data = $this->system_core->locale->get_data();
+      $localeData = $this->CMSCore->locale->get_data();
+      $localeName = $this->CMSCore->locale->get_name();
 
-      $pagination_item_current = (!is_null($this->system_core->urlp->get_param('pageNumber'))) ? (int)$this->system_core->urlp->get_param('pageNumber') : 0;
-      $pagination_items_on_page = 12;
+      $paginationItemCurrent = (!is_null($this->CMSCore->urlp->get_param('pageNumber'))) ? (int)$this->CMSCore->urlp->get_param('pageNumber') : 0;
+      $$paginationItemsOnPage = 12;
 
-      $entries_instance = new Entries($this->system_core);
-      $entries_array = $entries_instance->get_all();
+      $entries = new Entries($this->CMSCore);
+      $entriesObjects = $entries->get_all();
       
-      $entries_comments_array = [];
-      if (!empty($entries_array)) {
-        foreach ($entries_array as $entry) {
-          $entry_comments = $entry->get_comments();
-          if (!empty($entry_comments)) {
-            foreach ($entry_comments as $comment) {
-              $comment->init_data(['content', 'created_unix_timestamp', 'updated_unix_timestamp', 'metadata']);
-              array_push($entries_comments_array, $comment);
+      $entriesCommentsObjectsSorted = [];
+      if (!empty($entriesObjects)) {
+        foreach ($entriesObjects as $entry) {
+          $entryCommentsObjects = $entry->get_comments();
+          if (!empty($entryCommentsObjects)) {
+            foreach ($entryCommentsObjects as $object) {
+              $object->init_data(['content', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
+              array_push($entriesCommentsObjectsSorted, $object);
             }
           }
         }
       }
 
-      if (!empty($entries_comments_array)) {
-        usort($entries_comments_array, function ($a, $b) {
-          $a_created_unix_timestamp = $a->get_created_unix_timestamp();
-          $b_created_unix_timestamp = $b->get_created_unix_timestamp();
+      if (!empty($entriesCommentsObjectsSorted)) {
+        usort($entriesCommentsObjectsSorted, function ($a, $b) {
+          $aCreatedUnixTimestamp = $a->get_created_unix_timestamp();
+          $bCreatedUnixTimestamp = $b->get_created_unix_timestamp();
 
-          if ($a_created_unix_timestamp != $b_created_unix_timestamp) {
-            return ($a_created_unix_timestamp > $b_created_unix_timestamp) ? -1 : 1;
+          if ($aCreatedUnixTimestamp !== $bCreatedUnixTimestamp) {
+            return $aCreatedUnixTimestamp > $bCreatedUnixTimestamp ? -1 : 1;
           }
 
           return 0;
         });
 
-        $entries_comments_array = array_slice($entries_comments_array, $pagination_item_current * $pagination_items_on_page, $pagination_items_on_page);
+        $entriesCommentsObjectsSorted = array_slice($entriesCommentsObjectsSorted, $paginationItemCurrent * $$paginationItemsOnPage, $$paginationItemsOnPage);
       }
 
-      $pagination = new Pagination($this->system_core, count($entries_comments_array), $pagination_items_on_page, $pagination_item_current);
+      $pagination = new Pagination($this->CMSCore, count($entriesCommentsObjectsSorted), $$paginationItemsOnPage, $paginationItemCurrent);
       $pagination->assembly();
       
-      $comments_table_items_assembled = [];
-      if (!empty($entries_comments_array)) {
-        foreach ($entries_comments_array as $comment_index => $comment) {
-          $created_date_timestamp = date('d.m.Y H:i:s', $comment->get_created_unix_timestamp());
-          $updated_date_timestamp = date('d.m.Y H:i:s', $comment->get_updated_unix_timestamp());
+      $commentsTableItemsAssembled = [];
+      if (!empty($entriesCommentsObjectsSorted)) {
+        foreach ($entriesCommentsObjectsSorted as $index => $object) {
+          $createdDateTimestamp = date('d.m.Y H:i:s', $object->get_created_unix_timestamp());
+          $updatedDateTimestamp = date('d.m.Y H:i:s', $object->get_updated_unix_timestamp());
 
-          array_push($comments_table_items_assembled, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entriesComments/tableItem.tpl', [
-            'COMMENT_ID' => $comment->get_id(),
-            'COMMENT_IS_HIDDEN_STATUS' => ($comment->is_hidden()) ? 'true' : 'false',
-            'COMMENT_HIDDEN_REASON' => strip_tags($comment->get_hidden_reason()),
-            'COMMENT_INDEX' => $comment_index + 1,
-            'COMMENT_CONTENT' => strip_tags($comment->get_content()),
-            'COMMENT_CREATED_DATE_TIMESTAMP' => $created_date_timestamp,
-            'COMMENT_UPDATED_DATE_TIMESTAMP' => $updated_date_timestamp
+          array_push($commentsTableItemsAssembled, TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entriesComments/tableItem.tpl', [
+            'COMMENT_ID' => $object->get_id(),
+            'COMMENT_IS_HIDDEN_STATUS' => ($object->is_hidden()) ? 'true' : 'false',
+            'COMMENT_HIDDEN_REASON' => strip_tags($object->get_hidden_reason()),
+            'COMMENT_INDEX' => $index + 1,
+            'COMMENT_CONTENT' => strip_tags($object->get_content()),
+            'COMMENT_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
+            'COMMENT_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp
           ]));
         }
       }
 
-      $template_comments_table = (!empty($entries_array)) ? TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entriesComments/table.tpl', [
-        'ADMIN_PANEL_COMMENTS_TABLE_ITEMS' => implode($comments_table_items_assembled)
-      ]) : $locale_data['PAGE_ENTRIES_COMMENTS_NOT_FOUND_LABEL'];
+      $templateCommentsTable = (!empty($entriesObjects)) ? TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entriesComments/table.tpl', [
+        'ADMIN_PANEL_COMMENTS_TABLE_ITEMS' => implode($commentsTableItemsAssembled)
+      ]) : $localeData['PAGE_ENTRIES_COMMENTS_NOT_FOUND_LABEL'];
 
       /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entriesComments.tpl', [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entriesComments.tpl', [
         'PAGE_ENTRIES_COMMENTS_PAGINATION' => $pagination->assembled,
         'ADMIN_PANEL_PAGE_NAME' => 'comments',
-        'ADMIN_PANEL_COMMENTS_TABLE' => $template_comments_table
+        'ADMIN_PANEL_COMMENTS_TABLE' => $templateCommentsTable
       ]);
     }
 

@@ -13,42 +13,42 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-if ($system_core->client->is_logged(2) && $system_core->urlp->get_path(2) == 'secret-codes') {
-  $client_user = $system_core->client->get_user(2);
-  $client_user->init_data(['metadata']);
-  $client_user_group = $client_user->get_group();
-  $client_user_group->init_data(['permissions']);
+if ($CMSCore->client->is_logged(2) && $CMSCore->urlp->get_path(2) === 'secret-codes') {
+  $clientUser = $CMSCore->client->get_user(2);
+  $clientUser->init_data(['metadata']);
+  $clientUserGroup = $clientUser->get_group();
+  $clientUserGroup->init_data(['permissions']);
 
-  if ($client_user_group->permission_check($client_user_group::PERMISSION_ADMIN_SETTINGS_MANAGEMENT)) {
+  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT)) {
     $chars = 'qwertyuiopasdfghjklzxcvbnm123456789';
 
-    for ($code_index = 0; $code_index < 4; $code_index++) {
-      $code_chars_array = [];
-      for ($char_index = 0; $char_index < 4; $char_index++) {
-        array_push($code_chars_array, $chars[rand(0, strlen($chars) - 1)]);
+    for ($codeIndex = 0; $codeIndex < 4; $codeIndex++) {
+      $codeChars = [];
+      for ($charIndex = 0; $charIndex < 4; $charIndex++) {
+        array_push($codeChars, $chars[rand(0, strlen($chars) - 1)]);
       }
 
-      switch ($code_index) {
-        case 0: $code_char = 'a'; break;
-        case 1: $code_char = 'b'; break;
-        case 2: $code_char = 'c'; break;
-        case 3: $code_char = 'd'; break;
+      switch ($codeIndex) {
+        case 0: $codeChar = 'a'; break;
+        case 1: $codeChar = 'b'; break;
+        case 2: $codeChar = 'c'; break;
+        case 3: $codeChar = 'd'; break;
       }
 
-      $system_core->configurator->update_database_entry_value(
-        sprintf('security_admin_code_%s', $code_char),
-        password_hash(implode($code_chars_array), PASSWORD_ARGON2ID)
+      $CMSCore->configurator->update_database_entry_value(
+        'security_admin_code_' . $codeChar,
+        password_hash(implode($codeChars), PASSWORD_ARGON2ID)
       );
 
-      unset($code_chars_array);
+      unset($codeChars);
     }
 
-    $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_UTILS_SECRET_CODES_GENERATED_SUCCESS') : $handler_message;
-    $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_UTILS_SECRET_CODES_GENERATED_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 } else {
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
 
 ?>

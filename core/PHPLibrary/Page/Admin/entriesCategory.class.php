@@ -22,10 +22,10 @@ namespace core\PHPLibrary\Page\Admin {
 
     const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_CATEGORY_NAVIGATION_%s_LABEL';
 
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Page $page;
     public string $assembled = '';
-    public array $navigation_subsections_array = [
+    public array $navigationSubsections = [
       'back' => [
         'name' => 'back',
         'iconName' => 'back',
@@ -35,8 +35,8 @@ namespace core\PHPLibrary\Page\Admin {
       ],
     ];
 
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
     }
 
@@ -46,34 +46,35 @@ namespace core\PHPLibrary\Page\Admin {
      * @return void
      */
     public function init_subnavigation() : void {
-      $template_source =& $this->system_core->template->core->source;
-      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
+      $themeSource =& $this->CMSCore->theme->core->source;
+      $this->init_admin_panel_subnavigation($this->CMSCore, $themeSource);
     }
 
     public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page/entriesCategory.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/entriesCategory.css', 'rel' => 'stylesheet']);
       
-      $locale_data = $this->system_core->locale->get_data();
+      $localeData = $this->CMSCore->locale->get_data();
+      $localeName = $this->CMSCore->locale->get_name();
 
-      $entries_category = null;
-      if (!is_null($this->system_core->urlp->get_path(2))) {
-        $entries_category_id = (is_numeric($this->system_core->urlp->get_path(2))) ? (int)$this->system_core->urlp->get_path(2) : 0;
-        $entries_category = (EntryCategory::exists_by_id($this->system_core, $entries_category_id)) ? new EntryCategory($this->system_core, $entries_category_id) : null;
+      $entriesCategory = null;
+      if (!is_null($this->CMSCore->urlp->get_path(2))) {
+        $entriesCategoryID = (is_numeric($this->CMSCore->urlp->get_path(2))) ? (int)$this->CMSCore->urlp->get_path(2) : 0;
+        $entriesCategory = (EntryCategory::exists_by_id($this->CMSCore, $entriesCategoryID)) ? new EntryCategory($this->CMSCore, $entriesCategoryID) : null;
         
-        if (!is_null($entries_category)) {
-          $entries_category->init_data(['id', 'texts', 'name', 'parent_id', 'metadata']);
+        if (!is_null($entriesCategory)) {
+          $entriesCategory->init_data(['id', 'texts', 'name', 'parentID', 'metadata']);
         }
       }
       
       /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entriesCategory.tpl', [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entriesCategory.tpl', [
         'ADMIN_PANEL_PAGE_NAME' => 'entries-category',
-        'ENTRIES_CATEGORY_ID' => (!is_null($entries_category)) ? $entries_category->get_id() : 0,
-        'ENTRIES_CATEGORY_TITLE' => (!is_null($entries_category)) ? $entries_category->get_title() : '',
-        'ENTRIES_CATEGORY_DESCRIPTION' => (!is_null($entries_category)) ? $entries_category->get_description() : '',
-        'ENTRIES_CATEGORY_NAME' => (!is_null($entries_category)) ? $entries_category->get_name() : '',
-        'ENTRIES_CATEGORY_FORM_METHOD' => (!is_null($entries_category)) ? 'PATCH' : 'PUT',
-        'ENTRIES_CATEGORY_SHOW_ON_INDEX_PAGE' => (is_null($entries_category)) ? '' : (($entries_category->is_showed_on_index_page()) ? 'checked' : ''),
+        'ENTRIES_CATEGORY_ID' => !is_null($entriesCategory) ? $entriesCategory->get_id() : 0,
+        'ENTRIES_CATEGORY_TITLE' => !is_null($entriesCategory) ? $entriesCategory->get_title() : '',
+        'ENTRIES_CATEGORY_DESCRIPTION' => !is_null($entriesCategory) ? $entriesCategory->get_description() : '',
+        'ENTRIES_CATEGORY_NAME' => !is_null($entriesCategory) ? $entriesCategory->get_name() : '',
+        'ENTRIES_CATEGORY_FORM_METHOD' => !is_null($entriesCategory) ? 'PATCH' : 'PUT',
+        'ENTRIES_CATEGORY_SHOW_ON_INDEX_PAGE' => (is_null($entriesCategory)) ? '' : (($entriesCategory->is_showed_on_index_page()) ? 'checked' : ''),
       ]);
     }
 

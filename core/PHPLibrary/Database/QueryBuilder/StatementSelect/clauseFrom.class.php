@@ -31,11 +31,11 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect {
     /**
      * add_table
      *
-     * @param  mixed $table_name
+     * @param  mixed $name
      * @return void
      */
-    public function add_table(string $table_name, string $prefix = '') : void {
-      $this->tables[$table_name] = new Table($table_name, $prefix);
+    public function add_table(string $name, string $prefix = '') : void {
+      $this->tables[$name] = new Table($name, $prefix);
     }
     
     /**
@@ -44,30 +44,30 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect {
      * @return void
      */
     public function assembly() {
-      $query_array = [];
+      $queryArray = [];
 
-      $database_configurations = $this->statement->query_builder->system_core->configurator->get('database');
+      $databaseConfigurations = $this->statement->query_builder->system_core->configurator->get('database');
 
       foreach ($this->tables as $table) {
-        $table_fullname = '';
+        $tableFullname = '';
 
-        if (!is_null($database_configurations)) {
-          if ($database_configurations['scheme'] != '') {
-            $table_fullname .= sprintf('%s.', $database_configurations['scheme']);
+        if (!is_null($databaseConfigurations)) {
+          if ($databaseConfigurations['scheme'] != '') {
+            $tableFullname .= sprintf('%s.', $databaseConfigurations['scheme']);
           }
 
-          if ($database_configurations['prefix'] != '' || $table->get_prefix() != '') {
-            $table_prefix = ($table->get_prefix() == '') ? $database_configurations['prefix'] : $table->get_prefix();
-            $table_fullname .= sprintf('%s_', $table_prefix);
+          if ($databaseConfigurations['prefix'] != '' || $table->get_prefix() != '') {
+            $tablePrefix = ($table->get_prefix() == '') ? $databaseConfigurations['prefix'] : $table->get_prefix();
+            $tableFullname .= sprintf('%s_', $tablePrefix);
           }
         }
 
-        $table_fullname .= $table->get_name();
-        array_push($query_array, $table_fullname);
+        $tableFullname .= $table->get_name();
+        array_push($queryArray, $tableFullname);
       }
 
       if (count($this->tables) > 0) {
-        $this->assembled = sprintf('FROM %s', implode(', ', $query_array));
+        $this->assembled = sprintf('FROM %s', implode(', ', $queryArray));
       } else {
         $this->assembled =  '';
       }

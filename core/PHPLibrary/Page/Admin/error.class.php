@@ -17,44 +17,45 @@ namespace core\PHPLibrary\Page\Admin {
   use \core\PHPLibrary\Template\Collector as TemplateCollector;
 
   class PageError implements InterfacePage {
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Page $page;
     public string $assembled = '';
-    public int $error_code;
-    private string $error_title;
-    private string $error_desription;
+    public int $errorCode;
+    private string $errorTitle;
+    private string $errorDescription;
     
     /**
      * __construct
      *
-     * @param  SystemCore $system_core
+     * @param  SystemCore $CMSCore
      * @param  Page $page
-     * @param  int $error_code
+     * @param  int $errorCode
      * @return void
      */
-    public function __construct(SystemCore $system_core, Page $page, int $error_code) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page, int $errorCode) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
-      $this->error_code = $error_code;
+      $this->errorCode = $errorCode;
 
-      $locale_data = $this->system_core->locale->get_data();
+      $localeData = $this->CMSCore->locale->get_data();
+      $localeName = $this->CMSCore->locale->get_name();
 
-      switch ($error_code) {
+      switch ($errorCode) {
         case 404:
-          $this->error_title = $locale_data['PAGE_ERROR_404_TITLE'];
-          $this->error_desription = sprintf($locale_data['PAGE_ERROR_404_DESCRIPTION'], strip_tags(urldecode($_SERVER['REQUEST_URI'])));
+          $this->errorTitle = $localeData['PAGE_ERROR_404_TITLE'];
+          $this->errorDescription = sprintf($localeData['PAGE_ERROR_404_DESCRIPTION'], strip_tags(urldecode($_SERVER['REQUEST_URI'])));
           break;
         case 500:
-          $this->error_title = $locale_data['PAGE_ERROR_500_TITLE'];
-          $this->error_desription = $locale_data['PAGE_ERROR_500_DESCRIPTION'];
+          $this->errorTitle = $localeData['PAGE_ERROR_500_TITLE'];
+          $this->errorDescription = $localeData['PAGE_ERROR_500_DESCRIPTION'];
           break;
         case 503:
-          $this->error_title = $locale_data['PAGE_ERROR_503_TITLE'];
-          $this->error_desription = $locale_data['PAGE_ERROR_503_DESCRIPTION'];
+          $this->errorTitle = $localeData['PAGE_ERROR_503_TITLE'];
+          $this->errorDescription = $localeData['PAGE_ERROR_503_DESCRIPTION'];
           break;
         default:
-          $this->error_title = $locale_data['PAGE_ERROR_UNKNOWN_TITLE'];
-          $this->error_desription = $locale_data['PAGE_ERROR_UNKNOWN_DESCRIPTION'];
+          $this->errorTitle = $localeData['PAGE_ERROR_UNKNOWN_TITLE'];
+          $this->errorDescription = $localeData['PAGE_ERROR_UNKNOWN_DESCRIPTION'];
       }
 
     }
@@ -65,15 +66,15 @@ namespace core\PHPLibrary\Page\Admin {
      * @return void
      */
     public function assembly() : void {
-      http_response_code($this->error_code);
+      http_response_code($this->errorCode);
 
-      $this->system_core->template->add_style(['href' => 'styles/page/error.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/error.css', 'rel' => 'stylesheet']);
 
-      $this->system_core->configurator->set_meta_title($this->error_title);
+      $this->CMSCore->configurator->set_meta_title($this->errorTitle);
 
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/error.tpl', [
-        'ERROR_TITLE' => $this->error_title,
-        'ERROR_DESCRIPTION' => $this->error_desription
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/error.tpl', [
+        'ERROR_TITLE' => $this->errorTitle,
+        'ERROR_DESCRIPTION' => $this->errorDescription
       ]);
     }
 

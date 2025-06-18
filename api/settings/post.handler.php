@@ -13,334 +13,334 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-if ($system_core->client->is_logged(2)) {
-  $client_user = $system_core->client->get_user(2);
-  $client_user->init_data(['metadata']);
-  $client_user_group = $client_user->get_group();
-  $client_user_group->init_data(['permissions']);
+if ($CMSCore->client->is_logged(2)) {
+  $clientUser = $CMSCore->client->get_user(2);
+  $clientUser->init_data(['metadata']);
+  $clientUserGroup = $clientUser->get_group();
+  $clientUserGroup->init_data(['permissions']);
 
-  if ($client_user_group->permission_check($client_user_group::PERMISSION_ADMIN_SETTINGS_MANAGEMENT)) {
+  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT)) {
     if (!empty($_POST)) {
 
       /** @var int Количество пользовательских полей для пользователей */
-      $users_additional_fields_count = 0;
+      $usersAdditionalFieldsCount = 0;
       /** @var int Количество пользовательских полей для записей */
-      $entries_additional_fields_count = 0;
+      $entriesAdditionalFieldsCount = 0;
       /** @var int Количество пользовательских полей для статических страниц */
-      $static_pages_additional_fields_count = 0;
+      $staticPagesAdditionalFieldsCount = 0;
       /** @var bool Статус обнаружения ошибок */
-      $error_is_detected = false;
+      $errorIsDetected = false;
 
-      if (!$error_is_detected) {
+      if (!$errorIsDetected) {
         if (isset($_POST['setting_users_login_length_min']) && isset($_POST['setting_users_login_length_max'])) {
-          $setting_users_login_length_min = (is_numeric($_POST['setting_users_login_length_min'])) ? (int)$_POST['setting_users_login_length_min'] : 0;
-          $setting_users_login_length_max = (is_numeric($_POST['setting_users_login_length_max'])) ? (int)$_POST['setting_users_login_length_max'] : 0;
+          $settingUsersLoginLengthMin = (is_numeric($_POST['setting_users_login_length_min'])) ? (int)$_POST['setting_users_login_length_min'] : 0;
+          $settingUsersLoginLengthMax = (is_numeric($_POST['setting_users_login_length_max'])) ? (int)$_POST['setting_users_login_length_max'] : 0;
 
-          if ($setting_users_login_length_max < 0 && !$error_is_detected) {
-            $error_is_detected = true;
+          if ($settingUsersLoginLengthMax < 0 && !$errorIsDetected) {
+            $errorIsDetected = true;
 
-            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_USERS_LOGIN_LENGTH_MAX_TOO_SMALL')) : $handler_message;
-            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_USERS_LOGIN_LENGTH_MAX_TOO_SMALL');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
           }
 
-          if ($setting_users_login_length_max > 0 && !$error_is_detected) {
-            if ($setting_users_login_length_max < $setting_users_login_length_min) {
-              $error_is_detected = true;
+          if ($settingUsersLoginLengthMax > 0 && !$errorIsDetected) {
+            if ($settingUsersLoginLengthMax < $settingUsersLoginLengthMin) {
+              $errorIsDetected = true;
 
-              $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_USERS_LOGIN_LENGTH_MIN_LARGE_MAX')) : $handler_message;
-              $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_USERS_LOGIN_LENGTH_MIN_LARGE_MAX');
+              $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           }
 
-          if ($setting_users_login_length_min < 4 && !$error_is_detected) {
-            $error_is_detected = true;
+          if ($settingUsersLoginLengthMin < 4 && !$errorIsDetected) {
+            $errorIsDetected = true;
 
-            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_USERS_LOGIN_LENGTH_MIN_TOO_SMALL')) : $handler_message;
-            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_USERS_LOGIN_LENGTH_MIN_TOO_SMALL');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         }
       }
 
-      if (!$error_is_detected) {
+      if (!$errorIsDetected) {
         if (isset($_POST['setting_users_password_length_min']) && isset($_POST['setting_users_password_length_max'])) {
-          $setting_users_password_length_min = (is_numeric($_POST['setting_users_password_length_min'])) ? (int)$_POST['setting_users_password_length_min'] : 0;
-          $setting_users_password_length_max = (is_numeric($_POST['setting_users_password_length_max'])) ? (int)$_POST['setting_users_password_length_max'] : 0;
+          $settingUsersPasswordLengthMin = (is_numeric($_POST['setting_users_password_length_min'])) ? (int)$_POST['setting_users_password_length_min'] : 0;
+          $settingUsersPasswordLengthMax = (is_numeric($_POST['setting_users_password_length_max'])) ? (int)$_POST['setting_users_password_length_max'] : 0;
 
-          if ($setting_users_password_length_max < 0 && !$error_is_detected) {
-            $error_is_detected = true;
+          if ($settingUsersPasswordLengthMax < 0 && !$errorIsDetected) {
+            $errorIsDetected = true;
 
-            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_USERS_PASSWORD_LENGTH_MAX_TOO_SMALL')) : $handler_message;
-            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_USERS_PASSWORD_LENGTH_MAX_TOO_SMALL');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
           }
 
-          if ($setting_users_password_length_max > 0 && !$error_is_detected) {
-            if ($setting_users_password_length_max < $setting_users_password_length_min) {
-              $error_is_detected = true;
+          if ($settingUsersPasswordLengthMax > 0 && !$errorIsDetected) {
+            if ($settingUsersPasswordLengthMax < $settingUsersPasswordLengthMin) {
+              $errorIsDetected = true;
 
-              $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_USERS_PASSWORD_LENGTH_MIN_LARGE_MAX')) : $handler_message;
-              $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_USERS_PASSWORD_LENGTH_MIN_LARGE_MAX');
+              $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           }
 
-          if ($setting_users_password_length_min < 6 && !$error_is_detected) {
-            $error_is_detected = true;
+          if ($settingUsersPasswordLengthMin < 6 && !$errorIsDetected) {
+            $errorIsDetected = true;
 
-            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_USERS_PASSWORD_LENGTH_MIN_TOO_SMALL')) : $handler_message;
-            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_USERS_PASSWORD_LENGTH_MIN_TOO_SMALL');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         }
       }
       
-      if (!$error_is_detected) {
-        foreach ($_POST as $setting_name => $setting_value) {
-          if (preg_match('/^setting_([a-z0-9_]+)$/', $setting_name, $matches, PREG_OFFSET_CAPTURE)) {
-            $setting_name = $matches[1][0];
+      if (!$errorIsDetected) {
+        foreach ($_POST as $settingName => $settingValue) {
+          if (preg_match('/^setting_([a-z0-9_]+)$/', $settingName, $matches, PREG_OFFSET_CAPTURE)) {
+            $settingName = $matches[1][0];
 
-            if ($setting_name == 'seo_robots_txt') {
-              $file_robots_txt_path = sprintf('%s/robots.txt', CMS_ROOT_DIRECTORY);
+            if ($settingName == 'seo_robots_txt') {
+              $fileRobotsTXTPath = CMS_ROOT_DIRECTORY . '/robots.txt';
 
               try {
-                $file_robots_txt = @fopen($file_robots_txt_path, 'w+');
-                if ($file_robots_txt === false) {
-                  $exception_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED'));
-                  throw new Exception($exception_message);
+                $fileRobotsTXT = @fopen($fileRobotsTXTPath, 'w+');
+                if ($fileRobotsTXT === false) {
+                  $exceptionMessage = 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED');
+                  throw new Exception($exceptionMessage);
                 }
 
-                fwrite($file_robots_txt, $setting_value);
-                fclose($file_robots_txt);
-                chmod($file_robots_txt_path, 0664);
+                fwrite($fileRobotsTXT, $settingValue);
+                fclose($fileRobotsTXT);
+                chmod($fileRobotsTXTPath, 0664);
               } catch (Exception $exception) {
-                $exception_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED'));
-                $handler_message = (!isset($handler_message)) ? $exception_message : $handler_message;
-                $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+                $exceptionMessage = 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED');
+                $handlerMessage = $handlerMessage ?? $exceptionMessage;
+                $handlerStatusCode = $handlerStatusCode ?? 0;
               }
 
               continue;
             }
 
-            if ($setting_name == 'users_additional_field_title' && isset($_POST['_users_additional_fields_locale'])) {
-              if ($system_core->configurator->exists_database_entry_value($setting_name)) {
-                $fields_titles = json_decode($system_core->configurator->get_database_entry_value($setting_name), true);
+            if ($settingName === 'users_additional_field_title' && isset($_POST['_users_additional_fields_locale'])) {
+              if ($CMSCore->configurator->exists_database_entry_value($settingName)) {
+                $fieldsTitles = json_decode($CMSCore->configurator->get_database_entry_value($settingName), true);
                 
-                foreach ($setting_value as $key => $value) {
-                  $fields_titles[$_POST['_users_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                foreach ($settingValue as $key => $value) {
+                  $fieldsTitles[$_POST['_users_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
                 }
 
-                $setting_value = $fields_titles;
+                $settingValue = $fieldsTitles;
               } else {
-                $fields_titles = [];
-                foreach ($setting_value as $key => $value) {
-                  $fields_titles[$_POST['_users_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                $fieldsTitles = [];
+                foreach ($settingValue as $key => $value) {
+                  $fieldsTitles[$_POST['_users_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
                 }
 
-                $setting_value = $fields_titles;
+                $settingValue = $fieldsTitles;
               }
 
-              $users_additional_fields_count += 1;
+              $usersAdditionalFieldsCount += 1;
             }
 
-            if ($setting_name == 'users_additional_field_description' && isset($_POST['_users_additional_fields_locale'])) {
-              if ($system_core->configurator->exists_database_entry_value($setting_name)) {
-                $fields_descriptions = json_decode($system_core->configurator->get_database_entry_value($setting_name), true);
+            if ($settingName === 'users_additional_field_description' && isset($_POST['_users_additional_fields_locale'])) {
+              if ($CMSCore->configurator->exists_database_entry_value($settingName)) {
+                $fieldsDescriptions = json_decode($CMSCore->configurator->get_database_entry_value($settingName), true);
                 
-                foreach ($setting_value as $key => $value) {
-                  $fields_descriptions[$_POST['_users_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                foreach ($settingValue as $key => $value) {
+                  $fieldsDescriptions[$_POST['_users_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
                 }
 
-                $setting_value = $fields_descriptions;
+                $settingValue = $fieldsDescriptions;
               } else {
-                $fields_descriptions = [];
-                foreach ($setting_value as $key => $value) {
-                  $fields_descriptions[$_POST['_users_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                $fieldsDescriptions = [];
+                foreach ($settingValue as $key => $value) {
+                  $fieldsDescriptions[$_POST['_users_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
                 }
                 
-                $setting_value = $fields_descriptions;
+                $settingValue = $fieldsDescriptions;
               }
 
-              $users_additional_fields_count += 1;
+              $usersAdditionalFieldsCount += 1;
             }
 
-            if ($setting_name == 'users_additional_field_type' || $setting_name == 'users_additional_field_name') {
-              foreach ($setting_value as $key => $value) {
-                $setting_value[$key] = htmlspecialchars(str_replace('\'', '"', $value));
+            if ($settingName === 'users_additional_field_type' || $settingName === 'users_additional_field_name') {
+              foreach ($settingValue as $key => $value) {
+                $settingValue[$key] = htmlspecialchars(str_replace('\'', '"', $value));
               }
             }
 
-            if ($setting_name == 'entries_additional_field_title' && isset($_POST['_entries_additional_fields_locale'])) {
-              if ($system_core->configurator->exists_database_entry_value($setting_name)) {
-                $fields_titles = json_decode($system_core->configurator->get_database_entry_value($setting_name), true);
+            if ($settingName == 'entries_additional_field_title' && isset($_POST['_entries_additional_fields_locale'])) {
+              if ($CMSCore->configurator->exists_database_entry_value($settingName)) {
+                $fieldsTitles = json_decode($CMSCore->configurator->get_database_entry_value($settingName), true);
                 
-                foreach ($setting_value as $key => $value) {
-                  $fields_titles[$_POST['_entries_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                foreach ($settingValue as $key => $value) {
+                  $fieldsTitles[$_POST['_entries_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
                 }
 
-                $setting_value = $fields_titles;
+                $settingValue = $fieldsTitles;
               } else {
-                $fields_titles = [];
-                foreach ($setting_value as $key => $value) {
-                  $fields_titles[$_POST['_entries_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                $fieldsTitles = [];
+                foreach ($settingValue as $key => $value) {
+                  $fieldsTitles[$_POST['_entries_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
                 }
 
-                $setting_value = $fields_titles;
+                $settingValue = $fieldsTitles;
               }
 
-              $entries_additional_fields_count += 1;
+              $entriesAdditionalFieldsCount += 1;
             }
 
-            if ($setting_name == 'entries_additional_field_description' && isset($_POST['_entries_additional_fields_locale'])) {
-              if ($system_core->configurator->exists_database_entry_value($setting_name)) {
-                $fields_descriptions = json_decode($system_core->configurator->get_database_entry_value($setting_name), true);
+            if ($settingName == 'entries_additional_field_description' && isset($_POST['_entries_additional_fields_locale'])) {
+              if ($CMSCore->configurator->exists_database_entry_value($settingName)) {
+                $fieldsDescriptions = json_decode($CMSCore->configurator->get_database_entry_value($settingName), true);
                 
-                foreach ($setting_value as $key => $value) {
-                  $fields_descriptions[$_POST['_entries_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                foreach ($settingValue as $key => $value) {
+                  $fieldsDescriptions[$_POST['_entries_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
                 }
 
-                $setting_value = $fields_descriptions;
+                $settingValue = $fieldsDescriptions;
               } else {
-                $fields_descriptions = [];
-                foreach ($setting_value as $key => $value) {
-                  $fields_descriptions[$_POST['_entries_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                $fieldsDescriptions = [];
+                foreach ($settingValue as $key => $value) {
+                  $fieldsDescriptions[$_POST['_entries_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
                 }
                 
-                $setting_value = $fields_descriptions;
+                $settingValue = $fieldsDescriptions;
               }
 
-              $entries_additional_fields_count += 1;
+              $entriesAdditionalFieldsCount += 1;
             }
 
-            if ($setting_name == 'entries_additional_field_type' || $setting_name == 'entries_additional_field_name') {
-              foreach ($setting_value as $key => $value) {
-                $setting_value[$key] = htmlspecialchars(str_replace('\'', '"', $value));
+            if ($settingName === 'entries_additional_field_type' || $settingName === 'entries_additional_field_name') {
+              foreach ($settingValue as $key => $value) {
+                $settingValue[$key] = htmlspecialchars(str_replace('\'', '"', $value));
               }
             }
 
-            if ($setting_name == 'static_pages_additional_field_title' && isset($_POST['_static_pages_additional_fields_locale'])) {
-              if ($system_core->configurator->exists_database_entry_value($setting_name)) {
-                $fields_titles = json_decode($system_core->configurator->get_database_entry_value($setting_name), true);
+            if ($settingName === 'static_pages_additional_field_title' && isset($_POST['_static_pages_additional_fields_locale'])) {
+              if ($CMSCore->configurator->exists_database_entry_value($settingName)) {
+                $fieldsTitles = json_decode($CMSCore->configurator->get_database_entry_value($settingName), true);
                 
-                foreach ($setting_value as $key => $value) {
-                  $fields_titles[$_POST['_static_pages_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                foreach ($settingValue as $key => $value) {
+                  $fieldsTitles[$_POST['_static_pages_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
                 }
 
-                $setting_value = $fields_titles;
+                $settingValue = $fieldsTitles;
               } else {
-                $fields_titles = [];
-                foreach ($setting_value as $key => $value) {
-                  $fields_titles[$_POST['_static_pages_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                $fieldsTitles = [];
+                foreach ($settingValue as $key => $value) {
+                  $fieldsTitles[$_POST['_static_pages_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
                 }
 
-                $setting_value = $fields_titles;
+                $settingValue = $fieldsTitles;
               }
 
-              $static_pages_additional_fields_count += 1;
+              $staticPagesAdditionalFieldsCount += 1;
             }
 
-            if ($setting_name == 'static_pages_additional_field_description' && isset($_POST['_static_pages_additional_fields_locale'])) {
-              if ($system_core->configurator->exists_database_entry_value($setting_name)) {
-                $fields_descriptions = json_decode($system_core->configurator->get_database_entry_value($setting_name), true);
+            if ($settingName === 'static_pages_additional_field_description' && isset($_POST['_static_pages_additional_fields_locale'])) {
+              if ($CMSCore->configurator->exists_database_entry_value($settingName)) {
+                $fieldsDescriptions = json_decode($CMSCore->configurator->get_database_entry_value($settingName), true);
                 
-                foreach ($setting_value as $key => $value) {
-                  $fields_descriptions[$_POST['_static_pages_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                foreach ($settingValue as $key => $value) {
+                  $fieldsDescriptions[$_POST['_static_pages_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
                 }
 
-                $setting_value = $fields_descriptions;
+                $settingValue = $fieldsDescriptions;
               } else {
-                $fields_descriptions = [];
-                foreach ($setting_value as $key => $value) {
-                  $fields_descriptions[$_POST['_static_pages_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
+                $fieldsDescriptions = [];
+                foreach ($settingValue as $key => $value) {
+                  $fieldsDescriptions[$_POST['_static_pages_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
                 }
                 
-                $setting_value = $fields_descriptions;
+                $settingValue = $fieldsDescriptions;
               }
 
-              $static_pages_additional_fields_count += 1;
+              $staticPagesAdditionalFieldsCount += 1;
             }
 
-            if ($setting_name == 'static_pages_additional_field_type' || $setting_name == 'static_pages_additional_field_name') {
-              foreach ($setting_value as $key => $value) {
-                $setting_value[$key] = htmlspecialchars(str_replace('\'', '"', $value));
+            if ($settingName === 'static_pages_additional_field_type' || $settingName === 'static_pages_additional_field_name') {
+              foreach ($settingValue as $key => $value) {
+                $settingValue[$key] = htmlspecialchars(str_replace('\'', '"', $value));
               }
             }
 
-            if ($setting_name == 'setting_static_pages_additional_field_category_id') {
-              foreach ($setting_value as $key => $value) {
+            if ($settingName === 'setting_static_pages_additional_field_category_id') {
+              foreach ($settingValue as $key => $value) {
                 if (is_numeric($value)) {
-                  $setting_value[$key] = ($value > 0) ? (int)$value : 1;
+                  $settingValue[$key] = ($value > 0) ? (int)$value : 1;
                 }
               }
             }
 
-            if (is_array($setting_value)) $setting_value = json_encode($setting_value);
+            if (is_array($settingValue)) $settingValue = json_encode($settingValue);
 
-            switch ($setting_name) {
-              case 'security_allowed_admin_ip': $setting_value = (!empty($setting_value)) ? json_encode(preg_split('/\s*\,\s*/', $setting_value)) : json_encode([]); break;
-              case 'security_allowed_emails': $setting_value = (!empty($setting_value)) ? json_encode(preg_split('/\s*\,\s*/', $setting_value)) : json_encode([]); break;
-              case 'seo_site_keywords': $setting_value = (!empty($setting_value)) ? json_encode(preg_split('/\s*\,\s*/', $setting_value)) : json_encode([]); break;
-              case 'security_premoderation_words_filter_list': $setting_value = (!empty($setting_value)) ? json_encode(preg_split('/\s*\,\s*/', $setting_value)) : json_encode([]); break;
-              case 'users_logins_blacklist': $setting_value = (!empty($setting_value)) ? json_encode(preg_split('/\s*\,\s*/', $setting_value)) : json_encode([]); break;
-              case 'users_additional_field_title': $setting_value = $setting_value; break;
-              case 'users_additional_field_description': $setting_value = $setting_value; break;
-              case 'users_additional_field_type': $setting_value = $setting_value; break;
-              case 'users_additional_field_name': $setting_value = $setting_value; break;
-              case 'entries_additional_field_title': $setting_value = $setting_value; break;
-              case 'entries_additional_field_description': $setting_value = $setting_value; break;
-              case 'entries_additional_field_type': $setting_value = $setting_value; break;
-              case 'entries_additional_field_category_id': $setting_value = $setting_value; break;
-              case 'entries_additional_field_name': $setting_value = $setting_value; break;
-              case 'static_pages_additional_field_title': $setting_value = $setting_value; break;
-              case 'static_pages_additional_field_description': $setting_value = $setting_value; break;
-              case 'static_pages_additional_field_type': $setting_value = $setting_value; break;
-              case 'static_pages_additional_field_name': $setting_value = $setting_value; break;
-              default: $setting_value = htmlspecialchars(str_replace('\'', '"', $setting_value));
-            }
+            $settingValue = match ($settingName) {
+              'security_allowed_admin_ip' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
+              'security_allowed_emails' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
+              'seo_site_keywords' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
+              'security_premoderation_words_filter_list' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
+              'users_logins_blacklist' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
+              'users_additional_field_title' => $settingValue,
+              'users_additional_field_description' => $settingValue,
+              'users_additional_field_type' => $settingValue,
+              'users_additional_field_name' => $settingValue,
+              'entries_additional_field_title' => $settingValue,
+              'entries_additional_field_description' => $settingValue,
+              'entries_additional_field_type' => $settingValue,
+              'entries_additional_field_category_id' => $settingValue,
+              'entries_additional_field_name' => $settingValue,
+              'static_pages_additional_field_title' => $settingValue,
+              'static_pages_additional_field_description' => $settingValue,
+              'static_pages_additional_field_type' => $settingValue,
+              'static_pages_additional_field_name' => $settingValue,
+              default => htmlspecialchars(str_replace('\'', '"', $settingValue))
+            };
 
-            if ($system_core->configurator->exists_database_entry_value($setting_name)) {
-              $system_core->configurator->update_database_entry_value($setting_name, $setting_value);
+            if ($CMSCore->configurator->exists_database_entry_value($settingName)) {
+              $CMSCore->configurator->update_database_entry_value($settingName, $settingValue);
             } else {
-              $system_core->configurator->insert_database_entry_value($setting_name, $setting_value);
+              $CMSCore->configurator->insert_database_entry_value($settingName, $settingValue);
             }
           }
         }
 
-        if ($users_additional_fields_count == 0 && isset($_POST['_users_additional_fields_locale'])) {
+        if ($usersAdditionalFieldsCount === 0 && isset($_POST['_users_additional_fields_locale'])) {
           foreach (['users_additional_field_title', 'users_additional_field_description', 'users_additional_field_name', 'users_additional_field_type'] as $index => $name) {
-            if ($system_core->configurator->exists_database_entry_value('users_additional_field_title')) {
-              $system_core->configurator->update_database_entry_value($name, json_encode([]));
+            if ($CMSCore->configurator->exists_database_entry_value('users_additional_field_title')) {
+              $CMSCore->configurator->update_database_entry_value($name, json_encode([]));
             }
           }
         }
 
-        if ($entries_additional_fields_count == 0 && isset($_POST['_entries_additional_fields_locale'])) {
+        if ($entriesAdditionalFieldsCount === 0 && isset($_POST['_entries_additional_fields_locale'])) {
           foreach (['entries_additional_field_title', 'entries_additional_field_description', 'entries_additional_field_name', 'entries_additional_field_type', 'entries_additional_field_category_id'] as $index => $name) {
-            if ($system_core->configurator->exists_database_entry_value('entries_additional_field_title')) {
-              $system_core->configurator->update_database_entry_value($name, json_encode([]));
+            if ($CMSCore->configurator->exists_database_entry_value('entries_additional_field_title')) {
+              $CMSCore->configurator->update_database_entry_value($name, json_encode([]));
             }
           }
         }
 
-        if ($static_pages_additional_fields_count == 0 && isset($_POST['_static_pages_additional_fields_locale'])) {
+        if ($staticPagesAdditionalFieldsCount == 0 && isset($_POST['_static_pages_additional_fields_locale'])) {
           foreach (['static_pages_additional_field_title', 'static_pages_additional_field_description', 'static_pages_additional_field_name', 'static_pages_additional_field_type', 'static_pages_additional_field_type'] as $index => $name) {
-            if ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_title')) {
-              $system_core->configurator->update_database_entry_value($name, json_encode([]));
+            if ($CMSCore->configurator->exists_database_entry_value('static_pages_additional_field_title')) {
+              $CMSCore->configurator->update_database_entry_value($name, json_encode([]));
             }
           }
         }
 
-        $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS') : $handler_message;
-        $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+        $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS');
+        $handlerStatusCode = $handlerStatusCode ?? 1;
       }
     } else {
-      $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_INVALID_INPUT_DATA_SET')) : $handler_message;
-      $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_INVALID_INPUT_DATA_SET');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS'));
-    $handler_status_code = 0;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
   http_response_code(401);
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
 
 ?>

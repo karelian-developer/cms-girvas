@@ -17,22 +17,22 @@ namespace core\PHPLibrary\Database\QueryBuilder {
   use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
 
   final class StatementSelect implements InterfaceStatement {
-    public QueryBuilder $query_builder;
+    public QueryBuilder $queryBuilder;
     private array $selections = [];
-    public ClauseFrom|null $clause_from = null;
-    public ClauseWhere|null $clause_where = null;
-    public ClauseOrderBy|null $clause_order_by = null;
-    public ClauseLimit|null $clause_limit = null;
+    public ClauseFrom|null $clauseFrom = null;
+    public ClauseWhere|null $clauseWhere = null;
+    public ClauseOrderBy|null $clauseOrderBy = null;
+    public ClauseLimit|null $clauseLimit = null;
     public string $assembled = '';
     
     /**
      * __construct
      *
-     * @param  mixed $query_builder
+     * @param  mixed $queryBuilder
      * @return void
      */
-    public function __construct(QueryBuilder $query_builder) {
-      $this->query_builder = $query_builder;
+    public function __construct(QueryBuilder $queryBuilder) {
+      $this->queryBuilder = $queryBuilder;
     }
     
     /**
@@ -51,7 +51,7 @@ namespace core\PHPLibrary\Database\QueryBuilder {
      * @return void
      */
     public function set_clause_from() : void {
-      $this->clause_from = new ClauseFrom($this);
+      $this->clauseFrom = new ClauseFrom($this);
     }
     
     /**
@@ -60,7 +60,7 @@ namespace core\PHPLibrary\Database\QueryBuilder {
      * @return void
      */
     public function set_clause_where() : void {
-      $this->clause_where = new ClauseWhere($this);
+      $this->clauseWhere = new ClauseWhere($this);
     }
     
     /**
@@ -69,19 +69,19 @@ namespace core\PHPLibrary\Database\QueryBuilder {
      * @return void
      */
     public function set_clause_order_by() : void {
-      $this->clause_order_by = new ClauseOrderBy($this);
+      $this->clauseOrderBy = new ClauseOrderBy($this);
     }
     
     /**
      * Установить предложение LIMIT
      *
-     * @param  mixed $clause_limit
+     * @param  mixed $clauseLimit
      * @return void
      */
     public function set_clause_limit(int $limit, int $offset = 0) : void {
-      $this->clause_limit = new ClauseLimit($this);
-      $this->clause_limit->set_limit($limit);
-      $this->clause_limit->set_offset($offset);
+      $this->clauseLimit = new ClauseLimit($this);
+      $this->clauseLimit->set_limit($limit);
+      $this->clauseLimit->set_offset($offset);
     }
     
     /**
@@ -90,34 +90,34 @@ namespace core\PHPLibrary\Database\QueryBuilder {
      * @return void
      */
     public function assembly() : void {
-      $query_array = [];
+      $queryArray = [];
       if (!empty($this->selections)) {
-        array_push($query_array, implode(', ', $this->selections));
+        array_push($queryArray, implode(', ', $this->selections));
       } else {
-        array_push($query_array, '*');
+        array_push($queryArray, '*');
       }
 
-      if (!is_null($this->clause_from)) {
-        $this->clause_from->assembly();
-        array_push($query_array, $this->clause_from->assembled);
+      if (!is_null($this->clauseFrom)) {
+        $this->clauseFrom->assembly();
+        array_push($queryArray, $this->clauseFrom->assembled);
       }
 
-      if (!is_null($this->clause_where)) {
-        $this->clause_where->assembly();
-        array_push($query_array, $this->clause_where->assembled);
+      if (!is_null($this->clauseWhere)) {
+        $this->clauseWhere->assembly();
+        array_push($queryArray, $this->clauseWhere->assembled);
       }
 
-      if (!is_null($this->clause_order_by)) {
-        $this->clause_order_by->assembly();
-        array_push($query_array, $this->clause_order_by->assembled);
+      if (!is_null($this->clauseOrderBy)) {
+        $this->clauseOrderBy->assembly();
+        array_push($queryArray, $this->clauseOrderBy->assembled);
       }
 
-      if (!is_null($this->clause_limit)) {
-        $this->clause_limit->assembly();
-        array_push($query_array, $this->clause_limit->assembled);
+      if (!is_null($this->clauseLimit)) {
+        $this->clauseLimit->assembly();
+        array_push($queryArray, $this->clauseLimit->assembled);
       }
 
-      $this->assembled = sprintf('SELECT %s;', implode(' ', $query_array));
+      $this->assembled = sprintf('SELECT %s;', implode(' ', $queryArray));
     }
 
   }

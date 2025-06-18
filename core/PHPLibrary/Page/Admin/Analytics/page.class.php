@@ -21,21 +21,21 @@ namespace core\PHPLibrary\Page\Admin\Analytics {
  * Страница со списком записей
  */
   class PagePage implements InterfacePage {
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Page $page;
-    public PageStatic $page_static;
+    public PageStatic $pageStatic;
     public string $assembled = '';
 
     /**
      * __construct
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param Page $page
      */
-    public function __construct(SystemCore $system_core, Page $page, PageStatic $page_static) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page, PageStatic $pageStatic) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
-      $this->page_static = $page_static;
+      $this->pageStatic = $pageStatic;
     }
 
     /**
@@ -45,38 +45,38 @@ namespace core\PHPLibrary\Page\Admin\Analytics {
      */
     public function assembly() : void {
       // Добавление таблицы стилей для страницы
-      $this->system_core->template->add_style(['href' => 'styles/page/analytics.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/analytics.css', 'rel' => 'stylesheet']);
       
-      $locale_data = $this->system_core->locale->get_data();
+      $localeData = $this->CMSCore->locale->get_data();
+      $localeName = $this->CMSCore->locale->get_name();
 
       /** @var array Преобразованные элементы навигации */
-      $navigations_items_transformed = [];
-      array_push($navigations_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/item.tpl', [
-        'NAVIGATION_ITEM_TITLE' => sprintf('< %s', '{LANG:PAGE_ENTRY_NAVIGATION_BACK_LABEL'),
+      $navigationsItemsTransformed = [];
+      array_push($navigationsItemsTransformed, TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/navigationHorizontal/item.tpl', [
+        'NAVIGATION_ITEM_TITLE' => '< {LANG:PAGE_ENTRY_NAVIGATION_BACK_LABEL}',
         'NAVIGATION_ITEM_URL' => '/admin/entries',
         'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
       ]));
 
-      if (!empty($navigations_items_transformed)) {
-        $page_navigation_transformed = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal.tpl', [
-          'NAVIGATION_LIST' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/navigationHorizontal/list.tpl', [
-            'NAVIGATION_ITEMS' => implode($navigations_items_transformed)
+      if (!empty($navigationsItemsTransformed)) {
+        $pageNavigationTransformed = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/navigationHorizontal.tpl', [
+          'NAVIGATION_LIST' => TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/navigationHorizontal/list.tpl', [
+            'NAVIGATION_ITEMS' => implode($navigationsItemsTransformed)
           ])
         ]);
       } else {
-        $page_navigation_transformed = '';
+        $pageNavigationTransformed = '';
       }
 
-      $locale_default = $this->system_core->get_cms_locale('admin');
-      $page_static_title = $this->page_static->get_title($locale_default->get_name());
-      $page_static_title = (!empty($page_static_title)) ? $page_static_title : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $locale_default->get_name());
+      $pageStaticTitle = $this->pageStatic->get_title($localeName);
+      $pageStaticTitle = !empty($pageStaticTitle) ? $pageStaticTitle : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $localeName);
 
       /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/analytics/page.tpl', [
-        'PAGE_NAVIGATION' => $page_navigation_transformed,
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/analytics/page.tpl', [
+        'PAGE_NAVIGATION' => $pageNavigationTransformed,
         'ADMIN_PANEL_PAGE_NAME' => 'analytics',
-        'PAGE_ANALYTICS_PAGE_STATIC_TITLE' => sprintf($locale_data['PAGE_ANALYTICS_PAGE_STATIC_TITLE'], $page_static_title),
-        'PAGE_STATIC_NAME' => $this->page_static->get_name()
+        'PAGE_ANALYTICS_PAGE_STATIC_TITLE' => sprintf($localeData['PAGE_ANALYTICS_PAGE_STATIC_TITLE'], $pageStaticTitle),
+        'PAGE_STATIC_NAME' => $this->pageStatic->get_name()
       ]);
     }
   }

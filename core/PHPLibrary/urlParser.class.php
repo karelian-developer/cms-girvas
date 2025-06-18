@@ -9,7 +9,14 @@
  */
 
 namespace core\PHPLibrary {
-
+  /**
+   * URLParser
+   * 
+   * Класс для работы URL
+   * 
+   * @author Andrey Shestakov <drelagas.new@yandex.ru>
+   * @version 0.0.1-1
+   */
   final class URLParser {
     private array $path = [];
     private array $params = [];
@@ -27,11 +34,12 @@ namespace core\PHPLibrary {
     /**
      * Получить элемент пути URL
      *
-     * @param  int $path_index Индекс элемента массива пути
+     * @param  int $index Индекс элемента массива пути
+     * 
      * @return string|null
      */
-    public function get_path(int $path_index) : string|null {
-      return (isset($this->path[$path_index])) ? $this->path[$path_index] : null;
+    public function get_path(int $index) : string|null {
+      return (isset($this->path[$index])) ? $this->path[$index] : null;
     }
         
     /**
@@ -66,8 +74,8 @@ namespace core\PHPLibrary {
      *
      * @return mixed
      */
-    public function get_param(string $param_name) : mixed {
-      return (isset($this->params[$param_name])) ? $this->params[$param_name] : null;
+    public function get_param(string $name) : mixed {
+      return (isset($this->params[$name])) ? $this->params[$name] : null;
     }
     
     /**
@@ -78,14 +86,14 @@ namespace core\PHPLibrary {
     private function get_parsed_path() : array {
       $result = [];
 
-      $url_parsed = parse_url($_SERVER['REQUEST_URI']);
-      if (array_key_exists('path', $url_parsed)) {
-        $url_path_array =  explode('/', $url_parsed['path']);
+      $parsedURL = parse_url($_SERVER['REQUEST_URI']);
+      if (array_key_exists('path', $parsedURL)) {
+        $pathArray = explode('/', $parsedURL['path']);
 
-        foreach ($url_path_array as $url_path_element) {
-          if (!empty($url_path_element)) {
-            $url_path_element = (is_numeric($url_path_element)) ? (int)$url_path_element : $url_path_element;
-            array_push($result, $url_path_element);
+        foreach ($pathArray as $pathElement) {
+          if (!empty($pathElement)) {
+            $pathElement = (is_numeric($pathElement)) ? (int)$pathElement : $pathElement;
+            array_push($result, $pathElement);
           }
         }
       }
@@ -101,15 +109,15 @@ namespace core\PHPLibrary {
     private function get_parsed_params() : array {
       $result = [];
 
-      $url_parsed = parse_url($_SERVER['REQUEST_URI']);
-      if (array_key_exists('query', $url_parsed)) {
-        $url_params_array =  explode('&', $url_parsed['query']);
+      $parsedURL = parse_url($_SERVER['REQUEST_URI']);
+      if (array_key_exists('query', $parsedURL)) {
+        $paramsArray = explode('&', $parsedURL['query']);
 
-        foreach ($url_params_array as $url_param) {
-          preg_match('/([a-z0-9\-\_\.]*)\=([a-z0-9\-\_\\.\,]*)/i', $url_param, $regex_matches);
-          if (array_key_exists(1, $regex_matches) && array_key_exists(2, $regex_matches)) {
-            $param_value = (is_numeric($regex_matches[2])) ? (int)$regex_matches[2] : $regex_matches[2];
-            $result[$regex_matches[1]] = $param_value;
+        foreach ($paramsArray as $param) {
+          preg_match('/([a-z0-9\-\_\.]*)\=([a-z0-9\-\_\\.\,]*)/i', $param, $regexMatches);
+          if (array_key_exists(1, $regexMatches) && array_key_exists(2, $regexMatches)) {
+            $value = (is_numeric($regexMatches[2])) ? (int)$regexMatches[2] : $regexMatches[2];
+            $result[$regexMatches[1]] = $value;
           }
         }
       }

@@ -25,13 +25,13 @@ namespace core\PHPLibrary\Page\Admin {
     const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_TEMPLATE_NAVIGATION_%s_LABEL';
 
     /** @property SystemCore Объект системного ядра*/
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
 
     /** @property Page Объект страницы */
     public Page $page;
 
     /** @property array Массив разрешенных типов метаданных */
-    public array $allowed_metadata = [
+    public array $allowedMetadata = [
       TemplateEnumMetadata::AUTHOR_NAME,
       TemplateEnumMetadata::AUTHOR_CODE_NAME,
       TemplateEnumMetadata::AUTHOR_CODE_SERVER_NAME,
@@ -50,7 +50,7 @@ namespace core\PHPLibrary\Page\Admin {
     
     /** @property string Итоговая сборка шаблона в виде строки */
     public string $assembled = '';
-    public array $navigation_subsections_array = [
+    public array $navigationSubsections = [
       'back' => [
         'name' => 'back',
         'iconName' => 'back',
@@ -65,8 +65,8 @@ namespace core\PHPLibrary\Page\Admin {
      * 
      * @return void
      */
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
     }
 
@@ -76,8 +76,8 @@ namespace core\PHPLibrary\Page\Admin {
      * @return void
      */
     public function init_subnavigation() : void {
-      $template_source =& $this->system_core->template->core->source;
-      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
+      $themeSource =& $this->CMSCore->theme->core->source;
+      $this->init_admin_panel_subnavigation($this->CMSCore, $themeSource);
     }
 
     /**
@@ -86,172 +86,173 @@ namespace core\PHPLibrary\Page\Admin {
      * @return void
      */
     public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page/template.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/template.css', 'rel' => 'stylesheet']);
 
-      $locale_data = $this->system_core->locale->get_data();
+      $localeData = $this->CMSCore->locale->get_data();
+      $localeName = $this->CMSCore->locale->get_name();
 
-      $template_name = ($this->system_core->urlp->get_path(2) == 'repository') ? $this->system_core->urlp->get_path(3) : $this->system_core->urlp->get_path(2);
-      $template = new Template($this->system_core, $template_name);
-      $template_screenshots_list_items = [];
-      $template_metadata_items_transformed = [];
+      $themeName = $this->CMSCore->urlp->get_path(2) === 'repository' ? $this->CMSCore->urlp->get_path(3) : $this->CMSCore->urlp->get_path(2);
+      $theme = new Template($this->CMSCore, $themeName);
+      $themeScreenshotsListItems = [];
+      $themeMetadataItemsTransformed = [];
 
-      $template_exists = false;
+      $isExists = false;
 
-      if ($this->system_core->urlp->get_path(2) == 'repository') {
-        $template_repository_url = sprintf('https://repository.cms-girvas.ru/templates/%s', $template_name);
-        $ch = curl_init($template_repository_url);
+      if ($this->CMSCore->urlp->get_path(2) == 'repository') {
+        $themeRepositoryURL = sprintf('https://repository.cms-girvas.ru/templates/%s', $themeName);
+        $ch = curl_init($themeRepositoryURL);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $curl_exucute_result = json_decode(curl_exec($ch), true);
+        $CURLExucuteResult = json_decode(curl_exec($ch), true);
         curl_close($ch);
 
-        $template_data = $curl_exucute_result['outputData'];
-        if (isset($template_data['metadata'])) {
-          $template_exists = true;
+        $themeData = $CURLExucuteResult['outputData'];
+        if (isset($themeData['metadata'])) {
+          $isExists = true;
         }
 
-        if ($template_exists) {
+        if ($isExists) {
           $parsedown = new Parsedown();
 
-          $template_metadata = $template_data['metadata'];
-          $template_title = $template_metadata['title'];
-          $template_description = file_get_contents($template_data['readme_url']);
-          $template_description = (!empty($template_description)) ? $parsedown->text($template_description) : $locale_data['DEFAULT_TEXT_DESCRIPTION_NOT_FOUND'];
+          $themeMetadata = $themeData['metadata'];
+          $themeTitle = $themeMetadata['title'];
+          $themeDescription = file_get_contents($themeData['readme_url']);
+          $themeDescription = !empty($themeDescription) ? $parsedown->text($themeDescription) : $localeData['DEFAULT_TEXT_DESCRIPTION_NOT_FOUND'];
 
-          if (count($template_data['screenshots']) > 0) {
-            foreach ($template_data['screenshots'] as $screenshot_url) {
-              array_push($template_screenshots_list_items, TemplateCollector::assembly('<li class="gallery__item"><img class="gallery__item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
-                'TEMPLATE_SCREENSHOT_URL' => $screenshot_url
+          if (count($themeData['screenshots']) > 0) {
+            foreach ($themeData['screenshots'] as $screenshotURL) {
+              array_push($themeScreenshotsListItems, TemplateCollector::assembly('<li class="gallery__item"><img class="gallery__item-image item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
+                'TEMPLATE_SCREENSHOT_URL' => $screenshotURL
               ]));
             }
           }
         }
       } else {
-        if ($template->exists_file_metadata_json()) {
-          $template_exists = true;
+        if ($theme->exists_file_metadata_json()) {
+          $isExists = true;
         }
 
-        if ($template_exists) {
+        if ($isExists) {
           $parsedown = new Parsedown();
 
-          $template_metadata = $template->get_metadata();
-          $template_title = $template->get_title();
-          $template_description = $template->get_content_file_readme_md();
-          $template_description = $parsedown->text($template_description);
+          $themeMetadata = $theme->get_metadata();
+          $themeTitle = $theme->get_title();
+          $themeDescription = $theme->get_content_file_readme_md();
+          $themeDescription = $parsedown->text($themeDescription);
 
-          $template_screenshots_files_array = $template->get_screenshots_array();
-          if (count($template_screenshots_files_array) > 0) {
-            $template_screenshots_url = $template->get_screenshots_url();
-            foreach ($template_screenshots_files_array as $screenshot_file) {
-              array_push($template_screenshots_list_items, TemplateCollector::assembly('<li class="gallery__item"><img class="gallery__item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
-                'TEMPLATE_SCREENSHOT_URL' => sprintf('%s/%s', $template_screenshots_url, $screenshot_file)
+          $themeScreenshotsFiles = $theme->get_screenshots_array();
+          if (count($themeScreenshotsFiles) > 0) {
+            $themeScreenshotsURL = $theme->get_screenshots_url();
+            foreach ($themeScreenshotsFiles as $file) {
+              array_push($themeScreenshotsListItems, TemplateCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
+                'TEMPLATE_SCREENSHOT_URL' => $themeScreenshotsURL . '/' . $file
               ]));
             }
           }
         }
       }
 
-      if ($template_exists) {
-        foreach ($this->allowed_metadata as $enum_metadata) {
+      if ($isExists) {
+        foreach ($this->allowedMetadata as $enumMetadata) {
           /** @var string Имя ячейки метаданных */
-          $metadata_name = Template::get_metadata_name($enum_metadata);
+          $metadataName = Template::get_metadata_name($enumMetadata);
 
-          if (array_key_exists($metadata_name, $template_metadata) || $enum_metadata === TemplateEnumMetadata::WEIGHT) {
-            $get_metadata_value = function (Template $template, array $template_metadata, TemplateEnumMetadata $enum_metadata) {
-              $metadata_name = Template::get_metadata_name($enum_metadata);
+          if (array_key_exists($metadataName, $themeMetadata) || $enumMetadata === TemplateEnumMetadata::WEIGHT) {
+            $getMetadataValue = function (Template $theme, array $themeMetadata, TemplateEnumMetadata $enumMetadata) {
+              $metadataName = Template::get_metadata_name($enumMetadata);
               
-              if ($enum_metadata === TemplateEnumMetadata::WEIGHT) {
-                $template_weight = ($this->system_core->urlp->get_path(2) != 'repository') ? Template::get_weight($template, TemplateEnumWeight::BYTES) : $template_metadata[$metadata_name];
+              if ($enumMetadata === TemplateEnumMetadata::WEIGHT) {
+                $themeWeight = $this->CMSCore->urlp->get_path(2) !== 'repository' ? Template::get_weight($theme, TemplateEnumWeight::BYTES) : $themeMetadata[$metadataName];
                 
-                if ($template_weight < 1024) {
-                  return sprintf('%s B', $template_weight);
+                if ($themeWeight < 1024) {
+                  return sprintf('%s B', $themeWeight);
                 }
                 
-                if ($template_weight >= 1024 && $template_weight < 1024 ^ 2) {
-                  return sprintf('%s KB', round($template_weight / 1024, 2));
+                if ($themeWeight >= 1024 && $themeWeight < 1024 ^ 2) {
+                  return sprintf('%s KB', round($themeWeight / 1024, 2));
                 }
 
-                if ($template_weight >= 1024 ^ 2 && $template_weight < 1024 ^ 3) {
-                  return sprintf('%s MB', round($template_weight / (1024 ^ 2), 2));
+                if ($themeWeight >= 1024 ^ 2 && $themeWeight < 1024 ^ 3) {
+                  return sprintf('%s MB', round($themeWeight / (1024 ^ 2), 2));
                 }
 
-                if ($template_weight >= 1024 ^ 3) {
-                  return sprintf('%s GB', round($template_weight / (1024 ^ 3), 2));
+                if ($themeWeight >= 1024 ^ 3) {
+                  return sprintf('%s GB', round($themeWeight / (1024 ^ 3), 2));
                 }
               }
 
-              if ($enum_metadata === TemplateEnumMetadata::DATETIME_CREATED_UNIX || $enum_metadata === TemplateEnumMetadata::DATETIME_UPDATED_UNIX) {
-                return date('d.m.Y', $template_metadata[$metadata_name]);
+              if ($enumMetadata === TemplateEnumMetadata::DATETIME_CREATED_UNIX || $enumMetadata === TemplateEnumMetadata::DATETIME_UPDATED_UNIX) {
+                return date('d.m.Y', $themeMetadata[$metadataName]);
               }
 
-              return isset($template_metadata[$metadata_name]) ? $template_metadata[$metadata_name] : '[???]';
+              return isset($themeMetadata[$metadataName]) ? $themeMetadata[$metadataName] : '[???]';
             };
 
             /** @var string Заголовок ячейки метаданных */
-            $metadata_title = match ($enum_metadata) {
-              TemplateEnumMetadata::AUTHOR_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_NAME_LABEL'),
-              TemplateEnumMetadata::AUTHOR_CODE_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_CODE_NAME_LABEL'),
-              TemplateEnumMetadata::AUTHOR_CODE_SERVER_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_CODE_SERVER_NAME_LABEL'),
-              TemplateEnumMetadata::AUTHOR_CODE_CLIENT_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_CODE_CLIENT_NAME_LABEL'),
-              TemplateEnumMetadata::AUTHOR_DESIGNER_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_DESIGNER_NAME_LABEL'),
-              TemplateEnumMetadata::AUTHOR_LAYOUT_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_LAYOUT_NAME_LABEL'),
-              TemplateEnumMetadata::AUTHOR_SITE_LINK => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_SITE_LINK_LABEL'),
-              TemplateEnumMetadata::AUTHOR_SOCIAL_VK_LINK => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_SOCIAL_VK_LINK_LABEL'),
-              TemplateEnumMetadata::AUTHOR_SOCIAL_OK_LINK => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_AUTHOR_SOCIAL_OK_LINK_LABEL'),
-              TemplateEnumMetadata::CATEGORY_NAME => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_CATEGORY_NAME_LABEL'),
-              TemplateEnumMetadata::WEIGHT => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_SIZE_LABEL'),
-              TemplateEnumMetadata::DATETIME_CREATED_UNIX => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_DATETIME_CREATED_UNIX_LABEL'),
-              TemplateEnumMetadata::DATETIME_UPDATED_UNIX => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_DATETIME_UPDATED_UNIX_LABEL'),
-              TemplateEnumMetadata::VERSION => $template->system_core->locale::get_data_value($locale_data, 'PAGE_TEMPLATE_VERSION_LABEL')
+            $metadataTitle = match ($enumMetadata) {
+              TemplateEnumMetadata::AUTHOR_NAME => $theme->CMSCore->locale::get_data_value($localeData, 'PAGE_TEMPLATE_AUTHOR_NAME_LABEL'),
+              TemplateEnumMetadata::AUTHOR_CODE_NAME => $theme->CMSCore->locale::get_data_value($localeData, 'PAGE_TEMPLATE_AUTHOR_CODE_NAME_LABEL'),
+              TemplateEnumMetadata::AUTHOR_CODE_SERVER_NAME => $theme->CMSCore->locale::get_data_value($localeData, 'PAGE_TEMPLATE_AUTHOR_CODE_SERVER_NAME_LABEL'),
+              TemplateEnumMetadata::AUTHOR_CODE_CLIENT_NAME => $theme->CMSCore->locale::get_data_value($localeData, 'PAGE_TEMPLATE_AUTHOR_CODE_CLIENT_NAME_LABEL'),
+              TemplateEnumMetadata::AUTHOR_DESIGNER_NAME => $theme->CMSCore->locale::get_data_value($localeData, 'PAGE_TEMPLATE_AUTHOR_DESIGNER_NAME_LABEL'),
+              TemplateEnumMetadata::AUTHOR_LAYOUT_NAME => $theme->CMSCore->locale::get_data_value($localeData, 'PAGE_TEMPLATE_AUTHOR_LAYOUT_NAME_LABEL'),
+              TemplateEnumMetadata::AUTHOR_SITE_LINK => $theme->CMSCore->locale::get_data_value($localeData, 'PAGE_TEMPLATE_AUTHOR_SITE_LINK_LABEL'),
+              TemplateEnumMetadata::AUTHOR_SOCIAL_VK_LINK => $theme->CMSCore->locale::get_data_value($localeData, 'PAGE_TEMPLATE_AUTHOR_SOCIAL_VK_LINK_LABEL'),
+              TemplateEnumMetadata::AUTHOR_SOCIAL_OK_LINK => $theme->CMSCore->locale::get_data_value($localeData, 'PAGE_TEMPLATE_AUTHOR_SOCIAL_OK_LINK_LABEL'),
+              TemplateEnumMetadata::CATEGORY_NAME => $theme->CMSCore->locale::get_data_value($localeData, 'PAGE_TEMPLATE_CATEGORY_NAME_LABEL'),
+              TemplateEnumMetadata::WEIGHT => $theme->CMSCore->locale::get_data_value($localeData, 'PAGE_TEMPLATE_SIZE_LABEL'),
+              TemplateEnumMetadata::DATETIME_CREATED_UNIX => $theme->CMSCore->locale::get_data_value($localeData, 'PAGE_TEMPLATE_DATETIME_CREATED_UNIX_LABEL'),
+              TemplateEnumMetadata::DATETIME_UPDATED_UNIX => $theme->CMSCore->locale::get_data_value($localeData, 'PAGE_TEMPLATE_DATETIME_UPDATED_UNIX_LABEL'),
+              TemplateEnumMetadata::VERSION => $theme->CMSCore->locale::get_data_value($localeData, 'PAGE_TEMPLATE_VERSION_LABEL')
             };
 
-            switch ($enum_metadata) {
-              case TemplateEnumMetadata::AUTHOR_SITE_LINK: $metadata_value_template = '<li class="template__metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>'; break;
-              case TemplateEnumMetadata::AUTHOR_SOCIAL_VK_LINK: $metadata_value_template = '<li class="template__metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>'; break;
-              case TemplateEnumMetadata::AUTHOR_SOCIAL_OK_LINK: $metadata_value_template = '<li class="template__metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>'; break;
-              default: $metadata_value_template = '<li class="template__metadata-item"><b>{METADATA_TITLE}:</b> {METADATA_VALUE}</li>';
+            switch ($enumMetadata) {
+              case TemplateEnumMetadata::AUTHOR_SITE_LINK: $metadataValueTemplate = '<li class="template__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>'; break;
+              case TemplateEnumMetadata::AUTHOR_SOCIAL_VK_LINK: $metadataValueTemplate = '<li class="template__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>'; break;
+              case TemplateEnumMetadata::AUTHOR_SOCIAL_OK_LINK: $metadataValueTemplate = '<li class="template__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>'; break;
+              default: $metadataValueTemplate = '<li class="template__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> {METADATA_VALUE}</li>';
             }
 
-            array_push($template_metadata_items_transformed, TemplateCollector::assembly($metadata_value_template, [
-              'METADATA_TITLE' => $metadata_title,
-              'METADATA_VALUE' => $get_metadata_value($template, $template_metadata, $enum_metadata)
+            array_push($themeMetadataItemsTransformed, TemplateCollector::assembly($metadataValueTemplate, [
+              'METADATA_TITLE' => $metadataTitle,
+              'METADATA_VALUE' => $getMetadataValue($theme, $themeMetadata, $enumMetadata)
             ]));
           }
         }
 
-        if (count($template_screenshots_list_items) > 0) {
-          $template_gallery_list = TemplateCollector::assembly('<ul class="gallery__list list-reset">{TEMPLATE_GALLARY_LIST_ITEMS}</ul>', [
-            'TEMPLATE_GALLARY_LIST_ITEMS' => implode($template_screenshots_list_items)
+        if (count($themeScreenshotsListItems) > 0) {
+          $themeGalleryList = TemplateCollector::assembly('<ul class="gallery__list list list-reset">{TEMPLATE_GALLARY_LIST_ITEMS}</ul>', [
+            'TEMPLATE_GALLARY_LIST_ITEMS' => implode($themeScreenshotsListItems)
           ]);
         } else {
-          $template_gallery_list = '';
+          $themeGalleryList = '';
         }
 
-        if (count($template_metadata_items_transformed) > 0) {
-          $template_metadata_list_transformed = TemplateCollector::assembly('<ul class="template__metadata-list list-reset">{METADATA_LIST}</ul>', [
-            'METADATA_LIST' => implode($template_metadata_items_transformed)
+        if (count($themeMetadataItemsTransformed) > 0) {
+          $themeMetadataListTransformed = TemplateCollector::assembly('<ul class="template__metadata-list metadata-list list-reset">{METADATA_LIST}</ul>', [
+            'METADATA_LIST' => implode($themeMetadataItemsTransformed)
           ]);
         } else {
-          $template_metadata_list_transformed = $locale_data['PAGE_TEMPLATE_METADATA_BLOCK_METADATA_NOT_FOUND_TITLE'];
+          $themeMetadataListTransformed = $localeData['PAGE_TEMPLATE_METADATA_BLOCK_METADATA_NOT_FOUND_TITLE'];
         }
 
         $parsedown = new Parsedown();
 
-        $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/template.tpl', [
+        $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/template.tpl', [
           'ADMIN_PANEL_PAGE_NAME' => 'template',
-          'TEMPLATE_NAME' => $template_name,
-          'TEMPLATE_TITLE' => $template_title,
-          'TEMPLATE_DESCRIPTION' => $template_description,
-          'TEMPLATE_GALLARY_LIST' => $template_gallery_list,
-          'TEMPLATE_METADATA_LIST' => $template_metadata_list_transformed,
-          'TEMPLATE_DOWNLOADED_STATUS' => ($template->exists_file_metadata_json()) ? 'downloaded' : 'not-downloaded',
-          'TEMPLATE_INSTALLED_STATUS' => ($template->get_name() == $this->system_core->configurator->get_database_entry_value('base_template')) ? 'installed' : 'not-installed'
+          'TEMPLATE_NAME' => $themeName,
+          'TEMPLATE_TITLE' => $themeTitle,
+          'TEMPLATE_DESCRIPTION' => $themeDescription,
+          'TEMPLATE_GALLARY_LIST' => $themeGalleryList,
+          'TEMPLATE_METADATA_LIST' => $themeMetadataListTransformed,
+          'TEMPLATE_DOWNLOADED_STATUS' => $theme->exists_file_metadata_json() ? 'downloaded' : 'not-downloaded',
+          'TEMPLATE_INSTALLED_STATUS' => $theme->get_name() === $this->CMSCore->configurator->get_database_entry_value('base_template') ? 'installed' : 'not-installed'
         ]);
       } else {
         http_response_code(404);
 
-        $page_error = new PageError($this->system_core, $this->page, 404);
-        $page_error->assembly();
-        $this->assembled = $page_error->assembled;
+        $pageError = new PageError($this->CMSCore, $this->page, 404);
+        $pageError->assembly();
+        $this->assembled = $pageError->assembled;
       }
     }
   }

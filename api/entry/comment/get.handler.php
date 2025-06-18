@@ -16,35 +16,36 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\EntryComment as EntryComment;
 use \core\PHPLibrary\EntryComments as EntryComments;
 
-if ($system_core->client->is_logged(1) || $system_core->client->is_logged(2)) {
-  $comment_id = (is_numeric($system_core->urlp->get_path(3))) ? (int)$system_core->urlp->get_path(3) : 0;
+if ($CMSCore->client->is_logged(1) || $CMSCore->client->is_logged(2)) {
+  $commentID = $CMSCore->urlp->get_path(3) ?? 0;
+  $commentID = is_numeric($commentID) ? (int) $commentID : 0;
 
-  if (EntryComment::exists_by_id($system_core, $comment_id)) {
-    $comment = new EntryComment($system_core, $comment_id);
-    $comment->init_data(['entry_id', 'author_id', 'content', 'metadata', 'created_unix_timestamp', 'updated_unix_timestamp']);
+  if (EntryComment::exists_by_id($CMSCore, $commentID)) {
+    $comment = new EntryComment($CMSCore, $commentID);
+    $comment->init_data(['entryID', 'authorID', 'content', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
     
-    $handler_output_data['comment'] = [];
-    $handler_output_data['comment']['id'] = $comment->get_id();
-    $handler_output_data['comment']['content'] = $comment->get_content();
-    $handler_output_data['comment']['authorID'] = $comment->get_author_id();
-    $handler_output_data['comment']['parentID'] = $comment->get_parent_id();
-    $handler_output_data['comment']['answersCount'] = $comment->get_answers_count();
-    $handler_output_data['comment']['isHidden'] = $comment->is_hidden();
-    $handler_output_data['comment']['hiddenReason'] = $comment->get_hidden_reason();
-    $handler_output_data['comment']['rating'] = $comment->get_rating();
-    $handler_output_data['comment']['ratingVoters'] = $comment->get_rating_voters();
-    $handler_output_data['comment']['createdUnixTimestamp'] = $comment->get_created_unix_timestamp();
-    $handler_output_data['comment']['updatedUnixTimestamp'] = $comment->get_updated_unix_timestamp();
+    $handlerOutputData['comment'] = [];
+    $handlerOutputData['comment']['id'] = $comment->get_id();
+    $handlerOutputData['comment']['content'] = $comment->get_content();
+    $handlerOutputData['comment']['authorID'] = $comment->get_author_id();
+    $handlerOutputData['comment']['parentID'] = $comment->get_parent_id();
+    $handlerOutputData['comment']['answersCount'] = $comment->get_answers_count();
+    $handlerOutputData['comment']['isHidden'] = $comment->is_hidden();
+    $handlerOutputData['comment']['hiddenReason'] = $comment->get_hidden_reason();
+    $handlerOutputData['comment']['rating'] = $comment->get_rating();
+    $handlerOutputData['comment']['ratingVoters'] = $comment->get_rating_voters();
+    $handlerOutputData['comment']['createdUnixTimestamp'] = $comment->get_created_unix_timestamp();
+    $handlerOutputData['comment']['updatedUnixTimestamp'] = $comment->get_updated_unix_timestamp();
 
-    $handler_message = $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
-    $handler_status_code = 1;
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
   } else {
-    $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ENTRY_COMMENT_ERROR_NOT_FOUND'));
-    $handler_status_code = 0;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ENTRY_COMMENT_ERROR_NOT_FOUND');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
 
 ?>

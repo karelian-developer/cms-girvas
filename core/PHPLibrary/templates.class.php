@@ -14,8 +14,8 @@ namespace core\PHPLibrary {
    * 
    * Класс для работы с несколькими шаблонами CMS
    * 
-   * @author Andrey Shestakov <drelagas.new@gmail.com>
-   * @version 0.0.1
+   * @author Andrey Shestakov <drelagas.new@yandex.ru>
+   * @version 0.0.1-1
    */
   class Templates {
     const RELATIVE_TEMPLATES_PATH = 'templates';
@@ -25,17 +25,17 @@ namespace core\PHPLibrary {
     }
 
     public static function get_installed_templates_array() : array {
-      $templates_array = array_diff(scandir(self::get_absolute_templates_path()), ['.', '..']);
-      if (!empty($templates_array)) {
-        foreach ($templates_array as $template_name) {
-          $template_path = sprintf('%s/%s', self::get_absolute_templates_path(), $template_name);
-          if (!file_exists(sprintf('%s/installed', $template_path))) {
-            $templates_array = array_diff($templates_array, [$template_name]);
+      $themesDirectories = array_diff(scandir(self::get_absolute_templates_path()), ['.', '..']);
+      if (!empty($themesDirectories)) {
+        foreach ($themesDirectories as $directoryName) {
+          $directoryPath = sprintf('%s/%s', self::get_absolute_templates_path(), $directoryName);
+          if (!file_exists(sprintf('%s/installed', $directoryPath))) {
+            $themesDirectories = array_diff($themesDirectories, [$directoryName]);
           }
         }
       }
 
-      return $templates_array;
+      return $themesDirectories;
     }
   }
 }

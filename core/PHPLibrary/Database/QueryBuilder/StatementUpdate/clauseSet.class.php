@@ -32,15 +32,15 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementUpdate {
     /**
      * Добавить значение столбца
      *
-     * @param  mixed $column_name
+     * @param  mixed $name
      * @param  mixed $value
      * @return void
      */
-    public function add_column(string $column_name, mixed $column_value = null) : void {
-      array_push($this->columns, $column_name);
+    public function add_column(string $name, mixed $value = null) : void {
+      array_push($this->columns, $name);
 
-      if (!is_null($column_value)) {
-        $this->values[$column_name] = $column_value;
+      if (!is_null($value)) {
+        $this->values[$name] = $value;
       }
     }
     
@@ -50,15 +50,15 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementUpdate {
      * @return void
      */
     public function assembly() {
-      $query_array = [];
+      $queryArray = [];
 
-      foreach ($this->columns as $column_name) {
-        $column_value = (isset($this->values[$column_name])) ? $this->values[$column_name] : ':' . $column_name;
-        array_push($query_array, sprintf('%s = %s', $column_name, $column_value));
+      foreach ($this->columns as $name) {
+        $value = (isset($this->values[$name])) ? $this->values[$name] : ':' . $name;
+        array_push($queryArray, sprintf('%s = %s', $name, $value));
       }
 
-      if (count($query_array) > 0) {
-        $this->assembled = sprintf('SET %s', implode(', ', $query_array));
+      if (count($queryArray) > 0) {
+        $this->assembled = sprintf('SET %s', implode(', ', $queryArray));
       } else {
         $this->assembled =  '';
       }

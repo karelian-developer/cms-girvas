@@ -13,11 +13,11 @@ namespace core\PHPLibrary\Module {
   use \core\PHPLibrary\Module as Module;
 
   final class Locale {
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Module $module;
     private string $name;
-    private string $core_path;
-    private string $data_path;
+    private string $corePath;
+    private string $dataPath;
 
     /**
      * __construct
@@ -26,14 +26,15 @@ namespace core\PHPLibrary\Module {
      * @param string $name
      */
     public function __construct(Module $module, string $name) {
-      $this->system_core = $module->system_core;
+      $this->CMSCore = $module->CMSCore;
       $this->module = $module;
       $this->set_name($name);
 
-      $locale_core_path = sprintf('%s/modules/%s/locales/%s', $this->system_core->get_cms_path(), $module->get_name(), $name);
-      $locale_data_path = sprintf('%s/modules/%s/locales/%s', $this->system_core->get_cms_path(), $module->get_name(), $name);
-      $this->set_core_path($locale_core_path);
-      $this->set_data_path($locale_data_path);
+      $corePath = $this->CMSCore->get_cms_path() . '/modules/' . $module->get_name() . '/locales/' . $name;
+      $dataPath = $this->CMSCore->get_cms_path() . '/modules/' . $module->get_name() . '/locales/' . $name;
+
+      $this->set_core_path($corePath);
+      $this->set_data_path($dataPath);
     }
 
     /**
@@ -42,7 +43,7 @@ namespace core\PHPLibrary\Module {
      * @return string
      */
     public function get_icon_url() : string {
-      return sprintf('/modules/%s/locales/%s/icons/16.png', $this->module->get_name(), $this->get_name());
+      return '/modules/' . $this->module->get_name() . '/locales/' . $this->get_name() . '/icons/16.png';
     }
   
     /**
@@ -72,7 +73,7 @@ namespace core\PHPLibrary\Module {
      * @return void
      */
     public function set_core_path(string $path) : void {
-      $this->core_path = $path;
+      $this->corePath = $path;
     }
     
     /**
@@ -81,7 +82,7 @@ namespace core\PHPLibrary\Module {
      * @return string
      */
     public function get_core_path() : string {
-      return $this->core_path;
+      return $this->corePath;
     }
     
     /**
@@ -91,7 +92,7 @@ namespace core\PHPLibrary\Module {
      * @return void
      */
     public function set_data_path(string $path) : void {
-      $this->data_path = $path;
+      $this->dataPath = $path;
     }
     
     /**
@@ -100,7 +101,7 @@ namespace core\PHPLibrary\Module {
      * @return string
      */
     public function get_data_path() : string {
-      return $this->data_path;
+      return $this->dataPath;
     }
 
     /**
@@ -110,7 +111,7 @@ namespace core\PHPLibrary\Module {
      */
     public function get_title() : string {
       $metadata = $this->get_metadata();
-      return (isset($metadata['title'])) ? $metadata['title'] : '';
+      return isset($metadata['title']) ? $metadata['title'] : '';
     }
 
     /**
@@ -118,7 +119,7 @@ namespace core\PHPLibrary\Module {
      */
     public function get_author_name() : string {
       $metadata = $this->get_metadata();
-      return (isset($metadata['authorName'])) ? $metadata['authorName'] : '';
+      return isset($metadata['authorName']) ? $metadata['authorName'] : '';
     }
     
     /**
@@ -128,7 +129,7 @@ namespace core\PHPLibrary\Module {
      */
     public function get_iso_639_1() : string {
       $metadata = $this->get_metadata();
-      return (isset($metadata['iso639_1'])) ? $metadata['iso639_1'] : '';
+      return isset($metadata['iso639_1']) ? $metadata['iso639_1'] : '';
     }
 
     /**
@@ -138,7 +139,7 @@ namespace core\PHPLibrary\Module {
      */
     public function get_iso_639_2() : string {
       $metadata = $this->get_metadata();
-      return (isset($metadata['iso639_2'])) ? $metadata['iso639_2'] : '';
+      return isset($metadata['iso639_2']) ? $metadata['iso639_2'] : '';
     }
 
     /**
@@ -156,7 +157,7 @@ namespace core\PHPLibrary\Module {
      * @return string
      */
     public function get_file_data_json_path() : string {
-      return sprintf('%s/data.json', $this->get_data_path());
+      return $this->get_data_path() . '/data.json';
     }
 
     /**
@@ -174,7 +175,7 @@ namespace core\PHPLibrary\Module {
      * @return string
      */
     public function get_file_registry_json_path() : string {
-      return sprintf('%s/registry.json', $this->get_data_path());
+      return $this->get_data_path() . '/registry.json';
     }
 
     /**
@@ -183,10 +184,10 @@ namespace core\PHPLibrary\Module {
      * @return array
      */
     public function get_data() : array|bool|null {
-      $file_path = $this->get_file_data_json_path();
-      $file_content = (file_exists($file_path)) ? file_get_contents($file_path) : '{}';
+      $filePath = $this->get_file_data_json_path();
+      $fileContent = file_exists($filePath) ? file_get_contents($filePath) : '{}';
 
-      return json_decode($file_content, true);
+      return json_decode($fileContent, true);
     }
 
     /**
@@ -202,7 +203,14 @@ namespace core\PHPLibrary\Module {
         return $data[$name];
       }
 
-      return sprintf('<span style="background-color: red;color: white;">[%s]</span>', $name);
+      $document = new DOMDocument();
+
+      $spanElement = $document->createElement('span', '[' . $name . ']');
+      $spanElement->setAttribute('style', 'background-color: red;color: white;');
+
+      $document->appendChild($spanElement);
+
+      return $document->saveHTML();
     }
 
     /**
@@ -211,10 +219,10 @@ namespace core\PHPLibrary\Module {
      * @return array
      */
     public function get_registry_array() : array {
-      $file_path = $this->get_file_registry_json_path();
-      $file_content = (file_exists($file_path)) ? file_get_contents($file_path) : '{}';
+      $filePath = $this->get_file_registry_json_path();
+      $fileContent = (file_exists($filePath)) ? file_get_contents($filePath) : '{}';
 
-      return json_decode($file_content, true);
+      return json_decode($fileContent, true);
     }
 
     /**
@@ -225,8 +233,8 @@ namespace core\PHPLibrary\Module {
      * @return string
      */
     public function get_single_value_by_key(string $key) : string {
-      $locale_data = $this->get_data();
-      return (isset($locale_data[$key])) ? $locale_data[$key] : '[ ??? ]';
+      $data = $this->get_data();
+      return isset($data[$key]) ? $data[$key] : '[ ??? ]';
     }
 
     /**
@@ -244,7 +252,7 @@ namespace core\PHPLibrary\Module {
      * @return string
      */
     public function get_file_metadata_json_path() : string {
-      return sprintf('%s/metadata.json', $this->get_core_path());
+      return $this->get_core_path() . '/metadata.json';
     }
 
     /**
@@ -253,10 +261,10 @@ namespace core\PHPLibrary\Module {
      * @return array
      */
     public function get_metadata() : array|null {
-      $file_path = $this->get_file_metadata_json_path();
-      $file_content = file_get_contents($file_path);
+      $filePath = $this->get_file_metadata_json_path();
+      $fileContent = file_get_contents($filePath);
 
-      return json_decode($file_content, true);
+      return json_decode($fileContent, true);
     }
   }
 }

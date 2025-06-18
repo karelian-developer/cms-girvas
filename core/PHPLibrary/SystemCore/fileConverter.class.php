@@ -12,21 +12,21 @@ namespace core\PHPLibrary\SystemCore {
   use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as EnumFileFormat;
 
   final class FileConverter {
-    private mixed $system_core = null;
+    private mixed $CMSCore = null;
     private array|string $file = '';
-    private string $convert_from = '';
-    private string $convert_to = '';
+    private string $convertFrom = '';
+    private string $convertTo = '';
 
     /**
      * __construct
      *
-     * @param  mixed $system_core Объект SystemCore
+     * @param  mixed $CMSCore Объект SystemCore
      * @param  EnumFileFormat $format_from
      * @param  EnumFileFormat $format_to
      * @return void
      */
-    public function __construct(\core\PHPLibrary\SystemCore $system_core) {
-      $this->system_core = $system_core;
+    public function __construct(\core\PHPLibrary\SystemCore $CMSCore) {
+      $this->CMSCore = $CMSCore;
 
       // $this->convert_from = match ($format_from) {
       //   EnumFileFormat::JPG => $this->convert_from = 'jpeg',
@@ -55,118 +55,119 @@ namespace core\PHPLibrary\SystemCore {
      * Конвертация файла
      *
      * @param  array|string $file
-     * @param  string $file_output_folder_path
-     * @param  EnumFileFormat $convert_to
+     * @param  string $fileOutputFolderPath
+     * @param  EnumFileFormat $convertTo
      * @return bool
      */
-    public function convert(array|string $file, string $file_output_folder_path, EnumFileFormat $convert_to, bool $delete_old_file = false) : bool|array {
-      $system_salt = $this->system_core->configurator->get('system_salt');
-      $file_output_name = md5(sprintf('{GIRVAS:CONVERTER:%s:%d}', $system_salt, time()));
+    public function convert(array|string $file, string $fileOutputFolderPath, EnumFileFormat $convertTo, bool $deleteOldFile = false) : bool|array {
+      $CMSSalt = $this->CMSCore->configurator->get('salt');
+      $fileOutputName = md5(sprintf('{GIRVAS:CONVERTER:%s:%d}', $CMSSalt, time()));
       
-      if (file_exists($file_output_folder_path)) {
-        $convert_to_extension = match ($convert_to) {
-          EnumFileFormat::JPG => $convert_to_extension = 'jpeg',
-          EnumFileFormat::PNG => $convert_to_extension = 'png',
-          EnumFileFormat::WEBP => $convert_to_extension = 'webp',
-          EnumFileFormat::AVIF => $convert_to_extension = 'avif',
+      if (file_exists($fileOutputFolderPath)) {
+        $convertToExtension = match ($convertTo) {
+          EnumFileFormat::JPG => $convertToExtension = 'jpeg',
+          EnumFileFormat::PNG => $convertToExtension = 'png',
+          EnumFileFormat::WEBP => $convertToExtension = 'webp',
+          EnumFileFormat::AVIF => $convertToExtension = 'avif',
           default => ''
         };
 
-        if ($convert_to_extension == '') return false;
+        if ($convertToExtension ==== '') return false;
 
-        $file_output_name = sprintf('%s.%s', $file_output_name, $convert_to_extension);
-        $file_output_path = sprintf('%s/%s', $file_output_folder_path, $file_output_name);
-        $file_source_path = ''; $file_extension = '';
+        $fileOutputName = $fileOutputName . '.' . $convertToExtension;
+        $fileOutputPath = $fileOutputFolderPath . '/' . $fileOutputName;
+        $fileSourcePath = ''; $fileExtension = '';
 
         // Проверяем, является ли файл закодированным в Base64
         if (is_string($file)) {
           if (preg_match('/data:(\w+)\/([\w.]+);base64,/', $file, $matches)) {
-            $file_extension = $matches[2];
-            $file_source_name = sprintf('%s.%s', $file_output_name, $file_extension);
-            $file_source_path = sprintf('%s/%s', $file_output_folder_path, $file_source_name);
+            $fileExtension = $matches[2];
 
-            $file_open = fopen($file_source_path, 'w+');
-            $file_data = explode(',', $file);
-            fwrite($file_open, base64_decode($file_data[1]));
-            fclose($file_open);
+            $fileSourceName = $fileOutputName . '.' . $fileExtension;
+            $fileSourcePath = $fileOutputFolderPath . '/' . $fileSourceName;
+
+            $fileOpen = fopen($fileSourcePath, 'w+');
+            $fileData = explode(',', $file);
+            fwrite($fileOpen, base64_decode($fileData[1]));
+            fclose($fileOpen);
           }
         } else if (is_array($file)) {
           if (file_exists($file['tmp_name'])) {
-            $file_extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $file_source_name = sprintf('%s.%s', $file_output_name, $file_extension);
-            $file_source_path = sprintf('%s/%s', $file_output_folder_path, $file_source_name);
-            @move_uploaded_file($file['tmp_name'], $file_source_path);
+            $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
+            $fileSourceName = $fileOutputName . '.' . $fileExtension;
+            $fileSourcePath = $fileOutputFolderPath . '/' . $fileSourceName;
+            @move_uploaded_file($file['tmp_name'], $fileSourcePath);
           }
         }
 
-        $converted_result = false;
-        if ($file_source_path != '' && file_exists($file_source_path)) {
-          if (($file_extension == 'jpeg' || $file_extension == 'jpg') && $convert_to_extension == 'png') {
-            $converted_result = $this->convert_jpeg_to_png($file_source_path, $file_output_path, $delete_old_file);
+        $convertedResult = false;
+        if ($fileSourcePath != '' && file_exists($fileSourcePath)) {
+          if (($fileExtension === 'jpeg' || $fileExtension === 'jpg') && $convertToExtension === 'png') {
+            $convertedResult = $this->convert_jpeg_to_png($fileSourcePath, $fileOutputPath, $deleteOldFile);
           }
 
-          if (($file_extension == 'jpeg' || $file_extension == 'jpg') && $convert_to_extension == 'webp') {
-            $converted_result = $this->convert_jpeg_to_webp($file_source_path, $file_output_path, $delete_old_file);
+          if (($fileExtension === 'jpeg' || $fileExtension === 'jpg') && $convertToExtension === 'webp') {
+            $convertedResult = $this->convert_jpeg_to_webp($fileSourcePath, $fileOutputPath, $deleteOldFile);
           }
 
-          if (($file_extension == 'jpeg' || $file_extension == 'jpg') && $convert_to_extension == 'avif') {
-            $converted_result = $this->convert_jpeg_to_avif($file_source_path, $file_output_path, $delete_old_file);
+          if (($fileExtension === 'jpeg' || $fileExtension === 'jpg') && $convertToExtension === 'avif') {
+            $convertedResult = $this->convert_jpeg_to_avif($fileSourcePath, $fileOutputPath, $deleteOldFile);
           }
           
-          if ($file_extension == 'png' && ($convert_to_extension == 'jpeg' || $convert_to_extension == 'jpg')) {
-            $converted_result = $this->convert_png_to_jpeg($file_source_path, $file_output_path, $delete_old_file);
+          if ($fileExtension === 'png' && ($convertToExtension === 'jpeg' || $convertToExtension === 'jpg')) {
+            $convertedResult = $this->convert_png_to_jpeg($fileSourcePath, $fileOutputPath, $deleteOldFile);
           }
           
-          if ($file_extension == 'png' && $convert_to_extension == 'webp') {
-            $converted_result = $this->convert_png_to_webp($file_source_path, $file_output_path, $delete_old_file);
+          if ($fileExtension === 'png' && $convertToExtension === 'webp') {
+            $convertedResult = $this->convert_png_to_webp($fileSourcePath, $fileOutputPath, $deleteOldFile);
           }
           
-          if ($file_extension == 'png' && $convert_to_extension == 'avif') {
-            $converted_result = $this->convert_png_to_avif($file_source_path, $file_output_path, $delete_old_file);
+          if ($fileExtension === 'png' && $convertToExtension === 'avif') {
+            $convertedResult = $this->convert_png_to_avif($fileSourcePath, $fileOutputPath, $deleteOldFile);
           }
           
-          if ($file_extension == 'webp' && ($convert_to_extension == 'jpeg' || $convert_to_extension == 'jpg')) {
-            $converted_result = $this->convert_webp_to_jpeg($file_source_path, $file_output_path, $delete_old_file);
+          if ($fileExtension === 'webp' && ($convertToExtension === 'jpeg' || $convertToExtension === 'jpg')) {
+            $convertedResult = $this->convert_webp_to_jpeg($fileSourcePath, $fileOutputPath, $deleteOldFile);
           }
           
-          if ($file_extension == 'webp' && $convert_to_extension == 'png') {
-            $converted_result = $this->convert_webp_to_png($file_source_path, $file_output_path, $delete_old_file);
+          if ($fileExtension === 'webp' && $convertToExtension === 'png') {
+            $convertedResult = $this->convert_webp_to_png($fileSourcePath, $fileOutputPath, $deleteOldFile);
           }
           
-          if ($file_extension == 'webp' && $convert_to_extension == 'avif') {
-            $converted_result = $this->convert_webp_to_avif($file_source_path, $file_output_path, $delete_old_file);
+          if ($fileExtension === 'webp' && $convertToExtension === 'avif') {
+            $convertedResult = $this->convert_webp_to_avif($fileSourcePath, $fileOutputPath, $deleteOldFile);
           }
           
-          if ($file_extension == 'avif' && ($convert_to_extension == 'jpeg' || $convert_to_extension == 'jpg')) {
-            $converted_result = $this->convert_avif_to_jpeg($file_source_path, $file_output_path, $delete_old_file);
+          if ($fileExtension === 'avif' && ($convertToExtension === 'jpeg' || $convertToExtension === 'jpg')) {
+            $convertedResult = $this->convert_avif_to_jpeg($fileSourcePath, $fileOutputPath, $deleteOldFile);
           }
           
-          if ($file_extension == 'avif' && $convert_to_extension == 'png') {
-            $converted_result = $this->convert_avif_to_png($file_source_path, $file_output_path, $delete_old_file);
+          if ($fileExtension === 'avif' && $convertToExtension === 'png') {
+            $convertedResult = $this->convert_avif_to_png($fileSourcePath, $fileOutputPath, $deleteOldFile);
           }
           
-          if ($file_extension == 'avif' && $convert_to_extension == 'webp') {
-            $converted_result = $this->convert_avif_to_webp($file_source_path, $file_output_path, $delete_old_file);
+          if ($fileExtension === 'avif' && $convertToExtension === 'webp') {
+            $convertedResult = $this->convert_avif_to_webp($fileSourcePath, $fileOutputPath, $deleteOldFile);
           }
 
-          if (($file_extension == $convert_to_extension)) {
-            if (file_exists($file_source_path)) {
-              $file_renamed = rename($file_source_path, $file_output_path);
+          if (($fileExtension === $convertToExtension)) {
+            if (file_exists($fileSourcePath)) {
+              $fileRenamed = rename($fileSourcePath, $fileOutputPath);
 
-              if ($file_renamed) {
-                $converted_result = true;
+              if ($fileRenamed) {
+                $convertedResult = true;
               }
             };
           }
         }
 
-        if ($converted_result == true) {
+        if ($convertedResult === true) {
           return [
-            'extension_old' => $file_extension,
-            'extension_new' => $convert_to_extension,
-            'file_name' => $file_output_name,
-            'file_path' => $file_output_path,
-            'file_url' => str_replace(CMS_ROOT_DIRECTORY, '', $file_output_path)
+            'extensionOld' => $fileExtension,
+            'extensionNew' => $convertToExtension,
+            'fileName' => $fileOutputName,
+            'filePath' => $fileOutputPath,
+            'fileURL' => str_replace(CMS_ROOT_DIRECTORY, '', $fileOutputPath)
           ];
         }
       }
@@ -177,344 +178,344 @@ namespace core\PHPLibrary\SystemCore {
     /**
      * convert_jpg_to_png
      *
-     * @param  string $file_source_path
-     * @param  string $file_output_path
-     * @param  bool $delete_old_file
+     * @param  string $fileSourcePath
+     * @param  string $fileOutputPath
+     * @param  bool $deleteOldFile
      * @return bool
      */
-    private function convert_jpeg_to_png(string $file_source_path, string $file_output_path, bool $delete_old_file = false) : bool {
-      $image_source = imagecreatefromjpeg($file_source_path);
-      $image_source_width = imagesx($image_source);
-      $image_source_height = imagesy($image_source);
+    private function convert_jpeg_to_png(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool {
+      $imageSource = imagecreatefromjpeg($fileSourcePath);
+      $imageSourceWidth = imagesx($imageSource);
+      $imageSourceHeight = imagesy($imageSource);
 
-      $image_converted = imagecreatetruecolor($image_source_width, $image_source_height);
-      imagecopy($image_converted, $image_source, 0, 0, 0, 0, $image_source_width, $image_source_height);
-      imagepng($image_converted, $file_output_path, -1);
+      $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+      imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
+      imagepng($imageConverted, $fileOutputPath, -1);
       
-      imagedestroy($image_source);
-      imagedestroy($image_converted);
+      imagedestroy($imageSource);
+      imagedestroy($imageConverted);
 
-      if ($delete_old_file) unlink($file_source_path);
+      if ($deleteOldFile) unlink($fileSourcePath);
 
-      return file_exists($file_output_path);
+      return file_exists($fileOutputPath);
     }
     
     /**
      * convert_jpg_to_webp
      *
-     * @param  string $file_source_path
-     * @param  string $file_output_path
-     * @param  bool $delete_old_file
+     * @param  string $fileSourcePath
+     * @param  string $fileOutputPath
+     * @param  bool $deleteOldFile
      * @return bool
      */
-    private function convert_jpeg_to_webp(string $file_source_path, string $file_output_path, bool $delete_old_file = false) : bool {
-      $image_source = imagecreatefromjpeg($file_source_path);
-      $image_source_width = imagesx($image_source);
-      $image_source_height = imagesy($image_source);
+    private function convert_jpeg_to_webp(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool {
+      $imageSource = imagecreatefromjpeg($fileSourcePath);
+      $imageSourceWidth = imagesx($imageSource);
+      $imageSourceHeight = imagesy($imageSource);
 
-      $image_converted = imagecreatetruecolor($image_source_width, $image_source_height);
-      imagecopy($image_converted, $image_source, 0, 0, 0, 0, $image_source_width, $image_source_height);
-      imagewebp($image_converted, $file_output_path, 100);
+      $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+      imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
+      imagewebp($imageConverted, $fileOutputPath, 100);
 
-      imagedestroy($image_source);
-      imagedestroy($image_converted);
+      imagedestroy($imageSource);
+      imagedestroy($imageConverted);
 
-      if ($delete_old_file) unlink($file_source_path);
+      if ($deleteOldFile) unlink($fileSourcePath);
 
-      return file_exists($file_output_path);
+      return file_exists($fileOutputPath);
     }
     
     /**
      * convert_jpg_to_avif
      *
-     * @param  string $file_source_path
-     * @param  string $file_output_path
-     * @param  bool $delete_old_file
+     * @param  string $fileSourcePath
+     * @param  string $fileOutputPath
+     * @param  bool $deleteOldFile
      * @return bool
      */
-    private function convert_jpeg_to_avif(string $file_source_path, string $file_output_path, bool $delete_old_file = false) : bool {
-      $image_source = imagecreatefromjpeg($file_source_path);
-      $image_source_width = imagesx($image_source);
-      $image_source_height = imagesy($image_source);
+    private function convert_jpeg_to_avif(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool {
+      $imageSource = imagecreatefromjpeg($fileSourcePath);
+      $imageSourceWidth = imagesx($imageSource);
+      $imageSourceHeight = imagesy($imageSource);
 
-      $image_converted = imagecreatetruecolor($image_source_width, $image_source_height);
-      imagecopy($image_converted, $image_source, 0, 0, 0, 0, $image_source_width, $image_source_height);
-      imageavif($image_converted, $file_output_path);
+      $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+      imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
+      imageavif($imageConverted, $fileOutputPath);
 
-      imagedestroy($image_source);
-      imagedestroy($image_converted);
+      imagedestroy($imageSource);
+      imagedestroy($imageConverted);
 
-      if ($delete_old_file) unlink($file_source_path);
+      if ($deleteOldFile) unlink($fileSourcePath);
 
-      return file_exists($file_output_path);
+      return file_exists($fileOutputPath);
     }
     
     /**
      * convert_png_to_jpg
      *
-     * @param  string $file_source_path
-     * @param  string $file_output_path
-     * @param  bool $delete_old_file
+     * @param  string $fileSourcePath
+     * @param  string $fileOutputPath
+     * @param  bool $deleteOldFile
      * @return bool
      */
-    private function convert_png_to_jpeg(string $file_source_path, string $file_output_path, bool $delete_old_file = false) : bool {
-      $image_source = imagecreatefrompng($file_source_path);
-      $image_source_width = imagesx($image_source);
-      $image_source_height = imagesy($image_source);
+    private function convert_png_to_jpeg(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool {
+      $imageSource = imagecreatefrompng($fileSourcePath);
+      $imageSourceWidth = imagesx($imageSource);
+      $imageSourceHeight = imagesy($imageSource);
 
-      $image_converted = imagecreatetruecolor($image_source_width, $image_source_height);
-      imagefill($image_converted, 0, 0, imagecolorallocate($image_converted, 255, 255, 255));
-      imagealphablending($image_converted, true);
+      $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+      imagefill($imageConverted, 0, 0, imagecolorallocate($imageConverted, 255, 255, 255));
+      imagealphablending($imageConverted, true);
 
-      imagecopy($image_converted, $image_source, 0, 0, 0, 0, $image_source_width, $image_source_height);
-      imagejpeg($image_converted, $file_output_path, 100);
+      imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
+      imagejpeg($imageConverted, $fileOutputPath, 100);
       
-      imagedestroy($image_source);
-      imagedestroy($image_converted);
+      imagedestroy($imageSource);
+      imagedestroy($imageConverted);
 
-      if ($delete_old_file) unlink($file_source_path);
+      if ($deleteOldFile) unlink($fileSourcePath);
 
-      return file_exists($file_output_path);
+      return file_exists($fileOutputPath);
     }
     
     /**
      * convert_png_to_webp
      *
-     * @param  string $file_source_path
-     * @param  string $file_output_path
-     * @param  bool $delete_old_file
+     * @param  string $fileSourcePath
+     * @param  string $fileOutputPath
+     * @param  bool $deleteOldFile
      * @return bool
      */
-    private function convert_png_to_webp(string $file_source_path, string $file_output_path, bool $delete_old_file = false) : bool {
-      $image_source = imagecreatefrompng($file_source_path);
-      $image_source_width = imagesx($image_source);
-      $image_source_height = imagesy($image_source);
+    private function convert_png_to_webp(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool {
+      $imageSource = imagecreatefrompng($fileSourcePath);
+      $imageSourceWidth = imagesx($imageSource);
+      $imageSourceHeight = imagesy($imageSource);
 
-      $image_converted = imagecreatetruecolor($image_source_width, $image_source_height);
-      imageAlphaBlending($image_converted, false);
-      imageSaveAlpha($image_converted, true);
+      $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+      imageAlphaBlending($imageConverted, false);
+      imageSaveAlpha($imageConverted, true);
 
-      $image_transparent = imagecolorallocatealpha($image_converted, 0, 0, 0, 127);
-      imagefilledrectangle($image_converted, 0, 0, $image_source_width - 1, $image_source_height - 1, $image_transparent);
+      $image_transparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
+      imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
 
-      imagecopy($image_converted, $image_source, 0, 0, 0, 0, $image_source_width, $image_source_height);
-      imagewebp($image_converted, $file_output_path, 100);
+      imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
+      imagewebp($imageConverted, $fileOutputPath, 100);
 
-      imagedestroy($image_source);
-      imagedestroy($image_converted);
+      imagedestroy($imageSource);
+      imagedestroy($imageConverted);
 
-      if ($delete_old_file) unlink($file_source_path);
+      if ($deleteOldFile) unlink($fileSourcePath);
 
-      return file_exists($file_output_path);
+      return file_exists($fileOutputPath);
     }
     
     /**
      * convert_png_to_avif
      *
-     * @param  string $file_source_path
-     * @param  string $file_output_path
-     * @param  bool $delete_old_file
+     * @param  string $fileSourcePath
+     * @param  string $fileOutputPath
+     * @param  bool $deleteOldFile
      * @return bool
      */
-    private function convert_png_to_avif(string $file_source_path, string $file_output_path, bool $delete_old_file = false) : bool {
-      $image_source = imagecreatefrompng($file_source_path);
-      $image_source_width = imagesx($image_source);
-      $image_source_height = imagesy($image_source);
+    private function convert_png_to_avif(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool {
+      $imageSource = imagecreatefrompng($fileSourcePath);
+      $imageSourceWidth = imagesx($imageSource);
+      $imageSourceHeight = imagesy($imageSource);
 
-      $image_converted = imagecreatetruecolor($image_source_width, $image_source_height);
-      imageAlphaBlending($image_converted, false);
-      imageSaveAlpha($image_converted, true);
+      $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+      imageAlphaBlending($imageConverted, false);
+      imageSaveAlpha($imageConverted, true);
 
-      $image_transparent = imagecolorallocatealpha($image_converted, 0, 0, 0, 127);
-      imagefilledrectangle($image_converted, 0, 0, $image_source_width - 1, $image_source_height - 1, $image_transparent);
+      $image_transparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
+      imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
 
-      imagecopy($image_converted, $image_source, 0, 0, 0, 0, $image_source_width, $image_source_height);
-      imageavif($image_converted, $file_output_path);
+      imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
+      imageavif($imageConverted, $fileOutputPath);
 
-      imagedestroy($image_source);
-      imagedestroy($image_converted);
+      imagedestroy($imageSource);
+      imagedestroy($imageConverted);
 
-      if ($delete_old_file) unlink($file_source_path);
+      if ($deleteOldFile) unlink($fileSourcePath);
 
-      return file_exists($file_output_path);
+      return file_exists($fileOutputPath);
     }
     
     /**
      * convert_webp_to_jpg
      *
-     * @param  string $file_source_path
-     * @param  string $file_output_path
-     * @param  bool $delete_old_file
+     * @param  string $fileSourcePath
+     * @param  string $fileOutputPath
+     * @param  bool $deleteOldFile
      * @return bool
      */
-    private function convert_webp_to_jpeg(string $file_source_path, string $file_output_path, bool $delete_old_file = false) : bool {
-      $image_source = imagecreatefromwebp($file_source_path);
-      $image_source_width = imagesx($image_source);
-      $image_source_height = imagesy($image_source);
+    private function convert_webp_to_jpeg(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool {
+      $imageSource = imagecreatefromwebp($fileSourcePath);
+      $imageSourceWidth = imagesx($imageSource);
+      $imageSourceHeight = imagesy($imageSource);
 
-      $image_converted = imagecreatetruecolor($image_source_width, $image_source_height);
-      imagefill($image_converted, 0, 0, imagecolorallocate($image_converted, 255, 255, 255));
-      imagealphablending($image_converted, true);
+      $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+      imagefill($imageConverted, 0, 0, imagecolorallocate($imageConverted, 255, 255, 255));
+      imagealphablending($imageConverted, true);
 
-      imagecopy($image_converted, $image_source, 0, 0, 0, 0, $image_source_width, $image_source_height);
-      imagejpeg($image_converted, $file_output_path, 100);
+      imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
+      imagejpeg($imageConverted, $fileOutputPath, 100);
       
-      imagedestroy($image_source);
-      imagedestroy($image_converted);
+      imagedestroy($imageSource);
+      imagedestroy($imageConverted);
 
-      if ($delete_old_file) unlink($file_source_path);
+      if ($deleteOldFile) unlink($fileSourcePath);
 
-      return file_exists($file_output_path);
+      return file_exists($fileOutputPath);
     }
     
     /**
      * convert_webp_to_png
      *
-     * @param  string $file_source_path
-     * @param  string $file_output_path
-     * @param  bool $delete_old_file
+     * @param  string $fileSourcePath
+     * @param  string $fileOutputPath
+     * @param  bool $deleteOldFile
      * @return bool
      */
-    private function convert_webp_to_png(string $file_source_path, string $file_output_path, bool $delete_old_file = false) : bool {
-      $image_source = imagecreatefromwebp($file_source_path);
-      $image_source_width = imagesx($image_source);
-      $image_source_height = imagesy($image_source);
+    private function convert_webp_to_png(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool {
+      $imageSource = imagecreatefromwebp($fileSourcePath);
+      $imageSourceWidth = imagesx($imageSource);
+      $imageSourceHeight = imagesy($imageSource);
 
-      $image_converted = imagecreatetruecolor($image_source_width, $image_source_height);
-      imageAlphaBlending($image_converted, false);
-      imageSaveAlpha($image_converted, true);
+      $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+      imageAlphaBlending($imageConverted, false);
+      imageSaveAlpha($imageConverted, true);
 
-      $image_transparent = imagecolorallocatealpha($image_converted, 0, 0, 0, 127);
-      imagefilledrectangle($image_converted, 0, 0, $image_source_width - 1, $image_source_height - 1, $image_transparent);
-      imagecopy($image_converted, $image_source, 0, 0, 0, 0, $image_source_width, $image_source_height);
-      imagepng($image_converted, $file_output_path, -1);
+      $image_transparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
+      imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
+      imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
+      imagepng($imageConverted, $fileOutputPath, -1);
       
-      imagedestroy($image_source);
-      imagedestroy($image_converted);
+      imagedestroy($imageSource);
+      imagedestroy($imageConverted);
 
-      if ($delete_old_file) unlink($file_source_path);
+      if ($deleteOldFile) unlink($fileSourcePath);
 
-      return file_exists($file_output_path);
+      return file_exists($fileOutputPath);
     }
     
     /**
      * convert_webp_to_avif
      *
-     * @param  string $file_source_path
-     * @param  string $file_output_path
-     * @param  bool $delete_old_file
+     * @param  string $fileSourcePath
+     * @param  string $fileOutputPath
+     * @param  bool $deleteOldFile
      * @return bool
      */
-    private function convert_webp_to_avif(string $file_source_path, string $file_output_path, bool $delete_old_file = false) : bool {
-      $image_source = imagecreatefromwebp($file_source_path);
-      $image_source_width = imagesx($image_source);
-      $image_source_height = imagesy($image_source);
+    private function convert_webp_to_avif(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool {
+      $imageSource = imagecreatefromwebp($fileSourcePath);
+      $imageSourceWidth = imagesx($imageSource);
+      $imageSourceHeight = imagesy($imageSource);
 
-      $image_converted = imagecreatetruecolor($image_source_width, $image_source_height);
-      imageAlphaBlending($image_converted, false);
-      imageSaveAlpha($image_converted, true);
+      $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+      imageAlphaBlending($imageConverted, false);
+      imageSaveAlpha($imageConverted, true);
 
-      $image_transparent = imagecolorallocatealpha($image_converted, 0, 0, 0, 127);
-      imagefilledrectangle($image_converted, 0, 0, $image_source_width - 1, $image_source_height - 1, $image_transparent);
+      $image_transparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
+      imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
 
-      imagecopy($image_converted, $image_source, 0, 0, 0, 0, $image_source_width, $image_source_height);
-      imageavif($image_converted, $file_output_path);
+      imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
+      imageavif($imageConverted, $fileOutputPath);
 
-      imagedestroy($image_source);
-      imagedestroy($image_converted);
+      imagedestroy($imageSource);
+      imagedestroy($imageConverted);
 
-      if ($delete_old_file) unlink($file_source_path);
+      if ($deleteOldFile) unlink($fileSourcePath);
 
-      return file_exists($file_output_path);
+      return file_exists($fileOutputPath);
     }
     
     /**
      * convert_avif_to_jpg
      *
-     * @param  string $file_source_path
-     * @param  string $file_output_path
-     * @param  bool $delete_old_file
+     * @param  string $fileSourcePath
+     * @param  string $fileOutputPath
+     * @param  bool $deleteOldFile
      * @return bool
      */
-    private function convert_avif_to_jpeg(string $file_source_path, string $file_output_path, bool $delete_old_file = false) : bool {
-      $image_source = imagecreatefromavif($file_source_path);
-      $image_source_width = imagesx($image_source);
-      $image_source_height = imagesy($image_source);
+    private function convert_avif_to_jpeg(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool {
+      $imageSource = imagecreatefromavif($fileSourcePath);
+      $imageSourceWidth = imagesx($imageSource);
+      $imageSourceHeight = imagesy($imageSource);
 
-      $image_converted = imagecreatetruecolor($image_source_width, $image_source_height);
-      imagefill($image_converted, 0, 0, imagecolorallocate($image_converted, 255, 255, 255));
-      imagealphablending($image_converted, true);
+      $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+      imagefill($imageConverted, 0, 0, imagecolorallocate($imageConverted, 255, 255, 255));
+      imagealphablending($imageConverted, true);
 
-      imagecopy($image_converted, $image_source, 0, 0, 0, 0, $image_source_width, $image_source_height);
-      imagejpeg($image_converted, $file_output_path, 100);
+      imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
+      imagejpeg($imageConverted, $fileOutputPath, 100);
       
-      imagedestroy($image_source);
-      imagedestroy($image_converted);
+      imagedestroy($imageSource);
+      imagedestroy($imageConverted);
 
-      if ($delete_old_file) unlink($file_source_path);
+      if ($deleteOldFile) unlink($fileSourcePath);
 
-      return file_exists($file_output_path);
+      return file_exists($fileOutputPath);
     }
     
     /**
      * convert_avif_to_png
      *
-     * @param  string $file_source_path
-     * @param  string $file_output_path
-     * @param  bool $delete_old_file
+     * @param  string $fileSourcePath
+     * @param  string $fileOutputPath
+     * @param  bool $deleteOldFile
      * @return bool
      */
-    private function convert_avif_to_png(string $file_source_path, string $file_output_path, bool $delete_old_file = false) : bool {
-      $image_source = imagecreatefromavif($file_source_path);
-      $image_source_width = imagesx($image_source);
-      $image_source_height = imagesy($image_source);
+    private function convert_avif_to_png(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool {
+      $imageSource = imagecreatefromavif($fileSourcePath);
+      $imageSourceWidth = imagesx($imageSource);
+      $imageSourceHeight = imagesy($imageSource);
 
-      $image_converted = imagecreatetruecolor($image_source_width, $image_source_height);
-      imageAlphaBlending($image_converted, false);
-      imageSaveAlpha($image_converted, true);
+      $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+      imageAlphaBlending($imageConverted, false);
+      imageSaveAlpha($imageConverted, true);
 
-      $image_transparent = imagecolorallocatealpha($image_converted, 0, 0, 0, 127);
-      imagefilledrectangle($image_converted, 0, 0, $image_source_width - 1, $image_source_height - 1, $image_transparent);
-      imagecopy($image_converted, $image_source, 0, 0, 0, 0, $image_source_width, $image_source_height);
-      imagepng($image_converted, $file_output_path, -1);
+      $image_transparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
+      imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
+      imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
+      imagepng($imageConverted, $fileOutputPath, -1);
       
-      imagedestroy($image_source);
-      imagedestroy($image_converted);
+      imagedestroy($imageSource);
+      imagedestroy($imageConverted);
 
-      if ($delete_old_file) unlink($file_source_path);
+      if ($deleteOldFile) unlink($fileSourcePath);
 
-      return file_exists($file_output_path);
+      return file_exists($fileOutputPath);
     }
     
     /**
      * convert_avif_to_webp
      *
-     * @param  string $file_source_path
-     * @param  string $file_output_path
-     * @param  bool $delete_old_file
+     * @param  string $fileSourcePath
+     * @param  string $fileOutputPath
+     * @param  bool $deleteOldFile
      * @return bool
      */
-    private function convert_avif_to_webp(string $file_source_path, string $file_output_path, bool $delete_old_file = false) : bool {
-      $image_source = imagecreatefromavif($file_source_path);
-      $image_source_width = imagesx($image_source);
-      $image_source_height = imagesy($image_source);
+    private function convert_avif_to_webp(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool {
+      $imageSource = imagecreatefromavif($fileSourcePath);
+      $imageSourceWidth = imagesx($imageSource);
+      $imageSourceHeight = imagesy($imageSource);
 
-      $image_converted = imagecreatetruecolor($image_source_width, $image_source_height);
-      imageAlphaBlending($image_converted, false);
-      imageSaveAlpha($image_converted, true);
+      $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+      imageAlphaBlending($imageConverted, false);
+      imageSaveAlpha($imageConverted, true);
 
-      $image_transparent = imagecolorallocatealpha($image_converted, 0, 0, 0, 127);
-      imagefilledrectangle($image_converted, 0, 0, $image_source_width - 1, $image_source_height - 1, $image_transparent);
+      $image_transparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
+      imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
 
-      imagecopy($image_converted, $image_source, 0, 0, 0, 0, $image_source_width, $image_source_height);
-      imagewebp($image_converted, $file_output_path);
+      imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
+      imagewebp($imageConverted, $fileOutputPath);
 
-      imagedestroy($image_source);
-      imagedestroy($image_converted);
+      imagedestroy($imageSource);
+      imagedestroy($imageConverted);
 
-      if ($delete_old_file) unlink($file_source_path);
+      if ($deleteOldFile) unlink($fileSourcePath);
 
-      return file_exists($file_output_path);
+      return file_exists($fileOutputPath);
     }
   }
 }

@@ -40,11 +40,11 @@ namespace core\PHPLibrary\SystemCore {
       $query_builder->set_statement_select();
       $query_builder->statement->add_selections(['id']);
       $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('reports');
-      $query_builder->statement->clause_from->assembly();
+      $query_builder->statement->clauseFrom->add_table('reports');
+      $query_builder->statement->clauseFrom->assembly();
       $query_builder->statement->set_clause_order_by();
-      $query_builder->statement->clause_order_by->set_column('created_unix_timestamp');
-      $query_builder->statement->clause_order_by->set_sort_type('DESC');
+      $query_builder->statement->clauseOrderBy->set_column('created_unix_timestamp');
+      $query_builder->statement->clauseOrderBy->set_sort_type('DESC');
       if (array_key_exists('limit', $params_array)) {
         if (is_array($params_array['limit'])) {
           $limit = (is_integer($params_array['limit'][0])) ? $params_array['limit'][0] : 0;
@@ -95,14 +95,14 @@ namespace core\PHPLibrary\SystemCore {
       $query_builder->set_statement_select();
       $query_builder->statement->add_selections(['id']);
       $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('reports');
-      $query_builder->statement->clause_from->assembly();
+      $query_builder->statement->clauseFrom->add_table('reports');
+      $query_builder->statement->clauseFrom->assembly();
       $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition(implode(' OR ', $condition_type_ids));
-      $query_builder->statement->clause_where->assembly();
+      $query_builder->statement->clauseWhere->add_condition(implode(' OR ', $condition_type_ids));
+      $query_builder->statement->clauseWhere->assembly();
       $query_builder->statement->set_clause_order_by();
-      $query_builder->statement->clause_order_by->set_column('created_unix_timestamp');
-      $query_builder->statement->clause_order_by->set_sort_type('DESC');
+      $query_builder->statement->clauseOrderBy->set_column('created_unix_timestamp');
+      $query_builder->statement->clauseOrderBy->set_sort_type('DESC');
       if (array_key_exists('limit', $params_array)) {
         if (is_array($params_array['limit'])) {
           $limit = (is_integer($params_array['limit'][0])) ? $params_array['limit'][0] : 0;

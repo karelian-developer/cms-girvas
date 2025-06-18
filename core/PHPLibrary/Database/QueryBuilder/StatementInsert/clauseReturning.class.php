@@ -30,11 +30,11 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementInsert {
     /**
      * Добавить колонку значения
      *
-     * @param  mixed $column_name
+     * @param  mixed $name
      * @return void
      */
-    public function add_column(string $column_name) : void {
-      array_push($this->columns, $column_name);
+    public function add_column(string $name) : void {
+      array_push($this->columns, $name);
     }
     
     /**

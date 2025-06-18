@@ -38,25 +38,25 @@ namespace core\PHPLibrary {
     public const PERMISSION_BASE_ENTRY_COMMENT_CHANGE           = 1 << 15;
     public const PERMISSION_BASE_ENTRY_COMMENT_RATE             = 1 << 16;
 
-    private readonly SystemCore $system_core;
+    private readonly SystemCore $CMSCore;
     private int $id;
     
     /**
      * __construct
      *
-     * @param  mixed $system_core
+     * @param  mixed $CMSCore
      * @param  mixed $id
      * @return void
      */
-    public function __construct(SystemCore $system_core, int $id) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, int $id) {
+      $this->CMSCore= $CMSCore;
       $this->set_id($id);
     }
 
-    public function init_data(array $columns = ['*']) {
-      $columns_data = $this->get_database_columns_data($columns);
-      foreach ($columns_data as $column_name => $column_data) {
-        $this->{$column_name} = $column_data;
+    public function init_data(array $columns = ['*']) : void {
+      $columnsData = $this->get_database_columns_data($columns);
+      foreach ($columnsData as $name => $data) {
+        $this->{$name} = $data;
       }
     }
 
@@ -88,22 +88,22 @@ namespace core\PHPLibrary {
     }
 
     public function get_users() : array {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('(metadata->>\'group_id\')::int = :group_id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['id']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('(metadata->>\'groupID\')::int = :groupID');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':group_id', $this->id, \PDO::PARAM_INT);
-        $execute = $database_query->execute();
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':groupID', $this->id, \PDO::PARAM_INT);
+        $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -116,9 +116,9 @@ namespace core\PHPLibrary {
       $users = [];
 
       if ($execute) {
-        $result = $database_query->fetchAll(\PDO::FETCH_ASSOC);
-        foreach ($result as $user_data) {
-          array_push($users, new User($this->system_core, $user_data['id']));
+        $result = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+        foreach ($result as $userData) {
+          array_push($users, new User($this->CMSCore, $userData['id']));
         }
       }
 
@@ -126,22 +126,22 @@ namespace core\PHPLibrary {
     }
 
     public function get_users_count() : int {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['count(*)']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('(metadata->>\'group_id\')::int = :group_id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['count(*)']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('(metadata->>\'groupID\')::int = :groupID');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':group_id', $this->id, \PDO::PARAM_INT);
-        $execute = $database_query->execute();
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':groupID', $this->id, \PDO::PARAM_INT);
+        $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -152,7 +152,7 @@ namespace core\PHPLibrary {
       }
 
       if ($execute) {
-        $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+        $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
         return $result['count'];
       }
 
@@ -160,11 +160,11 @@ namespace core\PHPLibrary {
     }
 
     public function get_created_unix_timestamp() : int|string {
-      return (property_exists($this, 'created_unix_timestamp')) ? $this->created_unix_timestamp : '{ERROR:USER_GROUP_DATA_IS_NOT_EXISTS=created_unix_timestamp}';
+      return (property_exists($this, 'createdUnixTimestamp')) ? $this->createdUnixTimestamp : '{ERROR:USER_GROUP_DATA_IS_NOT_EXISTS=createdUnixTimestamp}';
     }
 
     public function get_updated_unix_timestamp() : int|string {
-      return (property_exists($this, 'updated_unix_timestamp')) ? $this->updated_unix_timestamp : '{ERROR:USER_GROUP_IS_NOT_EXISTS=updated_unix_timestamp}';
+      return (property_exists($this, 'updatedUnixTimestamp')) ? $this->updatedUnixTimestamp : '{ERROR:USER_GROUP_IS_NOT_EXISTS=updatedUnixTimestamp}';
     }
 
     public function permission_check(int $permission) : bool {
@@ -182,11 +182,11 @@ namespace core\PHPLibrary {
      *
      * @return string
      */
-    public function get_title($locale_name = 'en_US') : string {
+    public function get_title($localeName = 'en_US') : string {
       if (property_exists($this, 'texts')) {
         $texts_array = json_decode($this->texts, true);
-        if (isset($texts_array[$locale_name]['title'])) {
-          return $texts_array[$locale_name]['title'];
+        if (isset($texts_array[$localeName]['title'])) {
+          return $texts_array[$localeName]['title'];
         }
       }
 
@@ -194,25 +194,25 @@ namespace core\PHPLibrary {
     }
 
     private function get_database_columns_data(array $columns = ['*']) : array|null {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections($columns);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users_groups');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections($columns);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users_groups');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
       
-      /** @var int $user_group_id Идентификационный номер записи */
-      $user_group_id = $this->get_id();
+      /** @var int $userGroupID Идентификационный номер записи */
+      $userGroupID = $this->get_id();
 
       try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $user_group_id, \PDO::PARAM_INT);
-        $database_query->execute();
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':id', $userGroupID, \PDO::PARAM_INT);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -222,37 +222,37 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
       return ($result) ? $result : null;
     }
     
     /**
      * Получить объект группы пользователя по наименованию
      *
-     * @param  mixed $system_core
-     * @param  mixed $group_name
+     * @param  mixed $CMSCore
+     * @param  mixed $groupName
      * @return UserGroup
      */
-    public static function get_by_name(SystemCore $system_core, string $group_name) : UserGroup|null {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users_groups');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('LOWER(name) = :name');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function get_by_name(SystemCore $CMSCore, string $groupName) : UserGroup|null {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['id']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users_groups');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('LOWER(name) = :name');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
-      $group_name = strtolower($group_name);
+      $groupName = strtolower($groupName);
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':name', $group_name, \PDO::PARAM_STR);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':name', $groupName, \PDO::PARAM_STR);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -262,38 +262,38 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
       
-      return ($result) ? new UserGroup($system_core, (int)$result['id']) : null;
+      return ($result) ? new UserGroup($CMSCore, (int)$result['id']) : null;
     }
     
     /**
      * Проверить существование группы пользователей по наименованию
      *
-     * @param  mixed $system_core
-     * @param  string $group_name
+     * @param  mixed $CMSCore
+     * @param  string $groupName
      * @return void
      */
-    public static function exists_by_name(\core\PHPLibrary\SystemCore $system_core, string $group_name) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['1']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users_groups');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('LOWER(name) = :name');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function exists_by_name(\core\PHPLibrary\SystemCore $CMSCore, string $groupName) : bool {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['1']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users_groups');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('LOWER(name) = :name');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
-      $group_name = strtolower($group_name);
+      $groupName = strtolower($groupName);
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':name', $group_name, \PDO::PARAM_STR);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':name', $groupName, \PDO::PARAM_STR);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -303,34 +303,34 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
       
-      return ($database_query->fetchColumn()) ? true : false;
+      return ($databaseQuery->fetchColumn()) ? true : false;
     }
     
     /**
      * Проверить существование группы пользователей по ID
      *
-     * @param  mixed $system_core
+     * @param  mixed $CMSCore
      * @param  int $group_id
      * @return void
      */
-    public static function exists_by_id(\core\PHPLibrary\SystemCore $system_core, int $group_id) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['1']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users_groups');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function exists_by_id(\core\PHPLibrary\SystemCore $CMSCore, int $group_id) : bool {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['1']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users_groups');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $group_id, \PDO::PARAM_INT);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':id', $group_id, \PDO::PARAM_INT);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -340,7 +340,7 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      return ($database_query->fetchColumn()) ? true : false;
+      return ($databaseQuery->fetchColumn()) ? true : false;
     }
 
     /**
@@ -349,21 +349,21 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function delete() : bool {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_delete();
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users_groups');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_delete();
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users_groups');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-        $execute = $database_query->execute();
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+        $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -376,35 +376,35 @@ namespace core\PHPLibrary {
       return ($execute) ? true : false;
     }
 
-    public static function create(SystemCore $system_core, string $group_name, array $texts = [], int $permissions = 0x0000000000000000) : UserGroup|null {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_insert();
-      $query_builder->statement->set_table('users_groups');
-      $query_builder->statement->add_column('name');
-      $query_builder->statement->add_column('created_unix_timestamp');
-      $query_builder->statement->add_column('updated_unix_timestamp');
-      $query_builder->statement->add_column('permissions');
-      $query_builder->statement->add_column('metadata');
-      $query_builder->statement->add_column('texts');
-      $query_builder->statement->set_clause_returning();
-      $query_builder->statement->clause_returning->add_column('id');
-      $query_builder->statement->assembly();
+    public static function create(SystemCore $CMSCore, string $groupName, array $texts = [], int $permissions = 0x0000000000000000) : UserGroup|null {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_insert();
+      $queryBuilder->statement->set_table('users_groups');
+      $queryBuilder->statement->add_column('name');
+      $queryBuilder->statement->add_column('createdUnixTimestamp');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp');
+      $queryBuilder->statement->add_column('permissions');
+      $queryBuilder->statement->add_column('metadata');
+      $queryBuilder->statement->add_column('texts');
+      $queryBuilder->statement->set_clause_returning();
+      $queryBuilder->statement->clauseReturning->add_column('id');
+      $queryBuilder->statement->assembly();
 
-      $created_unix_timestamp = time();
-      $updated_unix_timestamp = $created_unix_timestamp;
-      $metadata_json = json_encode([], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-      $texts_json = json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      $createdUnixTimestamp = time();
+      $updatedUnixTimestamp = $createdUnixTimestamp;
+      $metadata = json_encode([], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      $texts = json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':name', $group_name, \PDO::PARAM_STR);
-        $database_query->bindParam(':created_unix_timestamp', $created_unix_timestamp, \PDO::PARAM_INT);
-        $database_query->bindParam(':updated_unix_timestamp', $updated_unix_timestamp, \PDO::PARAM_INT);
-        $database_query->bindParam(':permissions', $permissions, \PDO::PARAM_INT);
-        $database_query->bindParam(':metadata', $metadata_json, \PDO::PARAM_STR);
-        $database_query->bindParam(':texts', $texts_json, \PDO::PARAM_STR);
-        $execute = $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':name', $groupName, \PDO::PARAM_STR);
+        $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':permissions', $permissions, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':metadata', $metadata, \PDO::PARAM_STR);
+        $databaseQuery->bindParam(':texts', $texts, \PDO::PARAM_STR);
+        $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -415,8 +415,8 @@ namespace core\PHPLibrary {
       }
 
       if ($execute) {
-        $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-        return ($result) ? new UserGroup($system_core, $result['id']) : null;
+        $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+        return ($result) ? new UserGroup($CMSCore, $result['id']) : null;
       }
 
       return null;
@@ -429,71 +429,71 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function update(array $data) : bool {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_update();
-      $query_builder->statement->set_table('users_groups');
-      $query_builder->statement->set_clause_set();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_update();
+      $queryBuilder->statement->set_table('users_groups');
+      $queryBuilder->statement->set_clause_set();
 
-      foreach ($data as $data_name => $data_value) {
-        if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'texts', 'metadata'])) {
-          $query_builder->statement->clause_set->add_column($data_name);
+      foreach ($data as $name => $value) {
+        if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata'])) {
+          $queryBuilder->statement->clauseSet->add_column($name);
         }
       }
 
       if (array_key_exists('texts', $data)) {
-        $json_fields = [];
+        $jsonFields = [];
 
         foreach ($data['texts'] as $name => $value) {
-          array_push($json_fields, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
+          array_push($jsonFields, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
         }
 
         if (!empty($data['texts'])) {
-          $query_builder->statement->clause_set->add_column('texts', 'texts::jsonb || ' . implode(' || ', $json_fields));
+          $queryBuilder->statement->clauseSet->add_column('texts', 'texts::jsonb || ' . implode(' || ', $jsonFields));
         }
       }
 
       if (array_key_exists('metadata', $data)) {
-        $json_fields = [];
+        $jsonFields = [];
 
         foreach ($data['metadata'] as $name => $value) {
-          array_push($json_fields, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
+          array_push($jsonFields, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
         }
 
         if (!empty($data['metadata'])) {
-          $query_builder->statement->clause_set->add_column('metadata', 'metadata::jsonb || ' . implode(' || ', $json_fields));
+          $queryBuilder->statement->clauseSet->add_column('metadata', 'metadata::jsonb || ' . implode(' || ', $jsonFields));
         }
       }
 
-      $query_builder->statement->clause_set->add_column('updated_unix_timestamp');
-      $query_builder->statement->clause_set->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder->statement->clauseSet->add_column('updatedUnixTimestamp');
+      $queryBuilder->statement->clauseSet->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
 
       /** @var int $user_updated_unix_timestamp Текущее время в UNIX-формате */
-      $user_group_updated_unix_timestamp = time();
+      $userGroupUpdatedUnixTimestamp = time();
 
       try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
         
-        foreach ($data as $data_name => $data_value) {
-          if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'texts', 'metadata'])) {
-            switch (gettype($data_value)) {
-              case 'boolean': $data_value_type = \PDO::PARAM_INT; break;
-              case 'integer': $data_value_type = \PDO::PARAM_INT; break;
-              case 'string': $data_value_type = \PDO::PARAM_STR; break;
-              case 'null': $data_value_type = \PDO::PARAM_NULL; break;
+        foreach ($data as $name => $value) {
+          if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata'])) {
+            switch (gettype($value)) {
+              case 'boolean': $valueType = \PDO::PARAM_INT; break;
+              case 'integer': $valueType = \PDO::PARAM_INT; break;
+              case 'string': $valueType = \PDO::PARAM_STR; break;
+              case 'null': $valueType = \PDO::PARAM_NULL; break;
             }
             
-            $database_query->bindParam(':' . $data_name, $data[$data_name], $data_value_type);
+            $databaseQuery->bindParam(':' . $name, $data[$name], $valueType);
           }
         }
         
-        $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-        $database_query->bindParam(':updated_unix_timestamp', $user_group_updated_unix_timestamp, \PDO::PARAM_INT);
-        $execute = $database_query->execute();
+        $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':updatedUnixTimestamp', $userGroupUpdatedUnixTimestamp, \PDO::PARAM_INT);
+        $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),

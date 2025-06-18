@@ -105,13 +105,13 @@ namespace templates\default {
       $localeData = $this->theme->locale->get_data();
 
       $clientIsLogged = $this->theme->CMSCore->client->is_logged(1);
-      $user = ($clientIsLogged) ? $this->theme->CMSCore->client->get_user(1) : null;
+      $user = $clientIsLogged ? $this->theme->CMSCore->client->get_user(1) : null;
       
-      if ($user != null) {
+      if ($user !== null) {
         $user->init_data(['metadata']);
       }
 
-      $userGroupID = ($user != null) ? $user->get_group_id() : 0;
+      $userGroupID = $user !== null ? $user->get_group_id() : 0;
 
       if ($this->theme->CMSCore->configurator->get_database_entry_value('base_engineering_works_status') == 'off' || $userGroupID == 1) {
         $this->theme->add_style(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
@@ -123,9 +123,9 @@ namespace templates\default {
         $this->theme->add_script(['src' => 'core.class.js', 'type' => 'module'], true);
         $this->theme->add_script(['src' => 'core.class.js', 'type' => 'module']);
 
-        $profileLink = ($this->theme->CMSCore->client->is_logged(1)) ? sprintf('<a class="header__nav-link display-block" href="/profile"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_PROFILE']) : sprintf('<a id="SYSTEM_GE_IMC_00000001" class="header__nav-link display-block" href="#"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_LOGIN']);
-        $registrationLink = (!$this->theme->CMSCore->client->is_logged(1)) ? sprintf('<a class="header__nav-link display-block" href="/registration"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_REGISTRATION']) : '';
-        $exitLink = ($this->theme->CMSCore->client->is_logged(1)) ? sprintf('<a class="header__nav-link display-block" href="#" role="profileNavigationExit"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_EXIT']) : '';
+        $profileLink = $clientIsLogged ? sprintf('<a class="header__nav-link display-block" href="/profile"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_PROFILE']) : sprintf('<a id="SYSTEM_GE_IMC_00000001" class="header__nav-link display-block" href="#"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_LOGIN']);
+        $registrationLink = $clientIsLogged ? sprintf('<a class="header__nav-link display-block" href="/registration"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_REGISTRATION']) : '';
+        $exitLink = $clientIsLogged ? sprintf('<a class="header__nav-link display-block" href="#" role="profileNavigationExit"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_EXIT']) : '';
 
         /** @var string $this->assembled Итоговый шаблон в виде строки */
         $this->assembled = TemplateCollector::assembly($this->assembly_document(), [
@@ -147,9 +147,7 @@ namespace templates\default {
         ]);
       }
     }
-
   }
-
 }
 
 ?>

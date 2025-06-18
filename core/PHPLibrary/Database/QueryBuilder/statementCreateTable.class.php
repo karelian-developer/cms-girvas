@@ -13,20 +13,20 @@ namespace core\PHPLibrary\Database\QueryBuilder {
   use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
 
   final class StatementCreateTable implements InterfaceStatement {
-    public QueryBuilder $query_builder;
-    private string $table_name = '';
-    private bool $check_exists = false;
+    public QueryBuilder $queryBuilder;
+    private string $tableName = '';
+    private bool $checkExists = false;
     private array $columns = [];
     public string $assembled = '';
     
     /**
      * __construct
      *
-     * @param  mixed $query_builder
+     * @param  mixed $queryBuilder
      * @return void
      */
-    public function __construct(QueryBuilder $query_builder) {
-      $this->query_builder = $query_builder;
+    public function __construct(QueryBuilder $queryBuilder) {
+      $this->query_builder = $queryBuilder;
     }
 
     /**
@@ -45,24 +45,24 @@ namespace core\PHPLibrary\Database\QueryBuilder {
      * @return string
      */
     public function get_table_name() : string {
-      $database_configurations = $this->query_builder->system_core->configurator->get('database');
+      $databaseConfigurations = $this->query_builder->system_core->configurator->get('database');
       
-      $table_fullname = '';
-      if (!is_null($database_configurations)) {
-        if ($database_configurations['scheme'] != '') {
-          $table_fullname .= sprintf('%s.', $database_configurations['scheme']);
+      $tableFullname = '';
+      if (!is_null($databaseConfigurations)) {
+        if ($databaseConfigurations['scheme'] != '') {
+          $tableFullname .= sprintf('%s.', $databaseConfigurations['scheme']);
         }
-        if ($database_configurations['prefix'] != '') {
-          $table_fullname .= sprintf('%s_', $database_configurations['prefix']);
+        if ($databaseConfigurations['prefix'] != '') {
+          $tableFullname .= sprintf('%s_', $databaseConfigurations['prefix']);
         }
       }
 
-      $table_fullname .= $this->table_name;
-      return $table_fullname;
+      $tableFullname .= $this->table_name;
+      return $tableFullname;
     }
 
     public function set_check_exists(bool $value) : void {
-      $this->check_exists = $value;
+      $this->checkExists = $value;
     }
     
     /**
@@ -71,11 +71,11 @@ namespace core\PHPLibrary\Database\QueryBuilder {
      * @param  mixed $selection
      * @return void
      */
-    public function add_column(string $column_name, string $column_type, string $column_constraint = '') : void {
+    public function add_column(string $name, string $type, string $constraint = '') : void {
       $array = [];
-      array_push($array, $column_name);
-      array_push($array, $column_type);
-      array_push($array, $column_constraint);
+      array_push($array, $name);
+      array_push($array, $type);
+      array_push($array, $constraint);
 
       array_push($this->columns, implode(' ', $array));
 
@@ -88,8 +88,8 @@ namespace core\PHPLibrary\Database\QueryBuilder {
      * @return void
      */
     public function assembly() : void {
-      $if_not_exists = ($this->check_exists) ? 'IF NOT EXISTS' : '';
-      $this->assembled = sprintf('CREATE TABLE %s %s (%s);', $if_not_exists, $this->get_table_name(), implode(', ', $this->columns));
+      $ifNotExists = ($this->checkExists) ? 'IF NOT EXISTS' : '';
+      $this->assembled = sprintf('CREATE TABLE %s %s (%s);', $ifNotExists, $this->get_table_name(), implode(', ', $this->columns));
     }
 
   }

@@ -15,31 +15,31 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-if ($system_core->urlp->get_path(2) == 'session-end') {
-  $session_level = $system_core->urlp->get_param('level');
-  $session_level = (is_numeric($session_level)) ? (int)$session_level : 0;
-  $session = $system_core->client->get_session($session_level, ['user_id']);
-  $session_user_id = $session->get_user_id();
+if ($CMSCore->urlp->get_path(2) === 'session-end') {
+  $sessionLevel = $CMSCore->urlp->get_param('level');
+  $sessionLevel = is_numeric($sessionLevel) ? (int) $sessionLevel : 0;
+  $session = $CMSCore->client->get_session($sessionLevel, ['user_id']);
+  $sessionUserID = $session->get_user_id();
 
-  if (!is_null($session) && $session_level != 0) {
+  if ($session !== null && $sessionLevel !== 0) {
     $session->delete();
 
-    if (!ClientSession::exists_by_ip_and_user_id($system_core, $system_core->client->get_ip_address(), $session_user_id, $session_level)) {
-      $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_POST_DATA_SUCCESS') : $handler_message;
-      $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+    if (!ClientSession::exists_by_ip_and_user_id($CMSCore, $CMSCore->client->get_ip_address(), $sessionUserID, $sessionLevel)) {
+      $handlerMessage = $CMSCore->locale->get_single_value_by_key('API_POST_DATA_SUCCESS');
+      $handlerStatusCode = $handlerStatusCode ?? 1;
 
-      $handler_output_data['result'] = true;
+      $handlerOutputData['result'] = true;
     } else {
-      $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_ERROR_SESSION_NOT_DELETED') : $handler_message;
-      $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_SESSION_NOT_DELETED');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
 
-      $handler_output_data['result'] = false;
+      $handlerOutputData['result'] = false;
     }
   } else {
-    $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_ERROR_SESSION_UNKNOWN') : $handler_message;
-    $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_SESSION_UNKNOWN');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
 
-    $handler_output_data['result'] = false;
+    $handlerOutputData['result'] = false;
   }
 }
 

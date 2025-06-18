@@ -8,235 +8,240 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
+use \core\PHPLibrary\SystemCore\DatabaseConnector as CMSDatabaseConnector;
+use \core\PHPLibrary\Client as Client;
+use \core\PHPLibrary\User as User;
+use \DOMDocument as DOMDocument;
+
 if (!defined('IS_NOT_HACKED')) {
   http_response_code(503);
   die('An attempted hacker attack has been detected.');
 }
 
-if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
-  if ($system_core->urlp->get_path(2) == 'set-locales-and-timezone') {
-    $dom_document = new \DOMDocument();
-    $tip_block = $dom_document->createElement('div');
+if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
+  if ($CMSCore->urlp->get_path(2) === 'set-locales-and-timezone') {
+    $document = new DOMDocument();
+    $tipBlockElement = $document->createElement('div');
     
-    $system_core->database_connector = new \core\PHPLibrary\SystemCore\DatabaseConnector($system_core, $system_core->configurator);
+    $CMSCore->databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
 
-    if ($system_core->configurator->exists_database_entry_value('base_locale')) {
-      $system_core->configurator->update_database_entry_value('base_locale', $_POST['setting_base_locale']);
+    if ($CMSCore->configurator->exists_database_entry_value('base_locale')) {
+      $CMSCore->configurator->update_database_entry_value('base_locale', $_POST['setting_base_locale']);
     } else {
-      $system_core->configurator->insert_database_entry_value('base_locale', $_POST['setting_base_locale']);
+      $CMSCore->configurator->insert_database_entry_value('base_locale', $_POST['setting_base_locale']);
     }
 
-    if ($system_core->configurator->exists_database_entry_value('base_admin_locale')) {
-      $system_core->configurator->update_database_entry_value('base_admin_locale', $_POST['setting_admin_locale']);
+    if ($CMSCore->configurator->exists_database_entry_value('base_admin_locale')) {
+      $CMSCore->configurator->update_database_entry_value('base_admin_locale', $_POST['setting_admin_locale']);
     } else {
-      $system_core->configurator->insert_database_entry_value('base_admin_locale', $_POST['setting_admin_locale']);
+      $CMSCore->configurator->insert_database_entry_value('base_admin_locale', $_POST['setting_admin_locale']);
     }
 
-    if ($system_core->configurator->exists_database_entry_value('base_timezone')) {
-      $system_core->configurator->update_database_entry_value('base_timezone', $_POST['setting_base_timezone']);
+    if ($CMSCore->configurator->exists_database_entry_value('base_timezone')) {
+      $CMSCore->configurator->update_database_entry_value('base_timezone', $_POST['setting_base_timezone']);
     } else {
-      $system_core->configurator->insert_database_entry_value('base_timezone', $_POST['setting_base_timezone']);
+      $CMSCore->configurator->insert_database_entry_value('base_timezone', $_POST['setting_base_timezone']);
     }
 
-    $tip_block->setAttribute('class', 'tip tip_green');
-    $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_POST_DATA_SUCCESS');
+    $tipBlockElement->setAttribute('class', 'tip tip_green');
+    $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_POST_DATA_SUCCESS');
 
-    $dom_document->appendChild($tip_block);
+    $document->appendChild($tipBlockElement);
 
-    $handler_output_data['html'] = $dom_document->saveHTML();
-    $handler_message = $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
-    $handler_status_code = 1;
+    $handlerOutputData['html'] = $document->saveHTML();
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($system_core->urlp->get_path(2) == 'set-metadata') {
-    $dom_document = new \DOMDocument();
-    $tip_block = $dom_document->createElement('div');
+  if ($CMSCore->urlp->get_path(2) === 'set-metadata') {
+    $document = new DOMDocument();
+    $tipBlockElement = $document->createElement('div');
 
-    $site_title = trim($_POST['site_title']);
-    $site_title = strip_tags($site_title);
-    $site_title = str_replace('\'', '"', $site_title);
+    $siteTitle = trim($_POST['site_title']);
+    $siteTitle = strip_tags($siteTitle);
+    $siteTitle = str_replace('\'', '"', $siteTitle);
 
-    $site_description = trim($_POST['site_description']);
-    $site_description = strip_tags($site_description);
-    $site_description = str_replace('\'', '"', $site_description);
+    $siteDescription = trim($_POST['site_description']);
+    $siteDescription = strip_tags($siteDescription);
+    $siteDescription = str_replace('\'', '"', $siteDescription);
 
-    $site_keywords = trim($_POST['site_keywords']);
-    $site_keywords = strip_tags($site_keywords);
-    $site_keywords = str_replace('\'', '"', $site_keywords);
-    $site_keywords = preg_split('/\s*\,\s*/', $site_keywords);
+    $siteKeywords = trim($_POST['site_keywords']);
+    $siteKeywords = strip_tags($siteKeywords);
+    $siteKeywords = str_replace('\'', '"', $siteKeywords);
+    $siteKeywords = preg_split('/\s*\,\s*/', $siteKeywords);
     
-    if (!empty($site_title) && !empty($site_description)) {
-      $system_core->database_connector = new \core\PHPLibrary\SystemCore\DatabaseConnector($system_core, $system_core->configurator);
+    if (!empty($siteTitle) && !empty($siteDescription)) {
+      $CMSCore->databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
 
-      if ($system_core->configurator->exists_database_entry_value('base_site_title')) {
-        $system_core->configurator->update_database_entry_value('base_site_title', $site_title);
+      if ($CMSCore->configurator->exists_database_entry_value('base_site_title')) {
+        $CMSCore->configurator->update_database_entry_value('base_site_title', $siteTitle);
       } else {
-        $system_core->configurator->insert_database_entry_value('base_site_title', $site_title);
+        $CMSCore->configurator->insert_database_entry_value('base_site_title', $siteTitle);
       }
 
-      if ($system_core->configurator->exists_database_entry_value('seo_site_description')) {
-        $system_core->configurator->update_database_entry_value('seo_site_description', $site_description);
+      if ($CMSCore->configurator->exists_database_entry_value('seo_site_description')) {
+        $CMSCore->configurator->update_database_entry_value('seo_site_description', $siteDescription);
       } else {
-        $system_core->configurator->insert_database_entry_value('seo_site_description', $site_description);
+        $CMSCore->configurator->insert_database_entry_value('seo_site_description', $siteDescription);
       }
 
-      if ($system_core->configurator->exists_database_entry_value('seo_site_keywords')) {
-        $system_core->configurator->update_database_entry_value('seo_site_keywords', json_encode($site_keywords));
+      if ($CMSCore->configurator->exists_database_entry_value('seo_site_keywords')) {
+        $CMSCore->configurator->update_database_entry_value('seo_site_keywords', json_encode($siteKeywords));
       } else {
-        $system_core->configurator->insert_database_entry_value('seo_site_keywords', json_encode($site_keywords));
+        $CMSCore->configurator->insert_database_entry_value('seo_site_keywords', json_encode($siteKeywords));
       }
 
-      $tip_block->setAttribute('class', 'tip tip_green');
-      $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_POST_DATA_SUCCESS');
+      $tipBlockElement->setAttribute('class', 'tip tip_green');
+      $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_POST_DATA_SUCCESS');
 
-      $handler_message = $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
-      $handler_status_code = 1;
+      $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+      $handlerStatusCode = $handlerStatusCode ?? 1;
     } else {
-      $tip_block->setAttribute('class', 'tip tip_red');
-      $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_SITE_TITLE_OR_DESCRIPTION_IS_EMPTY');
+      $tipBlockElement->setAttribute('class', 'tip tip_red');
+      $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_SITE_TITLE_OR_DESCRIPTION_IS_EMPTY');
 
-      $handler_message = $system_core->locale->get_single_value_by_key('API_INSTALLATION_SITE_TITLE_OR_DESCRIPTION_IS_EMPTY');
-      $handler_status_code = 0;
+      $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_SITE_TITLE_OR_DESCRIPTION_IS_EMPTY');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
 
-    $dom_document->appendChild($tip_block);
+    $document->appendChild($tipBlockElement);
 
-    $handler_output_data['html'] = $dom_document->saveHTML();
+    $handlerOutputData['html'] = $document->saveHTML();
   }
 
-  if ($system_core->urlp->get_path(2) == 'create-admin') {
-    $dom_document = new \DOMDocument();
-    $tip_block = $dom_document->createElement('div');
+  if ($CMSCore->urlp->get_path(2) === 'create-admin') {
+    $document = new DOMDocument();
+    $tipBlockElement = $document->createElement('div');
     
-    $system_core->database_connector = new \core\PHPLibrary\SystemCore\DatabaseConnector($system_core, $system_core->configurator);
+    $CMSCore->databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
 
-    $admin_login = $_POST['admin_login'];
-    $admin_email = $_POST['admin_email'];
-    $admin_password = $_POST['admin_password'];
-    $admin_password_repeat = $_POST['admin_password_repeat'];
+    $adminLogin = $_POST['admin_login'] ?? '';
+    $adminEmail = $_POST['admin_email'] ?? '';
+    $adminPassword = $_POST['admin_password'] ?? '';
+    $adminPasswordRepeat = $_POST['admin_password_repeat'] ?? '';
 
-    if (preg_match('/^[a-z0-9\_]{4,}$/i', $admin_login)) {
-      if (filter_var($admin_email, FILTER_VALIDATE_EMAIL)) {
-        if (preg_match('/^[a-z0-9\_\$\%\&\#\@\?]{8,}$/i', $admin_password)) {
-          if ($admin_password == $admin_password_repeat) {
-            if (!\core\PHPLibrary\User::exists_by_login($system_core, $admin_login)) {
-              if (!\core\PHPLibrary\User::exists_by_email($system_core, $admin_email)) {
-                $admin = \core\PHPLibrary\User::create($system_core, $admin_login, $admin_email, $admin_password);
+    if (preg_match('/^[a-z0-9\_]{4,}$/i', $adminLogin)) {
+      if (filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+        if (preg_match('/^[a-z0-9\_\$\%\&\#\@\?]{8,}$/i', $adminPassword)) {
+          if ($adminPassword == $adminPasswordRepeat) {
+            if (!User::exists_by_login($CMSCore, $adminLogin)) {
+              if (!User::exists_by_email($CMSCore, $adminEmail)) {
+                $admin = User::create($CMSCore, $adminLogin, $adminEmail, $adminPassword);
 
                 if (!is_null($admin)) {
                   $admin->update(['email_is_submitted' => true, 'metadata' => ['group_id' => 1]]);
 
-                  $tip_block->setAttribute('class', 'tip tip_green');
-                  $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_POST_DATA_SUCCESS');
+                  $tipBlockElement->setAttribute('class', 'tip tip_green');
+                  $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_POST_DATA_SUCCESS');
 
-                  $handler_message = $system_core->locale->get_single_value_by_key('API_POST_DATA_SUCCESS');
-                  $handler_status_code = 1;
+                  $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_POST_DATA_SUCCESS');
+                  $handlerStatusCode = $handlerStatusCode ?? 1;
                 } else {
-                  $tip_block->setAttribute('class', 'tip tip_red');
-                  $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+                  $tipBlockElement->setAttribute('class', 'tip tip_red');
+                  $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
                 }
               } else {
-                $tip_block->setAttribute('class', 'tip tip_red');
-                $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_EMAIL_ALREADY_EXISTS');
+                $tipBlockElement->setAttribute('class', 'tip tip_red');
+                $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_EMAIL_ALREADY_EXISTS');
               }
             } else {
-              $tip_block->setAttribute('class', 'tip tip_red');
-              $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_LOGIN_ALREADY_EXISTS');
+              $tipBlockElement->setAttribute('class', 'tip tip_red');
+              $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_LOGIN_ALREADY_EXISTS');
             }
           } else {
-            $tip_block->setAttribute('class', 'tip tip_red');
-            $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_REPEAT_PASSWORD');
+            $tipBlockElement->setAttribute('class', 'tip tip_red');
+            $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_REPEAT_PASSWORD');
           }
         } else {
-          $tip_block->setAttribute('class', 'tip tip_red');
-          $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_PASSWORD');
+          $tipBlockElement->setAttribute('class', 'tip tip_red');
+          $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_PASSWORD');
         }
       } else {
-        $tip_block->setAttribute('class', 'tip tip_red');
-        $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_EMAIL');
+        $tipBlockElement->setAttribute('class', 'tip tip_red');
+        $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_EMAIL');
       }
     } else {
-      $tip_block->setAttribute('class', 'tip tip_red');
-      $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_LOGIN');
+      $tipBlockElement->setAttribute('class', 'tip tip_red');
+      $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ADMIN_ACCOUNT_CREATED_ERROR_INVALID_LOGIN');
     }
 
-    $dom_document->appendChild($tip_block);
-    $handler_output_data['html'] = $dom_document->saveHTML();
+    $document->appendChild($tipBlockElement);
+    $handlerOutputData['html'] = $document->saveHTML();
   }
 
-  if ($system_core->urlp->get_path(2) == 'generate-secret-key') {
-    $system_core->database_connector = new \core\PHPLibrary\SystemCore\DatabaseConnector($system_core, $system_core->configurator);
+  if ($CMSCore->urlp->get_path(2) === 'generate-secret-key') {
+    $CMSCore->databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
     
-    $dom_document = new \DOMDocument();
-    $tip_block = $dom_document->createElement('div');
+    $document = new DOMDocument();
+    $tipBlockElement = $document->createElement('div');
 
     $chars = strtoupper('qwertyuiopasdfghjklzxcvbnm123456789');
-    $codes_open = [];
+    $codes = [];
 
-    for ($code_index = 0; $code_index < 4; $code_index++) {
-      $code_chars_array = [];
+    for ($codeIndex = 0; $codeIndex < 4; $codeIndex++) {
+      $codeChars = [];
 
       for ($char_index = 0; $char_index < 4; $char_index++) {
-        array_push($code_chars_array, $chars[rand(0, strlen($chars) - 1)]);
+        array_push($codeChars, $chars[rand(0, strlen($chars) - 1)]);
       }
 
-      switch ($code_index) {
-        case 0: $code_char = 'a'; break;
-        case 1: $code_char = 'b'; break;
-        case 2: $code_char = 'c'; break;
-        case 3: $code_char = 'd'; break;
+      switch ($codeIndex) {
+        case 0: $codeChar = 'a'; break;
+        case 1: $codeChar = 'b'; break;
+        case 2: $codeChar = 'c'; break;
+        case 3: $codeChar = 'd'; break;
       }
 
-      $complete_code = implode($code_chars_array);
-      array_push($codes_open, $complete_code);
+      $codeFinal = implode($codeChars);
+      array_push($codes, $codeFinal);
 
-      if ($system_core->configurator->exists_database_entry_value(sprintf('security_admin_code_%s', $code_char))) {
-        $system_core->configurator->update_database_entry_value(sprintf('security_admin_code_%s', $code_char), password_hash($complete_code, PASSWORD_ARGON2ID));
+      if ($CMSCore->configurator->exists_database_entry_value('security_admin_code_' . $codeChar)) {
+        $CMSCore->configurator->update_database_entry_value('security_admin_code_' . $codeChar, password_hash($codeFinal, PASSWORD_ARGON2ID));
       } else {
-        $system_core->configurator->insert_database_entry_value(sprintf('security_admin_code_%s', $code_char), password_hash($complete_code, PASSWORD_ARGON2ID));
+        $CMSCore->configurator->insert_database_entry_value('security_admin_code_' . $codeChar, password_hash($codeFinal, PASSWORD_ARGON2ID));
       }
 
-      unset($code_chars_array);
+      unset($codeChars);
     }
 
-    $tip_block->setAttribute('class', 'tip tip_green');
-    $tip_block->nodeValue = sprintf('%s: ' . implode('-', $codes_open), $system_core->locale->get_single_value_by_key('API_INSTALLATION_SECRET_KEY_LABEL'));
+    $tipBlockElement->setAttribute('class', 'tip tip_green');
+    $tipBlockElement->nodeValue = sprintf('%s: ' . implode('-', $codes), $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_SECRET_KEY_LABEL'));
 
-    $dom_document->appendChild($tip_block);
-    $handler_output_data['html'] = $dom_document->saveHTML();
+    $document->appendChild($tipBlockElement);
+    $handlerOutputData['html'] = $document->saveHTML();
   }
 
-  if ($system_core->urlp->get_path(2) == 'finish') {
-    $installed_empty_file_path = sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY);
+  if ($CMSCore->urlp->get_path(2) === 'finish') {
+    $fileInstalledPath = sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY);
 
-    $client_ip_address = \core\PHPLibrary\Client::get_real_ip_address();
+    $clientIP = Client::get_real_ip_address();
 
-    $system_core->database_connector = new \core\PHPLibrary\SystemCore\DatabaseConnector($system_core, $system_core->configurator);
-    $system_core->client = new \core\PHPLibrary\Client($system_core);
+    $CMSCore->databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
+    $CMSCore->client = new Client($CMSCore);
 
-    $client_user = new \core\PHPLibrary\User($system_core, 1);
-    $client_user->init_data(['email']);
+    $clientUser = new User($CMSCore, 1);
+    $clientUser->init_data(['email']);
 
-    $client_user_email = $client_user->get_email();
+    $clientUserEmail = $clientUser->get_email();
 
-    if (!file_exists($installed_empty_file_path)) {
-      $file = fopen($installed_empty_file_path, 'w');
+    if (!file_exists($fileInstalledPath)) {
+      $file = fopen($fileInstalledPath, 'w');
       fclose($file);
 
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL,"https://cms-girvas.ru/feedback.php?type=install");
       curl_setopt($ch, CURLOPT_POST, true);
       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
-        'ip' => $client_ip_address,
-        'domain' => $system_core->configurator->get('domain'),
-        'system_salt' => $system_core->configurator->get('system_salt'),
+        'ip' => $clientIP,
+        'domain' => $CMSCore->configurator->get('domain'),
+        'system_salt' => $CMSCore->configurator->get('salt'),
         'php_version' => phpversion(),
         'server_software' => $_SERVER['SERVER_SOFTWARE'],
-        'admin_email' => $client_user_email
+        'admin_email' => $clientUserEmail
       ]));
 
       curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Installation-Hash: ' . hash('sha256', sprintf('{GIRVAS:HASH$INSTALL$%s$%s$%s}', $client_ip_address, $system_core->configurator->get('domain'), $system_core->configurator->get('system_salt')))
+        'Installation-Hash: ' . hash('sha256', sprintf('{GIRVAS:HASH$INSTALL$%s$%s$%s}', $clientIP, $CMSCore->configurator->get('domain'), $CMSCore->configurator->get('salt')))
       ]);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 

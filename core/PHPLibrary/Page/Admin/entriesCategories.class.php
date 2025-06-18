@@ -24,10 +24,10 @@ namespace core\PHPLibrary\Page\Admin {
 
     const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_NAVIGATION_%s_LABEL';
 
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Page $page;
     public string $assembled = '';
-    public array $navigation_subsections_array = [
+    public array $navigationSubsections = [
       'index' => [
         'name' => 'index',
         'iconName' => 'index',
@@ -65,8 +65,8 @@ namespace core\PHPLibrary\Page\Admin {
       ]
     ];
 
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
     }
 
@@ -76,55 +76,59 @@ namespace core\PHPLibrary\Page\Admin {
      * @return void
      */
     public function init_subnavigation() : void {
-      $template_source =& $this->system_core->template->core->source;
-      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
+      $themeSource =& $this->CMSCore->theme->core->source;
+      $this->init_admin_panel_subnavigation($this->CMSCore, $themeSource);
     }
 
     public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page/entriesCategories.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/entriesCategories.css', 'rel' => 'stylesheet']);
       
-      $locale_data = $this->system_core->locale->get_data();
+      $localeData = $this->CMSCore->locale->get_data();
+      $localeName = $this->CMSCore->locale->get_name();
 
-      $pagination_item_current = (!is_null($this->system_core->urlp->get_param('pageNumber'))) ? (int)$this->system_core->urlp->get_param('pageNumber') : 0;
-      $pagination_items_on_page = 12;
+      $paginationItemCurrent = (!is_null($this->CMSCore->urlp->get_param('pageNumber'))) ? (int)$this->CMSCore->urlp->get_param('pageNumber') : 0;
+      $paginationItemsOnPage = 12;
 
-      $entries_categories_table_items_assembled = [];
-      $entries_categories = new EntriesCategories($this->system_core);
-      $entries_categories_locale_default = $this->system_core->get_cms_locale('admin');
-      $entries_categories_array_objects = $entries_categories->get_all([
-        'limit' => [$pagination_items_on_page, $pagination_item_current * $pagination_items_on_page]
+      $entriesCategoriesTableItemsAssembled = [];
+      $entriesCategories = new EntriesCategories($this->CMSCore);
+
+      $entriesCategoriesLocale = $this->CMSCore->get_cms_locale('admin');
+      $entriesCategoriesLocaleName = $entriesLocale->get_name();
+
+      $entriesCategoriesObjects = $entriesCategories->get_all([
+        'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
       ]);
 
-      $pagination = new Pagination($this->system_core, $entries_categories->get_count_total(), $pagination_items_on_page, $pagination_item_current);
+      $pagination = new Pagination($this->CMSCore, $entriesCategories->get_count_total(), $paginationItemsOnPage, $paginationItemCurrent);
       $pagination->assembly();
 
-      unset($entries_categories);
+      unset($entriesCategories);
 
-      foreach ($entries_categories_array_objects as $entries_category_index => $entries_category_object) {
-        $entries_category_object->init_data(['id', 'texts', 'name', 'created_unix_timestamp', 'updated_unix_timestamp', 'parent_id']);
+      foreach ($entriesCategoriesObjects as $index => $object) {
+        $object->init_data(['id', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'parentID']);
 
-        $created_date_timestamp = date('d.m.Y H:i:s', $entries_category_object->get_created_unix_timestamp());
-        $updated_date_timestamp = date('d.m.Y H:i:s', $entries_category_object->get_updated_unix_timestamp());
+        $createdDateTimestamp = date('d.m.Y H:i:s', $object->get_created_unix_timestamp());
+        $updatedDateTimestamp = date('d.m.Y H:i:s', $object->get_updated_unix_timestamp());
 
-        $entries_category_title = $entries_category_object->get_title($entries_categories_locale_default->get_name());
-        $entries_category_title = strip_tags($entries_category_title);
+        $entriesCategoryTitle = $object->get_title($entriesCategoriesLocaleName);
+        $entriesCategoryTitle = strip_tags($entriesCategoryTitle);
 
-        array_push($entries_categories_table_items_assembled, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entriesCategories/tableItem.tpl', [
-          'ENTRIES_CATEGORY_ID' => $entries_category_object->get_id(),
-          'ENTRIES_CATEGORY_INDEX' => $entries_category_index + 1,
-          'ENTRIES_CATEGORY_TITLE' => (!empty($entries_category_title)) ? $entries_category_title : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $entries_categories_locale_default->get_name()),
-          'ENTRIES_CATEGORY_URL' => $entries_category_object->get_url(),
-          'ENTRIES_CATEGORY_CREATED_DATE_TIMESTAMP' => $created_date_timestamp,
-          'ENTRIES_CATEGORY_UPDATED_DATE_TIMESTAMP' => $updated_date_timestamp
+        array_push($entriesCategoriesTableItemsAssembled, TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entriesCategories/tableItem.tpl', [
+          'ENTRIES_CATEGORY_ID' => $object->get_id(),
+          'ENTRIES_CATEGORY_INDEX' => $index + 1,
+          'ENTRIES_CATEGORY_TITLE' => (!empty($entriesCategoryTitle)) ? $entriesCategoryTitle : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $entriesCategoriesLocaleName),
+          'ENTRIES_CATEGORY_URL' => $object->get_url(),
+          'ENTRIES_CATEGORY_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
+          'ENTRIES_CATEGORY_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp
         ]));
       }
 
       /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entriesCategories.tpl', [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entriesCategories.tpl', [
         'PAGE_ENTRIES_CATEGORIES_PAGINATION' => $pagination->assembled,
         'ADMIN_PANEL_PAGE_NAME' => 'entries-categories',
-        'ADMIN_PANEL_ENTRIES_CATEGORIES_TABLE' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entriesCategories/table.tpl', [
-          'ADMIN_PANEL_ENTRIES_CATEGORIES_TABLE_ITEMS' => implode($entries_categories_table_items_assembled)
+        'ADMIN_PANEL_ENTRIES_CATEGORIES_TABLE' => TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entriesCategories/table.tpl', [
+          'ADMIN_PANEL_ENTRIES_CATEGORIES_TABLE_ITEMS' => implode($entriesCategoriesTableItemsAssembled)
         ])
       ]);
     }

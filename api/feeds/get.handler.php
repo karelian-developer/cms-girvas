@@ -16,8 +16,8 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\Feed as Feed;
 use \core\PHPLibrary\Feed\Builder as FeedBuilder;
 
-if ($system_core->urlp->get_path(2) == 'types') {
-  $handler_output_data['feedsTypes'] = [
+if ($CMSCore->urlp->get_path(2) === 'types') {
+  $handlerOutputData['feedsTypes'] = [
     ['id' => 1, 'name' => FeedBuilder::get_type_name(1), 'title' => FeedBuilder::get_type_title(1)],
     ['id' => 2, 'name' => FeedBuilder::get_type_name(2), 'title' => FeedBuilder::get_type_title(2)],
     ['id' => 3, 'name' => FeedBuilder::get_type_name(3), 'title' => FeedBuilder::get_type_title(3)],

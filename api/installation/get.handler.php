@@ -8,397 +8,408 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
+use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Entry as Entry;
+use \core\PHPLibrary\EntryCategory as EntryCategory;
+use \core\PHPLibrary\EntriesSample as EntriesSample;
+use \core\PHPLibrary\SystemCore\DatabaseConnector as CMSDatabaseConnector;
+use \core\PHPLibrary\SystemCore\Configurator as CMSConfigurator;
+use \core\PHPLibrary\UserGroup as UserGroup;
+use \DOMDocument as DOMDocument;
+use \PDOException as PDOException;
+
 if (!defined('IS_NOT_HACKED')) {
   http_response_code(503);
   die('An attempted hacker attack has been detected.');
 }
 
 if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
-  $json_data_type_dms = 'json';
+  $JSONDataTypeDMS = 'json';
 
-  if ($system_core->urlp->get_param('stepIndex') == 1) {
-    $dom_document = new \DOMDocument();
+  if ($CMSCore->urlp->get_param('stepIndex') === 1) {
+    $document = new DOMDocument();
     
-    $php_loaded_extensions = get_loaded_extensions();
-
-    $table_data = [
-      [$system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_VERSION_LABEL'), '>= 8.2.6', phpversion()],
-      [sprintf('%s SimpleXML', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('SimpleXML', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s PDO', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('PDO', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s openssl', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('openssl', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s curl', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('curl', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s dom', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('dom', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s mbstring', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('mbstring', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s json', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('json', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s zip', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('zip', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s intl', $system_core->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('intl', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))]
+    $phpExtensionsLoaded = get_loaded_extensions();
+    
+    $tableData = [
+      [$CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_VERSION_LABEL'), '>= 8.2.6', phpversion()],
+      [sprintf('%s SimpleXML', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('SimpleXML', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s PDO', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('PDO', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s openssl', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('openssl', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s curl', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('curl', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s dom', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('dom', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s mbstring', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('mbstring', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s json', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('json', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s zip', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('zip', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s intl', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('intl', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))]
     ];
 
-    $table_cells_font_color = [
+    $tableCellsFontColor = [
       '',
-      (in_array('SimpleXML', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('PDO', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('openssl', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('curl', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('dom', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('mbstring', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('json', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('zip', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('intl', $php_loaded_extensions) ? '#209A20' : '#9A2020')
+      (in_array('SimpleXML', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('PDO', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('openssl', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('curl', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('dom', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('mbstring', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('json', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('zip', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('intl', $phpExtensionsLoaded) ? '#209A20' : '#9A2020')
     ];
 
-    $table = $dom_document->createElement('table');
-    $table->setAttribute('class', 'table');
+    $tableElement = $document->createElement('table');
+    $tableElement->setAttribute('class', 'table');
     
-    $table_row_header = $dom_document->createElement('tr');
+    $tableRowHeaderElement = $document->createElement('tr');
 
-    $table_cells_headers = [];
-    $table_cells_headers[] = $dom_document->createElement('th');
-    $table_cells_headers[] = $dom_document->createElement('th');
-    $table_cells_headers[] = $dom_document->createElement('th');
+    $tableCellsHeadersElements = [];
+    $tableCellsHeadersElements[] = $document->createElement('th');
+    $tableCellsHeadersElements[] = $document->createElement('th');
+    $tableCellsHeadersElements[] = $document->createElement('th');
 
-    foreach ($table_cells_headers as $table_cell) {
-      $table_cell->setAttribute('class', 'table__cell table__cell_header');
-      $table_cell->setAttribute('style', 'font-weight: 700;');
+    foreach ($tableCellsHeadersElements as $element) {
+      $element->setAttribute('class', 'table__cell table__cell_header');
+      $element->setAttribute('style', 'font-weight: 700;');
     }
 
-    $table_cells_headers[0]->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_NAME_LABEL');
-    $table_cells_headers[1]->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_EXPECTATION_LABEL');
-    $table_cells_headers[2]->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_FACT_LABEL');
+    $tableCellsHeadersElements[0]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_NAME_LABEL');
+    $tableCellsHeadersElements[1]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_EXPECTATION_LABEL');
+    $tableCellsHeadersElements[2]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_FACT_LABEL');
 
-    $table_row_header->appendChild($table_cells_headers[0]);
-    $table_row_header->appendChild($table_cells_headers[1]);
-    $table_row_header->appendChild($table_cells_headers[2]);
+    $tableRowHeaderElement->appendChild($tableCellsHeadersElements[0]);
+    $tableRowHeaderElement->appendChild($tableCellsHeadersElements[1]);
+    $tableRowHeaderElement->appendChild($tableCellsHeadersElements[2]);
 
-    $table->appendChild($table_row_header);
+    $tableElement->appendChild($tableRowHeaderElement);
 
-    foreach ($table_data as $data_array_index => $data_array) {
-      $table_row = $dom_document->createElement('tr');
+    foreach ($tableData as $dataIndex => $dataArray) {
+      $tableRowElement = $document->createElement('tr');
 
-      $table_cells = [];
-      $table_cells[] = $dom_document->createElement('td');
-      $table_cells[] = $dom_document->createElement('td');
-      $table_cells[] = $dom_document->createElement('td');
+      $tableCellElements = [];
+      $tableCellElements[] = $document->createElement('td');
+      $tableCellElements[] = $document->createElement('td');
+      $tableCellElements[] = $document->createElement('td');
 
-      foreach ($table_cells as $table_cell_index => $table_cell) {
-        $table_cell->setAttribute('class', 'table__cell');
+      foreach ($tableCellElements as $index => $element) {
+        $element->setAttribute('class', 'table__cell');
 
-        if ($table_cell_index == 0) {
-          $table_cell->setAttribute('style', 'font-weight: 700;');
+        if ($index == 0) {
+          $element->setAttribute('style', 'font-weight: 700;');
         }
 
-        if ($table_cell_index == 1 && $data_array_index > 0) {
-          $table_cell->setAttribute('colspan', 2);
+        if ($index == 1 && $dataIndex > 0) {
+          $element->setAttribute('colspan', 2);
         }
 
-        if ($table_cell_index == 1 && !empty($table_cells_font_color[$data_array_index])) {
-          $table_cell->setAttribute('style', sprintf('color: %s;', $table_cells_font_color[$data_array_index]));
+        if ($index == 1 && !empty($tableCellsFontColor[$dataIndex])) {
+          $element->setAttribute('style', sprintf('color: %s;', $tableCellsFontColor[$dataIndex]));
         }
       }
 
-      foreach ($data_array as $array_value_index => $array_value) {
-        $table_cells[$array_value_index]->nodeValue = $data_array[$array_value_index];
-        $table_row->appendChild($table_cells[$array_value_index]);
+      foreach ($dataArray as $arrayValueIndex => $arrayValue) {
+        $tableCellElements[$arrayValueIndex]->nodeValue = $dataArray[$arrayValueIndex];
+        $tableRowElement->appendChild($tableCellElements[$arrayValueIndex]);
       }
 
-      $table->appendChild($table_row);
+      $tableElement->appendChild($tableRowElement);
     }
     
-    $dom_document->appendChild($table);
+    $document->appendChild($table);
 
-    $handler_output_data['html'] = $dom_document->saveHTML();
+    $handlerOutputData['html'] = $document->saveHTML();
 
-    $handler_message = $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
-    $handler_status_code = 1;
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($system_core->urlp->get_param('stepIndex') == 2) {
-    $dom_document = new \DOMDocument();
+  if ($CMSCore->urlp->get_param('stepIndex') === 2) {
+    $document = new DOMDocument();
     
-    $table_data = [
-      ['./backups/', (file_exists(sprintf('%s/backups', CMS_ROOT_DIRECTORY))) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
-      ['./modules/', (file_exists(sprintf('%s/modules', CMS_ROOT_DIRECTORY))) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
-      ['./templates/', (file_exists(sprintf('%s/templates', CMS_ROOT_DIRECTORY))) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
-      ['./uploads/', (file_exists(sprintf('%s/uploads', CMS_ROOT_DIRECTORY))) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+    $tableData = [
+      ['./backups/', (file_exists(CMS_ROOT_DIRECTORY . '/backups')) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./modules/', (file_exists(CMS_ROOT_DIRECTORY . '/modules')) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./templates/', (file_exists(CMS_ROOT_DIRECTORY . '/templates')) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./uploads/', (file_exists(CMS_ROOT_DIRECTORY . '/uploads')) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
     ];
 
-    $table_cells_font_color = [
-      (file_exists(sprintf('%s/backups', CMS_ROOT_DIRECTORY)) ? '#209A20' : '#9A2020'),
-      (file_exists(sprintf('%s/modules', CMS_ROOT_DIRECTORY)) ? '#209A20' : '#9A2020'),
-      (file_exists(sprintf('%s/templates', CMS_ROOT_DIRECTORY)) ? '#209A20' : '#9A2020'),
-      (file_exists(sprintf('%s/uploads', CMS_ROOT_DIRECTORY)) ? '#209A20' : '#9A2020'),
+    $tableCellsFontColor = [
+      (file_exists(CMS_ROOT_DIRECTORY . '/backups') ? '#209A20' : '#9A2020'),
+      (file_exists(CMS_ROOT_DIRECTORY . '/modules') ? '#209A20' : '#9A2020'),
+      (file_exists(CMS_ROOT_DIRECTORY . '/templates') ? '#209A20' : '#9A2020'),
+      (file_exists(CMS_ROOT_DIRECTORY . '/uploads') ? '#209A20' : '#9A2020'),
     ];
 
-    $table = $dom_document->createElement('table');
-    $table->setAttribute('class', 'table');
+    $tableElement = $document->createElement('table');
+    $tableElement->setAttribute('class', 'table');
     
-    $table_row_header = $dom_document->createElement('tr');
+    $tableRowHeaderElement = $document->createElement('tr');
 
-    $table_cells_headers = [];
-    $table_cells_headers[] = $dom_document->createElement('th');
-    $table_cells_headers[] = $dom_document->createElement('th');
+    $tableCellsHeadersElements = [];
+    $tableCellsHeadersElements[] = $document->createElement('th');
+    $tableCellsHeadersElements[] = $document->createElement('th');
 
-    foreach ($table_cells_headers as $table_cell) {
-      $table_cell->setAttribute('class', 'table__cell table__cell_header');
+    foreach ($tableCellsHeadersElements as $tableCellElement) {
+      $tableCellElement->setAttribute('class', 'table__cell table__cell_header');
     }
 
-    $table_cells_headers[0]->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_NAME_LABEL');
-    $table_cells_headers[1]->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_FACT_LABEL');
+    $tableCellsHeadersElements[0]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_NAME_LABEL');
+    $tableCellsHeadersElements[1]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_FACT_LABEL');
 
-    $table_row_header->appendChild($table_cells_headers[0]);
-    $table_row_header->appendChild($table_cells_headers[1]);
+    $tableRowHeaderElement->appendChild($tableCellsHeadersElements[0]);
+    $tableRowHeaderElement->appendChild($tableCellsHeadersElements[1]);
 
-    $table->appendChild($table_row_header);
+    $tableElement->appendChild($tableRowHeaderElement);
 
-    foreach ($table_data as $data_array_index => $data_array) {
-      $table_row = $dom_document->createElement('tr');
+    foreach ($tableData as $dataIndex => $dataArray) {
+      $tableRowElement = $document->createElement('tr');
 
-      $table_cells = [];
-      $table_cells[] = $dom_document->createElement('td');
-      $table_cells[] = $dom_document->createElement('td');
+      $tableCellElements = [];
+      $tableCellElements[] = $document->createElement('td');
+      $tableCellElements[] = $document->createElement('td');
 
-      foreach ($table_cells as $table_cell_index => $table_cell) {
-        $table_cell->setAttribute('class', 'table__cell');
+      foreach ($tableCellElements as $index => $element) {
+        $element->setAttribute('class', 'table__cell');
 
-        if ($table_cell_index == 1 && !empty($table_cells_font_color[$data_array_index])) {
-          $table_cell->setAttribute('style', sprintf('color: %s;', $table_cells_font_color[$data_array_index]));
+        if ($index === 1 && !empty($tableCellsFontColor[$dataIndex])) {
+          $element->setAttribute('style', sprintf('color: %s;', $tableCellsFontColor[$dataIndex]));
         }
       }
 
-      foreach ($data_array as $array_value_index => $array_value) {
-        $table_cells[$array_value_index]->nodeValue = $data_array[$array_value_index];
-        $table_row->appendChild($table_cells[$array_value_index]);
+      foreach ($dataArray as $arrayValueIndex => $arrayValue) {
+        $tableCellElements[$arrayValueIndex]->nodeValue = $dataArray[$arrayValueIndex];
+        $tableRowElement->appendChild($tableCellElements[$arrayValueIndex]);
       }
 
-      $table->appendChild($table_row);
+      $tableElement->appendChild($tableRowElement);
     }
     
-    $dom_document->appendChild($table);
+    $document->appendChild($table);
 
-    $handler_output_data['html'] = $dom_document->saveHTML();
+    $handlerOutputData['html'] = $document->saveHTML();
 
-    $handler_message = $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
-    $handler_status_code = 1;
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($system_core->urlp->get_param('stepIndex') == 3) {
-    $dom_document = new \DOMDocument();
+  if ($CMSCore->urlp->get_param('stepIndex') === 3) {
+    $document = new DOMDocument();
 
-    $table_data = [
-      ['./core/', '755', file_exists(sprintf('%s/core', CMS_ROOT_DIRECTORY)) ? substr(sprintf('%o', fileperms(sprintf('%s/core', CMS_ROOT_DIRECTORY))), -3) : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
-      ['./backups/', '755', file_exists(sprintf('%s/backups', CMS_ROOT_DIRECTORY)) ? substr(sprintf('%o', fileperms(sprintf('%s/backups', CMS_ROOT_DIRECTORY))), -3) : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
-      ['./modules/', '755', file_exists(sprintf('%s/modules', CMS_ROOT_DIRECTORY)) ? substr(sprintf('%o', fileperms(sprintf('%s/modules', CMS_ROOT_DIRECTORY))), -3) : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
-      ['./templates/', '755', file_exists(sprintf('%s/templates', CMS_ROOT_DIRECTORY)) ? substr(sprintf('%o', fileperms(sprintf('%s/templates', CMS_ROOT_DIRECTORY))), -3) : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
-      ['./uploads/', '755', file_exists(sprintf('%s/uploads', CMS_ROOT_DIRECTORY)) ? substr(sprintf('%o', fileperms(sprintf('%s/uploads', CMS_ROOT_DIRECTORY))), -3) : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+    $tableData = [
+      ['./core/', '755', file_exists(CMS_ROOT_DIRECTORY . '/core') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/core')), -3) : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./backups/', '755', file_exists(CMS_ROOT_DIRECTORY . '/backups') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/backups')), -3) : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./modules/', '755', file_exists(CMS_ROOT_DIRECTORY . '/modules') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/modules')), -3) : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./templates/', '755', file_exists(CMS_ROOT_DIRECTORY . '/templates') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/templates')), -3) : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./uploads/', '755', file_exists(CMS_ROOT_DIRECTORY . '/uploads') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/uploads')), -3) : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
     ];
 
-    $table_cells_font_color = [
-      !file_exists(sprintf('%s/core', CMS_ROOT_DIRECTORY)) ? '#9A2020' : (decoct(fileperms(sprintf('%s/core', CMS_ROOT_DIRECTORY)) & 0777) >= 755 ? '#209A20' : '#9A2020'),
-      !file_exists(sprintf('%s/backups', CMS_ROOT_DIRECTORY)) ? '#9A2020' : (decoct(fileperms(sprintf('%s/backups', CMS_ROOT_DIRECTORY)) & 0777) >= 755 ? '#209A20' : '#9A2020'),
-      !file_exists(sprintf('%s/modules', CMS_ROOT_DIRECTORY)) ? '#9A2020' : (decoct(fileperms(sprintf('%s/modules', CMS_ROOT_DIRECTORY)) & 0777) >= 755 ? '#209A20' : '#9A2020'),
-      !file_exists(sprintf('%s/templates', CMS_ROOT_DIRECTORY)) ? '#9A2020' : (decoct(fileperms(sprintf('%s/templates', CMS_ROOT_DIRECTORY)) & 0777) >= 755 ? '#209A20' : '#9A2020'),
-      !file_exists(sprintf('%s/uploads', CMS_ROOT_DIRECTORY)) ? '#9A2020' : (decoct(fileperms(sprintf('%s/uploads', CMS_ROOT_DIRECTORY)) & 0777) >= 755 ? '#209A20' : '#9A2020'),
+    $tableCellsFontColor = [
+      !file_exists(CMS_ROOT_DIRECTORY . '/core') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/core') & 0777) >= 755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/backups') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/backups') & 0777) >= 755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/modules') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/modules') & 0777) >= 755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/templates') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/templates') & 0777) >= 755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/uploads') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/uploads') & 0777) >= 755 ? '#209A20' : '#9A2020'),
     ];
 
-    $table = $dom_document->createElement('table');
-    $table->setAttribute('class', 'table');
+    $tableElement = $document->createElement('table');
+    $tableElement->setAttribute('class', 'table');
     
-    $table_row_header = $dom_document->createElement('tr');
+    $tableRowHeaderElement = $document->createElement('tr');
 
-    $table_cells_headers = [];
-    $table_cells_headers[] = $dom_document->createElement('th');
-    $table_cells_headers[] = $dom_document->createElement('th');
-    $table_cells_headers[] = $dom_document->createElement('th');
+    $tableCellsHeadersElements = [];
+    $tableCellsHeadersElements[] = $document->createElement('th');
+    $tableCellsHeadersElements[] = $document->createElement('th');
+    $tableCellsHeadersElements[] = $document->createElement('th');
 
-    foreach ($table_cells_headers as $table_cell) {
-      $table_cell->setAttribute('class', 'table__cell table__cell_header');
+    foreach ($tableCellsHeadersElements as $element) {
+      $element->setAttribute('class', 'table__cell table__cell_header');
     }
 
-    $table_cells_headers[0]->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_NAME_LABEL');
-    $table_cells_headers[1]->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_EXPECTATION_LABEL');
-    $table_cells_headers[2]->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_FACT_LABEL');
+    $tableCellsHeadersElements[0]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_NAME_LABEL');
+    $tableCellsHeadersElements[1]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_EXPECTATION_LABEL');
+    $tableCellsHeadersElements[2]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_FACT_LABEL');
 
-    $table_row_header->appendChild($table_cells_headers[0]);
-    $table_row_header->appendChild($table_cells_headers[1]);
-    $table_row_header->appendChild($table_cells_headers[2]);
+    $tableRowHeaderElement->appendChild($tableCellsHeadersElements[0]);
+    $tableRowHeaderElement->appendChild($tableCellsHeadersElements[1]);
+    $tableRowHeaderElement->appendChild($tableCellsHeadersElements[2]);
 
-    $table->appendChild($table_row_header);
+    $tableElement->appendChild($tableRowHeaderElement);
 
-    foreach ($table_data as $data_array_index => $data_array) {
-      $table_row = $dom_document->createElement('tr');
+    foreach ($tableData as $dataIndex => $dataArray) {
+      $tableRowElement = $document->createElement('tr');
 
-      $table_cells = [];
-      $table_cells[] = $dom_document->createElement('td');
-      $table_cells[] = $dom_document->createElement('td');
-      $table_cells[] = $dom_document->createElement('td');
+      $tableCellElements = [];
+      $tableCellElements[] = $document->createElement('td');
+      $tableCellElements[] = $document->createElement('td');
+      $tableCellElements[] = $document->createElement('td');
 
-      foreach ($table_cells as $table_cell_index => $table_cell) {
-        $table_cell->setAttribute('class', 'table__cell');
+      foreach ($tableCellElements as $index => $element) {
+        $element->setAttribute('class', 'table__cell');
 
-        if ($table_cell_index == 2 && !empty($table_cells_font_color[$data_array_index])) {
-          $table_cell->setAttribute('style', sprintf('color: %s;', $table_cells_font_color[$data_array_index]));
+        if ($index === 2 && !empty($tableCellsFontColor[$dataIndex])) {
+          $element->setAttribute('style', sprintf('color: %s;', $tableCellsFontColor[$dataIndex]));
         }
       }
 
-      foreach ($data_array as $array_value_index => $array_value) {
-        $table_cells[$array_value_index]->nodeValue = $data_array[$array_value_index];
-        $table_row->appendChild($table_cells[$array_value_index]);
+      foreach ($dataArray as $arrayValueIndex => $arrayValue) {
+        $tableCellElements[$arrayValueIndex]->nodeValue = $dataArray[$arrayValueIndex];
+        $tableRowElement->appendChild($tableCellElements[$arrayValueIndex]);
       }
 
-      $table->appendChild($table_row);
+      $tableElement->appendChild($tableRowElement);
     }
     
-    $dom_document->appendChild($table);
+    $document->appendChild($table);
 
-    $handler_output_data['html'] = $dom_document->saveHTML();
+    $handlerOutputData['html'] = $document->saveHTML();
 
-    $handler_message = $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
-    $handler_status_code = 1;
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($system_core->urlp->get_param('stepIndex') == 4) {
-    $dom_document = new \DOMDocument();
+  if ($CMSCore->urlp->get_param('stepIndex') === 4) {
+    $document = new DOMDocument();
     
-    $php_loaded_extensions = get_loaded_extensions();
+    $phpExtensionsLoaded = get_loaded_extensions();
 
-    $table_data = [
-      ['Cubrid', (in_array('pdo_cubrid', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['FreeTDS / Microsoft SQL Server / Sybase', (in_array('pdo_dblib', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['Firebird', (in_array('pdo_firebird', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['IBM DB2', (in_array('pdo_ibm', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['IBM Informix Dynamic Server', (in_array('pdo_informix', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['MySQL', (in_array('pdo_mysql', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['Oracle Call Interface', (in_array('pdo_ocl', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['ODBC v3 (IBM DB2, unixODBC, win32 ODBC)', (in_array('pdo_odbc', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['PostgreSQL', (in_array('pdo_pgsql', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['SQLite 3 и SQLite 2', (in_array('pdo_sqlite', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['Microsoft SQL Server / SQL Azure', (in_array('pdo_sqlsrv', $php_loaded_extensions) ? $system_core->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $system_core->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))]
+    $tableData = [
+      ['Cubrid', (in_array('pdo_cubrid', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      ['FreeTDS / Microsoft SQL Server / Sybase', (in_array('pdo_dblib', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      ['Firebird', (in_array('pdo_firebird', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      ['IBM DB2', (in_array('pdo_ibm', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      ['IBM Informix Dynamic Server', (in_array('pdo_informix', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      ['MySQL', (in_array('pdo_mysql', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      ['Oracle Call Interface', (in_array('pdo_ocl', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      ['ODBC v3 (IBM DB2, unixODBC, win32 ODBC)', (in_array('pdo_odbc', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      ['PostgreSQL', (in_array('pdo_pgsql', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      ['SQLite 3 и SQLite 2', (in_array('pdo_sqlite', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
+      ['Microsoft SQL Server / SQL Azure', (in_array('pdo_sqlsrv', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))]
     ];
 
-    $table_cells_font_color = [
-      (in_array('pdo_cubrid', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('pdo_dblib', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('pdo_firebird', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('pdo_ibm', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('pdo_informix', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('pdo_mysql', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('pdo_ocl', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('pdo_odbc', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('pdo_pgsql', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('pdo_sqlite', $php_loaded_extensions) ? '#209A20' : '#9A2020'),
-      (in_array('pdo_sqlsrv', $php_loaded_extensions) ? '#209A20' : '#9A2020')
+    $tableCellsFontColor = [
+      (in_array('pdo_cubrid', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('pdo_dblib', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('pdo_firebird', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('pdo_ibm', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('pdo_informix', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('pdo_mysql', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('pdo_ocl', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('pdo_odbc', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('pdo_pgsql', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('pdo_sqlite', $phpExtensionsLoaded) ? '#209A20' : '#9A2020'),
+      (in_array('pdo_sqlsrv', $phpExtensionsLoaded) ? '#209A20' : '#9A2020')
     ];
 
-    $table = $dom_document->createElement('table');
-    $table->setAttribute('class', 'table');
+    $tableElement = $document->createElement('table');
+    $tableElement->setAttribute('class', 'table');
     
-    $table_row_header = $dom_document->createElement('tr');
+    $tableRowHeaderElement = $document->createElement('tr');
 
-    $table_cells_headers = [];
-    $table_cells_headers[] = $dom_document->createElement('th');
-    $table_cells_headers[] = $dom_document->createElement('th');
+    $tableCellsHeadersElements = [];
+    $tableCellsHeadersElements[] = $document->createElement('th');
+    $tableCellsHeadersElements[] = $document->createElement('th');
 
-    foreach ($table_cells_headers as $table_cell) {
-      $table_cell->setAttribute('class', 'table__cell table__cell_header');
+    foreach ($tableCellsHeadersElements as $element) {
+      $element->setAttribute('class', 'table__cell table__cell_header');
     }
 
-    $table_cells_headers[0]->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_DRIVER_PDO_LABEL');
-    $table_cells_headers[1]->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_DRIVER_PDO_STATUS_LABEL');
+    $tableCellsHeadersElements[0]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DRIVER_PDO_LABEL');
+    $tableCellsHeadersElements[1]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DRIVER_PDO_STATUS_LABEL');
 
-    $table_row_header->appendChild($table_cells_headers[0]);
-    $table_row_header->appendChild($table_cells_headers[1]);
+    $tableRowHeaderElement->appendChild($tableCellsHeadersElements[0]);
+    $tableRowHeaderElement->appendChild($tableCellsHeadersElements[1]);
 
-    $table->appendChild($table_row_header);
+    $tableElement->appendChild($tableRowHeaderElement);
 
-    foreach ($table_data as $data_array_index => $data_array) {
-      $table_row = $dom_document->createElement('tr');
+    foreach ($tableData as $dataIndex => $dataArray) {
+      $tableRowElement = $document->createElement('tr');
 
-      $table_cells = [];
-      $table_cells[] = $dom_document->createElement('td');
-      $table_cells[] = $dom_document->createElement('td');
+      $tableCellElements = [];
+      $tableCellElements[] = $document->createElement('td');
+      $tableCellElements[] = $document->createElement('td');
 
-      foreach ($table_cells as $table_cell_index => $table_cell) {
-        $table_cell->setAttribute('class', 'table__cell');
+      foreach ($tableCellElements as $index => $element) {
+        $element->setAttribute('class', 'table__cell');
 
-        if ($table_cell_index == 1 && !empty($table_cells_font_color[$data_array_index])) {
-          $table_cell->setAttribute('style', sprintf('color: %s; border-color: inherit;', $table_cells_font_color[$data_array_index]));
+        if ($index === 1 && !empty($tableCellsFontColor[$dataIndex])) {
+          $element->setAttribute('style', sprintf('color: %s; border-color: inherit;', $tableCellsFontColor[$dataIndex]));
         }
       }
 
-      foreach ($data_array as $array_value_index => $array_value) {
-        $table_cells[$array_value_index]->nodeValue = $data_array[$array_value_index];
-        $table_row->appendChild($table_cells[$array_value_index]);
+      foreach ($dataArray as $arrayValueIndex => $arrayValue) {
+        $tableCellElements[$arrayValueIndex]->nodeValue = $dataArray[$arrayValueIndex];
+        $tableRowElement->appendChild($tableCellElements[$arrayValueIndex]);
       }
 
-      $table->appendChild($table_row);
+      $tableElement->appendChild($tableRowElement);
     }
     
-    $dom_document->appendChild($table);
+    $document->appendChild($table);
 
-    $handler_output_data['html'] = $dom_document->saveHTML();
+    $handlerOutputData['html'] = $document->saveHTML();
 
-    $handler_message = $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
-    $handler_status_code = 1;
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($system_core->urlp->get_param('stepIndex') == 5) {
-    $dom_document = new \DOMDocument();
-    $tip_block = $dom_document->createElement('div');
+  if ($CMSCore->urlp->get_param('stepIndex') === 5) {
+    $document = new DOMDocument();
+    $tipBlockElement = $document->createElement('div');
 
-    $config_file_path = sprintf('%s/%s', CMS_ROOT_DIRECTORY, \core\PHPLibrary\SystemCore\Configurator::FILE_PATH);
-    if (file_exists($config_file_path)) {
-      unlink($config_file_path);
+    $fileCMSConfigurationPath = CMS_ROOT_DIRECTORY . '/' . CMSConfigurator::FILE_PATH;
+    if (file_exists($fileCMSConfigurationPath)) {
+      unlink($fileCMSConfigurationPath);
     }
 
-    if (!file_exists($config_file_path)) {
+    if (!file_exists($fileCMSConfigurationPath)) {
       $domain = (isset($_GET['domain'])) ? idn_to_ascii($_GET['domain']) : '';
 
-      $domain_aliases = (isset($_GET['domain_aliases'])) ? trim($_GET['domain_aliases']) : '';
-      $domain_aliases_array = explode(',', $domain_aliases);
-      if (count($domain_aliases_array) > 0) {
-        foreach ($domain_aliases_array as $domain_aliase_index => $domain_aliase) {
-          $domain_aliases_array[$domain_aliase_index] = '\'' . idn_to_ascii(trim($domain_aliase) . '\'');
+      $domainAliases = $_GET['domain_aliases'] ?? '';
+      $domainAliases = trim($domainAliases);
+
+      $domainAliasesExploaded = explode(',', $domainAliases);
+      if (count($domainAliasesExploaded) > 0) {
+        foreach ($domainAliasesExploaded as $index => $domain) {
+          $domainAliasesExploaded[$index] = '\'' . idn_to_ascii(trim($domain) . '\'');
         }
       }
 
-      $domain_aliases = implode(', ', $domain_aliases_array);
+      $domainAliases = implode(', ', $domainAliasesExploaded);
       
-      $domain_email = (isset($_GET['domain_email'])) ? idn_to_ascii($_GET['domain_email']) : '';
-      $domain_cookies = (isset($_GET['domain_cookies'])) ? idn_to_ascii($_GET['domain_cookies']) : '';
-      $domain_ssl_status = (isset($_GET['domain_ssl_status'])) ? 'true' : 'false';
-
-      $database_dms = (isset($_GET['database_dms'])) ? addslashes($_GET['database_dms']) : '';
-      $database_prefix = (isset($_GET['database_prefix'])) ? addslashes($_GET['database_prefix']) : '';
-      $database_scheme = (isset($_GET['database_scheme'])) ? addslashes($_GET['database_scheme']) : '';
-      $database_host = (isset($_GET['database_host'])) ? addslashes($_GET['database_host']) : '';
-      $database_user = (isset($_GET['database_user'])) ? addslashes($_GET['database_user']) : '';
-      $database_pass = (isset($_GET['database_dms'])) ? addslashes($_GET['database_pass']) : '';
-      $database_name = (isset($_GET['database_name'])) ? addslashes($_GET['database_name']) : '';
+      $domainEmail = idn_to_ascii($_GET['domain_email'] ?? '') ?? '';
+      $domainСookies = idn_to_ascii($_GET['domain_cookies'] ?? '') ?? '';
+      $domainSSLStatus = isset($_GET['domain_ssl_status']) ? 'true' : 'false';
+      $databaseDMSName = (isset($_GET['database_dms'])) ? addslashes($_GET['database_dms']) : '';
+      $databasePrefix = (isset($_GET['database_prefix'])) ? addslashes($_GET['database_prefix']) : '';
+      $databaseScheme = (isset($_GET['database_scheme'])) ? addslashes($_GET['database_scheme']) : '';
+      $databaseHost = (isset($_GET['database_host'])) ? addslashes($_GET['database_host']) : '';
+      $databaseUser = (isset($_GET['database_user'])) ? addslashes($_GET['database_user']) : '';
+      $databasePassword = (isset($_GET['database_dms'])) ? addslashes($_GET['database_pass']) : '';
+      $databaseName = (isset($_GET['database_name'])) ? addslashes($_GET['database_name']) : '';
       
-      $system_salt = bin2hex(openssl_random_pseudo_bytes(10));
+      $CMSSalt = bin2hex(openssl_random_pseudo_bytes(10));
 
-      $file = fopen($config_file_path, 'w+');
+      $file = fopen($fileCMSConfigurationPath, 'w+');
       fwrite($file, '<?php' . PHP_EOL);
       fwrite($file, PHP_EOL);
       fwrite($file, 'use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;' . PHP_EOL);
       fwrite($file, PHP_EOL);
       fwrite($file, '$configuration = [' . PHP_EOL);
       fwrite($file, sprintf('  \'domain\' => \'%s\',', $domain) . PHP_EOL);
-      fwrite($file, sprintf('  \'domain_aliases\' => [%s],', $domain_aliases) . PHP_EOL);
-      fwrite($file, sprintf('  \'domain_email\' => \'%s\',', $domain_email) . PHP_EOL);
-      fwrite($file, sprintf('  \'domain_cookies\' => \'%s\',', $domain_cookies) . PHP_EOL);
-      fwrite($file, sprintf('  \'ssl_is_enabled\' => %s,', $domain_ssl_status) . PHP_EOL);
+      fwrite($file, sprintf('  \'domain_aliases\' => [%s],', $domainAliases) . PHP_EOL);
+      fwrite($file, sprintf('  \'domain_email\' => \'%s\',', $domainEmail) . PHP_EOL);
+      fwrite($file, sprintf('  \'domain_cookies\' => \'%s\',', $domainСookies) . PHP_EOL);
+      fwrite($file, sprintf('  \'ssl_is_enabled\' => %s,', $domainSSLStatus) . PHP_EOL);
       fwrite($file, '  \'database\' => [' . PHP_EOL);
-      fwrite($file, sprintf('    \'dms\' => %s,', $database_dms) . PHP_EOL);
-      fwrite($file, sprintf('    \'prefix\' => \'%s\',', $database_prefix) . PHP_EOL);
-      fwrite($file, sprintf('    \'scheme\' => \'%s\',', $database_scheme) . PHP_EOL);
-      fwrite($file, sprintf('    \'host\' => \'%s\',', $database_host) . PHP_EOL);
-      fwrite($file, sprintf('    \'user\' => \'%s\',', $database_user) . PHP_EOL);
-      fwrite($file, sprintf('    \'password\' => \'%s\',', $database_pass) . PHP_EOL);
-      fwrite($file, sprintf('    \'name\' => \'%s\',', $database_name) . PHP_EOL);
+      fwrite($file, sprintf('    \'dms\' => %s,', $databaseDMSName) . PHP_EOL);
+      fwrite($file, sprintf('    \'prefix\' => \'%s\',', $databasePrefix) . PHP_EOL);
+      fwrite($file, sprintf('    \'scheme\' => \'%s\',', $databaseScheme) . PHP_EOL);
+      fwrite($file, sprintf('    \'host\' => \'%s\',', $databaseHost) . PHP_EOL);
+      fwrite($file, sprintf('    \'user\' => \'%s\',', $databaseUser) . PHP_EOL);
+      fwrite($file, sprintf('    \'password\' => \'%s\',', $databasePassword) . PHP_EOL);
+      fwrite($file, sprintf('    \'name\' => \'%s\',', $databaseName) . PHP_EOL);
       fwrite($file, '  ],' . PHP_EOL);
-      fwrite($file, sprintf('  \'system_salt\' => \'%s\',', $system_salt) . PHP_EOL);
-      fwrite($file, '  \'password_hashing_algorithm\' => PASSWORD_ARGON2ID,' . PHP_EOL);
+      fwrite($file, sprintf('  \'salt\' => \'%s\',', $CMSSalt) . PHP_EOL);
+      fwrite($file, '  \'passwordHashingAlgorithm\' => PASSWORD_ARGON2ID,' . PHP_EOL);
       fwrite($file, '  \'session_expires\' => 86400,' . PHP_EOL);
       fwrite($file, '  \'session_admin_expires\' => 86400,' . PHP_EOL);
       fwrite($file, '  \'ssl_csp\' => [' . PHP_EOL);
@@ -416,339 +427,337 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       fwrite($file, PHP_EOL);
       fwrite($file, '?>');
       fclose($file);
-      chmod($config_file_path, 0664);
+      chmod($fileCMSConfigurationPath, 0664);
     }
 
-    switch (strval($_GET['database_dms'])) {
-      case 'DMS::PostgreSQL': $json_data_type_dms = 'jsonb'; break;
-      default: $json_data_type_dms = 'json';
-    }
+    $JSONDataTypeDMS = match (strval($_GET['database_dms'])) {
+      'DMS::PostgreSQL' => 'jsonb',
+      default => 'json'
+    };
 
-    //$db_connector_test = new \core\PHPLibrary\SystemCore\DatabaseConnector($system_core, $system_core->configurator, true);
-
-    if (file_exists($config_file_path)) {
-      $tip_block->setAttribute('class', 'tip tip_green');
-      $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_CONFIGURATION_FILE_CREATED');
+    if (file_exists($fileCMSConfigurationPath)) {
+      $tipBlockElement->setAttribute('class', 'tip tip_green');
+      $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_CONFIGURATION_FILE_CREATED');
     } else {
-      $tip_block->setAttribute('class', 'tip tip_red');
-      $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_CONFIGURATION_FILE_NOT_CREATED');
+      $tipBlockElement->setAttribute('class', 'tip tip_red');
+      $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_CONFIGURATION_FILE_NOT_CREATED');
     }
 
-    $dom_document->appendChild($tip_block);
+    $document->appendChild($tipBlockElement);
 
-    $handler_output_data['html'] = $dom_document->saveHTML();
-    $handler_message = $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
-    $handler_status_code = 1;
+    $handlerOutputData['html'] = $document->saveHTML();
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($system_core->urlp->get_param('stepIndex') == 6) {
-    $database_connector = new \core\PHPLibrary\SystemCore\DatabaseConnector($system_core, $system_core->configurator);
-    $database_configurations = $system_core->configurator->get('database');
+  if ($CMSCore->urlp->get_param('stepIndex') === 6) {
+    $databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
+    $databaseConfigurations = $CMSCore->configurator->get('database');
 
-    switch ($database_configurations['dms']->get_string()) {
-      case 'PostgreSQL': $json_data_type_dms = 'jsonb'; break;
-      default: $json_data_type_dms = 'json';
+    switch ($databaseConfigurations['dms']->get_string()) {
+      case 'PostgreSQL': $JSONDataTypeDMS = 'jsonb'; break;
+      default: $JSONDataTypeDMS = 'json';
     }
 
-    $dom_document = new \DOMDocument();
-    $tip_block = $dom_document->createElement('div');
+    $document = new DOMDocument();
+    $tipBlockElement = $document->createElement('div');
 
-    $db_prefix = $database_configurations['prefix'];
-    $db_scheme = $database_configurations['scheme'];
-    $db_prefix = ($db_prefix != '') ? $db_prefix . '_' : '';
-    $db_scheme = ($db_scheme != '') ? $db_scheme . '.' : '';
+    $databasePrefix = $databaseConfigurations['prefix'];
+    $databaseScheme = $databaseConfigurations['scheme'];
+    $databasePrefix = ($databasePrefix !== '') ? $databasePrefix . '_' : '';
+    $databaseScheme = ($databaseScheme !== '') ? $databaseScheme . '.' : '';
     
     try {
       // =======================
       // ТАБЛИЦА КОНФИГУРАЦИЙ
       // =======================
 
-      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-      $query_builder->set_statement_create_table();
-      $query_builder->statement->set_check_exists(true);
-      $query_builder->statement->set_table_name('configurations');
-      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $query_builder->statement->add_column('name', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('value', 'text');
-      $query_builder->statement->add_column('texts', $json_data_type_dms);
-      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_create_table();
+      $queryBuilder->statement->set_check_exists(true);
+      $queryBuilder->statement->set_table_name('configurations');
+      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->add_column('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('value', 'text');
+      $queryBuilder->statement->add_column('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $databaseConnection = $databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
-      $execute = $database_query->execute();
+      $execute = $databaseQuery->execute();
 
       // =======================
       // ТАБЛИЦА ЗАПИСЕЙ
       // =======================
 
-      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-      $query_builder->set_statement_create_table();
-      $query_builder->statement->set_check_exists(true);
-      $query_builder->statement->set_table_name('entries');
-      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $query_builder->statement->add_column('category_id', 'bigint', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('author_id', 'bigint', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('texts', $json_data_type_dms);
-      $query_builder->statement->add_column('metadata', $json_data_type_dms);
-      $query_builder->statement->add_column('name', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_create_table();
+      $queryBuilder->statement->set_check_exists(true);
+      $queryBuilder->statement->set_table_name('entries');
+      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->add_column('categoryID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('authorID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $databaseConnection = $databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
-      $execute = $database_query->execute();
+      $execute = $databaseQuery->execute();
 
       // =======================
       // ТАБЛИЦА КАТЕГОРИЙ ЗАПИСЕЙ
       // =======================
 
-      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-      $query_builder->set_statement_create_table();
-      $query_builder->statement->set_check_exists(true);
-      $query_builder->statement->set_table_name('entries_categories');
-      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $query_builder->statement->add_column('parent_id', 'bigint', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('texts', $json_data_type_dms);
-      $query_builder->statement->add_column('metadata', $json_data_type_dms);
-      $query_builder->statement->add_column('name', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_create_table();
+      $queryBuilder->statement->set_check_exists(true);
+      $queryBuilder->statement->set_table_name('entries_categories');
+      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->add_column('parentID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $databaseConnection = $databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
-      $execute = $database_query->execute();
+      $execute = $databaseQuery->execute();
 
       // =======================
       // ТАБЛИЦА КОММЕНТАРИЕВ ЗАПИСЕЙ
       // =======================
 
-      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-      $query_builder->set_statement_create_table();
-      $query_builder->statement->set_check_exists(true);
-      $query_builder->statement->set_table_name('entries_comments');
-      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $query_builder->statement->add_column('entry_id', 'bigint', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('author_id', 'bigint', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('content', 'text');
-      $query_builder->statement->add_column('metadata', $json_data_type_dms);
-      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_create_table();
+      $queryBuilder->statement->set_check_exists(true);
+      $queryBuilder->statement->set_table_name('entries_comments');
+      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->add_column('entryID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('authorID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('content', 'text');
+      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $databaseConnection = $databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
-      $execute = $database_query->execute();
+      $execute = $databaseQuery->execute();
 
       // =======================
       // ТАБЛИЦА ВЫБОРОК ЗАПИСЕЙ
       // =======================
 
-      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-      $query_builder->set_statement_create_table();
-      $query_builder->statement->set_check_exists(true);
-      $query_builder->statement->set_table_name('entries_samples');
-      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $query_builder->statement->add_column('texts', $json_data_type_dms);
-      $query_builder->statement->add_column('metadata', $json_data_type_dms);
-      $query_builder->statement->add_column('name', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_create_table();
+      $queryBuilder->statement->set_check_exists(true);
+      $queryBuilder->statement->set_table_name('entries_samples');
+      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->add_column('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $databaseConnection = $databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
-      $execute = $database_query->execute();
+      $execute = $databaseQuery->execute();
 
       // =======================
       // ТАБЛИЦА СТАТИЧЕСКИХ СТРАНИЦ
       // =======================
 
-      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-      $query_builder->set_statement_create_table();
-      $query_builder->statement->set_check_exists(true);
-      $query_builder->statement->set_table_name('pages_static');
-      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $query_builder->statement->add_column('name', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('texts', $json_data_type_dms);
-      $query_builder->statement->add_column('author_id', 'bigint');
-      $query_builder->statement->add_column('metadata', $json_data_type_dms);
-      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_create_table();
+      $queryBuilder->statement->set_check_exists(true);
+      $queryBuilder->statement->set_table_name('pages_static');
+      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->add_column('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('authorID', 'bigint');
+      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $databaseConnection = $databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
-      $execute = $database_query->execute();
+      $execute = $databaseQuery->execute();
 
       // =======================
       // ТАБЛИЦА ОТЧЕТОВ
       // =======================
 
-      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-      $query_builder->set_statement_create_table();
-      $query_builder->statement->set_check_exists(true);
-      $query_builder->statement->set_table_name('reports');
-      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $query_builder->statement->add_column('variables', $json_data_type_dms);
-      $query_builder->statement->add_column('metadata', $json_data_type_dms);
-      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_create_table();
+      $queryBuilder->statement->set_check_exists(true);
+      $queryBuilder->statement->set_table_name('reports');
+      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->add_column('variables', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $databaseConnection = $databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
-      $execute = $database_query->execute();
+      $execute = $databaseQuery->execute();
 
       // =======================
       // ТАБЛИЦА ПОЛЬЗОВАТЕЛЕЙ
       // =======================
 
-      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-      $query_builder->set_statement_create_table();
-      $query_builder->statement->set_check_exists(true);
-      $query_builder->statement->set_table_name('users');
-      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $query_builder->statement->add_column('login', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('email', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('password_hash', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('security_hash', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('metadata', $json_data_type_dms);
-      $query_builder->statement->add_column('email_is_submitted', 'boolean', 'NOT NULL DEFAULT false');
-      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_create_table();
+      $queryBuilder->statement->set_check_exists(true);
+      $queryBuilder->statement->set_table_name('users');
+      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->add_column('login', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('email', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('passwordHash', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('securityHash', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('emailIsSubmitted', 'boolean', 'NOT NULL DEFAULT false');
+      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $databaseConnection = $databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
-      $execute = $database_query->execute();
+      $execute = $databaseQuery->execute();
 
       // =======================
       // ТАБЛИЦА ГРУПП ПОЛЬЗОВАТЕЛЕЙ
       // =======================
 
-      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-      $query_builder->set_statement_create_table();
-      $query_builder->statement->set_check_exists(true);
-      $query_builder->statement->set_table_name('users_groups');
-      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $query_builder->statement->add_column('name', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('texts', $json_data_type_dms);
-      $query_builder->statement->add_column('permissions', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('metadata', $json_data_type_dms);
-      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_create_table();
+      $queryBuilder->statement->set_check_exists(true);
+      $queryBuilder->statement->set_table_name('users_groups');
+      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->add_column('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('permissions', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $databaseConnection = $databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
-      $execute = $database_query->execute();
+      $execute = $databaseQuery->execute();
 
       // =======================
       // ТАБЛИЦА ЗАЯВОК НА ПОДТВЕРЖДЕНИЕ РЕГИСТРАЦИИ
       // =======================
 
-      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-      $query_builder->set_statement_create_table();
-      $query_builder->statement->set_check_exists(true);
-      $query_builder->statement->set_table_name('users_registration_submits');
-      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $query_builder->statement->add_column('user_id', 'bigint', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('submit_token', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('refusal_token', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_create_table();
+      $queryBuilder->statement->set_check_exists(true);
+      $queryBuilder->statement->set_table_name('users_registration_submits');
+      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->add_column('userID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('submitToken', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('refusalToken', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $databaseConnection = $databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
-      $execute = $database_query->execute();
+      $execute = $databaseQuery->execute();
 
       // =======================
       // ТАБЛИЦА СЕССИЙ ПОЛЬЗОВАТЕЛЕЙ
       // =======================
 
-      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-      $query_builder->set_statement_create_table();
-      $query_builder->statement->set_check_exists(true);
-      $query_builder->statement->set_table_name('users_sessions');
-      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $query_builder->statement->add_column('user_id', 'bigint', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('token', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('user_ip', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('type_id', 'integer', 'NOT NULL DEFAULT 1');
-      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_create_table();
+      $queryBuilder->statement->set_check_exists(true);
+      $queryBuilder->statement->set_table_name('users_sessions');
+      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->add_column('userID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('token', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('userIP', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('typeID', 'integer', 'NOT NULL DEFAULT 1');
+      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $databaseConnection = $databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
-      $execute = $database_query->execute();
+      $execute = $databaseQuery->execute();
 
       // =======================
       // ТАБЛИЦА ВЕБ-КАНАЛОВ
       // =======================
 
-      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-      $query_builder->set_statement_create_table();
-      $query_builder->statement->set_check_exists(true);
-      $query_builder->statement->set_table_name('web_channels');
-      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $query_builder->statement->add_column('name', 'text', 'NOT NULL');
-      $query_builder->statement->add_column('entries_category_id', 'bigint', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('type_id', 'integer', 'NOT NULL DEFAULT 1');
-      $query_builder->statement->add_column('texts', $json_data_type_dms);
-      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_create_table();
+      $queryBuilder->statement->set_check_exists(true);
+      $queryBuilder->statement->set_table_name('web_channels');
+      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->add_column('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->add_column('entriesCategoryID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('typeID', 'integer', 'NOT NULL DEFAULT 1');
+      $queryBuilder->statement->add_column('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $databaseConnection = $databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
-      $execute = $database_query->execute();
+      $execute = $databaseQuery->execute();
 
       // =======================
       // ТАБЛИЦА МЕТРИКИ
       // =======================
 
-      $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-      $query_builder->set_statement_create_table();
-      $query_builder->statement->set_check_exists(true);
-      $query_builder->statement->set_table_name('metrics');
-      $query_builder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $query_builder->statement->add_column('date', 'integer', 'NOT NULL');
-      $query_builder->statement->add_column('data', $json_data_type_dms);
-      $query_builder->statement->add_column('created_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->add_column('updated_unix_timestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_create_table();
+      $queryBuilder->statement->set_check_exists(true);
+      $queryBuilder->statement->set_table_name('metrics');
+      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->add_column('date', 'integer', 'NOT NULL');
+      $queryBuilder->statement->add_column('data', $JSONDataTypeDMS);
+      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $databaseConnection = $databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
-      $execute = $database_query->execute();
-    } catch (\PDOException $exception) {
-      $tip_block->setAttribute('class', 'tip tip_red');
-      $tip_block->nodeValue = $exception->getMessage();
+      $execute = $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      $tipBlockElement->setAttribute('class', 'tip tip_red');
+      $tipBlockElement->nodeValue = $exception->getMessage();
 
-      $dom_document->appendChild($tip_block);
+      $document->appendChild($tipBlockElement);
 
       die(json_encode([
         'message' => $exception->getMessage(),
         'statusCode' => 0,
         'outputData' => [
-          'html' => $dom_document->saveHTML()
+          'html' => $document->saveHTML()
         ]
       // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
@@ -758,9 +767,9 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
     // ПЕРВИЧНОЕ НАПОЛНЕНИЕ БАЗЫ ДАННЫХ
     // =======================
 
-    $system_core->database_connector = new \core\PHPLibrary\SystemCore\DatabaseConnector($system_core, $system_core->configurator);
+    $CMSCore->databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
 
-    $first_entries_category_texts = [
+    $firstEntriesCategoryTexts = [
       'en_US' => [
         'title' => 'News',
         'description' => 'All news'
@@ -771,7 +780,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       ]
     ];
 
-    $second_entries_category_texts = [
+    $secondEntriesCategoryTexts = [
       'en_US' => [
         'title' => 'Articles',
         'description' => 'All articles'
@@ -782,32 +791,32 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       ]
     ];
 
-    $first_entries_category = \core\PHPLibrary\EntryCategory::create($system_core, 'news', 0, $first_entries_category_texts);
-    $second_entries_category = \core\PHPLibrary\EntryCategory::create($system_core, 'articles', 0, $second_entries_category_texts);
+    $firstEntriesCategory = EntryCategory::create($CMSCore, 'news', 0, $firstEntriesCategoryTexts);
+    $secondEntriesCategory = EntryCategory::create($CMSCore, 'articles', 0, $secondEntriesCategoryTexts);
 
-    $first_entries_category->update(['metadata' => ['isShowedOnIndexPage' => true]]);
-    $second_entries_category->update(['metadata' => ['isShowedOnIndexPage' => true]]);
+    $firstEntriesCategory->update(['metadata' => ['isShowedOnIndexPage' => true]]);
+    $secondEntriesCategory->update(['metadata' => ['isShowedOnIndexPage' => true]]);
 
-    $first_entry_texts = [
+    $firstEntryTexts = [
       'en_US' => [
         'title' => 'Hello, World!',
-        'description' => 'Welcome to the \"GIRVAS\" Content Management System!',
-        'content' => "Welcome to the \"GIRVAS\" Content Management System! This is a simple example of an entry on your website that does not contain anything important, but we would like to tell you a little about the system and the developer company. In the future, you can delete or change this entry, or just keep it as a keepsake!\r\n\r\n##Briefly about the system\r\nContent management system \"GIRVAS\" is a technically complex software, but easy to use, through which you can manage content on a website, as well as change its appearance using templates or expand functionality using a modular system. On our YouTube channel we have collected several examples demonstrating the functionality of the CMS \"GIRVAS\".\r\n\r\n##First release of the system\r\nThe control system is currently undergoing the first stage of its post-release review, so we need to collect feedback on its performance. If something does not work or does not work as it should, then feel free to report it via one of the contacts: https://www.garbalo.com/page/contacts.",
+        'description' => 'Welcome to the GIRVAS Content Management System!',
+        'content' => "Welcome to the GIRVAS Content Management System! This is a simple example of an entry on your website that does not contain anything important, but we would like to tell you a little about the system and the developer company. In the future, you can delete or change this entry, or just keep it as a keepsake!\r\n\r\n##Briefly about the system\r\nContent management system \"GIRVAS\" is a technically complex software, but easy to use, through which you can manage content on a website, as well as change its appearance using templates or expand functionality using a modular system. On our YouTube channel we have collected several examples demonstrating the functionality of the CMS \"GIRVAS\".\r\n\r\n##First release of the system\r\nThe control system is currently undergoing the first stage of its post-release review, so we need to collect feedback on its performance. If something does not work or does not work as it should, then feel free to report it via one of the contacts: https://www.garbalo.com/page/contacts.",
         'keywords' => ['cms girvas', 'Content Management System GIRVAS']
       ],
       'ru_RU' => [
         'title' => 'Привет, Мир!',
-        'description' => 'Добро пожаловать в Систему управления содержимым \"ГИРВАС\"!',
-        'content' => "Добро пожаловать в Систему управления содержимым \"ГИРВАС\"! Это простой пример записи на Вашем сайте, которая не несет в себе ничего важного, однако хотели бы немного рассказать о системе и компании-разработчике. В дальнейшем Вы сможете удалить или изменить эту запись, или же просто оставить себе на память!\r\n\r\n##Кратко о системе\r\nСистема управления содержимым \"ГИРВАС\" представляет собой сложное в техническом плане программное обеспечение, но легкое в плане использования, через которое Вы можете управлять содержимым на веб-сайте, а также изменять его внешний вид при помощи шаблонов или расширять функционал при помощи модульной системы. На нашем YouTube-канале мы собрали несколько примеров с демонстрацией функционала СУС \"ГИРВАС\"\r\n\r\n##Первый выпуск системы\r\nСейчас система управления проходит первый этап своей проверки после выпуска, поэтому нам необходимо собирать обратную связь по ее работе. Если что-то будет не работать или работать не так как надо, то смело сообщайте по одному из контактов: https://www.garbalo.com/page/contacts.",
+        'description' => 'Добро пожаловать в Систему управления содержимым &laquo;ГИРВАСrlaquo;!',
+        'content' => "Добро пожаловать в Систему управления содержимым &laquo;ГИРВАСrlaquo;! Это простой пример записи на Вашем сайте, которая не несет в себе ничего важного, однако хотели бы немного рассказать о системе и компании-разработчике. В дальнейшем Вы сможете удалить или изменить эту запись, или же просто оставить себе на память!\r\n\r\n##Кратко о системе\r\nСистема управления содержимым &laquo;ГИРВАСrlaquo; представляет собой сложное в техническом плане программное обеспечение, но легкое в плане использования, через которое Вы можете управлять содержимым на веб-сайте, а также изменять его внешний вид при помощи шаблонов или расширять функционал при помощи модульной системы. На нашем YouTube-канале мы собрали несколько примеров с демонстрацией функционала СУС &laquo;ГИРВАСrlaquo;\r\n\r\n##Первый выпуск системы\r\nСейчас система управления проходит первый этап своей проверки после выпуска, поэтому нам необходимо собирать обратную связь по ее работе. Если что-то будет не работать или работать не так как надо, то смело сообщайте по одному из контактов: https://www.garbalo.com/page/contacts.",
         'keywords' => ['сус гирвас', 'Система управления содержимым ГИРВАС']
       ]
     ];
 
-    $first_entry = \core\PHPLibrary\Entry::create($system_core, 'hello-world', 1, 1, $first_entry_texts);
-    $first_entry->update(['metadata' => ['is_published' => true]]);
-    $first_entry->update(['metadata' => ['preview_url' => '/uploads/media/example.webp']]);
+    $firstEntry = Entry::create($CMSCore, 'hello-world', 1, 1, $firstEntryTexts);
+    $firstEntry->update(['metadata' => ['isPublished' => true]]);
+    $firstEntry->update(['metadata' => ['previewURL' => '/uploads/media/example.webp']]);
 
-    $first_entries_sample_texts = [
+    $firstEntriesSampleTexts = [
       'en_US' => [
         'title' => 'Last news',
         'description' => 'Last news on site'
@@ -818,53 +827,53 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       ]
     ];
 
-    $first_entries_sample = \core\PHPLibrary\EntriesSample::create($system_core, 'last-news', $first_entries_sample_texts, [
+    $firstEntriesSample = EntriesSample::create($CMSCore, 'last-news', $firstEntriesSampleTexts, [
       'limitCount' => 6,
       'sortTypeID' => 2,
       'categoriesIDs' => [1]
     ]);
 
-    $first_users_group_texts = [
+    $firstUsersGroupTexts = [
       'en_US' => ['title' => 'Administrator'],
       'ru_RU' => ['title' => 'Администратор']
     ];
 
-    $second_users_group_texts = [
+    $secondUsersGroupTexts = [
       'en_US' => ['title' => 'Moderator'],
       'ru_RU' => ['title' => 'Модератор']
     ];
 
-    $thirty_users_group_texts = [
+    $thirtyUsersGroupTexts = [
       'en_US' => ['title' => 'Editor'],
       'ru_RU' => ['title' => 'Редактор']
     ];
 
-    $fourty_users_group_texts = [
+    $fourtyUsersGroupTexts = [
       'en_US' => ['title' => 'User'],
       'ru_RU' => ['title' => 'Пользователь']
     ];
 
-    $first_users_group = \core\PHPLibrary\UserGroup::create($system_core, 'admin', $first_users_group_texts, 262143);
-    $second_users_group = \core\PHPLibrary\UserGroup::create($system_core, 'moder', $second_users_group_texts, 115585);
-    $thirty_users_group = \core\PHPLibrary\UserGroup::create($system_core, 'editor', $thirty_users_group_texts, 130049);
-    $fourty_users_group = \core\PHPLibrary\UserGroup::create($system_core, 'user', $fourty_users_group_texts, 114688);
+    $firstUsersGroup = UserGroup::create($CMSCore, 'admin', $firstUsersGroupTexts, 262143);
+    $secondUsersGroup = UserGroup::create($CMSCore, 'moder', $secondUsersGroupTexts, 115585);
+    $thirtyUsersGroup = UserGroup::create($CMSCore, 'editor', $thirtyUsersGroupTexts, 130049);
+    $fourtyUsersGroup = UserGroup::create($CMSCore, 'user', $fourtyUsersGroupTexts, 114688);
     
-    $system_core->configurator->insert_database_entry_value('base_template', 'default');
-    $system_core->configurator->insert_database_entry_value('base_site_title', 'CMS GIRVAS');
-    $system_core->configurator->insert_database_entry_value('base_engineering_works_status', 'off');
-    $system_core->configurator->insert_database_entry_value('base_engineering_works_text', '');
-    $system_core->configurator->insert_database_entry_value('seo_site_description', 'CMS GIRVAS - a multidisciplinary free contents control system from the Garbalo Karelian developers.');
-    $system_core->configurator->insert_database_entry_value('seo_site_keywords', '["CMS GIRVAS","Free Content Management System","Free CMS","Garbalo"]');
-    $system_core->configurator->insert_database_entry_value('base_site_title', 'CMS GIRVAS');
+    $CMSCore->configurator->insert_database_entry_value('base_template', 'default');
+    $CMSCore->configurator->insert_database_entry_value('base_site_title', 'CMS GIRVAS');
+    $CMSCore->configurator->insert_database_entry_value('base_engineering_works_status', 'off');
+    $CMSCore->configurator->insert_database_entry_value('base_engineering_works_text', '');
+    $CMSCore->configurator->insert_database_entry_value('seo_site_description', 'CMS GIRVAS - a multidisciplinary free contents control system from the Karelian Developer company.');
+    $CMSCore->configurator->insert_database_entry_value('seo_site_keywords', '["CMS GIRVAS","Free Content Management System","Free CMS","Karelian Developer"]');
+    $CMSCore->configurator->insert_database_entry_value('base_site_title', 'CMS GIRVAS');
 
-    $tip_block->setAttribute('class', 'tip tip_green');
-    $tip_block->nodeValue = $system_core->locale->get_single_value_by_key('API_INSTALLATION_TABLES_GENERATED');
+    $tipBlockElement->setAttribute('class', 'tip tip_green');
+    $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_TABLES_GENERATED');
 
-    $dom_document->appendChild($tip_block);
+    $document->appendChild($tipBlockElement);
 
-    $handler_output_data['html'] = $dom_document->saveHTML();
-    $handler_message = $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
-    $handler_status_code = 1;
+    $handlerOutputData['html'] = $document->saveHTML();
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 }
 

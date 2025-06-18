@@ -18,14 +18,14 @@ namespace core\PHPLibrary\Page\Admin\Settings {
   class SettingsSeo {
     const FORM_PATH = 'templates/page/settings';
 
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public string $title;
     public string $name;
     public string $description;
     public string $assembled = '';
 
-    public function __construct(SystemCore $system_core, string $name) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, string $name) {
+      $this->CMSCore = $CMSCore;
       $this->name = $name;
     }
 
@@ -45,21 +45,21 @@ namespace core\PHPLibrary\Page\Admin\Settings {
       return $this->description;
     }
 
-    public function assembly(array $template_values = []) {
-      $form_template_path = sprintf('%s/%s.tpl', self::FORM_PATH, $this->name);
+    public function assembly(array $templateValues = []) {
+      $formTemplatePath = self::FORM_PATH . '/' . $this->name . '.tpl';
 
-      $file_robots_txt_path = sprintf('%s/robots.txt', CMS_ROOT_DIRECTORY);
-      $file_robots_txt_content = (file_exists($file_robots_txt_path)) ? file_get_contents($file_robots_txt_path) : '';
+      $fileRobotsTXTPath = CMS_ROOT_DIRECTORY . '/robots.txt';
+      $fileRobotsTXTContent = file_exists($fileRobotsTXTPath) ? file_get_contents($fileRobotsTXTPath) : '';
       
-      $setting_permanent_redirect_www_status_value = $this->system_core->configurator->get_permanent_redirect_to_www_status();
+      $settingPermanentRedirectWWWStatusValue = $this->CMSCore->configurator->get_permanent_redirect_to_www_status();
 
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, $form_template_path, [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, $formTemplatePath, [
         'SETTINGS_NAME' => $this->name,
-        'SETTING_SITE_DESCRIPTION_VALUE' => ($this->system_core->configurator->exists_database_entry_value('seo_site_description')) ? $this->system_core->configurator->get_database_entry_value('seo_site_description') : '',
-        'SETTING_SITE_KEYWORDS_VALUE' => ($this->system_core->configurator->exists_database_entry_value('seo_site_keywords')) ? implode(', ', json_decode($this->system_core->configurator->get_database_entry_value('seo_site_keywords'), true)) : '',
-        'SETTING_SITE_ROBOTS_TXT_VALUE' => $file_robots_txt_content,
-        'SETTING_PERMANENT_REDIRECT_WWW_STATUS_VALUE' => ($setting_permanent_redirect_www_status_value) ? 'on' : 'off',
-        'SETTING_PERMANENT_REDIRECT_WWW_CHECKED_VALUE' => ($setting_permanent_redirect_www_status_value) ? 'checked' : '',
+        'SETTING_SITE_DESCRIPTION_VALUE' => $this->CMSCore->configurator->exists_database_entry_value('seo_site_description') ? $this->CMSCore->configurator->get_database_entry_value('seo_site_description') : '',
+        'SETTING_SITE_KEYWORDS_VALUE' => $this->CMSCore->configurator->exists_database_entry_value('seo_site_keywords') ? implode(', ', json_decode($this->CMSCore->configurator->get_database_entry_value('seo_site_keywords'), true)) : '',
+        'SETTING_SITE_ROBOTS_TXT_VALUE' => $fileRobotsTXTContent,
+        'SETTING_PERMANENT_REDIRECT_WWW_STATUS_VALUE' => $settingPermanentRedirectWWWStatusValue ? 'on' : 'off',
+        'SETTING_PERMANENT_REDIRECT_WWW_CHECKED_VALUE' => $settingPermanentRedirectWWWStatusValue ? 'checked' : '',
       ]);
     }
 

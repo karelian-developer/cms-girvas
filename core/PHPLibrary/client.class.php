@@ -15,17 +15,17 @@ namespace core\PHPLibrary {
    * Клиент
    */
   class Client {
-    private readonly SystemCore $system_core;
-    private string $ip_address;
+    private readonly SystemCore $CMSCore;
+    private string $ip;
     
     /**
      * __construct
      *
-     * @param  SystemCore $system_core
+     * @param  SystemCore $CMSCore
      * @return void
      */
-    public function __construct(SystemCore $system_core) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore) {
+      $this->CMSCore = $CMSCore;
 
       $this->set_ip_address();
     }
@@ -37,7 +37,7 @@ namespace core\PHPLibrary {
      * @return void
      */
     private function set_ip_address() : void {
-      $this->ip_address = self::get_real_ip_address();
+      $this->ip = self::get_real_ip_address();
     }
 
     /**
@@ -46,7 +46,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public function get_ip_address() : string {
-      return $this->ip_address;
+      return $this->ip;
     }
 
     /**
@@ -71,27 +71,29 @@ namespace core\PHPLibrary {
     /**
      * Получить объект сессии
      *
-     * @param  int $session_type_id
-     * @param  array $data_init
+     * @param  int $typeID
+     * @param  array $data
      * @return ClientSession
      */
-    public function get_session(int $session_type_id, array $data_init = ['*']) : ClientSession {
-      $session = ClientSession::get_by_ip($this->system_core, $this->ip_address, $session_type_id);
-      $session->init_data($data_init);
+    public function get_session(int $typeID, array $data = ['*']) : ClientSession {
+      $session = ClientSession::get_by_ip($this->CMSCore, $this->ip, $typeID);
+      $session->init_data($data);
+
       return $session;
     }
 
     /**
      * Получить объект сессии по токену
      *
-     * @param  int $session_type_id
+     * @param  int $typeID
      * @param  string $token
-     * @param  array $data_init
+     * @param  array $data
      * @return ClientSession
      */
-    public function get_session_by_token(int $session_type_id, string $token, array $data_init = ['*']) : ClientSession {
-      $session = ClientSession::get_by_ip_and_token($this->system_core, $this->ip_address, $token, $session_type_id);
-      $session->init_data($data_init);
+    public function get_session_by_token(int $typeID, string $token, array $data = ['*']) : ClientSession {
+      $session = ClientSession::get_by_ip_and_token($this->CMSCore, $this->ip, $token, $typeID);
+      $session->init_data($data);
+
       return $session;
     }
 
@@ -100,38 +102,38 @@ namespace core\PHPLibrary {
      *
      * @return User|null
      */
-    public function get_user(int $session_type_id) : User|null {
-      switch ($session_type_id) {
-        case 2: $client_session_cookie_token_name = '_grv_atoken'; break;
-        default: $client_session_cookie_token_name = '_grv_utoken';
+    public function get_user(int $typeID) : User|null {
+      switch ($typeID) {
+        case 2: $cookieTokenName = '_grv_atoken'; break;
+        default: $cookieTokenName = '_grv_utoken';
       }
 
-      $client_session_token = (isset($_COOKIE[$client_session_cookie_token_name])) ? $_COOKIE[$client_session_cookie_token_name] : '';
+      $token = (isset($_COOKIE[$cookieTokenName])) ? $_COOKIE[$cookieTokenName] : '';
 
-      $session = ClientSession::get_by_ip_and_token($this->system_core, $this->ip_address, $client_session_token, $session_type_id);
+      $session = ClientSession::get_by_ip_and_token($this->CMSCore, $this->ip, $token, $typeID);
       return (!is_null($session)) ? $session->get_user() : null;
     }
 
     /**
      * Проверка статуса авторизации клиента по типу сессии
      *
-     * @param  int $session_type_id
+     * @param  int $typeID
      * @return bool
      */
-    public function is_logged(int $session_type_id) : bool {
-      switch ($session_type_id) {
-        case 2: $client_session_cookie_token_name = '_grv_atoken'; break;
-        default: $client_session_cookie_token_name = '_grv_utoken';
+    public function is_logged(int $typeID) : bool {
+      switch ($typeID) {
+        case 2: $cookieTokenName = '_grv_atoken'; break;
+        default: $cookieTokenName = '_grv_utoken';
       }
 
-      $client_session_token = (isset($_COOKIE[$client_session_cookie_token_name])) ? $_COOKIE[$client_session_cookie_token_name] : '';
+      $token = (isset($_COOKIE[$cookieTokenName])) ? $_COOKIE[$cookieTokenName] : '';
 
-      if (isset($_COOKIE[$client_session_cookie_token_name])) {
-        if (ClientSession::exists_by_ip_and_token($this->system_core, $this->ip_address, $client_session_token, $session_type_id)) {
-          $client_session = $this->get_session_by_token($session_type_id, $client_session_token, ['updated_unix_timestamp', 'token']);
-          if (!is_null($client_session)) {
-            if ($client_session_token == $client_session->get_token()) {
-              if ($client_session->is_alive($this->system_core->configurator->get('session_expires'))) {
+      if (isset($_COOKIE[$cookieTokenName])) {
+        if (ClientSession::exists_by_ip_and_token($this->CMSCore, $this->ip, $token, $typeID)) {
+          $session = $this->get_session_by_token($typeID, $token, ['updatedUnixTimestamp', 'token']);
+          if (!is_null($session)) {
+            if ($token == $session->get_token()) {
+              if ($session->is_alive($this->CMSCore->configurator->get('sessionExpires'))) {
                 return true;
               }
             }
@@ -145,23 +147,23 @@ namespace core\PHPLibrary {
     /**
      * Создать Cookie (Устаревшее)
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param string $name
      * @param ClientSession $session
      * @param int $expires
      * 
      * @return bool
      */
-    public static function create_cookie(SystemCore $system_core, string $name, ClientSession $session, int $expires) : bool {
-      $domain_for_cookies = $system_core->configurator->get('domain_cookies');
-      $user_session_is_secure = ($system_core->configurator->get('ssl_is_enabled')) ? true : false;
+    public static function create_cookie(SystemCore $CMSCore, string $name, ClientSession $session, int $expires) : bool {
+      $domainForCookies = $CMSCore->configurator->get('domainCookies');
+      $userSessionIsSecure = ($CMSCore->configurator->get('SSLIsEnabled')) ? true : false;
       
-      if (!is_null($domain_for_cookies)) {
+      if (!is_null($domainForCookies)) {
         return setcookie($name, $session->get_token(), [
           'expires' => $expires,
           'path' => '/',
-          'domain' => $domain_for_cookies,
-          'secure' => $user_session_is_secure,
+          'domain' => $domainForCookies,
+          'secure' => $userSessionIsSecure,
           'httponly' => true
         ]);
       }

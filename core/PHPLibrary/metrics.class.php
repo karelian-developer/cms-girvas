@@ -24,17 +24,17 @@ namespace core\PHPLibrary {
   #[\AllowDynamicProperties]
   final class Metrics {
     /** @var SystemCore|null Объект системного ядра */
-    public SystemCore|null $system_core = null;
+    public SystemCore|null $CMSCore = null;
     /** @var string Временная отметка */
     public int $timestamp = 0;
 
     /**
      * __construct
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      */
-    public function __construct(SystemCore $system_core) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore) {
+      $this->CMSCore = $CMSCore;
     }
 
     /**
@@ -58,8 +58,8 @@ namespace core\PHPLibrary {
     public function get_session_by_timestamp(int $timestamp) : MetricsSession|null {
       $timestamp = strtotime(date('Y/m/d', $timestamp));
 
-      if (MetricsSession::exists_by_timestamp($this->system_core, $this, $timestamp)) {
-        return MetricsSession::get_by_timestamp($this->system_core, $this, $timestamp);
+      if (MetricsSession::exists_by_timestamp($this->CMSCore, $this, $timestamp)) {
+        return MetricsSession::get_by_timestamp($this->CMSCore, $this, $timestamp);
       }
 
       return null;
@@ -68,32 +68,32 @@ namespace core\PHPLibrary {
     /**
      * Получить массив объектов сессий метрики во временных рамках
      * 
-     * @param int $timestamp_start
-     * @param int $timestamp_end
+     * @param int $timestampStart
+     * @param int $timestampEnd
      * 
      * @return array
      */
-    public function get_sessions_by_timestamp_range(int $timestamp_start, int $timestamp_end) : array {
-      $timestamp_start = strtotime(date('Y/m/d', $timestamp_start));
-      $timestamp_end = strtotime(date('Y/m/d', $timestamp_end));
+    public function get_sessions_by_timestamp_range(int $timestampStart, int $timestampEnd) : array {
+      $timestampStart = strtotime(date('Y/m/d', $timestampStart));
+      $timestampEnd = strtotime(date('Y/m/d', $timestampEnd));
 
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('metrics');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('date >= :date_start AND date <= :date_end');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['id']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('metrics');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('date >= :dateStart AND date <= :dateEnd');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':date_start', $timestamp_start, \PDO::PARAM_INT);
-        $database_query->bindParam(':date_end', $timestamp_end, \PDO::PARAM_INT);
-        $database_query->execute();
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':dateStart', $timestampStart, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':dateEnd', $timestampEnd, \PDO::PARAM_INT);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -104,11 +104,11 @@ namespace core\PHPLibrary {
       }
 
       $sessions = [];
-      $results = $database_query->fetchAll(\PDO::FETCH_ASSOC);
+      $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
 
       if ($results) {
         foreach ($results as $data) {
-          array_push($sessions, new MetricsSession($this->system_core, $this, $data['id']));
+          array_push($sessions, new MetricsSession($this->CMSCore, $this, $data['id']));
         }
       }
 
@@ -123,36 +123,38 @@ namespace core\PHPLibrary {
      * @return array
      */
     public function get_entries_views_by_timestamp(int $timestamp) : array {
-      $entries = (new Entries($this->system_core, true))->get_all([], true);
-      $entries_result = [];
+      $entries = (new Entries($this->CMSCore, true))->get_all([], true);
+      $entriesResult = [];
 
-      foreach ($entries as $entry_index => $entry_object) {
-        $entry_object->init_data(['name']);
+      foreach ($entries as $index => $object) {
+        $object->init_data(['name']);
       }
 
       if (!empty($entries)) {
-        $metrics_session = $this->get_session_by_timestamp($timestamp);
-        if (!is_null($metrics_session)) {
-          $metrics_session->init_data(['data']);
+        $metricsSession = $this->get_session_by_timestamp($timestamp);
+        if (!is_null($metricsSession)) {
+          $metricsSession->init_data(['data']);
 
-          $metrics_views = $metrics_session->get_data_metrics_views();
-          if (!is_null($metrics_views)) {
-            foreach ($metrics_views as $views_token => $views_data) {
-              $views_urls = $views_data['urls'];
-              if (!empty($views_urls)) {
-                foreach ($views_urls as $url => $views_count) {
+          $metricsViews = $metricsSession->get_data_metrics_views();
+
+          if (!is_null($metricsViews)) {
+            foreach ($metricsViews as $views_token => $views_data) {
+              $viewsURLs = $views_data['urls'];
+
+              if (!empty($viewsURLs)) {
+                foreach ($viewsURLs as $url => $count) {
                   $url_parsed = parse_url($url);
                   $path_parts = explode('/', $url_parsed['path']);
 
                   if ($path_parts[1] == 'entry') {
-                    foreach ($entries as $entry_index => $entry_object) {
-                      if ($entry_object->get_name() == $path_parts[2]) {
-                        if (in_array($entry_object, $entries_result)) {
-                          $current_views = $entry_object->get_views_count();
-                          $entry_object->set_views_count($current_views + $views_count);
+                    foreach ($entries as $index => $object) {
+                      if ($object->get_name() == $path_parts[2]) {
+                        if (in_array($object, $entriesResult)) {
+                          $currentViews = $object->get_views_count();
+                          $object->set_views_count($currentViews + $count);
                         } else {
-                          $entry_object->set_views_count($views_count);
-                          array_push($entries_result, $entry_object);
+                          $object->set_views_count($count);
+                          array_push($entriesResult, $object);
                         }
                       }
                     }
@@ -164,7 +166,7 @@ namespace core\PHPLibrary {
         }
       }
 
-      return $entries_result;
+      return $entriesResult;
     }
 
     /**
@@ -175,36 +177,36 @@ namespace core\PHPLibrary {
      * @return array
      */
     public function get_pages_views_by_timestamp(int $timestamp) : array {
-      $pages = (new Pages($this->system_core, true))->get_all([], true);
-      $pages_result = [];
+      $pages = (new Pages($this->CMSCore, true))->get_all([], true);
+      $pagesResult = [];
 
-      foreach ($pages as $page_index => $page_object) {
-        $page_object->init_data(['name']);
+      foreach ($pages as $index => $object) {
+        $object->init_data(['name']);
       }
 
       if (!empty($pages)) {
-        $metrics_session = $this->get_session_by_timestamp($timestamp);
-        if (!is_null($metrics_session)) {
-          $metrics_session->init_data(['data']);
+        $metricsSession = $this->get_session_by_timestamp($timestamp);
+        if (!is_null($metricsSession)) {
+          $metricsSession->init_data(['data']);
 
-          $metrics_views = $metrics_session->get_data_metrics_views();
-          if (!is_null($metrics_views)) {
-            foreach ($metrics_views as $views_token => $views_data) {
-              $views_urls = $views_data['urls'];
-              if (!empty($views_urls)) {
-                foreach ($views_urls as $url => $views_count) {
+          $metricsViews = $metricsSession->get_data_metrics_views();
+          if (!is_null($metricsViews)) {
+            foreach ($metricsViews as $views_token => $views_data) {
+              $viewsURLs = $views_data['urls'];
+              if (!empty($viewsURLs)) {
+                foreach ($viewsURLs as $url => $count) {
                   $url_parsed = parse_url($url);
                   $path_parts = explode('/', $url_parsed['path']);
 
                   if ($path_parts[1] == 'page') {
-                    foreach ($pages as $page_index => $page_object) {
-                      if ($page_object->get_name() == $path_parts[2]) {
-                        if (in_array($page_object, $pages_result)) {
-                          $current_views = $page_object->get_views_count();
-                          $page_object->set_views_count($current_views + $views_count);
+                    foreach ($pages as $index => $object) {
+                      if ($object->get_name() == $path_parts[2]) {
+                        if (in_array($object, $pagesResult)) {
+                          $currentViews = $object->get_views_count();
+                          $object->set_views_count($currentViews + $count);
                         } else {
-                          $page_object->set_views_count($views_count);
-                          array_push($pages_result, $page_object);
+                          $object->set_views_count($count);
+                          array_push($pagesResult, $object);
                         }
                       }
                     }
@@ -216,7 +218,7 @@ namespace core\PHPLibrary {
         }
       }
 
-      return $pages_result;
+      return $pagesResult;
     }
   }
 }

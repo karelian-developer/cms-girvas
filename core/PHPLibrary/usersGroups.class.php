@@ -13,41 +13,41 @@ namespace core\PHPLibrary {
   use \PDOException as PDOException;
 
   final class UsersGroups {
-    private SystemCore $system_core;
+    private SystemCore $CMSCore;
     
     /**
      * __construct
      *
-     * @param  mixed $system_core
+     * @param  mixed $CMSCore
      * @return void
      */
-    public function __construct(SystemCore $system_core) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore) {
+      $this->CMSCore = $CMSCore;
     }
     
-    public function get_all(array $params_array = []) : array {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users_groups');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_order_by();
-      $query_builder->statement->clause_order_by->set_column('id');
-      $query_builder->statement->clause_order_by->set_sort_type('DESC');
-      if (array_key_exists('limit', $params_array)) {
-        if (is_array($params_array['limit'])) {
-          $limit = (is_integer($params_array['limit'][0])) ? $params_array['limit'][0] : 0;
-          $offset = (is_integer($params_array['limit'][1])) ? $params_array['limit'][1] : 0;
-          $query_builder->statement->set_clause_limit($limit, $offset);
+    public function get_all(array $paramsArray = []) : array {
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['id']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users_groups');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_order_by();
+      $queryBuilder->statement->clauseOrderBy->set_column('id');
+      $queryBuilder->statement->clauseOrderBy->set_sort_type('DESC');
+      if (array_key_exists('limit', $paramsArray)) {
+        if (is_array($paramsArray['limit'])) {
+          $limit = (is_integer($paramsArray['limit'][0])) ? $paramsArray['limit'][0] : 0;
+          $offset = (is_integer($paramsArray['limit'][1])) ? $paramsArray['limit'][1] : 0;
+          $queryBuilder->statement->set_clause_limit($limit, $offset);
         }
       }
-      $query_builder->statement->assembly();
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->execute();
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -58,10 +58,10 @@ namespace core\PHPLibrary {
       }
 
       $users = [];
-      $results = $database_query->fetchAll(\PDO::FETCH_ASSOC);
+      $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
       if ($results) {
         foreach ($results as $data) {
-          array_push($users, new UserGroup($this->system_core, $data['id']));
+          array_push($users, new UserGroup($this->CMSCore, $data['id']));
         }
       }
 
@@ -74,18 +74,18 @@ namespace core\PHPLibrary {
      * @return int
      */
     public function get_count_total() : int {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['count(*)']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users_groups');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['count(*)']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users_groups');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->execute();
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -95,7 +95,7 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
       return ($result) ? $result['count'] : 0;
     }
 

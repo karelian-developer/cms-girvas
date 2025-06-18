@@ -22,7 +22,7 @@ namespace core\PHPLibrary {
   #[\AllowDynamicProperties]
   final class Module {
     /** @var SystemCore|null Объект системного ядра */
-    public SystemCore|null $system_core = null;
+    public SystemCore|null $CMSCore = null;
     /** @var ModuleLocale|null Объект локализации */
     public ModuleLocale|null $locale = null;
     /** @var string|null Техническое наименование модуля */
@@ -35,33 +35,33 @@ namespace core\PHPLibrary {
     /**
      * __construct
      *
-     * @param  SystemCore $system_core
+     * @param  SystemCore $CMSCore
      * @param  string $name
      * @return void
      */
-    public function __construct(SystemCore $system_core, string $name) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, string $name) {
+      $this->CMSCore = $CMSCore;
       $this->set_name($name);
       
-      $cms_base_locale_setted_name = $system_core->configurator->get_database_entry_value('base_locale');
-      $url_base_locale_setted_name = $system_core->urlp->get_param('locale');
-      $cookie_base_locale_setted_name = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
+      $CMSBaseLocaleSettedName = $CMSCore->configurator->get_database_entry_value('base_locale');
+      $URLBaseLocaleSettedName = $CMSCore->urlp->get_param('locale');
+      $CookieBaseLocaleSettedName = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
 
-      $cms_base_locale_name = (!is_null($url_base_locale_setted_name)) ? $url_base_locale_setted_name : $cookie_base_locale_setted_name;
-      $cms_base_locale_name = (!is_null($cms_base_locale_name)) ? $cms_base_locale_name : $cms_base_locale_setted_name;
-      $cms_base_locale_name = (is_null($cms_base_locale_name)) ? 'en_US' : $cms_base_locale_name;
-      $cms_base_locale = new ModuleLocale($this, $cms_base_locale_name);
-      if (!$cms_base_locale->exists_file_data_json()) {
-        $cms_base_locale = new ModuleLocale($this, $cms_base_locale_name);
+      $CMSBaseLocaleName = (!is_null($URLBaseLocaleSettedName)) ? $URLBaseLocaleSettedName : $CookieBaseLocaleSettedName;
+      $CMSBaseLocaleName = (!is_null($CMSBaseLocaleName)) ? $CMSBaseLocaleName : $CMSBaseLocaleSettedName;
+      $CMSBaseLocaleName = (is_null($CMSBaseLocaleName)) ? 'en_US' : $CMSBaseLocaleName;
+      $CMSBaseLocale = new ModuleLocale($this, $CMSBaseLocaleName);
+      if (!$CMSBaseLocale->exists_file_data_json()) {
+        $CMSBaseLocale = new ModuleLocale($this, $CMSBaseLocaleName);
       }
 
-      $this->locale = $cms_base_locale;
+      $this->locale = $CMSBaseLocale;
 
-      $module_path = sprintf('%s/modules/%s', CMS_ROOT_DIRECTORY, $name);
-      $module_url = sprintf('modules/%s', $name);
+      $modulePath = CMS_ROOT_DIRECTORY . '/modules/' . $name;
+      $moduleURL = 'modules/' . $name;
 
-      $this->set_path($module_path);
-      $this->set_url($module_url);
+      $this->set_path($modulePath);
+      $this->set_url($moduleURL);
     }
     
     /**
@@ -90,7 +90,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public function get_preview_url() : string {
-      return sprintf('/%s/preview.png', $this->get_url());
+      return '/' . $this->get_url() . '/preview.png';
     }
 
     /**
@@ -99,7 +99,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public function get_screenshots_path() : string {
-      return sprintf('%s/screenshots', $this->get_path());
+      return $this->get_path() . '/screenshots';
     }
 
     /**
@@ -108,7 +108,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public function get_screenshots_url() : string {
-      return sprintf('/%s/screenshots', $this->get_url());
+      return '/' . $this->get_url() . '/screenshots';
     }
 
     /**
@@ -117,8 +117,8 @@ namespace core\PHPLibrary {
      * @return array
      */
     public function get_screenshots_array() : array {
-      $screenshots_path = $this->get_screenshots_path();
-      return (file_exists($screenshots_path)) ? array_diff(scandir($screenshots_path), ['.', '..']) : [];
+      $path = $this->get_screenshots_path();
+      return (file_exists($path)) ? array_diff(scandir($path), ['.', '..']) : [];
     }
     
     /**
@@ -181,54 +181,54 @@ namespace core\PHPLibrary {
     /**
      * Получить вес модуля в байтах
      * 
-     * @param ModuleEnumWeight $enum_weight
+     * @param ModuleEnumWeight $enumWeight
      * 
      * @return float
      */
-    public static function get_weight(Module $module, ModuleEnumWeight $enum_weight) : float {
-      $module_path = $module->get_path();
-      $total_weight = 0;
+    public static function get_weight(Module $module, ModuleEnumWeight $enumWeight) : float {
+      $modulePath = $module->get_path();
+      $totalWeight = 0;
       
-      $directory_files = array_diff(scandir($module_path), ['.', '..']);
-      $callback_function = function(string $path, array $files, $callback, &$total_weight) : void {
+      $directoryFiles = array_diff(scandir($modulePath), ['.', '..']);
+      $callbackFunction = function(string $path, array $files, $callback, &$totalWeight) : void {
         foreach ($files as $file) {
-          $file_path = sprintf('%s/%s', $path, $file);
+          $filePath = $path . '/' . $file;
 
-          if (is_dir($file_path)) {
-            $directory_files = array_diff(scandir($file_path), ['.', '..']);
-            $callback($file_path, $directory_files, $callback, $total_weight);
+          if (is_dir($filePath)) {
+            $directoryFiles = array_diff(scandir($filePath), ['.', '..']);
+            $callback($filePath, $directoryFiles, $callback, $totalWeight);
           } else {
-            $total_weight += filesize($file_path);
+            $totalWeight += filesize($filePath);
           }
         }
       };
 
-      $callback_function($module_path, $directory_files, $callback_function, $total_weight);
+      $callbackFunction($modulePath, $directoryFiles, $callbackFunction, $totalWeight);
 
-      $total_weight = match ($enum_weight) {
-        ModuleEnumWeight::BYTES => $total_weight,
-        ModuleEnumWeight::KILOBYTES => $total_weight / 1024,
-        ModuleEnumWeight::MEGABYTES => $total_weight / (1024 ^ 2),
-        ModuleEnumWeight::GIGABYTES => $total_weight / (1024 ^ 3),
-        ModuleEnumWeight::TERABYTES => $total_weight / (1024 ^ 4),
-        ModuleEnumWeight::PETABYTES => $total_weight / (1024 ^ 5),
-        ModuleEnumWeight::EXABYTES => $total_weight / (1024 ^ 6),
-        ModuleEnumWeight::ZETTABYTES => $total_weight / (1024 ^ 7),
-        ModuleEnumWeight::YOTTABYTES => $total_weight / (1024 ^ 8),
+      $totalWeight = match ($enumWeight) {
+        ModuleEnumWeight::BYTES => $totalWeight,
+        ModuleEnumWeight::KILOBYTES => $totalWeight / 1024,
+        ModuleEnumWeight::MEGABYTES => $totalWeight / (1024 ^ 2),
+        ModuleEnumWeight::GIGABYTES => $totalWeight / (1024 ^ 3),
+        ModuleEnumWeight::TERABYTES => $totalWeight / (1024 ^ 4),
+        ModuleEnumWeight::PETABYTES => $totalWeight / (1024 ^ 5),
+        ModuleEnumWeight::EXABYTES => $totalWeight / (1024 ^ 6),
+        ModuleEnumWeight::ZETTABYTES => $totalWeight / (1024 ^ 7),
+        ModuleEnumWeight::YOTTABYTES => $totalWeight / (1024 ^ 8),
       };
 
-      return $total_weight;
+      return $totalWeight;
     }
 
     /**
      * Получение имени ячейки метаданных
      * 
-     * @param ModuleEnumMetadata $enum_metadata
+     * @param ModuleEnumMetadata $metadata
      * 
      * @return string
      */
-    public static function get_metadata_name(ModuleEnumMetadata $enum_metadata) : string {
-      return match ($enum_metadata) {
+    public static function get_metadata_name(ModuleEnumMetadata $metadata) : string {
+      return match ($metadata) {
         ModuleEnumMetadata::AUTHOR_NAME => 'authorName',
         ModuleEnumMetadata::AUTHOR_CODE_NAME => 'authorCodeName',
         ModuleEnumMetadata::AUTHOR_CODE_SERVER_NAME => 'authorCodeServerName',
@@ -259,17 +259,17 @@ namespace core\PHPLibrary {
     /**
      * Подключние файла ядра модуля
      *
-     * @param  SystemCore $system_core
+     * @param  SystemCore $CMSCore
      * @param  string $name
      * @return bool
      */
-    public static function connect_core(SystemCore $system_core, string $name) : bool {
-      $module = new Module($system_core, $name);
+    public static function connect_core(SystemCore $CMSCore, string $name) : bool {
+      $module = new Module($CMSCore, $name);
       
       if ($module->exists_core_file()) {
         require_once($module->get_core_path());
-        $core_class = $module->get_core_class();
-        $system_core->modules[$name] = new $core_class($system_core, $module);
+        $coreClass = $module->get_core_class();
+        $CMSCore->modules[$name] = new $coreClass($CMSCore, $module);
 
         return true;
       }
@@ -283,8 +283,8 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function is_enabled() : bool {
-      $file_path = sprintf('%s/modules/%s/enabled', CMS_ROOT_DIRECTORY, $this->get_name());
-      return file_exists($file_path);
+      $filePath = CMS_ROOT_DIRECTORY . '/modules/' . $this->get_name() . '/enabled';
+      return file_exists($filePath);
     }
 
     /**
@@ -293,8 +293,8 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function is_installed() : bool {
-      $file_path = sprintf('%s/modules/%s/installed', CMS_ROOT_DIRECTORY, $this->get_name());
-      return file_exists($file_path);
+      $filePath = CMS_ROOT_DIRECTORY . '/modules/' . $this->get_name() . '/installed';
+      return file_exists($filePath);
     }
 
     /**
@@ -304,8 +304,8 @@ namespace core\PHPLibrary {
      */
     public function install() : bool {
       if (!$this->is_installed()) {
-        $file_path = sprintf('%s/modules/%s/installed', CMS_ROOT_DIRECTORY, $this->get_name());
-        $file = fopen($file_path, 'w');
+        $filePath = CMS_ROOT_DIRECTORY . '/modules/' . $this->get_name() . '/installed';
+        $file = fopen($filePath, 'w');
 
         return true;
       }
@@ -320,8 +320,8 @@ namespace core\PHPLibrary {
      */
     public function delete() : bool {
       if (!$this->is_installed()) {
-        $path = sprintf('%s/modules/%s', CMS_ROOT_DIRECTORY, $this->get_name());
-        $this->system_core::recursive_files_remove($path);
+        $path = CMS_ROOT_DIRECTORY . '/modules/' . $this->get_name();
+        $this->CMSCore::recursive_files_remove($path);
 
         return true;
       }
@@ -336,8 +336,8 @@ namespace core\PHPLibrary {
      */
     public function enable() : bool {
       if (!$this->is_enabled()) {
-        $file_path = sprintf('%s/modules/%s/enabled', CMS_ROOT_DIRECTORY, $this->get_name());
-        $file = fopen($file_path, 'w');
+        $filePath = CMS_ROOT_DIRECTORY . '/modules/' . $this->get_name() . '/enabled';
+        $file = fopen($filePath, 'w');
 
         return true;
       }
@@ -352,8 +352,8 @@ namespace core\PHPLibrary {
      */
     public function disable() : bool {
       if ($this->is_enabled()) {
-        $file_path = sprintf('%s/modules/%s/enabled', CMS_ROOT_DIRECTORY, $this->get_name());
-        unlink($file_path);
+        $filePath = CMS_ROOT_DIRECTORY . '/modules/' . $this->get_name() . '/enabled';
+        unlink($filePath);
 
         return true;
       }
@@ -367,8 +367,8 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function exists_core_file() : bool {
-      $file_path = sprintf('%s/modules/%s/core.class.php', CMS_ROOT_DIRECTORY, $this->get_name());
-      return file_exists($file_path);
+      $filePath = CMS_ROOT_DIRECTORY . '/modules/' . $this->get_name() . '/core.class.php';
+      return file_exists($filePath);
     }
     
     /**
@@ -377,7 +377,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public function get_core_path() : string {
-      return sprintf('%s/core.class.php', $this->get_path());
+      return $this->get_path() . '/core.class.php';
     }
     
     /**
@@ -414,7 +414,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public function get_file_metadata_json_path() : string {
-      return sprintf('%s/metadata.json', $this->get_path());
+      return $this->get_path() . '/metadata.json';
     }
     
     /**
@@ -423,10 +423,10 @@ namespace core\PHPLibrary {
      * @return array
      */
     public function get_metadata() : array|null {
-      $file_path = $this->get_file_metadata_json_path();
-      $file_content = file_get_contents($file_path);
+      $filePath = $this->get_file_metadata_json_path();
+      $fileContent = file_get_contents($filePath);
 
-      return json_decode($file_content, true);
+      return json_decode($fileContent, true);
     }
 
     /**
@@ -435,7 +435,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public function get_file_readme_md_path() : string {
-      return sprintf('%s/README.md', $this->get_path());
+      return $this->get_path() . '/README.md';
     }
 
     /**

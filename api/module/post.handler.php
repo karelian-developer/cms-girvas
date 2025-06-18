@@ -16,109 +16,109 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\Module as Module;
 use \ZipArchive as ZipArchive;
 
-if ($system_core->client->is_logged(2)) {
-  $client_user = $system_core->client->get_user(2);
-  $client_user->init_data(['metadata']);
-  $client_user_group = $client_user->get_group();
-  $client_user_group->init_data(['permissions']);
+if ($CMSCore->client->is_logged(2)) {
+  $clientUser = $CMSCore->client->get_user(2);
+  $clientUser->init_data(['metadata']);
+  $clientUserGroup = $clientUser->get_group();
+  $clientUserGroup->init_data(['permissions']);
   
-  if ($client_user_group->permission_check($client_user_group::PERMISSION_ADMIN_MODULES_MANAGEMENT)) {
-    if (isset($_POST['module_name']) && $system_core->urlp->get_path(2) == 'install') {
-      $module_name = $_POST['module_name'];
-      $module = new Module($system_core, $module_name);
+  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT)) {
+    if (isset($_POST['module_name']) && $CMSCore->urlp->get_path(2) === 'install') {
+      $moduleName = $_POST['module_name'];
+      $module = new Module($CMSCore, $moduleName);
 
       if (!$module->exists_core_file()) {
-        $module_repository_url = sprintf('https://repository.cms-girvas.ru/modules/%s', $module_name);
+        $moduleURL = 'https://repository.cms-girvas.ru/modules/' . $moduleName;
 
-        $curl = curl_init($module_repository_url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        $curl_exucute_result = json_decode(curl_exec($curl), true);
-        curl_close($curl);
+        $cURL = curl_init($moduleURL);
+        curl_setopt($cURL, CURLOPT_RETURNTRANSFER, 1);
+        $cURLExucuteResult = json_decode(curl_exec($cURL), true);
+        curl_close($cURL);
 
-        if (!empty($curl_exucute_result['outputData'])) {
-          $module_folder_path = sprintf('%s/modules/%s', CMS_ROOT_DIRECTORY, $module_name);
-          $module_archive_path = sprintf('%s/modules/%s.zip', CMS_ROOT_DIRECTORY, $module_name);
+        if (!empty($cURLExucuteResult['outputData'])) {
+          $moduleDirectoryPath = CMS_ROOT_DIRECTORY . '/modules/' . $moduleName;
+          $moduleArchivePath = CMS_ROOT_DIRECTORY . '/modules/' . $moduleName . '.zip';
 
-          $curl = curl_init($module_archive_path);
-          curl_setopt($curl, CURLOPT_URL, $curl_exucute_result['outputData']['download_url']);
-          curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-          $curl_exucute_result = curl_exec($curl);
-          curl_close($curl);
+          $cURL = curl_init($moduleArchivePath);
+          curl_setopt($cURL, CURLOPT_URL, $cURLExucuteResult['outputData']['download_url']);
+          curl_setopt($cURL, CURLOPT_RETURNTRANSFER, 1);
+          $cURLExucuteResult = curl_exec($cURL);
+          curl_close($cURL);
 
-          $file = fopen($module_archive_path, "w+");
-          fputs($file, $curl_exucute_result);
+          $file = fopen($moduleArchivePath, "w+");
+          fputs($file, $cURLExucuteResult);
           fclose($file);
 
-          if (file_exists($module_archive_path)) {
-            $zip_archive = new ZipArchive();
+          if (file_exists($moduleArchivePath)) {
+            $zipArchive = new ZipArchive();
 
-            if ($zip_archive->open($module_archive_path) === true) {
-              mkdir($module_folder_path);
+            if ($zipArchive->open($moduleArchivePath) === true) {
+              mkdir($moduleDirectoryPath);
 
-              $zip_archive_extracted = $zip_archive->extractTo($module_folder_path);
-              $zip_archive->close();
+              $zipArchive_extracted = $zipArchive->extractTo($moduleDirectoryPath);
+              $zipArchive->close();
 
-              unlink($module_archive_path);
+              unlink($moduleArchivePath);
 
-              if ($zip_archive_extracted) {
-                $module_core_path = sprintf('%s/core.class.php', $module_folder_path);
-                $module_core_namespace = sprintf('\\modules\\%s\\Core', $module_name);
+              if ($zipArchive_extracted) {
+                $moduleCorePath = $moduleDirectoryPath . '/core.class.php';
+                $moduleCoreNamespace = '\\modules\\' . $moduleName . '\\Core';
                 
-                if (file_exists($module_core_path)) {
-                  require_once($module_core_path);
+                if (file_exists($moduleCorePath)) {
+                  require_once($moduleCorePath);
 
-                  $module_core = new $module_core_namespace($system_core, $module);
+                  $moduleCore = new $moduleCoreNamespace($CMSCore, $module);
 
-                  if (method_exists($module_core, 'install')) {
-                    $module_core->install();
+                  if (method_exists($moduleCore, 'install')) {
+                    $moduleCore->install();
                   }
 
                   http_response_code(200);
-                  $handler_message = $system_core->locale->get_single_value_by_key('API_MODULE_UPLOADED');
-                  $handler_status_code = 1;
+                  $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_MODULE_UPLOADED');
+                  $handlerStatusCode = $handlerStatusCode ?? 1;
                 } else {
                   http_response_code(500);
-                  $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_MODULE_ERROR_CORE_NOT_FOUND'));
-                  $handler_status_code = 0;
+                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_MODULE_ERROR_CORE_NOT_FOUND');
+                  $handlerStatusCode = $handlerStatusCode ?? 0;
                 }
               } else {
                 http_response_code(500);
-                $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNZIPPING_NOT_POSSIBLE'));
-                $handler_status_code = 0;
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNZIPPING_NOT_POSSIBLE');
+                $handlerStatusCode = $handlerStatusCode ?? 0;
               }
             } else {
               http_response_code(500);
-              $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNZIPPING_NOT_POSSIBLE'));
-              $handler_status_code = 0;
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNZIPPING_NOT_POSSIBLE');
+              $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           } else {
             http_response_code(500);
-            $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_MODULE_ERROR_ARCHIVE_NOT_FOUND'));
-            $handler_status_code = 0;
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_MODULE_ERROR_ARCHIVE_NOT_FOUND');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
           http_response_code(500);
-          $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_MODULE_ERROR_REPOSITORY_DATA_NOT_GETTED'));
-          $handler_status_code = 0;
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_MODULE_ERROR_REPOSITORY_DATA_NOT_GETTED');
+          $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
         http_response_code(500);
-        $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_MODULE_ALREADY_UPLOADED'));
-        $handler_status_code = 0;
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_MODULE_ALREADY_UPLOADED');
+        $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
       http_response_code(400);
-      $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_INVALID_INPUT_DATA_SET'));
-      $handler_status_code = 0;
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_INVALID_INPUT_DATA_SET');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS'));
-    $handler_status_code = 0;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
   http_response_code(401);
-  $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION'));
-  $handler_status_code = 0;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
 
 

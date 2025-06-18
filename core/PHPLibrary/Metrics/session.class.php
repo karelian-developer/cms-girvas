@@ -22,19 +22,19 @@ namespace core\PHPLibrary\Metrics {
   #[\AllowDynamicProperties]
   final class Session {
     /** @var SystemCore|null Объект системного ядра */
-    public SystemCore|null $system_core = null;
+    public SystemCore|null $CMSCore = null;
     /** @var int Временная отметка */
     public int $timestamp = 0;
 
     /**
      * __construct
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param Metrics $metrics
      * @param int $id
      */
-    public function __construct(SystemCore $system_core, Metrics $metrics, int $id) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Metrics $metrics, int $id) {
+      $this->CMSCore = $CMSCore;
       $this->metrics = $metrics;
       $this->id = $id;
     }
@@ -45,10 +45,10 @@ namespace core\PHPLibrary\Metrics {
      * @param  mixed $columns
      * @return void
      */
-    public function init_data(array $columns = ['*']) {
-      $columns_data = $this->get_database_columns_data($columns);
-      foreach ($columns_data as $column_name => $column_data) {
-        $this->{$column_name} = $column_data;
+    public function init_data(array $columns = ['*']) : void {
+      $columnsData = $this->get_database_columns_data($columns);
+      foreach ($columnsData as $name => $data) {
+        $this->{$name} = $data;
       }
     }
 
@@ -116,25 +116,25 @@ namespace core\PHPLibrary\Metrics {
     /**
      * Получить данные по визитам/посещениям
      * 
-     * @param int $type_id
+     * @param int $typeID
      * 
      * @return array
      */
-    public function get_data_metrics_visits(int $type_id) : array|null {
+    public function get_data_metrics_visits(int $typeID) : array|null {
       if (property_exists($this, 'data')) {
         $data = $this->get_data();
 
         if (!is_null($data)) {
           if (array_key_exists('metrics', $data)) {
 
-            switch ($type_id) {
-              case 0: $visits_key_name = 'visits0'; break;
-              case 1: $visits_key_name = 'visits1'; break;
-              default: $visits_key_name = 'visits0';
+            switch ($typeID) {
+              case 0: $keyName = 'visits0'; break;
+              case 1: $keyName = 'visits1'; break;
+              default: $keyName = 'visits0';
             }
 
-            if (array_key_exists($visits_key_name, $data['metrics'])) {
-              return $data['metrics'][$visits_key_name];
+            if (array_key_exists($keyName, $data['metrics'])) {
+              return $data['metrics'][$keyName];
             }
           }
         }
@@ -146,13 +146,13 @@ namespace core\PHPLibrary\Metrics {
     /**
      * Получить количество визитов/посещений
      * 
-     * @param int $type_id
+     * @param int $typeID
      * 
      * @return int
      */
-    public function get_data_metrics_visits_count(int $type_id) : int {
+    public function get_data_metrics_visits_count(int $typeID) : int {
       if (property_exists($this, 'data')) {
-        $data = $this->get_data_metrics_visits($type_id);
+        $data = $this->get_data_metrics_visits($typeID);
         return count($data);
       }
 
@@ -162,86 +162,86 @@ namespace core\PHPLibrary\Metrics {
     /**
      * Получить объект сессии по его временной отметке
      *
-     * @param  SystemCore $system_core
+     * @param  SystemCore $CMSCore
      * @param  Metrics $metrics
      * @param  int $timestamp
      * @return Session|null
      */
-    public static function get_by_timestamp(SystemCore $system_core, Metrics $metrics, int $timestamp) : Session|null {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('metrics');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('date = :date');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function get_by_timestamp(SystemCore $CMSCore, Metrics $metrics, int $timestamp) : Session|null {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['id']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('metrics');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('date = :date');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':date', $timestamp, \PDO::PARAM_INT);
-			$database_query->execute();
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':date', $timestamp, \PDO::PARAM_INT);
+			$databaseQuery->execute();
 
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-      return ($result) ? new Session($system_core, $metrics, (int)$result['id']) : null;
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+      return $result ? new Session($CMSCore, $metrics, (int)$result['id']) : null;
     }
 
     /**
      * Проверка наличия сессии по временной отметке
      *
-     * @param  SystemCore $system_core
+     * @param  SystemCore $CMSCore
      * @param  Metrics $metrics
      * @param  int $timestamp
      * @return bool
      */
-    public static function exists_by_timestamp(SystemCore $system_core, Metrics $metrics, int $timestamp) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['1']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('metrics');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('date = :date');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function exists_by_timestamp(SystemCore $CMSCore, Metrics $metrics, int $timestamp) : bool {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['1']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('metrics');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('date = :date');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':date', $timestamp, \PDO::PARAM_INT);
-			$database_query->execute();
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':date', $timestamp, \PDO::PARAM_INT);
+			$databaseQuery->execute();
 
-      return ($database_query->fetchColumn()) ? true : false;
+      return ($databaseQuery->fetchColumn()) ? true : false;
     }
 
     /**
      * Создание новой сессии
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * 
      * @return Session|null
      */
-    public static function create(SystemCore $system_core, Metrics $metrics) : Session|null {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_insert();
-      $query_builder->statement->set_table('metrics');
-      $query_builder->statement->add_column('date');
-      $query_builder->statement->add_column('data');
-      $query_builder->statement->add_column('created_unix_timestamp');
-      $query_builder->statement->add_column('updated_unix_timestamp');
-      $query_builder->statement->set_clause_returning();
-      $query_builder->statement->clause_returning->add_column('id');
-      $query_builder->statement->assembly();
+    public static function create(SystemCore $CMSCore, Metrics $metrics) : Session|null {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_insert();
+      $queryBuilder->statement->set_table('metrics');
+      $queryBuilder->statement->add_column('date');
+      $queryBuilder->statement->add_column('data');
+      $queryBuilder->statement->add_column('createdUnixTimestamp');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp');
+      $queryBuilder->statement->set_clause_returning();
+      $queryBuilder->statement->clauseReturning->add_column('id');
+      $queryBuilder->statement->assembly();
 
-      $created_unix_timestamp = time();
-      $metrics_timestamp = $metrics->timestamp;
-      $updated_unix_timestamp = $created_unix_timestamp;
+      $createdUnixTimestamp = time();
+      $metricsTimestamp = $metrics->timestamp;
+      $updatedUnixTimestamp = $createdUnixTimestamp;
 
-      $data_json = json_encode([
+      $dataJSON = json_encode([
         'metrics' => [
           'views' => [],
           'visits0' => [],
@@ -249,17 +249,17 @@ namespace core\PHPLibrary\Metrics {
         ]
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':data', $data_json, \PDO::PARAM_STR);
-      $database_query->bindParam(':date', $metrics_timestamp, \PDO::PARAM_INT);
-      $database_query->bindParam(':created_unix_timestamp', $created_unix_timestamp, \PDO::PARAM_INT);
-      $database_query->bindParam(':updated_unix_timestamp', $updated_unix_timestamp, \PDO::PARAM_INT);
-      $execute = $database_query->execute();
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':data', $dataJSON, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':date', $metricsTimestamp, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+      $execute = $databaseQuery->execute();
 
       if ($execute) {
-        $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-        return ($result) ? new Session($system_core, $metrics, $result['id']) : null;
+        $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+        return $result ? new Session($CMSCore, $metrics, $result['id']) : null;
       }
 
       return null;
@@ -272,58 +272,58 @@ namespace core\PHPLibrary\Metrics {
      * @return bool
      */
     public function update(array $data) : bool {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_update();
-      $query_builder->statement->set_table('metrics');
-      $query_builder->statement->set_clause_set();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_update();
+      $queryBuilder->statement->set_table('metrics');
+      $queryBuilder->statement->set_clause_set();
       
-      foreach ($data as $data_name => $data_value) {
-        if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'data'])) {
-          $query_builder->statement->clause_set->add_column($data_name);
+      foreach ($data as $name => $value) {
+        if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'data'])) {
+          $queryBuilder->statement->clauseSet->add_column($name);
         }
       }
 
       if (array_key_exists('data', $data)) {
-        $json_fields = [];
+        $fieldsJSON = [];
 
         foreach ($data['data'] as $name => $value) {
-          array_push($json_fields, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
+          array_push($fieldsJSON, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
         }
 
         if (!empty($data['data'])) {
-          $query_builder->statement->clause_set->add_column('data', 'data::jsonb || ' . implode(' || ', $json_fields));
+          $queryBuilder->statement->clauseSet->add_column('data', 'data::jsonb || ' . implode(' || ', $fieldsJSON));
         }
       }
 
-      $query_builder->statement->clause_set->add_column('updated_unix_timestamp');
-      $query_builder->statement->clause_set->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder->statement->clauseSet->add_column('updatedUnixTimestamp');
+      $queryBuilder->statement->clauseSet->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
 
       /** @var int Текущее время в UNIX-формате */
-      $updated_unix_timestamp = time();
+      $updatedUnixTimestamp = time();
 
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       
-      foreach ($data as $data_name => $data_value) {
-        if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'data'])) {
-          switch (gettype($data_value)) {
-            case 'boolean': $data_value_type = \PDO::PARAM_BOOL; break;
-            case 'integer': $data_value_type = \PDO::PARAM_INT; break;
-            case 'string': $data_value_type = \PDO::PARAM_STR; break;
-            case 'null': $data_value_type = \PDO::PARAM_NULL; break;
+      foreach ($data as $name => $value) {
+        if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'data'])) {
+          switch (gettype($value)) {
+            case 'boolean': $valueType = \PDO::PARAM_BOOL; break;
+            case 'integer': $valueType = \PDO::PARAM_INT; break;
+            case 'string': $valueType = \PDO::PARAM_STR; break;
+            case 'null': $valueType = \PDO::PARAM_NULL; break;
           }
 
-          $database_query->bindParam(':' . $data_name, $data[$data_name], $data_value_type);
+          $databaseQuery->bindParam(':' . $name, $data[$name], $valueType);
         }
       }
 
-      $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-      $database_query->bindParam(':updated_unix_timestamp', $updated_unix_timestamp, \PDO::PARAM_INT);
-			$execute = $database_query->execute();
+      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+			$execute = $databaseQuery->execute();
 
       return ($execute) ? true : false;
     }
@@ -335,26 +335,26 @@ namespace core\PHPLibrary\Metrics {
      * @return void
      */
     private function get_database_columns_data(array $columns = ['*']) : array|null {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections($columns);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('metrics');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections($columns);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('metrics');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
       
       /** @var int Идентификационный номер записи */
       $id = $this->get_id();
 
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':id', $id, \PDO::PARAM_INT);
-			$database_query->execute();
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $id, \PDO::PARAM_INT);
+			$databaseQuery->execute();
 
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
       return ($result) ? $result : null;
     }
   }

@@ -15,165 +15,165 @@
 
 use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
+use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as FileConverterEnumFileFormat;
 use \core\PHPLibrary\SystemCore\Locale as Locale;
 
-if ($system_core->client->is_logged(2)) {
-  $client_user = $system_core->client->get_user(2);
-  $client_user->init_data(['metadata']);
-  $client_user_group = $client_user->get_group();
-  $client_user_group->init_data(['permissions']);
+if ($CMSCore->client->is_logged(2)) {
+  $clientUser = $CMSCore->client->get_user(2);
+  $clientUser->init_data(['metadata']);
+  $clientUserGroup = $clientUser->get_group();
+  $clientUserGroup->init_data(['permissions']);
 
-  if ($client_user_group->permission_check($client_user_group::PERMISSION_EDITOR_PAGES_STATIC_EDIT)) {
+  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_EDITOR_PAGES_STATIC_EDIT)) {
     if (isset($_PATCH['page_static_id'])) {
-      $page_static_id = (is_numeric($_PATCH['page_static_id'])) ? (int)$_PATCH['page_static_id'] : 0;
+      $pageStaticID = $_PATCH['page_static_id'] ?? 0;
+      $pageStaticID = is_numeric($pageStaticID) ? (int) $pageStaticID : 0;
 
-      if (PageStatic::exists_by_id($system_core, $page_static_id)) {
-        $page_static = new PageStatic($system_core, $page_static_id);
-        $page_static_data = [];
+      if (PageStatic::exists_by_id($CMSCore, $pageStaticID)) {
+        $pageStatic = new PageStatic($CMSCore, $pageStaticID);
+        $pageStaticData = [];
 
-        $cms_locales_names = $system_core->get_array_locales_names();
-        if (count($cms_locales_names) > 0) {
-          foreach ($cms_locales_names as $index => $cms_locale_name) {
-            $cms_locale = new Locale($system_core, $cms_locale_name);
+        $CMSLocalesNames = $CMSCore->get_array_locales_names();
+        if (count($CMSLocalesNames) > 0) {
+          foreach ($CMSLocalesNames as $index => $localeName) {
+            $CMSLocale = new Locale($CMSCore, $localeName);
 
-            $title_input_name = sprintf('page_static_title_%s', $cms_locale->get_iso_639_2());
-            $description_textarea_name = sprintf('page_static_description_%s', $cms_locale->get_iso_639_2());
-            $content_textarea_name = sprintf('page_static_content_%s', $cms_locale->get_iso_639_2());
-            $keywords_textarea_name = sprintf('page_static_keywords_%s', $cms_locale->get_iso_639_2());
+            $inputTitleName = 'page_static_title_' . $CMSLocale->get_iso_639_2();
+            $textareaDescriptionName = 'page_static_description_' . $CMSLocale->get_iso_639_2();
+            $textareaContentName = 'page_static_content_' . $CMSLocale->get_iso_639_2();
+            $textareaKeywordsName = 'page_static_keywords_' . $CMSLocale->get_iso_639_2();
 
-            if (!array_key_exists('metadata', $page_static_data)) $page_static_data['metadata'] = [];
-            if (isset($_PATCH['page_static_is_published'])) $page_static_data['metadata']['is_published'] = $_PATCH['page_static_is_published'];
+            if (!array_key_exists('metadata', $pageStaticData)) $pageStaticData['metadata'] = [];
+            if (isset($_PATCH['page_static_is_published'])) $pageStaticData['metadata']['is_published'] = $_PATCH['page_static_is_published'];
 
-            if (array_key_exists($title_input_name, $_PATCH) || array_key_exists($description_textarea_name, $_PATCH) || array_key_exists($content_textarea_name, $_PATCH)) {
-              if (!array_key_exists('texts', $page_static_data)) $page_static_data['texts'] = [];
-              if (!array_key_exists($cms_locale->get_name(), $page_static_data['texts'])) $page_static_data['texts'][$cms_locale->get_name()] = [];
+            if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH) || array_key_exists($textareaContentName, $_PATCH)) {
+              if (!array_key_exists('texts', $pageStaticData)) $pageStaticData['texts'] = [];
+              if (!array_key_exists($CMSLocale->get_name(), $pageStaticData['texts'])) $pageStaticData['texts'][$CMSLocale->get_name()] = [];
 
-              if (array_key_exists($title_input_name, $_PATCH)) {
-                $input_value = $_PATCH[$title_input_name];
-                $input_value = strip_tags($input_value);
-                $input_value = str_replace('\'', '"', $input_value);
+              if (array_key_exists($inputTitleName, $_PATCH)) {
+                $inputValue = $_PATCH[$inputTitleName];
+                $inputValue = strip_tags($inputValue);
+                $inputValue = str_replace('\'', '"', $inputValue);
                 
-                $page_static_data['texts'][$cms_locale->get_name()]['title'] = $input_value;
+                $pageStaticData['texts'][$CMSLocale->get_name()]['title'] = $inputValue;
               }
 
-              if (array_key_exists($description_textarea_name, $_PATCH)) {
-                $textarea_value = $_PATCH[$description_textarea_name];
-                $textarea_value = strip_tags($textarea_value);
-                $textarea_value = str_replace('\'', '"', $textarea_value);
+              if (array_key_exists($textareaDescriptionName, $_PATCH)) {
+                $textareaValue = $_PATCH[$textareaDescriptionName];
+                $textareaValue = strip_tags($textareaValue);
+                $textareaValue = str_replace('\'', '"', $textareaValue);
 
-                $page_static_data['texts'][$cms_locale->get_name()]['description'] = $textarea_value;
+                $pageStaticData['texts'][$CMSLocale->get_name()]['description'] = $textareaValue;
               }
 
-              if (array_key_exists($content_textarea_name, $_PATCH)) {
-                $textarea_value = $_PATCH[$content_textarea_name];
-                $textarea_value = strip_tags($textarea_value, '<table><tr><td><th><b><u><i><hr>');
-                $textarea_value = str_replace('\'', '"', $textarea_value);
+              if (array_key_exists($textareaContentName, $_PATCH)) {
+                $textareaValue = $_PATCH[$textareaContentName];
+                $textareaValue = strip_tags($textareaValue, '<table><tr><td><th><b><u><i><hr>');
+                $textareaValue = str_replace('\'', '"', $textareaValue);
 
-                $page_static_data['texts'][$cms_locale->get_name()]['content'] = $textarea_value;
+                $pageStaticData['texts'][$CMSLocale->get_name()]['content'] = $textareaValue;
               }
 
-              if (array_key_exists($keywords_textarea_name, $_PATCH)) {
-                $textarea_value = $_PATCH[$keywords_textarea_name];
-                $textarea_value = strip_tags($textarea_value);
-                $textarea_value = str_replace('\'', '"', $textarea_value);
+              if (array_key_exists($textareaKeywordsName, $_PATCH)) {
+                $textareaValue = $_PATCH[$textareaKeywordsName];
+                $textareaValue = strip_tags($textareaValue);
+                $textareaValue = str_replace('\'', '"', $textareaValue);
                 
-                $page_static_data['texts'][$cms_locale->get_name()]['keywords'] = preg_split('/\h*[\,]+\h*/', $textarea_value, -1, PREG_SPLIT_NO_EMPTY);
+                $pageStaticData['texts'][$CMSLocale->get_name()]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
               }
             }
           }
         }
 
-        if (isset($_PATCH['page_static_name'])) $page_static_data['name'] = urlencode(htmlentities($_PATCH['page_static_name']));
+        if (isset($_PATCH['page_static_name'])) $pageStaticData['name'] = urlencode(htmlentities($_PATCH['page_static_name']));
         if (isset($_PATCH['page_static_preview'])) {
-          $file_uploaded_folder_path = sprintf('%s/uploads/media', CMS_ROOT_DIRECTORY);
-          $file_converter = new FileConverter($system_core);
-          $file_converted = $file_converter->convert($_PATCH['page_static_preview'], $file_uploaded_folder_path, \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat::WEBP, true);
+          $fileUploadedDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
+          $fileConverter = new FileConverter($CMSCore);
+          $fileConverted = $fileConverter->convert($_PATCH['page_static_preview'], $fileUploadedDirectoryPath, FileConverterEnumFileFormat::WEBP, true);
           
-          if (is_array($file_converted)) {
-            if (!array_key_exists('metadata', $page_static_data)) $page_static_data['metadata'] = [];
-            $page_static_data['metadata']['preview_url'] = sprintf('/uploads/media/%s', $file_converted['file_name']);
+          if (is_array($fileConverted)) {
+            if (!array_key_exists('metadata', $pageStaticData)) $pageStaticData['metadata'] = [];
+            $pageStaticData['metadata']['preview_url'] = '/uploads/media/' . $fileConverted['file_name'];
           }
         }
 
         foreach ($_PATCH as $name => $value) {
           if (preg_match('/^page_static_additional_field_([a-z0-9_]+)$/', $name, $matches, PREG_OFFSET_CAPTURE)) {
-            if (!isset($page_static_data['metadata']['additionalFields'])) $page_static_data['metadata']['additionalFields'] = [];
+            if (!isset($pageStaticData['metadata']['additionalFields'])) $pageStaticData['metadata']['additionalFields'] = [];
             
-            $field_name = $matches[1][0];
-            $field_name_transformed = '';
+            $fieldName = $matches[1][0];
+            $fieldNameTransformed = '';
 
-            $field_name_parts = explode('_', $field_name);
-            for ($i = 0; $i < count($field_name_parts); $i++) {
-              $field_name_transformed .= ($i > 0) ? ucfirst($field_name_parts[$i]) : $field_name_parts[$i];
+            $fieldNameParts = explode('_', $fieldName);
+            for ($i = 0; $i < count($fieldNameParts); $i++) {
+              $fieldNameTransformed .= $i > 0 ? ucfirst($fieldNameParts[$i]) : $fieldNameParts[$i];
             }
 
-            $page_static_data['metadata']['additionalFields'][$field_name_transformed] = htmlspecialchars(str_replace('\'', '"', $value));
+            $pageStaticData['metadata']['additionalFields'][$fieldNameTransformed] = htmlspecialchars(str_replace('\'', '"', $value));
           }
 
           if ($name === 'page_static_template_path') {
-            $page_static_data['metadata']['personalTemplatePath'] = htmlspecialchars(str_replace('\'', '"', trim($value)));
+            $pageStaticData['metadata']['personalTemplatePath'] = htmlspecialchars(str_replace('\'', '"', trim($value)));
           }
         }
 
-        $page_static_is_published = isset($page_static_data['metadata']['is_published']) ? $page_static_data['metadata']['is_published'] : 0;
+        $pageStaticIsPublished = $pageStaticData['metadata']['is_published'] ?? 0;
 
         // Если происходит публикация страницы, то необходимо удостовериться, что
         // в странице присутствует стандартная локализация, в противном случае
         // система не даст сохранить ее.
-        if ($page_static_is_published) {
-          /** @var \core\PHPLibrary\SystemCore\Locale */
-          $base_locale = $system_core->get_cms_locale();
-          /** @var string */
-          $base_locale_name = $base_locale->get_name();
+        if ($pageStaticIsPublished) {
+          $CMSBaseLocale = $CMSCore->get_cms_locale();
+          $CMSBaseLocaleName = $CMSBaseLocale->get_name();
 
-          $page_static->init_data(['texts', 'metadata']);
+          $pageStatic->init_data(['texts', 'metadata']);
 
           /** @var string Заголовок записи */
-          $page_static_title_default = $page_static->get_title($base_locale_name);
+          $pageStaticTitle = $pageStatic->get_title($CMSBaseLocaleName);
           /** @var string описание записи */
-          $page_static_description_default = $page_static->get_description($base_locale_name);
+          $pageStaticDescription = $pageStatic->get_description($CMSBaseLocaleName);
           /** @var string содержимое записи */
-          $page_static_content_default = $page_static->get_content($base_locale_name);
+          $pageStaticContent = $pageStatic->get_content($CMSBaseLocaleName);
           /** @var int дата обновления страницы в формате UNIX */
-          $page_static_data['metadata']['publishedUnixTimestamp'] = time();
+          $pageStaticData['metadata']['publishedUnixTimestamp'] = time();
 
           // Если заголовок, описание или содержимое стандартной локализации не задано, то
           // запись не будет обновлена.
-          if (empty($page_static_title_default) || empty($page_static_description_default) || empty($page_static_content_default)) {
-            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', sprintf($system_core->locale->get_single_value_by_key('API_PAGE_STATIC_EMPTY_LOCALE_DEFAULT_PUBLISHED_ERROR'), $base_locale_name)) : $handler_message;
-            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+          if (empty($pageStaticTitle) || empty($pageStaticDescription) || empty($pageStaticContent)) {
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->get_single_value_by_key('API_PAGE_STATIC_EMPTY_LOCALE_DEFAULT_PUBLISHED_ERROR'), $CMSBaseLocaleName);
+            $handlerStatusCode = $handlerStatusCode ?? 0;
           } else {
             /** @var bool Обновление записи */
-            $page_static_is_updated = $page_static->update($page_static_data);
+            $pageStaticIsUpdated = $pageStatic->update($pageStaticData);
           }
         } else {
           /** @var bool Обновление записи */
-          $page_static_is_updated = $page_static->update($page_static_data);
+          $pageStaticIsUpdated = $pageStatic->update($pageStaticData);
         }
 
         /** @var bool Костыль */
-        $page_static_is_updated = isset($page_static_is_updated) ? $page_static_is_updated : false;
+        $pageStaticIsUpdated = $pageStaticIsUpdated ?? false;
 
-        if ($page_static_is_updated) {
-          $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS') : $handler_message;
-          $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+        if ($pageStaticIsUpdated) {
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS');
+          $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {
-          $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN')) : $handler_message;
-          $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+          $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_STATIC_PAGE_ERROR_NOT_FOUND')) : $handler_message;
-        $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_STATIC_PAGE_ERROR_NOT_FOUND');
+        $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     }
   } else {
-    $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS')) : $handler_message;
-    $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
   http_response_code(401);
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
 
 ?>

@@ -16,34 +16,35 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\EntriesSample as EntriesSample;
 use \core\PHPLibrary\EntriesSamples as EntriesSamples;
 
-if ($system_core->client->is_logged(1) || $system_core->client->is_logged(2)) {
+if ($CMSCore->client->is_logged(1) || $CMSCore->client->is_logged(2)) {
   /** @var int ID выборки */
-  $sample_id = (is_numeric($system_core->urlp->get_path(3))) ? (int)$system_core->urlp->get_path(3) : 0;
+  $sampleID = $CMSCore->urlp->get_path(3) ?? 0;
+  $sampleID = is_numeric($sampleID) ? (int) $sampleID : 0;
 
-  if (EntriesSample::exists_by_id($system_core, $sample_id)) {
-    $sample = new EntriesSample($system_core, $sample_id);
-    $sample->init_data(['texts', 'metadata', 'created_unix_timestamp', 'updated_unix_timestamp']);
+  if (EntriesSample::exists_by_id($CMSCore, $sampleID)) {
+    $sample = new EntriesSample($CMSCore, $sampleID);
+    $sample->init_data(['texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
     
-    $locale = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $system_core->configurator->get_database_entry_value('base_locale');
+    $localeName = $CMSCore->urlp->get_param('locale') ?? $CMSCore->configurator->get_database_entry_value('base_locale');
 
-    $handler_output_data['entriesSample'] = [];
-    $handler_output_data['entriesSample']['id'] = $sample->get_id();
-    $handler_output_data['entriesSample']['title'] = $sample->get_title($locale);
-    $handler_output_data['entriesSample']['description'] = $sample->get_description($locale);
-    $handler_output_data['entriesSample']['createdUnixTimestamp'] = $sample->get_created_unix_timestamp();
-    $handler_output_data['entriesSample']['updatedUnixTimestamp'] = $sample->get_updated_unix_timestamp();
-    $handler_output_data['entriesSample']['limitCount'] = $sample->get_limit_count();
-    $handler_output_data['entriesSample']['sortTypeID'] = $sample->get_sort_type_id();
+    $handlerOutputData['entriesSample'] = [];
+    $handlerOutputData['entriesSample']['id'] = $sample->get_id();
+    $handlerOutputData['entriesSample']['title'] = $sample->get_title($localeName);
+    $handlerOutputData['entriesSample']['description'] = $sample->get_description($localeName);
+    $handlerOutputData['entriesSample']['createdUnixTimestamp'] = $sample->get_created_unix_timestamp();
+    $handlerOutputData['entriesSample']['updatedUnixTimestamp'] = $sample->get_updated_unix_timestamp();
+    $handlerOutputData['entriesSample']['limitCount'] = $sample->get_limit_count();
+    $handlerOutputData['entriesSample']['sortTypeID'] = $sample->get_sort_type_id();
 
-    $handler_message = $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
-    $handler_status_code = 1;
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
   } else {
-    $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ENTRY_COMMENT_ERROR_NOT_FOUND'));
-    $handler_status_code = 0;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ENTRY_COMMENT_ERROR_NOT_FOUND');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
 
 ?>

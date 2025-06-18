@@ -65,17 +65,17 @@ namespace core\PHPLibrary\Client\Cookie {
     /**
      * Создать Cookie
      * 
-     * @param SystemCore $systemCore
+     * @param SystemCore $CMSCore
      * @param ClientSession $session
      * @param string $name
      * @param int $expires
      * 
      * @return bool
      */
-    public static function create(SystemCore $systemCore, ClientSession $session, string $name, int $expires) : Cookie {
-      $domainForCookies = $systemCore->configurator->get('domain_cookies');
-      $sslIsEnabled = $systemCore->configurator->get('ssl_is_enabled');
-      $userSessionIsSecure = ($sslIsEnabled) ? true : false;
+    public static function create(SystemCore $CMSCore, ClientSession $session, string $name, int $expires) : Cookie {
+      $domainForCookies = $CMSCore->configurator->get('domainCookies');
+      $SSLIsEnabled = $CMSCore->configurator->get('SSLIsEnabled');
+      $userSessionIsSecure = ($SSLIsEnabled) ? true : false;
 
       if (!is_null($domainForCookies)) {
         return setcookie($name, $session->get_token(), [

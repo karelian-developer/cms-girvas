@@ -14,28 +14,28 @@ namespace core\PHPLibrary\SystemCore {
   use \core\PHPLibrary\SystemCore as SystemCore;
 
   final class DatabaseConnector {
-    private mixed $system_core = null;
+    private mixed $CMSCore = null;
     public \core\PHPLibrary\Database|null $database = null;
     
     /**
      * __construct
      *
-     * @param  mixed $system_core
+     * @param  mixed $CMSCore
      * @return void
      */
-    public function __construct(SystemCore $system_core, Configurator $configurator, bool $is_test = false) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Configurator $configurator, bool $isTest = false) {
+      $this->CMSCore = $CMSCore;
 
-      $database_configurations = $configurator->get('database');
-      $this->database = new Database($database_configurations['dms']);
-      $this->database->set_database_name($database_configurations['name']);
-      $this->database->set_database_user($database_configurations['user']);
-      $this->database->set_database_host($database_configurations['host']);
-      $this->database->set_database_password($database_configurations['password']);
+      $databaseConfigurations = $configurator->get('database');
+      $this->database = new Database($databaseConfigurations['dms']);
+      $this->database->set_database_name($databaseConfigurations['name']);
+      $this->database->set_database_user($databaseConfigurations['user']);
+      $this->database->set_database_host($databaseConfigurations['host']);
+      $this->database->set_database_password($databaseConfigurations['password']);
       
-      if (!$is_test) {
-        $error_is_json = ($system_core->urlp->get_path(0) == 'handler') ? true : false;
-        @$this->database->connect($error_is_json);
+      if (!$isTest) {
+        $errorIsJSON = $CMSCore->urlp->get_path(0) === 'handler' ? true : false;
+        @$this->database->connect($errorIsJSON);
       }
     }
 

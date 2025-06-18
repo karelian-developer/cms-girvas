@@ -18,7 +18,7 @@ namespace core\PHPLibrary\Feed\Specification {
     const TYPE_NAME = 'rss1-0';
     const TYPE_TITLE = 'RSS 1.0';
 
-    private SystemCore $system_core;
+    private SystemCore $CMSCore;
     private FeedBuilder $builder;
     public string $title;
     public string $description;
@@ -26,9 +26,9 @@ namespace core\PHPLibrary\Feed\Specification {
     public string $language;
     public array $items = [];
 
-    public function __construct(SystemCore $system_core, FeedBuilder $web_channel_builder) {
-      $this->system_core = $system_core;
-      $this->builder = $web_channel_builder;
+    public function __construct(SystemCore $CMSCore, FeedBuilder $feedBuilder) {
+      $this->CMSCore = $CMSCore;
+      $this->builder = $feedBuilder;
     }
 
     public function set_title(string $value) : void {
@@ -77,76 +77,76 @@ namespace core\PHPLibrary\Feed\Specification {
     }
 
     public function assembly_rdf() : DOMElement|bool {
-      $element_rdf = $this->builder->document->createElement('rdf:RDF');
-      $element_rdf_attribute_xmlns_rdf = $this->builder->document->createAttribute('xmlns:rdf');
-      $element_rdf_attribute_xmlns = $this->builder->document->createAttribute('xmlns');
-      $element_rdf_attribute_xmlns_rdf->value = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
-      $element_rdf_attribute_xmlns->value = 'http://purl.org/rss/1.0/';
+      $RDFElement = $this->builder->document->createElement('rdf:RDF');
+      $RDFElementAttributeXMLnsRDF = $this->builder->document->createAttribute('xmlns:rdf');
+      $RDFElementAttributeXMLns = $this->builder->document->createAttribute('xmlns');
+      $RDFElementAttributeXMLnsRDF->value = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+      $RDFElementAttributeXMLns->value = 'http://purl.org/rss/1.0/';
 
-      $element_rdf->appendChild($element_rdf_attribute_xmlns_rdf);
-      $element_rdf->appendChild($element_rdf_attribute_xmlns);
-      return $element_rdf;
+      $RDFElement->appendChild($RDFElementAttributeXMLnsRDF);
+      $RDFElement->appendChild($RDFElementAttributeXMLns);
+      return $RDFElement;
     }
 
     public function assembly_channel() : DOMElement|bool {
-      $site_title = ($this->system_core->configurator->exists_database_entry_value('base_site_title')) ? $this->system_core->configurator->get_database_entry_value('base_site_title') : sprintf('%s %s', $this->system_core::CMS_TITLE, $this->system_core::CMS_VERSION);
-      $site_description = ($this->system_core->configurator->exists_database_entry_value('seo_site_description')) ? $this->system_core->configurator->get_database_entry_value('seo_site_description') : 'Description is not exists';
-      $site_link = sprintf('https://%s', $this->system_core->configurator->get('domain'));
+      $siteTitle = $this->CMSCore->configurator->exists_database_entry_value('base_site_title') ? $this->CMSCore->configurator->get_database_entry_value('base_site_title') : sprintf('%s %s', $this->CMSCore::CMS_TITLE, $this->CMSCore::CMS_VERSION);
+      $siteDescription = $this->CMSCore->configurator->exists_database_entry_value('seo_site_description') ? $this->CMSCore->configurator->get_database_entry_value('seo_site_description') : 'Description is not exists';
+      $siteLink = 'https://' . $this->CMSCore->configurator->get('domain');
 
-      $channel_title = (!empty($this->get_title())) ? $this->get_title() : $site_title;
-      $channel_description = (!empty($this->get_description())) ? $this->get_description() : $site_description;
-      $channel_link = (!empty($this->get_link())) ? $this->get_link() : $site_link;
+      $channelTitle = !empty($this->get_title()) ? $this->get_title() : $siteTitle;
+      $channelDescription = !empty($this->get_description()) ? $this->get_description() : $siteDescription;
+      $channelLink = !empty($this->get_link()) ? $this->get_link() : $siteLink;
 
-      $element_channel = $this->builder->document->createElement('channel');
-      $element_channel_title = $this->builder->document->createElement('title', $channel_title);
-      $element_channel_link = $this->builder->document->createElement('link', $channel_link);
-      $element_channel_description = $this->builder->document->createElement('description', $channel_description);
+      $channelElement = $this->builder->document->createElement('channel');
+      $channelTitleElement = $this->builder->document->createElement('title', $channelTitle);
+      $channelLinkElement = $this->builder->document->createElement('link', $channelLink);
+      $channelDescriptionElement = $this->builder->document->createElement('description', $channelDescription);
 
-      $element_channel->appendChild($element_channel_title);
-      $element_channel->appendChild($element_channel_link);
-      $element_channel->appendChild($element_channel_description);
+      $channelElement->appendChild($channelTitleElement);
+      $channelElement->appendChild($channelLinkElement);
+      $channelElement->appendChild($channelDescriptionElement);
 
-      $element_items = $this->builder->document->createElement('items');
-      $element_items_rdf_seq = $this->builder->document->createElement('rdf:Seq');
-      $element_items->appendChild($element_items_rdf_seq);
+      $itemsElement = $this->builder->document->createElement('items');
+      $itemsElementRDFSeq = $this->builder->document->createElement('rdf:Seq');
+      $itemsElement->appendChild($itemsElementRDFSeq);
 
       foreach ($this->items as $item) {
-        $element_items_rdf_li = $this->builder->document->createElement('rdf:li');
-        $element_items_rdf_li_attribute_resource = $this->builder->document->createAttribute('resource');
-        $element_items_rdf_li_attribute_resource->value = $item['link'];
+        $itemsElementRDFLi = $this->builder->document->createElement('rdf:li');
+        $itemsElementRDFLiAttributeResource = $this->builder->document->createAttribute('resource');
+        $itemsElementRDFLiAttributeResource->value = $item['link'];
 
-        $element_items_rdf_li->appendChild($element_items_rdf_li_attribute_resource);
-        $element_items_rdf_seq->appendChild($element_items_rdf_li);
+        $itemsElementRDFLi->appendChild($itemsElementRDFLiAttributeResource);
+        $itemsElementRDFSeq->appendChild($itemsElementRDFLi);
       }
 
-      $element_channel->appendChild($element_items);
+      $channelElement->appendChild($itemsElement);
 
       foreach ($this->items as $item) {
-        $element_item = $this->builder->document->createElement('item');
-        $element_item_attribute_rdf_about = $this->builder->document->createAttribute('rdf:about');
-        $element_item_attribute_rdf_about->value = $item['link'];
-        $element_item->appendChild($element_item_attribute_rdf_about);
+        $itemElement = $this->builder->document->createElement('item');
+        $itemElementAttributeRDFAbout = $this->builder->document->createAttribute('rdf:about');
+        $itemElementAttributeRDFAbout->value = $item['link'];
+        $itemElement->appendChild($itemElementAttributeRDFAbout);
 
-        $element_item_title = $this->builder->document->createElement('title', $item['title']);
-        $element_item_description = $this->builder->document->createElement('description', $item['description']);
-        $element_item_link = $this->builder->document->createElement('link', $item['link']);
+        $itemTitleElement = $this->builder->document->createElement('title', $item['title']);
+        $itemDescriptionElement = $this->builder->document->createElement('description', $item['description']);
+        $itemLinkElement = $this->builder->document->createElement('link', $item['link']);
 
-        $element_item->appendChild($element_item_title);
-        $element_item->appendChild($element_item_description);
-        $element_item->appendChild($element_item_link);
+        $itemElement->appendChild($itemTitleElement);
+        $itemElement->appendChild($itemDescriptionElement);
+        $itemElement->appendChild($itemLinkElement);
 
-        $element_channel->appendChild($element_item);
+        $channelElement->appendChild($itemElement);
       }
       
-      return $element_channel;
+      return $channelElement;
     }
 
     public function assembly() : void {
-      $element_rdf = $this->assembly_rdf();
-      $element_channel = $this->assembly_channel();
+      $RDFElement = $this->assembly_rdf();
+      $channelElement = $this->assembly_channel();
 
-      $element_rdf->appendChild($element_channel);
-      $this->builder->document->appendChild($element_rdf);
+      $RDFElement->appendChild($channelElement);
+      $this->builder->document->appendChild($RDFElement);
 
       $this->builder->assembled = $this->builder->document->saveXML();
     }

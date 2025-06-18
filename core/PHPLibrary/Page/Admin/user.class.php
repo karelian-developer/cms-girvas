@@ -21,10 +21,10 @@ namespace core\PHPLibrary\Page\Admin {
 
     const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_USER_NAVIGATION_%s_LABEL';
 
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Page $page;
     public string $assembled = '';
-    public array $navigation_subsections_array = [
+    public array $navigationSubsections = [
       'back' => [
         'name' => 'back',
         'iconName' => 'back',
@@ -34,8 +34,8 @@ namespace core\PHPLibrary\Page\Admin {
       ],
     ];
 
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
     }
 
@@ -45,22 +45,23 @@ namespace core\PHPLibrary\Page\Admin {
      * @return void
      */
     public function init_subnavigation() : void {
-      $template_source =& $this->system_core->template->core->source;
-      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
+      $themeSource =& $this->CMSCore->theme->core->source;
+      $this->init_admin_panel_subnavigation($this->CMSCore, $themeSource);
     }
 
     public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page/user.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/user.css', 'rel' => 'stylesheet']);
 
-      $locale_data = $this->system_core->locale->get_data();
+      $localeData = $this->CMSCore->locale->get_data();
+      $localeName = $this->CMSCore->locale->get_name();
 
       /** @var null Пустая переменная */
       $user = null;
-      if (!is_null($this->system_core->urlp->get_path(2))) {
+      if (!is_null($this->CMSCore->urlp->get_path(2))) {
         /** @var int Идентификационный номер пользователя */
-        $user_id = (is_numeric($this->system_core->urlp->get_path(2))) ? (int)$this->system_core->urlp->get_path(2) : 0;
+        $userID = is_numeric($this->CMSCore->urlp->get_path(2)) ? (int)$this->CMSCore->urlp->get_path(2) : 0;
         /** @var User|null Объект пользователя */
-        $user = (User::exists_by_id($this->system_core, $user_id)) ? new User($this->system_core, $user_id) : null;
+        $user = User::exists_by_id($this->CMSCore, $userID) ? new User($this->CMSCore, $userID) : null;
         
         if (!is_null($user)) {
           // Инициализация набора данных пользователя
@@ -74,19 +75,17 @@ namespace core\PHPLibrary\Page\Admin {
        */
 
       /** @var array Типы полей */
-      $fields_types = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_type')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_type'), true) : [];
+      $fieldsTypes = $this->CMSCore->configurator->exists_database_entry_value('users_additional_field_type') ? json_decode($this->CMSCore->configurator->get_database_entry_value('users_additional_field_type'), true) : [];
       /** @var array Заголовки полей */
-      $fields_titles = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_title')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_title'), true) : [];
+      $fieldsTitles = $this->CMSCore->configurator->exists_database_entry_value('users_additional_field_title') ? json_decode($this->CMSCore->configurator->get_database_entry_value('users_additional_field_title'), true) : [];
       /** @var array Описания полей */
-      $fields_descriptions = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_description')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_description'), true) : [];
+      $fieldsDescriptions = $this->CMSCore->configurator->exists_database_entry_value('users_additional_field_description') ? json_decode($this->CMSCore->configurator->get_database_entry_value('users_additional_field_description'), true) : [];
       /** @var array Имена полей */
-      $fields_names = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_name')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_name'), true) : [];
-      /** @var string Имя языкового базового пакета CMS */
-      $cms_locale_setted = $this->system_core->configurator->get_database_entry_value('base_locale');
+      $fieldsNames = $this->CMSCore->configurator->exists_database_entry_value('users_additional_field_name') ? json_decode($this->CMSCore->configurator->get_database_entry_value('users_additional_field_name'), true) : [];
 
-      $additional_fields_elements = [];
-      foreach ($fields_types as $field_index => $field_type) {
-        $field_name_exploded = explode('_', $fields_names[$field_index]);
+      $additionalFieldsElements = [];
+      foreach ($fieldsTypes as $index => $type) {
+        $field_name_exploded = explode('_', $fieldsNames[$index]);
 
         foreach ($field_name_exploded as $string_index => $string) {
           if ($string_index > 0) {
@@ -94,53 +93,51 @@ namespace core\PHPLibrary\Page\Admin {
           }
         }
 
-        $field_name_transformed = implode($field_name_exploded);
+        $fieldNameTransformed = implode($field_name_exploded);
 
-        if ($field_type == 'textarea') {
+        if ($type === 'textarea') {
           if (!is_null($user)) {
-            $field_value = (!is_null($user->get_additional_field_data($field_name_transformed))) ? $user->get_additional_field_data($field_name_transformed) : '';
+            $fieldValue = !is_null($user->get_additional_field_data($fieldNameTransformed)) ? $user->get_additional_field_data($fieldNameTransformed) : '';
           }
 
-          array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/user/form/fieldTextarea.tpl', [
-            'FIELD_NAME' => $fields_names[$field_index],
-            'FIELD_DESCRIPTION' => $fields_descriptions[$cms_locale_setted][$field_index],
-            'FIELD_TITLE' => $fields_titles[$cms_locale_setted][$field_index],
-            'FIELD_VALUE' => (isset($field_value)) ? $field_value : ''
+          array_push($additionalFieldsElements, TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/user/form/fieldTextarea.tpl', [
+            'FIELD_NAME' => $fieldsNames[$index],
+            'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
+            'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
+            'FIELD_VALUE' => isset($fieldValue) ? $fieldValue : ''
           ]));
         } else {
           if (!is_null($user)) {
-            $field_value = (!is_null($user->get_additional_field_data($field_name_transformed))) ? $user->get_additional_field_data($field_name_transformed) : '';
+            $fieldValue = !is_null($user->get_additional_field_data($fieldNameTransformed)) ? $user->get_additional_field_data($fieldNameTransformed) : '';
           }
 
-          array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/user/form/fieldInput.tpl', [
-            'FIELD_NAME' => $fields_names[$field_index],
-            'FIELD_DESCRIPTION' => $fields_descriptions[$cms_locale_setted][$field_index],
-            'FIELD_TYPE' => $fields_types[$field_index],
-            'FIELD_TITLE' => $fields_titles[$cms_locale_setted][$field_index],
-            'FIELD_VALUE' => (isset($field_value)) ? $field_value : ''
+          array_push($additionalFieldsElements, TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/user/form/fieldInput.tpl', [
+            'FIELD_NAME' => $fieldsNames[$index],
+            'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
+            'FIELD_TYPE' => $fieldsTypes[$index],
+            'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
+            'FIELD_VALUE' => isset($fieldValue) ? $fieldValue : ''
           ]));
         }
       }
 
       /** @var string Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/user.tpl', [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/user.tpl', [
         'ADMIN_PANEL_PAGE_NAME' => 'user',
-        'USER_ID' => (!is_null($user)) ? $user->get_id() : 0,
-        'USER_LOGIN' => (!is_null($user)) ? $user->get_login() : '',
-        'USER_EMAIL' => (!is_null($user)) ? $user->get_email() : '',
-        'USER_NAME' => (!is_null($user)) ? $user->get_name() : '',
-        'USER_SURNAME' => (!is_null($user)) ? $user->get_surname() : '',
-        'USER_PATRONYMIC' => (!is_null($user)) ? $user->get_patronymic() : '',
-        'USER_BIRTHDATE' => (!is_null($user)) ? date('Y-m-d', $user->get_birthdate_unix_timestamp()) : 0,
+        'USER_ID' => !is_null($user) ? $user->get_id() : 0,
+        'USER_LOGIN' => !is_null($user) ? $user->get_login() : '',
+        'USER_EMAIL' => !is_null($user) ? $user->get_email() : '',
+        'USER_NAME' => !is_null($user) ? $user->get_name() : '',
+        'USER_SURNAME' => !is_null($user) ? $user->get_surname() : '',
+        'USER_PATRONYMIC' => !is_null($user) ? $user->get_patronymic() : '',
+        'USER_BIRTHDATE' => !is_null($user) ? date('Y-m-d', $user->get_birthdate_unix_timestamp()) : 0,
         'USER_BIRTHDATE_MINIMUM' => date('Y-m-d', time() - 3155760000),
         'USER_BIRTHDATE_MAXIMUM' => date('Y-m-d', time() - 441763200),
-        'USER_ADDITIONAL_FIELDS' => implode($additional_fields_elements),
-        'USER_FORM_METHOD' => (!is_null($user)) ? 'PATCH' : 'PUT'
+        'USER_ADDITIONAL_FIELDS' => implode($additionalFieldsElements),
+        'USER_FORM_METHOD' => !is_null($user) ? 'PATCH' : 'PUT'
       ]);
     }
-
   }
-
 }
 
 ?>

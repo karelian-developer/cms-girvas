@@ -417,12 +417,12 @@ namespace core\PHPLibrary {
      * @return void
      */
     public function add_global_variable(string $name, string|int $value) : void {
-      $this->global_variables[$name] = $value;
+      $this->globalVars[$name] = $value;
     }
 
     public function assembly_global_variables() : void {
-      if (!empty($this->global_variables)) {
-        $this->core->assembled = TemplateCollector::assembly($this->core->assembled, $this->global_variables);
+      if (!empty($this->globalVars)) {
+        $this->core->assembled = TemplateCollector::assembly($this->core->assembled, $this->globalVars);
       }
     }
 

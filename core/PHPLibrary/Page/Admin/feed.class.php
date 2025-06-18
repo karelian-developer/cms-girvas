@@ -22,10 +22,10 @@ namespace core\PHPLibrary\Page\Admin {
 
     const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_FEED_NAVIGATION_%s_LABEL';
 
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Page $page;
     public string $assembled = '';
-    public array $navigation_subsections_array = [
+    public array $navigationSubsections = [
       'back' => [
         'name' => 'back',
         'iconName' => 'back',
@@ -41,38 +41,39 @@ namespace core\PHPLibrary\Page\Admin {
      * @return void
      */
     public function init_subnavigation() : void {
-      $template_source =& $this->system_core->template->core->source;
-      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
+      $themeSource =& $this->CMSCore->theme->core->source;
+      $this->init_admin_panel_subnavigation($this->CMSCore, $themeSource);
     }
 
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
     }
 
     public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page/feed.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/feed.css', 'rel' => 'stylesheet']);
       
-      $locale_data = $this->system_core->locale->get_data();
+      $localeData = $this->CMSCore->locale->get_data();
+      $localeName = $this->CMSCore->locale->get_name();
 
-      $web_channel = null;
-      if (!is_null($this->system_core->urlp->get_path(2))) {
-        $web_channel_id = (is_numeric($this->system_core->urlp->get_path(2))) ? (int)$this->system_core->urlp->get_path(2) : 0;
-        $web_channel = (Feed::exists_by_id($this->system_core, $web_channel_id)) ? new Feed($this->system_core, $web_channel_id) : null;
+      $feed = null;
+      if (!is_null($this->CMSCore->urlp->get_path(2))) {
+        $feedID = (is_numeric($this->CMSCore->urlp->get_path(2))) ? (int)$this->CMSCore->urlp->get_path(2) : 0;
+        $feed = (Feed::exists_by_id($this->CMSCore, $feedID)) ? new Feed($this->CMSCore, $feedID) : null;
         
-        if (!is_null($web_channel_id)) {
-          $web_channel->init_data(['id', 'name', 'entries_category_id', 'type_id', 'texts']);
+        if (!is_null($feedID)) {
+          $feed->init_data(['id', 'name', 'entriesCategoryID', 'typeID', 'texts']);
         }
       }
 
       /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/feed.tpl', [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/feed.tpl', [
         'ADMIN_PANEL_PAGE_NAME' => 'web-channel',
-        'WEB_CHANNEL_ID' => (!is_null($web_channel)) ? $web_channel->get_id() : 0,
-        'WEB_CHANNEL_NAME' => (!is_null($web_channel)) ? $web_channel->get_name() : '',
-        'WEB_CHANNEL_TITLE' => (!is_null($web_channel)) ? $web_channel->get_title() : '',
-        'WEB_CHANNEL_DESCRIPTION' => (!is_null($web_channel)) ? $web_channel->get_description() : '',
-        'WEB_CHANNEL_FORM_METHOD' => (!is_null($web_channel)) ? 'PATCH' : 'PUT',
+        'WEB_CHANNEL_ID' => !is_null($feed) ? $feed->get_id() : 0,
+        'WEB_CHANNEL_NAME' => !is_null($feed) ? $feed->get_name() : '',
+        'WEB_CHANNEL_TITLE' => !is_null($feed) ? $feed->get_title($localeName) : '',
+        'WEB_CHANNEL_DESCRIPTION' => !is_null($feed) ? $feed->get_description($localeName) : '',
+        'WEB_CHANNEL_FORM_METHOD' => !is_null($feed) ? 'PATCH' : 'PUT',
       ]);
     }
 

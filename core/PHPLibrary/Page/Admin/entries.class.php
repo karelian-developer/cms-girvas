@@ -27,10 +27,10 @@ namespace core\PHPLibrary\Page\Admin {
 
     const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_NAVIGATION_%s_LABEL';
 
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public Page $page;
     public string $assembled = '';
-    public array $navigation_subsections_array = [
+    public array $navigationSubsections = [
       'index' => [
         'name' => 'index',
         'iconName' => 'index',
@@ -71,11 +71,11 @@ namespace core\PHPLibrary\Page\Admin {
     /**
      * __construct
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param Page $page
      */
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, Page $page) {
+      $this->CMSCore = $CMSCore;
       $this->page = $page;
     }
 
@@ -85,8 +85,8 @@ namespace core\PHPLibrary\Page\Admin {
      * @return void
      */
     public function init_subnavigation() : void {
-      $template_source =& $this->system_core->template->core->source;
-      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
+      $themeSource =& $this->CMSCore->theme->core->source;
+      $this->init_admin_panel_subnavigation($this->CMSCore, $themeSource);
     }
 
     /**
@@ -96,71 +96,72 @@ namespace core\PHPLibrary\Page\Admin {
      */
     public function assembly() : void {
       // Добавление таблицы стилей для страницы
-      $this->system_core->template->add_style(['href' => 'styles/page/entries.css', 'rel' => 'stylesheet']);
+      $this->CMSCore->theme->add_style(['href' => 'styles/page/entries.css', 'rel' => 'stylesheet']);
       
-      $locale_data = $this->system_core->locale->get_data();
-      $cms_locale_name = $this->system_core->locale->get_name();
+      $localeData = $this->CMSCore->locale->get_data();
+      $localeName = $this->CMSCore->locale->get_name();
 
-      $pagination_item_current = (!is_null($this->system_core->urlp->get_param('pageNumber'))) ? (int)$this->system_core->urlp->get_param('pageNumber') : 0;
-      $pagination_items_on_page = 12;
+      $paginationItemCurrent = (!is_null($this->CMSCore->urlp->get_param('pageNumber'))) ? (int)$this->CMSCore->urlp->get_param('pageNumber') : 0;
+      $paginationItemsOnPage = 12;
 
-      $entries_table_items_assembled_array = [];
+      $entriesTableItemsAssembled = [];
 
-      $entries = new Entries($this->system_core);
-      $entries_locale_default = $this->system_core->get_cms_locale('admin');
+      $entries = new Entries($this->CMSCore);
+      $entriesLocale = $this->CMSCore->get_cms_locale('admin');
+      $entriesLocaleName = $entriesLocale->get_name();
       
-      $entries_array_objects = $entries->get_all([
-        'limit' => [$pagination_items_on_page, $pagination_item_current * $pagination_items_on_page]
+      $entriesObjects = $entries->get_all([
+        'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
       ]);
 
-      $pagination = new Pagination($this->system_core, $entries->get_count_total(), $pagination_items_on_page, $pagination_item_current);
+      $pagination = new Pagination($this->CMSCore, $entries->get_count_total(), $paginationItemsOnPage, $paginationItemCurrent);
       $pagination->assembly();
 
       unset($entries);
 
-      $entry_number = 1;
-      foreach ($entries_array_objects as $entry_object) {
-        $entry_object->init_data(['id', 'texts', 'name', 'created_unix_timestamp', 'updated_unix_timestamp', 'metadata', 'category_id']);
+      $entryNumber = 1;
+      foreach ($entriesObjects as $entryObject) {
+        $entryObject->init_data(['id', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata', 'categoryID']);
 
-        $entry_category_id = $entry_object->get_category_id();
-        $entry_category_object = new EntryCategory($this->system_core, $entry_category_id);
-        $entry_category_object->init_data(['texts']);
+        $entryCategoryID = $entryObject->get_category_id();
+        $entryCategory = new EntryCategory($this->CMSCore, $entryCategoryID);
+        $entryCategory->init_data(['texts']);
 
-        $entry_created_date_timestamp = date('d.m.Y H:i:s', $entry_object->get_created_unix_timestamp());
-        $entry_published_date_timestamp = date('d.m.Y H:i:s', $entry_object->get_published_unix_timestamp());
-        $entry_updated_date_timestamp = date('d.m.Y H:i:s', $entry_object->get_updated_unix_timestamp());
+        $entryCreatedDateTimestamp = date('d.m.Y H:i:s', $entryObject->get_created_unix_timestamp());
+        $entryPublishedDateTimestamp = date('d.m.Y H:i:s', $entryObject->get_published_unix_timestamp());
+        $entryUpdatedDateTimestamp = date('d.m.Y H:i:s', $entryObject->get_updated_unix_timestamp());
 
-        $entry_title = $entry_object->get_title($entries_locale_default->get_name());
-        $entry_description = $entry_object->get_description($entries_locale_default->get_name());
-        $entry_category_title = $entry_category_object->get_title($cms_locale_name);
+        $entryTitle = $entryObject->get_title($entriesLocaleName);
+        $entryDescription = $entryObject->get_description($entriesLocaleName);
+        $entryCategoryTitle = $entryCategory->get_title($localeName);
 
-        $entry_title = strip_tags($entry_title);
-        $entry_description = strip_tags($entry_description);
-        $entry_category_title = strip_tags($entry_category_title);
+        $entryTitle = strip_tags($entryTitle);
+        $entryDescription = strip_tags($entryDescription);
+        $entryCategoryTitle = strip_tags($entryCategoryTitle);
 
-        array_push($entries_table_items_assembled_array, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entries/tableItem.tpl', [
-          'ENTRY_ID' => $entry_object->get_id(),
-          'ENTRY_NAME' => $entry_object->get_name(),
-          'ENTRY_INDEX' => $entry_number,
-          'ENTRY_TITLE' => (!empty($entry_title)) ? $entry_title : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $entries_locale_default->get_name()),
-          'ENTRY_DESCRIPTION' => (!empty($entry_description)) ? $entry_description : sprintf('[ DESCRIPTION NOT FOUND IN LOCALE %s ]', $entries_locale_default->get_name()),
-          'ENTRY_CATEGORY_TITLE' => (!empty($entry_category_title)) ? $entry_category_title : sprintf('[ CATEGORY TITLE NOT FOUND IN LOCALE %s ]', $cms_locale_name),
-          'ENTRY_PUBLISHED_STATUS' => ($entry_object->is_published()) ? 'published' : 'not-published',
-          'ENTRY_URL' => $entry_object->get_url(),
-          'ENTRY_CREATED_DATE_TIMESTAMP' => $entry_created_date_timestamp,
-          'ENTRY_PUBLISHED_DATE_TIMESTAMP' => ($entry_object->get_published_unix_timestamp() > 0) ? $entry_published_date_timestamp : '-',
-          'ENTRY_UPDATED_DATE_TIMESTAMP' => $entry_updated_date_timestamp,
+        array_push($entriesTableItemsAssembled, TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entries/tableItem.tpl', [
+          'ENTRY_ID' => $entryObject->get_id(),
+          'ENTRY_NAME' => $entryObject->get_name(),
+          'ENTRY_INDEX' => $entryNumber,
+          'ENTRY_TITLE' => !empty($entryTitle) ? $entryTitle : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $entriesLocale->get_name()),
+          'ENTRY_DESCRIPTION' => !empty($entryDescription) ? $entryDescription : sprintf('[ DESCRIPTION NOT FOUND IN LOCALE %s ]', $entriesLocale->get_name()),
+          'ENTRY_CATEGORY_TITLE' => !empty($entryCategoryTitle) ? $entryCategoryTitle : sprintf('[ CATEGORY TITLE NOT FOUND IN LOCALE %s ]', $localeName),
+          'ENTRY_PUBLISHED_STATUS' => $entryObject->is_published() ? 'published' : 'not-published',
+          'ENTRY_URL' => $entryObject->get_url(),
+          'ENTRY_CREATED_DATE_TIMESTAMP' => $entryCreatedDateTimestamp,
+          'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $entryObject->get_published_unix_timestamp() > 0 ? $entryPublishedDateTimestamp : '-',
+          'ENTRY_UPDATED_DATE_TIMESTAMP' => $entryUpdatedDateTimestamp,
         ]));
 
-        $entry_number++;
+        $entryNumber++;
       }
 
       /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entries.tpl', [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entries.tpl', [
         'PAGE_ENTRIES_PAGINATION' => $pagination->assembled,
         'ADMIN_PANEL_PAGE_NAME' => 'entries',
-        'ADMIN_PANEL_ENTRIES_TABLE' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entries/table.tpl', [
-          'ADMIN_PANEL_ENTRIES_TABLE_ITEMS' => implode($entries_table_items_assembled_array)
+        'ADMIN_PANEL_ENTRIES_TABLE' => TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entries/table.tpl', [
+          'ADMIN_PANEL_ENTRIES_TABLE_ITEMS' => implode($entriesTableItemsAssembled)
         ])
       ]);
     }

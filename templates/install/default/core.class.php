@@ -49,23 +49,23 @@ namespace templates\install\default {
       $domainConfiguration = $this->theme->CMSCore->configurator->get('domain');
       
       $domainAliasesConfiguration = $this->theme->CMSCore->configurator->get('domain_aliases');
-      $domainAliasesConfiguration = (is_array($domainAliasesConfiguration)) ? implode(', ', $domainAliasesConfiguration) : '';
+      $domainAliasesConfiguration = is_array($domainAliasesConfiguration) ? implode(', ', $domainAliasesConfiguration) : '';
 
       $databaseConfigurations = $this->theme->CMSCore->configurator->get('database');
-      $databaseConfigurations = (is_null($databaseConfigurations)) ? [] : $databaseConfigurations;
+      $databaseConfigurations = $databaseConfigurations ?? [];
 
-      $themeVars['CONFIGURATION_DOMAIN'] = ($domainConfiguration != null) ? $domainConfiguration : '';
-      $themeVars['CONFIGURATION_DOMAIN_ALIASES'] = ($domainAliasesConfiguration != null) ? $domainAliasesConfiguration : '';
-      $themeVars['CONFIGURATION_DATABASE_SCHEME'] = (array_key_exists('scheme', $databaseConfigurations)) ? $databaseConfigurations['scheme'] : '';
-      $themeVars['CONFIGURATION_DATABASE_PREFIX'] = (array_key_exists('prefix', $databaseConfigurations)) ? $databaseConfigurations['prefix'] : '';
-      $themeVars['CONFIGURATION_DATABASE_HOST'] = (array_key_exists('host', $databaseConfigurations)) ? $databaseConfigurations['host'] : '';
-      $themeVars['CONFIGURATION_DATABASE_PASSWORD'] = (array_key_exists('password', $databaseConfigurations)) ? $databaseConfigurations['password'] : '';
-      $themeVars['CONFIGURATION_DATABASE_NAME'] = (array_key_exists('name', $databaseConfigurations)) ? $databaseConfigurations['name'] : '';
-      $themeVars['CONFIGURATION_DATABASE_USER'] = (array_key_exists('user', $databaseConfigurations)) ? $databaseConfigurations['user'] : '';
+      $themeVars['CONFIGURATION_DOMAIN'] =  $domainConfiguration ?? '';
+      $themeVars['CONFIGURATION_DOMAIN_ALIASES'] = $domainAliasesConfiguration ?? '';
+      $themeVars['CONFIGURATION_DATABASE_SCHEME'] = array_key_exists('scheme', $databaseConfigurations) ? $databaseConfigurations['scheme'] : '';
+      $themeVars['CONFIGURATION_DATABASE_PREFIX'] = array_key_exists('prefix', $databaseConfigurations) ? $databaseConfigurations['prefix'] : '';
+      $themeVars['CONFIGURATION_DATABASE_HOST'] = array_key_exists('host', $databaseConfigurations) ? $databaseConfigurations['host'] : '';
+      $themeVars['CONFIGURATION_DATABASE_PASSWORD'] = array_key_exists('password', $databaseConfigurations) ? $databaseConfigurations['password'] : '';
+      $themeVars['CONFIGURATION_DATABASE_NAME'] = array_key_exists('name', $databaseConfigurations) ? $databaseConfigurations['name'] : '';
+      $themeVars['CONFIGURATION_DATABASE_USER'] = array_key_exists('user', $databaseConfigurations) ? $databaseConfigurations['user'] : '';
 
-      $themeVars['SITE_TITLE_VALUE'] = ($this->theme->CMSCore->configurator->exists_database_entry_value('base_title')) ? $this->theme->CMSCore->configurator->get_database_entry_value('base_title') : '';
-      $themeVars['SITE_DESCRIPTION_VALUE'] = ($this->theme->CMSCore->configurator->exists_database_entry_value('seo_site_description')) ? $this->theme->CMSCore->configurator->get_database_entry_value('seo_site_description') : '';
-      $themeVars['SITE_KEYWORDS_VALUE'] = ($this->theme->CMSCore->configurator->exists_database_entry_value('seo_site_keywords')) ? implode(', ', json_decode($this->theme->CMSCore->configurator->get_database_entry_value('seo_site_keywords'), true)) : '';
+      $themeVars['SITE_TITLE_VALUE'] = $this->theme->CMSCore->configurator->exists_database_entry_value('base_title') ? $this->theme->CMSCore->configurator->get_database_entry_value('base_title') : '';
+      $themeVars['SITE_DESCRIPTION_VALUE'] = $this->theme->CMSCore->configurator->exists_database_entry_value('seo_site_description') ? $this->theme->CMSCore->configurator->get_database_entry_value('seo_site_description') : '';
+      $themeVars['SITE_KEYWORDS_VALUE'] = $this->theme->CMSCore->configurator->exists_database_entry_value('seo_site_keywords') ? implode(', ', json_decode($this->theme->CMSCore->configurator->get_database_entry_value('seo_site_keywords'), true)) : '';
 
       return TemplateCollector::assembly_file_content($this->theme, 'templates/main.tpl', $themeVars);
     }
@@ -114,9 +114,7 @@ namespace templates\install\default {
         'PAGE_FOOTER' => $this->assembly_footer()
       ]);
     }
-
   }
-
 }
 
 ?>

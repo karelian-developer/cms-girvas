@@ -11,7 +11,7 @@
 namespace core\PHPLibrary\Template {
 
   interface InterfaceCore {
-    public function __construct(\core\PHPLibrary\Template $template_base);
+    public function __construct(\core\PHPLibrary\Template $themeBase);
     public function assembly() : void;
     public function assembly_document() : string;
     public function assembly_header() : string;

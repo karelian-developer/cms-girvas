@@ -16,50 +16,50 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\Users as Users;
 
-if ($system_core->client->is_logged(2)) {
-  $client_user = $system_core->client->get_user(2);
-  $client_user->init_data(['metadata']);
-  $client_user_group = $client_user->get_group();
-  $client_user_group->init_data(['permissions']);
+if ($CMSCore->client->is_logged(2)) {
+  $clientUser = $CMSCore->client->get_user(2);
+  $clientUser->init_data(['metadata']);
+  $clientUserGroup = $clientUser->get_group();
+  $clientUserGroup->init_data(['permissions']);
 
-  if ($client_user_group->permission_check($client_user_group::PERMISSION_ADMIN_USERS_GROUPS_MANAGEMENT)) {
+  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_ADMIN_USERS_GROUPS_MANAGEMENT)) {
     if (isset($_DELETE['user_group_id'])) {
-      $user_group_id = (is_numeric($_DELETE['user_group_id'])) ? (int)$_DELETE['user_group_id'] : 0;
+      $userGroupID = filter_var($_DELETE['user_group_id'] ?? null, FILTER_VALIDATE_INT) ?: 0;
 
-      if (UserGroup::exists_by_id($system_core, $user_group_id)) {
-        $user_group = new UserGroup($system_core, $user_group_id);
-        $users = new Users($system_core);
+      if (UserGroup::exists_by_id($CMSCore, $userGroupID)) {
+        $userGroup = new UserGroup($CMSCore, $userGroupID);
+        $users = new Users($CMSCore);
 
-        if ($users->get_count_by_group_id($user_group_id) == 0) {
-          if ($user_group_id > 4) {
-            $user_group_is_deleted = $user_group->delete();
-            if ($user_group_is_deleted) {
-              $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_DELETE_DATA_SUCCESS') : $handler_message;
-              $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+        if ($users->get_count_by_group_id($userGroupID) === 0) {
+          if ($userGroupID > 4) {
+            $userGroupIsDeleted = $userGroup->delete();
+            if ($userGroupIsDeleted) {
+              $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_DELETE_DATA_SUCCESS');
+              $handlerStatusCode = $handlerStatusCode ?? 1;
             } else {
-              $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN')) : $handler_message;
-              $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+              $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           } else {
-            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USERS_GROUP_ERROR_DELETION_EXISTS_USERS')) : $handler_message;
-            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_USERS_GROUP_ERROR_DELETION_EXISTS_USERS');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
-          $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USERS_GROUP_ERROR_DELETION_PROHIBITED')) : $handler_message;
-          $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_USERS_GROUP_ERROR_DELETION_PROHIBITED');
+          $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USERS_GROUP_ERROR_NOT_FOUND')) : $handler_message;
-        $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_USERS_GROUP_ERROR_NOT_FOUND');
+        $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     }
   } else {
-    $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS'));
-    $handler_status_code = 0;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerStatusCode = 0;
   }
 } else {
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
 
 ?>

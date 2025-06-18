@@ -15,43 +15,44 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\PageStatic as PageStatic;
 
-if ($system_core->client->is_logged(2)) {
-  $client_user = $system_core->client->get_user(2);
-  $client_user->init_data(['metadata']);
-  $client_user_group = $client_user->get_group();
-  $client_user_group->init_data(['permissions']);
+if ($CMSCore->client->is_logged(2)) {
+  $clientUser = $CMSCore->client->get_user(2);
+  $clientUser->init_data(['metadata']);
+  $clientUserGroup = $clientUser->get_group();
+  $clientUserGroup->init_data(['permissions']);
 
-  if ($client_user_group->permission_check($client_user_group::PERMISSION_EDITOR_PAGES_STATIC_EDIT)) {
+  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_EDITOR_PAGES_STATIC_EDIT)) {
     if (isset($_DELETE['page_static_id'])) {
-      $page_static_id = (is_numeric($_DELETE['page_static_id'])) ? (int)$_DELETE['page_static_id'] : 0;
+      $pageStaticID = $_DELETE['page_static_id'] ?? 0;
+      $pageStaticID = is_numeric($pageStaticID) ? (int) $pageStaticID : 0;
 
-      if (PageStatic::exists_by_id($system_core, $page_static_id)) {
-        $page_static = new PageStatic($system_core, $page_static_id);
-        $page_static_is_deleted = $page_static->delete();
+      if (PageStatic::exists_by_id($CMSCore, $pageStaticID)) {
+        $pageStatic = new PageStatic($CMSCore, $pageStaticID);
+        $pageStaticIsDeleted = $pageStatic->delete();
 
-        if ($page_static_is_deleted) {
-          $handler_message = $system_core->locale->get_single_value_by_key('API_DELETE_DATA_SUCCESS');
-          $handler_status_code = 1;
+        if ($pageStaticIsDeleted) {
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_DELETE_DATA_SUCCESS');
+          $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {
-          $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN'));
-          $handler_status_code = 0;
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+          $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_STATIC_PAGE_ERROR_NOT_FOUND'));
-        $handler_status_code = 0;
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_STATIC_PAGE_ERROR_NOT_FOUND');
+        $handlerStatusCode = $handlerStatusCode ?? 0;
       }
 
-      $handler_output_data['modalClose'] = true;
-      $handler_output_data['reload'] = true;
+      $handlerOutputData['modalClose'] = true;
+      $handlerOutputData['reload'] = true;
     }
   } else {
-    $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS'));
-    $handler_status_code = 0;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
   http_response_code(401);
-  $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION'));
-  $handler_status_code = 0;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
 
 ?>

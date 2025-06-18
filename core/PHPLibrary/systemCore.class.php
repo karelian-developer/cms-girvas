@@ -46,13 +46,13 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.36-1.4';
+    public const CMS_VERSION = '0.1.36-1.5';
     public const CMS_STAGE_DEVELOPING = 'alpha';
     public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
     public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
     public const CMS_REESTR_DIGITAL_GOV_LINK = 'https://reestr.digital.gov.ru/reestr/2840045/?sphrase_id=5944628';
-    public string $scp_scripts_hash, $scp_styles_hash;
+    public string $CSPScriptsHash, $CSPStylesHash;
 
     /** 
      * @var \core\PHPLibrary\SystemCore\Configurator Конфигуратор системы
@@ -61,7 +61,7 @@ namespace core\PHPLibrary {
     /** 
      * @var \core\PHPLibrary\SystemCore\DatabaseConnector Класс системы подключения к БД 
      */
-    public SystemCoreDatabaseConnector|null $database_connector = null;
+    public SystemCoreDatabaseConnector|null $databaseConnector = null;
     /** 
      * @var \core\PHPLibrary\SystemCore\Locale Класс локализации ядра 
      */
@@ -77,7 +77,7 @@ namespace core\PHPLibrary {
     /** 
      * @var \core\PHPLibrary\Template Класс шаблона системы 
      */
-    public Template|null $template = null;
+    public Template|null $theme = null;
 
     /**
      *  @var array Массив активированных модулей
@@ -86,7 +86,7 @@ namespace core\PHPLibrary {
     /**
      * @var array Массив элементов пути до инициализированной страницы
      */
-    public array $page_dir_array = [];
+    public array $pageDirArray = [];
     /**
      * @var array Объект текущей страницы
      */
@@ -136,18 +136,18 @@ namespace core\PHPLibrary {
      * base - базовая локализация (веб-сайт)
      * admin - административная локализация (АП)
      * 
-     * @param string $locale_type
+     * @param string $localeType
      * 
      * @return SystemCoreLocale
      */
-    public function get_cms_locale(string $locale_type = 'base') : SystemCoreLocale {
-      switch ($locale_type) {
-        case 'base': $locale_name = (!is_null($this->configurator->get_database_entry_value('base_locale'))) ? $this->configurator->get_database_entry_value('base_locale') : SystemCoreLocale::DEFAULT_LOCALE_NAME; break;
-        case 'admin': $locale_name = (!is_null($this->configurator->get_database_entry_value('base_admin_locale'))) ? $this->configurator->get_database_entry_value('base_admin_locale') : SystemCoreLocale::DEFAULT_LOCALE_NAME; break;
-        default: $locale_name = (!is_null($this->configurator->get_database_entry_value($locale_type . '_locale'))) ? $this->configurator->get_database_entry_value($locale_type . '_locale') : SystemCoreLocale::DEFAULT_LOCALE_NAME;
+    public function get_cms_locale(string $localeType = 'base') : SystemCoreLocale {
+      switch ($localeType) {
+        case 'base': $localeName = (!is_null($this->configurator->get_database_entry_value('base_locale'))) ? $this->configurator->get_database_entry_value('base_locale') : SystemCoreLocale::DEFAULT_LOCALE_NAME; break;
+        case 'admin': $localeName = (!is_null($this->configurator->get_database_entry_value('base_admin_locale'))) ? $this->configurator->get_database_entry_value('base_admin_locale') : SystemCoreLocale::DEFAULT_LOCALE_NAME; break;
+        default: $localeName = (!is_null($this->configurator->get_database_entry_value($localeType . '_locale'))) ? $this->configurator->get_database_entry_value($localeType . '_locale') : SystemCoreLocale::DEFAULT_LOCALE_NAME;
       }
 
-      return new SystemCoreLocale($this, $locale_name, $locale_type);
+      return new SystemCoreLocale($this, $localeName, $localeType);
     }
 
     /**
@@ -167,7 +167,7 @@ namespace core\PHPLibrary {
     public function get_cms_link() : string {
       if (!is_null($this->configurator->get('domain'))) {
         $domain = $this->configurator->get('domain');
-        return ($this->configurator->get('ssl_is_enabled')) ? sprintf('https://%s/', $domain) : sprintf('http://%s/', $domain);
+        return ($this->configurator->get('SSLIsEnabled')) ? sprintf('https://%s/', $domain) : sprintf('http://%s/', $domain);
       }
 
       return 'errorhost';
@@ -176,12 +176,12 @@ namespace core\PHPLibrary {
     /**
      * Установить шаблон для системы
      * 
-     * @param Template $template
+     * @param Template $theme
      * 
      * @return void
      */
-    public function set_template(Template $template) : void {
-      $this->template = $template;
+    public function set_template(Template $theme) : void {
+      $this->theme = $theme;
     }
 
     /**
@@ -190,7 +190,7 @@ namespace core\PHPLibrary {
      * @return Template
      */
     public function get_template() : Template {
-      return $this->template;
+      return $this->theme;
     }
 
     /**
@@ -199,7 +199,7 @@ namespace core\PHPLibrary {
      * @return InterfacePage
      */
     public function get_inited_page() : InterfacePage {
-      return $this->page_dir_array[array_key_last($this->page_dir_array)];
+      return $this->pageDirArray[array_key_last($this->pageDirArray)];
     }
 
     /**
@@ -208,6 +208,21 @@ namespace core\PHPLibrary {
      * @return string
      */
     public static function get_copyright_string() : string {
+      $document = new DOMDocument();
+
+      // $copyrightContainerElement = $document->createElement('div');
+      // $copyrightContainerElement->setAttribute('class', 'footer__copyright copyright');
+
+      // $copyrightLabelSymbolNodeElement = $document->createTextNode('copy');
+      // $copyrightLabelSpaceNodeElement = $document->createTextNode('nbsp');
+
+      // $copyrightLabelSiteLinkElement = $document->createElement('a', '&laquo;Карельский разработчик&raquo;');
+      // $copyrightLabelSiteLinkElement->setAttribute('href', 'https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai/');
+      // $copyrightLabelSiteLinkElement->setAttribute('title', 'Компания &laquo;Карельский разработчик&raquo;');
+      // $copyrightLabelSiteLinkElement->setAttribute('target', '_blank');
+
+      // $copyrightLabelDatesElement = $document->createElement('span', '&laquo;Карельский разработчик&raquo;');
+
       return sprintf('<div class="footer__copyright"><span>&copy;&nbsp;<a href="%s" title="Garbalo Site Official" target="_blank">%s</a>.</span> <span>2021&nbsp;&mdash;&nbsp;%d. <span>All&nbsp;rights&nbsp;reserved.</span> <span>Powered&nbsp;by&nbsp;<a href="%s" title="CMS Site Official" target="_blank">CMS&nbsp;&laquo;GIRVAS&raquo;</a>.</span></div>', self::CMS_DEVELOPER_SITE_LINK, self::CMS_DEVELOPER_TITLE, date('Y'), self::CMS_PRODUCT_SITE_LINK);
     }
 
@@ -222,53 +237,53 @@ namespace core\PHPLibrary {
       $dir = ($dir == '') ? 'index' : $dir;
       $dir = rtrim($dir, '/');
       
-      $this->page_dir_array = explode('/', $dir);
-      $this->page_dir_array[count($this->page_dir_array) - 1] = explode('?', $this->page_dir_array[count($this->page_dir_array) - 1]);
-      $this->page_dir_array[count($this->page_dir_array) - 1] = $this->page_dir_array[count($this->page_dir_array) - 1][0];
+      $this->pageDirArray = explode('/', $dir);
+      $this->pageDirArray[count($this->pageDirArray) - 1] = explode('?', $this->pageDirArray[count($this->pageDirArray) - 1]);
+      $this->pageDirArray[count($this->pageDirArray) - 1] = $this->pageDirArray[count($this->pageDirArray) - 1][0];
       
-      if ($this->page_dir_array[0] == $this->template->get_category()) {
-        $this->page_dir_array[0] = ucfirst($this->page_dir_array[0]);
-        array_push($this->page_dir_array, 'index');
+      if ($this->pageDirArray[0] == $this->theme->get_category()) {
+        $this->pageDirArray[0] = ucfirst($this->pageDirArray[0]);
+        array_push($this->pageDirArray, 'index');
       }
       
-      $current_dir_final_array = [];
-      for ($index_a = 0; $index_a < count($this->page_dir_array); $index_a++) {
-        $current_dir_array = [];
-        for ($index_b = 0; $index_b < $index_a + 1; $index_b++) {
-          array_push($current_dir_array, $this->page_dir_array[$index_b]);
+      $currentDirFinalArray = [];
+      for ($indexA = 0; $indexA < count($this->pageDirArray); $indexA++) {
+        $currentDirArray = [];
+        for ($indexB = 0; $indexB < $indexA + 1; $indexB++) {
+          array_push($currentDirArray, $this->pageDirArray[$indexB]);
         }
 
-        $current_dir = implode('/', $current_dir_array);
-        $class_path = sprintf('%s/core/PHPLibrary/Page/%s.class.php', CMS_ROOT_DIRECTORY, $current_dir);
+        $currentDir = implode('/', $currentDirArray);
+        $class_path = sprintf('%s/core/PHPLibrary/Page/%s.class.php', CMS_ROOT_DIRECTORY, $currentDir);
         
         if (file_exists($class_path)) {
-          $current_dir_array[array_key_last($current_dir_array)] = 'Page' . ucfirst($current_dir_array[array_key_last($current_dir_array)]);
-          $current_dir = implode('/', $current_dir_array);
-          $current_dir = str_replace('/', '\\', $current_dir);
+          $currentDirArray[array_key_last($currentDirArray)] = 'Page' . ucfirst($currentDirArray[array_key_last($currentDirArray)]);
+          $currentDir = implode('/', $currentDirArray);
+          $currentDir = str_replace('/', '\\', $currentDir);
           
-          $class = sprintf('\\core\\PHPLibrary\\Page\\%s', $current_dir);
-          $this->page = new $class($this, new Page($this, $current_dir_array));
+          $class = sprintf('\\core\\PHPLibrary\\Page\\%s', $currentDir);
+          $this->page = new $class($this, new Page($this, $currentDirArray));
 
-          if ($current_dir_array[0] == $this->template->get_category()) unset($current_dir_array[0]);
-          $current_dir_array[array_key_last($current_dir_array)] =& $this->page;
-          $current_dir_final_array = $current_dir_array;
+          if ($currentDirArray[0] == $this->theme->get_category()) unset($currentDirArray[0]);
+          $currentDirArray[array_key_last($currentDirArray)] =& $this->page;
+          $currentDirFinalArray = $currentDirArray;
           break;
         }
       }
 
-      if (empty($current_dir_final_array)) {
-        $current_dir_final_array['oh_shit'] = 'karelia_forever';
+      if (empty($currentDirFinalArray)) {
+        $currentDirFinalArray['oh_shit'] = 'karelia_forever';
       }
 
-      if (gettype($current_dir_final_array[array_key_last($current_dir_final_array)]) == 'string') {
-        $this->template->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+      if (gettype($currentDirFinalArray[array_key_last($currentDirFinalArray)]) == 'string') {
+        $this->theme->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
         
-        $class = sprintf('\\core\\PHPLibrary\\Page\\PageError', $current_dir);
-        $this->page = new $class($this, new Page($this, $current_dir_final_array), 404);
-        $current_dir_final_array[array_key_last($current_dir_final_array)] =& $this->page;
+        $class = sprintf('\\core\\PHPLibrary\\Page\\PageError', $currentDir);
+        $this->page = new $class($this, new Page($this, $currentDirFinalArray), 404);
+        $currentDirFinalArray[array_key_last($currentDirFinalArray)] =& $this->page;
       }
 
-      $this->page_dir_array = $current_dir_final_array;
+      $this->pageDirArray = $currentDirFinalArray;
 
       return true;
     }
@@ -287,37 +302,37 @@ namespace core\PHPLibrary {
       $bytes = random_bytes(16);
 
       /** @var string Случайная хэш-строка для идентификации ранее встроенных скриптов */
-      $this->scp_scripts_hash = bin2hex($bytes);
+      $this->CSPScriptsHash = bin2hex($bytes);
 
       /** @var string Равномерно выбранные случайные байты */
       $bytes = random_bytes(16);
 
       /** @var string Случайная хэш-строка для идентификации ранее встроенных стилей (CSS) */
-      $this->scp_styles_hash = bin2hex($bytes);
+      $this->CSPStylesHash = bin2hex($bytes);
 
       /** @var SystemCoreFileConnector Объект файлового подключателя */
-      $file_connector = new SystemCoreFileConnector($this);
-      $file_connector->set_start_directory(self::CMS_CORE_PHP_LIBRARY_PATH);
-      $file_connector->set_current_directory(self::CMS_CORE_PHP_LIBRARY_PATH);
+      $fileConnector = new SystemCoreFileConnector($this);
+      $fileConnector->set_start_directory(self::CMS_CORE_PHP_LIBRARY_PATH);
+      $fileConnector->set_current_directory(self::CMS_CORE_PHP_LIBRARY_PATH);
 
       // Подключение файлов с перечислениями
-      $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.enum\.php$/');
-      $file_connector->reset_current_directory();
+      $fileConnector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.enum\.php$/');
+      $fileConnector->reset_current_directory();
 
       // Подключение файлов с интерфейсами
-      $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.interface\.php$/');
-      $file_connector->reset_current_directory();
+      $fileConnector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.interface\.php$/');
+      $fileConnector->reset_current_directory();
 
       // Подключение файлов с трейтами
-      $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.trait\.php$/');
-      $file_connector->reset_current_directory();
+      $fileConnector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.trait\.php$/');
+      $fileConnector->reset_current_directory();
 
       // Подключение файлов с классами
-      $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.class\.php$/');
-      $file_connector->reset_current_directory();
+      $fileConnector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.class\.php$/');
+      $fileConnector->reset_current_directory();
 
       /** @var null Переменная для будущего объекта шаблона */
-      $template = null;
+      $theme = null;
 
       // Инициализация URL-парсера
       $this->init_url_parser();
@@ -338,41 +353,41 @@ namespace core\PHPLibrary {
       // Подключение к базе данных
       if ($this->urlp->get_path(0) != 'install' && $this->urlp->get_path(1) != 'install' && $this->urlp->get_param('installation-mode') != 'true') {
         /** @var SystemCoreDatabaseConnector Объект подключения к базе данных */
-        $this->database_connector = new SystemCoreDatabaseConnector($this, $this->configurator);
+        $this->databaseConnector = new SystemCoreDatabaseConnector($this, $this->configurator);
 
         /** @var Client Объект клиента */
         $this->client = new Client($this);
       }
 
       /** @var string Проверка статуса HTTPS-протокола */
-      $server_https_status = (isset($_SERVER["HTTPS"])) ? strtolower($_SERVER["HTTPS"]) : 'off';
+      $serverHTTPSStatus = (isset($_SERVER["HTTPS"])) ? strtolower($_SERVER["HTTPS"]) : 'off';
 
       // Ядро перенаправляет клиент на HTTPS-протокол, в случае, если в CMS включена принудительная
       // переадресация на этот порт.
-      if ($server_https_status != 'on' && $this->configurator->get('ssl_perm_redirect')) {
+      if ($serverHTTPSStatus != 'on' && $this->configurator->get('ssl_perm_redirect')) {
         // Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена в настройках CMS.
         if ($this->configurator->get_permanent_redirect_to_www_status() && !preg_match('/^www\./', $_SERVER['HTTP_HOST'])) {
           /** @var string Адрес для переадресации по HTTPS-протоколу (поддомен www) */
-          $https_redirect = 'https://www.' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+          $HTTPSRedirect = 'https://www.' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         } else {
           /** @var string Адрес для переадресации по HTTPS-протоколу */
-          $https_redirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+          $HTTPSRedirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         }
 
         // Сообщаем браузеру, что это принудительная переадресация
         SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_RESPONSE_CODE, 301);
-        SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_LOCATION, $https_redirect);
+        SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_LOCATION, $HTTPSRedirect);
         exit();
       }
       
       // Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена в настройках CMS.
       if ($this->configurator->get_permanent_redirect_to_www_status() && !preg_match('/^www\./', $_SERVER['HTTP_HOST'])) {
         /** @var string Адрес для переадресации по HTTP-протоколу (поддомен www) */
-        $http_redirect = 'http://www.' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $HTTPRedirect = 'http://www.' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         
         // Сообщаем браузеру, что это принудительная переадресация
         SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_RESPONSE_CODE, 301);
-        SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_LOCATION, $http_redirect);
+        SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_LOCATION, $HTTPRedirect);
         exit();
       }
 
@@ -385,18 +400,18 @@ namespace core\PHPLibrary {
       header('X-Content-Type-Options: nosniff');
       
       if ($this->configurator->get('ssl_is_enabled')) {
-        $hsts_vars = [];
+        $HSTSVars = [];
 
         if ($this->configurator->exists('ssl_hsts_max_age')) {
           if (is_integer($this->configurator->get('ssl_hsts_max_age'))) {
-            array_push($hsts_vars, sprintf('max-age=%d', $this->configurator->get('ssl_hsts_max_age')));
+            array_push($HSTSVars, sprintf('max-age=%d', $this->configurator->get('ssl_hsts_max_age')));
           }
         }
 
         if ($this->configurator->exists('ssl_hsts_include_subdomains')) {
           if (is_bool($this->configurator->get('ssl_hsts_include_subdomains'))) {
             if ($this->configurator->get('ssl_hsts_include_subdomains') === true) {
-              array_push($hsts_vars, 'includeSubDomains');
+              array_push($HSTSVars, 'includeSubDomains');
             }
           }
         }
@@ -404,44 +419,44 @@ namespace core\PHPLibrary {
         if ($this->configurator->exists('ssl_hsts_preload')) {
           if (is_bool($this->configurator->get('ssl_hsts_preload'))) {
             if ($this->configurator->get('ssl_hsts_preload') === true) {
-              array_push($hsts_vars, 'preload');
+              array_push($HSTSVars, 'preload');
             }
           }
         }
 
-        header(sprintf('Strict-Transport-Security: %s;', implode('; ', $hsts_vars)));
+        header(sprintf('Strict-Transport-Security: %s;', implode('; ', $HSTSVars)));
       }
 
       if ($this->urlp->get_path(0) == 'install' && $this->urlp->get_path(1) != 'install') {
-        $install_locale = (!is_null($this->urlp->get_param('locale'))) ? $this->urlp->get_param('locale') : 'en_US';
+        $installLocaleName = (!is_null($this->urlp->get_param('locale'))) ? $this->urlp->get_param('locale') : 'en_US';
       }
 
       /** @var array Массив установленных модулей в системе */
-      $modules_installed = Modules::get_installed_modules_array();
-      if (!empty($modules_installed)) {
-        foreach ($modules_installed as $index => $folder_name) {
+      $modulesInstalled = Modules::get_installed_modules_array();
+      if (!empty($modulesInstalled)) {
+        foreach ($modulesInstalled as $index => $directoryName) {
           /** @var string Абсолютный путь до директории с модулями */
-          $modules_path = Modules::get_absolute_modules_path();
+          $modulesDirectoryPath = Modules::get_absolute_modules_path();
           /** @var string Абсолютный путь до директории с модулем */
-          $module_path = $modules_path . '/' . $folder_name;
+          $moduleDirectoryPath = $modulesDirectoryPath . '/' . $directoryName;
           /** @var Module Объект модуля */
-          $module = new Module($this, $folder_name);
+          $module = new Module($this, $directoryName);
 
           if ($module->is_enabled()) {
-            $file_connector->set_start_directory($module_path);
-            $file_connector->set_current_directory($module_path);
+            $fileConnector->set_start_directory($moduleDirectoryPath);
+            $fileConnector->set_current_directory($moduleDirectoryPath);
 
             // Подключение файлов с перечислениями
-            $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.enum\.php$/');
-            $file_connector->reset_current_directory();
+            $fileConnector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.enum\.php$/');
+            $fileConnector->reset_current_directory();
             // Подключение файлов с интерфейсами
-            $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.interface\.php$/');
-            $file_connector->reset_current_directory();
+            $fileConnector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.interface\.php$/');
+            $fileConnector->reset_current_directory();
             // Подключение файлов с классами
-            $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.class\.php$/');
-            $file_connector->reset_current_directory();
+            $fileConnector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.class\.php$/');
+            $fileConnector->reset_current_directory();
 
-            Module::connect_core($this, $folder_name);
+            Module::connect_core($this, $directoryName);
           }
 
           unset($module);
@@ -449,14 +464,14 @@ namespace core\PHPLibrary {
       }
 
       /** @var array Массив установленных модулей в системе */
-      $modules_installed = Modules::get_installed_modules_array();
+      $modulesInstalled = Modules::get_installed_modules_array();
       if (!empty($this->modules)) {
-        foreach ($this->modules as $name => $module_core) {
+        foreach ($this->modules as $name => $moduleCore) {
           /** @var Module Объект модуля */
           $module = new Module($this, $name);
 
           if ($module->is_installed() && $module->is_enabled()) {
-            $module_core->preparation();
+            $moduleCore->preparation();
           }
 
           unset($module);
@@ -472,102 +487,102 @@ namespace core\PHPLibrary {
         // Проверка активности локации инсталлятора
         if (!$this->is_location_installer_active()) {
           /** @var string Наименование шаблона сайта */
-          $template_base_name = ($this->configurator->exists_database_entry_value('base_template')) ? $this->configurator->get_database_entry_value('base_template') : 'default';
+          $themeBaseName = ($this->configurator->exists_database_entry_value('base_template')) ? $this->configurator->get_database_entry_value('base_template') : 'default';
           /** @var string Наименование шаблона административной панели */
-          $template_admin_name = ($this->configurator->exists_database_entry_value('admin_template')) ? $this->configurator->get_database_entry_value('admin_template') : 'default';
+          $themeAdminName = ($this->configurator->exists_database_entry_value('admin_template')) ? $this->configurator->get_database_entry_value('admin_template') : 'default';
         }
         
         /** @var string Имя локализации, определенное куки "locale" */
-        $cms_locale_cookie = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
+        $CMSLocaleCookie = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
         /** @var string Имя локализации, определенное параметром адресной строки параметром "locale" */
-        $cms_locale_url_param = ($this->urlp->get_param('locale') != null) ? $this->urlp->get_param('locale') : null;
+        $CMSLocaleURLParam = ($this->urlp->get_param('locale') != null) ? $this->urlp->get_param('locale') : null;
 
         // Проверка активности локации инсталлятора и статуса установки системы
         if ($this->is_location_installer_active() && !self::system_is_install()) {
           /** @var string Наименование локализации */
-          $system_core_locale_name = $install_locale;
+          $CMSCoreLocaleName = $installLocaleName;
           /** @var string Наименование категории шаблона системного ядра */
-          $system_core_template_category_name = 'install';
+          $CMSCoreThemeCategoryName = 'install';
         } else {
           // Определяем приоритетную локализацию системного ядра
           /** @var string Наименование локализации */
-          $checked_locale_name = $cms_locale_url_param ?? $cms_locale_cookie;
+          $checkedLocaleName = $CMSLocaleURLParam ?? $CMSLocaleCookie;
           // Если приоритетная локализация выбрана...
-          if ($checked_locale_name !== null) {
+          if ($checkedLocaleName !== null) {
             // Проверяем наличие локализации в системе
-            if (SystemCoreLocale::exists($this, $checked_locale_name)) {
+            if (SystemCoreLocale::exists($this, $checkedLocaleName)) {
               /** @var string Наименование локализации */
-              $system_core_locale_name = $checked_locale_name;
+              $CMSCoreLocaleName = $checkedLocaleName;
             }
           }
 
           /** @var string Наименование локализации сайта */
-          $cms_base_locale_name = ($this->configurator->exists_database_entry_value('base_locale')) ? $this->configurator->get_database_entry_value('base_locale') : 'en_US';
+          $CMSBaseLocaleName = ($this->configurator->exists_database_entry_value('base_locale')) ? $this->configurator->get_database_entry_value('base_locale') : 'en_US';
           /** @var string Наименование локализации административной панели */
-          $cms_admin_locale_name = ($this->configurator->exists_database_entry_value('base_admin_locale')) ? $this->configurator->get_database_entry_value('base_admin_locale') : 'en_US';
+          $CMSAdminLocaleName = ($this->configurator->exists_database_entry_value('base_admin_locale')) ? $this->configurator->get_database_entry_value('base_admin_locale') : 'en_US';
 
           // Проверка активности административной панели
           if ($this->is_location_administrative_panel_active()) {
             /** @var string Наименование категории шаблона системного ядра */
-            $system_core_template_category_name = 'admin';
+            $CMSCoreThemeCategoryName = 'admin';
             /** @var string Наименование шаблона системного ядра */
-            $system_core_template_name = $template_admin_name;
+            $CMSCoreThemeName = $themeAdminName;
             /** @var string Наименование локализации */
-            $system_core_locale_name = (isset($system_core_locale_name)) ? $system_core_locale_name : $cms_admin_locale_name;
+            $CMSCoreLocaleName = (isset($CMSCoreLocaleName)) ? $CMSCoreLocaleName : $CMSAdminLocaleName;
           } else {
             /** @var string Наименование категории шаблона системного ядра */
-            $system_core_template_category_name = 'base';
+            $CMSCoreThemeCategoryName = 'base';
             /** @var string Наименование шаблона системного ядра */
-            $system_core_template_name = $template_base_name;
+            $CMSCoreThemeName = $themeBaseName;
             /** @var string Наименование локализации */
-            $system_core_locale_name = (isset($system_core_locale_name)) ? $system_core_locale_name : $cms_base_locale_name;
+            $CMSCoreLocaleName = (isset($CMSCoreLocaleName)) ? $CMSCoreLocaleName : $CMSBaseLocaleName;
           }
         }
 
         // Если по какой-то причине имена категории шаблона и самого шаблона не определены,
         // то необходимо установить типовые значения.
         /** @var string Наименование категории шаблона системного ядра */
-        $system_core_template_category_name = (isset($system_core_template_category_name)) ? $system_core_template_category_name : 'base';
+        $CMSCoreThemeCategoryName = (isset($CMSCoreThemeCategoryName)) ? $CMSCoreThemeCategoryName : 'base';
         /** @var string Наименование шаблона системного ядра */
-        $system_core_template_name = (isset($system_core_template_name)) ? $system_core_template_name : 'default';
+        $CMSCoreThemeName = (isset($CMSCoreThemeName)) ? $CMSCoreThemeName : 'default';
 
         /** @var SystemCoreLocale Объект локализации системного ядра */
-        $this->locale = new SystemCoreLocale($this, $system_core_locale_name, $system_core_template_category_name);
+        $this->locale = new SystemCoreLocale($this, $CMSCoreLocaleName, $CMSCoreThemeCategoryName);
         // Устанавливаем объект шаблона для системного ядра
-        $this->set_template(new Template($this, $system_core_template_name, $system_core_template_category_name));
+        $this->set_template(new Template($this, $CMSCoreThemeName, $CMSCoreThemeCategoryName));
 
         /** @var Template Объект шаблона системного ядра */
-        $template = $this->get_template();
+        $theme = $this->get_template();
         // Инициализация шаблона системного ядра
-        $template->init();
+        $theme->init();
         
       } else {
         if ($this->urlp->get_path(1) == 'install') {
-          $locale_name = (!is_null($this->urlp->get_param('locale'))) ? $this->urlp->get_param('locale') : 'en_US';
-          $this->locale = new SystemCoreLocale($this, $locale_name, 'handler');
+          $localeName = (!is_null($this->urlp->get_param('locale'))) ? $this->urlp->get_param('locale') : 'en_US';
+          $this->locale = new SystemCoreLocale($this, $localeName, 'handler');
         } else {
           if (is_null($this->urlp->get_param('localeMessage'))) {
-            $locale_name = ($this->configurator->exists_database_entry_value('base_locale')) ? $this->configurator->get_database_entry_value('base_locale') : 'en_US';
+            $localeName = ($this->configurator->exists_database_entry_value('base_locale')) ? $this->configurator->get_database_entry_value('base_locale') : 'en_US';
           } else {
-            $locale_name = $this->urlp->get_param('localeMessage');
+            $localeName = $this->urlp->get_param('localeMessage');
           }
         }
 
-        $this->locale = new SystemCoreLocale($this, $locale_name, 'handler');
+        $this->locale = new SystemCoreLocale($this, $localeName, 'handler');
       }
       
-      if (!is_null($template)) {
-        $template->core->assembled = $template->get_core_assembled();
+      if (!is_null($theme)) {
+        $theme->core->assembled = $theme->get_core_assembled();
       }
 
-      $modules_installed = Modules::get_installed_modules_array();
+      $modulesInstalled = Modules::get_installed_modules_array();
       if (!empty($this->modules)) {
-        foreach ($this->modules as $name => $module_core) {
+        foreach ($this->modules as $name => $moduleCore) {
           $module = new Module($this, $name);
           
           if ($module->is_installed() && $module->is_enabled()) {
-            if (!is_null($template)) {
-              $template->core->assembled = TemplateCollector::assembly_locale($template->core->assembled, $module->locale);
+            if (!is_null($theme)) {
+              $theme->core->assembled = TemplateCollector::assembly_locale($theme->core->assembled, $module->locale);
             }
           }
 
@@ -575,25 +590,25 @@ namespace core\PHPLibrary {
         }
       }
 
-      if (!is_null($template)) {
-        $dom_document = new DOMDocument();
-        @$dom_document->loadHTML($template->core->assembled);
+      if (!is_null($theme)) {
+        $document = new DOMDocument();
+        @$document->loadHTML($theme->core->assembled);
 
-        $script_elements = $dom_document->getElementsByTagName('script');
-        foreach ($script_elements as $script_element) {
-          $script_element->setAttribute('nonce', $this->scp_scripts_hash);
+        $scriptElements = $document->getElementsByTagName('script');
+        foreach ($scriptElements as $scriptElement) {
+          $scriptElement->setAttribute('nonce', $this->CSPScriptsHash);
         }
 
-        $style_elements = $dom_document->getElementsByTagName('style');
-        foreach ($style_elements as $style_element) {
-          $style_element->setAttribute('nonce', $this->scp_styles_hash);
+        $styleElements = $document->getElementsByTagName('style');
+        foreach ($styleElements as $styleElement) {
+          $styleElement->setAttribute('nonce', $this->CSPStylesHash);
         }
 
-        $template->core->source = $dom_document;
+        $theme->core->source = $document;
 
         if ($this->urlp->get_path(0) == 'admin') {
-          if (method_exists($template->core, 'init_main_navigation')) {
-            $template->core->init_main_navigation();
+          if (method_exists($theme->core, 'init_main_navigation')) {
+            $theme->core->init_main_navigation();
           }
 
           if (!is_null($this->page)) {
@@ -605,19 +620,19 @@ namespace core\PHPLibrary {
       }
 
       if (!empty($this->modules)) {
-        foreach ($this->modules as $name => $module_core) {
+        foreach ($this->modules as $name => $moduleCore) {
           $module = new Module($this, $name);
           
           if ($module->is_installed() && $module->is_enabled()) {
-            $module_core->init();
+            $moduleCore->init();
           }
 
           unset($module);
         }
       }
 
-      if (!is_null($template)) {
-        $template->core->assembled = $dom_document->saveHTML();
+      if (!is_null($theme)) {
+        $theme->core->assembled = $document->saveHTML();
       }
     }
     
@@ -636,7 +651,7 @@ namespace core\PHPLibrary {
      * @return array
      */
     public function get_array_uploaded_templates_names() : array {
-      $path = sprintf('%s/templates', $this->get_cms_path());
+      $path = $this->get_cms_path() . '/templates';
       return array_diff(scandir(sprintf($path)), ['..', '.']);
     }
     
@@ -646,7 +661,7 @@ namespace core\PHPLibrary {
      * @return array
      */
     public function get_array_uploaded_modules_names() : array {
-      $path = sprintf('%s/modules', $this->get_cms_path());
+      $path = $this->get_cms_path() . '/modules';
       return array_diff(scandir(sprintf($path)), ['..', '.']);
     }
     
@@ -656,8 +671,8 @@ namespace core\PHPLibrary {
      * @return array
      */
     public function get_array_locales_names() : array {
-      $locales_path = sprintf('%s/locales', $this->get_cms_path());
-      return array_diff(scandir(sprintf($locales_path)), ['..', '.']);
+      $path = $this->get_cms_path() . '/locales';
+      return array_diff(scandir(sprintf($path)), ['..', '.']);
     }
     
     /**
@@ -666,7 +681,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public function get_site_url() : string {
-      return ($this->configurator->get('ssl_is_enabled')) ? sprintf('https://%s', $this->configurator->get('domain')) : sprintf('http://%s', $this->configurator->get('domain'));
+      return ($this->configurator->get('SSLIsEnabled')) ? sprintf('https://%s', $this->configurator->get('domain')) : sprintf('http://%s', $this->configurator->get('domain'));
     }
 
     /**
@@ -722,16 +737,16 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public static function recursive_files_remove(string $path) : bool {
-      $files_array_on_path = array_diff(scandir($path), ['..', '.']);
+      $filesArrayOnPath = array_diff(scandir($path), ['..', '.']);
 
-      if (count($files_array_on_path) > 0) {
-        foreach ($files_array_on_path as $file) {
-          $file_path = sprintf('%s/%s', $path, $file);
+      if (count($filesArrayOnPath) > 0) {
+        foreach ($filesArrayOnPath as $file) {
+          $path = $path . '/' . $file;
           
-          if (is_dir($file_path)) {
-            self::recursive_files_remove($file_path);
+          if (is_dir($path)) {
+            self::recursive_files_remove($path);
           } else {
-            unlink($file_path);
+            unlink($path);
           }
         }
 
@@ -748,23 +763,23 @@ namespace core\PHPLibrary {
     /**
      * Парсинг HTTP-запроса
      *
-     * @param  string $input_string
-     * @param  string $content_type
+     * @param  string $inputString
+     * @param  string $contentType
      * 
      * @return void
      */
-    public static function parse_raw_http_request(string $input_string, string $content_type) {
+    public static function parse_raw_http_request(string $inputString, string $contentType) {
       // grab multipart boundary from content type header
-      preg_match('/boundary=(.*)$/', $content_type, $matches);
+      preg_match('/boundary=(.*)$/', $contentType, $matches);
       $boundary = $matches[1];
       
       // split content by boundary and get rid of last -- element
-      $array_blocks = preg_split("/-+$boundary/", $input_string);
-      array_pop($array_blocks);
+      $arrayBlocks = preg_split("/-+$boundary/", $inputString);
+      array_pop($arrayBlocks);
       
-      $data_array = [];
+      $dataArray = [];
       // loop data blocks
-      foreach ($array_blocks as $index => $block) {
+      foreach ($arrayBlocks as $index => $block) {
         if (empty($block)) continue;
 
         // parse uploaded files
@@ -777,15 +792,15 @@ namespace core\PHPLibrary {
         }
 
         if (isset($matches[2])) {
-          if (preg_match('/(.*)\[\]$/', $matches[1], $matches_name)) {
-            $data_array[$matches_name[1]][] = $matches[2];
+          if (preg_match('/(.*)\[\]$/', $matches[1], $matchesName)) {
+            $dataArray[$matchesName[1]][] = $matches[2];
           } else {
-            $data_array[$matches[1]] = $matches[2];
+            $dataArray[$matches[1]] = $matches[2];
           }
         }
       }   
       
-      return $data_array;
+      return $dataArray;
     }
 
     /**
@@ -835,27 +850,27 @@ namespace core\PHPLibrary {
      * последующего кода и выведет сообщение об ошибке.
      *
      * @param  int $reason_id
-     * @param  int $status_code
+     * @param  int $statusCode
      * 
      * @return bool
      */
-    public static function abnormal_termination_of_work(int $reason_id, int $status_code, bool $is_json = false) : void {
+    public static function abnormal_termination_of_work(int $reason_id, int $statusCode, bool $isJSON = false) : void {
       if ($reason_id === 1) {
         $message = 'An attempted hacker attack has been detected.';
       }
 
       $message = (isset($message)) ? $message : 'The system core has terminated abnormally for an unknown reason.';
 
-      $output_data = (isset($output_data)) ? $output_data : [];
-      $output_data = (is_array($output_data)) ? $output_data : [];
+      $outputData = (isset($outputData)) ? $outputData : [];
+      $outputData = (is_array($outputData)) ? $outputData : [];
 
-      http_response_code($status_code);
+      http_response_code($statusCode);
 
-      if ($is_json) {
+      if ($isJSON) {
         die(json_encode([
           'message' => $message,
-          'statusCode' => $status_code,
-          'outputData' => $output_data
+          'statusCode' => $statusCode,
+          'outputData' => $outputData
         ]));
       }
 
@@ -869,8 +884,8 @@ namespace core\PHPLibrary {
      */
     public static function system_is_install() : bool {
       /** @var string Абсолютный путь до файла-пустышки "INSTALLED" */
-      $file_installed_path = sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY);
-      return file_exists($file_installed_path);
+      $path = CMS_ROOT_DIRECTORY . '/INSTALLED';
+      return file_exists($path);
     }
   }
 

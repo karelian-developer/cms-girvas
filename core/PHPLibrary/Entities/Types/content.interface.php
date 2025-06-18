@@ -12,7 +12,7 @@ namespace core\PHPLibrary\Entities\Types {
   use \core\PHPLibrary\SystemCore as SystemCore;
 
   interface Content {
-    public function __construct(SystemCore $system_core, int $id);
+    public function __construct(SystemCore $CMSCore, int $id);
 
     public function init_data(array $columns = ['*']): void;
   }

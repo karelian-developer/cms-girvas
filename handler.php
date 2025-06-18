@@ -8,339 +8,341 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
+use \core\PHPLibrary\SystemCore as CMSCo
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
+
 if (!defined('IS_NOT_HACKED')) {
   http_response_code(503);
   die('An attempted hacker attack has been detected.');
 }
 
-if (!isset($system_core)) {
+if (!isset($CMSCore)) {
   http_response_code(500);
   die('CMS system core not initialized.');
 }
 
 if (defined('IS_NOT_HACKED')) {
-  header('Access-Control-Allow-Origin: ' . $system_core->configurator->get('domain'));
+  header('Access-Control-Allow-Origin: ' . $CMSCore->configurator->get('domain'));
 
-  $handler_headers = apache_request_headers();
-  $php_input_content = file_get_contents('php://input');
+  $handlerHeaders = apache_request_headers();
+  $PHPInputContent = file_get_contents('php://input');
 
   switch ($_SERVER['REQUEST_METHOD']) {
-    case 'PATCH': $_PATCH = $system_core::parse_raw_http_request($php_input_content, $_SERVER['CONTENT_TYPE']); break;
-    case 'PUT': $_PUT = $system_core::parse_raw_http_request($php_input_content, $_SERVER['CONTENT_TYPE']); break;
-    case 'DELETE': $_DELETE = $system_core::parse_raw_http_request($php_input_content, $_SERVER['CONTENT_TYPE']); break;
+    case 'PATCH': $_PATCH = $CMSCore::parse_raw_http_request($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
+    case 'PUT': $_PUT = $CMSCore::parse_raw_http_request($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
+    case 'DELETE': $_DELETE = $CMSCore::parse_raw_http_request($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
   }
 
-  $handler_output_data = [];
+  $handlerOutputData = [];
 
   /** ===================================================
    * Обработчик CMS GIRVAS
    * ==================================================== */
 
   // Client API
-  if ($system_core->urlp->get_path(1) == 'client') {
-    $api_file_path = CMS_ROOT_DIRECTORY . '/api/client.api.php';
-    include_once $api_file_path;
+  if ($CMSCore->urlp->get_path(1) === 'client') {
+    $APIFilePath = CMS_ROOT_DIRECTORY . '/api/client.api.php';
+    include_once $APIFilePath;
 
   // Installation API
-  } else if ($system_core->urlp->get_path(1) == 'install') {
-    $api_file_path = CMS_ROOT_DIRECTORY . '/api/installation.api.php';
-    include_once $api_file_path;
+  } else if ($CMSCore->urlp->get_path(1) === 'install') {
+    $APIFilePath = CMS_ROOT_DIRECTORY . '/api/installation.api.php';
+    include_once $APIFilePath;
   
   // Metrics API
-  } else if ($system_core->urlp->get_path(1) == 'metrics' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($CMSCore->urlp->get_path(1) === 'metrics' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/metrics.api.php';
-      include_once $api_file_path;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/metrics.api.php';
+      include_once $APIFilePath;
     }
-  } else if ($system_core->urlp->get_path(1) == 'media' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($CMSCore->urlp->get_path(1) === 'media' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/media.api.php';
-      include_once $api_file_path;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/media.api.php';
+      include_once $APIFilePath;
     }
-  } else if ($system_core->urlp->get_path(1) == 'module' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($CMSCore->urlp->get_path(1) === 'module' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/module.api.php';
-      include_once $api_file_path;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/module.api.php';
+      include_once $APIFilePath;
     }
-  } else if ($system_core->urlp->get_path(1) == 'user' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($CMSCore->urlp->get_path(1) === 'user' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/user.api.php';
-      include_once $api_file_path;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/user.api.php';
+      include_once $APIFilePath;
     }
-  } else if ($system_core->urlp->get_path(1) == 'usersGroup' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($CMSCore->urlp->get_path(1) === 'usersGroup' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/usersGroup.api.php';
-      include_once $api_file_path;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/usersGroup.api.php';
+      include_once $APIFilePath;
     }
-  } else if ($system_core->urlp->get_path(1) == 'usersGroups' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($CMSCore->urlp->get_path(1) === 'usersGroups' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/usersGroups.api.php';
-      include_once $api_file_path;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/usersGroups.api.php';
+      include_once $APIFilePath;
     }
-  } else if ($system_core->urlp->get_path(1) == 'entry' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($CMSCore->urlp->get_path(1) === 'entry' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/entry.api.php';
-      include_once $api_file_path;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/entry.api.php';
+      include_once $APIFilePath;
     }
-  } else if ($system_core->urlp->get_path(1) == 'entries' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($CMSCore->urlp->get_path(1) === 'entries' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/entries.api.php';
-      include_once $api_file_path;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/entries.api.php';
+      include_once $APIFilePath;
     }
-  } else if ($system_core->urlp->get_path(1) == 'pageStatic' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($CMSCore->urlp->get_path(1) === 'pageStatic' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/pageStatic.api.php';
-      include_once $api_file_path;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/pageStatic.api.php';
+      include_once $APIFilePath;
     }
-  } else if ($system_core->urlp->get_path(1) == 'settings' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($CMSCore->urlp->get_path(1) === 'settings' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/settings.api.php';
-      include_once $api_file_path;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/settings.api.php';
+      include_once $APIFilePath;
     }
-  } else if ($system_core->urlp->get_path(1) == 'template' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($CMSCore->urlp->get_path(1) === 'template' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/template.api.php';
-      include_once $api_file_path;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/template.api.php';
+      include_once $APIFilePath;
     }
-  } else if ($system_core->urlp->get_path(1) == 'feed' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($CMSCore->urlp->get_path(1) === 'feed' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/feed.api.php';
-      include_once $api_file_path;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/feed.api.php';
+      include_once $APIFilePath;
     }
-  } else if ($system_core->urlp->get_path(1) == 'feeds' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($CMSCore->urlp->get_path(1) === 'feeds' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/feeds.api.php';
-      include_once $api_file_path;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/feeds.api.php';
+      include_once $APIFilePath;
     }
-  } else if ($system_core->urlp->get_path(1) == 'utils' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($CMSCore->urlp->get_path(1) === 'utils' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/utils.api.php';
-      include_once $api_file_path;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/utils.api.php';
+      include_once $APIFilePath;
     }
-  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'dms-available') {
-    $handler_output_data['charsets'] = ['UTF-8', 'UTF-16', 'Windows-1252', 'ISO-8859'];
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'dms-available') {
+    $handlerOutputData['charsets'] = ['UTF-8', 'UTF-16', 'Windows-1252', 'ISO-8859'];
   
   // Получение текущей кодировки
-  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'charset') {
-    $charset = ($system_core->configurator->exists_database_entry_value('base_site_charset')) ? $system_core->configurator->get_database_entry_value('base_site_charset') : 'UTF-8';
-    $handler_output_data['charset'] = $charset;
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'charset') {
+    $charset = $CMSCore->configurator->exists_database_entry_value('base_site_charset') ? $CMSCore->configurator->get_database_entry_value('base_site_charset') : 'UTF-8';
+    $handlerOutputData['charset'] = $charset;
   
   // Получение расширения, в которое производится конвертация
-  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'file-auto-convert-image-extension') {
-    $extension = ($system_core->configurator->exists_database_entry_value('files_auto_convert_file_image_extension')) ? $system_core->configurator->get_database_entry_value('files_auto_convert_file_image_extension') : 'webp';
-    $handler_output_data['extension'] = $extension;
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'file-auto-convert-image-extension') {
+    $extension = $CMSCore->configurator->exists_database_entry_value('files_auto_convert_file_image_extension') ? $CMSCore->configurator->get_database_entry_value('files_auto_convert_file_image_extension') : 'webp';
+    $handlerOutputData['extension'] = $extension;
 
   // Получение перечня кодировок
-  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'charsets') {
-    $handler_output_data['charsets'] = ['UTF-8', 'UTF-16', 'Windows-1252', 'ISO-8859'];
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'charsets') {
+    $handlerOutputData['charsets'] = ['UTF-8', 'UTF-16', 'Windows-1252', 'ISO-8859'];
   
   // Получение статуса технических работ
-  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'ew-status') {
-    $ew_status = ($system_core->configurator->exists_database_entry_value('base_engineering_works_status')) ? $system_core->configurator->get_database_entry_value('base_engineering_works_status') : 'off';
-    $handler_output_data['status'] = ($ew_status == 'on') ? 'on' : 'off';
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'ew-status') {
+    $EWStatus = $CMSCore->configurator->exists_database_entry_value('base_engineering_works_status') ? $CMSCore->configurator->get_database_entry_value('base_engineering_works_status') : 'off';
+    $handlerOutputData['status'] = $EWStatus === 'on' ? 'on' : 'off';
   
   // Получение текущего временной зоны
-  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'timezone') {
-    $timezone_name = ($system_core->configurator->exists_database_entry_value('base_timezone')) ? $system_core->configurator->get_database_entry_value('base_timezone') : date_default_timezone_get();
-    $timezone_utc = new DateTimeImmutable('now', new DateTimeZone($timezone_name));
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'timezone') {
+    $timezoneName = $CMSCore->configurator->exists_database_entry_value('base_timezone') ? $CMSCore->configurator->get_database_entry_value('base_timezone') : date_default_timezone_get();
+    $timezoneUTC = new DateTimeImmutable('now', new DateTimeZone($timezoneName));
 
-    $handler_output_data['timezone'] = [
-      'name' => $timezone_name,
-      'utc' => $timezone_utc->format('P')
+    $handlerOutputData['timezone'] = [
+      'name' => $timezoneName,
+      'utc' => $timezoneUTC->format('P')
     ];
   
   // Получение списка временных зон
-  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'timezones') {
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'timezones') {
     $timezones = [];
-    $timezone_names_array = DateTimeZone::listIdentifiers();
-    foreach ($timezone_names_array as $timezone_name) {
-      $timezone_utc = new DateTimeImmutable('now', new DateTimeZone($timezone_name));
+    $timezoneNames = DateTimeZone::listIdentifiers();
+    foreach ($timezoneNames as $name) {
+      $timezoneUTC = new DateTimeImmutable('now', new DateTimeZone($name));
 
       array_push($timezones, [
-        'name' => $timezone_name,
-        'utc' => $timezone_utc->format('P')
+        'name' => $name,
+        'utc' => $timezoneUTC->format('P')
       ]);
     }
 
-    $handler_output_data['timezones'] = $timezones;
+    $handlerOutputData['timezones'] = $timezones;
   
   // Получение дополнительной информации по профилю пользователя
-  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'profile' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'profile' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      if ($system_core->urlp->get_path(2) == 'additional-fields') {
-        $cms_locale_setted = $system_core->configurator->get_database_entry_value('base_locale');
-        $fields_locale = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $cms_locale_setted;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      if ($CMSCore->urlp->get_path(2) === 'additional-fields') {
+        $CMSLocaleSetted = $CMSCore->configurator->get_database_entry_value('base_locale');
+        $fieldsLocale = $CMSCore->urlp->get_param('locale') ?? $CMSLocaleSetted;
 
-        $fields_types = ($system_core->configurator->exists_database_entry_value('users_additional_field_type')) ? json_decode($system_core->configurator->get_database_entry_value('users_additional_field_type'), true) : [];
-        $fields_titles = ($system_core->configurator->exists_database_entry_value('users_additional_field_title')) ? json_decode($system_core->configurator->get_database_entry_value('users_additional_field_title'), true) : [];
-        $fields_descriptions = ($system_core->configurator->exists_database_entry_value('users_additional_field_description')) ? json_decode($system_core->configurator->get_database_entry_value('users_additional_field_description'), true) : [];
-        $fields_names = ($system_core->configurator->exists_database_entry_value('users_additional_field_name')) ? json_decode($system_core->configurator->get_database_entry_value('users_additional_field_name'), true) : [];
+        $fieldsTypes = $CMSCore->configurator->exists_database_entry_value('users_additional_field_type') ? json_decode($CMSCore->configurator->get_database_entry_value('users_additional_field_type'), true) : [];
+        $fieldsTitles = $CMSCore->configurator->exists_database_entry_value('users_additional_field_title') ? json_decode($CMSCore->configurator->get_database_entry_value('users_additional_field_title'), true) : [];
+        $fieldsDescriptions = $CMSCore->configurator->exists_database_entry_value('users_additional_field_description') ? json_decode($CMSCore->configurator->get_database_entry_value('users_additional_field_description'), true) : [];
+        $fieldsNames = $CMSCore->configurator->exists_database_entry_value('users_additional_field_name') ? json_decode($CMSCore->configurator->get_database_entry_value('users_additional_field_name'), true) : [];
         
         $fields = [];
-        foreach ($fields_types as $field_index => $field_type) {
+        foreach ($fieldsTypes as $index => $type) {
           array_push($fields, [
-            'type' => $field_type,
-            'title' => isset($fields_titles[$fields_locale]) ? $fields_titles[$fields_locale][$field_index] : '',
-            'description' => isset($fields_descriptions[$fields_locale]) ? $fields_descriptions[$fields_locale][$field_index] : '',
-            'name' => $fields_names[$field_index]
+            'type' => $type,
+            'title' => isset($fieldsTitles[$fieldsLocale]) ? $fieldsTitles[$fieldsLocale][$index] : '',
+            'description' => isset($fieldsDescriptions[$fieldsLocale]) ? $fieldsDescriptions[$fieldsLocale][$index] : '',
+            'name' => $fieldsNames[$index]
           ]);
         }
 
-        $handler_output_data['additionalFields'] = $fields;
+        $handlerOutputData['additionalFields'] = $fields;
       }
     }
   // Получить текущую локализацию
-  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'locale') {
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'locale') {
     // Базовая локализация
-    if ($system_core->urlp->get_path(2) == 'base') {
-      $cms_locale_setted = (!is_null($system_core->configurator->get_database_entry_value('base_locale'))) ? $system_core->configurator->get_database_entry_value('base_locale') : 'en_US';
-      $cms_locale = new \core\PHPLibrary\SystemCore\Locale($system_core, $cms_locale_setted);
-      $handler_output_data['locale'] = [
-        'title' => $cms_locale->get_title(),
-        'iconURL' => $cms_locale->get_icon_url(),
-        'name' => $cms_locale->get_name(),
-        'iso639_1' => $cms_locale->get_iso_639_1(),
-        'iso639_2' => $cms_locale->get_iso_639_2(),
+    if ($CMSCore->urlp->get_path(2) === 'base') {
+      $CMSLocaleSetted = $CMSCore->configurator->get_database_entry_value('base_locale') ?? 'en_US';
+      $CMSLocale = new CMSLocale($CMSCore, $CMSLocaleSetted);
+      $handlerOutputData['locale'] = [
+        'title' => $CMSLocale->get_title(),
+        'iconURL' => $CMSLocale->get_icon_url(),
+        'name' => $CMSLocale->get_name(),
+        'iso639_1' => $CMSLocale->get_iso_639_1(),
+        'iso639_2' => $CMSLocale->get_iso_639_2(),
       ];
     }
 
     // Локализация административной панели
-    if ($system_core->urlp->get_path(2) == 'admin') {
-      $cms_locale_setted = (!is_null($system_core->configurator->get_database_entry_value('base_admin_locale'))) ? $system_core->configurator->get_database_entry_value('base_admin_locale') : 'en_US';
-      $cms_locale = new \core\PHPLibrary\SystemCore\Locale($system_core, $cms_locale_setted);
-      $handler_output_data['locale'] = [
-        'title' => $cms_locale->get_title(),
-        'iconURL' => $cms_locale->get_icon_url(),
-        'name' => $cms_locale->get_name(),
-        'iso639_1' => $cms_locale->get_iso_639_1(),
-        'iso639_2' => $cms_locale->get_iso_639_2(),
+    if ($CMSCore->urlp->get_path(2) === 'admin') {
+      $CMSLocaleSetted = $CMSCore->configurator->get_database_entry_value('base_admin_locale') ?? 'en_US';
+      $CMSLocale = new CMSLocale($CMSCore, $CMSLocaleSetted);
+      $handlerOutputData['locale'] = [
+        'title' => $CMSLocale->get_title(),
+        'iconURL' => $CMSLocale->get_icon_url(),
+        'name' => $CMSLocale->get_name(),
+        'iso639_1' => $CMSLocale->get_iso_639_1(),
+        'iso639_2' => $CMSLocale->get_iso_639_2(),
       ];
     }
   
   // Получить перечень доступных локализаций
-  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'locales') {
-    $locale_selected = $system_core->urlp->get_param('locale');
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'locales') {
+    $handlerOutputData['locales'] = [];
+    $CMSLocalesNames = $CMSCore->get_array_locales_names();
 
-    $handler_output_data['locales'] = [];
-    $cms_locales_names = $system_core->get_array_locales_names();
-    if (count($cms_locales_names) > 0) {
-      foreach ($cms_locales_names as $index => $cms_locale_name) {
-        $cms_locale = new \core\PHPLibrary\SystemCore\Locale($system_core, $cms_locale_name);
+    if (count($CMSLocalesNames) > 0) {
+      foreach ($CMSLocalesNames as $index => $name) {
+        $CMSLocale = new CMSLocale($CMSCore, $name);
 
-        if ($cms_locale->exists_file_metadata_json()) {
-          array_push($handler_output_data['locales'], [
-            'title' => $cms_locale->get_title(),
-            'iconURL' => $cms_locale->get_icon_url(),
-            'name' => $cms_locale->get_name(),
-            'iso639_1' => $cms_locale->get_iso_639_1(),
-            'iso639_2' => $cms_locale->get_iso_639_2(),
+        if ($CMSLocale->exists_file_metadata_json()) {
+          array_push($handlerOutputData['locales'], [
+            'title' => $CMSLocale->get_title(),
+            'iconURL' => $CMSLocale->get_icon_url(),
+            'name' => $CMSLocale->get_name(),
+            'iso639_1' => $CMSLocale->get_iso_639_1(),
+            'iso639_2' => $CMSLocale->get_iso_639_2(),
           ]);
         }
       }
 
-      $handler_message = 'Данные по локализациям успешно получены.';
-      $handler_status_code = 1;
+      $handlerMessage = $handlerMessage ?? 'Данные по локализациям успешно получены.';
+      $handlerStatusCode = $handlerStatusCode ?? 1;
     } else {
-      $handler_message = 'Данные по локализациям не были получены, поскольку они не обнаружены в системе.';
-      $handler_status_code = 0;
+      $handlerMessage = $handlerMessage ?? 'Данные по локализациям не были получены, поскольку они не обнаружены в системе.';
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   
-  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'pages' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'pages' && $CMSCore::core_rest_cookie_exists()) {
+    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
+    $clientIP = $CMSCore->client->get_ip_address();
 
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      if ($system_core->urlp->get_path(2) == 'additional-fields' && is_null($system_core->urlp->get_path(3))) {
-        $cms_locale_setted = $system_core->configurator->get_database_entry_value('base_locale');
-        $fields_locale = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $cms_locale_setted;
+    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+      if ($CMSCore->urlp->get_path(2) === 'additional-fields' && $CMSCore->urlp->get_path(3) !== null) {
+        $CMSLocaleSetted = $CMSCore->configurator->get_database_entry_value('base_locale');
+        $fieldsLocale = $CMSCore->urlp->get_param('locale') ?? $CMSLocaleSetted;
 
-        $fields_types = ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_type')) ? json_decode($system_core->configurator->get_database_entry_value('static_pages_additional_field_type'), true) : [];
-        $fields_titles = ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_title')) ? json_decode($system_core->configurator->get_database_entry_value('static_pages_additional_field_title'), true) : [];
-        $fields_descriptions = ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_description')) ? json_decode($system_core->configurator->get_database_entry_value('static_pages_additional_field_description'), true) : [];
-        $fields_names = ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_name')) ? json_decode($system_core->configurator->get_database_entry_value('static_pages_additional_field_name'), true) : [];
+        $fieldsTypes = $CMSCore->configurator->exists_database_entry_value('static_pages_additional_field_type') ? json_decode($CMSCore->configurator->get_database_entry_value('static_pages_additional_field_type'), true) : [];
+        $fieldsTitles = $CMSCore->configurator->exists_database_entry_value('static_pages_additional_field_title') ? json_decode($CMSCore->configurator->get_database_entry_value('static_pages_additional_field_title'), true) : [];
+        $fieldsDescriptions = $CMSCore->configurator->exists_database_entry_value('static_pages_additional_field_description') ? json_decode($CMSCore->configurator->get_database_entry_value('static_pages_additional_field_description'), true) : [];
+        $fieldsNames = $CMSCore->configurator->exists_database_entry_value('static_pages_additional_field_name') ? json_decode($CMSCore->configurator->get_database_entry_value('static_pages_additional_field_name'), true) : [];
         
         $fields = [];
-        foreach ($fields_types as $field_index => $field_type) {
+        foreach ($fieldsTypes as $index => $type) {
           array_push($fields, [
-            'type' => $field_type,
-            'title' => isset($fields_titles[$fields_locale]) ? $fields_titles[$fields_locale][$field_index] : '',
-            'description' => isset($fields_descriptions[$fields_locale]) ? $fields_descriptions[$fields_locale][$field_index] : '',
-            'name' => $fields_names[$field_index]
+            'type' => $type,
+            'title' => isset($fieldsTitles[$fieldsLocale]) ? $fieldsTitles[$fieldsLocale][$index] : '',
+            'description' => isset($fieldsDescriptions[$fieldsLocale]) ? $fieldsDescriptions[$fieldsLocale][$index] : '',
+            'name' => $fieldsNames[$index]
           ]);
         }
 
-        $handler_output_data['additionalFields'] = $fields;
+        $handlerOutputData['additionalFields'] = $fields;
       }
     }
   // Попытка инициализации персонализированного обработчика
   } else {
-    if ($system_core->urlp->get_path(1) != null) {
+    if ($CMSCore->urlp->get_path(1) !== null) {
 
       /**
        * Рекурсивный поиск файла обработчика в директории API
        */
-      $recursion_handler_connect = function(\core\PHPLibrary\SystemCore $system_core, array $pathes, int $index) use (&$recursion_handler_connect) : string|null {
-        $handlers_root_directory_path = sprintf('%s/api', CMS_ROOT_DIRECTORY);
+      $recursionHandlerConnect = function(CMSCore $CMSCore, array $pathes, int $index) use (&$recursionHandlerConnect) : string|null {
+        $handlersDirectoryPath = CMS_ROOT_DIRECTORY . '/api';
 
-        $files_array = array_diff(scandir($handlers_root_directory_path), ['.', '..']);
-        foreach ($files_array as $file_index => $file_name) {
+        $files = array_diff(scandir($handlersDirectoryPath), ['.', '..']);
+        foreach ($files as $index => $name) {
           if (array_key_last($pathes) != $index) {
-            if ($file_name == $pathes[$index]) {
+            if ($name === $pathes[$index]) {
 
-              $url_pathes = $system_core->urlp->get_pathes();
-              return $recursion_handler_connect($system_core, $url_pathes, $index + 1);
+              $URLPathes = $CMSCore->urlp->get_pathes();
+              return $recursionHandlerConnect($CMSCore, $URLPathes, $index + 1);
             }
           } else {
-            $handler_file_name = sprintf('%s.api.php', $pathes[$index]);
-            $handler_file_path = sprintf('%s/%s/%s', $handlers_root_directory_path, implode('/', array_slice($pathes, 1, count($pathes) - 2)), $handler_file_name);
+            $handlerFileName = $pathes[$index] . '.api.php';
+            $handlerFilePath = $handlersDirectoryPath . '/' . implode('/', array_slice($pathes, 1, count($pathes) - 2)) . '/' .  $handlerFileName;
             
-            if (file_exists($handler_file_path)) {
-              return $handler_file_path;
+            if (file_exists($handlerFilePath)) {
+              return $handlerFilePath;
             }
 
             break;
@@ -350,34 +352,34 @@ if (defined('IS_NOT_HACKED')) {
         return null;
       };
 
-      $url_pathes = $system_core->urlp->get_pathes();
-      $handler_connection_result = $recursion_handler_connect($system_core, $url_pathes, 1);
+      $URLPathes = $CMSCore->urlp->get_pathes();
+      $handlerConnectionResult = $recursionHandlerConnect($CMSCore, $URLPathes, 1);
       
-      if ($handler_connection_result != null) {
-        include_once($handler_connection_result);
+      if ($handlerConnectionResult !== null) {
+        include_once $handlerConnectionResult;
       }
     }
   }
 
-  /** @var string $handler_message Сообщение обработчика */
-  $handler_message = (isset($handler_message)) ? $handler_message : 'Обработчик CMS GIRVAS не смог обработать запрос.';
-  /** @var int $handler_status_code Статус обработчика */
-  $handler_status_code = (isset($handler_status_code)) ? $handler_status_code : 0;
-  /** @var array $handler_output_data Выходные данные обработчика */
-  $handler_output_data = (isset($handler_output_data)) ? $handler_output_data : [];
-  $handler_output_data['debug']['method'] = $_SERVER['REQUEST_METHOD'];
-  $handler_output_data['debug']['client_ip'] = $_SERVER['REMOTE_ADDR'];
-  $handler_output_data['debug']['post_data'] = (isset($_POST)) ? $_POST : null;
-  $handler_output_data['debug']['get_data'] = (isset($_GET)) ? $_GET : null;
-  $handler_output_data['debug']['patch_data'] = (isset($_PATCH)) ? $_PATCH : null;
-  $handler_output_data['debug']['put_data'] = (isset($_PUT)) ? $_PUT : null;
-  $handler_output_data['debug']['delete_data'] = (isset($_DELETE)) ? $_DELETE : null;
+  /** @var string $handlerMessage Сообщение обработчика */
+  $handlerMessage = $handlerMessage ?? 'Обработчик CMS GIRVAS не смог обработать запрос.';
+  /** @var int $handlerStatusCode Статус обработчика */
+  $handlerStatusCode = $handlerStatusCode ?? 0;
+  /** @var array $handlerOutputData Выходные данные обработчика */
+  $handlerOutputData = $handlerOutputData ?? [];
+  $handlerOutputData['debug']['method'] = $_SERVER['REQUEST_METHOD'];
+  $handlerOutputData['debug']['client_ip'] = $_SERVER['REMOTE_ADDR'];
+  $handlerOutputData['debug']['post_data'] = $_POST ?? null;
+  $handlerOutputData['debug']['get_data'] = $_GET ?? null;
+  $handlerOutputData['debug']['patch_data'] = $_PATCH ?? null;
+  $handlerOutputData['debug']['put_data'] = $_PUT ?? null;
+  $handlerOutputData['debug']['delete_data'] = $_DELETE ?? null;
 
   // Выводим результат работы обработчика в JSON-формате
   echo json_encode([
-    'message' => $handler_message,
-    'statusCode' => $handler_status_code,
-    'outputData' => $handler_output_data
+    'message' => $handlerMessage,
+    'statusCode' => $handlerStatusCode,
+    'outputData' => $handlerOutputData
   // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
   ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 }

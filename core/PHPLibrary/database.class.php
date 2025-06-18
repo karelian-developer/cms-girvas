@@ -20,12 +20,12 @@ namespace core\PHPLibrary {
   final class Database {
     public const SQL_LIBRARY_PATH = 'core/SQLLibrary';
 
-    private string $database_name;
-    private string $database_user;
-    private string $database_password;
-    private string $database_host;
-    private EnumDatabaseManagementSystem $database_management_system;
-    private DatabaseQueryBuilder $query_builder;
+    private string $name;
+    private string $user;
+    private string $password;
+    private string $host;
+    private EnumDatabaseManagementSystem $managementSystem;
+    private DatabaseQueryBuilder $queryBuilder;
     public PDO|null $connection = null;
 
 
@@ -34,9 +34,8 @@ namespace core\PHPLibrary {
      *
      * @return void
      */
-    public function __construct(EnumDatabaseManagementSystem $database_management_system) {
-      $this->set_database_management_system($database_management_system);
-      //$this->query_builder = new DatabaseQueryBuilder();
+    public function __construct(EnumDatabaseManagementSystem $managementSystem) {
+      $this->set_database_management_system($managementSystem);
     }
     
     /**
@@ -46,7 +45,7 @@ namespace core\PHPLibrary {
      * @return void
      */
     private function set_database_management_system(EnumDatabaseManagementSystem $system) {
-      $this->database_management_system = $system;
+      $this->managementSystem = $system;
     }
     
     /**
@@ -55,7 +54,7 @@ namespace core\PHPLibrary {
      * @return EnumDatabaseManagementSystem
      */
     private function get_database_management_system() : EnumDatabaseManagementSystem {
-      return $this->database_management_system;
+      return $this->managementSystem;
     }
     
     /**
@@ -65,7 +64,7 @@ namespace core\PHPLibrary {
      * @return void
      */
     public function set_database_name(string $value) : void {
-      $this->database_name = $value;
+      $this->name = $value;
     }
     
     /**
@@ -75,7 +74,7 @@ namespace core\PHPLibrary {
      * @return void
      */
     public function set_database_user(string $value) : void {
-      $this->database_user = $value;
+      $this->user = $value;
     }
     
     /**
@@ -85,7 +84,7 @@ namespace core\PHPLibrary {
      * @return void
      */
     public function set_database_password(string $value) : void {
-      $this->database_password = $value;
+      $this->password = $value;
     }
     
     /**
@@ -95,7 +94,7 @@ namespace core\PHPLibrary {
      * @return void
      */
     public function set_database_host(string $value) : void {
-      $this->database_host = $value;
+      $this->host = $value;
     }
     
     /**
@@ -104,7 +103,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     private function get_database_name() : string {
-      return $this->database_name;
+      return $this->name;
     }
     
     /**
@@ -113,7 +112,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     private function get_database_user() : string {
-      return $this->database_user;
+      return $this->user;
     }
     
     /**
@@ -122,7 +121,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     private function get_database_password() : string {
-      return $this->database_password;
+      return $this->password;
     }
     
     /**
@@ -131,40 +130,40 @@ namespace core\PHPLibrary {
      * @return string
      */
     private function get_database_host() : string {
-      return $this->database_host;
+      return $this->host;
     }
 
     /**
      * Подключиться к базе данных
      * 
-     * @param bool $error_is_json
+     * @param bool $errorIsJSON
      * 
      * @return [type]
      */
-    public function connect(bool $error_is_json = false) {
-      /** @var string $database_name Наименование базы данных */
-      $database_name = $this->get_database_name();
-      /** @var string $database_user Пользователь базы данных */
-      $database_user = $this->get_database_user();
-      /** @var string $database_password Пароль базы данных */
-      $database_password = $this->get_database_password();
-      /** @var string $database_host Хост базы данных */
-      $database_host = $this->get_database_host();
+    public function connect(bool $errorIsJSON = false) {
+      /** @var string $name Наименование базы данных */
+      $name = $this->get_database_name();
+      /** @var string $user Пользователь базы данных */
+      $user = $this->get_database_user();
+      /** @var string $password Пароль базы данных */
+      $password = $this->get_database_password();
+      /** @var string $host Хост базы данных */
+      $host = $this->get_database_host();
       
-      /** @var EnumDatabaseManagementSystem $database_management_system */
-      $database_management_system = $this->get_database_management_system();
-      switch ($database_management_system->value) {
-        case 'mysql': $database_connection_query = 'mysql:host=%s;dbname=%s'; break;
-        case 'pgsql': $database_connection_query = 'pgsql:host=%s;dbname=%s'; break;
+      /** @var EnumDatabaseManagementSystem $managementSystem */
+      $managementSystem = $this->get_database_management_system();
+      switch ($managementSystem->value) {
+        case 'mysql': $connectionQuery = 'mysql:host=%s;dbname=%s'; break;
+        case 'pgsql': $connectionQuery = 'pgsql:host=%s;dbname=%s'; break;
       }
 
-      $database_connection_query_modified = sprintf($database_connection_query, $database_host, $database_name);
+      $connectionQueryModified = sprintf($connectionQuery, $host, $name);
 
       try {
-        $this->connection = new PDO($database_connection_query_modified, $database_user, $database_password);
+        $this->connection = new PDO($connectionQueryModified, $user, $password);
         $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
       } catch (PDOException $exception) {
-        if (!$error_is_json) {
+        if (!$errorIsJSON) {
           die($exception->getMessage());
         } else {
           die(json_encode([
@@ -185,26 +184,22 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function connect_test() : bool {
-      /** @var string $database_name Наименование базы данных */
-      $database_name = $this->get_database_name();
-      /** @var string $database_user Пользователь базы данных */
-      $database_user = $this->get_database_user();
-      /** @var string $database_password Пароль базы данных */
-      $database_password = $this->get_database_password();
-      /** @var string $database_host Хост базы данных */
-      $database_host = $this->get_database_host();
+      $name = $this->get_database_name();
+      $user = $this->get_database_user();
+      $password = $this->get_database_password();
+      $host = $this->get_database_host();
 
-      /** @var EnumDatabaseManagementSystem $database_management_system */
-      $database_management_system = $this->get_database_management_system();
-      switch ($database_management_system->value) {
-        case 'mysql': $database_connection_query = 'mysql:host=%s;dbname=%s'; break;
-        case 'pgsql': $database_connection_query = 'pgsql:host=%s;dbname=%s'; break;
+      /** @var EnumDatabaseManagementSystem $managementSystem */
+      $managementSystem = $this->get_database_management_system();
+      switch ($managementSystem->value) {
+        case 'mysql': $connectionQuery = 'mysql:host=%s;dbname=%s'; break;
+        case 'pgsql': $connectionQuery = 'pgsql:host=%s;dbname=%s'; break;
       }
 
-      $database_connection_query_modified = sprintf($database_connection_query, $database_host, $database_name);
+      $connectionQueryModified = sprintf($connectionQuery, $host, $name);
 
       try {
-        $this->connection = new PDO($database_connection_query_modified, $database_user, $database_password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING]);
+        $this->connection = new PDO($connectionQueryModified, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING]);
         return true;
       } catch (PDOException $exception) {
         return false;
@@ -214,17 +209,13 @@ namespace core\PHPLibrary {
     /**
      * Получить содержимое файла формата SQL
      * 
-     * @param string $file_path
+     * @param string $filePath
      * 
      * @return string
      */
-    public function get_file_sql(string $file_path) : string {
-      $file_path_full = sprintf('%s/%s/%s', CMS_ROOT_DIRECTORY, self::SQL_LIBRARY_PATH, $file_path);
-      if (file_exists($file_path_full)) {
-        return file_get_contents($file_path_full);
-      }
-
-      return '';
+    public function get_file_sql(string $filePath) : string {
+      $filePathFull = CMS_ROOT_DIRECTORY . '/' . self::SQL_LIBRARY_PATH . '/' . $filePath;
+      return file_exists($filePathFull) ? file_get_contents($filePathFull) : '';
     }
   }
 

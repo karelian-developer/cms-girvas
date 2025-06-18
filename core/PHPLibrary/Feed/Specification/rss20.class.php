@@ -18,7 +18,7 @@ namespace core\PHPLibrary\Feed\Specification {
     const TYPE_NAME = 'rss2-0';
     const TYPE_TITLE = 'RSS 2.0';
 
-    private SystemCore $system_core;
+    private SystemCore $CMSCore;
     private FeedBuilder $builder;
     public string $title;
     public string $description;
@@ -26,9 +26,9 @@ namespace core\PHPLibrary\Feed\Specification {
     public string $language;
     public array $items = [];
 
-    public function __construct(SystemCore $system_core, FeedBuilder $web_channel_builder) {
-      $this->system_core = $system_core;
-      $this->builder = $web_channel_builder;
+    public function __construct(SystemCore $CMSCore, FeedBuilder $feedBuilder) {
+      $this->CMSCore = $CMSCore;
+      $this->builder = $feedBuilder;
     }
 
     public function set_title(string $value) : void {
@@ -77,82 +77,82 @@ namespace core\PHPLibrary\Feed\Specification {
     }
 
     public function assembly_rss() : DOMElement|bool {
-      $element_rss = $this->builder->document->createElement('rss');
-      $element_rss_attribute_version = $this->builder->document->createAttribute('version');
-      $element_rss_attribute_version->value = '2.0';
+      $RSSElement = $this->builder->document->createElement('rss');
+      $RSSElementAttributeVersion = $this->builder->document->createAttribute('version');
+      $RSSElementAttributeVersion->value = '2.0';
 
-      $element_rss->appendChild($element_rss_attribute_version);
-      return $element_rss;
+      $RSSElement->appendChild($RSSElementAttributeVersion);
+      return $RSSElement;
     }
 
     public function assembly_channel() : DOMElement|bool {
-      $site_title = ($this->system_core->configurator->exists_database_entry_value('base_site_title')) ? $this->system_core->configurator->get_database_entry_value('base_site_title') : sprintf('%s %s', $this->system_core::CMS_TITLE, $this->system_core::CMS_VERSION);
-      $site_description = ($this->system_core->configurator->exists_database_entry_value('seo_site_description')) ? $this->system_core->configurator->get_database_entry_value('seo_site_description') : 'Description is not exists';
-      $site_link = sprintf('https://%s', $this->system_core->configurator->get('domain'));
+      $siteTitle = $this->CMSCore->configurator->exists_database_entry_value('base_site_title') ? $this->CMSCore->configurator->get_database_entry_value('base_site_title') : sprintf('%s %s', $this->CMSCore::CMS_TITLE, $this->CMSCore::CMS_VERSION);
+      $siteDescription = $this->CMSCore->configurator->exists_database_entry_value('seo_site_description') ? $this->CMSCore->configurator->get_database_entry_value('seo_site_description') : 'Description is not exists';
+      $siteLink = 'https://%s' . $this->CMSCore->configurator->get('domain');
 
-      $channel_title = (!empty($this->get_title())) ? $this->get_title() : $site_title;
-      $channel_description = (!empty($this->get_description())) ? $this->get_description() : $site_description;
-      $channel_link = (!empty($this->get_link())) ? $this->get_link() : $site_link;
+      $channelTitle = !empty($this->get_title()) ? $this->get_title() : $siteTitle;
+      $channelDescription = !empty($this->get_description()) ? $this->get_description() : $siteDescription;
+      $channelLink = !empty($this->get_link()) ? $this->get_link() : $siteLink;
 
-      $element_channel = $this->builder->document->createElement('channel');
-      $element_channel_title = $this->builder->document->createElement('title', $channel_title);
-      $element_channel_link = $this->builder->document->createElement('link', $channel_link);
-      $element_channel_description = $this->builder->document->createElement('description', $channel_description);
-      $element_channel_language = $this->builder->document->createElement('language', $this->builder->get_language());
-      $element_channel_lastbuilddate = $this->builder->document->createElement('lastBuildDate', date('D, d M Y H:i:s T', time()));
-      $element_channel_docs = $this->builder->document->createElement('docs', 'http://blogs.law.harvard.edu/tech/rss');
-      $element_channel_generator = $this->builder->document->createElement('generator', 'CMS GIRVAS: Web Channel Builder');
+      $channelElement = $this->builder->document->createElement('channel');
+      $channelTitleElement = $this->builder->document->createElement('title', $channelTitle);
+      $channelLinkElement = $this->builder->document->createElement('link', $channelLink);
+      $channelDescriptionElement = $this->builder->document->createElement('description', $channelDescription);
+      $channelLanguageElement = $this->builder->document->createElement('language', $this->builder->get_language());
+      $channelLastbuilddateElement = $this->builder->document->createElement('lastBuildDate', date('D, d M Y H:i:s T', time()));
+      $channelDocsElement = $this->builder->document->createElement('docs', 'http://blogs.law.harvard.edu/tech/rss');
+      $channelGeneratorElement = $this->builder->document->createElement('generator', 'CMS GIRVAS: Web Channel Builder');
 
-      $element_channel->appendChild($element_channel_title);
-      $element_channel->appendChild($element_channel_link);
-      $element_channel->appendChild($element_channel_description);
-      $element_channel->appendChild($element_channel_lastbuilddate);
-      $element_channel->appendChild($element_channel_docs);
-      $element_channel->appendChild($element_channel_generator);
+      $channelElement->appendChild($channelTitleElement);
+      $channelElement->appendChild($channelLinkElement);
+      $channelElement->appendChild($channelDescriptionElement);
+      $channelElement->appendChild($channelLastbuilddateElement);
+      $channelElement->appendChild($channelDocsElement);
+      $channelElement->appendChild($channelGeneratorElement);
 
       $items = $this->items;
       usort($items, function ($a, $b) {
-        $a_pubdate_unix = strtotime($a['pubdate']);
-        $b_pubdate_unix = strtotime($b['pubdate']);
+        $aPubdateUnix = strtotime($a['pubdate']);
+        $bPubdateUnix = strtotime($b['pubdate']);
 
-        if ($a_pubdate_unix == $b_pubdate_unix) {
+        if ($aPubdateUnix == $bPubdateUnix) {
           return 0;
         }
 
-        return ($a_pubdate_unix > $b_pubdate_unix) ? -1 : 1;
+        return $aPubdateUnix > $bPubdateUnix ? -1 : 1;
       });
 
-      $element_channel_pubdate = $this->builder->document->createElement('pubDate', $items[0]['pubdate']);
-      $element_channel->appendChild($element_channel_pubdate);
+      $channelPubdateElement = $this->builder->document->createElement('pubDate', $items[0]['pubdate']);
+      $channelElement->appendChild($channelPubdateElement);
 
       unset($items);
 
       foreach ($this->items as $item) {
-        $element_item_description_cdata = $this->builder->document->createCDATASection($item['description']);
+        $itemDescriptionCDATASection = $this->builder->document->createCDATASection($item['description']);
 
-        $element_item_title = $this->builder->document->createElement('title', $item['title']);
-        $element_item_description = $this->builder->document->createElement('description');
-        $element_item_link = $this->builder->document->createElement('link', $item['link']);
-        $element_item_pubdate = $this->builder->document->createElement('pubDate', $item['pubdate']);
-        $element_item_description->appendChild($element_item_description_cdata);
+        $itemTitleElement = $this->builder->document->createElement('title', $item['title']);
+        $itemDescriptionElement = $this->builder->document->createElement('description');
+        $itemLinkElement = $this->builder->document->createElement('link', $item['link']);
+        $itemPudateElement = $this->builder->document->createElement('pubDate', $item['pubdate']);
+        $itemDescriptionElement->appendChild($itemDescriptionCDATASection);
 
-        $element_item = $this->builder->document->createElement('item');
-        $element_item->appendChild($element_item_title);
-        $element_item->appendChild($element_item_description);
-        $element_item->appendChild($element_item_link);
-        $element_item->appendChild($element_item_pubdate);
-        $element_channel->appendChild($element_item);
+        $itemElement = $this->builder->document->createElement('item');
+        $itemElement->appendChild($itemTitleElement);
+        $itemElement->appendChild($itemDescriptionElement);
+        $itemElement->appendChild($itemLinkElement);
+        $itemElement->appendChild($itemPudateElement);
+        $channelElement->appendChild($itemElement);
       }
 
-      return $element_channel;
+      return $channelElement;
     }
 
     public function assembly() : void {
-      $element_rss = $this->assembly_rss();
-      $element_channel = $this->assembly_channel();
+      $RSSElement = $this->assembly_rss();
+      $channelElement = $this->assembly_channel();
 
-      $element_rss->appendChild($element_channel);
-      $this->builder->document->appendChild($element_rss);
+      $RSSElement->appendChild($channelElement);
+      $this->builder->document->appendChild($RSSElement);
 
       $this->builder->assembled = $this->builder->document->saveXML();
     }

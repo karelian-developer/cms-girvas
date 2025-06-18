@@ -12,6 +12,7 @@ namespace core\PHPLibrary\SystemCore {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
   use \core\PHPLibrary\SystemCore as SystemCore;
   use \PDOException as PDOException;
+  use \PDO as PDO;
 
   /**
    * Class Configurator
@@ -19,22 +20,23 @@ namespace core\PHPLibrary\SystemCore {
   final class Configurator {
     const FILE_PATH = 'core/configuration.php';
 
-    public string $meta_title = '';
-    public string $meta_description = '';
-    public array $meta_keywords = [];
+    public string $metaTitle = '';
+    public string $metaDescription = '';
+    public array $metaKeywords = [];
     private array $data = [];
-    private SystemCore $system_core;
+    private SystemCore $CMSCore;
     
     /**
      * __construct
      *
-     * @param  mixed $system_core
+     * @param  mixed $CMSCore
      * @return void
      */
-    public function __construct(SystemCore $system_core) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore) {
+      $this->CMSCore = $CMSCore;
+      $filePath = CMS_ROOT_DIRECTORY . '/' . self::FILE_PATH;
 
-      if (file_exists(sprintf('%s/%s', CMS_ROOT_DIRECTORY, self::FILE_PATH))) {
+      if (file_exists($filePath)) {
         $this->merge($this->get_file_data());
       }
     }
@@ -47,7 +49,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return void
      */
     public function set_meta_title(string $value) : void {
-      $this->meta_title = $value;
+      $this->metaTitle = $value;
     }
 
     /**
@@ -58,7 +60,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return void
      */
     public function set_meta_description(string $value) : void {
-      $this->meta_description = $value;
+      $this->metaDescription = $value;
     }
 
     /**
@@ -69,7 +71,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return void
      */
     public function set_meta_keywrords(array $values) : void {
-      $this->meta_keywords = $values;
+      $this->metaKeywords = $values;
     }
 
     /**
@@ -80,7 +82,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return void
      */
     public function add_meta_keywrord(mixed $value) : void {
-      array_push($this->meta_keywords, $value);
+      array_push($this->metaKeywords, $value);
     }
 
     /**
@@ -89,7 +91,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_meta_title() : string {
-      return $this->meta_title;
+      return $this->metaTitle;
     }
 
     /**
@@ -98,7 +100,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_meta_description() : string {
-      return $this->meta_description;
+      return $this->metaDescription;
     }
 
     /**
@@ -107,7 +109,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return array
      */
     public function get_meta_keywords() : array {
-      return $this->meta_keywords;
+      return $this->metaKeywords;
     }
 
     /**
@@ -116,7 +118,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_meta_keywords_imploded() : string {
-      return implode(', ', $this->meta_keywords);
+      return implode(', ', $this->metaKeywords);
     }
 
     /**
@@ -125,7 +127,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_meta_keywords_json() : string {
-      return json_encode($this->meta_keywords);
+      return json_encode($this->metaKeywords);
     }
 
     /**
@@ -134,7 +136,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_site_title() : string {
-      return ($this->exists_database_entry_value('base_site_title')) ? $this->get_database_entry_value('base_site_title') : $this->system_core->get_cms_title();
+      return $this->exists_database_entry_value('base_site_title') ? $this->get_database_entry_value('base_site_title') : $this->CMSCore->get_cms_title();
     }
 
     /**
@@ -143,7 +145,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_site_description() : string {
-      return ($this->exists_database_entry_value('seo_site_description')) ? $this->get_database_entry_value('seo_site_description') : sprintf('%s %s developed by www.garbalo.com', $this->system_core->get_cms_title(), $this->system_core->get_cms_version());
+      return $this->exists_database_entry_value('seo_site_description') ? $this->get_database_entry_value('seo_site_description') : sprintf('%s %s developed by www.garbalo.com', $this->CMSCore->get_cms_title(), $this->CMSCore->get_cms_version());
     }
 
     /**
@@ -152,7 +154,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_site_keywords() : string {
-      return ($this->exists_database_entry_value('seo_site_keywords')) ? implode(', ', json_decode($this->get_database_entry_value('seo_site_keywords'), true)) : implode(', ', ['cms girvas', 'garbalo', 'empty site']);
+      return $this->exists_database_entry_value('seo_site_keywords') ? implode(', ', json_decode($this->get_database_entry_value('seo_site_keywords'), true)) : implode(', ', ['cms girvas', 'empty site', 'karelian developer']);
     }
 
     /**
@@ -161,7 +163,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_site_charset() : string {
-      return ($this->exists_database_entry_value('base_site_charset')) ? $this->get_database_entry_value('base_site_charset') : 'UTF-8';
+      return $this->exists_database_entry_value('base_site_charset') ? $this->get_database_entry_value('base_site_charset') : 'UTF-8';
     }
 
     /**
@@ -170,7 +172,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_site_timezone() : string {
-      return ($this->exists_database_entry_value('base_timezone')) ? $this->get_database_entry_value('base_timezone') : 'Europe/Moscow';
+      return $this->exists_database_entry_value('base_timezone') ? $this->get_database_entry_value('base_timezone') : 'Europe/Moscow';
     }
 
     /**
@@ -179,7 +181,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return int
      */
     public function get_upload_file_weight_max() : int {
-      return ($this->exists_database_entry_value('files_upload_file_weight_max')) ? (int)$this->get_database_entry_value('files_upload_file_weight_max') : 0;
+      return $this->exists_database_entry_value('files_upload_file_weight_max') ? (int)$this->get_database_entry_value('files_upload_file_weight_max') : 0;
     }
 
     /**
@@ -188,7 +190,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return int
      */
     public function get_upload_file_image_width_max() : int {
-      return ($this->exists_database_entry_value('files_upload_file_image_width_max')) ? (int)$this->get_database_entry_value('files_upload_file_image_width_max') : 0;
+      return $this->exists_database_entry_value('files_upload_file_image_width_max') ? (int)$this->get_database_entry_value('files_upload_file_image_width_max') : 0;
     }
 
     /**
@@ -197,7 +199,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return int
      */
     public function get_upload_file_image_height_max() : int {
-      return ($this->exists_database_entry_value('files_upload_file_image_height_max')) ? (int)$this->get_database_entry_value('files_upload_file_image_height_max') : 0;
+      return $this->exists_database_entry_value('files_upload_file_image_height_max') ? (int)$this->get_database_entry_value('files_upload_file_image_height_max') : 0;
     }
 
     /**
@@ -206,7 +208,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return int
      */
     public function get_upload_file_image_avatar_weight_max() : int {
-      return ($this->exists_database_entry_value('files_upload_file_image_avatar_weight_max')) ? (int)$this->get_database_entry_value('files_upload_file_image_avatar_weight_max') : 0;
+      return $this->exists_database_entry_value('files_upload_file_image_avatar_weight_max') ? (int)$this->get_database_entry_value('files_upload_file_image_avatar_weight_max') : 0;
     }
 
     /**
@@ -215,7 +217,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return int
      */
     public function get_upload_file_image_avatar_width_max() : int {
-      return ($this->exists_database_entry_value('files_upload_file_image_avatar_width_max')) ? (int)$this->get_database_entry_value('files_upload_file_image_avatar_width_max') : 0;
+      return $this->exists_database_entry_value('files_upload_file_image_avatar_width_max') ? (int)$this->get_database_entry_value('files_upload_file_image_avatar_width_max') : 0;
     }
 
     /**
@@ -224,7 +226,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return int
      */
     public function get_upload_file_image_avatar_height_max() : int {
-      return ($this->exists_database_entry_value('files_upload_file_image_avatar_height_max')) ? (int)$this->get_database_entry_value('files_upload_file_image_avatar_height_max') : 0;
+      return $this->exists_database_entry_value('files_upload_file_image_avatar_height_max') ? (int)$this->get_database_entry_value('files_upload_file_image_avatar_height_max') : 0;
     }
 
     /**
@@ -232,16 +234,16 @@ namespace core\PHPLibrary\SystemCore {
      * 
      * @return string|bool
      */
-    public function get_section_entries_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_section_entries_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('base_section_entries_status')) {
-          return ($this->get_database_entry_value('base_section_entries_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('base_section_entries_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('base_section_entries_status')) ? $this->get_database_entry_value('base_section_entries_status') : 'off';
+      return $this->exists_database_entry_value('base_section_entries_status') ? $this->get_database_entry_value('base_section_entries_status') : 'off';
     }
 
     /**
@@ -249,16 +251,16 @@ namespace core\PHPLibrary\SystemCore {
      * 
      * @return string|bool
      */
-    public function get_section_static_pages_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_section_static_pages_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('base_section_static_pages_status')) {
-          return ($this->get_database_entry_value('base_section_static_pages_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('base_section_static_pages_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('base_section_static_pages_status')) ? $this->get_database_entry_value('base_section_static_pages_status') : 'off';
+      return $this->exists_database_entry_value('base_section_static_pages_status') ? $this->get_database_entry_value('base_section_static_pages_status') : 'off';
     }
 
     /**
@@ -266,16 +268,16 @@ namespace core\PHPLibrary\SystemCore {
      * 
      * @return string|bool
      */
-    public function get_section_modules_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_section_modules_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('base_section_modules_status')) {
-          return ($this->get_database_entry_value('base_section_modules_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('base_section_modules_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('base_section_modules_status')) ? $this->get_database_entry_value('base_section_modules_status') : 'off';
+      return $this->exists_database_entry_value('base_section_modules_status') ? $this->get_database_entry_value('base_section_modules_status') : 'off';
     }
 
     /**
@@ -283,16 +285,16 @@ namespace core\PHPLibrary\SystemCore {
      * 
      * @return string|bool
      */
-    public function get_section_templates_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_section_templates_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('base_section_templates_status')) {
-          return ($this->get_database_entry_value('base_section_templates_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('base_section_templates_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('base_section_templates_status')) ? $this->get_database_entry_value('base_section_templates_status') : 'off';
+      return $this->exists_database_entry_value('base_section_templates_status') ? $this->get_database_entry_value('base_section_templates_status') : 'off';
     }
 
     /**
@@ -300,16 +302,16 @@ namespace core\PHPLibrary\SystemCore {
      * 
      * @return string|bool
      */
-    public function get_section_users_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_section_users_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('base_section_users_status')) {
-          return ($this->get_database_entry_value('base_section_users_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('base_section_users_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('base_section_users_status')) ? $this->get_database_entry_value('base_section_users_status') : 'off';
+      return $this->exists_database_entry_value('base_section_users_status') ? $this->get_database_entry_value('base_section_users_status') : 'off';
     }
 
     /**
@@ -317,16 +319,16 @@ namespace core\PHPLibrary\SystemCore {
      * 
      * @return string|bool
      */
-    public function get_section_media_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_section_media_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('base_section_media_status')) {
-          return ($this->get_database_entry_value('base_section_media_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('base_section_media_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('base_section_media_status')) ? $this->get_database_entry_value('base_section_media_status') : 'off';
+      return $this->exists_database_entry_value('base_section_media_status') ? $this->get_database_entry_value('base_section_media_status') : 'off';
     }
 
     /**
@@ -334,16 +336,16 @@ namespace core\PHPLibrary\SystemCore {
      * 
      * @return string|bool
      */
-    public function get_section_feeds_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_section_feeds_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('base_section_feeds_status')) {
-          return ($this->get_database_entry_value('base_section_feeds_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('base_section_feeds_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('base_section_feeds_status')) ? $this->get_database_entry_value('base_section_feeds_status') : 'off';
+      return $this->exists_database_entry_value('base_section_feeds_status') ? $this->get_database_entry_value('base_section_feeds_status') : 'off';
     }
 
     /**
@@ -351,16 +353,16 @@ namespace core\PHPLibrary\SystemCore {
      * 
      * @return string|bool
      */
-    public function get_section_analytics_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_section_analytics_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('base_section_analytics_status')) {
-          return ($this->get_database_entry_value('base_section_analytics_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('base_section_analytics_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('base_section_analytics_status')) ? $this->get_database_entry_value('base_section_analytics_status') : 'off';
+      return $this->exists_database_entry_value('base_section_analytics_status') ? $this->get_database_entry_value('base_section_analytics_status') : 'off';
     }
 
     /**
@@ -368,16 +370,16 @@ namespace core\PHPLibrary\SystemCore {
      * 
      * @return string|bool
      */
-    public function get_engineering_works_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_engineering_works_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('base_engineering_works_status')) {
-          return ($this->get_database_entry_value('base_engineering_works_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('base_engineering_works_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('base_engineering_works_status')) ? $this->get_database_entry_value('base_engineering_works_status') : 'off';
+      return $this->exists_database_entry_value('base_engineering_works_status') ? $this->get_database_entry_value('base_engineering_works_status') : 'off';
     }
 
     /**
@@ -386,26 +388,26 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_engineering_works_text() : string {
-      return ($this->exists_database_entry_value('base_engineering_works_text')) ? (string)$this->get_database_entry_value('base_engineering_works_text') : '';
+      return $this->exists_database_entry_value('base_engineering_works_text') ? (string)$this->get_database_entry_value('base_engineering_works_text') : '';
     }
 
     /**
      * Получить статус настройки автоматической конвертации изображений
      * 
-     * @param bool $is_bool
+     * @param bool $isBoolean
      * 
      * @return string
      */
-    public function get_auto_convert_file_image_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_auto_convert_file_image_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('files_auto_convert_file_image_status')) {
-          return ($this->get_database_entry_value('files_auto_convert_file_image_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('files_auto_convert_file_image_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('files_auto_convert_file_image_status')) ? $this->get_database_entry_value('files_auto_convert_file_image_status') : 'off';
+      return $this->exists_database_entry_value('files_auto_convert_file_image_status') ? $this->get_database_entry_value('files_auto_convert_file_image_status') : 'off';
     }
 
     /**
@@ -414,26 +416,26 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_auto_convert_file_image_extension() : string {
-      return ($this->exists_database_entry_value('files_auto_convert_file_image_extension')) ? $this->get_database_entry_value('files_auto_convert_file_image_extension') : '';
+      return $this->exists_database_entry_value('files_auto_convert_file_image_extension') ? $this->get_database_entry_value('files_auto_convert_file_image_extension') : '';
     }
 
     /**
      * Получить статус возможности загрузки аватаров пользователей
      * 
-     * @param bool $is_bool
+     * @param bool $isBoolean
      * 
      * @return string|bool
      */
-    public function get_users_upload_avatar_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_users_upload_avatar_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('users_upload_avatar_status')) {
-          return ($this->get_database_entry_value('users_upload_avatar_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('users_upload_avatar_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('users_upload_avatar_status')) ? $this->get_database_entry_value('users_upload_avatar_status') : 'off';
+      return $this->exists_database_entry_value('users_upload_avatar_status') ? $this->get_database_entry_value('users_upload_avatar_status') : 'off';
     }
 
     /**
@@ -442,7 +444,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return int
      */
     public function get_users_login_length_min() : int {
-      return ($this->exists_database_entry_value('users_login_length_min')) ? (int)$this->get_database_entry_value('users_login_length_min') : 4;
+      return $this->exists_database_entry_value('users_login_length_min') ? (int)$this->get_database_entry_value('users_login_length_min') : 4;
     }
 
     /**
@@ -451,64 +453,64 @@ namespace core\PHPLibrary\SystemCore {
      * @return int
      */
     public function get_users_login_length_max() : int {
-      return ($this->exists_database_entry_value('users_login_length_max')) ? (int)$this->get_database_entry_value('users_login_length_max') : 0;
+      return $this->exists_database_entry_value('users_login_length_max') ? (int)$this->get_database_entry_value('users_login_length_max') : 0;
     }
 
     /**
      * Получить статус возможности редактирования логинов пользователей
      * 
-     * @param bool $is_bool
+     * @param bool $isBoolean
      * 
      * @return string|bool
      */
-    public function get_users_login_edit_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_users_login_edit_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('users_login_edit_status')) {
-          return ($this->get_database_entry_value('users_login_edit_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('users_login_edit_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('users_login_edit_status')) ? $this->get_database_entry_value('users_login_edit_status') : 'off';
+      return $this->exists_database_entry_value('users_login_edit_status') ? $this->get_database_entry_value('users_login_edit_status') : 'off';
     }
 
     /**
      * Получить статус возможности использования специальных символов в логине
      * 
-     * @param bool $is_bool
+     * @param bool $isBoolean
      * 
      * @return string|bool
      */
-    public function get_users_login_special_symbols_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_users_login_special_symbols_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('users_login_special_symbols_status')) {
-          return ($this->get_database_entry_value('users_login_special_symbols_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('users_login_special_symbols_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('users_login_special_symbols_status')) ? $this->get_database_entry_value('users_login_special_symbols_status') : 'off';
+      return $this->exists_database_entry_value('users_login_special_symbols_status') ? $this->get_database_entry_value('users_login_special_symbols_status') : 'off';
     }
 
     /**
      * Получить статус учета регистра символов в логине пользователя
      * 
-     * @param bool $is_bool
+     * @param bool $isBoolean
      * 
      * @return string|bool
      */
-    public function get_users_login_register_accounting_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_users_login_register_accounting_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('users_login_register_accounting_status')) {
-          return ($this->get_database_entry_value('users_login_register_accounting_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('users_login_register_accounting_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('users_login_register_accounting_status')) ? $this->get_database_entry_value('users_login_register_accounting_status') : 'off';
+      return $this->exists_database_entry_value('users_login_register_accounting_status') ? $this->get_database_entry_value('users_login_register_accounting_status') : 'off';
     }
 
     /**
@@ -517,7 +519,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return int
      */
     public function get_users_password_length_min() : int {
-      return ($this->exists_database_entry_value('users_password_length_min')) ? (int)$this->get_database_entry_value('users_password_length_min') : 6;
+      return $this->exists_database_entry_value('users_password_length_min') ? (int)$this->get_database_entry_value('users_password_length_min') : 6;
     }
 
     /**
@@ -526,45 +528,45 @@ namespace core\PHPLibrary\SystemCore {
      * @return int
      */
     public function get_users_password_length_max() : int {
-      return ($this->exists_database_entry_value('users_password_length_max')) ? (int)$this->get_database_entry_value('users_password_length_max') : 0;
+      return $this->exists_database_entry_value('users_password_length_max') ? (int)$this->get_database_entry_value('users_password_length_max') : 0;
     }
 
     /**
      * Получить статус возможности использования специальных символов в пароле
      * 
-     * @param bool $is_bool
+     * @param bool $isBoolean
      * 
      * @return string|bool
      */
-    public function get_users_password_special_symbols_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_users_password_special_symbols_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('users_password_special_symbols_status')) {
-          return ($this->get_database_entry_value('users_password_special_symbols_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('users_password_special_symbols_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('users_password_special_symbols_status')) ? $this->get_database_entry_value('users_password_special_symbols_status') : 'off';
+      return $this->exists_database_entry_value('users_password_special_symbols_status') ? $this->get_database_entry_value('users_password_special_symbols_status') : 'off';
     }
 
     /**
      * Получить статус использования фильтра для логинов
      * 
-     * @param bool $is_bool
+     * @param bool $isBoolean
      * 
      * @return string|bool
      */
-    public function get_users_logins_blacklist_status(bool $is_bool = false) : string|bool {
-      if ($is_bool) {
+    public function get_users_logins_blacklist_status(bool $isBoolean = false) : string|bool {
+      if ($isBoolean) {
         if ($this->exists_database_entry_value('users_logins_blacklist_status')) {
-          return ($this->get_database_entry_value('users_logins_blacklist_status') == 'on') ? true : false;
+          return $this->get_database_entry_value('users_logins_blacklist_status') === 'on' ? true : false;
         }
 
         return false;
       }
 
-      return ($this->exists_database_entry_value('users_logins_blacklist_status')) ? $this->get_database_entry_value('users_logins_blacklist_status') : 'off';
+      return $this->exists_database_entry_value('users_logins_blacklist_status') ? $this->get_database_entry_value('users_logins_blacklist_status') : 'off';
     }
 
     /**
@@ -572,9 +574,9 @@ namespace core\PHPLibrary\SystemCore {
      * 
      * @return string|array
      */
-    public function get_users_logins_blacklist(bool $is_array = false) : string|array {
-      if (!$is_array) {
-        return ($this->exists_database_entry_value('users_logins_blacklist')) ? implode(', ', json_decode($this->get_database_entry_value('users_logins_blacklist'), true)) : implode(', ', ['cms_girvas', 'garbalo', 'cms', 'girvas', 'admin', 'administrator', 'moder', 'moderator']);
+    public function get_users_logins_blacklist(bool $isArray = false) : string|array {
+      if (!$isArray) {
+        return $this->exists_database_entry_value('users_logins_blacklist') ? implode(', ', json_decode($this->get_database_entry_value('users_logins_blacklist'), true)) : implode(', ', ['cms_girvas', 'garbalo', 'cms', 'girvas', 'admin', 'administrator', 'moder', 'moderator']);
       }
       
       return json_decode($this->get_database_entry_value('users_logins_blacklist'), true);
@@ -586,15 +588,15 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_security_scp() : string {
-      $domain_address = sprintf('%s://%s', ($this->get('ssl_is_enabled')) ? 'https' : 'http', $this->get('domain'));
-      $domain_aliases = (is_array($this->get('domain_aliases'))) ? implode(' ', $this->get('domain_aliases')) : '';
+      $domainAddress = sprintf('%s://%s', ($this->get('SSLIsEnabled')) ? 'https' : 'http', $this->get('domain'));
+      $domainAliases = (is_array($this->get('domainAliases'))) ? implode(' ', $this->get('domainAliases')) : '';
 
       $csp = ($this->exists('ssl_csp')) ? $this->get('ssl_csp') : '';
       if (is_array($csp)) $csp = implode('; ', $csp);
 
-      $csp = str_replace('{SCRIPT_HASH}', $this->system_core->scp_scripts_hash, $csp);
-      $csp = str_replace('{DOMAIN}', $domain_address, $csp);
-      $csp = str_replace('{DOMAIN_ALIASES}', $domain_aliases, $csp);
+      $csp = str_replace('{SCRIPT_HASH}', $this->CMSCore->scp_scripts_hash, $csp);
+      $csp = str_replace('{DOMAIN}', $domainAddress, $csp);
+      $csp = str_replace('{DOMAIN_ALIASES}', $domainAliases, $csp);
       return str_replace('&quot;', '\'', $csp);
     }
 
@@ -604,8 +606,8 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_permanent_redirect_to_www_status() : bool {
-      $value = ($this->exists_database_entry_value('seo_permanent_redirect_www_status')) ? $this->get_database_entry_value('seo_permanent_redirect_www_status') : 'off';
-      return ($value == 'on') ? true : false;
+      $value = $this->exists_database_entry_value('seo_permanent_redirect_www_status') ? $this->get_database_entry_value('seo_permanent_redirect_www_status') : 'off';
+      return $value === 'on' ? true : false;
     }
 
     /**
@@ -614,26 +616,26 @@ namespace core\PHPLibrary\SystemCore {
      * @return array
      */
     public function get_database_entry_value(string $name) : mixed {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['value']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('configurations');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('name = :name');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['value']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('configurations');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('name = :name');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = (!is_null($this->system_core->database_connector)) ? $this->system_core->database_connector->database->connection : null;
+        $databaseConnection = !is_null($this->CMSCore->databaseConnector) ? $this->CMSCore->databaseConnector->database->connection : null;
         
-        if (!is_null($database_connection)) {
-          $database_query = $database_connection->prepare($query_builder->statement->assembled);
-          $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
-          $database_query->execute();
+        if (!is_null($databaseConnection)) {
+          $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+          $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
+          $databaseQuery->execute();
 
-          $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+          $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
           return ($result) ? $result['value'] : null;
         }
       } catch (PDOException $exception) {
@@ -656,27 +658,27 @@ namespace core\PHPLibrary\SystemCore {
      * @return bool
      */
     public function exists_database_entry_value(string $name) : bool {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['1']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('configurations');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('name = :name');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['1']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('configurations');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('name = :name');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = (!is_null($this->system_core->database_connector)) ? $this->system_core->database_connector->database->connection : null;
+        $databaseConnection = (!is_null($this->CMSCore->databaseConnector)) ? $this->CMSCore->databaseConnector->database->connection : null;
         
-        if (!is_null($database_connection)) {
-          $database_query = $database_connection->prepare($query_builder->statement->assembled);
-          $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
-          $database_query->execute();
+        if (!is_null($databaseConnection)) {
+          $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+          $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
+          $databaseQuery->execute();
 
-          return ($database_query->fetchColumn()) ? true : false;
+          return ($databaseQuery->fetchColumn()) ? true : false;
         }
       } catch (PDOException $exception) {
         die(json_encode([
@@ -699,21 +701,21 @@ namespace core\PHPLibrary\SystemCore {
      * @return bool
      */
     public function insert_database_entry_value(string $name, string $value) : bool {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_insert();
-      $query_builder->statement->set_table('configurations');
-      $query_builder->statement->add_column('name');
-      $query_builder->statement->add_column('value');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_insert();
+      $queryBuilder->statement->set_table('configurations');
+      $queryBuilder->statement->add_column('name');
+      $queryBuilder->statement->add_column('value');
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = (!is_null($this->system_core->database_connector)) ? $this->system_core->database_connector->database->connection : null;
+        $databaseConnection = (!is_null($this->CMSCore->databaseConnector)) ? $this->CMSCore->databaseConnector->database->connection : null;
         
-        if (!is_null($database_connection)) {
-          $database_query = $database_connection->prepare($query_builder->statement->assembled);
-          $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
-          $database_query->bindParam(':value', $value, \PDO::PARAM_STR);
-          $execute = $database_query->execute();
+        if (!is_null($databaseConnection)) {
+          $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+          $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
+          $databaseQuery->bindParam(':value', $value, \PDO::PARAM_STR);
+          $execute = $databaseQuery->execute();
 
           return ($execute) ? true : false;
         }
@@ -738,25 +740,25 @@ namespace core\PHPLibrary\SystemCore {
      * @return mixed
      */
     public function update_database_entry_value(string $name, string|int $value) : mixed {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_update();
-      $query_builder->statement->set_table('configurations');
-      $query_builder->statement->set_clause_set();
-      $query_builder->statement->clause_set->add_column('value');
-      $query_builder->statement->clause_set->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('name = :name');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_update();
+      $queryBuilder->statement->set_table('configurations');
+      $queryBuilder->statement->set_clause_set();
+      $queryBuilder->statement->clauseSet->add_column('value');
+      $queryBuilder->statement->clauseSet->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('name = :name');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = (!is_null($this->system_core->database_connector)) ? $this->system_core->database_connector->database->connection : null;
+        $databaseConnection = (!is_null($this->CMSCore->databaseConnector)) ? $this->CMSCore->databaseConnector->database->connection : null;
         
-        if (!is_null($database_connection)) {
-          $database_query = $database_connection->prepare($query_builder->statement->assembled);
-          $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
-          $database_query->bindParam(':value', $value, \PDO::PARAM_STR);
-          $execute = $database_query->execute();
+        if (!is_null($databaseConnection)) {
+          $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+          $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
+          $databaseQuery->bindParam(':value', $value, \PDO::PARAM_STR);
+          $execute = $databaseQuery->execute();
 
           return ($execute) ? true : false;
         }
@@ -778,39 +780,39 @@ namespace core\PHPLibrary\SystemCore {
      * @return array
      */
     private function get_file_data() : array {
-      require_once(sprintf('%s/%s', CMS_ROOT_DIRECTORY, self::FILE_PATH));
-      return (isset($configuration)) ? $configuration : [];
+      require_once CMS_ROOT_DIRECTORY . '/' . self::FILE_PATH;
+      return isset($configuration) ? $configuration : [];
     }
     
     /**
      * Назначить отдельного параметра конфигурации CMS
      *
-     * @param  mixed $configuration_name
-     * @param  mixed $configuration_value
+     * @param  mixed $name
+     * @param  mixed $value
      * @return void
      */
-    public function set(string $configuration_name, mixed $configuration_value) : void {
-      $this->data[$configuration_name] = $configuration_value;
+    public function set(string $name, mixed $value) : void {
+      $this->data[$name] = $value;
     }
 
     /**
      * Получить отдельного параметра конфигураций CMS
      *
-     * @param  mixed $configuration_name Наименование конфигурации
+     * @param  mixed $name Наименование конфигурации
      * @return mixed
      */
-    public function get(string $configuration_name) : mixed {
-      return (array_key_exists($configuration_name, $this->data)) ? $this->data[$configuration_name] : null;
+    public function get(string $name) : mixed {
+      return (array_key_exists($name, $this->data)) ? $this->data[$name] : null;
     }
 
     /**
      * Проверить наличие отдельного параметра конфигураций CMS
      *
-     * @param  string $configuration_name Наименование конфигурации
+     * @param  string $name Наименование конфигурации
      * @return bool
      */
-    public function exists(string $configuration_name) : bool {
-      return array_key_exists($configuration_name, $this->data);
+    public function exists(string $name) : bool {
+      return array_key_exists($name, $this->data);
     }
     
     /**

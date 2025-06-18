@@ -130,7 +130,7 @@ namespace templates\admin\default {
      */
     private function get_main_navigation_icon_path(string $navigationItemName) : string {
       $themePath = $this->theme->get_path();
-      return sprintf('%s/images/icons/mainNavigation/%s.svg', $themePath, $navigationItemName);
+      return $themePath . '/images/icons/mainNavigation/' . $navigationItemName . '.svg';
     }
 
     /**
@@ -139,9 +139,9 @@ namespace templates\admin\default {
      * @return void
      */
     public function init_main_navigation() : void {
-      if (!is_null($this->source)) {
+      if ($this->source !== null) {
         $elementCMSAPMainNavigation = $this->source->getElementById('SYSTEM_AP_MAIN_NAVIGATION');
-        if (!is_null($elementCMSAPMainNavigation)) {
+        if ($elementCMSAPMainNavigation !== null) {
           $listElement = $elementCMSAPMainNavigation->ownerDocument->createElement('ul');
           $listElement->setAttribute('class', 'navigation__list list list-reset');
 
@@ -156,7 +156,7 @@ namespace templates\admin\default {
               $sectionAllowed = false;
 
               if (!$navigationSectionPermanentStatus) {
-                $methodSectionCheckerName = sprintf('get_section_%s_status', $navigationSectionIndex);
+                $methodSectionCheckerName = 'get_section_' . (string) $navigationSectionIndex . '_status');
                 
                 if (method_exists($this->theme->CMSCore->configurator, $methodSectionCheckerName)) {
                   if ($this->theme->CMSCore->configurator->{$methodSectionCheckerName}(true)) {
@@ -177,14 +177,14 @@ namespace templates\admin\default {
                 $linkElement = $elementCMSAPMainNavigation->ownerDocument->createElement('a');
                 $labelElement = $elementCMSAPMainNavigation->ownerDocument->createElement('div', $itemTitle);
                 
-                $itemElement->setAttribute('class', sprintf('list__item item item_%s', $navigationSectionName));
+                $itemElement->setAttribute('class', 'list__item item item_' . $navigationSectionName);
 
                 if ($navigationSectionRole != '') {
                   $itemElement->setAttribute('role', $navigationSectionRole); 
                 }
 
                 $linkElement->setAttribute('class', 'item__link link');
-                $linkElement->setAttribute('href', sprintf('/admin%s', $navigationSectionLink));
+                $linkElement->setAttribute('href', '/admin' . $navigationSectionLink);
                 $linkElement->setAttribute('title', $itemTitle);
                 $labelElement->setAttribute('class', 'item__label label');
                 

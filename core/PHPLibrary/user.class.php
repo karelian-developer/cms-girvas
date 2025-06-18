@@ -17,22 +17,22 @@ namespace core\PHPLibrary {
    * Class User
    * @package core\PHPLibrary
    * 
-   * @property-read SystemCore $system_core Класс системного ядра CMS
+   * @property-read SystemCore $CMSCore Класс системного ядра CMS
    * @property int $id ID пользователя
    */
   class User {
-    private readonly SystemCore $system_core;
+    private readonly SystemCore $CMSCore;
     private int $id;
     
     /**
      * __construct
      *
-     * @param  mixed $system_core
+     * @param  mixed $CMSCore
      * @param  mixed $id
      * @return void
      */
-    public function __construct(SystemCore $system_core, int $id) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, int $id) {
+      $this->CMSCore = $CMSCore;
       $this->set_id($id);
     }
 
@@ -44,9 +44,9 @@ namespace core\PHPLibrary {
      * @return void
      */
     public function init_data(array $columns = ['*']) : void {
-      $columns_data = $this->get_database_columns_data($columns);
-      foreach ($columns_data as $column_name => $column_data) {
-        $this->{$column_name} = $column_data;
+      $columns = $this->get_database_columns_data($columns);
+      foreach ($columns as $name => $data) {
+        $this->{$name} = $data;
       }
     }
 
@@ -94,7 +94,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public function get_password_hash() : string {
-      return (property_exists($this, 'password_hash')) ? $this->password_hash : '';
+      return (property_exists($this, 'passwordHash')) ? $this->password_hash : '';
     }
 
     /**
@@ -103,7 +103,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     public function get_security_hash() : string {
-      return (property_exists($this, 'security_hash')) ? $this->security_hash : '';
+      return (property_exists($this, 'securityHash')) ? $this->security_hash : '';
     }
 
     /**
@@ -112,7 +112,7 @@ namespace core\PHPLibrary {
      * @return int
      */
     public function get_created_unix_timestamp() : int {
-      return (property_exists($this, 'created_unix_timestamp')) ? $this->created_unix_timestamp : 0;
+      return (property_exists($this, 'createdUnixTimestamp')) ? $this->createdUnixTimestamp : 0;
     }
 
     /**
@@ -121,19 +121,19 @@ namespace core\PHPLibrary {
      * @return int
      */
     public function get_updated_unix_timestamp() : int {
-      return (property_exists($this, 'updated_unix_timestamp')) ? $this->updated_unix_timestamp : 0;
+      return (property_exists($this, 'updatedUnixTimestamp')) ? $this->updatedUnixTimestamp : 0;
     }
 
     /**
      * Получить URL дефолтного аватара пользователя
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param int $size
      * 
      * @return string
      */
-    public static function get_avatar_default_url(SystemCore $system_core, int $size) : string {
-      return sprintf('/%s/images/avatar_default_%d.png', $system_core->template->get_url(), $size);
+    public static function get_avatar_default_url(SystemCore $CMSCore, int $size) : string {
+      return sprintf('/%s/images/avatar_default_%d.png', $CMSCore->theme->get_url(), $size);
     }
     
     /**
@@ -143,9 +143,9 @@ namespace core\PHPLibrary {
      */
     public function get_name() : string {
       if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['name'])) {
-          return $metadata_array['name'];
+        $metadata = json_decode($this->metadata, true);
+        if (isset($metadata['name'])) {
+          return $metadata['name'];
         }
       }
 
@@ -159,9 +159,9 @@ namespace core\PHPLibrary {
      */
     public function get_surname() : string {
       if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['surname'])) {
-          return $metadata_array['surname'];
+        $metadata = json_decode($this->metadata, true);
+        if (isset($metadata['surname'])) {
+          return $metadata['surname'];
         }
       }
 
@@ -175,9 +175,9 @@ namespace core\PHPLibrary {
      */
     public function get_patronymic() : string {
       if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['patronymic'])) {
-          return $metadata_array['patronymic'];
+        $metadata = json_decode($this->metadata, true);
+        if (isset($metadata['patronymic'])) {
+          return $metadata['patronymic'];
         }
       }
 
@@ -191,9 +191,9 @@ namespace core\PHPLibrary {
      */
     public function get_group_id() : int {
       if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['group_id'])) {
-          return $metadata_array['group_id'];
+        $metadata = json_decode($this->metadata, true);
+        if (isset($metadata['groupID'])) {
+          return $metadata['groupID'];
         }
       }
 
@@ -207,9 +207,9 @@ namespace core\PHPLibrary {
      */
     public function is_blocked() : bool {
       if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['isBlocked'])) {
-          return (bool)$metadata_array['isBlocked'];
+        $metadata = json_decode($this->metadata, true);
+        if (isset($metadata['isBlocked'])) {
+          return (bool)$metadata['isBlocked'];
         }
       }
 
@@ -222,10 +222,10 @@ namespace core\PHPLibrary {
      * @return UserGroup|null
      */
     public function get_group() : UserGroup|null {
-      $group_id = $this->get_group_id();
+      $groupID = $this->get_group_id();
       
-      if (UserGroup::exists_by_id($this->system_core, $group_id)) {
-        return new UserGroup($this->system_core, $group_id);
+      if (UserGroup::exists_by_id($this->CMSCore, $groupID)) {
+        return new UserGroup($this->CMSCore, $groupID);
       }
 
       return null;
@@ -238,9 +238,9 @@ namespace core\PHPLibrary {
      */
     public function get_password_reset_created_unix_timestamp() : int {
       if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['passwordResetTokenCreatedUnixTimestamp'])) {
-          return $metadata_array['passwordResetTokenCreatedUnixTimestamp'];
+        $metadata = json_decode($this->metadata, true);
+        if (isset($metadata['passwordResetTokenCreatedUnixTimestamp'])) {
+          return $metadata['passwordResetTokenCreatedUnixTimestamp'];
         }
       }
 
@@ -254,9 +254,9 @@ namespace core\PHPLibrary {
      */
     public function get_password_reset_token() : string {
       if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['passwordResetToken'])) {
-          return $metadata_array['passwordResetToken'];
+        $metadata = json_decode($this->metadata, true);
+        if (isset($metadata['passwordResetToken'])) {
+          return $metadata['passwordResetToken'];
         }
       }
 
@@ -270,9 +270,9 @@ namespace core\PHPLibrary {
      */
     public function get_birthdate_unix_timestamp() : int {
       if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['birthdateUnixTimestamp'])) {
-          return $metadata_array['birthdateUnixTimestamp'];
+        $metadata = json_decode($this->metadata, true);
+        if (isset($metadata['birthdateUnixTimestamp'])) {
+          return $metadata['birthdateUnixTimestamp'];
         }
       }
 
@@ -282,15 +282,15 @@ namespace core\PHPLibrary {
     /**
      * Получить данные по дополнительному полю
      * 
-     * @param string $field_name
+     * @param string $fieldName
      * 
      * @return mixed
      */
-    public function get_additional_field_data(string $field_name) : mixed {
+    public function get_additional_field_data(string $fieldName) : mixed {
       if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['additionalFields'])) {
-          return (isset($metadata_array['additionalFields'][$field_name])) ? $metadata_array['additionalFields'][$field_name] : null;
+        $metadata = json_decode($this->metadata, true);
+        if (isset($metadata['additionalFields'])) {
+          return (isset($metadata['additionalFields'][$fieldName])) ? $metadata['additionalFields'][$fieldName] : null;
         }
       }
 
@@ -304,14 +304,14 @@ namespace core\PHPLibrary {
      * @return string
      */
     public function get_avatar_url(int $size) : string {
-      $file_path = sprintf('%s/uploads/avatars/%d/%d.webp', CMS_ROOT_DIRECTORY, $this->id, $size);
-      $file_url = sprintf('/uploads/avatars/%d/%d.webp', $this->id, $size);
+      $filePath = sprintf('%s/uploads/avatars/%d/%d.webp', CMS_ROOT_DIRECTORY, $this->id, $size);
+      $fileURL = sprintf('/uploads/avatars/%d/%d.webp', $this->id, $size);
       
-      if (file_exists($file_path)) {
-        return $file_url;
+      if (file_exists($filePath)) {
+        return $fileURL;
       }
 
-      return self::get_avatar_default_url($this->system_core, $size);
+      return self::get_avatar_default_url($this->CMSCore, $size);
     }
 
     /**
@@ -322,27 +322,27 @@ namespace core\PHPLibrary {
      * @return string
      */
     public function hashing(string $string) : string {
-      $user_id = $this->get_id();
-      $security_hash = $this->get_security_hash();
-      $system_salt = $this->system_core->configurator->get('system_salt');
-      $hash_source = sprintf('{GIRVAS:%s:%d+%s=>%s}', $security_hash, $user_id, $system_salt, $string);
-      return md5($hash_source);
+      $userID = $this->get_id();
+      $securityHash = $this->get_security_hash();
+      $CMSSalt = $this->CMSCore->configurator->get('salt');
+      $hashSource = sprintf('{GIRVAS:%s:%d+%s=>%s}', $securityHash, $userID, $CMSSalt, $string);
+      return md5($hashSource);
     }
 
     /**
      * Хешировать пароль
      * 
-     * @param SystemCore $system_core
-     * @param string $user_security_hash
+     * @param SystemCore $CMSCore
+     * @param string $userSecurityHash
      * @param string $password
      * 
      * @return string
      */
-    public static function password_hash(SystemCore $system_core, string $user_security_hash, string $password) : string {
-      $system_salt = $system_core->configurator->get('system_salt');
-      $password_hashing_algorithm = $system_core->configurator->get('password_hashing_algorithm');
-      $crypt_source = sprintf('{GIRVAS:%s+%s=>%s}', $user_security_hash, $system_salt, $password);
-      return password_hash($crypt_source, $password_hashing_algorithm);
+    public static function password_hash(SystemCore $CMSCore, string $userSecurityHash, string $password) : string {
+      $CMSSalt = $CMSCore->configurator->get('salt');
+      $passwordHashingAlgorithm = $CMSCore->configurator->get('passwordHashingAlgorithm');
+      $cryptSource = sprintf('{GIRVAS:%s+%s=>%s}', $userSecurityHash, $CMSSalt, $password);
+      return password_hash($cryptSource, $passwordHashingAlgorithm);
     }
 
     /**
@@ -353,21 +353,21 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function password_verify(string $password) : bool {
-      $system_salt = $this->system_core->configurator->get('system_salt');
-      $crypt_source = sprintf('{GIRVAS:%s+%s=>%s}', $this->get_security_hash(), $system_salt, $password);
-      return password_verify($crypt_source, $this->get_password_hash());
+      $CMSSalt = $this->CMSCore->configurator->get('salt');
+      $cryptSource = sprintf('{GIRVAS:%s+%s=>%s}', $this->get_security_hash(), $CMSSalt, $password);
+      return password_verify($cryptSource, $this->get_password_hash());
     }
 
     /**
      * Сгенерировать хеш-ключ
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * 
      * @return string
      */
-    public static function generate_security_hash(SystemCore $system_core) : string {
-      $system_salt = $system_core->configurator->get('system_salt');
-      return md5(sprintf('{GIRVAS:%s+%d}', $system_salt, time()));
+    public static function generate_security_hash(SystemCore $CMSCore) : string {
+      $CMSSalt = $CMSCore->configurator->get('salt');
+      return md5(sprintf('{GIRVAS:%s+%d}', $CMSSalt, time()));
     }
 
     /**
@@ -378,25 +378,25 @@ namespace core\PHPLibrary {
      * @return array
      */
     private function get_database_columns_data(array $columns = ['*']) : array|null {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections($columns);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections($columns);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
       
-      /** @var int $user_id Идентификационный номер записи */
-      $user_id = $this->get_id();
+      /** @var int $userID Идентификационный номер записи */
+      $userID = $this->get_id();
 
       try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $user_id, \PDO::PARAM_INT);
-        $database_query->execute();
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':id', $userID, \PDO::PARAM_INT);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -406,37 +406,37 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
       return ($result) ? $result : null;
     }
     
     /**
      * Получить объекта пользователя по логину
      *
-     * @param  mixed $system_core
-     * @param  mixed $user_login
+     * @param  mixed $CMSCore
+     * @param  mixed $userLogin
      * @return User
      */
-    public static function get_by_login(SystemCore $system_core, string $user_login) : User|null {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('LOWER(login) = :login');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function get_by_login(SystemCore $CMSCore, string $userLogin) : User|null {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['id']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('LOWER(login) = :login');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
-      $user_login = strtolower($user_login);
+      $userLogin = strtolower($userLogin);
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':login', $user_login, \PDO::PARAM_STR);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':login', $userLogin, \PDO::PARAM_STR);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -446,38 +446,38 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
       
-      return ($result) ? new User($system_core, (int)$result['id']) : null;
+      return ($result) ? new User($CMSCore, (int)$result['id']) : null;
     }
     
     /**
      * Получить объекта пользователя по адресу электронной почты
      *
-     * @param  mixed $system_core
-     * @param  mixed $user_email
+     * @param  mixed $CMSCore
+     * @param  mixed $userEmail
      * @return User
      */
-    public static function get_by_email(SystemCore $system_core, string $user_email) : User|null {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('LOWER(email) = :email');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function get_by_email(SystemCore $CMSCore, string $userEmail) : User|null {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['id']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('LOWER(email) = :email');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
-      $user_email = strtolower($user_email);
+      $userEmail = strtolower($userEmail);
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':email', $user_email, \PDO::PARAM_STR);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':email', $userEmail, \PDO::PARAM_STR);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -487,45 +487,45 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
       
-      return ($result) ? new User($system_core, (int)$result['id']) : null;
+      return ($result) ? new User($CMSCore, (int)$result['id']) : null;
     }
     
     /**
      * Проверить существование пользователя по логину
      *
-     * @param mixed $system_core
-     * @param string $user_login
-     * @param bool $register_accounting
+     * @param mixed $CMSCore
+     * @param string $userLogin
+     * @param bool $registerIsAccounting
      * 
      * @return void
      */
-    public static function exists_by_login(SystemCore $system_core, string $user_login, bool $register_accounting = false) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['1']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
+    public static function exists_by_login(SystemCore $CMSCore, string $userLogin, bool $registerIsAccounting = false) : bool {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['1']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
 
-      if (!$register_accounting) {
-        $query_builder->statement->clause_where->add_condition('LOWER(login) = :login');
-        $user_login = strtolower($user_login);
+      if (!$registerIsAccounting) {
+        $queryBuilder->statement->clauseWhere->add_condition('LOWER(login) = :login');
+        $userLogin = strtolower($userLogin);
       } else {
-        $query_builder->statement->clause_where->add_condition('login = :login');
+        $queryBuilder->statement->clauseWhere->add_condition('login = :login');
       }
 
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':login', $user_login, \PDO::PARAM_STR);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':login', $userLogin, \PDO::PARAM_STR);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -535,36 +535,36 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
       
-      return ($database_query->fetchColumn()) ? true : false;
+      return ($databaseQuery->fetchColumn()) ? true : false;
     }
     
     /**
      * Проверить существование пользователя по E-Mail
      *
-     * @param  mixed $system_core
-     * @param  string $user_login
+     * @param  mixed $CMSCore
+     * @param  string $userLogin
      * @return void
      */
-    public static function exists_by_email(SystemCore $system_core, string $user_email) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['1']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('LOWER(email) = :email');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function exists_by_email(SystemCore $CMSCore, string $userEmail) : bool {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['1']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('LOWER(email) = :email');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
-      $user_email = strtolower($user_email);
+      $userEmail = strtolower($userEmail);
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':email', $user_email, \PDO::PARAM_STR);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':email', $userEmail, \PDO::PARAM_STR);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -574,34 +574,34 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
       
-      return ($database_query->fetchColumn()) ? true : false;
+      return ($databaseQuery->fetchColumn()) ? true : false;
     }
     
     /**
      * Проверить существование пользователя по ID
      *
-     * @param  mixed $system_core
-     * @param  int $user_id
+     * @param  mixed $CMSCore
+     * @param  int $userID
      * @return void
      */
-    public static function exists_by_id(SystemCore $system_core, int $user_id) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['1']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function exists_by_id(SystemCore $CMSCore, int $userID) : bool {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['1']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $user_id, \PDO::PARAM_INT);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':id', $userID, \PDO::PARAM_INT);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -611,7 +611,7 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      return ($database_query->fetchColumn()) ? true : false;
+      return ($databaseQuery->fetchColumn()) ? true : false;
     }
 
     /**
@@ -620,21 +620,21 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function delete() : bool {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_delete();
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_delete();
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-        $execute = $database_query->execute();
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+        $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -650,58 +650,58 @@ namespace core\PHPLibrary {
     /**
      * Создать пользователя
      * 
-     * @param SystemCore $system_core
-     * @param string $user_login
-     * @param string $user_email
-     * @param string $user_password
+     * @param SystemCore $CMSCore
+     * @param string $userLogin
+     * @param string $userEmail
+     * @param string $userPassword
      * 
      * @return User
      */
-    public static function create(SystemCore $system_core, string $user_login, string $user_email, string $user_password) : User|null {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_insert();
-      $query_builder->statement->set_table('users');
-      $query_builder->statement->add_column('login');
-      $query_builder->statement->add_column('email');
-      $query_builder->statement->add_column('password_hash');
-      $query_builder->statement->add_column('security_hash');
-      $query_builder->statement->add_column('created_unix_timestamp');
-      $query_builder->statement->add_column('updated_unix_timestamp');
-      $query_builder->statement->add_column('metadata');
-      $query_builder->statement->add_column('email_is_submitted');
-      $query_builder->statement->set_clause_returning();
-      $query_builder->statement->clause_returning->add_column('id');
-      $query_builder->statement->assembly();
+    public static function create(SystemCore $CMSCore, string $userLogin, string $userEmail, string $userPassword) : User|null {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_insert();
+      $queryBuilder->statement->set_table('users');
+      $queryBuilder->statement->add_column('login');
+      $queryBuilder->statement->add_column('email');
+      $queryBuilder->statement->add_column('password_hash');
+      $queryBuilder->statement->add_column('security_hash');
+      $queryBuilder->statement->add_column('createdUnixTimestamp');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp');
+      $queryBuilder->statement->add_column('metadata');
+      $queryBuilder->statement->add_column('email_is_submitted');
+      $queryBuilder->statement->set_clause_returning();
+      $queryBuilder->statement->clauseReturning->add_column('id');
+      $queryBuilder->statement->assembly();
 
-      $user_security_hash = self::generate_security_hash($system_core);
-      $user_password_hash = self::password_hash($system_core, $user_security_hash, $user_password);
-      $user_created_unix_timestamp = time();
-      $user_updated_unix_timestamp = $user_created_unix_timestamp;
+      $userSecurityHash = self::generate_security_hash($CMSCore);
+      $userPasswordHash = self::password_hash($CMSCore, $userSecurityHash, $userPassword);
+      $userCreatedUnixTimestamp = time();
+      $userUpdatedUnixTimestamp = $userCreatedUnixTimestamp;
 
-      $user_default_metadata = [
+      $userMetadata = [
         'name' => '',
         'surname' => '',
         'patronymic' => '',
-        'group_id' => 4,
+        'groupID' => 4,
         'passwordResetToken' => '',
         'passwordResetTokenCreatedUnixTimestamp' => '',
       ];
 
-      $user_metadata_json = json_encode($user_default_metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-      $email_is_submitted = false;
+      $userMetadataJSON = json_encode($userMetadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      $userEmailIsSubmitted = false;
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':login', $user_login, \PDO::PARAM_STR);
-        $database_query->bindParam(':email', $user_email, \PDO::PARAM_STR);
-        $database_query->bindParam(':password_hash', $user_password_hash, \PDO::PARAM_STR);
-        $database_query->bindParam(':security_hash', $user_security_hash, \PDO::PARAM_STR);
-        $database_query->bindParam(':created_unix_timestamp', $user_created_unix_timestamp, \PDO::PARAM_INT);
-        $database_query->bindParam(':updated_unix_timestamp', $user_updated_unix_timestamp, \PDO::PARAM_INT);
-        $database_query->bindParam(':metadata', $user_metadata_json, \PDO::PARAM_STR);
-        $database_query->bindParam(':email_is_submitted', $email_is_submitted, \PDO::PARAM_BOOL);
-        $execute = $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':login', $userLogin, \PDO::PARAM_STR);
+        $databaseQuery->bindParam(':email', $userEmail, \PDO::PARAM_STR);
+        $databaseQuery->bindParam(':password_hash', $userPasswordHash, \PDO::PARAM_STR);
+        $databaseQuery->bindParam(':security_hash', $userSecurityHash, \PDO::PARAM_STR);
+        $databaseQuery->bindParam(':createdUnixTimestamp', $userCreatedUnixTimestamp, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':updated_unix_timestamp', $userUpdatedUnixTimestamp, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':metadata', $userMetadataJSON, \PDO::PARAM_STR);
+        $databaseQuery->bindParam(':email_is_submitted', $userEmailIsSubmitted, \PDO::PARAM_BOOL);
+        $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -712,8 +712,8 @@ namespace core\PHPLibrary {
       }
 
       if ($execute) {
-        $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-        return ($result) ? new User($system_core, $result['id']) : null;
+        $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+        return ($result) ? new User($CMSCore, $result['id']) : null;
       }
 
       return null;
@@ -726,59 +726,59 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function update(array $data) : bool {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_update();
-      $query_builder->statement->set_table('users');
-      $query_builder->statement->set_clause_set();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_update();
+      $queryBuilder->statement->set_table('users');
+      $queryBuilder->statement->set_clause_set();
 
-      foreach ($data as $data_name => $data_value) {
-        if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'metadata'])) {
-          $query_builder->statement->clause_set->add_column($data_name);
+      foreach ($data as $name => $value) {
+        if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata'])) {
+          $queryBuilder->statement->clauseSet->add_column($name);
         }
       }
       
       if (array_key_exists('metadata', $data)) {
-        $json_fields = [];
+        $fieldsJSON = [];
 
         foreach ($data['metadata'] as $name => $value) {
-          array_push($json_fields, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
+          array_push($fieldsJSON, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
         }
 
         if (!empty($data['metadata'])) {
-          $query_builder->statement->clause_set->add_column('metadata', 'metadata::jsonb || ' . implode(' || ', $json_fields));
+          $queryBuilder->statement->clauseSet->add_column('metadata', 'metadata::jsonb || ' . implode(' || ', $fieldsJSON));
         }
       }
 
-      $query_builder->statement->clause_set->add_column('updated_unix_timestamp');
-      $query_builder->statement->clause_set->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder->statement->clauseSet->add_column('updatedUnixTimestamp');
+      $queryBuilder->statement->clauseSet->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
 
-      /** @var int $user_updated_unix_timestamp Текущее время в UNIX-формате */
-      $user_updated_unix_timestamp = time();
+      /** @var int $userUpdatedUnixTimestamp Текущее время в UNIX-формате */
+      $userUpdatedUnixTimestamp = time();
 
       try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
         
-        foreach ($data as $data_name => $data_value) {
-          if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'metadata'])) {
-            switch (gettype($data_value)) {
-              case 'boolean': $data_value_type = \PDO::PARAM_INT; break;
-              case 'integer': $data_value_type = \PDO::PARAM_INT; break;
-              case 'string': $data_value_type = \PDO::PARAM_STR; break;
-              case 'null': $data_value_type = \PDO::PARAM_NULL; break;
+        foreach ($data as $name => $value) {
+          if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata'])) {
+            switch (gettype($value)) {
+              case 'boolean': $valueType = \PDO::PARAM_INT; break;
+              case 'integer': $valueType = \PDO::PARAM_INT; break;
+              case 'string': $valueType = \PDO::PARAM_STR; break;
+              case 'null': $valueType = \PDO::PARAM_NULL; break;
             }
             
-            $database_query->bindParam(':' . $data_name, $data[$data_name], $data_value_type);
+            $databaseQuery->bindParam(':' . $name, $data[$name], $valueType);
           }
         }
         
-        $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-        $database_query->bindParam(':updated_unix_timestamp', $user_updated_unix_timestamp, \PDO::PARAM_INT);
-        $execute = $database_query->execute();
+        $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':updated_unix_timestamp', $userUpdatedUnixTimestamp, \PDO::PARAM_INT);
+        $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -797,30 +797,30 @@ namespace core\PHPLibrary {
      * @return array
      */
     public function create_registration_submit() : array|null {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_insert();
-      $query_builder->statement->set_table('users_registration_submits');
-      $query_builder->statement->add_column('user_id');
-      $query_builder->statement->add_column('submit_token');
-      $query_builder->statement->add_column('refusal_token');
-      $query_builder->statement->add_column('created_unix_timestamp');
-      $query_builder->statement->set_clause_returning();
-      $query_builder->statement->clause_returning->add_column('id');
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_insert();
+      $queryBuilder->statement->set_table('users_registration_submits');
+      $queryBuilder->statement->add_column('userID');
+      $queryBuilder->statement->add_column('submitToken');
+      $queryBuilder->statement->add_column('refusalToken');
+      $queryBuilder->statement->add_column('createdUnixTimestamp');
+      $queryBuilder->statement->set_clause_returning();
+      $queryBuilder->statement->clauseReturning->add_column('id');
+      $queryBuilder->statement->assembly();
 
-      $request_time = time();
-      $submit_token = md5(sprintf('[%d]%d => submit', $this->id, $request_time));
-      $refusal_token = md5(sprintf('[%d]%d => refusal', $this->id, $request_time));
-      $registration_submit_created_unix_timestamp = time();
+      $requestTime = time();
+      $submitToken = md5(sprintf('[%d]%d => submit', $this->id, $requestTime));
+      $refusalToken = md5(sprintf('[%d]%d => refusal', $this->id, $requestTime));
+      $createdUnixTimestamp = time();
       
       try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':user_id', $this->id, \PDO::PARAM_INT);
-        $database_query->bindParam(':submit_token', $submit_token, \PDO::PARAM_STR);
-        $database_query->bindParam(':refusal_token', $refusal_token, \PDO::PARAM_STR);
-        $database_query->bindParam(':created_unix_timestamp', $registration_submit_created_unix_timestamp, \PDO::PARAM_INT);
-        $execute = $database_query->execute();
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':userID', $this->id, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':submitToken', $submitToken, \PDO::PARAM_STR);
+        $databaseQuery->bindParam(':refusalToken', $refusalToken, \PDO::PARAM_STR);
+        $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
+        $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -832,8 +832,8 @@ namespace core\PHPLibrary {
 
       if ($execute) {
         return [
-          'submit_token' => $submit_token,
-          'refusal_token' => $refusal_token
+          'submitToken' => $submitToken,
+          'refusalToken' => $refusalToken
         ];
       }
 
@@ -844,29 +844,29 @@ namespace core\PHPLibrary {
      * Получить ID пользователя-инициатора заявки подтверждения регистрации
      * по подтвержающему токену
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param string $token
      * 
      * @return int
      */
-    public static function get_user_id_by_registration_submit_token(SystemCore $system_core, string $token) : int {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['user_id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users_registration_submits');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('submit_token = :submit_token');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function get_user_id_by_registration_submit_token(SystemCore $CMSCore, string $token) : int {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['userID']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users_registration_submits');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('submitToken = :submitToken');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':submit_token', $token, \PDO::PARAM_STR);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':submitToken', $token, \PDO::PARAM_STR);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -876,38 +876,38 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
       
-      return ($result) ? (int)$result['user_id'] : null;
+      return ($result) ? (int)$result['userID'] : null;
     }
 
     /**
      * Получить ID пользователя-инициатора заявки подтверждения регистрации
      * по сбрасывающему токену
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param string $token
      * 
      * @return int
      */
-    public static function get_user_id_by_registration_refusal_token(SystemCore $system_core, string $token) : int {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['user_id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users_registration_submits');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('refusal_token = :refusal_token');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function get_user_id_by_registration_refusal_token(SystemCore $CMSCore, string $token) : int {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['userID']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users_registration_submits');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('refusalToken = :refusalToken');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':refusal_token', $token, \PDO::PARAM_STR);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':refusalToken', $token, \PDO::PARAM_STR);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -917,37 +917,37 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
       
-      return ($result) ? (int)$result['user_id'] : null;
+      return ($result) ? (int)$result['userID'] : null;
     }
 
     /**
      * Проверить наличие заявки на подтверждение регистрации по подтверждающему токену
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param string $token
      * 
      * @return bool
      */
-    public static function exists_by_registration_submit_token(SystemCore $system_core, string $token) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['1']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users_registration_submits');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('submit_token = :submit_token');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function exists_by_registration_submit_token(SystemCore $CMSCore, string $token) : bool {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['1']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users_registration_submits');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('submitToken = :submitToken');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':submit_token', $token, \PDO::PARAM_STR);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':submitToken', $token, \PDO::PARAM_STR);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -957,35 +957,35 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      return ($database_query->fetchColumn()) ? true : false;
+      return ($databaseQuery->fetchColumn()) ? true : false;
     }
 
     /**
      * Проверить наличие заявки на подтверждение регистрации по сбрасывающему токену
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param string $token
      * 
      * @return bool
      */
-    public static function exists_by_registration_refusal_token(SystemCore $system_core, string $token) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['1']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users_registration_submits');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('refusal_token = :refusal_token');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function exists_by_registration_refusal_token(SystemCore $CMSCore, string $token) : bool {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['1']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users_registration_submits');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('refusalToken = :refusalToken');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':refusal_token', $token, \PDO::PARAM_STR);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':refusalToken', $token, \PDO::PARAM_STR);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -995,32 +995,32 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      return ($database_query->fetchColumn()) ? true : false;
+      return ($databaseQuery->fetchColumn()) ? true : false;
     }
 
     /**
      * Удалить заявку на подтверждение регистрации по сбрасывающему токену
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param string $token
      * 
      * @return bool
      */
-    public static function delete_registration_submit_by_refusal_token(SystemCore $system_core, string $token) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_delete();
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users_registration_submits');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('refusal_token = :refusal_token');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+    public static function delete_registration_submit_by_refusal_token(SystemCore $CMSCore, string $token) : bool {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_delete();
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users_registration_submits');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('refusalToken = :refusalToken');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
 
-      $database_connection = $system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':refusal_token', $token, \PDO::PARAM_STR);
-			$execute = $database_query->execute();
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':refusalToken', $token, \PDO::PARAM_STR);
+			$execute = $databaseQuery->execute();
 
       return ($execute) ? true : false;
     }
@@ -1028,27 +1028,27 @@ namespace core\PHPLibrary {
     /**
      * Удалить заявку на подтверждение регистрации по подтверждающему токену
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param string $token
      * 
      * @return bool
      */
-    public static function delete_registration_submit_by_submit_token(SystemCore $system_core, string $token) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_delete();
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('users_registration_submits');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('submit_token = :submit_token');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+    public static function delete_registration_submit_by_submit_token(SystemCore $CMSCore, string $token) : bool {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_delete();
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('users_registration_submits');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('submitToken = :submitToken');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':submit_token', $token, \PDO::PARAM_STR);
-        $execute = $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':submitToken', $token, \PDO::PARAM_STR);
+        $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -1064,36 +1064,37 @@ namespace core\PHPLibrary {
     /**
      * Проверить на валидацию E-Mail
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param string $email
      * 
      * @return bool
      */
-    public static function email_is_valid(SystemCore $system_core, string $email) : bool {
+    public static function email_is_valid(SystemCore $CMSCore, string $email) : bool {
       return preg_match('/^[\w\-\.]{1,30}@([\w\-]{1,63}\.){1,2}[\w\-]{2,4}$/i', $email);
     }
 
     /**
      * Проверить на валидацию логин
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param string $login
      * 
      * @return bool
      */
-    public static function login_is_valid(SystemCore $system_core, string $login) : bool {
+    public static function login_is_valid(SystemCore $CMSCore, string $login) : bool {
       return preg_match('/^[\w\-\.\_]{1,36}$/i', $login);
     }
 
     /**
      * Проверить на валидацию пароль
      * 
-     * @param SystemCore $system_core
-     * @param string $login
+     * @param SystemCore $CMSCore
+     * @param string $password
      * 
      * @return bool
+     * 
      */
-    public static function password_is_valid(SystemCore $system_core, string $password) : bool {
+    public static function password_is_valid(SystemCore $CMSCore, string $password) : bool {
       return preg_match('/^[a-zA-Z0-9\@\#\$\%\&\(\)\?\!]{1,36}$/', $password);
     }
   }

@@ -18,7 +18,7 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect {
 
     private StatementSelect $statement;
     public string $column = '';
-    public string $sort_type = '';
+    public string $sortType = '';
     public string $assembled = '';
     
     /**
@@ -38,7 +38,7 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect {
      * @return void
      */
     public function set_sort_type(string $value) : void {
-      $this->sort_type = $value;
+      $this->sortType = $value;
     }
     
     /**
@@ -57,7 +57,7 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect {
      * @return void
      */
     public function assembly() : void {
-      $this->assembled = sprintf('ORDER BY %s %s', $this->column, $this->sort_type);
+      $this->assembled = sprintf('ORDER BY %s %s', $this->column, $this->sortType);
     }
 
   }

@@ -197,7 +197,7 @@ namespace core\PHPLibrary\SystemCore {
       $query_builder->statement->add_column('metadata');
       $query_builder->statement->add_column('created_unix_timestamp');
       $query_builder->statement->set_clause_returning();
-      $query_builder->statement->clause_returning->add_column('id');
+      $query_builder->statement->clauseReturning->add_column('id');
       $query_builder->statement->assembly();
 
       /** @var int Время создания записи в БД в UNIX-формате */
@@ -242,11 +242,11 @@ namespace core\PHPLibrary\SystemCore {
       $query_builder->set_statement_select();
       $query_builder->statement->add_selections($columns);
       $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('reports');
-      $query_builder->statement->clause_from->assembly();
+      $query_builder->statement->clauseFrom->add_table('reports');
+      $query_builder->statement->clauseFrom->assembly();
       $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
+      $query_builder->statement->clauseWhere->add_condition('id = :id');
+      $query_builder->statement->clauseWhere->assembly();
       $query_builder->statement->assembly();
       
       /** @var int Идентификационный номер записи */

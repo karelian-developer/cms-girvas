@@ -10,9 +10,10 @@
 
 namespace core\PHPLibrary\SystemCore {
   use \core\PHPLibrary\SystemCore as SystemCore;
+  use \DOMDocument as DOMDocument;
 
   final class Locale {
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
 
     public const DEFAULT_LOCALE_NAME = 'en_US';
     public const LOCALE_CORE_PATH_PATTERN = '%s/locales/%s';
@@ -25,21 +26,19 @@ namespace core\PHPLibrary\SystemCore {
     /**
      * __construct
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param string $name
      * @param string $dir
      */
-    public function __construct(SystemCore $system_core, string $name, string $dir = 'base') {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, string $name, string $dir = 'base') {
+      $this->CMSCore = $CMSCore;
       $this->set_name($name);
 
-      /** @var string Абсолютный путь до корня локализации */
-      $locale_core_path = sprintf('%s/locales/%s', $system_core->get_cms_path(), $name);
-      /** @var string Абсолютный путь до корня категории локализации */
-      $locale_data_path = sprintf('%s/locales/%s/%s', $system_core->get_cms_path(), $name, $dir);
+      $corePath = $this->CMSCore->get_cms_path() . '/locales/' . $name;
+      $dataPath = $this->CMSCore->get_cms_path() . '/locales/' . $name . '/' . $dir;
       
-      $this->set_core_path($locale_core_path);
-      $this->set_data_path($locale_data_path);
+      $this->set_core_path($corePath);
+      $this->set_data_path($dataPath);
     }
 
     /**
@@ -48,7 +47,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_icon_url() : string {
-      return sprintf('/locales/%s/icons/16.png', $this->get_name());
+      return '/locales/' . $this->get_name() . '/icons/16.png';
     }
   
     /**
@@ -78,7 +77,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return void
      */
     public function set_core_path(string $path) : void {
-      $this->core_path = $path;
+      $this->corePath = $path;
     }
     
     /**
@@ -87,7 +86,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_core_path() : string {
-      return $this->core_path;
+      return $this->corePath;
     }
     
     /**
@@ -97,7 +96,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return void
      */
     public function set_data_path(string $path) : void {
-      $this->data_path = $path;
+      $this->dataPath = $path;
     }
     
     /**
@@ -106,7 +105,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_data_path() : string {
-      return $this->data_path;
+      return $this->dataPath;
     }
 
     /**
@@ -164,7 +163,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_file_data_json_path() : string {
-      return sprintf('%s/data.json', $this->get_data_path());
+      return $this->get_data_path() . '/data.json';
     }
 
     /**
@@ -182,7 +181,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_file_registry_json_path() : string {
-      return sprintf('%s/registry.json', $this->get_data_path());
+      return $this->get_data_path() . '/registry.json';
     }
 
     /**
@@ -191,10 +190,10 @@ namespace core\PHPLibrary\SystemCore {
      * @return array
      */
     public function get_data() : array|bool|null {
-      $file_path = $this->get_file_data_json_path();
-      $file_content = (file_exists($file_path)) ? file_get_contents($file_path) : '{}';
+      $filePath = $this->get_file_data_json_path();
+      $fileContent = file_exists($filePath) ? file_get_contents($filePath) : '{}';
 
-      return json_decode($file_content, true);
+      return json_decode($fileContent, true);
     }
 
     /**
@@ -210,7 +209,14 @@ namespace core\PHPLibrary\SystemCore {
         return $data[$name];
       }
 
-      return sprintf('<span style="background-color: red;color: white;">[%s]</span>', $name);
+      $document = new DOMDocument();
+
+      $spanElement = $DOMDocument->createElement('span', '[' . $name . ']');
+      $spanElement->setAttribute('style', 'background-color: red;color: white;');
+
+      $document->appendChild($spanElement);
+
+      return $DOMDocument->saveHTML();
     }
 
     /**
@@ -219,10 +225,10 @@ namespace core\PHPLibrary\SystemCore {
      * @return array
      */
     public function get_registry_array() : array {
-      $file_path = $this->get_file_registry_json_path();
-      $file_content = (file_exists($file_path)) ? file_get_contents($file_path) : '{}';
+      $filePath = $this->get_file_registry_json_path();
+      $fileContent = file_exists($filePath) ? file_get_contents($filePath) : '{}';
 
-      return json_decode($file_content, true);
+      return json_decode($fileContent, true);
     }
 
     /**
@@ -233,8 +239,8 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_single_value_by_key(string $key) : string {
-      $locale_data = $this->get_data();
-      return (isset($locale_data[$key])) ? $locale_data[$key] : '[ ??? ]';
+      $data = $this->get_data();
+      return isset($data[$key]) ? $data[$key] : '[ ??? ]';
     }
 
     /**
@@ -252,7 +258,7 @@ namespace core\PHPLibrary\SystemCore {
      * @return string
      */
     public function get_file_metadata_json_path() : string {
-      return sprintf('%s/metadata.json', $this->get_core_path());
+      return $this->get_core_path() . '/metadata.json';
     }
 
     /**
@@ -261,10 +267,10 @@ namespace core\PHPLibrary\SystemCore {
      * @return array
      */
     public function get_metadata() : array|null {
-      $file_path = $this->get_file_metadata_json_path();
-      $file_content = file_get_contents($file_path);
+      $filePath = $this->get_file_metadata_json_path();
+      $fileContent = file_get_contents($filePath);
 
-      return json_decode($file_content, true);
+      return json_decode($fileContent, true);
     }
 
     /**
@@ -272,10 +278,10 @@ namespace core\PHPLibrary\SystemCore {
      * 
      * @return bool
      */
-    public static function exists(SystemCore $system_core, string $locale_name) : bool {
+    public static function exists(SystemCore $CMSCore, string $localeName) : bool {
       /** @var string Абсолютный путь до директории локализации */
-      $locale_core_path = sprintf(self::LOCALE_CORE_PATH_PATTERN, $system_core->get_cms_path(), $locale_name);
-      return file_exists($locale_core_path);
+      $path = sprintf(self::LOCALE_CORE_PATH_PATTERN, $CMSCore->get_cms_path(), $localeName);
+      return file_exists($path);
     } 
   }
 }

@@ -16,20 +16,20 @@ namespace core\PHPLibrary {
 
   #[\AllowDynamicProperties]
   class Entry implements EntityTypeContent {
-    private readonly SystemCore $system_core;
+    private readonly SystemCore $CMSCore;
     private int $id;
-    private int $category_id;
-    private int $views_count = 0;
+    private int $categoryID;
+    private int $viewsCount = 0;
     private string $name;
     
     /**
      * __construct
      *
-     * @param  SystemCore $system_core
+     * @param  SystemCore $CMSCore
      * @return void
      */
-    public function __construct(SystemCore $system_core, int $id) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, int $id) {
+      $this->CMSCore = $CMSCore;
       $this->set_id($id);
     }
     
@@ -40,9 +40,9 @@ namespace core\PHPLibrary {
      * @return void
      */
     public function init_data(array $columns = ['*']) : void {
-      $columns_data = $this->get_database_columns_data($columns);
-      foreach ($columns_data as $column_name => $column_data) {
-        $this->{$column_name} = $column_data;
+      $columnsData = $this->get_database_columns_data($columns);
+      foreach ($columnsData as $name => $data) {
+        $this->{$name} = $data;
       }
     }
     
@@ -64,7 +64,7 @@ namespace core\PHPLibrary {
      * @return void
      */
     public function set_views_count(int $value) : void {
-      $this->views_count = $value;
+      $this->viewsCount = $value;
     }
 
     /**
@@ -75,7 +75,7 @@ namespace core\PHPLibrary {
      * @return int
      */
     public function get_views_count() : int {
-      return $this->views_count;
+      return $this->viewsCount;
     }
     
     /**
@@ -94,7 +94,7 @@ namespace core\PHPLibrary {
      * @return int
      */
     public function get_category_id() : int {
-      return $this->category_id;
+      return $this->categoryID;
     }
 
     /**
@@ -102,8 +102,8 @@ namespace core\PHPLibrary {
      * 
      * @return int
      */
-    public function get_created_unix_timestamp() : int|string {
-      return (property_exists($this, 'created_unix_timestamp')) ? $this->created_unix_timestamp : '';
+    public function get_created_unix_timestamp() : int {
+      return (property_exists($this, 'createdUnixTimestamp')) ? $this->createdUnixTimestamp : 0;
     }
 
     /**
@@ -111,8 +111,8 @@ namespace core\PHPLibrary {
      * 
      * @return int
      */
-    public function get_updated_unix_timestamp() : int|string {
-      return (property_exists($this, 'updated_unix_timestamp')) ? $this->updated_unix_timestamp : '';
+    public function get_updated_unix_timestamp() : int {
+      return (property_exists($this, 'updatedUnixTimestamp')) ? $this->updatedUnixTimestamp : 0;
     }
 
     /**
@@ -120,25 +120,25 @@ namespace core\PHPLibrary {
      * 
      * @return int
      */
-    public function get_author_id() : int|string {
-      return (property_exists($this, 'author_id')) ? $this->author_id : 0;
+    public function get_author_id() : int {
+      return (property_exists($this, 'authorID')) ? $this->author_id : 0;
     }
 
     /**
      * Получить объект категории записи
      * 
-     * @param array $init_data
+     * @param array $data
      * 
      * @return EntryCategory
      */
-    public function get_category(array $init_data = ['*']) : EntryCategory|null {
-      $entry_category_id = $this->get_category_id();
+    public function get_category(array $data = ['*']) : EntryCategory|null {
+      $categoryID = $this->get_category_id();
 
-      if (EntryCategory::exists_by_id($this->system_core, $entry_category_id)) {
-        $entry_category = new EntryCategory($this->system_core, $entry_category_id);
-        $entry_category->init_data($init_data);
+      if (EntryCategory::exists_by_id($this->CMSCore, $categoryID)) {
+        $category = new EntryCategory($this->CMSCore, $categoryID);
+        $category->init_data($data);
 
-        return $entry_category;
+        return $category;
       }
 
       return null;
@@ -147,18 +147,18 @@ namespace core\PHPLibrary {
     /**
      * Получить объект автора записи
      * 
-     * @param array $init_data
+     * @param array $data
      * 
      * @return User
      */
-    public function get_author(array $init_data = ['*']) : User|null {
-      $entry_author_id = $this->get_author_id();
+    public function get_author(array $data = ['*']) : User|null {
+      $authorID = $this->get_author_id();
 
-      if (User::exists_by_id($this->system_core, $entry_author_id)) {
-        $entry_user = new User($this->system_core, $entry_author_id);
-        $entry_user->init_data($init_data);
+      if (User::exists_by_id($this->CMSCore, $authorID)) {
+        $user = new User($this->CMSCore, $authorID);
+        $user->init_data($data);
 
-        return $entry_user;
+        return $user;
       }
 
       return null;
@@ -167,14 +167,14 @@ namespace core\PHPLibrary {
     /**
      * Получить заголовок записи
      *
-     * @param  mixed $locale_name Наименование локализации
+     * @param  mixed $localeName Наименование локализации
      * @return string
      */
-    public function get_title($locale_name = 'en_US') : string {
+    public function get_title($localeName = 'en_US') : string {
       if (property_exists($this, 'texts')) {
-        $texts_array = json_decode($this->texts, true);
-        if (isset($texts_array[$locale_name]['title'])) {
-          return $texts_array[$locale_name]['title'];
+        $texts = json_decode($this->texts, true);
+        if (isset($texts[$localeName]['title'])) {
+          return $texts[$localeName]['title'];
         }
       }
 
@@ -184,14 +184,14 @@ namespace core\PHPLibrary {
     /**
      * Получить описание записи
      *
-     * @param  mixed $locale_name Наименование локализации
+     * @param  mixed $localeName Наименование локализации
      * @return string
      */
-    public function get_description($locale_name = 'en_US') : string {
+    public function get_description($localeName = 'en_US') : string {
       if (property_exists($this, 'texts')) {
-        $texts_array = json_decode($this->texts, true);
-        if (isset($texts_array[$locale_name]['description'])) {
-          return $texts_array[$locale_name]['description'];
+        $texts = json_decode($this->texts, true);
+        if (isset($texts[$localeName]['description'])) {
+          return $texts[$localeName]['description'];
         }
       }
 
@@ -201,14 +201,14 @@ namespace core\PHPLibrary {
     /**
      * Получить содержимое записи
      *
-     * @param  mixed $locale_name Наименование локализации
+     * @param  mixed $localeName Наименование локализации
      * @return string
      */
-    public function get_content($locale_name = 'en_US') : string {
+    public function get_content($localeName = 'en_US') : string {
       if (property_exists($this, 'texts')) {
-        $texts_array = json_decode($this->texts, true);
-        if (isset($texts_array[$locale_name]['content'])) {
-          return $texts_array[$locale_name]['content'];
+        $texts = json_decode($this->texts, true);
+        if (isset($texts[$localeName]['content'])) {
+          return $texts[$localeName]['content'];
         }
       }
 
@@ -218,14 +218,14 @@ namespace core\PHPLibrary {
     /**
      * Получить ключевые слова
      *
-     * @param  mixed $locale_name Наименование локализации
+     * @param  mixed $localeName Наименование локализации
      * @return array
      */
-    public function get_keywords($locale_name = 'en_US') : array {
+    public function get_keywords($localeName = 'en_US') : array {
       if (property_exists($this, 'texts')) {
-        $texts_array = json_decode($this->texts, true);
-        if (isset($texts_array[$locale_name]['keywords'])) {
-          return $texts_array[$locale_name]['keywords'];
+        $texts = json_decode($this->texts, true);
+        if (isset($texts[$localeName]['keywords'])) {
+          return $texts[$localeName]['keywords'];
         }
       }
 
@@ -239,9 +239,9 @@ namespace core\PHPLibrary {
      */
     public function get_preview_url() : string {
       if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['preview_url'])) {
-          return $metadata_array['preview_url'];
+        $metadata = json_decode($this->metadata, true);
+        if (isset($metadata['previewURL'])) {
+          return $metadata['previewURL'];
         }
       }
 
@@ -255,9 +255,9 @@ namespace core\PHPLibrary {
      */
     public function is_published() : bool {
       if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['is_published'])) {
-          return (bool)$metadata_array['is_published'];
+        $metadata = json_decode($this->metadata, true);
+        if (isset($metadata['isPublished'])) {
+          return (bool)$metadata['isPublished'];
         }
       }
 
@@ -271,9 +271,9 @@ namespace core\PHPLibrary {
      */
     public function get_published_unix_timestamp() : int {
       if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['publishedUnixTimestamp'])) {
-          return $metadata_array['publishedUnixTimestamp'];
+        $metadata = json_decode($this->metadata, true);
+        if (isset($metadata['publishedUnixTimestamp'])) {
+          return $metadata['publishedUnixTimestamp'];
         }
       }
 
@@ -283,17 +283,17 @@ namespace core\PHPLibrary {
     /**
      * Получить данные по дополнительному полю
      * 
-     * @param string $field_name
+     * @param string $fieldName
      * 
      * @return mixed
      */
-    public function get_additional_field_data(string $field_name) : mixed {
+    public function get_additional_field_data(string $fieldName) : mixed {
       if (property_exists($this, 'metadata')) {
         /** @var array Массив метаданных */
-        $metadata_array = json_decode($this->metadata, true);
+        $metadata = json_decode($this->metadata, true);
         
-        if (isset($metadata_array['additionalFields'])) {
-          return (isset($metadata_array['additionalFields'][$field_name])) ? $metadata_array['additionalFields'][$field_name] : null;
+        if (isset($metadata['additionalFields'])) {
+          return (isset($metadata['additionalFields'][$fieldName])) ? $metadata['additionalFields'][$fieldName] : null;
         }
       }
 
@@ -308,9 +308,9 @@ namespace core\PHPLibrary {
     public function get_additional_fields_data() : array {
       if (property_exists($this, 'metadata')) {
         /** @var array Массив метаданных */
-        $metadata_array = json_decode($this->metadata, true);
+        $metadata = json_decode($this->metadata, true);
         
-        return (isset($metadata_array['additionalFields'])) ? $metadata_array['additionalFields'] : [];
+        return (isset($metadata['additionalFields'])) ? $metadata['additionalFields'] : [];
       }
 
       return [];
@@ -319,13 +319,13 @@ namespace core\PHPLibrary {
     /**
      * Получить URL дефолтной заставки
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * @param int $size
      * 
      * @return string
      */
-    public static function get_preview_default_url(SystemCore $system_core, int $size) : string {
-      return sprintf('/%s/images/entry/default_%d.png', $system_core->template->get_url(), $size);
+    public static function get_preview_default_url(SystemCore $CMSCore, int $size) : string {
+      return '/' . $CMSCore->template->get_url() . '/images/entry/default_' . (string)$size . '.png';
     }
     
     /**
@@ -333,7 +333,7 @@ namespace core\PHPLibrary {
      *
      * @return void
      */
-    public function get_name() {
+    public function get_name() : string {
       return (property_exists($this, 'name')) ? $this->name : '';
     }
     
@@ -342,8 +342,8 @@ namespace core\PHPLibrary {
      *
      * @return void
      */
-    public function get_url() {
-      return sprintf('/entry/%s', $this->get_name());
+    public function get_url() : string {
+      return '/entry/' . $this->get_name();
     }
     
     /**
@@ -353,39 +353,39 @@ namespace core\PHPLibrary {
      * @return void
      */
     private function get_database_columns_data(array $columns = ['*']) : array|null {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections($columns);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections($columns);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('entries');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
       
-      /** @var int $entry_id Идентификационный номер записи */
-      $entry_id = $this->get_id();
+      /** @var int $entryID Идентификационный номер записи */
+      $entryID = $this->get_id();
 
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':id', $entry_id, \PDO::PARAM_INT);
-			$database_query->execute();
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $entryID, \PDO::PARAM_INT);
+			$databaseQuery->execute();
 
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
       return ($result) ? $result : null;
     }
     
     /**
      * Получить массив объектов комментариев
      *
-     * @param array $params_array
+     * @param array $params
      * @return array
      */
-    public function get_comments($params_array = []) : array {
+    public function get_comments($params = []) : array {
       if ($this->get_comments_count() > 0) {
-        $entry_comments = new EntryComments($this->system_core);
-        return $entry_comments->get_by_entry_id($this->id, $params_array);
+        $comments = new EntryComments($this->CMSCore);
+        return $comments->get_by_entry_id($this->id, $params);
       }
 
       return [];
@@ -397,8 +397,8 @@ namespace core\PHPLibrary {
      * @return int
      */
     public function get_comments_count() : int {
-      $entry_comments = new EntryComments($this->system_core);
-      return $entry_comments->get_count_by_entry_id($this->id);
+      $comments = new EntryComments($this->CMSCore);
+      return $comments->get_count_by_entry_id($this->id);
     }
 
     /**
@@ -407,37 +407,37 @@ namespace core\PHPLibrary {
      * @return float
      */
     public function get_relevance_points() : float {
-      $views_count = $this->get_views_count();
-      $comments_count = $this->get_comments_count();
+      $viewsCount = $this->get_views_count();
+      $commentsCount = $this->get_comments_count();
 
-      return ($views_count * 0.5) + ($comments_count * 2);
+      return ($viewsCount * 0.5) + ($commentsCount * 2);
     }
     
     /**
      * Получить объект записи по его наименованию
      *
-     * @param  mixed $system_core
-     * @param  mixed $entry_name
+     * @param  mixed $CMSCore
+     * @param  mixed $name
      * @return Entry
      */
-    public static function get_by_name(SystemCore $system_core, string $entry_name) : Entry|null {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('name = :name');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function get_by_name(SystemCore $CMSCore, string $name) : Entry|null {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['id']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('entries');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('name = :name');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':name', $entry_name, \PDO::PARAM_STR);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -447,35 +447,35 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-      return ($result) ? new Entry($system_core, (int)$result['id']) : null;
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+      return ($result) ? new Entry($CMSCore, (int)$result['id']) : null;
     }
 
     /**
      * Проверка наличия записи
      *
-     * @param  mixed $system_core
-     * @param  mixed $entry_name
+     * @param  mixed $CMSCore
+     * @param  mixed $name
      * @return Entry
      */
-    public static function exists_by_name(SystemCore $system_core, string $entry_name) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['1']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('name = :name');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function exists_by_name(SystemCore $CMSCore, string $name) : bool {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['1']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('entries');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('name = :name');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':name', $entry_name, \PDO::PARAM_STR);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -485,34 +485,34 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      return ($database_query->fetchColumn()) ? true : false;
+      return ($databaseQuery->fetchColumn()) ? true : false;
     }
 
     /**
      * Проверка наличия записи по идентификационному номеру
      *
-     * @param  SystemCore $system_core
+     * @param  SystemCore $CMSCore
      * @param  int $id
      * @return bool
      */
-    public static function exists_by_id(SystemCore $system_core, int $id) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['1']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
+    public static function exists_by_id(SystemCore $CMSCore, int $id) : bool {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_select();
+      $queryBuilder->statement->add_selections(['1']);
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('entries');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->set_clause_limit(1);
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $id, \PDO::PARAM_INT);
-        $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':id', $id, \PDO::PARAM_INT);
+        $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -522,7 +522,7 @@ namespace core\PHPLibrary {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
 
-      return ($database_query->fetchColumn()) ? true : false;
+      return ($databaseQuery->fetchColumn()) ? true : false;
     }
     
     /**
@@ -531,21 +531,21 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function delete() : bool {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_delete();
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_delete();
+      $queryBuilder->statement->set_clause_from();
+      $queryBuilder->statement->clauseFrom->add_table('entries');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
 
       try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-			  $execute = $database_query->execute();
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+			  $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -561,48 +561,48 @@ namespace core\PHPLibrary {
     /**
      * Создание новой записи
      *
-     * @param  mixed $system_core
+     * @param  mixed $CMSCore
      * @param  mixed $name
-     * @param  mixed $author_id
-     * @param  mixed $category_id
+     * @param  mixed $authorID
+     * @param  mixed $categoryID
      * @param  mixed $texts
      * @return Entry
      */
-    public static function create(SystemCore $system_core, string $name, int $author_id, int $category_id, array $texts, array $metadata = []) : Entry|null {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_insert();
-      $query_builder->statement->set_table('entries');
-      $query_builder->statement->add_column('author_id');
-      $query_builder->statement->add_column('category_id');
-      $query_builder->statement->add_column('name');
-      $query_builder->statement->add_column('texts');
-      $query_builder->statement->add_column('metadata');
-      $query_builder->statement->add_column('created_unix_timestamp');
-      $query_builder->statement->add_column('updated_unix_timestamp');
-      $query_builder->statement->set_clause_returning();
-      $query_builder->statement->clause_returning->add_column('id');
-      $query_builder->statement->assembly();
+    public static function create(SystemCore $CMSCore, string $name, int $authorID, int $categoryID, array $texts, array $metadata = []) : Entry|null {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder->set_statement_insert();
+      $queryBuilder->statement->set_table('entries');
+      $queryBuilder->statement->add_column('authorID');
+      $queryBuilder->statement->add_column('categoryID');
+      $queryBuilder->statement->add_column('name');
+      $queryBuilder->statement->add_column('texts');
+      $queryBuilder->statement->add_column('metadata');
+      $queryBuilder->statement->add_column('createdUnixTimestamp');
+      $queryBuilder->statement->add_column('updatedUnixTimestamp');
+      $queryBuilder->statement->set_clause_returning();
+      $queryBuilder->statement->clauseReturning->add_column('id');
+      $queryBuilder->statement->assembly();
 
-      $entry_created_unix_timestamp = time();
-      $entry_updated_unix_timestamp = $entry_created_unix_timestamp;
+      $createdUnixTimestamp = time();
+      $updatedUnixTimestamp = $createdUnixTimestamp;
 
-      $metadata['preview_url'] = '';
-      $metadata['is_publish'] = false;
+      $metadata['previewURL'] = '';
+      $metadata['isPublished'] = false;
 
-      $texts_json = json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-      $metadata_json = json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      $texts = json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      $metadata = json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
       try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':author_id', $author_id, \PDO::PARAM_INT);
-        $database_query->bindParam(':category_id', $category_id, \PDO::PARAM_INT);
-        $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
-        $database_query->bindParam(':texts', $texts_json, \PDO::PARAM_STR);
-        $database_query->bindParam(':metadata', $metadata_json, \PDO::PARAM_STR);
-        $database_query->bindParam(':created_unix_timestamp', $entry_created_unix_timestamp, \PDO::PARAM_INT);
-        $database_query->bindParam(':updated_unix_timestamp', $entry_updated_unix_timestamp, \PDO::PARAM_INT);
-        $execute = $database_query->execute();
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->bindParam(':authorID', $authorID, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':categoryID', $categoryID, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
+        $databaseQuery->bindParam(':texts', $texts, \PDO::PARAM_STR);
+        $databaseQuery->bindParam(':metadata', $metadata, \PDO::PARAM_STR);
+        $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+        $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),
@@ -613,8 +613,8 @@ namespace core\PHPLibrary {
       }
 
       if ($execute) {
-        $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-        return ($result) ? FactoryContent::create($system_core, 'entry', [
+        $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+        return ($result) ? FactoryContent::create($CMSCore, 'entry', [
           'id' => $result['id']
         ]) : null;
       }
@@ -629,71 +629,71 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function update(array $data) : bool {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_update();
-      $query_builder->statement->set_table('entries');
-      $query_builder->statement->set_clause_set();
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+      $queryBuilder->set_statement_update();
+      $queryBuilder->statement->set_table('entries');
+      $queryBuilder->statement->set_clause_set();
       
-      foreach ($data as $data_name => $data_value) {
-        if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'texts', 'metadata'])) {
-          $query_builder->statement->clause_set->add_column($data_name);
+      foreach ($data as $name => $value) {
+        if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata'])) {
+          $queryBuilder->statement->clauseSet->add_column($name);
         }
       }
 
       if (array_key_exists('texts', $data)) {
-        $json_fields = [];
+        $fieldsJSON = [];
 
         foreach ($data['texts'] as $name => $value) {
-          array_push($json_fields, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
+          array_push($fieldsJSON, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
         }
 
         if (!empty($data['texts'])) {
-          $query_builder->statement->clause_set->add_column('texts', 'texts::jsonb || ' . implode(' || ', $json_fields));
+          $queryBuilder->statement->clauseSet->add_column('texts', 'texts::jsonb || ' . implode(' || ', $fieldsJSON));
         }
       }
 
       if (array_key_exists('metadata', $data)) {
-        $json_fields = [];
+        $fieldsJSON = [];
 
         foreach ($data['metadata'] as $name => $value) {
-          array_push($json_fields, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
+          array_push($fieldsJSON, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
         }
 
         if (!empty($data['metadata'])) {
-          $query_builder->statement->clause_set->add_column('metadata', 'metadata::jsonb || ' . implode(' || ', $json_fields));
+          $queryBuilder->statement->clauseSet->add_column('metadata', 'metadata::jsonb || ' . implode(' || ', $fieldsJSON));
         }
       }
 
-      $query_builder->statement->clause_set->add_column('updated_unix_timestamp');
-      $query_builder->statement->clause_set->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+      $queryBuilder->statement->clauseSet->add_column('updatedUnixTimestamp');
+      $queryBuilder->statement->clauseSet->assembly();
+      $queryBuilder->statement->set_clause_where();
+      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
 
-      /** @var int $entry_updated_unix_timestamp Текущее время в UNIX-формате */
-      $entry_updated_unix_timestamp = time();
+      /** @var int $updatedUnixTimestamp Текущее время в UNIX-формате */
+      $updatedUnixTimestamp = time();
 
       try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
         
-        foreach ($data as $data_name => $data_value) {
-          if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'texts', 'metadata'])) {
-            switch (gettype($data_value)) {
-              case 'boolean': $data_value_type = \PDO::PARAM_BOOL; break;
-              case 'integer': $data_value_type = \PDO::PARAM_INT; break;
-              case 'string': $data_value_type = \PDO::PARAM_STR; break;
-              case 'null': $data_value_type = \PDO::PARAM_NULL; break;
+        foreach ($data as $name => $value) {
+          if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata'])) {
+            switch (gettype($value)) {
+              case 'boolean': $valueType = \PDO::PARAM_BOOL; break;
+              case 'integer': $valueType = \PDO::PARAM_INT; break;
+              case 'string': $valueType = \PDO::PARAM_STR; break;
+              case 'null': $valueType = \PDO::PARAM_NULL; break;
             }
 
-            $database_query->bindParam(':' . $data_name, $data[$data_name], $data_value_type);
+            $databaseQuery->bindParam(':' . $name, $data[$name], $valueType);
           }
         }
 
-        $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-        $database_query->bindParam(':updated_unix_timestamp', $entry_updated_unix_timestamp, \PDO::PARAM_INT);
-        $execute = $database_query->execute();
+        $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+        $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+        $execute = $databaseQuery->execute();
       } catch (PDOException $exception) {
         die(json_encode([
           'message' => $exception->getMessage(),

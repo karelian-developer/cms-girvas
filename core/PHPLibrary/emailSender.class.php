@@ -10,9 +10,9 @@
 
 namespace core\PHPLibrary {
   class EmailSender {
-    private readonly SystemCore $system_core;
-    private array $from_user = [];
-    private string $to_user_email = '';
+    private readonly SystemCore $CMSCore;
+    private array $fromUser = [];
+    private string $toUserEmail = '';
     private string $subject = '';
     private string $content = '';
     private array $headers = [];
@@ -20,23 +20,23 @@ namespace core\PHPLibrary {
     /**
      * __construct
      *
-     * @param  mixed $system_core
+     * @param  mixed $CMSCore
      * @return void
      */
-    public function __construct(SystemCore $system_core) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore) {
+      $this->CMSCore = $CMSCore;
     }
     
     /**
      * Назначить данные отправителя
      *
-     * @param  string $user_name
-     * @param  string $user_email
+     * @param  string $name
+     * @param  string $email
      * @return void
      */
-    public function set_from_user(string $user_name, string $user_email) : void {
-      $this->from_user['name'] = $user_name;
-      $this->from_user['email'] = $user_email;
+    public function set_from_user(string $name, string $email) : void {
+      $this->fromUser['name'] = $name;
+      $this->fromUser['email'] = $email;
     }
     
     /**
@@ -45,17 +45,17 @@ namespace core\PHPLibrary {
      * @return array
      */
     public function get_from_user() : array {
-      return $this->from_user;
+      return $this->fromUser;
     }
     
     /**
      * Назначить E-Mail получателя
      *
-     * @param  string $user_email
+     * @param  string $email
      * @return void
      */
-    public function set_to_user_email(string $user_email) : void {
-      $this->to_user_email = $user_email;
+    public function set_to_user_email(string $email) : void {
+      $this->toUserEmail = $email;
     }
     
     /**
@@ -64,7 +64,7 @@ namespace core\PHPLibrary {
      * @return array
      */
     public function get_to_user_email() : string {
-      return $this->to_user_email;
+      return $this->toUserEmail;
     }
     
     /**
@@ -130,7 +130,7 @@ namespace core\PHPLibrary {
      * @return bool
      */
     public function send() : bool {
-      $from_user = $this->get_from_user();
+      $fromUser = $this->get_from_user();
 
       return mail(
         $this->get_to_user_email(),
@@ -143,34 +143,34 @@ namespace core\PHPLibrary {
     /**
      * Получить доменное имя системного отправителя электронной почты
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * 
      * @return string
      */
-    public static function get_system_sender_domain(SystemCore $system_core) : string {
-      return ($system_core->configurator->exists('domain_email')) ? $system_core->configurator->get('domain_email') : 'example.ru';
+    public static function get_system_sender_domain(SystemCore $CMSCore) : string {
+      return ($CMSCore->configurator->exists('domainEmail')) ? $CMSCore->configurator->get('domainEmail') : 'example.ru';
     }
 
     /**
      * Получить E-Mail системного отправителя электронной почты
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * 
      * @return string
      */
-    public static function get_system_sender_email(SystemCore $system_core) : string {
-      $sender_name = EmailSender::get_system_sender_name($system_core);
-      return sprintf('%s@%s', $sender_name, EmailSender::get_system_sender_domain($system_core));
+    public static function get_system_sender_email(SystemCore $CMSCore) : string {
+      $sender_name = EmailSender::get_system_sender_name($CMSCore);
+      return $sender_name . '@' . EmailSender::get_system_sender_domain($CMSCore);
     }
 
     /**
      * Получить имя системного отправителя электронной почты
      * 
-     * @param SystemCore $system_core
+     * @param SystemCore $CMSCore
      * 
      * @return string
      */
-    public static function get_system_sender_name(SystemCore $system_core) : string {
+    public static function get_system_sender_name(SystemCore $CMSCore) : string {
       return 'no-reply';
     }
   }

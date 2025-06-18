@@ -86,8 +86,8 @@ namespace core\PHPLibrary\SystemCore {
     const HTTP_RESPONSE_CODE_LABEL_510 = '510 Not Extended';
     const HTTP_RESPONSE_CODE_LABEL_511 = '511 Network Authentication Required';
 
-    static public function add(EnumHeader $enum_header, mixed $value) : bool {
-      if ($enum_header === EnumHeader::HTTP_RESPONSE_CODE) {
+    static public function add(EnumHeader $enumHeader, mixed $value) : bool {
+      if ($enumHeader === EnumHeader::HTTP_RESPONSE_CODE) {
         if (is_numeric($value)) {
           $string = self::get_http_response_code_label($value);
 
@@ -98,14 +98,14 @@ namespace core\PHPLibrary\SystemCore {
         }
       }
 
-      if ($enum_header === EnumHeader::HTTP_LOCATION) {
+      if ($enumHeader === EnumHeader::HTTP_LOCATION) {
         if (filter_var($value, FILTER_VALIDATE_URL) !== false) {
           header(sprintf('Location: %s', $value));
           return true;
         }
       }
 
-      if ($enum_header === EnumHeader::HTTP_CONTENT_SECURITY_POLICY) {
+      if ($enumHeader === EnumHeader::HTTP_CONTENT_SECURITY_POLICY) {
         $string = '';
   
         if (is_string($value)) {
@@ -126,8 +126,8 @@ namespace core\PHPLibrary\SystemCore {
     }
 
     static public function get_http_response_code_label(int $code) : string {
-      $constant_name = sprintf('EnumHeader::HTTP_RESPONSE_CODE_LABEL_%d', $code);
-      return defined($constant_name) ? constant($constant_name) : '';
+      $constantName = sprintf('EnumHeader::HTTP_RESPONSE_CODE_LABEL_%d', $code);
+      return defined($constantName) ? constant($constantName) : '';
     }
   }
 }

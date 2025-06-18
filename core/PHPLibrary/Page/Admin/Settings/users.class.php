@@ -18,14 +18,14 @@ namespace core\PHPLibrary\Page\Admin\Settings {
   class SettingsUsers {
     const FORM_PATH = 'templates/page/settings';
 
-    public SystemCore $system_core;
+    public SystemCore $CMSCore;
     public string $title;
     public string $name;
     public string $description;
     public string $assembled = '';
 
-    public function __construct(SystemCore $system_core, string $name) {
-      $this->system_core = $system_core;
+    public function __construct(SystemCore $CMSCore, string $name) {
+      $this->CMSCore = $CMSCore;
       $this->name = $name;
     }
 
@@ -45,35 +45,35 @@ namespace core\PHPLibrary\Page\Admin\Settings {
       return $this->description;
     }
 
-    public function assembly(array $template_values = []) {
-      $form_template_path = sprintf('%s/%s.tpl', self::FORM_PATH, $this->name);
+    public function assembly(array $templateValues = []) {
+      $formTemplatePath = self::FORM_PATH . '/' . $this->name . '.tpl';
       
-      $setting_upload_avatar_status_value = $this->system_core->configurator->get_users_upload_avatar_status();
-      $setting_login_edit_status_value = $this->system_core->configurator->get_users_login_edit_status();
-      $setting_login_special_symbols_status_value = $this->system_core->configurator->get_users_login_special_symbols_status();
-      $setting_login_register_accounting_status_value = $this->system_core->configurator->get_users_login_register_accounting_status();
-      $setting_password_special_symbols_status_value = $this->system_core->configurator->get_users_password_special_symbols_status();
-      $setting_logins_blacklist_status_value = $this->system_core->configurator->get_users_logins_blacklist_status();
+      $settingUploadAvatarStatusValue = $this->CMSCore->configurator->get_users_upload_avatar_status();
+      $settingLoginEditStatusValue = $this->CMSCore->configurator->get_users_login_edit_status();
+      $settingLoginSpecialSymbolsStatusValue = $this->CMSCore->configurator->get_users_login_special_symbols_status();
+      $settingLoginRegisterAccountingStatusValue = $this->CMSCore->configurator->get_users_login_register_accounting_status();
+      $settingPasswordSpecialSymbolsStatusValue = $this->CMSCore->configurator->get_users_password_special_symbols_status();
+      $settingLoginsBlacklistStatusValue = $this->CMSCore->configurator->get_users_logins_blacklist_status();
 
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, $form_template_path, [
+      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, $formTemplatePath, [
         'SETTINGS_NAME' => $this->name,
-        'SETTING_USERS_UPLOAD_AVATAR_STATUS_VALUE' => $setting_upload_avatar_status_value,
-        'SETTING_USERS_UPLOAD_AVATAR_CHECKED_VALUE' => ($setting_upload_avatar_status_value == 'on') ? 'checked' : '',
-        'SETTING_LOGIN_LENGTH_MIN_VALUE' => $this->system_core->configurator->get_users_login_length_min(),
-        'SETTING_LOGIN_LENGTH_MAX_VALUE' => $this->system_core->configurator->get_users_login_length_max(),
-        'SETTING_USERS_LOGIN_EDIT_STATUS_VALUE' => $setting_login_edit_status_value,
-        'SETTING_USERS_LOGIN_EDIT_CHECKED_VALUE' => ($setting_login_edit_status_value == 'on') ? 'checked' : '',
-        'SETTING_USERS_LOGIN_SPECIAL_SYMBOLS_STATUS_VALUE' => $setting_login_special_symbols_status_value,
-        'SETTING_USERS_LOGIN_SPECIAL_SYMBOLS_CHECKED_VALUE' => ($setting_login_special_symbols_status_value == 'on') ? 'checked' : '',
-        'SETTING_USERS_LOGIN_REGISTER_ACCOUNTING_STATUS_VALUE' => $setting_login_register_accounting_status_value,
-        'SETTING_USERS_LOGIN_REGISTER_ACCOUNTING_CHECKED_VALUE' => ($setting_login_register_accounting_status_value == 'on') ? 'checked' : '',
-        'SETTING_PASSWORD_LENGTH_MIN_VALUE' => $this->system_core->configurator->get_users_password_length_min(),
-        'SETTING_PASSWORD_LENGTH_MAX_VALUE' => $this->system_core->configurator->get_users_password_length_max(),
-        'SETTING_USERS_PASSWORD_SPECIAL_SYMBOLS_STATUS_VALUE' => $setting_password_special_symbols_status_value,
-        'SETTING_USERS_PASSWORD_SPECIAL_SYMBOLS_CHECKED_VALUE' => ($setting_password_special_symbols_status_value == 'on') ? 'checked' : '',
-        'SETTING_USERS_LOGINS_BLACKLIST_STATUS_VALUE' => $setting_logins_blacklist_status_value,
-        'SETTING_USERS_LOGINS_BLACKLIST_CHECKED_VALUE' => ($setting_logins_blacklist_status_value == 'on') ? 'checked' : '',
-        'SETTING_LOGINS_BLACKLIST_VALUE' => $this->system_core->configurator->get_users_logins_blacklist()
+        'SETTING_USERS_UPLOAD_AVATAR_STATUS_VALUE' => $settingUploadAvatarStatusValue,
+        'SETTING_USERS_UPLOAD_AVATAR_CHECKED_VALUE' => $settingUploadAvatarStatusValue === 'on' ? 'checked' : '',
+        'SETTING_LOGIN_LENGTH_MIN_VALUE' => $this->CMSCore->configurator->get_users_login_length_min(),
+        'SETTING_LOGIN_LENGTH_MAX_VALUE' => $this->CMSCore->configurator->get_users_login_length_max(),
+        'SETTING_USERS_LOGIN_EDIT_STATUS_VALUE' => $settingLoginEditStatusValue,
+        'SETTING_USERS_LOGIN_EDIT_CHECKED_VALUE' => $settingLoginEditStatusValue === 'on' ? 'checked' : '',
+        'SETTING_USERS_LOGIN_SPECIAL_SYMBOLS_STATUS_VALUE' => $settingLoginSpecialSymbolsStatusValue,
+        'SETTING_USERS_LOGIN_SPECIAL_SYMBOLS_CHECKED_VALUE' => $settingLoginSpecialSymbolsStatusValue === 'on' ? 'checked' : '',
+        'SETTING_USERS_LOGIN_REGISTER_ACCOUNTING_STATUS_VALUE' => $settingLoginRegisterAccountingStatusValue,
+        'SETTING_USERS_LOGIN_REGISTER_ACCOUNTING_CHECKED_VALUE' => $settingLoginRegisterAccountingStatusValue === 'on' ? 'checked' : '',
+        'SETTING_PASSWORD_LENGTH_MIN_VALUE' => $this->CMSCore->configurator->get_users_password_length_min(),
+        'SETTING_PASSWORD_LENGTH_MAX_VALUE' => $this->CMSCore->configurator->get_users_password_length_max(),
+        'SETTING_USERS_PASSWORD_SPECIAL_SYMBOLS_STATUS_VALUE' => $settingPasswordSpecialSymbolsStatusValue,
+        'SETTING_USERS_PASSWORD_SPECIAL_SYMBOLS_CHECKED_VALUE' => $settingPasswordSpecialSymbolsStatusValue === 'on' ? 'checked' : '',
+        'SETTING_USERS_LOGINS_BLACKLIST_STATUS_VALUE' => $settingLoginsBlacklistStatusValue,
+        'SETTING_USERS_LOGINS_BLACKLIST_CHECKED_VALUE' => $settingLoginsBlacklistStatusValue === 'on' ? 'checked' : '',
+        'SETTING_LOGINS_BLACKLIST_VALUE' => $this->CMSCore->configurator->get_users_logins_blacklist()
       ]);
     }
 

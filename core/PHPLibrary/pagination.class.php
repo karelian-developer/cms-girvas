@@ -60,7 +60,7 @@ namespace core\PHPLibrary {
 
       $ulElement = $DOMDocument->createElement('ul');
       $ulElement->setAttribute('class', 'pagination-list list-reset');
-
+      
       if ($this->itemCurrent > 0) {
         for ($itemIndex = 0; $itemIndex < 2; $itemIndex++) {
           $pageNumber = $itemIndex === 0 ? 0 : $this->itemCurrent - 1;
@@ -112,8 +112,6 @@ namespace core\PHPLibrary {
 
       $this->assembled = $DOMDocument->saveHTML();
     }
-
   }
-
 }
 ?>
