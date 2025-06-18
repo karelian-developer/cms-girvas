@@ -43,7 +43,7 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementDelete {
      * @return void
      */
     public function assembly() {
-      if ($this->condition != '') {
+      if ($this->condition !== '') {
         $this->assembled = sprintf('WHERE %s', $this->condition);
       } else {
         $this->assembled = '';

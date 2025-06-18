@@ -46,7 +46,7 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementDelete {
     public function assembly() {
       $queryArray = [];
 
-      $databaseConfigurations = $this->statement->query_builder->system_core->configurator->get('database');
+      $databaseConfigurations = $this->statement->queryBuilder->CMSCore->configurator->get('database');
 
       foreach ($this->tables as $table) {
         $tableFullname = '';

@@ -57,12 +57,12 @@ namespace core\PHPLibrary\Database\QueryBuilder {
     public function assembly() : void {
       $queryArray = [];
 
-      if (!is_null($this->clauseFrom)) {
+      if ($this->clauseFrom !== null) {
         $this->clauseFrom->assembly();
         array_push($queryArray, $this->clauseFrom->assembled);
       }
 
-      if (!is_null($this->clauseWhere)) {
+      if ($this->clauseWhere !== null) {
         $this->clauseWhere->assembly();
         array_push($queryArray, $this->clauseWhere->assembled);
       }
