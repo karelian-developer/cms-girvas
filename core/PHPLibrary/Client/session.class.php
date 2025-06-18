@@ -176,7 +176,7 @@ namespace core\PHPLibrary\Client {
       return $result ? new Session($CMSCore, $result['id']) : null;
     }
 
-    public static function get_by_ip_and_userID(SystemCore $CMSCore, string $userIP, int $userID, int $typeID) : Session|null {
+    public static function get_by_ip_and_user_id(SystemCore $CMSCore, string $userIP, int $userID, int $typeID) : Session|null {
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
       $queryBuilder->set_statement_select();
       $queryBuilder->statement->add_selections(['id']);
@@ -230,7 +230,7 @@ namespace core\PHPLibrary\Client {
      * @param  mixed $userIP
      * @return void
      */
-    public static function exists_by_ip_and_userID(SystemCore $CMSCore, string $userIP, int $userID, int $typeID) : bool {
+    public static function exists_by_ip_and_user_id(SystemCore $CMSCore, string $userIP, int $userID, int $typeID) : bool {
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
       $queryBuilder->set_statement_select();
       $queryBuilder->statement->add_selections(['1']);
