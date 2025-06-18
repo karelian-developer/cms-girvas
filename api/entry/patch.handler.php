@@ -47,7 +47,7 @@ if ($CMSCore->client->is_logged(2)) {
               $textareaDescriptionName = 'entries_category_description_' . $CMSLocale->get_iso_639_2();
 
               if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH)) {
-                if (!array_key_exists('texts', $entriesCategoryData)) {$entriesCategoryData['texts'] = [];
+                if (!array_key_exists('texts', $entriesCategoryData)) $entriesCategoryData['texts'] = [];
                 if (!array_key_exists($CMSLocaleName, $entriesCategoryData['texts'])) $entriesCategoryData['texts'][$CMSLocaleName] = [];
 
                 if (array_key_exists($inputTitleName, $_PATCH)) {
