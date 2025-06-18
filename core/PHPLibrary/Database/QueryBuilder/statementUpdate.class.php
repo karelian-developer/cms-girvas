@@ -18,7 +18,7 @@ namespace core\PHPLibrary\Database\QueryBuilder {
     public QueryBuilder $queryBuilder;
     private array $columns = [];
     public ClauseSet|null $clauseSet = null;
-    public ClauseWhere|null $clause_where = null;
+    public ClauseWhere|null $clauseWhere = null;
     public string $tableName = '';
     public string $tablePrefix = '';
     public string $assembled = '';
@@ -72,14 +72,14 @@ namespace core\PHPLibrary\Database\QueryBuilder {
       $databaseConfigurations = $this->queryBuilder->CMSCore->configurator->get('database');
       
       $tableFullname = '';
-      if (!is_null($databaseConfigurations)) {
-        if ($databaseConfigurations['scheme'] != '') {
-          $tableFullname .= sprintf('%s.', $databaseConfigurations['scheme']);
+      if ($databaseConfigurations !== null) {
+        if ($databaseConfigurations['scheme'] !== '') {
+          $tableFullname .= $databaseConfigurations['scheme'] . '.';
         }
 
-        if ($databaseConfigurations['prefix'] != '' || $this->tablePrefix != '') {
-          $tablePrefix = ($this->tablePrefix == '') ? $databaseConfigurations['prefix'] : $this->tablePrefix;
-          $tableFullname .= sprintf('%s_', $tablePrefix);
+        if ($databaseConfigurations['prefix'] !== '' || $this->tablePrefix !== '') {
+          $tablePrefix = $this->tablePrefix === '' ? $databaseConfigurations['prefix'] : $this->tablePrefix;
+          $tableFullname .= $tablePrefix . '_';
         }
       }
 
@@ -96,12 +96,12 @@ namespace core\PHPLibrary\Database\QueryBuilder {
     public function assembly() : void {
       $queryArray = [];
 
-      if (!is_null($this->clauseSet)) {
+      if ($this->clauseSet !== null) {
         $this->clauseSet->assembly();
         array_push($queryArray, $this->clauseSet->assembled);
       }
 
-      if (!is_null($this->clauseWhere)) {
+      if ($this->clauseWhere !== null) {
         $this->clauseWhere->assembly();
         array_push($queryArray, $this->clauseWhere->assembled);
       }
