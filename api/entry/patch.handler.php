@@ -39,8 +39,8 @@ if ($CMSCore->client->is_logged(2)) {
 
           $CMSLocalesNames = $CMSCore->get_array_locales_names();
           if (count($CMSLocalesNames) > 0) {
-            foreach ($CMSLocalesNames as $index => $CMSLocale_name) {
-              $CMSLocale = new Locale($CMSCore, $CMSLocale_name);
+            foreach ($CMSLocalesNames as $index => $CMSLocaleName) {
+              $CMSLocale = new Locale($CMSCore, $CMSLocaleName);
               $CMSLocaleName = $CMSLocale->get_name();
 
               $inputTitleName = 'entries_category_title_' . $CMSLocale->get_iso_639_2();
@@ -112,8 +112,8 @@ if ($CMSCore->client->is_logged(2)) {
 
           $CMSLocalesNames = $CMSCore->get_array_locales_names();
           if (count($CMSLocalesNames) > 0) {
-            foreach ($CMSLocalesNames as $index => $CMSLocale_name) {
-              $CMSLocale = new Locale($CMSCore, $CMSLocale_name);
+            foreach ($CMSLocalesNames as $index => $CMSLocaleName) {
+              $CMSLocale = new Locale($CMSCore, $CMSLocaleName);
               $CMSLocaleName = $CMSLocale->get_name();
 
               $inputTitleName = 'entry_title_' . $CMSLocale->get_iso_639_2();

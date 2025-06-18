@@ -43,12 +43,12 @@ if (is_numeric($CMSCore->urlp->get_path(2))) {
 
       if (isset($_GET['parentID'])) {
         if (is_numeric($_GET['parentID'])) {
-          $commentsParamsData['parent_id'] = (int) $_GET['parentID'];
+          $commentsParamsData['parentID'] = (int) $_GET['parentID'];
         }
       }
 
-      if (!isset($commentsParamsData['parent_id'])) {
-        $commentsParamsData['parent_id'] = 0;
+      if (!isset($commentsParamsData['parentID'])) {
+        $commentsParamsData['parentID'] = 0;
       }
       
       $entryComments = $entry->get_comments($commentsParamsData);

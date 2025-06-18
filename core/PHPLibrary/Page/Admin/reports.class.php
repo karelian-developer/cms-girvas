@@ -79,7 +79,7 @@ namespace core\PHPLibrary\Page\Admin {
       ], ['limit' => 50]);
 
       foreach ($reportsSecurity as $report) {
-        $report->init_data(['metadata', 'variables', 'created_unix_timestamp']);
+        $report->init_data(['metadata', 'variables', 'createdUnixTimestamp']);
         
         $reportCategoryName = 'security';
         $reportVariables = $report->get_variables();
@@ -96,7 +96,7 @@ namespace core\PHPLibrary\Page\Admin {
       }
 
       foreach ($reportsCommon as $report) {
-        $report->init_data(['metadata', 'variables', 'created_unix_timestamp']);
+        $report->init_data(['metadata', 'variables', 'createdUnixTimestamp']);
 
         $reportCategoryName = 'common';
         $reportVariables = $report->get_variables();
