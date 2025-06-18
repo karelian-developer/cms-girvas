@@ -342,7 +342,7 @@ namespace core\PHPLibrary\Metrics {
       $queryBuilder->statement->clauseFrom->add_table('metrics');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
       

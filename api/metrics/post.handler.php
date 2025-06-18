@@ -55,14 +55,14 @@ if (array_key_exists('Metrics-Token', $handlerHeaders)) {
         'ip' => $clientIP,
         'time' => $metricsTimestamp,
         'URLTransfers' => $metricsDataSort['metrics']['views'][$metricsToken]['URLTransfers'],
-        'URLs' => $metricsDataSort['metrics']['views'][$metricsToken]['URLs']
+        'urls' => $metricsDataSort['metrics']['views'][$metricsToken]['urls']
       ];
 
-      if (array_key_exists($metricsCurrentURL, $metricsDataSort['metrics']['views'][$metricsToken]['URLs'])) {
-        $URLValue = $metricsDataSort['metrics']['views'][$metricsToken]['URLs'][$metricsCurrentURL];
-        $metricsDataSort['metrics']['views'][$metricsToken]['URLs'][$metricsCurrentURL] = $URLValue + 1;
+      if (array_key_exists($metricsCurrentURL, $metricsDataSort['metrics']['views'][$metricsToken]['urls'])) {
+        $URLValue = $metricsDataSort['metrics']['views'][$metricsToken]['urls'][$metricsCurrentURL];
+        $metricsDataSort['metrics']['views'][$metricsToken]['urls'][$metricsCurrentURL] = $URLValue + 1;
       } else {
-        $metricsDataSort['metrics']['views'][$metricsToken]['URLs'][$metricsCurrentURL] = 1;
+        $metricsDataSort['metrics']['views'][$metricsToken]['urls'][$metricsCurrentURL] = 1;
       }
     } else {
       $metricsDataSort['metrics']['time'] = $metricsTimestamp;
