@@ -164,7 +164,7 @@ if ($CMSCore->client->is_logged(2)) {
           }
 
           if (isset($_PATCH['entry_name'])) $entryData['name'] = urlencode(htmlentities($_PATCH['entry_name']));
-          if (isset($_PATCH['entry_category_id'])) $entryData['category_id'] = $_PATCH['entry_category_id'];
+          if (isset($_PATCH['entry_category_id'])) $entryData['categoryID'] = $_PATCH['entry_category_id'];
           
           if (isset($_PATCH['entry_preview'])) {
             $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
@@ -193,7 +193,7 @@ if ($CMSCore->client->is_logged(2)) {
             }
           }
 
-          $entryIsPublished = isset($entryData['metadata']['isPublished']) ? $entryData['metadata']['isPublished'] : 0;
+          $entryIsPublished = $entryData['metadata']['isPublished'] ?? 0;
 
           // Если происходит публикация записи, то необходимо удостовериться, что
           // в записи присутствует стандартная локализация, в противном случае
