@@ -69,7 +69,7 @@ namespace core\PHPLibrary {
 
       if (count($this->get_array()) > 0) {
         foreach ($this->get_array() as $index => $data) {
-          array_push($breadcrumbsItemsTransformed, TemplateCollector::assembly_file_content($this->CMSCore->template, 'templates/page/breadcrumps/listItem.tpl', [
+          array_push($breadcrumbsItemsTransformed, TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/breadcrumps/listItem.tpl', [
             'BREADCRUMP_URL' => $data['url'],
             'BREADCRUMP_TITLE' => $data['title'],
             'BREADCRUMP_META_POSITION' => $index + 1
@@ -78,7 +78,7 @@ namespace core\PHPLibrary {
       }
 
       if (count($breadcrumbsItemsTransformed) > 0) {
-        $breadcrumbsListTransformed = TemplateCollector::assembly_file_content($this->CMSCore->template, 'templates/page/breadcrumps/list.tpl', [
+        $breadcrumbsListTransformed = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/breadcrumps/list.tpl', [
           'BREADCRUMPS_ITEMS' => implode($breadcrumbsItemsTransformed)
         ]);
       }

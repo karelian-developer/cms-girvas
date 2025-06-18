@@ -22,7 +22,7 @@ namespace core\PHPLibrary {
      * @return string
      */
     private function get_subnavigation_item_icon_path(SystemCore $CMSCore, string $subnavigationItemName) : string {
-      $themePath = $this->system_core->template->get_path();
+      $themePath = $this->CMSCore->theme->get_path();
       return $themePath . '/images/icons/subNavigation/' . $subnavigationItemName . '.svg';
     }
 
@@ -35,8 +35,8 @@ namespace core\PHPLibrary {
           $listElement = $elementCMSAdminPanelSubnavigation->ownerDocument->createElement('ul');
           $listElement->setAttribute('class', 'navigation__list list list-reset');
 
-          if (count($this->navigation_subsections_array) > 0) {
-            foreach ($this->navigation_subsections_array as $index => $data) {
+          if (count($this->navigationSubsections) > 0) {
+            foreach ($this->navigationSubsections as $index => $data) {
               $subsectionName = $data['name'];
               $subsectionLink = $data['link'];
               $subsectionIconName = $data['iconName'];
@@ -75,7 +75,7 @@ namespace core\PHPLibrary {
                   $itemElement->setAttribute('class', sprintf('list__item item item_%s', $subsectionName));
                 }
 
-                $linkElement->setAttribute('href', sprintf('/admin%s', $subsectionLink));
+                $linkElement->setAttribute('href', '/admin' . $subsectionLink);
                 $linkElement->setAttribute('class', 'item__link link');
                 $linkElement->setAttribute('title', $itemTitle);
                 $labelElement->setAttribute('class', 'item__label label');
