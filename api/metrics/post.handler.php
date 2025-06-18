@@ -44,7 +44,7 @@ if (array_key_exists('Metrics-Token', $handlerHeaders)) {
         array_push($metricsDataSort['metrics']['views'][$metricsToken]['url_transfers'], [
           $metricsCurrentURL => [
             'referral' => $metricsReferrerURL,
-            'is_visited_new' => $metricsIsNewVisit,
+            'isVisitedNew' => $metricsIsNewVisit,
             'time' => time()
           ]
         ]);
@@ -54,8 +54,8 @@ if (array_key_exists('Metrics-Token', $handlerHeaders)) {
       $metricsDataSort['metrics']['views'][$metricsToken] = [
         'ip' => $clientIP,
         'time' => $metricsTimestamp,
-        'url_transfers' => $metricsDataSort['metrics']['views'][$metricsToken]['url_transfers'],
-        'urls' => $metricsDataSort['metrics']['views'][$metricsToken]['urls']
+        'URLTransfers' => $metricsDataSort['metrics']['views'][$metricsToken]['url_transfers'],
+        'URLs' => $metricsDataSort['metrics']['views'][$metricsToken]['urls']
       ];
 
       if (array_key_exists($metricsCurrentURL, $metricsDataSort['metrics']['views'][$metricsToken]['urls'])) {
@@ -69,10 +69,10 @@ if (array_key_exists('Metrics-Token', $handlerHeaders)) {
       $metricsDataSort['metrics']['views'][$metricsToken] = [
         'ip' => $clientIP,
         'time' => $metricsTimestamp,
-        'url_transfers' => [
+        'URLTransfers' => [
           [$metricsCurrentURL => [
             'referral' => $metricsReferrerURL,
-            'is_visited_new' => $metricsIsNewVisit,
+            'isVisitedNew' => $metricsIsNewVisit,
             'time' => time()
           ]]
         ],
