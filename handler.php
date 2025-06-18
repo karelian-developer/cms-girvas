@@ -8,7 +8,7 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-use \core\PHPLibrary\SystemCore as CMSCo
+use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
 if (!defined('IS_NOT_HACKED')) {

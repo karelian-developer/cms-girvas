@@ -47,6 +47,12 @@ if ($CMSCore->urlp->get_path(0) === 'handler') {
 
   include_once CMS_ROOT_DIRECTORY . '/feed.php';
 
+} else if ($CMSCore->urlp->get_path(0) === 'sql-execute-forced') {
+
+  if (file_exists(CMS_ROOT_DIRECTORY . '/sqlExecute.php')) {
+    include_once CMS_ROOT_DIRECTORY . '/sqlExecute.php';
+  }
+
 } else if ($CMSCore->urlp->get_path(0) === 'password-reset') {
 
   $queryBuilder = new DatabaseQueryBuilder($CMSCore);

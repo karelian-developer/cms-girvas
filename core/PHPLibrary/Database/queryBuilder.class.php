@@ -10,14 +10,16 @@
 
 namespace core\PHPLibrary\Database {
   use \core\PHPLibrary\SystemCore as SystemCore;
+  use \core\PHPLibrary\Database\QueryBuilder\StatementAlterTable as StatementAlterTable;
   use \core\PHPLibrary\Database\QueryBuilder\StatementCreateTable as StatementCreateTable;
   use \core\PHPLibrary\Database\QueryBuilder\StatementSelect as StatementSelect;
   use \core\PHPLibrary\Database\QueryBuilder\StatementInsert as StatementInsert;
   use \core\PHPLibrary\Database\QueryBuilder\StatementUpdate as StatementUpdate;
   use \core\PHPLibrary\Database\QueryBuilder\StatementDelete as StatementDelete;
+  use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
 
   class QueryBuilder {
-    public StatementCreateTable|StatementSelect|StatementInsert|StatementUpdate|StatementDelete $statement;
+    public InterfaceStatement $statement;
     public readonly SystemCore $CMSCore;
 
     /**
@@ -72,6 +74,15 @@ namespace core\PHPLibrary\Database {
      */
     public function set_statement_delete() : void {
       $this->statement = new StatementDelete($this);
+    }
+    
+    /**
+     * setStatementAlterTable
+     *
+     * @return void
+     */
+    public function setStatementAlterTable() : void {
+      $this->statement = new StatementAlterTable($this);
     }
   }
 
