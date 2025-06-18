@@ -108,7 +108,7 @@ namespace core\PHPLibrary\Client {
       $queryBuilder->statement->clauseSet->add_column('updatedUnixTimestamp');
       $queryBuilder->statement->clauseSet->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
@@ -133,7 +133,7 @@ namespace core\PHPLibrary\Client {
       $queryBuilder->statement->clauseFrom->add_table('users_sessions');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
       
@@ -161,7 +161,7 @@ namespace core\PHPLibrary\Client {
       $queryBuilder->statement->clauseFrom->add_table('users_sessions');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('userIP = :userIP AND typeID = :typeID');
+      $queryBuilder->statement->clauseWhere->add_condition('"userIP" = :userIP AND "typeID" = :typeID');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->set_clause_limit(1);
       $queryBuilder->statement->assembly();
@@ -184,7 +184,7 @@ namespace core\PHPLibrary\Client {
       $queryBuilder->statement->clauseFrom->add_table('users_sessions');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('userIP = :userIP AND userID = :userID AND typeID = :typeID');
+      $queryBuilder->statement->clauseWhere->add_condition('"userIP" = :userIP AND "userID" = :userID AND "typeID" = :typeID');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->set_clause_limit(1);
       $queryBuilder->statement->assembly();
@@ -208,7 +208,7 @@ namespace core\PHPLibrary\Client {
       $queryBuilder->statement->clauseFrom->add_table('users_sessions');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('"userIP" = :userIP AND token = :token AND "typeID" = :typeID');
+      $queryBuilder->statement->clauseWhere->add_condition('"userIP" = :userIP AND "token" = :token AND "typeID" = :typeID');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->set_clause_limit(1);
       $queryBuilder->statement->assembly();
@@ -238,7 +238,7 @@ namespace core\PHPLibrary\Client {
       $queryBuilder->statement->clauseFrom->add_table('users_sessions');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('userIP = :userIP AND userID = :userID AND typeID = :typeID');
+      $queryBuilder->statement->clauseWhere->add_condition('"userIP" = :userIP AND "userID" = :userID AND "typeID" = :typeID');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->set_clause_limit(1);
       $queryBuilder->statement->assembly();
@@ -296,7 +296,7 @@ namespace core\PHPLibrary\Client {
       $queryBuilder->statement->clauseFrom->add_table('users_sessions');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('userIP = :userIP AND typeID = :typeID');
+      $queryBuilder->statement->clauseWhere->add_condition('"userIP" = :userIP AND "typeID" = :typeID');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->set_clause_limit(1);
       $queryBuilder->statement->assembly();
@@ -325,7 +325,7 @@ namespace core\PHPLibrary\Client {
       $queryBuilder->statement->clauseSet->add_column('updatedUnixTimestamp');
       $queryBuilder->statement->clauseSet->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
@@ -409,7 +409,7 @@ namespace core\PHPLibrary\Client {
       $queryBuilder->statement->clauseFrom->add_table('users_sessions');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 

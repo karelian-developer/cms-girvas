@@ -45,12 +45,13 @@ namespace core\PHPLibrary {
       
       $CMSBaseLocaleSettedName = $CMSCore->configurator->get_database_entry_value('base_locale');
       $URLBaseLocaleSettedName = $CMSCore->urlp->get_param('locale');
-      $CookieBaseLocaleSettedName = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
+      $CookieBaseLocaleSettedName = $_COOKIE['locale'] ?? null;
 
-      $CMSBaseLocaleName = (!is_null($URLBaseLocaleSettedName)) ? $URLBaseLocaleSettedName : $CookieBaseLocaleSettedName;
-      $CMSBaseLocaleName = (!is_null($CMSBaseLocaleName)) ? $CMSBaseLocaleName : $CMSBaseLocaleSettedName;
-      $CMSBaseLocaleName = (is_null($CMSBaseLocaleName)) ? 'en_US' : $CMSBaseLocaleName;
+      $CMSBaseLocaleName = $URLBaseLocaleSettedName ?? $CookieBaseLocaleSettedName;
+      $CMSBaseLocaleName = $CMSBaseLocaleName ?? $CMSBaseLocaleSettedName;
+      $CMSBaseLocaleName = $CMSBaseLocaleName ?? 'en_US';
       $CMSBaseLocale = new ModuleLocale($this, $CMSBaseLocaleName);
+
       if (!$CMSBaseLocale->exists_file_data_json()) {
         $CMSBaseLocale = new ModuleLocale($this, $CMSBaseLocaleName);
       }

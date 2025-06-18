@@ -84,7 +84,7 @@ namespace core\PHPLibrary {
       $queryBuilder->statement->clauseFrom->add_table('metrics');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('date >= :dateStart AND date <= :dateEnd');
+      $queryBuilder->statement->clauseWhere->add_condition('"date" >= :dateStart AND "date" <= :dateEnd');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
@@ -143,12 +143,12 @@ namespace core\PHPLibrary {
 
               if (!empty($viewsURLs)) {
                 foreach ($viewsURLs as $url => $count) {
-                  $url_parsed = parse_url($url);
-                  $path_parts = explode('/', $url_parsed['path']);
+                  $URLParsed = parse_url($url);
+                  $pathParts = explode('/', $URLParsed['path']);
 
-                  if ($path_parts[1] == 'entry') {
+                  if ($pathParts[1] == 'entry') {
                     foreach ($entries as $index => $object) {
-                      if ($object->get_name() == $path_parts[2]) {
+                      if ($object->get_name() == $pathParts[2]) {
                         if (in_array($object, $entriesResult)) {
                           $currentViews = $object->get_views_count();
                           $object->set_views_count($currentViews + $count);
@@ -195,12 +195,12 @@ namespace core\PHPLibrary {
               $viewsURLs = $views_data['urls'];
               if (!empty($viewsURLs)) {
                 foreach ($viewsURLs as $url => $count) {
-                  $url_parsed = parse_url($url);
-                  $path_parts = explode('/', $url_parsed['path']);
+                  $URLParsed = parse_url($url);
+                  $pathParts = explode('/', $URLParsed['path']);
 
-                  if ($path_parts[1] == 'page') {
+                  if ($pathParts[1] === 'page') {
                     foreach ($pages as $index => $object) {
-                      if ($object->get_name() == $path_parts[2]) {
+                      if ($object->get_name() == $pathParts[2]) {
                         if (in_array($object, $pagesResult)) {
                           $currentViews = $object->get_views_count();
                           $object->set_views_count($currentViews + $count);

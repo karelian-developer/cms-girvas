@@ -57,7 +57,7 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect {
      * @return void
      */
     public function assembly() : void {
-      $this->assembled = sprintf('ORDER BY %s %s', $this->column, $this->sortType);
+      $this->assembled = sprintf('ORDER BY "%s" %s', $this->column, $this->sortType);
     }
 
   }

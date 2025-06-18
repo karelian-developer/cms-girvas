@@ -54,7 +54,7 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementUpdate {
 
       foreach ($this->columns as $name) {
         $value = (isset($this->values[$name])) ? $this->values[$name] : ':' . $name;
-        array_push($queryArray, sprintf('%s = %s', $name, $value));
+        array_push($queryArray, sprintf('"%s" = %s', $name, $value));
       }
 
       if (count($queryArray) > 0) {

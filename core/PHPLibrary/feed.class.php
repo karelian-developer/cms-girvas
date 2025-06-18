@@ -290,7 +290,7 @@ namespace core\PHPLibrary {
       $queryBuilder->statement->clauseFrom->add_table('web_channels');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->set_clause_limit(1);
       $queryBuilder->statement->assembly();
@@ -324,7 +324,7 @@ namespace core\PHPLibrary {
       $queryBuilder->statement->clauseFrom->add_table('web_channels');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
@@ -378,7 +378,7 @@ namespace core\PHPLibrary {
       $queryBuilder->statement->clauseSet->add_column('updatedUnixTimestamp');
       $queryBuilder->statement->clauseSet->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 

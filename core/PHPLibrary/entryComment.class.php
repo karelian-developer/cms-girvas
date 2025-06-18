@@ -326,7 +326,7 @@ namespace core\PHPLibrary {
       $queryBuilder->statement->clauseFrom->add_table('entries_comments');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->add_condition(': = :id');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
       
@@ -366,7 +366,7 @@ namespace core\PHPLibrary {
       $queryBuilder->statement->clauseFrom->add_table('entries_comments');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->set_clause_limit(1);
       $queryBuilder->statement->assembly();
@@ -400,7 +400,7 @@ namespace core\PHPLibrary {
       $queryBuilder->statement->clauseFrom->add_table('entries_comments');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
@@ -512,26 +512,26 @@ namespace core\PHPLibrary {
               if (!isset($commentRatingVoters[$metadataValue['voter_id']])) {
                 array_push($metadataAssignments, 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int + 1)');
               } else {
-                if ($commentRatingVoters[$metadataValue['voter_id']] != $metadataValue['vote']) {
+                if ($commentRatingVoters[$metadataValue['voter_id']] !== $metadataValue['vote']) {
                   array_push($metadataAssignments, 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int + 2)');
                 }
               }
-            } else if ($metadataName == 'rating_vote' && $metadataValue['vote'] == 'down') {
+            } else if ($metadataName === 'ratingVote' && $metadataValue['vote'] === 'down') {
               $commentRatingVoters = $this->get_rating_voters();
 
               array_push($metadataAssignments, sprintf('jsonb_set(metadata::jsonb, \'{ratingVoters}\', (metadata::jsonb->>\'ratingVoters\')::jsonb || \'{"%d": "%s"}\')', $metadataValue['voter_id'], $metadataValue['vote']));
               if (!isset($commentRatingVoters[$metadataValue['voter_id']])) {
                 array_push($metadataAssignments, 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int - 1)');
               } else {
-                if ($commentRatingVoters[$metadataValue['voter_id']] != $metadataValue['vote']) {
+                if ($commentRatingVoters[$metadataValue['voter_id']] !== $metadataValue['vote']) {
                   array_push($metadataAssignments, 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int - 2)');
                 }
               }
-            } else if ($metadataName == 'is_hidden') {
+            } else if ($metadataName === 'isHidden') {
               array_push($metadataAssignments, sprintf('jsonb_build_object(\'isHidden\', %d::int::bool)', $metadataValue));
-            } else if ($metadataName == 'hidden_reason') {
+            } else if ($metadataName === 'hiddenReason') {
               array_push($metadataAssignments, sprintf('jsonb_build_object(\'hiddenReason\', \'%s\'::text)', $metadataValue));
-            } else if ($metadataName == 'parent_id') {
+            } else if ($metadataName === 'parentID') {
               array_push($metadataAssignments, sprintf('jsonb_build_object(\'parentID\', %d::int)', $metadataValue));
             }
           }
@@ -545,7 +545,7 @@ namespace core\PHPLibrary {
       $queryBuilder->statement->clauseSet->add_column('updatedUnixTimestamp');
       $queryBuilder->statement->clauseSet->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('id = :id');
+      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 

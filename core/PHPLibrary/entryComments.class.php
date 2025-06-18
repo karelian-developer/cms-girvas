@@ -90,7 +90,7 @@ namespace core\PHPLibrary {
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
 
-      $queryBuilder->statement->clauseWhere->add_condition('entryID = :entryID');
+      $queryBuilder->statement->clauseWhere->add_condition('"entryID" = :entryID');
       if (array_key_exists('parent_id', $params)) {
         error_log(print_r($params, true));
         $queryBuilder->statement->clauseWhere->add_condition(sprintf('(metadata::jsonb->\'parentID\')::int = %d', $params['parent_id']), 'AND');
@@ -155,7 +155,7 @@ namespace core\PHPLibrary {
       $queryBuilder->statement->clauseFrom->add_table('entries_comments');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('entryID = :entryID');
+      $queryBuilder->statement->clauseWhere->add_condition('"entryID" = :entryID');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 

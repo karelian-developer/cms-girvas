@@ -34,7 +34,7 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementInsert {
      * @return void
      */
     public function add_column(string $name) : void {
-      array_push($this->columns, $name);
+      array_push($this->columns, '"' . $name . '"');
     }
     
     /**
