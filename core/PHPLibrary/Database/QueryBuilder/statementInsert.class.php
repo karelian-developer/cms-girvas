@@ -64,7 +64,7 @@ namespace core\PHPLibrary\Database\QueryBuilder {
      * @return string
      */
     public function get_table() : string {
-      $databaseConfigurations = $this->queryBuilder->system_core->configurator->get('database');
+      $databaseConfigurations = $this->queryBuilder->CMSCore->configurator->get('database');
       
       $tableFullname = '';
       if (!is_null($databaseConfigurations)) {
