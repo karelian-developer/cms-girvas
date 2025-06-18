@@ -46,19 +46,19 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect {
     public function assembly() {
       $queryArray = [];
 
-      $databaseConfigurations = $this->statement->query_builder->system_core->configurator->get('database');
+      $databaseConfigurations = $this->statement->queryBuilder->CMSCore->configurator->get('database');
 
       foreach ($this->tables as $table) {
         $tableFullname = '';
 
         if (!is_null($databaseConfigurations)) {
-          if ($databaseConfigurations['scheme'] != '') {
+          if ($databaseConfigurations['scheme'] !== '') {
             $tableFullname .= sprintf('%s.', $databaseConfigurations['scheme']);
           }
 
-          if ($databaseConfigurations['prefix'] != '' || $table->get_prefix() != '') {
-            $tablePrefix = ($table->get_prefix() == '') ? $databaseConfigurations['prefix'] : $table->get_prefix();
-            $tableFullname .= sprintf('%s_', $tablePrefix);
+          if ($databaseConfigurations['prefix'] !== '' || $table->get_prefix() !== '') {
+            $tablePrefix = $table->get_prefix() === '' ? $databaseConfigurations['prefix'] : $table->get_prefix();
+            $tableFullname .= $tablePrefix . '_';
           }
         }
 
@@ -69,7 +69,7 @@ namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect {
       if (count($this->tables) > 0) {
         $this->assembled = sprintf('FROM %s', implode(', ', $queryArray));
       } else {
-        $this->assembled =  '';
+        $this->assembled = '';
       }
     }
 
