@@ -21,7 +21,7 @@ if ($CMSCore->client->is_logged(2)) {
 
   if (PageStatic::exists_by_id($CMSCore, $pageStaticID)) {
     $pageStatic = new PageStatic($CMSCore, $pageStaticID);
-    $pageStatic->init_data(['name', 'author_id', 'texts', 'metadata', 'created_unix_timestamp', 'updated_unix_timestamp']);
+    $pageStatic->init_data(['name', 'authorID', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
     $pageStaticLocale = (!is_null($CMSCore->urlp->get_param('locale'))) ? $CMSCore->urlp->get_param('locale') : $CMSCore->configurator->get_database_entry_value('base_locale');
 
     $handlerOutputData['pageStatic'] = [];
