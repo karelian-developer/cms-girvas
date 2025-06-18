@@ -22,7 +22,7 @@ if (array_key_exists('Metrics-Token', $handlerHeaders)) {
   $metricsTimestamp = (is_numeric($_POST['time'])) ? strtotime(date('Y/m/d', $_POST['time'])) : strtotime(date('Y/m/d', time()));
   $metricsCurrentURL = strip_tags(str_replace('\'', '', $_POST['current_url']));
   $metricsReferrerURL = strip_tags(str_replace('\'', '', $_POST['referrer_url']));
-  $metricsIsNewVisit = (bool)$_POST['is_visited_new'];
+  $metricsIsNewVisit = (bool) $_POST['is_visited_new'];
 
   $metrics = new Metrics($CMSCore);
   $metrics->set_timestamp($metricsTimestamp);
@@ -40,8 +40,8 @@ if (array_key_exists('Metrics-Token', $handlerHeaders)) {
     $metricsDataSort = $metricsSession->get_data();
 
     if (isset($metricsDataSort['metrics']['views'][$metricsToken])) {
-      if ($metricsReferrerURL != $metricsCurrentURL) {
-        array_push($metricsDataSort['metrics']['views'][$metricsToken]['url_transfers'], [
+      if ($metricsReferrerURL !== $metricsCurrentURL) {
+        array_push($metricsDataSort['metrics']['views'][$metricsToken]['URLTransfers'], [
           $metricsCurrentURL => [
             'referral' => $metricsReferrerURL,
             'isVisitedNew' => $metricsIsNewVisit,
@@ -54,7 +54,7 @@ if (array_key_exists('Metrics-Token', $handlerHeaders)) {
       $metricsDataSort['metrics']['views'][$metricsToken] = [
         'ip' => $clientIP,
         'time' => $metricsTimestamp,
-        'URLTransfers' => $metricsDataSort['metrics']['views'][$metricsToken]['url_transfers'],
+        'URLTransfers' => $metricsDataSort['metrics']['views'][$metricsToken]['URLTransfers'],
         'URLs' => $metricsDataSort['metrics']['views'][$metricsToken]['urls']
       ];
 
