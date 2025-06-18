@@ -21,6 +21,7 @@ namespace core\PHPLibrary\Database\QueryBuilder {
     private string $tableName;
     private string $event;
     private array $data;
+    private bool $ifExists = false;
     public string $assembled = '';
 
     /**
@@ -83,12 +84,18 @@ namespace core\PHPLibrary\Database\QueryBuilder {
       $this->event = $name;
     }
 
+    public function setIfExists(bool $value) : void {
+      $this->ifExists = $value;
+    }
+
     public function assembly() : void {
       $this->assembled .= 'ALTER TABLE ';
       $this->assembled .= trim($this->tableName) ?? 'column_undefined';
 
+      $ifExists = $this->ifExists ? 'IF EXISTS ' : '';
+
       if ($this->event === 'renameColumn') {
-        $this->assembled .= ' RENAME COLUMN ' . $this->data['oldName'] . ' TO ' . $this->data['newName'];
+        $this->assembled .= ' RENAME COLUMN ' . $ifExists . $this->data['oldName'] . ' TO ' . $this->data['newName'];
       }
 
       if ($this->event === 'modifyColumn') {
