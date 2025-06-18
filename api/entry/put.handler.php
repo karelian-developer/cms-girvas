@@ -175,7 +175,7 @@ if ($CMSCore->client->is_logged(2)) {
         $entry->init_data(['texts']);
 
         // Обновление дополнительной информации
-        $entryData['category_id'] = $entryCategoryID;
+        $entryData['categoryID'] = $entryCategoryID;
         $entry->update($entryData);
 
         $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED, [
