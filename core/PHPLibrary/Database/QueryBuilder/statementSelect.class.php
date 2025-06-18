@@ -42,6 +42,12 @@ namespace core\PHPLibrary\Database\QueryBuilder {
      * @return void
      */
     public function add_selections(array $selections) : void {
+      foreach ($selections as $index => $selection) {
+        if (!preg_match('/\"[a-z0-9_]\"/i', $selection)) {
+          $selections[$index] = '"' . $selection . '"';
+        }
+      }
+
       $this->selections = array_merge($this->selections, $selections);
     }
     
