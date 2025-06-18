@@ -46,7 +46,7 @@ namespace core\PHPLibrary {
     public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
     public const CMS_MODULES_PATH = 'modules';
     public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.36-1.6-1';
+    public const CMS_VERSION = '0.1.36-1.6-2';
     public const CMS_STAGE_DEVELOPING = 'alpha';
     public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
     public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -549,7 +549,7 @@ namespace core\PHPLibrary {
         /** @var SystemCoreLocale Объект локализации системного ядра */
         $this->locale = new SystemCoreLocale($this, $CMSCoreLocaleName, $CMSCoreThemeCategoryName);
         
-        if ($this->urlp->get_path(1) !== 'sql-execute-forced') {
+        if ($this->urlp->get_path(0) !== 'sql-execute-forced') {
           // Устанавливаем объект шаблона для системного ядра
           $this->set_template(new Template($this, $CMSCoreThemeName, $CMSCoreThemeCategoryName));
 
