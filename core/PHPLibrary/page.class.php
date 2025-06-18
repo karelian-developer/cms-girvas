@@ -24,7 +24,7 @@ namespace core\PHPLibrary {
      * @param  string $name
      * @return void
      */
-    public function __construct(SystemCore $CMSCore, array $dir_exploded) {
+    public function __construct(SystemCore $CMSCore, array $directoryExploded) {
       $this->set_system_core($CMSCore);
       $this->breadcrumbs = new PageBreadcrumbs($CMSCore);
     }
