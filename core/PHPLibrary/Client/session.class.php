@@ -63,7 +63,7 @@ namespace core\PHPLibrary\Client {
      * @param  mixed $value
      * @return int
      */
-    public function get_userID() : int {
+    public function get_user_id() : int {
       return $this->userID;
     }
     
