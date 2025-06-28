@@ -8,419 +8,538 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Client {
-  use \core\PHPLibrary\SystemCore as SystemCore;
-  use \core\PHPLibrary\User as User;
-  use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+namespace core\PHPLibrary\Client;
 
-  #[\AllowDynamicProperties]
-  class Session {
-    private readonly SystemCore $CMSCore;
-    private int $id;
-    
-    /**
-     * __construct
-     *
-     * @param  mixed $CMSCore
-     * @param  mixed $id
-     * @return void
-     */
-    public function __construct(SystemCore $CMSCore, int $id) {
-      $this->CMSCore = $CMSCore;
-      $this->set_id($id);
-    }
+use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 
-    public function init_data(array $columns = ['*']) {
-      $columnsData = $this->get_database_columns_data($columns);
-      foreach ($columnsData as $name => $data) {
-        $this->{$name} = $data;
-      }
-    }
+#[\AllowDynamicProperties]
+class Session
+{
+  private readonly SystemCore $CMSCore;
+  private int $id;
+  
+  /**
+   * __construct
+   *
+   * @param  mixed $CMSCore
+   * @param  mixed $id
+   * @return void
+   */
+  public function __construct(SystemCore $CMSCore, int $id)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->setID($id);
+  }
 
-    /**
-     * Назначить идентификатор записи
-     *
-     * @param  mixed $value
-     * @return void
-     */
-    private function set_id(int $value) : void {
-      $this->id = $value;
-    }
-    
-    /**
-     * Получить идентификатор записи
-     *
-     * @param  mixed $value
-     * @return int
-     */
-    public function get_id() : int {
-      return $this->id;
-    }
-    
-    /**
-     * Получить идентификатор пользователя, к которому привязана сессия
-     *
-     * @param  mixed $value
-     * @return int
-     */
-    public function get_user_id() : int {
-      return $this->userID;
-    }
-    
-    /**
-     * Получить объект пользователя, к которому привязана сессия
-     *
-     * @return User|null
-     */
-    public function get_user() : User|null {
-      if (!property_exists($this, 'createdUnixTimestamp')) {
-        $this->init_data(['userID']);
-      }
-
-      return User::exists_by_id($this->CMSCore, $this->userID) ? new User($this->CMSCore, $this->userID) : null;
-    }
-
-    public function get_created_unix_timestamp() : int {
-      return property_exists($this, 'createdUnixTimestamp') ? $this->createdUnixTimestamp : 0;
-    }
-
-    public function get_updated_unix_timestamp() : int {
-      return property_exists($this, 'updatedUnixTimestamp') ? $this->updatedUnixTimestamp : 0;
-    }
-
-    public function get_token() : string {
-      return property_exists($this, 'token') ? $this->token : '';
-    }
-
-    public function is_alive(int $expire) : bool {
-      if (property_exists($this, 'updatedUnixTimestamp')) {
-        return $this->get_updated_unix_timestamp() + $expire > time() ? true : false;
-      }
-
-      return false;
-    }
-
-    public function reset_expire() : bool {
-      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
-      $queryBuilder->set_statement_update();
-      $queryBuilder->statement->set_table('users_sessions');
-      $queryBuilder->statement->set_clause_set();
-      $queryBuilder->statement->clauseSet->add_column('updatedUnixTimestamp');
-      $queryBuilder->statement->clauseSet->assembly();
-      $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
-      $queryBuilder->statement->clauseWhere->assembly();
-      $queryBuilder->statement->assembly();
-
-      /** @var int $sessionID Идентификационный номер записи */
-      $sessionID = $this->get_id();
-      $updatedUnixTimestamp = time();
-
-      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':id', $sessionID, \PDO::PARAM_INT);
-      $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
-			$execute = $databaseQuery->execute();
-
-      return ($execute) ? true : false;
-    }
-
-    private function get_database_columns_data(array $columns = ['*']) : array|null {
-      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
-      $queryBuilder->set_statement_select();
-      $queryBuilder->statement->add_selections($columns);
-      $queryBuilder->statement->set_clause_from();
-      $queryBuilder->statement->clauseFrom->add_table('users_sessions');
-      $queryBuilder->statement->clauseFrom->assembly();
-      $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
-      $queryBuilder->statement->clauseWhere->assembly();
-      $queryBuilder->statement->assembly();
-      
-      /** @var int $sessionID Идентификационный номер записи */
-      $sessionID = $this->get_id();
-
-      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':id', $sessionID, \PDO::PARAM_INT);
-			$databaseQuery->execute();
-
-      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return $result ? $result : null;
-    }
-
-    public static function generate_token(int $bytes = 64) : string {
-      return bin2hex(random_bytes($bytes));
-    }
-
-    public static function get_by_ip(SystemCore $CMSCore, string $userIP, int $typeID) : Session|null {
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_select();
-      $queryBuilder->statement->add_selections(['id']);
-      $queryBuilder->statement->set_clause_from();
-      $queryBuilder->statement->clauseFrom->add_table('users_sessions');
-      $queryBuilder->statement->clauseFrom->assembly();
-      $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('"userIP" = :userIP AND "typeID" = :typeID');
-      $queryBuilder->statement->clauseWhere->assembly();
-      $queryBuilder->statement->set_clause_limit(1);
-      $queryBuilder->statement->assembly();
-
-      $databaseConnection = $CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':userIP', $userIP, \PDO::PARAM_STR);
-      $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
-			$databaseQuery->execute();
-
-      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return $result ? new Session($CMSCore, $result['id']) : null;
-    }
-
-    public static function get_by_ip_and_user_id(SystemCore $CMSCore, string $userIP, int $userID, int $typeID) : Session|null {
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_select();
-      $queryBuilder->statement->add_selections(['id']);
-      $queryBuilder->statement->set_clause_from();
-      $queryBuilder->statement->clauseFrom->add_table('users_sessions');
-      $queryBuilder->statement->clauseFrom->assembly();
-      $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('"userIP" = :userIP AND "userID" = :userID AND "typeID" = :typeID');
-      $queryBuilder->statement->clauseWhere->assembly();
-      $queryBuilder->statement->set_clause_limit(1);
-      $queryBuilder->statement->assembly();
-
-      $databaseConnection = $CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':userIP', $userIP, \PDO::PARAM_STR);
-      $databaseQuery->bindParam(':userID', $userID, \PDO::PARAM_INT);
-      $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
-			$databaseQuery->execute();
-
-      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return $result ? new Session($CMSCore, $result['id']) : null;
-    }
-
-    public static function get_by_ip_and_token(SystemCore $CMSCore, string $userIP, string $token, int $typeID) : Session|null{
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_select();
-      $queryBuilder->statement->add_selections(['id']);
-      $queryBuilder->statement->set_clause_from();
-      $queryBuilder->statement->clauseFrom->add_table('users_sessions');
-      $queryBuilder->statement->clauseFrom->assembly();
-      $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('"userIP" = :userIP AND "token" = :token AND "typeID" = :typeID');
-      $queryBuilder->statement->clauseWhere->assembly();
-      $queryBuilder->statement->set_clause_limit(1);
-      $queryBuilder->statement->assembly();
-
-      $databaseConnection = $CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':userIP', $userIP, \PDO::PARAM_STR);
-      $databaseQuery->bindParam(':token', $token, \PDO::PARAM_STR);
-      $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
-			$databaseQuery->execute();
-
-      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return $result ? new Session($CMSCore, $result['id']) : null;
-    }
-
-    /**
-     * Проверка существования сессии по IP-адресу и ID пользователя
-     *
-     * @param  mixed $userIP
-     * @return void
-     */
-    public static function exists_by_ip_and_user_id(SystemCore $CMSCore, string $userIP, int $userID, int $typeID) : bool {
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_select();
-      $queryBuilder->statement->add_selections(['1']);
-      $queryBuilder->statement->set_clause_from();
-      $queryBuilder->statement->clauseFrom->add_table('users_sessions');
-      $queryBuilder->statement->clauseFrom->assembly();
-      $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('"userIP" = :userIP AND "userID" = :userID AND "typeID" = :typeID');
-      $queryBuilder->statement->clauseWhere->assembly();
-      $queryBuilder->statement->set_clause_limit(1);
-      $queryBuilder->statement->assembly();
-
-      $databaseConnection = $CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':userIP', $userIP, \PDO::PARAM_STR);
-      $databaseQuery->bindParam(':userID', $userID, \PDO::PARAM_INT);
-      $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
-			$databaseQuery->execute();
-
-      return $databaseQuery->fetchColumn() ? true : false;
-    }
-
-    /**
-     * Проверка существования сессии по IP-адресу и токену
-     *
-     * @param  mixed $userIP
-     * @return void
-     */
-    public static function exists_by_ip_and_token(SystemCore $CMSCore, string $userIP, string $token, int $typeID) : bool {
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_select();
-      $queryBuilder->statement->add_selections(['1']);
-      $queryBuilder->statement->set_clause_from();
-      $queryBuilder->statement->clauseFrom->add_table('users_sessions');
-      $queryBuilder->statement->clauseFrom->assembly();
-      $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('"userIP" = :userIP AND "token" = :token AND "typeID" = :typeID');
-      $queryBuilder->statement->clauseWhere->assembly();
-      $queryBuilder->statement->set_clause_limit(1);
-      $queryBuilder->statement->assembly();
-
-      $databaseConnection = $CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':userIP', $userIP, \PDO::PARAM_STR);
-      $databaseQuery->bindParam(':token', $token, \PDO::PARAM_STR);
-      $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
-			$databaseQuery->execute();
-
-      return $databaseQuery->fetchColumn() ? true : false;
-    }
-    
-    /**
-     * Проверка существования сессии по IP-адресу
-     *
-     * @param  mixed $userIP
-     * @return void
-     */
-    public static function exists_by_ip(SystemCore $CMSCore, string $userIP, int $typeID) : bool {
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_select();
-      $queryBuilder->statement->add_selections(['1']);
-      $queryBuilder->statement->set_clause_from();
-      $queryBuilder->statement->clauseFrom->add_table('users_sessions');
-      $queryBuilder->statement->clauseFrom->assembly();
-      $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('"userIP" = :userIP AND "typeID" = :typeID');
-      $queryBuilder->statement->clauseWhere->assembly();
-      $queryBuilder->statement->set_clause_limit(1);
-      $queryBuilder->statement->assembly();
-
-      $databaseConnection = $CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':userIP', $userIP, \PDO::PARAM_STR);
-      $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
-			$databaseQuery->execute();
-
-      return $databaseQuery->fetchColumn() ? true : false;
-    }
-
-    public function update(array $data) : bool {
-      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
-      $queryBuilder->set_statement_update();
-      $queryBuilder->statement->set_table('users_sessions');
-      $queryBuilder->statement->set_clause_set();
-
-      foreach ($data as $name => $value) {
-        if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp'])) {
-          $queryBuilder->statement->clauseSet->add_column($name);
-        }
-      }
-
-      $queryBuilder->statement->clauseSet->add_column('updatedUnixTimestamp');
-      $queryBuilder->statement->clauseSet->assembly();
-      $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
-      $queryBuilder->statement->clauseWhere->assembly();
-      $queryBuilder->statement->assembly();
-
-      /** @var int $updatedUnixTimestamp Текущее время в UNIX-формате */
-      $updatedUnixTimestamp = time();
-
-      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      
-      foreach ($data as $name => $value) {
-        if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp'])) {
-          $valueTypeName = gettype($value);
-
-          $valueType = match ($valueTypeName) {
-            'boolean' => \PDO::PARAM_INT,
-            'integer' => \PDO::PARAM_INT,
-            'string' => \PDO::PARAM_STR,
-            'null' => \PDO::PARAM_NULL,
-          };
-          
-          $databaseQuery->bindParam(':' . $name, $data[$name], $valueType);
-        }
-      }
-      
-      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
-      $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
-			$execute = $databaseQuery->execute();
-
-      return $execute ? true : false;
-    }
-    
-    /**
-     * Создание записи нового пользователя в базе данных
-     *
-     * @param  SystemCore $CMSCore
-     * @param  array $data (userID, token, userIP, typeID)
-     * @return Session
-     */
-    public static function create(SystemCore $CMSCore, array $data = []) : Session|null {
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_insert();
-      $queryBuilder->statement->set_table('users_sessions');
-      $queryBuilder->statement->add_column('userID');
-      $queryBuilder->statement->add_column('token');
-      $queryBuilder->statement->add_column('userIP');
-      $queryBuilder->statement->add_column('typeID');
-      $queryBuilder->statement->add_column('createdUnixTimestamp');
-      $queryBuilder->statement->add_column('updatedUnixTimestamp');
-      $queryBuilder->statement->set_clause_returning();
-      $queryBuilder->statement->clause_returning->add_column('id');
-      $queryBuilder->statement->assembly();
-
-      $createdUnixTimestamp = time();
-      $updatedUnixTimestamp = $createdUnixTimestamp;
-      
-      $databaseConnection = $CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':userID', $data['userID'], \PDO::PARAM_INT);
-      $databaseQuery->bindParam(':token', $data['token'], \PDO::PARAM_STR);
-      $databaseQuery->bindParam(':userIP', $data['userIP'], \PDO::PARAM_STR);
-      $databaseQuery->bindParam(':typeID', $data['typeID'], \PDO::PARAM_INT);
-      $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
-      $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
-			$execute = $databaseQuery->execute();
-
-      if ($execute) {
-        $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-        return $result ? new Session($CMSCore, $result['id']) : null;
-      }
-
-      return null;
-    }
-    
-    /**
-     * Удаление сессии
-     */
-    public function delete() : bool {
-      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
-      $queryBuilder->set_statement_delete();
-      $queryBuilder->statement->set_clause_from();
-      $queryBuilder->statement->clauseFrom->add_table('users_sessions');
-      $queryBuilder->statement->clauseFrom->assembly();
-      $queryBuilder->statement->set_clause_where();
-      $queryBuilder->statement->clauseWhere->add_condition('"id" = :id');
-      $queryBuilder->statement->clauseWhere->assembly();
-      $queryBuilder->statement->assembly();
-
-      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
-			$execute = $databaseQuery->execute();
-
-      return $execute ? true : false;
+  /**
+   * Инициализировать данные
+   * 
+   * @param array $columns
+   * 
+   * @return void
+   */
+  public function initData(array $columns = ['*']) : void
+  {
+    $columnsData = $this->getDatabaseColumnsData($columns);
+    foreach ($columnsData as $name => $data) {
+      $this->{$name} = $data;
     }
   }
-}
 
-?>
+  /**
+   * Назначить идентификатор записи
+   *
+   * @param  mixed $value
+   * 
+   * @return void
+   */
+  private function setID(int $value) : void
+  {
+    $this->id = $value;
+  }
+  
+  /**
+   * Получить идентификатор записи
+   *
+   * @param  mixed $value
+   * 
+   * @return int
+   */
+  public function getID() : int
+  {
+    return $this->id;
+  }
+  
+  /**
+   * Получить идентификатор пользователя, к которому привязана сессия
+   *
+   * @param  mixed $value
+   * 
+   * @return int
+   */
+  public function getUserID() : int
+  {
+    return $this->userID;
+  }
+  
+  /**
+   * Получить объект пользователя, к которому привязана сессия
+   *
+   * @return User|null
+   */
+  public function getUser() : User|null {
+    if (!property_exists($this, 'createdUnixTimestamp'))
+    {
+      $this->initData(['userID']);
+    }
+
+    return User::existsByID($this->CMSCore, $this->userID) ? new User($this->CMSCore, $this->userID) : null;
+  }
+
+  /**
+   * Получить временную отметку создания в UNIX-формате
+   * 
+   * @return int
+   */
+  public function getCreatedUnixTimestamp() : int
+  {
+    return $this->createdUnixTimestamp ?? 0;
+  }
+
+  /**
+   * Получить временную отметку обновления в UNIX-формате
+   * 
+   * @return int
+   */
+  public function getUpdatedUnixTimestamp() : int
+  {
+    return $this->updatedUnixTimestamp ?? 0;
+  }
+
+  /**
+   * Получить токен
+   * 
+   * @return string
+   */
+  public function getToken() : string
+  {
+    return $this->token ?? '';
+  }
+
+  /**
+   * Проверить жизнеспособность
+   * 
+   * @param int $expire
+   * 
+   * @return bool
+   */
+  public function isAlive(int $expire) : bool
+  {
+    if (property_exists($this, 'updatedUnixTimestamp')) {
+      return $this->getUpdatedUnixTimestamp() + $expire > time();
+    }
+
+    return false;
+  }
+
+  /**
+   * Сбросить жизнеспособность
+   * 
+   * @return bool
+   */
+  public function resetExpire() : bool
+  {
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $queryBuilder->setStatementUpdate();
+    $queryBuilder->statement->setTable('users_sessions');
+    $queryBuilder->statement->setClauseSet();
+    $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
+    $queryBuilder->statement->clauseSet->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    /** @var int $sessionID Идентификационный номер записи */
+    $sessionID = $this->getID();
+    $updatedUnixTimestamp = time();
+
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':id', $sessionID, \PDO::PARAM_INT);
+    $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+    $execute = $databaseQuery->execute();
+
+    return $execute ? true : false;
+  }
+
+  /**
+   * Получить данные колонок записи в базе данных
+   *
+   * @param  array $columns
+   * 
+   * @return array|null
+   */
+  private function getDatabaseColumnsData(array $columns = ['*']) : array|null
+  {
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections($columns);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('users_sessions');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+    
+    /** @var int $sessionID Идентификационный номер записи */
+    $sessionID = $this->getID();
+
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':id', $sessionID, \PDO::PARAM_INT);
+    $databaseQuery->execute();
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? $result : null;
+  }
+
+  /**
+   * Сгенерировать и получить токен
+   * 
+   * @return string
+   */
+  public static function generateToken(int $bytes = 64) : string
+  {
+    return bin2hex(random_bytes($bytes));
+  }
+
+  /**
+   * Получить при помощи IP-адреса
+   * 
+   * @param SystemCore $CMSCore
+   * @param string $userIP
+   * @param int $typeID
+   * 
+   * @return Session|null
+   */
+  public static function getByIP(SystemCore $CMSCore, string $userIP, int $typeID) : Session|null {
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('users_sessions');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addCondition('"userIP" = :userIP AND "typeID" = :typeID');
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':userIP', $userIP, \PDO::PARAM_STR);
+    $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
+    $databaseQuery->execute();
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? new Session($CMSCore, $result['id']) : null;
+  }
+
+  /**
+   * Получить при помощи IP-адреса и ID пользователя
+   * 
+   * @param SystemCore $CMSCore
+   * @param string $userIP
+   * @param int $userID
+   * @param int $typeID
+   * 
+   * @return Session|null
+   */
+  public static function getByIPAndUserID(SystemCore $CMSCore, string $userIP, int $userID, int $typeID) : Session|null
+  {
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('users_sessions');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addCondition('"userIP" = :userIP AND "userID" = :userID AND "typeID" = :typeID');
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':userIP', $userIP, \PDO::PARAM_STR);
+    $databaseQuery->bindParam(':userID', $userID, \PDO::PARAM_INT);
+    $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
+    $databaseQuery->execute();
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? new Session($CMSCore, $result['id']) : null;
+  }
+
+  /**
+   * Получить при помощи IP-адреса и токена
+   * 
+   * @param SystemCore $CMSCore
+   * @param string $userIP
+   * @param string $token
+   * @param int $typeID
+   * 
+   * @return Session|null
+   */
+  public static function getByIPAndToken(SystemCore $CMSCore, string $userIP, string $token, int $typeID) : Session|null
+  {
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('users_sessions');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addCondition('"userIP" = :userIP AND "token" = :token AND "typeID" = :typeID');
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':userIP', $userIP, \PDO::PARAM_STR);
+    $databaseQuery->bindParam(':token', $token, \PDO::PARAM_STR);
+    $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
+    $databaseQuery->execute();
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? new Session($CMSCore, $result['id']) : null;
+  }
+
+  /**
+   * Проверить существование сессии по IP-адресу и ID пользователя
+   *
+   * @param SystemCore $CMSCore
+   * @param string $userIP
+   * @param int $userID
+   * @param int $typeID
+   * 
+   * @return bool
+   */
+  public static function existsByIPAndUserID(SystemCore $CMSCore, string $userIP, int $userID, int $typeID) : bool
+  {
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['1']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('users_sessions');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addCondition('"userIP" = :userIP AND "userID" = :userID AND "typeID" = :typeID');
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':userIP', $userIP, \PDO::PARAM_STR);
+    $databaseQuery->bindParam(':userID', $userID, \PDO::PARAM_INT);
+    $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
+    $databaseQuery->execute();
+
+    return $databaseQuery->fetchColumn() ? true : false;
+  }
+
+  /**
+   * Проверить существование сессии по IP-адресу и токену
+   *
+   * @param SystemCore $CMSCore
+   * @param string $userIP
+   * @param string $token
+   * @param int $typeID
+   * 
+   * @return bool
+   */
+  public static function existsByIPAndToken(SystemCore $CMSCore, string $userIP, string $token, int $typeID) : bool
+  {
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['1']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('users_sessions');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addCondition('"userIP" = :userIP AND "token" = :token AND "typeID" = :typeID');
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':userIP', $userIP, \PDO::PARAM_STR);
+    $databaseQuery->bindParam(':token', $token, \PDO::PARAM_STR);
+    $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
+    $databaseQuery->execute();
+
+    return $databaseQuery->fetchColumn() ? true : false;
+  }
+  
+  /**
+   * Проверить существование сессии по IP-адресу
+   *
+   * @param SystemCore $CMSCore
+   * @param string $userIP
+   * @param int $typeID
+   * 
+   * @return bool
+   */
+  public static function existsByIP(SystemCore $CMSCore, string $userIP, int $typeID) : bool
+  {
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['1']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('users_sessions');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addCondition('"userIP" = :userIP AND "typeID" = :typeID');
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':userIP', $userIP, \PDO::PARAM_STR);
+    $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
+    $databaseQuery->execute();
+
+    return $databaseQuery->fetchColumn() ? true : false;
+  }
+
+  /**
+   * Обновить
+   * 
+   * @param array $data
+   * 
+   * @return bool
+   */
+  public function update(array $data) : bool
+  {
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $queryBuilder->setStatementUpdate();
+    $queryBuilder->statement->setTable('users_sessions');
+    $queryBuilder->statement->setClauseSet();
+
+    foreach ($data as $name => $value) {
+      if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp'])) {
+        $queryBuilder->statement->clauseSet->addColumn($name);
+      }
+    }
+
+    $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
+    $queryBuilder->statement->clauseSet->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    /** @var int $updatedUnixTimestamp Текущее время в UNIX-формате */
+    $updatedUnixTimestamp = time();
+
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    
+    foreach ($data as $name => $value) {
+      if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp'])) {
+        $valueTypeName = gettype($value);
+
+        $valueType = match ($valueTypeName) {
+          'boolean' => \PDO::PARAM_INT,
+          'integer' => \PDO::PARAM_INT,
+          'string' => \PDO::PARAM_STR,
+          'null' => \PDO::PARAM_NULL,
+        };
+        
+        $databaseQuery->bindParam(':' . $name, $data[$name], $valueType);
+      }
+    }
+    
+    $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+    $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+    $execute = $databaseQuery->execute();
+
+    return $execute ? true : false;
+  }
+  
+  /**
+   * Создать
+   *
+   * @param  SystemCore $CMSCore
+   * @param  array $data (userID, token, userIP, typeID)
+   * 
+   * @return Session
+   */
+  public static function create(SystemCore $CMSCore, array $data = []) : Session|null
+  {
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $queryBuilder->setStatementInsert();
+    $queryBuilder->statement->setTable('users_sessions');
+    $queryBuilder->statement->addColumn('userID');
+    $queryBuilder->statement->addColumn('token');
+    $queryBuilder->statement->addColumn('userIP');
+    $queryBuilder->statement->addColumn('typeID');
+    $queryBuilder->statement->addColumn('createdUnixTimestamp');
+    $queryBuilder->statement->addColumn('updatedUnixTimestamp');
+    $queryBuilder->statement->setClauseReturning();
+    $queryBuilder->statement->clause_returning->addColumn('id');
+    $queryBuilder->statement->assembly();
+
+    $createdUnixTimestamp = time();
+    $updatedUnixTimestamp = $createdUnixTimestamp;
+    
+    $databaseConnection = $CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':userID', $data['userID'], \PDO::PARAM_INT);
+    $databaseQuery->bindParam(':token', $data['token'], \PDO::PARAM_STR);
+    $databaseQuery->bindParam(':userIP', $data['userIP'], \PDO::PARAM_STR);
+    $databaseQuery->bindParam(':typeID', $data['typeID'], \PDO::PARAM_INT);
+    $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
+    $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+    $execute = $databaseQuery->execute();
+
+    if ($execute) {
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+      return $result ? new Session($CMSCore, $result['id']) : null;
+    }
+
+    return null;
+  }
+  
+  /**
+   * Удалить
+   * 
+   * @return bool
+   */
+  public function delete() : bool
+  {
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $queryBuilder->setStatementDelete();
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('users_sessions');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+    $execute = $databaseQuery->execute();
+
+    return $execute ? true : false;
+  }
+}

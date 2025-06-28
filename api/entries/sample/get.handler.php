@@ -16,35 +16,33 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\EntriesSample as EntriesSample;
 use \core\PHPLibrary\EntriesSamples as EntriesSamples;
 
-if ($CMSCore->client->is_logged(1) || $CMSCore->client->is_logged(2)) {
+if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
   /** @var int ID выборки */
-  $sampleID = $CMSCore->urlp->get_path(3) ?? 0;
+  $sampleID = $CMSCore->urlp->getPath(3) ?? 0;
   $sampleID = is_numeric($sampleID) ? (int) $sampleID : 0;
 
-  if (EntriesSample::exists_by_id($CMSCore, $sampleID)) {
+  if (EntriesSample::existsByID($CMSCore, $sampleID)) {
     $sample = new EntriesSample($CMSCore, $sampleID);
-    $sample->init_data(['texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+    $sample->initData(['texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
     
-    $localeName = $CMSCore->urlp->get_param('locale') ?? $CMSCore->configurator->get_database_entry_value('base_locale');
+    $localeName = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
 
     $handlerOutputData['entriesSample'] = [];
-    $handlerOutputData['entriesSample']['id'] = $sample->get_id();
-    $handlerOutputData['entriesSample']['title'] = $sample->get_title($localeName);
-    $handlerOutputData['entriesSample']['description'] = $sample->get_description($localeName);
-    $handlerOutputData['entriesSample']['createdUnixTimestamp'] = $sample->get_created_unix_timestamp();
-    $handlerOutputData['entriesSample']['updatedUnixTimestamp'] = $sample->get_updated_unix_timestamp();
-    $handlerOutputData['entriesSample']['limitCount'] = $sample->get_limit_count();
-    $handlerOutputData['entriesSample']['sortTypeID'] = $sample->get_sort_type_id();
+    $handlerOutputData['entriesSample']['id'] = $sample->getID();
+    $handlerOutputData['entriesSample']['title'] = $sample->getTitle($localeName);
+    $handlerOutputData['entriesSample']['description'] = $sample->getDescription($localeName);
+    $handlerOutputData['entriesSample']['createdUnixTimestamp'] = $sample->getCreatedUnixTimestamp();
+    $handlerOutputData['entriesSample']['updatedUnixTimestamp'] = $sample->getUpdatedUnixTimestamp();
+    $handlerOutputData['entriesSample']['limitCount'] = $sample->getLimitCount();
+    $handlerOutputData['entriesSample']['sortTypeID'] = $sample->getSortTypeID();
 
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ENTRY_COMMENT_ERROR_NOT_FOUND');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRY_COMMENT_ERROR_NOT_FOUND');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

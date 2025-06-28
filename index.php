@@ -15,11 +15,13 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\SystemCore as CMSCore;
 
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', 1);
-
 // Абсолютный путь до корневой директории CMS
 define('CMS_ROOT_DIRECTORY', preg_replace('/[\/]*$/', '', $_SERVER['DOCUMENT_ROOT']));
+
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', CMS_ROOT_DIRECTORY . '/logs/girvas-error.log');
+
 // ‿︵‿ヽ(°□° )ノ︵‿︵
 define('IS_NOT_HACKED', true);
 
@@ -27,44 +29,46 @@ if (PHP_VERSION_ID < 80200) {
   die(sprintf('PHP version is too old (you have %s). CMS "GIRVAS" works on PHP version 8.2.0 and higher.', phpversion()));
 }
 
+$startTime = microtime(true);
+
 require_once CMS_ROOT_DIRECTORY . '/core/PHPLibrary/systemCore.class.php';
 
 $CMSCore = new CMSCore();
 
-if ($CMSCore->urlp->get_path(0) === 'handler') {
+if ($CMSCore->urlp->getPath(0) === 'handler') {
 
   include_once CMS_ROOT_DIRECTORY . '/handler.php';
 
-} else if ($CMSCore->urlp->get_path(0) === 'sitemap') {
+} else if ($CMSCore->urlp->getPath(0) === 'sitemap') {
 
   include_once CMS_ROOT_DIRECTORY . '/sitemap.php';
 
-} else if ($CMSCore->urlp->get_path(0) === 'rss') {
+} else if ($CMSCore->urlp->getPath(0) === 'rss') {
 
   include_once CMS_ROOT_DIRECTORY . '/rss.php';
 
-} else if ($CMSCore->urlp->get_path(0) === 'feed') {
+} else if ($CMSCore->urlp->getPath(0) === 'feed') {
 
   include_once CMS_ROOT_DIRECTORY . '/feed.php';
 
-} else if ($CMSCore->urlp->get_path(0) === 'sql-execute-forced') {
+} else if ($CMSCore->urlp->getPath(0) === 'sql-execute-forced') {
 
   if (file_exists(CMS_ROOT_DIRECTORY . '/sqlExecute.php')) {
     include_once CMS_ROOT_DIRECTORY . '/sqlExecute.php';
   }
 
-} else if ($CMSCore->urlp->get_path(0) === 'password-reset') {
+} else if ($CMSCore->urlp->getPath(0) === 'password-reset') {
 
   $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-  $queryBuilder->set_statement_select();
-  $queryBuilder->statement->add_selections(['id']);
-  $queryBuilder->statement->set_clause_from();
-  $queryBuilder->statement->clauseFrom->add_table('users');
+  $queryBuilder->setStatementSelect();
+  $queryBuilder->statement->addSelections(['id']);
+  $queryBuilder->statement->setClauseFrom();
+  $queryBuilder->statement->clauseFrom->addTable('users');
   $queryBuilder->statement->clauseFrom->assembly();
-  $queryBuilder->statement->set_clause_where();
-  $queryBuilder->statement->clauseWhere->add_condition(sprintf('metadata::jsonb->>\'passwordResetToken\' = \'%s\'', $CMSCore->urlp->get_param('token')));
+  $queryBuilder->statement->setClauseWhere();
+  $queryBuilder->statement->clauseWhere->addCondition(sprintf('metadata::jsonb->>\'passwordResetToken\' = \'%s\'', $CMSCore->urlp->getParam('token')));
   $queryBuilder->statement->clauseWhere->assembly();
-  $queryBuilder->statement->set_clause_limit(1);
+  $queryBuilder->statement->setClauseLimit(1);
   $queryBuilder->statement->assembly();
 
   $databaseConnection = $CMSCore->databaseConnector->database->connection;
@@ -76,32 +80,32 @@ if ($CMSCore->urlp->get_path(0) === 'handler') {
   $user = $result ? new User($CMSCore, (int)$result['id']) : null;
 
   if ($user !== null) {
-    $user->init_data(['login', 'email', 'metadata', 'securityHash']);
+    $user->initData(['login', 'email', 'metadata', 'securityHash']);
     
-    if ($user->get_password_reset_created_unix_timestamp() + 600 > time()) {
+    if ($user->getPasswordResetCreatedUnixTimestamp() + 600 > time()) {
       $userPasswordNew = random_int(10000000, 99999999);
-      $user->update(['passwordHash' => User::password_hash($CMSCore, $user->get_security_hash(), $userPasswordNew), 'metadata' => ['passwordResetToken' => '', 'passwordResetTokenCreatedTimestamp' => 0]]);
+      $user->update(['passwordHash' => User::passwordHash($CMSCore, $user->getSecurityHash(), $userPasswordNew), 'metadata' => ['passwordResetToken' => '', 'passwordResetTokenCreatedTimestamp' => 0]]);
       
-      $themeBaseName = $CMSCore->configurator->exists_database_entry_value('base_template') ? $CMSCore->configurator->get_database_entry_value('base_template') : 'default';
+      $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template') ? $CMSCore->configurator->getDatabaseEntryValue('base_template') : 'default';
 
       $theme = new Theme($CMSCore, $themeBaseName);
 
       $emailSender = new EmailSender($CMSCore);
-      $emailSender->set_from_user('CMS GIRVAS', 'support@garbalo.com');
-      $emailSender->set_to_user_email($user->get_email());
-      $emailSender->add_header(sprintf("From: %s <%s>", 'CMS GIRVAS', 'support@garbalo.com'));
-      $emailSender->add_header(sprintf("\r\nX-Mailer: PHP/%s", phpversion()));
-      $emailSender->add_header("\r\nMIME-Version: 1.0");
-      $emailSender->add_header("\r\nContent-type: text/html; charset=UTF-8");
-      $emailSender->add_header("\r\n");
+      $emailSender->setFromUser('CMS GIRVAS', 'support@garbalo.com');
+      $emailSender->setToUserEmail($user->getEmail());
+      $emailSender->addHeader(sprintf("From: %s <%s>", 'CMS GIRVAS', 'support@garbalo.com'));
+      $emailSender->addHeader(sprintf("\r\nX-Mailer: PHP/%s", phpversion()));
+      $emailSender->addHeader("\r\nMIME-Version: 1.0");
+      $emailSender->addHeader("\r\nContent-type: text/html; charset=UTF-8");
+      $emailSender->addHeader("\r\n");
 
       $resetPasswordCreatedUnixTimestamp = time();
       $resetPasswordToken = md5($resetPasswordCreatedUnixTimestamp . $CMSCore::CMS_VERSION);
 
-      $emailSender->set_subject('Новый пароль');
-      $emailSender->set_content(ThemeCollector::assembly_file_content($theme, 'templates/email/default.tpl', [
+      $emailSender->setSubject('Новый пароль');
+      $emailSender->setContent(ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
         'EMAIL_TITLE' => 'Новый пароль',
-        'EMAIL_CONTENT' => sprintf('%s, здравствуйте! Используйте свой новый пароль для авторизации: <b>%d</b>. После авторизации рекомендуем сразу же его сменить.', $user->get_login(), $userPasswordNew),
+        'EMAIL_CONTENT' => sprintf('%s, здравствуйте! Используйте свой новый пароль для авторизации: <b>%d</b>. После авторизации рекомендуем сразу же его сменить.', $user->getLogin(), $userPasswordNew),
         'EMAIL_COPYRIGHT' => 'С уважением, администрация сайта.'
       ]));
 
@@ -115,10 +119,10 @@ if ($CMSCore->urlp->get_path(0) === 'handler') {
     echo 'Request is not exists!';
   }
 } else {
-  if ($CMSCore->urlp->get_param('mode') !== 'install' && file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
-    if ($CMSCore->configurator->get_database_entry_value('security_allowed_admin_ip_status') === 'on' && $CMSCore->urlp->get_path(0) === 'admin') {
+  if ($CMSCore->urlp->getParam('mode') !== 'install' && file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
+    if ($CMSCore->configurator->getDatabaseEntryValue('security_allowed_admin_ip_status') === 'on' && $CMSCore->urlp->getPath(0) === 'admin') {
       /** @var array Массив разрешенных IP-адресов */
-      $allowedIPs = json_decode($CMSCore->configurator->get_database_entry_value('security_allowed_admin_ip'), true);
+      $allowedIPs = json_decode($CMSCore->configurator->getDatabaseEntryValue('security_allowed_admin_ip'), true);
       
       if (!in_array($_SERVER['REMOTE_ADDR'], $allowedIPs)) {
         http_response_code(503);
@@ -127,9 +131,11 @@ if ($CMSCore->urlp->get_path(0) === 'handler') {
     }
   }
 
-  $theme = $CMSCore->get_template();
-  $theme->assembly_global_variables();
+  $theme = $CMSCore->getTemplate();
+  $theme->assemblyGlobalVariables();
+
+  $loadTime = microtime(true) - $startTime; // Конечное время
+  header('X-Load-Time: ' . round($loadTime, 3) . 's');
+
   echo $theme->core->assembled;
 }
-
-?>

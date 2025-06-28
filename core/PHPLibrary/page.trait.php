@@ -8,89 +8,92 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary {
-  use \core\PHPLibrary\Template\Collector as TemplateCollector;
-  use \core\PHPLibrary\SystemCore as SystemCore;
-  use \DOMDocument as DOMDocument;
+namespace core\PHPLibrary;
 
-  trait TraitPage {
-    /**
-     * Получить абсолютный путь SVG-файла иконки подраздела
-     * 
-     * @param SystemCore $CMSCore
-     * @param string $subnavigationItemName
-     * @return string
-     */
-    private function get_subnavigation_item_icon_path(SystemCore $CMSCore, string $subnavigationItemName) : string {
-      $themePath = $this->CMSCore->theme->get_path();
-      return $themePath . '/images/icons/subNavigation/' . $subnavigationItemName . '.svg';
-    }
+use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\SystemCore as SystemCore;
+use \DOMDocument as DOMDocument;
 
-    public function init_admin_panel_subnavigation(SystemCore $CMSCore, DOMDocument|null &$source) : void {
-      $themeSource =& $source;
+trait TraitPage
+{
+  /**
+   * Получить абсолютный путь SVG-файла иконки подраздела
+   * 
+   * @param SystemCore $CMSCore
+   * @param string $subnavigationItemName
+   * 
+   * @return string
+   */
+  private function getSubnavigationItemIconPath(SystemCore $CMSCore, string $subnavigationItemName) : string
+  {
+    $themePath = $this->CMSCore->theme->get_path();
+    return $themePath . '/images/icons/subNavigation/' . $subnavigationItemName . '.svg';
+  }
 
-      if (!is_null($themeSource)) {
-        $elementCMSAdminPanelSubnavigation = $themeSource->getElementById('SYSTEM_AP_SUBNAVIGATION');
-        if (!is_null($elementCMSAdminPanelSubnavigation)) {
-          $listElement = $elementCMSAdminPanelSubnavigation->ownerDocument->createElement('ul');
-          $listElement->setAttribute('class', 'navigation__list list list-reset');
+  public function initAdminPanelSubnavigation(SystemCore $CMSCore, DOMDocument|null &$source) : void
+  {
+    $themeSource =& $source;
 
-          if (count($this->navigationSubsections) > 0) {
-            foreach ($this->navigationSubsections as $index => $data) {
-              $subsectionName = $data['name'];
-              $subsectionLink = $data['link'];
-              $subsectionIconName = $data['iconName'];
-              $subsectionPermanentStatus = $data['permanent'];
-              $subsectionIsActiveStatus = $data['isActive'];
+    if (!is_null($themeSource)) {
+      $elementCMSAdminPanelSubnavigation = $themeSource->getElementById('SYSTEM_AP_SUBNAVIGATION');
 
-              // :D
-              $sectionIsAllowed = true;
+      if (!is_null($elementCMSAdminPanelSubnavigation)) {
+        $listElement = $elementCMSAdminPanelSubnavigation->ownerDocument->createElement('ul');
+        $listElement->setAttribute('class', 'navigation__list list list-reset');
 
-              if ($sectionIsAllowed) {
-                $itemTitle = sprintf('{LANG:%s}', self::LANG_PAGE_NAVIGATION_LABLE_TEMPLATE);
-                $itemTitle = sprintf($itemTitle, strtoupper($subsectionName));
-                $itemTitle = TemplateCollector::assembly_locale($itemTitle, $CMSCore->locale);
+        if (count($this->navigationSubsections) > 0) {
+          foreach ($this->navigationSubsections as $index => $data) {
+            $subsectionName = $data['name'];
+            $subsectionLink = $data['link'];
+            $subsectionIconName = $data['iconName'];
+            $subsectionPermanentStatus = $data['permanent'];
+            $subsectionIsActiveStatus = $data['isActive'];
 
-                $itemElement = $elementCMSAdminPanelSubnavigation->ownerDocument->createElement('li');
-                $linkElement = $elementCMSAdminPanelSubnavigation->ownerDocument->createElement('a');
-                $labelElement = $elementCMSAdminPanelSubnavigation->ownerDocument->createElement('div', $itemTitle);
+            $sectionIsAllowed = true;
 
-                $iconPath = $this->get_subnavigation_item_icon_path($CMSCore, $subsectionIconName);
-                if (file_exists($iconPath)) {
-                  $iconContainerElement = $elementCMSAdminPanelSubnavigation->ownerDocument->createElement('div');
-                  $iconContainerElement->setAttribute('class', sprintf('item__icon-container icon-container', $subsectionIconName));
+            if ($sectionIsAllowed) {
+              $itemTitle = sprintf('{LANG:%s}', self::LANG_PAGE_NAVIGATION_LABLE_TEMPLATE);
+              $itemTitle = sprintf($itemTitle, strtoupper($subsectionName));
+              $itemTitle = TemplateCollector::assemblyLocale($itemTitle, $CMSCore->locale);
 
-                  $SVGElement = new DOMDocument();
-                  $SVGElement->load($iconPath);
-                  $SVGImportedElement = $themeSource->importNode($SVGElement->documentElement, true);
-                  $SVGImportedElement->setAttribute('class', 'item__icon icon');
+              $itemElement = $elementCMSAdminPanelSubnavigation->ownerDocument->createElement('li');
+              $linkElement = $elementCMSAdminPanelSubnavigation->ownerDocument->createElement('a');
+              $labelElement = $elementCMSAdminPanelSubnavigation->ownerDocument->createElement('div', $itemTitle);
 
-                  $iconContainerElement->appendChild($SVGImportedElement);
-                  $linkElement->appendChild($iconContainerElement);
-                }
+              $iconPath = $this->getSubnavigationItemIconPath($CMSCore, $subsectionIconName);
+              if (file_exists($iconPath)) {
+                $iconContainerElement = $elementCMSAdminPanelSubnavigation->ownerDocument->createElement('div');
+                $iconContainerElement->setAttribute('class', sprintf('item__icon-container icon-container', $subsectionIconName));
 
-                if ($subsectionIsActiveStatus) {
-                  $itemElement->setAttribute('class', sprintf('list__item item item_%s item_is-active', $subsectionName));
-                } else {
-                  $itemElement->setAttribute('class', sprintf('list__item item item_%s', $subsectionName));
-                }
+                $SVGElement = new DOMDocument();
+                $SVGElement->load($iconPath);
+                $SVGImportedElement = $themeSource->importNode($SVGElement->documentElement, true);
+                $SVGImportedElement->setAttribute('class', 'item__icon icon');
 
-                $linkElement->setAttribute('href', '/admin' . $subsectionLink);
-                $linkElement->setAttribute('class', 'item__link link');
-                $linkElement->setAttribute('title', $itemTitle);
-                $labelElement->setAttribute('class', 'item__label label');
-
-                $linkElement->appendChild($labelElement);
-                $itemElement->appendChild($linkElement);
-                $listElement->appendChild($itemElement);
+                $iconContainerElement->appendChild($SVGImportedElement);
+                $linkElement->appendChild($iconContainerElement);
               }
-            }
 
-            $elementCMSAdminPanelSubnavigation->appendChild($listElement);
+              if ($subsectionIsActiveStatus) {
+                $itemElement->setAttribute('class', sprintf('list__item item item_%s item_is-active', $subsectionName));
+              } else {
+                $itemElement->setAttribute('class', sprintf('list__item item item_%s', $subsectionName));
+              }
+
+              $linkElement->setAttribute('href', '/admin' . $subsectionLink);
+              $linkElement->setAttribute('class', 'item__link link');
+              $linkElement->setAttribute('title', $itemTitle);
+              $labelElement->setAttribute('class', 'item__label label');
+
+              $linkElement->appendChild($labelElement);
+              $itemElement->appendChild($linkElement);
+              $listElement->appendChild($itemElement);
+            }
           }
+
+          $elementCMSAdminPanelSubnavigation->appendChild($listElement);
         }
       }
     }
   }
 }
-?>

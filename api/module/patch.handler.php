@@ -15,13 +15,13 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\Module as Module;
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT)) {
     if (isset($_PATCH['module_name'])) {
       $moduleName = trim($_PATCH['module_name']);
       $module = new Module($CMSCore, $moduleName);
@@ -30,54 +30,52 @@ if ($CMSCore->client->is_logged(2)) {
         $moduleEvent = $_PATCH['module_event'];
 
         if ($moduleEvent === 'enable') {
-          if (!$module->is_enabled()) {
+          if (!$module->isEnabled()) {
             $module->enable();
 
-            if ($module->is_enabled()) {
+            if ($module->isEnabled()) {
               http_response_code(200);
-              $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_MODULE_ENABLED');
+              $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_ENABLED');
               $handlerStatusCode = $handlerStatusCode ?? 1;
             } else {
               http_response_code(500);
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
               $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           } else {
             http_response_code(500);
-            $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_MODULE_ALREADY_ENABLED');
+            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_ALREADY_ENABLED');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         }
 
         if ($moduleEvent === 'disable') {
-          if ($module->is_enabled()) {
+          if ($module->isEnabled()) {
             $module->disable();
 
-            if (!$module->is_enabled()) {
+            if (!$module->isEnabled()) {
               http_response_code(200);
-              $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_MODULE_DISABLED');
+              $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_DISABLED');
               $handlerStatusCode = $handlerStatusCode ?? 1;
             } else {
               http_response_code(500);
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
               $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           } else {
             http_response_code(500);
-            $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_MODULE_ALREADY_DISABLED');
+            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_ALREADY_DISABLED');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         }
       }
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
   http_response_code(401);
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

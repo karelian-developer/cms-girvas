@@ -8,72 +8,69 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect {
-  use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\InterfaceClause as InterfaceClause;
-  use \core\PHPLibrary\Database\QueryBuilder\StatementSelect as StatementSelect;
-  use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseFrom\Table as Table;
+namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect;
 
-  final class ClauseFrom implements InterfaceClause {
-    private StatementSelect $statement;
-    public array $tables;
-    public string $assembled = '';
-    
-    /**
-     * __construct
-     *
-     * @param  mixed $statement
-     * @return void
-     */
-    public function __construct(StatementSelect $statement) {
-      $this->statement = $statement;
-    }
-    
-    /**
-     * add_table
-     *
-     * @param  mixed $name
-     * @return void
-     */
-    public function add_table(string $name, string $prefix = '') : void {
-      $this->tables[$name] = new Table($name, $prefix);
-    }
-    
-    /**
-     * assembly
-     *
-     * @return void
-     */
-    public function assembly() {
-      $queryArray = [];
+use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\InterfaceClause as InterfaceClause;
+use \core\PHPLibrary\Database\QueryBuilder\StatementSelect as StatementSelect;
+use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseFrom\Table as Table;
 
-      $databaseConfigurations = $this->statement->queryBuilder->CMSCore->configurator->get('database');
+final class ClauseFrom implements InterfaceClause
+{
+  private StatementSelect $statement;
+  public array $tables;
+  public string $assembled = '';
+  
+  /**
+   * __construct
+   *
+   * @param  mixed $statement
+   * @return void
+   */
+  public function __construct(StatementSelect $statement)
+  {
+    $this->statement = $statement;
+  }
+  
+  /**
+   * addTable
+   *
+   * @param  mixed $name
+   * @return void
+   */
+  public function addTable(string $name, string $prefix = '') : void
+  {
+    $this->tables[$name] = new Table($name, $prefix);
+  }
+  
+  /**
+   * assembly
+   *
+   * @return void
+   */
+  public function assembly() : void
+  {
+    $queryArray = [];
 
-      foreach ($this->tables as $table) {
-        $tableFullname = '';
+    $databaseConfigurations = $this->statement->queryBuilder->CMSCore->configurator->get('database');
 
-        if (!is_null($databaseConfigurations)) {
-          if ($databaseConfigurations['scheme'] !== '') {
-            $tableFullname .= sprintf('%s.', $databaseConfigurations['scheme']);
-          }
+    foreach ($this->tables as $table) {
+      $tableFullname = '';
 
-          if ($databaseConfigurations['prefix'] !== '' || $table->get_prefix() !== '') {
-            $tablePrefix = $table->get_prefix() === '' ? $databaseConfigurations['prefix'] : $table->get_prefix();
-            $tableFullname .= $tablePrefix . '_';
-          }
+      if (!is_null($databaseConfigurations)) {
+        if ($databaseConfigurations['scheme'] !== '') {
+          $tableFullname .= sprintf('%s.', $databaseConfigurations['scheme']);
         }
 
-        $tableFullname .= $table->get_name();
-        array_push($queryArray, $tableFullname);
+        if ($databaseConfigurations['prefix'] !== '' || $table->getPrefix() !== '') {
+          $tablePrefix = $table->getPrefix() === '' ? $databaseConfigurations['prefix'] : $table->getPrefix();
+          $tableFullname .= $tablePrefix . '_';
+        }
       }
 
-      if (count($this->tables) > 0) {
-        $this->assembled = sprintf('FROM %s', implode(', ', $queryArray));
-      } else {
-        $this->assembled = '';
-      }
+      $tableFullname .= $table->getName();
+      array_push($queryArray, $tableFullname);
     }
 
+    $this->assembled = count($this->tables) > 0 ? sprintf('FROM %s', implode(', ', $queryArray)) : '';
   }
 }
-
-?>

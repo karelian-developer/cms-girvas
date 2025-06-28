@@ -18,44 +18,45 @@ use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
 use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as FileConverterEnumFileFormat;
 use \core\PHPLibrary\SystemCore\Locale as Locale;
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_EDITOR_PAGES_STATIC_EDIT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_PAGES_STATIC_EDIT)) {
     if (isset($_PATCH['page_static_id'])) {
       $pageStaticID = $_PATCH['page_static_id'] ?? 0;
       $pageStaticID = is_numeric($pageStaticID) ? (int) $pageStaticID : 0;
 
-      if (PageStatic::exists_by_id($CMSCore, $pageStaticID)) {
+      if (PageStatic::existsByID($CMSCore, $pageStaticID)) {
         $pageStatic = new PageStatic($CMSCore, $pageStaticID);
         $pageStaticData = [];
 
-        $CMSLocalesNames = $CMSCore->get_array_locales_names();
+        $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
         if (count($CMSLocalesNames) > 0) {
           foreach ($CMSLocalesNames as $index => $localeName) {
             $CMSLocale = new Locale($CMSCore, $localeName);
+            $CMSLocaleName = $CMSLocale->getName();
 
-            $inputTitleName = 'page_static_title_' . $CMSLocale->get_iso_639_2();
-            $textareaDescriptionName = 'page_static_description_' . $CMSLocale->get_iso_639_2();
-            $textareaContentName = 'page_static_content_' . $CMSLocale->get_iso_639_2();
-            $textareaKeywordsName = 'page_static_keywords_' . $CMSLocale->get_iso_639_2();
+            $inputTitleName = 'page_static_title_' . $CMSLocale->getISO639(2);
+            $textareaDescriptionName = 'page_static_description_' . $CMSLocale->getISO639(2);
+            $textareaContentName = 'page_static_content_' . $CMSLocale->getISO639(2);
+            $textareaKeywordsName = 'page_static_keywords_' . $CMSLocale->getISO639(2);
 
             if (!array_key_exists('metadata', $pageStaticData)) $pageStaticData['metadata'] = [];
             if (isset($_PATCH['page_static_is_published'])) $pageStaticData['metadata']['is_published'] = $_PATCH['page_static_is_published'];
 
             if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH) || array_key_exists($textareaContentName, $_PATCH)) {
               if (!array_key_exists('texts', $pageStaticData)) $pageStaticData['texts'] = [];
-              if (!array_key_exists($CMSLocale->get_name(), $pageStaticData['texts'])) $pageStaticData['texts'][$CMSLocale->get_name()] = [];
+              if (!array_key_exists($CMSLocaleName, $pageStaticData['texts'])) $pageStaticData['texts'][$CMSLocaleName] = [];
 
               if (array_key_exists($inputTitleName, $_PATCH)) {
                 $inputValue = $_PATCH[$inputTitleName];
                 $inputValue = strip_tags($inputValue);
                 $inputValue = str_replace('\'', '"', $inputValue);
                 
-                $pageStaticData['texts'][$CMSLocale->get_name()]['title'] = $inputValue;
+                $pageStaticData['texts'][$CMSLocaleName]['title'] = $inputValue;
               }
 
               if (array_key_exists($textareaDescriptionName, $_PATCH)) {
@@ -63,7 +64,7 @@ if ($CMSCore->client->is_logged(2)) {
                 $textareaValue = strip_tags($textareaValue);
                 $textareaValue = str_replace('\'', '"', $textareaValue);
 
-                $pageStaticData['texts'][$CMSLocale->get_name()]['description'] = $textareaValue;
+                $pageStaticData['texts'][$CMSLocaleName]['description'] = $textareaValue;
               }
 
               if (array_key_exists($textareaContentName, $_PATCH)) {
@@ -71,7 +72,7 @@ if ($CMSCore->client->is_logged(2)) {
                 $textareaValue = strip_tags($textareaValue, '<table><tr><td><th><b><u><i><hr>');
                 $textareaValue = str_replace('\'', '"', $textareaValue);
 
-                $pageStaticData['texts'][$CMSLocale->get_name()]['content'] = $textareaValue;
+                $pageStaticData['texts'][$CMSLocaleName]['content'] = $textareaValue;
               }
 
               if (array_key_exists($textareaKeywordsName, $_PATCH)) {
@@ -79,7 +80,7 @@ if ($CMSCore->client->is_logged(2)) {
                 $textareaValue = strip_tags($textareaValue);
                 $textareaValue = str_replace('\'', '"', $textareaValue);
                 
-                $pageStaticData['texts'][$CMSLocale->get_name()]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
+                $pageStaticData['texts'][$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
               }
             }
           }
@@ -123,24 +124,24 @@ if ($CMSCore->client->is_logged(2)) {
         // в странице присутствует стандартная локализация, в противном случае
         // система не даст сохранить ее.
         if ($pageStaticIsPublished) {
-          $CMSBaseLocale = $CMSCore->get_cms_locale();
-          $CMSBaseLocaleName = $CMSBaseLocale->get_name();
+          $CMSBaseLocale = $CMSCore->getCMSLocale();
+          $CMSBaseLocaleName = $CMSBaseLocale->getName();
 
-          $pageStatic->init_data(['texts', 'metadata']);
+          $pageStatic->initData(['texts', 'metadata']);
 
           /** @var string Заголовок записи */
-          $pageStaticTitle = $pageStatic->get_title($CMSBaseLocaleName);
+          $pageStaticTitle = $pageStatic->getTitle($CMSBaseLocaleName);
           /** @var string описание записи */
-          $pageStaticDescription = $pageStatic->get_description($CMSBaseLocaleName);
+          $pageStaticDescription = $pageStatic->getDescription($CMSBaseLocaleName);
           /** @var string содержимое записи */
-          $pageStaticContent = $pageStatic->get_content($CMSBaseLocaleName);
+          $pageStaticContent = $pageStatic->getContent($CMSBaseLocaleName);
           /** @var int дата обновления страницы в формате UNIX */
           $pageStaticData['metadata']['publishedUnixTimestamp'] = time();
 
           // Если заголовок, описание или содержимое стандартной локализации не задано, то
           // запись не будет обновлена.
           if (empty($pageStaticTitle) || empty($pageStaticDescription) || empty($pageStaticContent)) {
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->get_single_value_by_key('API_PAGE_STATIC_EMPTY_LOCALE_DEFAULT_PUBLISHED_ERROR'), $CMSBaseLocaleName);
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_PAGE_STATIC_EMPTY_LOCALE_DEFAULT_PUBLISHED_ERROR'), $CMSBaseLocaleName);
             $handlerStatusCode = $handlerStatusCode ?? 0;
           } else {
             /** @var bool Обновление записи */
@@ -155,25 +156,23 @@ if ($CMSCore->client->is_logged(2)) {
         $pageStaticIsUpdated = $pageStaticIsUpdated ?? false;
 
         if ($pageStaticIsUpdated) {
-          $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS');
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_STATIC_PAGE_ERROR_NOT_FOUND');
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_STATIC_PAGE_ERROR_NOT_FOUND');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
   http_response_code(401);
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

@@ -15,36 +15,36 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\EntryComment as EntryComment;
 
-if ($CMSCore->client->is_logged(1) || $CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(1);
-  $clientUser->init_data(['metadata']);
+if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(1);
+  $clientUser->initData(['metadata']);
   $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+  $clientUserGroup->initData(['permissions']);
 
   if (isset($_DELETE['comment_id'])) {
     $commentID = $_DELETE['comment_id'] ?? 0;
     $commentID = is_numeric($commentID) ? (int) $commentID : 0;
 
-    if (EntryComment::exists_by_id($CMSCore, $commentID)) {
+    if (EntryComment::existsByID($CMSCore, $commentID)) {
       $comment = new EntryComment($CMSCore, $commentID);
-      $comment->init_data(['authorID']);
+      $comment->initData(['authorID']);
 
-      if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT) || $clientUserGroup->permission_check($clientUserGroup::PERMISSION_BASE_ENTRY_COMMENT_CHANGE) && $comment->get_author_id() == $clientUser->get_id()) {
+      if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT) || $clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_BASE_ENTRY_COMMENT_CHANGE) && $comment->getAuthorID() == $clientUser->getID()) {
         $commentIsDeleted = $comment->delete();
 
         if ($commentIsDeleted) {
-          $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_DELETE_DATA_SUCCESS');
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_DELETE_DATA_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ENTRY_COMMENT_ERROR_NOT_FOUND');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRY_COMMENT_ERROR_NOT_FOUND');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
 
@@ -52,8 +52,6 @@ if ($CMSCore->client->is_logged(1) || $CMSCore->client->is_logged(2)) {
     $handlerOutputData['reload'] = true;
   }
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

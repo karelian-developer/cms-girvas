@@ -18,66 +18,66 @@ use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($CMSCore->urlp->get_path(2) === 'category') {
-    if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT)) {
+  if ($CMSCore->urlp->getPath(2) === 'category') {
+    if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT)) {
       $entriesCategoryID = is_numeric($_DELETE['entries_category_id']) ? (int) $_DELETE['entries_category_id'] : 0;
       $entries = new Entries($CMSCore);
 
-      if (EntryCategory::exists_by_id($CMSCore, $entriesCategoryID)) {
-        if ($entries->get_count_by_category_id($entriesCategoryID) === 0) {
+      if (EntryCategory::existsByID($CMSCore, $entriesCategoryID)) {
+        if ($entries->getCountByCategoryID($entriesCategoryID) === 0) {
           $entriesСategory = new EntryCategory($CMSCore, $entriesCategoryID);
           $entriesСategoryIsDeleted = $entriesСategory->delete();
 
           if ($entriesСategoryIsDeleted) {
-            $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_DELETE_DATA_SUCCESS');
+            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_DELETE_DATA_SUCCESS');
             $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ENTRIES_CATEGORY_ERROR_DELETION_EXISTS_ENTRIES');
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRIES_CATEGORY_ERROR_DELETION_EXISTS_ENTRIES');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       }
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_EDITOR_ENTRIES_EDIT)) {
+    if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_ENTRIES_EDIT)) {
       if (isset($_DELETE['entry_id'])) {
         $entryID = is_numeric($_DELETE['entry_id']) ? (int) $_DELETE['entry_id'] : 0;
 
-        if (Entry::exists_by_id($CMSCore, $entryID)) {
+        if (Entry::existsByID($CMSCore, $entryID)) {
           $entry = new Entry($CMSCore, $entryID);
 
-          $entry->init_data(['texts']);
-          $entryTitle = $entry->get_title();
+          $entry->initData(['texts']);
+          $entryTitle = $entry->getTitle();
 
           $entryIsDeleted = $entry->delete();
 
           if ($entryIsDeleted) {
             $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_ENTRY_DELETED, [
-              'clientIP' => $CMSCore->client->get_ip_address(),
+              'clientIP' => $CMSCore->client->getIPAddress(),
               'entryTitle' => $entryTitle,
               'date' => date('Y/m/d H:i:s', time())
             ]);
 
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_DELETE_DATA_SUCCESS');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_DELETE_DATA_SUCCESS');
             $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ENTRY_ERROR_NOT_FOUND');
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRY_ERROR_NOT_FOUND');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
 
@@ -85,13 +85,11 @@ if ($CMSCore->client->is_logged(2)) {
         $handler_output_data['reload'] = true;
       }
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   }
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

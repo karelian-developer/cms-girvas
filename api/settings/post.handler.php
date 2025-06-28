@@ -13,13 +13,13 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT)) {
     if (!empty($_POST)) {
 
       /** @var int Количество пользовательских полей для пользователей */
@@ -33,13 +33,13 @@ if ($CMSCore->client->is_logged(2)) {
 
       if (!$errorIsDetected) {
         if (isset($_POST['setting_users_login_length_min']) && isset($_POST['setting_users_login_length_max'])) {
-          $settingUsersLoginLengthMin = (is_numeric($_POST['setting_users_login_length_min'])) ? (int)$_POST['setting_users_login_length_min'] : 0;
-          $settingUsersLoginLengthMax = (is_numeric($_POST['setting_users_login_length_max'])) ? (int)$_POST['setting_users_login_length_max'] : 0;
+          $settingUsersLoginLengthMin = is_numeric($_POST['setting_users_login_length_min']) ? (int) $_POST['setting_users_login_length_min'] : 0;
+          $settingUsersLoginLengthMax = is_numeric($_POST['setting_users_login_length_max']) ? (int) $_POST['setting_users_login_length_max'] : 0;
 
           if ($settingUsersLoginLengthMax < 0 && !$errorIsDetected) {
             $errorIsDetected = true;
 
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_USERS_LOGIN_LENGTH_MAX_TOO_SMALL');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_USERS_LOGIN_LENGTH_MAX_TOO_SMALL');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
 
@@ -47,7 +47,7 @@ if ($CMSCore->client->is_logged(2)) {
             if ($settingUsersLoginLengthMax < $settingUsersLoginLengthMin) {
               $errorIsDetected = true;
 
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_USERS_LOGIN_LENGTH_MIN_LARGE_MAX');
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_USERS_LOGIN_LENGTH_MIN_LARGE_MAX');
               $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           }
@@ -55,7 +55,7 @@ if ($CMSCore->client->is_logged(2)) {
           if ($settingUsersLoginLengthMin < 4 && !$errorIsDetected) {
             $errorIsDetected = true;
 
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_USERS_LOGIN_LENGTH_MIN_TOO_SMALL');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_USERS_LOGIN_LENGTH_MIN_TOO_SMALL');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         }
@@ -63,13 +63,13 @@ if ($CMSCore->client->is_logged(2)) {
 
       if (!$errorIsDetected) {
         if (isset($_POST['setting_users_password_length_min']) && isset($_POST['setting_users_password_length_max'])) {
-          $settingUsersPasswordLengthMin = (is_numeric($_POST['setting_users_password_length_min'])) ? (int)$_POST['setting_users_password_length_min'] : 0;
-          $settingUsersPasswordLengthMax = (is_numeric($_POST['setting_users_password_length_max'])) ? (int)$_POST['setting_users_password_length_max'] : 0;
+          $settingUsersPasswordLengthMin = is_numeric($_POST['setting_users_password_length_min']) ? (int) $_POST['setting_users_password_length_min'] : 0;
+          $settingUsersPasswordLengthMax = is_numeric($_POST['setting_users_password_length_max']) ? (int) $_POST['setting_users_password_length_max'] : 0;
 
           if ($settingUsersPasswordLengthMax < 0 && !$errorIsDetected) {
             $errorIsDetected = true;
 
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_USERS_PASSWORD_LENGTH_MAX_TOO_SMALL');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_USERS_PASSWORD_LENGTH_MAX_TOO_SMALL');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
 
@@ -77,7 +77,7 @@ if ($CMSCore->client->is_logged(2)) {
             if ($settingUsersPasswordLengthMax < $settingUsersPasswordLengthMin) {
               $errorIsDetected = true;
 
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_USERS_PASSWORD_LENGTH_MIN_LARGE_MAX');
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_USERS_PASSWORD_LENGTH_MIN_LARGE_MAX');
               $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           }
@@ -85,7 +85,7 @@ if ($CMSCore->client->is_logged(2)) {
           if ($settingUsersPasswordLengthMin < 6 && !$errorIsDetected) {
             $errorIsDetected = true;
 
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_USERS_PASSWORD_LENGTH_MIN_TOO_SMALL');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_USERS_PASSWORD_LENGTH_MIN_TOO_SMALL');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         }
@@ -102,7 +102,7 @@ if ($CMSCore->client->is_logged(2)) {
               try {
                 $fileRobotsTXT = @fopen($fileRobotsTXTPath, 'w+');
                 if ($fileRobotsTXT === false) {
-                  $exceptionMessage = 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED');
+                  $exceptionMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED');
                   throw new Exception($exceptionMessage);
                 }
 
@@ -110,7 +110,7 @@ if ($CMSCore->client->is_logged(2)) {
                 fclose($fileRobotsTXT);
                 chmod($fileRobotsTXTPath, 0664);
               } catch (Exception $exception) {
-                $exceptionMessage = 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED');
+                $exceptionMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED');
                 $handlerMessage = $handlerMessage ?? $exceptionMessage;
                 $handlerStatusCode = $handlerStatusCode ?? 0;
               }
@@ -119,8 +119,8 @@ if ($CMSCore->client->is_logged(2)) {
             }
 
             if ($settingName === 'users_additional_field_title' && isset($_POST['_users_additional_fields_locale'])) {
-              if ($CMSCore->configurator->exists_database_entry_value($settingName)) {
-                $fieldsTitles = json_decode($CMSCore->configurator->get_database_entry_value($settingName), true);
+              if ($CMSCore->configurator->existsDatabaseEntryValue($settingName)) {
+                $fieldsTitles = json_decode($CMSCore->configurator->getDatabaseEntryValue($settingName), true);
                 
                 foreach ($settingValue as $key => $value) {
                   $fieldsTitles[$_POST['_users_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
@@ -140,8 +140,8 @@ if ($CMSCore->client->is_logged(2)) {
             }
 
             if ($settingName === 'users_additional_field_description' && isset($_POST['_users_additional_fields_locale'])) {
-              if ($CMSCore->configurator->exists_database_entry_value($settingName)) {
-                $fieldsDescriptions = json_decode($CMSCore->configurator->get_database_entry_value($settingName), true);
+              if ($CMSCore->configurator->existsDatabaseEntryValue($settingName)) {
+                $fieldsDescriptions = json_decode($CMSCore->configurator->getDatabaseEntryValue($settingName), true);
                 
                 foreach ($settingValue as $key => $value) {
                   $fieldsDescriptions[$_POST['_users_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
@@ -167,8 +167,8 @@ if ($CMSCore->client->is_logged(2)) {
             }
 
             if ($settingName == 'entries_additional_field_title' && isset($_POST['_entries_additional_fields_locale'])) {
-              if ($CMSCore->configurator->exists_database_entry_value($settingName)) {
-                $fieldsTitles = json_decode($CMSCore->configurator->get_database_entry_value($settingName), true);
+              if ($CMSCore->configurator->existsDatabaseEntryValue($settingName)) {
+                $fieldsTitles = json_decode($CMSCore->configurator->getDatabaseEntryValue($settingName), true);
                 
                 foreach ($settingValue as $key => $value) {
                   $fieldsTitles[$_POST['_entries_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
@@ -188,8 +188,8 @@ if ($CMSCore->client->is_logged(2)) {
             }
 
             if ($settingName == 'entries_additional_field_description' && isset($_POST['_entries_additional_fields_locale'])) {
-              if ($CMSCore->configurator->exists_database_entry_value($settingName)) {
-                $fieldsDescriptions = json_decode($CMSCore->configurator->get_database_entry_value($settingName), true);
+              if ($CMSCore->configurator->existsDatabaseEntryValue($settingName)) {
+                $fieldsDescriptions = json_decode($CMSCore->configurator->getDatabaseEntryValue($settingName), true);
                 
                 foreach ($settingValue as $key => $value) {
                   $fieldsDescriptions[$_POST['_entries_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
@@ -215,8 +215,8 @@ if ($CMSCore->client->is_logged(2)) {
             }
 
             if ($settingName === 'static_pages_additional_field_title' && isset($_POST['_static_pages_additional_fields_locale'])) {
-              if ($CMSCore->configurator->exists_database_entry_value($settingName)) {
-                $fieldsTitles = json_decode($CMSCore->configurator->get_database_entry_value($settingName), true);
+              if ($CMSCore->configurator->existsDatabaseEntryValue($settingName)) {
+                $fieldsTitles = json_decode($CMSCore->configurator->getDatabaseEntryValue($settingName), true);
                 
                 foreach ($settingValue as $key => $value) {
                   $fieldsTitles[$_POST['_static_pages_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
@@ -236,8 +236,8 @@ if ($CMSCore->client->is_logged(2)) {
             }
 
             if ($settingName === 'static_pages_additional_field_description' && isset($_POST['_static_pages_additional_fields_locale'])) {
-              if ($CMSCore->configurator->exists_database_entry_value($settingName)) {
-                $fieldsDescriptions = json_decode($CMSCore->configurator->get_database_entry_value($settingName), true);
+              if ($CMSCore->configurator->existsDatabaseEntryValue($settingName)) {
+                $fieldsDescriptions = json_decode($CMSCore->configurator->getDatabaseEntryValue($settingName), true);
                 
                 foreach ($settingValue as $key => $value) {
                   $fieldsDescriptions[$_POST['_static_pages_additional_fields_locale']][$key] = htmlspecialchars(str_replace('\'', '"', $value));
@@ -294,53 +294,51 @@ if ($CMSCore->client->is_logged(2)) {
               default => htmlspecialchars(str_replace('\'', '"', $settingValue))
             };
 
-            if ($CMSCore->configurator->exists_database_entry_value($settingName)) {
-              $CMSCore->configurator->update_database_entry_value($settingName, $settingValue);
+            if ($CMSCore->configurator->existsDatabaseEntryValue($settingName)) {
+              $CMSCore->configurator->updateDatabaseEntryValue($settingName, $settingValue);
             } else {
-              $CMSCore->configurator->insert_database_entry_value($settingName, $settingValue);
+              $CMSCore->configurator->insertDatabaseEntryValue($settingName, $settingValue);
             }
           }
         }
 
         if ($usersAdditionalFieldsCount === 0 && isset($_POST['_users_additional_fields_locale'])) {
           foreach (['users_additional_field_title', 'users_additional_field_description', 'users_additional_field_name', 'users_additional_field_type'] as $index => $name) {
-            if ($CMSCore->configurator->exists_database_entry_value('users_additional_field_title')) {
-              $CMSCore->configurator->update_database_entry_value($name, json_encode([]));
+            if ($CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_title')) {
+              $CMSCore->configurator->updateDatabaseEntryValue($name, json_encode([]));
             }
           }
         }
 
         if ($entriesAdditionalFieldsCount === 0 && isset($_POST['_entries_additional_fields_locale'])) {
           foreach (['entries_additional_field_title', 'entries_additional_field_description', 'entries_additional_field_name', 'entries_additional_field_type', 'entries_additional_field_category_id'] as $index => $name) {
-            if ($CMSCore->configurator->exists_database_entry_value('entries_additional_field_title')) {
-              $CMSCore->configurator->update_database_entry_value($name, json_encode([]));
+            if ($CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_title')) {
+              $CMSCore->configurator->updateDatabaseEntryValue($name, json_encode([]));
             }
           }
         }
 
         if ($staticPagesAdditionalFieldsCount == 0 && isset($_POST['_static_pages_additional_fields_locale'])) {
           foreach (['static_pages_additional_field_title', 'static_pages_additional_field_description', 'static_pages_additional_field_name', 'static_pages_additional_field_type', 'static_pages_additional_field_type'] as $index => $name) {
-            if ($CMSCore->configurator->exists_database_entry_value('static_pages_additional_field_title')) {
-              $CMSCore->configurator->update_database_entry_value($name, json_encode([]));
+            if ($CMSCore->configurator->existsDatabaseEntryValue('static_pages_additional_field_title')) {
+              $CMSCore->configurator->updateDatabaseEntryValue($name, json_encode([]));
             }
           }
         }
 
-        $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS');
+        $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
         $handlerStatusCode = $handlerStatusCode ?? 1;
       }
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_INVALID_INPUT_DATA_SET');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
   http_response_code(401);
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

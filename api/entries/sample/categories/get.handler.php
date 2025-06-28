@@ -16,44 +16,43 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\EntriesSample as EntriesSample;
 use \core\PHPLibrary\EntriesSamples as EntriesSamples;
 
-if ($CMSCore->client->is_logged(1) || $CMSCore->client->is_logged(2)) {
+if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
   /** @var int ID выборки */
   $sampleID = $CMSCore->urlp->get_path(3) ?? 0;
   $sampleID = is_numeric($sampleID) ? (int) $sampleID : 0;
   
-  if (EntriesSample::exists_by_id($CMSCore, $sampleID)) {
+  if (EntriesSample::existsByID($CMSCore, $sampleID)) {
     $sample = new EntriesSample($CMSCore, $sampleID);
-    $sample->init_data(['metadata']);
+    $sample->initData(['metadata']);
     
-    $localeName = $CMSCore->urlp->get_param('locale') ?? $CMSCore->configurator->get_database_entry_value('base_locale');
+    $localeName = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->get_database_entry_value('base_locale');
 
     $handlerOutputData['entriesSample'] = ['categories' => []];
-    $handlerOutputData['entriesSample']['id'] = $sample->get_id();
+    $handlerOutputData['entriesSample']['id'] = $sample->getID();
 
-    $sampleCategoriesIDs = $sample->get_categories_ids();
-    $sampleCategories = $sample->get_categories();
+    $sampleCategoriesIDs = $sample->getCategoriesIDs();
+    $sampleCategories = $sample->getCategories();
+    
     if (count($sampleCategories) > 0) {
       foreach ($sampleCategories as $category) {
-        $category->init_data(['texts']);
-        $isSelected = array_search($category->get_id(), $sampleCategoriesIDs) !== false ? true : false;
+        $category->initData(['texts']);
+        $isSelected = array_search($category->getID(), $sampleCategoriesIDs) !== false ? true : false;
 
         $handlerOutputData['entriesSample']['categories'][] = [
-          'id' => $category->get_id(),
-          'title' => $category->get_title($localeName),
+          'id' => $category->getID(),
+          'title' => $category->getTitle($localeName),
           'isSelected' => $isSelected
         ];
       }
     }
 
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ENTRY_COMMENT_ERROR_NOT_FOUND');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRY_COMMENT_ERROR_NOT_FOUND');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

@@ -13,13 +13,13 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT)) {
     $themeName = $_POST['template_name'];
     $themeURL = 'https://repository.cms-girvas.ru/templates/' . $themeName;
 
@@ -53,27 +53,25 @@ if ($CMSCore->client->is_logged(2)) {
 
           unlink($themeArchivePath);
 
-          $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_TEMPLATE_UPLOADED');
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_TEMPLATE_UPLOADED');
           $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNZIPPING_NOT_POSSIBLE');
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNZIPPING_NOT_POSSIBLE');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_TEMPLATE_ERROR_REPOSITORY_DATA_NOT_GETTED');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_TEMPLATE_ERROR_REPOSITORY_DATA_NOT_GETTED');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

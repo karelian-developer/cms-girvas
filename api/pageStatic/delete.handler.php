@@ -15,30 +15,30 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\PageStatic as PageStatic;
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_EDITOR_PAGES_STATIC_EDIT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_PAGES_STATIC_EDIT)) {
     if (isset($_DELETE['page_static_id'])) {
       $pageStaticID = $_DELETE['page_static_id'] ?? 0;
       $pageStaticID = is_numeric($pageStaticID) ? (int) $pageStaticID : 0;
 
-      if (PageStatic::exists_by_id($CMSCore, $pageStaticID)) {
+      if (PageStatic::existsByID($CMSCore, $pageStaticID)) {
         $pageStatic = new PageStatic($CMSCore, $pageStaticID);
         $pageStaticIsDeleted = $pageStatic->delete();
 
         if ($pageStaticIsDeleted) {
-          $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_DELETE_DATA_SUCCESS');
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_DELETE_DATA_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_STATIC_PAGE_ERROR_NOT_FOUND');
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_STATIC_PAGE_ERROR_NOT_FOUND');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
 
@@ -46,13 +46,11 @@ if ($CMSCore->client->is_logged(2)) {
       $handlerOutputData['reload'] = true;
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
   http_response_code(401);
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

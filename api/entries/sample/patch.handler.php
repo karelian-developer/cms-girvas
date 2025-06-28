@@ -19,17 +19,17 @@ use \core\PHPLibrary\EntriesSamples as EntriesSamples;
 use \core\PHPLibrary\SystemCore\Locale as Locale;
 use \core\PHPLibrary\EntriesSample\EnumSortTypeID as EnumSortTypeID;
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT)) {
     $dataUpdated = [];
     
     /** @var int ID выборки */
-    $sampleID = $CMSCore->urlp->get_path(3) ?? 0;
+    $sampleID = $CMSCore->urlp->getPath(3) ?? 0;
     $sampleID = is_numeric($sampleID) ? (int) $sampleID : 0;
     
     /** @var string Техническое наименование выборки */
@@ -43,12 +43,12 @@ if ($CMSCore->client->is_logged(2)) {
     $sampleSortTypeID = $_PATCH['entries_sample_sort_type_id'] ?? 0;
     $sampleSortTypeID = is_numeric($sampleSortTypeID) ? (int) $sampleSortTypeID : 0;
     $sampleSortTypeID = match ($sampleSortTypeID) {
-      1 => EnumSortTypeID::BY_DATE_OF_PUBLICATION->get_id(),
-      2 => EnumSortTypeID::BY_DATE_OF_CREATION->get_id(),
-      3 => EnumSortTypeID::BY_NUMBER_OF_VIEW->get_id(),
-      4 => EnumSortTypeID::BY_NUMBER_OF_COMMENTS->get_id(),
-      5 => EnumSortTypeID::BY_RELEVANCE->get_id(),
-      default => EnumSortTypeID::BY_DATE_OF_PUBLICATION->get_id()
+      1 => EnumSortTypeID::BY_DATE_OF_PUBLICATION->getID(),
+      2 => EnumSortTypeID::BY_DATE_OF_CREATION->getID(),
+      3 => EnumSortTypeID::BY_NUMBER_OF_VIEW->getID(),
+      4 => EnumSortTypeID::BY_NUMBER_OF_COMMENTS->getID(),
+      5 => EnumSortTypeID::BY_RELEVANCE->getID(),
+      default => EnumSortTypeID::BY_DATE_OF_PUBLICATION->getID()
     };
 
     $sampleCategoriesIDs = $_PATCH['entries_sample_categories_id'] ?? [];
@@ -56,14 +56,14 @@ if ($CMSCore->client->is_logged(2)) {
     /** @var array Текстовые значения для выборки */
     $sampleTexts = [];
 
-    $CMSLocalesNames = $CMSCore->get_array_locales_names();
+    $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
     if (count($CMSLocalesNames) > 0) {
       foreach ($CMSLocalesNames as $index => $localeName) {
         $CMSLocale = new Locale($CMSCore, $localeName);
-        $CMSLocaleName = $CMSLocale->get_name();
+        $CMSLocaleName = $CMSLocale->getName();
 
-        $inputTitleName = 'entries_sample_title_' . $CMSLocale->get_iso_639_2();
-        $textareaDescriptionName = 'entries_sample_description_' . $CMSLocale->get_iso_639_2();
+        $inputTitleName = 'entries_sample_title_' . $CMSLocale->getISO639(2);
+        $textareaDescriptionName = 'entries_sample_description_' . $CMSLocale->getISO639(2);
 
         if (isset($_PATCH[$inputTitleName]) || isset($_PATCH[$textareaDescriptionName])) {
           $dataUpdated['texts'] = [];
@@ -102,42 +102,40 @@ if ($CMSCore->client->is_logged(2)) {
       $dataUpdated['metadata']['categoriesIDs'] = [];
 
       foreach ($sampleCategoriesIDs as $id) {
-        if (EntryCategory::exists_by_id($CMSCore, $id)) {
+        if (EntryCategory::existsByID($CMSCore, $id)) {
           array_push($dataUpdated['metadata']['categoriesIDs'], $id);
         }
       }
     }
 
     if (preg_match('/\S/', $sampleName)) {
-      if (EntriesSample::exists_by_id($CMSCore, $sample_id)) {
+      if (EntriesSample::existsByID($CMSCore, $sample_id)) {
         $sample = new EntriesSample($CMSCore, $sample_id);
-        $sample->init_data(['name', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+        $sample->initData(['name', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
 
-        if (!EntriesSample::exists_by_name($CMSCore, $sampleName) || $sampleName === $sample->get_name()) {
+        if (!EntriesSample::existsByName($CMSCore, $sampleName) || $sampleName === $sample->getName()) {
           $dataUpdated['name'] = $sampleName;
 
           $isUpdated = $sample->update($dataUpdated);
 
           if ($isUpdated) {
-            $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS');
+            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
             $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         }
       }
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ENTRIES_SAMPLE_ERROR_NAME_EMPTY');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRIES_SAMPLE_ERROR_NAME_EMPTY');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

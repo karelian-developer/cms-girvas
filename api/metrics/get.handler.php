@@ -16,27 +16,27 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\Metrics as Metrics;
 use \core\PHPLibrary\Metrics\Session as MetricsSession;
 
-$clientIP = $CMSCore->client->get_ip_address();
+$clientIP = $CMSCore->client->getIPAddress();
 $metrics = new Metrics($CMSCore);
 
 if (isset($_GET['time'])) {
   $metricsTimestamp = (is_numeric($_GET['time'])) ? strtotime(date('Y/m/d', $_GET['time'])) : strtotime(date('Y/m/d', time()));
 
-  if (MetricsSession::exists_by_timestamp($CMSCore, $metrics, $metricsTimestamp)) {
-    $metricsSession = MetricsSession::get_by_timestamp($CMSCore, $metrics, $metricsTimestamp);
+  if (MetricsSession::existsByTimestamp($CMSCore, $metrics, $metricsTimestamp)) {
+    $metricsSession = MetricsSession::getByTimestamp($CMSCore, $metrics, $metricsTimestamp);
 
     if (!is_null($metricsSession)) {
-      $metricsSession->init_data(['data']);
+      $metricsSession->initData(['data']);
 
-      $handlerOutputData['data'] = $metricsSession->get_data();
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+      $handlerOutputData['data'] = $metricsSession->getData();
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
       $handlerStatusCode = $handlerStatusCode ?? 1;
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } elseif (isset($_GET['timeStart']) && isset($_GET['timeEnd'])) {
@@ -45,23 +45,21 @@ if (isset($_GET['time'])) {
 
   $handlerOutputData['data'] = [];
 
-  $metricsSessions = $metrics->get_sessions_by_timestamp_range($metricsTimestampStart, $metricsTimestampEnd);
+  $metricsSessions = $metrics->getSessionsByTimestampRange($metricsTimestampStart, $metricsTimestampEnd);
   if (!empty($metricsSessions)) {
     foreach ($metricsSessions as $session) {
-      $session->init_data(['data']);
+      $session->initData(['data']);
 
-      array_push($handlerOutputData['data'], $session->get_data());
+      array_push($handlerOutputData['data'], $session->getData());
     }
 
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   } {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

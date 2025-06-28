@@ -14,19 +14,17 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 // Проверка авторизации клиента
-if ($CMSCore->urlp->get_path(2) === 'is-logged') {
-  $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+if ($CMSCore->urlp->getPath(2) === 'is-logged') {
+  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
   $handlerStatusCode = $handlerStatusCode ?? 1;
 
-  $handlerOutputData['result'] = $CMSCore->client->is_logged(1);
+  $handlerOutputData['result'] = $CMSCore->client->isLogged(1);
 }
 
 // Получение IP-адреса клиента
-if ($CMSCore->urlp->get_path(2) === 'ip-address') {
-  $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+if ($CMSCore->urlp->getPath(2) === 'ip-address') {
+  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
   $handlerStatusCode = $handlerStatusCode ?? 1;
 
-  $handlerOutputData['result'] = $CMSCore->client->get_ip_address();
+  $handlerOutputData['result'] = $CMSCore->client->getIPAddress();
 }
-
-?>

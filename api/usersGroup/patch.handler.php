@@ -17,17 +17,17 @@ use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\SystemCore\Locale as Locale;
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_ADMIN_USERS_GROUPS_MANAGEMENT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_GROUPS_MANAGEMENT)) {
     if (isset($_PATCH['user_group_id'])) {
-      $usersGroupID = (is_numeric($_PATCH['user_group_id'])) ? (int)$_PATCH['user_group_id'] : 0;
+      $usersGroupID = is_numeric($_PATCH['user_group_id']) ? (int) $_PATCH['user_group_id'] : 0;
       
-      if (UserGroup::exists_by_id($CMSCore, $usersGroupID)) {
+      if (UserGroup::existsByID($CMSCore, $usersGroupID)) {
         $usersGroup = new UserGroup($CMSCore, $usersGroupID);
         $usersGroupData = [];
 
@@ -61,20 +61,21 @@ if ($CMSCore->client->is_logged(2)) {
 
         $usersGroupData['permissions'] = $usersGroupPermissions;
 
-        $CMSLocalesNames = $CMSCore->get_array_locales_names();
+        $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
         if (count($CMSLocalesNames) > 0) {
           foreach ($CMSLocalesNames as $index => $name) {
             $CMSLocale = new Locale($CMSCore, $name);
+            $CMSLocaleName = $CMSLocale->getName();
 
-            $usersGroupTitleInputName = 'user_group_title_' . $CMSLocale->get_iso_639_2();
+            $usersGroupTitleInputName = 'user_group_title_' . $CMSLocale->getISO639(2);
 
             if (!array_key_exists('metadata', $usersGroupData)) $usersGroupData['metadata'] = [];
 
             if (array_key_exists($usersGroupTitleInputName, $_PATCH)) {
               if (!array_key_exists('texts', $usersGroupData)) $usersGroupData['texts'] = [];
-              if (!array_key_exists($CMSLocale->get_name(), $usersGroupData['texts'])) $usersGroupData['texts'][$CMSLocale->get_name()] = [];
+              if (!array_key_exists($CMSLocaleName, $usersGroupData['texts'])) $usersGroupData['texts'][$CMSLocaleName] = [];
 
-              if (array_key_exists($usersGroupTitleInputName, $_PATCH)) $usersGroupData['texts'][$CMSLocale->get_name()]['title'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$usersGroupTitleInputName]));
+              if (array_key_exists($usersGroupTitleInputName, $_PATCH)) $usersGroupData['texts'][$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$usersGroupTitleInputName]));
             }
           }
         }
@@ -84,24 +85,22 @@ if ($CMSCore->client->is_logged(2)) {
         $usersGroupIsUpdated = $usersGroup->update($usersGroupData);
 
         if ($usersGroupIsUpdated) {
-          $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS');
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_USERS_GROUP_ERROR_NOT_FOUND');
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USERS_GROUP_ERROR_NOT_FOUND');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

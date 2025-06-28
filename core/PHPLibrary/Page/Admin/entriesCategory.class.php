@@ -9,77 +9,77 @@
  */
 
 
-namespace core\PHPLibrary\Page\Admin {
-  use \core\PHPLibrary\InterfacePage as InterfacePage;
-  use \core\PHPLibrary\SystemCore as SystemCore;
-  use \core\PHPLibrary\EntryCategory as EntryCategory;
-  use \core\PHPLibrary\Template\Collector as TemplateCollector;
-  use \core\PHPLibrary\Page as Page;
-  use \core\PHPLibrary\TraitPage as TraitPage;
+namespace core\PHPLibrary\Page\Admin;
 
-  class PageEntriesCategory implements InterfacePage {
-    use TraitPage;
+use \core\PHPLibrary\InterfacePage as InterfacePage;
+use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\EntryCategory as EntryCategory;
+use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\TraitPage as TraitPage;
 
-    const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_CATEGORY_NAVIGATION_%s_LABEL';
+class PageEntriesCategory implements InterfacePage
+{
+  use TraitPage;
 
-    public SystemCore $CMSCore;
-    public Page $page;
-    public string $assembled = '';
-    public array $navigationSubsections = [
-      'back' => [
-        'name' => 'back',
-        'iconName' => 'back',
-        'link' => '/entriesCategories',
-        'permanent' => true,
-        'isActive' => false
-      ],
-    ];
+  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_CATEGORY_NAVIGATION_%s_LABEL';
 
-    public function __construct(SystemCore $CMSCore, Page $page) {
-      $this->CMSCore = $CMSCore;
-      $this->page = $page;
-    }
+  public SystemCore $CMSCore;
+  public Page $page;
+  public string $assembled = '';
+  public array $navigationSubsections = [
+    'back' => [
+      'name' => 'back',
+      'iconName' => 'back',
+      'link' => '/entriesCategories',
+      'permanent' => true,
+      'isActive' => false
+    ],
+  ];
 
-    /**
-     * Инициализация подразделов
-     * 
-     * @return void
-     */
-    public function init_subnavigation() : void {
-      $themeSource =& $this->CMSCore->theme->core->source;
-      $this->init_admin_panel_subnavigation($this->CMSCore, $themeSource);
-    }
+  public function __construct(SystemCore $CMSCore, Page $page) {
+    $this->CMSCore = $CMSCore;
+    $this->page = $page;
+  }
 
-    public function assembly() : void {
-      $this->CMSCore->theme->add_style(['href' => 'styles/page/entriesCategory.css', 'rel' => 'stylesheet']);
+  /**
+   * Инициализация подразделов
+   * 
+   * @return void
+   */
+  public function initSubnavigation() : void
+  {
+    $themeSource =& $this->CMSCore->theme->core->source;
+    $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
+  }
+
+  public function assembly() : void
+  {
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page/entriesCategory.css', 'rel' => 'stylesheet']);
+    
+    $localeData = $this->CMSCore->locale->getData();
+    $localeName = $this->CMSCore->locale->getName();
+
+    $entriesCategory = null;
+    if ($this->CMSCore->urlp->getPath(2) !== null) {
+      $entriesCategoryID = (is_numeric($this->CMSCore->urlp->getPath(2))) ? (int)$this->CMSCore->urlp->getPath(2) : 0;
+      $entriesCategory = EntryCategory::existsByID($this->CMSCore, $entriesCategoryID) ? new EntryCategory($this->CMSCore, $entriesCategoryID) : null;
       
-      $localeData = $this->CMSCore->locale->get_data();
-      $localeName = $this->CMSCore->locale->get_name();
-
-      $entriesCategory = null;
-      if (!is_null($this->CMSCore->urlp->get_path(2))) {
-        $entriesCategoryID = (is_numeric($this->CMSCore->urlp->get_path(2))) ? (int)$this->CMSCore->urlp->get_path(2) : 0;
-        $entriesCategory = (EntryCategory::exists_by_id($this->CMSCore, $entriesCategoryID)) ? new EntryCategory($this->CMSCore, $entriesCategoryID) : null;
-        
-        if (!is_null($entriesCategory)) {
-          $entriesCategory->init_data(['id', 'texts', 'name', 'parentID', 'metadata']);
-        }
+      if ($entriesCategory !== null) {
+        $entriesCategory->initData(['id', 'texts', 'name', 'parentID', 'metadata']);
       }
-      
-      /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entriesCategory.tpl', [
-        'ADMIN_PANEL_PAGE_NAME' => 'entries-category',
-        'ENTRIES_CATEGORY_ID' => !is_null($entriesCategory) ? $entriesCategory->get_id() : 0,
-        'ENTRIES_CATEGORY_TITLE' => !is_null($entriesCategory) ? $entriesCategory->get_title() : '',
-        'ENTRIES_CATEGORY_DESCRIPTION' => !is_null($entriesCategory) ? $entriesCategory->get_description() : '',
-        'ENTRIES_CATEGORY_NAME' => !is_null($entriesCategory) ? $entriesCategory->get_name() : '',
-        'ENTRIES_CATEGORY_FORM_METHOD' => !is_null($entriesCategory) ? 'PATCH' : 'PUT',
-        'ENTRIES_CATEGORY_SHOW_ON_INDEX_PAGE' => (is_null($entriesCategory)) ? '' : (($entriesCategory->is_showed_on_index_page()) ? 'checked' : ''),
-      ]);
     }
-
+    
+    /** @var string $site_page Содержимое шаблона страницы */
+    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesCategory.tpl', [
+      'ADMIN_PANEL_PAGE_NAME' => 'entries-category',
+      'ENTRIES_CATEGORY_ID' => $entriesCategory !== null ? $entriesCategory->getID() : 0,
+      'ENTRIES_CATEGORY_TITLE' => $entriesCategory !== null ? $entriesCategory->getTitle() : '',
+      'ENTRIES_CATEGORY_DESCRIPTION' => $entriesCategory !== null ? $entriesCategory->getDescription() : '',
+      'ENTRIES_CATEGORY_NAME' => $entriesCategory !== null ? $entriesCategory->getName() : '',
+      'ENTRIES_CATEGORY_FORM_METHOD' => $entriesCategory !== null ? 'PATCH' : 'PUT',
+      'ENTRIES_CATEGORY_SHOW_ON_INDEX_PAGE' => $entriesCategory === null ? '' : ($entriesCategory->isShowedOnIndexPage() ? 'checked' : ''),
+    ]);
   }
 
 }
-
-?>

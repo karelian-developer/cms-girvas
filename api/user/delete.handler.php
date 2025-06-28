@@ -15,47 +15,45 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\User as User;
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT)) {
     if (isset($_DELETE['user_id'])) {
-      $userID = (is_numeric($_DELETE['user_id'])) ? (int)$_DELETE['user_id'] : 0;
+      $userID = is_numeric($_DELETE['user_id']) ? (int) $_DELETE['user_id'] : 0;
 
       if ($userID != 1) {
-        if (User::exists_by_id($CMSCore, $userID)) {
+        if (User::existsByID($CMSCore, $userID)) {
           $user = new User($CMSCore, $userID);
 
           $userIsDeleted = $user->delete();
           if ($userIsDeleted) {
-            $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_DELETE_DATA_SUCCESS');
+            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_DELETE_DATA_SUCCESS');
             $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_USER_ERROR_NOT_FOUND');
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_NOT_FOUND');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_USER_ERROR_CANNOT_REMOVE_SUPERUSER');
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_CANNOT_REMOVE_SUPERUSER');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_INVALID_INPUT_DATA_SET');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handlerMessage = sprintf('API ERROR: %s', $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS'));
+    $handlerMessage = sprintf('API ERROR: %s', $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS'));
     $handlerStatusCode = 0;
   }
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

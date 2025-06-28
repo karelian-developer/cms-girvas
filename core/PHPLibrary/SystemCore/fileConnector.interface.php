@@ -8,15 +8,14 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\SystemCore {
+namespace core\PHPLibrary\SystemCore;
 
-  interface InterfaceFileConnector {
-    public function __construct(\core\PHPLibrary\SystemCore $CMSCore);
-    public function set_current_directory(string $directory) : void;
-    public function get_current_directory() : string;
-    public function connect_file(string $file_name) : bool;
-  }
+use \core\PHPLibrary\SystemCore as CMSCore;
 
+interface InterfaceFileConnector
+{
+  public function __construct(CMSCore $CMSCore);
+  public function setCurrentDirectory(string $directory) : void;
+  public function getCurrentDirectory() : string;
+  public function connectFile(string $fileName) : bool;
 }
-
-?>

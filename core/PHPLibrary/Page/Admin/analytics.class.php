@@ -8,357 +8,360 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Page\Admin {
-  use \core\PHPLibrary\Page\Admin\Analytics\PageEntry as PageAnalyticsEntry;
-  use \core\PHPLibrary\Page\Admin\Analytics\PagePage as PageAnalyticsPageStatic;
-  use \core\PHPLibrary\InterfacePage as InterfacePage;
-  use \core\PHPLibrary\SystemCore as SystemCore;
-  use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-  use \core\PHPLibrary\Entry as Entry;
-  use \core\PHPLibrary\Entries as Entries;
-  use \core\PHPLibrary\Metrics as Metrics;
-  use \core\PHPLibrary\EntryCategory as EntryCategory;
-  use \core\PHPLibrary\PageStatic as PageStatic;
-  use \core\PHPLibrary\Pages as PagesStatic;
-  use \core\PHPLibrary\Template\Collector as TemplateCollector;
-  use \core\PHPLibrary\Page as Page;
-  use \core\PHPLibrary\Pagination as Pagination;
-  use \core\PHPLibrary\Users as Users;
-  use \DOMDocument as DOMDocument;
+namespace core\PHPLibrary\Page\Admin;
+
+use \core\PHPLibrary\Page\Admin\Analytics\PageEntry as PageAnalyticsEntry;
+use \core\PHPLibrary\Page\Admin\Analytics\PagePage as PageAnalyticsPageStatic;
+use \core\PHPLibrary\InterfacePage as InterfacePage;
+use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\Entry as Entry;
+use \core\PHPLibrary\Entries as Entries;
+use \core\PHPLibrary\Metrics as Metrics;
+use \core\PHPLibrary\EntryCategory as EntryCategory;
+use \core\PHPLibrary\PageStatic as PageStatic;
+use \core\PHPLibrary\Pages as PagesStatic;
+use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\Pagination as Pagination;
+use \core\PHPLibrary\Users as Users;
+use \DOMDocument as DOMDocument;
 
 /**
  * Страница со списком записей
  */
-  class PageAnalytics implements InterfacePage {
-    public SystemCore $CMSCore;
-    public Page $page;
-    public string $assembled = '';
+class PageAnalytics implements InterfacePage
+{
+  public SystemCore $CMSCore;
+  public Page $page;
+  public string $assembled = '';
 
-    /**
-     * __construct
-     * 
-     * @param SystemCore $CMSCore
-     * @param Page $page
-     */
-    public function __construct(SystemCore $CMSCore, Page $page) {
-      $this->CMSCore = $CMSCore;
-      $this->page = $page;
-    }
+  /**
+   * __construct
+   * 
+   * @param SystemCore $CMSCore
+   * @param Page $page
+   */
+  public function __construct(SystemCore $CMSCore, Page $page)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->page = $page;
+  }
 
-    public function assembly_entries_table(array $entries = []) : string {
-      $localeData = $this->CMSCore->locale->get_data();
-      $localeName = $this->CMSCore->locale->get_name();
+  public function assemblyEntriesTable(array $entries = []) : string
+  {
+    $localeData = $this->CMSCore->locale->getData();
+    $localeName = $this->CMSCore->locale->getName();
 
-      $document = new DOMDocument('1.0');
+    $document = new DOMDocument('1.0');
 
-      $documentFragment = $document->createDocumentFragment();
+    $documentFragment = $document->createDocumentFragment();
 
-      $tableElement = $document->createElement('table');
-      $tableElement->setAttribute('class', 'analytics__table table table_entries');
+    $tableElement = $document->createElement('table');
+    $tableElement->setAttribute('class', 'analytics__table table table_entries');
 
-      $tableColgroupElement = $document->createElement('colgroup');
-      $tableColIndexElement = $document->createElement('col');
-      $tableColTitleElement = $document->createElement('col');
-      $tableColViewsElement = $document->createElement('col');
+    $tableColgroupElement = $document->createElement('colgroup');
+    $tableColIndexElement = $document->createElement('col');
+    $tableColTitleElement = $document->createElement('col');
+    $tableColViewsElement = $document->createElement('col');
 
-      $tableColIndexElement->setAttribute('width', '10%');
-      $tableColTitleElement->setAttribute('width', '70%');
-      $tableColViewsElement->setAttribute('width', '20%');
+    $tableColIndexElement->setAttribute('width', '10%');
+    $tableColTitleElement->setAttribute('width', '70%');
+    $tableColViewsElement->setAttribute('width', '20%');
 
-      $tableColgroupElement->appendChild($tableColIndexElement);
-      $tableColgroupElement->appendChild($tableColTitleElement);
-      $tableColgroupElement->appendChild($tableColViewsElement);
-      $tableElement->appendChild($tableColgroupElement);
+    $tableColgroupElement->appendChild($tableColIndexElement);
+    $tableColgroupElement->appendChild($tableColTitleElement);
+    $tableColgroupElement->appendChild($tableColViewsElement);
+    $tableElement->appendChild($tableColgroupElement);
 
-      $tableRowHeaderElement = $document->createElement('tr');
-      $tableRowHeaderElement->setAttribute('class', 'table__row');
+    $tableRowHeaderElement = $document->createElement('tr');
+    $tableRowHeaderElement->setAttribute('class', 'table__row');
 
-      $tableCellIndexHeaderElement = $document->createElement('th');
-      $tableCellTitleHeaderElement = $document->createElement('th');
-      $tableCellViewsHeaderElement = $document->createElement('th');
+    $tableCellIndexHeaderElement = $document->createElement('th');
+    $tableCellTitleHeaderElement = $document->createElement('th');
+    $tableCellViewsHeaderElement = $document->createElement('th');
 
-      $tableCellIndexHeaderElement->setAttribute('class', 'table__cell cell table__cell_header');
-      $tableCellTitleHeaderElement->setAttribute('class', 'table__cell cell table__cell_header');
-      $tableCellViewsHeaderElement->setAttribute('class', 'table__cell cell table__cell_header');
+    $tableCellIndexHeaderElement->setAttribute('class', 'table__cell cell table__cell_header');
+    $tableCellTitleHeaderElement->setAttribute('class', 'table__cell cell table__cell_header');
+    $tableCellViewsHeaderElement->setAttribute('class', 'table__cell cell table__cell_header');
 
-      $tableCellIndexHeaderText = $document->createTextNode('');
-      $tableCellTitleHeaderText = $document->createTextNode($localeData['PAGE_ANALYTICS_TABLE_COLUMN_TITLE_TITLE']);
-      $tableCellViewsHeaderText = $document->createTextNode($localeData['PAGE_ANALYTICS_TABLE_COLUMN_VIEWS_TITLE']);
+    $tableCellIndexHeaderText = $document->createTextNode('');
+    $tableCellTitleHeaderText = $document->createTextNode($localeData['PAGE_ANALYTICS_TABLE_COLUMN_TITLE_TITLE']);
+    $tableCellViewsHeaderText = $document->createTextNode($localeData['PAGE_ANALYTICS_TABLE_COLUMN_VIEWS_TITLE']);
 
-      $tableCellIndexHeaderElement->appendChild($tableCellIndexHeaderText);
-      $tableCellTitleHeaderElement->appendChild($tableCellTitleHeaderText);
-      $tableCellViewsHeaderElement->appendChild($tableCellViewsHeaderText);
+    $tableCellIndexHeaderElement->appendChild($tableCellIndexHeaderText);
+    $tableCellTitleHeaderElement->appendChild($tableCellTitleHeaderText);
+    $tableCellViewsHeaderElement->appendChild($tableCellViewsHeaderText);
 
-      $tableRowHeaderElement->appendChild($tableCellIndexHeaderElement);
-      $tableRowHeaderElement->appendChild($tableCellTitleHeaderElement);
-      $tableRowHeaderElement->appendChild($tableCellViewsHeaderElement);
-      $tableElement->appendChild($tableRowHeaderElement);
+    $tableRowHeaderElement->appendChild($tableCellIndexHeaderElement);
+    $tableRowHeaderElement->appendChild($tableCellTitleHeaderElement);
+    $tableRowHeaderElement->appendChild($tableCellViewsHeaderElement);
+    $tableElement->appendChild($tableRowHeaderElement);
 
-      if (!empty($entries)) {
-        $locale = $this->CMSCore->get_cms_locale('admin');
+    if (!empty($entries)) {
+      $locale = $this->CMSCore->getCMSLocale('admin');
 
-        $entryIndex = 1;
-        foreach ($entries as $entry) {
-          $entry->init_data(['id', 'texts', 'name']);
+      $entryIndex = 1;
+      foreach ($entries as $entry) {
+        $entry->initData(['id', 'texts', 'name']);
 
-          $entryTitle = $entry->get_title($localeName);
+        $entryTitle = $entry->getTitle($localeName);
 
-          $entryTitle = !empty($entryTitle) ? $entryTitle : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $localeName);
+        $entryTitle = !empty($entryTitle) ? $entryTitle : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $localeName);
 
-          $tableRowElement = $document->createElement('tr');
-          $tableRowElement->setAttribute('class', 'table__row');
+        $tableRowElement = $document->createElement('tr');
+        $tableRowElement->setAttribute('class', 'table__row');
 
-          $tableCellIndexElement = $document->createElement('td');
-          $tableCellTitleElement = $document->createElement('td');
-          $tableCellViewsElement = $document->createElement('td');
+        $tableCellIndexElement = $document->createElement('td');
+        $tableCellTitleElement = $document->createElement('td');
+        $tableCellViewsElement = $document->createElement('td');
 
-          $tableCellIndexElement->setAttribute('class', 'table__cell cell table__cell_index');
-          $tableCellTitleElement->setAttribute('class', 'table__cell cell table__cell_title');
-          $tableCellViewsElement->setAttribute('class', 'table__cell cell table__cell_views');
+        $tableCellIndexElement->setAttribute('class', 'table__cell cell table__cell_index');
+        $tableCellTitleElement->setAttribute('class', 'table__cell cell table__cell_title');
+        $tableCellViewsElement->setAttribute('class', 'table__cell cell table__cell_views');
 
-          $tableCellTitleLinkElement = $document->createElement('a');
-          $tableCellTitleLinkElement->setAttribute('href', $entry->get_url());
-          $tableCellTitleLinkElement->setAttribute('target', '_blank');
+        $tableCellTitleLinkElement = $document->createElement('a');
+        $tableCellTitleLinkElement->setAttribute('href', $entry->get_url());
+        $tableCellTitleLinkElement->setAttribute('target', '_blank');
 
-          $tableCellIndexText = $document->createTextNode(sprintf('#%d', $entryIndex));
-          $tableCellTitleText = $document->createTextNode(html_entity_decode($entryTitle));
-          $tableCellViewsText = $document->createTextNode($entry->get_views_count());
-          
-          $tableCellTitleLinkElement->appendChild($tableCellTitleText);
+        $tableCellIndexText = $document->createTextNode(sprintf('#%d', $entryIndex));
+        $tableCellTitleText = $document->createTextNode(html_entity_decode($entryTitle));
+        $tableCellViewsText = $document->createTextNode($entry->getViewsCount());
+        
+        $tableCellTitleLinkElement->appendChild($tableCellTitleText);
 
-          $tableCellIndexElement->appendChild($tableCellIndexText);
-          $tableCellTitleElement->appendChild($tableCellTitleLinkElement);
-          $tableCellViewsElement->appendChild($tableCellViewsText);
+        $tableCellIndexElement->appendChild($tableCellIndexText);
+        $tableCellTitleElement->appendChild($tableCellTitleLinkElement);
+        $tableCellViewsElement->appendChild($tableCellViewsText);
 
-          $tableRowElement->appendChild($tableCellIndexElement);
-          $tableRowElement->appendChild($tableCellTitleElement);
-          $tableRowElement->appendChild($tableCellViewsElement);
-          $tableElement->appendChild($tableRowElement);
+        $tableRowElement->appendChild($tableCellIndexElement);
+        $tableRowElement->appendChild($tableCellTitleElement);
+        $tableRowElement->appendChild($tableCellViewsElement);
+        $tableElement->appendChild($tableRowElement);
 
-          $entryIndex++;
-        }
+        $entryIndex++;
       }
-
-      $documentFragment->appendChild($tableElement);
-      $document->appendChild($documentFragment);
-
-      return $document->saveHTML();
     }
 
-    public function assembly_pages_table(array $pages = []) : string {
-      $localeData = $this->CMSCore->locale->get_data();
-      $localeName = $this->CMSCore->locale->get_name();
+    $documentFragment->appendChild($tableElement);
+    $document->appendChild($documentFragment);
 
-      $document = new DOMDocument('1.0');
+    return $document->saveHTML();
+  }
 
-      $documentFragment = $document->createDocumentFragment();
+  public function assemblyPagesTable(array $pages = []) : string
+  {
+    $localeData = $this->CMSCore->locale->getData();
+    $localeName = $this->CMSCore->locale->getName();
 
-      $tableElement = $document->createElement('table');
-      $tableElement->setAttribute('class', 'analytics__table table table_pages');
+    $document = new DOMDocument('1.0');
 
-      $tableColgroupElement = $document->createElement('colgroup');
-      $tableColIndexElement = $document->createElement('col');
-      $tableColTitleElement = $document->createElement('col');
-      $tableColViewsElement = $document->createElement('col');
+    $documentFragment = $document->createDocumentFragment();
 
-      $tableColIndexElement->setAttribute('width', '10%');
-      $tableColTitleElement->setAttribute('width', '70%');
-      $tableColViewsElement->setAttribute('width', '20%');
+    $tableElement = $document->createElement('table');
+    $tableElement->setAttribute('class', 'analytics__table table table_pages');
 
-      $tableColgroupElement->appendChild($tableColIndexElement);
-      $tableColgroupElement->appendChild($tableColTitleElement);
-      $tableColgroupElement->appendChild($tableColViewsElement);
-      $tableElement->appendChild($tableColgroupElement);
+    $tableColgroupElement = $document->createElement('colgroup');
+    $tableColIndexElement = $document->createElement('col');
+    $tableColTitleElement = $document->createElement('col');
+    $tableColViewsElement = $document->createElement('col');
 
-      $tableRowHeaderElement = $document->createElement('tr');
-      $tableRowHeaderElement->setAttribute('class', 'table__row');
+    $tableColIndexElement->setAttribute('width', '10%');
+    $tableColTitleElement->setAttribute('width', '70%');
+    $tableColViewsElement->setAttribute('width', '20%');
 
-      $tableCellIndexHeaderElement = $document->createElement('th');
-      $tableCellTitleHeaderElement = $document->createElement('th');
-      $tableCellViewsHeaderElement = $document->createElement('th');
+    $tableColgroupElement->appendChild($tableColIndexElement);
+    $tableColgroupElement->appendChild($tableColTitleElement);
+    $tableColgroupElement->appendChild($tableColViewsElement);
+    $tableElement->appendChild($tableColgroupElement);
 
-      $tableCellIndexHeaderElement->setAttribute('class', 'table__cell cell table__cell_header');
-      $tableCellTitleHeaderElement->setAttribute('class', 'table__cell cell table__cell_header');
-      $tableCellViewsHeaderElement->setAttribute('class', 'table__cell cell table__cell_header');
+    $tableRowHeaderElement = $document->createElement('tr');
+    $tableRowHeaderElement->setAttribute('class', 'table__row');
 
-      $tableCellIndexHeaderText = $document->createTextNode('');
-      $tableCellTitleHeaderText = $document->createTextNode($localeData['PAGE_ANALYTICS_TABLE_COLUMN_TITLE_TITLE']);
-      $tableCellViewsHeaderText = $document->createTextNode($localeData['PAGE_ANALYTICS_TABLE_COLUMN_VIEWS_TITLE']);
+    $tableCellIndexHeaderElement = $document->createElement('th');
+    $tableCellTitleHeaderElement = $document->createElement('th');
+    $tableCellViewsHeaderElement = $document->createElement('th');
 
-      $tableCellIndexHeaderElement->appendChild($tableCellIndexHeaderText);
-      $tableCellTitleHeaderElement->appendChild($tableCellTitleHeaderText);
-      $tableCellViewsHeaderElement->appendChild($tableCellViewsHeaderText);
+    $tableCellIndexHeaderElement->setAttribute('class', 'table__cell cell table__cell_header');
+    $tableCellTitleHeaderElement->setAttribute('class', 'table__cell cell table__cell_header');
+    $tableCellViewsHeaderElement->setAttribute('class', 'table__cell cell table__cell_header');
 
-      $tableRowHeaderElement->appendChild($tableCellIndexHeaderElement);
-      $tableRowHeaderElement->appendChild($tableCellTitleHeaderElement);
-      $tableRowHeaderElement->appendChild($tableCellViewsHeaderElement);
-      $tableElement->appendChild($tableRowHeaderElement);
+    $tableCellIndexHeaderText = $document->createTextNode('');
+    $tableCellTitleHeaderText = $document->createTextNode($localeData['PAGE_ANALYTICS_TABLE_COLUMN_TITLE_TITLE']);
+    $tableCellViewsHeaderText = $document->createTextNode($localeData['PAGE_ANALYTICS_TABLE_COLUMN_VIEWS_TITLE']);
 
-      if (!empty($pages)) {
-        $locale = $this->CMSCore->get_cms_locale('admin');
+    $tableCellIndexHeaderElement->appendChild($tableCellIndexHeaderText);
+    $tableCellTitleHeaderElement->appendChild($tableCellTitleHeaderText);
+    $tableCellViewsHeaderElement->appendChild($tableCellViewsHeaderText);
 
-        $pageIndex = 1;
-        foreach ($pages as $page) {
-          $page->init_data(['id', 'texts', 'name']);
+    $tableRowHeaderElement->appendChild($tableCellIndexHeaderElement);
+    $tableRowHeaderElement->appendChild($tableCellTitleHeaderElement);
+    $tableRowHeaderElement->appendChild($tableCellViewsHeaderElement);
+    $tableElement->appendChild($tableRowHeaderElement);
 
-          $pageTitle = $page->get_title($localeName);
+    if (!empty($pages)) {
+      $locale = $this->CMSCore->getCMSLocale('admin');
 
-          $pageTitle = !empty($pageTitle) ? $pageTitle : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $localeName);
+      $pageIndex = 1;
+      foreach ($pages as $page) {
+        $page->initData(['id', 'texts', 'name']);
 
-          $tableRowElement = $document->createElement('tr');
-          $tableRowElement->setAttribute('class', 'table__row');
+        $pageTitle = $page->getTitle($localeName);
 
-          $tableCellIndexElement = $document->createElement('td');
-          $tableCellTitleElement = $document->createElement('td');
-          $tableCellViewsElement = $document->createElement('td');
+        $pageTitle = !empty($pageTitle) ? $pageTitle : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $localeName);
 
-          $tableCellIndexElement->setAttribute('class', 'table__cell cell table__cell_index');
-          $tableCellTitleElement->setAttribute('class', 'table__cell cell table__cell_title');
-          $tableCellViewsElement->setAttribute('class', 'table__cell cell table__cell_views');
+        $tableRowElement = $document->createElement('tr');
+        $tableRowElement->setAttribute('class', 'table__row');
 
-          $tableCellTitleLinkElement = $document->createElement('a');
-          $tableCellTitleLinkElement->setAttribute('href', $page->get_url());
-          $tableCellTitleLinkElement->setAttribute('target', '_blank');
+        $tableCellIndexElement = $document->createElement('td');
+        $tableCellTitleElement = $document->createElement('td');
+        $tableCellViewsElement = $document->createElement('td');
 
-          $tableCellIndexText = $document->createTextNode(sprintf('#%d', $pageIndex));
-          $tableCellTitleText = $document->createTextNode(html_entity_decode($pageTitle));
-          $tableCellViewsText = $document->createTextNode($page->get_views_count());
-          
-          $tableCellTitleLinkElement->appendChild($tableCellTitleText);
+        $tableCellIndexElement->setAttribute('class', 'table__cell cell table__cell_index');
+        $tableCellTitleElement->setAttribute('class', 'table__cell cell table__cell_title');
+        $tableCellViewsElement->setAttribute('class', 'table__cell cell table__cell_views');
 
-          $tableCellIndexElement->appendChild($tableCellIndexText);
-          $tableCellTitleElement->appendChild($tableCellTitleLinkElement);
-          $tableCellViewsElement->appendChild($tableCellViewsText);
+        $tableCellTitleLinkElement = $document->createElement('a');
+        $tableCellTitleLinkElement->setAttribute('href', $page->get_url());
+        $tableCellTitleLinkElement->setAttribute('target', '_blank');
 
-          $tableRowElement->appendChild($tableCellIndexElement);
-          $tableRowElement->appendChild($tableCellTitleElement);
-          $tableRowElement->appendChild($tableCellViewsElement);
-          $tableElement->appendChild($tableRowElement);
+        $tableCellIndexText = $document->createTextNode(sprintf('#%d', $pageIndex));
+        $tableCellTitleText = $document->createTextNode(html_entity_decode($pageTitle));
+        $tableCellViewsText = $document->createTextNode($page->getViewsCount());
+        
+        $tableCellTitleLinkElement->appendChild($tableCellTitleText);
 
-          $pageIndex++;
-        }
+        $tableCellIndexElement->appendChild($tableCellIndexText);
+        $tableCellTitleElement->appendChild($tableCellTitleLinkElement);
+        $tableCellViewsElement->appendChild($tableCellViewsText);
+
+        $tableRowElement->appendChild($tableCellIndexElement);
+        $tableRowElement->appendChild($tableCellTitleElement);
+        $tableRowElement->appendChild($tableCellViewsElement);
+        $tableElement->appendChild($tableRowElement);
+
+        $pageIndex++;
       }
-
-      $documentFragment->appendChild($tableElement);
-      $document->appendChild($documentFragment);
-
-      return $document->saveHTML();
     }
 
-    /**
-     * Сборка
-     * 
-     * @return void
-     */
-    public function assembly() : void {
-      // Добавление таблицы стилей для страницы
-      $this->CMSCore->theme->add_style(['href' => 'styles/page/analytics.css', 'rel' => 'stylesheet']);
+    $documentFragment->appendChild($tableElement);
+    $document->appendChild($documentFragment);
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Сборка
+   * 
+   * @return void
+   */
+  public function assembly() : void
+  {
+    // Добавление таблицы стилей для страницы
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics.css', 'rel' => 'stylesheet']);
+    
+    $localeData = $this->CMSCore->locale->getData();
+
+    if ($this->CMSCore->urlp->getPath(2) === 'entry' && $this->CMSCore->urlp->getPath(3) !== null) {
+      $entry = null;
+      $entryID = is_numeric($this->CMSCore->urlp->getPath(3)) ? (int) $this->CMSCore->urlp->getPath(3) : 0;
+      $entry = Entry::existByID($this->CMSCore, $entryID) ? new Entry($this->CMSCore, $entryID) : null;
       
-      $localeData = $this->CMSCore->locale->get_data();
+      if (!is_null($entry)) {
+        $entry->initData(['id', 'texts', 'name']);
 
-      if ($this->CMSCore->urlp->get_path(2) == 'entry' && !is_null($this->CMSCore->urlp->get_path(3))) {
-        $entry = null;
-        $entryID = (is_numeric($this->CMSCore->urlp->get_path(3))) ? (int)$this->CMSCore->urlp->get_path(3) : 0;
-        $entry = (Entry::exists_by_id($this->CMSCore, $entryID)) ? new Entry($this->CMSCore, $entryID) : null;
-        
-        if (!is_null($entry)) {
-          $entry->init_data(['id', 'texts', 'name']);
+        $page = new PageAnalyticsEntry($this->CMSCore, $this->page, $entry);
+        $page->assembly();
 
-          $page = new PageAnalyticsEntry($this->CMSCore, $this->page, $entry);
-          $page->assembly();
-
-          $this->assembled = $page->assembled;
-        } else {
-          http_response_code(404);
-
-          $pageError = new PageError($this->CMSCore, $this->page, 404);
-          $pageError->assembly();
-
-          $this->assembled = $pageError->assembled;
-        }
-      } elseif ($this->CMSCore->urlp->get_path(2) == 'page' && !is_null($this->CMSCore->urlp->get_path(3))) {
-        $pageStatic = null;
-        $pageStaticID = (is_numeric($this->CMSCore->urlp->get_path(3))) ? (int)$this->CMSCore->urlp->get_path(3) : 0;
-        $pageStatic = (PageStatic::exists_by_id($this->CMSCore, $pageStaticID)) ? new PageStatic($this->CMSCore, $pageStaticID) : null;
-        
-        if (!is_null($pageStatic)) {
-          $pageStatic->init_data(['id', 'texts', 'name']);
-
-          $page = new PageAnalyticsPageStatic($this->CMSCore, $this->page, $pageStatic);
-          $page->assembly();
-
-          $this->assembled = $page->assembled;
-        } else {
-          http_response_code(404);
-
-          $pageError = new PageError($this->CMSCore, $this->page, 404);
-          $pageError->assembly();
-          
-          $this->assembled = $pageError->assembled;
-        }
+        $this->assembled = $page->assembled;
       } else {
-        /** @var array Преобразованные элементы навигации */
-        $navigationsItemsTransformed = [];
-        array_push($navigationsItemsTransformed, TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/navigationHorizontal/item.tpl', [
-          'NAVIGATION_ITEM_TITLE' => sprintf('< %s', '{LANG:PAGE_ENTRIES_NAVIGATION_INDEX_LABEL}'),
-          'NAVIGATION_ITEM_URL' => '/admin',
-          'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
-        ]));
+        http_response_code(404);
 
-        if (!empty($navigationsItemsTransformed)) {
-          $pageNavigationTransformed = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/navigationHorizontal.tpl', [
-            'NAVIGATION_LIST' => TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/navigationHorizontal/list.tpl', [
-              'NAVIGATION_ITEMS' => implode($navigationsItemsTransformed)
-            ])
-          ]);
-        } else {
-          $pageNavigationTransformed = '';
-        }
+        $pageError = new PageError($this->CMSCore, $this->page, 404);
+        $pageError->assembly();
 
-        $metrics = new Metrics($this->CMSCore);
-        $metricsEntries = $metrics->get_entries_views_by_timestamp(time());
-        $metricsPages = $metrics->get_pages_views_by_timestamp(time());
-
-        if (!empty($metricsEntries)) {
-          usort($metricsEntries, function ($a, $b) {
-            if ($a->get_views_count() != $b->get_views_count()) {
-              return ($a->get_views_count() < $b->get_views_count()) ? 1 : -1;
-            }
-
-            return 0;
-          });
-    
-          $entriesTableAssembled = $this->assembly_entries_table($metricsEntries);
-        } else {
-          $entriesTableAssembled = '';
-        }
-
-        if (!empty($metricsPages)) {
-          usort($metricsPages, function ($a, $b) {
-            if ($a->get_views_count() != $b->get_views_count()) {
-              return ($a->get_views_count() < $b->get_views_count()) ? 1 : -1;
-            }
-
-            return 0;
-          });
-    
-          $pagesTableAssembled = $this->assembly_pages_table($metricsPages);
-        } else {
-          $pagesTableAssembled = '';
-        }
-
-        /** @var string $site_page Содержимое шаблона страницы */
-        $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/analytics.tpl', [
-          'PAGE_NAVIGATION' => $pageNavigationTransformed,
-          'ADMIN_PANEL_PAGE_NAME' => 'analytics',
-          'ENTRIES_LIST_ITEMS' => $entriesTableAssembled,
-          'PAGES_LIST_ITEMS' => $pagesTableAssembled
-        ]);
+        $this->assembled = $pageError->assembled;
       }
-    }
+    } elseif ($this->CMSCore->urlp->getPath(2) === 'page' && $this->CMSCore->urlp->getPath(3) !== null) {
+      $pageStatic = null;
+      $pageStaticID = is_numeric($this->CMSCore->urlp->getPath(3)) ? (int) $this->CMSCore->urlp->getPath(3) : 0;
+      $pageStatic = PageStatic::existByID($this->CMSCore, $pageStaticID) ? new PageStatic($this->CMSCore, $pageStaticID) : null;
+      
+      if (!is_null($pageStatic)) {
+        $pageStatic->initData(['id', 'texts', 'name']);
 
+        $page = new PageAnalyticsPageStatic($this->CMSCore, $this->page, $pageStatic);
+        $page->assembly();
+
+        $this->assembled = $page->assembled;
+      } else {
+        http_response_code(404);
+
+        $pageError = new PageError($this->CMSCore, $this->page, 404);
+        $pageError->assembly();
+        
+        $this->assembled = $pageError->assembled;
+      }
+    } else {
+      /** @var array Преобразованные элементы навигации */
+      $navigationsItemsTransformed = [];
+      array_push($navigationsItemsTransformed, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/navigationHorizontal/item.tpl', [
+        'NAVIGATION_ITEM_TITLE' => sprintf('< %s', '{LANG:PAGE_ENTRIES_NAVIGATION_INDEX_LABEL}'),
+        'NAVIGATION_ITEM_URL' => '/admin',
+        'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
+      ]));
+
+      if (!empty($navigationsItemsTransformed)) {
+        $pageNavigationTransformed = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/navigationHorizontal.tpl', [
+          'NAVIGATION_LIST' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/navigationHorizontal/list.tpl', [
+            'NAVIGATION_ITEMS' => implode($navigationsItemsTransformed)
+          ])
+        ]);
+      } else {
+        $pageNavigationTransformed = '';
+      }
+
+      $metrics = new Metrics($this->CMSCore);
+      $metricsEntries = $metrics->getEntriesViewsByTimestamp(time());
+      $metricsPages = $metrics->getPagesViewsByTimestamp(time());
+
+      if (!empty($metricsEntries)) {
+        usort($metricsEntries, function ($a, $b) {
+          if ($a->getViewsCount() !== $b->getViewsCount()) {
+            return $a->getViewsCount() < $b->getViewsCount() ? 1 : -1;
+          }
+
+          return 0;
+        });
+  
+        $entriesTableAssembled = $this->assemblyEntriesTable($metricsEntries);
+      } else {
+        $entriesTableAssembled = '';
+      }
+
+      if (!empty($metricsPages)) {
+        usort($metricsPages, function ($a, $b)
+        {
+          if ($a->getViewsCount() !== $b->getViewsCount()) {
+            return $a->getViewsCount() < $b->getViewsCount() ? 1 : -1;
+          }
+
+          return 0;
+        });
+  
+        $pagesTableAssembled = $this->assemblyPagesTable($metricsPages);
+      } else {
+        $pagesTableAssembled = '';
+      }
+
+      /** @var string $site_page Содержимое шаблона страницы */
+      $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/analytics.tpl', [
+        'PAGE_NAVIGATION' => $pageNavigationTransformed,
+        'ADMIN_PANEL_PAGE_NAME' => 'analytics',
+        'ENTRIES_LIST_ITEMS' => $entriesTableAssembled,
+        'PAGES_LIST_ITEMS' => $pagesTableAssembled
+      ]);
+    }
   }
 
 }
-
-?>

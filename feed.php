@@ -21,33 +21,33 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 if (defined('IS_NOT_HACKED')) {
-  if ($CMSCore->urlp->get_path(1) !== null) {
-    if (Feed::exists_by_name($CMSCore, $CMSCore->urlp->get_path(1))) {
+  if ($CMSCore->urlp->getPath(1) !== null) {
+    if (Feed::existsByName($CMSCore, $CMSCore->urlp->getPath(1))) {
       http_response_code(200);
       
-      $feed = Feed::get_by_name($CMSCore, $CMSCore->urlp->get_path(1));
-      $feed->init_data(['name', 'texts', 'typeID', 'entriesCategoryID']);
+      $feed = Feed::getByName($CMSCore, $CMSCore->urlp->getPath(1));
+      $feed->initData(['name', 'texts', 'typeID', 'entriesCategoryID']);
       
-      $feedBuilder = new FeedBuilder($CMSCore, FeedBuilder::get_type_enum($feed->get_type_id()));
-      $localeName = $this->CMSCore->locale->get_name();
+      $feedBuilder = new FeedBuilder($CMSCore, FeedBuilder::getTypeEnum($feed->getTypeID()));
+      $localeName = $this->CMSCore->locale->getName();
 
-      $feedBuilder->set_language($localeName);
+      $feedBuilder->setLanguage($localeName);
 
-      $feedBuilder->feed->set_title($feed->get_title($localeName));
-      $feedBuilder->feed->set_description($feed->get_description($localeName));
+      $feedBuilder->feed->setTitle($feed->getTitle($localeName));
+      $feedBuilder->feed->setDescription($feed->getDescription($localeName));
 
       $entries = new Entries($CMSCore);
-      if (in_array($feed->get_entries_category_id(), [0, 1])) {
+      if (in_array($feed->getEntriesCategoryID(), [0, 1])) {
         $feedLink = 'https://' . $CMSCore->configurator->get('domain') . '/entries';
-        $feedBuilder->feed->set_link($feedLink);
-        $entriesArray = $entries->get_all();
+        $feedBuilder->feed->setLink($feedLink);
+        $entriesArray = $entries->getAll();
       } else {
-        $entriesCategory = new EntryCategory($CMSCore, $feed->get_entries_category_id());
-        $entriesCategory->init_data(['name']);
+        $entriesCategory = new EntryCategory($CMSCore, $feed->getEntriesCategoryID());
+        $entriesCategory->initData(['name']);
 
-        $feedLink = 'https://' . $CMSCore->configurator->get('domain') . '/entries/' . $entriesCategory->get_name();
-        $feedBuilder->feed->set_link($feedLink);
-        $entriesArray = $entries->get_by_category_id($feed->get_entries_category_id());
+        $feedLink = 'https://' . $CMSCore->configurator->get('domain') . '/entries/' . $entriesCategory->getName();
+        $feedBuilder->feed->setLink($feedLink);
+        $entriesArray = $entries->getByCategoryID($feed->getEntriesCategoryID());
       }
 
       /**
@@ -58,19 +58,19 @@ if (defined('IS_NOT_HACKED')) {
       $parsedown->setMarkupEscaped(true);
 
       foreach ($entriesArray as $entry) {
-        $entry->init_data(['name', 'metadata', 'texts', 'updatedUnixTimestamp']);
+        $entry->initData(['name', 'metadata', 'texts', 'updatedUnixTimestamp']);
 
-        $entryAuthor = $entry->get_author();
-        $entryLink = 'https://' . $CMSCore->configurator->get('domain') . '/entry/' . $entry->get_name();
+        $entryAuthor = $entry->getAuthor();
+        $entryLink = 'https://' . $CMSCore->configurator->get('domain') . '/entry/' . $entry->getName();
 
-        $feedBuilder->feed->add_item([
-          'title' => $entry->get_title($localeName),
-          'description' => $entry->get_description($localeName),
-          'content' => $parsedown->text($entry->get_content($localeName)),
-          'preview_url' => $entry->get_preview_url(),
+        $feedBuilder->feed->addItem([
+          'title' => $entry->getTitle($localeName),
+          'description' => $entry->getDescription($localeName),
+          'content' => $parsedown->text($entry->getContent($localeName)),
+          'preview_url' => $entry->getPreviewURL(),
           'link' => $entryLink,
-          'pubdate' => $entry->get_updated_unix_timestamp(),
-          'author' => $entryAuthor !== null ? $entryAuthor->get_login() : 'User Unknown'
+          'pubdate' => $entry->getUpdatedUnixTimestamp(),
+          'author' => $entryAuthor !== null ? $entryAuthor->getLogin() : 'User Unknown'
         ]);
       }
 
@@ -85,5 +85,3 @@ if (defined('IS_NOT_HACKED')) {
     http_response_code(404);
   }
 }
-
-?>

@@ -17,7 +17,7 @@ use \core\PHPLibrary\Metrics as Metrics;
 use \core\PHPLibrary\Metrics\Session as MetricsSession;
 
 if (array_key_exists('Metrics-Token', $handlerHeaders)) {
-  $clientIP = $CMSCore->client->get_ip_address();
+  $clientIP = $CMSCore->client->getIPAddress();
   $metricsToken = $handlerHeaders['Metrics-Token'];
   $metricsTimestamp = (is_numeric($_POST['time'])) ? strtotime(date('Y/m/d', $_POST['time'])) : strtotime(date('Y/m/d', time()));
   $metricsCurrentURL = strip_tags(str_replace('\'', '', $_POST['current_url']));
@@ -25,19 +25,19 @@ if (array_key_exists('Metrics-Token', $handlerHeaders)) {
   $metricsIsNewVisit = (bool) $_POST['is_visited_new'];
 
   $metrics = new Metrics($CMSCore);
-  $metrics->set_timestamp($metricsTimestamp);
+  $metrics->setTimestamp($metricsTimestamp);
 
-  if (!MetricsSession::exists_by_timestamp($CMSCore, $metrics, $metricsTimestamp)) {
+  if (!MetricsSession::existsByTimestamp($CMSCore, $metrics, $metricsTimestamp)) {
     $metricsSession = MetricsSession::create($CMSCore, $metrics);
   } else {
-    $metricsSession = MetricsSession::get_by_timestamp($CMSCore, $metrics, $metricsTimestamp);
+    $metricsSession = MetricsSession::getByTimestamp($CMSCore, $metrics, $metricsTimestamp);
   }
 
   if (!is_null($metricsSession)) {
-    $metricsSession->init_data(['data']);
+    $metricsSession->initData(['data']);
     
     $metricsData = [];
-    $metricsDataSort = $metricsSession->get_data();
+    $metricsDataSort = $metricsSession->getData();
 
     if (isset($metricsDataSort['metrics']['views'][$metricsToken])) {
       if ($metricsReferrerURL !== $metricsCurrentURL) {
@@ -85,5 +85,3 @@ if (array_key_exists('Metrics-Token', $handlerHeaders)) {
     $metricsSession->update($metricsData);
   }
 }
-
-?>

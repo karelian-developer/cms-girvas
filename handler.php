@@ -28,9 +28,9 @@ if (defined('IS_NOT_HACKED')) {
   $PHPInputContent = file_get_contents('php://input');
 
   switch ($_SERVER['REQUEST_METHOD']) {
-    case 'PATCH': $_PATCH = $CMSCore::parse_raw_http_request($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
-    case 'PUT': $_PUT = $CMSCore::parse_raw_http_request($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
-    case 'DELETE': $_DELETE = $CMSCore::parse_raw_http_request($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
+    case 'PATCH': $_PATCH = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
+    case 'PUT': $_PUT = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
+    case 'DELETE': $_DELETE = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
   }
 
   $handlerOutputData = [];
@@ -40,153 +40,153 @@ if (defined('IS_NOT_HACKED')) {
    * ==================================================== */
 
   // Client API
-  if ($CMSCore->urlp->get_path(1) === 'client') {
+  if ($CMSCore->urlp->getPath(1) === 'client') {
     $APIFilePath = CMS_ROOT_DIRECTORY . '/api/client.api.php';
     include_once $APIFilePath;
 
   // Installation API
-  } else if ($CMSCore->urlp->get_path(1) === 'install') {
+  } else if ($CMSCore->urlp->getPath(1) === 'install') {
     $APIFilePath = CMS_ROOT_DIRECTORY . '/api/installation.api.php';
     include_once $APIFilePath;
   
   // Metrics API
-  } else if ($CMSCore->urlp->get_path(1) === 'metrics' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($CMSCore->urlp->getPath(1) === 'metrics' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/metrics.api.php';
       include_once $APIFilePath;
     }
-  } else if ($CMSCore->urlp->get_path(1) === 'media' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($CMSCore->urlp->getPath(1) === 'media' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/media.api.php';
       include_once $APIFilePath;
     }
-  } else if ($CMSCore->urlp->get_path(1) === 'module' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($CMSCore->urlp->getPath(1) === 'module' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/module.api.php';
       include_once $APIFilePath;
     }
-  } else if ($CMSCore->urlp->get_path(1) === 'user' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($CMSCore->urlp->getPath(1) === 'user' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/user.api.php';
       include_once $APIFilePath;
     }
-  } else if ($CMSCore->urlp->get_path(1) === 'usersGroup' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($CMSCore->urlp->getPath(1) === 'usersGroup' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/usersGroup.api.php';
       include_once $APIFilePath;
     }
-  } else if ($CMSCore->urlp->get_path(1) === 'usersGroups' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($CMSCore->urlp->getPath(1) === 'usersGroups' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/usersGroups.api.php';
       include_once $APIFilePath;
     }
-  } else if ($CMSCore->urlp->get_path(1) === 'entry' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($CMSCore->urlp->getPath(1) === 'entry' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/entry.api.php';
       include_once $APIFilePath;
     }
-  } else if ($CMSCore->urlp->get_path(1) === 'entries' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($CMSCore->urlp->getPath(1) === 'entries' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/entries.api.php';
       include_once $APIFilePath;
     }
-  } else if ($CMSCore->urlp->get_path(1) === 'pageStatic' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($CMSCore->urlp->getPath(1) === 'pageStatic' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/pageStatic.api.php';
       include_once $APIFilePath;
     }
-  } else if ($CMSCore->urlp->get_path(1) === 'settings' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($CMSCore->urlp->getPath(1) === 'settings' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/settings.api.php';
       include_once $APIFilePath;
     }
-  } else if ($CMSCore->urlp->get_path(1) === 'template' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($CMSCore->urlp->getPath(1) === 'template' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/template.api.php';
       include_once $APIFilePath;
     }
-  } else if ($CMSCore->urlp->get_path(1) === 'feed' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($CMSCore->urlp->getPath(1) === 'feed' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/feed.api.php';
       include_once $APIFilePath;
     }
-  } else if ($CMSCore->urlp->get_path(1) === 'feeds' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($CMSCore->urlp->getPath(1) === 'feeds' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/feeds.api.php';
       include_once $APIFilePath;
     }
-  } else if ($CMSCore->urlp->get_path(1) === 'utils' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($CMSCore->urlp->getPath(1) === 'utils' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/utils.api.php';
       include_once $APIFilePath;
     }
-  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'dms-available') {
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->getPath(1) === 'dms-available') {
     $handlerOutputData['charsets'] = ['UTF-8', 'UTF-16', 'Windows-1252', 'ISO-8859'];
   
   // Получение текущей кодировки
-  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'charset') {
-    $charset = $CMSCore->configurator->exists_database_entry_value('base_site_charset') ? $CMSCore->configurator->get_database_entry_value('base_site_charset') : 'UTF-8';
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->getPath(1) === 'charset') {
+    $charset = $CMSCore->configurator->existsDatabaseEntryValue('base_site_charset') ? $CMSCore->configurator->getDatabaseEntryValue('base_site_charset') : 'UTF-8';
     $handlerOutputData['charset'] = $charset;
   
   // Получение расширения, в которое производится конвертация
-  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'file-auto-convert-image-extension') {
-    $extension = $CMSCore->configurator->exists_database_entry_value('files_auto_convert_file_image_extension') ? $CMSCore->configurator->get_database_entry_value('files_auto_convert_file_image_extension') : 'webp';
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->getPath(1) === 'file-auto-convert-image-extension') {
+    $extension = $CMSCore->configurator->existsDatabaseEntryValue('files_auto_convert_file_image_extension') ? $CMSCore->configurator->getDatabaseEntryValue('files_auto_convert_file_image_extension') : 'webp';
     $handlerOutputData['extension'] = $extension;
 
   // Получение перечня кодировок
-  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'charsets') {
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->getPath(1) === 'charsets') {
     $handlerOutputData['charsets'] = ['UTF-8', 'UTF-16', 'Windows-1252', 'ISO-8859'];
   
   // Получение статуса технических работ
-  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'ew-status') {
-    $EWStatus = $CMSCore->configurator->exists_database_entry_value('base_engineering_works_status') ? $CMSCore->configurator->get_database_entry_value('base_engineering_works_status') : 'off';
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->getPath(1) === 'ew-status') {
+    $EWStatus = $CMSCore->configurator->existsDatabaseEntryValue('base_engineering_works_status') ? $CMSCore->configurator->getDatabaseEntryValue('base_engineering_works_status') : 'off';
     $handlerOutputData['status'] = $EWStatus === 'on' ? 'on' : 'off';
   
   // Получение текущего временной зоны
-  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'timezone') {
-    $timezoneName = $CMSCore->configurator->exists_database_entry_value('base_timezone') ? $CMSCore->configurator->get_database_entry_value('base_timezone') : date_default_timezone_get();
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->getPath(1) === 'timezone') {
+    $timezoneName = $CMSCore->configurator->existsDatabaseEntryValue('base_timezone') ? $CMSCore->configurator->getDatabaseEntryValue('base_timezone') : date_default_timezone_get();
     $timezoneUTC = new DateTimeImmutable('now', new DateTimeZone($timezoneName));
 
     $handlerOutputData['timezone'] = [
@@ -195,7 +195,7 @@ if (defined('IS_NOT_HACKED')) {
     ];
   
   // Получение списка временных зон
-  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'timezones') {
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->getPath(1) === 'timezones') {
     $timezones = [];
     $timezoneNames = DateTimeZone::listIdentifiers();
     foreach ($timezoneNames as $name) {
@@ -210,19 +210,19 @@ if (defined('IS_NOT_HACKED')) {
     $handlerOutputData['timezones'] = $timezones;
   
   // Получение дополнительной информации по профилю пользователя
-  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'profile' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->getPath(1) === 'profile' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
-      if ($CMSCore->urlp->get_path(2) === 'additional-fields') {
-        $CMSLocaleSetted = $CMSCore->configurator->get_database_entry_value('base_locale');
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
+      if ($CMSCore->urlp->getPath(2) === 'additional-fields') {
+        $CMSLocaleSetted = $CMSCore->configurator->getDatabaseEntryValue('base_locale');
         $fieldsLocale = $CMSCore->urlp->get_param('locale') ?? $CMSLocaleSetted;
 
-        $fieldsTypes = $CMSCore->configurator->exists_database_entry_value('users_additional_field_type') ? json_decode($CMSCore->configurator->get_database_entry_value('users_additional_field_type'), true) : [];
-        $fieldsTitles = $CMSCore->configurator->exists_database_entry_value('users_additional_field_title') ? json_decode($CMSCore->configurator->get_database_entry_value('users_additional_field_title'), true) : [];
-        $fieldsDescriptions = $CMSCore->configurator->exists_database_entry_value('users_additional_field_description') ? json_decode($CMSCore->configurator->get_database_entry_value('users_additional_field_description'), true) : [];
-        $fieldsNames = $CMSCore->configurator->exists_database_entry_value('users_additional_field_name') ? json_decode($CMSCore->configurator->get_database_entry_value('users_additional_field_name'), true) : [];
+        $fieldsTypes = $CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_type') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('users_additional_field_type'), true) : [];
+        $fieldsTitles = $CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_title') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('users_additional_field_title'), true) : [];
+        $fieldsDescriptions = $CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_description') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('users_additional_field_description'), true) : [];
+        $fieldsNames = $CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_name') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('users_additional_field_name'), true) : [];
         
         $fields = [];
         foreach ($fieldsTypes as $index => $type) {
@@ -238,49 +238,49 @@ if (defined('IS_NOT_HACKED')) {
       }
     }
   // Получить текущую локализацию
-  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'locale') {
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->getPath(1) === 'locale') {
     // Базовая локализация
-    if ($CMSCore->urlp->get_path(2) === 'base') {
-      $CMSLocaleSetted = $CMSCore->configurator->get_database_entry_value('base_locale') ?? 'en_US';
+    if ($CMSCore->urlp->getPath(2) === 'base') {
+      $CMSLocaleSetted = $CMSCore->configurator->getDatabaseEntryValue('base_locale') ?? 'en_US';
       $CMSLocale = new CMSLocale($CMSCore, $CMSLocaleSetted);
       $handlerOutputData['locale'] = [
-        'title' => $CMSLocale->get_title(),
-        'iconURL' => $CMSLocale->get_icon_url(),
-        'name' => $CMSLocale->get_name(),
-        'iso639_1' => $CMSLocale->get_iso_639_1(),
-        'iso639_2' => $CMSLocale->get_iso_639_2(),
+        'title' => $CMSLocale->getTitle(),
+        'iconURL' => $CMSLocale->getIconURL(),
+        'name' => $CMSLocale->getName(),
+        'iso639_1' => $CMSLocale->getISO639(1),
+        'iso639_2' => $CMSLocale->getISO639(2),
       ];
     }
 
     // Локализация административной панели
-    if ($CMSCore->urlp->get_path(2) === 'admin') {
-      $CMSLocaleSetted = $CMSCore->configurator->get_database_entry_value('base_admin_locale') ?? 'en_US';
+    if ($CMSCore->urlp->getPath(2) === 'admin') {
+      $CMSLocaleSetted = $CMSCore->configurator->getDatabaseEntryValue('base_admin_locale') ?? 'en_US';
       $CMSLocale = new CMSLocale($CMSCore, $CMSLocaleSetted);
       $handlerOutputData['locale'] = [
-        'title' => $CMSLocale->get_title(),
-        'iconURL' => $CMSLocale->get_icon_url(),
-        'name' => $CMSLocale->get_name(),
-        'iso639_1' => $CMSLocale->get_iso_639_1(),
-        'iso639_2' => $CMSLocale->get_iso_639_2(),
+        'title' => $CMSLocale->getTitle(),
+        'iconURL' => $CMSLocale->getIconURL(),
+        'name' => $CMSLocale->getName(),
+        'iso639_1' => $CMSLocale->getISO639(1),
+        'iso639_2' => $CMSLocale->getISO639(2),
       ];
     }
   
   // Получить перечень доступных локализаций
-  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'locales') {
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->getPath(1) === 'locales') {
     $handlerOutputData['locales'] = [];
-    $CMSLocalesNames = $CMSCore->get_array_locales_names();
+    $CMSLocalesNames = $CMSCore->getAarrayLocalesNames();
 
     if (count($CMSLocalesNames) > 0) {
       foreach ($CMSLocalesNames as $index => $name) {
         $CMSLocale = new CMSLocale($CMSCore, $name);
 
-        if ($CMSLocale->exists_file_metadata_json()) {
+        if ($CMSLocale->existsFileMetadataJSON()) {
           array_push($handlerOutputData['locales'], [
-            'title' => $CMSLocale->get_title(),
-            'iconURL' => $CMSLocale->get_icon_url(),
-            'name' => $CMSLocale->get_name(),
-            'iso639_1' => $CMSLocale->get_iso_639_1(),
-            'iso639_2' => $CMSLocale->get_iso_639_2(),
+            'title' => $CMSLocale->getTitle(),
+            'iconURL' => $CMSLocale->getIconURL(),
+            'name' => $CMSLocale->getName(),
+            'iso639_1' => $CMSLocale->getISO639(1),
+            'iso639_2' => $CMSLocale->getISO639(2),
           ]);
         }
       }
@@ -292,19 +292,19 @@ if (defined('IS_NOT_HACKED')) {
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   
-  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->get_path(1) === 'pages' && $CMSCore::core_rest_cookie_exists()) {
-    $CMSCoreRESTCookie = $CMSCore::get_core_rest_cookie();
-    $clientIP = $CMSCore->client->get_ip_address();
+  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->getPath(1) === 'pages' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSCore->client->getIPAddress();
 
-    if ($CMSCore::core_rest_cookie_is_valid($CMSCoreRESTCookie, $clientIP)) {
-      if ($CMSCore->urlp->get_path(2) === 'additional-fields' && $CMSCore->urlp->get_path(3) !== null) {
-        $CMSLocaleSetted = $CMSCore->configurator->get_database_entry_value('base_locale');
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
+      if ($CMSCore->urlp->getPath(2) === 'additional-fields' && $CMSCore->urlp->getPath(3) !== null) {
+        $CMSLocaleSetted = $CMSCore->configurator->getDatabaseEntryValue('base_locale');
         $fieldsLocale = $CMSCore->urlp->get_param('locale') ?? $CMSLocaleSetted;
 
-        $fieldsTypes = $CMSCore->configurator->exists_database_entry_value('static_pages_additional_field_type') ? json_decode($CMSCore->configurator->get_database_entry_value('static_pages_additional_field_type'), true) : [];
-        $fieldsTitles = $CMSCore->configurator->exists_database_entry_value('static_pages_additional_field_title') ? json_decode($CMSCore->configurator->get_database_entry_value('static_pages_additional_field_title'), true) : [];
-        $fieldsDescriptions = $CMSCore->configurator->exists_database_entry_value('static_pages_additional_field_description') ? json_decode($CMSCore->configurator->get_database_entry_value('static_pages_additional_field_description'), true) : [];
-        $fieldsNames = $CMSCore->configurator->exists_database_entry_value('static_pages_additional_field_name') ? json_decode($CMSCore->configurator->get_database_entry_value('static_pages_additional_field_name'), true) : [];
+        $fieldsTypes = $CMSCore->configurator->existsDatabaseEntryValue('static_pages_additional_field_type') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('static_pages_additional_field_type'), true) : [];
+        $fieldsTitles = $CMSCore->configurator->existsDatabaseEntryValue('static_pages_additional_field_title') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('static_pages_additional_field_title'), true) : [];
+        $fieldsDescriptions = $CMSCore->configurator->existsDatabaseEntryValue('static_pages_additional_field_description') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('static_pages_additional_field_description'), true) : [];
+        $fieldsNames = $CMSCore->configurator->existsDatabaseEntryValue('static_pages_additional_field_name') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('static_pages_additional_field_name'), true) : [];
         
         $fields = [];
         foreach ($fieldsTypes as $index => $type) {
@@ -321,7 +321,7 @@ if (defined('IS_NOT_HACKED')) {
     }
   // Попытка инициализации персонализированного обработчика
   } else {
-    if ($CMSCore->urlp->get_path(1) !== null) {
+    if ($CMSCore->urlp->getPath(1) !== null) {
 
       /**
        * Рекурсивный поиск файла обработчика в директории API
@@ -334,7 +334,7 @@ if (defined('IS_NOT_HACKED')) {
           if (array_key_last($pathes) != $index) {
             if ($name === $pathes[$index]) {
 
-              $URLPathes = $CMSCore->urlp->get_pathes();
+              $URLPathes = $CMSCore->urlp->getPathes();
               return $recursionHandlerConnect($CMSCore, $URLPathes, $index + 1);
             }
           } else {
@@ -352,7 +352,7 @@ if (defined('IS_NOT_HACKED')) {
         return null;
       };
 
-      $URLPathes = $CMSCore->urlp->get_pathes();
+      $URLPathes = $CMSCore->urlp->getPathes();
       $handlerConnectionResult = $recursionHandlerConnect($CMSCore, $URLPathes, 1);
       
       if ($handlerConnectionResult !== null) {
@@ -383,5 +383,3 @@ if (defined('IS_NOT_HACKED')) {
   // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
   ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 }
-
-?>

@@ -15,38 +15,36 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\PageStatic as PageStatic;
 
-if ($CMSCore->client->is_logged(2)) {
-  $pageStaticID = $CMSCore->urlp->get_path(2) ?? 0;
+if ($CMSCore->client->isLogged(2)) {
+  $pageStaticID = $CMSCore->urlp->getPath(2) ?? 0;
   $pageStaticID = is_numeric($pageStaticID) ? (int) $pageStaticID : 0;
 
-  if (PageStatic::exists_by_id($CMSCore, $pageStaticID)) {
+  if (PageStatic::existsByID($CMSCore, $pageStaticID)) {
     $pageStatic = new PageStatic($CMSCore, $pageStaticID);
-    $pageStatic->init_data(['name', 'authorID', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
-    $pageStaticLocale = (!is_null($CMSCore->urlp->get_param('locale'))) ? $CMSCore->urlp->get_param('locale') : $CMSCore->configurator->get_database_entry_value('base_locale');
+    $pageStatic->initData(['name', 'authorID', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+    $pageStaticLocale = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
 
     $handlerOutputData['pageStatic'] = [];
-    $handlerOutputData['pageStatic']['id'] = $pageStatic->get_id();
-    $handlerOutputData['pageStatic']['name'] = $pageStatic->get_name();
-    $handlerOutputData['pageStatic']['title'] = $pageStatic->get_title($pageStaticLocale);
-    $handlerOutputData['pageStatic']['description'] = $pageStatic->get_description($pageStaticLocale);
-    $handlerOutputData['pageStatic']['content'] = $pageStatic->get_content($pageStaticLocale);
-    $handlerOutputData['pageStatic']['keywords'] = $pageStatic->get_keywords($pageStaticLocale);
-    $handlerOutputData['pageStatic']['authorID'] = $pageStatic->get_author_id();
-    $handlerOutputData['pageStatic']['previewURL'] = $pageStatic->get_preview_url();
-    $handlerOutputData['pageStatic']['isPublished'] = $pageStatic->is_published();
-    $handlerOutputData['pageStatic']['createdUnixTimestamp'] = $pageStatic->get_created_unix_timestamp();
-    $handlerOutputData['pageStatic']['updatedUnixTimestamp'] = $pageStatic->get_updated_unix_timestamp();
+    $handlerOutputData['pageStatic']['id'] = $pageStatic->getID();
+    $handlerOutputData['pageStatic']['name'] = $pageStatic->getName();
+    $handlerOutputData['pageStatic']['title'] = $pageStatic->getTitle($pageStaticLocale);
+    $handlerOutputData['pageStatic']['description'] = $pageStatic->getDescription($pageStaticLocale);
+    $handlerOutputData['pageStatic']['content'] = $pageStatic->getContent($pageStaticLocale);
+    $handlerOutputData['pageStatic']['keywords'] = $pageStatic->getKeywords($pageStaticLocale);
+    $handlerOutputData['pageStatic']['authorID'] = $pageStatic->getAuthorID();
+    $handlerOutputData['pageStatic']['previewURL'] = $pageStatic->getPreviewURL();
+    $handlerOutputData['pageStatic']['isPublished'] = $pageStatic->isPublished();
+    $handlerOutputData['pageStatic']['createdUnixTimestamp'] = $pageStatic->getCreatedUnixTimestamp();
+    $handlerOutputData['pageStatic']['updatedUnixTimestamp'] = $pageStatic->getUpdatedUnixTimestamp();
 
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_STATIC_PAGE_ERROR_NOT_FOUND');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_STATIC_PAGE_ERROR_NOT_FOUND');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
   http_response_code(401);
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

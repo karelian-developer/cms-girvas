@@ -16,36 +16,37 @@
 use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\SystemCore\Locale as Locale;
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_EDITOR_PAGES_STATIC_EDIT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_PAGES_STATIC_EDIT)) {
     $pageStaticName = isset($_PUT['page_static_name']) ? urlencode(htmlentities($_PUT['page_static_name'])) : '';
     $pageStaticCreationAllowed = true;
     $texts = [];
 
-    $CMSLocalesNames = $CMSCore->get_array_locales_names();
+    $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
     if (count($CMSLocalesNames) > 0) {
       foreach ($CMSLocalesNames as $index => $localeName) {
         $CMSLocale = new Locale($CMSCore, $localeName);
+        $CMSLocaleName = $CMSLocale->getName();
 
-        $inputTitleName = 'page_static_title_' . $CMSLocale->get_iso_639_2();
-        $textareaDescriptionName = 'page_static_description_' . $CMSLocale->get_iso_639_2();
-        $textareaContentName = 'page_static_content_' . $CMSLocale->get_iso_639_2();
-        $textareaKeywordsName = 'page_static_keywords_' . $CMSLocale->get_iso_639_2();
+        $inputTitleName = 'page_static_title_' . $CMSLocale->getISO639(2);
+        $textareaDescriptionName = 'page_static_description_' . $CMSLocale->getISO639(2);
+        $textareaContentName = 'page_static_content_' . $CMSLocale->getISO639(2);
+        $textareaKeywordsName = 'page_static_keywords_' . $CMSLocale->getISO639(2);
 
         if (array_key_exists($inputTitleName, $_PUT) || array_key_exists($textareaDescriptionName, $_PUT) || array_key_exists($textareaContentName, $_PUT)) {
-          if (!array_key_exists($CMSLocale->get_name(), $texts)) $texts[$CMSLocale->get_name()] = [];
+          if (!array_key_exists($CMSLocaleName, $texts)) $texts[$CMSLocaleName] = [];
 
           if (array_key_exists($inputTitleName, $_PUT)) {
             $inputValue = $_PUT[$inputTitleName];
             $inputValue = strip_tags($inputValue);
             $inputValue = str_replace('\'', '"', $inputValue);
 
-            $texts[$CMSLocale->get_name()]['title'] = $inputValue;
+            $texts[$CMSLocaleName]['title'] = $inputValue;
           }
 
           if (array_key_exists($textareaDescriptionName, $_PUT)) {
@@ -53,7 +54,7 @@ if ($CMSCore->client->is_logged(2)) {
             $textareaValue = strip_tags($textareaValue);
             $textareaValue = str_replace('\'', '"', $textareaValue);
 
-            $texts[$CMSLocale->get_name()]['description'] = $textareaValue;
+            $texts[$CMSLocaleName]['description'] = $textareaValue;
           }
 
           if (array_key_exists($textareaContentName, $_PUT)) {
@@ -61,7 +62,7 @@ if ($CMSCore->client->is_logged(2)) {
             $textareaValue = strip_tags($textareaValue, '<table><tr><td><th><b><u><i><hr>');
             $textareaValue = str_replace('\'', '"', $textareaValue);
 
-            $texts[$CMSLocale->get_name()]['content'] = $textareaValue;
+            $texts[$CMSLocaleName]['content'] = $textareaValue;
           }
 
           if (array_key_exists($textareaKeywordsName, $_PUT)) {
@@ -69,7 +70,7 @@ if ($CMSCore->client->is_logged(2)) {
             $textareaValue = strip_tags($textareaValue);
             $textareaValue = str_replace('\'', '"', $textareaValue);
             
-            $texts[$CMSLocale->get_name()]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
+            $texts[$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
           }
         }
       }
@@ -105,37 +106,35 @@ if ($CMSCore->client->is_logged(2)) {
     }
 
     if ($pageStaticCreationAllowed) {
-      $clientSession = $CMSCore->client->get_session(2, ['userID']);
+      $clientSession = $CMSCore->client->getSession(2, ['userID']);
       
-      $pageStatic = PageStatic::create($CMSCore, $pageStaticName, $clientSession->get_user_id(), $texts);
+      $pageStatic = PageStatic::create($CMSCore, $pageStaticName, $clientSession->getUserID(), $texts);
       if (!is_null($pageStatic)) {
-        $pageStatic->init_data(['*']);
+        $pageStatic->initData(['*']);
 
         if (isset($pageStaticData)) {
           $pageStatic->update($pageStaticData);
         }
 
         $handlerOutputData['pageStatic'] = [];
-        $handlerOutputData['pageStatic']['id'] = $pageStatic->get_id();
+        $handlerOutputData['pageStatic']['id'] = $pageStatic->getID();
 
-        $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_PUT_DATA_SUCCESS');
+        $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PUT_DATA_SUCCESS');
         $handlerStatusCode = $handlerStatusCode ?? 1;
       } else {
-        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
   http_response_code(401);
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

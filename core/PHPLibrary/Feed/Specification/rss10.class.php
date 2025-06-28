@@ -8,149 +8,161 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Feed\Specification {
-  use \DOMElement as DOMElement;
-  use \core\PHPLibrary\SystemCore as SystemCore;
-  use \core\PHPLibrary\Feed\Builder as FeedBuilder;
-  use \core\PHPLibrary\Feed\InterfaceSpecification as InterfaceSpecification;
+namespace core\PHPLibrary\Feed\Specification;
 
-  class RSS1_0 implements InterfaceSpecification {
-    const TYPE_NAME = 'rss1-0';
-    const TYPE_TITLE = 'RSS 1.0';
+use \DOMElement as DOMElement;
+use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\Feed\Builder as FeedBuilder;
+use \core\PHPLibrary\Feed\InterfaceSpecification as InterfaceSpecification;
 
-    private SystemCore $CMSCore;
-    private FeedBuilder $builder;
-    public string $title;
-    public string $description;
-    public string $link;
-    public string $language;
-    public array $items = [];
+class RSS1_0 implements InterfaceSpecification
+{
+  const TYPE_NAME = 'rss1-0';
+  const TYPE_TITLE = 'RSS 1.0';
 
-    public function __construct(SystemCore $CMSCore, FeedBuilder $feedBuilder) {
-      $this->CMSCore = $CMSCore;
-      $this->builder = $feedBuilder;
+  private SystemCore $CMSCore;
+  private FeedBuilder $builder;
+  public string $title;
+  public string $description;
+  public string $link;
+  public string $language;
+  public array $items = [];
+
+  public function __construct(SystemCore $CMSCore, FeedBuilder $feedBuilder)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->builder = $feedBuilder;
+  }
+
+  public function setTitle(string $value) : void
+  {
+    $this->title = $value;
+  }
+
+  public function setDescription(string $value) : void
+  {
+    $this->description = $value;
+  }
+
+  public function setLink(string $value) : void
+  {
+    $this->link = $value;
+  }
+
+  public function setLanguage(string $value) : void
+  {
+    $this->language = str_replace('_', '-', strtolower($value));
+  }
+
+  public function addItem(array $data) : void
+  {
+    array_push($this->items, [
+      'title' => $data['title'],
+      'description' => $data['description'],
+      'link' => $data['link'],
+      'pubdate' => date('D, d M Y H:i:s O', $data['pubdate'])
+    ]);
+  }
+
+  public function getTitle() : string
+  {
+    return $this->title;
+  }
+
+  public function getDescription() : string
+  {
+    return $this->description;
+  }
+
+  public function getLink() : string
+  {
+    return $this->link;
+  }
+
+  public function getLanguage() : string
+  {
+    return $this->language;
+  }
+
+  public function getItems() : array
+  {
+    return $this->items;
+  }
+
+  public function assemblyRDF() : DOMElement|bool
+  {
+    $RDFElement = $this->builder->document->createElement('rdf:RDF');
+    $RDFElementAttributeXMLnsRDF = $this->builder->document->createAttribute('xmlns:rdf');
+    $RDFElementAttributeXMLns = $this->builder->document->createAttribute('xmlns');
+    $RDFElementAttributeXMLnsRDF->value = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
+    $RDFElementAttributeXMLns->value = 'http://purl.org/rss/1.0/';
+
+    $RDFElement->appendChild($RDFElementAttributeXMLnsRDF);
+    $RDFElement->appendChild($RDFElementAttributeXMLns);
+    return $RDFElement;
+  }
+
+  public function assemblyChannel() : DOMElement|bool
+  {
+    $siteTitle = $this->CMSCore->configurator->exists_database_entry_value('base_site_title') ? $this->CMSCore->configurator->get_database_entry_value('base_site_title') : sprintf('%s %s', $this->CMSCore::CMS_TITLE, $this->CMSCore::CMS_VERSION);
+    $siteDescription = $this->CMSCore->configurator->exists_database_entry_value('seo_site_description') ? $this->CMSCore->configurator->get_database_entry_value('seo_site_description') : 'Description is not exists';
+    $siteLink = 'https://' . $this->CMSCore->configurator->get('domain');
+
+    $channelTitle = !empty($this->getTitle()) ? $this->getTitle() : $siteTitle;
+    $channelDescription = !empty($this->getDescription()) ? $this->getDescription() : $siteDescription;
+    $channelLink = !empty($this->getLink()) ? $this->getLink() : $siteLink;
+
+    $channelElement = $this->builder->document->createElement('channel');
+    $channelTitleElement = $this->builder->document->createElement('title', $channelTitle);
+    $channelLinkElement = $this->builder->document->createElement('link', $channelLink);
+    $channelDescriptionElement = $this->builder->document->createElement('description', $channelDescription);
+
+    $channelElement->appendChild($channelTitleElement);
+    $channelElement->appendChild($channelLinkElement);
+    $channelElement->appendChild($channelDescriptionElement);
+
+    $itemsElement = $this->builder->document->createElement('items');
+    $itemsElementRDFSeq = $this->builder->document->createElement('rdf:Seq');
+    $itemsElement->appendChild($itemsElementRDFSeq);
+
+    foreach ($this->items as $item) {
+      $itemsElementRDFLi = $this->builder->document->createElement('rdf:li');
+      $itemsElementRDFLiAttributeResource = $this->builder->document->createAttribute('resource');
+      $itemsElementRDFLiAttributeResource->value = $item['link'];
+
+      $itemsElementRDFLi->appendChild($itemsElementRDFLiAttributeResource);
+      $itemsElementRDFSeq->appendChild($itemsElementRDFLi);
     }
 
-    public function set_title(string $value) : void {
-      $this->title = $value;
+    $channelElement->appendChild($itemsElement);
+
+    foreach ($this->items as $item) {
+      $itemElement = $this->builder->document->createElement('item');
+      $itemElementAttributeRDFAbout = $this->builder->document->createAttribute('rdf:about');
+      $itemElementAttributeRDFAbout->value = $item['link'];
+      $itemElement->appendChild($itemElementAttributeRDFAbout);
+
+      $itemTitleElement = $this->builder->document->createElement('title', $item['title']);
+      $itemDescriptionElement = $this->builder->document->createElement('description', $item['description']);
+      $itemLinkElement = $this->builder->document->createElement('link', $item['link']);
+
+      $itemElement->appendChild($itemTitleElement);
+      $itemElement->appendChild($itemDescriptionElement);
+      $itemElement->appendChild($itemLinkElement);
+
+      $channelElement->appendChild($itemElement);
     }
+    
+    return $channelElement;
+  }
 
-    public function set_description(string $value) : void {
-      $this->description = $value;
-    }
-
-    public function set_link(string $value) : void {
-      $this->link = $value;
-    }
-
-    public function set_language(string $value) : void {
-      $this->language = str_replace('_', '-', strtolower($value));
-    }
-
-    public function add_item(array $data) : void {
-      array_push($this->items, [
-        'title' => $data['title'],
-        'description' => $data['description'],
-        'link' => $data['link'],
-        'pubdate' => date('D, d M Y H:i:s O', $data['pubdate'])
-      ]);
-    }
-
-    public function get_title() : string {
-      return $this->title;
-    }
-
-    public function get_description() : string {
-      return $this->description;
-    }
-
-    public function get_link() : string {
-      return $this->link;
-    }
-
-    public function get_language() : string {
-      return $this->language;
-    }
-
-    public function get_items() : array {
-      return $this->items;
-    }
-
-    public function assembly_rdf() : DOMElement|bool {
-      $RDFElement = $this->builder->document->createElement('rdf:RDF');
-      $RDFElementAttributeXMLnsRDF = $this->builder->document->createAttribute('xmlns:rdf');
-      $RDFElementAttributeXMLns = $this->builder->document->createAttribute('xmlns');
-      $RDFElementAttributeXMLnsRDF->value = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#';
-      $RDFElementAttributeXMLns->value = 'http://purl.org/rss/1.0/';
-
-      $RDFElement->appendChild($RDFElementAttributeXMLnsRDF);
-      $RDFElement->appendChild($RDFElementAttributeXMLns);
-      return $RDFElement;
-    }
-
-    public function assembly_channel() : DOMElement|bool {
-      $siteTitle = $this->CMSCore->configurator->exists_database_entry_value('base_site_title') ? $this->CMSCore->configurator->get_database_entry_value('base_site_title') : sprintf('%s %s', $this->CMSCore::CMS_TITLE, $this->CMSCore::CMS_VERSION);
-      $siteDescription = $this->CMSCore->configurator->exists_database_entry_value('seo_site_description') ? $this->CMSCore->configurator->get_database_entry_value('seo_site_description') : 'Description is not exists';
-      $siteLink = 'https://' . $this->CMSCore->configurator->get('domain');
-
-      $channelTitle = !empty($this->get_title()) ? $this->get_title() : $siteTitle;
-      $channelDescription = !empty($this->get_description()) ? $this->get_description() : $siteDescription;
-      $channelLink = !empty($this->get_link()) ? $this->get_link() : $siteLink;
-
-      $channelElement = $this->builder->document->createElement('channel');
-      $channelTitleElement = $this->builder->document->createElement('title', $channelTitle);
-      $channelLinkElement = $this->builder->document->createElement('link', $channelLink);
-      $channelDescriptionElement = $this->builder->document->createElement('description', $channelDescription);
-
-      $channelElement->appendChild($channelTitleElement);
-      $channelElement->appendChild($channelLinkElement);
-      $channelElement->appendChild($channelDescriptionElement);
-
-      $itemsElement = $this->builder->document->createElement('items');
-      $itemsElementRDFSeq = $this->builder->document->createElement('rdf:Seq');
-      $itemsElement->appendChild($itemsElementRDFSeq);
-
-      foreach ($this->items as $item) {
-        $itemsElementRDFLi = $this->builder->document->createElement('rdf:li');
-        $itemsElementRDFLiAttributeResource = $this->builder->document->createAttribute('resource');
-        $itemsElementRDFLiAttributeResource->value = $item['link'];
-
-        $itemsElementRDFLi->appendChild($itemsElementRDFLiAttributeResource);
-        $itemsElementRDFSeq->appendChild($itemsElementRDFLi);
-      }
-
-      $channelElement->appendChild($itemsElement);
-
-      foreach ($this->items as $item) {
-        $itemElement = $this->builder->document->createElement('item');
-        $itemElementAttributeRDFAbout = $this->builder->document->createAttribute('rdf:about');
-        $itemElementAttributeRDFAbout->value = $item['link'];
-        $itemElement->appendChild($itemElementAttributeRDFAbout);
-
-        $itemTitleElement = $this->builder->document->createElement('title', $item['title']);
-        $itemDescriptionElement = $this->builder->document->createElement('description', $item['description']);
-        $itemLinkElement = $this->builder->document->createElement('link', $item['link']);
-
-        $itemElement->appendChild($itemTitleElement);
-        $itemElement->appendChild($itemDescriptionElement);
-        $itemElement->appendChild($itemLinkElement);
-
-        $channelElement->appendChild($itemElement);
-      }
-      
-      return $channelElement;
-    }
-
-    public function assembly() : void {
-      $RDFElement = $this->assembly_rdf();
-      $channelElement = $this->assembly_channel();
-
-      $RDFElement->appendChild($channelElement);
-      $this->builder->document->appendChild($RDFElement);
-
-      $this->builder->assembled = $this->builder->document->saveXML();
-    }
+  public function assembly() : void
+  {
+    $RDFElement = $this->assembly_rdf();
+    $channelElement = $this->assembly_channel();
+    $RDFElement->appendChild($channelElement);
+    
+    $this->builder->document->appendChild($RDFElement);
+    $this->builder->assembled = $this->builder->document->saveXML();
   }
 }
-
-?>

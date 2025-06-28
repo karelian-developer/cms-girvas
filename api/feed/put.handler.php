@@ -16,13 +16,13 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Feed as Feed;
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_ADMIN_FEEDS_MANAGEMENT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_FEEDS_MANAGEMENT)) {
     $feedName = (isset($_PUT['web_channel_name'])) ? urlencode(htmlentities($_PUT['web_channel_name'])) : '';
     
     $feedEntriesCategoryID = $_PUT['web_channel_entries_category_id'] ?? 0;
@@ -33,19 +33,20 @@ if ($CMSCore->client->is_logged(2)) {
 
     $texts = [];
 
-    $CMSLocalesNames = $CMSCore->get_array_locales_names();
+    $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
     if (count($CMSLocalesNames) > 0) {
       foreach ($CMSLocalesNames as $index => $name) {
         $CMSLocale = new SystemCoreLocale($CMSCore, $name);
+        $CMSLocaleName = $CMSLocale->getName();
 
-        $inputTitleName = 'web_channel_title_' . $CMSLocale->get_iso_639_2();
-        $textareaDescriptionName = 'web_channel_description_' . $CMSLocale->get_iso_639_2();
+        $inputTitleName = 'web_channel_title_' . $CMSLocale->getISO639(2);
+        $textareaDescriptionName = 'web_channel_description_' . $CMSLocale->getISO639(2);
 
         if (array_key_exists($inputTitleName, $_PUT) || array_key_exists($textareaDescriptionName, $_PUT)) {
-          if (!array_key_exists($CMSLocale->get_name(), $texts)) $texts[$CMSLocale->get_name()] = [];
+          if (!array_key_exists($CMSLocaleName, $texts)) $texts[$CMSLocaleName] = [];
 
-          if (array_key_exists($inputTitleName, $_PUT)) $texts[$CMSLocale->get_name()]['title'] = htmlspecialchars(str_replace('\'', '"', $_PUT[$inputTitleName]));
-          if (array_key_exists($textareaDescriptionName, $_PUT)) $texts[$CMSLocale->get_name()]['description'] = htmlspecialchars(str_replace('\'', '"', $_PUT[$textareaDescriptionName]));
+          if (array_key_exists($inputTitleName, $_PUT)) $texts[$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', $_PUT[$inputTitleName]));
+          if (array_key_exists($textareaDescriptionName, $_PUT)) $texts[$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', $_PUT[$textareaDescriptionName]));
         }
       }
     }
@@ -53,21 +54,19 @@ if ($CMSCore->client->is_logged(2)) {
     $feed = Feed::create($CMSCore, $feedName, $feedEntriesCategoryID, $feedTypeID, $texts);
     if (!is_null($feed)) {
       $handlerOutputData['feed'] = [];
-      $handlerOutputData['feed']['id'] = $feed->get_id();
+      $handlerOutputData['feed']['id'] = $feed->getID();
 
-      $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_PUT_DATA_SUCCESS');
+      $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PUT_DATA_SUCCESS');
       $handlerStatusCode = $handlerStatusCode ?? 1;
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

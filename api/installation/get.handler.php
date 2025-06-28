@@ -26,22 +26,22 @@ if (!defined('IS_NOT_HACKED')) {
 if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
   $JSONDataTypeDMS = 'json';
 
-  if ($CMSCore->urlp->get_param('stepIndex') === 1) {
+  if ($CMSCore->urlp->getParam('stepIndex') === 1) {
     $document = new DOMDocument();
     
     $phpExtensionsLoaded = get_loaded_extensions();
     
     $tableData = [
-      [$CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_VERSION_LABEL'), '>= 8.2.6', phpversion()],
-      [sprintf('%s SimpleXML', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('SimpleXML', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s PDO', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('PDO', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s openssl', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('openssl', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s curl', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('curl', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s dom', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('dom', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s mbstring', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('mbstring', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s json', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('json', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s zip', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('zip', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      [sprintf('%s intl', $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('intl', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))]
+      [$CMSCore->locale->getSingleValueByKey('API_INSTALLATION_PHP_VERSION_LABEL'), '>= 8.2.6', phpversion()],
+      [sprintf('%s SimpleXML', $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('SimpleXML', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s PDO', $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('PDO', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s openssl', $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('openssl', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s curl', $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('curl', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s dom', $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('dom', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s mbstring', $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('mbstring', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s json', $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('json', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s zip', $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('zip', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      [sprintf('%s intl', $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_PHP_MODULE_LABEL')), (in_array('intl', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))]
     ];
 
     $tableCellsFontColor = [
@@ -72,9 +72,9 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       $element->setAttribute('style', 'font-weight: 700;');
     }
 
-    $tableCellsHeadersElements[0]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_NAME_LABEL');
-    $tableCellsHeadersElements[1]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_EXPECTATION_LABEL');
-    $tableCellsHeadersElements[2]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_FACT_LABEL');
+    $tableCellsHeadersElements[0]->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_NAME_LABEL');
+    $tableCellsHeadersElements[1]->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_EXPECTATION_LABEL');
+    $tableCellsHeadersElements[2]->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_FACT_LABEL');
 
     $tableRowHeaderElement->appendChild($tableCellsHeadersElements[0]);
     $tableRowHeaderElement->appendChild($tableCellsHeadersElements[1]);
@@ -118,18 +118,18 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
 
     $handlerOutputData['html'] = $document->saveHTML();
 
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($CMSCore->urlp->get_param('stepIndex') === 2) {
+  if ($CMSCore->urlp->getParam('stepIndex') === 2) {
     $document = new DOMDocument();
     
     $tableData = [
-      ['./backups/', (file_exists(CMS_ROOT_DIRECTORY . '/backups')) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
-      ['./modules/', (file_exists(CMS_ROOT_DIRECTORY . '/modules')) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
-      ['./templates/', (file_exists(CMS_ROOT_DIRECTORY . '/templates')) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
-      ['./uploads/', (file_exists(CMS_ROOT_DIRECTORY . '/uploads')) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./backups/', (file_exists(CMS_ROOT_DIRECTORY . '/backups')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./modules/', (file_exists(CMS_ROOT_DIRECTORY . '/modules')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./templates/', (file_exists(CMS_ROOT_DIRECTORY . '/templates')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./uploads/', (file_exists(CMS_ROOT_DIRECTORY . '/uploads')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
     ];
 
     $tableCellsFontColor = [
@@ -152,8 +152,8 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       $tableCellElement->setAttribute('class', 'table__cell table__cell_header');
     }
 
-    $tableCellsHeadersElements[0]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_NAME_LABEL');
-    $tableCellsHeadersElements[1]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_FACT_LABEL');
+    $tableCellsHeadersElements[0]->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_NAME_LABEL');
+    $tableCellsHeadersElements[1]->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_FACT_LABEL');
 
     $tableRowHeaderElement->appendChild($tableCellsHeadersElements[0]);
     $tableRowHeaderElement->appendChild($tableCellsHeadersElements[1]);
@@ -187,19 +187,19 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
 
     $handlerOutputData['html'] = $document->saveHTML();
 
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($CMSCore->urlp->get_param('stepIndex') === 3) {
+  if ($CMSCore->urlp->getParam('stepIndex') === 3) {
     $document = new DOMDocument();
 
     $tableData = [
-      ['./core/', '755', file_exists(CMS_ROOT_DIRECTORY . '/core') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/core')), -3) : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
-      ['./backups/', '755', file_exists(CMS_ROOT_DIRECTORY . '/backups') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/backups')), -3) : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
-      ['./modules/', '755', file_exists(CMS_ROOT_DIRECTORY . '/modules') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/modules')), -3) : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
-      ['./templates/', '755', file_exists(CMS_ROOT_DIRECTORY . '/templates') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/templates')), -3) : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
-      ['./uploads/', '755', file_exists(CMS_ROOT_DIRECTORY . '/uploads') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/uploads')), -3) : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./core/', '755', file_exists(CMS_ROOT_DIRECTORY . '/core') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/core')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./backups/', '755', file_exists(CMS_ROOT_DIRECTORY . '/backups') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/backups')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./modules/', '755', file_exists(CMS_ROOT_DIRECTORY . '/modules') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/modules')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./templates/', '755', file_exists(CMS_ROOT_DIRECTORY . '/templates') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/templates')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./uploads/', '755', file_exists(CMS_ROOT_DIRECTORY . '/uploads') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/uploads')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
     ];
 
     $tableCellsFontColor = [
@@ -224,9 +224,9 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       $element->setAttribute('class', 'table__cell table__cell_header');
     }
 
-    $tableCellsHeadersElements[0]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_NAME_LABEL');
-    $tableCellsHeadersElements[1]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_EXPECTATION_LABEL');
-    $tableCellsHeadersElements[2]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_FACT_LABEL');
+    $tableCellsHeadersElements[0]->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_NAME_LABEL');
+    $tableCellsHeadersElements[1]->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_EXPECTATION_LABEL');
+    $tableCellsHeadersElements[2]->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_FACT_LABEL');
 
     $tableRowHeaderElement->appendChild($tableCellsHeadersElements[0]);
     $tableRowHeaderElement->appendChild($tableCellsHeadersElements[1]);
@@ -262,27 +262,27 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
 
     $handlerOutputData['html'] = $document->saveHTML();
 
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($CMSCore->urlp->get_param('stepIndex') === 4) {
+  if ($CMSCore->urlp->getParam('stepIndex') === 4) {
     $document = new DOMDocument();
     
     $phpExtensionsLoaded = get_loaded_extensions();
 
     $tableData = [
-      ['Cubrid', (in_array('pdo_cubrid', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['FreeTDS / Microsoft SQL Server / Sybase', (in_array('pdo_dblib', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['Firebird', (in_array('pdo_firebird', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['IBM DB2', (in_array('pdo_ibm', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['IBM Informix Dynamic Server', (in_array('pdo_informix', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['MySQL', (in_array('pdo_mysql', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['Oracle Call Interface', (in_array('pdo_ocl', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['ODBC v3 (IBM DB2, unixODBC, win32 ODBC)', (in_array('pdo_odbc', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['PostgreSQL', (in_array('pdo_pgsql', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['SQLite 3 и SQLite 2', (in_array('pdo_sqlite', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))],
-      ['Microsoft SQL Server / SQL Azure', (in_array('pdo_sqlsrv', $phpExtensionsLoaded) ? $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_ENABLED') : $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DISABLED'))]
+      ['Cubrid', (in_array('pdo_cubrid', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      ['FreeTDS / Microsoft SQL Server / Sybase', (in_array('pdo_dblib', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      ['Firebird', (in_array('pdo_firebird', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      ['IBM DB2', (in_array('pdo_ibm', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      ['IBM Informix Dynamic Server', (in_array('pdo_informix', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      ['MySQL', (in_array('pdo_mysql', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      ['Oracle Call Interface', (in_array('pdo_ocl', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      ['ODBC v3 (IBM DB2, unixODBC, win32 ODBC)', (in_array('pdo_odbc', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      ['PostgreSQL', (in_array('pdo_pgsql', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      ['SQLite 3 и SQLite 2', (in_array('pdo_sqlite', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      ['Microsoft SQL Server / SQL Azure', (in_array('pdo_sqlsrv', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))]
     ];
 
     $tableCellsFontColor = [
@@ -312,8 +312,8 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       $element->setAttribute('class', 'table__cell table__cell_header');
     }
 
-    $tableCellsHeadersElements[0]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DRIVER_PDO_LABEL');
-    $tableCellsHeadersElements[1]->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_DRIVER_PDO_STATUS_LABEL');
+    $tableCellsHeadersElements[0]->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DRIVER_PDO_LABEL');
+    $tableCellsHeadersElements[1]->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DRIVER_PDO_STATUS_LABEL');
 
     $tableRowHeaderElement->appendChild($tableCellsHeadersElements[0]);
     $tableRowHeaderElement->appendChild($tableCellsHeadersElements[1]);
@@ -347,11 +347,11 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
 
     $handlerOutputData['html'] = $document->saveHTML();
 
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($CMSCore->urlp->get_param('stepIndex') === 5) {
+  if ($CMSCore->urlp->getParam('stepIndex') === 5) {
     $document = new DOMDocument();
     $tipBlockElement = $document->createElement('div');
 
@@ -437,20 +437,20 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
 
     if (file_exists($fileCMSConfigurationPath)) {
       $tipBlockElement->setAttribute('class', 'tip tip_green');
-      $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_CONFIGURATION_FILE_CREATED');
+      $tipBlockElement->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_CONFIGURATION_FILE_CREATED');
     } else {
       $tipBlockElement->setAttribute('class', 'tip tip_red');
-      $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_CONFIGURATION_FILE_NOT_CREATED');
+      $tipBlockElement->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_CONFIGURATION_FILE_NOT_CREATED');
     }
 
     $document->appendChild($tipBlockElement);
 
     $handlerOutputData['html'] = $document->saveHTML();
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($CMSCore->urlp->get_param('stepIndex') === 6) {
+  if ($CMSCore->urlp->getParam('stepIndex') === 6) {
     $databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
     $databaseConfigurations = $CMSCore->configurator->get('database');
 
@@ -473,15 +473,15 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // =======================
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_create_table();
-      $queryBuilder->statement->set_check_exists(true);
-      $queryBuilder->statement->set_table_name('configurations');
-      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->add_column('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('value', 'text');
-      $queryBuilder->statement->add_column('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('configurations');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('value', 'text');
+      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $databaseConnector->database->connection;
@@ -494,17 +494,17 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // =======================
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_create_table();
-      $queryBuilder->statement->set_check_exists(true);
-      $queryBuilder->statement->set_table_name('entries');
-      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->add_column('categoryID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('authorID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('entries');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('categoryID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('authorID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $databaseConnector->database->connection;
@@ -517,16 +517,16 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // =======================
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_create_table();
-      $queryBuilder->statement->set_check_exists(true);
-      $queryBuilder->statement->set_table_name('entries_categories');
-      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->add_column('parentID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('entries_categories');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('parentID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $databaseConnector->database->connection;
@@ -539,16 +539,16 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // =======================
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_create_table();
-      $queryBuilder->statement->set_check_exists(true);
-      $queryBuilder->statement->set_table_name('entries_comments');
-      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->add_column('entryID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('authorID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('content', 'text');
-      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('entries_comments');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('entryID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('authorID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('content', 'text');
+      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $databaseConnector->database->connection;
@@ -561,15 +561,15 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // =======================
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_create_table();
-      $queryBuilder->statement->set_check_exists(true);
-      $queryBuilder->statement->set_table_name('entries_samples');
-      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->add_column('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('entries_samples');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $databaseConnector->database->connection;
@@ -582,16 +582,16 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // =======================
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_create_table();
-      $queryBuilder->statement->set_check_exists(true);
-      $queryBuilder->statement->set_table_name('pages_static');
-      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->add_column('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('authorID', 'bigint');
-      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('pages_static');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('authorID', 'bigint');
+      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $databaseConnector->database->connection;
@@ -604,13 +604,13 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // =======================
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_create_table();
-      $queryBuilder->statement->set_check_exists(true);
-      $queryBuilder->statement->set_table_name('reports');
-      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->add_column('variables', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('reports');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('variables', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $databaseConnector->database->connection;
@@ -623,18 +623,18 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // =======================
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_create_table();
-      $queryBuilder->statement->set_check_exists(true);
-      $queryBuilder->statement->set_table_name('users');
-      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->add_column('login', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('email', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('passwordHash', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('securityHash', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('emailIsSubmitted', 'boolean', 'NOT NULL DEFAULT false');
-      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('users');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('login', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('email', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('passwordHash', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('securityHash', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('emailIsSubmitted', 'boolean', 'NOT NULL DEFAULT false');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $databaseConnector->database->connection;
@@ -647,16 +647,16 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // =======================
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_create_table();
-      $queryBuilder->statement->set_check_exists(true);
-      $queryBuilder->statement->set_table_name('users_groups');
-      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->add_column('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('permissions', 'integer', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('metadata', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('users_groups');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('permissions', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $databaseConnector->database->connection;
@@ -669,14 +669,14 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // =======================
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_create_table();
-      $queryBuilder->statement->set_check_exists(true);
-      $queryBuilder->statement->set_table_name('users_registration_submits');
-      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->add_column('userID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('submitToken', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('refusalToken', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('users_registration_submits');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('submitToken', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('refusalToken', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $databaseConnector->database->connection;
@@ -689,16 +689,16 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // =======================
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_create_table();
-      $queryBuilder->statement->set_check_exists(true);
-      $queryBuilder->statement->set_table_name('users_sessions');
-      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->add_column('userID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('token', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('userIP', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('typeID', 'integer', 'NOT NULL DEFAULT 1');
-      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('users_sessions');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('token', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('userIP', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('typeID', 'integer', 'NOT NULL DEFAULT 1');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $databaseConnector->database->connection;
@@ -711,16 +711,16 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // =======================
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_create_table();
-      $queryBuilder->statement->set_check_exists(true);
-      $queryBuilder->statement->set_table_name('web_channels');
-      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->add_column('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->add_column('entriesCategoryID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('typeID', 'integer', 'NOT NULL DEFAULT 1');
-      $queryBuilder->statement->add_column('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('web_channels');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('entriesCategoryID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('typeID', 'integer', 'NOT NULL DEFAULT 1');
+      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $databaseConnector->database->connection;
@@ -733,14 +733,14 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // =======================
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore);
-      $queryBuilder->set_statement_create_table();
-      $queryBuilder->statement->set_check_exists(true);
-      $queryBuilder->statement->set_table_name('metrics');
-      $queryBuilder->statement->add_column('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->add_column('date', 'integer', 'NOT NULL');
-      $queryBuilder->statement->add_column('data', $JSONDataTypeDMS);
-      $queryBuilder->statement->add_column('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->add_column('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('metrics');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('date', 'integer', 'NOT NULL');
+      $queryBuilder->statement->addColumn('data', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $databaseConnector->database->connection;
@@ -858,23 +858,21 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
     $thirtyUsersGroup = UserGroup::create($CMSCore, 'editor', $thirtyUsersGroupTexts, 130049);
     $fourtyUsersGroup = UserGroup::create($CMSCore, 'user', $fourtyUsersGroupTexts, 114688);
     
-    $CMSCore->configurator->insert_database_entry_value('base_template', 'default');
-    $CMSCore->configurator->insert_database_entry_value('base_site_title', 'CMS GIRVAS');
-    $CMSCore->configurator->insert_database_entry_value('base_engineering_works_status', 'off');
-    $CMSCore->configurator->insert_database_entry_value('base_engineering_works_text', '');
-    $CMSCore->configurator->insert_database_entry_value('seo_site_description', 'CMS GIRVAS - a multidisciplinary free contents control system from the Karelian Developer company.');
-    $CMSCore->configurator->insert_database_entry_value('seo_site_keywords', '["CMS GIRVAS","Free Content Management System","Free CMS","Karelian Developer"]');
-    $CMSCore->configurator->insert_database_entry_value('base_site_title', 'CMS GIRVAS');
+    $CMSCore->configurator->insertDatabaseEntryValue('base_template', 'default');
+    $CMSCore->configurator->insertDatabaseEntryValue('base_site_title', 'CMS GIRVAS');
+    $CMSCore->configurator->insertDatabaseEntryValue('base_engineering_works_status', 'off');
+    $CMSCore->configurator->insertDatabaseEntryValue('base_engineering_works_text', '');
+    $CMSCore->configurator->insertDatabaseEntryValue('seo_site_description', 'CMS GIRVAS - a multidisciplinary free contents control system from the Karelian Developer company.');
+    $CMSCore->configurator->insertDatabaseEntryValue('seo_site_keywords', '["CMS GIRVAS","Free Content Management System","Free CMS","Karelian Developer"]');
+    $CMSCore->configurator->insertDatabaseEntryValue('base_site_title', 'CMS GIRVAS');
 
     $tipBlockElement->setAttribute('class', 'tip tip_green');
-    $tipBlockElement->nodeValue = $CMSCore->locale->get_single_value_by_key('API_INSTALLATION_TABLES_GENERATED');
+    $tipBlockElement->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_TABLES_GENERATED');
 
     $document->appendChild($tipBlockElement);
 
     $handlerOutputData['html'] = $document->saveHTML();
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 }
-
-?>

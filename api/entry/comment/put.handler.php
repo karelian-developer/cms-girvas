@@ -16,11 +16,11 @@
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryComment as EntryComment;
 
-if ($CMSCore->client->is_logged(1)) {
-  $clientUser = $CMSCore->client->get_user(1);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(1)) {
+  $clientUser = $CMSCore->client->getUser(1);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
   $commentParentID = $_PUT['comment_parent_id'] ?? 0;
   $commentParentID = is_numeric($commentParentID) ? (int) $commentParentID : 0;
@@ -34,17 +34,17 @@ if ($CMSCore->client->is_logged(1)) {
   $commentContentLengthMin = 16;
   $commentContentLengthMax = 400;
 
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_BASE_ENTRY_COMMENT_CREATE)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_BASE_ENTRY_COMMENT_CREATE)) {
     if (!empty($commentContent)) {
       if (strlen($commentContent) >= $commentContentLengthMin) {
         if (strlen($commentContent) <= $commentContentLengthMax) {
-          if (Entry::exists_by_id($CMSCore, $commentEntryID)) {
-            $comment = EntryComment::create($CMSCore, $commentEntryID, $clientUser->get_id(), $commentContent);
+          if (Entry::existsByID($CMSCore, $commentEntryID)) {
+            $comment = EntryComment::create($CMSCore, $commentEntryID, $clientUser->getID(), $commentContent);
             
             if (!is_null($comment)) {
               // Система премодерации не будет проигнорирована, если пользователь является первичным
               // или его группа не является административной или модеративной
-              if (!in_array($clientUserGroup->get_id(), [1, 2]) && $clientUser->get_id() !== 1) {
+              if (!in_array($clientUserGroup->getID(), [1, 2]) && $clientUser->getID() !== 1) {
                 $commentRiskFactorsDetected = [];
                 $commentRiskFactors = [
                   0 => '{LANG:COMMENT_PREMODERATION_BANNED_WORDS_DETECTED}',
@@ -52,17 +52,17 @@ if ($CMSCore->client->is_logged(1)) {
                   2 => '{LANG:COMMENT_PREMODERATION_MANDATORY_PREMODERATION}',
                 ];
 
-                $settingSecurityPremoderationCreateStatus = $CMSCore->configurator->get_database_entry_value('security_premoderation_create_status');
-                $settingSecurityPremoderationWordsFilterStatus = $CMSCore->configurator->get_database_entry_value('security_premoderation_words_filter_status');
+                $settingSecurityPremoderationCreateStatus = $CMSCore->configurator->getDatabaseEntryValue('security_premoderation_create_status');
+                $settingSecurityPremoderationWordsFilterStatus = $CMSCore->configurator->getDatabaseEntryValue('security_premoderation_words_filter_status');
                 
                 if ($settingSecurityPremoderationWordsFilterStatus === 'on' && $settingSecurityPremoderationCreateStatus !== 'on') {
-                  $settingSecurityPremoderationWordsFilterList = $CMSCore->configurator->get_database_entry_value('security_premoderation_words_filter_list');
+                  $settingSecurityPremoderationWordsFilterList = $CMSCore->configurator->getDatabaseEntryValue('security_premoderation_words_filter_list');
                   
                   if (!empty($settingSecurityPremoderationWordsFilterList)) {
                     $words = json_decode($settingSecurityPremoderationWordsFilterList, true);
                     
-                    $comment->init_data(['content']);
-                    $commentContent = $comment->get_content();
+                    $comment->initData(['content']);
+                    $commentContent = $comment->getContent();
 
                     foreach ($words as $word) {
                       $wordRegexPattern = '/' . $word . '/ui';
@@ -75,10 +75,10 @@ if ($CMSCore->client->is_logged(1)) {
                   }
                 }
         
-                $setting_security_premoderation_links_filter_status = $CMSCore->configurator->get_database_entry_value('security_premoderation_links_filter_status');
+                $setting_security_premoderation_links_filter_status = $CMSCore->configurator->getDatabaseEntryValue('security_premoderation_links_filter_status');
                 if ($setting_security_premoderation_links_filter_status === 'on' && $settingSecurityPremoderationCreateStatus !== 'on') {
-                  $comment->init_data(['content']);
-                  $commentContent = $comment->get_content();
+                  $comment->initData(['content']);
+                  $commentContent = $comment->getContent();
 
                   $linkRegexPattern = '/(?:http(?:s)?\:\/\/)?((?:[\w\-]+\.)?(?:[\w\-]+)(?:\.[\w\-]+))/ui';
                   if (preg_match($linkRegexPattern, $commentContent, $regexMatches, PREG_OFFSET_CAPTURE)) {
@@ -113,38 +113,36 @@ if ($CMSCore->client->is_logged(1)) {
                 }
               }
 
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_PUT_DATA_SUCCESS');
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_PUT_DATA_SUCCESS');
               $handlerStatusCode = $handlerStatusCode ?? 1;
 
               $handlerOutputData['comment'] = [];
-              $handlerOutputData['comment']['id'] = $comment->get_id();
+              $handlerOutputData['comment']['id'] = $comment->getID();
             } else {
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
               $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           } else {
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ENTRY_ERROR_NOT_FOUND');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRY_ERROR_NOT_FOUND');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ENTRY_COMMENT_ERROR_MAX_CHARACTERS');
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRY_COMMENT_ERROR_MAX_CHARACTERS');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ENTRY_COMMENT_ERROR_FEW_CHARACTERS');
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRY_COMMENT_ERROR_FEW_CHARACTERS');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ENTRY_COMMENT_ERROR_EMPTY');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRY_COMMENT_ERROR_EMPTY');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

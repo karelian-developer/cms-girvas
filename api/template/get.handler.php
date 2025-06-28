@@ -20,14 +20,14 @@ use \core\PHPLibrary\Template\Collector as TemplateCollector;
 /**
  * Сборка шаблона по запросу
  */
-if ($CMSCore->urlp->get_path(2) == 'assembly') {
+if ($CMSCore->urlp->getPath(2) == 'assembly') {
   if (isset($_GET['templateCategory']) && isset($_GET['templateFilePath'])) {
     $themeCategory = $_GET['templateCategory'];
     
     switch ($themeCategory) {
-      case 'base': $themeConfigName = 'base_template'; $localeName = $CMSCore->configurator->exists_database_entry_value('base_locale') ? $CMSCore->configurator->get_database_entry_value('base_locale') : 'en_US'; break;
-      case 'admin': $themeConfigName = 'base_admin_template'; $localeName = $CMSCore->configurator->exists_database_entry_value('base_admin_locale') ? $CMSCore->configurator->get_database_entry_value('base_admin_locale') : 'en_US'; break;
-      case 'install': $themeConfigName = 'base_install_template'; $localeName = !is_null($CMSCore->urlp->get_param('locale')) ? $CMSCore->urlp->get_param('locale') : 'en_US'; break;
+      case 'base': $themeConfigName = 'base_template'; $localeName = $CMSCore->configurator->existsDatabaseEntryValue('base_locale') ? $CMSCore->configurator->getDatabaseEntryValue('base_locale') : 'en_US'; break;
+      case 'admin': $themeConfigName = 'base_admin_template'; $localeName = $CMSCore->configurator->existsDatabaseEntryValue('base_admin_locale') ? $CMSCore->configurator->getDatabaseEntryValue('base_admin_locale') : 'en_US'; break;
+      case 'install': $themeConfigName = 'base_install_template'; $localeName = $CMSCore->urlp->getParam('locale') ?? 'en_US'; break;
       default: $themeConfigName = sprintf('%s_template', $themeCategory); break;
     }
 
@@ -38,7 +38,7 @@ if ($CMSCore->urlp->get_path(2) == 'assembly') {
       default => $themeCategory . '_template'
     };
 
-    $themeName = ($CMSCore->configurator->exists_database_entry_value($themeConfigName)) ? $CMSCore->configurator->get_database_entry_value($themeConfigName) : 'default';
+    $themeName = ($CMSCore->configurator->existsDatabaseEntryValue($themeConfigName)) ? $CMSCore->configurator->getDatabaseEntryValue($themeConfigName) : 'default';
     $theme = new Template($CMSCore, $themeName, $themeCategory);
 
     $themesPatterns = [];
@@ -50,9 +50,9 @@ if ($CMSCore->urlp->get_path(2) == 'assembly') {
       }
     }
 
-    $handlerOutputData['templateAssembled'] = TemplateCollector::assembly_locale(TemplateCollector::assembly_file_content($theme, $_GET['templateFilePath'], $themesPatterns), $CMSCore->locale);
+    $handlerOutputData['templateAssembled'] = TemplateCollector::assemblyLocale(TemplateCollector::assemblyFileContent($theme, $_GET['templateFilePath'], $themesPatterns), $CMSCore->locale);
     
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 }
@@ -60,13 +60,13 @@ if ($CMSCore->urlp->get_path(2) == 'assembly') {
 /**
  * Получение данных о текущем шаблоне для конкретной категории
  */
-if ($CMSCore->urlp->get_path(2) == null && $CMSCore->urlp->get_param('categoryName') != null) {
-  $themeCategoryName = $CMSCore->urlp->get_param('categoryName');
+if ($CMSCore->urlp->get_path(2) == null && $CMSCore->urlp->getParam('categoryName') != null) {
+  $themeCategoryName = $CMSCore->urlp->getParam('categoryName');
     
   switch ($themeCategoryName) {
-    case 'base': $themeConfigName = 'base_template'; $localeName = ($CMSCore->configurator->exists_database_entry_value('base_locale')) ? $CMSCore->configurator->get_database_entry_value('base_locale') : 'en_US'; break;
-    case 'admin': $themeConfigName = 'base_admin_template'; $localeName = ($CMSCore->configurator->exists_database_entry_value('base_admin_locale')) ? $CMSCore->configurator->get_database_entry_value('base_admin_locale') : 'en_US'; break;
-    case 'install': $themeConfigName = 'base_install_template'; $localeName = (!is_null($CMSCore->urlp->get_param('locale'))) ? $CMSCore->urlp->get_param('locale') : 'en_US'; break;
+    case 'base': $themeConfigName = 'base_template'; $localeName = ($CMSCore->configurator->existsDatabaseEntryValue('base_locale')) ? $CMSCore->configurator->getDatabaseEntryValue('base_locale') : 'en_US'; break;
+    case 'admin': $themeConfigName = 'base_admin_template'; $localeName = ($CMSCore->configurator->existsDatabaseEntryValue('base_admin_locale')) ? $CMSCore->configurator->getDatabaseEntryValue('base_admin_locale') : 'en_US'; break;
+    case 'install': $themeConfigName = 'base_install_template'; $localeName = $CMSCore->urlp->getParam('locale') ?? 'en_US'; break;
     default: $themeConfigName = sprintf('%s_template', $themeCategoryName); break;
   }
 
@@ -77,15 +77,13 @@ if ($CMSCore->urlp->get_path(2) == null && $CMSCore->urlp->get_param('categoryNa
     default => $themeCategoryName . '_template'
   };
 
-  $themeName = $CMSCore->configurator->exists_database_entry_value($themeConfigName) ? $CMSCore->configurator->get_database_entry_value($themeConfigName) : 'default';
+  $themeName = $CMSCore->configurator->existsDatabaseEntryValue($themeConfigName) ? $CMSCore->configurator->getDatabaseEntryValue($themeConfigName) : 'default';
 
   $handlerOutputData['template'] = [
     'name' => $themeName,
     'categoryName' => $themeCategoryName
   ];
 
-  $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
   $handlerStatusCode = $handlerStatusCode ?? 1;
 }
-
-?>

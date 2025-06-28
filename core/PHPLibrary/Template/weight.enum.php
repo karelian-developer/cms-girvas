@@ -8,18 +8,17 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Template {
-  enum EnumWeight {
-    case BYTES;
-    case KILOBYTES;
-    case MEGABYTES;
-    case GIGABYTES;
-    case TERABYTES;
-    case PETABYTES;
-    case EXABYTES;
-    case ZETTABYTES;
-    case YOTTABYTES;
-  }
-}
+namespace core\PHPLibrary\Template;
 
-?>
+enum EnumWeight
+{
+  case BYTES;
+  case KILOBYTES;
+  case MEGABYTES;
+  case GIGABYTES;
+  case TERABYTES;
+  case PETABYTES;
+  case EXABYTES;
+  case ZETTABYTES;
+  case YOTTABYTES;
+}

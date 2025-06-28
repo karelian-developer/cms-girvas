@@ -8,87 +8,87 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary {
-  use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+namespace core\PHPLibrary;
 
-  final class EntriesCategories {
-    private SystemCore $CMSCore;
-    
-    /**
-     * __construct
-     *
-     * @param  mixed $CMSCore
-     * @return void
-     */
-    public function __construct(SystemCore $CMSCore) {
-      $this->CMSCore = $CMSCore;
-    }
-    
-    /**
-     * Получить массив объектов всех категорий
-     * 
-     * @param array $params
-     * 
-     * @return array
-     */
-    public function get_all(array $params = []) : array {
-      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
-      $queryBuilder->set_statement_select();
-      $queryBuilder->statement->add_selections(['id']);
-      $queryBuilder->statement->set_clause_from();
-      $queryBuilder->statement->clauseFrom->add_table('entries_categories');
-      $queryBuilder->statement->clauseFrom->assembly();
-      $queryBuilder->statement->set_clause_order_by();
-      $queryBuilder->statement->clauseOrderBy->set_column('createdUnixTimestamp');
-      $queryBuilder->statement->clauseOrderBy->set_sort_type('DESC');
-      if (array_key_exists('limit', $params)) {
-        if (is_array($params['limit'])) {
-          $limit = (is_integer($params['limit'][0])) ? $params['limit'][0] : 0;
-          $offset = (is_integer($params['limit'][1])) ? $params['limit'][1] : 0;
-          $queryBuilder->statement->set_clause_limit($limit, $offset);
-        }
-      }
-      $queryBuilder->statement->assembly();
+use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 
-      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-			$databaseQuery->execute();
-
-      $array = [];
-      $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
-      if ($results) {
-        foreach ($results as $data) {
-          array_push($array, new EntryCategory($this->CMSCore, $data['id']));
-        }
-      }
-
-      return $array;
-    }
-        
-    /**
-     * Получить общее количество
-     *
-     * @return int
-     */
-    public function get_count_total() : int {
-      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
-      $queryBuilder->set_statement_select();
-      $queryBuilder->statement->add_selections(['count(*)']);
-      $queryBuilder->statement->set_clause_from();
-      $queryBuilder->statement->clauseFrom->add_table('entries_categories');
-      $queryBuilder->statement->clauseFrom->assembly();
-      $queryBuilder->statement->assembly();
-
-      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-			$databaseQuery->execute();
-
-      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return ($result) ? $result['count'] : 0;
-    }
-
+final class EntriesCategories
+{
+  private SystemCore $CMSCore;
+  
+  /**
+   * __construct
+   *
+   * @param  mixed $CMSCore
+   * @return void
+   */
+  public function __construct(SystemCore $CMSCore)
+  {
+    $this->CMSCore = $CMSCore;
   }
+  
+  /**
+   * Получить массив объектов всех категорий
+   * 
+   * @param array $params
+   * 
+   * @return array
+   */
+  public function getAll(array $params = []) : array
+  {
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries_categories');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
+    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    if (array_key_exists('limit', $params)) {
+      if (is_array($params['limit'])) {
+        $limit = is_integer($params['limit'][0]) ? $params['limit'][0] : 0;
+        $offset = is_integer($params['limit'][1]) ? $params['limit'][1] : 0;
+        $queryBuilder->statement->setClauseLimit($limit, $offset);
+      }
+    }
+    $queryBuilder->statement->assembly();
 
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->execute();
+
+    $array = [];
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    if ($results) {
+      foreach ($results as $data) {
+        array_push($array, new EntryCategory($this->CMSCore, $data['id']));
+      }
+    }
+
+    return $array;
+  }
+      
+  /**
+   * Получить общее количество
+   *
+   * @return int
+   */
+  public function get_count_total() : int
+  {
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['count(*)']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries_categories');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->execute();
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? $result['count'] : 0;
+  }
 }
-
-?>

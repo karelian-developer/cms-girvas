@@ -8,38 +8,41 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Forum {
-  use \core\PHPLibrary\Forum as Forum;
-  use \core\PHPLibrary\Forum\Category as ForumCategory;
-  use \core\PHPLibrary\Forum\Section as ForumSection;
+namespace core\PHPLibrary\Forum;
+
+use \core\PHPLibrary\Forum as Forum;
+use \core\PHPLibrary\Forum\Category as ForumCategory;
+use \core\PHPLibrary\Forum\Section as ForumSection;
+
+/**
+ * Форум
+ * 
+ * @author Andrey Shestakov <drelagas.new@gmail.com>
+ * @version 0.0.1
+ */
+#[\AllowDynamicProperties]
+final class Topic
+{
+  /** @var SystemCore|null Объект системного ядра */
+  public SystemCore|null $CMSCore = null;
+  /** @var Forum|null Объект форума */
+  public Forum|null $forum = null;
 
   /**
-   * Форум
-   * 
-   * @author Andrey Shestakov <drelagas.new@gmail.com>
-   * @version 0.0.1
+   * __construct
+   *
+   * @param  SystemCore $CMSCore
+   * @param  string $name
+   * @return void
    */
-  #[\AllowDynamicProperties]
-  final class Topic {
-    /** @var SystemCore|null Объект системного ядра */
-    public SystemCore|null $CMSCore = null;
-    /** @var Forum|null Объект форума */
-    public Forum|null $forum = null;
+  public function __construct(SystemCore $CMSCore, Forum $forum)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->forum = $forum;
+  }
 
-    /**
-     * __construct
-     *
-     * @param  SystemCore $CMSCore
-     * @param  string $name
-     * @return void
-     */
-    public function __construct(SystemCore $CMSCore, Forum $forum) {
-      $this->CMSCore = $CMSCore;
-      $this->forum = $forum;
-    }
-
-    public function get_answers() {
-      
-    }
+  public function getAnswers()
+  {
+    
   }
 }

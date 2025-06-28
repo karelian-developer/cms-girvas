@@ -8,13 +8,11 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Database\QueryBuilder\StatementDelete {
-  use \core\PHPLibrary\Database\QueryBuilder\StatementDelete as StatementDelete;
+namespace core\PHPLibrary\Database\QueryBuilder\StatementDelete;
 
-  interface InterfaceClause {
-    public function __construct(StatementDelete $statement);
-  }
+use \core\PHPLibrary\Database\QueryBuilder\StatementDelete as StatementDelete;
 
+interface InterfaceClause
+{
+  public function __construct(StatementDelete $statement);
 }
-
-?>

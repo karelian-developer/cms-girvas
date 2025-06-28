@@ -15,30 +15,28 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\Feed as Feed;
 
-if (is_numeric($CMSCore->urlp->get_path(2))) {
-  $feedID = (int)$CMSCore->urlp->get_path(2);
+if (is_numeric($CMSCore->urlp->getPath(2))) {
+  $feedID = (int) $CMSCore->urlp->getPath(2);
 
-  if (Feed::exists_by_id($CMSCore, $feedID)) {
+  if (Feed::existsByID($CMSCore, $feedID)) {
     $feed = new Feed($CMSCore, $feedID);
-    $feed->init_data(['name', 'typeID', 'entriesCategoryID', 'texts', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
-    $feedLocale = $CMSCore->urlp->get_param('locale') ?? $CMSCore->configurator->get_database_entry_value('base_locale');
+    $feed->initData(['name', 'typeID', 'entriesCategoryID', 'texts', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+    $feedLocale = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
 
     $handlerOutputData['feed'] = [];
-    $handlerOutputData['feed']['id'] = $feed->get_id();
-    $handlerOutputData['feed']['name'] = $feed->get_name();
-    $handlerOutputData['feed']['title'] = $feed->get_title($feedLocale);
-    $handlerOutputData['feed']['description'] = $feed->get_description($feedLocale);
-    $handlerOutputData['feed']['typeID'] = $feed->get_type_id();
-    $handlerOutputData['feed']['entriesCategoryID'] = $feed->get_entries_category_id();
-    $handlerOutputData['feed']['createdUnixTimestamp'] = $feed->get_created_unix_timestamp();
-    $handlerOutputData['feed']['updatedUnixTimestamp'] = $feed->get_updated_unix_timestamp();
+    $handlerOutputData['feed']['id'] = $feed->getID();
+    $handlerOutputData['feed']['name'] = $feed->getName();
+    $handlerOutputData['feed']['title'] = $feed->getTitle($feedLocale);
+    $handlerOutputData['feed']['description'] = $feed->getDescription($feedLocale);
+    $handlerOutputData['feed']['typeID'] = $feed->getTypeID();
+    $handlerOutputData['feed']['entriesCategoryID'] = $feed->getEntriesCategoryID();
+    $handlerOutputData['feed']['createdUnixTimestamp'] = $feed->getCreatedUnixTimestamp();
+    $handlerOutputData['feed']['updatedUnixTimestamp'] = $feed->getUpdatedUnixTimestamp();
 
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_FEED_ERROR_NOT_FOUND');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_FEED_ERROR_NOT_FOUND');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 }
-
-?>

@@ -18,93 +18,91 @@ use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\UsersGroups as UsersGroups;
 
-if ($CMSCore->urlp->get_path(3) === 'permissions') {
+if ($CMSCore->urlp->getPath(3) === 'permissions') {
   $user = null;
-  if ($CMSCore->urlp->get_path(2) === '@me') {
-    if ($CMSCore->client->is_logged(1)) {
-      $user = $CMSCore->client->get_user(1);
+  if ($CMSCore->urlp->getPath(2) === '@me') {
+    if ($CMSCore->client->isLogged(1)) {
+      $user = $CMSCore->client->getUser(1);
     }
   } else {
-    $user = is_numeric($CMSCore->urlp->get_path(2)) ? new User($CMSCore, $CMSCore->urlp->get_path(2)) : User::get_by_login($CMSCore, $CMSCore->urlp->get_path(2));
+    $user = is_numeric($CMSCore->urlp->getPath(2)) ? new User($CMSCore, $CMSCore->urlp->getPath(2)) : User::getByLogin($CMSCore, $CMSCore->urlp->getPath(2));
   }
 
-  if ($CMSCore->client->is_logged(1)) {
+  if ($CMSCore->client->isLogged(1)) {
     if (!is_null($user)) {
-      $user->init_data(['metadata']);
-      $userGroup = $user->get_group();
+      $user->initData(['metadata']);
+      $userGroup = $user->getGroup();
       
       if (!is_null($userGroup)) {
-        $userGroup->init_data(['permissions']);
+        $userGroup->initData(['permissions']);
 
         $handlerOutputData['user'] = [];
         $handlerOutputData['user']['permissions'] = [];
-        $handlerOutputData['user']['permissions']['admin_panel_auth'] = $userGroup->permission_check(UserGroup::PERMISSION_ADMIN_PANEL_AUTH);
-        $handlerOutputData['user']['permissions']['admin_users_management'] = $userGroup->permission_check(UserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT);
-        $handlerOutputData['user']['permissions']['admin_users_groups_management'] = $userGroup->permission_check(UserGroup::PERMISSION_ADMIN_USERS_GROUPS_MANAGEMENT);
-        $handlerOutputData['user']['permissions']['admin_modules_management'] = $userGroup->permission_check(UserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT);
-        $handlerOutputData['user']['permissions']['admin_templates_management'] = $userGroup->permission_check(UserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT);
-        $handlerOutputData['user']['permissions']['admin_settings_management'] = $userGroup->permission_check(UserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT);
-        $handlerOutputData['user']['permissions']['admin_viewing_logs'] = $userGroup->permission_check(UserGroup::PERMISSION_ADMIN_VIEWING_LOGS);
-        $handlerOutputData['user']['permissions']['moder_users_ban'] = $userGroup->permission_check(UserGroup::PERMISSION_MODER_USERS_BAN);
-        $handlerOutputData['user']['permissions']['moder_entries_comments_management'] = $userGroup->permission_check(UserGroup::PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT);
-        $handlerOutputData['user']['permissions']['moder_users_warns'] = $userGroup->permission_check(UserGroup::PERMISSION_MODER_USERS_WARNS);
-        $handlerOutputData['user']['permissions']['editor_media_files_management'] = $userGroup->permission_check(UserGroup::PERMISSION_EDITOR_MEDIA_FILES_MANAGEMENT);
-        $handlerOutputData['user']['permissions']['editor_entries_edit'] = $userGroup->permission_check(UserGroup::PERMISSION_EDITOR_ENTRIES_EDIT);
-        $handlerOutputData['user']['permissions']['editor_entries_categories_edit'] = $userGroup->permission_check(UserGroup::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT);
-        $handlerOutputData['user']['permissions']['editor_pages_static_edit'] = $userGroup->permission_check(UserGroup::PERMISSION_EDITOR_PAGES_STATIC_EDIT);
-        $handlerOutputData['user']['permissions']['base_entry_comment_create'] = $userGroup->permission_check(UserGroup::PERMISSION_BASE_ENTRY_COMMENT_CREATE);
-        $handlerOutputData['user']['permissions']['base_entry_comment_change'] = $userGroup->permission_check(UserGroup::PERMISSION_BASE_ENTRY_COMMENT_CHANGE);
-        $handlerOutputData['user']['permissions']['base_entry_comment_rate'] = $userGroup->permission_check(UserGroup::PERMISSION_BASE_ENTRY_COMMENT_RATE);
+        $handlerOutputData['user']['permissions']['admin_panel_auth'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_PANEL_AUTH);
+        $handlerOutputData['user']['permissions']['admin_users_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT);
+        $handlerOutputData['user']['permissions']['admin_users_groups_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_GROUPS_MANAGEMENT);
+        $handlerOutputData['user']['permissions']['admin_modules_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT);
+        $handlerOutputData['user']['permissions']['admin_templates_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT);
+        $handlerOutputData['user']['permissions']['admin_settings_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT);
+        $handlerOutputData['user']['permissions']['admin_viewing_logs'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_VIEWING_LOGS);
+        $handlerOutputData['user']['permissions']['moder_users_ban'] = $userGroup->permissionCheck(UserGroup::PERMISSION_MODER_USERS_BAN);
+        $handlerOutputData['user']['permissions']['moder_entries_comments_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT);
+        $handlerOutputData['user']['permissions']['moder_users_warns'] = $userGroup->permissionCheck(UserGroup::PERMISSION_MODER_USERS_WARNS);
+        $handlerOutputData['user']['permissions']['editor_media_files_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_EDITOR_MEDIA_FILES_MANAGEMENT);
+        $handlerOutputData['user']['permissions']['editor_entries_edit'] = $userGroup->permissionCheck(UserGroup::PERMISSION_EDITOR_ENTRIES_EDIT);
+        $handlerOutputData['user']['permissions']['editor_entries_categories_edit'] = $userGroup->permissionCheck(UserGroup::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT);
+        $handlerOutputData['user']['permissions']['editor_pages_static_edit'] = $userGroup->permissionCheck(UserGroup::PERMISSION_EDITOR_PAGES_STATIC_EDIT);
+        $handlerOutputData['user']['permissions']['base_entry_comment_create'] = $userGroup->permissionCheck(UserGroup::PERMISSION_BASE_ENTRY_COMMENT_CREATE);
+        $handlerOutputData['user']['permissions']['base_entry_comment_change'] = $userGroup->permissionCheck(UserGroup::PERMISSION_BASE_ENTRY_COMMENT_CHANGE);
+        $handlerOutputData['user']['permissions']['base_entry_comment_rate'] = $userGroup->permissionCheck(UserGroup::PERMISSION_BASE_ENTRY_COMMENT_RATE);
 
-        $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+        $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
         $handlerStatusCode = $handlerStatusCode ?? 1;
       } else {
-        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_USERS_GROUP_ERROR_NOT_FOUND');
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USERS_GROUP_ERROR_NOT_FOUND');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_USER_ERROR_NOT_FOUND');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_NOT_FOUND');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
-} else if (is_null($CMSCore->urlp->get_path(3))) {
-  $user = ($CMSCore->urlp->get_path(2) === '@me') ? $CMSCore->client->get_user(1) : (is_numeric($CMSCore->urlp->get_path(2)) ? new User($CMSCore, $CMSCore->urlp->get_path(2)) : User::get_by_login($CMSCore, $CMSCore->urlp->get_path(2)));
-  $locale = ($CMSCore->urlp->get_param('locale') !== null) ? $CMSCore->urlp->get_param('locale') : $CMSCore->configurator->get_database_entry_value('base_locale');
+} else if ($CMSCore->urlp->getPath(3) !== null) {
+  $user = $CMSCore->urlp->getPath(2) === '@me' ? $CMSCore->client->getUser(1) : (is_numeric($CMSCore->urlp->getPath(2)) ? new User($CMSCore, $CMSCore->urlp->getPath(2)) : User::getByLogin($CMSCore, $CMSCore->urlp->getPath(2)));
+  $locale = $CMSCore->urlp->getParam('locale') !== null ? $CMSCore->urlp->getParam('locale') : $CMSCore->configurator->getDatabaseEntryValue('base_locale');
   
-  if (!is_null($user)) {
-    $user->init_data(['login', 'metadata']);
+  if ($user !== null) {
+    $user->initData(['login', 'metadata']);
 
-    $userGroup = $user->get_group();
-    $userGroup->init_data(['texts']);
+    $userGroup = $user->getGroup();
+    $userGroup->initData(['texts']);
     
-    $themeName = ($CMSCore->configurator->exists_database_entry_value('base_template')) ? $CMSCore->configurator->get_database_entry_value('base_template') : 'default';
+    $themeName = ($CMSCore->configurator->existsDatabaseEntryValue('base_template')) ? $CMSCore->configurator->getDatabaseEntryValue('base_template') : 'default';
     $theme = new Theme($CMSCore, $themeName);
-    $CMSCore->set_template($theme);
+    $CMSCore->setTemplate($theme);
 
     $handlerOutputData['user'] = [];
-    $handlerOutputData['user']['id'] = $user->get_id();
-    $handlerOutputData['user']['login'] = $user->get_login();
-    $handlerOutputData['user']['avatarURL'] = $user->get_avatar_url(64);
-    $handlerOutputData['user']['isBlocked'] = $user->is_blocked();
-    $handlerOutputData['user']['groupID'] = $user->get_group_id();
+    $handlerOutputData['user']['id'] = $user->getID();
+    $handlerOutputData['user']['login'] = $user->getLogin();
+    $handlerOutputData['user']['avatarURL'] = $user->getAvatarURL(64);
+    $handlerOutputData['user']['isBlocked'] = $user->isBlocked();
+    $handlerOutputData['user']['groupID'] = $user->getGroupID();
     $handlerOutputData['user']['group'] = [
-      'id' => $userGroup->get_id(),
-      'title' => $userGroup->get_title($locale)
+      'id' => $userGroup->getID(),
+      'title' => $userGroup->getTitle($locale)
     ];
 
-    if ($CMSCore->urlp->get_path(2) == '@me') {
-      $handlerOutputData['user']['isLogged'] = ($CMSCore->client->is_logged(1)) ? true : false;
+    if ($CMSCore->urlp->getPath(2) === '@me') {
+      $handlerOutputData['user']['isLogged'] = $CMSCore->client->isLogged(1);
     }
 
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_USER_ERROR_NOT_FOUND');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_NOT_FOUND');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 }
-
-?>

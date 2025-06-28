@@ -15,50 +15,48 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\Module as Module;
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT)) {
     if (isset($_DELETE['module_name'])) {
       $moduleName = trim($_DELETE['module_name']);
       $module = new Module($CMSCore, $moduleName);
+      $modulePath = $module->getPath();
 
-      if ($module->exists_core_file()) {
-        $CMSCore::recursive_files_remove($module->get_path());
+      if ($module->existsCoreFile()) {
+        $CMSCore::recursiveFilesRemove($modulePath);
 
         http_response_code(200);
-        $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_DELETE_MODULE_SUCCESS');
+        $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_DELETE_MODULE_SUCCESS');
         $handlerStatusCode = $handlerStatusCode ?? 1;
       } else {
-        if (file_exists($module->get_path())) {
-          $CMSCore::recursive_files_remove($module->get_path());
+        if (file_exists($modulePath)) {
+          $CMSCore::recursiveFilesRemove($modulePath);
 
           http_response_code(200);
-          $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_DELETE_MODULE_DIRECTORY_SUCCESS');
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_DELETE_MODULE_DIRECTORY_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {
           http_response_code(500);
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_MODULE_ERROR_NOT_FOUND');
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_MODULE_ERROR_NOT_FOUND');
           $handlerStatusCode = 0;
         }
       }
     } else {
       http_response_code(400);
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_MODULE_ERROR_NOT_FOUND');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_MODULE_ERROR_NOT_FOUND');
       $handlerStatusCode = 0;
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
     $handlerStatusCode = 0;
   }
 } else {
   http_response_code(401);
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = 0;
 }
-
-
-?>

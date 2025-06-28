@@ -8,48 +8,52 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary {
+namespace core\PHPLibrary;
+
+/**
+ * Templates
+ * 
+ * Класс для работы с несколькими шаблонами CMS
+ * 
+ * @author Andrey Shestakov <drelagas.new@yandex.ru>
+ * @version 0.0.1-1
+ */
+class Timestamp
+{
+  public SystemCore $CMSCore;
+  private int $time;
+
   /**
-   * Templates
+   * __construct
    * 
-   * Класс для работы с несколькими шаблонами CMS
-   * 
-   * @author Andrey Shestakov <drelagas.new@yandex.ru>
-   * @version 0.0.1-1
+   * @param SystemCore $CMSCore
+   * @param int $time
    */
-  class Timestamp {
-    public SystemCore $CMSCore;
-    private int $time;
+  public function __construct(SystemCore $CMSCore, int $time)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->setTime($time);
+  }
 
-    /**
-     * __construct
-     * 
-     * @param SystemCore $CMSCore
-     * @param int $time
-     */
-    public function __construct(SystemCore $CMSCore, int $time) {
-      $this->CMSCore = $CMSCore;
-      $this->set_time($time);
-    }
+  /**
+   * Установить время (UNIX)
+   * 
+   * @param int $time
+   * 
+   * @return void
+   */
+  public function setTime(int $time) : void
+  {
+    $this->time = $time;
+  }
 
-    /**
-     * Установить время (UNIX)
-     * 
-     * @param int $time
-     * 
-     * @return void
-     */
-    public function set_time(int $time) : void {
-      $this->time = $time;
-    }
-
-    /**
-     * Получить время UNIX
-     * 
-     * @return int
-     */
-    public function get_time() : int {
-      return $this->time;
-    }
+  /**
+   * Получить время UNIX
+   * 
+   * @return int
+   */
+  public function getTime() : int
+  {
+    return $this->time;
   }
 }

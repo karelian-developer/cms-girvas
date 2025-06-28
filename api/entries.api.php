@@ -13,21 +13,21 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-if ($CMSCore->urlp->get_path(2) === 'categories') {
+if ($CMSCore->urlp->getPath(2) === 'categories') {
   $APIFilePath = CMS_ROOT_DIRECTORY . '/api/entries/categories.api.php';
   include_once $APIFilePath;
-} else if ($CMSCore->urlp->get_path(2) === 'sample') {
+} else if ($CMSCore->urlp->getPath(2) === 'sample') {
   $APIFilePath = CMS_ROOT_DIRECTORY . '/api/entries/sample.api.php';
   include_once $APIFilePath;
-} else if ($CMSCore->urlp->get_path(2) === 'additional-fields') {
-  $locale = $CMSCore->configurator->get_database_entry_value('base_locale');
-  $fieldsLocale = (!is_null($CMSCore->urlp->get_param('locale'))) ? $CMSCore->urlp->get_param('locale') : $locale;
+} else if ($CMSCore->urlp->getPath(2) === 'additional-fields') {
+  $locale = $CMSCore->configurator->getDatabaseEntryValue('base_locale');
+  $fieldsLocale = (!is_null($CMSCore->urlp->getParam('locale'))) ? $CMSCore->urlp->getParam('locale') : $locale;
 
-  $fieldsTypes = $CMSCore->configurator->exists_database_entry_value('entries_additional_field_type') ? json_decode($CMSCore->configurator->get_database_entry_value('entries_additional_field_type'), true) : [];
-  $fieldsCategoriesIDs = $CMSCore->configurator->exists_database_entry_value('entries_additional_field_category_id') ? json_decode($CMSCore->configurator->get_database_entry_value('entries_additional_field_category_id'), true) : [];
-  $fieldsTitles = $CMSCore->configurator->exists_database_entry_value('entries_additional_field_title') ? json_decode($CMSCore->configurator->get_database_entry_value('entries_additional_field_title'), true) : [];
-  $fieldsDescriptions = $CMSCore->configurator->exists_database_entry_value('entries_additional_field_description') ? json_decode($CMSCore->configurator->get_database_entry_value('entries_additional_field_description'), true) : [];
-  $fieldsNames = $CMSCore->configurator->exists_database_entry_value('entries_additional_field_name') ? json_decode($CMSCore->configurator->get_database_entry_value('entries_additional_field_name'), true) : [];
+  $fieldsTypes = $CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_type') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('entries_additional_field_type'), true) : [];
+  $fieldsCategoriesIDs = $CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_category_id') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('entries_additional_field_category_id'), true) : [];
+  $fieldsTitles = $CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_title') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('entries_additional_field_title'), true) : [];
+  $fieldsDescriptions = $CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_description') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('entries_additional_field_description'), true) : [];
+  $fieldsNames = $CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_name') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('entries_additional_field_name'), true) : [];
   
   $fields = [];
   foreach ($fieldsTypes as $index => $type) {
@@ -59,7 +59,7 @@ if ($CMSCore->urlp->get_path(2) === 'categories') {
     // Если абсолютный путь не был инициализирован, то запрещаем дальше работать с API
     if (!$handlerIsExists) {
       http_response_code(500);
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_HANDLER_NOT_FOUND');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_HANDLER_NOT_FOUND');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
 
@@ -69,5 +69,3 @@ if ($CMSCore->urlp->get_path(2) === 'categories') {
     }
   }
 }
-
-?>

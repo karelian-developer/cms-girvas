@@ -30,7 +30,7 @@ if (isset($CMSCore)) {
   // Если абсолютный путь не был инициализирован, то запрещаем дальше работать с API
   if (!$handlerIsExists) {
     http_response_code(500);
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_HANDLER_NOT_FOUND');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_HANDLER_NOT_FOUND');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 
@@ -39,5 +39,3 @@ if (isset($CMSCore)) {
     include_once $handlerPath;
   }
 }
-
-?>

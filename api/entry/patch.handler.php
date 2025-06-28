@@ -20,31 +20,31 @@ use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \core\PHPLibrary\SystemCore\Locale as Locale;
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($CMSCore->urlp->get_path(2) === 'category') {
-    if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT)) {
+  if ($CMSCore->urlp->getPath(2) === 'category') {
+    if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT)) {
       if (isset($_PATCH['entries_category_id'])) {
         $entriesCategoryID = $_PATCH['entries_category_id'] ?? 0;
         $entriesCategoryID = is_numeric($entriesCategoryID) ? (int) $entriesCategoryID : 0;
 
-        if (EntryCategory::exists_by_id($CMSCore, $entriesCategoryID)) {
+        if (EntryCategory::existsByID($CMSCore, $entriesCategoryID)) {
           $entriesCategory = new EntryCategory($CMSCore, $entriesCategoryID);
-          $entriesCategory->init_data(['metadata']);
+          $entriesCategory->initData(['metadata']);
           $entriesCategoryData = [];
 
-          $CMSLocalesNames = $CMSCore->get_array_locales_names();
+          $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
           if (count($CMSLocalesNames) > 0) {
             foreach ($CMSLocalesNames as $index => $CMSLocaleName) {
               $CMSLocale = new Locale($CMSCore, $CMSLocaleName);
-              $CMSLocaleName = $CMSLocale->get_name();
+              $CMSLocaleName = $CMSLocale->getName();
 
-              $inputTitleName = 'entries_category_title_' . $CMSLocale->get_iso_639_2();
-              $textareaDescriptionName = 'entries_category_description_' . $CMSLocale->get_iso_639_2();
+              $inputTitleName = 'entries_category_title_' . $CMSLocale->getISO639(2);
+              $textareaDescriptionName = 'entries_category_description_' . $CMSLocale->getISO639(2);
 
               if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH)) {
                 if (!array_key_exists('texts', $entriesCategoryData)) $entriesCategoryData['texts'] = [];
@@ -85,14 +85,14 @@ if ($CMSCore->client->is_logged(2)) {
           $entriesCategoryIsUpdated = $entriesCategory->update($entriesCategoryData);
 
           if ($entriesCategoryIsUpdated) {
-            $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS');
+            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
             $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ENTRIES_CATEGORY_ERROR_NOT_FOUND');
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRIES_CATEGORY_ERROR_NOT_FOUND');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       }
@@ -101,25 +101,25 @@ if ($CMSCore->client->is_logged(2)) {
     $entryTitleLengthMax = 80;
     $entryDescriptionLengthMax = 600;
 
-    if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_EDITOR_ENTRIES_EDIT)) {
+    if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_ENTRIES_EDIT)) {
       if (isset($_PATCH['entry_id'])) {
         $entryID = $_PATCH['entry_id'] ?? 0;
         $entryID = is_numeric($entryID) ? (int) $entryID : 0;
 
-        if (Entry::exists_by_id($CMSCore, $entryID)) {
+        if (Entry::existsByID($CMSCore, $entryID)) {
           $entry = new Entry($CMSCore, $entryID);
           $entryData = [];
 
-          $CMSLocalesNames = $CMSCore->get_array_locales_names();
+          $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
           if (count($CMSLocalesNames) > 0) {
             foreach ($CMSLocalesNames as $index => $CMSLocaleName) {
               $CMSLocale = new Locale($CMSCore, $CMSLocaleName);
-              $CMSLocaleName = $CMSLocale->get_name();
+              $CMSLocaleName = $CMSLocale->getName();
 
-              $inputTitleName = 'entry_title_' . $CMSLocale->get_iso_639_2();
-              $textareaDescriptionName = 'entry_description_' . $CMSLocale->get_iso_639_2();
-              $textareaContentName = 'entry_content_' . $CMSLocale->get_iso_639_2();
-              $textareaKeywordsName = 'entry_keywords_' . $CMSLocale->get_iso_639_2();
+              $inputTitleName = 'entry_title_' . $CMSLocale->getISO639(2);
+              $textareaDescriptionName = 'entry_description_' . $CMSLocale->getISO639(2);
+              $textareaContentName = 'entry_content_' . $CMSLocale->getISO639(2);
+              $textareaKeywordsName = 'entry_keywords_' . $CMSLocale->getISO639(2);
 
               if (!array_key_exists('metadata', $entryData)) $entryData['metadata'] = [];
               if (isset($_PATCH['entry_is_published'])) $entryData['metadata']['isPublished'] = $_PATCH['entry_is_published'];
@@ -199,24 +199,24 @@ if ($CMSCore->client->is_logged(2)) {
           // в записи присутствует стандартная локализация, в противном случае
           // система не даст сохранить ее.
           if ($entryIsPublished) {
-            $CMSBaseLocale = $CMSCore->get_cms_locale();
-            $CMSBaseLocaleName = $CMSBaseLocale->get_name();
+            $CMSBaseLocale = $CMSCore->getCMSLocale();
+            $CMSBaseLocaleName = $CMSBaseLocale->getName();
 
-            $entry->init_data(['texts']);
+            $entry->initData(['texts']);
 
             /** @var string Заголовок записи */
-            $entryTitle = $entry->get_title($CMSBaseLocaleName);
+            $entryTitle = $entry->getTitle($CMSBaseLocaleName);
             /** @var string описание записи */
-            $entryDescription = $entry->get_description($CMSBaseLocaleName);
+            $entryDescription = $entry->getDescription($CMSBaseLocaleName);
             /** @var string содержимое записи */
-            $entryContent = $entry->get_content($CMSBaseLocaleName);
+            $entryContent = $entry->getContent($CMSBaseLocaleName);
             /** @var int дата обновления страницы в формате UNIX */
             $entryData['metadata']['publishedUnixTimestamp'] = time();
 
             // Если заголовок, описание или содержимое стандартной локализации не задано, то
             // запись не будет обновлена.
             if (empty($entryTitle) || empty($entryDescription) || empty($entryContent)) {
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->get_single_value_by_key('API_ENTRY_EMPTY_LOCALE_DEFAULT_PUBLISHED_ERROR'), $CMSBaseLocaleName);
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_ENTRY_EMPTY_LOCALE_DEFAULT_PUBLISHED_ERROR'), $CMSBaseLocaleName);
               $handlerStatusCode = $handlerStatusCode ?? 0;
             } else {
               /** @var bool Обновление записи */
@@ -232,34 +232,32 @@ if ($CMSCore->client->is_logged(2)) {
 
           if ($entryIsUpdated) {
             // Инициализация данных с текстом записи
-            $entry->init_data(['texts']);
+            $entry->initData(['texts']);
             
             /** @var CMSReport Новый отчет */
             $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_ENTRY_EDITED, [
-              'clientIP' => $CMSCore->client->get_ip_address(),
-              'entryTitle' => $entry->get_title(),
+              'clientIP' => $CMSCore->client->getIPAddress(),
+              'entryTitle' => $entry->getTitle(),
               'date' => date('Y/m/d H:i:s', time())
             ]);
 
-            $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS');
+            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
             $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ENTRY_ERROR_NOT_FOUND');
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRY_ERROR_NOT_FOUND');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       }
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   }
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

@@ -15,32 +15,30 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-if ($CMSCore->urlp->get_path(2) === 'session-end') {
-  $sessionLevel = $CMSCore->urlp->get_param('level');
+if ($CMSCore->urlp->getPath(2) === 'session-end') {
+  $sessionLevel = $CMSCore->urlp->getParam('level');
   $sessionLevel = is_numeric($sessionLevel) ? (int) $sessionLevel : 0;
-  $session = $CMSCore->client->get_session($sessionLevel, ['user_id']);
-  $sessionUserID = $session->get_user_id();
+  $session = $CMSCore->client->getSession($sessionLevel, ['user_id']);
+  $sessionUserID = $session->getUserID();
 
   if ($session !== null && $sessionLevel !== 0) {
     $session->delete();
 
-    if (!ClientSession::exists_by_ip_and_user_id($CMSCore, $CMSCore->client->get_ip_address(), $sessionUserID, $sessionLevel)) {
-      $handlerMessage = $CMSCore->locale->get_single_value_by_key('API_POST_DATA_SUCCESS');
+    if (!ClientSession::existsByIPAndUserID($CMSCore, $CMSCore->client->getIPAddress(), $sessionUserID, $sessionLevel)) {
+      $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_POST_DATA_SUCCESS');
       $handlerStatusCode = $handlerStatusCode ?? 1;
 
       $handlerOutputData['result'] = true;
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_SESSION_NOT_DELETED');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_SESSION_NOT_DELETED');
       $handlerStatusCode = $handlerStatusCode ?? 0;
 
       $handlerOutputData['result'] = false;
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_SESSION_UNKNOWN');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_SESSION_UNKNOWN');
     $handlerStatusCode = $handlerStatusCode ?? 0;
 
     $handlerOutputData['result'] = false;
   }
 }
-
-?>

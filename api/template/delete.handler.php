@@ -15,45 +15,46 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\Template as Template;
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT)) {
     $themeName = $_DELETE['template_name'];
     $themeCategory = $_DELETE['template_category'];
     $theme = new Template($CMSCore, $themeName, $themeCategory);
+    $themePath = $theme->getPath();
 
-    if ($theme->exists_core_file()) {
-      $CMSCore::recursive_files_remove($theme->get_path());
+    if ($theme->existsCoreFile()) {
+      $CMSCore::recursiveFilesRemove($themePath);
 
-      $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS');
+      http_response_code(200);
+      $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
       $handlerStatusCode = $handlerStatusCode ?? 1;
     } else {
-      if (file_exists($theme->get_path())) {
-        if ($themeName === $theme->get_name() && $themeCategory === $theme->get_category_name()) {
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_TEMPLATE_ERROR_FORBIDDEN_DELETE_INSTALLED_TEMPLATE');
+      if (file_exists($themePath)) {
+        if ($themeName === $theme->getName() && $themeCategory === $theme->getCategoryName()) {
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_TEMPLATE_ERROR_FORBIDDEN_DELETE_INSTALLED_TEMPLATE');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         } else {
-          $CMSCore::recursive_files_remove($theme->get_path());
+          $CMSCore::recursiveFilesRemove($themePath);
 
-          $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS');
+          http_response_code(200);
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
         }
       } else {
-        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_TEMPLATE_ERROR_NOT_FOUND');
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_TEMPLATE_ERROR_NOT_FOUND');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION'));
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION'));
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

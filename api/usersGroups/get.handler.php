@@ -17,28 +17,26 @@ use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\UsersGroups as UsersGroups;
 
-$usersGroups = (new UsersGroups($CMSCore))->get_all();
-$usersGroupsLocale = $CMSCore->urlp->get_param('locale') !== null ? $CMSCore->urlp->get_param('locale') : $CMSCore->configurator->get_database_entry_value('base_locale');
+$usersGroups = (new UsersGroups($CMSCore))->getAll();
+$usersGroupsLocale = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
 
 $handlerOutputData['usersGroups'] = [];
 if (count($usersGroups) > 0) {
   foreach ($usersGroups as $usersGroup) {
-    $usersGroup->init_data(['id', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+    $usersGroup->initData(['id', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
 
     array_push($handlerOutputData['usersGroups'], [
-      'id' => $usersGroup->get_id(),
-      'name' => $usersGroup->get_name(),
-      'title' => $usersGroup->get_title($usersGroupsLocale),
-      'createdUnixTimestamp' => $usersGroup->get_created_unix_timestamp(),
-      'updatedUnixTimestamp' => $usersGroup->get_updated_unix_timestamp()
+      'id' => $usersGroup->getID(),
+      'name' => $usersGroup->getName(),
+      'title' => $usersGroup->getTitle($usersGroupsLocale),
+      'createdUnixTimestamp' => $usersGroup->getCreatedUnixTimestamp(),
+      'updatedUnixTimestamp' => $usersGroup->getUpdatedUnixTimestamp()
     ]);
   }
 
-  $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
   $handlerStatusCode = $handlerStatusCode ?? 1;
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_USERS_GROUPS_ERROR_NOT_FOUND');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USERS_GROUPS_ERROR_NOT_FOUND');
   $handlerStatusCode = $handlerStatusCode ?? 1;
 }
-
-?>

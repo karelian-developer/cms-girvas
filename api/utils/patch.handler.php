@@ -13,13 +13,13 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-if ($CMSCore->client->is_logged(2) && $CMSCore->urlp->get_path(2) === 'secret-codes') {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2) && $CMSCore->urlp->getPath(2) === 'secret-codes') {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT)) {
     $chars = 'qwertyuiopasdfghjklzxcvbnm123456789';
 
     for ($codeIndex = 0; $codeIndex < 4; $codeIndex++) {
@@ -35,7 +35,7 @@ if ($CMSCore->client->is_logged(2) && $CMSCore->urlp->get_path(2) === 'secret-co
         case 3: $codeChar = 'd'; break;
       }
 
-      $CMSCore->configurator->update_database_entry_value(
+      $CMSCore->configurator->updateDatabaseEntryValue(
         'security_admin_code_' . $codeChar,
         password_hash(implode($codeChars), PASSWORD_ARGON2ID)
       );
@@ -43,12 +43,10 @@ if ($CMSCore->client->is_logged(2) && $CMSCore->urlp->get_path(2) === 'secret-co
       unset($codeChars);
     }
 
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_UTILS_SECRET_CODES_GENERATED_SUCCESS');
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_SECRET_CODES_GENERATED_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 } else {
-  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION');
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

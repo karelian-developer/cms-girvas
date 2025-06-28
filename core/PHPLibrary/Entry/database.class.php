@@ -8,77 +8,81 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Entry {
+namespace core\PHPLibrary\Entry;
 
-  final class Database {
-    private \core\PHPLibrary\Database $database;
-    private \core\PHPLibrary\Entry $entry;
-    
-    /**
-     * __construct
-     *
-     * @param  mixed $database
-     * @param  mixed $entry
-     * @return void
-     */
-    public function __construct(\core\PHPLibrary\Database $database, \core\PHPLibrary\Entry $entry) {
-      $this->database = $database;
-      $this->entry = $entry;
-    }
+use \core\PHPLibrary\Database as Database;
+use \core\PHPLibrary\Entries as Entries;
 
-    private function get_entry_id() : int {
-      return $this->entry->get_id();
-    }
-
-    public function get_data(string|array $columns) : string|array|null {
-      /** @var string $databaseQuery SQL-запрос */
-      $databaseQuery = '';
-      /** @var EnumDatabaseManagementSystem $databaseManagementSystem */
-      $databaseManagementSystem = $this->database->get_database_management_system();
-      $databaseQuery = match ($databaseManagementSystem->value) {
-        'mysql' => $this->database->get_file_sql('Entry/get.mysql.sql'),
-        'pgsql' => $this->database->get_file_sql('Entry/get.pgsql.sql'),
-      };
-
-      /** @var string $databaseQuery SQL-запрос (переопределение) */
-      $databaseQuery = is_string($columns) ? sprintf($databaseQuery, $columns) : sprintf($databaseQuery, implode(', ', $columns));
-      $entryID = $this->get_entry_id();
-
-      $this->database->prepare($databaseQuery);
-      $this->database->bindParam(':id', $entryID, \PDO::PARAM_INT);
-			$this->database->execute();
-
-      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-			if ($result) {
-        return is_string($columns) ? $result[$columns] : $result;
-      }
-
-      return null;
-    }
-
-    public function exists() : bool {
-      /** @var string $databaseQuery SQL-запрос */
-      $databaseQuery = '';
-      /** @var EnumDatabaseManagementSystem $databaseManagementSystem */
-      $databaseManagementSystem = $this->database->get_database_management_system();
-
-      $databaseQuery = match ($databaseManagementSystem->value) {
-        'mysql' => $this->database->get_file_sql('Entry/exists.mysql.sql'),
-        'pgsql' => $this->database->get_file_sql('Entry/exists.pgsql.sql'),
-      };
-      
-      $entryID = $this->get_entry_id();
-
-      $this->database->prepare($databaseQuery);
-      $this->database->bindParam(':id', $entryID, \PDO::PARAM_INT);
-			$this->database->execute();
-
-      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-			return ($result) ? $result['exists'] : false;
-    }
-
+final class Database
+{
+  private Database $database;
+  private Entries $entry;
+  
+  /**
+   * __construct
+   *
+   * @param  Database $database
+   * @param  Entries $entry
+   * 
+   * @return void
+   */
+  public function __construct(Database $database, Entries $entry)
+  {
+    $this->database = $database;
+    $this->entry = $entry;
   }
 
-}
+  private function getEntryID() : int
+  {
+    return $this->entry->getID();
+  }
 
-?>
+  public function getData(string|array $columns) : string|array|null
+  {
+    /** @var string $databaseQuery SQL-запрос */
+    $databaseQuery = '';
+    /** @var EnumDatabaseManagementSystem $databaseManagementSystem */
+    $databaseManagementSystem = $this->database->getDatabaseNanagementSystem();
+    $databaseQuery = match ($databaseManagementSystem->value) {
+      'mysql' => $this->database->getFileSQL('Entry/get.mysql.sql'),
+      'pgsql' => $this->database->getFileSQL('Entry/get.pgsql.sql'),
+    };
+
+    /** @var string $databaseQuery SQL-запрос (переопределение) */
+    $databaseQuery = is_string($columns) ? sprintf($databaseQuery, $columns) : sprintf($databaseQuery, implode(', ', $columns));
+    $entryID = $this->getEntryID();
+
+    $this->database->prepare($databaseQuery);
+    $this->database->bindParam(':id', $entryID, \PDO::PARAM_INT);
+    $this->database->execute();
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    if ($result) {
+      return is_string($columns) ? $result[$columns] : $result;
+    }
+
+    return null;
+  }
+
+  public function exists() : bool
+  {
+    /** @var string $databaseQuery SQL-запрос */
+    $databaseQuery = '';
+    /** @var EnumDatabaseManagementSystem $databaseManagementSystem */
+    $databaseManagementSystem = $this->database->getDatabaseNanagementSystem();
+
+    $databaseQuery = match ($databaseManagementSystem->value) {
+      'mysql' => $this->database->getFileSQL('Entry/exists.mysql.sql'),
+      'pgsql' => $this->database->getFileSQL('Entry/exists.pgsql.sql'),
+    };
+    
+    $entryID = $this->getEntryID();
+
+    $this->database->prepare($databaseQuery);
+    $this->database->bindParam(':id', $entryID, \PDO::PARAM_INT);
+    $this->database->execute();
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? $result['exists'] : false;
+  }
+}

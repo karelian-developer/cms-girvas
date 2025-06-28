@@ -17,14 +17,14 @@ use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
 use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as EnumFileFormat;
 use \GdImage as GdImage;
 
-if ($CMSCore->client->is_logged(2)) {
-  $clientUser = $CMSCore->client->get_user(2);
-  $clientUser->init_data(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
-  $clientUserGroup->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
   // Проверка прав пользователя на доступ к данному действию
-  if ($clientUserGroup->permission_check($clientUserGroup::PERMISSION_EDITOR_MEDIA_FILES_MANAGEMENT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_MEDIA_FILES_MANAGEMENT)) {
     // Проверка передачи файлов (действительно ли они были переданы в массиве)
     if (!empty($_FILES)) {
       /** @var array Массив передаваемых файлов для отладки */
@@ -50,7 +50,7 @@ if ($CMSCore->client->is_logged(2)) {
         // Проверка соответствия расширения массиву разрешенных расширений загружаемых файлов
         if (in_array($fileUploadedExtension, $fileExtensionsAllowed)) {
           // Проверка величины файла на соответствие ограничениям
-          if ($CMSCore->configurator->get_upload_file_weight_max() >= filesize($_FILES['mediaFile']['tmp_name']) / 1024 || $CMSCore->configurator->get_upload_file_weight_max() == 0) {
+          if ($CMSCore->configurator->getUploadFileWeightMax() >= filesize($_FILES['mediaFile']['tmp_name']) / 1024 || $CMSCore->configurator->getUploadFileWeightMax() == 0) {
             /** @var string Путь до загружаемых файлов */
             $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
             /** @var string MIME-тип загружаемого файла */
@@ -82,12 +82,12 @@ if ($CMSCore->client->is_logged(2)) {
               imagedestroy($image);
 
               // Проверка ширины изображения на соответствие ограничениям
-              if ($imageWidth <= $CMSCore->configurator->get_upload_file_image_width_max() || $CMSCore->configurator->get_upload_file_image_width_max() === 0) {
+              if ($imageWidth <= $CMSCore->configurator->getUploadFileImageWidthMax() || $CMSCore->configurator->getUploadFileImageWidthMax() === 0) {
                 // Проверка высоты изображения на соответствие ограничениям
-                if ($imageHeight <= $CMSCore->configurator->get_upload_file_image_height_max() || $CMSCore->configurator->get_upload_file_image_height_max() === 0) {
+                if ($imageHeight <= $CMSCore->configurator->getUploadFileImageHeightMax() || $CMSCore->configurator->getUploadFileImageHeightMax() === 0) {
                   
-                  if ($CMSCore->configurator->get_auto_convert_file_image_status(true)) {
-                    $fileExtensionConvertedEnum = match ($CMSCore->configurator->get_auto_convert_file_image_extension()) {
+                  if ($CMSCore->configurator->getAutoConvertFileImageStatus(true)) {
+                    $fileExtensionConvertedEnum = match ($CMSCore->configurator->getAutoConvertFileImageExtension()) {
                       'webp' => EnumFileFormat::WEBP,
                       'avif' => EnumFileFormat::AVIF
                     };
@@ -111,45 +111,43 @@ if ($CMSCore->client->is_logged(2)) {
                   $handlerOutputData['file'] = $fileData;
 
                   if (is_array($fileConverted)) {
-                    $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_POST_FILES_SUCCESS');
+                    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_POST_FILES_SUCCESS');
                     $handlerStatusCode = $handlerStatusCode ?? 1;
                   } else {
-                    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+                    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
                     $handlerStatusCode = $handlerStatusCode ?? 0;
                   }
                 } else {
-                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->get_single_value_by_key('API_FILE_ERROR_TOO_HEIGHT_IMAGE'), $CMSCore->configurator->get_upload_file_image_height_max());
+                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_TOO_HEIGHT_IMAGE'), $CMSCore->configurator->getUploadFileImageHeightMax());
                   $handlerStatusCode = $handlerStatusCode ?? 0;
                 }
               } else {
-                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->get_single_value_by_key('API_FILE_ERROR_TOO_WIDTH_IMAGE'), $CMSCore->configurator->get_upload_file_image_width_max());
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_TOO_WIDTH_IMAGE'), $CMSCore->configurator->getUploadFileImageWidthMax());
                 $handlerStatusCode = $handlerStatusCode ?? 0;
               }
             }
           } else {
-            $handlerMessage = $handlerMessage ?? sprintf('API ERROR: %s', sprintf($CMSCore->locale->get_single_value_by_key('API_FILE_ERROR_HEAVY_FILE'), $CMSCore->configurator->get_upload_file_weight_max()));
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_HEAVY_FILE'), $CMSCore->configurator->getUploadFileWeightMax());
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
-          $handlerMessage = $handlerMessage ?? sprintf('API ERROR: %s', $CMSCore->locale->get_single_value_by_key('API_FILE_ERROR_INVALID_EXTENSION'));
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_INVALID_EXTENSION');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $handlerMessage = $handlerMessage ?? sprintf('API ERROR: %s', $CMSCore->locale->get_single_value_by_key('API_FILE_ERROR_DIRECTORY_NOT_FOUND'));
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_DIRECTORY_NOT_FOUND');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
-      $handlerMessage = $handlerMessage ?? sprintf('API ERROR: %s', $CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN'));
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handlerMessage = sprintf('API ERROR: %s', $CMSCore->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS'));
+    $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
     $handlerStatusCode = 0;
   }
 } else {
   http_response_code(401);
-  $handlerMessage = $handlerMessage ?? sprintf('API ERROR: %s', $CMSCore->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION'));
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
   $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

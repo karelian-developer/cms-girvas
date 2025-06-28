@@ -13,7 +13,7 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-if ($CMSCore->urlp->get_path(2) === 'comment') {
+if ($CMSCore->urlp->getPath(2) === 'comment') {
   $APIFilePath =  CMS_ROOT_DIRECTORY . '/api/entry/comment.api.php';
   include_once $APIFilePath;
 } else {
@@ -34,7 +34,7 @@ if ($CMSCore->urlp->get_path(2) === 'comment') {
     // Если абсолютный путь не был инициализирован, то запрещаем дальше работать с API
     if (!$handlerIsExists) {
       http_response_code(500);
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->get_single_value_by_key('API_ERROR_HANDLER_NOT_FOUND');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_HANDLER_NOT_FOUND');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
 
@@ -44,5 +44,3 @@ if ($CMSCore->urlp->get_path(2) === 'comment') {
     }
   }
 }
-
-?>

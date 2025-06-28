@@ -8,11 +8,10 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary {
-  interface InterfaceModule {
-    public function __construct(SystemCore $CMSCore);
-    public function get_status() : bool;
-  }
-}
+namespace core\PHPLibrary;
 
-?>
+interface InterfaceModule
+{
+  public function __construct(SystemCore $CMSCore);
+  public function getStatus() : bool;
+}

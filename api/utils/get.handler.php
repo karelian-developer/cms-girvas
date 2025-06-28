@@ -14,19 +14,17 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 // Получение версии CMS
-if ($CMSCore->urlp->get_path(2) === 'cms-version') {
-  $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+if ($CMSCore->urlp->getPath(2) === 'cms-version') {
+  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
   $handlerStatusCode = $handlerStatusCode ?? 1;
 
   $handlerOutputData['result'] = $CMSCore::CMS_VERSION;
 }
 
 // Получение наименования CMS
-if ($CMSCore->urlp->get_path(2) === 'cms-title') {
-  $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
+if ($CMSCore->urlp->getPath(2) === 'cms-title') {
+  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
   $handlerStatusCode = $handlerStatusCode ?? 1;
 
   $handlerOutputData['result'] = $CMSCore::CMS_TITLE;
 }
-
-?>

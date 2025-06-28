@@ -24,11 +24,11 @@ use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as EnumFileFormat;
 /**
  * Загрузка аватара для пользователя
  */
-if ($CMSCore->urlp->get_path(2) == 'avatar') {
+if ($CMSCore->urlp->getPath(2) == 'avatar') {
   $userID = trim($_POST['user_id']) ?? : 0;
   $userID = (is_numeric($userID)) ? (int)$userID : 0;
 
-  if (User::exists_by_id($CMSCore, $userID)) {
+  if (User::existsByID($CMSCore, $userID)) {
     if (isset($_FILES['avatarFile'])) {
       $handlerOutputData['debug_files'] = $_FILES;
 
@@ -51,7 +51,7 @@ if ($CMSCore->urlp->get_path(2) == 'avatar') {
           $fileConverted = $fileConverter->convert($_FILES['avatarFile'], $uploadedDirectoryUserPath, EnumFileFormat::WEBP, true);
 
           if (is_array($fileConverted)) {
-            $imageOriginalPath = CMS_ROOT_DIRECTORY . '/uploads/avatars/' . (string)$userID . '/' . $fileConverted['file_name'];
+            $imageOriginalPath = CMS_ROOT_DIRECTORY . '/uploads/avatars/' . (string) $userID . '/' . $fileConverted['file_name'];
             
             foreach ([16, 32, 64, 96, 128, 254] as $imageResizedWidth) {
               list($imageOriginalWidth, $imageOriginalHeight) = getimagesize($imageOriginalPath);
@@ -67,21 +67,21 @@ if ($CMSCore->urlp->get_path(2) == 'avatar') {
             $handlerOutputData['file']['url'] = '/uploads/avatars/' . (string)$userID . '/254.webp';
             $handlerOutputData['file']['fullname'] = '254.webp';
 
-            $handlerMessage = $handlerMessage ?? $CMSCore->locale->get_single_value_by_key('API_POST_FILES_SUCCESS');
+            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_POST_FILES_SUCCESS');
             $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' .$CMSCore->locale->get_single_value_by_key('API_ERROR_UNKNOWN');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' .$CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         }
       }
 
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' .$CMSCore->locale->get_single_value_by_key('API_ERROR_INVALID_INPUT_DATA_SET');
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' .$CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' .$CMSCore->locale->get_single_value_by_key('API_USER_ERROR_NOT_FOUND');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' .$CMSCore->locale->getSingleValueByKey('API_USER_ERROR_NOT_FOUND');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 }
@@ -93,7 +93,7 @@ if ($CMSCore->urlp->get_path(2) == 'avatar') {
  * ни логин, ни e-mail не были отправлены, то обработчик вернет ошибку о неполноте
  * введенных данных.
  */
-if ($CMSCore->urlp->get_path(2) == 'reset') {
+if ($CMSCore->urlp->getPath(2) == 'reset') {
   /** @var string Логин или e-mail пользователя */
   $userLoginOrEmail = $_POST['user_login_or_email'] ?? '';
 
@@ -101,51 +101,51 @@ if ($CMSCore->urlp->get_path(2) == 'reset') {
     /** @var User|null Объект пользователя */
     $user = null;
 
-    if (User::email_is_valid($CMSCore, $userLoginOrEmail)) {
-      if (User::exists_by_email($CMSCore, $userLoginOrEmail)) {
-        $user = User::get_by_email($CMSCore, $userLoginOrEmail);
+    if (User::emailIsValid($CMSCore, $userLoginOrEmail)) {
+      if (User::existsByEmail($CMSCore, $userLoginOrEmail)) {
+        $user = User::getByEmail($CMSCore, $userLoginOrEmail);
       }
     } else {
-      if (User::exists_by_login($CMSCore, $userLoginOrEmail)) {
-        $user = User::get_by_login($CMSCore, $userLoginOrEmail);
+      if (User::existsByLogin($CMSCore, $userLoginOrEmail)) {
+        $user = User::getByLogin($CMSCore, $userLoginOrEmail);
       }
     }
 
     if (!is_null($user)) {
       $user->init_data(['login', 'email', 'metadata']);
       /** @var string Заголовок веб-сайта */
-      $siteTitle = (empty($CMSCore->configurator->get_meta_title())) ? $CMSCore->configurator->get_site_title() : $CMSCore->configurator->get_meta_title();
+      $siteTitle = empty($CMSCore->configurator->getMetaTitle()) ? $CMSCore->configurator->getSiteTitle() : $CMSCore->configurator->getMetaTitle();
       /** @var string E-Mail получателя */
-      $userEmail = $user->get_email();
+      $userEmail = $user->getEmail();
       /** @var string Логин получателя */
-      $userLogin = $user->get_login();
+      $userLogin = $user->getLogin();
 
-      $themeBaseName = ($CMSCore->configurator->exists_database_entry_value('base_template')) ? $CMSCore->configurator->get_database_entry_value('base_template') : 'default';
+      $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template') ? $CMSCore->configurator->getDatabaseEntryValue('base_template') : 'default';
 
       /** @var Template Объект шаблона */
       $theme = new Template($CMSCore, $themeBaseName);
 
       /** @var EmailSender Объект отправителя E-Mail */
       $emailSender = new EmailSender($CMSCore);
-      $emailSenderSystemSenderEmail = EmailSender::get_system_sender_email($CMSCore);
-      $emailSender->set_from_user($siteTitle, $emailSenderSystemSenderEmail);
-      $emailSender->set_to_user_email($userEmail);
-      $emailSender->add_header(sprintf("From: %s <%s>", $siteTitle, $emailSenderSystemSenderEmail));
-      $emailSender->add_header(sprintf("\r\nX-Mailer: PHP/%s", phpversion()));
-      $emailSender->add_header("\r\nMIME-Version: 1.0");
-      $emailSender->add_header("\r\nContent-type: text/html; charset=UTF-8");
-      $emailSender->add_header("\r\n");
+      $emailSenderSystemSenderEmail = EmailSender::getSystemSenderEmail($CMSCore);
+      $emailSender->setFromUser($siteTitle, $emailSenderSystemSenderEmail);
+      $emailSender->setToUserEmail($userEmail);
+      $emailSender->addHeader(sprintf("From: %s <%s>", $siteTitle, $emailSenderSystemSenderEmail));
+      $emailSender->addHeader(sprintf("\r\nX-Mailer: PHP/%s", phpversion()));
+      $emailSender->addHeader("\r\nMIME-Version: 1.0");
+      $emailSender->addHeader("\r\nContent-type: text/html; charset=UTF-8");
+      $emailSender->addHeader("\r\n");
 
       /** @var int Временная отметка в UNIX-формате создания заявки на сброс пароля */
       $resetPasswordCreatedUnixTimestamp = time();
       /** @var string Токен сброса пароля */
       $resetPasswordToken = md5($resetPasswordCreatedUnixTimestamp . $CMSCore::CMS_VERSION);
 
-      $emailSender->set_subject($CMSCore->locale->get_single_value_by_key('API_USER_REQUEST_PASSWORD_RESET_EMAIL_SUBJECT'));
-      $emailSender->set_content(TemplateCollector::assembly_file_content($theme, 'templates/email/default.tpl', [
-        'EMAIL_TITLE' => $CMSCore->locale->get_single_value_by_key('API_USER_REQUEST_PASSWORD_RESET_EMAIL_TITLE'),
-        'EMAIL_CONTENT' => sprintf($CMSCore->locale->get_single_value_by_key('API_USER_REQUEST_PASSWORD_RESET_EMAIL_CONTENT'), $userLogin, $CMSCore->get_site_url() . '/password-reset?token=' . $resetPasswordToken),
-        'EMAIL_COPYRIGHT' => $CMSCore->locale->get_single_value_by_key('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')
+      $emailSender->setSubject($CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_SUBJECT'));
+      $emailSender->setContent(TemplateCollector::assembly_file_content($theme, 'templates/email/default.tpl', [
+        'EMAIL_TITLE' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_TITLE'),
+        'EMAIL_CONTENT' => sprintf($CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_CONTENT'), $userLogin, $CMSCore->getSiteURL() . '/password-reset?token=' . $resetPasswordToken),
+        'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')
       ]));
 
       $emailSender->send();
@@ -154,16 +154,14 @@ if ($CMSCore->urlp->get_path(2) == 'reset') {
       $resetPasswordCreatedUnixTimestamp = time();
       $user->update(['metadata' => ['passwordResetToken' => $resetPasswordToken, 'passwordResetTokenCreatedUnixTimestamp' => $resetPasswordCreatedUnixTimestamp]]);
 
-      $handlerMessage = $CMSCore->locale->get_single_value_by_key('API_USER_REQUEST_PASSWORD_RESET_SENDED_SUCCESS');
+      $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_SENDED_SUCCESS');
       $handlerStatusCode = $handlerStatusCode ?? 1;
     } else {
-      $handlerMessage = 'API ERROR: ' .$CMSCore->locale->get_single_value_by_key('API_USER_ERROR_NOT_FOUND');
+      $handlerMessage = 'API ERROR: ' .$CMSCore->locale->getSingleValueByKey('API_USER_ERROR_NOT_FOUND');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handlerMessage = 'API ERROR: ' .$CMSCore->locale->get_single_value_by_key('API_ERROR_INVALID_INPUT_DATA_SET');
+    $handlerMessage = 'API ERROR: ' .$CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 }
-
-?>
