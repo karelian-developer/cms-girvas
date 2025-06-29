@@ -109,8 +109,8 @@ if ($CMSCore->client->isLogged(2)) {
     }
 
     if (preg_match('/\S/', $sampleName)) {
-      if (EntriesSample::existsByID($CMSCore, $sample_id)) {
-        $sample = new EntriesSample($CMSCore, $sample_id);
+      if (EntriesSample::existsByID($CMSCore, $sampleID)) {
+        $sample = new EntriesSample($CMSCore, $sampleID);
         $sample->initData(['name', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
 
         if (!EntriesSample::existsByName($CMSCore, $sampleName) || $sampleName === $sample->getName()) {
