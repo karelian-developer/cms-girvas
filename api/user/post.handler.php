@@ -26,7 +26,7 @@ use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as EnumFileFormat;
  */
 if ($CMSCore->urlp->getPath(2) === 'avatar') {
   $userID = trim($_POST['user_id']) ?? 0;
-  $userID = (is_numeric($userID)) ? (int)$userID : 0;
+  $userID = is_numeric($userID) ? (int) $userID : 0;
 
   if (User::existsByID($CMSCore, $userID)) {
     if (isset($_FILES['avatarFile'])) {

@@ -37,7 +37,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
 
         if (isset($_PATCH['user_is_block'])) {
           if (!isset($userData['metadata'])) $userData['metadata'] = [];
-          $userData['metadata']['isBlocked'] = (int)$_PATCH['user_is_block'];
+          $userData['metadata']['isBlocked'] = (int) $_PATCH['user_is_block'];
           $userUpdateIsAllowed = true;
         }
 
@@ -88,7 +88,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
             }
 
             if ($CMSConfigurator->getUsersLoginRegisterAccountingStatus(true)) {
-              $loginPattern = '/^' . $userLogin . '$/i';
+              $loginPattern = '/^' . $loginPattern . '$/';
 
               if (!preg_match($loginPattern, $userLogin)) {
                 $userUpdateIsAllowed = false;
@@ -97,7 +97,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
                 $handlerStatusCode = $handlerStatusCode ?? 0;
               }
             } else {
-              $loginPattern = '/^' . $userLogin . '$/';
+              $loginPattern = '/^' . $loginPattern . '$/i';
 
               if (!preg_match($loginPattern, $userLogin)) {
                 $userUpdateIsAllowed = false;
@@ -134,7 +134,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
         if (isset($_PATCH['user_surname'])) $userSurname = htmlspecialchars(str_replace('\'', '"', trim($_PATCH['user_surname'])));
         if (isset($_PATCH['user_patronymic'])) $userPatronymic = htmlspecialchars(str_replace('\'', '"', trim($_PATCH['user_patronymic'])));
         if (isset($_PATCH['user_birthdate'])) $userBirthdate = strtotime($_PATCH['user_birthdate']);
-        if (isset($_PATCH['user_group_id'])) $userGroupID = (int)$_PATCH['user_group_id'];
+        if (isset($_PATCH['user_group_id'])) $userGroupID = (int) $_PATCH['user_group_id'];
         if (isset($_PATCH['user_password'])) $userPassword = str_replace('\'', '"', trim($_PATCH['user_password']));
         if (isset($_PATCH['user_password_repeat'])) $userPasswordRepeat = str_replace('\'', '"', trim($_PATCH['user_password_repeat']));
         if (isset($_PATCH['user_password_old'])) $userPasswordOld = str_replace('\'', '"', trim($_PATCH['user_password_old']));
@@ -215,7 +215,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
 
         if ($userUpdateIsAllowed) {
           if (isset($userLogin) && $clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT)) {
-            if ($userLogin != $user->getLogin()) {
+            if ($userLogin !== $user->getLogin()) {
               if (!User::existsByLogin($CMSCore, $userLogin, $CMSConfigurator->getUsersLoginRegisterAccountingStatus(true))) {
                 $userData['login'] = $userLogin;
               } else {

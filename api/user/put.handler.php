@@ -62,7 +62,7 @@ if ($CMSCore->client->isLogged(2)) {
               $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           } else {
-            $loginPattern = '/^' . $userLogin . '$/';
+            $loginPattern = '/^' . $userLogin . '$/i';
 
             if (preg_match($loginPattern, $login)) {
               $userCreationAllowed = false;
