@@ -33,7 +33,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
 
         $userData = [];
 
-        $userUpdateIsAllowed = false;error_log(__LINE__);
+        $userUpdateIsAllowed = false;
 
         if (isset($_PATCH['user_is_block'])) {
           if (!isset($userData['metadata'])) $userData['metadata'] = [];
@@ -42,89 +42,92 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
         }
 
         if (isset($_PATCH['user_login'])) {
-          $userLogin = htmlspecialchars(str_replace('\'', '"', $_PATCH['user_login']));
+          $userLogin = trim($_PATCH['user_login']);if ($userUpdateIsAllowed) {
+          $userLogin = htmlspecialchars(str_replace('\'', '"', $userLogin));
 
-          if ($CMSConfigurator->getUsersLoginEditStatus(true) && $userID === $clientUser->getID()) {
-            $userUpdateIsAllowed = true;
-          } else {
-            if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT)) {
+          if ($userLogin !== $user->getLogin() && !empty($userLogin)) {
+            if ($CMSConfigurator->getUsersLoginEditStatus(true) && $userID === $clientUser->getID()) {
               $userUpdateIsAllowed = true;
+            } else {
+              if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT)) {
+                $userUpdateIsAllowed = true;
+              }
             }
-          }
 
-          if ($userUpdateIsAllowed) { error_log(__LINE__);
-            if ($CMSConfigurator->getUsersLoginsBlacklistStatus(true)) {
-              $loginBlacklist = $CMSConfigurator->getUsersLoginsBlacklist(true);
+            if ($userUpdateIsAllowed) {
+              if ($CMSConfigurator->getUsersLoginsBlacklistStatus(true)) {
+                $loginBlacklist = $CMSConfigurator->getUsersLoginsBlacklist(true);
 
-              foreach ($loginBlacklist as $login) {
-                if ($CMSConfigurator->getUsersLoginRegisterAccountingStatus(true)) {
-                  $loginPattern = '/^' . $userLogin . '$/';
+                foreach ($loginBlacklist as $login) {
+                  if ($CMSConfigurator->getUsersLoginRegisterAccountingStatus(true)) {
+                    $loginPattern = '/^' . $userLogin . '$/';
 
-                  if (preg_match($loginPattern, $login)) {
-                    $userUpdateIsAllowed = false;
+                    if (preg_match($loginPattern, $login)) {
+                      $userUpdateIsAllowed = false;
 
-                    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST');
-                    $handlerStatusCode = $handlerStatusCode ?? 0;
-                  }
-                } else {
-                  $loginPattern = '/^' . $userLogin . '$/i';
+                      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST');
+                      $handlerStatusCode = $handlerStatusCode ?? 0;
+                    }
+                  } else {
+                    $loginPattern = '/^' . $userLogin . '$/i';
 
-                  if (preg_match($loginPattern, $login)) {
-                    $userUpdateIsAllowed = false;
+                    if (preg_match($loginPattern, $login)) {
+                      $userUpdateIsAllowed = false;
 
-                    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST');
-                    $handlerStatusCode = $handlerStatusCode ?? 0;
+                      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST');
+                      $handlerStatusCode = $handlerStatusCode ?? 0;
+                    }
                   }
                 }
               }
             }
-          }
 
-          if ($userUpdateIsAllowed) { error_log(__LINE__);
-            if ($CMSConfigurator->getUsersLoginSpecialSymbolsStatus(true)) {
-              $loginPattern = '[a-zA-Z0-9\_\-\!\@\#\$\%\&]+';
-            } else {
-              $loginPattern = '[a-zA-Z0-9\_\-]+';
-            }
-
-            if ($CMSConfigurator->getUsersLoginRegisterAccountingStatus(true)) {
-              $loginPattern = '/^' . $loginPattern . '$/';
-
-              if (!preg_match($loginPattern, $userLogin)) {
-                $userUpdateIsAllowed = false;
-    
-                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN');
-                $handlerStatusCode = $handlerStatusCode ?? 0;
+            if ($userUpdateIsAllowed) {
+              if ($CMSConfigurator->getUsersLoginSpecialSymbolsStatus(true)) {
+                $loginPattern = '[a-zA-Z0-9\_\-\!\@\#\$\%\&]+';
+              } else {
+                $loginPattern = '[a-zA-Z0-9\_\-]+';
               }
-            } else {
-              $loginPattern = '/^' . $loginPattern . '$/i';
 
-              if (!preg_match($loginPattern, $userLogin)) {
-                $userUpdateIsAllowed = false;
-    
-                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN');
-                $handlerStatusCode = $handlerStatusCode ?? 0;
-              }
-            }
-          }
+              if ($CMSConfigurator->getUsersLoginRegisterAccountingStatus(true)) {
+                $loginPattern = '/^' . $loginPattern . '$/';
 
-          if ($userUpdateIsAllowed) { error_log(__LINE__);
-            if ($CMSConfigurator->getUsersLoginLengthMax() > 0) {
-              if (strlen($userLogin) > $CMSConfigurator->getUsersLoginLengthMax()) {
-                $userUpdateIsAllowed = false;
-    
-                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_LARGE'), $CMSConfigurator->getUsersLoginLengthMax());
-                $handlerStatusCode = $handlerStatusCode ?? 0;
+                if (!preg_match($loginPattern, $userLogin)) {
+                  $userUpdateIsAllowed = false;
+      
+                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN');
+                  $handlerStatusCode = $handlerStatusCode ?? 0;
+                }
+              } else {
+                $loginPattern = '/^' . $loginPattern . '$/i';
+
+                if (!preg_match($loginPattern, $userLogin)) {
+                  $userUpdateIsAllowed = false;
+      
+                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN');
+                  $handlerStatusCode = $handlerStatusCode ?? 0;
+                }
               }
             }
-          }
-    
-          if ($userUpdateIsAllowed) { error_log(__LINE__);
-            if (strlen($userLogin) < $CMSConfigurator->getUsersLoginLengthMin()) {
-              $userUpdateIsAllowed = false;
-    
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_SMALL'), $CMSConfigurator->getUsersLoginLengthMin());
-              $handlerStatusCode = $handlerStatusCode ?? 0;
+
+            if ($userUpdateIsAllowed) {
+              if ($CMSConfigurator->getUsersLoginLengthMax() > 0) {
+                if (strlen($userLogin) > $CMSConfigurator->getUsersLoginLengthMax()) {
+                  $userUpdateIsAllowed = false;
+      
+                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_LARGE'), $CMSConfigurator->getUsersLoginLengthMax());
+                  $handlerStatusCode = $handlerStatusCode ?? 0;
+                }
+              }
+            }
+      
+            if ($userUpdateIsAllowed) {
+              if (strlen($userLogin) < $CMSConfigurator->getUsersLoginLengthMin()) {
+                $userUpdateIsAllowed = false;
+      
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_SMALL'), $CMSConfigurator->getUsersLoginLengthMin());
+                $handlerStatusCode = $handlerStatusCode ?? 0;
+              }
             }
           }
         }
@@ -150,7 +153,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               $passwordRegularPattern = '[a-zA-Z0-9\_\-]+';
             }
             
-            if ($userUpdateIsAllowed) { error_log(__LINE__);
+            if ($userUpdateIsAllowed) {
               if ($CMSConfigurator->getUsersPasswordLengthMax() > 0) {
                 if (strlen($userPassword) > $CMSConfigurator->getUsersPasswordLengthMax()) {
                   $userUpdateIsAllowed = false;
@@ -161,7 +164,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               }
             }
       
-            if ($userUpdateIsAllowed) { error_log(__LINE__);
+            if ($userUpdateIsAllowed) {
               if (strlen($userPassword) < $CMSConfigurator->getUsersPasswordLengthMin()) {
                 $userUpdateIsAllowed = false;
       
@@ -170,7 +173,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               }
             }
       
-            if ($userUpdateIsAllowed) { error_log(__LINE__);
+            if ($userUpdateIsAllowed) {
               if (!preg_match(sprintf('/^%s$/i', $passwordRegularPattern), $userPassword)) {
                 $userUpdateIsAllowed = false;
       
@@ -179,7 +182,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               }
             }
 
-            if ($userUpdateIsAllowed) { error_log(__LINE__);
+            if ($userUpdateIsAllowed) {
               if (!empty($userPassword) || !empty($userPasswordRepeat)) {
                 if ($userPassword === $userPasswordRepeat) {
                   $userData['password_hash'] = User::password_hash($CMSCore, $user->get_security_hash(), $userPassword);
@@ -213,7 +216,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           if (isset($userLogin) && $clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT)) {
             if ($userLogin !== $user->getLogin()) {
               if (!User::existsByLogin($CMSCore, $userLogin, $CMSConfigurator->getUsersLoginRegisterAccountingStatus(true))) {
@@ -227,7 +230,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           if (isset($userEmail)) {
             if ($userEmail !== $user->getEmail()) {
               if (User::emailIIsValid($CMSCore, $userEmail)) {
@@ -247,7 +250,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           if (isset($userBirthdate)) {
             $userBirthdate = is_numeric($userBirthdate) ? $userBirthdate : strtotime($userBirthdate);
             
@@ -261,25 +264,25 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           if (isset($userName)) {
             $userData['metadata']['name'] = $userName;
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           if (isset($userSurname)) {
             $userData['metadata']['surname'] = $userSurname;
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           if (isset($userPatronymic)) {
             $userData['metadata']['patronymic'] = $userPatronymic;
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           /**
            * Обновление данных в дополнительных полях
            * Обратите внимание, что наименование поля будет преобразовано - система будет
@@ -304,7 +307,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           if (isset($userGroupID)) {
             if (!isset($userData)) $userData = [];
             if (!isset($userData['metadata'])) $userData['metadata'] = [];
@@ -313,7 +316,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           $user->update($userData);
 
           $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
