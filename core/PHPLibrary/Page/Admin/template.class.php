@@ -13,8 +13,8 @@ namespace core\PHPLibrary\Page\Admin;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Template as Template;
-use \core\PHPLibrary\Template\EnumMetadata as TemplateEnumMetadata;
-use \core\PHPLibrary\Template\EnumWeight as TemplateEnumWeight;
+use \core\PHPLibrary\Template\EnumMetadata as ThemeEnumMetadata;
+use \core\PHPLibrary\Template\EnumWeight as ThemeEnumWeight;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
@@ -34,20 +34,20 @@ class PageTemplate implements InterfacePage
 
   /** @property array Массив разрешенных типов метаданных */
   public array $allowedMetadata = [
-    TemplateEnumMetadata::AUTHOR_NAME,
-    TemplateEnumMetadata::AUTHOR_CODE_NAME,
-    TemplateEnumMetadata::AUTHOR_CODE_SERVER_NAME,
-    TemplateEnumMetadata::AUTHOR_CODE_CLIENT_NAME,
-    TemplateEnumMetadata::AUTHOR_DESIGNER_NAME,
-    TemplateEnumMetadata::AUTHOR_LAYOUT_NAME,
-    TemplateEnumMetadata::AUTHOR_SITE_LINK,
-    TemplateEnumMetadata::AUTHOR_SOCIAL_VK_LINK,
-    TemplateEnumMetadata::AUTHOR_SOCIAL_OK_LINK,
-    TemplateEnumMetadata::CATEGORY_NAME,
-    TemplateEnumMetadata::WEIGHT,
-    TemplateEnumMetadata::DATETIME_CREATED_UNIX,
-    TemplateEnumMetadata::DATETIME_UPDATED_UNIX,
-    TemplateEnumMetadata::VERSION
+    ThemeEnumMetadata::AUTHOR_NAME,
+    ThemeEnumMetadata::AUTHOR_CODE_NAME,
+    ThemeEnumMetadata::AUTHOR_CODE_SERVER_NAME,
+    ThemeEnumMetadata::AUTHOR_CODE_CLIENT_NAME,
+    ThemeEnumMetadata::AUTHOR_DESIGNER_NAME,
+    ThemeEnumMetadata::AUTHOR_LAYOUT_NAME,
+    ThemeEnumMetadata::AUTHOR_SITE_LINK,
+    ThemeEnumMetadata::AUTHOR_SOCIAL_VK_LINK,
+    ThemeEnumMetadata::AUTHOR_SOCIAL_OK_LINK,
+    ThemeEnumMetadata::CATEGORY_NAME,
+    ThemeEnumMetadata::WEIGHT,
+    ThemeEnumMetadata::DATETIME_CREATED_UNIX,
+    ThemeEnumMetadata::DATETIME_UPDATED_UNIX,
+    ThemeEnumMetadata::VERSION
   ];
   
   /** @property string Итоговая сборка шаблона в виде строки */
@@ -161,12 +161,12 @@ class PageTemplate implements InterfacePage
         /** @var string Имя ячейки метаданных */
         $metadataName = Template::getMetadataName($enumMetadata);
 
-        if (array_key_exists($metadataName, $themeMetadata) || $enumMetadata === TemplateEnumMetadata::WEIGHT) {
-          $getMetadataValue = function (Template $theme, array $themeMetadata, TemplateEnumMetadata $enumMetadata) {
+        if (array_key_exists($metadataName, $themeMetadata) || $enumMetadata === ThemeEnumMetadata::WEIGHT) {
+          $getMetadataValue = function (Template $theme, array $themeMetadata, ThemeEnumMetadata $enumMetadata) {
             $metadataName = Template::getMetadataName($enumMetadata);
             
-            if ($enumMetadata === TemplateEnumMetadata::WEIGHT) {
-              $themeWeight = $this->CMSCore->urlp->getPath(2) !== 'repository' ? Template::get_weight($theme, TemplateEnumWeight::BYTES) : $themeMetadata[$metadataName];
+            if ($enumMetadata === ThemeEnumMetadata::WEIGHT) {
+              $themeWeight = $this->CMSCore->urlp->getPath(2) !== 'repository' ? Template::get_weight($theme, ThemeEnumWeight::BYTES) : $themeMetadata[$metadataName];
               
               if ($themeWeight < 1024) {
                 return sprintf('%s B', $themeWeight);
@@ -185,7 +185,7 @@ class PageTemplate implements InterfacePage
               }
             }
 
-            if ($enumMetadata === TemplateEnumMetadata::DATETIME_CREATED_UNIX || $enumMetadata === TemplateEnumMetadata::DATETIME_UPDATED_UNIX) {
+            if ($enumMetadata === ThemeEnumMetadata::DATETIME_CREATED_UNIX || $enumMetadata === ThemeEnumMetadata::DATETIME_UPDATED_UNIX) {
               return date('d.m.Y', $themeMetadata[$metadataName]);
             }
 
@@ -194,26 +194,26 @@ class PageTemplate implements InterfacePage
 
           /** @var string Заголовок ячейки метаданных */
           $metadataTitle = match ($enumMetadata) {
-            TemplateEnumMetadata::AUTHOR_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_NAME_LABEL'),
-            TemplateEnumMetadata::AUTHOR_CODE_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_CODE_NAME_LABEL'),
-            TemplateEnumMetadata::AUTHOR_CODE_SERVER_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_CODE_SERVER_NAME_LABEL'),
-            TemplateEnumMetadata::AUTHOR_CODE_CLIENT_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_CODE_CLIENT_NAME_LABEL'),
-            TemplateEnumMetadata::AUTHOR_DESIGNER_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_DESIGNER_NAME_LABEL'),
-            TemplateEnumMetadata::AUTHOR_LAYOUT_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_LAYOUT_NAME_LABEL'),
-            TemplateEnumMetadata::AUTHOR_SITE_LINK => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_SITE_LINK_LABEL'),
-            TemplateEnumMetadata::AUTHOR_SOCIAL_VK_LINK => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_SOCIAL_VK_LINK_LABEL'),
-            TemplateEnumMetadata::AUTHOR_SOCIAL_OK_LINK => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_SOCIAL_OK_LINK_LABEL'),
-            TemplateEnumMetadata::CATEGORY_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_CATEGORY_NAME_LABEL'),
-            TemplateEnumMetadata::WEIGHT => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_SIZE_LABEL'),
-            TemplateEnumMetadata::DATETIME_CREATED_UNIX => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_DATETIME_CREATED_UNIX_LABEL'),
-            TemplateEnumMetadata::DATETIME_UPDATED_UNIX => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_DATETIME_UPDATED_UNIX_LABEL'),
-            TemplateEnumMetadata::VERSION => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_VERSION_LABEL')
+            ThemeEnumMetadata::AUTHOR_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_NAME_LABEL'),
+            ThemeEnumMetadata::AUTHOR_CODE_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_CODE_NAME_LABEL'),
+            ThemeEnumMetadata::AUTHOR_CODE_SERVER_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_CODE_SERVER_NAME_LABEL'),
+            ThemeEnumMetadata::AUTHOR_CODE_CLIENT_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_CODE_CLIENT_NAME_LABEL'),
+            ThemeEnumMetadata::AUTHOR_DESIGNER_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_DESIGNER_NAME_LABEL'),
+            ThemeEnumMetadata::AUTHOR_LAYOUT_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_LAYOUT_NAME_LABEL'),
+            ThemeEnumMetadata::AUTHOR_SITE_LINK => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_SITE_LINK_LABEL'),
+            ThemeEnumMetadata::AUTHOR_SOCIAL_VK_LINK => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_SOCIAL_VK_LINK_LABEL'),
+            ThemeEnumMetadata::AUTHOR_SOCIAL_OK_LINK => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_SOCIAL_OK_LINK_LABEL'),
+            ThemeEnumMetadata::CATEGORY_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_CATEGORY_NAME_LABEL'),
+            ThemeEnumMetadata::WEIGHT => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_SIZE_LABEL'),
+            ThemeEnumMetadata::DATETIME_CREATED_UNIX => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_DATETIME_CREATED_UNIX_LABEL'),
+            ThemeEnumMetadata::DATETIME_UPDATED_UNIX => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_DATETIME_UPDATED_UNIX_LABEL'),
+            ThemeEnumMetadata::VERSION => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_VERSION_LABEL')
           };
 
           $metadataValueTemplate = match ($enumMetadata) {
-            ModuleEnumMetadata::AUTHOR_SITE_LINK => '<li class="template__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>',
-            ModuleEnumMetadata::AUTHOR_SOCIAL_VK_LINK => '<li class="template__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>',
-            ModuleEnumMetadata::AUTHOR_SOCIAL_OK_LINK => '<li class="template__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>',
+            ThemeEnumMetadata::AUTHOR_SITE_LINK => '<li class="template__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>',
+            ThemeEnumMetadata::AUTHOR_SOCIAL_VK_LINK => '<li class="template__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>',
+            ThemeEnumMetadata::AUTHOR_SOCIAL_OK_LINK => '<li class="template__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> <a class="template__metadata-link metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>',
             default => '<li class="template__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> {METADATA_VALUE}</li>',
           };
 
