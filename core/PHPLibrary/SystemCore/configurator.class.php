@@ -75,7 +75,7 @@ final class Configurator
    * 
    * @return void
    */
-  public function setMetaKeywrords(array $values) : void
+  public function setMetaKeywords(array $values) : void
   {
     $this->metaKeywords = $values;
   }
@@ -87,7 +87,7 @@ final class Configurator
    * 
    * @return void
    */
-  public function addMetaKeywrord(mixed $value) : void
+  public function addMetaKeyword(mixed $value) : void
   {
     array_push($this->metaKeywords, $value);
   }
