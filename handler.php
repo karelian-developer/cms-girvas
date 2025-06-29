@@ -268,7 +268,7 @@ if (defined('IS_NOT_HACKED')) {
   // Получить перечень доступных локализаций
   } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSCore->urlp->getPath(1) === 'locales') {
     $handlerOutputData['locales'] = [];
-    $CMSLocalesNames = $CMSCore->getAarrayLocalesNames();
+    $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
 
     if (count($CMSLocalesNames) > 0) {
       foreach ($CMSLocalesNames as $index => $name) {
