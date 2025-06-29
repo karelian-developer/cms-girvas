@@ -36,7 +36,10 @@ final class Entries
    */
   public function getAll(array $params = [], $isPublished = false) : array
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
@@ -104,8 +107,8 @@ final class Entries
     $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
     if (array_key_exists('limit', $params)) {
       if (is_array($params['limit'])) {
-        $limit = (is_integer($params['limit'][0])) ? $params['limit'][0] : 0;
-        $offset = (is_integer($params['limit'][1])) ? $params['limit'][1] : 0;
+        $limit = is_integer($params['limit'][0]) ? $params['limit'][0] : 0;
+        $offset = is_integer($params['limit'][1]) ? $params['limit'][1] : 0;
         $queryBuilder->statement->setClauseLimit($limit, $offset);
       }
     }
@@ -187,6 +190,6 @@ final class Entries
     $databaseQuery->execute();
 
     $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-    return ($result) ? $result['count'] : 0;
+    return $result ? $result['count'] : 0;
   }
 }

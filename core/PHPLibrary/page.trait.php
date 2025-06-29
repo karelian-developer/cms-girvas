@@ -52,7 +52,7 @@ trait TraitPage
             $sectionIsAllowed = true;
 
             if ($sectionIsAllowed) {
-              $itemTitle = sprintf('{LANG:%s}', self::LANG_PAGE_NAVIGATION_LABLE_TEMPLATE);
+              $itemTitle = '{LANG:' . self::LANG_PAGE_NAVIGATION_LABLE_TEMPLATE . '}';
               $itemTitle = sprintf($itemTitle, strtoupper($subsectionName));
               $itemTitle = TemplateCollector::assemblyLocale($itemTitle, $CMSCore->locale);
 
@@ -75,9 +75,9 @@ trait TraitPage
               }
 
               if ($subsectionIsActiveStatus) {
-                $itemElement->setAttribute('class', sprintf('list__item item item_%s item_is-active', $subsectionName));
+                $itemElement->setAttribute('class', 'list__item item item_' . $subsectionName . ' item_is-active');
               } else {
-                $itemElement->setAttribute('class', sprintf('list__item item item_%s', $subsectionName));
+                $itemElement->setAttribute('class', 'list__item item item_' . $subsectionName);
               }
 
               $linkElement->setAttribute('href', '/admin' . $subsectionLink);

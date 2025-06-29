@@ -77,7 +77,7 @@ class Page
   private function assembly() : string
   {
     /** @var string $themePath Путь до шаблона */
-    $themePath = $this->theme->get_path();
+    $themePath = $this->theme->getPath();
     $fileTemplatePath = $themePath . '/page.tpl';
 
     if (file_exists($fileTemplatePath)) {

@@ -526,14 +526,16 @@ final class Template
         $siteKeywords = 'girvas';
         $siteCharset = 'UTF-8';
       } else {
-        $localeData = $this->CMSCore->locale->getData();
-        $systemLocaleName = $this->CMSCore->locale->getName();
+        $CMSConfigurator = $this->CMSCore->configurator;
+        $CMSLocale = $this->CMSCore->locale;
 
-        $systemConfigurator = $this->CMSCore->configurator;
-        $siteTitle = $systemConfigurator->getMetaTitle() ?: $systemConfigurator->getSiteTitle();
-        $siteDescription = $systemConfigurator->getMetaDescription() ?: $systemConfigurator->getSiteDescription();
-        $siteKeywords = $systemConfigurator->getMetaKeywordsImploded() ?: $systemConfigurator->getSiteKeywords();
-        $siteCharset = $systemConfigurator->getSiteCharset();
+        $localeData = $CMSLocale->getData();
+        $systemLocaleName = $CMSLocale->getName();
+
+        $siteTitle = $CMSConfigurator->getMetaTitle() ?: $CMSConfigurator->getSiteTitle();
+        $siteDescription = $CMSConfigurator->getMetaDescription() ?: $CMSConfigurator->getSiteDescription();
+        $siteKeywords = $CMSConfigurator->getMetaKeywordsImploded() ?: $CMSConfigurator->getSiteKeywords();
+        $siteCharset = $CMSConfigurator->getSiteCharset();
       }
 
       $systemStageDevelopingLabel = str_replace('-', '_', strtoupper($this->CMSCore->getCMSStageDeveloping()));

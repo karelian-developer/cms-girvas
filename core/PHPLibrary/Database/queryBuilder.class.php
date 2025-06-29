@@ -10,7 +10,8 @@
 
 namespace core\PHPLibrary\Database;
 
-use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;
 use \core\PHPLibrary\Database\QueryBuilder\StatementAlterTable as StatementAlterTable;
 use \core\PHPLibrary\Database\QueryBuilder\StatementCreateTable as StatementCreateTable;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect as StatementSelect;
@@ -22,15 +23,20 @@ use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatem
 class QueryBuilder
 {
   public InterfaceStatement $statement;
-  public readonly SystemCore $CMSCore;
+  public readonly CMSCore $CMSCore;
+  public readonly DMS $DMS;
 
   /**
    * __construct
    *
+   * @param CMSCore $CMSCore
+   * @param DMS $DMS
+   * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore) {
+  public function __construct(CMSCore $CMSCore, DMS $DMS = DMS::PostgreSQL) {
     $this->CMSCore = $CMSCore;
+    $this->DMS = $DMS;
   }
   
   /**

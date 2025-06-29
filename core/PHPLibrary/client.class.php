@@ -131,19 +131,21 @@ class Client
    */
   public function isLogged(int $typeID) : bool
   {
+    $CMSConfigurator = $this->CMSCore->configurator;
+
     switch ($typeID) {
       case 2: $cookieTokenName = '_grv_atoken'; break;
       default: $cookieTokenName = '_grv_utoken';
     }
 
-    $token = (isset($_COOKIE[$cookieTokenName])) ? $_COOKIE[$cookieTokenName] : '';
+    $token = $_COOKIE[$cookieTokenName] ?? '';
 
     if (isset($_COOKIE[$cookieTokenName])) {
       if (ClientSession::existsByIPAndToken($this->CMSCore, $this->ip, $token, $typeID)) {
         $session = $this->getSessionByToken($typeID, $token, ['updatedUnixTimestamp', 'token']);
-        if (!is_null($session)) {
+        if ($session !== null) {
           if ($token == $session->getToken()) {
-            if ($session->isAlive($this->CMSCore->configurator->get('sessionExpires'))) {
+            if ($session->isAlive($CMSConfigurator->get('sessionExpires'))) {
               return true;
             }
           }
@@ -166,8 +168,10 @@ class Client
    */
   public static function createCookie(SystemCore $CMSCore, string $name, ClientSession $session, int $expires) : bool
   {
-    $domainForCookies = $CMSCore->configurator->get('domainCookies');
-    $userSessionIsSecure = $CMSCore->configurator->get('SSLIsEnabled') ? true : false;
+    $CMSConfigurator = $CMSCore->configurator;
+
+    $domainForCookies = $CMSConfigurator->get('domainCookies');
+    $userSessionIsSecure = $CMSConfigurator->get('SSLIsEnabled') ? true : false;
     
     if (!is_null($domainForCookies)) {
       return setcookie($name, $session->getToken(), [
