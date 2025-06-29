@@ -114,6 +114,6 @@ final class StatementUpdate implements InterfaceStatement
       array_push($queryArray, $this->clauseWhere->assembled);
     }
 
-    $this->assembled = sprintf('UPDATE %s %s;', $this->get_table(), implode(' ', $queryArray));
+    $this->assembled = sprintf('UPDATE %s %s;', $this->getTable(), implode(' ', $queryArray));
   }
 }
