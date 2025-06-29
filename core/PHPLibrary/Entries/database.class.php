@@ -10,12 +10,12 @@
 
 namespace core\PHPLibrary\Entries;
 
-use \core\PHPLibrary\Database as Database;
+use \core\PHPLibrary\Database as CMSDatabase;
 use \core\PHPLibrary\Entries as Entries;
 
 final class Database
 {
-  private Database $database;
+  private CMSDatabase $database;
   private Entries $entries;
   private mixed $data;
   private array $conditions = [];
@@ -25,11 +25,11 @@ final class Database
   /**
    * __construct
    *
-   * @param  Database $database
+   * @param  CMSDatabase $database
    * 
    * @return void
    */
-  public function __construct(Database $database)
+  public function __construct(CMSDatabase $database)
   {
     $this->database = $database;
   }

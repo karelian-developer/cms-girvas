@@ -14,7 +14,7 @@ use \core\PHPLibrary\SystemCore as CMSCore;
 
 final class FileConnector implements InterfaceFileConnector
 {
-  private CMSCore $CMSCore;
+  private CMSCore|null $CMSCore = null;
   private string $currentDirectory = '';
   private string $startDirectory = '';
       
