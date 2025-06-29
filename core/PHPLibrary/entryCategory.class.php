@@ -202,6 +202,7 @@ class EntryCategory implements EntityTypeContent
    * Получить данные колонок записи в базе данных
    *
    * @param  array $columns
+   * 
    * @return void
    */
   private function getDatabaseColumnsData(array $columns = ['*']) : array|null
@@ -243,6 +244,7 @@ class EntryCategory implements EntityTypeContent
    *
    * @param  SystemCore $CMSCore
    * @param  int $categoryID
+   * 
    * @return bool
    */
   public static function existsByID(SystemCore $CMSCore, int $categoryID) : bool
@@ -281,6 +283,7 @@ class EntryCategory implements EntityTypeContent
    *
    * @param  SystemCore $CMSCore
    * @param  string $categoryName
+   * 
    * @return bool
    */
   public static function existsByName(SystemCore $CMSCore, string $categoryName) : bool
@@ -319,9 +322,10 @@ class EntryCategory implements EntityTypeContent
    *
    * @param  SystemCore $CMSCore
    * @param  string $categoryName
+   * 
    * @return EntryCategory
    */
-  public static function get_by_name(SystemCore $CMSCore, string $categoryName) : EntryCategory|null
+  public static function getByName(SystemCore $CMSCore, string $categoryName) : EntryCategory|null
   {
     $queryBuilder = new DatabaseQueryBuilder($CMSCore);
     $queryBuilder->setStatementSelect();
@@ -361,6 +365,7 @@ class EntryCategory implements EntityTypeContent
    * @param  int $parentID
    * @param  array $texts
    * @param  array $metadata
+   * 
    * @return EntryCategory|null
    */
   public static function create(SystemCore $CMSCore, string $name, int $parentID, array $texts, array $metadata = []) : EntryCategory|null
@@ -415,6 +420,7 @@ class EntryCategory implements EntityTypeContent
    * Обновление существующей категории записей
    *
    * @param  array $data Массив данных
+   * 
    * @return bool
    */
   public function update(array $data) : bool
