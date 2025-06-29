@@ -26,7 +26,7 @@ trait TraitPage
    */
   private function getSubnavigationItemIconPath(SystemCore $CMSCore, string $subnavigationItemName) : string
   {
-    $themePath = $this->CMSCore->theme->get_path();
+    $themePath = $this->CMSCore->theme->getPath();
     return $themePath . '/images/icons/subNavigation/' . $subnavigationItemName . '.svg';
   }
 
