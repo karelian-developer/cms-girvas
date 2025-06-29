@@ -308,7 +308,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
             $userSessionIsSecure = (bool) $CMSCore->configurator->get('SSLIsEnabled');
 
-            setcookie('_grv_utoken', $userSession->get_token(), [
+            setcookie('_grv_utoken', $userSession->getToken(), [
               'expires' => ($userRememberMe) ? $userSessionExpires : 0,
               'path' => '/',
               'domain' => $CMSCore->configurator->get('domainCookies'),
