@@ -352,7 +352,7 @@ class Entry implements EntityTypeContent
    * 
    * @return string
    */
-  public static function getPreviewDefaultURLl(SystemCore $CMSCore, int $size) : string
+  public static function getPreviewDefaultURL(SystemCore $CMSCore, int $size) : string
   {
     return '/' . $CMSCore->theme->getURL() . '/images/entry/default_' . (string) $size . '.png';
   }
