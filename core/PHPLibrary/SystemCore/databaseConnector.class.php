@@ -10,14 +10,14 @@
 
 namespace core\PHPLibrary\SystemCore;
 
-use \core\PHPLibrary\Database as Database;
+use \core\PHPLibrary\Database as CMSDatabase;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as DatabaseManagementSystem;
 use \core\PHPLibrary\SystemCore as CMSCore;
 
 final class DatabaseConnector
 {
   private CMSCore|null $CMSCore = null;
-  public \core\PHPLibrary\Database|null $database = null;
+  public CMSDatabase|null $database = null;
   
   /**
    * __construct
@@ -33,14 +33,14 @@ final class DatabaseConnector
     $this->CMSCore = $CMSCore;
 
     $databaseConfigurations = $configurator->get('database');
-    $this->database = new Database($databaseConfigurations['dms']);
+    $this->database = new CMSDatabase($databaseConfigurations['dms']);
     $this->database->setDatabaseName($databaseConfigurations['name']);
     $this->database->setDatabaseUser($databaseConfigurations['user']);
     $this->database->setDatabaseHost($databaseConfigurations['host']);
     $this->database->setDatabasePassword($databaseConfigurations['password']);
     
     if (!$isTest) {
-      $errorIsJSON = $CMSCore->urlp->get_path(0) === 'handler' ? true : false;
+      $errorIsJSON = $CMSCore->urlp->getPath(0) === 'handler' ? true : false;
       @$this->database->connect($errorIsJSON);
     }
   }
