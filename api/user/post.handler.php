@@ -51,7 +51,7 @@ if ($CMSCore->urlp->getPath(2) === 'avatar') {
           $fileConverted = $fileConverter->convert($_FILES['avatarFile'], $uploadedDirectoryUserPath, EnumFileFormat::WEBP, true);
 
           if (is_array($fileConverted)) {
-            $imageOriginalPath = CMS_ROOT_DIRECTORY . '/uploads/avatars/' . (string) $userID . '/' . $fileConverted['file_name'];
+            $imageOriginalPath = CMS_ROOT_DIRECTORY . '/uploads/avatars/' . (string) $userID . '/' . $fileConverted['fileName'];
             
             foreach ([16, 32, 64, 96, 128, 254] as $imageResizedWidth) {
               list($imageOriginalWidth, $imageOriginalHeight) = getimagesize($imageOriginalPath);
