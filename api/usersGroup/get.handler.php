@@ -49,7 +49,7 @@ if ($CMSCore->urlp->getPath(3) == 'permissions') {
     $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USERS_GROUP_ERROR_NOT_FOUND');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
-} else if ($CMSCore->urlp->getPath(3) !== null) {
+} else if ($CMSCore->urlp->getPath(3) === null) {
   $usersGroup = is_numeric($CMSCore->urlp->getPath(2) ? new UserGroup($CMSCore, $CMSCore->urlp->getPath(2)) : UserGroup::getByName($CMSCore, $CMSCore->urlp->getPath(2)));
 
   if ($usersGroup !== null) {

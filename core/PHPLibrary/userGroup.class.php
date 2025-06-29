@@ -235,10 +235,10 @@ class UserGroup
   public function getTitle($localeName = 'en_US') : string
   {
     if (property_exists($this, 'texts')) {
-      $texts_array = json_decode($this->texts, true);
+      $texts = json_decode($this->texts, true);
       
-      if (isset($texts_array[$localeName]['title'])) {
-        return $texts_array[$localeName]['title'];
+      if (isset($texts[$localeName]['title'])) {
+        return $texts[$localeName]['title'];
       }
     }
 
