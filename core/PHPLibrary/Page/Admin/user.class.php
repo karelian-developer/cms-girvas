@@ -13,7 +13,7 @@ namespace core\PHPLibrary\Page\Admin;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\User as User;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 
@@ -105,7 +105,7 @@ class PageUser implements InterfacePage
           $fieldValue = $user->getAdditionalFieldData($fieldNameTransformed) !== null ? $user->getAdditionalFieldData($fieldNameTransformed) : '';
         }
 
-        array_push($additionalFieldsElements, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/user/form/fieldTextarea.tpl', [
+        array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/user/form/fieldTextarea.tpl', [
           'FIELD_NAME' => $fieldsNames[$index],
           'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
           'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
@@ -116,7 +116,7 @@ class PageUser implements InterfacePage
           $fieldValue = $user->getAdditionalFieldData($fieldNameTransformed) !== null ? $user->getAdditionalFieldData($fieldNameTransformed) : '';
         }
 
-        array_push($additionalFieldsElements, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/user/form/fieldInput.tpl', [
+        array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/user/form/fieldInput.tpl', [
           'FIELD_NAME' => $fieldsNames[$index],
           'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
           'FIELD_TYPE' => $fieldsTypes[$index],
@@ -127,7 +127,7 @@ class PageUser implements InterfacePage
     }
 
     /** @var string Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/user.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/user.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'user',
       'USER_ID' => $user !== null ? $user->getID() : 0,
       'USER_LOGIN' => $user !== null ? $user->getLogin() : '',

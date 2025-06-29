@@ -16,7 +16,7 @@ use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\EnumMetadata as TemplateEnumMetadata;
 use \core\PHPLibrary\Template\EnumWeight as TemplateEnumWeight;
 use \core\PHPLibrary\Parsedown as Parsedown;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 
@@ -125,7 +125,7 @@ class PageTemplate implements InterfacePage
 
         if (count($themeData['screenshots']) > 0) {
           foreach ($themeData['screenshots'] as $screenshotURL) {
-            array_push($themeScreenshotsListItems, TemplateCollector::assembly('<li class="gallery__item"><img class="gallery__item-image item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
+            array_push($themeScreenshotsListItems, ThemeCollector::assembly('<li class="gallery__item"><img class="gallery__item-image item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
               'TEMPLATE_SCREENSHOT_URL' => $screenshotURL
             ]));
           }
@@ -148,7 +148,7 @@ class PageTemplate implements InterfacePage
         if (count($themeScreenshotsFiles) > 0) {
           $themeScreenshotsURL = $theme->getScreenshotsURL();
           foreach ($themeScreenshotsFiles as $file) {
-            array_push($themeScreenshotsListItems, TemplateCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
+            array_push($themeScreenshotsListItems, ThemeCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
               'TEMPLATE_SCREENSHOT_URL' => $themeScreenshotsURL . '/' . $file
             ]));
           }
@@ -217,7 +217,7 @@ class PageTemplate implements InterfacePage
             default => '<li class="template__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> {METADATA_VALUE}</li>',
           };
 
-          array_push($themeMetadataItemsTransformed, TemplateCollector::assembly($metadataValueTemplate, [
+          array_push($themeMetadataItemsTransformed, ThemeCollector::assembly($metadataValueTemplate, [
             'METADATA_TITLE' => $metadataTitle,
             'METADATA_VALUE' => $getMetadataValue($theme, $themeMetadata, $enumMetadata)
           ]));
@@ -225,7 +225,7 @@ class PageTemplate implements InterfacePage
       }
 
       if (count($themeScreenshotsListItems) > 0) {
-        $themeGalleryList = TemplateCollector::assembly('<ul class="gallery__list list list-reset">{TEMPLATE_GALLARY_LIST_ITEMS}</ul>', [
+        $themeGalleryList = ThemeCollector::assembly('<ul class="gallery__list list list-reset">{TEMPLATE_GALLARY_LIST_ITEMS}</ul>', [
           'TEMPLATE_GALLARY_LIST_ITEMS' => implode($themeScreenshotsListItems)
         ]);
       } else {
@@ -233,7 +233,7 @@ class PageTemplate implements InterfacePage
       }
 
       if (count($themeMetadataItemsTransformed) > 0) {
-        $themeMetadataListTransformed = TemplateCollector::assembly('<ul class="template__metadata-list metadata-list list-reset">{METADATA_LIST}</ul>', [
+        $themeMetadataListTransformed = ThemeCollector::assembly('<ul class="template__metadata-list metadata-list list-reset">{METADATA_LIST}</ul>', [
           'METADATA_LIST' => implode($themeMetadataItemsTransformed)
         ]);
       } else {
@@ -242,7 +242,7 @@ class PageTemplate implements InterfacePage
 
       $parsedown = new Parsedown();
 
-      $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/template.tpl', [
+      $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/template.tpl', [
         'ADMIN_PANEL_PAGE_NAME' => 'template',
         'TEMPLATE_NAME' => $themeName,
         'TEMPLATE_TITLE' => $themeTitle,

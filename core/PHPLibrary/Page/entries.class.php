@@ -19,7 +19,7 @@ use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class PageEntries implements InterfacePage
 {
@@ -152,7 +152,7 @@ class PageEntries implements InterfacePage
         $categoryTitle = strip_tags($categoryTitle);
 
         if (!empty($entryTitle) && !empty($entryDescription) && !empty($entryContent)) {
-          array_push($entriesArrayRemplates, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/entriesList/item.tpl', [
+          array_push($entriesArrayRemplates, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/entriesList/item.tpl', [
             'ENTRY_ID' => $entryObject->getID(),
             'ENTRY_TITLE' => $entryTitle,
             'ENTRY_DESCRIPTION' => $entryDescription,
@@ -189,12 +189,12 @@ class PageEntries implements InterfacePage
       $pagination = new Pagination($this->CMSCore, $entriesCount, $entriesCountOnPage, $paginationItemCurrent);
       $pagination->assembly();
 
-      $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+      $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
         'PAGE_NAME' => 'entries',
-        'PAGE_CONTENT' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries.tpl', [
+        'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries.tpl', [
           'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
           'ENTRIES_CATEGORY_TITLE' => ($categoryName == 'all') ? $localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_LABEL'] : $category->getTitle($localeName),
-          'ENTRIES_LIST' => (!empty($entriesArrayRemplates)) ? TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/entriesList/list.tpl', [
+          'ENTRIES_LIST' => (!empty($entriesArrayRemplates)) ? ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/entriesList/list.tpl', [
             'ENTRIES_LIST_ITEMS' => implode($entriesArrayRemplates)
           ]) : sprintf('<div class="page__simple-note">%s</div>', $localeData['PAGE_ENTRIES_NOT_FOUND_LABEL']),
           'ENTRIES_PAGINATION' => (!empty($entriesArrayRemplates)) ? $pagination->assembled : ''

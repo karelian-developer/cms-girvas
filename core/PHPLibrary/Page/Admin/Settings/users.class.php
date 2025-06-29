@@ -14,7 +14,7 @@ namespace core\PHPLibrary\Page\Admin\Settings;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Template as Template;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class SettingsUsers
 {
@@ -63,7 +63,7 @@ class SettingsUsers
     $settingPasswordSpecialSymbolsStatusValue = $this->CMSCore->configurator->getUsersPasswordSpecialSymbolsStatus();
     $settingLoginsBlacklistStatusValue = $this->CMSCore->configurator->getUsersLoginsBlacklistStatus();
 
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
       'SETTINGS_NAME' => $this->name,
       'SETTING_USERS_UPLOAD_AVATAR_STATUS_VALUE' => $settingUploadAvatarStatusValue,
       'SETTING_USERS_UPLOAD_AVATAR_CHECKED_VALUE' => $settingUploadAvatarStatusValue === 'on' ? 'checked' : '',

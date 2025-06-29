@@ -21,7 +21,7 @@ use \core\PHPLibrary\Metrics as Metrics;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\Pages as PagesStatic;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\Pagination as Pagination;
 use \core\PHPLibrary\Users as Users;
@@ -305,15 +305,15 @@ class PageAnalytics implements InterfacePage
     } else {
       /** @var array Преобразованные элементы навигации */
       $navigationsItemsTransformed = [];
-      array_push($navigationsItemsTransformed, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/navigationHorizontal/item.tpl', [
+      array_push($navigationsItemsTransformed, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/navigationHorizontal/item.tpl', [
         'NAVIGATION_ITEM_TITLE' => sprintf('< %s', '{LANG:PAGE_ENTRIES_NAVIGATION_INDEX_LABEL}'),
         'NAVIGATION_ITEM_URL' => '/admin',
         'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
       ]));
 
       if (!empty($navigationsItemsTransformed)) {
-        $pageNavigationTransformed = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/navigationHorizontal.tpl', [
-          'NAVIGATION_LIST' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/navigationHorizontal/list.tpl', [
+        $pageNavigationTransformed = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/navigationHorizontal.tpl', [
+          'NAVIGATION_LIST' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/navigationHorizontal/list.tpl', [
             'NAVIGATION_ITEMS' => implode($navigationsItemsTransformed)
           ])
         ]);
@@ -355,7 +355,7 @@ class PageAnalytics implements InterfacePage
       }
 
       /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/analytics.tpl', [
+      $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/analytics.tpl', [
         'PAGE_NAVIGATION' => $pageNavigationTransformed,
         'ADMIN_PANEL_PAGE_NAME' => 'analytics',
         'ENTRIES_LIST_ITEMS' => $entriesTableAssembled,

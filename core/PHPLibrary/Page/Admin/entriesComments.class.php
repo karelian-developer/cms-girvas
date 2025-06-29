@@ -15,7 +15,7 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\EntryComments as EntryComments;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
@@ -137,7 +137,7 @@ class PageEntriesComments implements InterfacePage
         $createdDateTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
         $updatedDateTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
-        array_push($commentsTableItemsAssembled, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesComments/tableItem.tpl', [
+        array_push($commentsTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesComments/tableItem.tpl', [
           'COMMENT_ID' => $object->get_id(),
           'COMMENT_IS_HIDDEN_STATUS' => var_export($object->isHidden(), true),
           'COMMENT_HIDDEN_REASON' => strip_tags($object->getHiddenReason()),
@@ -149,12 +149,12 @@ class PageEntriesComments implements InterfacePage
       }
     }
 
-    $templateCommentsTable = !empty($entriesObjects) ? TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesComments/table.tpl', [
+    $templateCommentsTable = !empty($entriesObjects) ? ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesComments/table.tpl', [
       'ADMIN_PANEL_COMMENTS_TABLE_ITEMS' => implode($commentsTableItemsAssembled)
     ]) : $localeData['PAGE_ENTRIES_COMMENTS_NOT_FOUND_LABEL'];
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesComments.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesComments.tpl', [
       'PAGE_ENTRIES_COMMENTS_PAGINATION' => $pagination->assembled,
       'ADMIN_PANEL_PAGE_NAME' => 'comments',
       'ADMIN_PANEL_COMMENTS_TABLE' => $templateCommentsTable

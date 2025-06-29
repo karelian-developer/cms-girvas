@@ -12,7 +12,7 @@ namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 
@@ -143,11 +143,11 @@ class PageSettings implements InterfacePage
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/settings.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/settings.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'settings',
       'SETTINGS_TITLE' => $settingsTitle ?? $localeData['PAGE_SETTINGS_GROUP_NOT_FOUND_TITLE'],
       'SETTINGS_DESCRIPTION' => $settingsDescription ?? $localeData['PAGE_SETTINGS_GROUP_NOT_FOUND_DESCRIPTION'],
-      'SETTINGS_FORM' => TemplateCollector::assembly($settings->assembled, [])
+      'SETTINGS_FORM' => ThemeCollector::assembly($settings->assembled, [])
     ]);
   }
 }

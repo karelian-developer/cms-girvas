@@ -13,7 +13,7 @@ namespace core\PHPLibrary\Page\Admin;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\UserGroup as UserGroup;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 
@@ -71,7 +71,7 @@ class PageUserGroup implements InterfacePage
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/userGroup.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/userGroup.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'user-group',
       'USER_GROUP_ID' => $userGroup !== null ? $userGroup->getID() : 0,
       'USER_GROUP_NAME' => $userGroup !== null ? $userGroup->getName() : '',

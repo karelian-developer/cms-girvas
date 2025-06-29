@@ -17,7 +17,7 @@ use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class PageEntry implements InterfacePage
 {
@@ -133,7 +133,7 @@ class PageEntry implements InterfacePage
 
             $entryCommentContent = strip_tags($entryComment->getContent());
 
-            array_push($entryCommentsTransformedArray, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/comment.tpl', [
+            array_push($entryCommentsTransformedArray, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/comment.tpl', [
               'COMMENT_ID' => $entryComment->getID(),
               'COMMENT_INDEX' => $entryCommentIndex,
               'COMMENT_CREATED_DATE_TIMESTAMP' => date('d.m.Y H:i:s', $entryComment->getCreatedUnixTimestamp()),
@@ -147,7 +147,7 @@ class PageEntry implements InterfacePage
           }
 
           if (count($commentsArray) > 0) {
-            $entryCommentsTransformed = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/commentsList.tpl', [
+            $entryCommentsTransformed = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/commentsList.tpl', [
               'COMMENTS_ITEMS' => implode($entryCommentsTransformedArray)
             ]);
           }
@@ -227,9 +227,9 @@ class PageEntry implements InterfacePage
           /**
            * @property string Собранный шаблон в виде строки
            */
-          $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+          $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
             'PAGE_NAME' => 'entry',
-            'PAGE_CONTENT' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry.tpl', $pageTemplateVariables)
+            'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry.tpl', $pageTemplateVariables)
           ]);
         } else {
           http_response_code(404);

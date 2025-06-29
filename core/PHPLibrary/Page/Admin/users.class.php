@@ -15,7 +15,7 @@ use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\Users as Users;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
@@ -111,7 +111,7 @@ class PageUsers implements InterfacePage
       $usersGroupTitle = $userGroupObject->get_title($usersLocaleName);
       $usersGroupTitle = strip_tags($usersGroupTitle);
 
-      array_push($usersTableItemsAssembled, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/users/tableItem.tpl', [
+      array_push($usersTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/users/tableItem.tpl', [
         'USER_ID' => $object->getID(),
         'USER_INDEX' => $userNumber,
         'USER_LOGIN' => strip_tags($object->getLogin()),
@@ -125,10 +125,10 @@ class PageUsers implements InterfacePage
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/users.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/users.tpl', [
       'PAGE_USERS_PAGINATION' => $pagination->assembled,
       'ADMIN_PANEL_PAGE_NAME' => 'users',
-      'ADMIN_PANEL_USERS_TABLE' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/users/table.tpl', [
+      'ADMIN_PANEL_USERS_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/users/table.tpl', [
         'ADMIN_PANEL_USERS_TABLE_ITEMS' => implode($usersTableItemsAssembled)
       ])
     ]);

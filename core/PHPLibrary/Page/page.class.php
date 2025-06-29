@@ -16,7 +16,7 @@ use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class PagePage implements InterfacePage
 {
@@ -158,9 +158,9 @@ class PagePage implements InterfacePage
           /** @var string Путь до персонального шаблона */
           $personalTemplatePath = $pageStatic->existsPersonalTemplateFile() ? 'templates/' . $pageStatic->getPersonalTemplatePath() : 'templates/page/static.tpl';
 
-          $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+          $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
             'PAGE_NAME' => 'static',
-            'PAGE_CONTENT' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, $personalTemplatePath, $pageTemplateVariables)
+            'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, $personalTemplatePath, $pageTemplateVariables)
           ]);
         } else {
           http_response_code(404);

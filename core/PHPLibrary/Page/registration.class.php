@@ -15,7 +15,7 @@ use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\User as User;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class PageRegistration implements InterfacePage
 {
@@ -50,9 +50,9 @@ class PageRegistration implements InterfacePage
 
     if ($this->CMSCore->urlp->getParam('submit') === null && $this->CMSCore->urlp->getParam('refusal') === null) {
       if (!$this->CMSCore->client->isLogged(1)) {
-        $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+        $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
           'PAGE_NAME' => 'registration',
-          'PAGE_CONTENT' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registration.tpl', [])
+          'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registration.tpl', [])
         ]);
       } else {
         http_response_code(503);
@@ -71,17 +71,17 @@ class PageRegistration implements InterfacePage
           if ($userDataIsUpdated) {
             User::deleteRegistrationSubmitBySubmitToken($this->CMSCore, $this->CMSCore->urlp->getParam('submit'));
 
-            $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+            $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
               'PAGE_NAME' => 'registration',
-              'PAGE_CONTENT' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registrationSubmit.tpl', [
+              'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registrationSubmit.tpl', [
                 'REGISTRATION_SUBMIT_TITLE' => $localeData['PAGE_REGISTRATION_CONFIRMATION_TITLE'],
                 'REGISTRATION_SUBMIT_TEXT' => $localeData['PAGE_REGISTRATION_CONFIRMATION_SUCCESS_DESCRIPTION']
               ])
             ]);
           } else {
-            $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+            $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
               'PAGE_NAME' => 'registration',
-              'PAGE_CONTENT' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registrationSubmit.tpl', [
+              'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registrationSubmit.tpl', [
                 'REGISTRATION_SUBMIT_TITLE' => $localeData['PAGE_REGISTRATION_CONFIRMATION_TITLE'],
                 'REGISTRATION_SUBMIT_TEXT' => $localeData['PAGE_REGISTRATION_CONFIRMATION_FAIL_DESCRIPTION']
               ])
@@ -103,17 +103,17 @@ class PageRegistration implements InterfacePage
           if ($userIsDeleted) {
             User::deleteRegistrationSubmitByRefusalToken($this->CMSCore, $this->CMSCore->urlp->getParam('refusal'));
 
-            $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+            $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
               'PAGE_NAME' => 'registration',
-              'PAGE_CONTENT' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registrationSubmit.tpl', [
+              'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registrationSubmit.tpl', [
                 'REGISTRATION_SUBMIT_TITLE' => $localeData['PAGE_REGISTRATION_CANCELLATION_TITLE'],
                 'REGISTRATION_SUBMIT_TEXT' => $localeData['PAGE_REGISTRATION_CANCELLATION_SUCCESS_DESCRIPTION']
               ])
             ]);
           } else {
-            $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+            $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
               'PAGE_NAME' => 'registration',
-              'PAGE_CONTENT' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registrationSubmit.tpl', [
+              'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registrationSubmit.tpl', [
                 'REGISTRATION_SUBMIT_TITLE' => $localeData['PAGE_REGISTRATION_CANCELLATION_TITLE'],
                 'REGISTRATION_SUBMIT_TEXT' => $localeData['PAGE_REGISTRATION_CANCELLATION_FAIL_DESCRIPTION']
               ])

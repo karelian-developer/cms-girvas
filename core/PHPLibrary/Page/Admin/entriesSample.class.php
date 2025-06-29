@@ -14,7 +14,7 @@ namespace core\PHPLibrary\Page\Admin;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\EntriesSample as EntriesSample;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 
@@ -69,7 +69,7 @@ class PageEntriesSample implements InterfacePage
     }
     
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entriesSample.tpl', [
+    $this->assembled = ThemeCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entriesSample.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'entries-category',
       'ENTRIES_SAMPLE_ID' => $entriesSample !== null ? $entriesSample->getID() : 0,
       'ENTRIES_SAMPLE_TITLE' => $entriesSample !== null ? $entriesSample->getTitle($localeName) : '',

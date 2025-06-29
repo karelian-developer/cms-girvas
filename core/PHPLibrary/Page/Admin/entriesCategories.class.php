@@ -15,7 +15,7 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\EntriesCategories as EntriesCategories;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
@@ -118,7 +118,7 @@ class PageEntriesCategories implements InterfacePage
       $entriesCategoryTitle = $object->getTitle($entriesCategoriesLocaleName);
       $entriesCategoryTitle = strip_tags($entriesCategoryTitle);
 
-      array_push($entriesCategoriesTableItemsAssembled, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesCategories/tableItem.tpl', [
+      array_push($entriesCategoriesTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesCategories/tableItem.tpl', [
         'ENTRIES_CATEGORY_ID' => $object->getID(),
         'ENTRIES_CATEGORY_INDEX' => $index + 1,
         'ENTRIES_CATEGORY_TITLE' => !empty($entriesCategoryTitle) ? $entriesCategoryTitle : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $entriesCategoriesLocaleName),
@@ -129,10 +129,10 @@ class PageEntriesCategories implements InterfacePage
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesCategories.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesCategories.tpl', [
       'PAGE_ENTRIES_CATEGORIES_PAGINATION' => $pagination->assembled,
       'ADMIN_PANEL_PAGE_NAME' => 'entries-categories',
-      'ADMIN_PANEL_ENTRIES_CATEGORIES_TABLE' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesCategories/table.tpl', [
+      'ADMIN_PANEL_ENTRIES_CATEGORIES_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesCategories/table.tpl', [
         'ADMIN_PANEL_ENTRIES_CATEGORIES_TABLE_ITEMS' => implode($entriesCategoriesTableItemsAssembled)
       ])
     ]);

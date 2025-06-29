@@ -15,7 +15,7 @@ use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\Entry as Entry;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 
 class PageIndex implements InterfacePage
@@ -95,7 +95,7 @@ class PageIndex implements InterfacePage
       $categoryTitle = strip_tags($categoryTitle); 
 
       if ($entryObject->isPublished() && $categoryObject->isShowedOnIndexPage()) {
-        array_push($entriesArrayTemplates, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/entriesList/item.tpl', [
+        array_push($entriesArrayTemplates, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/entriesList/item.tpl', [
           'ENTRY_ID' => $entryObject->getID(),
           'ENTRY_TITLE' => $entryTitle,
           'ENTRY_DESCRIPTION' => $entryDescription,
@@ -127,10 +127,10 @@ class PageIndex implements InterfacePage
 
     unset($entriesObjects);
 
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
       'PAGE_NAME' => 'index',
-      'PAGE_CONTENT' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index.tpl', [
-        'ENTRIES_LIST' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/entriesList/list.tpl', [
+      'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index.tpl', [
+        'ENTRIES_LIST' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/entriesList/list.tpl', [
           'ENTRIES_LIST_ITEMS' => implode($entriesArrayTemplates)
         ])
       ])

@@ -14,7 +14,7 @@ namespace core\PHPLibrary\Page\Admin\Settings;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Template as Template;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 /**
  * Class SettingsBase
@@ -122,7 +122,7 @@ class SettingsBase
     /** @var string */
     $settingSectionAnalyticsStatusValue = $this->CMSCore->configurator->getSectionAnalyticsStatus();
 
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
       'SETTINGS_NAME' => $this->name,
       'SETTING_SITE_TITLE_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('base_site_title') ? $this->CMSCore->configurator->getDatabaseEntryValue('base_site_title') : '',
       'SETTING_ENGINEERING_WORKS_TEXT_VALUE' => $settingEngineeringWorksTextValue,

@@ -14,7 +14,7 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\Module as Module;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
@@ -114,7 +114,7 @@ class PageModules implements InterfacePage
               $metadataAuthorName = isset($data['metadata']['authorName']) ? $data['metadata']['authorName'] : 'Anonymous';
               $metadataCategoryName = isset($data['metadata']['categoryName']) ? $data['metadata']['categoryName'] : 'default';
 
-              array_push($modulesListItemsTransformed, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/modules/listItem.tpl', [
+              array_push($modulesListItemsTransformed, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/modules/listItem.tpl', [
                 'MODULE_NAME' => $name,
                 'MODULE_TITLE' => $metadataTitle,
                 'MODULE_DESCRIPTION' => $parsedown->text($metadataDescription),
@@ -147,7 +147,7 @@ class PageModules implements InterfacePage
           $moduleEnabledStatus = $module->isEnabled() ? 'enabled' : 'disabled';
 
           if ($module->existsFileMetadataJSON()) {
-            array_push($modulesListItemsTransformed, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/modules/listItem.tpl', [
+            array_push($modulesListItemsTransformed, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/modules/listItem.tpl', [
               'MODULE_NAME' => $module->getName(),
               'MODULE_TITLE' => $module->getTitle(),
               'MODULE_DESCRIPTION' => $parsedown->text($module->getDescription()),
@@ -176,10 +176,10 @@ class PageModules implements InterfacePage
       $this->assembled = $modulePage->assembled;
     } else {
       /** @var string $assembled Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/modules.tpl', [
+      $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/modules.tpl', [
         'PAGE_MODULES_PAGINATION' => $pagination->assembled,
         'ADMIN_PANEL_PAGE_NAME' => 'modules',
-        'MODULES_LIST' => !empty($modulesListItemsTransformed) ? TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/modules/list.tpl', [
+        'MODULES_LIST' => !empty($modulesListItemsTransformed) ? ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/modules/list.tpl', [
           'MODULES_LIST_ITEMS' => implode($modulesListItemsTransformed)
         ]) : sprintf('<p class="page__content-phar">%s</p>', $localeData['PAGE_MODULES_MODULES_INSTALLED_NOT_FOUND_TITLE'])
       ]);

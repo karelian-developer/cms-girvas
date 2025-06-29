@@ -14,7 +14,7 @@ namespace core\PHPLibrary\Page\Admin\Settings;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Template as Template;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class SettingsPages
 {
@@ -56,7 +56,7 @@ class SettingsPages
   {
     $formTemplatePath = self::FORM_PATH . '/' . $this->name . '.tpl';
     
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
       'SETTINGS_NAME' => $this->name
     ]);
   }

@@ -14,7 +14,7 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Report as SystemCoreReport;
 use \core\PHPLibrary\SystemCore\Reports as SystemCoreReports;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
@@ -89,9 +89,9 @@ final class PageReports implements InterfacePage
       $reportCategoryName = 'security';
       $reportVariables = $report->getVariables();
 
-      array_push($reportsSecurityAssembled, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports/listItem.tpl', [
+      array_push($reportsSecurityAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports/listItem.tpl', [
         'REPORT_CATEGORY_NAME' => $reportCategoryName,
-        'REPORT_CONTENT' =>TemplateCollector::assembly(TemplateCollector::assemblyLocale($report->getContent(), $this->CMSCore->locale), [
+        'REPORT_CONTENT' =>ThemeCollector::assembly(ThemeCollector::assemblyLocale($report->getContent(), $this->CMSCore->locale), [
           'CLIENT_IP' => $reportVariables['clientIP'] ?? '0.0.0.0',
           'DATE' => $reportVariables['date'] ?? date('d.m.Y H:i:s', time()),
           'ENTRY_TITLE' => $reportVariables['entryTitle'] ?? '[ ??? ]',
@@ -106,9 +106,9 @@ final class PageReports implements InterfacePage
       $reportCategoryName = 'common';
       $reportVariables = $report->getVariables();
 
-      array_push($reportsCommonAssembled, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports/listItem.tpl', [
+      array_push($reportsCommonAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports/listItem.tpl', [
         'REPORT_CATEGORY_NAME' => $reportCategoryName,
-        'REPORT_CONTENT' =>TemplateCollector::assembly(TemplateCollector::assemblyLocale($report->getContent(), $this->CMSCore->locale), [
+        'REPORT_CONTENT' =>ThemeCollector::assembly(ThemeCollector::assemblyLocale($report->getContent(), $this->CMSCore->locale), [
           'CLIENT_IP' => $reportVariables['clientIP'] ?? '0.0.0.0',
           'DATE' => $reportVariables['date'] ?? date('d.m.Y H:i:s', time()),
           'ENTRY_TITLE' => $reportVariables['entryTitle'] ?? '[ ??? ]',
@@ -118,12 +118,12 @@ final class PageReports implements InterfacePage
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'reports',
-      'REPORTS_SECURITY_LIST' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports/list.tpl', [
+      'REPORTS_SECURITY_LIST' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports/list.tpl', [
         'REPORTS_LIST_ITEMS' => implode($reportsSecurityAssembled)
       ]),
-      'REPORTS_COMMON_LIST' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports/list.tpl', [
+      'REPORTS_COMMON_LIST' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports/list.tpl', [
         'REPORTS_LIST_ITEMS' => implode($reportsCommonAssembled)
       ])
     ]);

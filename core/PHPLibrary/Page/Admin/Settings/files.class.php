@@ -14,7 +14,7 @@ namespace core\PHPLibrary\Page\Admin\Settings;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Template as Template;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class SettingsFiles
 {
@@ -89,7 +89,7 @@ class SettingsFiles
     
     $settingAutoConvertFileImageStatusValue = $this->CMSCore->configurator->getAutoConvertFileImageStatus();
 
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
       'SETTINGS_NAME' => $this->name,
       // Максимальный вес файла
       'SETTING_UPLOAD_FILE_WEIGHT_MAX_VALUE' => $this->CMSCore->configurator->getUploadFileWeightMax(),

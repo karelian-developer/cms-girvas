@@ -14,7 +14,7 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\Template as Template;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
@@ -111,7 +111,7 @@ class PageTemplates implements InterfacePage
             $metadataAuthorName = isset($data['metadata']['authorName']) ? $data['metadata']['authorName'] : 'Anonymous';
             $metadataCategoryName = isset($data['metadata']['categoryName']) ? $data['metadata']['categoryName'] : 'default';
 
-            array_push($themesListItemsTransformed, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates/listItem.tpl', [
+            array_push($themesListItemsTransformed, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates/listItem.tpl', [
               'TEMPLATE_NAME' => $name,
               'TEMPLATE_TITLE' => $metadataTitle,
               'TEMPLATE_DESCRIPTION' => $parsedown->text($metadataDescription),
@@ -138,7 +138,7 @@ class PageTemplates implements InterfacePage
           $themeInstalledStatus = $theme->existsFileMetadataJSON() ? 'installed' : 'not-installed';
           
           if ($theme->existsFileMetadataJSON()) {
-            array_push($themesListItemsTransformed, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates/listItem.tpl', [
+            array_push($themesListItemsTransformed, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates/listItem.tpl', [
               'TEMPLATE_NAME' => $theme->getName(),
               'TEMPLATE_TITLE' => $theme->get_title(),
               'TEMPLATE_DESCRIPTION' => $parsedown->text($theme->getDescription()),
@@ -168,10 +168,10 @@ class PageTemplates implements InterfacePage
       $this->assembled = $themePage->assembled;
     } else {
       /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates.tpl', [
+      $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates.tpl', [
         'PAGE_TEMPLATES_PAGINATION' => $pagination->assembled,
         'ADMIN_PANEL_PAGE_NAME' => 'templates',
-        'TEMPLATES_LIST' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates/list.tpl', [
+        'TEMPLATES_LIST' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates/list.tpl', [
           'TEMPLATES_LIST_ITEMS' => implode('', $themesListItemsTransformed)
         ])
       ]);

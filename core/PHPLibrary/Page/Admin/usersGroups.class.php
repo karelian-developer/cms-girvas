@@ -14,7 +14,7 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\UsersGroups as UsersGroups;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
@@ -105,7 +105,7 @@ class PageUsersGroups implements InterfacePage
       $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
       $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
-      array_push($usersGroupsTableItemsAssembled, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/usersGroups/tableItem.tpl', [
+      array_push($usersGroupsTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/usersGroups/tableItem.tpl', [
         'USER_GROUP_ID' => $object->getID(),
         'USER_GROUP_INDEX' => $userGroupNumber,
         'USER_GROUP_NAME' => $object->getName(),
@@ -119,10 +119,10 @@ class PageUsersGroups implements InterfacePage
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/usersGroups.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/usersGroups.tpl', [
       'PAGE_USERS_GROUPS_PAGINATION' => $pagination->assembled,
       'ADMIN_PANEL_PAGE_NAME' => 'users-groups',
-      'ADMIN_PANEL_USERS_GROUPS_TABLE' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/usersGroups/table.tpl', [
+      'ADMIN_PANEL_USERS_GROUPS_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/usersGroups/table.tpl', [
         'ADMIN_PANEL_USERS_GROUPS_TABLE_ITEMS' => implode($usersGroupsTableItemsAssembled)
       ])
     ]);

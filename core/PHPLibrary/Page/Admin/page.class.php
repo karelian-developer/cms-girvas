@@ -13,7 +13,7 @@ namespace core\PHPLibrary\Page\Admin;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\PageStatic as PageStatic;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \DOMDocument as DOMDocument;
@@ -114,7 +114,7 @@ class PagePage implements InterfacePage
 
         $documentString = $document->saveHTML($element);
 
-        array_push($additionaFieldsElements, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
+        array_push($additionaFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
           'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
           'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
           'FIELD_INPUT' => $documentString
@@ -138,7 +138,7 @@ class PagePage implements InterfacePage
 
         $documentString = $document->saveHTML($element);
 
-        array_push($additionaFieldsElements, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
+        array_push($additionaFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
           'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
           'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
           'FIELD_INPUT' => $documentString
@@ -147,9 +147,9 @@ class PagePage implements InterfacePage
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/pageStatic.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/pageStatic.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'page-static',
-      'PAGE_STATIC_EDITOR' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/pageStatic/editor.tpl', []),
+      'PAGE_STATIC_EDITOR' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/pageStatic/editor.tpl', []),
       'PAGE_STATIC_ID' => $pageStatic !== null ? $pageStatic->getID() : 0,
       'PAGE_STATIC_TITLE' => $pageStatic !== null ? $pageStatic->getTitle($localeName) : '',
       'PAGE_STATIC_DESCRIPTION' => $pageStatic !== null ? $pageStatic->getDescription($localeName) : '',

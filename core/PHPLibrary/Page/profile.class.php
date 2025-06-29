@@ -16,7 +16,7 @@ use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class PageProfile implements InterfacePage
 {
@@ -105,7 +105,7 @@ class PageProfile implements InterfacePage
                   }
                 }
 
-                array_push($additionalFieldsElements, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/editor/fieldInput.tpl', [
+                array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/editor/fieldInput.tpl', [
                   'FIELD_NAME' => $fieldName,
                   'FIELD_TYPE' => $fieldType === 'textarea' ? '' : $fieldType,
                   'FIELD_TITLE' => $fieldTitle,
@@ -115,9 +115,9 @@ class PageProfile implements InterfacePage
               }
             }
 
-            $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+            $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
               'PAGE_NAME' => 'profile-editor',
-              'PAGE_CONTENT' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/editor.tpl', [
+              'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/editor.tpl', [
                 'USER_ID' => $profileUser->getID(),
                 'USER_LOGIN' => $profileUser->getLogin(),
                 'USER_AVATAR_URL' => $profileUser->getAvatarURL(128),
@@ -147,15 +147,15 @@ class PageProfile implements InterfacePage
             }
             $fieldNameTransformed = implode($fieldNameExploded);
 
-            array_push($additionalFieldsElements, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/additionalField.tpl', [
+            array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/additionalField.tpl', [
               'FIELD_TITLE' => $fieldsTitles[$localeName][$fieldIndex],
               'FIELD_VALUE' => $profileUser->getAdditionalFieldData($fieldNameTransformed) !== null ? strip_tags($profileUser->getAdditionalFieldData($fieldNameTransformed)) : ''
             ]));
           }
 
-          $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+          $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
             'PAGE_NAME' => 'profile',
-            'PAGE_CONTENT' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile.tpl', [
+            'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile.tpl', [
               'USER_ID' => $profileUser->getID(),
               'USER_LOGIN' => $profileUser->getLogin(),
               'USER_AVATAR_URL' => $profileUser->getAvatarURL(128),

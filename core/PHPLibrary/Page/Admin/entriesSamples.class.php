@@ -15,7 +15,7 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\EntriesSamples as EntriesSamples;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
@@ -148,10 +148,10 @@ class PageEntriesSamples implements InterfacePage
     }
 
     // Присвоение значений заголовкам колонок таблицы
-    $tableCellsHeadersElements[1]->nodeValue = $this->CMSCore->locale->get_single_value_by_key('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_TITLE_LABEL');
-    $tableCellsHeadersElements[2]->nodeValue = $this->CMSCore->locale->get_single_value_by_key('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_COUNT_LABEL');
-    $tableCellsHeadersElements[3]->nodeValue = $this->CMSCore->locale->get_single_value_by_key('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_CREATED_DATE_TIMESTAMP_LABEL');
-    $tableCellsHeadersElements[4]->nodeValue = $this->CMSCore->locale->get_single_value_by_key('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_UPDATED_DATE_TIMESTAMP_LABEL');
+    $tableCellsHeadersElements[1]->nodeValue = $this->CMSCore->locale->getSingleValueByKey('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_TITLE_LABEL');
+    $tableCellsHeadersElements[2]->nodeValue = $this->CMSCore->locale->getSingleValueByKey('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_COUNT_LABEL');
+    $tableCellsHeadersElements[3]->nodeValue = $this->CMSCore->locale->getSingleValueByKey('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_CREATED_DATE_TIMESTAMP_LABEL');
+    $tableCellsHeadersElements[4]->nodeValue = $this->CMSCore->locale->getSingleValueByKey('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_UPDATED_DATE_TIMESTAMP_LABEL');
 
     // Добавление DOM-элементов в DOM-элемент $tableRowHeaderElement
     foreach ($tableCellsHeadersElements as $index => $element) {
@@ -232,7 +232,7 @@ class PageEntriesSamples implements InterfacePage
     // Добавление DOM-элемента в конструктор DOM-документ
     $document->appendChild($tableElement);
 
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesSamples.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesSamples.tpl', [
       'PAGE_ENTRIES_SAMPLES_PAGINATION' => $pagination->assembled,
       'PAGE_ENTRIES_SAMPLES_TABLE' => $document->saveHTML()
     ]);

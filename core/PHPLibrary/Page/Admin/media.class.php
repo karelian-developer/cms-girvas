@@ -14,7 +14,7 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\Template as Template;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\Pagination as Pagination;
 
@@ -72,7 +72,7 @@ class PageMedia implements InterfacePage
     $mediaFilesTransformed = [];
     foreach ($mediaFilesSorted as $file) {
       $URL = '/uploads/media/' . $file;
-      array_push($mediaFilesTransformed, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/media/listItem.tpl', [
+      array_push($mediaFilesTransformed, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/media/listItem.tpl', [
         'MEDIA_FILE_URL' => $URL,
         'MEDIA_FILE_FULLNAME' => $file
       ]));
@@ -82,7 +82,7 @@ class PageMedia implements InterfacePage
     $pagination->assembly();
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/media.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/media.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'media',
       'PAGE_MEDIA_PAGINATION' => $pagination->assembled,
       'MEDIA_LIST_ITEMS' => implode($mediaFilesTransformed)

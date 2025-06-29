@@ -14,7 +14,7 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\Template as Template;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\Feed\Importer as FeedImporter;
 
@@ -48,7 +48,7 @@ class PageAbout implements InterfacePage
     if (isset($feedXML->channel->item) && $feedXML != false) {
       $countMax = 3; $itemIndex = 0;
       foreach ($feedXML->channel->item as $item) {
-        array_push($feedItemsAssembled, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/feed/listItem.tpl', [
+        array_push($feedItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/feed/listItem.tpl', [
           'ITEM_TITLE' => $item->title,
           'ITEM_DESCRIPTION' => $item->description,
           'ITEM_LINK' => $item->link
@@ -64,7 +64,7 @@ class PageAbout implements InterfacePage
 
     $feedLastNewsList = $localeData['PAGE_INDEX_SIDEBAR_BLOCK_WEB_CHANNEL_ENTRIES_NOT_FOUND_LABEL'];
     if (count($feedItemsAssembled) > 0) {
-      $feedLastNewsList = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/feed/list.tpl', [
+      $feedLastNewsList = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/feed/list.tpl', [
         'WEB_CHANNEL_ITEMS' => implode($feedItemsAssembled)
       ]);
     }
@@ -83,7 +83,7 @@ class PageAbout implements InterfacePage
       
       foreach ($feedXML->channel as $channel) {
         foreach ($channel->item as $item) {
-          array_push($feedItemsAssembled, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/feed/listItem.tpl', [
+          array_push($feedItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/feed/listItem.tpl', [
             'ITEM_TITLE' => $item->title,
             'ITEM_DESCRIPTION' => $item->description,
             'ITEM_LINK' => $item->link
@@ -100,13 +100,13 @@ class PageAbout implements InterfacePage
 
     $feedLastReleasesList = $localeData['PAGE_INDEX_SIDEBAR_BLOCK_WEB_CHANNEL_ENTRIES_NOT_FOUND_LABEL'];
     if (count($feedItemsAssembled) > 0) {
-      $feedLastReleasesList = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/feed/list.tpl', [
+      $feedLastReleasesList = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/feed/list.tpl', [
         'WEB_CHANNEL_ITEMS' => implode($feedItemsAssembled)
       ]);
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/about.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/about.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'about',
       'WEB_CHANNEL_LATEST_NEWS_LIST' => $feedLastNewsList,
       'WEB_CHANNEL_LATEST_RELEASES_LIST' => $feedLastReleasesList,

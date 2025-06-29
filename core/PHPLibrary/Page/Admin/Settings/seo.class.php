@@ -14,7 +14,7 @@ namespace core\PHPLibrary\Page\Admin\Settings;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Template as Template;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class SettingsSeo
 {
@@ -61,7 +61,7 @@ class SettingsSeo
     
     $settingPermanentRedirectWWWStatusValue = $this->CMSCore->configurator->getPermanentRedirectToWWWStatus();
 
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
       'SETTINGS_NAME' => $this->name,
       'SETTING_SITE_DESCRIPTION_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('seo_site_description') ? $this->CMSCore->configurator->getDatabaseEntryValue('seo_site_description') : '',
       'SETTING_SITE_KEYWORDS_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('seo_site_keywords') ? implode(', ', json_decode($this->CMSCore->configurator->getDatabaseEntryValue('seo_site_keywords'), true)) : '',

@@ -14,7 +14,7 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Feed as Feed;
 use \core\PHPLibrary\Feed\Builder as FeedBuilder;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 
@@ -69,7 +69,7 @@ class PageFeed implements InterfacePage
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feed.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feed.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'web-channel',
       'WEB_CHANNEL_ID' => $feed !== null ? $feed->getID() : 0,
       'WEB_CHANNEL_NAME' => $feed !== null ? $feed->getName() : '',

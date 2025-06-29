@@ -13,7 +13,7 @@ namespace core\PHPLibrary\Page\Admin;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Entry as Entry;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \DOMDocument as DOMDocument;
@@ -117,7 +117,7 @@ class PageEntry implements InterfacePage
 
         $documentString = $document->saveHTML($element);
 
-        array_push($additionalFieldsElements, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
+        array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
           'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
           'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
           'FIELD_INPUT' => $documentString
@@ -142,7 +142,7 @@ class PageEntry implements InterfacePage
 
         $documentString = $document->saveHTML($element);
 
-        array_push($additionalFieldsElements, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
+        array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
           'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
           'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
           'FIELD_INPUT' => $documentString
@@ -157,14 +157,14 @@ class PageEntry implements InterfacePage
     $mediaFilesTransformed = [];
     foreach ($mediaFiles as $fileName) {
       $mediaFileURL = '/uploads/media/' . $fileName;
-      array_push($mediaFilesTransformed, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/mediaManager/listItem.tpl', [
+      array_push($mediaFilesTransformed, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/mediaManager/listItem.tpl', [
         'MEDIA_FILE_URL' => $mediaFileURL,
         'MEDIA_FILE_FULLNAME' => $fileName
       ]));
     }
 
     if (!empty($mediaFilesTransformed)) {
-      $mediaManagerList = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/mediaManager/list.tpl', [
+      $mediaManagerList = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/mediaManager/list.tpl', [
         'MEDIA_LIST_ITEMS' => implode($mediaFilesTransformed)
       ]);
     } else {
@@ -172,9 +172,9 @@ class PageEntry implements InterfacePage
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'entry',
-      'ENTRY_EDITOR' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/editor.tpl', []),
+      'ENTRY_EDITOR' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/editor.tpl', []),
       'ENTRY_ID' => $entry !== null ? $entry->getID() : 0,
       'ENTRY_TITLE' => $entry !== null ? $entry->getTitle($localeName) : '',
       'ENTRY_DESCRIPTION' => $entry !== null ? $entry->getDescription($localeName) : '',

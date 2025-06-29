@@ -15,7 +15,7 @@ use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Feeds as Feeds;
 use \core\PHPLibrary\Feed\Builder as FeedBuilder;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
@@ -112,7 +112,7 @@ class PageFeeds implements InterfacePage
       $feedTypeTitle = FeedBuilder::getTypeTitle($object->getTypeID());
       $indexCurrent = $index + 1;
 
-      array_push($feedsItemsAssembled, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds/tableItem.tpl', [
+      array_push($feedsItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds/tableItem.tpl', [
         'WEB_CHANNEL_ID' => $feedID,
         'WEB_CHANNEL_INDEX' => $indexCurrent,
         'WEB_CHANNEL_NAME' => $feedName,
@@ -124,10 +124,10 @@ class PageFeeds implements InterfacePage
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds.tpl', [
       'PAGE_WEB_CHANNELS_PAGINATION' => $pagination->assembled,
       'ADMIN_PANEL_PAGE_NAME' => 'web-channels',
-      'ADMIN_PANEL_WEB_CHANNELS_TABLE' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds/table.tpl', [
+      'ADMIN_PANEL_WEB_CHANNELS_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds/table.tpl', [
         'ADMIN_PANEL_WEB_CHANNELS_TABLE_ITEMS' => implode($feedsItemsAssembled)
       ])
     ]);

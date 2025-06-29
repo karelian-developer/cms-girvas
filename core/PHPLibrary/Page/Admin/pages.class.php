@@ -14,7 +14,7 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Pages as Pages;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
@@ -100,7 +100,7 @@ class PagePages implements InterfacePage
       $pageStaticTitle = strip_tags($pageStaticTitle);
       $pageStaticDescription = strip_tags($pageStaticDescription);
 
-      array_push($pagesStaticTableItemsAssembled, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/pages/tableItem.tpl', [
+      array_push($pagesStaticTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/pages/tableItem.tpl', [
         'PAGE_STATIC_ID' => $object->getID(),
         'PAGE_STATIC_NAME' => $object->getName(),
         'PAGE_STATIC_INDEX' => $pageStaticNumber,
@@ -117,10 +117,10 @@ class PagePages implements InterfacePage
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/pages.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/pages.tpl', [
       'PAGE_PAGES_STATIC_PAGINATION' => $pagination->assembled,
       'ADMIN_PANEL_PAGE_NAME' => 'page_static',
-      'ADMIN_PANEL_PAGES_STATIC_TABLE' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/pages/table.tpl', [
+      'ADMIN_PANEL_PAGES_STATIC_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/pages/table.tpl', [
         'ADMIN_PANEL_PAGES_STATIC_TABLE_ITEMS' => implode($pagesStaticTableItemsAssembled)
       ])
     ]);

@@ -15,7 +15,7 @@ use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\Entries as Entries;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
@@ -144,7 +144,7 @@ class PageEntries implements InterfacePage
       $entryDescription = strip_tags($entryDescription);
       $entryCategoryTitle = strip_tags($entryCategoryTitle);
 
-      array_push($entriesTableItemsAssembled, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/tableItem.tpl', [
+      array_push($entriesTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/tableItem.tpl', [
         'ENTRY_ID' => $entryObject->getID(),
         'ENTRY_NAME' => $entryObject->getName(),
         'ENTRY_INDEX' => $entryNumber,
@@ -162,10 +162,10 @@ class PageEntries implements InterfacePage
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries.tpl', [
       'PAGE_ENTRIES_PAGINATION' => $pagination->assembled,
       'ADMIN_PANEL_PAGE_NAME' => 'entries',
-      'ADMIN_PANEL_ENTRIES_TABLE' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/table.tpl', [
+      'ADMIN_PANEL_ENTRIES_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/table.tpl', [
         'ADMIN_PANEL_ENTRIES_TABLE_ITEMS' => implode($entriesTableItemsAssembled)
       ])
     ]);

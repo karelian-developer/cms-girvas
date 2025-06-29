@@ -16,7 +16,7 @@ use \core\PHPLibrary\Module as Module;
 use \core\PHPLibrary\Module\EnumMetadata as ModuleEnumMetadata;
 use \core\PHPLibrary\Module\EnumWeight as ModuleEnumWeight;
 use \core\PHPLibrary\Parsedown as Parsedown;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \DOMDocument as DOMDocument;
@@ -126,7 +126,7 @@ class PageModule implements InterfacePage
 
         if (count($moduleData['screenshots']) > 0) {
           foreach ($moduleData['screenshots'] as $screenshotURL) {
-            array_push($moduleScreenshotsListItems, TemplateCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{MODULE_SCREENSHOT_URL}"></li>', [
+            array_push($moduleScreenshotsListItems, ThemeCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{MODULE_SCREENSHOT_URL}"></li>', [
               'MODULE_SCREENSHOT_URL' => $screenshotURL
             ]));
           }
@@ -151,7 +151,7 @@ class PageModule implements InterfacePage
         if (count($moduleScreenshotsFiles) > 0) {
           $moduleScreenshotsDirectoryURL = $module->getScreenshotsURL();
           foreach ($moduleScreenshotsFiles as $file) {
-            array_push($moduleScreenshotsListItems, TemplateCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{MODULE_SCREENSHOT_URL}"></li>', [
+            array_push($moduleScreenshotsListItems, ThemeCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{MODULE_SCREENSHOT_URL}"></li>', [
               'MODULE_SCREENSHOT_URL' => $moduleScreenshotsDirectoryURL . '/' . $file
             ]));
           }
@@ -220,7 +220,7 @@ class PageModule implements InterfacePage
             default => '<li class="module__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> {METADATA_VALUE}</li>',
           };
 
-          array_push($moduleMetadataItemsTransformed, TemplateCollector::assembly($metadataValueTemplate, [
+          array_push($moduleMetadataItemsTransformed, ThemeCollector::assembly($metadataValueTemplate, [
             'METADATA_TITLE' => $metadataTitle,
             'METADATA_VALUE' => $getMetadataValue($module, $moduleMetadata, $enumMetadata)
           ]));
@@ -228,7 +228,7 @@ class PageModule implements InterfacePage
       }
 
       if (count($moduleScreenshotsListItems) > 0) {
-        $moduleGalleryList = TemplateCollector::assembly('<ul class="gallery__list list list-reset">{MODULE_GALLARY_LIST_ITEMS}</ul>', [
+        $moduleGalleryList = ThemeCollector::assembly('<ul class="gallery__list list list-reset">{MODULE_GALLARY_LIST_ITEMS}</ul>', [
           'MODULE_GALLARY_LIST_ITEMS' => implode($moduleScreenshotsListItems)
         ]);
       } else {
@@ -236,7 +236,7 @@ class PageModule implements InterfacePage
       }
 
       if (count($moduleMetadataItemsTransformed) > 0) {
-        $metadataListTransformed = TemplateCollector::assembly('<ul class="module__metadata-list metadata-list list-reset">{METADATA_LIST}</ul>', [
+        $metadataListTransformed = ThemeCollector::assembly('<ul class="module__metadata-list metadata-list list-reset">{METADATA_LIST}</ul>', [
           'METADATA_LIST' => implode($moduleMetadataItemsTransformed)
         ]);
       } else {
@@ -245,7 +245,7 @@ class PageModule implements InterfacePage
 
       $parsedown = new Parsedown();
 
-      $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/module.tpl', [
+      $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/module.tpl', [
         'ADMIN_PANEL_PAGE_NAME' => 'module',
         'MODULE_NAME' => $moduleName,
         'MODULE_TITLE' => $moduleTitle,

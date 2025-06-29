@@ -15,7 +15,7 @@ use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\Entry as Entry;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class PageError implements InterfacePage
 {
@@ -75,9 +75,9 @@ class PageError implements InterfacePage
 
     $this->CMSCore->configurator->setMetaTitle($this->errorTitle);
 
-    $this->assembled = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
       'PAGE_NAME' => 'error error_' . (string) $this->errorCode,
-      'PAGE_CONTENT' => TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/error.tpl', [
+      'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/error.tpl', [
         'ERROR_TITLE' => $this->errorTitle,
         'ERROR_DESCRIPTION' => sprintf('<div class="page__simple-note">%s</div>', $this->errorDescription)
       ])
