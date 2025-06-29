@@ -140,14 +140,14 @@ final class Core implements ThemeInterfaceCore
     $CMSConfigEngineeringWorksStatus = $this->theme->CMSCore->configurator->getDatabaseEntryValue('base_engineering_works_status');
 
     if ($CMSConfigEngineeringWorksStatus === 'off' || $userGroupID === 1) {
-      $this->theme->add_style(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
-      $this->theme->add_style(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
-      $this->theme->add_style(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
-      $this->theme->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+      $this->theme->addStyle(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
+      $this->theme->addStyle(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
+      $this->theme->addStyle(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
+      $this->theme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
       
-      $this->theme->add_script(['src' => 'common.js'], true);
-      $this->theme->add_script(['src' => 'core.class.js', 'type' => 'module'], true);
-      $this->theme->add_script(['src' => 'core.class.js', 'type' => 'module']);
+      $this->theme->addScript(['src' => 'common.js'], true);
+      $this->theme->addScript(['src' => 'core.class.js', 'type' => 'module'], true);
+      $this->theme->addScript(['src' => 'core.class.js', 'type' => 'module']);
 
       $profileLink = $clientIsLogged ? sprintf('<a class="header__nav-link display-block" href="/profile"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_PROFILE']) : sprintf('<a id="SYSTEM_GE_IMC_00000001" class="header__nav-link display-block" href="#"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_LOGIN']);
       $registrationLink = $clientIsLogged ? sprintf('<a class="header__nav-link display-block" href="/registration"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_REGISTRATION']) : '';
