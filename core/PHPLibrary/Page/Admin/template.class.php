@@ -16,6 +16,7 @@ use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\EnumMetadata as ThemeEnumMetadata;
 use \core\PHPLibrary\Template\EnumWeight as ThemeEnumWeight;
 use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
@@ -97,7 +98,7 @@ class PageTemplate implements InterfacePage
     $localeName = $this->CMSCore->locale->getName();
 
     $themeName = $this->CMSCore->urlp->getPath(2) === 'repository' ? $this->CMSCore->urlp->getPath(3) : $this->CMSCore->urlp->getPath(2);
-    $theme = new Template($this->CMSCore, $themeName);
+    $theme = new Theme($this->CMSCore, $themeName);
     $themeScreenshotsListItems = [];
     $themeMetadataItemsTransformed = [];
 
@@ -159,14 +160,14 @@ class PageTemplate implements InterfacePage
     if ($isExists) {
       foreach ($this->allowedMetadata as $enumMetadata) {
         /** @var string Имя ячейки метаданных */
-        $metadataName = Template::getMetadataName($enumMetadata);
+        $metadataName = Theme::getMetadataName($enumMetadata);
 
         if (array_key_exists($metadataName, $themeMetadata) || $enumMetadata === ThemeEnumMetadata::WEIGHT) {
-          $getMetadataValue = function (Template $theme, array $themeMetadata, ThemeEnumMetadata $enumMetadata) {
-            $metadataName = Template::getMetadataName($enumMetadata);
+          $getMetadataValue = function (Theme $theme, array $themeMetadata, ThemeEnumMetadata $enumMetadata) {
+            $metadataName = Theme::getMetadataName($enumMetadata);
             
             if ($enumMetadata === ThemeEnumMetadata::WEIGHT) {
-              $themeWeight = $this->CMSCore->urlp->getPath(2) !== 'repository' ? Template::get_weight($theme, ThemeEnumWeight::BYTES) : $themeMetadata[$metadataName];
+              $themeWeight = $this->CMSCore->urlp->getPath(2) !== 'repository' ? Theme::getWeight($theme, ThemeEnumWeight::BYTES) : $themeMetadata[$metadataName];
               
               if ($themeWeight < 1024) {
                 return sprintf('%s B', $themeWeight);
