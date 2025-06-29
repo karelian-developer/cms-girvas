@@ -75,7 +75,7 @@ class PageUserGroup implements InterfacePage
       'ADMIN_PANEL_PAGE_NAME' => 'user-group',
       'USER_GROUP_ID' => $userGroup !== null ? $userGroup->getID() : 0,
       'USER_GROUP_NAME' => $userGroup !== null ? $userGroup->getName() : '',
-      'USER_GROUP_TITLE' => $userGroup !== null ? $userGroup->getTitle() : '',
+      'USER_GROUP_TITLE' => $userGroup !== null ? $userGroup->getTitle($localeName) : '',
       'USER_GROUP_FORM_METHOD' => $userGroup !== null ? 'PATCH' : 'PUT',
       'USER_GROUP_PERMISSION_ADMIN_PANEL_AUTH_VALUE' => $userGroup === null ? '' : (($userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_PANEL_AUTH)) ? 'checked' : ''),
       'USER_GROUP_PERMISSION_ADMIN_USERS_MANAGEMENT_VALUE' => $userGroup === null ? '' : (($userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT)) ? 'checked' : ''),
