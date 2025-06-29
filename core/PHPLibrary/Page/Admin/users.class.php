@@ -108,7 +108,7 @@ class PageUsers implements InterfacePage
       $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
       $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
-      $usersGroupTitle = $userGroupObject->get_title($usersLocaleName);
+      $usersGroupTitle = $userGroupObject->getTitle($usersLocaleName);
       $usersGroupTitle = strip_tags($usersGroupTitle);
 
       array_push($usersTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/users/tableItem.tpl', [
