@@ -107,7 +107,7 @@ final class Collector
           }
 
           if ($attributeName === 'src') {
-            $scriptElement->setAttribute($attributeName, $attributeValue);
+            $scriptElement->setAttribute($attributeName, $scriptURL);
           }
         }
 
