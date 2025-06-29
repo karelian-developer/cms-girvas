@@ -37,7 +37,10 @@ final class Reports
    */
   public function getAll(array $paramsArray = []) : array
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
@@ -89,12 +92,15 @@ final class Reports
    */
   public function getByTypeIDs(array $typeIDs, array $paramsArray = []) : array
   {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
     $conditionTypeIDs = [];
     foreach ($typeIDs as $typeID) {
       array_push($conditionTypeIDs, sprintf('(metadata::jsonb->>\'typeID\')::int = %d', $typeID));
     }
 
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();

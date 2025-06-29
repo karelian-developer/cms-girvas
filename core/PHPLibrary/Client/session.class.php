@@ -151,7 +151,10 @@ class Session
    */
   public function resetExpire() : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementUpdate();
     $queryBuilder->statement->setTable('users_sessions');
     $queryBuilder->statement->setClauseSet();
@@ -184,7 +187,10 @@ class Session
    */
   private function getDatabaseColumnsData(array $columns = ['*']) : array|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections($columns);
     $queryBuilder->statement->setClauseFrom();
@@ -226,8 +232,12 @@ class Session
    * 
    * @return Session|null
    */
-  public static function getByIP(SystemCore $CMSCore, string $userIP, int $typeID) : Session|null {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+  public static function getByIP(SystemCore $CMSCore, string $userIP, int $typeID) : Session|null
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
@@ -261,7 +271,10 @@ class Session
    */
   public static function getByIPAndUserID(SystemCore $CMSCore, string $userIP, int $userID, int $typeID) : Session|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
@@ -296,7 +309,10 @@ class Session
    */
   public static function getByIPAndToken(SystemCore $CMSCore, string $userIP, string $token, int $typeID) : Session|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
@@ -331,7 +347,10 @@ class Session
    */
   public static function existsByIPAndUserID(SystemCore $CMSCore, string $userIP, int $userID, int $typeID) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['1']);
     $queryBuilder->statement->setClauseFrom();
@@ -365,7 +384,10 @@ class Session
    */
   public static function existsByIPAndToken(SystemCore $CMSCore, string $userIP, string $token, int $typeID) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['1']);
     $queryBuilder->statement->setClauseFrom();
@@ -398,7 +420,10 @@ class Session
    */
   public static function existsByIP(SystemCore $CMSCore, string $userIP, int $typeID) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['1']);
     $queryBuilder->statement->setClauseFrom();
@@ -428,7 +453,10 @@ class Session
    */
   public function update(array $data) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementUpdate();
     $queryBuilder->statement->setTable('users_sessions');
     $queryBuilder->statement->setClauseSet();
@@ -484,7 +512,10 @@ class Session
    */
   public static function create(SystemCore $CMSCore, array $data = []) : Session|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementInsert();
     $queryBuilder->statement->setTable('users_sessions');
     $queryBuilder->statement->addColumn('userID');
@@ -525,7 +556,10 @@ class Session
    */
   public function delete() : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementDelete();
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');

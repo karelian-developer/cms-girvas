@@ -181,7 +181,10 @@ class EntryComment implements EntityTypeContent
    */
   public function getAnswersCount() : int
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['count(id)']);
     $queryBuilder->statement->setClauseFrom();
@@ -217,7 +220,10 @@ class EntryComment implements EntityTypeContent
    */
   public function getAnswers() : array
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
@@ -347,7 +353,10 @@ class EntryComment implements EntityTypeContent
    */
   private function getDatabaseColumnsData(array $columns = ['*']) : array|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections($columns);
     $queryBuilder->statement->setClauseFrom();
@@ -388,7 +397,10 @@ class EntryComment implements EntityTypeContent
    */
   public static function existsByID(SystemCore $CMSCore, int $commentID) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['1']);
     $queryBuilder->statement->setClauseFrom();
@@ -424,7 +436,10 @@ class EntryComment implements EntityTypeContent
    */
   public function delete() : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementDelete();
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
@@ -462,7 +477,10 @@ class EntryComment implements EntityTypeContent
    */
   public static function create(SystemCore $CMSCore, int $entryID, int $authorID, string $content) : EntryComment|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementInsert();
     $queryBuilder->statement->setTable('entries_comments');
     $queryBuilder->statement->addColumn('authorID');
@@ -520,7 +538,10 @@ class EntryComment implements EntityTypeContent
    */
   public function update(array $data) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementUpdate();
     $queryBuilder->statement->setTable('entries_comments');
     $queryBuilder->statement->setClauseSet();

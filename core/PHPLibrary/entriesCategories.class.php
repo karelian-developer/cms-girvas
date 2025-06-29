@@ -36,7 +36,10 @@ final class EntriesCategories
    */
   public function getAll(array $params = []) : array
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
@@ -76,7 +79,10 @@ final class EntriesCategories
    */
   public function getCountTotal() : int
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['count(*)']);
     $queryBuilder->statement->setClauseFrom();

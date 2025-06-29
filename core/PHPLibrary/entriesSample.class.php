@@ -270,7 +270,10 @@ class EntriesSample implements EntityTypeContent
    */
   private function getDatabaseColumnsData(array $columns = ['*']) : array|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections($columns);
     $queryBuilder->statement->setClauseFrom();
@@ -312,7 +315,10 @@ class EntriesSample implements EntityTypeContent
    */
   public static function existsByID(SystemCore $CMSCore, int $id) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['1']);
     $queryBuilder->statement->setClauseFrom();
@@ -351,7 +357,10 @@ class EntriesSample implements EntityTypeContent
    */
   public static function existsByName(SystemCore $CMSCore, string $name) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['1']);
     $queryBuilder->statement->setClauseFrom();
@@ -390,7 +399,10 @@ class EntriesSample implements EntityTypeContent
    */
   public static function getByName(SystemCore $CMSCore, string $name) : EntriesSample|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
@@ -432,7 +444,10 @@ class EntriesSample implements EntityTypeContent
    */
   public static function create(SystemCore $CMSCore, string $name, array $texts, array $metadata = []) : EntriesSample|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementInsert();
     $queryBuilder->statement->setTable('entries_samples');
     $queryBuilder->statement->addColumn('name');
@@ -485,7 +500,10 @@ class EntriesSample implements EntityTypeContent
    */
   public function update(array $data) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementUpdate();
     $queryBuilder->statement->setTable('entries_samples');
     $queryBuilder->statement->setClauseSet();
@@ -570,7 +588,10 @@ class EntriesSample implements EntityTypeContent
    */
   public function delete() : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementDelete();
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('entries_samples');

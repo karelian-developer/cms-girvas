@@ -452,9 +452,9 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
 
   if ($CMSCore->urlp->getParam('stepIndex') === 6) {
     $databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
-    $databaseConfigurations = $CMSCore->configurator->get('database');
+    $CMSConfigDatabase = $CMSCore->configurator->get('database');
 
-    switch ($databaseConfigurations['dms']->get_string()) {
+    switch ($CMSConfigDatabase['dms']->get_string()) {
       case 'PostgreSQL': $JSONDataTypeDMS = 'jsonb'; break;
       default: $JSONDataTypeDMS = 'json';
     }
@@ -462,8 +462,8 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
     $document = new DOMDocument();
     $tipBlockElement = $document->createElement('div');
 
-    $databasePrefix = $databaseConfigurations['prefix'];
-    $databaseScheme = $databaseConfigurations['scheme'];
+    $databasePrefix = $CMSConfigDatabase['prefix'];
+    $databaseScheme = $CMSConfigDatabase['scheme'];
     $databasePrefix = ($databasePrefix !== '') ? $databasePrefix . '_' : '';
     $databaseScheme = ($databaseScheme !== '') ? $databaseScheme . '.' : '';
     
@@ -472,7 +472,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // ТАБЛИЦА КОНФИГУРАЦИЙ
       // =======================
 
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('configurations');
@@ -493,7 +493,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // ТАБЛИЦА ЗАПИСЕЙ
       // =======================
 
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries');
@@ -516,7 +516,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // ТАБЛИЦА КАТЕГОРИЙ ЗАПИСЕЙ
       // =======================
 
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries_categories');
@@ -538,7 +538,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // ТАБЛИЦА КОММЕНТАРИЕВ ЗАПИСЕЙ
       // =======================
 
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries_comments');
@@ -560,7 +560,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // ТАБЛИЦА ВЫБОРОК ЗАПИСЕЙ
       // =======================
 
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries_samples');
@@ -581,7 +581,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // ТАБЛИЦА СТАТИЧЕСКИХ СТРАНИЦ
       // =======================
 
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('pages_static');
@@ -603,7 +603,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // ТАБЛИЦА ОТЧЕТОВ
       // =======================
 
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('reports');
@@ -622,7 +622,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // ТАБЛИЦА ПОЛЬЗОВАТЕЛЕЙ
       // =======================
 
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('users');
@@ -646,7 +646,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // ТАБЛИЦА ГРУПП ПОЛЬЗОВАТЕЛЕЙ
       // =======================
 
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('users_groups');
@@ -668,7 +668,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // ТАБЛИЦА ЗАЯВОК НА ПОДТВЕРЖДЕНИЕ РЕГИСТРАЦИИ
       // =======================
 
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('users_registration_submits');
@@ -688,7 +688,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // ТАБЛИЦА СЕССИЙ ПОЛЬЗОВАТЕЛЕЙ
       // =======================
 
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('users_sessions');
@@ -710,7 +710,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // ТАБЛИЦА ВЕБ-КАНАЛОВ
       // =======================
 
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('web_channels');
@@ -732,7 +732,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
       // ТАБЛИЦА МЕТРИКИ
       // =======================
 
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('metrics');

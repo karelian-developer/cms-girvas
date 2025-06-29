@@ -192,7 +192,10 @@ class Feed
    */
   private function getDatabaseColumnsData(array $columns = ['*']) : array|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections($columns);
     $queryBuilder->statement->setClauseFrom();
@@ -234,7 +237,10 @@ class Feed
    */
   public static function getByName(CMSCore $CMSCore, string $name) : Feed|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
@@ -277,7 +283,10 @@ class Feed
    */
   public static function existsByName(CMSCore $CMSCore, string $name) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['1']);
     $queryBuilder->statement->setClauseFrom();
@@ -316,9 +325,12 @@ class Feed
    * 
    * @return bool
    */
-  public static function exists_by_id(CMSCore $CMSCore, int $id) : bool
+  public static function existsByID(CMSCore $CMSCore, int $id) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['1']);
     $queryBuilder->statement->setClauseFrom();
@@ -354,7 +366,10 @@ class Feed
    */
   public function delete() : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementDelete();
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('web_channels');
@@ -389,7 +404,10 @@ class Feed
    */
   public function update(array $data) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->set_statement_update();
     $queryBuilder->statement->setTable('web_channels');
     $queryBuilder->statement->set_clause_set();
@@ -457,7 +475,10 @@ class Feed
 
   public static function create(CMSCore $CMSCore, string $name, int $entriesCategoryID, int $typeID, array $texts) : Feed|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementInsert();
     $queryBuilder->statement->setTable('web_channels');
     $queryBuilder->statement->addColumn('entriesCategoryID');

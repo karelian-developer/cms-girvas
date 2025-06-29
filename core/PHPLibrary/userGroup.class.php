@@ -119,7 +119,10 @@ class UserGroup
    */
   public function getUsers() : array
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
@@ -163,7 +166,10 @@ class UserGroup
    */
   public function getUsersCount() : int
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['count(*)']);
     $queryBuilder->statement->setClauseFrom();
@@ -254,7 +260,10 @@ class UserGroup
    */
   private function getDatabaseColumnsData(array $columns = ['*']) : array|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections($columns);
     $queryBuilder->statement->setClauseFrom();
@@ -295,7 +304,10 @@ class UserGroup
    */
   public static function getByName(SystemCore $CMSCore, string $groupName) : UserGroup|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
@@ -337,7 +349,10 @@ class UserGroup
    */
   public static function existsByName(SystemCore $CMSCore, string $groupName) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['1']);
     $queryBuilder->statement->setClauseFrom();
@@ -377,7 +392,10 @@ class UserGroup
    */
   public static function existsByID(SystemCore $CMSCore, int $groupID) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['1']);
     $queryBuilder->statement->setClauseFrom();
@@ -413,7 +431,10 @@ class UserGroup
    */
   public function delete() : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementDelete();
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('users_groups');
@@ -452,7 +473,10 @@ class UserGroup
    */
   public static function create(SystemCore $CMSCore, string $groupName, array $texts = [], int $permissions = 0x0000000000000000) : UserGroup|null
   {
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementInsert();
     $queryBuilder->statement->setTable('users_groups');
     $queryBuilder->statement->addColumn('name');
@@ -506,7 +530,10 @@ class UserGroup
    */
   public function update(array $data) : bool
   {
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementUpdate();
     $queryBuilder->statement->setTable('users_groups');
     $queryBuilder->statement->setClauseSet();

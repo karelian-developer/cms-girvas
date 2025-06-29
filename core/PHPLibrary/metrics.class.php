@@ -80,10 +80,13 @@ final class Metrics
    */
   public function getSessionsByTimestampRange(int $timestampStart, int $timestampEnd) : array
   {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
     $timestampStart = strtotime(date('Y/m/d', $timestampStart));
     $timestampEnd = strtotime(date('Y/m/d', $timestampEnd));
 
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
