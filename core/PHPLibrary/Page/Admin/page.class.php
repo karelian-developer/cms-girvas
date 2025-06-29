@@ -68,7 +68,7 @@ class PagePage implements InterfacePage
       $pageStatic = PageStatic::existsByID($this->CMSCore, $pageStaticID) ? new PageStatic($this->CMSCore, $pageStaticID) : null;
       
       if ($pageStatic !== null) {
-        $pageStatic->init_data(['id', 'texts', 'metadata', 'name']);
+        $pageStatic->initData(['id', 'texts', 'metadata', 'name']);
       }
     }
 
