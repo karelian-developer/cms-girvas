@@ -268,7 +268,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
     $userRememberMe = isset($_POST['user_remember_me']);
 
     if ($userLogin !== null && $userPassword !== null) {
-      $user = User::geByLogin($CMSCore, $userLogin);
+      $user = User::getByLogin($CMSCore, $userLogin);
 
       if ($user !== null) {
         // Инициализация данных пользователя
@@ -347,7 +347,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
     $adminAccessCodes = $_POST['admin_access-code'] ?? [];
 
     if ($userLogin !== null && !$userPassword !== null && !empty($adminAccessCodes)) {
-      $user = User::geByLogin($CMSCore, $userLogin);
+      $user = User::getByLogin($CMSCore, $userLogin);
 
       if ($user !== null) {
         // Инициализация данных пользователя

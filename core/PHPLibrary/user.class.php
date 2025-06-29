@@ -11,6 +11,7 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\SystemCore as CMSCore;
 use \PDOException as PDOException;
 
 #[\AllowDynamicProperties]
@@ -457,7 +458,7 @@ class User
    * 
    * @return User|null
    */
-  public static function geByLogin(CMSCore $CMSCore, string $userLogin) : User|null
+  public static function getByLogin(CMSCore $CMSCore, string $userLogin) : User|null
   {
     $queryBuilder = new DatabaseQueryBuilder($CMSCore);
     $queryBuilder->setStatementSelect();
