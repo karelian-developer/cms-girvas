@@ -78,15 +78,15 @@ class PageEntry implements InterfacePage
      */
 
     /** @var array Типы полей */
-    $fieldsTypes = $this->CMSCore->configurator->exists_database_entry_value('entries_additional_field_type') ? json_decode($this->CMSCore->configurator->getDatabase_entry_value('entries_additional_field_type'), true) : [];
+    $fieldsTypes = $this->CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_type') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('entries_additional_field_type'), true) : [];
     /** @var array Категории полей */
-    $fieldsCategoriesIDs = $this->CMSCore->configurator->exists_database_entry_value('entries_additional_field_category_id') ? json_decode($this->CMSCore->configurator->getDatabase_entry_value('entries_additional_field_category_id'), true) : [];
+    $fieldsCategoriesIDs = $this->CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_category_id') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('entries_additional_field_category_id'), true) : [];
     /** @var array Заголовки полей */
-    $fieldsTitles = $this->CMSCore->configurator->exists_database_entry_value('entries_additional_field_title') ? json_decode($this->CMSCore->configurator->getDatabase_entry_value('entries_additional_field_title'), true) : [];
+    $fieldsTitles = $this->CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_title') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('entries_additional_field_title'), true) : [];
     /** @var array Описания полей */
-    $fieldsDescriptions = $this->CMSCore->configurator->exists_database_entry_value('entries_additional_field_description') ? json_decode($this->CMSCore->configurator->getDatabase_entry_value('entries_additional_field_description'), true) : [];
+    $fieldsDescriptions = $this->CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_description') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('entries_additional_field_description'), true) : [];
     /** @var array Имена полей */
-    $fieldsNames = $this->CMSCore->configurator->exists_database_entry_value('entries_additional_field_name') ? json_decode($this->CMSCore->configurator->getDatabase_entry_value('entries_additional_field_name'), true) : [];
+    $fieldsNames = $this->CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_name') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('entries_additional_field_name'), true) : [];
 
     $additionalFieldsElements = [];
     foreach ($fieldsTypes as $index => $type) {
