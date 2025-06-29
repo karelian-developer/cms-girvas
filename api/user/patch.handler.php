@@ -54,7 +54,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               }
             }
 
-            if ($userUpdateIsAllowed) { error_log(__LINE__);
+            if ($userUpdateIsAllowed) {
               if ($CMSConfigurator->getUsersLoginsBlacklistStatus(true)) {
                 $loginBlacklist = $CMSConfigurator->getUsersLoginsBlacklist(true);
 
@@ -82,7 +82,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               }
             }
 
-            if ($userUpdateIsAllowed) { error_log(__LINE__);
+            if ($userUpdateIsAllowed) {
               if ($CMSConfigurator->getUsersLoginSpecialSymbolsStatus(true)) {
                 $loginPattern = '[a-zA-Z0-9\_\-\!\@\#\$\%\&]+';
               } else {
@@ -110,7 +110,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               }
             }
 
-            if ($userUpdateIsAllowed) { error_log(__LINE__);
+            if ($userUpdateIsAllowed) {
               if ($CMSConfigurator->getUsersLoginLengthMax() > 0) {
                 if (strlen($userLogin) > $CMSConfigurator->getUsersLoginLengthMax()) {
                   $userUpdateIsAllowed = false;
@@ -121,7 +121,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               }
             }
       
-            if ($userUpdateIsAllowed) { error_log(__LINE__);
+            if ($userUpdateIsAllowed) {
               if (strlen($userLogin) < $CMSConfigurator->getUsersLoginLengthMin()) {
                 $userUpdateIsAllowed = false;
       
@@ -130,6 +130,8 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               }
             }
           }
+        } else {
+          $userUpdateIsAllowed = true;
         }
 
         if (isset($_PATCH['user_email'])) $userEmail = str_replace('\'', '"', trim($_PATCH['user_email']));
@@ -153,7 +155,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               $passwordRegularPattern = '[a-zA-Z0-9\_\-]+';
             }
             
-            if ($userUpdateIsAllowed) { error_log(__LINE__);
+            if ($userUpdateIsAllowed) {
               if ($CMSConfigurator->getUsersPasswordLengthMax() > 0) {
                 if (strlen($userPassword) > $CMSConfigurator->getUsersPasswordLengthMax()) {
                   $userUpdateIsAllowed = false;
@@ -164,7 +166,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               }
             }
       
-            if ($userUpdateIsAllowed) { error_log(__LINE__);
+            if ($userUpdateIsAllowed) {
               if (strlen($userPassword) < $CMSConfigurator->getUsersPasswordLengthMin()) {
                 $userUpdateIsAllowed = false;
       
@@ -173,7 +175,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               }
             }
       
-            if ($userUpdateIsAllowed) { error_log(__LINE__);
+            if ($userUpdateIsAllowed) {
               if (!preg_match(sprintf('/^%s$/i', $passwordRegularPattern), $userPassword)) {
                 $userUpdateIsAllowed = false;
       
@@ -182,7 +184,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               }
             }
 
-            if ($userUpdateIsAllowed) { error_log(__LINE__);
+            if ($userUpdateIsAllowed) {
               if (!empty($userPassword) || !empty($userPasswordRepeat)) {
                 if ($userPassword === $userPasswordRepeat) {
                   $userData['password_hash'] = User::password_hash($CMSCore, $user->get_security_hash(), $userPassword);
@@ -216,7 +218,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           if (isset($userLogin) && $clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT)) {
             if ($userLogin !== $user->getLogin()) {
               if (!User::existsByLogin($CMSCore, $userLogin, $CMSConfigurator->getUsersLoginRegisterAccountingStatus(true))) {
@@ -230,7 +232,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           if (isset($userEmail)) {
             if ($userEmail !== $user->getEmail()) {
               if (User::emailIIsValid($CMSCore, $userEmail)) {
@@ -250,7 +252,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           if (isset($userBirthdate)) {
             $userBirthdate = is_numeric($userBirthdate) ? $userBirthdate : strtotime($userBirthdate);
             
@@ -264,25 +266,25 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           if (isset($userName)) {
             $userData['metadata']['name'] = $userName;
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           if (isset($userSurname)) {
             $userData['metadata']['surname'] = $userSurname;
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           if (isset($userPatronymic)) {
             $userData['metadata']['patronymic'] = $userPatronymic;
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           /**
            * Обновление данных в дополнительных полях
            * Обратите внимание, что наименование поля будет преобразовано - система будет
@@ -307,7 +309,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           if (isset($userGroupID)) {
             if (!isset($userData)) $userData = [];
             if (!isset($userData['metadata'])) $userData['metadata'] = [];
@@ -316,7 +318,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
         }
 
-        if ($userUpdateIsAllowed) { error_log(__LINE__);
+        if ($userUpdateIsAllowed) {
           $user->update($userData);
 
           $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
