@@ -11,7 +11,7 @@
 namespace core\PHPLibrary\SystemCore;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore as CMSCore;
 use \PDOException as PDOException;
 use \PDO as PDO;
 
@@ -26,7 +26,7 @@ final class Configurator
   public string $metaDescription = '';
   public array $metaKeywords = [];
   private array $data = [];
-  private SystemCore $CMSCore;
+  private CMSCore $CMSCore;
   
   /**
    * __construct
@@ -34,7 +34,7 @@ final class Configurator
    * @param  mixed $CMSCore
    * @return void
    */
-  public function __construct(SystemCore $CMSCore)
+  public function __construct(CMSCore $CMSCore)
   {
     $this->CMSCore = $CMSCore;
     $filePath = CMS_ROOT_DIRECTORY . '/' . self::FILE_PATH;

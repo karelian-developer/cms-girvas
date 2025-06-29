@@ -15,7 +15,7 @@ use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as EnumFileFormat;
 
 final class FileConverter
 {
-  private mixed $CMSCore = null;
+  private CMSCore|null $CMSCore = null;
   private array|string $file = '';
   private string $convertFrom = '';
   private string $convertTo = '';
