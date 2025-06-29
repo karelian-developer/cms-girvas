@@ -292,10 +292,10 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
           if (!ClientSession::existsByIPAndUserID($CMSCore, $userIP, $user->getID(), 1)) {
             /** @var ClientSession|null $userSession */
             $userSession = ClientSession::create($CMSCore, [
-              'user_id' => $user->getID(),
+              'userID' => $user->getID(),
               'token' => $userToken,
-              'user_ip' => $userIP,
-              'type_id' => 1
+              'userIP' => $userIP,
+              'typeID' => 1
             ]);
           } else {
             $userSession = ClientSession::getByIPAndUserID($CMSCore, $userIP, $user->getID(), 1);
@@ -393,10 +393,10 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             if (!ClientSession::existsByIPAndUserID($CMSCore, $userIP, $user->getID(), 1)) {
               /** @var ClientSession|null $userSession */
               $userSessionBase = ClientSession::create($CMSCore, [
-                'user_id' => $user->getID(),
+                'userID' => $user->getID(),
                 'token' => $userTokenBase,
-                'user_ip' => $userIP,
-                'type_id' => 1
+                'userIP' => $userIP,
+                'typeID' => 1
               ]);
             } else {
               $userSessionBase = ClientSession::getByIPAndUserID($CMSCore, $userIP, $user->getID(), 1);
@@ -407,10 +407,10 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             if (!ClientSession::existsByIPAndUserID($CMSCore, $userIP, $user->getID(), 2)) {
               /** @var ClientSession|null $userSession */
               $userSessionAdmin = ClientSession::create($CMSCore, [
-                'user_id' => $user->getID(),
+                'userID' => $user->getID(),
                 'token' => $userTokenAdmin,
-                'user_ip' => $userIP,
-                'type_id' => 2
+                'userIP' => $userIP,
+                'typeID' => 2
               ]);
             } else {
               $userSessionAdmin = ClientSession::getByIPAndUserID($CMSCore, $userIP, $user->getID(), 2);
