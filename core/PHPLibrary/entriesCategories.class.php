@@ -74,7 +74,7 @@ final class EntriesCategories
    *
    * @return int
    */
-  public function get_count_total() : int
+  public function getCountTotal() : int
   {
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore);
     $queryBuilder->setStatementSelect();
