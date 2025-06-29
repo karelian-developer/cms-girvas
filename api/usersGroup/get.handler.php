@@ -55,12 +55,12 @@ if ($CMSCore->urlp->getPath(3) == 'permissions') {
   if ($usersGroup !== null) {
     $usersGroup->initData(['name', 'texts', 'metadata']);
 
-    $locale = $CMSCore->urlp->get_param('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
+    $localeName = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
     
     $handlerOutputData['usersGroup'] = [];
     $handlerOutputData['usersGroup']['id'] = $usersGroup->getID();
     $handlerOutputData['usersGroup']['name'] = $usersGroup->getName();
-    $handlerOutputData['usersGroup']['title'] = $usersGroup->getTitle($locale);
+    $handlerOutputData['usersGroup']['title'] = $usersGroup->getTitle($localeName);
 
     $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
