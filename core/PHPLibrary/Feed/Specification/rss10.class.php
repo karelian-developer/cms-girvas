@@ -104,8 +104,8 @@ class RSS1_0 implements InterfaceSpecification
 
   public function assemblyChannel() : DOMElement|bool
   {
-    $siteTitle = $this->CMSCore->configurator->exists_database_entry_value('base_site_title') ? $this->CMSCore->configurator->get_database_entry_value('base_site_title') : sprintf('%s %s', $this->CMSCore::CMS_TITLE, $this->CMSCore::CMS_VERSION);
-    $siteDescription = $this->CMSCore->configurator->exists_database_entry_value('seo_site_description') ? $this->CMSCore->configurator->get_database_entry_value('seo_site_description') : 'Description is not exists';
+    $siteTitle = $this->CMSCore->configurator->existsDatabaseEntryValue('base_site_title') ? $this->CMSCore->configurator->getDatabaseEntryValue('base_site_title') : sprintf('%s %s', $this->CMSCore::CMS_TITLE, $this->CMSCore::CMS_VERSION);
+    $siteDescription = $this->CMSCore->configurator->existsDatabaseEntryValue('seo_site_description') ? $this->CMSCore->configurator->getDatabaseEntryValue('seo_site_description') : 'Description is not exists';
     $siteLink = 'https://' . $this->CMSCore->configurator->get('domain');
 
     $channelTitle = !empty($this->getTitle()) ? $this->getTitle() : $siteTitle;
@@ -161,7 +161,7 @@ class RSS1_0 implements InterfaceSpecification
     $RDFElement = $this->assembly_rdf();
     $channelElement = $this->assembly_channel();
     $RDFElement->appendChild($channelElement);
-    
+
     $this->builder->document->appendChild($RDFElement);
     $this->builder->assembled = $this->builder->document->saveXML();
   }
