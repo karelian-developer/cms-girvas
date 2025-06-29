@@ -691,12 +691,13 @@ class PageStatic implements EntityTypeContent
       
       foreach ($data as $name => $value) {
         if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata'])) {
-          switch (gettype($value)) {
-            case 'boolean': $valueType = \PDO::PARAM_BOOL; break;
-            case 'integer': $valueType = \PDO::PARAM_INT; break;
-            case 'string': $valueType = \PDO::PARAM_STR; break;
-            case 'null': $valueType = \PDO::PARAM_NULL; break;
-          }
+          $valueTypeName = gettype($value);
+          $valueType = match ($valueTypeName) {
+            'boolean' => \PDO::PARAM_BOOL,
+            'integer' => \PDO::PARAM_INT,
+            'string' => \PDO::PARAM_STR,
+            'null' => \PDO::PARAM_NULL,
+          };
 
           $databaseQuery->bindParam(':' . $name, $data[$name], $valueType);
         }

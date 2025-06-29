@@ -538,10 +538,10 @@ class EntriesSample implements EntityTypeContent
         if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata'])) {
           $valueTypeName = gettype($value);
           $valueType = match ($valueTypeName) {
-            'boolean' => \PDO::PARAM_BOOL;
-            'integer' => \PDO::PARAM_INT;
-            'string' => \PDO::PARAM_STR;
-            'null' => \PDO::PARAM_NULL;
+            'boolean' => \PDO::PARAM_BOOL,
+            'integer' => \PDO::PARAM_INT,
+            'string' => \PDO::PARAM_STR,
+            'null' => \PDO::PARAM_NULL,
           };
 
           $databaseQuery->bindParam(':' . $name, $data[$name], $valueType);
