@@ -72,7 +72,7 @@ if ($CMSCore->client->isLogged(2)) {
           }
           
           if (isset($_PATCH['entries_category_name'])) $entriesCategoryData['name'] = urlencode(htmlentities($_PATCH['entries_category_name']));
-          if (isset($_PATCH['entries_category_parent_id'])) $entriesCategoryData['parent_id'] = $_PATCH['entries_category_parent_id'];
+          if (isset($_PATCH['entries_category_parent_id'])) $entriesCategoryData['parentID'] = $_PATCH['entries_category_parent_id'];
           
           if (isset($_PATCH['entries_category_show_index'])) {
             if (!isset($entriesCategoryData['metadata'])) $entriesCategoryData['metadata'] = [];
