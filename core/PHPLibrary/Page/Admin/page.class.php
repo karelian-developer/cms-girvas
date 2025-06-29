@@ -154,7 +154,7 @@ class PagePage implements InterfacePage
       'PAGE_STATIC_TITLE' => $pageStatic !== null ? $pageStatic->getTitle($localeName) : '',
       'PAGE_STATIC_DESCRIPTION' => $pageStatic !== null ? $pageStatic->getDescription($localeName) : '',
       'PAGE_STATIC_CONTENT' => $pageStatic !== null ? $pageStatic->getContent($localeName) : '',
-      'PAGE_STATIC_KEYWORDS' => $pageStatic !== null ? implode(', ', $pageStatic->geKeywords($localeName)) : '',
+      'PAGE_STATIC_KEYWORDS' => $pageStatic !== null ? implode(', ', $pageStatic->getKeywords($localeName)) : '',
       'PAGE_STATIC_NAME' => $pageStatic !== null ? $pageStatic->getName() : '',
       'PAGE_STATIC_ADDITIONAL_FIELDS' => implode($additionaFieldsElements),
       'PAGE_STATIC_PERSONAL_TEMPLATE_PATH' => $pageStatic !== null ? $pageStatic->getPersonalTemplatePath() : '',
