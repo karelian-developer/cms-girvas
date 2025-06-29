@@ -10,23 +10,23 @@
 
 namespace core\PHPLibrary\Entry;
 
-use \core\PHPLibrary\Database as Database;
+use \core\PHPLibrary\Database as CMSDatabase;
 use \core\PHPLibrary\Entries as Entries;
 
 final class Database
 {
-  private Database $database;
+  private CMSDatabase $database;
   private Entries $entry;
   
   /**
    * __construct
    *
-   * @param  Database $database
+   * @param  CMSDatabase $database
    * @param  Entries $entry
    * 
    * @return void
    */
-  public function __construct(Database $database, Entries $entry)
+  public function __construct(CMSDatabase $database, Entries $entry)
   {
     $this->database = $database;
     $this->entry = $entry;
