@@ -92,7 +92,7 @@ class PageEntry implements InterfacePage
            */
           $parsedown = new Parsedown();
 
-          $commentsArray = $entry->getСomments([
+          $commentsArray = $entry->getComments([
             'limit' => [2, 0],
             'order_by' => [
               'column' => 'createdUnixTimestamp',
