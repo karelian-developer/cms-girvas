@@ -494,7 +494,7 @@ class Session
     $queryBuilder->statement->addColumn('createdUnixTimestamp');
     $queryBuilder->statement->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->setClauseReturning();
-    $queryBuilder->statement->clause_returning->addColumn('id');
+    $queryBuilder->statement->clauseReturning->addColumn('id');
     $queryBuilder->statement->assembly();
 
     $createdUnixTimestamp = time();
