@@ -639,7 +639,7 @@ final class Template
             $entryUpdatedDateTimestampISO8601WithoutDate = date('H:i:s', $entryUpdatedUnixTimestamp);
 
             array_push($entriesAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, $themeSamplePath . '/item.tpl', [
-              'ENTRY_ID' => $entry->get_id(),
+              'ENTRY_ID' => $entry->getID(),
               'ENTRY_NAME' => $entry->getName(),
               'ENTRY_TITLE' => $entry->getTitle($systemLocaleName),
               'ENTRY_DESCRIPTION' => $entry->getDescription($systemLocaleName),
