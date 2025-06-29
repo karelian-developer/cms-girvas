@@ -140,7 +140,7 @@ class PageTemplates implements InterfacePage
           if ($theme->existsFileMetadataJSON()) {
             array_push($themesListItemsTransformed, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates/listItem.tpl', [
               'TEMPLATE_NAME' => $theme->getName(),
-              'TEMPLATE_TITLE' => $theme->get_title(),
+              'TEMPLATE_TITLE' => $theme->getTitle(),
               'TEMPLATE_DESCRIPTION' => $parsedown->text($theme->getDescription()),
               'TEMPLATE_CREATED_TIMESTAMP' => date('d.m.Y', $theme->getCoreCreatedUnixTimestamp()),
               'TEMPLATE_AUTHOR' => $theme->getAuthorName(),
@@ -154,7 +154,6 @@ class PageTemplates implements InterfacePage
           unset($theme);
         }
       }
-
     }
 
     $pagination = new Pagination($this->CMSCore, $themesCount, $paginationItemsOnPage, $paginationItemCurrent);
