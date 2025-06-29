@@ -194,7 +194,7 @@ class PageEntry implements InterfacePage
             'ENTRY_CONTENT' => $parsedown->text($entry_content),
             'ENTRY_PREVIEW_URL' => $entry->getPreviewURL() !== '' ? $entry->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 1024),
             'ENTRY_CATEGORY_TITLE' => $categoryTitle,
-            'ENTRY_CATEGORY_URL' => $category->get_url(),
+            'ENTRY_CATEGORY_URL' => $category->getURL(),
             'ENTRY_COMMENTS_LIST' => count($commentsArray) > 0 ? $entryCommentsTransformed : $localeData['PAGE_ENTRY_COMMENTS_NOT_FOUND_LABEL'],
             'ENTRY_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
             'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $entry->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestamp : date('d.m.Y H:i:s', 0),
