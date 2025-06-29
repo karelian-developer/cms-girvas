@@ -49,7 +49,7 @@ final class EntriesSamples
       if (is_array($params['limit'])) {
         $limit = is_integer($params['limit'][0]) ? $params['limit'][0] : 0;
         $offset = is_integer($params['limit'][1]) ? $params['limit'][1] : 0;
-        $queryBuilder->statement->set_clause_limit($limit, $offset);
+        $queryBuilder->statement->setClauseLimit($limit, $offset);
       }
     }
 
