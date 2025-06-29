@@ -195,7 +195,7 @@ class EntryCategory implements EntityTypeContent
    */
   public function getEntries(array $params = [], $isPublished = false) : array
   {
-    return (new Entries($this->CMSCore))->get_by_category_id($this->id, $params, $isPublished);
+    return (new Entries($this->CMSCore))->getByCategoryID($this->id, $params, $isPublished);
   }
   
   /**
