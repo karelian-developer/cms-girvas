@@ -56,22 +56,22 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
 
             if ($userUpdateIsAllowed) {
               if ($CMSConfigurator->getUsersLoginsBlacklistStatus(true)) {
-                $loginBlacklist = $CMSConfigurator->getUsersLoginsBlacklist(true);
+                $loginsBlacklist = $CMSConfigurator->getUsersLoginsBlacklist(true);
 
-                foreach ($loginBlacklist as $login) {
+                foreach ($loginsBlacklist as $loginBlacklist) {
                   if ($CMSConfigurator->getUsersLoginRegisterAccountingStatus(true)) {
-                    $loginPattern = '/^' . $userLogin . '$/';
+                    $loginPattern = '/^' . $loginBlacklist . '$/';
 
-                    if (preg_match($loginPattern, $login)) {
+                    if (preg_match($loginPattern, $userLogin)) {
                       $userUpdateIsAllowed = false;
 
                       $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST');
                       $handlerStatusCode = $handlerStatusCode ?? 0;
                     }
                   } else {
-                    $loginPattern = '/^' . $userLogin . '$/i';
+                    $loginPattern = '/^' . $loginBlacklist . '$/i';
 
-                    if (preg_match($loginPattern, $login)) {
+                    if (preg_match($loginPattern, $userLogin)) {
                       $userUpdateIsAllowed = false;
 
                       $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST');
