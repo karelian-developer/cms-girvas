@@ -187,7 +187,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
             if ($userUpdateIsAllowed) {
               if (!empty($userPassword) || !empty($userPasswordRepeat)) {
                 if ($userPassword === $userPasswordRepeat) {
-                  $userData['password_hash'] = User::password_hash($CMSCore, $user->get_security_hash(), $userPassword);
+                  $userData['password_hash'] = User::passwordHash($CMSCore, $user->getSecurityHash(), $userPassword);
                 } else {
                   $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_REPEAT_PASSWORD');
                   $handlerStatusCode = $handlerStatusCode ?? 0;
