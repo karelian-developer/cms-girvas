@@ -19,7 +19,7 @@ use \core\PHPLibrary\UserGroup as UserGroup;
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
   $clientUser->initData(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
+  $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT)) {
