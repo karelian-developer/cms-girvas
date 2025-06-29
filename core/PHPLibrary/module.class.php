@@ -55,7 +55,7 @@ final class Module {
     $CMSBaseLocaleName = $CMSBaseLocaleName ?? 'en_US';
     $CMSBaseLocale = new ModuleLocale($this, $CMSBaseLocaleName);
 
-    if (!$CMSBaseLocale->exists_file_data_json()) {
+    if (!$CMSBaseLocale->existsFileDataJSON()) {
       $CMSBaseLocale = new ModuleLocale($this, $CMSBaseLocaleName);
     }
 
