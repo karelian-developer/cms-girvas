@@ -24,8 +24,8 @@ use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as EnumFileFormat;
 /**
  * Загрузка аватара для пользователя
  */
-if ($CMSCore->urlp->getPath(2) == 'avatar') {
-  $userID = trim($_POST['user_id']) ?? : 0;
+if ($CMSCore->urlp->getPath(2) === 'avatar') {
+  $userID = trim($_POST['user_id']) ?? 0;
   $userID = (is_numeric($userID)) ? (int)$userID : 0;
 
   if (User::existsByID($CMSCore, $userID)) {

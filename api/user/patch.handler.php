@@ -23,7 +23,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
 
   if (isset($_PATCH['user_id'])) {
     if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT) || $clientUser->getID() === (int) $_PATCH['user_id']) {
-      $userID = (is_numeric($_PATCH['user_id'])) ? (int)$_PATCH['user_id'] : 0;
+      $userID = is_numeric($_PATCH['user_id']) ? (int) $_PATCH['user_id'] : 0;
 
       if (User::existsByID($CMSCore, $userID)) {
         $user = new User($CMSCore, $userID);
