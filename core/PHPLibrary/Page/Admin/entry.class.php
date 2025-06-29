@@ -125,7 +125,7 @@ class PageEntry implements InterfacePage
 
       } else {
         if ($entry !== null) {
-          $fieldValue = $entry->getAdditionalFieldData($fieldsNames[$index]) != null ? $entry->getAdditionalFieldData($fieldsNames[$index]) : '';
+          $fieldValue = $entry->getAdditionalFieldData($fieldsNames[$index]) !== null ? $entry->getAdditionalFieldData($fieldsNames[$index]) : '';
         }
 
         /** @var DOMDocument */
@@ -150,7 +150,7 @@ class PageEntry implements InterfacePage
       }
     }
 
-    $mediaFilesPath = $this->CMSCore->get_cms_path() . '/uploads/media';
+    $mediaFilesPath = $this->CMSCore->getCMSPath() . '/uploads/media';
     $mediaFiles = array_diff(scandir($mediaFilesPath), ['.', '..']);
     $mediaFiles = array_slice($mediaFiles, 0, 6);
 
@@ -185,5 +185,4 @@ class PageEntry implements InterfacePage
       'ENTRY_FORM_METHOD' => $entry !== null ? 'PATCH' : 'PUT'
     ]);
   }
-
 }
