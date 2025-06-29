@@ -66,7 +66,7 @@ final class Session
    */
   public function getID() : int
   {
-    return return $this->id ?? 0; 
+    return $this->id ?? 0; 
   }
 
   /**
