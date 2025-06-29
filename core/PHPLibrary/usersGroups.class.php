@@ -51,7 +51,7 @@ final class UsersGroups
       if (is_array($paramsArray['limit'])) {
         $limit = is_integer($paramsArray['limit'][0]) ? $paramsArray['limit'][0] : 0;
         $offset = is_integer($paramsArray['limit'][1]) ? $paramsArray['limit'][1] : 0;
-        $queryBuilder->statement->set_clause_limit($limit, $offset);
+        $queryBuilder->statement->setClauseLimit($limit, $offset);
       }
     }
 
