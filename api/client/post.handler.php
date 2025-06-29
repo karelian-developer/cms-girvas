@@ -18,7 +18,7 @@ if (!defined('IS_NOT_HACKED')) {
 if ($CMSCore->urlp->getPath(2) === 'session-end') {
   $sessionLevel = $CMSCore->urlp->getParam('level');
   $sessionLevel = is_numeric($sessionLevel) ? (int) $sessionLevel : 0;
-  $session = $CMSCore->client->getSession($sessionLevel, ['user_id']);
+  $session = $CMSCore->client->getSession($sessionLevel, ['userID']);
   $sessionUserID = $session->getUserID();
 
   if ($session !== null && $sessionLevel !== 0) {
