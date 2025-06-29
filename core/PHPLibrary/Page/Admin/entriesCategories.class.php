@@ -98,7 +98,7 @@ class PageEntriesCategories implements InterfacePage
     $entriesCategories = new EntriesCategories($this->CMSCore);
 
     $entriesCategoriesLocale = $this->CMSCore->getCMSLocale('admin');
-    $entriesCategoriesLocaleName = $entriesLocale->getName();
+    $entriesCategoriesLocaleName = $entriesCategoriesLocale->getName();
 
     $entriesCategoriesObjects = $entriesCategories->getAll([
       'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
