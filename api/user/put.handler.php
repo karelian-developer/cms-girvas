@@ -179,7 +179,7 @@ if ($CMSCore->client->isLogged(2)) {
     }
 
     if (isset($userBirthdate)) {
-      $userBirthdate = (is_numeric($userBirthdate)) ? $userBirthdate : strtotime($userBirthdate);
+      $userBirthdate = is_numeric($userBirthdate) ? $userBirthdate : strtotime($userBirthdate);
       
       if ($userBirthdate <= time()) {
         $userData['metadata']['birthdateUnixTimestamp'] = $userBirthdate;
@@ -233,7 +233,7 @@ if ($CMSCore->client->isLogged(2)) {
       if (!is_null($user)) {
         $user->initData(['*']);
         // Подтверждение E-Mail у пользователя
-        $userData['email_is_submitted'] = true;
+        $userData['emailIsSubmitted'] = true;
 
         if (isset($userData)) {
           $user->update($userData);
