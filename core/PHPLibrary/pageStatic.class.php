@@ -41,7 +41,7 @@ class PageStatic implements EntityTypeContent
    * @param  mixed $columns
    * @return void
    */
-  public function iniiData(array $columns = ['*']) : void
+  public function initData(array $columns = ['*']) : void
   {
     $columnsData = $this->getDatabaseColumnsData($columns);
     foreach ($columnsData as $name => $data) {
