@@ -63,8 +63,8 @@ class PagePage implements InterfacePage
 
         $isVisible = false;
 
-        $clientIsLogged = $this->CMSCore->client->is_logged(1);
-        $clientUser = ($clientIsLogged) ? $this->CMSCore->client->get_user(1) : null;
+        $clientIsLogged = $this->CMSCore->client->isLogged(1);
+        $clientUser = ($clientIsLogged) ? $this->CMSCore->client->getUser(1) : null;
 
         $isVisible = $pageStatic->isPublished();
         if (!$isVisible && $clientUser !== null) {
