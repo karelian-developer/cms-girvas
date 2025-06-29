@@ -166,7 +166,7 @@ final class EntryComments
     try {
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':entry_id', $entryID, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':entryID', $entryID, \PDO::PARAM_INT);
       $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
