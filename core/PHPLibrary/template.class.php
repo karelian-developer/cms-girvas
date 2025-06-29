@@ -836,10 +836,13 @@ final class Template
    */
   private function getCoreClass() : string
   {
-    /** @var string $themeName Наименование шаблона */
     $themeName = $this->getName();
     $themeCategory = $this->getCategory();
-    return $themeCategory !== 'base' ? '\\templates\\' . $themeCategory . '\\' . $themeName . '\\Core' : '\\templates\\' $themeName . '\\Core';
+
+    $themeCoreNamespaceNotBase = '\\templates\\' . $themeCategory . '\\' . $themeName . '\\Core';
+    $themeCoreNamespaceBase = '\\templates\\' . $themeName . '\\Core';
+
+    return $themeCategory !== 'base' ? $themeCoreNamespaceNotBase : $themeCoreNamespaceBase;
   }
   
   /**
