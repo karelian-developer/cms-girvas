@@ -84,7 +84,7 @@ final class Collector
    * 
    * @return string
    */
-  public static function assembly_scripts(Template $theme, array $scriptsArray) : string
+  public static function assemblyScripts(Template $theme, array $scriptsArray) : string
   {
     $document = new DOMDocument();
 
