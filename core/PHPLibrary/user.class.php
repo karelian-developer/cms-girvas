@@ -746,8 +746,8 @@ class User
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       $databaseQuery->bindParam(':login', $userLogin, \PDO::PARAM_STR);
       $databaseQuery->bindParam(':email', $userEmail, \PDO::PARAM_STR);
-      $databaseQuery->bindParam(':password_hash', $userPasswordHash, \PDO::PARAM_STR);
-      $databaseQuery->bindParam(':security_hash', $userSecurityHash, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':passwordHash', $userPasswordHash, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':securityHash', $userSecurityHash, \PDO::PARAM_STR);
       $databaseQuery->bindParam(':createdUnixTimestamp', $userCreatedUnixTimestamp, \PDO::PARAM_INT);
       $databaseQuery->bindParam(':updatedUnixTimestamp', $userUpdatedUnixTimestamp, \PDO::PARAM_INT);
       $databaseQuery->bindParam(':metadata', $userMetadataJSON, \PDO::PARAM_STR);
