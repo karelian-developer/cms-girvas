@@ -21,6 +21,8 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
+  $CMSConfigurator = $CMSCore->configurator;
+
   if (isset($_PATCH['user_id'])) {
     if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT) || $clientUser->getID() === (int) $_PATCH['user_id']) {
       $userID = is_numeric($_PATCH['user_id']) ? (int) $_PATCH['user_id'] : 0;
@@ -42,7 +44,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
         if (isset($_PATCH['user_login'])) {
           $userLogin = htmlspecialchars(str_replace('\'', '"', $_PATCH['user_login']));
 
-          if ($CMSCore->configurator->getUsersLoginEditStatus(true) && $userID === $clientUser->getID()) {
+          if ($CMSConfigurator->getUsersLoginEditStatus(true) && $userID === $clientUser->getID()) {
             $userUpdateIsAllowed = true;
           } else {
             if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT)) {
@@ -51,11 +53,11 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
 
           if ($userUpdateIsAllowed) {
-            if ($CMSCore->configurator->getUsersLoginsBlacklistStatus(true)) {
-              $logins_blacklist_array = $CMSCore->configurator->getUsersLoginsBlacklist(true);
+            if ($CMSConfigurator->getUsersLoginsBlacklistStatus(true)) {
+              $logins_blacklist_array = $CMSConfigurator->getUsersLoginsBlacklist(true);
 
               foreach ($logins_blacklist_array as $login) {
-                if ($CMSCore->configurator->getUsersLoginRegisterAccountingStatus(true)) {
+                if ($CMSConfigurator->getUsersLoginRegisterAccountingStatus(true)) {
                   $loginPattern = '/^' . $userLogin . '$/';
 
                   if (preg_match($loginPattern, $login)) {
@@ -79,13 +81,13 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
 
           if ($userUpdateIsAllowed) {
-            if ($CMSCore->configurator->getUsersLoginSpecialSymbolsStatus(true)) {
+            if ($CMSConfigurator->getUsersLoginSpecialSymbolsStatus(true)) {
               $loginPattern = '[a-zA-Z0-9\_\-\!\@\#\$\%\&]+';
             } else {
               $loginPattern = '[a-zA-Z0-9\_\-]+';
             }
 
-            if ($CMSCore->configurator->getUsersLoginRegisterAccountingStatus(true)) {
+            if ($CMSConfigurator->getUsersLoginRegisterAccountingStatus(true)) {
               $loginPattern = '/^' . $userLogin . '$/i';
 
               if (!preg_match($loginPattern, $userLogin)) {
@@ -107,21 +109,21 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
 
           if ($userUpdateIsAllowed) {
-            if ($CMSCore->configurator->getUsersLoginLengthMax() > 0) {
-              if (strlen($userLogin) > $CMSCore->configurator->getUsersLoginLengthMax()) {
+            if ($CMSConfigurator->getUsersLoginLengthMax() > 0) {
+              if (strlen($userLogin) > $CMSConfigurator->getUsersLoginLengthMax()) {
                 $userUpdateIsAllowed = false;
     
-                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_LARGE'), $CMSCore->configurator->getUsersLoginLengthMax());
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_LARGE'), $CMSConfigurator->getUsersLoginLengthMax());
                 $handlerStatusCode = $handlerStatusCode ?? 0;
               }
             }
           }
     
           if ($userUpdateIsAllowed) {
-            if (strlen($userLogin) < $CMSCore->configurator->getUsersLoginLengthMin()) {
+            if (strlen($userLogin) < $CMSConfigurator->getUsersLoginLengthMin()) {
               $userUpdateIsAllowed = false;
     
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_SMALL'), $CMSCore->configurator->getUsersLoginLengthMin());
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_SMALL'), $CMSConfigurator->getUsersLoginLengthMin());
               $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           }
@@ -142,28 +144,28 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           // Проверяем, являются ли переменные $userPassword и $userPasswordRepeat пустыми.
           // Если пустые, то игнорируем проверку пароля
           if (!empty($userPassword) && !empty($userPasswordRepeat)) {
-            if ($CMSCore->configurator->getUsersPasswordSpecialSymbolsStatus(true)) {
+            if ($CMSConfigurator->getUsersPasswordSpecialSymbolsStatus(true)) {
               $passwordRegularPattern = '[a-zA-Z0-9\_\-\!\@\#\$\%\&]+';
             } else {
               $passwordRegularPattern = '[a-zA-Z0-9\_\-]+';
             }
             
             if ($userUpdateIsAllowed) {
-              if ($CMSCore->configurator->getUsersPasswordLengthMax() > 0) {
-                if (strlen($userPassword) > $CMSCore->configurator->getUsersPasswordLengthMax()) {
+              if ($CMSConfigurator->getUsersPasswordLengthMax() > 0) {
+                if (strlen($userPassword) > $CMSConfigurator->getUsersPasswordLengthMax()) {
                   $userUpdateIsAllowed = false;
       
-                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_LARGE'), $CMSCore->configurator->getUsersPasswordLengthMax());
+                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_LARGE'), $CMSConfigurator->getUsersPasswordLengthMax());
                   $handlerStatusCode = $handlerStatusCode ?? 0;
                 }
               }
             }
       
             if ($userUpdateIsAllowed) {
-              if (strlen($userPassword) < $CMSCore->configurator->getUsersPasswordLengthMin()) {
+              if (strlen($userPassword) < $CMSConfigurator->getUsersPasswordLengthMin()) {
                 $userUpdateIsAllowed = false;
       
-                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_SMALL'), $CMSCore->configurator->getUsersPasswordLengthMin());
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_SMALL'), $CMSConfigurator->getUsersPasswordLengthMin());
                 $handlerStatusCode = $handlerStatusCode ?? 0;
               }
             }
@@ -214,7 +216,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
         if ($userUpdateIsAllowed) {
           if (isset($userLogin) && $clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT)) {
             if ($userLogin != $user->getLogin()) {
-              if (!User::existsByLogin($CMSCore, $userLogin, $CMSCore->configurator->getUsersLoginRegisterAccountingStatus(true))) {
+              if (!User::existsByLogin($CMSCore, $userLogin, $CMSConfigurator->getUsersLoginRegisterAccountingStatus(true))) {
                 $userData['login'] = $userLogin;
               } else {
                 $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_LOGIN_ALREADY_EXISTS');
