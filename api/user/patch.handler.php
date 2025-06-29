@@ -42,7 +42,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
         }
 
         if (isset($_PATCH['user_login'])) {
-          $userLogin = trim($_PATCH['user_login']);if ($userUpdateIsAllowed) {
+          $userLogin = trim($_PATCH['user_login']);
           $userLogin = htmlspecialchars(str_replace('\'', '"', $userLogin));
 
           if ($userLogin !== $user->getLogin() && !empty($userLogin)) {
