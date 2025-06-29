@@ -60,7 +60,7 @@ class PageEntriesSample implements InterfacePage
 
     $entriesSample = null;
     if ($this->CMSCore->urlp->getPath(2) !== null) {
-      $entriesSampleID = is_numeric($this->CMSCore->urlp->getPath(2)) ? (int)$this->CMSCore->urlp->getPath(2) : 0;
+      $entriesSampleID = is_numeric($this->CMSCore->urlp->getPath(2)) ? (int) $this->CMSCore->urlp->getPath(2) : 0;
       $entriesSample = EntriesSample::existsByID($this->CMSCore, $entriesSampleID) ? new EntriesSample($this->CMSCore, $entriesSampleID) : null;
       
       if ($entriesSample !== null) {
@@ -69,7 +69,7 @@ class PageEntriesSample implements InterfacePage
     }
     
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = ThemeCollector::assembly_file_content($this->CMSCore->theme, 'templates/page/entriesSample.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesSample.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'entries-category',
       'ENTRIES_SAMPLE_ID' => $entriesSample !== null ? $entriesSample->getID() : 0,
       'ENTRIES_SAMPLE_TITLE' => $entriesSample !== null ? $entriesSample->getTitle($localeName) : '',
