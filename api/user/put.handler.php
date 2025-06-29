@@ -75,8 +75,7 @@ if ($CMSCore->client->isLogged(2)) {
       }
 
       if ($userCreationAllowed) {
-        if ($CMSCore->configurator->getUsersLoginRegisterAccountingS
-        tatus(true)) {
+        if ($CMSCore->configurator->getUsersLoginRegisterAccountingStatus(true)) {
           if (!preg_match(sprintf('/^%s$/i', $loginRegularPattern), $userLogin)) {
             $userCreationAllowed = false;
 
