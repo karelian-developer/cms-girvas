@@ -76,7 +76,7 @@ class PageUsersGroups implements InterfacePage
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
 
-    $paginationItemCurrent $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
+    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
     $paginationItemsOnPage = 12;
 
     $usersGroupsTableItemsAssembled = [];
