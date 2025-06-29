@@ -24,7 +24,7 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUserGroup->initData(['permissions']);
 
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_GROUPS_MANAGEMENT)) {
-    if (is_null($CMSCore->urlp->getPath(2))) {
+    if ($CMSCore->urlp->getPath(2) === null) {
       $userGroupName = isset($_PUT['user_group_name']) ? urlencode(htmlentities($_PUT['user_group_name'])) : '';
 
       if (!empty($userGroupName)) {
@@ -77,12 +77,12 @@ if ($CMSCore->client->isLogged(2)) {
             }
 
             $userGroup = UserGroup::create($CMSCore, $userGroupName, $texts, $usersGroupPermissions);
-            if (!is_null($userGroup)) {
+            if ($userGroup !== null) {
               $handlerOutputData['usersGroup'] = [];
               $handlerOutputData['usersGroup']['id'] = $userGroup->getID();
 
               $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PUT_DATA_SUCCESS');
-              $handlerStatusCode = $handlerStatusCode ?? 0;
+              $handlerStatusCode = $handlerStatusCode ?? 1;
             } else {
               $handlerMessage = $handlerMessage ?? 'API ERROR: ' .$CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
               $handlerStatusCode = $handlerStatusCode ?? 0;
