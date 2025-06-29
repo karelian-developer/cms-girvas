@@ -50,7 +50,7 @@ class PageSettings implements InterfacePage
   {
     $themeSource =& $this->CMSCore->theme->core->source;
 
-    $availableSettingsCategories = $this->initAdminPanelSubnavigation();
+    $availableSettingsCategories = $this->getAvailableSettingsCategoriesArray();
     if (!empty($availableSettingsCategories)) {
       $settingsName = $this->CMSCore->urlp->getPath(2) ?? 'base';
 
