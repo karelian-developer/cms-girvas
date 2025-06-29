@@ -126,7 +126,7 @@ class PagePage implements InterfacePage
             'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
             'PAGE_TITLE' => $pageStaticTitle,
             'PAGE_CONTENT' => $parsedown->text($pageStaticContent),
-            'PAGE_PREVIEW_URL' => $pageStatic->getPreviewURL() !== '' ? $pageStatic->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 1024),
+            'PAGE_PREVIEW_URL' => $pageStatic->getPreviewURL() !== '' ? $pageStatic->getPreviewURL() : PageStatic::getPreviewDefaultURL($this->CMSCore, 1024),
             'PAGE_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
             'PAGE_PUBLISHED_DATE_TIMESTAMP' => $pageStatic->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestamp : date('d.m.Y H:i:s', 0),
             'PAGE_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp,
