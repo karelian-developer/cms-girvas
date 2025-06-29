@@ -21,16 +21,19 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
   $clientUser->initData(['metadata']);
   $clientUserGroup = $clientUser->getGroup();
-  $clientUserGroup->initData(['permissions']);
-
+  $clientUserGroup->initData(['name', 'permissions']);
+  
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_GROUPS_MANAGEMENT)) {
     if (isset($_PATCH['user_group_id'])) {
       $usersGroupID = is_numeric($_PATCH['user_group_id']) ? (int) $_PATCH['user_group_id'] : 0;
       $userGroupName = isset($_PATCH['user_group_name']) ? urlencode(htmlentities($_PATCH['user_group_name'])) : '';
       
       if (UserGroup::existsByID($CMSCore, $usersGroupID)) {
-        if (!UserGroup::existsByName($CMSCore, $userGroupName)) {
-          $usersGroup = new UserGroup($CMSCore, $usersGroupID);
+        $usersGroup = new UserGroup($CMSCore, $usersGroupID);
+        $usersGroup->initData(['name']);
+        $usersGroupnameCurrent = $usersGroup->getName();
+
+        if (!UserGroup::existsByName($CMSCore, $userGroupName) || $userGroupName === $usersGroupnameCurrent) {
           $usersGroupData = [];
 
           $usersGroupPermissions = 0x0000000000000000;
