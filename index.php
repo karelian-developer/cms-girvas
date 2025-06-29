@@ -131,7 +131,7 @@ if ($CMSCore->urlp->getPath(0) === 'handler') {
     }
   }
 
-  $theme = $CMSCore->getTemplate();
+  $theme = $CMSCore->getTheme();
   $theme->assemblyGlobalVariables();
 
   $loadTime = microtime(true) - $startTime; // Конечное время

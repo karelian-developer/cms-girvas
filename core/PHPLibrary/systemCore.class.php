@@ -25,6 +25,7 @@ use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\SystemCore\DatabaseConnector as CMSDatabaseConnector;
 use \core\PHPLibrary\SystemCore\FileConnector as CMSFileConnector;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
+use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Client as Client;
 use \DOMDocument as DOMDocument;
@@ -48,7 +49,7 @@ final class SystemCore
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS GIRVAS';
-  public const CMS_VERSION = '0.1.36-1.7-21';
+  public const CMS_VERSION = '0.1.36-1.7-22';
   public const CMS_STAGE_DEVELOPING = 'alpha';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -57,29 +58,29 @@ final class SystemCore
   public string $CSPScriptsHash, $CSPStylesHash;
 
   /** 
-   * @var \core\PHPLibrary\SystemCore\Configurator Конфигуратор системы
+   * @var CMSConfigurator Конфигуратор системы
    */
   public CMSConfigurator|null $configurator = null;
   /** 
-   * @var \core\PHPLibrary\SystemCore\DatabaseConnector Класс системы подключения к БД 
+   * @var CMSDatabaseConnector Класс системы подключения к БД 
    */
   public CMSDatabaseConnector|null $databaseConnector = null;
   /** 
-   * @var \core\PHPLibrary\SystemCore\Locale Класс локализации ядра 
+   * @var CMSLocale Класс локализации ядра 
    */
   public CMSLocale|null $locale = null;
   /**
-   * @var \core\PHPLibrary\URLParser Класс парсера адресной строки 
+   * @var URLParser Класс парсера адресной строки 
    */
   public URLParser|null $urlp = null;
   /** 
-   * @var \core\PHPLibrary\Client Класс клиента
+   * @var Client Класс клиента
    */
   public Client|null $client = null;
   /** 
-   * @var \core\PHPLibrary\Template Класс шаблона системы 
+   * @var Theme Класс шаблона системы 
    */
-  public Template|null $theme = null;
+  public Theme|null $theme = null;
 
   /**
    *  @var array Массив активированных модулей
@@ -185,11 +186,11 @@ final class SystemCore
   /**
    * Установить шаблон для системы
    * 
-   * @param Template $theme
+   * @param Theme $theme
    * 
    * @return void
    */
-  public function setTheme(Template $theme) : void
+  public function setTheme(Theme $theme) : void
   {
     $this->theme = $theme;
   }
@@ -197,9 +198,9 @@ final class SystemCore
   /**
    * Получить текущий шаблон
    * 
-   * @return Template
+   * @return Theme
    */
-  public function getTheme() : Template
+  public function getTheme() : Theme
   {
     return $this->theme;
   }
@@ -569,9 +570,9 @@ final class SystemCore
       
       if ($this->urlp->getPath(0) !== 'sql-execute-forced') {
         // Устанавливаем объект шаблона для системного ядра
-        $this->setTheme(new Template($this, $CMSCoreThemeName, $CMSCoreThemeCategoryName));
+        $this->setTheme(new Theme($this, $CMSCoreThemeName, $CMSCoreThemeCategoryName));
 
-        /** @var Template Объект шаблона системного ядра */
+        /** @var Theme Объект шаблона системного ядра */
         $theme = $this->getTheme();
         // Инициализация шаблона системного ядра
         $theme->init();
