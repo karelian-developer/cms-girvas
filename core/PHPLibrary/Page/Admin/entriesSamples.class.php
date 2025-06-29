@@ -171,7 +171,7 @@ class PageEntriesSamples implements InterfacePage
       $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
       /** @var string Заголовок выборки */
-      $entriesSampleTitle = $object->get_title($entriesSamplesLocaleName);
+      $entriesSampleTitle = $object->getTitle($entriesSamplesLocaleName);
       $entriesSampleTitle = strip_tags($entriesSampleTitle);
       
       /** @var int Количество записей в выборке */
