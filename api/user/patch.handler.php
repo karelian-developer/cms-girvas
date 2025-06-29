@@ -33,7 +33,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
 
         $userData = [];
 
-        $userUpdateIsAllowed = false;
+        $userUpdateIsAllowed = false;error_log(__LINE__);
 
         if (isset($_PATCH['user_is_block'])) {
           if (!isset($userData['metadata'])) $userData['metadata'] = [];
