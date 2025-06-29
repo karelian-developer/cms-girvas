@@ -157,7 +157,7 @@ class PageEntries implements InterfacePage
             'ENTRY_TITLE' => $entryTitle,
             'ENTRY_DESCRIPTION' => $entryDescription,
             'ENTRY_URL' => $entryObject->getURL(),
-            'ENTRY_PREVIEW_URL' => $entryObject->getPreviewURL() !== '' ? $entryObject->getPreviewURL() : Entry::get_preview_default_url($this->CMSCore, 512),
+            'ENTRY_PREVIEW_URL' => $entryObject->getPreviewURL() !== '' ? $entryObject->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 512),
             'ENTRY_CATEGORY_TITLE' => $categoryTitle,
             'ENTRY_CATEGORY_URL' => $category->getURL(),
             'ENTRY_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
