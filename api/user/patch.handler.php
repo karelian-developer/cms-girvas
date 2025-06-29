@@ -54,14 +54,16 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
 
           if ($userUpdateIsAllowed) {
             if ($CMSConfigurator->getUsersLoginsBlacklistStatus(true)) {
-              $logins_blacklist_array = $CMSConfigurator->getUsersLoginsBlacklist(true);
+              $loginBlacklist = $CMSConfigurator->getUsersLoginsBlacklist(true);
 
-              foreach ($logins_blacklist_array as $login) {
+              foreach ($loginBlacklist as $login) {
                 if ($CMSConfigurator->getUsersLoginRegisterAccountingStatus(true)) {
                   $loginPattern = '/^' . $userLogin . '$/';
 
                   if (preg_match($loginPattern, $login)) {
                     $userUpdateIsAllowed = false;
+
+                    error_log(__LINE__);
 
                     $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST');
                     $handlerStatusCode = $handlerStatusCode ?? 0;
@@ -71,6 +73,8 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
 
                   if (preg_match($loginPattern, $login)) {
                     $userUpdateIsAllowed = false;
+
+                    error_log(__LINE__);
 
                     $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST');
                     $handlerStatusCode = $handlerStatusCode ?? 0;
@@ -92,6 +96,8 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
 
               if (!preg_match($loginPattern, $userLogin)) {
                 $userUpdateIsAllowed = false;
+
+                    error_log(__LINE__);
     
                 $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN');
                 $handlerStatusCode = $handlerStatusCode ?? 0;
@@ -101,6 +107,8 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
 
               if (!preg_match($loginPattern, $userLogin)) {
                 $userUpdateIsAllowed = false;
+
+                    error_log(__LINE__);
     
                 $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN');
                 $handlerStatusCode = $handlerStatusCode ?? 0;
@@ -112,6 +120,8 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
             if ($CMSConfigurator->getUsersLoginLengthMax() > 0) {
               if (strlen($userLogin) > $CMSConfigurator->getUsersLoginLengthMax()) {
                 $userUpdateIsAllowed = false;
+
+                    error_log(__LINE__);
     
                 $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_LARGE'), $CMSConfigurator->getUsersLoginLengthMax());
                 $handlerStatusCode = $handlerStatusCode ?? 0;
@@ -122,6 +132,8 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           if ($userUpdateIsAllowed) {
             if (strlen($userLogin) < $CMSConfigurator->getUsersLoginLengthMin()) {
               $userUpdateIsAllowed = false;
+
+                    error_log(__LINE__);
     
               $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_SMALL'), $CMSConfigurator->getUsersLoginLengthMin());
               $handlerStatusCode = $handlerStatusCode ?? 0;
