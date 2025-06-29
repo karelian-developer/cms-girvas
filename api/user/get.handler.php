@@ -72,7 +72,7 @@ if ($CMSCore->urlp->getPath(3) === 'permissions') {
   }
 } else if ($CMSCore->urlp->getPath(3) === null) {
   $user = $CMSCore->urlp->getPath(2) === '@me' ? $CMSCore->client->getUser(1) : is_numeric($CMSCore->urlp->getPath(2) ? new User($CMSCore, $CMSCore->urlp->getPath(2)) : User::getByLogin($CMSCore, $CMSCore->urlp->getPath(2)));
-  $locale = $CMSCore->urlp->getParam('locale') !== null ? $CMSCore->urlp->getParam('locale') : $CMSCore->configurator->getDatabaseEntryValue('base_locale');
+  $locale = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
   
   if ($user !== null) {
     $user->initData(['login', 'metadata']);
@@ -82,7 +82,7 @@ if ($CMSCore->urlp->getPath(3) === 'permissions') {
     
     $themeName = ($CMSCore->configurator->existsDatabaseEntryValue('base_template')) ? $CMSCore->configurator->getDatabaseEntryValue('base_template') : 'default';
     $theme = new Theme($CMSCore, $themeName);
-    $CMSCore->setTemplate($theme);
+    $CMSCore->setTheme($theme);
 
     $handlerOutputData['user'] = [];
     $handlerOutputData['user']['id'] = $user->getID();
