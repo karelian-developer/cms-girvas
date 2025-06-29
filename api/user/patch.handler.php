@@ -307,7 +307,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
             if (!isset($userData)) $userData = [];
             if (!isset($userData['metadata'])) $userData['metadata'] = [];
       
-            $userData['metadata']['group_id'] = $userGroupID;
+            $userData['metadata']['groupID'] = $userGroupID;
           }
         }
 

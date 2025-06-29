@@ -375,6 +375,9 @@ if (defined('IS_NOT_HACKED')) {
   $handlerOutputData['debug']['put_data'] = $_PUT ?? null;
   $handlerOutputData['debug']['delete_data'] = $_DELETE ?? null;
 
+  $loadTime = microtime(true) - $startTime; // Конечное время
+  header('X-Load-Time: ' . round($loadTime, 3) . 's');
+
   // Выводим результат работы обработчика в JSON-формате
   echo json_encode([
     'message' => $handlerMessage,
