@@ -48,7 +48,7 @@ final class SystemCore
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS GIRVAS';
-  public const CMS_VERSION = '0.1.36-1.7';
+  public const CMS_VERSION = '0.1.36-1.7-1';
   public const CMS_STAGE_DEVELOPING = 'alpha';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -798,9 +798,9 @@ final class SystemCore
    * @param  string $inputString
    * @param  string $contentType
    * 
-   * @return void
+   * @return array
    */
-  public static function parseRawHTTPRequest(string $inputString, string $contentType) : void
+  public static function parseRawHTTPRequest(string $inputString, string $contentType) : array
   {
     // grab multipart boundary from content type header
     preg_match('/boundary=(.*)$/', $contentType, $matches);
