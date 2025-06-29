@@ -14,7 +14,7 @@ namespace core\PHPLibrary\Page\Admin\Settings;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Template as Template;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class SettingsSecurity
 {
@@ -63,7 +63,7 @@ class SettingsSecurity
     $settingPremoderationLinksFilterStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_links_filter_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_links_filter_status') : '';
     $settingPremoderationWordsFilterStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_words_filter_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_words_filter_status') : '';
 
-    $this->assembled = TemplateCollector::assembly_file_content($this->CMSCore->theme, $formTemplatePath, [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
       'SETTINGS_NAME' => $this->name,
       'SETTING_ALLOWED_USERS_REGISTRATION_STATUS_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_users_registration_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_users_registration_status') : 'off',
       'SETTING_ALLOWED_USERS_REGISTRATION_CHECKED_VALUE' => $settingAllowedUsersRegistrationStatusValue === 'on' ? 'checked' : '',
