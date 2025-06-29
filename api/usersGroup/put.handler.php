@@ -30,11 +30,11 @@ if ($CMSCore->client->isLogged(2)) {
       if (!empty($userGroupName)) {
         if (!UserGroup::existsByName($CMSCore, $userGroupName)) {
           if (preg_match('/[a-z\_]+/i', $userGroupName)) {
-            $userGroupPermissions = 0x0000000000000000;
-            $userGroupPermissionsArray = $_PUT['user_group_permissions'] ?? [];
+            $usersGroupPermissions = 0x0000000000000000;
+            $usersGroupPermissionsArray = $_PUT['user_group_permissions'] ?? [];
 
-            if (!empty($userGroupPermissionsArray)) {
-              foreach ($userGroupPermissionsArray as $permission) {
+            if (!empty($usersGroupPermissionsArray)) {
+              foreach ($usersGroupPermissionsArray as $permission) {
                 $usersGroupPermissions = match ($permission) {
                   'admin_panel_auth' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_PANEL_AUTH,
                   'admin_users_management' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT,
@@ -76,7 +76,7 @@ if ($CMSCore->client->isLogged(2)) {
               }
             }
 
-            $userGroup = UserGroup::create($CMSCore, $userGroupName, $texts, $userGroupPermissions);
+            $userGroup = UserGroup::create($CMSCore, $userGroupName, $texts, $usersGroupPermissions);
             if (!is_null($userGroup)) {
               $handlerOutputData['usersGroup'] = [];
               $handlerOutputData['usersGroup']['id'] = $userGroup->getID();
