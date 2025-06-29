@@ -50,7 +50,7 @@ if ($CMSCore->urlp->getPath(3) == 'permissions') {
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else if ($CMSCore->urlp->getPath(3) === null) {
-  $usersGroup = is_numeric($CMSCore->urlp->getPath(2) ? new UserGroup($CMSCore, $CMSCore->urlp->getPath(2)) : UserGroup::getByName($CMSCore, $CMSCore->urlp->getPath(2)));
+  $usersGroup = is_numeric($CMSCore->urlp->getPath(2)) ? new UserGroup($CMSCore, $CMSCore->urlp->getPath(2)) : UserGroup::getByName($CMSCore, $CMSCore->urlp->getPath(2));
 
   if ($usersGroup !== null) {
     $usersGroup->initData(['name', 'texts', 'metadata']);
