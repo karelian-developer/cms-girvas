@@ -106,41 +106,49 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
           }
 
           if (!$errorIsDetected) {
-            if ($CMSCore->configurator->getUsersLoginLengthMax() > 0) {
-              if (strlen($userLogin) > $CMSCore->configurator->getUsersLoginLengthMax()) {
+            $usersLoginLengthMax = $CMSCore->configurator->getUsersLoginLengthMax();
+
+            if ($usersLoginLengthMax > 0) {
+              if (strlen($userLogin) > $usersLoginLengthMax) {
                 $errorIsDetected = true;
 
-                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_LARGE');
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_LARGE'), $usersLoginLengthMax);
                 $handlerStatusCode = $handlerStatusCode ?? 0;
               }
             }
           }
 
           if (!$errorIsDetected) {
-            if (strlen($userLogin) < $CMSCore->configurator->getUsersLoginLengthMin()) {
+            $usersLoginLengthMin = $CMSCore->configurator->getUsersLoginLengthMin();
+
+            if (strlen($userLogin) < $usersLoginLengthMin) {
               $errorIsDetected = true;
 
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_SMALL');
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_SMALL'), $usersLoginLengthMin);
               $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           }
 
           if (!$errorIsDetected) {
-            if ($CMSCore->configurator->getUsersPasswordLengthMax() > 0) {
-              if (strlen($userPassword) > $CMSCore->configurator->getUsersPasswordLengthMax()) {
+            $usersPasswordLengthMax = $CMSCore->configurator->getUsersPasswordLengthMax();
+
+            if ($usersPasswordLengthMax > 0) {
+              if (strlen($userPassword) > $usersPasswordLengthMax) {
                 $errorIsDetected = true;
 
-                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_LARGE');
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_LARGE'), $usersPasswordLengthMax);
                 $handlerStatusCode = $handlerStatusCode ?? 0;
               }
             }
           }
 
           if (!$errorIsDetected) {
-            if (strlen($userPassword) < $CMSCore->configurator->getUsersPasswordLengthMin()) {
+            $usersPasswordLengthMin = $CMSCore->configurator->getUsersPasswordLengthMin();
+
+            if (strlen($userPassword) < $usersPasswordLengthMin) {
               $errorIsDetected = true;
 
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_SMALL');
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_SMALL'), $usersPasswordLengthMin);
               $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           }
