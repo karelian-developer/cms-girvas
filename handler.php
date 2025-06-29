@@ -217,7 +217,7 @@ if (defined('IS_NOT_HACKED')) {
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       if ($CMSCore->urlp->getPath(2) === 'additional-fields') {
         $CMSLocaleSetted = $CMSCore->configurator->getDatabaseEntryValue('base_locale');
-        $fieldsLocale = $CMSCore->urlp->get_param('locale') ?? $CMSLocaleSetted;
+        $fieldsLocale = $CMSCore->urlp->getParam('locale') ?? $CMSLocaleSetted;
 
         $fieldsTypes = $CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_type') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('users_additional_field_type'), true) : [];
         $fieldsTitles = $CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_title') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('users_additional_field_title'), true) : [];
@@ -299,7 +299,7 @@ if (defined('IS_NOT_HACKED')) {
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       if ($CMSCore->urlp->getPath(2) === 'additional-fields' && $CMSCore->urlp->getPath(3) !== null) {
         $CMSLocaleSetted = $CMSCore->configurator->getDatabaseEntryValue('base_locale');
-        $fieldsLocale = $CMSCore->urlp->get_param('locale') ?? $CMSLocaleSetted;
+        $fieldsLocale = $CMSCore->urlp->getParam('locale') ?? $CMSLocaleSetted;
 
         $fieldsTypes = $CMSCore->configurator->existsDatabaseEntryValue('static_pages_additional_field_type') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('static_pages_additional_field_type'), true) : [];
         $fieldsTitles = $CMSCore->configurator->existsDatabaseEntryValue('static_pages_additional_field_title') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('static_pages_additional_field_title'), true) : [];
