@@ -93,9 +93,9 @@ final class Collector
       $src = $scriptData['src'] ?? '';
 
       if ($theme->getCategory() !== 'default') {
-        $scriptURL = $isCMSCore ? '/templates/' . $theme->getCategory() . '/' . $theme->getName() . '/' . $src : '/core/JSLibrary/' . $src;
+        $scriptURL = !$isCMSCore ? '/templates/' . $theme->getCategory() . '/' . $theme->getName() . '/' . $src : '/core/JSLibrary/' . $src;
       } else {
-        $scriptURL = $isCMSCore ? '/templates/' . $theme->getName() . '/' . $src : '/core/JSLibrary/' . $src;
+        $scriptURL = !$isCMSCore ? '/templates/' . $theme->getName() . '/' . $src : '/core/JSLibrary/' . $src;
       }
 
       if (array_key_exists('src', $scriptData)) {
