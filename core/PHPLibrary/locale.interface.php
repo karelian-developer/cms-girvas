@@ -38,6 +38,4 @@ interface LocaleInterface
   public function existsFileMetadataJSON() : bool;
 
   public static function getDataValue(array $data, string $name) : string;
-  
-  private function setName(string $value) : void;
 }
