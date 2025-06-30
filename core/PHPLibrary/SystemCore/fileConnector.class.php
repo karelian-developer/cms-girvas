@@ -114,7 +114,7 @@ final class FileConnector implements InterfaceFileConnector
     /** @var string $filesPath Полный путь до файлов */
     $filesPath = $this->getCurrentDirectory();
     /** @var array $filesList Массив файлов */
-    $filesList = array_diff(scandir(sprintf($filesPath)), ['..', '.']);
+    $filesList = array_diff(scandir($filesPath), ['..', '.']);
     foreach ($filesList as $fileName) {
       if ($level === 0) {
         $this->resetCurrentDirectory();
