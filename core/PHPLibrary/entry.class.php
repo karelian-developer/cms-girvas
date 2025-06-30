@@ -725,7 +725,7 @@ class Entry implements EntityTypeContent
 
       if (!empty($data[$columnName])) {
         $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-          'mysql' => 'JSON_MERGE_PRESERVE(COALESCE(' . $columnName . ', \'{}\'), {' . implode(', ', $fieldsJSON) . '})',
+          'mysql' => 'JSON_MERGE_PRESERVE(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\') AS JSON)',
           'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
         ]);
       }
