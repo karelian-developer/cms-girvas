@@ -40,7 +40,7 @@ final class Locale implements LocaleInterface
     $this->setName($name);
   }
 
-  private function initPathes() : void
+  public function initPathes() : void
   {
     $CMSCore = $this->CMSCore;
 
