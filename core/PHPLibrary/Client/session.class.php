@@ -389,18 +389,24 @@ class Session
 
     $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections(['1']);
-    $queryBuilder->statement->setClauseFrom();
-    $queryBuilder->statement->clauseFrom->addTable('users_sessions');
-    $queryBuilder->statement->clauseFrom->assembly();
-    $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"userIP" = :userIP AND "token" = :token AND "typeID" = :typeID');
-    $queryBuilder->statement->clauseWhere->assembly();
-    $queryBuilder->statement->setClauseLimit(1);
-    $queryBuilder->statement->assembly();
+
+    $queryBuilderStatement = $queryBuilder->statement;
+    $queryBuilderStatement->addSelections(['1']);
+    $queryBuilderStatement->setClauseFrom();
+
+    $queryBuilderStatementClauseFrom = $queryBuilderStatement->clauseFrom;
+    $queryBuilderStatementClauseFrom->addTable('users_sessions');
+    $queryBuilderStatementClauseFrom->assembly();
+    $queryBuilderStatement->setClauseWhere();
+
+    $queryBuilderStatementClauseWhere = $queryBuilderStatement->clauseWhere;
+    $queryBuilderStatementClauseWhere->addCondition('"userIP" = :userIP AND "token" = :token AND "typeID" = :typeID');
+    $queryBuilderStatementClauseWhere->assembly();
+    $queryBuilderStatement->setClauseLimit(1);
+    $queryBuilderStatement->assembly();
 
     $databaseConnection = $CMSCore->databaseConnector->database->connection;
-    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery = $databaseConnection->prepare($queryBuilderStatement->assembled);
     $databaseQuery->bindParam(':userIP', $userIP, \PDO::PARAM_STR);
     $databaseQuery->bindParam(':token', $token, \PDO::PARAM_STR);
     $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
