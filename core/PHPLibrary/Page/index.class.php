@@ -44,14 +44,18 @@ class PageIndex implements InterfacePage
    */
   public function assembly() : void
   {
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page/index.css', 'rel' => 'stylesheet']);
+    $CMSCore = $this->CMSCore;
+    $CMSTheme = $CMSCore->theme;
+    $CMSLocale = $CMSCore->locale;
 
-    $localeData = $this->CMSCore->locale->getData();
-    $localeName = $this->CMSCore->locale->getName();
+    $CMSTheme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+    $CMSTheme->addStyle(['href' => 'styles/page/index.css', 'rel' => 'stylesheet']);
+
+    $localeData = $CMSLocale->getData();
+    $localeName = $CMSLocale->getName();
 
     /** @var Entries $entries Объект класса Entries */
-    $entries = new Entries($this->CMSCore);
+    $entries = new Entries($CMSCore);
     $entriesObjects = $entries->getAll(['limit' => [6, 0]]);
     unset($entries);
 
@@ -94,15 +98,19 @@ class PageIndex implements InterfacePage
       $categoryTitle = $categoryObject->getTitle($localeName);
       $categoryTitle = strip_tags($categoryTitle); 
 
+      $entryPreviewURL = $entryObject->getPreviewURL() !== '' ? $entryObject->getPreviewURL() : Entry::getPreviewDefaultURL($CMSCore, 512);
+      $entryURL = $entryObject->getURL();
+      $entryCategoryURL = $categoryObject->getURL();
+
       if ($entryObject->isPublished() && $categoryObject->isShowedOnIndexPage()) {
-        array_push($entriesArrayTemplates, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/entriesList/item.tpl', [
+        array_push($entriesArrayTemplates, ThemeCollector::assemblyFileContent($CMSTheme, 'templates/page/index/entriesList/item.tpl', [
           'ENTRY_ID' => $entryObject->getID(),
           'ENTRY_TITLE' => $entryTitle,
           'ENTRY_DESCRIPTION' => $entryDescription,
-          'ENTRY_URL' => $entryObject->getURL(),
-          'ENTRY_PREVIEW_URL' => $entryObject->getPreviewURL() !== '' ? $entryObject->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 512),
+          'ENTRY_URL' => $entryURL,
+          'ENTRY_PREVIEW_URL' => $entryPreviewURL,
           'ENTRY_CATEGORY_TITLE' => $categoryTitle,
-          'ENTRY_CATEGORY_URL' => $categoryObject->getURL(),
+          'ENTRY_CATEGORY_URL' => $entryCategoryURL,
           'ENTRY_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
           'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $entryObject->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestamp : date('d.m.Y H:i:s', 0),
           'ENTRY_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp,
@@ -127,10 +135,10 @@ class PageIndex implements InterfacePage
 
     unset($entriesObjects);
 
-    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($CMSTheme, 'templates/page.tpl', [
       'PAGE_NAME' => 'index',
-      'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index.tpl', [
-        'ENTRIES_LIST' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/entriesList/list.tpl', [
+      'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($CMSTheme, 'templates/page/index.tpl', [
+        'ENTRIES_LIST' => ThemeCollector::assemblyFileContent($CMSTheme, 'templates/page/index/entriesList/list.tpl', [
           'ENTRIES_LIST_ITEMS' => implode($entriesArrayTemplates)
         ])
       ])
