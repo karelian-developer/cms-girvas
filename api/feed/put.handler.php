@@ -13,7 +13,7 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Feed as Feed;
 
 if ($CMSCore->client->isLogged(2)) {
@@ -36,7 +36,10 @@ if ($CMSCore->client->isLogged(2)) {
     $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
     if (count($CMSLocalesNames) > 0) {
       foreach ($CMSLocalesNames as $index => $name) {
-        $CMSLocale = new SystemCoreLocale($CMSCore, $name);
+        $CMSLocale = new  CMSLocale($CMSCore, $name);
+        $CMSLocale->setTypeName('handler');
+        $CMSLocale->initPathes();
+
         $CMSLocaleName = $CMSLocale->getName();
 
         $inputTitleName = 'web_channel_title_' . $CMSLocale->getISO639(2);

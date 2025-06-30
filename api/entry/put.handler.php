@@ -16,7 +16,7 @@
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
-use \core\PHPLibrary\SystemCore\Locale as Locale;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
@@ -36,7 +36,10 @@ if ($CMSCore->client->isLogged(2)) {
       $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
       if (count($CMSLocalesNames) > 0) {
         foreach ($CMSLocalesNames as $index => $localeName) {
-          $CMSLocale = new Locale($CMSCore, $localeName);
+          $CMSLocale = new CMSLocale($CMSCore, $localeName);
+          $CMSLocale->setTypeName('handler');
+          $CMSLocale->initPathes();
+          
           $CMSLocaleName = $CMSLocale->getName();
 
           $inputTitleName = 'entries_category_title_' . $CMSLocale->getISO639(2);
@@ -104,7 +107,10 @@ if ($CMSCore->client->isLogged(2)) {
       $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
       if (count($CMSLocalesNames) > 0) {
         foreach ($CMSLocalesNames as $index => $localeName) {
-          $CMSLocale = new Locale($CMSCore, $localeName);
+          $CMSLocale = new CMSLocale($CMSCore, $localeName);
+          $CMSLocale->setTypeName('handler');
+          $CMSLocale->initPathes();
+
           $CMSLocaleName = $CMSLocale->getName();
 
           $inputTitleName = 'entry_title_' . $CMSLocale->getISO639(2);

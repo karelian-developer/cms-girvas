@@ -13,9 +13,9 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-use \core\PHPLibrary\Template as Template;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\SystemCore\Locale as  CMSLocale;
+use \core\PHPLibrary\Template as Theme;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 /**
  * Сборка шаблона по запросу
@@ -32,14 +32,17 @@ if ($CMSCore->urlp->getPath(2) == 'assembly') {
     }
 
     $CMSCore->locale = match ($themeCategory) {
-      'base' => new SystemCoreLocale($CMSCore, $localeName, 'base'),
-      'admin' => new SystemCoreLocale($CMSCore, $localeName, 'admin'),
-      'install' => new SystemCoreLocale($CMSCore, $localeName, 'install'),
+      'base' => new CMSLocale($CMSCore, $localeName, 'base'),
+      'admin' => new CMSLocale($CMSCore, $localeName, 'admin'),
+      'install' => new CMSLocale($CMSCore, $localeName, 'install'),
       default => $themeCategory . '_template'
     };
 
+    $CMSCore->locale->setTypeName($themeCategory);
+    $CMSCore->locale->initPathes();
+
     $themeName = ($CMSCore->configurator->existsDatabaseEntryValue($themeConfigName)) ? $CMSCore->configurator->getDatabaseEntryValue($themeConfigName) : 'default';
-    $theme = new Template($CMSCore, $themeName, $themeCategory);
+    $theme = new Theme($CMSCore, $themeName, $themeCategory);
 
     $themesPatterns = [];
     if (isset($_GET['patternNames']) && isset($_GET['patternValues'])) {
@@ -50,7 +53,7 @@ if ($CMSCore->urlp->getPath(2) == 'assembly') {
       }
     }
 
-    $handlerOutputData['templateAssembled'] = TemplateCollector::assemblyLocale(TemplateCollector::assemblyFileContent($theme, $_GET['templateFilePath'], $themesPatterns), $CMSCore->locale);
+    $handlerOutputData['templateAssembled'] = ThemeCollector::assemblyLocale(ThemeCollector::assemblyFileContent($theme, $_GET['templateFilePath'], $themesPatterns), $CMSCore->locale);
     
     $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
@@ -71,11 +74,14 @@ if ($CMSCore->urlp->get_path(2) == null && $CMSCore->urlp->getParam('categoryNam
   }
 
   $CMSCore->locale = match ($themeCategoryName) {
-    'base' => new SystemCoreLocale($CMSCore, $localeName, 'base'),
-    'admin' => new SystemCoreLocale($CMSCore, $localeName, 'admin'),
-    'install' => new SystemCoreLocale($CMSCore, $localeName, 'install'),
+    'base' => new  CMSLocale($CMSCore, $localeName, 'base'),
+    'admin' => new  CMSLocale($CMSCore, $localeName, 'admin'),
+    'install' => new  CMSLocale($CMSCore, $localeName, 'install'),
     default => $themeCategoryName . '_template'
   };
+
+  $CMSCore->locale->setTypeName($themeCategory);
+  $CMSCore->locale->initPathes();
 
   $themeName = $CMSCore->configurator->existsDatabaseEntryValue($themeConfigName) ? $CMSCore->configurator->getDatabaseEntryValue($themeConfigName) : 'default';
 

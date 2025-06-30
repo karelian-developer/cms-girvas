@@ -14,7 +14,7 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 use \core\PHPLibrary\Feed as Feed;
-use \core\PHPLibrary\SystemCore\Locale as Locale;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
@@ -33,7 +33,10 @@ if ($CMSCore->client->isLogged(2)) {
       $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
       if (count($CMSLocalesNames) > 0) {
         foreach ($CMSLocalesNames as $index => $name) {
-          $CMSLocale = new Locale($CMSCore, $name);
+          $CMSLocale = new CMSLocale($CMSCore, $name);
+          $CMSLocale->setTypeName('handler');
+          $CMSLocale->initPathes();
+
           $CMSLocaleName = $CMSLocale->getName();
 
           $inputTitleName = 'web_channel_title_' . $CMSLocale->getISO639(2);
