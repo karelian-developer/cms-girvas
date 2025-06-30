@@ -71,7 +71,7 @@ final class ClauseFrom implements InterfaceClause
       array_push($queryArray, $tableFullname);
     }
 
-    $this->assembled = count($this->tables) > 0 ? sprintf('FROM %s', implode(', ', $queryArray)) : '';
+    $this->assembled = count($this->tables) > 0 ? 'FROM ' . implode(', ', $queryArray) : '';
   }
 
 }

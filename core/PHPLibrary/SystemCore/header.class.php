@@ -90,22 +90,21 @@ class Header
 
   static public function add(EnumHeader $enumHeader, mixed $value) : bool
   {
-    if ($enumHeader === EnumHeader::HTTP_RESPONSE_CODE) {
-      if (is_numeric($value)) {
-        $string = self::getHTTPResponseCodeLabel($value);
+    if ($enumHeader === EnumHeader::HTTP_RESPONSE_CODE && is_numeric($value)) {
+      $string = self::getHTTPResponseCodeLabel($value);
 
-        if (!empty($string)) {
-          header(sprintf('HTTP/1.1 %s', $string));
-          return true;
-        }
+      if (!empty($string)) {
+        header('HTTP/1.1 ' . $string);
+        return true;
       }
     }
 
-    if ($enumHeader === EnumHeader::HTTP_LOCATION) {
-      if (filter_var($value, FILTER_VALIDATE_URL) !== false) {
-        header(sprintf('Location: %s', $value));
-        return true;
-      }
+    if (
+      $enumHeader === EnumHeader::HTTP_LOCATION
+      && filter_var($value, FILTER_VALIDATE_URL) !== false
+    ) {
+      header('Location: ' . $value);
+      return true;
     }
 
     if ($enumHeader === EnumHeader::HTTP_CONTENT_SECURITY_POLICY) {

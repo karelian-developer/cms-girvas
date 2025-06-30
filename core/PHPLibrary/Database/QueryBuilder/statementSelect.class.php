@@ -106,32 +106,29 @@ final class StatementSelect implements InterfaceStatement
   public function assembly() : void
   {
     $queryArray = [];
-    if (!empty($this->selections)) {
-      array_push($queryArray, implode(', ', $this->selections));
-    } else {
-      array_push($queryArray, '*');
-    }
+    $queryArray[] = !empty($this->selections) ? implode(', ', $this->selections) : '*';
 
-    if (!is_null($this->clauseFrom)) {
-      $this->clauseFrom->assembly();
-      array_push($queryArray, $this->clauseFrom->assembled);
-    }
-
-    if (!is_null($this->clauseWhere)) {
-      $this->clauseWhere->assembly();
-      array_push($queryArray, $this->clauseWhere->assembled);
-    }
-
-    if (!is_null($this->clauseOrderBy)) {
-      $this->clauseOrderBy->assembly();
-      array_push($queryArray, $this->clauseOrderBy->assembled);
-    }
-
-    if (!is_null($this->clauseLimit)) {
-      $this->clauseLimit->assembly();
-      array_push($queryArray, $this->clauseLimit->assembled);
+    $clausesToPrecess = $this->getClausesToProcess();
+    foreach ($clausesToPrecess as $clause) {
+      if ($clause !== null) {
+        $clause->assembly();
+        $queryArray[] = $clause->assembled;
+      }
     }
 
     $this->assembled = sprintf('SELECT %s;', implode(' ', $queryArray));
+  }
+
+  /**
+   * Получение массива объектов предложений
+   */
+  private function getClausesToProcess() : array
+  {
+    return [
+      $this->clauseFrom,
+      $this->clauseWhere,
+      $this->clauseOrderBy,
+      $this->clauseLimit
+    ];
   }
 }

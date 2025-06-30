@@ -63,16 +63,25 @@ final class StatementDelete implements InterfaceStatement
   {
     $queryArray = [];
 
-    if ($this->clauseFrom !== null) {
-      $this->clauseFrom->assembly();
-      array_push($queryArray, $this->clauseFrom->assembled);
-    }
-
-    if ($this->clauseWhere !== null) {
-      $this->clauseWhere->assembly();
-      array_push($queryArray, $this->clauseWhere->assembled);
+    $clausesToPrecess = $this->getClausesToProcess();
+    foreach ($clausesToPrecess as $clause) {
+      if ($clause !== null) {
+        $clause->assembly();
+        $queryArray[] = $clause->assembled;
+      }
     }
 
     $this->assembled = sprintf('DELETE %s;', implode(' ', $queryArray));
+  }
+
+  /**
+   * Получение массива объектов предложений
+   */
+  private function getClausesToProcess() : array
+  {
+    return [
+      $this->clauseFrom,
+      $this->clauseWhere
+    ];
   }
 }

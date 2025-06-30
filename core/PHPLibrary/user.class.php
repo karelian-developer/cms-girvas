@@ -816,15 +816,20 @@ class User
       }
     }
     
-    if (array_key_exists('metadata', $data)) {
+    foreach (['metadata'] as $columnName) {
       $fieldsJSON = [];
-
-      foreach ($data['metadata'] as $name => $value) {
-        array_push($fieldsJSON, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
+      
+      if (!isset($data[$columnName])) {
+        continue;
       }
 
-      if (!empty($data['metadata'])) {
-        $queryBuilder->statement->clauseSet->addColumn('metadata', 'metadata::jsonb || ' . implode(' || ', $fieldsJSON));
+      foreach ($data[$columnName] as $name => $value) {
+        $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $fieldsJSON[] = sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON);
+      }
+
+      if (!empty($data[$columnName])) {
+        $queryBuilder->statement->clauseSet->addColumn($columnName, $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON));
       }
     }
 

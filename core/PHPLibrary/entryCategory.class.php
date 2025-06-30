@@ -454,27 +454,20 @@ class EntryCategory implements EntityTypeContent
       }
     }
 
-    if (array_key_exists('texts', $data)) {
+    foreach (['texts', 'metadata'] as $columnName) {
       $fieldsJSON = [];
-
-      foreach ($data['texts'] as $name => $value) {
-        array_push($fieldsJSON, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
+      
+      if (!isset($data[$columnName])) {
+        continue;
       }
 
-      if (!empty($data['texts'])) {
-        $queryBuilder->statement->clauseSet->addColumn('texts', 'texts::jsonb || ' . implode(' || ', $fieldsJSON));
-      }
-    }
-
-    if (array_key_exists('metadata', $data)) {
-      $fieldsJSON = [];
-
-      foreach ($data['metadata'] as $name => $value) {
-        array_push($fieldsJSON, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
+      foreach ($data[$columnName] as $name => $value) {
+        $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $fieldsJSON[] = sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON);
       }
 
-      if (!empty($data['metadata'])) {
-        $queryBuilder->statement->clauseSet->addColumn('metadata', 'metadata::jsonb || ' . implode(' || ', $fieldsJSON));
+      if (!empty($data[$columnName])) {
+        $queryBuilder->statement->clauseSet->addColumn($columnName, $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON));
       }
     }
 

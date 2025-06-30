@@ -10,6 +10,7 @@
 
 namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect;
 
+use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\InterfaceClause as InterfaceClause;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect as StatementSelect;
 
@@ -33,13 +34,36 @@ final class ClauseWhere implements InterfaceClause
   /**
    * addCondition
    *
-   * @param  mixed $condition
+   * @param string $condition
+   * @param string $conjunction
+   * 
    * @return void
    */
   public function addCondition(string $condition, string $conjunction = '') : void
   {
-    array_push($this->conditions, !empty($conjunction) ? $conjunction . ' ' . $condition : $condition);
+    $this->conditions[] = !empty($conjunction) ? $conjunction . ' ' . $condition : $condition;
   }
+  
+  /**
+   * addConditionAdaptive
+   *
+   * @param array $conditions
+   * @param string $conjunction
+   * 
+   * @return void
+   */
+  public function addConditionAdaptive(array $conditions, string $conjunction = '') : void
+  {
+    $CMSConfigurator = $this->statement->queryBuilder->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $condition = match ($CMSConfigDatabase['dms']) {
+      DMS::MySQL => $conditions['mysql'] ?? '',
+      DMS::PostgreSQL => $conditions['postgresql'] ?? '',
+      default => ''
+    };
+    $this->conditions[] = !empty($conjunction) ? $conjunction . ' ' . $condition : $condition;
+  } 
   
   /**
    * assembly

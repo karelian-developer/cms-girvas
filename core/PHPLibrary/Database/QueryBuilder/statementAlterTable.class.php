@@ -82,14 +82,6 @@ final class StatementAlterTable implements InterfaceStatement
     ];
   }
 
-  // public function addConstraint(string $name) : void
-  // {
-  //   $this->setEvent('addConstraint');
-  //   $this->data = [
-  //     'name' => $name
-  //   ];
-  // }
-
   private function setEvent(string $name) : void
   {
     $this->event = $name;

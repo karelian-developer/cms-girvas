@@ -88,18 +88,20 @@ final class Session
    * 
    * @return array
    */
-  public function getDataMetricsViews() : array|null
+  public function getDataMetricsViews() : ?array
   {
-    if (property_exists($this, 'data')) {
-      $data = $this->getData();
+    if (!property_exists($this, 'data')) {
+      return null;
+    }
 
-      if (!is_null($data)) {
-        if (array_key_exists('metrics', $data)) {
-          if (array_key_exists('views', $data['metrics'])) {
-            return $data['metrics']['views'];
-          }
-        }
-      }
+    $data = $this->getData();
+
+    if ($data === null || !is_array($data)) {
+      return null;
+    }
+
+    if (isset($data['metrics']['views'])) {
+      return $data['metrics']['views'];
     }
 
     return null;
@@ -127,25 +129,26 @@ final class Session
    * 
    * @return array
    */
-  public function getDataMetricsVisits(int $typeID) : array|null
+  public function getDataMetricsVisits(int $typeID) : ?array
   {
-    if (property_exists($this, 'data')) {
-      $data = $this->getData();
+    if (!property_exists($this, 'data')) {
+      return null;
+    }
 
-      if (!is_null($data)) {
-        if (array_key_exists('metrics', $data)) {
+    $data = $this->getData();
 
-          $keyName = match ($typeID) {
-            0 => 'visits0',
-            1 => 'visits1',
-            default => 'visits0',
-          };
+    if ($data === null || !is_array($data)) {
+      return null;
+    }
 
-          if (array_key_exists($keyName, $data['metrics'])) {
-            return $data['metrics'][$keyName];
-          }
-        }
-      }
+    $keyName = match ($typeID) {
+      0 => 'visits0',
+      1 => 'visits1',
+      default => 'visits0',
+    };
+
+    if (isset($data['metrics'][$keyName])) {
+      return $data['metrics'][$keyName];
     }
 
     return null;

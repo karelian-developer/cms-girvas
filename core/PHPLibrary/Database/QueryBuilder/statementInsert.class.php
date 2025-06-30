@@ -105,16 +105,29 @@ final class StatementInsert implements InterfaceStatement
         $this->columns[$index] = '"' . $columnName . '"';
       }
 
-      array_push($columnsValues, ':' . $columnName);
+      $columnsValues[] = ':' . $columnName;
     }
 
-    array_push($queryArray, sprintf('(%s) VALUES (%s)', implode(', ', $this->columns), implode(', ', $columnsValues)));
+    $queryArray[] = sprintf('(%s) VALUES (%s)', implode(', ', $this->columns), implode(', ', $columnsValues));
 
-    if ($this->clauseReturning !== null) {
-      $this->clauseReturning->assembly();
-      array_push($queryArray, $this->clauseReturning->assembled);
+    $clausesToPrecess = $this->getClausesToProcess();
+    foreach ($clausesToPrecess as $clause) {
+      if ($clause !== null) {
+        $clause->assembly();
+        $queryArray[] = $clause->assembled;
+      }
     }
 
     $this->assembled = sprintf('INSERT INTO %s %s;', $this->getTable(), implode(' ', $queryArray));
+  }
+
+  /**
+   * Получение массива объектов предложений
+   */
+  private function getClausesToProcess() : array
+  {
+    return [
+      $this->clauseReturning
+    ];
   }
 }

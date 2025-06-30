@@ -40,7 +40,7 @@ final class DatabaseConnector
     $this->database->setDatabasePassword($databaseConfigurations['password']);
     
     if (!$isTest) {
-      $errorIsJSON = $CMSCore->urlp->getPath(0) === 'handler' ? true : false;
+      $errorIsJSON = $CMSCore->urlp->getPath(0) === 'handler';
       @$this->database->connect($errorIsJSON);
     }
   }

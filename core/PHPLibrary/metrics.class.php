@@ -142,30 +142,29 @@ final class Metrics
 
     if (!empty($entries)) {
       $metricsSession = $this->getSessionByTimestamp($timestamp);
-      if (!is_null($metricsSession)) {
+
+      if ($metricsSession !== null) {
         $metricsSession->initData(['data']);
 
         $metricsViews = $metricsSession->getDataMetricsViews();
 
-        if (!is_null($metricsViews)) {
-          foreach ($metricsViews as $views_token => $views_data) {
-            $viewsURLs = $views_data['urls'];
+        if ($metricsViews !== null) {
+          foreach ($metricsViews as $viewsToken => $viewsData) {
+            $viewsURLs = $viewsData['urls'] ?? [];
 
-            if (!empty($viewsURLs)) {
-              foreach ($viewsURLs as $url => $count) {
-                $URLParsed = parse_url($url);
-                $pathParts = explode('/', $URLParsed['path']);
+            foreach ($viewsURLs as $url => $count) {
+              $URLParsed = parse_url($url);
+              $pathParts = explode('/', $URLParsed['path']);
 
-                if ($pathParts[1] == 'entry') {
-                  foreach ($entries as $index => $object) {
-                    if ($object->getName() === $pathParts[2]) {
-                      if (in_array($object, $entriesResult)) {
-                        $currentViews = $object->getViewsCount();
-                        $object->setViewsCount($currentViews + $count);
-                      } else {
-                        $object->setViewsCount($count);
-                        array_push($entriesResult, $object);
-                      }
+              if ($pathParts[1] === 'entry') {
+                foreach ($entries as $index => $object) {
+                  if ($object->getName() === $pathParts[2]) {
+                    if (in_array($object, $entriesResult)) {
+                      $currentViews = $object->getViewsCount();
+                      $object->setViewsCount($currentViews + $count);
+                    } else {
+                      $object->setViewsCount($count);
+                      $entriesResult[] = $object;
                     }
                   }
                 }
@@ -197,28 +196,29 @@ final class Metrics
 
     if (!empty($pages)) {
       $metricsSession = $this->getSessionByTimestamp($timestamp);
-      if (!is_null($metricsSession)) {
+
+      if ($metricsSession !== null) {
         $metricsSession->initData(['data']);
 
         $metricsViews = $metricsSession->getDataMetricsViews();
-        if (!is_null($metricsViews)) {
-          foreach ($metricsViews as $views_token => $views_data) {
-            $viewsURLs = $views_data['urls'];
-            if (!empty($viewsURLs)) {
-              foreach ($viewsURLs as $url => $count) {
-                $URLParsed = parse_url($url);
-                $pathParts = explode('/', $URLParsed['path']);
 
-                if ($pathParts[1] === 'page') {
-                  foreach ($pages as $index => $object) {
-                    if ($object->getName() === $pathParts[2]) {
-                      if (in_array($object, $pagesResult)) {
-                        $currentViews = $object->getViewsCount();
-                        $object->setViewsCount($currentViews + $count);
-                      } else {
-                        $object->setViewsCount($count);
-                        array_push($pagesResult, $object);
-                      }
+        if ($metricsViews !== null) {
+          foreach ($metricsViews as $viewsToken => $viewsData) {
+            $viewsURLs = $viewsData['urls'] ?? [];
+
+            foreach ($viewsURLs as $url => $count) {
+              $URLParsed = parse_url($url);
+              $pathParts = explode('/', $URLParsed['path']);
+
+              if ($pathParts[1] === 'page') {
+                foreach ($pages as $index => $object) {
+                  if ($object->getName() === $pathParts[2]) {
+                    if (in_array($object, $pagesResult)) {
+                      $currentViews = $object->getViewsCount();
+                      $object->setViewsCount($currentViews + $count);
+                    } else {
+                      $object->setViewsCount($count);
+                      array_push($pagesResult, $object);
                     }
                   }
                 }

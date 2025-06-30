@@ -10,6 +10,7 @@
 
 namespace core\PHPLibrary\Database\QueryBuilder\StatementUpdate;
 
+use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;
 use \core\PHPLibrary\Database\QueryBuilder\StatementUpdate\InterfaceClause as InterfaceClause;
 use \core\PHPLibrary\Database\QueryBuilder\StatementUpdate as StatementUpdate;
 
@@ -40,6 +41,26 @@ final class ClauseWhere implements InterfaceClause
   {
     $this->condition = $condition;
   }
+  
+  /**
+   * addConditionAdaptive
+   *
+   * @param array $conditions
+   * 
+   * @return void
+   */
+  public function addConditionAdaptive(array $conditions) : void
+  {
+    $CMSConfigurator = $this->statement->queryBuilder->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $condition = match ($CMSConfigDatabase['dms']) {
+      DMS::MySQL => $conditions['mysql'] ?? '',
+      DMS::PostgreSQL => $conditions['postgresql'] ?? '',
+      default => ''
+    };
+    $this->condition = $condition;
+  } 
   
   /**
    * assembly

@@ -29,7 +29,7 @@ final class StatementCreateTable implements InterfaceStatement
    */
   public function __construct(QueryBuilder $queryBuilder)
   {
-    $this->query_builder = $queryBuilder;
+    $this->queryBuilder = $queryBuilder;
   }
 
   /**
@@ -40,7 +40,7 @@ final class StatementCreateTable implements InterfaceStatement
    */
   public function setTableName(string $name) : void
   {
-    $this->table_name = $name;
+    $this->tableName = $name;
   }
 
   /**
@@ -50,19 +50,20 @@ final class StatementCreateTable implements InterfaceStatement
    */
   public function getTableName() : string
   {
-    $databaseConfigurations = $this->query_builder->CMSCore->configurator->get('database');
+    $databaseConfigurations = $this->queryBuilder->CMSCore->configurator->get('database');
     
     $tableFullname = '';
-    if (!is_null($databaseConfigurations)) {
-      if ($databaseConfigurations['scheme'] != '') {
-        $tableFullname .= sprintf('%s.', $databaseConfigurations['scheme']);
+    if ($databaseConfigurations !== null) {
+      if ($databaseConfigurations['scheme'] !== '') {
+        $tableFullname .= $databaseConfigurations['scheme'] . '.';
       }
-      if ($databaseConfigurations['prefix'] != '') {
-        $tableFullname .= sprintf('%s_', $databaseConfigurations['prefix']);
+
+      if ($databaseConfigurations['prefix'] !== '') {
+        $tableFullname .= $databaseConfigurations['prefix'] . '_';
       }
     }
 
-    $tableFullname .= $this->table_name;
+    $tableFullname .= $this->tableName;
     return $tableFullname;
   }
 
@@ -80,11 +81,11 @@ final class StatementCreateTable implements InterfaceStatement
   public function addColumn(string $name, string $type, string $constraint = '') : void
   {
     $array = [];
-    array_push($array, $name);
-    array_push($array, $type);
-    array_push($array, $constraint);
-
-    array_push($this->columns, implode(' ', $array));
+    $array[] = $name;
+    $array[] = $type;
+    $array[] = $constraint;
+    
+    $this->columns[] = implode(' ', $array);
 
     unset($array);
   }
@@ -95,7 +96,7 @@ final class StatementCreateTable implements InterfaceStatement
    * @return void
    */
   public function assembly() : void {
-    $ifNotExists = ($this->checkExists) ? 'IF NOT EXISTS' : '';
+    $ifNotExists = $this->checkExists ? 'IF NOT EXISTS' : '';
     $this->assembled = sprintf('CREATE TABLE %s "%s" (%s);', $ifNotExists, $this->getTableName(), implode(', ', $this->columns));
   }
 
