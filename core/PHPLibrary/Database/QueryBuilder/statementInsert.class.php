@@ -47,22 +47,16 @@ final class StatementInsert implements InterfaceStatement
    * 
    * @return void
    */
-  public function addColumn(string $columnName) : void
+  public function addColumn(string $name) : void
   {
     $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
 
-    $array = [];
-    $array[] = match ($CMSConfigDatabase['dms']) {
+    $name = match ($CMSConfigDatabase['dms']) {
       CMSDMS::MySQL => '`' . $name . '`',
       CMSDMS::PostgreSQL => '"' . $name . '"'
     };
 
-    $array[] = $type;
-    $array[] = $constraint;
-    
-    $this->columns[] = implode(' ', $array);
-
-    unset($array);
+    $this->columns[] = $name;
   }
   
   /**
