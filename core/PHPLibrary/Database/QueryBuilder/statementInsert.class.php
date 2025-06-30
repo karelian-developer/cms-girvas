@@ -42,13 +42,26 @@ final class StatementInsert implements InterfaceStatement
   /**
    * Добавить значение столбца
    *
-   * @param  mixed $columnName
-   * @param  mixed $value
+   * @param  string $columnName
+   * 
    * @return void
    */
   public function addColumn(string $columnName) : void
   {
-    array_push($this->columns, $columnName);
+    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+
+    $array = [];
+    $array[] = match ($CMSConfigDatabase['dms']) {
+      CMSDMS::MySQL => '`' . $name . '`',
+      CMSDMS::PostgreSQL => '"' . $name . '"'
+    };
+
+    $array[] = $type;
+    $array[] = $constraint;
+    
+    $this->columns[] = implode(' ', $array);
+
+    unset($array);
   }
   
   /**
@@ -56,6 +69,7 @@ final class StatementInsert implements InterfaceStatement
    *
    * @param  string $name
    * @param  string $prefix
+   * 
    * @return void
    */
   public function setTable(string $name, string $prefix = '') : void
@@ -71,17 +85,19 @@ final class StatementInsert implements InterfaceStatement
    */
   public function getTable() : string
   {
-    $databaseConfigurations = $this->queryBuilder->CMSCore->configurator->get('database');
+    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
     
     $tableFullname = '';
-    if (!is_null($databaseConfigurations)) {
-      if ($databaseConfigurations['scheme'] !== '') {
-        $tableFullname .= sprintf('%s.', $databaseConfigurations['scheme']);
+    if ($CMSConfigDatabase !== null) {
+      if (
+        $CMSConfigDatabase['scheme'] !== ''
+        && $CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL
+      ) {
+        $tableFullname .= $CMSConfigDatabase['scheme'] . '.';
       }
 
-      if ($databaseConfigurations['prefix'] !== '' || $this->tablePrefix !== '') {
-        $tablePrefix = $this->tablePrefix === '' ? $databaseConfigurations['prefix'] : $this->tablePrefix;
-        $tableFullname .= $tablePrefix . '_';
+      if ($CMSConfigDatabase['prefix'] !== '') {
+        $tableFullname .= $CMSConfigDatabase['prefix'] . '_';
       }
     }
 
