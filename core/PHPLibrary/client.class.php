@@ -112,10 +112,10 @@ class Client
    */
   public function getUser(int $typeID) : User|null
   {
-    switch ($typeID) {
-      case 2: $cookieTokenName = '_grv_atoken'; break;
-      default: $cookieTokenName = '_grv_utoken';
-    }
+    $cookieTokenName = match ($typeID) {
+      2 => '_grv_atoken',
+      default => '_grv_utoken'
+    };
 
     $token = $_COOKIE[$cookieTokenName] ?? '';
 
@@ -127,33 +127,35 @@ class Client
    * Проверка статуса авторизации клиента по типу сессии
    *
    * @param  int $typeID
+   * 
    * @return bool
    */
   public function isLogged(int $typeID) : bool
   {
-    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSCore = $this->CMSCore;
+    $CMSConfigurator = $CMSCore->configurator;
 
-    switch ($typeID) {
-      case 2: $cookieTokenName = '_grv_atoken'; break;
-      default: $cookieTokenName = '_grv_utoken';
-    }
+    $cookieTokenName = match ($typeID) {
+      2 => '_grv_atoken',
+      default => '_grv_utoken'
+    };
 
     $token = $_COOKIE[$cookieTokenName] ?? '';
+    if ($token === '') {
+      return false;
+    }
 
-    if (isset($_COOKIE[$cookieTokenName])) {
-      if (ClientSession::existsByIPAndToken($this->CMSCore, $this->ip, $token, $typeID)) {
+    if ($token !== '') {
+      if (ClientSession::existsByIPAndToken($CMSCore, $this->ip, $token, $typeID)) {
         $session = $this->getSessionByToken($typeID, $token, ['updatedUnixTimestamp', 'token']);
+
         if ($session !== null) {
-          if ($token == $session->getToken()) {
-            if ($session->isAlive($CMSConfigurator->get('sessionExpires'))) {
-              return true;
-            }
+          if ($token === $session->getToken()) {
+            return $session->isAlive($CMSConfigurator->get('sessionExpires'));
           }
         }
       }
     }
-
-    return false;
   }
 
   /**
@@ -173,7 +175,7 @@ class Client
     $domainForCookies = $CMSConfigurator->get('domainCookies');
     $userSessionIsSecure = $CMSConfigurator->get('SSLIsEnabled') ? true : false;
     
-    if (!is_null($domainForCookies)) {
+    if ($domainForCookies !== null) {
       return setcookie($name, $session->getToken(), [
         'expires' => $expires,
         'path' => '/',
@@ -195,7 +197,9 @@ class Client
    */
   public static function removeCookie(string $name) : bool
   {
-    if (isset($_COOKIE[$name])) {
+    $cookie = $_COOKIE[$name] ?? '';
+    
+    if ($cookie !== '') {
       unset($_COOKIE[$name]);
       return setcookie($name, '', time() - 3600, '/');
     }

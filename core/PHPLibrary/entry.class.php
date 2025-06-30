@@ -11,6 +11,7 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\Factories\Content as FactoryContent;
 use \PDOException as PDOException;
@@ -712,13 +713,21 @@ class Entry implements EntityTypeContent
         continue;
       }
 
+      $queryBuilder->DMS = CMSDMS::MySQL;
+
       foreach ($data[$columnName] as $name => $value) {
         $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $fieldsJSON[] = sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON);
+        $fieldsJSON[] = match ($queryBuilder->DMS) {
+          CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
+          CMSDMS::PostgeSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
+        };
       }
 
       if (!empty($data[$columnName])) {
-        $queryBuilder->statement->clauseSet->addColumn($columnName, $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON));
+        $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
+          CMSDMS::MySQL => 'JSON_MERGE_PRESERVE(COALESCE(' . $columnName . ', \'{}\'), {' . implode(', ', $fieldsJSON) . '})',
+          CMSDMS::PostgeSQL => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
+        ]);
       }
     }
 
@@ -728,6 +737,8 @@ class Entry implements EntityTypeContent
     $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
+
+    error_log($queryBuilder->statement->assembled);
 
     /** @var int $updatedUnixTimestamp Текущее время в UNIX-формате */
     $updatedUnixTimestamp = time();

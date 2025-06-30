@@ -24,7 +24,7 @@ class QueryBuilder
 {
   public InterfaceStatement $statement;
   public readonly CMSCore $CMSCore;
-  public readonly DMS $DMS;
+  public DMS $DMS;
 
   /**
    * __construct

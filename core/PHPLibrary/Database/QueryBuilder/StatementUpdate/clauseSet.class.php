@@ -35,16 +35,37 @@ final class ClauseSet implements InterfaceClause
   /**
    * Добавить значение столбца
    *
-   * @param  mixed $name
-   * @param  mixed $value
+   * @param string $name
+   * @param mixed $value
+   * 
    * @return void
    */
   public function addColumn(string $name, mixed $value = null) : void
   {
     array_push($this->columns, $name);
 
-    if (!is_null($value)) {
+    if ($value !== null) {
       $this->values[$name] = $value;
+    }
+  }
+
+  /**
+   * Добавить адаптивное значение столбца
+   *
+   * @param string $name
+   * @param array $values
+   * 
+   * @return void
+   */
+  public function addColumnAdaptive(string $name, array $values = []) : void
+  {
+    $queryBuilder = $this->statement->queryBuilder;
+    if (isset($values[$queryBuilder->DMS])) {
+      $this->columns[] = $name;
+
+      if (!empty($values[$queryBuilder->DMS])) {
+        $this->values[$name] = $values[$queryBuilder->DMS];
+      }
     }
   }
   
@@ -59,9 +80,9 @@ final class ClauseSet implements InterfaceClause
 
     foreach ($this->columns as $name) {
       $value = $this->values[$name] ?? ':' . $name;
-      array_push($queryArray, sprintf('"%s" = %s', $name, $value));
+      $queryArray[] = sprintf('"%s" = %s', $name, $value);
     }
 
-    $this->assembled = count($queryArray) > 0 ? sprintf('SET %s', implode(', ', $queryArray)) : '';
+    $this->assembled = count($queryArray) > 0 ? 'SET ' . implode(', ', $queryArray) : '';
   }
 }
