@@ -25,7 +25,7 @@ final class Locale implements LocaleInterface
   private string $name;
   private string $corePath;
   private string $dataPath;
-  private string $typeName;
+  private string $typeName = 'base';
 
   /**
    * __construct

@@ -273,6 +273,7 @@ if (defined('IS_NOT_HACKED')) {
     if (count($CMSLocalesNames) > 0) {
       foreach ($CMSLocalesNames as $index => $name) {
         $CMSLocale = new CMSLocale($CMSCore, $name);
+        $this->locale->initPathes();
 
         if ($CMSLocale->existsFileMetadataJSON()) {
           array_push($handlerOutputData['locales'], [
