@@ -49,7 +49,7 @@ final class SystemCore
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS GIRVAS';
-  public const CMS_VERSION = '0.1.36-3';
+  public const CMS_VERSION = '0.1.36-4';
   public const CMS_STAGE_DEVELOPING = 'alpha';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -149,10 +149,12 @@ final class SystemCore
    */
   public function getCMSLocale(string $localeType = 'base') : CMSLocale
   {
+    $CMSConfigurator = $this->configurator;
+
     $localeName = match ($localeType) {
-      'base' => $this->configurator->getDatabaseEntryValue('base_locale') ?? CMSLocale::DEFAULT_LOCALE_NAME,
-      'admin' => $this->configurator->getDatabaseEntryValue('base_admin_locale') ?? CMSLocale::DEFAULT_LOCALE_NAME,
-      default => $this->configurator->getDatabaseEntryValue($localeType . '_locale') ?? CMSLocale::DEFAULT_LOCALE_NAME,
+      'base' => $CMSConfigurator->getDatabaseEntryValue('base_locale') ?? CMSLocale::DEFAULT_LOCALE_NAME,
+      'admin' => $CMSConfigurator->getDatabaseEntryValue('base_admin_locale') ?? CMSLocale::DEFAULT_LOCALE_NAME,
+      default => $CMSConfigurator->getDatabaseEntryValue($localeType . '_locale') ?? CMSLocale::DEFAULT_LOCALE_NAME,
     };
 
     return new CMSLocale($this, $localeName, $localeType);
@@ -165,7 +167,8 @@ final class SystemCore
    */
   public function getCMSDomain() : string
   {
-    return $this->configurator->get('domain') ?? 'errorhost';
+    $CMSConfigurator = $this->configurator;
+    return $CMSConfigurator->get('domain') ?? 'errorhost';
   }
 
   /**
@@ -175,9 +178,11 @@ final class SystemCore
    */
   public function getCMSLink() : string
   {
-    if ($this->configurator->get('domain') !== null) {
-      $domain = $this->configurator->get('domain');
-      return $this->configurator->get('SSLIsEnabled') ? 'https://' . $domain . '/' : 'http://' . $domain . '/';
+    $CMSConfigurator = $this->configurator;
+
+    if ($CMSConfigurator->get('domain') !== null) {
+      $domain = $CMSConfigurator->get('domain');
+      return $CMSConfigurator->get('SSLIsEnabled') ? 'https://' . $domain . '/' : 'http://' . $domain . '/';
     }
 
     return 'errorhost';
@@ -253,15 +258,21 @@ final class SystemCore
    */
   public function initPage(string $dir) : bool
   {
+    $CMSTheme = $this->theme;
+
     $dir = $dir === '' ? 'index' : $dir;
     $dir = rtrim($dir, '/');
     
     $this->pageDirArray = explode('/', $dir);
-    $this->pageDirArray[count($this->pageDirArray) - 1] = explode('?', $this->pageDirArray[count($this->pageDirArray) - 1]);
-    $this->pageDirArray[count($this->pageDirArray) - 1] = $this->pageDirArray[count($this->pageDirArray) - 1][0];
+
+    $pageDirLastIndex = count($this->pageDirArray) - 1;
+    $pageDirFirstElement = $this->pageDirArray[0];
+
+    $this->pageDirArray[$pageDirLastIndex] = explode('?', $this->pageDirArray[$pageDirLastIndex]);
+    $this->pageDirArray[$pageDirLastIndex] = $this->pageDirArray[$pageDirLastIndex][0];
     
-    if ($this->pageDirArray[0] === $this->theme->getCategory()) {
-      $this->pageDirArray[0] = ucfirst($this->pageDirArray[0]);
+    if ($pageDirFirstElement === $CMSTheme->getCategory()) {
+      $this->pageDirArray[0] = ucfirst($pageDirFirstElement);
       array_push($this->pageDirArray, 'index');
     }
     
@@ -276,15 +287,16 @@ final class SystemCore
       $classPath = CMS_ROOT_DIRECTORY . '/core/PHPLibrary/Page/' . $currentDir . '.class.php';
       
       if (file_exists($classPath)) {
-        $currentDirArray[array_key_last($currentDirArray)] = 'Page' . ucfirst($currentDirArray[array_key_last($currentDirArray)]);
+        $currentDirLastKey = array_key_last($currentDirArray);
+        $currentDirArray[$currentDirLastKey] = 'Page' . ucfirst($currentDirArray[$currentDirLastKey]);
         $currentDir = implode('/', $currentDirArray);
         $currentDir = str_replace('/', '\\', $currentDir);
         
         $class = '\\core\\PHPLibrary\\Page\\' . $currentDir;
         $this->page = new $class($this, new Page($this, $currentDirArray));
 
-        if ($currentDirArray[0] === $this->theme->getCategory()) unset($currentDirArray[0]);
-        $currentDirArray[array_key_last($currentDirArray)] =& $this->page;
+        if ($currentDirArray[0] === $CMSTheme->getCategory()) unset($currentDirArray[0]);
+        $currentDirArray[$currentDirLastKey] =& $this->page;
         $currentDirFinalArray = $currentDirArray;
         break;
       }
@@ -294,12 +306,14 @@ final class SystemCore
       $currentDirFinalArray['oh_shit'] = 'karelia_forever';
     }
 
-    if (gettype($currentDirFinalArray[array_key_last($currentDirFinalArray)]) === 'string') {
-      $this->theme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+    $currentDirFinalLastKey = array_key_last($currentDirFinalArray);
+
+    if (is_string($currentDirFinalArray[$currentDirFinalLastKey])) {
+      $CMSTheme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
       
       $class = sprintf('\\core\\PHPLibrary\\Page\\PageError', $currentDir);
       $this->page = new $class($this, new Page($this, $currentDirFinalArray), 404);
-      $currentDirFinalArray[array_key_last($currentDirFinalArray)] =& $this->page;
+      $currentDirFinalArray[$currentDirFinalLastKey] =& $this->page;
     }
 
     $this->pageDirArray = $currentDirFinalArray;
@@ -330,36 +344,30 @@ final class SystemCore
     /** @var string Случайная хэш-строка для идентификации ранее встроенных стилей (CSS) */
     $this->CSPStylesHash = bin2hex($bytes);
 
-    /** @var CMSFileConnector Объект файлового подключателя */
-    $fileConnector = new CMSFileConnector($this);
-    $fileConnector->setStartDirectory(self::CMS_CORE_PHP_LIBRARY_PATH);
-    $fileConnector->setCurrentDirectory(self::CMS_CORE_PHP_LIBRARY_PATH);
-
-    // Подключение файлов с перечислениями
-    $fileConnector->connectFilesRecursive('/^([a-zA-Z_0-9]+)\.enum\.php$/');
-    $fileConnector->resetCurrentDirectory();
-
-    // Подключение файлов с интерфейсами
-    $fileConnector->connectFilesRecursive('/^([a-zA-Z_0-9]+)\.interface\.php$/');
-    $fileConnector->resetCurrentDirectory();
-
-    // Подключение файлов с трейтами
-    $fileConnector->connectFilesRecursive('/^([a-zA-Z_0-9]+)\.trait\.php$/');
-    $fileConnector->resetCurrentDirectory();
-
-    // Подключение файлов с классами
-    $fileConnector->connectFilesRecursive('/^([a-zA-Z_0-9]+)\.class\.php$/');
-    $fileConnector->resetCurrentDirectory();
+    /** @var CMSFileConnector Объект подключателя файлов */
+    $CMSFileConnector = new CMSFileConnector($this);
+    $CMSFileConnector = $this->autoloadComponents(
+      $CMSFileConnector,
+      self::CMS_CORE_PHP_LIBRARY_PATH,
+      ['enum', 'interface', 'trait', 'class']
+    );
 
     /** @var null Переменная для будущего объекта шаблона */
     $theme = null;
 
     // Инициализация URL-парсера
     $this->initURLParser();
+    $CMSURLP = $this->urlp;
 
-    // Если настройка системы не была произведена и пользователь не находится на странице инсталлятора,
-    // то его необходимо перенаправить на страницу инсталлятора.
-    if (!self::CMSIsInstall() && $this->urlp->getPath(0) !== 'install' && $this->urlp->getPath(0) !== 'handler') {
+    /*
+     * Если настройка системы не была произведена и пользователь не находится на странице
+     * инсталлятора, то его необходимо перенаправить на страницу инсталлятора.
+     */
+    if (
+      !self::CMSIsInstall()
+      && $CMSURLP->getPath(0) !== 'install'
+      && $CMSURLP->getPath(0) !== 'handler'
+    ) {
       header('location: /install');
     }
 
@@ -369,29 +377,36 @@ final class SystemCore
 
     /** @var CMSConfigurator Объект конфигуратора системного ядра */
     $this->configurator = new CMSConfigurator($this);
+    $CMSConfigurator = $this->configurator;
 
     // Подключение к базе данных
-    if ($this->urlp->getPath(0) !== 'install' && $this->urlp->getPath(1) !== 'install' && $this->urlp->getParam('installation-mode') !== 'true') {
+    if ($CMSURLP->getPath(0) !== 'install' && $CMSURLP->getPath(1) !== 'install' && $CMSURLP->getParam('installation-mode') !== 'true') {
       /** @var CMSDatabaseConnector Объект подключения к базе данных */
-      $this->databaseConnector = new CMSDatabaseConnector($this, $this->configurator);
+      $this->databaseConnector = new CMSDatabaseConnector($this, $CMSConfigurator);
 
       /** @var Client Объект клиента */
       $this->client = new Client($this);
     }
 
-    /** @var string Проверка статуса HTTPS-протокола */
-    $serverHTTPSStatus = isset($_SERVER["HTTPS"]) ? strtolower($_SERVER["HTTPS"]) : 'off';
+    $serverHTTPHost = $_SERVER['HTTP_HOST'] ?? '';
+    $serverRequestURI = $_SERVER['REQUEST_URI'] ?? '';
 
     // Ядро перенаправляет клиент на HTTPS-протокол, в случае, если в CMS включена принудительная
     // переадресация на этот порт.
-    if ($serverHTTPSStatus !== 'on' && $this->configurator->get('ssl_perm_redirect')) {
-      // Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена в настройках CMS.
-      if ($this->configurator->getPermanentRedirectToWWWStatus() && !preg_match('/^www\./', $_SERVER['HTTP_HOST'])) {
+    if (!self::isHTTPS() && $CMSConfigurator->get('SSLPermRedirect')) {
+      /* 
+       * Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена
+       * в настройках CMS.
+       */
+      if (
+        $CMSConfigurator->getPermanentRedirectToWWWStatus()
+        && !preg_match('/^www\./', $serverHTTPHost)
+      ) {
         /** @var string Адрес для переадресации по HTTPS-протоколу (поддомен www) */
-        $HTTPSRedirect = 'https://www.' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $HTTPSRedirect = 'https://www.' . $serverHTTPHost . $serverRequestURI;
       } else {
         /** @var string Адрес для переадресации по HTTPS-протоколу */
-        $HTTPSRedirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $HTTPSRedirect = 'https://' . $serverHTTPHost . $serverRequestURI;
       }
 
       // Сообщаем браузеру, что это принудительная переадресация
@@ -400,10 +415,16 @@ final class SystemCore
       exit();
     }
     
-    // Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена в настройках CMS.
-    if ($this->configurator->getPermanentRedirectToWWWStatus() && !preg_match('/^www\./', $_SERVER['HTTP_HOST'])) {
+    /* 
+     * Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена
+     * в настройках CMS.
+     */
+    if (
+      $CMSConfigurator->getPermanentRedirectToWWWStatus()
+      && !preg_match('/^www\./', $serverHTTPHost)
+    ) {
       /** @var string Адрес для переадресации по HTTP-протоколу (поддомен www) */
-      $HTTPRedirect = 'http://www.' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+      $HTTPRedirect = 'http://www.' . $serverHTTPHost . $serverRequestURI;
       
       // Сообщаем браузеру, что это принудительная переадресация
       CMSHeader::add(CMSEnumHeader::HTTP_RESPONSE_CODE, 301);
@@ -412,43 +433,47 @@ final class SystemCore
     }
 
     // Указываем серверу, что будем использовать временную зону для расчета времени, указанную в настройках CMS. 
-    date_default_timezone_set($this->configurator->getSiteTimezone());
+    date_default_timezone_set($CMSConfigurator->getSiteTimezone());
 
     // Сообщаем браузеру, что для сайта деятсвуют особые правила безопасности
-    CMSHeader::add(CMSEnumHeader::HTTP_CONTENT_SECURITY_POLICY, $this->configurator->getSecurityCSP());
+    CMSHeader::add(CMSEnumHeader::HTTP_CONTENT_SECURITY_POLICY, $CMSConfigurator->getSecurityCSP());
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('X-Content-Type-Options: nosniff');
     
-    if ($this->configurator->get('SSLIsEnabled')) {
+    if ($CMSConfigurator->get('SSLIsEnabled')) {
       $HSTSVars = [];
 
-      if ($this->configurator->exists('SSLHSTSMaxAge')) {
-        if (is_integer($this->configurator->get('SSLHSTSMaxAge'))) {
-          array_push($HSTSVars, sprintf('max-age=%d', $this->configurator->get('SSLHSTSMaxAge')));
+      if ($CMSConfigurator->exists('SSLHSTSMaxAge')) {
+        $CMSConfigSSLHSTSMaxAge = $CMSConfigurator->get('SSLHSTSMaxAge');
+
+        if (is_integer($CMSConfigSSLHSTSMaxAge)) {
+          array_push($HSTSVars, 'max-age=' . $CMSConfigSSLHSTSMaxAge);
         }
       }
 
-      if ($this->configurator->exists('SSLHSTSIncludeSubdomains')) {
-        if (is_bool($this->configurator->get('SSLHSTSIncludeSubdomains'))) {
-          if ($this->configurator->get('SSLHSTSIncludeSubdomains') === true) {
+      if ($CMSConfigurator->exists('SSLHSTSIncludeSubdomains')) {
+        $CMSConfigSSLHSTSIncludeSubdomains = $CMSConfigurator->get('SSLHSTSIncludeSubdomains');
+
+        if (is_bool($CMSConfigSSLHSTSIncludeSubdomains)) {
+          if ($CMSConfigSSLHSTSIncludeSubdomains === true) {
             array_push($HSTSVars, 'includeSubDomains');
           }
         }
       }
 
-      if ($this->configurator->exists('SSLHSTSPreload')) {
-        if (is_bool($this->configurator->get('SSLHSTSPreload'))) {
-          if ($this->configurator->get('SSLHSTSPreload') === true) {
-            array_push($HSTSVars, 'preload');
-          }
+      if ($CMSConfigurator->exists('SSLHSTSPreload')) {
+        $CMSConfigSSLHSTSPreload = $CMSConfigurator->get('SSLHSTSPreload');
+
+        if (is_bool($CMSConfigSSLHSTSPreload) && $CMSConfigSSLHSTSPreload === true) {
+          array_push($HSTSVars, 'preload');
         }
       }
 
-      header(sprintf('Strict-Transport-Security: %s;', implode('; ', $HSTSVars)));
+      header('Strict-Transport-Security: ' . implode('; ', $HSTSVars));
     }
 
-    if ($this->urlp->getPath(0) === 'install' && $this->urlp->getPath(1) !== 'install') {
-      $installLocaleName = $this->urlp->getParam('locale') ?? 'en_US';
+    if ($CMSURLP->getPath(0) === 'install' && $CMSURLP->getPath(1) !== 'install') {
+      $installLocaleName = $CMSURLP->getParam('locale') ?? 'en_US';
     }
 
     /** @var array Массив установленных модулей в системе */
@@ -463,19 +488,14 @@ final class SystemCore
         $module = new Module($this, $directoryName);
 
         if ($module->isEnabled()) {
-          $fileConnector->setStartDirectory($moduleDirectoryPath);
-          $fileConnector->setCurrentDirectory($moduleDirectoryPath);
-
-          // Подключение файлов с перечислениями
-          $fileConnector->connectFilesRecursive('/^([a-zA-Z_0-9]+)\.enum\.php$/');
-          $fileConnector->resetCurrentDirectory();
-          // Подключение файлов с интерфейсами
-          $fileConnector->connectFilesRecursive('/^([a-zA-Z_0-9]+)\.interface\.php$/');
-          $fileConnector->resetCurrentDirectory();
-          // Подключение файлов с классами
-          $fileConnector->connectFilesRecursive('/^([a-zA-Z_0-9]+)\.class\.php$/');
-          $fileConnector->resetCurrentDirectory();
-
+          /** @var CMSFileConnector Объект подключателя файлов */
+          $CMSFileConnector = new CMSFileConnector($this);
+          $CMSFileConnector = $this->autoloadComponents(
+            $CMSFileConnector,
+            $moduleDirectoryPath,
+            ['enum', 'interface', 'trait', 'class']
+          );
+          
           Module::connectCore($this, $directoryName);
         }
 
@@ -506,15 +526,19 @@ final class SystemCore
       // Проверка активности локации инсталлятора
       if (!$this->isLocationInstallerActive()) {
         /** @var string Наименование шаблона сайта */
-        $themeBaseName = ($this->configurator->existsDatabaseEntryValue('base_template')) ? $this->configurator->getDatabaseEntryValue('base_template') : 'default';
+        $themeBaseName = $CMSConfigurator->existsDatabaseEntryValue('base_template')
+          ? $CMSConfigurator->getDatabaseEntryValue('base_template')
+          : 'default';
         /** @var string Наименование шаблона административной панели */
-        $themeAdminName = ($this->configurator->existsDatabaseEntryValue('admin_template')) ? $this->configurator->getDatabaseEntryValue('admin_template') : 'default';
+        $themeAdminName = $CMSConfigurator->existsDatabaseEntryValue('admin_template')
+          ? $CMSConfigurator->getDatabaseEntryValue('admin_template')
+          : 'default';
       }
       
       /** @var string Имя локализации, определенное куки "locale" */
       $CMSLocaleCookie = $_COOKIE['locale'] ?? null;
       /** @var string Имя локализации, определенное параметром адресной строки параметром "locale" */
-      $CMSLocaleURLParam = $this->urlp->getParam('locale') ?? null;
+      $CMSLocaleURLParam = $CMSURLP->getParam('locale') ?? null;
 
       // Проверка активности локации инсталлятора и статуса установки системы
       if ($this->isLocationInstallerActive() && !self::CMSIsInstall()) {
@@ -536,9 +560,9 @@ final class SystemCore
         }
 
         /** @var string Наименование локализации сайта */
-        $CMSBaseLocaleName = $this->configurator->existsDatabaseEntryValue('base_locale') ? $this->configurator->getDatabaseEntryValue('base_locale') : 'en_US';
+        $CMSBaseLocaleName = $CMSConfigurator->existsDatabaseEntryValue('base_locale') ? $CMSConfigurator->getDatabaseEntryValue('base_locale') : 'en_US';
         /** @var string Наименование локализации административной панели */
-        $CMSAdminLocaleName = $this->configurator->existsDatabaseEntryValue('base_admin_locale') ? $this->configurator->getDatabaseEntryValue('base_admin_locale') : 'en_US';
+        $CMSAdminLocaleName = $CMSConfigurator->existsDatabaseEntryValue('base_admin_locale') ? $CMSConfigurator->getDatabaseEntryValue('base_admin_locale') : 'en_US';
 
         // Проверка активности административной панели
         if ($this->isLocationAdministrativePanelActive()) {
@@ -568,7 +592,7 @@ final class SystemCore
       /** @var CMSLocale Объект локализации системного ядра */
       $this->locale = new CMSLocale($this, $CMSLocaleName, $CMSCoreThemeCategoryName);
       
-      if ($this->urlp->getPath(0) !== 'sql-execute-forced') {
+      if ($CMSURLP->getPath(0) !== 'sql-execute-forced') {
         // Устанавливаем объект шаблона для системного ядра
         $this->setTheme(new Theme($this, $CMSCoreThemeName, $CMSCoreThemeCategoryName));
 
@@ -579,14 +603,14 @@ final class SystemCore
       }
       
     } else {
-      if ($this->urlp->getPath(1) === 'install') {
-        $localeName = $this->urlp->getParam('locale') ?? 'en_US';
+      if ($CMSURLP->getPath(1) === 'install') {
+        $localeName = $CMSURLP->getParam('locale') ?? 'en_US';
         $this->locale = new CMSLocale($this, $localeName, 'handler');
       } else {
-        if ($this->urlp->getParam('localeMessage') === null) {
-          $localeName = $this->configurator->existsDatabaseEntryValue('base_locale') ? $this->configurator->getDatabaseEntryValue('base_locale') : 'en_US';
+        if ($CMSURLP->getParam('localeMessage') === null) {
+          $localeName = $CMSConfigurator->existsDatabaseEntryValue('base_locale') ? $CMSConfigurator->getDatabaseEntryValue('base_locale') : 'en_US';
         } else {
-          $localeName = $this->urlp->getParam('localeMessage');
+          $localeName = $CMSURLP->getParam('localeMessage');
         }
       }
 
@@ -602,10 +626,11 @@ final class SystemCore
       foreach ($this->modules as $name => $moduleCore) {
         $module = new Module($this, $name);
         
-        if ($module->isInstalled() && $module->isEnabled()) {
-          if ($theme !== null) {
-            $theme->core->assembled = ThemeCollector::assembly_locale($theme->core->assembled, $module->locale);
-          }
+        if ($module->isInstalled() && $module->isEnabled() && $theme !== null) {
+          $theme->core->assembled = ThemeCollector::assemblyLocale(
+            $theme->core->assembled,
+            $module->locale
+          );
         }
 
         unset($module);
@@ -628,14 +653,16 @@ final class SystemCore
 
       $theme->core->source = $document;
 
-      if ($this->urlp->getPath(0) === 'admin') {
+      if ($CMSURLP->getPath(0) === 'admin') {
         if (method_exists($theme->core, 'initMainNavigation')) {
           $theme->core->initMainNavigation();
         }
 
-        if (!is_null($this->page)) {
-          if (method_exists($this->page, 'initSubnavigation')) {
-            $this->page->initSubnavigation();
+        $CMSPage = $this->page;
+
+        if ($CMSPage !== null) {
+          if (method_exists($CMSPage, 'initSubnavigation')) {
+            $CMSPage->initSubnavigation();
           }
         }
       }
@@ -676,7 +703,7 @@ final class SystemCore
   public function getArrayUploadedTemplatesNames() : array
   {
     $path = $this->getCMSPath() . '/templates';
-    return array_diff(scandir(sprintf($path)), ['..', '.']);
+    return array_diff(scandir($path), ['..', '.']);
   }
   
   /**
@@ -687,7 +714,7 @@ final class SystemCore
   public function getArrayUploadedModulesNames() : array
   {
     $path = $this->getCMSPath() . '/modules';
-    return array_diff(scandir(sprintf($path)), ['..', '.']);
+    return array_diff(scandir($path), ['..', '.']);
   }
   
   /**
@@ -698,7 +725,7 @@ final class SystemCore
   public function getArrayLocalesNames() : array
   {
     $path = $this->getCMSPath() . '/locales';
-    return array_diff(scandir(sprintf($path)), ['..', '.']);
+    return array_diff(scandir($path), ['..', '.']);
   }
   
   /**
@@ -708,7 +735,11 @@ final class SystemCore
    */
   public function geSiteURL() : string
   {
-    return ($this->configurator->get('SSLIsEnabled')) ? 'https://' . $this->configurator->get('domain') : 'http://' . $this->configurator->get('domain');
+    $CMSConfigurator = $this->configurator;
+    $CMSConfigSSLIsEnabled = $CMSConfigurator->get('SSLIsEnabled');
+    $CMSConfigDomainProtocol = $CMSConfigSSLIsEnabled ? 'https://' : 'http://';
+
+    return $CMSConfigDomainProtocol . $CMSConfigurator->get('domain');
   }
 
   /**
@@ -926,5 +957,43 @@ final class SystemCore
     /** @var string Абсолютный путь до файла-пустышки "INSTALLED" */
     $path = CMS_ROOT_DIRECTORY . '/INSTALLED';
     return file_exists($path);
+  }
+
+  /**
+   * Автоподключение компонентов системы
+   * 
+   * @return void
+   */
+  private function autoloadComponents(CMSFileConnector $CMSFileConnector, string $pathToFiles, array $filesTypes = []) : void
+  {
+    $CMSFileConnector->setStartDirectory($pathToFiles);
+    $CMSFileConnector->setCurrentDirectory($pathToFiles);
+
+    foreach ($filesTypes as $type) {
+      $CMSFileConnector->connectFilesRecursive('/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/');
+      $CMSFileConnector->resetCurrentDirectory();
+    }
+  }
+
+  /**
+   * Проверка наличия HTTPS-соединения
+   * 
+   * @return bool
+   */
+  public static function isHTTPS() : bool
+  {
+    $HTTPS = $_SERVER["HTTPS"] ?? '';
+    
+    // Основная проверка
+    if ($HTTPS === 'on' || $HTTPS === '1') {
+      return true;
+    }
+
+    // Проверка для облачных окружений и прокси
+    if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+      return $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https';
+    }
+
+    return ($_SERVER['SERVER_PORT'] ?? null) === 443;
   }
 }
