@@ -83,7 +83,7 @@ final class ClauseSet implements InterfaceClause
       $value = $this->values[$name] ?? ':' . $name;
 
       $queryArray[] = match ($this->statement->queryBuilder->DMS) {
-        DMS::MySQL => sprintf('`"%s` = %s', $name, $value),
+        DMS::MySQL => sprintf('`%s` = %s', $name, $value),
         DMS::PostgreSQL => sprintf('"%s" = %s', $name, $value),
       };
     }
