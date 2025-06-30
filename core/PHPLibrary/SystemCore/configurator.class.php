@@ -11,6 +11,7 @@
 namespace core\PHPLibrary\SystemCore;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \PDOException as PDOException;
 use \PDO as PDO;
@@ -666,6 +667,7 @@ final class Configurator
     $CMSCore = $this->CMSCore;
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
+    $CMSConfigDatabase['dms'] = $CMSConfigDatabase['dms'] ?? CMSDMS::PostgreSQL;
 
     $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
@@ -722,6 +724,7 @@ final class Configurator
     $CMSCore = $this->CMSCore;
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
+    $CMSConfigDatabase['dms'] = $CMSConfigDatabase['dms'] ?? CMSDMS::PostgreSQL;
 
     $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
