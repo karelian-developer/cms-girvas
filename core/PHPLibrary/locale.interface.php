@@ -15,7 +15,7 @@ use SystemCore as CMSCore;
 interface LocaleInterface
 {
   public function __construct(mixed $object, string $name);
-  
+
   public function getIconURL() : string;
   public function getName() : string;
   public function getCorePath() : string;
@@ -28,7 +28,6 @@ interface LocaleInterface
   public function getFileMetadataJSONPath() : string;
   public function getMetadata() : array|null;
   public function getData() : array|bool|null;
-  public function getDataValue(array $data, string $name) : string;
   public function getRegistryArray() : array;
   public function getSingleValueByKey(string $key) : string;
 
@@ -38,4 +37,6 @@ interface LocaleInterface
 
   public function existsFileDataJSON() : bool;
   public function existsFileMetadataJSON() : bool;
+  
+  public static function getDataValue(array $data, string $name) : string;
 }
