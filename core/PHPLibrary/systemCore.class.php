@@ -49,7 +49,7 @@ final class SystemCore
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS GIRVAS';
-  public const CMS_VERSION = '0.1.36-5';
+  public const CMS_VERSION = '0.1.36-5.1';
   public const CMS_STAGE_DEVELOPING = 'alpha';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -157,7 +157,11 @@ final class SystemCore
       default => $CMSConfigurator->getDatabaseEntryValue($localeType . '_locale') ?? CMSLocale::DEFAULT_LOCALE_NAME,
     };
 
-    return new CMSLocale($this, $localeName, $localeType);
+    $CMSLocale = new CMSLocale($this, $localeName);
+    $CMSLocale->setTypeName($localeType);
+    $CMSLocale->initPathes();
+
+    return $CMSLocale;
   }
 
   /**
@@ -593,7 +597,9 @@ final class SystemCore
       $CMSCoreThemeName = $CMSCoreThemeName ?? 'default';
 
       /** @var CMSLocale Объект локализации системного ядра */
-      $this->locale = new CMSLocale($this, $CMSLocaleName, $CMSCoreThemeCategoryName);
+      $this->locale = new CMSLocale($this, $CMSLocaleName);
+      $this->locale->setTypeName($CMSCoreThemeCategoryName);
+      $this->locale->initPathes();
       
       if ($CMSURLP->getPath(0) !== 'sql-execute-forced') {
         // Устанавливаем объект шаблона для системного ядра
@@ -608,7 +614,9 @@ final class SystemCore
     } else {
       if ($CMSURLP->getPath(1) === 'install') {
         $localeName = $CMSURLP->getParam('locale') ?? 'en_US';
-        $this->locale = new CMSLocale($this, $localeName, 'handler');
+        $this->locale = new CMSLocale($this, $localeName);
+        $this->locale->setTypeName('handler');
+        $this->locale->initPathes();
       } else {
         if ($CMSURLP->getParam('localeMessage') === null) {
           $localeName = $CMSConfigurator->existsDatabaseEntryValue('base_locale') ? $CMSConfigurator->getDatabaseEntryValue('base_locale') : 'en_US';
@@ -617,7 +625,9 @@ final class SystemCore
         }
       }
 
-      $this->locale = new CMSLocale($this, $localeName, 'handler');
+      $this->locale = new CMSLocale($this, $localeName);
+      $this->locale->setTypeName('handler');
+      $this->locale->initPathes();
     }
     
     if ($theme !== null) {

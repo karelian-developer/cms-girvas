@@ -25,10 +25,10 @@ final class Locale implements LocaleInterface
   /**
    * __construct
    * 
-   * @param Module $module
+   * @param mixed $module
    * @param string $name
    */
-  public function __construct(Module $module, string $name)
+  public function __construct(mixed $module, string $name)
   {
     $this->CMSCore = $module->CMSCore;
     $this->module = $module;

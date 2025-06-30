@@ -25,10 +25,10 @@ final class Locale implements LocaleInterface
   /**
    * __construct
    * 
-   * @param Theme $theme
+   * @param mixed $theme
    * @param string $name
    */
-  public function __construct(Theme $theme, string $name)
+  public function __construct(mixed $theme, string $name)
   {
     $this->CMSCore = $theme->CMSCore;
     $this->theme = $theme;

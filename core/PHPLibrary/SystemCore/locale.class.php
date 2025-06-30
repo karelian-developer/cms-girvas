@@ -25,24 +25,40 @@ final class Locale implements LocaleInterface
   private string $name;
   private string $corePath;
   private string $dataPath;
+  private string $typeName;
 
   /**
    * __construct
    * 
-   * @param SystemCore $CMSCore
+   * @param mixed $CMSCore
    * @param string $name
    * @param string $dir
    */
-  public function __construct(SystemCore $CMSCore, string $name, string $dir = 'base')
+  public function __construct(mixed $CMSCore, string $name)
   {
     $this->CMSCore = $CMSCore;
     $this->setName($name);
+  }
 
-    $corePath = $this->CMSCore->getCMSPath() . '/locales/' . $name;
-    $dataPath = $this->CMSCore->getCMSPath() . '/locales/' . $name . '/' . $dir;
-    
+  private function initPathes() : void
+  {
+    $CMSCore = $this->CMSCore;
+
+    $corePath = $CMSCore->getCMSPath() . '/locales/' . $name;
+    $dataPath = $CMSCore->getCMSPath() . '/locales/' . $name . '/' . $this->typeName;
+
     $this->setCorePath($corePath);
     $this->setDataPath($dataPath);
+  }
+
+  public function setTypeName(string $name) : void
+  {
+    $this->typeName = $name;
+  }
+
+  public function getTypeName() : string
+  {
+    return $this->typeName;
   }
 
   /**
