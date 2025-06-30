@@ -710,14 +710,12 @@ class Entry implements EntityTypeContent
       $fieldsJSON = [];
       
       if (!isset($data[$columnName])) {
-        error_log('kek1');
         continue;
       }
 
       $queryBuilder->DMS = CMSDMS::MySQL;
 
       foreach ($data[$columnName] as $name => $value) {
-        error_log('kek2');
         $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $fieldsJSON[] = match ($queryBuilder->DMS) {
           CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
@@ -726,7 +724,6 @@ class Entry implements EntityTypeContent
       }
 
       if (!empty($data[$columnName])) {
-        error_log('kek3');
         $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
           'mysql' => 'JSON_MERGE_PRESERVE(COALESCE(' . $columnName . ', \'{}\'), {' . implode(', ', $fieldsJSON) . '})',
           'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
