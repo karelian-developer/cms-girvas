@@ -103,6 +103,7 @@
                   </td>
                   <td class="table__cell cell">
                     <select name="database_dms">
+                      <option value="DMS::MySQL">MySQL</option>
                       <option value="DMS::PostgreSQL">PostgreSQL</option>
                     </select>
                   </td>

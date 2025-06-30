@@ -739,8 +739,6 @@ class Entry implements EntityTypeContent
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
-    error_log($queryBuilder->statement->assembled);
-
     /** @var int $updatedUnixTimestamp Текущее время в UNIX-формате */
     $updatedUnixTimestamp = time();
 
