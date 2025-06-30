@@ -458,7 +458,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     $databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
     $CMSConfigDatabase = $CMSCore->configurator->get('database');
 
-    switch ($CMSConfigDatabase['dms']->get_string()) {
+    switch ($CMSConfigDatabase['dms']->getString()) {
       case 'PostgreSQL': $JSONDataTypeDMS = 'jsonb'; break;
       default: $JSONDataTypeDMS = 'json';
     }

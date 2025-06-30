@@ -63,7 +63,7 @@
                     </div>
                   </td>
                   <td class="table__cell cell">
-                    <input name="domain_cookies" type="text" class="form__input" value="{CONFIGURATION_DATABASE_DOMAIN}" placeholder="example.ru">
+                    <input name="domain_cookies" type="text" class="form__input" value="{CONFIGURATION_DOMAIN}" placeholder="example.ru">
                   </td>
                 </tr>
                 <tr class="table__row">
@@ -74,7 +74,7 @@
                     </div>
                   </td>
                   <td class="table__cell cell">
-                    <input name="domain_email" type="text" class="form__input" value="{CONFIGURATION_DATABASE_DOMAIN}" placeholder="example.ru">
+                    <input name="domain_email" type="text" class="form__input" value="{CONFIGURATION_DOMAIN}" placeholder="example.ru">
                   </td>
                 </tr>
                 <tr class="table__row">
