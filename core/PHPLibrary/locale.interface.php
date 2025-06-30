@@ -17,7 +17,7 @@ interface LocaleInterface
   public function __construct(mixed $object, string $name);
 
   public function getIconURL() : string;
-  public function getName() : string;
+  private function getName() : string;
   public function getCorePath() : string;
   public function getDataPath() : string;
   public function getTitle() : string;
@@ -37,6 +37,6 @@ interface LocaleInterface
 
   public function existsFileDataJSON() : bool;
   public function existsFileMetadataJSON() : bool;
-  
+
   public static function getDataValue(array $data, string $name) : string;
 }
