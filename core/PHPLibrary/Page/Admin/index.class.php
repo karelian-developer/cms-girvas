@@ -31,12 +31,16 @@ class PageIndex implements InterfacePage
 
   public function assembly() : void
   {
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page/index.css', 'rel' => 'stylesheet']);
+    $CMSCore = $this->CMSCore;
+    $CMSTheme = $CMSCore->theme;
+    $CMSLocale = $CMSCore->locale;
 
-    $localeData = $this->CMSCore->locale->getData();
-    $localeName = $this->CMSCore->locale->getName();
+    $CMSTheme->addStyle(['href' => 'styles/page/index.css', 'rel' => 'stylesheet']);
 
-    $feedImporter = new FeedImporter($this->CMSCore, 'https://www.cms-girvas.ru/feed/last-news');
+    $localeData = $CMSLocale->getData();
+    $localeName = $CMSLocale->getName();
+
+    $feedImporter = new FeedImporter($CMSCore, 'https://www.cms-girvas.ru/feed/last-news');
     $feedXML = $feedImporter->get([
       'ssl' => [
         'verify_peer' => false,
@@ -48,12 +52,18 @@ class PageIndex implements InterfacePage
     if (isset($feedXML->channel->item) && $feedXML !== false) {
       $countMax = 3; $itemIndex = 0;
 
-      foreach ($feedXML->channel->item as $item) {
-        array_push($feedItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/feed/listItem.tpl', [
-          'ITEM_TITLE' => $item->title,
-          'ITEM_DESCRIPTION' => $item->description,
-          'ITEM_LINK' => $item->link
-        ]));
+      $feedXMLChannelItem = $feedXML->channel->item;
+
+      foreach ($feedXMLChannelItem as $item) {
+        $feedItemsAssembled[] = ThemeCollector::assemblyFileContent(
+          $CMSTheme,
+          'templates/page/index/feed/listItem.tpl',
+          [
+            'ITEM_TITLE' => (string) $item->title,
+            'ITEM_DESCRIPTION' => (string) $item->description,
+            'ITEM_LINK' => (string) $item->link
+          ]
+        );
 
         if ($itemIndex == $countMax - 1) break;
         $itemIndex++;
@@ -65,12 +75,16 @@ class PageIndex implements InterfacePage
 
     $feedLastNewsList = $localeData['PAGE_INDEX_SIDEBAR_BLOCK_WEB_CHANNEL_ENTRIES_NOT_FOUND_LABEL'];
     if (count($feedItemsAssembled) > 0) {
-      $feedLastNewsList = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/feed/list.tpl', [
-        'WEB_CHANNEL_ITEMS' => implode($feedItemsAssembled)
-      ]);
+      $feedLastNewsList = ThemeCollector::assemblyFileContent(
+        $CMSTheme,
+        'templates/page/index/feed/list.tpl',
+        [
+          'WEB_CHANNEL_ITEMS' => implode($feedItemsAssembled)
+        ]
+      );
     }
 
-    $feedImporter = new FeedImporter($this->CMSCore, 'https://www.cms-girvas.ru/feed/last-releases');
+    $feedImporter = new FeedImporter($CMSCore, 'https://www.cms-girvas.ru/feed/last-releases');
     $feedXML = $feedImporter->get([
       'ssl' => [
         'verify_peer' => false,
@@ -84,11 +98,15 @@ class PageIndex implements InterfacePage
       
       foreach ($feedXML->channel as $channel) {
         foreach ($channel->item as $item) {
-          array_push($feedItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/feed/listItem.tpl', [
-            'ITEM_TITLE' => $item->title,
-            'ITEM_DESCRIPTION' => $item->description,
-            'ITEM_LINK' => $item->link
-          ]));
+          $feedItemsAssembled[] = ThemeCollector::assemblyFileContent(
+            $CMSTheme,
+            'templates/page/index/feed/listItem.tpl',
+            [
+              'ITEM_TITLE' => (string) $item->title,
+              'ITEM_DESCRIPTION' => (string) $item->description,
+              'ITEM_LINK' => (string) $item->link
+            ]
+          );
 
           if ($itemIndex == $countMax - 1) break;
           $itemIndex++;
@@ -101,13 +119,17 @@ class PageIndex implements InterfacePage
 
     $feedLastReleasesList = $localeData['PAGE_INDEX_SIDEBAR_BLOCK_WEB_CHANNEL_ENTRIES_NOT_FOUND_LABEL'];
     if (count($feedItemsAssembled) > 0) {
-      $feedLastReleasesList = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index/feed/list.tpl', [
-        'WEB_CHANNEL_ITEMS' => implode($feedItemsAssembled)
-      ]);
+      $feedLastReleasesList = ThemeCollector::assemblyFileContent(
+        $CMSTheme,
+        'templates/page/index/feed/list.tpl',
+        [
+          'WEB_CHANNEL_ITEMS' => implode($feedItemsAssembled)
+        ]
+      );
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/index.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($CMSTheme, 'templates/page/index.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'index',
       'WEB_CHANNEL_LATEST_NEWS_LIST' => $feedLastNewsList,
       'WEB_CHANNEL_LATEST_RELEASES_LIST' => $feedLastReleasesList,
