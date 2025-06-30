@@ -718,7 +718,7 @@ class Entry implements EntityTypeContent
       foreach ($data[$columnName] as $name => $value) {
         $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $fieldsJSON[] = match ($queryBuilder->DMS) {
-          CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
+          CMSDMS::MySQL => sprintf('\'%s\': %s', $name, $valueJSON),
           CMSDMS::PostgeSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
         };
       }

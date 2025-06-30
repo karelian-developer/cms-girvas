@@ -10,6 +10,7 @@
 
 namespace core\PHPLibrary\Database\QueryBuilder\StatementUpdate;
 
+use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;
 use \core\PHPLibrary\Database\QueryBuilder\StatementUpdate\InterfaceClause as InterfaceClause;
 use \core\PHPLibrary\Database\QueryBuilder\StatementUpdate as StatementUpdate;
 
@@ -80,7 +81,11 @@ final class ClauseSet implements InterfaceClause
 
     foreach ($this->columns as $name) {
       $value = $this->values[$name] ?? ':' . $name;
-      $queryArray[] = sprintf('"%s" = %s', $name, $value);
+
+      $queryArray[] = match ($this->statement->queryBuilder->DMS) {
+        DMS::MySQL => sprintf('`"%s` = %s', $name, $value),
+        DMS::PostgreSQL => sprintf('"%s" = %s', $name, $value),
+      };
     }
 
     $this->assembled = count($queryArray) > 0 ? 'SET ' . implode(', ', $queryArray) : '';
