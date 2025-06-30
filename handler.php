@@ -22,6 +22,10 @@ if (!isset($CMSCore)) {
 }
 
 if (defined('IS_NOT_HACKED')) {
+  $CMSURLP = $CMSCore->urlp;
+  $CMSClient = $CMSCore->client;
+  $CMSConfigurator = $CMSCore->configurator;
+
   header('Access-Control-Allow-Origin: ' . $CMSConfigurator->get('domain'));
 
   $handlerHeaders = apache_request_headers();
@@ -38,10 +42,6 @@ if (defined('IS_NOT_HACKED')) {
   /** ===================================================
    * Обработчик CMS GIRVAS
    * ==================================================== */
-
-  $CMSURLP = $CMSCore->urlp;
-  $CMSClient = $CMSCore->client;
-  $CMSConfigurator = $CMSCore->configurator;
 
   $CMSURLPathes = [];
   $CMSURLPathes[] = $CMSURLP->getPath(0);
