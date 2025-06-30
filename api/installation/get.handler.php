@@ -23,10 +23,14 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
+if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
   $JSONDataTypeDMS = 'json';
 
-  if ($CMSCore->urlp->getParam('stepIndex') === 1) {
+  $installationStepIndex = $CMSCore->urlp->getParam('stepIndex');
+  $installationStepIndex = $installationStepIndex ?? 1;
+  $installationStepIndex = is_numeric($installationStepIndex) ? (int) $installationStepIndex : 1;
+
+  if ($installationStepIndex === 1) {
     $document = new DOMDocument();
     
     $phpExtensionsLoaded = get_loaded_extensions();
@@ -122,7 +126,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
     $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($CMSCore->urlp->getParam('stepIndex') === 2) {
+  if ($installationStepIndex === 2) {
     $document = new DOMDocument();
     
     $tableData = [
@@ -191,7 +195,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
     $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($CMSCore->urlp->getParam('stepIndex') === 3) {
+  if ($installationStepIndex === 3) {
     $document = new DOMDocument();
 
     $tableData = [
@@ -266,7 +270,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
     $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($CMSCore->urlp->getParam('stepIndex') === 4) {
+  if ($installationStepIndex === 4) {
     $document = new DOMDocument();
     
     $phpExtensionsLoaded = get_loaded_extensions();
@@ -351,7 +355,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
     $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($CMSCore->urlp->getParam('stepIndex') === 5) {
+  if ($installationStepIndex === 5) {
     $document = new DOMDocument();
     $tipBlockElement = $document->createElement('div');
 
@@ -450,7 +454,7 @@ if (!file_exists(sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY))) {
     $handlerStatusCode = $handlerStatusCode ?? 1;
   }
 
-  if ($CMSCore->urlp->getParam('stepIndex') === 6) {
+  if ($installationStepIndex === 6) {
     $databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
     $CMSConfigDatabase = $CMSCore->configurator->get('database');
 
