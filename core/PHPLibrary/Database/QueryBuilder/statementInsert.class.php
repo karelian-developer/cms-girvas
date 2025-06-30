@@ -108,12 +108,16 @@ final class StatementInsert implements InterfaceStatement
    */
   public function assembly() : void
   {
+    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
     $queryArray = [];
 
     $columnsValues = [];
     foreach ($this->columns as $index => $columnName) {
       if (!preg_match('/\"[a-z0-9_]+\"/i', $columnName)) {
-        $this->columns[$index] = '"' . $columnName . '"';
+        $this->columns[$index] = match ($CMSConfigDatabase['dms']) {
+          CMSDMS::MySQL => '`' . $columnName . '`',
+          CMSDMS::PostgreSQL => '"' . $columnName . '"',
+        };
       }
 
       $columnsValues[] = ':' . $columnName;
