@@ -243,6 +243,9 @@ if (defined('IS_NOT_HACKED')) {
     if ($CMSCore->urlp->getPath(2) === 'base') {
       $CMSLocaleSetted = $CMSCore->configurator->getDatabaseEntryValue('base_locale') ?? 'en_US';
       $CMSLocale = new CMSLocale($CMSCore, $CMSLocaleSetted);
+      $CMSLocale->setTypeName('handler');
+      $CMSLocale->initPathes();
+
       $handlerOutputData['locale'] = [
         'title' => $CMSLocale->getTitle(),
         'iconURL' => $CMSLocale->getIconURL(),
@@ -256,6 +259,9 @@ if (defined('IS_NOT_HACKED')) {
     if ($CMSCore->urlp->getPath(2) === 'admin') {
       $CMSLocaleSetted = $CMSCore->configurator->getDatabaseEntryValue('base_admin_locale') ?? 'en_US';
       $CMSLocale = new CMSLocale($CMSCore, $CMSLocaleSetted);
+      $CMSLocale->setTypeName('handler');
+      $CMSLocale->initPathes();
+
       $handlerOutputData['locale'] = [
         'title' => $CMSLocale->getTitle(),
         'iconURL' => $CMSLocale->getIconURL(),
@@ -273,6 +279,7 @@ if (defined('IS_NOT_HACKED')) {
     if (count($CMSLocalesNames) > 0) {
       foreach ($CMSLocalesNames as $index => $name) {
         $CMSLocale = new CMSLocale($CMSCore, $name);
+        $CMSLocale->setTypeName('handler');
         $CMSLocale->initPathes();
 
         if ($CMSLocale->existsFileMetadataJSON()) {
