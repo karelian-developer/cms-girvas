@@ -44,8 +44,8 @@ final class Locale implements LocaleInterface
   {
     $CMSCore = $this->CMSCore;
 
-    $corePath = $CMSCore->getCMSPath() . '/locales/' . $name;
-    $dataPath = $CMSCore->getCMSPath() . '/locales/' . $name . '/' . $this->typeName;
+    $corePath = $CMSCore->getCMSPath() . '/locales/' . $this->name;
+    $dataPath = $CMSCore->getCMSPath() . '/locales/' . $this->name . '/' . $this->typeName;
 
     $this->setCorePath($corePath);
     $this->setDataPath($dataPath);
