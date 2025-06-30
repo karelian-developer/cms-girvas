@@ -118,7 +118,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $tableElement->appendChild($tableRowElement);
     }
     
-    $document->appendChild($table);
+    $document->appendChild($tableElement);
 
     $handlerOutputData['html'] = $document->saveHTML();
 
@@ -187,7 +187,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $tableElement->appendChild($tableRowElement);
     }
     
-    $document->appendChild($table);
+    $document->appendChild($tableElement);
 
     $handlerOutputData['html'] = $document->saveHTML();
 
@@ -262,7 +262,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $tableElement->appendChild($tableRowElement);
     }
     
-    $document->appendChild($table);
+    $document->appendChild($tableElement);
 
     $handlerOutputData['html'] = $document->saveHTML();
 
@@ -347,7 +347,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $tableElement->appendChild($tableRowElement);
     }
     
-    $document->appendChild($table);
+    $document->appendChild($tableElement);
 
     $handlerOutputData['html'] = $document->saveHTML();
 
