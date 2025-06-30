@@ -45,5 +45,3 @@ $configuration = [
   'SSLHSTSIncludeSubdomains' => false,
   'SSLHSTSPreload' => false
 ];
-
-?>

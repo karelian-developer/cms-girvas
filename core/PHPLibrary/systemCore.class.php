@@ -49,7 +49,7 @@ final class SystemCore
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS GIRVAS';
-  public const CMS_VERSION = '0.1.36-11.6';
+  public const CMS_VERSION = '0.1.36-11.7';
   public const CMS_STAGE_DEVELOPING = 'alpha';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -393,90 +393,90 @@ final class SystemCore
 
       /** @var Client Объект клиента */
       $this->client = new Client($this);
-    }
 
-    $serverHTTPHost = $_SERVER['HTTP_HOST'] ?? '';
-    $serverRequestURI = $_SERVER['REQUEST_URI'] ?? '';
+      $serverHTTPHost = $_SERVER['HTTP_HOST'] ?? '';
+      $serverRequestURI = $_SERVER['REQUEST_URI'] ?? '';
 
-    // Ядро перенаправляет клиент на HTTPS-протокол, в случае, если в CMS включена принудительная
-    // переадресация на этот порт.
-    if (!self::isHTTPS() && $CMSConfigurator->get('SSLPermRedirect')) {
+      // Ядро перенаправляет клиент на HTTPS-протокол, в случае, если в CMS включена принудительная
+      // переадресация на этот порт.
+      if (!self::isHTTPS() && $CMSConfigurator->get('SSLPermRedirect')) {
+        /* 
+        * Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена
+        * в настройках CMS.
+        */
+        if (
+          $CMSConfigurator->getPermanentRedirectToWWWStatus()
+          && !preg_match('/^www\./', $serverHTTPHost)
+        ) {
+          /** @var string Адрес для переадресации по HTTPS-протоколу (поддомен www) */
+          $HTTPSRedirect = 'https://www.' . $serverHTTPHost . $serverRequestURI;
+        } else {
+          /** @var string Адрес для переадресации по HTTPS-протоколу */
+          $HTTPSRedirect = 'https://' . $serverHTTPHost . $serverRequestURI;
+        }
+
+        // Сообщаем браузеру, что это принудительная переадресация
+        CMSHeader::add(CMSEnumHeader::HTTP_RESPONSE_CODE, 301);
+        CMSHeader::add(CMSEnumHeader::HTTP_LOCATION, $HTTPSRedirect);
+        exit();
+      }
+      
       /* 
-       * Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена
-       * в настройках CMS.
-       */
+      * Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена
+      * в настройках CMS.
+      */
       if (
         $CMSConfigurator->getPermanentRedirectToWWWStatus()
         && !preg_match('/^www\./', $serverHTTPHost)
       ) {
-        /** @var string Адрес для переадресации по HTTPS-протоколу (поддомен www) */
-        $HTTPSRedirect = 'https://www.' . $serverHTTPHost . $serverRequestURI;
-      } else {
-        /** @var string Адрес для переадресации по HTTPS-протоколу */
-        $HTTPSRedirect = 'https://' . $serverHTTPHost . $serverRequestURI;
+        /** @var string Адрес для переадресации по HTTP-протоколу (поддомен www) */
+        $HTTPRedirect = 'http://www.' . $serverHTTPHost . $serverRequestURI;
+        
+        // Сообщаем браузеру, что это принудительная переадресация
+        CMSHeader::add(CMSEnumHeader::HTTP_RESPONSE_CODE, 301);
+        CMSHeader::add(CMSEnumHeader::HTTP_LOCATION, $HTTPRedirect);
+        exit();
       }
 
-      // Сообщаем браузеру, что это принудительная переадресация
-      CMSHeader::add(CMSEnumHeader::HTTP_RESPONSE_CODE, 301);
-      CMSHeader::add(CMSEnumHeader::HTTP_LOCATION, $HTTPSRedirect);
-      exit();
-    }
-    
-    /* 
-     * Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена
-     * в настройках CMS.
-     */
-    if (
-      $CMSConfigurator->getPermanentRedirectToWWWStatus()
-      && !preg_match('/^www\./', $serverHTTPHost)
-    ) {
-      /** @var string Адрес для переадресации по HTTP-протоколу (поддомен www) */
-      $HTTPRedirect = 'http://www.' . $serverHTTPHost . $serverRequestURI;
+      // Указываем серверу, что будем использовать временную зону для расчета времени, указанную в настройках CMS. 
+      date_default_timezone_set($CMSConfigurator->getSiteTimezone());
+
+      // Сообщаем браузеру, что для сайта деятсвуют особые правила безопасности
+      CMSHeader::add(CMSEnumHeader::HTTP_CONTENT_SECURITY_POLICY, $CMSConfigurator->getSecurityCSP());
+      header('Referrer-Policy: strict-origin-when-cross-origin');
+      header('X-Content-Type-Options: nosniff');
       
-      // Сообщаем браузеру, что это принудительная переадресация
-      CMSHeader::add(CMSEnumHeader::HTTP_RESPONSE_CODE, 301);
-      CMSHeader::add(CMSEnumHeader::HTTP_LOCATION, $HTTPRedirect);
-      exit();
-    }
+      if ($CMSConfigurator->get('SSLIsEnabled')) {
+        $HSTSVars = [];
 
-    // Указываем серверу, что будем использовать временную зону для расчета времени, указанную в настройках CMS. 
-    date_default_timezone_set($CMSConfigurator->getSiteTimezone());
+        if ($CMSConfigurator->exists('SSLHSTSMaxAge')) {
+          $CMSConfigSSLHSTSMaxAge = $CMSConfigurator->get('SSLHSTSMaxAge');
 
-    // Сообщаем браузеру, что для сайта деятсвуют особые правила безопасности
-    CMSHeader::add(CMSEnumHeader::HTTP_CONTENT_SECURITY_POLICY, $CMSConfigurator->getSecurityCSP());
-    header('Referrer-Policy: strict-origin-when-cross-origin');
-    header('X-Content-Type-Options: nosniff');
-    
-    if ($CMSConfigurator->get('SSLIsEnabled')) {
-      $HSTSVars = [];
-
-      if ($CMSConfigurator->exists('SSLHSTSMaxAge')) {
-        $CMSConfigSSLHSTSMaxAge = $CMSConfigurator->get('SSLHSTSMaxAge');
-
-        if (is_integer($CMSConfigSSLHSTSMaxAge)) {
-          array_push($HSTSVars, 'max-age=' . $CMSConfigSSLHSTSMaxAge);
-        }
-      }
-
-      if ($CMSConfigurator->exists('SSLHSTSIncludeSubdomains')) {
-        $CMSConfigSSLHSTSIncludeSubdomains = $CMSConfigurator->get('SSLHSTSIncludeSubdomains');
-
-        if (is_bool($CMSConfigSSLHSTSIncludeSubdomains)) {
-          if ($CMSConfigSSLHSTSIncludeSubdomains === true) {
-            array_push($HSTSVars, 'includeSubDomains');
+          if (is_integer($CMSConfigSSLHSTSMaxAge)) {
+            array_push($HSTSVars, 'max-age=' . $CMSConfigSSLHSTSMaxAge);
           }
         }
-      }
 
-      if ($CMSConfigurator->exists('SSLHSTSPreload')) {
-        $CMSConfigSSLHSTSPreload = $CMSConfigurator->get('SSLHSTSPreload');
+        if ($CMSConfigurator->exists('SSLHSTSIncludeSubdomains')) {
+          $CMSConfigSSLHSTSIncludeSubdomains = $CMSConfigurator->get('SSLHSTSIncludeSubdomains');
 
-        if (is_bool($CMSConfigSSLHSTSPreload) && $CMSConfigSSLHSTSPreload === true) {
-          array_push($HSTSVars, 'preload');
+          if (is_bool($CMSConfigSSLHSTSIncludeSubdomains)) {
+            if ($CMSConfigSSLHSTSIncludeSubdomains === true) {
+              array_push($HSTSVars, 'includeSubDomains');
+            }
+          }
         }
-      }
 
-      header('Strict-Transport-Security: ' . implode('; ', $HSTSVars));
+        if ($CMSConfigurator->exists('SSLHSTSPreload')) {
+          $CMSConfigSSLHSTSPreload = $CMSConfigurator->get('SSLHSTSPreload');
+
+          if (is_bool($CMSConfigSSLHSTSPreload) && $CMSConfigSSLHSTSPreload === true) {
+            array_push($HSTSVars, 'preload');
+          }
+        }
+
+        header('Strict-Transport-Security: ' . implode('; ', $HSTSVars));
+      }
     }
 
     if ($CMSURLP->getPath(0) === 'install' && $CMSURLP->getPath(1) !== 'install') {
