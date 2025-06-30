@@ -34,30 +34,34 @@ $startTime = microtime(true);
 require_once CMS_ROOT_DIRECTORY . '/core/PHPLibrary/systemCore.class.php';
 
 $CMSCore = new CMSCore();
+$CMSURLP = $CMSCore->urlp;
 
-if ($CMSCore->urlp->getPath(0) === 'handler') {
+$CMSURLPathes = [];
+$CMSURLPathes[] = $CMSURLP->getPath(0);
+
+if ($CMSURLPathes[0] === 'handler') {
 
   include_once CMS_ROOT_DIRECTORY . '/handler.php';
 
-} else if ($CMSCore->urlp->getPath(0) === 'sitemap') {
+} else if ($CMSURLPathes[0] === 'sitemap') {
 
   include_once CMS_ROOT_DIRECTORY . '/sitemap.php';
 
-} else if ($CMSCore->urlp->getPath(0) === 'rss') {
+} else if ($CMSURLPathes[0] === 'rss') {
 
   include_once CMS_ROOT_DIRECTORY . '/rss.php';
 
-} else if ($CMSCore->urlp->getPath(0) === 'feed') {
+} else if ($CMSURLPathes[0] === 'feed') {
 
   include_once CMS_ROOT_DIRECTORY . '/feed.php';
 
-} else if ($CMSCore->urlp->getPath(0) === 'sql-execute-forced') {
+} else if ($CMSURLPathes[0] === 'sql-execute-forced') {
 
   if (file_exists(CMS_ROOT_DIRECTORY . '/sqlExecute.php')) {
     include_once CMS_ROOT_DIRECTORY . '/sqlExecute.php';
   }
 
-} else if ($CMSCore->urlp->getPath(0) === 'password-reset') {
+} else if ($CMSURLPathes[0] === 'password-reset') {
 
   $queryBuilder = new DatabaseQueryBuilder($CMSCore);
   $queryBuilder->setStatementSelect();
@@ -66,7 +70,7 @@ if ($CMSCore->urlp->getPath(0) === 'handler') {
   $queryBuilder->statement->clauseFrom->addTable('users');
   $queryBuilder->statement->clauseFrom->assembly();
   $queryBuilder->statement->setClauseWhere();
-  $queryBuilder->statement->clauseWhere->addCondition(sprintf('metadata::jsonb->>\'passwordResetToken\' = \'%s\'', $CMSCore->urlp->getParam('token')));
+  $queryBuilder->statement->clauseWhere->addCondition(sprintf('metadata::jsonb->>\'passwordResetToken\' = \'%s\'', $CMSURLP->getParam('token')));
   $queryBuilder->statement->clauseWhere->assembly();
   $queryBuilder->statement->setClauseLimit(1);
   $queryBuilder->statement->assembly();
@@ -119,8 +123,8 @@ if ($CMSCore->urlp->getPath(0) === 'handler') {
     echo 'Request is not exists!';
   }
 } else {
-  if ($CMSCore->urlp->getParam('mode') !== 'install' && file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
-    if ($CMSCore->configurator->getDatabaseEntryValue('security_allowed_admin_ip_status') === 'on' && $CMSCore->urlp->getPath(0) === 'admin') {
+  if ($CMSURLP->getParam('mode') !== 'install' && file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
+    if ($CMSCore->configurator->getDatabaseEntryValue('security_allowed_admin_ip_status') === 'on' && $CMSURLPathes[0] === 'admin') {
       /** @var array Массив разрешенных IP-адресов */
       $allowedIPs = json_decode($CMSCore->configurator->getDatabaseEntryValue('security_allowed_admin_ip'), true);
       
