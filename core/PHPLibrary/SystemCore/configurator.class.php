@@ -663,30 +663,40 @@ final class Configurator
    */
   public function getDatabaseEntryValue(string $name) : mixed
   {
-    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSCore = $this->CMSCore;
+    $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections(['value']);
-    $queryBuilder->statement->setClauseFrom();
-    $queryBuilder->statement->clauseFrom->addTable('configurations');
-    $queryBuilder->statement->clauseFrom->assembly();
-    $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('name = :name');
-    $queryBuilder->statement->clauseWhere->assembly();
-    $queryBuilder->statement->assembly();
+
+    $queryBuilderStatement = $queryBuilder->statement;
+    $queryBuilderStatement->addSelections(['value']);
+    $queryBuilderStatement->setClauseFrom();
+
+    $queryBuilderStatementClauseFrom = $queryBuilderStatement->clauseFrom;
+    $queryBuilderStatementClauseFrom->addTable('configurations');
+    $queryBuilderStatementClauseFrom->assembly();
+    $queryBuilderStatement->setClauseWhere();
+
+    $queryBuilderStatementClauseWhere = $queryBuilderStatement->clauseWhere;
+    $queryBuilderStatementClauseWhere->addCondition('"name" = :name');
+    $queryBuilderStatementClauseWhere->assembly();
+    $queryBuilderStatement->assembly();
 
     try {
-      $databaseConnection = $this->CMSCore->databaseConnector !== null ? $this->CMSCore->databaseConnector->database->connection : null;
+      $CMSDatabaseConnector = $CMSCore->databaseConnector;
+      $databaseConnection = $CMSDatabaseConnector !== null
+        ? $CMSDatabaseConnector->database->connection
+        : null;
       
       if ($databaseConnection !== null) {
-        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery = $databaseConnection->prepare($queryBuilderStatement->assembled);
         $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
         $databaseQuery->execute();
 
         $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-        return ($result) ? $result['value'] : null;
+        return $result ? $result['value'] : null;
       }
     } catch (PDOException $exception) {
       die(json_encode([
@@ -709,26 +719,36 @@ final class Configurator
    */
   public function existsDatabaseEntryValue(string $name) : bool
   {
-    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSCore = $this->CMSCore;
+    $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections(['1']);
-    $queryBuilder->statement->setClauseFrom();
-    $queryBuilder->statement->clauseFrom->addTable('configurations');
-    $queryBuilder->statement->clauseFrom->assembly();
-    $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('name = :name');
-    $queryBuilder->statement->clauseWhere->assembly();
-    $queryBuilder->statement->setClauseLimit(1);
-    $queryBuilder->statement->assembly();
+
+    $queryBuilderStatement = $queryBuilder->statement;
+    $queryBuilderStatement->addSelections(['1']);
+    $queryBuilderStatement->setClauseFrom();
+
+    $queryBuilderStatementClauseFrom = $queryBuilderStatement->clauseFrom;
+    $queryBuilderStatementClauseFrom->addTable('configurations');
+    $queryBuilderStatementClauseFrom->assembly();
+    $queryBuilderStatement->setClauseWhere();
+
+    $queryBuilderStatementClauseWhere = $queryBuilderStatement->clauseWhere;
+    $queryBuilderStatementClauseWhere->addCondition('name = :name');
+    $queryBuilderStatementClauseWhere->assembly();
+    $queryBuilderStatement->setClauseLimit(1);
+    $queryBuilderStatement->assembly();
 
     try {
-      $databaseConnection = $this->CMSCore->databaseConnector !== null ? $this->CMSCore->databaseConnector->database->connection : null;
+      $CMSDatabaseConnector = $CMSCore->databaseConnector;
+      $databaseConnection = $CMSDatabaseConnector !== null
+        ? $CMSDatabaseConnector->database->connection
+        : null;
       
       if ($databaseConnection !== null) {
-        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery = $databaseConnection->prepare($queryBuilderStatement->assembled);
         $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
         $databaseQuery->execute();
 
