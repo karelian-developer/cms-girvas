@@ -88,9 +88,10 @@ final class StatementCreateTable implements InterfaceStatement
 
     $array = [];
     $array[] = match ($CMSConfigDatabase['dms']) {
-      CMSDMS::MySQL => '`' . $name '`',
-      CMSDMS::PostgreSQL => '"' . $name '"'
+      CMSDMS::MySQL => '`' . $name . '`',
+      CMSDMS::PostgreSQL => '"' . $name . '"'
     };
+
     $array[] = $type;
     $array[] = $constraint;
     
