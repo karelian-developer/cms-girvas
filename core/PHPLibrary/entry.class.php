@@ -713,8 +713,6 @@ class Entry implements EntityTypeContent
         continue;
       }
 
-      $queryBuilder->DMS = CMSDMS::MySQL;
-
       foreach ($data[$columnName] as $name => $value) {
         $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $fieldsJSON[] = match ($queryBuilder->DMS) {

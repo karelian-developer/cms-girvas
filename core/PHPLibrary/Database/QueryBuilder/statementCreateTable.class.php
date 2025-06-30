@@ -11,6 +11,7 @@
 namespace core\PHPLibrary\Database\QueryBuilder;
 
 use \core\PHPLibrary\Database\QueryBuilder as QueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
 
 final class StatementCreateTable implements InterfaceStatement
@@ -50,16 +51,19 @@ final class StatementCreateTable implements InterfaceStatement
    */
   public function getTableName() : string
   {
-    $databaseConfigurations = $this->queryBuilder->CMSCore->configurator->get('database');
+    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
     
     $tableFullname = '';
-    if ($databaseConfigurations !== null) {
-      if ($databaseConfigurations['scheme'] !== '') {
-        $tableFullname .= $databaseConfigurations['scheme'] . '.';
+    if ($CMSConfigDatabase !== null) {
+      if (
+        $CMSConfigDatabase['scheme'] !== ''
+        && $CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL
+      ) {
+        $tableFullname .= $CMSConfigDatabase['scheme'] . '.';
       }
 
-      if ($databaseConfigurations['prefix'] !== '') {
-        $tableFullname .= $databaseConfigurations['prefix'] . '_';
+      if ($CMSConfigDatabase['prefix'] !== '') {
+        $tableFullname .= $CMSConfigDatabase['prefix'] . '_';
       }
     }
 
@@ -73,15 +77,20 @@ final class StatementCreateTable implements InterfaceStatement
   }
   
   /**
-   * Установить выборку для SELECT
+   * Добавить колонку
    *
    * @param  mixed $selection
    * @return void
    */
   public function addColumn(string $name, string $type, string $constraint = '') : void
   {
+    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+
     $array = [];
-    $array[] = $name;
+    $array[] = match ($CMSConfigDatabase['dms']) {
+      CMSDMS::MySQL => '`' . $name '`',
+      CMSDMS::PostgreSQL => '"' . $name '"'
+    };
     $array[] = $type;
     $array[] = $constraint;
     
@@ -96,8 +105,13 @@ final class StatementCreateTable implements InterfaceStatement
    * @return void
    */
   public function assembly() : void {
+    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
     $ifNotExists = $this->checkExists ? 'IF NOT EXISTS' : '';
-    $this->assembled = sprintf('CREATE TABLE %s "%s" (%s);', $ifNotExists, $this->getTableName(), implode(', ', $this->columns));
+
+    $this->assembled = match ($CMSConfigDatabase['dms']) {
+      CMSDMS::MySQL => sprintf('CREATE TABLE %s `%s` (%s);', $ifNotExists, $this->getTableName(), implode(', ', $this->columns)),
+      CMSDMS::PostgreSQL => sprintf('CREATE TABLE %s "%s" (%s);', $ifNotExists, $this->getTableName(), implode(', ', $this->columns))
+    };
   }
 
 }

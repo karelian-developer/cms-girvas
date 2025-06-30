@@ -11,6 +11,7 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \PDOException as PDOException;
 
@@ -556,41 +557,73 @@ class EntryComment implements EntityTypeContent
       if (!empty($data['metadata'])) {
         $metadataAssignments = [];
         
-        foreach ($data['metadata'] as $metadataName => $metadataValue) {
-          if ($metadataName == 'rating_vote' && $metadataValue['vote'] == 'up') {
+        foreach ($data['metadata'] as $name => $value) {
+          if ($name == 'ratingVote' && $value['vote'] == 'up') {
             $commentRatingVoters = $this->getRatingVoters();
 
-            array_push($metadataAssignments, sprintf('jsonb_set(metadata::jsonb, \'{ratingVoters}\', (metadata::jsonb->>\'ratingVoters\')::jsonb || \'{"%d": "%s"}\')', $metadataValue['voter_id'], $metadataValue['vote']));
+            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'ratingVoters\', JSON_MERGE(COALESCE(JSON_EXTRACT(metadata, \'$.ratingVoters\'), \'{}\'), CAST(\'{"%d": "%s"}\' AS JSON))))', $value['voterID'], $value['vote']),
+              CMSDMS::PostgreSQL => sprintf('jsonb_set(metadata::jsonb, \'{ratingVoters}\', (metadata::jsonb->>\'ratingVoters\')::jsonb || \'{"%d": "%s"}\')', $value['voterID'], $value['vote'])
+            };
 
-            if (!isset($commentRatingVoters[$metadataValue['voter_id']])) {
-              array_push($metadataAssignments, 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int + 1)');
+            if (!isset($commentRatingVoters[$value['voterID']])) {
+              $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+                CMSDMS::MySQL => 'JSON_OBJECT(\'rating\', JSON_EXTRACT(`metadata`, \'$.rating\') + 1)',
+                CMSDMS::PostgreSQL => 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int + 1)'
+              };
             } else {
-              if ($commentRatingVoters[$metadataValue['voter_id']] !== $metadataValue['vote']) {
-                array_push($metadataAssignments, 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int + 2)');
+              if ($commentRatingVoters[$value['voterID']] !== $value['vote']) {
+                $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+                  CMSDMS::MySQL => 'JSON_OBJECT(\'rating\', JSON_EXTRACT(`metadata`, \'$.rating\') + 2)',
+                  CMSDMS::PostgreSQL => 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int + 2)'
+                };
               }
             }
-          } else if ($metadataName === 'ratingVote' && $metadataValue['vote'] === 'down') {
+          } else if ($name === 'ratingVote' && $value['vote'] === 'down') {
             $commentRatingVoters = $this->getRatingVoters();
 
-            array_push($metadataAssignments, sprintf('jsonb_set(metadata::jsonb, \'{ratingVoters}\', (metadata::jsonb->>\'ratingVoters\')::jsonb || \'{"%d": "%s"}\')', $metadataValue['voter_id'], $metadataValue['vote']));
-            if (!isset($commentRatingVoters[$metadataValue['voter_id']])) {
-              array_push($metadataAssignments, 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int - 1)');
+            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'ratingVoters\', JSON_MERGE(COALESCE(JSON_EXTRACT(metadata, \'$.ratingVoters\'), \'{}\'), CAST(\'{"%d": "%s"}\' AS JSON))))', $value['voterID'], $value['vote']),
+              CMSDMS::PostgreSQL => sprintf('jsonb_set(metadata::jsonb, \'{ratingVoters}\', (metadata::jsonb->>\'ratingVoters\')::jsonb || \'{"%d": "%s"}\')', $value['voterID'], $value['vote'])
+            };
+
+            if (!isset($commentRatingVoters[$value['voterID']])) {
+              $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+                CMSDMS::MySQL => 'JSON_OBJECT(\'rating\', JSON_EXTRACT(`metadata`, \'$.rating\') - 1)',
+                CMSDMS::PostgreSQL => 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int - 1)'
+              };
             } else {
-              if ($commentRatingVoters[$metadataValue['voter_id']] !== $metadataValue['vote']) {
-                array_push($metadataAssignments, 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int - 2)');
+              if ($commentRatingVoters[$value['voterID']] !== $value['vote']) {
+                $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+                  CMSDMS::MySQL => 'JSON_OBJECT(\'rating\', JSON_EXTRACT(`metadata`, \'$.rating\') - 2)',
+                  CMSDMS::PostgreSQL => 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int - 2)'
+                };
               }
             }
-          } else if ($metadataName === 'isHidden') {
-            array_push($metadataAssignments, sprintf('jsonb_build_object(\'isHidden\', %d::int::bool)', $metadataValue));
-          } else if ($metadataName === 'hiddenReason') {
-            array_push($metadataAssignments, sprintf('jsonb_build_object(\'hiddenReason\', \'%s\'::text)', $metadataValue));
-          } else if ($metadataName === 'parentID') {
-            array_push($metadataAssignments, sprintf('jsonb_build_object(\'parentID\', %d::int)', $metadataValue));
+          } else if ($name === 'isHidden') {
+            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'isHidden\', %d != 0)', $value),
+              CMSDMS::PostgreSQL => sprintf('jsonb_build_object(\'isHidden\', %d::int::bool)', $value)
+            };
+          } else if ($name === 'hiddenReason') {
+            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'hiddenReason\', \'%s\')', $value),
+              CMSDMS::PostgreSQL => sprintf('jsonb_build_object(\'hiddenReason\', \'%s\'::text)', $value)
+            };
+          } else if ($name === 'parentID') {
+            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'parentID\', \'%d\')', $value),
+              CMSDMS::PostgreSQL => sprintf('jsonb_build_object(\'parentID\', %d::int)', $value)
+            };
           }
         }
 
         if (!empty($metadataAssignments)) {
           $queryBuilder->statement->clauseSet->addColumn('metadata', sprintf('metadata::jsonb || %s', implode(' || ', $metadataAssignments)));
+          $queryBuilder->statement->clauseSet->addColumnAdaptive('metadata', [
+            'mysql' => 'JSON_MERGE_PRESERVE(COALESCE(`metadata`, \'{}\'), CAST(\'{' . implode(', ', $metadataAssignments) . '}\' AS JSON))',
+            'postgresql' => sprintf('metadata::jsonb || %s', implode(' || ', $metadataAssignments))
+          ]);
         }
       }
     }
@@ -598,7 +631,10 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 

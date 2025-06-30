@@ -11,6 +11,7 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \PDOException as PDOException;
 
@@ -412,12 +413,6 @@ class Feed
     $queryBuilder->statement->setTable('web_channels');
     $queryBuilder->statement->set_clause_set();
 
-    foreach ($data as $name => $value) {
-      if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts'])) {
-        $queryBuilder->statement->clauseSet->addColumn($name);
-      }
-    }
-
     foreach (['texts'] as $columnName) {
       $fieldsJSON = [];
       
@@ -427,18 +422,27 @@ class Feed
 
       foreach ($data[$columnName] as $name => $value) {
         $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $fieldsJSON[] = sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON);
+        $fieldsJSON[] = match ($queryBuilder->DMS) {
+          CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
+          CMSDMS::PostgeSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
+        };
       }
 
       if (!empty($data[$columnName])) {
-        $queryBuilder->statement->clauseSet->addColumn($columnName, $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON));
+        $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
+          'mysql' => 'JSON_MERGE_PRESERVE(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
+          'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
+        ]);
       }
     }
 
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
