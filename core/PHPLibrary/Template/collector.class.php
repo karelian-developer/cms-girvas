@@ -12,9 +12,9 @@ namespace core\PHPLibrary\Template;
 
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Parsedown as Parsedown;
-use \core\PHPLibrary\Template as Template;
-use \core\PHPLibrary\Template\Locale as TemplateLocale;
+use \core\PHPLibrary\LocaleInterface as LocaleInterface;
 use \core\PHPLibrary\Module\Locale as ModuleLocale;
+use \core\PHPLibrary\Template as Theme;
 use \DOMDocument as DOMDocument;
 
 final class Collector
@@ -24,7 +24,7 @@ final class Collector
   private const TEMPLATE_TAG_LANG_MARKDOWN_PATTERN = '/\{LANG\:MD\:([a-zA-Z0-9_]+)\}/';
   private const TEMPLATE_LOGIC_IF_PATTERN = '/\{\?IF\:([a-zA-Z0-9_]+)([=<>!]+)([a-zA-Z0-9_]+)\?\}(.*)\{\?ENDIF\?\}/is';
   private const TEMPLATE_LOGIC_IF_ELSE_PATTERN = '/\{\?IF\:([a-zA-Z0-9_]+)([=<>!]+)([a-zA-Z0-9_]+)\?\}(.*){\?ELSE\?\}(.*)\{\?ENDIF\?\}/is';
-  private Template $theme;
+  private Theme $theme;
   
   /**
    * __construct
@@ -33,7 +33,7 @@ final class Collector
    * 
    * @return void
    */
-  public function __construct(Template $theme)
+  public function __construct(Theme $theme)
   {
     $this->theme = $theme;
   }
@@ -41,12 +41,12 @@ final class Collector
   /**
    * Сборка элементов link-стилей для последующего встраивания в секцию HEAD
    * 
-   * @param Template $theme
+   * @param Theme $theme
    * @param array $stylesArray
    * 
    * @return string
    */
-  public static function assemblyStyles(Template $theme, array $stylesArray) : string
+  public static function assemblyStyles(Theme $theme, array $stylesArray) : string
   {
     $document = new DOMDocument();
 
@@ -79,12 +79,12 @@ final class Collector
   /**
    * Сборка элементов-скриптов для последующего встраивания в секцию HEAD
    * 
-   * @param Template $theme
+   * @param Theme $theme
    * @param array $scriptsArray
    * 
    * @return string
    */
-  public static function assemblyScripts(Template $theme, array $scriptsArray) : string
+  public static function assemblyScripts(Theme $theme, array $scriptsArray) : string
   {
     $document = new DOMDocument();
 
@@ -122,11 +122,11 @@ final class Collector
    * Сборка шаблона на основе общих данных локализации
    * 
    * @param string $themeString
-   * @param SystemCoreLocale|TemplateLocale|ModuleLocale $locale
+   * @param LocaleInterface $locale
    * 
    * @return string
    */
-  public static function assemblyLocale(string $themeString, SystemCoreLocale|TemplateLocale|ModuleLocale $locale) : string
+  public static function assemblyLocale(string $themeString, LocaleInterface $locale) : string
   {
     $themeTransformed = $themeString;
 
@@ -146,11 +146,11 @@ final class Collector
    * Сборка шаблона на основе файлов с разметкой MarkDown на основе реестра локализации
    * 
    * @param string $themeString
-   * @param SystemCoreLocale|TemplateLocale|ModuleLocale $locale
+   * @param LocaleInterface $locale
    * 
    * @return string
    */
-  public static function assemblyLocaleMarkdown(string $themeString, SystemCoreLocale|TemplateLocale|ModuleLocale $locale) : string
+  public static function assemblyLocaleMarkdown(string $themeString, LocaleInterface $locale) : string
   {
     $themeTransformed = $themeString;
     $localeRegistryArray = $locale->getRegistryArray();
@@ -182,21 +182,27 @@ final class Collector
   /**
    * Сборка шаблона на основе строки
    *
-   * @param  mixed $themeString Содержимое шаблона
-   * @param  mixed $themeVariables Массив с тегами шаблона и их значениями
+   * @param  mixed $template Содержимое шаблона
+   * @param  mixed $variables Массив с тегами шаблона и их значениями
    * @return string
    */
-  public static function assembly(string $themeString, array $themeVariables) : string
+  public static function assembly(string $template, array $variables = []) : string
   {
-    $themeTransformed = $themeString;
+    if ($template === '') {
+      return '';
+    }
 
-    foreach($themeVariables as $name => $value) {
-      if (preg_match(self::TEMPLATE_TAG_PATTERN, $themeTransformed)) {
-        $themeTransformed = str_replace("{{$name}}", $value, $themeTransformed);
+    if (empty($variables)) {
+      return $template;
+    }
+
+    foreach($variables as $name => $value) {
+      if (preg_match(self::TEMPLATE_TAG_PATTERN, $template)) {
+        $template = str_replace("{{$name}}", $value, $template);
       }
     }
 
-    return $themeTransformed;
+    return $template;
   }
 
   public static function assemblyLogic(SystemCore $CMSCore, string $themeString) : string
@@ -205,7 +211,7 @@ final class Collector
 
     $defineFunction = function(string $functionName) : mixed {
       switch ($functionName) {
-        case 'CLIENT_IS_LOGGED': return $CMSCore->client->is_logged(1);
+        case 'CLIENT_IS_LOGGED': return $CMSCore->client->isLogged(1);
       }
 
       return null;
@@ -241,13 +247,13 @@ final class Collector
   /**
    * Сборка шаблона на основе содержимого файла
    *
-   * @param Template $theme
+   * @param Theme $theme
    * @param string $filePath Полный путь до файла
    * @param array $themeVariables Массив с тегами шаблона и их значениями
    * 
    * @return string
    */
-  public static function assemblyFileContent(Template $theme, string $filePath, array $themeVariables) : string
+  public static function assemblyFileContent(Theme $theme, string $filePath, array $themeVariables) : string
   {
     /** @var string $filePath Полный путь до шаблона */
     $filePath = $theme->getPath() . '/' . $filePath;
@@ -259,5 +265,4 @@ final class Collector
 
     return sprintf('{ERROR:FILE_IS_NOT_EXISTS=%s}', $filePath);
   }
-
 }

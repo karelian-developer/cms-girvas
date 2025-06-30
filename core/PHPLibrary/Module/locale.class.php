@@ -12,8 +12,9 @@ namespace core\PHPLibrary\Module;
 
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Module as Module;
+use \core\PHPLibrary\LocaleInterface as LocaleInterface;
 
-final class Locale
+final class Locale implements LocaleInterface
 {
   public SystemCore $CMSCore;
   public Module $module;

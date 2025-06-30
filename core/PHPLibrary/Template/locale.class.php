@@ -12,8 +12,9 @@ namespace core\PHPLibrary\Template;
 
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Template as Theme;
+use \core\PHPLibrary\LocaleInterface as LocaleInterface;
 
-final class Locale
+final class Locale implements LocaleInterface
 {
   public SystemCore $CMSCore;
   public Theme $theme;

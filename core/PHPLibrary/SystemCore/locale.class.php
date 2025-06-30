@@ -11,9 +11,10 @@
 namespace core\PHPLibrary\SystemCore;
 
 use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\LocaleInterface as LocaleInterface;
 use \DOMDocument as DOMDocument;
 
-final class Locale
+final class Locale implements LocaleInterface
 {
   public SystemCore $CMSCore;
 
