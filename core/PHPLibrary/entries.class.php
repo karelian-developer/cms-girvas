@@ -48,7 +48,10 @@ final class Entries
 
     if ($isPublished) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('(metadata::jsonb->>\'isPublished\')::boolean = true');
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => 'AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
@@ -98,10 +101,16 @@ final class Entries
     $queryBuilder->statement->clauseFrom->addTable('entries');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"categoryID" = :categoryID');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`categoryID` = :categoryID',
+      'postgresql' => '"categoryID" = :categoryID'
+    ]);
 
     if ($isPublished) {
-      $queryBuilder->statement->clauseWhere->addCondition('AND (metadata::jsonb->>\'isPublished\')::boolean = true');
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => 'AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
     }
 
     $queryBuilder->statement->clauseWhere->assembly();
@@ -151,10 +160,16 @@ final class Entries
     $queryBuilder->statement->clauseFrom->addTable('entries');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"categoryID" = :categoryID');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`categoryID` = :categoryID',
+      'postgresql' => '"categoryID" = :categoryID'
+    ]);
 
     if ($isPublished) {
-      $queryBuilder->statement->clauseWhere->addCondition('AND (metadata::jsonb->>\'isPublished\')::boolean = true');
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => 'AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
     }
 
     $queryBuilder->statement->clauseWhere->assembly();
@@ -188,7 +203,10 @@ final class Entries
 
     if ($isPublished) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('(metadata::jsonb->>\'isPublished\')::boolean = true');
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => 'AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
       $queryBuilder->statement->clauseWhere->assembly();
     }
 

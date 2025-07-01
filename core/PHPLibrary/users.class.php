@@ -102,6 +102,10 @@ final class Users
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.groupID\') = :groupID',
+      'postgresql' => '(metadata::jsonb->>\'groupID\')::int = :groupID'
+    ]);
     $queryBuilder->statement->clauseWhere->addCondition('(metadata::jsonb->>\'groupID\')::int = :groupID');
 
     $queryBuilder->statement->clauseWhere->assembly();

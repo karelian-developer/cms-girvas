@@ -51,7 +51,10 @@ final class Pages
 
     if ($isPublised) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('(metadata::jsonb->>\'is_published\')::boolean = true');
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => 'AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
