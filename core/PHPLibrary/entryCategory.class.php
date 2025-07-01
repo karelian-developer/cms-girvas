@@ -405,6 +405,8 @@ class EntryCategory implements EntityTypeContent
     $texts = !empty($texts) ? json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
     $metadata = !empty($metadata) ? json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
 
+    error_log('SQL: ' . $queryBuilder->statement->assembled);
+
     try {
       $databaseConnection = $CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
