@@ -455,7 +455,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
   }
 
   if ($installationStepIndex === 6) {
-    $databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
+    $CMSDatabaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
     $CMSConfigDatabase = $CMSCore->configurator->get('database');
 
     switch ($CMSConfigDatabase['dms']->getString()) {
@@ -488,7 +488,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
-      $databaseConnection = $databaseConnector->database->connection;
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       $execute = $databaseQuery->execute();
@@ -511,7 +511,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
-      $databaseConnection = $databaseConnector->database->connection;
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       $execute = $databaseQuery->execute();
@@ -533,7 +533,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
-      $databaseConnection = $databaseConnector->database->connection;
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       $execute = $databaseQuery->execute();
@@ -555,7 +555,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
-      $databaseConnection = $databaseConnector->database->connection;
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       $execute = $databaseQuery->execute();
@@ -576,7 +576,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
-      $databaseConnection = $databaseConnector->database->connection;
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       $execute = $databaseQuery->execute();
@@ -598,7 +598,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
-      $databaseConnection = $databaseConnector->database->connection;
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       $execute = $databaseQuery->execute();
@@ -617,7 +617,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
-      $databaseConnection = $databaseConnector->database->connection;
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       $execute = $databaseQuery->execute();
@@ -641,7 +641,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
-      $databaseConnection = $databaseConnector->database->connection;
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       $execute = $databaseQuery->execute();
@@ -663,7 +663,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
-      $databaseConnection = $databaseConnector->database->connection;
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       $execute = $databaseQuery->execute();
@@ -683,7 +683,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
-      $databaseConnection = $databaseConnector->database->connection;
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       $execute = $databaseQuery->execute();
@@ -705,7 +705,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
-      $databaseConnection = $databaseConnector->database->connection;
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       $execute = $databaseQuery->execute();
@@ -727,7 +727,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
-      $databaseConnection = $databaseConnector->database->connection;
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       $execute = $databaseQuery->execute();
@@ -747,7 +747,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
-      $databaseConnection = $databaseConnector->database->connection;
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       $execute = $databaseQuery->execute();
@@ -770,8 +770,6 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     // =======================
     // ПЕРВИЧНОЕ НАПОЛНЕНИЕ БАЗЫ ДАННЫХ
     // =======================
-
-    $CMSCore->databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
 
     $firstEntriesCategoryTexts = [
       'en_US' => [
