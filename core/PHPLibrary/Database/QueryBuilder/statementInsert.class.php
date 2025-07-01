@@ -133,7 +133,19 @@ final class StatementInsert implements InterfaceStatement
       }
     }
 
-    $this->assembled = sprintf('INSERT INTO %s %s;', $this->getTable(), implode(' ', $queryArray));
+    $this->assembled = match ($CMSConfigDatabase['dms']) {
+      CMSDMS::PostgreSQL => sprintf(
+        'INSERT INTO %s %s;',
+        $this->getTable(),
+        implode(' ', $queryArray)
+      ),
+      CMSDMS::MySQL => sprintf(
+        'INSERT INTO %s %s; SELECT `id` FROM `%s` WHERE `id` = LAST_INSERT_ID();',
+        $this->getTable(),
+        implode(' ', $queryArray),
+        $this->getTable()
+      ),
+    };
   }
 
   /**
@@ -141,8 +153,14 @@ final class StatementInsert implements InterfaceStatement
    */
   private function getClausesToProcess() : array
   {
-    return [
-      $this->clauseReturning
-    ];
+    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+
+    if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+      return [
+        $this->clauseReturning
+      ];
+    }
+
+    return [];
   }
 }

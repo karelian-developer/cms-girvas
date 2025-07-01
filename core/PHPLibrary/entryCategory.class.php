@@ -408,12 +408,12 @@ class EntryCategory implements EntityTypeContent
     try {
       $databaseConnection = $CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':parentID', $parentID, \PDO::PARAM_INT);
       $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
       $databaseQuery->bindParam(':texts', $texts, \PDO::PARAM_STR);
       $databaseQuery->bindParam(':metadata', $metadata, \PDO::PARAM_STR);
       $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
       $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':parentID', $parentID, \PDO::PARAM_INT);
       $execute = $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
