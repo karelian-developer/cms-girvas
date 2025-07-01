@@ -126,19 +126,11 @@ final class StatementInsert implements InterfaceStatement
       }
     }
 
-    $this->assembled = match ($CMSConfigDatabase['dms']) {
-      CMSDMS::PostgreSQL => sprintf(
-        'INSERT INTO %s %s;',
-        $this->getTable(),
-        implode(' ', $queryArray)
-      ),
-      CMSDMS::MySQL => sprintf(
-        'INSERT INTO %s %s; SELECT `id` FROM `%s` WHERE `id` = LAST_INSERT_ID();',
-        $this->getTable(),
-        implode(' ', $queryArray),
-        $this->getTable()
-      ),
-    };
+    $this->assembled = sprintf(
+      'INSERT INTO %s %s;',
+      $this->getTable(),
+      implode(' ', $queryArray)
+    )ж
   }
 
   /**
