@@ -419,8 +419,8 @@ class Session
 
     $queryBuilderStatementClauseWhere = $queryBuilderStatement->clauseWhere;
     $queryBuilderStatementClauseWhere->addConditionAdaptive([
-      'mysql' => '`userIP` = :userIP AND `typeID` = :typeID',
-      'postgresql' => '"userIP" = :userIP AND "typeID" = :typeID'
+      'mysql' => '`userIP` = :userIP AND `token` = :token AND `typeID` = :typeID',
+      'postgresql' => '"userIP" = :userIP AND "token" = :token AND "typeID" = :typeID'
     ]);
     $queryBuilderStatementClauseWhere->assembly();
     $queryBuilderStatement->setClauseLimit(1);
