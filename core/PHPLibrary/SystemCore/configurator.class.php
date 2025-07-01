@@ -683,8 +683,8 @@ final class Configurator
 
     $queryBuilderStatementClauseWhere = $queryBuilderStatement->clauseWhere;
     $queryBuilderStatementClauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
+      'mysql' => '`name` = :name',
+      'postgresql' => '"name" = :name'
     ]);
     $queryBuilderStatementClauseWhere->assembly();
     $queryBuilderStatement->assembly();
@@ -743,8 +743,8 @@ final class Configurator
 
     $queryBuilderStatementClauseWhere = $queryBuilderStatement->clauseWhere;
     $queryBuilderStatementClauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
+      'mysql' => '`name` = :name',
+      'postgresql' => '"name" = :name'
     ]);
     $queryBuilderStatementClauseWhere->assembly();
     $queryBuilderStatement->setClauseLimit(1);
