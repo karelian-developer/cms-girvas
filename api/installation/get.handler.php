@@ -771,7 +771,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     // ПЕРВИЧНОЕ НАПОЛНЕНИЕ БАЗЫ ДАННЫХ
     // =======================
 
-    $CMSCore->CMSDatabaseConnector = $CMSDatabaseConnector;
+    $CMSCore->databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
 
     $firstEntriesCategoryTexts = [
       'en_US' => [
