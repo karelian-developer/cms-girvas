@@ -11,6 +11,7 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \PDOException as PDOException;
 
 final class EntryComments
@@ -99,10 +100,15 @@ final class EntryComments
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-
-    $queryBuilder->statement->clauseWhere->addCondition('"entryID" = :entryID');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`entryID` = :entryID',
+      'postgresql' => '"entryID" = :entryID'
+    ]);
     if (array_key_exists('parent_id', $params)) {
-      $queryBuilder->statement->clauseWhere->addCondition(sprintf('(metadata::jsonb->\'parentID\')::int = %d', $params['parent_id']), 'AND');
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => sprintf('AND JSON_EXTRACT(`metadata`, \'$.parentID\') = %d', $params['parent_id']),
+        'postgresql' => sprintf('AND (metadata::jsonb->\'parentID\')::int = %d', $params['parent_id'])
+      ]);
     }
 
     $queryBuilder->statement->clauseWhere->assembly();
@@ -168,7 +174,10 @@ final class EntryComments
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"entryID" = :entryID');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`entryID` = :entryID',
+      'postgresql' => '"entryID" = :entryID'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 

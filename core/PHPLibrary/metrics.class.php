@@ -13,6 +13,7 @@ namespace core\PHPLibrary;
 use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\Pages as Pages;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Metrics\Session as MetricsSession;
 use \PDOException as PDOException;
 
@@ -93,7 +94,10 @@ final class Metrics
     $queryBuilder->statement->clauseFrom->addTable('metrics');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"date" >= :dateStart AND "date" <= :dateEnd');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`date` >= :dateStart AND `date` <= :dateEnd',
+      'postgresql' => '"date" >= :dateStart AND "date" <= :dateEnd'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
