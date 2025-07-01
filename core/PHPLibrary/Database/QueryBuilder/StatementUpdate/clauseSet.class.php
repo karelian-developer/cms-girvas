@@ -61,7 +61,7 @@ final class ClauseSet implements InterfaceClause
   public function addColumnAdaptive(string $name, array $values = []) : void
   {
     $queryBuilder = $this->statement->queryBuilder;
-    echo $queryBuilder->DMS->name;
+    error_log($queryBuilder->DMS->name);
     if (isset($values[strtolower($queryBuilder->DMS->name)])) {
       $this->columns[] = $name;
 
