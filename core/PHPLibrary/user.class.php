@@ -862,7 +862,7 @@ class User
 
       if (!empty($data[$columnName])) {
         $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-          'mysql' => 'JSON_MERGE_PRESERVE(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
+          'mysql' => 'JSON_MERGE_PATCH(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
           'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
         ]);
       }
