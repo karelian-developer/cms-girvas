@@ -544,7 +544,7 @@ class UserGroup
 
     if ($execute) {
       $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return $result ? new UserGroup($CMSCore, $result['id']) : null;
+      return $result ? new UserGroup($CMSCore, (int) $result['id']) : null;
     }
 
     return null;

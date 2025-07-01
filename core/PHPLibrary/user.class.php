@@ -817,7 +817,7 @@ class User
 
     if ($execute) {
       $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return $result ? new User($CMSCore, $result['id']) : null;
+      return $result ? new User($CMSCore, (int) $result['id']) : null;
     }
 
     return null;

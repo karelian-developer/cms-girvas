@@ -704,8 +704,8 @@ class Entry implements EntityTypeContent
 
     if ($execute) {
       $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return ($result) ? FactoryContent::create($CMSCore, 'entry', [
-        'id' => $result['id']
+      return $result ? FactoryContent::create($CMSCore, 'entry', [
+        'id' => (int) $result['id']
       ]) : null;
     }
 

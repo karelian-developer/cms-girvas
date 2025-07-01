@@ -553,7 +553,7 @@ class EntryComment implements EntityTypeContent
 
     if ($execute) {
       $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return $result ? new EntryComment($CMSCore, $result['id']) : null;
+      return $result ? new EntryComment($CMSCore, (int) $result['id']) : null;
     }
 
     return null;
