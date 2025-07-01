@@ -519,7 +519,7 @@ class UserGroup
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
       $queryBuilder->statement->setClauseFrom();
-      $queryBuilder->statement->clauseFrom->addTable('users_group');
+      $queryBuilder->statement->clauseFrom->addTable('users_groups');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
       $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
