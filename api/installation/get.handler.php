@@ -771,6 +771,8 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     // ПЕРВИЧНОЕ НАПОЛНЕНИЕ БАЗЫ ДАННЫХ
     // =======================
 
+    $CMSCore->CMSDatabaseConnector = $CMSDatabaseConnector;
+
     $firstEntriesCategoryTexts = [
       'en_US' => [
         'title' => 'News',
