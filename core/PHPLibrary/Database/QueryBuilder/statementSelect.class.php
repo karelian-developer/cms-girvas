@@ -11,6 +11,7 @@
 namespace core\PHPLibrary\Database\QueryBuilder;
 
 use \core\PHPLibrary\Database\QueryBuilder as QueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseFrom as ClauseFrom;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseWhere as ClauseWhere;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseOrderBy as ClauseOrderBy;
@@ -46,9 +47,14 @@ final class StatementSelect implements InterfaceStatement
    */
   public function addSelections(array $selections) : void
   {
+    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+
     foreach ($selections as $index => $selection) {
       if (!preg_match('/\"[a-z0-9_]+\"/i', $selection) && !preg_match('/[a-z]+\([a-z0-9_]*[*]*\)/i', $selection) && !is_numeric($selection) && $selection !== '*') {
-        $selections[$index] = '"' . $selection . '"';
+        $selections[$index] = match ($CMSConfigDatabase['dms']) {
+          CMSDMS::MySQL => '`' . $selection . '`',
+          CMSDMS::PostgreSQL => '"' . $selection . '"',
+        };
       }
     }
 

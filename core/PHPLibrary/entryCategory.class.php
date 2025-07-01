@@ -456,7 +456,7 @@ class EntryCategory implements EntityTypeContent
 
     if ($execute) {
       $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return $result ? new EntryCategory($CMSCore, $result['id']) : null;
+      return $result ? new EntryCategory($CMSCore, (int) $result['id']) : null;
     }
 
     return null;
