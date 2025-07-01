@@ -130,7 +130,7 @@ final class StatementInsert implements InterfaceStatement
       'INSERT INTO %s %s;',
       $this->getTable(),
       implode(' ', $queryArray)
-    )ж
+    );
   }
 
   /**
