@@ -429,7 +429,10 @@ class User
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -474,7 +477,10 @@ class User
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('LOWER("login") = :login');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'LOWER(`login`) = :login',
+      'postgresql' => 'LOWER("login") = :login'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -520,7 +526,10 @@ class User
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('LOWER("email") = :email');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'LOWER(`email`) = :email',
+      'postgresql' => 'LOWER("email") = :email'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -569,10 +578,17 @@ class User
     $queryBuilder->statement->setClauseWhere();
 
     if (!$registerIsAccounting) {
-      $queryBuilder->statement->clauseWhere->addCondition('LOWER("login") = :login');
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'LOWER(`login`) = :login',
+        'postgresql' => 'LOWER("login") = :login'
+      ]);
+
       $userLogin = strtolower($userLogin);
     } else {
-      $queryBuilder->statement->clauseWhere->addCondition('"login" = :login');
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => '`login` = :login',
+        'postgresql' => '"login" = :login'
+      ]);
     }
 
     $queryBuilder->statement->clauseWhere->assembly();
@@ -616,7 +632,10 @@ class User
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('LOWER("email") = :email');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'LOWER(`email`) = :email',
+      'postgresql' => 'LOWER("email") = :email'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -660,7 +679,10 @@ class User
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -698,7 +720,10 @@ class User
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -988,7 +1013,10 @@ class User
     $queryBuilder->statement->clauseFrom->addTable('users_registration_submits');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"submitToken" = :submitToken');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`submitToken` = :submitToken',
+      'postgresql' => '"submitToken" = :submitToken'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -1033,7 +1061,10 @@ class User
     $queryBuilder->statement->clauseFrom->addTable('users_registration_submits');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"refusalToken" = :refusalToken');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`refusalToken` = :refusalToken',
+      'postgresql' => '"refusalToken" = :refusalToken'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -1077,7 +1108,10 @@ class User
     $queryBuilder->statement->clauseFrom->addTable('users_registration_submits');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"submitToken" = :submitToken');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`submitToken` = :submitToken',
+      'postgresql' => '"submitToken" = :submitToken'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -1119,7 +1153,10 @@ class User
     $queryBuilder->statement->clauseFrom->addTable('users_registration_submits');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"refusalToken" = :refusalToken');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`refusalToken` = :refusalToken',
+      'postgresql' => '"refusalToken" = :refusalToken'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -1160,7 +1197,10 @@ class User
     $queryBuilder->statement->clauseFrom->addTable('users_registration_submits');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"refusalToken" = :refusalToken');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`refusalToken` = :refusalToken',
+      'postgresql' => '"refusalToken" = :refusalToken'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -1191,7 +1231,10 @@ class User
     $queryBuilder->statement->clauseFrom->addTable('users_registration_submits');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"submitToken" = :submitToken');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`submitToken` = :submitToken',
+      'postgresql' => '"submitToken" = :submitToken'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 

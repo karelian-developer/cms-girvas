@@ -161,7 +161,10 @@ class Session
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -197,7 +200,10 @@ class Session
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -244,7 +250,10 @@ class Session
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"userIP" = :userIP AND "typeID" = :typeID');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`userIP` = :userIP AND `typeID` = :typeID',
+      'postgresql' => '`userIP` = :userIP AND `typeID` = :typeID'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -281,7 +290,10 @@ class Session
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"userIP" = :userIP AND "userID" = :userID AND "typeID" = :typeID');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`userIP` = :userIP AND `userID` = :userID AND `typeID` = :typeID',
+      'postgresql' => '"userIP" = :userIP AND "userID" = :userID AND "typeID" = :typeID'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -319,7 +331,10 @@ class Session
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"userIP" = :userIP AND "token" = :token AND "typeID" = :typeID');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`userIP` = :userIP AND `token` = :token AND `typeID` = :typeID',
+      'postgresql' => '"userIP" = :userIP AND "token" = :token AND "typeID" = :typeID'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -357,7 +372,10 @@ class Session
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"userIP" = :userIP AND "userID" = :userID AND "typeID" = :typeID');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`userIP` = :userIP AND `typeID` = :typeID',
+      'postgresql' => '"userIP" = :userIP AND "typeID" = :typeID'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -400,7 +418,10 @@ class Session
     $queryBuilderStatement->setClauseWhere();
 
     $queryBuilderStatementClauseWhere = $queryBuilderStatement->clauseWhere;
-    $queryBuilderStatementClauseWhere->addCondition('"userIP" = :userIP AND "token" = :token AND "typeID" = :typeID');
+    $queryBuilderStatementClauseWhere->addConditionAdaptive([
+      'mysql' => '`userIP` = :userIP AND `typeID` = :typeID',
+      'postgresql' => '"userIP" = :userIP AND "typeID" = :typeID'
+    ]);
     $queryBuilderStatementClauseWhere->assembly();
     $queryBuilderStatement->setClauseLimit(1);
     $queryBuilderStatement->assembly();
@@ -436,7 +457,10 @@ class Session
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"userIP" = :userIP AND "typeID" = :typeID');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`userIP` = :userIP AND `typeID` = :typeID',
+      'postgresql' => '"userIP" = :userIP AND "typeID" = :typeID'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -540,19 +564,56 @@ class Session
     $createdUnixTimestamp = time();
     $updatedUnixTimestamp = $createdUnixTimestamp;
     
-    $databaseConnection = $CMSCore->databaseConnector->database->connection;
-    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-    $databaseQuery->bindParam(':userID', $data['userID'], \PDO::PARAM_INT);
-    $databaseQuery->bindParam(':token', $data['token'], \PDO::PARAM_STR);
-    $databaseQuery->bindParam(':userIP', $data['userIP'], \PDO::PARAM_STR);
-    $databaseQuery->bindParam(':typeID', $data['typeID'], \PDO::PARAM_INT);
-    $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
-    $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
-    $execute = $databaseQuery->execute();
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':userID', $data['userID'], \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':token', $data['token'], \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':userIP', $data['userIP'], \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':typeID', $data['typeID'], \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+      $execute = $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementSelect();
+      $queryBuilder->statement->addSelections(['id']);
+      $queryBuilder->statement->setClauseFrom();
+      $queryBuilder->statement->clauseFrom->addTable('users_sessions');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
+
+      error_log('SQL: ' . $queryBuilder->statement->assembled);
+
+      try {
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
+    }
 
     if ($execute) {
       $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return $result ? new Session($CMSCore, $result['id']) : null;
+      return $result ? new Session($CMSCore, (int) $result['id']) : null;
     }
 
     return null;
@@ -574,7 +635,10 @@ class Session
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 

@@ -271,7 +271,10 @@ class UserGroup
     $queryBuilder->statement->clauseFrom->addTable('users_groups');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -315,7 +318,10 @@ class UserGroup
     $queryBuilder->statement->clauseFrom->addTable('users_groups');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('LOWER("name") = :name');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'LOWER(`name`) = :name',
+      'postgresql' => 'LOWER("name") = :name'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -360,7 +366,10 @@ class UserGroup
     $queryBuilder->statement->clauseFrom->addTable('users_groups');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('LOWER("name") = :name');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'LOWER(`name`) = :name',
+      'postgresql' => 'LOWER("name") = :name'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -403,7 +412,10 @@ class UserGroup
     $queryBuilder->statement->clauseFrom->addTable('users_groups');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -441,7 +453,10 @@ class UserGroup
     $queryBuilder->statement->clauseFrom->addTable('users_groups');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 

@@ -280,7 +280,10 @@ class EntriesSample implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_samples');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -325,7 +328,10 @@ class EntriesSample implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_samples');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -367,7 +373,10 @@ class EntriesSample implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_samples');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"name" = :name');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`name` = :name',
+      'postgresql' => '"name" = :name'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -409,7 +418,10 @@ class EntriesSample implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_samples');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"name" = :name');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`name` = :name',
+      'postgresql' => '"name" = :name'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -513,7 +525,7 @@ class EntriesSample implements EntityTypeContent
 
     if ($execute) {
       $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return $result ? new EntriesSample($CMSCore, (int) $result['id']) : null;
+      return $result ? new EntriesSample($CMSCore, $result['id']) : null;
     }
 
     return null;
@@ -627,7 +639,10 @@ class EntriesSample implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_samples');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
