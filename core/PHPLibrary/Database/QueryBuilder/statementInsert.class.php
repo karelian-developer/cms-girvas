@@ -126,11 +126,7 @@ final class StatementInsert implements InterfaceStatement
       }
     }
 
-    $this->assembled = sprintf(
-      'INSERT INTO %s %s;',
-      $this->getTable(),
-      implode(' ', $queryArray)
-    );
+    $this->assembled = sprintf('INSERT INTO %s %s;', $this->getTable(), implode(' ', $queryArray));
   }
 
   /**
