@@ -143,9 +143,7 @@ class Client
     $token = $_COOKIE[$cookieTokenName] ?? '';
     if ($token === '') {
       return false;
-    }
-
-    if ($token !== '') {
+    } else {
       if (ClientSession::existsByIPAndToken($CMSCore, $this->ip, $token, $typeID)) {
         $session = $this->getSessionByToken($typeID, $token, ['updatedUnixTimestamp', 'token']);
 
@@ -156,6 +154,8 @@ class Client
         }
       }
     }
+
+    return false;
   }
 
   /**
