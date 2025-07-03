@@ -29,7 +29,7 @@ if (defined('IS_NOT_HACKED')) {
       $feed->initData(['name', 'texts', 'typeID', 'entriesCategoryID']);
       
       $feedBuilder = new FeedBuilder($CMSCore, FeedBuilder::getTypeEnum($feed->getTypeID()));
-      $localeName = $this->CMSCore->locale->getName();
+      $localeName = $CMSCore->locale->getName();
 
       $feedBuilder->setLanguage($localeName);
 
