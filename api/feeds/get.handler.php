@@ -20,7 +20,6 @@ if ($CMSCore->urlp->getPath(2) === 'types') {
   $handlerOutputData['feedsTypes'] = [
     ['id' => 1, 'name' => FeedBuilder::getTypeName(1), 'title' => FeedBuilder::getTypeTitle(1)],
     ['id' => 2, 'name' => FeedBuilder::getTypeName(2), 'title' => FeedBuilder::getTypeTitle(2)],
-    ['id' => 3, 'name' => FeedBuilder::getTypeName(3), 'title' => FeedBuilder::getTypeTitle(3)],
-    ['id' => 4, 'name' => FeedBuilder::getTypeName(4), 'title' => FeedBuilder::getTypeTitle(4)]
+    ['id' => 3, 'name' => FeedBuilder::getTypeName(3), 'title' => FeedBuilder::getTypeTitle(3)]
   ];
 }
