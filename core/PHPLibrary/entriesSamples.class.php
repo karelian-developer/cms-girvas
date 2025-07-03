@@ -86,7 +86,7 @@ final class EntriesSamples
     
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections(['count(*)']);
+    $queryBuilder->statement->addSelections(['count(*) AS count']);
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('entries_samples');
     $queryBuilder->statement->clauseFrom->assembly();

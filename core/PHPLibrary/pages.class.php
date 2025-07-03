@@ -109,7 +109,7 @@ final class Pages
     
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections(['count(*)']);
+    $queryBuilder->statement->addSelections(['count(*) AS count']);
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('pages_static');
     $queryBuilder->statement->clauseFrom->assembly();
