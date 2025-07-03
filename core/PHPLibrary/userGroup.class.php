@@ -175,7 +175,7 @@ class UserGroup
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections(['count(*)']);
+    $queryBuilder->statement->addSelections(['count(*) AS count']);
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
