@@ -130,7 +130,10 @@ class UserGroup
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('(metadata->>\'groupID\')::int = :groupID');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.groupID\') = :groupID',
+      'postgresql' => 'AND (metadata::jsonb->>\'groupID\')::int = :groupID'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -177,7 +180,10 @@ class UserGroup
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('(metadata->>\'groupID\')::int = :groupID');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.groupID\') = :groupID',
+      'postgresql' => 'AND (metadata::jsonb->>\'groupID\')::int = :groupID'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
