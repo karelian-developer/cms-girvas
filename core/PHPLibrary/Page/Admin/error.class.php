@@ -46,7 +46,10 @@ class PageError implements InterfacePage
     switch ($errorCode) {
       case 404:
         $this->errorTitle = $localeData['PAGE_ERROR_404_TITLE'];
-        $this->errorDescription = sprintf($localeData['PAGE_ERROR_404_DESCRIPTION'], strip_tags(urldecode($_SERVER['REQUEST_URI'])));
+        $this->errorDescription = sprintf(
+          $localeData['PAGE_ERROR_404_DESCRIPTION'],
+          strip_tags(urldecode($_SERVER['REQUEST_URI']))
+        );
         break;
       case 500:
         $this->errorTitle = $localeData['PAGE_ERROR_500_TITLE'];
@@ -76,9 +79,12 @@ class PageError implements InterfacePage
 
     $this->CMSCore->configurator->setMetaTitle($this->errorTitle);
 
-    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/error.tpl', [
-      'ERROR_TITLE' => $this->errorTitle,
-      'ERROR_DESCRIPTION' => $this->errorDescription
-    ]);
+    $this->assembled = ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme, 'templates/page/error.tpl',
+      [
+        'ERROR_TITLE' => $this->errorTitle,
+        'ERROR_DESCRIPTION' => $this->errorDescription
+      ]
+    );
   }
 }

@@ -179,7 +179,7 @@ if ($CMSCore->client->isLogged(2)) {
             
             if (is_array($fileConverted)) {
               if (!array_key_exists('metadata', $entryData)) $entryData['metadata'] = [];
-              $entryData['metadata']['previewURL'] = '/uploads/media/' . $fileConverted['file_name'];
+              $entryData['metadata']['previewURL'] = '/uploads/media/' . $fileConverted['fileName'];
             }
           }
 
