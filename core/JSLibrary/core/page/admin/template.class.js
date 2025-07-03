@@ -31,7 +31,7 @@ export class PageTemplate {
             let computedStyleMarginLeft = Number(computedStyle.getPropertyValue('margin-left').replace(/px/, ''));
             let computedStyleWidth = Number(computedStyle.getPropertyValue('width').replace(/px/, ''));
 
-            if (element.getAttribute('role') == 'controller-left') {
+            if (element.getAttribute('role') === 'controller-left') {
               if (computedStyleMarginLeft < 0) {
                 computedStyleMarginLeft += computedStyleWidth;
               } else {
@@ -41,7 +41,7 @@ export class PageTemplate {
               slidesListItemsElements[0].style.marginLeft = `${computedStyleMarginLeft}px`;
             }
 
-            if (element.getAttribute('role') == 'controller-right') {
+            if (element.getAttribute('role') === 'controller-right') {
               if ((computedStyleMarginLeft * -1) >= computedStyleWidth * (slidesListItemsElements.length - 1)) {
                 computedStyleMarginLeft = 0;
               } else {
@@ -100,7 +100,7 @@ export class PageTemplate {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               buttons.install.target.element.style.display = 'none';
               buttons.delete.target.element.style.display = 'none';
               buttons.download.target.element.style.display = 'none';
@@ -125,7 +125,7 @@ export class PageTemplate {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               buttons.download.target.element.style.display = 'flex';
               buttons.delete.target.element.style.display = 'none';
               buttons.install.target.element.style.display = 'none';
@@ -150,7 +150,7 @@ export class PageTemplate {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               buttons.download.target.element.style.display = 'none';
               buttons.delete.target.element.style.display = 'flex';
               buttons.install.target.element.style.display = 'flex';
@@ -165,14 +165,14 @@ export class PageTemplate {
         buttons.install.assembly();
         buttons.download.assembly();
     
-        if (templateInstalledStatus == 'installed') {
+        if (templateInstalledStatus === 'installed') {
           buttons.download.target.element.style.display = 'none';
           buttons.delete.target.element.style.display = 'none';
           buttons.install.target.element.style.display = 'none';
         } else {
-          buttons.download.target.element.style.display = (templateDownloadedStatus == 'downloaded') ? 'none' : 'flex';
-          buttons.delete.target.element.style.display = (templateDownloadedStatus == 'downloaded') ? 'flex' : 'none';
-          buttons.install.target.element.style.display = (templateDownloadedStatus == 'downloaded') ? 'flex' : 'none';
+          buttons.download.target.element.style.display = (templateDownloadedStatus === 'downloaded') ? 'none' : 'flex';
+          buttons.delete.target.element.style.display = (templateDownloadedStatus === 'downloaded') ? 'flex' : 'none';
+          buttons.install.target.element.style.display = (templateDownloadedStatus === 'downloaded') ? 'flex' : 'none';
         }
     
         interactiveContainerElement.append(buttons.download.target.element);

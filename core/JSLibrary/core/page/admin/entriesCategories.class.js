@@ -52,11 +52,11 @@ export class PageEntriesCategories {
 
         for (let button of buttons) {
           button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') == 'entries-category-edit') {
+            if (button.getAttribute('role') === 'entries-category-edit') {
               window.location.href = `./entriesCategory/${entriesCategoryID}`;
             }
 
-            if (button.getAttribute('role') == 'entries-category-delete') {
+            if (button.getAttribute('role') === 'entries-category-delete') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_ENTRIES_CATEGORY_DELETE_TITLE,
                 content: localeData.MODAL_ENTRIES_CATEGORY_DELETE_DESCRIPTION
@@ -74,7 +74,7 @@ export class PageEntriesCategories {
                 request.target.data = formData;
       
                 request.target.send().then((data) => {
-                  if (data.statusCode == 1) {
+                  if (data.statusCode === 1) {
                     window.location.href = '/admin/entriesCategories';
                   }
                 });

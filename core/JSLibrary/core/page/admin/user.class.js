@@ -81,7 +81,7 @@ export class PageUser {
           userPasswordInput.setAttribute('required', '');
           userPasswordRepeatInput.setAttribute('required', '');
         } else {
-          if (userPasswordRepeatInput.value == '') {
+          if (userPasswordRepeatInput.value === '') {
             userPasswordInput.removeAttribute('required');
             userPasswordRepeatInput.removeAttribute('required');
           }
@@ -95,7 +95,7 @@ export class PageUser {
           userPasswordInput.setAttribute('required', '');
           userPasswordRepeatInput.setAttribute('required', '');
         } else {
-          if (userPasswordRepeatInput.value == '') {
+          if (userPasswordRepeatInput.value === '') {
             userPasswordInput.removeAttribute('required');
             userPasswordRepeatInput.removeAttribute('required');
           }
@@ -104,7 +104,7 @@ export class PageUser {
 
       if (searchParams.getPathPart(3) != null) {
         usersGroups.forEach((usersGroup, usersGroupIndex) => {
-          if (usersGroup.id == userData.groupID) {
+          if (usersGroup.id === userData.groupID) {
             interactiveChoicesUsersGroups.target.setItemSelectedIndex(usersGroupIndex);
           }
         });
@@ -120,13 +120,13 @@ export class PageUser {
 
         if (form.target.checkRequiredFields()) {
           let request = new Interactive('request', {
-            method: (searchParams.getPathPart(3) == null) ? 'PUT' : 'PATCH',
+            method: (searchParams.getPathPart(3) === null) ? 'PUT' : 'PATCH',
             url: '/handler/user?localeMessage=' + window.CMSCore.locales.admin.name,
             data: elementForm
           });
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1 && searchParams.getPathPart(3) == null) {
+            if (data.statusCode === 1 && searchParams.getPathPart(3) === null) {
               if (data.outputData.hasOwnProperty('user')) {
                 let userData = data.outputData.user;
                 window.location.href = '/admin/user/' + userData.id;
@@ -164,7 +164,7 @@ export class PageUser {
         request.target.data = formData;
 
         request.target.send().then((data) => {
-          if (data.statusCode == 1) {
+          if (data.statusCode === 1) {
             this.buttons.unblock.target.element.style.display = 'flex';
             this.buttons.block.target.element.style.display = 'none';
           }
@@ -189,7 +189,7 @@ export class PageUser {
         request.target.data = formData;
 
         request.target.send().then((data) => {
-          if (data.statusCode == 1) {
+          if (data.statusCode === 1) {
             this.buttons.unblock.target.element.style.display = 'none';
             this.buttons.block.target.element.style.display = 'flex';
           }
@@ -219,7 +219,7 @@ export class PageUser {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               window.location.href = '/admin/users';
             }
           });
@@ -235,7 +235,7 @@ export class PageUser {
       });
       this.buttons.delete.assembly();
   
-      if (searchParams.getPathPart(3) == null) {
+      if (searchParams.getPathPart(3) === null) {
         this.buttons.unblock.target.element.style.display = 'none';
         this.buttons.block.target.element.style.display = 'none';
         this.buttons.delete.target.element.style.display = 'none';

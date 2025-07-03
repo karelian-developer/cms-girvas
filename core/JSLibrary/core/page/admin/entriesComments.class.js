@@ -40,16 +40,16 @@ export class PageEntriesComments {
         let buttons = tableItem.querySelectorAll('button[role]');
         
         for (let button of buttons) {
-          if (button.getAttribute('role') == 'comment-hide' && commentIsHidden == 'true') {
+          if (button.getAttribute('role') === 'comment-hide' && commentIsHidden === 'true') {
             button.parentElement.style.display = 'none';
           }
 
-          if (button.getAttribute('role') == 'comment-show' && commentIsHidden == 'false') {
+          if (button.getAttribute('role') === 'comment-show' && commentIsHidden === 'false') {
             button.parentElement.style.display = 'none';
           }
 
           button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') == 'comment-show') {
+            if (button.getAttribute('role') === 'comment-show') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_COMMENT_SHOW_TITLE,
                 content: localeData.MODAL_COMMENT_SHOW_DESCRIPTION
@@ -71,7 +71,7 @@ export class PageEntriesComments {
                 request.target.send().then((data) => {
                   interactiveModal.target.close();
 
-                  if (data.statusCode == 1) {
+                  if (data.statusCode === 1) {
                     window.location.reload();
                   }
                 });
@@ -86,7 +86,7 @@ export class PageEntriesComments {
               interactiveModal.target.show();
             }
 
-            if (button.getAttribute('role') == 'comment-hide') {
+            if (button.getAttribute('role') === 'comment-hide') {
               let elementForm = document.createElement('form');
               elementForm.classList.add('form');
               let elementTextarea = document.createElement('textarea');
@@ -117,7 +117,7 @@ export class PageEntriesComments {
                 request.target.send().then((data) => {
                   interactiveModal.target.close();
 
-                  if (data.statusCode == 1) {
+                  if (data.statusCode === 1) {
                     window.location.reload();
                   }
                 });
@@ -132,7 +132,7 @@ export class PageEntriesComments {
               interactiveModal.target.show();
             }
 
-            if (button.getAttribute('role') == 'comment-delete') {
+            if (button.getAttribute('role') === 'comment-delete') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_ENTRY_COMMENT_DELETE_TITLE,
                 content: localeData.MODAL_ENTRY_COMMENT_DELETE_DESCRIPTION
@@ -152,7 +152,7 @@ export class PageEntriesComments {
                 request.target.send().then((data) => {
                   interactiveModal.target.close();
 
-                  if (data.statusCode == 1) {
+                  if (data.statusCode === 1) {
                     tableItem.remove();
                     window.location.reload();
                   }

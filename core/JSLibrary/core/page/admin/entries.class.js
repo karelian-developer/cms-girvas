@@ -53,19 +53,19 @@ export class PageEntries {
 
         for (let button of buttons) {
           button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') == 'entry-edit') {
+            if (button.getAttribute('role') === 'entry-edit') {
               window.location.href = `./entry/${entryID}`;
             }
             
-            if (button.getAttribute('role') == 'entry-view') {
+            if (button.getAttribute('role') === 'entry-view') {
               window.open(`/entry/${entryName}`, '_blank');
             }
             
-            if (button.getAttribute('role') == 'entry-analytics') {
+            if (button.getAttribute('role') === 'entry-analytics') {
               window.open(`/admin/analytics/entry/${entryID}`, '_blank');
             }
 
-            if (button.getAttribute('role') == 'entry-remove') {
+            if (button.getAttribute('role') === 'entry-remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_ENTRY_DELETE_TITLE,
                 content: localeData.MODAL_ENTRY_DELETE_DESCRIPTION
@@ -83,7 +83,7 @@ export class PageEntries {
                 request.target.data = formData;
       
                 request.target.send().then((data) => {
-                  if (data.statusCode == 1) {
+                  if (data.statusCode === 1) {
                     window.location.href = '/admin/entries';
                   }
                 });

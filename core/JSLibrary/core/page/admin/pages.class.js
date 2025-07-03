@@ -53,19 +53,19 @@ export class PagePages {
 
         for (let button of buttons) {
           button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') == 'page-static-edit') {
+            if (button.getAttribute('role') === 'page-static-edit') {
               window.location.href = `./page/${pageStaticID}`;
             }
             
-            if (button.getAttribute('role') == 'page-static-analytics') {
+            if (button.getAttribute('role') === 'page-static-analytics') {
               window.open(`/admin/analytics/page/${pageStaticID}`, '_blank');
             }
             
-            if (button.getAttribute('role') == 'page-static-view') {
+            if (button.getAttribute('role') === 'page-static-view') {
               window.open(`/page/${pageStaticName}`, '_blank');
             }
 
-            if (button.getAttribute('role') == 'page-static-remove') {
+            if (button.getAttribute('role') === 'page-static-remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_PAGE_DELETE_TITLE,
                 content: localeData.MODAL_PAGE_DELETE_DESCRIPTION
@@ -83,7 +83,7 @@ export class PagePages {
                 request.target.data = formData;
       
                 request.target.send().then((data) => {
-                  if (data.statusCode == 1) {
+                  if (data.statusCode === 1) {
                     window.location.href = '/admin/pages';
                   }
                 });

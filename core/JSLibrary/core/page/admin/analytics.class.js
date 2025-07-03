@@ -64,7 +64,7 @@ export class PageAnalytics {
 
         scheduleAttendance.target.addGroup('Просмотры');
 
-        if (searchParams.getPathPart(4) == null) {
+        if (searchParams.getPathPart(4) === null) {
           scheduleAttendance.target.addGroup('Визиты');
           scheduleAttendance.target.addGroup('Посещения');
         }
@@ -81,7 +81,7 @@ export class PageAnalytics {
             let urlTransfers = data.metrics.views[token].url_transfers;
 
             for (let url in urls) {
-              if (searchParams.getPathPart(4) == null) {
+              if (searchParams.getPathPart(4) === null) {
                 urlsTotalViews += urls[url];
               } else {
                 let urlObject = new URL(url);
@@ -90,14 +90,14 @@ export class PageAnalytics {
                 let targetObjectName = document.querySelector('article.page[data-name]');
 
                 if (targetObjectName != null) {
-                  if (urlPathParts[2] == targetObjectName.getAttribute('data-name')) {
+                  if (urlPathParts[2] === targetObjectName.getAttribute('data-name')) {
                     urlsTotalViews += urls[url];
                   }
                 }
               }
             }
 
-            if (searchParams.getPathPart(4) == null) {
+            if (searchParams.getPathPart(4) === null) {
               for (let transferIndex in urlTransfers) {
                 for (let transfer in urlTransfers[transferIndex]) {
                   let urlReferral = urlTransfers[transferIndex][transfer].referral;
@@ -115,7 +115,7 @@ export class PageAnalytics {
                   }
 
                   if (transfer != urlReferral) {
-                    if (visits1.indexOf(token) == -1) {
+                    if (visits1.indexOf(token) === -1) {
                       if (visitedIsNew) {
                         visits1.push(token);
                       }
@@ -128,14 +128,14 @@ export class PageAnalytics {
 
           scheduleAttendance.target.addData(0, date.getDate() - 1, urlsTotalViews);
 
-          if (searchParams.getPathPart(4) == null) {
+          if (searchParams.getPathPart(4) === null) {
             scheduleAttendance.target.addData(1, date.getDate() - 1, visits0.length);
             scheduleAttendance.target.addData(2, date.getDate() - 1, visits1.length);
           }
 
           scheduleAttendance.target.types[0].setColor('#EE82EE');
 
-          if (searchParams.getPathPart(4) == null) {
+          if (searchParams.getPathPart(4) === null) {
             scheduleAttendance.target.types[1].setColor('#5B92E5');
             scheduleAttendance.target.types[2].setColor('#088567');
           }

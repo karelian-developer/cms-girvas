@@ -78,7 +78,7 @@ export class PageEntry {
           titleInputElement.setAttribute('name', 'entry_title_' + locale.iso639_2);
           keywordsInputElement.setAttribute('name', 'entry_keywords_' + locale.iso639_2);
 
-          if (searchParams.getPathPart(3) != null) {
+          if (searchParams.getPathPart(3) !== null) {
             let request = new Interactive('request', {
               method: 'GET',
               url: '/handler/entry/' + searchParams.getPathPart(3) + '?locale=' + locale.name
@@ -87,7 +87,7 @@ export class PageEntry {
             request.target.showingNotification = false;
     
             request.target.send().then((data) => {
-              if (data.statusCode == 1) {
+              if (data.statusCode === 1) {
                 contentTextareaElement.value = data.outputData.entry.content;
                 descriptionTextareaElement.value = data.outputData.entry.description;
                 titleInputElement.value = data.outputData.entry.title;
@@ -121,20 +121,20 @@ export class PageEntry {
       let interactiveChoicesSelectElement = interactiveHeaderContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
         locales.forEach((locale, localeIndex) => {
-          if (locale.name == event.target.value) {
+          if (locale.name === event.target.value) {
             contentTextareaElement.setAttribute('name', 'entry_content_' + locale.iso639_2);
             descriptionTextareaElement.setAttribute('name', 'entry_description_' + locale.iso639_2);
             titleInputElement.setAttribute('name', 'entry_title_' + locale.iso639_2);
             keywordsInputElement.setAttribute('name', 'entry_keywords_' + locale.iso639_2);
             
-            if (searchParams.getPathPart(3) != null) {
+            if (searchParams.getPathPart(3) !== null) {
               let request = new Interactive('request', {
                 method: 'GET',
                 url: '/handler/entry/' + searchParams.getPathPart(3) + '?locale=' + locale.name
               });
       
               request.target.send().then((data) => {
-                if (data.statusCode == 1) {
+                if (data.statusCode === 1) {
                   contentTextareaElement.value = data.outputData.entry.content;
                   descriptionTextareaElement.value = data.outputData.entry.description;
                   titleInputElement.value = data.outputData.entry.title;
@@ -170,7 +170,7 @@ export class PageEntry {
           let formData = new FormData(elementForm);
 
           let additionalDataContainerElement = document.querySelector('[role="additional-data"]');
-          if (additionalDataContainerElement != null) {
+          if (additionalDataContainerElement !== null) {
             let additionalDataInputs = additionalDataContainerElement.querySelectorAll('input');
             additionalDataInputs.forEach((element) => {
               formData.append(element.name, element.value);
@@ -178,14 +178,14 @@ export class PageEntry {
           }
 
           let request = new Interactive('request', {
-            method: (searchParams.getPathPart(3) == null) ? 'PUT' : 'PATCH',
+            method: (searchParams.getPathPart(3) === null) ? 'PUT' : 'PATCH',
             url: '/handler/entry?localeMessage=' + window.CMSCore.locales.admin.name
           });
   
           request.target.data = formData;
   
           request.target.send().then((data) => {
-            if (data.statusCode == 1 && searchParams.getPathPart(3) == null) {
+            if (data.statusCode === 1 && searchParams.getPathPart(3) === null) {
               if (data.outputData.hasOwnProperty('entry')) {
                 let entryData = data.outputData.entry;
                 window.location.href = '/admin/entry/' + entryData.id;
@@ -228,7 +228,7 @@ export class PageEntry {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               window.location.href = '/admin/entries';
             }
           });
@@ -261,7 +261,7 @@ export class PageEntry {
         request.target.data = formData;
 
         request.target.send().then((data) => {
-          if (data.statusCode == 1) {
+          if (data.statusCode === 1) {
             this.buttons.unpublish.target.element.style.display = 'flex';
             this.buttons.publish.target.element.style.display = 'none';
           }
@@ -286,7 +286,7 @@ export class PageEntry {
         request.target.data = formData;
 
         request.target.send().then((data) => {
-          if (data.statusCode == 1) {
+          if (data.statusCode === 1) {
             this.buttons.unpublish.target.element.style.display = 'none';
             this.buttons.publish.target.element.style.display = 'flex';
           }
@@ -294,7 +294,7 @@ export class PageEntry {
       });
       this.buttons.unpublish.assembly();
 
-      if (searchParams.getPathPart(3) == null) {
+      if (searchParams.getPathPart(3) === null) {
         let request = new Interactive('request', {
           method: 'GET',
           url: '/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name,
@@ -303,7 +303,7 @@ export class PageEntry {
         request.target.showingNotification = false;
 
         request.target.send().then((responseEntryCategories) => {
-          if (responseEntryCategories.statusCode == 1 && responseEntryCategories.outputData.hasOwnProperty('entriesCategories')) {
+          if (responseEntryCategories.statusCode === 1 && responseEntryCategories.outputData.hasOwnProperty('entriesCategories')) {
             let entriesCategories = responseEntryCategories.outputData.entriesCategories;
             
             entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
@@ -331,7 +331,7 @@ export class PageEntry {
                     fieldsArrayElements.forEach((element) => {
                       let fieldInputElement = element.querySelector('input, textarea');
 
-                      if (fieldInputElement.getAttribute('data-category-id') == interactiveCategoriesChoices.target.getValue()) {
+                      if (fieldInputElement.getAttribute('data-category-id') === interactiveCategoriesChoices.target.getValue()) {
                         element.style.display = 'block';
                       } else {
                         element.style.display = 'none';
@@ -355,7 +355,7 @@ export class PageEntry {
                   fieldsArrayElements.forEach((element) => {
                     let fieldInputElement = element.querySelector('input, textarea');
 
-                    if (fieldInputElement.getAttribute('data-category-id') == interactiveCategoriesChoices.target.getValue()) {
+                    if (fieldInputElement.getAttribute('data-category-id') === interactiveCategoriesChoices.target.getValue()) {
                       element.style.display = 'block';
                     } else {
                       element.style.display = 'none';
@@ -398,7 +398,7 @@ export class PageEntry {
             return;
           }
 
-          if (event.target.files.length == 0) {
+          if (event.target.files.length === 0) {
             console.error(`[CMSCore] ${localeData.REPORT_JS_CMSCORE_ERROR_IMAGES_WHERE_NOT_LOADED}.`);
             return;
           }
@@ -448,10 +448,10 @@ export class PageEntry {
         }).then((response) => {
           return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data1) => {
-          if (data1.statusCode == 1) {
+          if (data1.statusCode === 1) {
             entryData = data1.outputData.entry;
             
-            if (entryData.previewURL != '') {
+            if (entryData.previewURL !== '') {
               let imageElement = document.createElement('img');
               imageElement.setAttribute('src', entryData.previewURL);
               imageElement.style.width = '100%';
@@ -490,7 +490,7 @@ export class PageEntry {
         }).then((response) => {
           return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data1) => {
-          if (data1.statusCode == 1) {
+          if (data1.statusCode === 1) {
             let entriesCategories = data1.outputData.entriesCategories;
             
             entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
@@ -498,7 +498,7 @@ export class PageEntry {
             });
 
             entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
-              if (entriesCategory.id == entryData.categoryID) {
+              if (entriesCategory.id === entryData.categoryID) {
                 interactiveCategoriesChoices.target.setItemSelectedIndex(entriesCategoryIndex);
               }
             });
@@ -525,7 +525,7 @@ export class PageEntry {
                     fieldsArrayElements.forEach((element) => {
                       let fieldInputElement = element.querySelector('input, textarea');
 
-                      if (fieldInputElement.getAttribute('data-category-id') == interactiveCategoriesChoices.target.getValue()) {
+                      if (fieldInputElement.getAttribute('data-category-id') === interactiveCategoriesChoices.target.getValue()) {
                         element.style.display = 'block';
                       } else {
                         element.style.display = 'none';
@@ -549,7 +549,7 @@ export class PageEntry {
                   fieldsArrayElements.forEach((element) => {
                     let fieldInputElement = element.querySelector('input, textarea');
 
-                    if (fieldInputElement.getAttribute('data-category-id') == interactiveCategoriesChoices.target.getValue()) {
+                    if (fieldInputElement.getAttribute('data-category-id') === interactiveCategoriesChoices.target.getValue()) {
                       element.style.display = 'block';
                     } else {
                       element.style.display = 'none';

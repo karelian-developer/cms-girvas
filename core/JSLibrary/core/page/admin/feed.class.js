@@ -64,7 +64,7 @@ export class PageFeed {
           request.target.data = formData;
   
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               window.location.href = '/admin/feeds';
             }
           });
@@ -92,16 +92,16 @@ export class PageFeed {
           let formData = new FormData(elementForm);
 
           let request = new Interactive('request', {
-            method: (searchParams.getPathPart(3) == null) ? 'PUT' : 'PATCH',
+            method: (searchParams.getPathPart(3) === null) ? 'PUT' : 'PATCH',
             url: '/handler/feed?localeMessage=' + window.CMSCore.locales.admin.name
           });
 
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1 && searchParams.getPathPart(3) == null) {
+            if (data.statusCode === 1 && searchParams.getPathPart(3) === null) {
               if (data.outputData.hasOwnProperty('feed')) {
-                let feedData = data1.outputData.feed;
+                let feedData = data.outputData.feed;
                 window.location.href = '/admin/feed/' + feedData.id;
               }
             }
@@ -120,7 +120,7 @@ export class PageFeed {
       });
       this.buttons.save.assembly();
 
-      if (searchParams.getPathPart(3) != null) {
+      if (searchParams.getPathPart(3) !== null) {
         let feedsTypes;
         let interactiveChoicesWebChannelsTypes = new Interactive('choices');
         let feedDescriptionTextareaElement = document.querySelector('[role="feedDescription"]');
@@ -141,7 +141,7 @@ export class PageFeed {
           });
 
           feedsTypes.forEach((type, typeIndex) => {
-            if (type.id == data1.outputData.feed.typeID) {
+            if (type.id === data1.outputData.feed.typeID) {
               interactiveChoicesWebChannelsTypes.target.setItemSelectedIndex(typeIndex);
             }
           });
@@ -169,7 +169,7 @@ export class PageFeed {
           });
 
           entriesCategories.forEach((entryCategory, entryCategoryIndex) => {
-            if (entryCategory.id == data1.outputData.feed.entriesCategoryID) {
+            if (entryCategory.id === data1.outputData.feed.entriesCategoryID) {
               interactiveChoicesEntriesCategories.target.setItemSelectedIndex(entryCategoryIndex);
             }
           });
@@ -217,7 +217,7 @@ export class PageFeed {
             request.target.showingNotification = false;
 
             request.target.send().then((data) => {
-              if (data.statusCode == 1 && data.outputData.hasOwnProperty('feed')) {
+              if (data.statusCode === 1 && data.outputData.hasOwnProperty('feed')) {
                 feedDescriptionTextareaElement.value = data.outputData.feed.description;
                 feedTitleInputElement.value = data.outputData.feed.title;
               }
@@ -248,7 +248,7 @@ export class PageFeed {
         let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
         interactiveChoicesSelectElement.addEventListener('change', (event) => {
           locales.forEach((locale, localeIndex) => {
-            if (locale.name == event.target.value) {
+            if (locale.name === event.target.value) {
               feedDescriptionTextareaElement.setAttribute('name', 'web_channel_description_' + locale.iso639_2);
               feedTitleInputElement.setAttribute('name', 'web_channel_title_' + locale.iso639_2);
               
@@ -260,7 +260,7 @@ export class PageFeed {
               request.target.showingNotification = false;
   
               request.target.send().then((data) => {
-                if (data.statusCode == 1 && data.outputData.hasOwnProperty('feed')) {
+                if (data.statusCode === 1 && data.outputData.hasOwnProperty('feed')) {
                   feedDescriptionTextareaElement.value = data.outputData.feed.description;
                   feedTitleInputElement.value = data.outputData.feed.title;
                 }
@@ -304,7 +304,7 @@ export class PageFeed {
         });
       }
 
-      if (searchParams.getPathPart(3) == null) {
+      if (searchParams.getPathPart(3) === null) {
         this.buttons.delete.target.element.style.display = 'none';
         this.buttons.save.target.element.style.display = 'flex';
       } else {

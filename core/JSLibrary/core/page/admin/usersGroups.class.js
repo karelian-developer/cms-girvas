@@ -52,11 +52,11 @@ export class PageUsersGroups {
 
         for (let button of buttons) {
           button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') == 'user-group-edit') {
+            if (button.getAttribute('role') === 'user-group-edit') {
               window.location.href = `./userGroup/${userGroupID}`;
             }
 
-            if (button.getAttribute('role') == 'user-group-remove') {
+            if (button.getAttribute('role') === 'user-group-remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_USERS_GROUP_DELETE_TITLE,
                 content: localeData.MODAL_USERS_GROUP_DELETE_DESCRIPTION
@@ -74,7 +74,7 @@ export class PageUsersGroups {
                 request.target.data = formData;
       
                 request.target.send().then((data) => {
-                  if (data.statusCode == 1) {
+                  if (data.statusCode === 1) {
                     window.location.href = '/admin/usersGroups';
                   }
                 });

@@ -73,10 +73,10 @@ export class PageGlobal {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1 && data.outputData.hasOwnProperty('result')) {
+            if (data.statusCode === 1 && data.outputData.hasOwnProperty('result')) {
               let result = data.outputData.result;
 
-              if (result == true) {
+              if (result === true) {
                 window.location.reload();
               }
             }

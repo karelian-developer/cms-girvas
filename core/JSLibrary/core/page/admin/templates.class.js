@@ -79,7 +79,7 @@ export class PageTemplates {
             request.target.send().then((data) => {
               interactiveModal.target.close();
               
-              if (data.statusCode == 1) {
+              if (data.statusCode === 1) {
                 if (searchParams.getPathPart(3) != 'repository') {
                   listItem.remove();
                 } else {
@@ -107,7 +107,7 @@ export class PageTemplates {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               buttons.install.target.element.style.display = 'none';
               buttons.delete.target.element.style.display = 'flex';
             }
@@ -122,8 +122,8 @@ export class PageTemplates {
         itemFooterContainer.appendChild(buttons.delete.target.element);
         itemFooterContainer.appendChild(buttons.install.target.element);
 
-        buttons.install.target.element.style.display = (templateInstalledStatus == 'installed') ? 'none' : 'flex';
-        buttons.delete.target.element.style.display = (templateInstalledStatus == 'installed') ? 'flex' : 'none';
+        buttons.install.target.element.style.display = (templateInstalledStatus === 'installed') ? 'none' : 'flex';
+        buttons.delete.target.element.style.display = (templateInstalledStatus === 'installed') ? 'flex' : 'none';
       }
     }, (rejectionReason) => {
       let interactiveNotification = new Interactive('notification');
