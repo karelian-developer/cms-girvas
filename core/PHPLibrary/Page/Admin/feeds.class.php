@@ -99,7 +99,7 @@ class PageFeeds implements InterfacePage
     unset($feeds);
 
     foreach ($feedsObjects as $index => $object) {
-      $object->init_data(['id', 'name', 'type_id', 'texts', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+      $object->initData(['id', 'name', 'type_id', 'texts', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
 
       $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
       $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
