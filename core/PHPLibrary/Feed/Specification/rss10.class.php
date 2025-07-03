@@ -158,8 +158,8 @@ class RSS1_0 implements InterfaceSpecification
 
   public function assembly() : void
   {
-    $RDFElement = $this->assembly_rdf();
-    $channelElement = $this->assembly_channel();
+    $RDFElement = $this->assemblyRDF();
+    $channelElement = $this->assemblyChannel();
     $RDFElement->appendChild($channelElement);
 
     $this->builder->document->appendChild($RDFElement);

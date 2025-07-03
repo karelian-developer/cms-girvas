@@ -164,8 +164,8 @@ class RSS2_0 implements InterfaceSpecification
 
   public function assembly() : void
   {
-    $RSSElement = $this->assembly_rss();
-    $channelElement = $this->assembly_channel();
+    $RSSElement = $this->assemblyRSS();
+    $channelElement = $this->assemblyChannel();
 
     $RSSElement->appendChild($channelElement);
     $this->builder->document->appendChild($RSSElement);
