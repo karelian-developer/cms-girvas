@@ -68,38 +68,35 @@ final class Builder
     return $this->feed->language;
   }
 
-  public static function getTypeEnum(int $typeID) : EnumSpecification|null
+  public static function getTypeEnum(int $typeID) : ?EnumSpecification
   {
-    switch ($typeID) {
-      case 1: return EnumSpecification::RSS1_0;
-      case 2: return EnumSpecification::RSS2_0;
-      case 3: return EnumSpecification::Atom;
-      case 4: return EnumSpecification::YandexTurbo;
-    }
+    return match ($typeID) {
+      1 => EnumSpecification::RSS1_0,
+      2 => EnumSpecification::RSS2_0,
+      3 => EnumSpecification::Atom,
+    };
 
     return null;
   }
 
   public static function getTypeTitle(int $typeID) : string
   {
-    switch ($typeID) {
-      case 1: return SpecificationRSS1_0::TYPE_TITLE;
-      case 2: return SpecificationRSS2_0::TYPE_TITLE;
-      case 3: return SpecificationAtom::TYPE_TITLE;
-      case 4: return SpecificationYandexTurbo::TYPE_TITLE;
-    }
+    return match ($typeID) {
+      1 => SpecificationRSS1_0::TYPE_TITLE,
+      2 => SpecificationRSS2_0::TYPE_TITLE,
+      3 => SpecificationAtom::TYPE_TITLE,
+    };
 
     return '';
   }
 
   public static function getTypeName(int $typeID) : string
   {
-    switch ($typeID) {
-      case 1: return SpecificationRSS1_0::TYPE_NAME;
-      case 2: return SpecificationRSS2_0::TYPE_NAME;
-      case 3: return SpecificationAtom::TYPE_NAME;
-      case 4: return SpecificationYandexTurbo::TYPE_NAME;
-    }
+    return match ($typeID) {
+      1 => SpecificationRSS1_0::TYPE_NAME,
+      2 => SpecificationRSS2_0::TYPE_NAME,
+      3 => SpecificationAtom::TYPE_NAME,
+    };
 
     return '';
   }
