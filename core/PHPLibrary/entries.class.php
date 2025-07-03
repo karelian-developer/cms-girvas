@@ -204,8 +204,8 @@ final class Entries
     if ($isPublished) {
       $queryBuilder->statement->setClauseWhere();
       $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
-        'postgresql' => 'AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+        'mysql' => 'JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => '(metadata::jsonb->>\'isPublished\')::boolean = true'
       ]);
       $queryBuilder->statement->clauseWhere->assembly();
     }
