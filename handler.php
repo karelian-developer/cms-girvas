@@ -340,18 +340,17 @@ if (defined('IS_NOT_HACKED')) {
   // Попытка инициализации персонализированного обработчика
   } else {
     if ($CMSURLPathes[1] !== null) {
-
       /**
        * Рекурсивный поиск файла обработчика в директории API
        */
-      $recursionHandlerConnect = function(CMSCore $CMSCore, array $pathes, int $index) use (&$recursionHandlerConnect) : string|null {
+      $recursionHandlerConnect = function(CMSCore $CMSCore, array $pathes, int $index) use (&$recursionHandlerConnect) : string|null
+      {
         $handlersDirectoryPath = CMS_ROOT_DIRECTORY . '/api';
 
         $files = array_diff(scandir($handlersDirectoryPath), ['.', '..']);
         foreach ($files as $index => $name) {
-          if (array_key_last($pathes) != $index) {
+          if (array_key_last($pathes) !== $index) {
             if ($name === $pathes[$index]) {
-
               $URLPathes = $CMSURLP->getPathes();
               return $recursionHandlerConnect($CMSCore, $URLPathes, $index + 1);
             }
