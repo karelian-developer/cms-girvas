@@ -91,11 +91,11 @@ class RSS1_0 implements InterfaceSpecification
 
   public function assemblyDTD() : ?DOMDocumentType
   {
-    return $this->builder->document->createImplementation()->createDocumentType(
-      'rdf:RDF',
-      '',
-      '<!ENTITY laquo "«"><!ENTITY raquo "»"><!ENTITY nbsp "&#160;">'
-    );
+    return '<!DOCTYPE rdf:RDF [
+      <!ENTITY laquo "«">
+      <!ENTITY raquo "»">
+      <!ENTITY nbsp "&#160;">
+    ]>';
   }
 
   public function assemblyRDF() : DOMElement|bool
@@ -172,8 +172,7 @@ class RSS1_0 implements InterfaceSpecification
     $channelElement = $this->assemblyChannel();
     $RDFElement->appendChild($channelElement);
 
-    $this->builder->document->appendChild($DTDElement);
     $this->builder->document->appendChild($RDFElement);
-    $this->builder->assembled = $this->builder->document->saveXML();
+    $this->builder->assembled = $DTDElement . $this->builder->document->saveXML();
   }
 }
