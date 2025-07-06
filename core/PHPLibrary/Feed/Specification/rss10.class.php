@@ -89,7 +89,7 @@ class RSS1_0 implements InterfaceSpecification
     return $this->items;
   }
 
-  public function assemblyDTD() : ?DOMDocumentType
+  public function assemblyDTD() : string
   {
     return '<!DOCTYPE rdf:RDF [
       <!ENTITY laquo "«">
