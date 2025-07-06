@@ -89,15 +89,6 @@ class RSS1_0 implements InterfaceSpecification
     return $this->items;
   }
 
-  public function assemblyDTD() : string
-  {
-    return '<!DOCTYPE rdf:RDF [
-      <!ENTITY laquo "«">
-      <!ENTITY raquo "»">
-      <!ENTITY nbsp "&#160;">
-    ]>';
-  }
-
   public function assemblyRDF() : DOMElement|bool
   {
     $RDFElement = $this->builder->document->createElement('rdf:RDF');
@@ -151,8 +142,14 @@ class RSS1_0 implements InterfaceSpecification
       $itemElementAttributeRDFAbout->value = $item['link'];
       $itemElement->appendChild($itemElementAttributeRDFAbout);
 
+      $itemDescription = str_replace(
+        ['&laquo;', '&raquo;', '&nbsp;'],
+        ['«', '»', ' '],
+        $item['description']
+      );
+
       $itemTitleElement = $this->builder->document->createElement('title', $item['title']);
-      $itemDescriptionElement = $this->builder->document->createElement('description', $item['description']);
+      $itemDescriptionElement = $this->builder->document->createElement('description', $itemDescription);
       $itemLinkElement = $this->builder->document->createElement('link', $item['link']);
 
       $itemElement->appendChild($itemTitleElement);
@@ -167,12 +164,11 @@ class RSS1_0 implements InterfaceSpecification
 
   public function assembly() : void
   {
-    $DTDElement = $this->assemblyDTD();
     $RDFElement = $this->assemblyRDF();
     $channelElement = $this->assemblyChannel();
     $RDFElement->appendChild($channelElement);
 
     $this->builder->document->appendChild($RDFElement);
-    $this->builder->assembled = $DTDElement . $this->builder->document->saveXML();
+    $this->builder->assembled = $this->builder->document->saveXML();
   }
 }
