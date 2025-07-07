@@ -237,8 +237,8 @@ class PageStatic implements EntityTypeContent
     if (property_exists($this, 'metadata')) {
       $metadata = json_decode($this->metadata, true);
 
-      if (isset($metadata['preview_url'])) {
-        return $metadata['preview_url'];
+      if (isset($metadata['previewURL'])) {
+        return $metadata['previewURL'];
       }
     }
 
