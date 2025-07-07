@@ -23,6 +23,7 @@ use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\Pages as PagesStatic;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
 use \core\PHPLibrary\Users as Users;
 use \core\PHPLibrary\URLParser as CMSURLP;
