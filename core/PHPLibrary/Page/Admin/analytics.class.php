@@ -36,6 +36,15 @@ class PageAnalytics implements InterfacePage
   public SystemCore $CMSCore;
   public Page $page;
   public string $assembled = '';
+  public array $navigationSubsections = [
+    'back' => [
+      'name' => 'back',
+      'iconName' => 'back',
+      'link' => '/',
+      'permanent' => true,
+      'isActive' => false
+    ],
+  ];
 
   /**
    * __construct
@@ -47,6 +56,17 @@ class PageAnalytics implements InterfacePage
   {
     $this->CMSCore = $CMSCore;
     $this->page = $page;
+  }
+
+  /**
+   * Инициализация подразделов
+   * 
+   * @return void
+   */
+  public function initSubnavigation() : void
+  {
+    $themeSource =& $this->CMSCore->theme->core->source;
+    $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
   public function assemblyEntriesTable(array $entries = []) : string
@@ -264,7 +284,7 @@ class PageAnalytics implements InterfacePage
     $CMSLocale = $CMSCore->locale;
 
     // Добавление таблицы стилей для страницы
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics.css', 'rel' => 'stylesheet']);
+    $CMSTheme->addStyle(['href' => 'styles/page/analytics.css', 'rel' => 'stylesheet']);
     
     $localeData = $CMSLocale->getData();
 
@@ -312,7 +332,8 @@ class PageAnalytics implements InterfacePage
       /** @var array Преобразованные элементы навигации */
       $navigationsItemsTransformed = [];
       $navigationsItemsTransformed[] = ThemeCollector::assemblyFileContent(
-        $this->CMSCore->theme, 'templates/page/navigationHorizontal/item.tpl',
+        $CMSTheme,
+        'templates/page/navigationHorizontal/item.tpl',
         [
           'NAVIGATION_ITEM_TITLE' => '< {LANG:PAGE_ENTRIES_NAVIGATION_INDEX_LABEL}',
           'NAVIGATION_ITEM_URL' => '/admin',
@@ -322,10 +343,12 @@ class PageAnalytics implements InterfacePage
 
       if (!empty($navigationsItemsTransformed)) {
         $pageNavigationTransformed = ThemeCollector::assemblyFileContent(
-          $this->CMSCore->theme, 'templates/page/navigationHorizontal.tpl',
+          $CMSTheme,
+          'templates/page/navigationHorizontal.tpl',
           [
             'NAVIGATION_LIST' => ThemeCollector::assemblyFileContent(
-              $this->CMSCore->theme, 'templates/page/navigationHorizontal/list.tpl',
+              $CMSTheme,
+              'templates/page/navigationHorizontal/list.tpl',
               [
                 'NAVIGATION_ITEMS' => implode($navigationsItemsTransformed)
               ]
@@ -372,7 +395,8 @@ class PageAnalytics implements InterfacePage
 
       /** @var string $site_page Содержимое шаблона страницы */
       $this->assembled = ThemeCollector::assemblyFileContent(
-        $this->CMSCore->theme, 'templates/page/analytics.tpl',
+        $CMSTheme,
+        'templates/page/analytics.tpl',
         [
           'PAGE_NAVIGATION' => $pageNavigationTransformed,
           'ADMIN_PANEL_PAGE_NAME' => 'analytics',

@@ -136,4 +136,15 @@ final class URLParser
 
     return $result;
   }
+
+  /**
+   * Получить предыдущий URL (при наличии)
+   * 
+   * @param string $defaultURL
+   * 
+   * @return string
+   */
+  public function getPreviousURL(string $defaultURL = '/') : string {
+    return $_SERVER['HTTP_REFERER'] ?? $defaultURL;
+  }
 }
