@@ -464,6 +464,8 @@ class Feed
     /** @var int $updatedUnixTimestamp Текущее время в UNIX-формате */
     $updatedUnixTimestamp = time();
 
+    error_log($queryBuilder->statement->assembled);
+
     try {
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
