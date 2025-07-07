@@ -428,6 +428,12 @@ class Feed
     $queryBuilder->statement->setTable('web_channels');
     $queryBuilder->statement->setClauseSet();
 
+    foreach ($data as $name => $value) {
+      if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts'])) {
+        $queryBuilder->statement->clauseSet->addColumn($name);
+      }
+    }
+
     foreach (['texts'] as $columnName) {
       $fieldsJSON = [];
       
