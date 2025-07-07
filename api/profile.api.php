@@ -17,10 +17,10 @@ if ($CMSCore->urlp->getPath(2) === 'additional-fields') {
   $locale = $CMSCore->configurator->getDatabaseEntryValue('base_locale');
   $fieldsLocale = $CMSCore->urlp->getParam('locale') ?? $locale;
 
-  $fieldsTypes = $CMSCore->configurator->existsDatabaseEntryValue('static_pages_additional_field_type') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('static_pages_additional_field_type'), true) : [];
-  $fieldsTitles = $CMSCore->configurator->existsDatabaseEntryValue('static_pages_additional_field_title') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('static_pages_additional_field_title'), true) : [];
-  $fieldsDescriptions = $CMSCore->configurator->existsDatabaseEntryValue('static_pages_additional_field_description') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('static_pages_additional_field_description'), true) : [];
-  $fieldsNames = $CMSCore->configurator->existsDatabaseEntryValue('static_pages_additional_field_name') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('static_pages_additional_field_name'), true) : [];
+  $fieldsTypes = $CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_type') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('users_additional_field_type'), true) : [];
+  $fieldsTitles = $CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_title') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('users_additional_field_title'), true) : [];
+  $fieldsDescriptions = $CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_description') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('users_additional_field_description'), true) : [];
+  $fieldsNames = $CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_name') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('users_additional_field_name'), true) : [];
   
   $fields = [];
   foreach ($fieldsTypes as $index => $type) {
@@ -34,7 +34,7 @@ if ($CMSCore->urlp->getPath(2) === 'additional-fields') {
 
   $handlerOutputData['additionalFields'] = $fields;
 } else {
-  define('API_HANDLERS_ABSOLUTE_PATH', CMS_ROOT_DIRECTORY . '/api/pagesStatic');
+  define('API_HANDLERS_ABSOLUTE_PATH', CMS_ROOT_DIRECTORY . '/api/profile');
 
   if (isset($CMSCore)) {
     // Определение абсолютного пути до обработчика текущего API

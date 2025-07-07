@@ -21,7 +21,7 @@ if ($CMSCore->urlp->getPath(2) === 'categories') {
   include_once $APIFilePath;
 } else if ($CMSCore->urlp->getPath(2) === 'additional-fields') {
   $locale = $CMSCore->configurator->getDatabaseEntryValue('base_locale');
-  $fieldsLocale = (!is_null($CMSCore->urlp->getParam('locale'))) ? $CMSCore->urlp->getParam('locale') : $locale;
+  $fieldsLocale = $CMSCore->urlp->getParam('locale') ?? $locale;
 
   $fieldsTypes = $CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_type') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('entries_additional_field_type'), true) : [];
   $fieldsCategoriesIDs = $CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_category_id') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('entries_additional_field_category_id'), true) : [];
@@ -31,13 +31,13 @@ if ($CMSCore->urlp->getPath(2) === 'categories') {
   
   $fields = [];
   foreach ($fieldsTypes as $index => $type) {
-    array_push($fields, [
+    $fields[] = [
       'type' => $type,
       'categoryID' => isset($fieldsCategoriesIDs[$index]) ? (int)$fieldsCategoriesIDs[$index] : 1,
       'title' => isset($fieldsTitles[$fieldsLocale]) ? $fieldsTitles[$fieldsLocale][$index] : '',
       'description' => isset($fieldsDescriptions[$fieldsLocale]) ? $fieldsDescriptions[$fieldsLocale][$index] : '',
       'name' => $fieldsNames[$index]
-    ]);
+    ];
   }
 
   $handlerOutputData['additionalFields'] = $fields;
