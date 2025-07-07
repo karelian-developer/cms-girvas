@@ -52,18 +52,13 @@ final class StatementCreateTable implements InterfaceStatement
   public function getTableName() : string
   {
     $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
-    
+    $CMSConfigDatabaseScheme = trim($CMSConfigDatabase['scheme']);
+    $CMSConfigDatabasePrefix = trim($CMSConfigDatabase['prefix']);
+
     $tableFullname = '';
     if ($CMSConfigDatabase !== null) {
-      if (
-        $CMSConfigDatabase['scheme'] !== ''
-        && $CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL
-      ) {
-        $tableFullname .= $CMSConfigDatabase['scheme'] . '.';
-      }
-
-      if ($CMSConfigDatabase['prefix'] !== '') {
-        $tableFullname .= $CMSConfigDatabase['prefix'] . '_';
+      if ($CMSConfigDatabasePrefix !== '') {
+        $tableFullname .= $CMSConfigDatabasePrefix . '_';
       }
     }
 
@@ -107,12 +102,12 @@ final class StatementCreateTable implements InterfaceStatement
    */
   public function assembly() : void {
     $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+    $CMSConfigDatabaseScheme = trim($CMSConfigDatabase['scheme']);
     $ifNotExists = $this->checkExists ? 'IF NOT EXISTS' : '';
 
     $this->assembled = match ($CMSConfigDatabase['dms']) {
       CMSDMS::MySQL => sprintf('CREATE TABLE %s `%s` (%s);', $ifNotExists, $this->getTableName(), implode(', ', $this->columns)),
-      CMSDMS::PostgreSQL => sprintf('CREATE TABLE %s "%s" (%s);', $ifNotExists, $this->getTableName(), implode(', ', $this->columns))
+      CMSDMS::PostgreSQL => sprintf('CREATE TABLE %s %s."%s" (%s);', $ifNotExists, $CMSConfigDatabaseScheme, $this->getTableName(), implode(', ', $this->columns))
     };
   }
-
 }
