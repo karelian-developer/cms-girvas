@@ -126,7 +126,8 @@ class RSS2_0 implements InterfaceSpecification
     $channelElement->appendChild($channelGeneratorElement);
 
     $items = $this->items;
-    usort($items, function ($a, $b) {
+    usort($items, function ($a, $b)
+    {
       $aPubdateUnix = strtotime($a['pubdate']);
       $bPubdateUnix = strtotime($b['pubdate']);
 

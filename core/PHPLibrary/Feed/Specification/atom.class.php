@@ -138,11 +138,14 @@ class Atom implements InterfaceSpecification
     foreach ($this->items as $item) {
       $entryElement = $this->builder->document->createElement('entry');
       $entryTitleElement = $this->builder->document->createElement('title', $item['title']);
-      $entrySummaryElement = $this->builder->document->createElement('summary', $item['description']);
+      $entrySummaryElement = $this->builder->document->createElement('summary');
+      $entrySummaryCDATAElement = $this->builder->document->createCDATASection($item['description']);
       $entryLinkElement = $this->builder->document->createElement('link');
       $entryLinkElementAttributeHref = $this->builder->document->createAttribute('href');
       $entryLinkElementAttributeHref->value = $item['link'];
       $entryUpdatedElement = $this->builder->document->createElement('updated', $item['pubdate']);
+
+      $entrySummaryElement->appendChild($entrySummaryCDATAElement);
 
       $entryElement->appendChild($entryTitleElement);
       $entryLinkElement->appendChild($entryLinkElementAttributeHref);

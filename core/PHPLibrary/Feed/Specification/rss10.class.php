@@ -142,15 +142,12 @@ class RSS1_0 implements InterfaceSpecification
       $itemElementAttributeRDFAbout->value = $item['link'];
       $itemElement->appendChild($itemElementAttributeRDFAbout);
 
-      $itemDescription = str_replace(
-        ['&laquo;', '&raquo;', '&nbsp;'],
-        ['«', '»', ' '],
-        $item['description']
-      );
-
       $itemTitleElement = $this->builder->document->createElement('title', $item['title']);
-      $itemDescriptionElement = $this->builder->document->createElement('description', $itemDescription);
+      $itemDescriptionElement = $this->builder->document->createElement('description');
+      $itemDescriptionCDATAElement = $this->builder->document->createCDATASection($item['description']);
       $itemLinkElement = $this->builder->document->createElement('link', $item['link']);
+
+      $itemDescriptionElement->appendChild($itemDescriptionCDATAElement);
 
       $itemElement->appendChild($itemTitleElement);
       $itemElement->appendChild($itemDescriptionElement);
