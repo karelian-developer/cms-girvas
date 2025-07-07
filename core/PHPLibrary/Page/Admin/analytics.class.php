@@ -25,6 +25,7 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\Pagination as Pagination;
 use \core\PHPLibrary\Users as Users;
+use \core\PHPLibrary\URLParser as CMSURLP;
 use \DOMDocument as DOMDocument;
 
 /**
@@ -257,17 +258,22 @@ class PageAnalytics implements InterfacePage
    */
   public function assembly() : void
   {
+    $CMSCore = $this->CMSCore;
+    $CMSURLP = $CMSCore->urlp;
+    $CMSTheme = $CMSCore->theme;
+    $CMSLocale = $CMSCore->locale;
+
     // Добавление таблицы стилей для страницы
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics.css', 'rel' => 'stylesheet']);
     
-    $localeData = $this->CMSCore->locale->getData();
+    $localeData = $CMSLocale->getData();
 
-    if ($this->CMSCore->urlp->getPath(2) === 'entry' && $this->CMSCore->urlp->getPath(3) !== null) {
+    if ($CMSURLP->getPath(2) === 'entry' && $CMSURLP->getPath(3) !== null) {
       $entry = null;
-      $entryID = is_numeric($this->CMSCore->urlp->getPath(3)) ? (int) $this->CMSCore->urlp->getPath(3) : 0;
-      $entry = Entry::existByID($this->CMSCore, $entryID) ? new Entry($this->CMSCore, $entryID) : null;
+      $entryID = $this->getContentEntityIDFromURL($this->CMSCore, $CMSURLP);
+      $entry = $this->getEntryObjectByID($this->CMSCore, $entryID);
       
-      if (!is_null($entry)) {
+      if ($entry !== null) {
         $entry->initData(['id', 'texts', 'name']);
 
         $page = new PageAnalyticsEntry($this->CMSCore, $this->page, $entry);
@@ -282,12 +288,12 @@ class PageAnalytics implements InterfacePage
 
         $this->assembled = $pageError->assembled;
       }
-    } elseif ($this->CMSCore->urlp->getPath(2) === 'page' && $this->CMSCore->urlp->getPath(3) !== null) {
+    } elseif ($CMSURLP->getPath(2) === 'page' && $CMSURLP->getPath(3) !== null) {
       $pageStatic = null;
-      $pageStaticID = is_numeric($this->CMSCore->urlp->getPath(3)) ? (int) $this->CMSCore->urlp->getPath(3) : 0;
-      $pageStatic = PageStatic::existByID($this->CMSCore, $pageStaticID) ? new PageStatic($this->CMSCore, $pageStaticID) : null;
+      $pageStaticID = $this->getContentEntityIDFromURL($this->CMSCore, $CMSURLP);
+      $pageStatic = $this->getPageStaticObjectByID($this->CMSCore, $pageStaticID);
       
-      if (!is_null($pageStatic)) {
+      if ($pageStatic !== null) {
         $pageStatic->initData(['id', 'texts', 'name']);
 
         $page = new PageAnalyticsPageStatic($this->CMSCore, $this->page, $pageStatic);
@@ -305,18 +311,27 @@ class PageAnalytics implements InterfacePage
     } else {
       /** @var array Преобразованные элементы навигации */
       $navigationsItemsTransformed = [];
-      array_push($navigationsItemsTransformed, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/navigationHorizontal/item.tpl', [
-        'NAVIGATION_ITEM_TITLE' => sprintf('< %s', '{LANG:PAGE_ENTRIES_NAVIGATION_INDEX_LABEL}'),
-        'NAVIGATION_ITEM_URL' => '/admin',
-        'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
-      ]));
+      $navigationsItemsTransformed[] = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme, 'templates/page/navigationHorizontal/item.tpl',
+        [
+          'NAVIGATION_ITEM_TITLE' => '< {LANG:PAGE_ENTRIES_NAVIGATION_INDEX_LABEL}',
+          'NAVIGATION_ITEM_URL' => '/admin',
+          'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
+        ]
+      );
 
       if (!empty($navigationsItemsTransformed)) {
-        $pageNavigationTransformed = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/navigationHorizontal.tpl', [
-          'NAVIGATION_LIST' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/navigationHorizontal/list.tpl', [
-            'NAVIGATION_ITEMS' => implode($navigationsItemsTransformed)
-          ])
-        ]);
+        $pageNavigationTransformed = ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme, 'templates/page/navigationHorizontal.tpl',
+          [
+            'NAVIGATION_LIST' => ThemeCollector::assemblyFileContent(
+              $this->CMSCore->theme, 'templates/page/navigationHorizontal/list.tpl',
+              [
+                'NAVIGATION_ITEMS' => implode($navigationsItemsTransformed)
+              ]
+            )
+          ]
+        );
       } else {
         $pageNavigationTransformed = '';
       }
@@ -326,7 +341,8 @@ class PageAnalytics implements InterfacePage
       $metricsPages = $metrics->getPagesViewsByTimestamp(time());
 
       if (!empty($metricsEntries)) {
-        usort($metricsEntries, function ($a, $b) {
+        usort($metricsEntries, function ($a, $b)
+        {
           if ($a->getViewsCount() !== $b->getViewsCount()) {
             return $a->getViewsCount() < $b->getViewsCount() ? 1 : -1;
           }
@@ -355,13 +371,54 @@ class PageAnalytics implements InterfacePage
       }
 
       /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/analytics.tpl', [
-        'PAGE_NAVIGATION' => $pageNavigationTransformed,
-        'ADMIN_PANEL_PAGE_NAME' => 'analytics',
-        'ENTRIES_LIST_ITEMS' => $entriesTableAssembled,
-        'PAGES_LIST_ITEMS' => $pagesTableAssembled
-      ]);
+      $this->assembled = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme, 'templates/page/analytics.tpl',
+        [
+          'PAGE_NAVIGATION' => $pageNavigationTransformed,
+          'ADMIN_PANEL_PAGE_NAME' => 'analytics',
+          'ENTRIES_LIST_ITEMS' => $entriesTableAssembled,
+          'PAGES_LIST_ITEMS' => $pagesTableAssembled
+        ]
+      );
     }
   }
 
+  /**
+   * Получение объекта статической страницы по ID
+   * 
+   * @param SystemCore $CMSCore
+   * @param int $id
+   * 
+   * @return ?PageStatic
+   */
+  private function getPageStaticObjectByID(SystemCore $CMSCore, int $id) : ?PageStatic
+  {
+    return PageStatic::existsByID($CMSCore, $id) ? new PageStatic($CMSCore, $id) : null;
+  }
+
+  /**
+   * Получение объекта записи по ID
+   * 
+   * @param SystemCore $CMSCore
+   * @param int $id
+   * 
+   * @return ?Entry
+   */
+  private function getEntryObjectByID(SystemCore $CMSCore, int $id) : ?Entry
+  {
+    return Entry::existsByID($CMSCore, $id) ? new Entry($CMSCore, $id) : null;
+  }
+
+  /**
+   * Получение ID сущности контента через URL
+   * 
+   * @param SystemCore $CMSCore
+   * @param CMSURLP $CMSURLP
+   * 
+   * @return int
+   */
+  private function getContentEntityIDFromURL(SystemCore $CMSCore, CMSURLP $CMSURLP) : int
+  {
+    return is_numeric($CMSURLP->getPath(3)) ? (int) $CMSURLP->getPath(3) : 0;
+  }
 }
