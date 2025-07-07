@@ -663,7 +663,7 @@ class PageStatic implements EntityTypeContent
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
       $queryBuilder->statement->setClauseFrom();
-      $queryBuilder->statement->clauseFrom->addTable('entries');
+      $queryBuilder->statement->clauseFrom->addTable('pages_static');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
       $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');

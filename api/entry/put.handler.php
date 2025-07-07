@@ -177,7 +177,7 @@ if ($CMSCore->client->isLogged(2)) {
 
       $clientSession = $CMSCore->client->getSession(2, ['userID']);
       $entry = Entry::create($CMSCore, $entryName, $clientSession->getUserID(), 1, $texts);
-      if (!is_null($entry)) {
+      if ($entry !== null) {
         $entry->initData(['texts']);
 
         // Обновление дополнительной информации
