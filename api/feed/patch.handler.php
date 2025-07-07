@@ -53,8 +53,8 @@ if ($CMSCore->client->isLogged(2)) {
       }
 
       if (isset($_PATCH['web_channel_name'])) $feedData['name'] = urlencode(htmlentities($_PATCH['web_channel_name']));
-      if (isset($_PATCH['web_channel_type_id'])) $feedData['type_id'] = $_PATCH['web_channel_type_id'];
-      if (isset($_PATCH['web_channel_entries_category_id'])) $feedData['entries_category_id'] = $_PATCH['web_channel_entries_category_id'];
+      if (isset($_PATCH['web_channel_type_id'])) $feedData['typeID'] = $_PATCH['web_channel_type_id'];
+      if (isset($_PATCH['web_channel_entries_category_id'])) $feedData['entriesCategoryID'] = $_PATCH['web_channel_entries_category_id'];
 
       $feedIsUpdated = $feed->update($feedData);
 
