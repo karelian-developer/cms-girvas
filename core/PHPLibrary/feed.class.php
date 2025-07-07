@@ -424,9 +424,9 @@ class Feed
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
-    $queryBuilder->set_statement_update();
+    $queryBuilder->setStatementUpdate();
     $queryBuilder->statement->setTable('web_channels');
-    $queryBuilder->statement->set_clause_set();
+    $queryBuilder->statement->setClauseSet();
 
     foreach (['texts'] as $columnName) {
       $fieldsJSON = [];
@@ -467,7 +467,7 @@ class Feed
     try {
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      error_log($queryBuilder->statement->assembled);
+      
       foreach ($data as $name => $value) {
         if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts'])) {
           $valueTypeName = gettype($value);

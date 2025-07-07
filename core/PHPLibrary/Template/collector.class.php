@@ -134,7 +134,7 @@ final class Collector
     if (!empty($localeData)) {
       foreach ($localeData as $name => $value) {
         if (preg_match(self::TEMPLATE_TAG_LANG_PATTERN, $themeTransformed)) {
-          $themeTransformed = str_replace("{LANG:{$name}}", $value, $themeTransformed);
+          $themeTransformed = strtr($themeTransformed, "{LANG:{$name}}", $value);
         }
       }
     }
@@ -170,7 +170,7 @@ final class Collector
             $parsedown->setMarkupEscaped(true);
 
             $fileMarkdownContent = file_get_contents($fileMarkdownPath);
-            $themeTransformed = str_replace("{LANG:MD:{$name}}", $parsedown->text($fileMarkdownContent), $themeTransformed);
+            $themeTransformed = strtr($themeTransformed, "{LANG:MD:{$name}}", $parsedown->text($fileMarkdownContent));
           }
         }
       }
@@ -198,7 +198,7 @@ final class Collector
 
     foreach($variables as $name => $value) {
       if (preg_match(self::TEMPLATE_TAG_PATTERN, $template)) {
-        $template = str_replace("{{$name}}", $value, $template);
+        $template = strtr($template, "{{$name}}", $value);
       }
     }
 
@@ -235,7 +235,7 @@ final class Collector
       if ($matches[2] == '<') $defineFunctionReturned = $defineFunction($matches[1]) < $matches[3];
 
       if ($defineFunctionReturned) {
-        $themeTransformed = str_replace($matches[0], self::assemblyLogic($matches[4]), $themeTransformed);
+        $themeTransformed = strtr($themeTransformed, $matches[0], self::assemblyLogic($matches[4]));
       } else {
         $themeTransformed = '';
       }
