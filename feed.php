@@ -37,7 +37,7 @@ if (defined('IS_NOT_HACKED')) {
       $feedBuilder->feed->setDescription($feed->getDescription($localeName));
 
       $entries = new Entries($CMSCore);
-      if (in_array($feed->getEntriesCategoryID(), [0, 1])) {
+      if ($feed->getEntriesCategoryID() === 0) {
         $feedLink = 'https://' . $CMSCore->configurator->get('domain') . '/entries';
         $feedBuilder->feed->setLink($feedLink);
         $entriesArray = $entries->getAll();
