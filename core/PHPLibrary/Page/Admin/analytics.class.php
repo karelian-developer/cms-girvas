@@ -45,7 +45,7 @@ class PageAnalytics implements InterfacePage
     'back' => [
       'name' => 'back',
       'iconName' => 'back',
-      'link' => '/analytics',
+      'link' => '/',
       'permanent' => true,
       'isActive' => false
     ],
@@ -331,7 +331,7 @@ class PageAnalytics implements InterfacePage
         if (method_exists($page, 'initSubnavigation')) {
           $page->initSubnavigation();
         }
-        
+
         $page->assembly();
 
         $this->assembled = $page->assembled;

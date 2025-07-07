@@ -32,9 +32,9 @@ class PageEntry implements InterfacePage
   public Entry $entry;
   public string $assembled = '';
   public array $navigationSubsections = [
-    'back' => [
-      'name' => 'back',
-      'iconName' => 'back',
+    'index' => [
+      'name' => 'index',
+      'iconName' => 'index',
       'link' => '/analytics',
       'permanent' => true,
       'isActive' => false
