@@ -110,7 +110,7 @@ if ($CMSCore->urlp->getPath(2) === null && $CMSCore->urlp->getParam('categoryNam
     default => $themeCategoryName . '_template'
   };
 
-  $CMSCore->locale->setTypeName($themeCategory);
+  $CMSCore->locale->setTypeName($themeCategoryName);
   $CMSCore->locale->initPathes();
 
   $themeName = $CMSCore->configurator->existsDatabaseEntryValue($themeConfigName) ? $CMSCore->configurator->getDatabaseEntryValue($themeConfigName) : 'default';

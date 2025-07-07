@@ -91,9 +91,9 @@ if ($CMSCore->client->isLogged(2)) {
 
         if (isset($_PATCH['page_static_name'])) $pageStaticData['name'] = urlencode(htmlentities($_PATCH['page_static_name']));
         if (isset($_PATCH['page_static_preview'])) {
-          $fileUploadedDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
+          $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
           $fileConverter = new FileConverter($CMSCore);
-          $fileConverted = $fileConverter->convert($_PATCH['page_static_preview'], $fileUploadedDirectoryPath, FileConverterEnumFileFormat::WEBP, true);
+          $fileConverted = $fileConverter->convert($_PATCH['page_static_preview'], $fileDirectoryPath, FileConverterEnumFileFormat::WEBP, true);
           
           if (is_array($fileConverted)) {
             if (!array_key_exists('metadata', $pageStaticData)) $pageStaticData['metadata'] = [];

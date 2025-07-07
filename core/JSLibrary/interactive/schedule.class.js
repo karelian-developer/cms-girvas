@@ -16,15 +16,27 @@ export class Schedule {
   constructor(interactiveObject, canvas, type = 'linear') {
     this.interactiveObject = interactiveObject;
 
-    this.dataCollision = {x: 0, y: 0};
+    this.dataCollision = {
+      x: 0,
+      y: 0
+    };
     this.mouseCollision = false;
-    this.mouse = {x: 0, y: 0};
+    this.mouse = {
+      x: 0,
+      y: 0
+    };
     this.canvas = canvas;
     this.frame = {
-      position: {x: 25, y: 25},
-      size: {width: 600, height: 200}
+      position: {
+        x: 25,
+        y: 25
+      },
+      size: {
+        width: 600,
+        height: 200
+      }
     };
-    this.context = (typeof(canvas) == 'object') ? canvas.getContext('2d') : null;
+    this.context = typeof(canvas) == 'object' ? canvas.getContext('2d') : null;
     this.dataDots = [];
     this.types = [];
     this.legend = new Legend();
@@ -82,10 +94,13 @@ export class Schedule {
   }
 
   getMaxYData() {
-    let maxData = {x: 0, y: 0};
+    let maxData = {
+      x: 0,
+      y: 0
+    };
 
-    for (let groupIndex = 0; groupIndex < this.types.length; groupIndex++) {
-      for (let data of this.types[groupIndex].data) {
+    for (const groupIndex = 0; groupIndex < this.types.length; groupIndex++) {
+      for (const data of this.types[groupIndex].data) {
         if (data.y > maxData.y) {
           maxData = data;
         }
@@ -98,8 +113,8 @@ export class Schedule {
   getMaxXData() {
     let maxData = {x: 0, y: 0};
 
-    for (let groupIndex = 0; groupIndex < this.types.length; groupIndex++) {
-      for (let data of this.types[groupIndex].data) {
+    for (const groupIndex = 0; groupIndex < this.types.length; groupIndex++) {
+      for (const data of this.types[groupIndex].data) {
         if (data.x > maxData.x) {
           maxData = data;
         }
@@ -123,7 +138,7 @@ export class Schedule {
     });
 
     for (let typeIndex = 0; typeIndex < this.types.length; typeIndex++) {
-      if (this.types[typeIndex].label == '') {
+      if (this.types[typeIndex].label === '') {
         this.types[typeIndex].label = `Data #${typeIndex}`;
       }
 
@@ -172,7 +187,7 @@ export class Schedule {
   }
 
   getDaysCountInCurrentMonth() {
-    let date = new Date();
+    const date = new Date();
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   }
 
@@ -200,8 +215,6 @@ export class Schedule {
       let lineXStep = this.getFrameSize().width / (this.getDaysCountInCurrentMonth() * 2);
       let lineYStep = lineXStep;
 
-      console.log(lineXStep);
-
       this.context.strokeStyle  = '#EAEAEA';
       this.context.font = '12px serif';
       this.context.textBaseline = 'top';
@@ -220,7 +233,7 @@ export class Schedule {
         }
       }
 
-      for (let lineY = this.getFramePosition().y; lineY <= this.getFrameSize().height; lineY += lineYStep) {
+      for (const lineY = this.getFramePosition().y; lineY <= this.getFrameSize().height; lineY += lineYStep) {
         this.context.beginPath();
         this.context.moveTo(this.getFramePosition().x, (this.getFramePosition().y + this.getFrameSize().height) - lineY);
         this.context.lineTo(this.getFramePosition().x + this.getFrameSize().width, (this.getFramePosition().y + this.getFrameSize().height) - lineY);
