@@ -302,6 +302,11 @@ class PageAnalytics implements InterfacePage
         $entry->initData(['id', 'texts', 'name']);
 
         $page = new PageAnalyticsEntry($this->CMSCore, $this->page, $entry);
+        
+        if (method_exists($page, 'initSubnavigation')) {
+          $page->initSubnavigation();
+        }
+
         $page->assembly();
 
         $this->assembled = $page->assembled;
@@ -322,6 +327,11 @@ class PageAnalytics implements InterfacePage
         $pageStatic->initData(['id', 'texts', 'name']);
 
         $page = new PageAnalyticsPageStatic($this->CMSCore, $this->page, $pageStatic);
+        
+        if (method_exists($page, 'initSubnavigation')) {
+          $page->initSubnavigation();
+        }
+        
         $page->assembly();
 
         $this->assembled = $page->assembled;
