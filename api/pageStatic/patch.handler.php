@@ -48,7 +48,7 @@ if ($CMSCore->client->isLogged(2)) {
             $textareaKeywordsName = 'page_static_keywords_' . $CMSLocale->getISO639(2);
 
             if (!array_key_exists('metadata', $pageStaticData)) $pageStaticData['metadata'] = [];
-            if (isset($_PATCH['page_static_is_published'])) $pageStaticData['metadata']['is_published'] = $_PATCH['page_static_is_published'];
+            if (isset($_PATCH['page_static_is_published'])) $pageStaticData['metadata']['isPublished'] = $_PATCH['page_static_is_published'];
 
             if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH) || array_key_exists($textareaContentName, $_PATCH)) {
               if (!array_key_exists('texts', $pageStaticData)) $pageStaticData['texts'] = [];
@@ -97,7 +97,7 @@ if ($CMSCore->client->isLogged(2)) {
           
           if (is_array($fileConverted)) {
             if (!array_key_exists('metadata', $pageStaticData)) $pageStaticData['metadata'] = [];
-            $pageStaticData['metadata']['preview_url'] = '/uploads/media/' . $fileConverted['file_name'];
+            $pageStaticData['metadata']['previewURL'] = '/uploads/media/' . $fileConverted['fileName'];
           }
         }
 
@@ -121,7 +121,7 @@ if ($CMSCore->client->isLogged(2)) {
           }
         }
 
-        $pageStaticIsPublished = $pageStaticData['metadata']['is_published'] ?? 0;
+        $pageStaticIsPublished = $pageStaticData['metadata']['isPublished'] ?? 0;
 
         // Если происходит публикация страницы, то необходимо удостовериться, что
         // в странице присутствует стандартная локализация, в противном случае
