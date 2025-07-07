@@ -10,7 +10,7 @@
 
 namespace templates\default;
 
-use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
@@ -20,7 +20,7 @@ use \DOMDocument as DOMDocument;
 final class Core implements ThemeInterfaceCore
 {
   private Theme $theme;
-  private SystemCoreLocale $locale;
+  private CMSLocale $locale;
   public string $assembled = '';
   public DOMDocument|null $source = null;
   
@@ -124,53 +124,185 @@ final class Core implements ThemeInterfaceCore
    */
   public function assembly() : void
   {
-    $this->theme->addStyle(['href' => 'styles/colors.css', 'rel' => 'stylesheet']);
-    $this->theme->addStyle(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
+    $CMSTheme = $this->theme;
+    $CMSConfigurator = $CMSTheme->CMSCore->configurator;
 
-    $localeData = $this->theme->locale->getData();
+    $CMSTheme->addStyle(['href' => 'styles/colors.css', 'rel' => 'stylesheet']);
+    $CMSTheme->addStyle(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
 
-    $clientIsLogged = $this->theme->CMSCore->client->isLogged(1);
-    $user = $clientIsLogged ? $this->theme->CMSCore->client->getUser(1) : null;
+    $localeData = $CMSTheme->locale->getData();
+
+    $clientIsLogged = $CMSTheme->CMSCore->client->isLogged(1);
+    $user = $clientIsLogged ? $CMSTheme->CMSCore->client->getUser(1) : null;
     
     if ($user !== null) {
       $user->initData(['metadata']);
     }
 
     $userGroupID = $user !== null ? $user->getGroupID() : 0;
-    $CMSConfigEngineeringWorksStatus = $this->theme->CMSCore->configurator->getDatabaseEntryValue('base_engineering_works_status');
+    $CMSConfigEngineeringWorksStatus = $CMSConfigurator->getDatabaseEntryValue('base_engineering_works_status');
 
     if ($CMSConfigEngineeringWorksStatus === 'off' || $userGroupID === 1) {
-      $this->theme->addStyle(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
-      $this->theme->addStyle(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
-      $this->theme->addStyle(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
-      $this->theme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+      $CMSTheme->addStyle(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
+      $CMSTheme->addStyle(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
+      $CMSTheme->addStyle(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
+      $CMSTheme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
       
-      $this->theme->addScript(['src' => 'common.js'], true);
-      $this->theme->addScript(['src' => 'core.class.js', 'type' => 'module'], true);
-      $this->theme->addScript(['src' => 'core.class.js', 'type' => 'module']);
+      $CMSTheme->addScript(['src' => 'common.js'], true);
+      $CMSTheme->addScript(['src' => 'core.class.js', 'type' => 'module'], true);
+      $CMSTheme->addScript(['src' => 'core.class.js', 'type' => 'module']);
 
-      $profileLink = $clientIsLogged ? sprintf('<a class="header__nav-link display-block" href="/profile"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_PROFILE']) : sprintf('<a id="SYSTEM_GE_IMC_00000001" class="header__nav-link display-block" href="#"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_LOGIN']);
-      $registrationLink = $clientIsLogged ? sprintf('<a class="header__nav-link display-block" href="/registration"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_REGISTRATION']) : '';
-      $exitLink = $clientIsLogged ? sprintf('<a class="header__nav-link display-block" href="#" role="profileNavigationExit"><span class="header__nav-span">%s</span></a>', $localeData['DEFAULT_TEXT_EXIT']) : '';
+      $profileLink = $clientIsLogged
+        ? $this->assemblyProfileLink($localeData)
+        : $this->assemblyLoginLink($localeData);
+      $registrationLink = !$clientIsLogged
+        ? $this->assemblyRegistrationLink($localeData)
+        : '';
+      $exitLink = $clientIsLogged
+        ? $this->assemblyExitLink($localeData)
+        : '';
 
       /** @var string $this->assembled Итоговый шаблон в виде строки */
-      $this->assembled = ThemeCollector::assembly($this->assemblyDocument(), [
-        'SITE_HEADER' => $this->assemblyHeader([
-          'NAVIGATION_PROFILE_LINK' => $profileLink,
-          'NAVIGATION_REGISTRATION_LINK' => $registrationLink,
-          'NAVIGATION_EXIT_LINK' => $exitLink
-        ]),
-        'SITE_MAIN' => $this->assemblyMain(),
-        'SITE_FOOTER' => $this->assemblyFooter()
-      ]);
+      $this->assembled = ThemeCollector::assembly(
+        $this->assemblyDocument(),
+        [
+          'SITE_HEADER' => $this->assemblyHeader(
+            [
+              'NAVIGATION_PROFILE_LINK' => $profileLink,
+              'NAVIGATION_REGISTRATION_LINK' => $registrationLink,
+              'NAVIGATION_EXIT_LINK' => $exitLink
+            ]
+          ),
+          'SITE_MAIN' => $this->assemblyMain(),
+          'SITE_FOOTER' => $this->assemblyFooter()
+        ]
+      );
     } else {
-      $this->assembled = ThemeCollector::assembly($this->assemblyDocument(), [
-        'SITE_HEADER' => '',
-        'SITE_MAIN' => ThemeCollector::assembly($this->assemblyPlug(), [
-          'SITE_CLOSED_REASON' => $this->theme->CMSCore->configurator->getDatabaseEntryValue('base_engineering_works_text')
-        ]),
-        'SITE_FOOTER' => ''
-      ]);
+      $CMSConfigEngineeringWorksText = $CMSConfigurator->getDatabaseEntryValue('base_engineering_works_text');
+
+      $this->assembled = ThemeCollector::assembly(
+        $this->assemblyDocument(),
+        [
+          'SITE_HEADER' => '',
+          'SITE_MAIN' => ThemeCollector::assembly(
+            $this->assemblyPlug(),
+            [
+              'SITE_CLOSED_REASON' => $CMSConfigEngineeringWorksText
+            ]
+          ),
+          'SITE_FOOTER' => ''
+        ]
+      );
     }
+  }
+
+  /**
+   * Сборка ссылки "Профиль"
+   * 
+   * @param array $localeData
+   * 
+   * @return string
+   */
+  private function assemblyProfileLink(array $localeData = []) : string
+  {
+    $document = new DOMDocument('1.0');
+
+    $documentFragment = $document->createDocumentFragment();
+
+    $linkElement = $document->createElement('a');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('href', '/profile');
+
+    $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_PROFILE']);
+    $linkLabelElement->setAttribute('class', 'header__nav-span nav-span');
+
+    $linkElement->appendChild($linkLabelElement);
+    $documentFragment->appendChild($linkElement);
+    $document->appendChild($documentFragment);
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Сборка ссылки "Войти"
+   * 
+   * @param array $localeData
+   * 
+   * @return string
+   */
+  private function assemblyLoginLink(array $localeData = []) : string
+  {
+    $document = new DOMDocument('1.0');
+
+    $documentFragment = $document->createDocumentFragment();
+
+    $linkElement = $document->createElement('a');
+    $linkElement->setAttribute('id', 'SYSTEM_GE_IMC_00000001');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('href', '#');
+
+    $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_LOGIN']);
+    $linkLabelElement->setAttribute('class', 'header__nav-span nav-span');
+
+    $linkElement->appendChild($linkLabelElement);
+    $documentFragment->appendChild($linkElement);
+    $document->appendChild($documentFragment);
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Сборка ссылки "Регистрация"
+   * 
+   * @param array $localeData
+   * 
+   * @return string
+   */
+  private function assemblyRegistrationLink(array $localeData = []) : string
+  {
+    $document = new DOMDocument('1.0');
+
+    $documentFragment = $document->createDocumentFragment();
+
+    $linkElement = $document->createElement('a');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('href', '/registration');
+
+    $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_REGISTRATION']);
+    $linkLabelElement->setAttribute('class', 'header__nav-span nav-span');
+
+    $linkElement->appendChild($linkLabelElement);
+    $documentFragment->appendChild($linkElement);
+    $document->appendChild($documentFragment);
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Сборка ссылки "Выход"
+   * 
+   * @param array $localeData
+   * 
+   * @return string
+   */
+  private function assemblyExitLink(array $localeData = []) : string
+  {
+    $document = new DOMDocument('1.0');
+
+    $documentFragment = $document->createDocumentFragment();
+
+    $linkElement = $document->createElement('a');
+    $linkElement->setAttribute('role', 'profileNavigationExit');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('href', '#');
+
+    $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_EXIT']);
+    $linkLabelElement->setAttribute('class', 'header__nav-span nav-span');
+
+    $linkElement->appendChild($linkLabelElement);
+    $documentFragment->appendChild($linkElement);
+    $document->appendChild($documentFragment);
+
+    return $document->saveHTML();
   }
 }
