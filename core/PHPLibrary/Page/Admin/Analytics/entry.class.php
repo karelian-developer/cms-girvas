@@ -17,6 +17,7 @@ use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
 
 /**
@@ -24,6 +25,8 @@ use \core\PHPLibrary\Pagination as Pagination;
  */
 class PageEntry implements InterfacePage
 {
+  use TraitPage;
+
   public SystemCore $CMSCore;
   public Page $page;
   public Entry $entry;
@@ -40,6 +43,17 @@ class PageEntry implements InterfacePage
     $this->CMSCore = $CMSCore;
     $this->page = $page;
     $this->entry = $entry;
+  }
+
+  /**
+   * Инициализация подразделов
+   * 
+   * @return void
+   */
+  public function initSubnavigation() : void
+  {
+    $themeSource =& $this->CMSCore->theme->core->source;
+    $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
   /**

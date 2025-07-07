@@ -16,6 +16,7 @@ use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
 
 /**
@@ -23,6 +24,8 @@ use \core\PHPLibrary\Pagination as Pagination;
  */
 class PagePage implements InterfacePage
 {
+  use TraitPage;
+
   public SystemCore $CMSCore;
   public Page $page;
   public PageStatic $pageStatic;
@@ -39,6 +42,17 @@ class PagePage implements InterfacePage
     $this->CMSCore = $CMSCore;
     $this->page = $page;
     $this->pageStatic = $pageStatic;
+  }
+
+  /**
+   * Инициализация подразделов
+   * 
+   * @return void
+   */
+  public function initSubnavigation() : void
+  {
+    $themeSource =& $this->CMSCore->theme->core->source;
+    $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
   /**
