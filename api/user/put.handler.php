@@ -43,7 +43,7 @@ if ($CMSCore->client->isLogged(2)) {
     $userSurname = isset($_PUT['user_surname']) ? htmlspecialchars(str_replace('\'', '"', $_PUT['user_surname'])) : '';
     $userPatronymic = isset($_PUT['user_patronymic']) ? htmlspecialchars(str_replace('\'', '"', $_PUT['user_patronymic'])) : '';
     $userBirthdate = isset($_PUT['user_birthdate']) ? $_PUT['user_birthdate'] : 0;
-    $userGroupID = isset($_PUT['user_group_id']) ? (int)$_PUT['user_group_id'] : 4;
+    $userGroupID = isset($_PUT['user_group_id']) ? (int) $_PUT['user_group_id'] : 4;
     $userPassword = isset($_PUT['user_password']) ? str_replace('\'', '"', $_PUT['user_password']) : '';
     $userPasswordRepeat = isset($_PUT['user_password_repeat']) ? str_replace('\'', '"', $_PUT['user_password_repeat']) : '';
     
@@ -205,7 +205,7 @@ if ($CMSCore->client->isLogged(2)) {
       if (!isset($userData)) $userData = [];
       if (!isset($userData['metadata'])) $userData['metadata'] = [];
 
-      $userData['metadata']['group_id'] = $userGroupID;
+      $userData['metadata']['groupID'] = $userGroupID;
     }
 
     foreach ($_PUT as $key => $value) {

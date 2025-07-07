@@ -129,7 +129,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
                 $admin = User::create($CMSCore, $adminLogin, $adminEmail, $adminPassword);
 
                 if (!is_null($admin)) {
-                  $admin->update(['emailIsSubmitted' => true, 'metadata' => ['group_id' => 1]]);
+                  $admin->update(['emailIsSubmitted' => true, 'metadata' => ['groupID' => 1]]);
 
                   $tipBlockElement->setAttribute('class', 'tip tip_green');
                   $tipBlockElement->nodeValue = $CMSCore->locale->getSingleValueByKey('API_POST_DATA_SUCCESS');
