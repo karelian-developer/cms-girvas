@@ -132,6 +132,14 @@ if (defined('IS_NOT_HACKED')) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/pageStatic.api.php';
       include_once $APIFilePath;
     }
+  } else if ($CMSURLPathes[1] === 'pages' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSClient->getIPAddress();
+
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/pagesStatic.api.php';
+      include_once $APIFilePath;
+    }
   } else if ($CMSURLPathes[1] === 'settings' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
@@ -310,34 +318,6 @@ if (defined('IS_NOT_HACKED')) {
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   
-  } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSURLPathes[1] === 'pages' && $CMSCore::coreRESTCookieExists()) {
-    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
-    $clientIP = $CMSClient->getIPAddress();
-
-    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
-      if ($CMSURLPathes[2] === 'additional-fields' && $CMSURLPathes[3] !== null) {
-        $CMSLocaleSetted = $CMSConfigurator->getDatabaseEntryValue('base_locale');
-        $fieldsLocale = $CMSURLP->getParam('locale') ?? $CMSLocaleSetted;
-
-        $fieldsTypes = $CMSConfigurator->existsDatabaseEntryValue('static_pages_additional_field_type') ? json_decode($CMSConfigurator->getDatabaseEntryValue('static_pages_additional_field_type'), true) : [];
-        $fieldsTitles = $CMSConfigurator->existsDatabaseEntryValue('static_pages_additional_field_title') ? json_decode($CMSConfigurator->getDatabaseEntryValue('static_pages_additional_field_title'), true) : [];
-        $fieldsDescriptions = $CMSConfigurator->existsDatabaseEntryValue('static_pages_additional_field_description') ? json_decode($CMSConfigurator->getDatabaseEntryValue('static_pages_additional_field_description'), true) : [];
-        $fieldsNames = $CMSConfigurator->existsDatabaseEntryValue('static_pages_additional_field_name') ? json_decode($CMSConfigurator->getDatabaseEntryValue('static_pages_additional_field_name'), true) : [];
-        
-        $fields = [];
-        foreach ($fieldsTypes as $index => $type) {
-          array_push($fields, [
-            'type' => $type,
-            'title' => isset($fieldsTitles[$fieldsLocale]) ? $fieldsTitles[$fieldsLocale][$index] : '',
-            'description' => isset($fieldsDescriptions[$fieldsLocale]) ? $fieldsDescriptions[$fieldsLocale][$index] : '',
-            'name' => $fieldsNames[$index]
-          ]);
-        }
-
-        $handlerOutputData['additionalFields'] = $fields;
-      }
-    }
-  // Попытка инициализации персонализированного обработчика
   } else {
     if ($CMSURLPathes[1] !== null) {
       /**
