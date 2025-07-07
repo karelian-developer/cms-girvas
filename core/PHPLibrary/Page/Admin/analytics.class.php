@@ -334,36 +334,6 @@ class PageAnalytics implements InterfacePage
         $this->assembled = $pageError->assembled;
       }
     } else {
-      /** @var array Преобразованные элементы навигации */
-      $navigationsItemsTransformed = [];
-      $navigationsItemsTransformed[] = ThemeCollector::assemblyFileContent(
-        $CMSTheme,
-        'templates/page/navigationHorizontal/item.tpl',
-        [
-          'NAVIGATION_ITEM_TITLE' => '< {LANG:PAGE_ENTRIES_NAVIGATION_INDEX_LABEL}',
-          'NAVIGATION_ITEM_URL' => '/admin',
-          'NAVIGATION_ITEM_LINK_CLASS_IS_ACTIVE' => ''
-        ]
-      );
-
-      if (!empty($navigationsItemsTransformed)) {
-        $pageNavigationTransformed = ThemeCollector::assemblyFileContent(
-          $CMSTheme,
-          'templates/page/navigationHorizontal.tpl',
-          [
-            'NAVIGATION_LIST' => ThemeCollector::assemblyFileContent(
-              $CMSTheme,
-              'templates/page/navigationHorizontal/list.tpl',
-              [
-                'NAVIGATION_ITEMS' => implode($navigationsItemsTransformed)
-              ]
-            )
-          ]
-        );
-      } else {
-        $pageNavigationTransformed = '';
-      }
-
       $metrics = new Metrics($this->CMSCore);
       $metricsEntries = $metrics->getEntriesViewsByTimestamp(time());
       $metricsPages = $metrics->getPagesViewsByTimestamp(time());
@@ -403,7 +373,6 @@ class PageAnalytics implements InterfacePage
         $CMSTheme,
         'templates/page/analytics.tpl',
         [
-          'PAGE_NAVIGATION' => $pageNavigationTransformed,
           'ADMIN_PANEL_PAGE_NAME' => 'analytics',
           'ENTRIES_LIST_ITEMS' => $entriesTableAssembled,
           'PAGES_LIST_ITEMS' => $pagesTableAssembled
