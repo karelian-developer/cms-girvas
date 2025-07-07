@@ -48,9 +48,6 @@ class PagePage implements InterfacePage
    */
   public function assembly() : void
   {
-    // Добавление таблицы стилей для страницы
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics.css', 'rel' => 'stylesheet']);
-    
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
 
