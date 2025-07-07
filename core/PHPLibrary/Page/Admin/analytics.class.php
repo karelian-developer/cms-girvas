@@ -33,6 +33,10 @@ use \DOMDocument as DOMDocument;
  */
 class PageAnalytics implements InterfacePage
 {
+  use TraitPage;
+
+  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ANALYTICS_NAVIGATION_%s_LABEL';
+
   public SystemCore $CMSCore;
   public Page $page;
   public string $assembled = '';
@@ -40,7 +44,7 @@ class PageAnalytics implements InterfacePage
     'back' => [
       'name' => 'back',
       'iconName' => 'back',
-      'link' => '/',
+      'link' => '/analytics',
       'permanent' => true,
       'isActive' => false
     ],

@@ -37,6 +37,11 @@ class PageFeed implements InterfacePage
     ],
   ];
 
+  public function __construct(SystemCore $CMSCore, Page $page) {
+    $this->CMSCore = $CMSCore;
+    $this->page = $page;
+  }
+
   /**
    * Инициализация подразделов
    * 
@@ -45,11 +50,6 @@ class PageFeed implements InterfacePage
   public function initSubnavigation() : void {
     $themeSource =& $this->CMSCore->theme->core->source;
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
-  }
-
-  public function __construct(SystemCore $CMSCore, Page $page) {
-    $this->CMSCore = $CMSCore;
-    $this->page = $page;
   }
 
   public function assembly() : void {
