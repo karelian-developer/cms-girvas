@@ -30,6 +30,15 @@ class PagePage implements InterfacePage
   public Page $page;
   public PageStatic $pageStatic;
   public string $assembled = '';
+  public array $navigationSubsections = [
+    'back' => [
+      'name' => 'back',
+      'iconName' => 'back',
+      'link' => '/analytics',
+      'permanent' => true,
+      'isActive' => false
+    ],
+  ];
 
   /**
    * __construct
