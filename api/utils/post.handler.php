@@ -164,7 +164,7 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
 
           if (!$errorIsDetected) {
             $userEmail = trim($_POST['user_email']);
-            $userPasswordRepeat = trim($$_POST['user_password_repeat']);
+            $userPasswordRepeat = trim($_POST['user_password_repeat']);
 
             $userEmailPattern = '/^[\w\-\.]{1,30}@([\w\-]{1,63}\.){1,2}[\w\-]{2,4}$/i';
 
@@ -240,7 +240,7 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                   $handlerStatusCode = $handlerStatusCode ?? 0;
                 }
               } else {
-                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_ERROR_LOGIN_ALREADY_EXISTS');
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_ERROR_INVALID_REPEAT_PASSWORD');
                 $handlerStatusCode = $handlerStatusCode ?? 0;
               }
             } else {

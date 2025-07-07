@@ -112,7 +112,7 @@ if ($CMSCore->urlp->getPath(2) == 'reset') {
     }
 
     if (!is_null($user)) {
-      $user->init_data(['login', 'email', 'metadata']);
+      $user->initData(['login', 'email', 'metadata']);
       /** @var string Заголовок веб-сайта */
       $siteTitle = empty($CMSCore->configurator->getMetaTitle()) ? $CMSCore->configurator->getSiteTitle() : $CMSCore->configurator->getMetaTitle();
       /** @var string E-Mail получателя */
@@ -142,7 +142,7 @@ if ($CMSCore->urlp->getPath(2) == 'reset') {
       $resetPasswordToken = md5($resetPasswordCreatedUnixTimestamp . $CMSCore::CMS_VERSION);
 
       $emailSender->setSubject($CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_SUBJECT'));
-      $emailSender->setContent(TemplateCollector::assembly_file_content($theme, 'templates/email/default.tpl', [
+      $emailSender->setContent(TemplateCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
         'EMAIL_TITLE' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_TITLE'),
         'EMAIL_CONTENT' => sprintf($CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_CONTENT'), $userLogin, $CMSCore->getSiteURL() . '/password-reset?token=' . $resetPasswordToken),
         'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')

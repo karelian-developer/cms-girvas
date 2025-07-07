@@ -745,7 +745,7 @@ final class SystemCore
    *
    * @return string
    */
-  public function geSiteURL() : string
+  public function getSiteURL() : string
   {
     $CMSConfigurator = $this->configurator;
     $CMSConfigSSLIsEnabled = $CMSConfigurator->get('SSLIsEnabled');
