@@ -23,16 +23,13 @@
 }
 
 .header__logo-block {
+  display: flex;
+  justify-content: center;
   padding: 68px 25px;
   border-radius: inherit;
 }
 
 @media (max-width: 669px) {
-  .header__logo-block {
-    display: flex;
-    justify-content: center;
-  }
-
   .header__logo-link img {
     width: 80%;
   }  
