@@ -100,21 +100,6 @@ if ($CMSCore->client->isLogged(2)) {
               $fileRobotsTXTPath = CMS_ROOT_DIRECTORY . '/robots.txt';
 
               try {
-<<<<<<< HEAD
-                $file_robots_txt = @fopen($file_robots_txt_path, 'w+');
-                if ($file_robots_txt === false) {
-                  $exception_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED'));
-                  throw new Exception($exception_message);
-                }
-
-                fwrite($file_robots_txt, $setting_value);
-                fclose($file_robots_txt);
-                chmod($file_robots_txt_path, 0664);
-              } catch (Exception $exception) {
-                $exception_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED'));
-                $handler_message = (!isset($handler_message)) ? $exception_message : $handler_message;
-                $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
-=======
                 $fileRobotsTXT = @fopen($fileRobotsTXTPath, 'w+');
                 if ($fileRobotsTXT === false) {
                   $exceptionMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED');
@@ -128,7 +113,6 @@ if ($CMSCore->client->isLogged(2)) {
                 $exceptionMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED');
                 $handlerMessage = $handlerMessage ?? $exceptionMessage;
                 $handlerStatusCode = $handlerStatusCode ?? 0;
->>>>>>> develop
               }
 
               continue;
@@ -278,45 +262,12 @@ if ($CMSCore->client->isLogged(2)) {
               }
             }
 
-<<<<<<< HEAD
-            if ($setting_name == 'setting_static_pages_additional_field_category_id') {
-              foreach ($setting_value as $key => $value) {
-                if (is_numeric($value)) {
-                  $setting_value[$key] = ($value > 0) ? (int)$value : 1;
-                }
-              }
-            }
-
-            if (is_array($setting_value)) $setting_value = json_encode($setting_value);
-
-            switch ($setting_name) {
-              case 'security_allowed_admin_ip': $setting_value = (!empty($setting_value)) ? json_encode(preg_split('/\s*\,\s*/', $setting_value)) : json_encode([]); break;
-              case 'security_allowed_emails': $setting_value = (!empty($setting_value)) ? json_encode(preg_split('/\s*\,\s*/', $setting_value)) : json_encode([]); break;
-              case 'seo_site_keywords': $setting_value = (!empty($setting_value)) ? json_encode(preg_split('/\s*\,\s*/', $setting_value)) : json_encode([]); break;
-              case 'security_premoderation_words_filter_list': $setting_value = (!empty($setting_value)) ? json_encode(preg_split('/\s*\,\s*/', $setting_value)) : json_encode([]); break;
-              case 'users_logins_blacklist': $setting_value = (!empty($setting_value)) ? json_encode(preg_split('/\s*\,\s*/', $setting_value)) : json_encode([]); break;
-              case 'users_additional_field_title': $setting_value = $setting_value; break;
-              case 'users_additional_field_description': $setting_value = $setting_value; break;
-              case 'users_additional_field_type': $setting_value = $setting_value; break;
-              case 'users_additional_field_name': $setting_value = $setting_value; break;
-              case 'entries_additional_field_title': $setting_value = $setting_value; break;
-              case 'entries_additional_field_description': $setting_value = $setting_value; break;
-              case 'entries_additional_field_type': $setting_value = $setting_value; break;
-              case 'entries_additional_field_category_id': $setting_value = $setting_value; break;
-              case 'entries_additional_field_name': $setting_value = $setting_value; break;
-              case 'static_pages_additional_field_title': $setting_value = $setting_value; break;
-              case 'static_pages_additional_field_description': $setting_value = $setting_value; break;
-              case 'static_pages_additional_field_type': $setting_value = $setting_value; break;
-              case 'static_pages_additional_field_name': $setting_value = $setting_value; break;
-              default: $setting_value = htmlspecialchars(str_replace('\'', '"', $setting_value));
-=======
             if ($settingName === 'setting_static_pages_additional_field_category_id') {
               foreach ($settingValue as $key => $value) {
                 if (is_numeric($value)) {
                   $settingValue[$key] = ($value > 0) ? (int)$value : 1;
                 }
               }
->>>>>>> develop
             }
 
             if (is_array($settingValue)) $settingValue = json_encode($settingValue);
@@ -359,32 +310,18 @@ if ($CMSCore->client->isLogged(2)) {
           }
         }
 
-<<<<<<< HEAD
-        if ($entries_additional_fields_count == 0 && isset($_POST['_entries_additional_fields_locale'])) {
-          foreach (['entries_additional_field_title', 'entries_additional_field_description', 'entries_additional_field_name', 'entries_additional_field_type', 'entries_additional_field_category_id'] as $index => $name) {
-            if ($system_core->configurator->exists_database_entry_value('entries_additional_field_title')) {
-              $system_core->configurator->update_database_entry_value($name, json_encode([]));
-=======
         if ($entriesAdditionalFieldsCount === 0 && isset($_POST['_entries_additional_fields_locale'])) {
           foreach (['entries_additional_field_title', 'entries_additional_field_description', 'entries_additional_field_name', 'entries_additional_field_type', 'entries_additional_field_category_id'] as $index => $name) {
             if ($CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_title')) {
               $CMSCore->configurator->updateDatabaseEntryValue($name, json_encode([]));
->>>>>>> develop
             }
           }
         }
 
-<<<<<<< HEAD
-        if ($static_pages_additional_fields_count == 0 && isset($_POST['_static_pages_additional_fields_locale'])) {
-          foreach (['static_pages_additional_field_title', 'static_pages_additional_field_description', 'static_pages_additional_field_name', 'static_pages_additional_field_type', 'static_pages_additional_field_type'] as $index => $name) {
-            if ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_title')) {
-              $system_core->configurator->update_database_entry_value($name, json_encode([]));
-=======
         if ($staticPagesAdditionalFieldsCount == 0 && isset($_POST['_static_pages_additional_fields_locale'])) {
           foreach (['static_pages_additional_field_title', 'static_pages_additional_field_description', 'static_pages_additional_field_name', 'static_pages_additional_field_type', 'static_pages_additional_field_type'] as $index => $name) {
             if ($CMSCore->configurator->existsDatabaseEntryValue('static_pages_additional_field_title')) {
               $CMSCore->configurator->updateDatabaseEntryValue($name, json_encode([]));
->>>>>>> develop
             }
           }
         }

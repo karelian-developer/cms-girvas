@@ -399,17 +399,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       fwrite($file, PHP_EOL);
       fwrite($file, '$configuration = [' . PHP_EOL);
       fwrite($file, sprintf('  \'domain\' => \'%s\',', $domain) . PHP_EOL);
-<<<<<<< HEAD
-      fwrite($file, sprintf('  \'domain_aliases\' => [%s],', $domain_aliases) . PHP_EOL);
-      fwrite($file, sprintf('  \'domain_email\' => \'%s\',', $domain_email) . PHP_EOL);
-      fwrite($file, sprintf('  \'domain_cookies\' => \'%s\',', $domain_cookies) . PHP_EOL);
-      fwrite($file, sprintf('  \'ssl_is_enabled\' => %s,', $domain_ssl_status) . PHP_EOL);
-=======
       fwrite($file, sprintf('  \'domainAliases\' => [%s],', $domainAliases) . PHP_EOL);
       fwrite($file, sprintf('  \'domainEmail\' => \'%s\',', $domainEmail) . PHP_EOL);
       fwrite($file, sprintf('  \'domainCookies\' => \'%s\',', $domainСookies) . PHP_EOL);
       fwrite($file, sprintf('  \'SSLIsEnabled\' => %s,', $domainSSLStatus) . PHP_EOL);
->>>>>>> develop
       fwrite($file, '  \'database\' => [' . PHP_EOL);
       fwrite($file, sprintf('    \'dms\' => %s,', $databaseDMSName) . PHP_EOL);
       fwrite($file, sprintf('    \'prefix\' => \'%s\',', $databasePrefix) . PHP_EOL);

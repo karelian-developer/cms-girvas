@@ -106,10 +106,6 @@ if ($CMSCore->client->isLogged(2)) {
       if ($key === 'page_static_template_path') {
         $pageStaticData['metadata']['personalTemplatePath'] = htmlspecialchars(str_replace('\'', '"', trim($value)));
       }
-
-      if ($key === 'page_static_template_path') {
-        $page_static_data['metadata']['personalTemplatePath'] = htmlspecialchars(str_replace('\'', '"', trim($value)));
-      }
     }
 
     if ($pageStaticCreationAllowed) {

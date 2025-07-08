@@ -11,7 +11,7 @@
 namespace core\PHPLibrary\Client\Cookie;
 
 use \core\PHPLibrary\Client\Session as ClientSession;
-use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore as CMSCore;
 
 class Cookie
 {
@@ -72,14 +72,14 @@ class Cookie
   /**
    * Создать Cookie
    * 
-   * @param SystemCore $CMSCore
+   * @param CMSCore $CMSCore
    * @param ClientSession $session
    * @param string $name
    * @param int $expires
    * 
    * @return bool
    */
-  public static function create(SystemCore $CMSCore, ClientSession $session, string $name, int $expires) : Cookie
+  public static function create(CMSCore $CMSCore, ClientSession $session, string $name, int $expires) : Cookie
   {
     $domainForCookies = $CMSCore->configurator->get('domainCookies');
     $SSLIsEnabled = $CMSCore->configurator->get('SSLIsEnabled');
