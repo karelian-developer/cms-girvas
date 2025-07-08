@@ -130,6 +130,10 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               }
             }
           }
+
+          if ($userLogin === $user->getLogin()) {
+            $userUpdateIsAllowed = true;
+          }
         } else {
           $userUpdateIsAllowed = true;
         }
