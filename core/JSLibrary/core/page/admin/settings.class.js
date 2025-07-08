@@ -683,21 +683,13 @@ export class PageSettings {
     requestGetEntriesCategories.target.send().then((responseData) => {
       let interactiveChoicesCategoryField = new Interactive('choices');
 
-<<<<<<< HEAD
-      if (responseData.statusCode == 1 && responseData.outputData.hasOwnProperty('entriesCategories')) {
-=======
       if (responseData.statusCode === 1 && responseData.outputData.hasOwnProperty('entriesCategories')) {
->>>>>>> develop
         let entriesCategories = responseData.outputData.entriesCategories;
         
         entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
           interactiveChoicesCategoryField.target.addItem(entriesCategory.title, entriesCategory.id);
 
-<<<<<<< HEAD
-          if (entriesCategory.id == data.categoryID) {
-=======
           if (entriesCategory.id === data.categoryID) {
->>>>>>> develop
             interactiveChoicesCategoryField.target.setItemSelectedIndex(entriesCategoryIndex);
           }
         });

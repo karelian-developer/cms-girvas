@@ -39,25 +39,10 @@ class Client
    * @param  mixed $value
    * @return void
    */
-<<<<<<< HEAD
-  class Client {
-    private readonly SystemCore $system_core;
-    private string $ip_address;
-    
-    /**
-     * __construct
-     *
-     * @param  SystemCore $system_core
-     * @return void
-     */
-    public function __construct(SystemCore $system_core) {
-      $this->system_core = $system_core;
-=======
   private function setIPAddress() : void
   {
     $this->ip = self::getRealIPAddress();
   }
->>>>>>> develop
 
   /**
    * Получить IP-адрес клиента
@@ -101,18 +86,8 @@ class Client
     $session = ClientSession::getByIP($this->CMSCore, $this->ip, $typeID);
     $session->initData($data);
 
-<<<<<<< HEAD
-    /**
-     * Получить реальный IP-адрес клиента
-     *
-     * @return string
-     */
-    public static function get_real_ip_address() : string {
-      $ip = '';
-=======
     return $session;
   }
->>>>>>> develop
 
   /**
    * Получить объект сессии по токену
@@ -180,52 +155,7 @@ class Client
       }
     }
 
-<<<<<<< HEAD
-    /**
-     * Создать Cookie (Устаревшее)
-     * 
-     * @param SystemCore $system_core
-     * @param string $name
-     * @param ClientSession $session
-     * @param int $expires
-     * 
-     * @return bool
-     */
-    public static function create_cookie(SystemCore $system_core, string $name, ClientSession $session, int $expires) : bool {
-      $domain_for_cookies = $system_core->configurator->get('domain_cookies');
-      $user_session_is_secure = ($system_core->configurator->get('ssl_is_enabled')) ? true : false;
-      
-      if (!is_null($domain_for_cookies)) {
-        return setcookie($name, $session->get_token(), [
-          'expires' => $expires,
-          'path' => '/',
-          'domain' => $domain_for_cookies,
-          'secure' => $user_session_is_secure,
-          'httponly' => true
-        ]);
-      }
-
-      return false;
-    }
-    
-    /**
-     * Удалить Cookie (Устаревшее)
-     * 
-     * @param string $name
-     * 
-     * @return bool
-     */
-    public static function remove_cookie(string $name) : bool {
-      if (isset($_COOKIE[$name])) {
-        unset($_COOKIE[$name]);
-        return setcookie($name, '', time() - 3600, '/');
-      }
-
-      return false;
-    }
-=======
     return false;
->>>>>>> develop
   }
 
   /**

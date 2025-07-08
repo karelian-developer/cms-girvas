@@ -50,12 +50,6 @@ if ($CMSCore->client->isLogged(2)) {
             if (!array_key_exists('metadata', $pageStaticData)) $pageStaticData['metadata'] = [];
             if (isset($_PATCH['page_static_is_published'])) $pageStaticData['metadata']['isPublished'] = $_PATCH['page_static_is_published'];
 
-<<<<<<< HEAD
-              if (array_key_exists($title_input_name, $_PATCH)) {
-                $input_value = $_PATCH[$title_input_name];
-                $input_value = strip_tags($input_value);
-                $input_value = str_replace('\'', '"', $input_value);
-=======
             if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH) || array_key_exists($textareaContentName, $_PATCH)) {
               if (!array_key_exists('texts', $pageStaticData)) $pageStaticData['texts'] = [];
               if (!array_key_exists($CMSLocaleName, $pageStaticData['texts'])) $pageStaticData['texts'][$CMSLocaleName] = [];
@@ -64,52 +58,30 @@ if ($CMSCore->client->isLogged(2)) {
                 $inputValue = $_PATCH[$inputTitleName];
                 $inputValue = strip_tags($inputValue);
                 $inputValue = str_replace('\'', '"', $inputValue);
->>>>>>> develop
                 
                 $pageStaticData['texts'][$CMSLocaleName]['title'] = $inputValue;
               }
 
-<<<<<<< HEAD
-              if (array_key_exists($description_textarea_name, $_PATCH)) {
-                $textarea_value = $_PATCH[$description_textarea_name];
-                $textarea_value = strip_tags($textarea_value);
-                $textarea_value = str_replace('\'', '"', $textarea_value);
-=======
               if (array_key_exists($textareaDescriptionName, $_PATCH)) {
                 $textareaValue = $_PATCH[$textareaDescriptionName];
                 $textareaValue = strip_tags($textareaValue);
                 $textareaValue = str_replace('\'', '"', $textareaValue);
->>>>>>> develop
 
                 $pageStaticData['texts'][$CMSLocaleName]['description'] = $textareaValue;
               }
 
-<<<<<<< HEAD
-              if (array_key_exists($content_textarea_name, $_PATCH)) {
-                $textarea_value = $_PATCH[$content_textarea_name];
-                $textarea_value = strip_tags($textarea_value, '<table><tr><td><th><b><u><i><hr>');
-                $textarea_value = str_replace('\'', '"', $textarea_value);
-=======
               if (array_key_exists($textareaContentName, $_PATCH)) {
                 $textareaValue = $_PATCH[$textareaContentName];
                 $textareaValue = strip_tags($textareaValue, '<table><tr><td><th><b><u><i><hr>');
                 $textareaValue = str_replace('\'', '"', $textareaValue);
->>>>>>> develop
 
                 $pageStaticData['texts'][$CMSLocaleName]['content'] = $textareaValue;
               }
 
-<<<<<<< HEAD
-              if (array_key_exists($keywords_textarea_name, $_PATCH)) {
-                $textarea_value = $_PATCH[$keywords_textarea_name];
-                $textarea_value = strip_tags($textarea_value);
-                $textarea_value = str_replace('\'', '"', $textarea_value);
-=======
               if (array_key_exists($textareaKeywordsName, $_PATCH)) {
                 $textareaValue = $_PATCH[$textareaKeywordsName];
                 $textareaValue = strip_tags($textareaValue);
                 $textareaValue = str_replace('\'', '"', $textareaValue);
->>>>>>> develop
                 
                 $pageStaticData['texts'][$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
               }

@@ -303,11 +303,7 @@ export class PageEntry {
         request.target.showingNotification = false;
 
         request.target.send().then((responseEntryCategories) => {
-<<<<<<< HEAD
-          if (responseEntryCategories.statusCode == 1 && responseEntryCategories.outputData.hasOwnProperty('entriesCategories')) {
-=======
           if (responseEntryCategories.statusCode === 1 && responseEntryCategories.outputData.hasOwnProperty('entriesCategories')) {
->>>>>>> develop
             let entriesCategories = responseEntryCategories.outputData.entriesCategories;
             
             entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
@@ -335,11 +331,7 @@ export class PageEntry {
                     fieldsArrayElements.forEach((element) => {
                       let fieldInputElement = element.querySelector('input, textarea');
 
-<<<<<<< HEAD
-                      if (fieldInputElement.getAttribute('data-category-id') == interactiveCategoriesChoices.target.getValue()) {
-=======
                       if (fieldInputElement.getAttribute('data-category-id') === interactiveCategoriesChoices.target.getValue()) {
->>>>>>> develop
                         element.style.display = 'block';
                       } else {
                         element.style.display = 'none';
@@ -363,11 +355,7 @@ export class PageEntry {
                   fieldsArrayElements.forEach((element) => {
                     let fieldInputElement = element.querySelector('input, textarea');
 
-<<<<<<< HEAD
-                    if (fieldInputElement.getAttribute('data-category-id') == interactiveCategoriesChoices.target.getValue()) {
-=======
                     if (fieldInputElement.getAttribute('data-category-id') === interactiveCategoriesChoices.target.getValue()) {
->>>>>>> develop
                       element.style.display = 'block';
                     } else {
                       element.style.display = 'none';
@@ -537,11 +525,7 @@ export class PageEntry {
                     fieldsArrayElements.forEach((element) => {
                       let fieldInputElement = element.querySelector('input, textarea');
 
-<<<<<<< HEAD
-                      if (fieldInputElement.getAttribute('data-category-id') == interactiveCategoriesChoices.target.getValue()) {
-=======
                       if (fieldInputElement.getAttribute('data-category-id') === interactiveCategoriesChoices.target.getValue()) {
->>>>>>> develop
                         element.style.display = 'block';
                       } else {
                         element.style.display = 'none';
@@ -565,11 +549,7 @@ export class PageEntry {
                   fieldsArrayElements.forEach((element) => {
                     let fieldInputElement = element.querySelector('input, textarea');
 
-<<<<<<< HEAD
-                    if (fieldInputElement.getAttribute('data-category-id') == interactiveCategoriesChoices.target.getValue()) {
-=======
                     if (fieldInputElement.getAttribute('data-category-id') === interactiveCategoriesChoices.target.getValue()) {
->>>>>>> develop
                       element.style.display = 'block';
                     } else {
                       element.style.display = 'none';

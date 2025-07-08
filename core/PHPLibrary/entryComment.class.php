@@ -8,124 +8,6 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-<<<<<<< HEAD
-namespace core\PHPLibrary {
-  use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-  use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
-  use \PDOException as PDOException;
-
-  #[\AllowDynamicProperties]
-  class EntryComment implements EntityTypeContent {
-    private readonly SystemCore $system_core;
-    private int $id;
-    
-    /**
-     * __construct
-     *
-     * @param  SystemCore $system_core
-     * @param  int $id
-     * @return void
-     */
-    public function __construct(SystemCore $system_core, int $id) {
-      $this->system_core = $system_core;
-      $this->set_id($id);
-    }
-
-    /**
-     * Инициализация данных из БД
-     *
-     * @param  mixed $columns
-     * @return void
-     */
-    public function init_data(array $columns = ['*']) : void {
-      $columns_data = $this->get_database_columns_data($columns);
-      foreach ($columns_data as $column_name => $column_data) {
-        $this->{$column_name} = $column_data;
-      }
-    }
-    
-    /**
-     * Назначить идентификатор комментарию
-     *
-     * @param  mixed $value
-     * @return void
-     */
-    private function set_id(int $value) : void {
-      $this->id = $value;
-    }
-    
-    /**
-     * Получить идентификатор комментария
-     *
-     * @return int
-     */
-    public function get_id() : int {
-      return $this->id;
-    }
-    
-    /**
-     * Получить идентификатор записи, к которой написан комментарий
-     *
-     * @return int
-     */
-    public function get_entry_id() : int {
-      return (property_exists($this, 'entry_id')) ? $this->entry_id : '{ERROR:ENTRY_COMMENT_DATA_IS_NOT_EXISTS=entry_id}';
-    }
-    
-    /**
-     * Получить объект записи, к которой написан комментарий
-     *
-     * @return Entry|null
-     */
-    public function get_entry() : Entry|null {
-      return (property_exists($this, 'entry_id')) ? new User($this->system_core, $this->entry_id) : null;
-    }
-    
-    /**
-     * Получить идентификатор автора комментария
-     *
-     * @return int
-     */
-    public function get_author_id() : int {
-      return (property_exists($this, 'author_id')) ? $this->author_id : '{ERROR:ENTRY_COMMENT_DATA_IS_NOT_EXISTS=author_id}';
-    }
-    
-    /**
-     * Получить объект автора комментария
-     *
-     * @return User|null
-     */
-    public function get_author() : User|null {
-      return (property_exists($this, 'author_id')) ? new User($this->system_core, $this->author_id) : null;
-    }
-    
-    /**
-     * Получить идентификатор записи, к которой написан комментарий
-     *
-     * @return string
-     */
-    public function get_content() : string {
-      return (property_exists($this, 'content')) ? $this->content : '{ERROR:ENTRY_COMMENT_DATA_IS_NOT_EXISTS=content}';
-    }
-    
-    /**
-     * Получить дату создания в UNIX-формате
-     *
-     * @return int
-     */
-    public function get_created_unix_timestamp() : int|string {
-      return (property_exists($this, 'created_unix_timestamp')) ? $this->created_unix_timestamp : '{ERROR:ENTRY_COMMENT_DATA_IS_NOT_EXISTS=created_unix_timestamp}';
-    }
-    
-    /**
-     * Получить дату обновления в UNIX-формате
-     *
-     * @return int
-     */
-    public function get_updated_unix_timestamp() : int|string {
-      return (property_exists($this, 'updated_unix_timestamp')) ? $this->updated_unix_timestamp : '{ERROR:ENTRY_COMMENT_DATA_IS_NOT_EXISTS=updated_unix_timestamp}';
-    }
-=======
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
@@ -151,7 +33,6 @@ class EntryComment implements EntityTypeContent
     $this->CMSCore = $CMSCore;
     $this->setID($id);
   }
->>>>>>> develop
 
   /**
    * Инициализация данных из БД

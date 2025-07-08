@@ -30,17 +30,10 @@ export class InstallationMaster {
     let installationProgress = document.querySelector('[role="installer-progress"]');
     let installationPages = document.querySelectorAll('[data-page-index]');
 
-<<<<<<< HEAD
-    if (this.searchParams.getParam('locale') != null) {
-      for (let stepIndex = 0; stepIndex < installationPages.length; stepIndex++) {
-        let stepID = stepIndex + 1;
-        let isBuilded = (stepIndex == 0) ? true : false;
-=======
     if (this.searchParams.getParam('locale') !== null) {
       for (let stepIndex = 0; stepIndex < installationPages.length; stepIndex++) {
         let stepID = stepIndex + 1;
         let isBuilded = stepIndex === 0;
->>>>>>> develop
 
         this.stepsData.push({
           id: stepID,
@@ -410,11 +403,7 @@ export class InstallationMaster {
        * - Выбор локализации сайта и административной панели
        * - Выбор временной зоны для расчета времени
        */
-<<<<<<< HEAD
-      if (this.getStepIndex() == 7) {
-=======
       if (this.getStepIndex() === 7) {
->>>>>>> develop
         // Если сборка страница шага еще не осуществлялась ранее,
         // то делаем запросы к внутреннему API для получения списков
         // локализаций системы для формирования выпадающих списков
@@ -524,11 +513,7 @@ export class InstallationMaster {
        * - Назначение описания сайту
        * - Назначение ключевых слов сайту
        */
-<<<<<<< HEAD
-      if (this.getStepIndex() == 8) {
-=======
       if (this.getStepIndex() === 8) {
->>>>>>> develop
         this.buttons.updateData = new Interactive('button');
         this.buttons.updateData.target.setLabel(localeData.BUTTON_APPLY_LABEL);
         this.buttons.updateData.target.setCallback((event) => {
@@ -542,11 +527,7 @@ export class InstallationMaster {
             
             // Применение данных из формы
             fetch(`/handler/install/set-metadata?locale=${localeName}&installation-mode=true`, {method: 'POST', body: formData}).then((response) => {
-<<<<<<< HEAD
-              return (response.ok) ? response.json() : Promise.reject(response);
-=======
               return response.ok ? response.json() : Promise.reject(response);
->>>>>>> develop
             }).then((data) => {
               let resultHTML = data.outputData.html;
               let statusCode = data.statusCode;

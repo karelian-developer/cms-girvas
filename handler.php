@@ -22,17 +22,6 @@ if (!isset($CMSCore)) {
 }
 
 if (defined('IS_NOT_HACKED')) {
-<<<<<<< HEAD
-  header('Access-Control-Allow-Origin: ' . $system_core->configurator->get('domain'));
-
-  $handler_headers = apache_request_headers();
-  $php_input_content = file_get_contents('php://input');
-
-  switch ($_SERVER['REQUEST_METHOD']) {
-    case 'PATCH': $_PATCH = $system_core::parse_raw_http_request($php_input_content, $_SERVER['CONTENT_TYPE']); break;
-    case 'PUT': $_PUT = $system_core::parse_raw_http_request($php_input_content, $_SERVER['CONTENT_TYPE']); break;
-    case 'DELETE': $_DELETE = $system_core::parse_raw_http_request($php_input_content, $_SERVER['CONTENT_TYPE']); break;
-=======
   $CMSURLP = $CMSCore->urlp;
   $CMSClient = $CMSCore->client;
   $CMSConfigurator = $CMSCore->configurator;
@@ -46,7 +35,6 @@ if (defined('IS_NOT_HACKED')) {
     case 'PATCH': $_PATCH = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
     case 'PUT': $_PUT = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
     case 'DELETE': $_DELETE = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
->>>>>>> develop
   }
 
   $handlerOutputData = [];
@@ -62,16 +50,6 @@ if (defined('IS_NOT_HACKED')) {
   $CMSURLPathes[] = $CMSURLP->getPath(3);
 
   // Client API
-<<<<<<< HEAD
-  if ($system_core->urlp->get_path(1) == 'client') {
-    $api_file_path = CMS_ROOT_DIRECTORY . '/api/client.api.php';
-    include_once $api_file_path;
-
-  // Installation API
-  } else if ($system_core->urlp->get_path(1) == 'install') {
-    $api_file_path = CMS_ROOT_DIRECTORY . '/api/installation.api.php';
-    include_once $api_file_path;
-=======
   if ($CMSURLPathes[1] === 'client') {
     $APIFilePath = CMS_ROOT_DIRECTORY . '/api/client.api.php';
     include_once $APIFilePath;
@@ -80,204 +58,119 @@ if (defined('IS_NOT_HACKED')) {
   } else if ($CMSURLPathes[1] === 'install') {
     $APIFilePath = CMS_ROOT_DIRECTORY . '/api/installation.api.php';
     include_once $APIFilePath;
->>>>>>> develop
   
   // Metrics API
   } else if ($CMSURLPathes[1] === 'metrics' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
 
-<<<<<<< HEAD
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/metrics.api.php';
-      include_once $api_file_path;
-=======
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/metrics.api.php';
       include_once $APIFilePath;
->>>>>>> develop
     }
   } else if ($CMSURLPathes[1] === 'media' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
 
-<<<<<<< HEAD
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/media.api.php';
-      include_once $api_file_path;
-=======
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/media.api.php';
       include_once $APIFilePath;
->>>>>>> develop
     }
   } else if ($CMSURLPathes[1] === 'module' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
 
-<<<<<<< HEAD
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/module.api.php';
-      include_once $api_file_path;
-=======
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/module.api.php';
       include_once $APIFilePath;
->>>>>>> develop
     }
   } else if ($CMSURLPathes[1] === 'user' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
 
-<<<<<<< HEAD
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/user.api.php';
-      include_once $api_file_path;
-=======
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/user.api.php';
       include_once $APIFilePath;
->>>>>>> develop
     }
   } else if ($CMSURLPathes[1] === 'usersGroup' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
 
-<<<<<<< HEAD
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/usersGroup.api.php';
-      include_once $api_file_path;
-=======
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/usersGroup.api.php';
       include_once $APIFilePath;
->>>>>>> develop
     }
   } else if ($CMSURLPathes[1] === 'usersGroups' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
 
-<<<<<<< HEAD
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/usersGroups.api.php';
-      include_once $api_file_path;
-=======
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/usersGroups.api.php';
       include_once $APIFilePath;
->>>>>>> develop
     }
   } else if ($CMSURLPathes[1] === 'entry' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
 
-<<<<<<< HEAD
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/entry.api.php';
-      include_once $api_file_path;
-=======
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/entry.api.php';
       include_once $APIFilePath;
->>>>>>> develop
     }
   } else if ($CMSURLPathes[1] === 'entries' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
 
-<<<<<<< HEAD
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/entries.api.php';
-      include_once $api_file_path;
-=======
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/entries.api.php';
       include_once $APIFilePath;
->>>>>>> develop
     }
   } else if ($CMSURLPathes[1] === 'pageStatic' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
 
-<<<<<<< HEAD
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/pageStatic.api.php';
-      include_once $api_file_path;
-=======
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/pageStatic.api.php';
       include_once $APIFilePath;
->>>>>>> develop
     }
   } else if ($CMSURLPathes[1] === 'pages' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
 
-<<<<<<< HEAD
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/settings.api.php';
-      include_once $api_file_path;
-=======
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/pagesStatic.api.php';
       include_once $APIFilePath;
->>>>>>> develop
     }
   } else if ($CMSURLPathes[1] === 'settings' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
 
-<<<<<<< HEAD
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/template.api.php';
-      include_once $api_file_path;
-=======
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/settings.api.php';
       include_once $APIFilePath;
->>>>>>> develop
     }
   } else if ($CMSURLPathes[1] === 'template' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
 
-<<<<<<< HEAD
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/feed.api.php';
-      include_once $api_file_path;
-=======
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/template.api.php';
       include_once $APIFilePath;
->>>>>>> develop
     }
   } else if ($CMSURLPathes[1] === 'feed' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
 
-<<<<<<< HEAD
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/feeds.api.php';
-      include_once $api_file_path;
-=======
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/feed.api.php';
       include_once $APIFilePath;
->>>>>>> develop
     }
   } else if ($CMSURLPathes[1] === 'feeds' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();
 
-<<<<<<< HEAD
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      $api_file_path = CMS_ROOT_DIRECTORY . '/api/utils.api.php';
-      include_once $api_file_path;
-=======
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/feeds.api.php';
       include_once $APIFilePath;
->>>>>>> develop
     }
   } else if ($CMSURLPathes[1] === 'profile' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
@@ -405,37 +298,6 @@ if (defined('IS_NOT_HACKED')) {
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   
-<<<<<<< HEAD
-  } else if ($_SERVER['REQUEST_METHOD'] == 'GET' && $system_core->urlp->get_path(1) == 'pages' && $system_core::core_rest_cookie_exists()) {
-    $system_core_rest_cookie = $system_core::get_core_rest_cookie();
-    $client_ip = $system_core->client->get_ip_address();
-
-    if ($system_core::core_rest_cookie_is_valid($system_core_rest_cookie, $client_ip)) {
-      if ($system_core->urlp->get_path(2) == 'additional-fields' && is_null($system_core->urlp->get_path(3))) {
-        $cms_locale_setted = $system_core->configurator->get_database_entry_value('base_locale');
-        $fields_locale = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $cms_locale_setted;
-
-        $fields_types = ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_type')) ? json_decode($system_core->configurator->get_database_entry_value('static_pages_additional_field_type'), true) : [];
-        $fields_titles = ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_title')) ? json_decode($system_core->configurator->get_database_entry_value('static_pages_additional_field_title'), true) : [];
-        $fields_descriptions = ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_description')) ? json_decode($system_core->configurator->get_database_entry_value('static_pages_additional_field_description'), true) : [];
-        $fields_names = ($system_core->configurator->exists_database_entry_value('static_pages_additional_field_name')) ? json_decode($system_core->configurator->get_database_entry_value('static_pages_additional_field_name'), true) : [];
-        
-        $fields = [];
-        foreach ($fields_types as $field_index => $field_type) {
-          array_push($fields, [
-            'type' => $field_type,
-            'title' => isset($fields_titles[$fields_locale]) ? $fields_titles[$fields_locale][$field_index] : '',
-            'description' => isset($fields_descriptions[$fields_locale]) ? $fields_descriptions[$fields_locale][$field_index] : '',
-            'name' => $fields_names[$field_index]
-          ]);
-        }
-
-        $handler_output_data['additionalFields'] = $fields;
-      }
-    }
-  // Попытка инициализации персонализированного обработчика
-=======
->>>>>>> develop
   } else {
     if ($CMSURLPathes[1] !== null) {
       /**

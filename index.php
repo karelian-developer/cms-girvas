@@ -8,17 +8,12 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-<<<<<<< HEAD
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', 1);
-=======
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\EmailSender as EmailSender;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\SystemCore as CMSCore;
->>>>>>> develop
 
 // Абсолютный путь до корневой директории CMS
 define('CMS_ROOT_DIRECTORY', preg_replace('/[\/]*$/', '', $_SERVER['DOCUMENT_ROOT']));
@@ -34,47 +29,27 @@ if (PHP_VERSION_ID < 80200) {
   die(sprintf('PHP version is too old (you have %s). CMS "GIRVAS" works on PHP version 8.2.0 and higher.', phpversion()));
 }
 
-<<<<<<< HEAD
-require_once CMS_ROOT_DIRECTORY . '/core/PHPLibrary/systemCore.class.php';
-=======
 $startTime = microtime(true);
->>>>>>> develop
 
 require_once CMS_ROOT_DIRECTORY . '/core/PHPLibrary/systemCore.class.php';
 
 $CMSCore = new CMSCore();
 $CMSURLP = $CMSCore->urlp;
 
-<<<<<<< HEAD
-  include_once CMS_ROOT_DIRECTORY . '/handler.php';
-=======
 $CMSURLPathes = [];
 $CMSURLPathes[] = $CMSURLP->getPath(0);
->>>>>>> develop
 
 if ($CMSURLPathes[0] === 'handler') {
 
-<<<<<<< HEAD
-  include_once CMS_ROOT_DIRECTORY . '/sitemap.php';
-=======
   include_once CMS_ROOT_DIRECTORY . '/handler.php';
->>>>>>> develop
 
 } else if ($CMSURLPathes[0] === 'sitemap') {
 
-<<<<<<< HEAD
-  include_once CMS_ROOT_DIRECTORY . '/rss.php';
-=======
   include_once CMS_ROOT_DIRECTORY . '/sitemap.php';
->>>>>>> develop
 
 } else if ($CMSURLPathes[0] === 'rss') {
 
-<<<<<<< HEAD
-  include_once CMS_ROOT_DIRECTORY . '/feed.php';
-=======
   include_once CMS_ROOT_DIRECTORY . '/rss.php';
->>>>>>> develop
 
 } else if ($CMSURLPathes[0] === 'feed') {
 
@@ -148,21 +123,12 @@ if ($CMSURLPathes[0] === 'handler') {
     echo 'Request is not exists!';
   }
 } else {
-<<<<<<< HEAD
-  if ($system_core->urlp->get_param('mode') != 'install' && file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
-    if ($system_core->configurator->get_database_entry_value('security_allowed_admin_ip_status') == 'on' && $system_core->urlp->get_path(0) == 'admin') {
-      /** @var array Массив разрешенных IP-адресов */
-      $allowed_ips = json_decode($system_core->configurator->get_database_entry_value('security_allowed_admin_ip'), true);
-      
-      if (!in_array($_SERVER['REMOTE_ADDR'], $allowed_ips)) {
-=======
   if ($CMSURLP->getParam('mode') !== 'install' && file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     if ($CMSCore->configurator->getDatabaseEntryValue('security_allowed_admin_ip_status') === 'on' && $CMSURLPathes[0] === 'admin') {
       /** @var array Массив разрешенных IP-адресов */
       $allowedIPs = json_decode($CMSCore->configurator->getDatabaseEntryValue('security_allowed_admin_ip'), true);
       
       if (!in_array($_SERVER['REMOTE_ADDR'], $allowedIPs)) {
->>>>>>> develop
         http_response_code(503);
         die('An attempted hacker attack has been detected.');
       }

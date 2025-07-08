@@ -366,23 +366,6 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
 
     if (!file_exists($fileCMSConfigurationPath)) {
       $domain = (isset($_GET['domain'])) ? idn_to_ascii($_GET['domain']) : '';
-<<<<<<< HEAD
-
-      $domain_aliases = (isset($_GET['domain_aliases'])) ? trim($_GET['domain_aliases']) : '';
-      $domain_aliases_array = explode(',', $domain_aliases);
-      if (count($domain_aliases_array) > 0) {
-        foreach ($domain_aliases_array as $domain_aliase_index => $domain_aliase) {
-          $domain_aliases_array[$domain_aliase_index] = '\'' . idn_to_ascii(trim($domain_aliase) . '\'');
-        }
-      }
-
-      $domain_aliases = implode(', ', $domain_aliases_array);
-      
-      $domain_email = (isset($_GET['domain_email'])) ? idn_to_ascii($_GET['domain_email']) : '';
-      $domain_cookies = (isset($_GET['domain_cookies'])) ? idn_to_ascii($_GET['domain_cookies']) : '';
-      $domain_ssl_status = (isset($_GET['domain_ssl_status'])) ? 'true' : 'false';
-=======
->>>>>>> develop
 
       $domainAliases = $_GET['domain_aliases'] ?? '';
       $domainAliases = trim($domainAliases);

@@ -58,85 +58,6 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               if ($CMSConfigurator->getUsersLoginsBlacklistStatus(true)) {
                 $loginsBlacklist = $CMSConfigurator->getUsersLoginsBlacklist(true);
 
-<<<<<<< HEAD
-        if (isset($_PATCH['user_email'])) $user_email = str_replace('\'', '"', trim($_PATCH['user_email']));
-        if (isset($_PATCH['user_name'])) $user_name = htmlspecialchars(str_replace('\'', '"', trim($_PATCH['user_name'])));
-        if (isset($_PATCH['user_surname'])) $user_surname = htmlspecialchars(str_replace('\'', '"', trim($_PATCH['user_surname'])));
-        if (isset($_PATCH['user_patronymic'])) $user_patronymic = htmlspecialchars(str_replace('\'', '"', trim($_PATCH['user_patronymic'])));
-        if (isset($_PATCH['user_birthdate'])) $user_birthdate = strtotime($_PATCH['user_birthdate']);
-        if (isset($_PATCH['user_group_id'])) $user_group_id = (int)$_PATCH['user_group_id'];
-        if (isset($_PATCH['user_password'])) $user_password = str_replace('\'', '"', trim($_PATCH['user_password']));
-        if (isset($_PATCH['user_password_repeat'])) $user_password_repeat = str_replace('\'', '"', trim($_PATCH['user_password_repeat']));
-        if (isset($_PATCH['user_password_old'])) $user_password_old = str_replace('\'', '"', trim($_PATCH['user_password_old']));
-
-        // Проверяем, установлены ли переменные $user_password и $user_password_repeat
-        if (isset($user_password) && isset($user_password_repeat)) {
-          // Проверяем, являются ли переменные $user_password и $user_password_repeat пустыми.
-          // Если пустые, то игнорируем проверку пароля
-          if (!empty($user_password) && !empty($user_password_repeat)) {
-            if ($system_core->configurator->get_users_password_special_symbols_status(true)) {
-              $password_regular = '[a-zA-Z0-9\_\-\!\@\#\$\%\&]+';
-            } else {
-              $password_regular = '[a-zA-Z0-9\_\-]+';
-            }
-            
-            if ($user_update_is_allowed) {
-              if ($system_core->configurator->get_users_password_length_max() > 0) {
-                if (strlen($user_password) > $system_core->configurator->get_users_password_length_max()) {
-                  $user_update_is_allowed = false;
-      
-                  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', sprintf($system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_LARGE'), $system_core->configurator->get_users_password_length_max())) : $handler_message;
-                  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
-                }
-              }
-            }
-      
-            if ($user_update_is_allowed) {
-              if (strlen($user_password) < $system_core->configurator->get_users_password_length_min()) {
-                $user_update_is_allowed = false;
-      
-                $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', sprintf($system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_SMALL'), $system_core->configurator->get_users_password_length_min())) : $handler_message;
-                $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
-              }
-            }
-      
-            if ($user_update_is_allowed) {
-              if (!preg_match(sprintf('/^%s$/i', $password_regular), $user_password)) {
-                $user_update_is_allowed = false;
-      
-                $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_PASSWORD')) : $handler_message;
-                $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
-              }
-            }
-
-            if ($user_update_is_allowed) {
-              if (!empty($user_password) || !empty($user_password_repeat)) {
-                if ($user_password == $user_password_repeat) {
-                  $user_data['password_hash'] = User::password_hash($system_core, $user->get_security_hash(), $user_password);
-                } else {
-                  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_REPEAT_PASSWORD')) : $handler_message;
-                  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
-                  $user_update_is_allowed = false;
-                }
-
-                if (!$client_user_group->permission_check($client_user_group::PERMISSION_ADMIN_USERS_MANAGEMENT) || $user_id == $client_user->get_id()) {
-                  if (isset($user_password_old)) {
-                    if (!empty($user_password_old)) {
-                      if (!$user->password_verify($user_password_old)) {
-                        $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_INVALID_OLD_PASSWORD')) : $handler_message;
-                        $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
-                        $user_update_is_allowed = false;
-                      }
-                    } else {
-                      $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USER_ERROR_EMPTY_OLD_PASSWORD')) : $handler_message;
-                      $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
-                      $user_update_is_allowed = false;
-                    }
-                  } else {
-                    $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_INVALID_INPUT_DATA_SET')) : $handler_message;
-                    $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
-                    $user_update_is_allowed = false;
-=======
                 foreach ($loginsBlacklist as $loginBlacklist) {
                   if ($CMSConfigurator->getUsersLoginRegisterAccountingStatus(true)) {
                     $loginPattern = '/^' . $loginBlacklist . '$/';
@@ -156,7 +77,6 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
                       $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST');
                       $handlerStatusCode = $handlerStatusCode ?? 0;
                     }
->>>>>>> develop
                   }
                 }
               }

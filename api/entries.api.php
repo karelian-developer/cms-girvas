@@ -13,38 +13,6 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-<<<<<<< HEAD
-if ($system_core->urlp->get_path(2) == 'categories') {
-  $api_file_path = sprintf('%s/api/entries/categories.api.php', CMS_ROOT_DIRECTORY);
-  include_once($api_file_path);
-} else if ($system_core->urlp->get_path(2) == 'sample') {
-  $api_file_path = sprintf('%s/api/entries/sample.api.php', CMS_ROOT_DIRECTORY);
-  include_once($api_file_path);
-} else if ($system_core->urlp->get_path(2) == 'additional-fields') {
-  $cms_locale_setted = $system_core->configurator->get_database_entry_value('base_locale');
-  $fields_locale = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $cms_locale_setted;
-
-  $fields_types = ($system_core->configurator->exists_database_entry_value('entries_additional_field_type')) ? json_decode($system_core->configurator->get_database_entry_value('entries_additional_field_type'), true) : [];
-  $fields_categories_ids = ($system_core->configurator->exists_database_entry_value('entries_additional_field_category_id')) ? json_decode($system_core->configurator->get_database_entry_value('entries_additional_field_category_id'), true) : [];
-  $fields_titles = ($system_core->configurator->exists_database_entry_value('entries_additional_field_title')) ? json_decode($system_core->configurator->get_database_entry_value('entries_additional_field_title'), true) : [];
-  $fields_descriptions = ($system_core->configurator->exists_database_entry_value('entries_additional_field_description')) ? json_decode($system_core->configurator->get_database_entry_value('entries_additional_field_description'), true) : [];
-  $fields_names = ($system_core->configurator->exists_database_entry_value('entries_additional_field_name')) ? json_decode($system_core->configurator->get_database_entry_value('entries_additional_field_name'), true) : [];
-  
-  $fields = [];
-  foreach ($fields_types as $field_index => $field_type) {
-    array_push($fields, [
-      'type' => $field_type,
-      'categoryID' => isset($fields_categories_ids[$field_index]) ? (int)$fields_categories_ids[$field_index] : 1,
-      'title' => isset($fields_titles[$fields_locale]) ? $fields_titles[$fields_locale][$field_index] : '',
-      'description' => isset($fields_descriptions[$fields_locale]) ? $fields_descriptions[$fields_locale][$field_index] : '',
-      'name' => $fields_names[$field_index]
-    ]);
-  }
-
-  $handler_output_data['additionalFields'] = $fields;
-} else {
-  define('API_HANDLERS_ABSOLUTE_PATH', sprintf('%s/api/entries', CMS_ROOT_DIRECTORY));
-=======
 if ($CMSCore->urlp->getPath(2) === 'categories') {
   $APIFilePath = CMS_ROOT_DIRECTORY . '/api/entries/categories.api.php';
   include_once $APIFilePath;
@@ -54,7 +22,6 @@ if ($CMSCore->urlp->getPath(2) === 'categories') {
 } else if ($CMSCore->urlp->getPath(2) === 'additional-fields') {
   $locale = $CMSCore->configurator->getDatabaseEntryValue('base_locale');
   $fieldsLocale = $CMSCore->urlp->getParam('locale') ?? $locale;
->>>>>>> develop
 
   $fieldsTypes = $CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_type') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('entries_additional_field_type'), true) : [];
   $fieldsCategoriesIDs = $CMSCore->configurator->existsDatabaseEntryValue('entries_additional_field_category_id') ? json_decode($CMSCore->configurator->getDatabaseEntryValue('entries_additional_field_category_id'), true) : [];

@@ -44,62 +44,34 @@ if ($CMSCore->client->isLogged(2)) {
         if (array_key_exists($inputTitleName, $_PUT) || array_key_exists($textareaDescriptionName, $_PUT) || array_key_exists($textareaContentName, $_PUT)) {
           if (!array_key_exists($CMSLocaleName, $texts)) $texts[$CMSLocaleName] = [];
 
-<<<<<<< HEAD
-          if (array_key_exists($title_input_name, $_PUT)) {
-            $input_value = $_PUT[$title_input_name];
-            $input_value = strip_tags($input_value);
-            $input_value = str_replace('\'', '"', $input_value);
-=======
           if (array_key_exists($inputTitleName, $_PUT)) {
             $inputValue = $_PUT[$inputTitleName];
             $inputValue = strip_tags($inputValue);
             $inputValue = str_replace('\'', '"', $inputValue);
->>>>>>> develop
 
             $texts[$CMSLocaleName]['title'] = $inputValue;
           }
 
-<<<<<<< HEAD
-          if (array_key_exists($description_textarea_name, $_PUT)) {
-            $textarea_value = $_PUT[$description_textarea_name];
-            $textarea_value = strip_tags($textarea_value);
-            $textarea_value = str_replace('\'', '"', $textarea_value);
-=======
           if (array_key_exists($textareaDescriptionName, $_PUT)) {
             $textareaValue = $_PUT[$textareaDescriptionName];
             $textareaValue = strip_tags($textareaValue);
             $textareaValue = str_replace('\'', '"', $textareaValue);
->>>>>>> develop
 
             $texts[$CMSLocaleName]['description'] = $textareaValue;
           }
 
-<<<<<<< HEAD
-          if (array_key_exists($content_textarea_name, $_PUT)) {
-            $textarea_value = $_PUT[$content_textarea_name];
-            $textarea_value = strip_tags($textarea_value, '<table><tr><td><th><b><u><i><hr>');
-            $textarea_value = str_replace('\'', '"', $textarea_value);
-=======
           if (array_key_exists($textareaContentName, $_PUT)) {
             $textareaValue = $_PUT[$textareaContentName];
             $textareaValue = strip_tags($textareaValue, '<table><tr><td><th><b><u><i><hr>');
             $textareaValue = str_replace('\'', '"', $textareaValue);
->>>>>>> develop
 
             $texts[$CMSLocaleName]['content'] = $textareaValue;
           }
 
-<<<<<<< HEAD
-          if (array_key_exists($keywords_textarea_name, $_PUT)) {
-            $textarea_value = $_PUT[$keywords_textarea_name];
-            $textarea_value = strip_tags($textarea_value);
-            $textarea_value = str_replace('\'', '"', $textarea_value);
-=======
           if (array_key_exists($textareaKeywordsName, $_PUT)) {
             $textareaValue = $_PUT[$textareaKeywordsName];
             $textareaValue = strip_tags($textareaValue);
             $textareaValue = str_replace('\'', '"', $textareaValue);
->>>>>>> develop
             
             $texts[$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
           }

@@ -8,19 +8,6 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-<<<<<<< HEAD
-namespace core\PHPLibrary\Entities\Types {
-  use \core\PHPLibrary\SystemCore as SystemCore;
-
-  interface Content {
-    public function __construct(SystemCore $system_core, int $id);
-
-    public function init_data(array $columns = ['*']): void;
-  }
-}
-
-?>
-=======
 namespace core\PHPLibrary\Entities\Types;
 
 use \core\PHPLibrary\SystemCore as SystemCore;
@@ -30,4 +17,3 @@ interface Content
   public function __construct(SystemCore $CMSCore, int $id);
   public function initData(array $columns = ['*']): void;
 }
->>>>>>> develop

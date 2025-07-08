@@ -18,16 +18,10 @@
 
 $configuration = [
   'domain' => 'example.com',
-<<<<<<< HEAD
-  'domain_aliases' => ['127.0.0.1', 'localhost'],
-  'domain_email' => 'example.com',
-  'domain_cookies' => 'example.com',
-=======
   'domainAliases' => ['127.0.0.1', 'localhost'],
   'domainEmail' => 'example.com',
   'domainCookies' => 'example.com',
   'SSLIsEnabled' => false,
->>>>>>> develop
   'database' => ['host' => '', 'user' => '', 'password' => '', 'name' => '', 'scheme' => '', 'prefix' => ''],
   // Системная соль (необходима для хеширования некоторых данных)
   // Пример: ?d7R(TF1f30br7tl=!PeIrk) <== (НЕ ИСПОЛЬЗУЙТЕ ЭТУ СОЛЬ)
