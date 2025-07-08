@@ -8,119 +8,123 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Page\Admin {
-  use \core\PHPLibrary\InterfacePage as InterfacePage;
-  use \core\PHPLibrary\SystemCore as SystemCore;
-  use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-  use \core\PHPLibrary\UsersGroups as UsersGroups;
-  use \core\PHPLibrary\Template\Collector as TemplateCollector;
-  use \core\PHPLibrary\Page as Page;
-  use \core\PHPLibrary\TraitPage as TraitPage;
-  use \core\PHPLibrary\Pagination as Pagination;
+namespace core\PHPLibrary\Page\Admin;
 
-  class PageUsersGroups implements InterfacePage {
-    use TraitPage;
+use \core\PHPLibrary\InterfacePage as InterfacePage;
+use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\UsersGroups as UsersGroups;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\TraitPage as TraitPage;
+use \core\PHPLibrary\Pagination as Pagination;
 
-    const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_USERS_GROUPS_NAVIGATION_%s_LABEL';
+class PageUsersGroups implements InterfacePage
+{
+  use TraitPage;
 
-    public SystemCore $system_core;
-    public Page $page;
-    public string $assembled = '';
-    public array $navigation_subsections_array = [
-      'index' => [
-        'name' => 'index',
-        'iconName' => 'index',
-        'link' => '/',
-        'permanent' => true,
-        'isActive' => false
-      ],
-      'users' => [
-        'name' => 'users',
-        'iconName' => 'users',
-        'link' => '/users',
-        'permanent' => false,
-        'isActive' => false
-      ],
-      'groups' => [
-        'name' => 'groups',
-        'iconName' => 'usersGroups',
-        'link' => '/usersGroups',
-        'permanent' => false,
-        'isActive' => true
-      ],
-    ];
+  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_USERS_GROUPS_NAVIGATION_%s_LABEL';
 
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
-      $this->page = $page;
-    }
+  public SystemCore $CMSCore;
+  public Page $page;
+  public string $assembled = '';
+  public array $navigationSubsections = [
+    'index' => [
+      'name' => 'index',
+      'iconName' => 'index',
+      'link' => '/',
+      'permanent' => true,
+      'isActive' => false
+    ],
+    'users' => [
+      'name' => 'users',
+      'iconName' => 'users',
+      'link' => '/users',
+      'permanent' => false,
+      'isActive' => false
+    ],
+    'groups' => [
+      'name' => 'groups',
+      'iconName' => 'usersGroups',
+      'link' => '/usersGroups',
+      'permanent' => false,
+      'isActive' => true
+    ],
+  ];
 
-    /**
-     * Инициализация подразделов
-     * 
-     * @return void
-     */
-    public function init_subnavigation() : void {
-      $template_source =& $this->system_core->template->core->source;
-      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
-    }
-
-    public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page/usersGroups.css', 'rel' => 'stylesheet']);
-
-      $locale_data = $this->system_core->locale->get_data();
-
-      $pagination_item_current = (!is_null($this->system_core->urlp->get_param('pageNumber'))) ? (int)$this->system_core->urlp->get_param('pageNumber') : 0;
-      $pagination_items_on_page = 12;
-
-      $users_groups_table_items_assembled_array = [];
-      $users_groups = new UsersGroups($this->system_core);
-      $users_groups_locale_default = $this->system_core->get_cms_locale('admin');
-      $users_groups_array_objects = $users_groups->get_all([
-        'limit' => [$pagination_items_on_page, $pagination_item_current * $pagination_items_on_page]
-      ]);
-
-      $pagination = new Pagination($this->system_core, $users_groups->get_count_total(), $pagination_items_on_page, $pagination_item_current);
-      $pagination->assembly();
-
-      unset($users_groups);
-
-      $user_group_number = 1;
-      foreach ($users_groups_array_objects as $user_group_object) {
-        $user_group_object->init_data(['id', 'texts', 'name', 'metadata', 'created_unix_timestamp', 'updated_unix_timestamp']);
-
-        /** @var string Заголовок группы пользователей */
-        $users_group_title = $user_group_object->get_title($users_groups_locale_default->get_name());
-        $users_group_title = strip_tags($users_group_title);
-        
-        $user_group_created_date_timestamp = date('d.m.Y H:i:s', $user_group_object->get_created_unix_timestamp());
-        $user_group_updated_date_timestamp = date('d.m.Y H:i:s', $user_group_object->get_updated_unix_timestamp());
-
-        array_push($users_groups_table_items_assembled_array, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/usersGroups/tableItem.tpl', [
-          'USER_GROUP_ID' => $user_group_object->get_id(),
-          'USER_GROUP_INDEX' => $user_group_number,
-          'USER_GROUP_NAME' => $user_group_object->get_name(),
-          'USER_GROUP_TITLE' => $users_group_title,
-          'USER_GROUP_USERS_COUNT' => $user_group_object->get_users_count(),
-          'USER_GROUP_CREATED_DATE_TIMESTAMP' => $user_group_created_date_timestamp,
-          'USER_GROUP_UPDATED_DATE_TIMESTAMP' => $user_group_updated_date_timestamp
-        ]));
-
-        $user_group_number++;
-      }
-
-      /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/usersGroups.tpl', [
-        'PAGE_USERS_GROUPS_PAGINATION' => $pagination->assembled,
-        'ADMIN_PANEL_PAGE_NAME' => 'users-groups',
-        'ADMIN_PANEL_USERS_GROUPS_TABLE' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/usersGroups/table.tpl', [
-          'ADMIN_PANEL_USERS_GROUPS_TABLE_ITEMS' => implode($users_groups_table_items_assembled_array)
-        ])
-      ]);
-    }
-
+  public function __construct(SystemCore $CMSCore, Page $page)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->page = $page;
   }
 
-}
+  /**
+   * Инициализация подразделов
+   * 
+   * @return void
+   */
+  public function initSubnavigation() : void
+  {
+    $themeSource =& $this->CMSCore->theme->core->source;
+    $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
+  }
 
-?>
+  public function assembly() : void
+  {
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page/usersGroups.css', 'rel' => 'stylesheet']);
+
+    $localeData = $this->CMSCore->locale->getData();
+    $localeName = $this->CMSCore->locale->getName();
+
+    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
+    $paginationItemsOnPage = 12;
+
+    $usersGroupsTableItemsAssembled = [];
+    $usersGroups = new UsersGroups($this->CMSCore);
+
+    $usersGroupsLocale = $this->CMSCore->getCMSLocale('admin');
+    $usersGroupsLocaleName = $usersGroupsLocale->getName();
+
+    $usersGroupsObjects = $usersGroups->getAll([
+      'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
+    ]);
+
+    $pagination = new Pagination($this->CMSCore, $usersGroups->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
+    $pagination->assembly();
+
+    unset($usersGroups);
+
+    $userGroupNumber = 1;
+    foreach ($usersGroupsObjects as $object) {
+      $object->initData(['id', 'texts', 'name', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+
+      /** @var string Заголовок группы пользователей */
+      $usersGroupTitle = $object->getTitle($usersGroupsLocaleName);
+      $usersGroupTitle = strip_tags($usersGroupTitle);
+      
+      $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
+      $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
+
+      array_push($usersGroupsTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/usersGroups/tableItem.tpl', [
+        'USER_GROUP_ID' => $object->getID(),
+        'USER_GROUP_INDEX' => $userGroupNumber,
+        'USER_GROUP_NAME' => $object->getName(),
+        'USER_GROUP_TITLE' => $usersGroupTitle,
+        'USER_GROUP_USERS_COUNT' => $object->getUsersCount(),
+        'USER_GROUP_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
+        'USER_GROUP_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
+      ]));
+
+      $userGroupNumber++;
+    }
+
+    /** @var string $site_page Содержимое шаблона страницы */
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/usersGroups.tpl', [
+      'PAGE_USERS_GROUPS_PAGINATION' => $pagination->assembled,
+      'ADMIN_PANEL_PAGE_NAME' => 'users-groups',
+      'ADMIN_PANEL_USERS_GROUPS_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/usersGroups/table.tpl', [
+        'ADMIN_PANEL_USERS_GROUPS_TABLE_ITEMS' => implode($usersGroupsTableItemsAssembled)
+      ])
+    ]);
+  }
+}

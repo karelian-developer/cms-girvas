@@ -9,76 +9,74 @@
  */
 
 
-namespace core\PHPLibrary\Page\Admin {
-  use \core\PHPLibrary\InterfacePage as InterfacePage;
-  use \core\PHPLibrary\SystemCore as SystemCore;
-  use \core\PHPLibrary\EntriesSample as EntriesSample;
-  use \core\PHPLibrary\Template\Collector as TemplateCollector;
-  use \core\PHPLibrary\Page as Page;
-  use \core\PHPLibrary\TraitPage as TraitPage;
+namespace core\PHPLibrary\Page\Admin;
 
-  class PageEntriesSample implements InterfacePage {
-    use TraitPage;
+use \core\PHPLibrary\InterfacePage as InterfacePage;
+use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\EntriesSample as EntriesSample;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\TraitPage as TraitPage;
 
-    const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_SAMPLE_NAVIGATION_%s_LABEL';
+class PageEntriesSample implements InterfacePage
+{
+  use TraitPage;
 
-    public SystemCore $system_core;
-    public Page $page;
-    public string $assembled = '';
-    public array $navigation_subsections_array = [
-      'back' => [
-        'name' => 'back',
-        'iconName' => 'back',
-        'link' => '/entriesSamples',
-        'permanent' => true,
-        'isActive' => false
-      ],
-    ];
+  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_SAMPLE_NAVIGATION_%s_LABEL';
 
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
-      $this->page = $page;
-    }
+  public SystemCore $CMSCore;
+  public Page $page;
+  public string $assembled = '';
+  public array $navigationSubsections = [
+    'back' => [
+      'name' => 'back',
+      'iconName' => 'back',
+      'link' => '/entriesSamples',
+      'permanent' => true,
+      'isActive' => false
+    ],
+  ];
 
-    /**
-     * Инициализация подразделов
-     * 
-     * @return void
-     */
-    public function init_subnavigation() : void {
-      $template_source =& $this->system_core->template->core->source;
-      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
-    }
-
-    public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page/entriesSample.css', 'rel' => 'stylesheet']);
-      
-      $locale_data = $this->system_core->locale->get_data();
-
-      $entries_sample = null;
-      if (!is_null($this->system_core->urlp->get_path(2))) {
-        $entries_sample_id = (is_numeric($this->system_core->urlp->get_path(2))) ? (int)$this->system_core->urlp->get_path(2) : 0;
-        $entries_sample = (EntriesSample::exists_by_id($this->system_core, $entries_sample_id)) ? new EntriesSample($this->system_core, $entries_sample_id) : null;
-        
-        if (!is_null($entries_sample)) {
-          $entries_sample->init_data(['id', 'texts', 'name', 'metadata']);
-        }
-      }
-      
-      /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/entriesSample.tpl', [
-        'ADMIN_PANEL_PAGE_NAME' => 'entries-category',
-        'ENTRIES_SAMPLE_ID' => (!is_null($entries_sample)) ? $entries_sample->get_id() : 0,
-        'ENTRIES_SAMPLE_TITLE' => (!is_null($entries_sample)) ? $entries_sample->get_title() : '',
-        'ENTRIES_SAMPLE_DESCRIPTION' => (!is_null($entries_sample)) ? $entries_sample->get_description() : '',
-        'ENTRIES_SAMPLE_NAME' => (!is_null($entries_sample)) ? $entries_sample->get_name() : '',
-        'ENTRIES_SAMPLE_LIMIT_COUNT' => (!is_null($entries_sample)) ? $entries_sample->get_limit_count() : '',
-        'ENTRIES_SAMPLE_FORM_METHOD' => (!is_null($entries_sample)) ? 'PATCH' : 'PUT'
-      ]);
-    }
-
+  public function __construct(SystemCore $CMSCore, Page $page) {
+    $this->CMSCore = $CMSCore;
+    $this->page = $page;
   }
 
-}
+  /**
+   * Инициализация подразделов
+   * 
+   * @return void
+   */
+  public function initSubnavigation() : void {
+    $themeSource =& $this->CMSCore->theme->core->source;
+    $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
+  }
 
-?>
+  public function assembly() : void {
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page/entriesSample.css', 'rel' => 'stylesheet']);
+    
+    $localeData = $this->CMSCore->locale->getData();
+    $localeName = $this->CMSCore->locale->getName();
+
+    $entriesSample = null;
+    if ($this->CMSCore->urlp->getPath(2) !== null) {
+      $entriesSampleID = is_numeric($this->CMSCore->urlp->getPath(2)) ? (int) $this->CMSCore->urlp->getPath(2) : 0;
+      $entriesSample = EntriesSample::existsByID($this->CMSCore, $entriesSampleID) ? new EntriesSample($this->CMSCore, $entriesSampleID) : null;
+      
+      if ($entriesSample !== null) {
+        $entriesSample->initData(['id', 'texts', 'name', 'metadata']);
+      }
+    }
+    
+    /** @var string $site_page Содержимое шаблона страницы */
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesSample.tpl', [
+      'ADMIN_PANEL_PAGE_NAME' => 'entries-category',
+      'ENTRIES_SAMPLE_ID' => $entriesSample !== null ? $entriesSample->getID() : 0,
+      'ENTRIES_SAMPLE_TITLE' => $entriesSample !== null ? $entriesSample->getTitle($localeName) : '',
+      'ENTRIES_SAMPLE_DESCRIPTION' => $entriesSample !== null ? $entriesSample->getDescription($localeName) : '',
+      'ENTRIES_SAMPLE_NAME' => $entriesSample !== null ? $entriesSample->getName() : '',
+      'ENTRIES_SAMPLE_LIMIT_COUNT' => $entriesSample !== null ? $entriesSample->getLimitCount() : '',
+      'ENTRIES_SAMPLE_FORM_METHOD' => $entriesSample !== null ? 'PATCH' : 'PUT'
+    ]);
+  }
+}

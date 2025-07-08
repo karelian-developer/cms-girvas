@@ -8,46 +8,51 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Entries {
+namespace core\PHPLibrary\Entries;
 
-  final class Database {
-    private \core\PHPLibrary\Database $database;
-    private \core\PHPLibrary\Entries $entries;
-    private mixed $data;
-    private array $conditions = [];
-    private int $limit = 100;
-    private array $select_columns = [];
-    
-    /**
-     * __construct
-     *
-     * @param  mixed $database
-     * @param  mixed $entries
-     * @return void
-     */
-    public function __construct(\core\PHPLibrary\Database $database) {
-      $this->database = $database;
-    }
+use \core\PHPLibrary\Database as CMSDatabase;
+use \core\PHPLibrary\Entries as Entries;
 
-    public function get() : array {
-      /** @var string $database_query SQL-запрос */
-      $database_query = '';
-      /** @var EnumDatabaseManagementSystem $database_management_system */
-      $database_management_system = $this->database->get_database_management_system();
-      switch ($database_management_system->value) {
-        case 'mysql': $database_query = $this->database->get_file_sql('Entries/get.mysql.sql'); break;
-        case 'pgsql': $database_query = $this->database->get_file_sql('Entries/get.pgsql.sql'); break;
-      }
+final class Database
+{
+  private CMSDatabase $database;
+  private Entries $entries;
+  private mixed $data;
+  private array $conditions = [];
+  private int $limit = 100;
+  private array $selectColumns = [];
+  
+  /**
+   * __construct
+   *
+   * @param  CMSDatabase $database
+   * 
+   * @return void
+   */
+  public function __construct(CMSDatabase $database)
+  {
+    $this->database = $database;
+  }
 
-      /** @var string $database_query SQL-запрос (переопределение) */
-      $database_query = sprintf($database_query, implode(', ', $this->select_columns), implode(' AND ', $this->conditions), $this->limit);
+  public function get() : array
+  {
+    /** @var string $databaseQuery SQL-запрос */
+    $databaseQuery = '';
+    /** @var EnumDatabaseManagementSystem $databaseManagementSystem */
+    $databaseManagementSystem = $this->database->getDatabaseNanagementSystem();
+    $databaseQuery = match ($databaseManagementSystem->value) {
+      'mysql' => $this->database->getFileSQL('Entry/get.mysql.sql'),
+      'pgsql' => $this->database->getFileSQL('Entry/get.pgsql.sql')
+    };
 
-      $this->database->prepare($database_query);
-      $this->database->bindParam(':category_id', $category_id, \PDO::PARAM_INT);
-			$this->database->execute();
+    /** @var string $databaseQuery SQL-запрос (переопределение) */
+    $databaseQuery = sprintf($databaseQuery, implode(', ', $this->selectColumns), implode(' AND ', $this->conditions), $this->limit);
 
-      $result = $database_query->fetchAll(\PDO::FETCH_ASSOC);
-			return (count($result) > 0) ? $result : [];
-    }
+    $this->database->prepare($databaseQuery);
+    $this->database->bindParam(':categoryID', $categoryID, \PDO::PARAM_INT);
+    $this->database->execute();
+
+    $result = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    return count($result) > 0 ? $result : [];
   }
 }

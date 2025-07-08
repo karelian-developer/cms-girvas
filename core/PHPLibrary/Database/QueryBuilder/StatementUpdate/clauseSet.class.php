@@ -8,63 +8,87 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Database\QueryBuilder\StatementUpdate {
-  use \core\PHPLibrary\Database\QueryBuilder\StatementUpdate\InterfaceClause as InterfaceClause;
-  use \core\PHPLibrary\Database\QueryBuilder\StatementUpdate as StatementUpdate;
+namespace core\PHPLibrary\Database\QueryBuilder\StatementUpdate;
 
-  final class ClauseSet implements InterfaceClause {
-    private StatementUpdate $statement;
-    private array $columns = [];
-    private array $values = [];
-    public array $tables;
-    public string $assembled = '';
+use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;
+use \core\PHPLibrary\Database\QueryBuilder\StatementUpdate\InterfaceClause as InterfaceClause;
+use \core\PHPLibrary\Database\QueryBuilder\StatementUpdate as StatementUpdate;
+
+final class ClauseSet implements InterfaceClause
+{
+  private StatementUpdate $statement;
+  private array $columns = [];
+  private array $values = [];
+  public array $tables;
+  public string $assembled = '';
+  
+  /**
+   * __construct
+   *
+   * @param  mixed $statement
+   * @return void
+   */
+  public function __construct(StatementUpdate $statement)
+  {
+    $this->statement = $statement;
+  }
+
+  /**
+   * Добавить значение столбца
+   *
+   * @param string $name
+   * @param mixed $value
+   * 
+   * @return void
+   */
+  public function addColumn(string $name, mixed $value = null) : void
+  {
+    array_push($this->columns, $name);
+
+    if ($value !== null) {
+      $this->values[$name] = $value;
+    }
+  }
+
+  /**
+   * Добавить адаптивное значение столбца
+   *
+   * @param string $name
+   * @param array $values
+   * 
+   * @return void
+   */
+  public function addColumnAdaptive(string $name, array $values = []) : void
+  {
+    $queryBuilder = $this->statement->queryBuilder;
     
-    /**
-     * __construct
-     *
-     * @param  mixed $statement
-     * @return void
-     */
-    public function __construct(StatementUpdate $statement) {
-      $this->statement = $statement;
-    }
+    if (isset($values[strtolower($queryBuilder->DMS->name)])) {
+      $this->columns[] = $name;
 
-    /**
-     * Добавить значение столбца
-     *
-     * @param  mixed $column_name
-     * @param  mixed $value
-     * @return void
-     */
-    public function add_column(string $column_name, mixed $column_value = null) : void {
-      array_push($this->columns, $column_name);
-
-      if (!is_null($column_value)) {
-        $this->values[$column_name] = $column_value;
+      if (!empty($values[strtolower($queryBuilder->DMS->name)])) {
+        $this->values[$name] = $values[strtolower($queryBuilder->DMS->name)];
       }
     }
-    
-    /**
-     * assembly
-     *
-     * @return void
-     */
-    public function assembly() {
-      $query_array = [];
+  }
+  
+  /**
+   * assembly
+   *
+   * @return void
+   */
+  public function assembly() : void
+  {
+    $queryArray = [];
 
-      foreach ($this->columns as $column_name) {
-        $column_value = (isset($this->values[$column_name])) ? $this->values[$column_name] : ':' . $column_name;
-        array_push($query_array, sprintf('%s = %s', $column_name, $column_value));
-      }
+    foreach ($this->columns as $name) {
+      $value = $this->values[$name] ?? ':' . $name;
 
-      if (count($query_array) > 0) {
-        $this->assembled = sprintf('SET %s', implode(', ', $query_array));
-      } else {
-        $this->assembled =  '';
-      }
+      $queryArray[] = match ($this->statement->queryBuilder->DMS) {
+        DMS::MySQL => sprintf('`%s` = %s', $name, $value),
+        DMS::PostgreSQL => sprintf('"%s" = %s', $name, $value),
+      };
     }
 
+    $this->assembled = count($queryArray) > 0 ? 'SET ' . implode(', ', $queryArray) : '';
   }
 }
-
-?>

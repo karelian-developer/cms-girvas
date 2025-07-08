@@ -8,86 +8,83 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary {
-  use \core\PHPLibrary\Template\Collector as TemplateCollector;
+namespace core\PHPLibrary;
 
-  final class PageBreadcrumbs {
-    private SystemCore $system_core;
-    private array $array = [];
-    public string $assembled = '';
+use \core\PHPLibrary\Template\Collector as TemplateCollector;
 
-    /**
-     * __construct
-     * 
-     * @param SystemCore $system_core
-     */
-    public function __construct(SystemCore $system_core) {
-      $this->system_core = $system_core;
-    }
+final class PageBreadcrumbs
+{
+  private SystemCore $CMSCore;
+  private array $array = [];
+  public string $assembled = '';
 
-    /**
-     * Добавить элемент
-     * 
-     * @param string $title
-     * @param string $url
-     * 
-     * @return bool
-     */
-    public function add(string $title, string $url) : bool {
-      $array_items_count_start = count($this->array);
-      $array_items_count = array_push($this->array, [
-        'title' => $title,
-        'url' => $url
-      ]);
-
-      if ($array_items_count > $array_items_count_start) {
-        return true;
-      }
-
-      return false;
-    }
-
-    /**
-     * Получить массив элементов
-     * 
-     * @return array
-     */
-    public function get_array() : array {
-      return $this->array;
-    }
-
-    /**
-     * Сборка шаблона "хлебных крошек"
-     * 
-     * @return void
-     */
-    public function assembly() : void {
-      /** @var array Массив преобразованных элементов */
-      $breadcrumbs_items_transformed = [];
-      /** @var string Преобразованный массив элементов в TPL-шаблон */
-      $breadcrumbs_list_transformed = '';
-
-      if (count($this->get_array()) > 0) {
-        foreach ($this->get_array() as $breadcrumb_index => $breadcrumb_data) {
-          array_push($breadcrumbs_items_transformed, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/breadcrumps/listItem.tpl', [
-            'BREADCRUMP_URL' => $breadcrumb_data['url'],
-            'BREADCRUMP_TITLE' => $breadcrumb_data['title'],
-            'BREADCRUMP_META_POSITION' => $breadcrumb_index + 1
-          ]));
-        }
-      }
-
-      if (count($breadcrumbs_items_transformed) > 0) {
-        $breadcrumbs_list_transformed = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/breadcrumps/list.tpl', [
-          'BREADCRUMPS_ITEMS' => implode($breadcrumbs_items_transformed)
-        ]);
-      }
-
-      $this->assembled = $breadcrumbs_list_transformed;
-    }
-
+  /**
+   * __construct
+   * 
+   * @param SystemCore $CMSCore
+   */
+  public function __construct(SystemCore $CMSCore)
+  {
+    $this->CMSCore = $CMSCore;
   }
 
-}
+  /**
+   * Добавить элемент
+   * 
+   * @param string $title
+   * @param string $url
+   * 
+   * @return bool
+   */
+  public function add(string $title, string $url) : bool
+  {
+    $arrayItemsCountStart = count($this->array);
+    $arrayItemsCount = array_push($this->array, [
+      'title' => $title,
+      'url' => $url
+    ]);
 
-?>
+    return $arrayItemsCount > $arrayItemsCountStart;
+  }
+
+  /**
+   * Получить массив элементов
+   * 
+   * @return array
+   */
+  public function getArray() : array
+  {
+    return $this->array;
+  }
+
+  /**
+   * Сборка шаблона "хлебных крошек"
+   * 
+   * @return void
+   */
+  public function assembly() : void
+  {
+    /** @var array Массив преобразованных элементов */
+    $breadcrumbsItemsTransformed = [];
+    /** @var string Преобразованный массив элементов в TPL-шаблон */
+    $breadcrumbsListTransformed = '';
+
+    if (count($this->getArray()) > 0) {
+      foreach ($this->getArray() as $index => $data) {
+        array_push($breadcrumbsItemsTransformed, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/breadcrumps/listItem.tpl', [
+          'BREADCRUMP_URL' => $data['url'],
+          'BREADCRUMP_TITLE' => $data['title'],
+          'BREADCRUMP_META_POSITION' => $index + 1
+        ]));
+      }
+    }
+
+    if (count($breadcrumbsItemsTransformed) > 0) {
+      $breadcrumbsListTransformed = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/breadcrumps/list.tpl', [
+        'BREADCRUMPS_ITEMS' => implode($breadcrumbsItemsTransformed)
+      ]);
+    }
+
+    $this->assembled = $breadcrumbsListTransformed;
+  }
+}

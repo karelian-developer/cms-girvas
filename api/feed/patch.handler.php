@@ -14,64 +14,66 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 use \core\PHPLibrary\Feed as Feed;
-use \core\PHPLibrary\SystemCore\Locale as Locale;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
-if ($system_core->client->is_logged(2)) {
-  $client_user = $system_core->client->get_user(2);
-  $client_user->init_data(['metadata']);
-  $client_user_group = $client_user->get_group();
-  $client_user_group->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($client_user_group->permission_check($client_user_group::PERMISSION_ADMIN_FEEDS_MANAGEMENT)) {
-    $web_channel_id = (isset($_PATCH['web_channel_id'])) ? $_PATCH['web_channel_id'] : 0;
-    $web_channel_id = (is_numeric($web_channel_id)) ? (int)$web_channel_id : 0;
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_FEEDS_MANAGEMENT)) {
+    $feedID = (isset($_PATCH['web_channel_id'])) ? $_PATCH['web_channel_id'] : 0;
+    $feedID = (is_numeric($feedID)) ? (int)$feedID : 0;
 
-    if (Feed::exists_by_id($system_core, $web_channel_id)) {
-      $web_channel = new Feed($system_core, $web_channel_id);
-      $web_channel_data = [];
+    if (Feed::existsByID($CMSCore, $feedID)) {
+      $feed = new Feed($CMSCore, $feedID);
+      $feedData = [];
 
-      $cms_locales_names = $system_core->get_array_locales_names();
-      if (count($cms_locales_names) > 0) {
-        foreach ($cms_locales_names as $index => $cms_locale_name) {
-          $cms_locale = new Locale($system_core, $cms_locale_name);
+      $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+      if (count($CMSLocalesNames) > 0) {
+        foreach ($CMSLocalesNames as $index => $name) {
+          $CMSLocale = new CMSLocale($CMSCore, $name);
+          $CMSLocale->setTypeName('handler');
+          $CMSLocale->initPathes();
 
-          $feed_title_input_name = sprintf('web_channel_title_%s', $cms_locale->get_iso_639_2());
-          $feed_description_textarea_name = sprintf('web_channel_description_%s', $cms_locale->get_iso_639_2());
+          $CMSLocaleName = $CMSLocale->getName();
 
-          if (array_key_exists($feed_title_input_name, $_PATCH) || array_key_exists($feed_description_textarea_name, $_PATCH)) {
-            if (!array_key_exists('texts', $web_channel_data)) $web_channel_data['texts'] = [];
-            if (!array_key_exists($cms_locale->get_name(), $web_channel_data['texts'])) $web_channel_data['texts'][$cms_locale->get_name()] = [];
+          $inputTitleName = 'web_channel_title_' . $CMSLocale->getISO639(2);
+          $textareaDescriptionName = 'web_channel_description_' . $CMSLocale->getISO639(2);
 
-            if (array_key_exists($feed_title_input_name, $_PATCH)) $web_channel_data['texts'][$cms_locale->get_name()]['title'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$feed_title_input_name]));
-            if (array_key_exists($feed_description_textarea_name, $_PATCH)) $web_channel_data['texts'][$cms_locale->get_name()]['description'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$feed_description_textarea_name]));
+          if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH)) {
+            if (!array_key_exists('texts', $feedData)) $feedData['texts'] = [];
+            if (!array_key_exists($CMSLocaleName, $feedData['texts'])) $feedData['texts'][$CMSLocaleName] = [];
+
+            if (array_key_exists($inputTitleName, $_PATCH)) $feedData['texts'][$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$inputTitleName]));
+            if (array_key_exists($textareaDescriptionName, $_PATCH)) $feedData['texts'][$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$textareaDescriptionName]));
           }
         }
       }
 
-      if (isset($_PATCH['web_channel_name'])) $web_channel_data['name'] = urlencode(htmlentities($_PATCH['web_channel_name']));
-      if (isset($_PATCH['web_channel_type_id'])) $web_channel_data['type_id'] = $_PATCH['web_channel_type_id'];
-      if (isset($_PATCH['web_channel_entries_category_id'])) $web_channel_data['entries_category_id'] = $_PATCH['web_channel_entries_category_id'];
+      if (isset($_PATCH['web_channel_name'])) $feedData['name'] = urlencode(htmlentities($_PATCH['web_channel_name']));
+      if (isset($_PATCH['web_channel_type_id'])) $feedData['typeID'] = $_PATCH['web_channel_type_id'];
+      if (isset($_PATCH['web_channel_entries_category_id'])) $feedData['entriesCategoryID'] = $_PATCH['web_channel_entries_category_id'];
 
-      $web_channel_is_updated = $web_channel->update($web_channel_data);
+      $feedIsUpdated = $feed->update($feedData);
 
-      if ($web_channel_is_updated) {
-        $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS') : $handler_message;
-        $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+      if ($feedIsUpdated) {
+        $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
+        $handlerStatusCode = $handlerStatusCode ?? 1;
       } else {
-        $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN')) : $handler_message;
-        $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+        $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
-      $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_FEED_ERROR_NOT_FOUND')) : $handler_message;
-      $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_FEED_ERROR_NOT_FOUND');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS'));
-    $handler_status_code = 0;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

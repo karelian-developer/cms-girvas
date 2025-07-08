@@ -8,6 +8,7 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
+<<<<<<< HEAD
 namespace core\PHPLibrary {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
   use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
@@ -706,8 +707,815 @@ namespace core\PHPLibrary {
       return ($execute) ? true : false;
     }
 
+=======
+namespace core\PHPLibrary;
+
+use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
+use \core\PHPLibrary\Factories\Content as FactoryContent;
+use \PDOException as PDOException;
+
+#[\AllowDynamicProperties]
+class Entry implements EntityTypeContent
+{
+  private readonly SystemCore $CMSCore;
+  private int $id;
+  private int $categoryID;
+  private int $viewsCount = 0;
+  private string $name;
+  
+  /**
+   * __construct
+   *
+   * @param  SystemCore $CMSCore
+   * @return void
+   */
+  public function __construct(SystemCore $CMSCore, int $id)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->setID($id);
+  }
+  
+  /**
+   * Инициализация данных из БД
+   *
+   * @param  mixed $columns
+   * @return void
+   */
+  public function initData(array $columns = ['*']) : void
+  {
+    $columnsData = $this->getDatabaseColumnsData($columns);
+    foreach ($columnsData as $name => $data) {
+      $this->{$name} = $data;
+    }
+  }
+  
+  /**
+   * Назначить идентификатор записи
+   *
+   * @param  mixed $value
+   * @return void
+   */
+  private function setID(int $value) : void
+  {
+    $this->id = $value;
+>>>>>>> develop
   }
 
-}
+  /**
+   * Установить количество просмотров
+   * 
+   * @param int $views
+   * 
+   * @return void
+   */
+  public function setViewsCount(int $value) : void
+  {
+    $this->viewsCount = $value;
+  }
 
-?>
+  /**
+   * Получить количество просмотров
+   * 
+   * @param int $value
+   * 
+   * @return int
+   */
+  public function getViewsCount() : int
+  {
+    return $this->viewsCount;
+  }
+  
+  /**
+   * Получить идентификатор записи
+   *
+   * @param  mixed $value
+   * @return int
+   */
+  public function getID() : int
+  {
+    return $this->id;
+  }
+
+  /**
+   * Получить ID категории записи
+   * 
+   * @return int
+   */
+  public function getCategoryID() : int
+  {
+    return $this->categoryID;
+  }
+
+  /**
+   * Получить временную отметку создания записи в UNIX-формате
+   * 
+   * @return int
+   */
+  public function getCreatedUnixTimestamp() : int
+  {
+    return  $this->createdUnixTimestamp ?? 0;
+  }
+
+  /**
+   * Получить временную отметку обновления записи в UNIX-формате
+   * 
+   * @return int
+   */
+  public function getUpdatedUnixTimestamp() : int
+  {
+    return $this->updatedUnixTimestamp ?? 0;
+  }
+
+  /**
+   * Получить ID автора записи
+   * 
+   * @return int
+   */
+  public function getAuthorID() : int
+  {
+    return $this->authorID ?? 0;
+  }
+
+  /**
+   * Получить объект категории записи
+   * 
+   * @param array $data
+   * 
+   * @return EntryCategory
+   */
+  public function getCategory(array $data = ['*']) : EntryCategory|null
+  {
+    $categoryID = $this->getCategoryID();
+
+    if (EntryCategory::existsByID($this->CMSCore, $categoryID)) {
+      $category = new EntryCategory($this->CMSCore, $categoryID);
+      $category->initData($data);
+
+      return $category;
+    }
+
+    return null;
+  }
+
+  /**
+   * Получить объект автора записи
+   * 
+   * @param array $data
+   * 
+   * @return User
+   */
+  public function getAuthor(array $data = ['*']) : User|null
+  {
+    $authorID = $this->getAuthorID();
+
+    if (User::existsByID($this->CMSCore, $authorID)) {
+      $user = new User($this->CMSCore, $authorID);
+      $user->initData($data);
+
+      return $user;
+    }
+
+    return null;
+  }
+  
+  /**
+   * Получить заголовок записи
+   *
+   * @param  mixed $localeName Наименование локализации
+   * @return string
+   */
+  public function getTitle(string $localeName = 'en_US') : string
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      if (isset($texts[$localeName]['title'])) {
+        return $texts[$localeName]['title'];
+      }
+    }
+
+    return '';
+  }
+
+  /**
+   * Получить описание записи
+   *
+   * @param  mixed $localeName Наименование локализации
+   * @return string
+   */
+  public function getDescription(string $localeName = 'en_US') : string
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      if (isset($texts[$localeName]['description'])) {
+        return $texts[$localeName]['description'];
+      }
+    }
+
+    return '';
+  }
+
+  /**
+   * Получить содержимое записи
+   *
+   * @param  mixed $localeName Наименование локализации
+   * @return string
+   */
+  public function getContent(string $localeName = 'en_US') : string
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      if (isset($texts[$localeName]['content'])) {
+        return $texts[$localeName]['content'];
+      }
+    }
+
+    return '';
+  }
+  
+  /**
+   * Получить ключевые слова
+   *
+   * @param  mixed $localeName Наименование локализации
+   * @return array
+   */
+  public function getKeywords($localeName = 'en_US') : array
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      if (isset($texts[$localeName]['keywords'])) {
+        return $texts[$localeName]['keywords'];
+      }
+    }
+
+    return [];
+  }
+
+  /**
+   * Получить URL изображения предпросмотра
+   *
+   * @return string
+   */
+  public function getPreviewURL() : string
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+
+      if (isset($metadata['previewURL'])) {
+        return $metadata['previewURL'];
+      }
+    }
+
+    return '';
+  }
+
+  /**
+   * Получить статус публикации записи
+   *
+   * @return bool
+   */
+  public function isPublished() : bool
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+
+      if (isset($metadata['isPublished'])) {
+        return (bool) $metadata['isPublished'];
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Получить временную отметку публикации записи в UNIX-формате
+   * 
+   * @return int
+   */
+  public function getPublishedUnixTimestamp() : int
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+
+      if (isset($metadata['publishedUnixTimestamp'])) {
+        return $metadata['publishedUnixTimestamp'];
+      }
+    }
+
+    return 0;
+  }
+
+  /**
+   * Получить данные по дополнительному полю
+   * 
+   * @param string $fieldName
+   * 
+   * @return mixed
+   */
+  public function getAdditionalFieldData(string $fieldName) : mixed
+  {
+    if (property_exists($this, 'metadata')) {
+      /** @var array Массив метаданных */
+      $metadata = json_decode($this->metadata, true);
+      
+      if (isset($metadata['additionalFields'])) {
+        return $metadata['additionalFields'][$fieldName] ?? null;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Получить данные по дополнительным полям
+   * 
+   * @return array
+   */
+  public function getAdditionalFieldsData() : array
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+      return $metadata['additionalFields'] ?? [];
+    }
+
+    return [];
+  }
+
+  /**
+   * Получить URL дефолтной заставки
+   * 
+   * @param SystemCore $CMSCore
+   * @param int $size
+   * 
+   * @return string
+   */
+  public static function getPreviewDefaultURL(SystemCore $CMSCore, int $size) : string
+  {
+    return '/' . $CMSCore->theme->getURL() . '/images/entry/default_' . (string) $size . '.png';
+  }
+  
+  /**
+   * Получить имя записи
+   *
+   * @return void
+   */
+  public function getName() : string
+  {
+    return $this->name ?? '';
+  }
+  
+  /**
+   * Получить URL до записи
+   *
+   * @return void
+   */
+  public function getURL() : string
+  {
+    return '/entry/' . $this->getName();
+  }
+  
+  /**
+   * Получить данные колонок записи в базе данных
+   *
+   * @param  array $columns
+   * 
+   * @return array|null
+   */
+  private function getDatabaseColumnsData(array $columns = ['*']) : array|null
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections($columns);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+    
+    /** @var int $entryID Идентификационный номер записи */
+    $entryID = $this->getID();
+
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':id', $entryID, \PDO::PARAM_INT);
+    $databaseQuery->execute();
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? $result : null;
+  }
+  
+  /**
+   * Получить массив объектов комментариев
+   *
+   * @param array $params
+   * 
+   * @return array
+   */
+  public function getComments(array $params = []) : array
+  {
+    if ($this->getCommentsCount() > 0) {
+      $comments = new EntryComments($this->CMSCore);
+      return $comments->getByEntryID($this->id, $params);
+    }
+
+    return [];
+  }
+  
+  /**
+   * Получить количество комментариев
+   *
+   * @return int
+   */
+  public function getCommentsCount() : int
+  {
+    $comments = new EntryComments($this->CMSCore);
+    return $comments->getCountByEntryID($this->id);
+  }
+
+  /**
+   * Получить очки релевантности
+   * 
+   * @return float
+   */
+  public function getRelevancePoints() : float
+  {
+    $viewsCount = $this->getViewsCount();
+    $commentsCount = $this->getCommentsCount();
+
+    return ($viewsCount * 0.5) + ($commentsCount * 2);
+  }
+  
+  /**
+   * Получить объект записи по его наименованию
+   *
+   * @param  mixed $CMSCore
+   * @param  mixed $name
+   * 
+   * @return Entry
+   */
+  public static function getByName(SystemCore $CMSCore, string $name) : Entry|null
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`name` = :name',
+      'postgresql' => '"name" = :name'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? new Entry($CMSCore, (int) $result['id']) : null;
+  }
+
+  /**
+   * Проверка наличия записи
+   *
+   * @param  mixed $CMSCore
+   * @param  mixed $name
+   * @return Entry
+   */
+  public static function existsByName(SystemCore $CMSCore, string $name) : bool
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['1']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`name` = :name',
+      'postgresql' => '"name" = :name'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    return $databaseQuery->fetchColumn() ? true : false;
+  }
+
+  /**
+   * Проверка наличия записи по идентификационному номеру
+   *
+   * @param  SystemCore $CMSCore
+   * @param  int $id
+   * @return bool
+   */
+  public static function existsByID(SystemCore $CMSCore, int $id) : bool
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['1']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $id, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    return $databaseQuery->fetchColumn() ? true : false;
+  }
+  
+  /**
+   * Удаление существующей записи
+   *
+   * @return bool
+   */
+  public function delete() : bool
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementDelete();
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+      $execute = $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    return $execute ? true : false;
+  }
+      
+  /**
+   * Создание новой записи
+   *
+   * @param  mixed $CMSCore
+   * @param  mixed $name
+   * @param  mixed $authorID
+   * @param  mixed $categoryID
+   * @param  mixed $texts
+   * @return Entry
+   */
+  public static function create(SystemCore $CMSCore, string $name, int $authorID, int $categoryID, array $texts, array $metadata = []) : Entry|null
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementInsert();
+    $queryBuilder->statement->setTable('entries');
+    $queryBuilder->statement->addColumn('authorID');
+    $queryBuilder->statement->addColumn('categoryID');
+    $queryBuilder->statement->addColumn('name');
+    $queryBuilder->statement->addColumn('texts');
+    $queryBuilder->statement->addColumn('metadata');
+    $queryBuilder->statement->addColumn('createdUnixTimestamp');
+    $queryBuilder->statement->addColumn('updatedUnixTimestamp');
+    $queryBuilder->statement->setClauseReturning();
+    $queryBuilder->statement->clauseReturning->addColumn('id');
+    $queryBuilder->statement->assembly();
+
+    $createdUnixTimestamp = time();
+    $updatedUnixTimestamp = $createdUnixTimestamp;
+
+    $metadata['previewURL'] = '';
+    $metadata['isPublished'] = false;
+
+    $texts = !empty($texts) ? json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
+    $metadata = !empty($metadata) ? json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':authorID', $authorID, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':categoryID', $categoryID, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':texts', $texts, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':metadata', $metadata, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+      $execute = $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementSelect();
+      $queryBuilder->statement->addSelections(['id']);
+      $queryBuilder->statement->setClauseFrom();
+      $queryBuilder->statement->clauseFrom->addTable('entries');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
+
+      error_log('SQL: ' . $queryBuilder->statement->assembled);
+
+      try {
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
+    }
+
+    if ($execute) {
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+      return $result ? FactoryContent::create($CMSCore, 'entry', [
+        'id' => (int) $result['id']
+      ]) : null;
+    }
+
+    return null;
+  }
+
+  /**
+   * Обновление существующей записи
+   *
+   * @param  array $data Массив данных
+   * @return bool
+   */
+  public function update(array $data) : bool
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementUpdate();
+    $queryBuilder->statement->setTable('entries');
+    $queryBuilder->statement->setClauseSet();
+    
+    foreach ($data as $name => $value) {
+      if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata'])) {
+        $queryBuilder->statement->clauseSet->addColumn($name);
+      }
+    }
+
+    foreach (['texts', 'metadata'] as $columnName) {
+      $fieldsJSON = [];
+      
+      if (!isset($data[$columnName])) {
+        continue;
+      }
+
+      foreach ($data[$columnName] as $name => $value) {
+        $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $fieldsJSON[] = match ($queryBuilder->DMS) {
+          CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
+          CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
+        };
+      }
+
+      if (!empty($data[$columnName])) {
+        $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
+          'mysql' => 'JSON_MERGE_PATCH(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
+          'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
+        ]);
+      }
+    }
+
+    $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
+    $queryBuilder->statement->clauseSet->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    /** @var int $updatedUnixTimestamp Текущее время в UNIX-формате */
+    $updatedUnixTimestamp = time();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      
+      foreach ($data as $name => $value) {
+        if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata'])) {
+          $valueTypeName = gettype($value);
+          $valueType = match ($valueTypeName) {
+            'boolean' => \PDO::PARAM_BOOL,
+            'integer' => \PDO::PARAM_INT,
+            'string' => \PDO::PARAM_STR,
+            'null' => \PDO::PARAM_NULL,
+          };
+
+          $databaseQuery->bindParam(':' . $name, $data[$name], $valueType);
+        }
+      }
+
+      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+      $execute = $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    return $execute ? true : false;
+  }
+}

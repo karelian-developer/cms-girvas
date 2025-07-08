@@ -8,250 +8,261 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Template {
-  use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-  use \core\PHPLibrary\Parsedown as Parsedown;
-  use \core\PHPLibrary\Template as Template;
-  use \core\PHPLibrary\Template\Locale as TemplateLocale;
-  use \core\PHPLibrary\Module\Locale as ModuleLocale;
+namespace core\PHPLibrary\Template;
 
-  final class Collector {
-    private const TEMPLATE_TAG_PATTERN = '/\{([a-zA-Z0-9_]+)\}/';
-    private const TEMPLATE_TAG_LANG_PATTERN = '/\{LANG\:([a-zA-Z0-9_]+)\}/';
-    private const TEMPLATE_TAG_LANG_MARKDOWN_PATTERN = '/\{LANG\:MD\:([a-zA-Z0-9_]+)\}/';
-    private const TEMPLATE_LOGIC_IF_PATTERN = '/\{\?IF\:([a-zA-Z0-9_]+)([=<>!]+)([a-zA-Z0-9_]+)\?\}(.*)\{\?ENDIF\?\}/is';
-    private const TEMPLATE_LOGIC_IF_ELSE_PATTERN = '/\{\?IF\:([a-zA-Z0-9_]+)([=<>!]+)([a-zA-Z0-9_]+)\?\}(.*){\?ELSE\?\}(.*)\{\?ENDIF\?\}/is';
-    private Template $template;
-    
-    /**
-     * __construct
-     *
-     * @param  mixed $template
-     * @return void
-     */
-    public function __construct(Template $template) {
-      $this->template = $template;
-    }
+use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\LocaleInterface as LocaleInterface;
+use \core\PHPLibrary\Module\Locale as ModuleLocale;
+use \core\PHPLibrary\Template as Theme;
+use \DOMDocument as DOMDocument;
 
-    /**
-     * Сборка элементов link-стилей для последующего встраивания в секцию HEAD
-     * 
-     * @param Template $template
-     * @param array $styles_array
-     * 
-     * @return string
-     */
-    public static function assembly_styles(Template $template, array $styles_array) : string {
-      /** @var array $styles_assembled Массив стилей страницы, прошедших сборку */
-      $styles_assembled = [];
-
-      foreach ($styles_array as $style) {
-        if (array_key_exists('href', $style) && array_key_exists('rel', $style)) {
-          $style_is_core = false;
-          if (array_key_exists('is_core', $style)) {
-            if ($style['is_core'] == true) {
-              $style_is_core = true;
-              $style_href = sprintf('/core/CSSCore/%s', $style['href']);
-            }
-          }
-
-          if (!$style_is_core) {
-            $style_href = ($template->get_category() != 'default') ? sprintf('/templates/%s/%s/%s', $template->get_category(), $template->get_name(), $style['href']) : sprintf('/templates/%s/%s', $template->get_name(), $style['href']);
-          }
-
-          /** @var string $style_assembled Собранный DOM-элемент LINK для добавления стиля */
-          $style_assembled = self::assembly('<link href="{STYLE_HREF}" rel="{STYLE_RELATIONSHIP}">', [
-            'STYLE_HREF' => $style_href,
-            'STYLE_RELATIONSHIP' => $style['rel']
-          ]);
-
-          array_push($styles_assembled, $style_assembled);
-        }
-      }
-
-      return implode($styles_assembled);
-    }
-
-
-    /**
-     * Сборка элементов-скриптов для последующего встраивания в секцию HEAD
-     * 
-     * @param Template $template
-     * @param array $scripts_array
-     * 
-     * @return string
-     */
-    public static function assembly_scripts(Template $template, array $scripts_array) : string {
-      /** @var array $styles_assembled Массив стилей страницы, прошедших сборку */
-      $scripts_assembled = [];
-
-      foreach ($scripts_array as $script) {
-        if ($template->get_category() != 'default') {
-          $script_url = (!$script['is_cms_core']) ? sprintf('/templates/%s/%s/%s', $template->get_category(), $template->get_name(), $script['src']) : sprintf('/core/JSLibrary/%s', $script['src']);
-        } else {
-          $script_url = (!$script['is_cms_core']) ? sprintf('/templates/%s/%s', $template->get_name(), $script['src']) : sprintf('/core/JSLibrary/%s', $script['src']);
-        }
-
-        if (array_key_exists('src', $script)) {
-          $attributes = [];
-          foreach ($script as $script_attribute_name => $script_attribute_value) {
-            if ($script_attribute_name != 'is_cms_core' && $script_attribute_name != 'src') {
-              array_push($attributes, sprintf('%s="%s"', $script_attribute_name, $script_attribute_value));
-            }
-
-            if ($script_attribute_name == 'src') {
-              array_push($attributes, sprintf('%s="%s"', $script_attribute_name, $script_url));
-            }
-          }
-
-          /** @var string $script_assembled Собранный DOM-элемент SCRIPT для добавления скрипта */
-          $script_assembled = self::assembly('<script {SCRIPT_ATTRIBUTES}></script>', [
-            'SCRIPT_ATTRIBUTES' => implode(' ', $attributes)
-          ]);
-
-          array_push($scripts_assembled, $script_assembled);
-        }
-      }
-
-      return implode($scripts_assembled);
-    }
-
-    /**
-     * Сборка шаблона на основе общих данных локализации
-     * 
-     * @param string $template_string
-     * @param SystemCoreLocale|TemplateLocale|ModuleLocale $locale
-     * 
-     * @return string
-     */
-    public static function assembly_locale(string $template_string, SystemCoreLocale|TemplateLocale|ModuleLocale $locale) : string {
-      $template_transformed = $template_string;
-
-      $locale_data = $locale->get_data();
-      if (!empty($locale_data)) {
-        foreach ($locale_data as $string_name => $string_value) {
-          if (preg_match(self::TEMPLATE_TAG_LANG_PATTERN, $template_transformed)) {
-            $template_transformed = str_replace("{LANG:{$string_name}}", $string_value, $template_transformed);
-          }
-        }
-      }
-
-      return $template_transformed;
-    }
-
-    /**
-     * Сборка шаблона на основе файлов с разметкой MarkDown на основе реестра локализации
-     * 
-     * @param string $template_string
-     * @param SystemCoreLocale|TemplateLocale|ModuleLocale $locale
-     * 
-     * @return string
-     */
-    public static function assembly_locale_markdown(string $template_string, SystemCoreLocale|TemplateLocale|ModuleLocale $locale) : string {
-      $template_transformed = $template_string;
-      $locale_registry_array = $locale->get_registry_array();
-      $locale_core_path = $locale->get_data_path();
-      if (!empty($locale_registry_array)) {
-        foreach ($locale_registry_array as $name => $value) {
-          if (preg_match(self::TEMPLATE_TAG_LANG_MARKDOWN_PATTERN, $template_transformed)) {
-            $file_markdown_path = sprintf('%s/%s', $locale_core_path, $value);
-            
-            if (file_exists($file_markdown_path)) {
-              /**
-               * @var Parsedown Парсер markdown-разметки
-               */
-              $parsedown = new Parsedown();
-              $parsedown->setSafeMode(true);
-              $parsedown->setMarkupEscaped(true);
-
-              $file_markdown_content = file_get_contents($file_markdown_path);
-              $template_transformed = str_replace("{LANG:MD:{$name}}", $parsedown->text($file_markdown_content), $template_transformed);
-            }
-          }
-        }
-      }
-
-      return $template_transformed;
-    }
-
-    /**
-     * Сборка шаблона на основе строки
-     *
-     * @param  mixed $template_string Содержимое шаблона
-     * @param  mixed $template_replaces Массив с тегами шаблона и их значениями
-     * @return string
-     */
-    public static function assembly(string $template_string, array $template_replaces) : string {
-      $template_transformed = $template_string;
-
-      foreach($template_replaces as $template_name => $template_value) {
-        if (preg_match(self::TEMPLATE_TAG_PATTERN, $template_transformed)) {
-          $template_transformed = str_replace("{{$template_name}}", $template_value, $template_transformed);
-        }
-      }
-
-      return $template_transformed;
-    }
-
-    public static function assembly_logic(SystemCore $system_core, string $template_string) : string {
-      $template_transformed = $template_string;
-
-      $define_function = function(string $function_name) : mixed {
-        switch ($function_name) {
-          case 'CLIENT_IS_LOGGED': return $system_core->client->is_logged(1);
-        }
-
-        return null;
-      };
-
-      //       1  2  3     4            5
-      // {?IF:CONDITION?} ... {?ELSE?} ... {?ENDIF?}
-      if (preg_match(self::TEMPLATE_LOGIC_IF_ELSE_PATTERN, $template_transformed, $matches)) {
-        //
-      }
-
-      //       1  2  3     4
-      // {?IF:CONDITION?} ... {?ENDIF?}
-      if (preg_match(self::TEMPLATE_LOGIC_IF_PATTERN, $template_transformed, $matches)) {
-        $define_function_returned = false;
-        if ($matches[2] == '==') $define_function_returned = $define_function($matches[1]) == $matches[3];
-        if ($matches[2] == '!=') $define_function_returned = $define_function($matches[1]) != $matches[3];
-        if ($matches[2] == '>=') $define_function_returned = $define_function($matches[1]) >= $matches[3];
-        if ($matches[2] == '<=') $define_function_returned = $define_function($matches[1]) <= $matches[3];
-        if ($matches[2] == '>') $define_function_returned = $define_function($matches[1]) > $matches[3];
-        if ($matches[2] == '<') $define_function_returned = $define_function($matches[1]) < $matches[3];
-
-        if ($define_function_returned) {
-          $template_transformed = str_replace($matches[0], self::assembly_logic($matches[4]), $template_transformed);
-        } else {
-          $template_transformed = '';
-        }
-      }
-
-      return $template_transformed;
-    }
-    
-    /**
-     * Сборка шаблона на основе содержимого файла
-     *
-     * @param  mixed $file_path Полный путь до файла
-     * @param  mixed $template_replaces Массив с тегами шаблона и их значениями
-     * @return string
-     */
-    public static function assembly_file_content(Template $template, string $file_path, array $template_replaces) : string {
-      /** @var string $file_path Полный путь до шаблона */
-      $file_path = sprintf('%s/%s', $template->get_path(), $file_path);
-
-      if (file_exists($file_path)) {
-        $file_content = file_get_contents($file_path);
-        return self::assembly($file_content, $template_replaces);
-      }
-
-      return sprintf('{ERROR:FILE_IS_NOT_EXISTS=%s}', $file_path);
-    }
-
+final class Collector
+{
+  private const TEMPLATE_TAG_PATTERN = '/\{([a-zA-Z0-9_]+)\}/';
+  private const TEMPLATE_TAG_LANG_PATTERN = '/\{LANG\:([a-zA-Z0-9_]+)\}/';
+  private const TEMPLATE_TAG_LANG_MARKDOWN_PATTERN = '/\{LANG\:MD\:([a-zA-Z0-9_]+)\}/';
+  private const TEMPLATE_LOGIC_IF_PATTERN = '/\{\?IF\:([a-zA-Z0-9_]+)([=<>!]+)([a-zA-Z0-9_]+)\?\}(.*)\{\?ENDIF\?\}/is';
+  private const TEMPLATE_LOGIC_IF_ELSE_PATTERN = '/\{\?IF\:([a-zA-Z0-9_]+)([=<>!]+)([a-zA-Z0-9_]+)\?\}(.*){\?ELSE\?\}(.*)\{\?ENDIF\?\}/is';
+  private Theme $theme;
+  
+  /**
+   * __construct
+   *
+   * @param  mixed $theme
+   * 
+   * @return void
+   */
+  public function __construct(Theme $theme)
+  {
+    $this->theme = $theme;
   }
 
-}
+  /**
+   * Сборка элементов link-стилей для последующего встраивания в секцию HEAD
+   * 
+   * @param Theme $theme
+   * @param array $stylesArray
+   * 
+   * @return string
+   */
+  public static function assemblyStyles(Theme $theme, array $stylesArray) : string
+  {
+    $document = new DOMDocument();
 
-?>
+    foreach ($stylesArray as $style) {
+      if (array_key_exists('href', $style) && array_key_exists('rel', $style)) {
+        $styleIsCore = false;
+        if (array_key_exists('isCore', $style)) {
+          if ($style['isCore'] == true) {
+            $styleIsCore = true;
+            $styleHref = '/core/CSSCore/' . $style['href'];
+          }
+        }
+
+        if (!$styleIsCore) {
+          $styleHref = ($theme->getCategory() !== 'default') ? '/templates/' . $theme->getCategory() . '/' . $theme->getName() . '/' .$style['href'] : '/templates/' . $theme->getName() . '/' . $style['href'];
+        }
+
+        $linkElement = $document->createElement('link');
+        $linkElement->setAttribute('href', $styleHref);
+        $linkElement->setAttribute('rel', $style['rel']);
+
+        $document->appendChild($linkElement);
+      }
+    }
+
+    return $document->saveHTML();
+  }
+
+
+  /**
+   * Сборка элементов-скриптов для последующего встраивания в секцию HEAD
+   * 
+   * @param Theme $theme
+   * @param array $scriptsArray
+   * 
+   * @return string
+   */
+  public static function assemblyScripts(Theme $theme, array $scriptsArray) : string
+  {
+    $document = new DOMDocument();
+
+    foreach ($scriptsArray as $scriptData) {
+      $isCMSCore = $scriptData['isCMSCore'] ?? false;
+      $src = $scriptData['src'] ?? '';
+
+      if ($theme->getCategory() !== 'default') {
+        $scriptURL = !$isCMSCore ? '/templates/' . $theme->getCategory() . '/' . $theme->getName() . '/' . $src : '/core/JSLibrary/' . $src;
+      } else {
+        $scriptURL = !$isCMSCore ? '/templates/' . $theme->getName() . '/' . $src : '/core/JSLibrary/' . $src;
+      }
+
+      if (array_key_exists('src', $scriptData)) {
+        $scriptElement = $document->createElement('script');
+
+        foreach ($scriptData as $attributeName => $attributeValue) {
+          if ($attributeName !== 'isCMSCore' && $attributeName !== 'src') {
+            $scriptElement->setAttribute($attributeName, $attributeValue);
+          }
+
+          if ($attributeName === 'src') {
+            $scriptElement->setAttribute($attributeName, $scriptURL);
+          }
+        }
+
+        $document->appendChild($scriptElement);
+      }
+    }
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Сборка шаблона на основе общих данных локализации
+   * 
+   * @param string $themeString
+   * @param LocaleInterface $locale
+   * 
+   * @return string
+   */
+  public static function assemblyLocale(string $themeString, LocaleInterface $locale) : string
+  {
+    $themeTransformed = $themeString;
+
+    $localeData = $locale->getData();
+    if (!empty($localeData)) {
+      foreach ($localeData as $name => $value) {
+        if (preg_match(self::TEMPLATE_TAG_LANG_PATTERN, $themeTransformed)) {
+          $themeTransformed = str_replace("{LANG:{$name}}", $value, $themeTransformed);
+        }
+      }
+    }
+
+    return $themeTransformed;
+  }
+
+  /**
+   * Сборка шаблона на основе файлов с разметкой MarkDown на основе реестра локализации
+   * 
+   * @param string $themeString
+   * @param LocaleInterface $locale
+   * 
+   * @return string
+   */
+  public static function assemblyLocaleMarkdown(string $themeString, LocaleInterface $locale) : string
+  {
+    $themeTransformed = $themeString;
+    $localeRegistryArray = $locale->getRegistryArray();
+    $localeCorePath = $locale->getDataPath();
+
+    if (!empty($localeRegistryArray)) {
+      foreach ($localeRegistryArray as $name => $value) {
+        if (preg_match(self::TEMPLATE_TAG_LANG_MARKDOWN_PATTERN, $themeTransformed)) {
+          $fileMarkdownPath = sprintf('%s/%s', $localeCorePath, $value);
+          
+          if (file_exists($fileMarkdownPath)) {
+            /**
+             * @var Parsedown Парсер markdown-разметки
+             */
+            $parsedown = new Parsedown();
+            $parsedown->setSafeMode(true);
+            $parsedown->setMarkupEscaped(true);
+
+            $fileMarkdownContent = file_get_contents($fileMarkdownPath);
+            $themeTransformed = str_replace("{LANG:MD:{$name}}", $parsedown->text($fileMarkdownContent), $themeTransformed);
+          }
+        }
+      }
+    }
+
+    return $themeTransformed;
+  }
+
+  /**
+   * Сборка шаблона на основе строки
+   *
+   * @param  mixed $template Содержимое шаблона
+   * @param  mixed $variables Массив с тегами шаблона и их значениями
+   * @return string
+   */
+  public static function assembly(string $template, array $variables = []) : string
+  {
+    if ($template === '') {
+      return '';
+    }
+
+    if (empty($variables)) {
+      return $template;
+    }
+
+    foreach($variables as $name => $value) {
+      if (preg_match(self::TEMPLATE_TAG_PATTERN, $template)) {
+        $template = str_replace("{{$name}}", $value, $template);
+      }
+    }
+
+    return $template;
+  }
+
+  public static function assemblyLogic(SystemCore $CMSCore, string $themeString) : string
+  {
+    $themeTransformed = $themeString;
+
+    $defineFunction = function(string $functionName) : mixed {
+      switch ($functionName) {
+        case 'CLIENT_IS_LOGGED': return $CMSCore->client->isLogged(1);
+      }
+
+      return null;
+    };
+
+    //       1  2  3     4            5
+    // {?IF:CONDITION?} ... {?ELSE?} ... {?ENDIF?}
+    if (preg_match(self::TEMPLATE_LOGIC_IF_ELSE_PATTERN, $themeTransformed, $matches)) {
+      //
+    }
+
+    //       1  2  3     4
+    // {?IF:CONDITION?} ... {?ENDIF?}
+    if (preg_match(self::TEMPLATE_LOGIC_IF_PATTERN, $themeTransformed, $matches)) {
+      $defineFunctionReturned = false;
+      if ($matches[2] == '==') $defineFunctionReturned = $defineFunction($matches[1]) == $matches[3];
+      if ($matches[2] == '!=') $defineFunctionReturned = $defineFunction($matches[1]) != $matches[3];
+      if ($matches[2] == '>=') $defineFunctionReturned = $defineFunction($matches[1]) >= $matches[3];
+      if ($matches[2] == '<=') $defineFunctionReturned = $defineFunction($matches[1]) <= $matches[3];
+      if ($matches[2] == '>') $defineFunctionReturned = $defineFunction($matches[1]) > $matches[3];
+      if ($matches[2] == '<') $defineFunctionReturned = $defineFunction($matches[1]) < $matches[3];
+
+      if ($defineFunctionReturned) {
+        $themeTransformed = str_replace($matches[0], self::assemblyLogic($matches[4]), $themeTransformed);
+      } else {
+        $themeTransformed = '';
+      }
+    }
+
+    return $themeTransformed;
+  }
+  
+  /**
+   * Сборка шаблона на основе содержимого файла
+   *
+   * @param Theme $theme
+   * @param string $filePath Полный путь до файла
+   * @param array $themeVariables Массив с тегами шаблона и их значениями
+   * 
+   * @return string
+   */
+  public static function assemblyFileContent(Theme $theme, string $filePath, array $themeVariables) : string
+  {
+    /** @var string $filePath Полный путь до шаблона */
+    $filePath = $theme->getPath() . '/' . $filePath;
+
+    if (file_exists($filePath)) {
+      $fileContent = file_get_contents($filePath);
+      return self::assembly($fileContent, $themeVariables);
+    }
+
+    return sprintf('{ERROR:FILE_IS_NOT_EXISTS=%s}', $filePath);
+  }
+}

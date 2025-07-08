@@ -8,13 +8,11 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect {
-  use \core\PHPLibrary\Database\QueryBuilder\StatementSelect as StatementSelect;
+namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect;
 
-  interface InterfaceClause {
-    public function __construct(StatementSelect $statement);
-  }
+use \core\PHPLibrary\Database\QueryBuilder\StatementSelect as StatementSelect;
 
+interface InterfaceClause
+{
+  public function __construct(StatementSelect $statement);
 }
-
-?>

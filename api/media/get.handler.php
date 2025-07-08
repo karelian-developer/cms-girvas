@@ -13,59 +13,57 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-if ($system_core->client->is_logged(2)) {
-  $handler_output_data['dom'] = [];
+if ($CMSCore->client->isLogged(2)) {
+  $handlerOutputData['dom'] = [];
 
   /** @var string */
-  $media_files_path = sprintf('%s/uploads/media', $system_core->get_cms_path());
+  $filesDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
   /** @var array */
-  $media_files = array_diff(scandir($media_files_path), ['.', '..']);
+  $files = array_diff(scandir($filesDirectoryPath), ['.', '..']);
   /** @var array */
-  $files_data = [];
+  $filesData = [];
 
-  foreach ($media_files as $file) {
+  foreach ($files as $file) {
     /** @var string */
-    $file_path = sprintf('%s/%s', $media_files_path, $file);
+    $filePath = $filesDirectoryPath . '/' . $file;
     /** @var string */
-    $file_url = $file;
+    $fileURL = $file;
     
-    array_push($files_data, [
-      'file_url' => $file_url,
-      'created_unix_timestamp' => filemtime($file_path)
+    array_push($filesData, [
+      'file_url' => $fileURL,
+      'created_unix_timestamp' => filemtime($filePath)
     ]);
   }
 
-  usort($files_data, function($a, $b) {
-    if ($a['created_unix_timestamp'] == $b['created_unix_timestamp']) {
+  usort($filesData, function($a, $b) {
+    if ($a['created_unix_timestamp'] === $b['created_unix_timestamp']) {
       return 0;
     }
 
     return ($a['created_unix_timestamp'] > $b['created_unix_timestamp']) ? -1 : 1;
   });
 
-  $media_files_sorted = [];
-  foreach ($files_data as $file_data) {
-    array_push($media_files_sorted, $file_data['file_url']);
+  $filesSorted = [];
+  foreach ($filesData as $data) {
+    array_push($filesSorted, $data['file_url']);
   }
 
-  $media_files_transformed = [];
-  foreach ($media_files_sorted as $media_file) {
-    array_push($media_files_transformed, sprintf('/uploads/media/%s', $media_file));
+  $filesTransformed = [];
+  foreach ($filesSorted as $file) {
+    array_push($filesTransformed, '/uploads/media/' . $file);
   }
 
-  $handler_output_data['items'] = $media_files_transformed;
+  $handlerOutputData['items'] = $filesTransformed;
 
-  if (!empty($media_files_transformed)) {
-    $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS') : $handler_message;
-    $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+  if (!empty($filesTransformed)) {
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
   } else {
-    $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_FILES_ERROR_NOT_FOUND')) : $handler_message;
-    $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_FILES_ERROR_NOT_FOUND');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
   http_response_code(401);
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

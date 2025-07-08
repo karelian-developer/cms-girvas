@@ -15,30 +15,28 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\Feed as Feed;
 
-if (is_numeric($system_core->urlp->get_path(2))) {
-  $web_channel_id = (int)$system_core->urlp->get_path(2);
+if (is_numeric($CMSCore->urlp->getPath(2))) {
+  $feedID = (int) $CMSCore->urlp->getPath(2);
 
-  if (Feed::exists_by_id($system_core, $web_channel_id)) {
-    $web_channel = new Feed($system_core, $web_channel_id);
-    $web_channel->init_data(['name', 'type_id', 'entries_category_id', 'texts', 'created_unix_timestamp', 'updated_unix_timestamp']);
-    $web_channel_locale = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $system_core->configurator->get_database_entry_value('base_locale');
+  if (Feed::existsByID($CMSCore, $feedID)) {
+    $feed = new Feed($CMSCore, $feedID);
+    $feed->initData(['name', 'typeID', 'entriesCategoryID', 'texts', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+    $feedLocale = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
 
-    $handler_output_data['feed'] = [];
-    $handler_output_data['feed']['id'] = $web_channel->get_id();
-    $handler_output_data['feed']['name'] = $web_channel->get_name();
-    $handler_output_data['feed']['title'] = $web_channel->get_title($web_channel_locale);
-    $handler_output_data['feed']['description'] = $web_channel->get_description($web_channel_locale);
-    $handler_output_data['feed']['typeID'] = $web_channel->get_type_id();
-    $handler_output_data['feed']['entriesCategoryID'] = $web_channel->get_entries_category_id();
-    $handler_output_data['feed']['createdUnixTimestamp'] = $web_channel->get_created_unix_timestamp();
-    $handler_output_data['feed']['updatedUnixTimestamp'] = $web_channel->get_updated_unix_timestamp();
+    $handlerOutputData['feed'] = [];
+    $handlerOutputData['feed']['id'] = $feed->getID();
+    $handlerOutputData['feed']['name'] = $feed->getName();
+    $handlerOutputData['feed']['title'] = $feed->getTitle($feedLocale);
+    $handlerOutputData['feed']['description'] = $feed->getDescription($feedLocale);
+    $handlerOutputData['feed']['typeID'] = $feed->getTypeID();
+    $handlerOutputData['feed']['entriesCategoryID'] = $feed->getEntriesCategoryID();
+    $handlerOutputData['feed']['createdUnixTimestamp'] = $feed->getCreatedUnixTimestamp();
+    $handlerOutputData['feed']['updatedUnixTimestamp'] = $feed->getUpdatedUnixTimestamp();
 
-    $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS') : $handler_message;
-    $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
   } else {
-    $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_FEED_ERROR_NOT_FOUND')) : $handler_message;
-    $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_FEED_ERROR_NOT_FOUND');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 }
-
-?>

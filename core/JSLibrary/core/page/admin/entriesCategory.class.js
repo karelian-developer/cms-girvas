@@ -83,7 +83,7 @@ export class PageEntriesCategory {
             request.target.showingNotification = false;
     
             request.target.send().then((data) => {
-              if (data.statusCode == 1 && data.outputData.hasOwnProperty('entriesCategory')) {
+              if (data.statusCode === 1 && data.outputData.hasOwnProperty('entriesCategory')) {
                 descriptionTextareaElement.value = data.outputData.entriesCategory.description;
                 titleInputElement.value = data.outputData.entriesCategory.title;
               }
@@ -117,7 +117,7 @@ export class PageEntriesCategory {
         let entryTitleInputElement = document.querySelector('[role="entriesCategoryTitle"]');
         
         locales.forEach((locale, localeIndex) => {
-          if (locale.name == event.target.value) {
+          if (locale.name === event.target.value) {
             entryDescriptionTextareaElement.setAttribute('name', 'entries_category_description_' + locale.iso639_2);
             entryTitleInputElement.setAttribute('name', 'entries_category_title_' + locale.iso639_2);
 
@@ -130,7 +130,7 @@ export class PageEntriesCategory {
               request.target.showingNotification = false;
       
               request.target.send().then((data) => {
-                if (data.statusCode == 1 && data.outputData.hasOwnProperty('entriesCategory')) {
+                if (data.statusCode === 1 && data.outputData.hasOwnProperty('entriesCategory')) {
                   entryDescriptionTextareaElement.value = data.outputData.entriesCategory.description;
                   entryTitleInputElement.value = data.outputData.entriesCategory.title;
                 }
@@ -147,7 +147,7 @@ export class PageEntriesCategory {
       }).then((response) => {
         return (response.ok) ? response.json() : Promise.reject(response);
       }).then((data1) => {
-        if (data1.statusCode == 1) {
+        if (data1.statusCode === 1) {
           entriesCategoryData = data1.outputData.entriesCategory;
         }
 
@@ -163,7 +163,7 @@ export class PageEntriesCategory {
       }).then((response) => {
         return (response.ok) ? response.json() : Promise.reject(response);
       }).then((data1) => {
-        if (data1.statusCode == 1) {
+        if (data1.statusCode === 1) {
           entriesCategoriesData = data1.outputData.entriesCategories;
 
           interactiveParentChoices.target.addItem('', 0);
@@ -173,7 +173,7 @@ export class PageEntriesCategory {
               interactiveParentChoices.target.addItem(entriesCategory.title, entriesCategory.id);
             }
 
-            if (entriesCategory.id == entriesCategoryData.parentID) {
+            if (entriesCategory.id === entriesCategoryData.parentID) {
               interactiveParentChoices.target.setItemSelectedIndex(entriesCategoryIndex);
             }
           });
@@ -204,8 +204,8 @@ export class PageEntriesCategory {
         
         if (form.target.checkRequiredFields()) {
           let formData = new FormData(elementForm);
-          let fetchLink = (searchParams.getPathPart(3) == null) ? '/handler/entry/category?localeMessage=' + window.CMSCore.locales.admin.name : '/handler/entry/category/' + searchParams.getPathPart(3) + '?localeMessage=' + window.CMSCore.locales.admin.name;
-          let fetchMethod = (searchParams.getPathPart(3) == null) ? 'PUT' : 'PATCH';
+          let fetchLink = (searchParams.getPathPart(3) === null) ? '/handler/entry/category?localeMessage=' + window.CMSCore.locales.admin.name : '/handler/entry/category/' + searchParams.getPathPart(3) + '?localeMessage=' + window.CMSCore.locales.admin.name;
+          let fetchMethod = (searchParams.getPathPart(3) === null) ? 'PUT' : 'PATCH';
 
           let request = new Interactive('request', {
             method: fetchMethod,
@@ -215,7 +215,7 @@ export class PageEntriesCategory {
           request.target.data = formData;
   
           request.target.send().then((data) => {
-            if (data.statusCode == 1 && searchParams.getPathPart(3) == null) {
+            if (data.statusCode === 1 && searchParams.getPathPart(3) === null) {
               let entriesCategoryData = data.outputData.entriesCategory;
               window.location.href = '/admin/entriesCategory/' + entriesCategoryData.id;
             }
@@ -254,7 +254,7 @@ export class PageEntriesCategory {
           });
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               window.location.href = '/admin/entriesCategories';
             }
           });
@@ -270,7 +270,7 @@ export class PageEntriesCategory {
       });
       this.buttons.delete.assembly();
 
-      if (searchParams.getPathPart(3) == null) {
+      if (searchParams.getPathPart(3) === null) {
         this.buttons.delete.target.element.style.display = 'none';
         this.buttons.save.target.element.style.display = 'flex';
       } else {

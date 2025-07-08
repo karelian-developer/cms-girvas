@@ -8,6 +8,7 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
+<<<<<<< HEAD
 namespace core\PHPLibrary {
   use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
   use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
@@ -124,466 +125,708 @@ namespace core\PHPLibrary {
     public function get_updated_unix_timestamp() : int|string {
       return (property_exists($this, 'updated_unix_timestamp')) ? $this->updated_unix_timestamp : '{ERROR:ENTRY_COMMENT_DATA_IS_NOT_EXISTS=updated_unix_timestamp}';
     }
+=======
+namespace core\PHPLibrary;
 
-    /**
-     * Получить статус отображения
-     *
-     * @return bool
-     */
-    public function is_hidden() : bool {
-      if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['isHidden'])) {
-          return (bool)$metadata_array['isHidden'];
-        }
-      }
+use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
+use \PDOException as PDOException;
 
-      return false;
-    }
+#[\AllowDynamicProperties]
+class EntryComment implements EntityTypeContent
+{
+  private readonly SystemCore $CMSCore;
+  private int $id;
+  
+  /**
+   * __construct
+   *
+   * @param  SystemCore $CMSCore
+   * @param  int $id
+   * @return void
+   */
+  public function __construct(SystemCore $CMSCore, int $id)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->setID($id);
+  }
+>>>>>>> develop
 
-    /**
-     * Получить причину скрытия комментария
-     *
-     * @return string
-     */
-    public function get_hidden_reason() : string {
-      if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['hiddenReason'])) {
-          return $metadata_array['hiddenReason'];
-        }
-      }
-
-      return '';
-    }
-
-    /**
-     * Получить количество ответов к комментарию
-     * 
-     * @return int
-     */
-    public function get_answers_count() : int {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['count(id)']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries_comments');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('(metadata::jsonb->\'parentID\')::int = :parentID::int');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
-      
-      try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':parentID', $this->id, \PDO::PARAM_INT);
-        $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-      return ($result) ? $result['count'] : 0;
-    }
-
-    /**
-     * Получить массив объектов ответов к комментарию
-     * 
-     * @return array
-     */
-    public function get_answers() : array {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries_comments');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('(metadata::jsonb->\'parentID\')::int = :parentID::int');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
-      
-      try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':parentID', $this->id, \PDO::PARAM_INT);
-        $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-
-      $objects = [];
-      $results = $database_query->fetchAll(\PDO::FETCH_ASSOC);
-      if ($results) {
-        foreach ($results as $data) {
-          array_push($objects, new EntryComment($this->system_core, $data['id']));
-        }
-      }
-
-      return $objects;
-    }
-
-    /**
-     * Получить ID комментария-родителя
-     *
-     * @return string
-     */
-    public function get_parent_id() : int {
-      if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['parentID'])) {
-          return (int)$metadata_array['parentID'];
-        }
-      }
-
-      return 0;
-    }
-
-    /**
-     * Получить объект комментария-родителя
-     *
-     * @return string
-     */
-    public function get_parent() : EntryComment|null {
-      if (property_exists($this, 'metadata')) {
-        $parent_id = $this->get_parent_id();
-        if ($parent_id > 0) {
-          return new EntryComment($this->system_core, $parent_id);
-        }
-      }
-
-      return null;
-    }
-
-    /**
-     * Получить рейтинг комментария
-     *
-     * @return int
-     */
-    public function get_rating() : int {
-      if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['rating'])) {
-          return $metadata_array['rating'];
-        }
-      }
-
-      return 0;
-    }
-
-    /**
-     * Получить массив ID голосовавших пользователей за рейтинг комментария
-     *
-     * @return string
-     */
-    public function get_rating_voters() : array {
-      if (property_exists($this, 'metadata')) {
-        $metadata_array = json_decode($this->metadata, true);
-        if (isset($metadata_array['ratingVoters'])) {
-          return $metadata_array['ratingVoters'];
-        }
-      }
-
-      return [];
-    }
-
-    /**
-     * Проверить наличие голоса от конкретного пользователя по его ID
-     *
-     * @return bool
-     */
-    public function user_is_voted(int $user_id) : bool {
-      if (property_exists($this, 'metadata')) {
-        $voters = $this->get_rating_voters();
-        return in_array($user_id, $voters);
-      }
-
-      return false;
-    }
-    
-    /**
-     * Получить данные колонок комментария в базе данных
-     *
-     * @param  mixed $columns
-     * @return void
-     */
-    private function get_database_columns_data(array $columns = ['*']) : array|null {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections($columns);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries_comments');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
-      
-      /** @var int $entry_id Идентификационный номер записи */
-      $entry_id = $this->get_id();
-
-      try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $entry_id, \PDO::PARAM_INT);
-        $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-      return ($result) ? $result : null;
-    }
-
-    /**
-     * Проверка наличия комментария по идентификационному номеру
-     *
-     * @param  SystemCore $system_core
-     * @param  int $comment_id
-     * @return bool
-     */
-    public static function exists_by_id(SystemCore $system_core, int $comment_id) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['1']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries_comments');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
-
-      try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $comment_id, \PDO::PARAM_INT);
-        $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-
-      return ($database_query->fetchColumn()) ? true : false;
-    }
-    
-    /**
-     * Удаление существующего комментария
-     *
-     * @return bool
-     */
-    public function delete() : bool {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_delete();
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries_comments');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
-
-      try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-        $execute = $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-
-      return ($execute) ? true : false;
-    }
-        
-    /**
-     * Создание нового комментария
-     *
-     * @param  SystemCore $system_core
-     * @param  int $entry_id
-     * @param  int $author_id
-     * @param  string $content
-     * @return EntryComment|null
-     */
-    public static function create(SystemCore $system_core, int $entry_id, int $author_id, string $content) : EntryComment|null {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_insert();
-      $query_builder->statement->set_table('entries_comments');
-      $query_builder->statement->add_column('author_id');
-      $query_builder->statement->add_column('entry_id');
-      $query_builder->statement->add_column('content');
-      $query_builder->statement->add_column('created_unix_timestamp');
-      $query_builder->statement->add_column('updated_unix_timestamp');
-      $query_builder->statement->add_column('metadata');
-      $query_builder->statement->set_clause_returning();
-      $query_builder->statement->clause_returning->add_column('id');
-      $query_builder->statement->assembly();
-
-      $metadata = [];
-      $metadata['rating'] = 0;
-      $metadata['ratingVoters'] = json_decode('{}');
-      $metadata['isHidden'] = false;
-      $metadata['hiddenReason'] = false;
-      $metadata = json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-
-      $entry_comment_created_unix_timestamp = time();
-      $entry_comment_updated_unix_timestamp = $entry_comment_created_unix_timestamp;
-
-      try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':author_id', $author_id, \PDO::PARAM_INT);
-        $database_query->bindParam(':entry_id', $entry_id, \PDO::PARAM_INT);
-        $database_query->bindParam(':content', $content, \PDO::PARAM_STR);
-        $database_query->bindParam(':created_unix_timestamp', $entry_comment_created_unix_timestamp, \PDO::PARAM_INT);
-        $database_query->bindParam(':updated_unix_timestamp', $entry_comment_updated_unix_timestamp, \PDO::PARAM_INT);
-        $database_query->bindParam(':metadata', $metadata, \PDO::PARAM_STR);
-        $execute = $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-
-      if ($execute) {
-        $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-        return ($result) ? new EntryComment($system_core, $result['id']) : null;
-      }
-
-      return null;
-    }
-
-    /**
-     * Обновление существующего комментария
-     *
-     * @param  array $data Массив данных
-     * @return bool
-     */
-    public function update(array $data) : bool {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_update();
-      $query_builder->statement->set_table('entries_comments');
-      $query_builder->statement->set_clause_set();
-
-      foreach ($data as $data_name => $data_value) {
-        if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'metadata'])) {
-          $query_builder->statement->clause_set->add_column($data_name);
-        }
-      }
-
-      if (array_key_exists('metadata', $data)) {
-        if (!empty($data['metadata'])) {
-          $metadata_assignments = [];
-          
-          foreach ($data['metadata'] as $metadata_name => $metadata_value) {
-            if ($metadata_name == 'rating_vote' && $metadata_value['vote'] == 'up') {
-              $comment_rating_voters = $this->get_rating_voters();
-
-              array_push($metadata_assignments, sprintf('jsonb_set(metadata::jsonb, \'{ratingVoters}\', (metadata::jsonb->>\'ratingVoters\')::jsonb || \'{"%d": "%s"}\')', $metadata_value['voter_id'], $metadata_value['vote']));
-
-              if (!isset($comment_rating_voters[$metadata_value['voter_id']])) {
-                array_push($metadata_assignments, 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int + 1)');
-              } else {
-                if ($comment_rating_voters[$metadata_value['voter_id']] != $metadata_value['vote']) {
-                  array_push($metadata_assignments, 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int + 2)');
-                }
-              }
-            } else if ($metadata_name == 'rating_vote' && $metadata_value['vote'] == 'down') {
-              $comment_rating_voters = $this->get_rating_voters();
-
-              array_push($metadata_assignments, sprintf('jsonb_set(metadata::jsonb, \'{ratingVoters}\', (metadata::jsonb->>\'ratingVoters\')::jsonb || \'{"%d": "%s"}\')', $metadata_value['voter_id'], $metadata_value['vote']));
-              if (!isset($comment_rating_voters[$metadata_value['voter_id']])) {
-                array_push($metadata_assignments, 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int - 1)');
-              } else {
-                if ($comment_rating_voters[$metadata_value['voter_id']] != $metadata_value['vote']) {
-                  array_push($metadata_assignments, 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int - 2)');
-                }
-              }
-            } else if ($metadata_name == 'is_hidden') {
-              array_push($metadata_assignments, sprintf('jsonb_build_object(\'isHidden\', %d::int::bool)', $metadata_value));
-            } else if ($metadata_name == 'hidden_reason') {
-              array_push($metadata_assignments, sprintf('jsonb_build_object(\'hiddenReason\', \'%s\'::text)', $metadata_value));
-            } else if ($metadata_name == 'parent_id') {
-              array_push($metadata_assignments, sprintf('jsonb_build_object(\'parentID\', %d::int)', $metadata_value));
-            }
-          }
-
-          if (!empty($metadata_assignments)) {
-            $query_builder->statement->clause_set->add_column('metadata', sprintf('metadata::jsonb || %s', implode(' || ', $metadata_assignments)));
-          }
-        }
-      }
-
-      $query_builder->statement->clause_set->add_column('updated_unix_timestamp');
-      $query_builder->statement->clause_set->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
-
-      /** @var int $entry_updated_unix_timestamp Текущее время в UNIX-формате */
-      $entry_comment_updated_unix_timestamp = time();
-
-      try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        error_log($query_builder->statement->assembled);
-        foreach ($data as $data_name => $data_value) {
-          if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'metadata'])) {
-            switch (gettype($data_value)) {
-              case 'boolean': $data_value_type = \PDO::PARAM_BOOL; break;
-              case 'integer': $data_value_type = \PDO::PARAM_INT; break;
-              case 'string': $data_value_type = \PDO::PARAM_STR; break;
-              case 'null': $data_value_type = \PDO::PARAM_NULL; break;
-            }
-
-            $database_query->bindParam(':' . $data_name, $data[$data_name], $data_value_type);
-          }
-        }
-
-        $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-        $database_query->bindParam(':updated_unix_timestamp', $entry_comment_updated_unix_timestamp, \PDO::PARAM_INT);
-        $execute = $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-
-      return ($execute) ? true : false;
+  /**
+   * Инициализация данных из БД
+   *
+   * @param  mixed $columns
+   * @return void
+   */
+  public function initData(array $columns = ['*']) : void
+  {
+    $columnsData = $this->getDatabaseColumnsData($columns);
+    foreach ($columnsData as $name => $data) {
+      $this->{$name} = $data;
     }
   }
-}
+  
+  /**
+   * Назначить идентификатор комментарию
+   *
+   * @param  mixed $value
+   * @return void
+   */
+  private function setID(int $value) : void
+  {
+    $this->id = $value;
+  }
+  
+  /**
+   * Получить идентификатор комментария
+   *
+   * @return int
+   */
+  public function geID() : int
+  {
+    return $this->id;
+  }
+  
+  /**
+   * Получить идентификатор записи, к которой написан комментарий
+   *
+   * @return int
+   */
+  public function getEntryID() : int
+  {
+    return $this->entryID ?? 0;
+  }
+  
+  /**
+   * Получить объект записи, к которой написан комментарий
+   *
+   * @return Entry|null
+   */
+  public function getEntry() : Entry|null
+  {
+    return new User($this->CMSCore, $this->entryID) ?? null;
+  }
+  
+  /**
+   * Получить идентификатор автора комментария
+   *
+   * @return int
+   */
+  public function getAuthorID() : int
+  {
+    return $this->authorID ?? 0;
+  }
+  
+  /**
+   * Получить объект автора комментария
+   *
+   * @return User|null
+   */
+  public function getAuthor() : User|null
+  {
+    return new User($this->CMSCore, $this->authorID) ?? null;
+  }
+  
+  /**
+   * Получить идентификатор записи, к которой написан комментарий
+   *
+   * @return string
+   */
+  public function getContent() : string
+  {
+    return $this->content ?? '';
+  }
+  
+  /**
+   * Получить дату создания в UNIX-формате
+   *
+   * @return int
+   */
+  public function getCreatedUnixTimestamp() : int
+  {
+    return $this->createdUnixTimestamp ??  0;
+  }
+  
+  /**
+   * Получить дату обновления в UNIX-формате
+   *
+   * @return int
+   */
+  public function getUpdatedUnixTimestamp() : int
+  {
+    return $this->updatedUnixTimestamp ?? 0;
+  }
 
-?>
+  /**
+   * Получить статус отображения
+   *
+   * @return bool
+   */
+  public function isHidden() : bool
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+
+      if (isset($metadata['isHidden'])) {
+        return (bool) $metadata['isHidden'];
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Получить причину скрытия комментария
+   *
+   * @return string
+   */
+  public function getHiddenReason() : string
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+
+      if (isset($metadata['hiddenReason'])) {
+        return $metadata['hiddenReason'];
+      }
+    }
+
+    return '';
+  }
+
+  /**
+   * Получить количество ответов к комментарию
+   * 
+   * @return int
+   */
+  public function getAnswersCount() : int
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['count(id)']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries_comments');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addCondition('(metadata::jsonb->\'parentID\')::int = :parentID::int');
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+    
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':parentID', $this->id, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? $result['count'] : 0;
+  }
+
+  /**
+   * Получить массив объектов ответов к комментарию
+   * 
+   * @return array
+   */
+  public function getAnswers() : array
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries_comments');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addCondition('(metadata::jsonb->\'parentID\')::int = :parentID::int');
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+    
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':parentID', $this->id, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $objects = [];
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    if ($results) {
+      foreach ($results as $data) {
+        array_push($objects, new EntryComment($this->CMSCore, $data['id']));
+      }
+    }
+
+    return $objects;
+  }
+
+  /**
+   * Получить ID комментария-родителя
+   *
+   * @return string
+   */
+  public function getParentID() : int
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+
+      if (isset($metadata['parentID'])) {
+        return (int) $metadata['parentID'];
+      }
+    }
+
+    return 0;
+  }
+
+  /**
+   * Получить объект комментария-родителя
+   *
+   * @return string
+   */
+  public function getParent() : EntryComment|null
+  {
+    if (property_exists($this, 'metadata')) {
+      $parentID = $this->getParentID();
+      if ($parentID > 0) {
+        return new EntryComment($this->CMSCore, $parentID);
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Получить рейтинг комментария
+   *
+   * @return int
+   */
+  public function getRating() : int
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+
+      if (isset($metadata['rating'])) {
+        return $metadata['rating'];
+      }
+    }
+
+    return 0;
+  }
+
+  /**
+   * Получить массив ID голосовавших пользователей за рейтинг комментария
+   *
+   * @return string
+   */
+  public function getRatingVoters() : array
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+
+      if (isset($metadata['ratingVoters'])) {
+        return $metadata['ratingVoters'];
+      }
+    }
+
+    return [];
+  }
+
+  /**
+   * Проверить наличие голоса от конкретного пользователя по его ID
+   *
+   * @return bool
+   */
+  public function user_is_voted(int $user_id) : bool
+  {
+    if (property_exists($this, 'metadata')) {
+      $voters = $this->getRatingVoters();
+      return in_array($user_id, $voters);
+    }
+
+    return false;
+  }
+  
+  /**
+   * Получить данные колонок комментария в базе данных
+   *
+   * @param  mixed $columns
+   * @return void
+   */
+  private function getDatabaseColumnsData(array $columns = ['*']) : array|null
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections($columns);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries_comments');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+    
+    /** @var int $entryID Идентификационный номер записи */
+    $entryID = $this->geID();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $entryID, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? $result : null;
+  }
+
+  /**
+   * Проверка наличия комментария по идентификационному номеру
+   *
+   * @param  SystemCore $CMSCore
+   * @param  int $commentID
+   * @return bool
+   */
+  public static function existsByID(SystemCore $CMSCore, int $commentID) : bool
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['1']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries_comments');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $commentID, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    return $databaseQuery->fetchColumn() ? true : false;
+  }
+  
+  /**
+   * Удаление существующего комментария
+   *
+   * @return bool
+   */
+  public function delete() : bool
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementDelete();
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries_comments');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+      $execute = $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    return $execute ? true : false;
+  }
+      
+  /**
+   * Создание нового комментария
+   *
+   * @param  SystemCore $CMSCore
+   * @param  int $entryID
+   * @param  int $authorID
+   * @param  string $content
+   * @return EntryComment|null
+   */
+  public static function create(SystemCore $CMSCore, int $entryID, int $authorID, string $content) : EntryComment|null
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementInsert();
+    $queryBuilder->statement->setTable('entries_comments');
+    $queryBuilder->statement->addColumn('authorID');
+    $queryBuilder->statement->addColumn('entryID');
+    $queryBuilder->statement->addColumn('content');
+    $queryBuilder->statement->addColumn('createdUnixTimestamp');
+    $queryBuilder->statement->addColumn('updatedUnixTimestamp');
+    $queryBuilder->statement->addColumn('metadata');
+    $queryBuilder->statement->setClauseReturning();
+    $queryBuilder->statement->clauseReturning->addColumn('id');
+    $queryBuilder->statement->assembly();
+
+    $metadata = [];
+    $metadata['rating'] = 0;
+    $metadata['ratingVoters'] = json_decode('{}');
+    $metadata['isHidden'] = false;
+    $metadata['hiddenReason'] = false;
+    $metadata = json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+    $createdUnixTimestamp = time();
+    $updatedUnixTimestamp = $createdUnixTimestamp;
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':authorID', $authorID, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':entryID', $entryID, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':content', $content, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':metadata', $metadata, \PDO::PARAM_STR);
+      $execute = $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementSelect();
+      $queryBuilder->statement->addSelections(['id']);
+      $queryBuilder->statement->setClauseFrom();
+      $queryBuilder->statement->clauseFrom->addTable('entries_comments');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
+
+      error_log('SQL: ' . $queryBuilder->statement->assembled);
+
+      try {
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
+    }
+
+    if ($execute) {
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+      return $result ? new EntryComment($CMSCore, (int) $result['id']) : null;
+    }
+
+    return null;
+  }
+
+  /**
+   * Обновление существующего комментария
+   *
+   * @param  array $data Массив данных
+   * @return bool
+   */
+  public function update(array $data) : bool
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementUpdate();
+    $queryBuilder->statement->setTable('entries_comments');
+    $queryBuilder->statement->setClauseSet();
+
+    foreach ($data as $name => $value) {
+      if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata'])) {
+        $queryBuilder->statement->clauseSet->addColumn($name);
+      }
+    }
+
+    if (array_key_exists('metadata', $data)) {
+      if (!empty($data['metadata'])) {
+        $metadataAssignments = [];
+        
+        foreach ($data['metadata'] as $name => $value) {
+          if ($name == 'ratingVote' && $value['vote'] == 'up') {
+            $commentRatingVoters = $this->getRatingVoters();
+
+            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'ratingVoters\', JSON_MERGE(COALESCE(JSON_EXTRACT(metadata, \'$.ratingVoters\'), \'{}\'), CAST(\'{"%d": "%s"}\' AS JSON))))', $value['voterID'], $value['vote']),
+              CMSDMS::PostgreSQL => sprintf('jsonb_set(metadata::jsonb, \'{ratingVoters}\', (metadata::jsonb->>\'ratingVoters\')::jsonb || \'{"%d": "%s"}\')', $value['voterID'], $value['vote'])
+            };
+
+            if (!isset($commentRatingVoters[$value['voterID']])) {
+              $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+                CMSDMS::MySQL => 'JSON_OBJECT(\'rating\', JSON_EXTRACT(`metadata`, \'$.rating\') + 1)',
+                CMSDMS::PostgreSQL => 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int + 1)'
+              };
+            } else {
+              if ($commentRatingVoters[$value['voterID']] !== $value['vote']) {
+                $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+                  CMSDMS::MySQL => 'JSON_OBJECT(\'rating\', JSON_EXTRACT(`metadata`, \'$.rating\') + 2)',
+                  CMSDMS::PostgreSQL => 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int + 2)'
+                };
+              }
+            }
+          } else if ($name === 'ratingVote' && $value['vote'] === 'down') {
+            $commentRatingVoters = $this->getRatingVoters();
+
+            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'ratingVoters\', JSON_MERGE(COALESCE(JSON_EXTRACT(metadata, \'$.ratingVoters\'), \'{}\'), CAST(\'{"%d": "%s"}\' AS JSON))))', $value['voterID'], $value['vote']),
+              CMSDMS::PostgreSQL => sprintf('jsonb_set(metadata::jsonb, \'{ratingVoters}\', (metadata::jsonb->>\'ratingVoters\')::jsonb || \'{"%d": "%s"}\')', $value['voterID'], $value['vote'])
+            };
+
+            if (!isset($commentRatingVoters[$value['voterID']])) {
+              $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+                CMSDMS::MySQL => 'JSON_OBJECT(\'rating\', JSON_EXTRACT(`metadata`, \'$.rating\') - 1)',
+                CMSDMS::PostgreSQL => 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int - 1)'
+              };
+            } else {
+              if ($commentRatingVoters[$value['voterID']] !== $value['vote']) {
+                $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+                  CMSDMS::MySQL => 'JSON_OBJECT(\'rating\', JSON_EXTRACT(`metadata`, \'$.rating\') - 2)',
+                  CMSDMS::PostgreSQL => 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int - 2)'
+                };
+              }
+            }
+          } else if ($name === 'isHidden') {
+            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'isHidden\', %d != 0)', $value),
+              CMSDMS::PostgreSQL => sprintf('jsonb_build_object(\'isHidden\', %d::int::bool)', $value)
+            };
+          } else if ($name === 'hiddenReason') {
+            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'hiddenReason\', \'%s\')', $value),
+              CMSDMS::PostgreSQL => sprintf('jsonb_build_object(\'hiddenReason\', \'%s\'::text)', $value)
+            };
+          } else if ($name === 'parentID') {
+            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
+              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'parentID\', \'%d\')', $value),
+              CMSDMS::PostgreSQL => sprintf('jsonb_build_object(\'parentID\', %d::int)', $value)
+            };
+          }
+        }
+
+        if (!empty($metadataAssignments)) {
+          $queryBuilder->statement->clauseSet->addColumn('metadata', sprintf('metadata::jsonb || %s', implode(' || ', $metadataAssignments)));
+          $queryBuilder->statement->clauseSet->addColumnAdaptive('metadata', [
+            'mysql' => 'JSON_MERGE_PRESERVE(COALESCE(`metadata`, \'{}\'), CAST(\'{' . implode(', ', $metadataAssignments) . '}\' AS JSON))',
+            'postgresql' => sprintf('metadata::jsonb || %s', implode(' || ', $metadataAssignments))
+          ]);
+        }
+      }
+    }
+
+    $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
+    $queryBuilder->statement->clauseSet->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    /** @var int $updatedUnixTimestamp Текущее время в UNIX-формате */
+    $updatedUnixTimestamp = time();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      error_log($queryBuilder->statement->assembled);
+      foreach ($data as $name => $value) {
+        if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata'])) {
+          $valueTypeName = gettype($value);
+          $valueType = match ($valueTypeName) {
+            'boolean' => \PDO::PARAM_BOOL,
+            'integer' => \PDO::PARAM_INT,
+            'string' => \PDO::PARAM_STR,
+            'null' => \PDO::PARAM_NULL,
+          };
+
+          $databaseQuery->bindParam(':' . $name, $data[$name], $valueType);
+        }
+      }
+
+      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+      $execute = $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    return $execute ? true : false;
+  }
+}

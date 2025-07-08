@@ -8,68 +8,80 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Database\QueryBuilder {
-  use \core\PHPLibrary\Database\QueryBuilder as QueryBuilder;
-  use \core\PHPLibrary\Database\QueryBuilder\StatementDelete\ClauseFrom as ClauseFrom;
-  use \core\PHPLibrary\Database\QueryBuilder\StatementDelete\ClauseWhere as ClauseWhere;
-  use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
+namespace core\PHPLibrary\Database\QueryBuilder;
+
+use \core\PHPLibrary\Database\QueryBuilder as QueryBuilder;
+use \core\PHPLibrary\Database\QueryBuilder\StatementDelete\ClauseFrom as ClauseFrom;
+use \core\PHPLibrary\Database\QueryBuilder\StatementDelete\ClauseWhere as ClauseWhere;
+use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
 
 
-  final class StatementDelete implements InterfaceStatement {
-    public QueryBuilder $query_builder;
-    public ClauseFrom|null $clause_from = null;
-    public ClauseWhere|null $clause_where = null;
-    public string $assembled = '';
+final class StatementDelete implements InterfaceStatement
+{
+  public QueryBuilder $queryBuilder;
+  public ClauseFrom|null $clauseFrom = null;
+  public ClauseWhere|null $clauseWhere = null;
+  public string $assembled = '';
 
-    /**
-     * __construct
-     *
-     * @param  mixed $query_builder
-     * @return void
-     */
-    public function __construct(QueryBuilder $query_builder) {
-      $this->query_builder = $query_builder;
-    }
-    
-    /**
-     * Установить предложение FROM
-     *
-     * @return void
-     */
-    public function set_clause_from() : void {
-      $this->clause_from = new ClauseFrom($this);
-    }
-    
-    /**
-     * Установить предложение WHERE
-     *
-     * @return void
-     */
-    public function set_clause_where() : void {
-      $this->clause_where = new ClauseWhere($this);
-    }
+  /**
+   * __construct
+   *
+   * @param  mixed $queryBuilder
+   * @return void
+   */
+  public function __construct(QueryBuilder $queryBuilder)
+  {
+    $this->queryBuilder = $queryBuilder;
+  }
+  
+  /**
+   * Установить предложение FROM
+   *
+   * @return void
+   */
+  public function setClauseFrom() : void
+  {
+    $this->clauseFrom = new ClauseFrom($this);
+  }
+  
+  /**
+   * Установить предложение WHERE
+   *
+   * @return void
+   */
+  public function setClauseWhere() : void
+  {
+    $this->clauseWhere = new ClauseWhere($this);
+  }
 
-    /**
-     * Сборка SQL-запроса
-     *
-     * @return void
-     */
-    public function assembly() : void {
-      $query_array = [];
+  /**
+   * Сборка SQL-запроса
+   *
+   * @return void
+   */
+  public function assembly() : void
+  {
+    $queryArray = [];
 
-      if (!is_null($this->clause_from)) {
-        $this->clause_from->assembly();
-        array_push($query_array, $this->clause_from->assembled);
+    $clausesToPrecess = $this->getClausesToProcess();
+    foreach ($clausesToPrecess as $clause) {
+      if ($clause !== null) {
+        $clause->assembly();
+        $queryArray[] = $clause->assembled;
       }
-
-      if (!is_null($this->clause_where)) {
-        $this->clause_where->assembly();
-        array_push($query_array, $this->clause_where->assembled);
-      }
-
-      $this->assembled = sprintf('DELETE %s;', implode(' ', $query_array));
     }
+
+    $this->assembled = sprintf('DELETE %s;', implode(' ', $queryArray));
+  }
+
+  /**
+   * Получение массива объектов предложений
+   */
+  private function getClausesToProcess() : array
+  {
+    return [
+      $this->clauseFrom,
+      $this->clauseWhere
+    ];
   }
 }
-
-?>

@@ -8,17 +8,16 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Template {
+namespace core\PHPLibrary\Template;
 
-  interface InterfaceCore {
-    public function __construct(\core\PHPLibrary\Template $template_base);
-    public function assembly() : void;
-    public function assembly_document() : string;
-    public function assembly_header() : string;
-    public function assembly_main() : string;
-    public function assembly_footer() : string;
-  }
+use \core\PHPLibrary\Template as Theme;
 
+interface InterfaceCore
+{
+  public function __construct(Theme $themeBase);
+  public function assembly() : void;
+  public function assemblyDocument() : string;
+  public function assemblyHeader() : string;
+  public function assemblyMain() : string;
+  public function assemblyFooter() : string;
 }
-
-?>

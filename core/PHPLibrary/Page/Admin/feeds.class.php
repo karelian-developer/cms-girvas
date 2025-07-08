@@ -8,126 +8,128 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Page\Admin {
-  use \core\PHPLibrary\InterfacePage as InterfacePage;
-  use \core\PHPLibrary\SystemCore as SystemCore;
-  use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-  use \core\PHPLibrary\Feeds as Feeds;
-  use \core\PHPLibrary\Feed\Builder as FeedBuilder;
-  use \core\PHPLibrary\Template\Collector as TemplateCollector;
-  use \core\PHPLibrary\Page as Page;
-  use \core\PHPLibrary\TraitPage as TraitPage;
-  use \core\PHPLibrary\Pagination as Pagination;
+namespace core\PHPLibrary\Page\Admin;
 
-  class PageFeeds implements InterfacePage {
-    use TraitPage;
+use \core\PHPLibrary\InterfacePage as InterfacePage;
+use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\Feeds as Feeds;
+use \core\PHPLibrary\Feed\Builder as FeedBuilder;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\TraitPage as TraitPage;
+use \core\PHPLibrary\Pagination as Pagination;
 
-    const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_FEEDS_NAVIGATION_%s_LABEL';
+class PageFeeds implements InterfacePage
+{
+  use TraitPage;
 
-    public SystemCore $system_core;
-    public Page $page;
-    public string $assembled = '';
-    public array $navigation_subsections_array = [
-      'index' => [
-        'name' => 'index',
-        'iconName' => 'index',
-        'link' => '/',
-        'permanent' => true,
-        'isActive' => false
-      ],
-      'feeds' => [
-        'name' => 'feeds',
-        'iconName' => 'feeds',
-        'link' => '/feeds',
-        'permanent' => false,
-        'isActive' => true
-      ],
-    ];
+  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_FEEDS_NAVIGATION_%s_LABEL';
 
-    /**
-     * __construct
-     * 
-     * @param SystemCore $system_core
-     * @param Page $page
-     */
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
-      $this->page = $page;
-    }
+  public SystemCore $CMSCore;
+  public Page $page;
+  public string $assembled = '';
+  public array $navigationSubsections = [
+    'index' => [
+      'name' => 'index',
+      'iconName' => 'index',
+      'link' => '/',
+      'permanent' => true,
+      'isActive' => false
+    ],
+    'feeds' => [
+      'name' => 'feeds',
+      'iconName' => 'feeds',
+      'link' => '/feeds',
+      'permanent' => false,
+      'isActive' => true
+    ],
+  ];
 
-    /**
-     * Инициализация подразделов
-     * 
-     * @return void
-     */
-    public function init_subnavigation() : void {
-      $template_source =& $this->system_core->template->core->source;
-      $this->init_admin_panel_subnavigation($this->system_core, $template_source);
-    }
-
-    /**
-     * Сборка
-     * 
-     * @return void
-     */
-    public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page/feeds.css', 'rel' => 'stylesheet']);
-
-      $locale_data = $this->system_core->locale->get_data();
-
-      $pagination_item_current = (!is_null($this->system_core->urlp->get_param('pageNumber'))) ? (int)$this->system_core->urlp->get_param('pageNumber') : 0;
-      $pagination_items_on_page = 12;
-
-      $feeds_items_assembled_array = [];
-      $feeds = new Feeds($this->system_core);
-      $feeds_locale_default = $this->system_core->get_cms_locale('admin');
-
-      $feeds_array_objects = $feeds->get_all([
-        'limit' => [$pagination_items_on_page, $pagination_item_current * $pagination_items_on_page]
-      ]);
-
-      $pagination = new Pagination($this->system_core, $feeds->get_count_total(), $pagination_items_on_page, $pagination_item_current);
-      $pagination->assembly();
-
-      unset($feeds);
-
-      foreach ($feeds_array_objects as $feed_index => $feed_object) {
-        $feed_object->init_data(['id', 'name', 'type_id', 'texts', 'created_unix_timestamp', 'updated_unix_timestamp']);
-
-        $feed_created_date_timestamp = date('d.m.Y H:i:s', $feed_object->get_created_unix_timestamp());
-        $feed_updated_date_timestamp = date('d.m.Y H:i:s', $feed_object->get_updated_unix_timestamp());
-
-        $feed_id = $feed_object->get_id();
-        $feed_title = $feed_object->get_title($feeds_locale_default->get_name());
-        $feed_title = strip_tags($feed_title);
-
-        $feed_name = $feed_object->get_name();
-        $feed_type_title = FeedBuilder::get_type_title($feed_object->get_type_id());
-        $feed_index_current = $feed_index + 1;
-
-        array_push($feeds_items_assembled_array, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/feeds/tableItem.tpl', [
-          'WEB_CHANNEL_ID' => $feed_id,
-          'WEB_CHANNEL_INDEX' => $feed_index_current,
-          'WEB_CHANNEL_NAME' => $feed_name,
-          'WEB_CHANNEL_TITLE' => $feed_title,
-          'WEB_CHANNEL_TYPE_TITLE' => $feed_type_title,
-          'WEB_CHANNEL_CREATED_DATE_TIMESTAMP' => $feed_created_date_timestamp,
-          'WEB_CHANNEL_UPDATED_DATE_TIMESTAMP' => $feed_updated_date_timestamp
-        ]));
-      }
-
-      /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/feeds.tpl', [
-        'PAGE_WEB_CHANNELS_PAGINATION' => $pagination->assembled,
-        'ADMIN_PANEL_PAGE_NAME' => 'web-channels',
-        'ADMIN_PANEL_WEB_CHANNELS_TABLE' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/feeds/table.tpl', [
-          'ADMIN_PANEL_WEB_CHANNELS_TABLE_ITEMS' => implode($feeds_items_assembled_array)
-        ])
-      ]);
-    }
-
+  /**
+   * __construct
+   * 
+   * @param SystemCore $CMSCore
+   * @param Page $page
+   */
+  public function __construct(SystemCore $CMSCore, Page $page)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->page = $page;
   }
 
-}
+  /**
+   * Инициализация подразделов
+   * 
+   * @return void
+   */
+  public function initSubnavigation() : void
+  {
+    $themeSource =& $this->CMSCore->theme->core->source;
+    $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
+  }
 
-?>
+  /**
+   * Сборка
+   * 
+   * @return void
+   */
+  public function assembly() : void
+  {
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page/feeds.css', 'rel' => 'stylesheet']);
+
+    $localeData = $this->CMSCore->locale->getData();
+    $localeName = $this->CMSCore->locale->getName();
+
+    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
+    $paginationItemsOnPage = 12;
+
+    $feedsItemsAssembled = [];
+    $feeds = new Feeds($this->CMSCore);
+    $feedsLocale = $this->CMSCore->getCMSLocale('admin');
+    $feedsLocaleName = $feedsLocale->getName();
+
+    $feedsObjects = $feeds->getAll([
+      'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
+    ]);
+
+    $pagination = new Pagination($this->CMSCore, $feeds->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
+    $pagination->assembly();
+
+    unset($feeds);
+
+    foreach ($feedsObjects as $index => $object) {
+      $object->initData(['id', 'name', 'typeID', 'texts', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+
+      $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
+      $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
+
+      $feedID = $object->getID();
+      $feedTitle = $object->getTitle($feedsLocaleName);
+      $feedTitle = strip_tags($feedTitle);
+
+      $feedName = $object->getName();
+      $feedTypeTitle = FeedBuilder::getTypeTitle($object->getTypeID());
+      $indexCurrent = $index + 1;
+
+      array_push($feedsItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds/tableItem.tpl', [
+        'WEB_CHANNEL_ID' => $feedID,
+        'WEB_CHANNEL_INDEX' => $indexCurrent,
+        'WEB_CHANNEL_NAME' => $feedName,
+        'WEB_CHANNEL_TITLE' => $feedTitle,
+        'WEB_CHANNEL_TYPE_TITLE' => $feedTypeTitle,
+        'WEB_CHANNEL_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
+        'WEB_CHANNEL_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
+      ]));
+    }
+
+    /** @var string $site_page Содержимое шаблона страницы */
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds.tpl', [
+      'PAGE_WEB_CHANNELS_PAGINATION' => $pagination->assembled,
+      'ADMIN_PANEL_PAGE_NAME' => 'web-channels',
+      'ADMIN_PANEL_WEB_CHANNELS_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds/table.tpl', [
+        'ADMIN_PANEL_WEB_CHANNELS_TABLE_ITEMS' => implode($feedsItemsAssembled)
+      ])
+    ]);
+  }
+}

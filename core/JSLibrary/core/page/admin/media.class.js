@@ -53,7 +53,7 @@ export class PageMedia {
         request.target.data = formData;
 
         request.target.send().then((data) => {
-          if (data.statusCode == 1) {
+          if (data.statusCode === 1) {
             element.remove();
             interactiveModal.target.close();
           }
@@ -101,7 +101,7 @@ export class PageMedia {
     request.target.data = formData;
 
     request.target.send().then((data) => {
-      if (data.statusCode == 1 && data.outputData.hasOwnProperty('file')) {
+      if (data.statusCode === 1 && data.outputData.hasOwnProperty('file')) {
         let fileName, fileURL;
 
         fileName = data.outputData.file.fullname;
@@ -137,7 +137,7 @@ export class PageMedia {
         this.initMediaElement(listItemElement);
       }
 
-      if (data.statusCode == 1 && fileIndex < (inputElement.files.length - 1)) {
+      if (data.statusCode === 1 && fileIndex < (inputElement.files.length - 1)) {
         this.uploadFile(inputElement, fileIndex + 1);
       }
     });

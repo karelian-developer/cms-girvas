@@ -19,125 +19,123 @@ use \core\PHPLibrary\EntriesSamples as EntriesSamples;
 use \core\PHPLibrary\SystemCore\Locale as Locale;
 use \core\PHPLibrary\EntriesSample\EnumSortTypeID as EnumSortTypeID;
 
-if ($system_core->client->is_logged(2)) {
-  $client_user = $system_core->client->get_user(2);
-  $client_user->init_data(['metadata']);
-  $client_user_group = $client_user->get_group();
-  $client_user_group->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($client_user_group->permission_check($client_user_group::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT)) {
-    $data_for_updated = [];
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT)) {
+    $dataUpdated = [];
     
     /** @var int ID выборки */
-    $sample_id = (is_numeric($system_core->urlp->get_path(3))) ? (int)$system_core->urlp->get_path(3) : 0;
+    $sampleID = $CMSCore->urlp->getPath(3) ?? 0;
+    $sampleID = is_numeric($sampleID) ? (int) $sampleID : 0;
     
     /** @var string Техническое наименование выборки */
-    $sample_name = isset($_PATCH['entries_sample_name']) ? $_PATCH['entries_sample_name'] : '';
-    $sample_name = trim($sample_name);
-    $sample_name = strtolower($sample_name);
+    $sampleName = $_PATCH['entries_sample_name'] ?? '';
+    $sampleName = strtolower(trim($sampleName));
 
     /** @var int Лимит на количество записей в выборке */
-    $sample_limit_count = isset($_PATCH['entries_sample_limit_count']) ? $_PATCH['entries_sample_limit_count'] : 0;
-    $sample_limit_count = is_numeric($sample_limit_count) ? (int)$sample_limit_count : 0;
+    $sampleLimitCount = $_PATCH['entries_sample_limit_count'] ?? 0;
+    $sampleLimitCount = is_numeric($sampleLimitCount) ? (int) $sampleLimitCount : 0;
     
-    $sample_sort_type_id = isset($_PATCH['entries_sample_sort_type_id']) ? $_PATCH['entries_sample_sort_type_id'] : 0;
-    $sample_sort_type_id = is_numeric($sample_sort_type_id) ? (int)$sample_sort_type_id : 0;
-    $sample_sort_type_id = match ($sample_sort_type_id) {
-      1 => EnumSortTypeID::BY_DATE_OF_PUBLICATION->get_id(),
-      2 => EnumSortTypeID::BY_DATE_OF_CREATION->get_id(),
-      3 => EnumSortTypeID::BY_NUMBER_OF_VIEW->get_id(),
-      4 => EnumSortTypeID::BY_NUMBER_OF_COMMENTS->get_id(),
-      5 => EnumSortTypeID::BY_RELEVANCE->get_id(),
-      default => EnumSortTypeID::BY_DATE_OF_PUBLICATION->get_id()
+    $sampleSortTypeID = $_PATCH['entries_sample_sort_type_id'] ?? 0;
+    $sampleSortTypeID = is_numeric($sampleSortTypeID) ? (int) $sampleSortTypeID : 0;
+    $sampleSortTypeID = match ($sampleSortTypeID) {
+      1 => EnumSortTypeID::BY_DATE_OF_PUBLICATION->getID(),
+      2 => EnumSortTypeID::BY_DATE_OF_CREATION->getID(),
+      3 => EnumSortTypeID::BY_NUMBER_OF_VIEW->getID(),
+      4 => EnumSortTypeID::BY_NUMBER_OF_COMMENTS->getID(),
+      5 => EnumSortTypeID::BY_RELEVANCE->getID(),
+      default => EnumSortTypeID::BY_DATE_OF_PUBLICATION->getID()
     };
 
-    $sample_categories_ids = isset($_PATCH['entries_sample_categories_id']) ? $_PATCH['entries_sample_categories_id'] : [];
+    $sampleCategoriesIDs = $_PATCH['entries_sample_categories_id'] ?? [];
     
     /** @var array Текстовые значения для выборки */
-    $sample_texts = [];
+    $sampleTexts = [];
 
-    $locales_names = $system_core->get_array_locales_names();
-    if (count($locales_names) > 0) {
-      foreach ($locales_names as $locale_index => $locale_name) {
-        $locale = new Locale($system_core, $locale_name);
-        $locale_iso_639_2 = $locale->get_iso_639_2();
+    $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+    if (count($CMSLocalesNames) > 0) {
+      foreach ($CMSLocalesNames as $index => $localeName) {
+        $CMSLocale = new Locale($CMSCore, $localeName);
+        $CMSLocaleName = $CMSLocale->getName();
 
-        $input_sample_title_name = sprintf('entries_sample_title_%s', $locale_iso_639_2);
-        $input_sample_description_name = sprintf('entries_sample_description_%s', $locale_iso_639_2);
+        $inputTitleName = 'entries_sample_title_' . $CMSLocale->getISO639(2);
+        $textareaDescriptionName = 'entries_sample_description_' . $CMSLocale->getISO639(2);
 
-        if (isset($_PATCH[$input_sample_title_name]) || isset($_PATCH[$input_sample_description_name])) {
-          $data_for_updated['texts'] = [];
+        if (isset($_PATCH[$inputTitleName]) || isset($_PATCH[$textareaDescriptionName])) {
+          $dataUpdated['texts'] = [];
           
-          $sample_title = isset($_PATCH[$input_sample_title_name]) ? $_PATCH[$input_sample_title_name] : '';
-          $sample_description = isset($_PATCH[$input_sample_description_name]) ? $_PATCH[$input_sample_description_name] : '';
+          $sampleTitle = $_PATCH[$inputTitleName] ?? '';
+          $sampleDescription = $_PATCH[$textareaDescriptionName] ?? '';
           
-          if (!isset($sample_texts[$locale_name])) $sample_texts[$locale_name] = [];
+          if (!isset($sampleTexts[$localeName])) $sampleTexts[$localeName] = [];
 
-          if (preg_match('/\S/', $sample_title)) {
-            $input_value = trim($sample_title);
-            $input_value = preg_replace('/<script(.*?)>(.*?)<\/script>/is', '', $sample_title);
-            $input_value = str_replace('\'', '"', $sample_title);
+          if (preg_match('/\S/', $sampleTitle)) {
+            $inputValue = trim($sampleTitle);
+            $inputValue = strip_tags($inputValue);
+            $inputValue = str_replace('\'', '"', $inputValue);
 
-            $data_for_updated['texts'][$locale_name]['title'] = $input_value;
+            $dataUpdated['texts'][$localeName]['title'] = $inputValue;
           }
 
-          if (preg_match('/\S/', $sample_description)) {
-            $textarea_value = trim($sample_description);
-            $textarea_value = preg_replace('/<script(.*?)>(.*?)<\/script>/is', '', $sample_description);
-            $textarea_value = str_replace('\'', '"', $sample_description);
+          if (preg_match('/\S/', $sampleDescription)) {
+            $textareaValue = trim($sampleDescription);
+            $textareaValue = strip_tags($textareaValue);
+            $textareaValue = str_replace('\'', '"', $textareaValue);
 
-            $data_for_updated['texts'][$locale_name]['description'] = $textarea_value;
+            $dataUpdated['texts'][$localeName]['description'] = $textareaValue;
           }
         }
       }
     }
 
     /** @var array Метаданные для выборки */
-    $data_for_updated['metadata'] = [];
+    $dataUpdated['metadata'] = [];
 
-    $data_for_updated['metadata']['limitCount'] = $sample_limit_count;
-    $data_for_updated['metadata']['sortTypeID'] = $sample_sort_type_id;
+    $dataUpdated['metadata']['limitCount'] = $sampleLimitCount;
+    $dataUpdated['metadata']['sortTypeID'] = $sampleSortTypeID;
 
-    if (!empty($sample_categories_ids)) {
-      $data_for_updated['metadata']['categoriesIDs'] = [];
+    if (!empty($sampleCategoriesIDs)) {
+      $dataUpdated['metadata']['categoriesIDs'] = [];
 
-      foreach ($sample_categories_ids as $sample_category_id) {
-        if (EntryCategory::exists_by_id($system_core, $sample_category_id)) {
-          array_push($data_for_updated['metadata']['categoriesIDs'], $sample_category_id);
+      foreach ($sampleCategoriesIDs as $id) {
+        if (EntryCategory::existsByID($CMSCore, $id)) {
+          array_push($dataUpdated['metadata']['categoriesIDs'], $id);
         }
       }
     }
 
-    if (preg_match('/\S/', $sample_name)) {
-      if (EntriesSample::exists_by_id($system_core, $sample_id)) {
-        $sample = new EntriesSample($system_core, $sample_id);
-        $sample->init_data(['name', 'texts', 'metadata', 'created_unix_timestamp', 'updated_unix_timestamp']);
+    if (preg_match('/\S/', $sampleName)) {
+      if (EntriesSample::existsByID($CMSCore, $sampleID)) {
+        $sample = new EntriesSample($CMSCore, $sampleID);
+        $sample->initData(['name', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
 
-        if (!EntriesSample::exists_by_name($system_core, $sample_name) || $sample_name == $sample->get_name()) {
-          $data_for_updated['name'] = $sample_name;
+        if (!EntriesSample::existsByName($CMSCore, $sampleName) || $sampleName === $sample->getName()) {
+          $dataUpdated['name'] = $sampleName;
 
-          $is_updated = $sample->update($data_for_updated);
+          $isUpdated = $sample->update($dataUpdated);
 
-          if ($is_updated) {
-            $handler_message = $system_core->locale->get_single_value_by_key('API_PATCH_DATA_SUCCESS');
-            $handler_status_code = 1;
+          if ($isUpdated) {
+            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
+            $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {
-            $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN'));
-            $handler_status_code = 0;
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         }
       }
     } else {
-      $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ENTRIES_SAMPLE_ERROR_NAME_EMPTY'));
-      $handler_status_code = 0;
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRIES_SAMPLE_ERROR_NAME_EMPTY');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS'));
-    $handler_status_code = 0;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

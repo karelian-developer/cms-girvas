@@ -8,34 +8,34 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary {
+namespace core\PHPLibrary;
+
+/**
+ * Форум
+ * 
+ * @author Andrey Shestakov <drelagas.new@gmail.com>
+ * @version 0.0.1
+ */
+#[\AllowDynamicProperties]
+final class Forum
+{
+  /** @var SystemCore|null Объект системного ядра */
+  public SystemCore|null $CMSCore = null;
 
   /**
-   * Форум
+   * __construct
+   *
+   * @param  SystemCore $CMSCore
    * 
-   * @author Andrey Shestakov <drelagas.new@gmail.com>
-   * @version 0.0.1
+   * @return void
    */
-  #[\AllowDynamicProperties]
-  final class Forum {
-    /** @var SystemCore|null Объект системного ядра */
-    public SystemCore|null $system_core = null;
+  public function __construct(SystemCore $CMSCore)
+  {
+    $this->CMSCore = $CMSCore;
+  }
 
-    /**
-     * __construct
-     *
-     * @param  SystemCore $system_core
-     * @param  string $name
-     * @return void
-     */
-    public function __construct(SystemCore $system_core) {
-      $this->system_core = $system_core;
-    }
+  public function getCategories()
+  {
 
-    public function get_categories() {
-
-    }
   }
 }
-
-?>

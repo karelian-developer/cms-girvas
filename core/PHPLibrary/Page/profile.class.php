@@ -8,194 +8,181 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Page {
-  use \core\PHPLibrary\InterfacePage as InterfacePage;
-  use \core\PHPLibrary\SystemCore as SystemCore;
-  use \core\PHPLibrary\Page as Page;
-  use \core\PHPLibrary\Parsedown as Parsedown;
-  use \core\PHPLibrary\User as User;
-  use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-  use \core\PHPLibrary\Template\Collector as TemplateCollector;
+namespace core\PHPLibrary\Page;
 
-  class PageProfile implements InterfacePage {
-    public SystemCore $system_core;
-    public Page $page;
-    public string $assembled = '';
-    
-    /**
-     * __construct
-     *
-     * @param  SystemCore $system_core
-     * @param  Page $page
-     * @return void
-     */
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
-      $this->page = $page;
-    }
+use \core\PHPLibrary\InterfacePage as InterfacePage;
+use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
-    /**
-     * Получение массива дополнительных полей
-     * 
-     * @return array
-     */
-    private function get_additional_fields() : array {
-      
-    }
-    
-    /**
-     * Сборка шаблона страницы
-     *
-     * @return void
-     */
-    public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-      $this->system_core->template->add_style(['href' => 'styles/page/profile.css', 'rel' => 'stylesheet']);
-      
-      $cms_base_locale_setted_name = $this->system_core->configurator->get_database_entry_value('base_locale');
-      $url_base_locale_setted_name = $this->system_core->urlp->get_param('locale');
-      $cookie_base_locale_setted_name = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
-      
-      $cms_base_locale_name = (!is_null($url_base_locale_setted_name)) ? $url_base_locale_setted_name : $cookie_base_locale_setted_name;
-      $cms_base_locale_name = (!is_null($cms_base_locale_name)) ? $cms_base_locale_name : $cms_base_locale_setted_name;
-      $cms_base_locale = new SystemCoreLocale($this->system_core, $cms_base_locale_name);
-      if (!$cms_base_locale->exists_file_data_json()) {
-        $cms_base_locale = new SystemCoreLocale($this->system_core, $cms_base_locale_setted_name);
-        $cms_base_locale_name = $cms_base_locale_setted_name;
-      }
-
-      $this->system_core->locale = $cms_base_locale;
-      $locale_data = $this->system_core->locale->get_data();
-
-      if ($this->system_core->client->is_logged(1)) {
-        $user = $this->system_core->client->get_user(1);
-        $user->init_data(['login', 'metadata']);
-        
-        $profile_user_login = (!is_null($this->system_core->urlp->get_path(1))) ? $this->system_core->urlp->get_path(1) : $user->get_login();
-        
-        /**
-         * @var User Объект пользователя
-         */
-        $profile_user = null;
-        if (User::exists_by_login($this->system_core, $profile_user_login)) {
-          $profile_user = User::get_by_login($this->system_core, $profile_user_login);
-          // Инициализация данных пользователя
-          $profile_user->init_data(['login', 'email', 'metadata']);
-        }
-        
-        if (!is_null($profile_user)) {
-          $user_group = $user->get_group();
-          $user_group->init_data(['permissions']);
-
-          $fields_types = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_type')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_type'), true) : [];
-          $fields_titles = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_title')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_title'), true) : [];
-          $fields_descriptions = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_description')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_description'), true) : [];
-          $fields_names = ($this->system_core->configurator->exists_database_entry_value('users_additional_field_name')) ? json_decode($this->system_core->configurator->get_database_entry_value('users_additional_field_name'), true) : [];
-
-          $additional_fields_elements = [];
-
-          if ($this->system_core->urlp->get_param('event') == 'edit') {
-            if ($user_group->permission_check($user_group::PERMISSION_ADMIN_USERS_MANAGEMENT) || $user->get_id() == $profile_user->get_id()) {
-              foreach ($fields_types as $field_index => $field_type) {
-                $field_name_exploded = (isset($fields_names[$field_index])) ? explode('_', $fields_names[$field_index]) : [];
-                $field_name_transformed = implode($field_name_exploded);
-
-                $field_name = (isset($fields_names[$field_index])) ? $fields_names[$field_index] : '';
-                $field_title = (isset($fields_titles[$cms_base_locale_name][$field_index])) ? $fields_titles[$cms_base_locale_name][$field_index] : '';
-                $field_description = (isset($fields_descriptions[$cms_base_locale_name][$field_index])) ? $fields_descriptions[$cms_base_locale_name][$field_index] : '';
-                $field_value = (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? strip_tags($profile_user->get_additional_field_data($field_name_transformed)) : '';
-                $field_type = (isset($fields_types[$field_index])) ? $fields_types[$field_index] : 'text';
-
-                if ($field_title != '') {
-                  foreach ($field_name_exploded as $string_index => $string) {
-                    if ($string_index > 0) {
-                      $field_name_exploded[$string_index] = ucfirst($string);
-                    }
-                  }
-
-                  array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile/editor/fieldInput.tpl', [
-                    'FIELD_NAME' => $field_name,
-                    'FIELD_TYPE' => ($field_type == 'textarea') ? '' : $field_type,
-                    'FIELD_TITLE' => $field_title,
-                    'FIELD_DESCRIPTION' => $field_description,
-                    'FIELD_VALUE' => $field_value
-                  ]));
-                }
-              }
-
-              $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page.tpl', [
-                'PAGE_NAME' => 'profile-editor',
-                'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile/editor.tpl', [
-                  'USER_ID' => $profile_user->get_id(),
-                  'USER_LOGIN' => $profile_user->get_login(),
-                  'USER_AVATAR_URL' => $profile_user->get_avatar_url(128),
-                  'USER_EMAIL' => $profile_user->get_email(),
-                  'USER_NAME' => $profile_user->get_name(),
-                  'USER_SURNAME' => $profile_user->get_surname(),
-                  'USER_PATRONYMIC' => $profile_user->get_patronymic(),
-                  'USER_BIRTHDATE' => date('Y-m-d', $profile_user->get_birthdate_unix_timestamp()),
-                  'PROFILE_ADDITIONAL_FIELDS' => implode($additional_fields_elements)
-                ])
-              ]);
-            } else {
-              http_response_code(404);
-
-              $page_error = new PageError($this->system_core, $this->page, 404);
-              $page_error->assembly();
-              $this->assembled = $page_error->assembled;
-            }
-          } else {
-            foreach ($fields_types as $field_index => $field_type) {
-              $field_name_exploded = explode('_', $fields_names[$field_index]);
-              
-              foreach ($field_name_exploded as $string_index => $string) {
-                if ($string_index > 0) {
-                  $field_name_exploded[$string_index] = ucfirst($string);
-                }
-              }
-              $field_name_transformed = implode($field_name_exploded);
-
-              array_push($additional_fields_elements, TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile/additionalField.tpl', [
-                'FIELD_TITLE' => $fields_titles[$cms_base_locale_name][$field_index],
-                'FIELD_VALUE' => (!is_null($profile_user->get_additional_field_data($field_name_transformed))) ? strip_tags($profile_user->get_additional_field_data($field_name_transformed)) : ''
-              ]));
-            }
-
-            $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page.tpl', [
-              'PAGE_NAME' => 'profile',
-              'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/profile.tpl', [
-                'USER_ID' => $profile_user->get_id(),
-                'USER_LOGIN' => $profile_user->get_login(),
-                'USER_AVATAR_URL' => $profile_user->get_avatar_url(128),
-                'USER_EMAIL' => $profile_user->get_email(),
-                'USER_NAME' => $profile_user->get_name(),
-                'USER_SURNAME' => $profile_user->get_surname(),
-                'USER_PATRONYMIC' => $profile_user->get_patronymic(),
-                'USER_BIRTHDATE' => date('d.m.Y', $profile_user->get_birthdate_unix_timestamp()),
-                'USER_BIRTHDATE_MINIMUM' => date('Y-m-d', time() - 3155760000),
-                'USER_BIRTHDATE_MAXIMUM' => date('Y-m-d', time() - 441763200),
-                'PROFILE_ADDITIONAL_FIELDS' => implode($additional_fields_elements)
-              ])
-            ]);
-          }
-        } else {
-          http_response_code(404);
-
-          $page_error = new PageError($this->system_core, $this->page, 404);
-          $page_error->assembly();
-          $this->assembled = $page_error->assembled;
-        }
-      } else {
-        http_response_code(503);
-
-        $page_error = new PageError($this->system_core, $this->page, 503);
-        $page_error->assembly();
-        $this->assembled = $page_error->assembled;
-      }
-    }
-
+class PageProfile implements InterfacePage
+{
+  public SystemCore $CMSCore;
+  public Page $page;
+  public string $assembled = '';
+  
+  /**
+   * __construct
+   *
+   * @param  SystemCore $CMSCore
+   * @param  Page $page
+   * @return void
+   */
+  public function __construct(SystemCore $CMSCore, Page $page)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->page = $page;
   }
 
-}
+  /**
+   * Получение массива дополнительных полей
+   * 
+   * @return array
+   */
+  private function getAdditionalFields() : array
+  {
+    // ...
+  }
+  
+  /**
+   * Сборка шаблона страницы
+   *
+   * @return void
+   */
+  public function assembly() : void
+  {
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page/profile.css', 'rel' => 'stylesheet']);
+    
+    $localeData = $this->CMSCore->locale->getData();
+    $localeName = $this->CMSCore->locale->getName();
 
-?>
+    if ($this->CMSCore->client->isLogged(1)) {
+      $user = $this->CMSCore->client->getUser(1);
+      $user->initData(['login', 'metadata']);
+      
+      $profileUserLogin = $this->CMSCore->urlp->getPath(1) ?? $user->getLogin();
+      
+      /**
+       * @var User Объект пользователя
+       */
+      $profileUser = null;
+      if (User::existsByLogin($this->CMSCore, $profileUserLogin)) {
+        $profileUser = User::getByLogin($this->CMSCore, $profileUserLogin);
+        $profileUser->initData(['login', 'email', 'metadata']);
+      }
+      
+      if ($profileUser !== null) {
+        $userGroup = $user->getGroup();
+        $userGroup->initData(['permissions']);
+
+        $fieldsTypes = $this->CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_type') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_type'), true) : [];
+        $fieldsTitles = $this->CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_title') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_title'), true) : [];
+        $fieldsDescriptions = $this->CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_description') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_description'), true) : [];
+        $fieldsNames = $this->CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_name') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_name'), true) : [];
+
+        $additionalFieldsElements = [];
+
+        if ($this->CMSCore->urlp->getParam('event') === 'edit') {
+          if ($userGroup->permissionCheck($userGroup::PERMISSION_ADMIN_USERS_MANAGEMENT) || $user->getID() == $profileUser->getID()) {
+            foreach ($fieldsTypes as $fieldIndex => $fieldType) {
+              $fieldNameExploded = isset($fieldsNames[$fieldIndex]) ? explode('_', $fieldsNames[$fieldIndex]) : [];
+              $fieldNameTransformed = implode($fieldNameExploded);
+
+              $fieldName = $fieldsNames[$fieldIndex] ?? '';
+              $fieldTitle = isset($fieldsTitles[$localeName][$fieldIndex]) ? $fieldsTitles[$localeName][$fieldIndex] : '';
+              $fieldDescription = isset($fieldsDescriptions[$localeName][$fieldIndex]) ? $fieldsDescriptions[$localeName][$fieldIndex] : '';
+              $fieldValue = !is_null($profileUser->getAdditionalFieldData($fieldNameTransformed)) ? strip_tags($profileUser->getAdditionalFieldData($fieldNameTransformed)) : '';
+              $fieldType = $fieldsTypes[$fieldIndex] ?? 'text';
+
+              if ($fieldTitle !== '') {
+                foreach ($fieldNameExploded as $stringIndex => $string) {
+                  if ($stringIndex > 0) {
+                    $fieldNameExploded[$stringIndex] = ucfirst($string);
+                  }
+                }
+
+                array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/editor/fieldInput.tpl', [
+                  'FIELD_NAME' => $fieldName,
+                  'FIELD_TYPE' => $fieldType === 'textarea' ? '' : $fieldType,
+                  'FIELD_TITLE' => $fieldTitle,
+                  'FIELD_DESCRIPTION' => $fieldDescription,
+                  'FIELD_VALUE' => $fieldValue
+                ]));
+              }
+            }
+
+            $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+              'PAGE_NAME' => 'profile-editor',
+              'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/editor.tpl', [
+                'USER_ID' => $profileUser->getID(),
+                'USER_LOGIN' => $profileUser->getLogin(),
+                'USER_AVATAR_URL' => $profileUser->getAvatarURL(128),
+                'USER_EMAIL' => $profileUser->getEmail(),
+                'USER_NAME' => $profileUser->getName(),
+                'USER_SURNAME' => $profileUser->getSurname(),
+                'USER_PATRONYMIC' => $profileUser->getPatronymic(),
+                'USER_BIRTHDATE' => date('Y-m-d', $profileUser->getBirthdateUnixTimestamp()),
+                'PROFILE_ADDITIONAL_FIELDS' => implode($additionalFieldsElements)
+              ])
+            ]);
+          } else {
+            http_response_code(404);
+
+            $pageError = new PageError($this->CMSCore, $this->page, 404);
+            $pageError->assembly();
+            $this->assembled = $pageError->assembled;
+          }
+        } else {
+          foreach ($fieldsTypes as $fieldIndex => $fieldType) {
+            $fieldNameExploded = explode('_', $fieldsNames[$fieldIndex]);
+            
+            foreach ($fieldNameExploded as $stringIndex => $string) {
+              if ($stringIndex > 0) {
+                $fieldNameExploded[$stringIndex] = ucfirst($string);
+              }
+            }
+            $fieldNameTransformed = implode($fieldNameExploded);
+
+            array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/additionalField.tpl', [
+              'FIELD_TITLE' => $fieldsTitles[$localeName][$fieldIndex],
+              'FIELD_VALUE' => $profileUser->getAdditionalFieldData($fieldNameTransformed) !== null ? strip_tags($profileUser->getAdditionalFieldData($fieldNameTransformed)) : ''
+            ]));
+          }
+
+          $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+            'PAGE_NAME' => 'profile',
+            'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile.tpl', [
+              'USER_ID' => $profileUser->getID(),
+              'USER_LOGIN' => $profileUser->getLogin(),
+              'USER_AVATAR_URL' => $profileUser->getAvatarURL(128),
+              'USER_EMAIL' => $profileUser->getEmail(),
+              'USER_NAME' => $profileUser->getName(),
+              'USER_SURNAME' => $profileUser->getSurname(),
+              'USER_PATRONYMIC' => $profileUser->getPatronymic(),
+              'USER_BIRTHDATE' => date('d.m.Y', $profileUser->getBirthdateUnixTimestamp()),
+              'USER_BIRTHDATE_MINIMUM' => date('Y-m-d', time() - 3155760000),
+              'USER_BIRTHDATE_MAXIMUM' => date('Y-m-d', time() - 441763200),
+              'PROFILE_ADDITIONAL_FIELDS' => implode($additionalFieldsElements)
+            ])
+          ]);
+        }
+      } else {
+        http_response_code(404);
+
+        $pageError = new PageError($this->CMSCore, $this->page, 404);
+        $pageError->assembly();
+        $this->assembled = $pageError->assembled;
+      }
+    } else {
+      http_response_code(503);
+
+      $pageError = new PageError($this->CMSCore, $this->page, 503);
+      $pageError->assembly();
+      $this->assembled = $pageError->assembled;
+    }
+  }
+}

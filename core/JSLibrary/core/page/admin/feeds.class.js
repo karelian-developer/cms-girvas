@@ -55,15 +55,15 @@ export class PageFeeds {
         
         for (let button of buttons) {
           button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') == 'web-channel-edit') {
+            if (button.getAttribute('role') === 'web-channel-edit') {
               window.location.href = `./feed/${feedID}`;
             }
             
-            if (button.getAttribute('role') == 'web-channel-view') {
+            if (button.getAttribute('role') === 'web-channel-view') {
               window.open(`/feed/${feedName}`, '_blank');
             }
 
-            if (button.getAttribute('role') == 'web-channel-remove') {
+            if (button.getAttribute('role') === 'web-channel-remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_WEB_CHANNEL_DELETE_TITLE,
                 content: localeData.MODAL_WEB_CHANNEL_DELETE_DESCRIPTION
@@ -81,7 +81,7 @@ export class PageFeeds {
                 request.target.data = formData;
       
                 request.target.send().then((data) => {
-                  if (data.statusCode == 1) {
+                  if (data.statusCode === 1) {
                     window.location.href = '/admin/feeds';
                   }
                 });

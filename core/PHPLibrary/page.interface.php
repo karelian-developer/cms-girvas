@@ -8,10 +8,9 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary {
-  interface InterfacePage {
-    public function assembly() : void;
-  }
-}
+namespace core\PHPLibrary;
 
-?>
+interface InterfacePage
+{
+  public function assembly() : void;
+}

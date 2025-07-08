@@ -8,11 +8,25 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
+<<<<<<< HEAD
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
+=======
+use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\EmailSender as EmailSender;
+use \core\PHPLibrary\Template as Theme;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\SystemCore as CMSCore;
+>>>>>>> develop
 
 // Абсолютный путь до корневой директории CMS
 define('CMS_ROOT_DIRECTORY', preg_replace('/[\/]*$/', '', $_SERVER['DOCUMENT_ROOT']));
+
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', CMS_ROOT_DIRECTORY . '/logs/girvas-error.log');
+
 // ‿︵‿ヽ(°□° )ノ︵‿︵
 define('IS_NOT_HACKED', true);
 
@@ -20,79 +34,111 @@ if (PHP_VERSION_ID < 80200) {
   die(sprintf('PHP version is too old (you have %s). CMS "GIRVAS" works on PHP version 8.2.0 and higher.', phpversion()));
 }
 
+<<<<<<< HEAD
+require_once CMS_ROOT_DIRECTORY . '/core/PHPLibrary/systemCore.class.php';
+=======
+$startTime = microtime(true);
+>>>>>>> develop
+
 require_once CMS_ROOT_DIRECTORY . '/core/PHPLibrary/systemCore.class.php';
 
-$system_core = new \core\PHPLibrary\SystemCore();
+$CMSCore = new CMSCore();
+$CMSURLP = $CMSCore->urlp;
 
-if ($system_core->urlp->get_path(0) == 'handler') {
-
+<<<<<<< HEAD
   include_once CMS_ROOT_DIRECTORY . '/handler.php';
+=======
+$CMSURLPathes = [];
+$CMSURLPathes[] = $CMSURLP->getPath(0);
+>>>>>>> develop
 
-} else if ($system_core->urlp->get_path(0) == 'sitemap') {
+if ($CMSURLPathes[0] === 'handler') {
 
+<<<<<<< HEAD
   include_once CMS_ROOT_DIRECTORY . '/sitemap.php';
+=======
+  include_once CMS_ROOT_DIRECTORY . '/handler.php';
+>>>>>>> develop
 
-} else if ($system_core->urlp->get_path(0) == 'rss') {
+} else if ($CMSURLPathes[0] === 'sitemap') {
 
+<<<<<<< HEAD
   include_once CMS_ROOT_DIRECTORY . '/rss.php';
+=======
+  include_once CMS_ROOT_DIRECTORY . '/sitemap.php';
+>>>>>>> develop
 
-} else if ($system_core->urlp->get_path(0) == 'feed') {
+} else if ($CMSURLPathes[0] === 'rss') {
+
+<<<<<<< HEAD
+  include_once CMS_ROOT_DIRECTORY . '/feed.php';
+=======
+  include_once CMS_ROOT_DIRECTORY . '/rss.php';
+>>>>>>> develop
+
+} else if ($CMSURLPathes[0] === 'feed') {
 
   include_once CMS_ROOT_DIRECTORY . '/feed.php';
 
-} else if ($system_core->urlp->get_path(0) == 'password-reset') {
+} else if ($CMSURLPathes[0] === 'sql-execute-forced') {
 
-  $query_builder = new \core\PHPLibrary\Database\QueryBuilder($system_core);
-  $query_builder->set_statement_select();
-  $query_builder->statement->add_selections(['id']);
-  $query_builder->statement->set_clause_from();
-  $query_builder->statement->clause_from->add_table('users');
-  $query_builder->statement->clause_from->assembly();
-  $query_builder->statement->set_clause_where();
-  $query_builder->statement->clause_where->add_condition(sprintf('metadata::jsonb->>\'passwordResetToken\' = \'%s\'', $system_core->urlp->get_param('token')));
-  $query_builder->statement->clause_where->assembly();
-  $query_builder->statement->set_clause_limit(1);
-  $query_builder->statement->assembly();
+  if (file_exists(CMS_ROOT_DIRECTORY . '/sqlExecute.php')) {
+    include_once CMS_ROOT_DIRECTORY . '/sqlExecute.php';
+  }
 
-  $database_connection = $system_core->database_connector->database->connection;
-  $database_query = $database_connection->prepare($query_builder->statement->assembled);
-  $database_query->execute();
+} else if ($CMSURLPathes[0] === 'password-reset') {
 
-  $result = $database_query->fetch(\PDO::FETCH_ASSOC);
+  $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+  $queryBuilder->setStatementSelect();
+  $queryBuilder->statement->addSelections(['id']);
+  $queryBuilder->statement->setClauseFrom();
+  $queryBuilder->statement->clauseFrom->addTable('users');
+  $queryBuilder->statement->clauseFrom->assembly();
+  $queryBuilder->statement->setClauseWhere();
+  $queryBuilder->statement->clauseWhere->addCondition(sprintf('metadata::jsonb->>\'passwordResetToken\' = \'%s\'', $CMSURLP->getParam('token')));
+  $queryBuilder->statement->clauseWhere->assembly();
+  $queryBuilder->statement->setClauseLimit(1);
+  $queryBuilder->statement->assembly();
 
-  $user = ($result) ? new \core\PHPLibrary\User($system_core, (int)$result['id']) : null;
+  $databaseConnection = $CMSCore->databaseConnector->database->connection;
+  $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+  $databaseQuery->execute();
 
-  if (!is_null($user)) {
-    $user->init_data(['login', 'email', 'metadata', 'security_hash']);
+  $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+
+  $user = $result ? new User($CMSCore, (int)$result['id']) : null;
+
+  if ($user !== null) {
+    $user->initData(['login', 'email', 'metadata', 'securityHash']);
     
-    if ($user->get_password_reset_created_unix_timestamp() + 600 > time()) {
-      $user_new_password = random_int(10000000, 99999999);
-      $user->update(['password_hash' => \core\PHPLibrary\User::password_hash($system_core, $user->get_security_hash(), $user_new_password), 'metadata' => ['passwordResetToken' => '', 'passwordResetTokenCreatedTimestamp' => 0]]);
+    if ($user->getPasswordResetCreatedUnixTimestamp() + 600 > time()) {
+      $userPasswordNew = random_int(10000000, 99999999);
+      $user->update(['passwordHash' => User::passwordHash($CMSCore, $user->getSecurityHash(), $userPasswordNew), 'metadata' => ['passwordResetToken' => '', 'passwordResetTokenCreatedTimestamp' => 0]]);
       
-      $template_base_name = ($system_core->configurator->exists_database_entry_value('base_template')) ? $system_core->configurator->get_database_entry_value('base_template') : 'default';
+      $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template') ? $CMSCore->configurator->getDatabaseEntryValue('base_template') : 'default';
 
-      $template = new \core\PHPLibrary\Template($system_core, $template_base_name);
+      $theme = new Theme($CMSCore, $themeBaseName);
 
-      $email_sender = new \core\PHPLibrary\EmailSender($system_core);
-      $email_sender->set_from_user('CMS GIRVAS', 'support@garbalo.com');
-      $email_sender->set_to_user_email($user->get_email());
-      $email_sender->add_header(sprintf("From: %s <%s>", 'CMS GIRVAS', 'support@garbalo.com'));
-      $email_sender->add_header(sprintf("\r\nX-Mailer: PHP/%s", phpversion()));
-      $email_sender->add_header("\r\nMIME-Version: 1.0");
-      $email_sender->add_header("\r\nContent-type: text/html; charset=UTF-8");
-      $email_sender->add_header("\r\n");
+      $emailSender = new EmailSender($CMSCore);
+      $emailSender->setFromUser('CMS GIRVAS', 'support@garbalo.com');
+      $emailSender->setToUserEmail($user->getEmail());
+      $emailSender->addHeader(sprintf("From: %s <%s>", 'CMS GIRVAS', 'support@garbalo.com'));
+      $emailSender->addHeader(sprintf("\r\nX-Mailer: PHP/%s", phpversion()));
+      $emailSender->addHeader("\r\nMIME-Version: 1.0");
+      $emailSender->addHeader("\r\nContent-type: text/html; charset=UTF-8");
+      $emailSender->addHeader("\r\n");
 
-      $reset_password_created_timestamp = time();
-      $reset_password_token = md5($reset_password_created_timestamp . $system_core::CMS_VERSION);
+      $resetPasswordCreatedUnixTimestamp = time();
+      $resetPasswordToken = md5($resetPasswordCreatedUnixTimestamp . $CMSCore::CMS_VERSION);
 
-      $email_sender->set_subject('Новый пароль');
-      $email_sender->set_content(\core\PHPLibrary\Template\Collector::assembly_file_content($template, 'templates/email/default.tpl', [
+      $emailSender->setSubject('Новый пароль');
+      $emailSender->setContent(ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
         'EMAIL_TITLE' => 'Новый пароль',
-        'EMAIL_CONTENT' => sprintf('%s, здравствуйте! Используйте свой новый пароль для авторизации: <b>%d</b>. После авторизации рекомендуем сразу же его сменить.', $user->get_login(), $user_new_password),
+        'EMAIL_CONTENT' => sprintf('%s, здравствуйте! Используйте свой новый пароль для авторизации: <b>%d</b>. После авторизации рекомендуем сразу же его сменить.', $user->getLogin(), $userPasswordNew),
         'EMAIL_COPYRIGHT' => 'С уважением, администрация сайта.'
       ]));
 
-      $email_sender->send();
+      $emailSender->send();
 
       echo 'Your password reseted!';
     } else {
@@ -102,21 +148,32 @@ if ($system_core->urlp->get_path(0) == 'handler') {
     echo 'Request is not exists!';
   }
 } else {
+<<<<<<< HEAD
   if ($system_core->urlp->get_param('mode') != 'install' && file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     if ($system_core->configurator->get_database_entry_value('security_allowed_admin_ip_status') == 'on' && $system_core->urlp->get_path(0) == 'admin') {
       /** @var array Массив разрешенных IP-адресов */
       $allowed_ips = json_decode($system_core->configurator->get_database_entry_value('security_allowed_admin_ip'), true);
       
       if (!in_array($_SERVER['REMOTE_ADDR'], $allowed_ips)) {
+=======
+  if ($CMSURLP->getParam('mode') !== 'install' && file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
+    if ($CMSCore->configurator->getDatabaseEntryValue('security_allowed_admin_ip_status') === 'on' && $CMSURLPathes[0] === 'admin') {
+      /** @var array Массив разрешенных IP-адресов */
+      $allowedIPs = json_decode($CMSCore->configurator->getDatabaseEntryValue('security_allowed_admin_ip'), true);
+      
+      if (!in_array($_SERVER['REMOTE_ADDR'], $allowedIPs)) {
+>>>>>>> develop
         http_response_code(503);
         die('An attempted hacker attack has been detected.');
       }
     }
   }
 
-  $template = $system_core->get_template();
-  $template->assembly_global_variables();
-  echo $template->core->assembled;
-}
+  $theme = $CMSCore->getTheme();
+  $theme->assemblyGlobalVariables();
 
-?>
+  $loadTime = microtime(true) - $startTime; // Конечное время
+  header('X-Load-Time: ' . round($loadTime, 3) . 's');
+
+  echo $theme->core->assembled;
+}

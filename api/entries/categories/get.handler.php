@@ -15,28 +15,26 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\EntriesCategories as EntriesCategories;
 
-if ($system_core->client->is_logged(1) || $system_core->client->is_logged(2)) {
-  $handler_output_data['entriesCategories'] = [];
+if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
+  $handlerOutputData['entriesCategories'] = [];
 
-  $locale = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $system_core->configurator->get_database_entry_value('base_locale');
+  $localeName = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
 
-  $entries_categories = new EntriesCategories($system_core);
-  $entries_categories_objects_array = $entries_categories->get_all();
+  $entriesCategories = new EntriesCategories($CMSCore);
+  $entriesCategoriesObjects = $entriesCategories->getAll();
 
-  foreach ($entries_categories_objects_array as $entries_category_object) {
-    $entries_category_object->init_data(['texts']);
+  foreach ($entriesCategoriesObjects as $objects) {
+    $objects->initData(['texts']);
 
-    $handler_output_data['entriesCategories'][] = [
-      'id' => $entries_category_object->get_id(),
-      'title' => $entries_category_object->get_title($locale)
+    $handlerOutputData['entriesCategories'][] = [
+      'id' => $objects->getID(),
+      'title' => $objects->getTitle($localeName)
     ];
   }
 
-  $handler_message = $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
-  $handler_status_code = 1;
+  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+  $handlerStatusCode = $handlerStatusCode ?? 1;
 } else {
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

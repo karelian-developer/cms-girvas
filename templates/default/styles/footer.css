@@ -124,7 +124,7 @@
 }
 
 .footer__text {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   color: var(--container-and-text-white-color);
 }
@@ -190,6 +190,8 @@
 }
 
 .footer__bottom-left-block {
+  display: flex;
+  align-items: center;
   font-size: 12px;
   font-weight: 400;
 }
@@ -206,6 +208,14 @@
   }
 }
 
+.information-list__item:not(:first-child) {
+  padding-left: 5px;
+}
+
+.information-list__item:not(:last-child) {
+  padding-right: 5px;
+}
+
 @media (max-width: 929px) {
   .footer__bottom-left-block {
     width: fit-content;
@@ -218,10 +228,6 @@
   .information-list__item {
     text-align: center;
   }
-}
-
-.information-list__item {
-  padding: 0 3px;
 }
 
 @media (min-width: 930px) {

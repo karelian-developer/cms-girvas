@@ -8,153 +8,167 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary {  
-  use \core\PHPLibrary\Entries as Entries;
-  use \core\PHPLibrary\Pages as Pages;
-  use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-  use \core\PHPLibrary\Metrics\Session as MetricsSession;
-  use \PDOException as PDOException;
+namespace core\PHPLibrary;
+
+use \core\PHPLibrary\Entries as Entries;
+use \core\PHPLibrary\Pages as Pages;
+use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\Metrics\Session as MetricsSession;
+use \PDOException as PDOException;
+
+/**
+ * Метрики CMS
+ * 
+ * @author Andrey Shestakov <drelagas.new@gmail.com>
+ * @version 0.0.1
+ */
+#[\AllowDynamicProperties]
+final class Metrics
+{
+  /** @var SystemCore|null Объект системного ядра */
+  public SystemCore|null $CMSCore = null;
+  /** @var string Временная отметка */
+  public int $timestamp = 0;
 
   /**
-   * Метрики CMS
+   * __construct
    * 
-   * @author Andrey Shestakov <drelagas.new@gmail.com>
-   * @version 0.0.1
+   * @param SystemCore $CMSCore
    */
-  #[\AllowDynamicProperties]
-  final class Metrics {
-    /** @var SystemCore|null Объект системного ядра */
-    public SystemCore|null $system_core = null;
-    /** @var string Временная отметка */
-    public int $timestamp = 0;
+  public function __construct(SystemCore $CMSCore)
+  {
+    $this->CMSCore = $CMSCore;
+  }
 
-    /**
-     * __construct
-     * 
-     * @param SystemCore $system_core
-     */
-    public function __construct(SystemCore $system_core) {
-      $this->system_core = $system_core;
+  /**
+   * Установить временную отметку
+   * 
+   * @param int $value
+   * 
+   * @return void
+   */
+  public function setTimestamp(int $value) : void
+  {
+    $this->timestamp = $value;
+  }
+
+  /**
+   * Получить сессию метрики
+   * 
+   * @param int $timestamp
+   * 
+   * @return Session|null
+   */
+  public function getSessionByTimestamp(int $timestamp) : MetricsSession|null
+  {
+    $timestamp = strtotime(date('Y/m/d', $timestamp));
+
+    if (MetricsSession::existsByTimestamp($this->CMSCore, $this, $timestamp)) {
+      return MetricsSession::getByTimestamp($this->CMSCore, $this, $timestamp);
     }
 
-    /**
-     * Установить временную отметку
-     * 
-     * @param int $value
-     * 
-     * @return void
-     */
-    public function set_timestamp(int $value) : void {
-      $this->timestamp = $value;
+    return null;
+  }
+
+  /**
+   * Получить массив объектов сессий метрики во временных рамках
+   * 
+   * @param int $timestampStart
+   * @param int $timestampEnd
+   * 
+   * @return array
+   */
+  public function getSessionsByTimestampRange(int $timestampStart, int $timestampEnd) : array
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
+    $timestampStart = strtotime(date('Y/m/d', $timestampStart));
+    $timestampEnd = strtotime(date('Y/m/d', $timestampEnd));
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('metrics');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`date` >= :dateStart AND `date` <= :dateEnd',
+      'postgresql' => '"date" >= :dateStart AND "date" <= :dateEnd'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':dateStart', $timestampStart, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':dateEnd', $timestampEnd, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    /**
-     * Получить сессию метрики
-     * 
-     * @param int $timestamp
-     * 
-     * @return Session
-     */
-    public function get_session_by_timestamp(int $timestamp) : MetricsSession|null {
-      $timestamp = strtotime(date('Y/m/d', $timestamp));
+    $sessions = [];
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
 
-      if (MetricsSession::exists_by_timestamp($this->system_core, $this, $timestamp)) {
-        return MetricsSession::get_by_timestamp($this->system_core, $this, $timestamp);
+    if ($results) {
+      foreach ($results as $data) {
+        array_push($sessions, new MetricsSession($this->CMSCore, $this, $data['id']));
       }
-
-      return null;
     }
 
-    /**
-     * Получить массив объектов сессий метрики во временных рамках
-     * 
-     * @param int $timestamp_start
-     * @param int $timestamp_end
-     * 
-     * @return array
-     */
-    public function get_sessions_by_timestamp_range(int $timestamp_start, int $timestamp_end) : array {
-      $timestamp_start = strtotime(date('Y/m/d', $timestamp_start));
-      $timestamp_end = strtotime(date('Y/m/d', $timestamp_end));
+    return $sessions;
+  }
 
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('metrics');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('date >= :date_start AND date <= :date_end');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
+  /**
+   * Получить просмотры по записям
+   * 
+   * @param int $timestamp
+   * 
+   * @return array
+   */
+  public function getEntriesViewsByTimestamp(int $timestamp) : array
+  {
+    $entries = (new Entries($this->CMSCore, true))->getAll([], true);
+    $entriesResult = [];
 
-      try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':date_start', $timestamp_start, \PDO::PARAM_INT);
-        $database_query->bindParam(':date_end', $timestamp_end, \PDO::PARAM_INT);
-        $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-
-      $sessions = [];
-      $results = $database_query->fetchAll(\PDO::FETCH_ASSOC);
-
-      if ($results) {
-        foreach ($results as $data) {
-          array_push($sessions, new MetricsSession($this->system_core, $this, $data['id']));
-        }
-      }
-
-      return $sessions;
+    foreach ($entries as $index => $object) {
+      $object->initData(['name']);
     }
 
-    /**
-     * Получить просмотры по записям
-     * 
-     * @param int $timestamp
-     * 
-     * @return array
-     */
-    public function get_entries_views_by_timestamp(int $timestamp) : array {
-      $entries = (new Entries($this->system_core, true))->get_all([], true);
-      $entries_result = [];
+    if (!empty($entries)) {
+      $metricsSession = $this->getSessionByTimestamp($timestamp);
 
-      foreach ($entries as $entry_index => $entry_object) {
-        $entry_object->init_data(['name']);
-      }
+      if ($metricsSession !== null) {
+        $metricsSession->initData(['data']);
 
-      if (!empty($entries)) {
-        $metrics_session = $this->get_session_by_timestamp($timestamp);
-        if (!is_null($metrics_session)) {
-          $metrics_session->init_data(['data']);
+        $metricsViews = $metricsSession->getDataMetricsViews();
 
-          $metrics_views = $metrics_session->get_data_metrics_views();
-          if (!is_null($metrics_views)) {
-            foreach ($metrics_views as $views_token => $views_data) {
-              $views_urls = $views_data['urls'];
-              if (!empty($views_urls)) {
-                foreach ($views_urls as $url => $views_count) {
-                  $url_parsed = parse_url($url);
-                  $path_parts = explode('/', $url_parsed['path']);
+        if ($metricsViews !== null) {
+          foreach ($metricsViews as $viewsToken => $viewsData) {
+            $viewsURLs = $viewsData['urls'] ?? [];
 
-                  if ($path_parts[1] == 'entry') {
-                    foreach ($entries as $entry_index => $entry_object) {
-                      if ($entry_object->get_name() == $path_parts[2]) {
-                        if (in_array($entry_object, $entries_result)) {
-                          $current_views = $entry_object->get_views_count();
-                          $entry_object->set_views_count($current_views + $views_count);
-                        } else {
-                          $entry_object->set_views_count($views_count);
-                          array_push($entries_result, $entry_object);
-                        }
-                      }
+            foreach ($viewsURLs as $url => $count) {
+              $URLParsed = parse_url($url);
+              $pathParts = explode('/', $URLParsed['path']);
+
+              if ($pathParts[1] === 'entry') {
+                foreach ($entries as $index => $object) {
+                  if ($object->getName() === $pathParts[2]) {
+                    if (in_array($object, $entriesResult)) {
+                      $currentViews = $object->getViewsCount();
+                      $object->setViewsCount($currentViews + $count);
+                    } else {
+                      $object->setViewsCount($count);
+                      $entriesResult[] = $object;
                     }
                   }
                 }
@@ -163,50 +177,52 @@ namespace core\PHPLibrary {
           }
         }
       }
-
-      return $entries_result;
     }
 
-    /**
-     * Получить просмотры по страницам
-     * 
-     * @param int $timestamp
-     * 
-     * @return array
-     */
-    public function get_pages_views_by_timestamp(int $timestamp) : array {
-      $pages = (new Pages($this->system_core, true))->get_all([], true);
-      $pages_result = [];
+    return $entriesResult;
+  }
 
-      foreach ($pages as $page_index => $page_object) {
-        $page_object->init_data(['name']);
-      }
+  /**
+   * Получить просмотры по страницам
+   * 
+   * @param int $timestamp
+   * 
+   * @return array
+   */
+  public function getPagesViewsByTimestamp(int $timestamp) : array
+  {
+    $pages = (new Pages($this->CMSCore, true))->getAll([], true);
+    $pagesResult = [];
 
-      if (!empty($pages)) {
-        $metrics_session = $this->get_session_by_timestamp($timestamp);
-        if (!is_null($metrics_session)) {
-          $metrics_session->init_data(['data']);
+    foreach ($pages as $index => $object) {
+      $object->initData(['name']);
+    }
 
-          $metrics_views = $metrics_session->get_data_metrics_views();
-          if (!is_null($metrics_views)) {
-            foreach ($metrics_views as $views_token => $views_data) {
-              $views_urls = $views_data['urls'];
-              if (!empty($views_urls)) {
-                foreach ($views_urls as $url => $views_count) {
-                  $url_parsed = parse_url($url);
-                  $path_parts = explode('/', $url_parsed['path']);
+    if (!empty($pages)) {
+      $metricsSession = $this->getSessionByTimestamp($timestamp);
 
-                  if ($path_parts[1] == 'page') {
-                    foreach ($pages as $page_index => $page_object) {
-                      if ($page_object->get_name() == $path_parts[2]) {
-                        if (in_array($page_object, $pages_result)) {
-                          $current_views = $page_object->get_views_count();
-                          $page_object->set_views_count($current_views + $views_count);
-                        } else {
-                          $page_object->set_views_count($views_count);
-                          array_push($pages_result, $page_object);
-                        }
-                      }
+      if ($metricsSession !== null) {
+        $metricsSession->initData(['data']);
+
+        $metricsViews = $metricsSession->getDataMetricsViews();
+
+        if ($metricsViews !== null) {
+          foreach ($metricsViews as $viewsToken => $viewsData) {
+            $viewsURLs = $viewsData['urls'] ?? [];
+
+            foreach ($viewsURLs as $url => $count) {
+              $URLParsed = parse_url($url);
+              $pathParts = explode('/', $URLParsed['path']);
+
+              if ($pathParts[1] === 'page') {
+                foreach ($pages as $index => $object) {
+                  if ($object->getName() === $pathParts[2]) {
+                    if (in_array($object, $pagesResult)) {
+                      $currentViews = $object->getViewsCount();
+                      $object->setViewsCount($currentViews + $count);
+                    } else {
+                      $object->setViewsCount($count);
+                      array_push($pagesResult, $object);
                     }
                   }
                 }
@@ -215,10 +231,8 @@ namespace core\PHPLibrary {
           }
         }
       }
-
-      return $pages_result;
     }
+
+    return $pagesResult;
   }
 }
-
-?>

@@ -8,133 +8,131 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Page {
-  use \core\PHPLibrary\InterfacePage as InterfacePage;
-  use \core\PHPLibrary\SystemCore as SystemCore;
-  use \core\PHPLibrary\Page as Page;
-  use \core\PHPLibrary\Parsedown as Parsedown;
-  use \core\PHPLibrary\User as User;
-  use \core\PHPLibrary\Template\Collector as TemplateCollector;
+namespace core\PHPLibrary\Page;
 
-  class PageRegistration implements InterfacePage {
-    public SystemCore $system_core;
-    public Page $page;
-    public string $assembled = '';
-    
-    /**
-     * __construct
-     *
-     * @param  SystemCore $system_core
-     * @param  Page $page
-     * @return void
-     */
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
-      $this->page = $page;
-    }
-    
-    /**
-     * Сборка шаблона страницы
-     *
-     * @return void
-     */
-    public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-      $this->system_core->template->add_style(['href' => 'styles/page/registration.css', 'rel' => 'stylesheet']);
-      
-      $locale_data = $this->system_core->locale->get_data();
+use \core\PHPLibrary\InterfacePage as InterfacePage;
+use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
-      if (is_null($this->system_core->urlp->get_param('submit')) && is_null($this->system_core->urlp->get_param('refusal'))) {
-        if (!$this->system_core->client->is_logged(1)) {
-          $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page.tpl', [
-            'PAGE_NAME' => 'registration',
-            'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/registration.tpl', [])
-          ]);
+class PageRegistration implements InterfacePage
+{
+  public SystemCore $CMSCore;
+  public Page $page;
+  public string $assembled = '';
+  
+  /**
+   * __construct
+   *
+   * @param  SystemCore $CMSCore
+   * @param  Page $page
+   * @return void
+   */
+  public function __construct(SystemCore $CMSCore, Page $page)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->page = $page;
+  }
+  
+  /**
+   * Сборка шаблона страницы
+   *
+   * @return void
+   */
+  public function assembly() : void
+  {
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page/registration.css', 'rel' => 'stylesheet']);
+    
+    $localeData = $this->CMSCore->locale->getData();
+
+    if ($this->CMSCore->urlp->getParam('submit') === null && $this->CMSCore->urlp->getParam('refusal') === null) {
+      if (!$this->CMSCore->client->isLogged(1)) {
+        $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+          'PAGE_NAME' => 'registration',
+          'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registration.tpl', [])
+        ]);
+      } else {
+        http_response_code(503);
+
+        $pageError = new PageError($this->CMSCore, $this->page, 503);
+        $pageError->assembly();
+        $this->assembled = $pageError->assembled;
+      }
+    } else {
+      if ($this->CMSCore->urlp->getParam('submit') !== null && $this->CMSCore->urlp->getParam('refusal') === null) {
+        if (User::existsByRegistrationSubmitToken($this->CMSCore, $this->CMSCore->urlp->getParam('submit'))) {
+          $userID = User::getUserIDByRegistrationSubmitToken($this->CMSCore, $this->CMSCore->urlp->getParam('submit'));
+          $user = new User($this->CMSCore, $userID);
+          $userData['emailIsSubmitted'] = true;
+          $userDataIsUpdated = $user->update($userData);
+          if ($userDataIsUpdated) {
+            User::deleteRegistrationSubmitBySubmitToken($this->CMSCore, $this->CMSCore->urlp->getParam('submit'));
+
+            $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+              'PAGE_NAME' => 'registration',
+              'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registrationSubmit.tpl', [
+                'REGISTRATION_SUBMIT_TITLE' => $localeData['PAGE_REGISTRATION_CONFIRMATION_TITLE'],
+                'REGISTRATION_SUBMIT_TEXT' => $localeData['PAGE_REGISTRATION_CONFIRMATION_SUCCESS_DESCRIPTION']
+              ])
+            ]);
+          } else {
+            $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+              'PAGE_NAME' => 'registration',
+              'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registrationSubmit.tpl', [
+                'REGISTRATION_SUBMIT_TITLE' => $localeData['PAGE_REGISTRATION_CONFIRMATION_TITLE'],
+                'REGISTRATION_SUBMIT_TEXT' => $localeData['PAGE_REGISTRATION_CONFIRMATION_FAIL_DESCRIPTION']
+              ])
+            ]);
+          }
         } else {
-          http_response_code(503);
+          http_response_code(500);
 
-          $page_error = new PageError($this->system_core, $this->page, 503);
-          $page_error->assembly();
-          $this->assembled = $page_error->assembled;
+          $pageError = new PageError($this->CMSCore, $this->page, 500);
+          $pageError->assembly();
+          $this->assembled = $pageError->assembled;
+        }
+      } else if ($this->CMSCore->urlp->getParam('submit') === null && $this->CMSCore->urlp->getParam('refusal') !== null) {
+        if (User::existsByRegistrationRefusalToken($this->CMSCore, $this->CMSCore->urlp->getParam('refusal'))) {
+          $userID = User::getUserIDByRegistrationRefusalToken($this->CMSCore, $this->CMSCore->urlp->getParam('refusal'));
+          $user = new User($this->CMSCore, $userID);
+          $userIsDeleted = $user->delete();
+
+          if ($userIsDeleted) {
+            User::deleteRegistrationSubmitByRefusalToken($this->CMSCore, $this->CMSCore->urlp->getParam('refusal'));
+
+            $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+              'PAGE_NAME' => 'registration',
+              'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registrationSubmit.tpl', [
+                'REGISTRATION_SUBMIT_TITLE' => $localeData['PAGE_REGISTRATION_CANCELLATION_TITLE'],
+                'REGISTRATION_SUBMIT_TEXT' => $localeData['PAGE_REGISTRATION_CANCELLATION_SUCCESS_DESCRIPTION']
+              ])
+            ]);
+          } else {
+            $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+              'PAGE_NAME' => 'registration',
+              'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/registrationSubmit.tpl', [
+                'REGISTRATION_SUBMIT_TITLE' => $localeData['PAGE_REGISTRATION_CANCELLATION_TITLE'],
+                'REGISTRATION_SUBMIT_TEXT' => $localeData['PAGE_REGISTRATION_CANCELLATION_FAIL_DESCRIPTION']
+              ])
+            ]);
+          }
+        } else {
+          http_response_code(500);
+
+          $pageError = new PageError($this->CMSCore, $this->page, 500);
+          $pageError->assembly();
+          $this->assembled = $pageError->assembled;
         }
       } else {
-        if (!is_null($this->system_core->urlp->get_param('submit')) && is_null($this->system_core->urlp->get_param('refusal'))) {
-          if (User::exists_by_registration_submit_token($this->system_core, $this->system_core->urlp->get_param('submit'))) {
-            $user_id = User::get_user_id_by_registration_submit_token($this->system_core, $this->system_core->urlp->get_param('submit'));
-            $user = new User($this->system_core, $user_id);
-            $user_data['email_is_submitted'] = true;
-            $user_data_updated = $user->update($user_data);
-            if ($user_data_updated) {
-              User::delete_registration_submit_by_submit_token($this->system_core, $this->system_core->urlp->get_param('submit'));
+        http_response_code(503);
 
-              $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page.tpl', [
-                'PAGE_NAME' => 'registration',
-                'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/registrationSubmit.tpl', [
-                  'REGISTRATION_SUBMIT_TITLE' => $locale_data['PAGE_REGISTRATION_CONFIRMATION_TITLE'],
-                  'REGISTRATION_SUBMIT_TEXT' => $locale_data['PAGE_REGISTRATION_CONFIRMATION_SUCCESS_DESCRIPTION']
-                ])
-              ]);
-            } else {
-              $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page.tpl', [
-                'PAGE_NAME' => 'registration',
-                'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/registrationSubmit.tpl', [
-                  'REGISTRATION_SUBMIT_TITLE' => $locale_data['PAGE_REGISTRATION_CONFIRMATION_TITLE'],
-                  'REGISTRATION_SUBMIT_TEXT' => $locale_data['PAGE_REGISTRATION_CONFIRMATION_FAIL_DESCRIPTION']
-                ])
-              ]);
-            }
-          } else {
-            http_response_code(500);
-
-            $page_error = new PageError($this->system_core, $this->page, 500);
-            $page_error->assembly();
-            $this->assembled = $page_error->assembled;
-          }
-        } else if (is_null($this->system_core->urlp->get_param('submit')) && !is_null($this->system_core->urlp->get_param('refusal'))) {
-          if (User::exists_by_registration_refusal_token($this->system_core, $this->system_core->urlp->get_param('refusal'))) {
-            $user_id = User::get_user_id_by_registration_refusal_token($this->system_core, $this->system_core->urlp->get_param('refusal'));
-            $user = new User($this->system_core, $user_id);
-            $user_deleted = $user->delete();
-
-            if ($user_deleted) {
-              User::delete_registration_submit_by_refusal_token($this->system_core, $this->system_core->urlp->get_param('refusal'));
-
-              $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page.tpl', [
-                'PAGE_NAME' => 'registration',
-                'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/registrationSubmit.tpl', [
-                  'REGISTRATION_SUBMIT_TITLE' => $locale_data['PAGE_REGISTRATION_CANCELLATION_TITLE'],
-                  'REGISTRATION_SUBMIT_TEXT' => $locale_data['PAGE_REGISTRATION_CANCELLATION_SUCCESS_DESCRIPTION']
-                ])
-              ]);
-            } else {
-              $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page.tpl', [
-                'PAGE_NAME' => 'registration',
-                'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/registrationSubmit.tpl', [
-                  'REGISTRATION_SUBMIT_TITLE' => $locale_data['PAGE_REGISTRATION_CANCELLATION_TITLE'],
-                  'REGISTRATION_SUBMIT_TEXT' => $locale_data['PAGE_REGISTRATION_CANCELLATION_FAIL_DESCRIPTION']
-                ])
-              ]);
-            }
-          } else {
-            http_response_code(500);
-
-            $page_error = new PageError($this->system_core, $this->page, 500);
-            $page_error->assembly();
-            $this->assembled = $page_error->assembled;
-          }
-        } else {
-          http_response_code(503);
-
-          $page_error = new PageError($this->system_core, $this->page, 503);
-          $page_error->assembly();
-          $this->assembled = $page_error->assembled;
-        }
-
+        $pageError = new PageError($this->CMSCore, $this->page, 503);
+        $pageError->assembly();
+        $this->assembled = $pageError->assembled;
       }
     }
-
   }
-
 }
-
-?>

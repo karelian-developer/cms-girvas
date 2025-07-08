@@ -8,120 +8,133 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Database\QueryBuilder {
-  use \core\PHPLibrary\Database\QueryBuilder as QueryBuilder;
-  use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseFrom as ClauseFrom;
-  use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseWhere as ClauseWhere;
-  use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseOrderBy as ClauseOrderBy;
-  use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseLimit as ClauseLimit;
-  use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
+namespace core\PHPLibrary\Database\QueryBuilder;
 
-  final class StatementSelect implements InterfaceStatement {
-    public QueryBuilder $query_builder;
-    private array $selections = [];
-    public ClauseFrom|null $clause_from = null;
-    public ClauseWhere|null $clause_where = null;
-    public ClauseOrderBy|null $clause_order_by = null;
-    public ClauseLimit|null $clause_limit = null;
-    public string $assembled = '';
-    
-    /**
-     * __construct
-     *
-     * @param  mixed $query_builder
-     * @return void
-     */
-    public function __construct(QueryBuilder $query_builder) {
-      $this->query_builder = $query_builder;
-    }
-    
-    /**
-     * Установить выборку для SELECT
-     *
-     * @param  mixed $selection
-     * @return void
-     */
-    public function add_selections(array $selections) : void {
-      $this->selections = array_merge($this->selections, $selections);
-    }
-    
-    /**
-     * Установить предложение FROM
-     *
-     * @return void
-     */
-    public function set_clause_from() : void {
-      $this->clause_from = new ClauseFrom($this);
-    }
-    
-    /**
-     * Установить предложение WHERE
-     *
-     * @return void
-     */
-    public function set_clause_where() : void {
-      $this->clause_where = new ClauseWhere($this);
-    }
-    
-    /**
-     * Установить предложение ORDER BY
-     *
-     * @return void
-     */
-    public function set_clause_order_by() : void {
-      $this->clause_order_by = new ClauseOrderBy($this);
-    }
-    
-    /**
-     * Установить предложение LIMIT
-     *
-     * @param  mixed $clause_limit
-     * @return void
-     */
-    public function set_clause_limit(int $limit, int $offset = 0) : void {
-      $this->clause_limit = new ClauseLimit($this);
-      $this->clause_limit->set_limit($limit);
-      $this->clause_limit->set_offset($offset);
-    }
-    
-    /**
-     * Сборка SQL-запроса
-     *
-     * @return void
-     */
-    public function assembly() : void {
-      $query_array = [];
-      if (!empty($this->selections)) {
-        array_push($query_array, implode(', ', $this->selections));
-      } else {
-        array_push($query_array, '*');
+use \core\PHPLibrary\Database\QueryBuilder as QueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseFrom as ClauseFrom;
+use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseWhere as ClauseWhere;
+use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseOrderBy as ClauseOrderBy;
+use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseLimit as ClauseLimit;
+use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
+
+final class StatementSelect implements InterfaceStatement
+{
+  public QueryBuilder $queryBuilder;
+  private array $selections = [];
+  public ClauseFrom|null $clauseFrom = null;
+  public ClauseWhere|null $clauseWhere = null;
+  public ClauseOrderBy|null $clauseOrderBy = null;
+  public ClauseLimit|null $clauseLimit = null;
+  public string $assembled = '';
+  
+  /**
+   * __construct
+   *
+   * @param  mixed $queryBuilder
+   * @return void
+   */
+  public function __construct(QueryBuilder $queryBuilder)
+  {
+    $this->queryBuilder = $queryBuilder;
+  }
+  
+  /**
+   * Установить выборку для SELECT
+   *
+   * @param  mixed $selection
+   * @return void
+   */
+  public function addSelections(array $selections) : void
+  {
+    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+
+    foreach ($selections as $index => $selection) {
+      if (!preg_match('/\"[a-z0-9_]+\"/i', $selection) && !preg_match('/[a-z]+\([a-z0-9_]*[*]*\)/i', $selection) && !is_numeric($selection) && $selection !== '*') {
+        $selections[$index] = match ($CMSConfigDatabase['dms']) {
+          CMSDMS::MySQL => '`' . $selection . '`',
+          CMSDMS::PostgreSQL => '"' . $selection . '"',
+        };
       }
-
-      if (!is_null($this->clause_from)) {
-        $this->clause_from->assembly();
-        array_push($query_array, $this->clause_from->assembled);
-      }
-
-      if (!is_null($this->clause_where)) {
-        $this->clause_where->assembly();
-        array_push($query_array, $this->clause_where->assembled);
-      }
-
-      if (!is_null($this->clause_order_by)) {
-        $this->clause_order_by->assembly();
-        array_push($query_array, $this->clause_order_by->assembled);
-      }
-
-      if (!is_null($this->clause_limit)) {
-        $this->clause_limit->assembly();
-        array_push($query_array, $this->clause_limit->assembled);
-      }
-
-      $this->assembled = sprintf('SELECT %s;', implode(' ', $query_array));
     }
 
+    $this->selections = array_merge($this->selections, $selections);
+  }
+  
+  /**
+   * Установить предложение FROM
+   *
+   * @return void
+   */
+  public function setClauseFrom() : void
+  {
+    $this->clauseFrom = new ClauseFrom($this);
+  }
+  
+  /**
+   * Установить предложение WHERE
+   *
+   * @return void
+   */
+  public function setClauseWhere() : void
+  {
+    $this->clauseWhere = new ClauseWhere($this);
+  }
+  
+  /**
+   * Установить предложение ORDER BY
+   *
+   * @return void
+   */
+  public function setClauseOrderBy() : void
+  {
+    $this->clauseOrderBy = new ClauseOrderBy($this);
+  }
+  
+  /**
+   * Установить предложение LIMIT
+   *
+   * @param  mixed $clauseLimit
+   * @return void
+   */
+  public function setClauseLimit(int $limit, int $offset = 0) : void
+  {
+    $this->clauseLimit = new ClauseLimit($this);
+    $this->clauseLimit->setLimit($limit);
+    $this->clauseLimit->setOffset($offset);
+  }
+  
+  /**
+   * Сборка SQL-запроса
+   *
+   * @return void
+   */
+  public function assembly() : void
+  {
+    $queryArray = [];
+    $queryArray[] = !empty($this->selections) ? implode(', ', $this->selections) : '*';
+
+    $clausesToPrecess = $this->getClausesToProcess();
+    foreach ($clausesToPrecess as $clause) {
+      if ($clause !== null) {
+        $clause->assembly();
+        $queryArray[] = $clause->assembled;
+      }
+    }
+
+    $this->assembled = sprintf('SELECT %s;', implode(' ', $queryArray));
   }
 
+  /**
+   * Получение массива объектов предложений
+   */
+  private function getClausesToProcess() : array
+  {
+    return [
+      $this->clauseFrom,
+      $this->clauseWhere,
+      $this->clauseOrderBy,
+      $this->clauseLimit
+    ];
+  }
 }
-
-?>

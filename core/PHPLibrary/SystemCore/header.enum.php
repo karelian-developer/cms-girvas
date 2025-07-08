@@ -8,14 +8,13 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\SystemCore {
-  enum EnumHeader {
-    case HTTP_RESPONSE_CODE;
-    case HTTP_LOCATION;
-    case HTTP_CONTENT_SECURITY_POLICY;
-    case HTTP_REFERRER_POLICY;
-    case HTTP_X_CONTENT_TYPE_OPTIONS;
-  }
-}
+namespace core\PHPLibrary\SystemCore;
 
-?>
+enum EnumHeader
+{
+  case HTTP_RESPONSE_CODE;
+  case HTTP_LOCATION;
+  case HTTP_CONTENT_SECURITY_POLICY;
+  case HTTP_REFERRER_POLICY;
+  case HTTP_X_CONTENT_TYPE_OPTIONS;
+}

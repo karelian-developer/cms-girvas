@@ -8,35 +8,37 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Feed {
-  use \DOMDocument as DOMDocument;
-  use \SimpleXMLElement as SimpleXMLElement;
-  use \XMLReader as XMLReader;
-  use \core\PHPLibrary\SystemCore as SystemCore;
+namespace core\PHPLibrary\Feed;
 
-  final class Importer {
-    public string $web_channel_link = '';
+use \DOMDocument as DOMDocument;
+use \SimpleXMLElement as SimpleXMLElement;
+use \XMLReader as XMLReader;
+use \core\PHPLibrary\SystemCore as SystemCore;
 
-    public function __construct(SystemCore $system_core, string $web_channel_link) {
-      $this->set_web_channel_link($web_channel_link);
-    }
+final class Importer
+{
+  public string $feedLink = '';
 
-    public function get(array $stream_context = []) : SimpleXMLElement|bool {
-      $web_channel_link = $this->get_web_channel_link();
+  public function __construct(SystemCore $CMSCore, string $feedLink)
+  {
+    $this->setFeedLink($feedLink);
+  }
 
-      $assertion = file_get_contents($web_channel_link, false, stream_context_create($stream_context));
-      return simplexml_load_string($assertion);
-    }
+  public function get(array $streamContext = []) : SimpleXMLElement|bool
+  {
+    $feedLink = $this->getFeedLink();
 
-    private function set_web_channel_link(string $link) : void {
-      $this->web_channel_link = $link;
-    }
+    $assertion = file_get_contents($feedLink, false, stream_context_create($streamContext));
+    return simplexml_load_string($assertion);
+  }
 
-    public function get_web_channel_link() : string {
-      return $this->web_channel_link;
-    }
+  private function setFeedLink(string $link) : void
+  {
+    $this->feedLink = $link;
+  }
 
+  public function getFeedLink() : string
+  {
+    return $this->feedLink;
   }
 }
-
-?>

@@ -4,7 +4,7 @@
  * CMS GIRVAS (https://www.cms-girvas.ru/)
  * 
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * @copyright   Copyright (c) 2022 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
@@ -13,23 +13,29 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-use \core\PHPLibrary\Parsedown as Parsedown;
-use \core\PHPLibrary\User as User;
+
 use \core\PHPLibrary\Client\Session as ClientSession;
+use \core\PHPLibrary\EmailSender as EmailSender;
+use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\Template as Theme;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
-if ($system_core->urlp->get_path(2) == 'parsedown') {
-  if ($system_core->client->is_logged(1)) {
+if ($CMSCore->urlp->getPath(2) === 'parsedown') {
+  if ($CMSCore->client->isLogged(1)) {
     $parsedown = new Parsedown();
-    $handler_output_data['parsedown'] = $parsedown->text($_POST['markdown_text']);
+    $handlerOutputData['parsedown'] = $parsedown->text($_POST['markdown_text']);
 
-    $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_UTILS_PARSEDOWN_TRANSFORMED_SUCCESS') : $handler_message;
-    $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_PARSEDOWN_TRANSFORMED_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
   } else {
-    $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-    $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 }
 
+<<<<<<< HEAD
 if ($system_core->urlp->get_path(2) == 'registration') {
   $user_agreement = isset($_POST['user_agreement']);
 
@@ -215,11 +221,56 @@ if ($system_core->urlp->get_path(2) == 'registration') {
                 } else {
                   $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_ERROR_LOGIN_ALREADY_EXISTS')) : $handler_message;
                   $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+=======
+if ($CMSCore->urlp->getPath(2) === 'registration') {
+  $userAgreement = isset($_POST['user_agreement']);
+
+  if (!$CMSCore->client->isLogged(1)) {
+    if ($CMSCore->configurator->getDatabaseEntryValue('security_allowed_users_registration_status') == 'on') {
+      if ($userAgreement) {
+        if (isset($_POST['user_login']) && isset($_POST['user_email']) && isset($_POST['user_password']) && isset($_POST['user_password_repeat'])) {
+          $errorIsDetected = false;
+          $userLogin = trim($_POST['user_login']);
+          $userPassword = trim($_POST['user_password']);
+
+          if ($CMSCore->configurator->getUsersLoginSpecialSymbolsStatus(true)) {
+            $loginRegularPattern = '[a-zA-Z0-9\_\-\!\@\#\$\%\&]+';
+          } else {
+            $loginRegularPattern = '[a-zA-Z0-9\_\-]+';
+          }
+
+          if ($CMSCore->configurator->getUsersPasswordSpecialSymbolsStatus(true)) {
+            $passwordRegularPattern = '[a-zA-Z0-9\_\-\!\@\#\$\%\&]+';
+          } else {
+            $passwordRegularPattern = '[a-zA-Z0-9\_\-]+';
+          }
+          
+          // Проверка: включен ли черный список логинов
+          if ($CMSCore->configurator->getUsersLoginsBlacklistStatus(true)) {
+            $loginsBlacklist = $CMSCore->configurator->getUsersLoginsBlacklist(true);
+
+            foreach ($loginsBlacklist as $login) {
+              if ($CMSCore->configurator->getUsersLoginRegisterAccountingStatus(true)) {
+                $loginPattern = '/^' . $userLogin . '$/';
+
+                if (preg_match($loginPattern, $login)) {
+                  $errorIsDetected = true;
+
+                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST');
+                  $handlerStatusCode = $handlerStatusCode ?? 0;
+>>>>>>> develop
                 }
               } else {
-                $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_ERROR_LOGIN_ALREADY_EXISTS')) : $handler_message;
-                $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+                $loginPattern = '/^' . $userLogin . '$/i';
+
+                if (preg_match($loginPattern, $login)) {
+                  $errorIsDetected = true;
+
+                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_LOGIN_EXISTS_IN_BLACKLIST');
+                  $handlerStatusCode = $handlerStatusCode ?? 0;
+                }
               }
+<<<<<<< HEAD
             } else {
               $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_ERROR_INVALID_EMAIL')) : $handler_message;
               $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
@@ -235,17 +286,196 @@ if ($system_core->urlp->get_path(2) == 'registration') {
       } else {
         $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_ERROR_AGREEMENT')) : $handler_message;
         $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+=======
+            }
+          } else {
+            if ($CMSCore->configurator->getUsersLoginRegisterAccountingStatus(true)) {
+              $loginPattern = '/^' . $userLogin . '$/';
+
+              if (!preg_match($loginPattern, $userLogin)) {
+                $errorIsDetected = true;
+
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN');
+                $handlerStatusCode = $handlerStatusCode ?? 0;
+              }
+            } else {
+              $loginPattern = '/^' . $userLogin . '$/i';
+
+              if (!preg_match($loginPattern, $userLogin)) {
+                $errorIsDetected = true;
+
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN');
+                $handlerStatusCode = $handlerStatusCode ?? 0;
+              }
+            }
+          }
+
+          if (!$errorIsDetected) {
+            $usersLoginLengthMax = $CMSCore->configurator->getUsersLoginLengthMax();
+
+            if ($usersLoginLengthMax > 0) {
+              if (strlen($userLogin) > $usersLoginLengthMax) {
+                $errorIsDetected = true;
+
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_LARGE'), $usersLoginLengthMax);
+                $handlerStatusCode = $handlerStatusCode ?? 0;
+              }
+            }
+          }
+
+          if (!$errorIsDetected) {
+            $usersLoginLengthMin = $CMSCore->configurator->getUsersLoginLengthMin();
+
+            if (strlen($userLogin) < $usersLoginLengthMin) {
+              $errorIsDetected = true;
+
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_LOGIN_LENGTH_TOO_SMALL'), $usersLoginLengthMin);
+              $handlerStatusCode = $handlerStatusCode ?? 0;
+            }
+          }
+
+          if (!$errorIsDetected) {
+            $usersPasswordLengthMax = $CMSCore->configurator->getUsersPasswordLengthMax();
+
+            if ($usersPasswordLengthMax > 0) {
+              if (strlen($userPassword) > $usersPasswordLengthMax) {
+                $errorIsDetected = true;
+
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_LARGE'), $usersPasswordLengthMax);
+                $handlerStatusCode = $handlerStatusCode ?? 0;
+              }
+            }
+          }
+
+          if (!$errorIsDetected) {
+            $usersPasswordLengthMin = $CMSCore->configurator->getUsersPasswordLengthMin();
+
+            if (strlen($userPassword) < $usersPasswordLengthMin) {
+              $errorIsDetected = true;
+
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_PASSWORD_LENGTH_TOO_SMALL'), $usersPasswordLengthMin);
+              $handlerStatusCode = $handlerStatusCode ?? 0;
+            }
+          }
+
+          if (!$errorIsDetected) {
+            if (!preg_match(sprintf('/^%s$/i', $passwordRegularPattern), $userPassword)) {
+              $errorIsDetected = true;
+
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USER_ERROR_INVALID_PASSWORD');
+              $handlerStatusCode = $handlerStatusCode ?? 0;
+            }
+          }
+
+          if (!$errorIsDetected) {
+            $userEmail = trim($_POST['user_email']);
+            $userPasswordRepeat = trim($_POST['user_password_repeat']);
+
+            $userEmailPattern = '/^[\w\-\.]{1,30}@([\w\-]{1,63}\.){1,2}[\w\-]{2,4}$/i';
+
+            if (preg_match($userEmailPattern, $userEmail)) {
+              if ($userPassword === $userPasswordRepeat) {
+                if (!User::existsByLogin($CMSCore, $userLogin, $CMSCore->configurator->getUsersLoginRegisterAccountingStatus(true))) {
+                  if (!User::existsByEmail($CMSCore, $userEmail)) {
+                    $allowedEmails = [];
+
+                    if ($CMSCore->configurator->existsDatabaseEntryValue('security_allowed_emails')) {
+                      $allowedEmails = $CMSCore->configurator->getDatabaseEntryValue('security_allowed_emails');
+                      $allowedEmails = json_decode($allowedEmails, true);
+                    }
+
+                    if ($CMSCore->configurator->existsDatabaseEntryValue('security_allowed_emails_status')) {
+                      $allowedEmailsStatus = $CMSCore->configurator->getDatabaseEntryValue('security_allowed_emails_status');
+                    } else {
+                      $allowedEmailsStatus = 'off';
+                    }
+                    
+                    $userEmailExploded = explode('@', $userEmail);
+
+                    if (empty($allowedEmails) || in_array($userEmailExploded[1], $allowedEmails) || $allowedEmailsStatus === 'off') {
+                      $user = User::create($CMSCore, $userLogin, $userEmail, $userPassword);
+                      
+                      if ($user !== null) {
+                        $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template') ? $CMSCore->configurator->getDatabaseEntryValue('base_template') : 'default';
+
+                        $theme = new Theme($CMSCore, $themeBaseName);
+                        $registrationSubmit = $user->createRegistrationSubmit();
+
+                        if (is_array($registrationSubmit)) {
+                          $siteTitle = empty($CMSCore->configurator->getMetaTitle()) ? $CMSCore->configurator->getSiteTitle() : $CMSCore->configurator->getMetaTitle();
+
+                          $emailSender = new EmailSender($CMSCore);
+                          $emailSenderSystemSenderEmail = EmailSender::getSystemSenderEmail($CMSCore);
+                          $emailSender->setFromUser($siteTitle, $emailSenderSystemSenderEmail);
+                          $emailSender->setToUserEmail($userEmail);
+                          $emailSender->addHeader(sprintf('From: %s <%s>', $siteTitle, $emailSenderSystemSenderEmail));
+                          $emailSender->addHeader(sprintf("\r\nX-Mailer: PHP/%s", phpversion()));
+                          $emailSender->addHeader("\r\nMIME-Version: 1.0");
+                          $emailSender->addHeader("\r\nContent-type: text/html; charset=UTF-8");
+
+                          $emailSender->setSubject($CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_SUBJECT'));
+                          $emailSender->setContent(ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
+                            'EMAIL_TITLE' => $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_TITLE'),
+                            'EMAIL_CONTENT' => sprintf($CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_CONTENT'), $userLogin, sprintf('%s/registration?submit=%s', $CMSCore->getSiteURL(), $registrationSubmit['submitToken']), sprintf('%s/registration?refusal=%s', $CMSCore->getSiteURL(), $registrationSubmit['refusalToken'])),
+                            'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_COPYRIGHT')
+                          ]));
+
+                          $emailSender->send();
+                          
+                          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_SENDED_SUCCESS');
+                          $handlerStatusCode = $handlerStatusCode ?? 1;
+                        } else {
+                          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+                          $handlerStatusCode = $handlerStatusCode ?? 0;
+                        }
+                      } else {
+                        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+                        $handlerStatusCode = $handlerStatusCode ?? 0;
+                      }
+                    } else {
+                      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_ERROR_EMAIL_IS_NOT_ALLOWED');
+                      $handlerStatusCode = $handlerStatusCode ?? 0;
+                    }
+                  } else {
+                    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_ERROR_EMAIL_ALREADY_EXISTS');
+                    $handlerStatusCode = $handlerStatusCode ?? 0;
+                  }
+                } else {
+                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_ERROR_LOGIN_ALREADY_EXISTS');
+                  $handlerStatusCode = $handlerStatusCode ?? 0;
+                }
+              } else {
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_ERROR_INVALID_REPEAT_PASSWORD');
+                $handlerStatusCode = $handlerStatusCode ?? 0;
+              }
+            } else {
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_ERROR_INVALID_EMAIL');
+              $handlerStatusCode = $handlerStatusCode ?? 0;
+            }
+          } else {
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
+          }
+        } else {
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
+          $handlerStatusCode = $handlerStatusCode ?? 0;
+        }
+      } else {
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_ERROR_AGREEMENT');
+        $handlerStatusCode = $handlerStatusCode ?? 0;
+>>>>>>> develop
       }
     } else {
-      $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_ERROR_DISABLED')) : $handler_message;
-      $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_ERROR_DISABLED');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_REGISTRATION_ERROR_AUTHORIZATION_ALREADY')) : $handler_message;
-    $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_ERRAPI_UTILS_USER_REGISTRATION_ERROR_AUTHORIZATION_ALREADYOR_DISABLED');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 }
 
+<<<<<<< HEAD
 if ($system_core->urlp->get_path(2) == 'authorization' && $system_core->urlp->get_param('method') == 'base') {
   if (!$system_core->client->is_logged(1)) {
     /** @var string|null $user_login */
@@ -254,80 +484,92 @@ if ($system_core->urlp->get_path(2) == 'authorization' && $system_core->urlp->ge
     $user_password = (isset($_POST['user_password'])) ? $_POST['user_password'] : null;
     /** @var bool $user_remember_me */
     $user_remember_me = isset($_POST['user_remember_me']);
+=======
+if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('method') === 'base') {
+  if (!$CMSCore->client->isLogged(1)) {
+    $userLogin = trim($_POST['user_login']) ?? null;
+    $userPassword = trim($_POST['user_password']) ?? null;
+    $userRememberMe = isset($_POST['user_remember_me']);
+>>>>>>> develop
 
-    if (!is_null($user_login) && !is_null($user_password)) {
-      /** @var User|null $user */
-      $user = User::get_by_login($system_core, $user_login);
+    if ($userLogin !== null && $userPassword !== null) {
+      $user = User::getByLogin($CMSCore, $userLogin);
 
-      if (!is_null($user)) {
+      if ($user !== null) {
         // Инициализация данных пользователя
-        $user->init_data(['password_hash', 'security_hash']);
+        $user->initData(['passwordHash', 'securityHash']);
         
         // Проверяем правильность пароля
-        if ($user->password_verify($user_password)) {
-          /** @var string $user_ip */
-          $user_ip = $_SERVER['REMOTE_ADDR'];
-          /** @var string $user_token */
-          $user_token = ClientSession::generate_token();
+        if ($user->passwordVerify($userPassword)) {
+          /** @var string $userIP */
+          $userIP = $_SERVER['REMOTE_ADDR'];
+          /** @var string $userToken */
+          $userToken = ClientSession::generateToken();
 
-          if (!ClientSession::exists_by_ip_and_user_id($system_core, $user_ip, $user->get_id(), 1)) {
-            /** @var ClientSession|null $user_session */
-            $user_session = ClientSession::create($system_core, [
-              'user_id' => $user->get_id(),
-              'token' => $user_token,
-              'user_ip' => $user_ip,
-              'type_id' => 1
+          if (!ClientSession::existsByIPAndUserID($CMSCore, $userIP, $user->getID(), 1)) {
+            /** @var ClientSession|null $userSession */
+            $userSession = ClientSession::create($CMSCore, [
+              'userID' => $user->getID(),
+              'token' => $userToken,
+              'userIP' => $userIP,
+              'typeID' => 1
             ]);
           } else {
-            $user_session = ClientSession::get_by_ip_and_user_id($system_core, $user_ip, $user->get_id(), 1);
-            $user_session->update([]);
+            $userSession = ClientSession::getByIPAndUserID($CMSCore, $userIP, $user->getID(), 1);
+            $userSession->update([]);
           }
 
-          if (!is_null($user_session)) {
-            $user_session->init_data(['updated_unix_timestamp', 'token']);
-            $user_session_expires = $user_session->get_updated_unix_timestamp() + $system_core->configurator->get('session_expires');
+          if (!is_null($userSession)) {
+            $userSession->initData(['updatedUnixTimestamp', 'token']);
+            $userSessionExpires = $userSession->getUpdatedUnixTimestamp() + $CMSCore->configurator->get('sessionExpires');
 
-            $user_session_is_secure = ($system_core->configurator->get('ssl_is_enabled')) ? true : false;
+            $userSessionIsSecure = (bool) $CMSCore->configurator->get('SSLIsEnabled');
 
+<<<<<<< HEAD
             setcookie('_grv_utoken', $user_session->get_token(), [
               'expires' => ($user_remember_me) ? $user_session_expires : 0,
+=======
+            setcookie('_grv_utoken', $userSession->getToken(), [
+              'expires' => ($userRememberMe) ? $userSessionExpires : 0,
+>>>>>>> develop
               'path' => '/',
-              'domain' => $system_core->configurator->get('domain_cookies'),
-              'secure' => $user_session_is_secure,
+              'domain' => $CMSCore->configurator->get('domainCookies'),
+              'secure' => $userSessionIsSecure,
               'httponly' => true
             ]);
 
-            $handler_output_data['reload'] = true;
+            $handlerOutputData['reload'] = true;
 
-            /** @var string $handler_message Сообщение обработчика */
-            $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_UTILS_USER_AUTHORIZATION_SUCCESS') : $handler_message;
-            $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+            /** @var string $handlerMessage Сообщение обработчика */
+            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_SUCCESS');
+            $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {
-            /** @var string $handler_message Сообщение обработчика */
-            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN')) : $handler_message;
-            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+            /** @var string $handlerMessage Сообщение обработчика */
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
           }
 
         } else {
-          /** @var string $handler_message Сообщение обработчика */
-          $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND')) : $handler_message;
-          $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+          /** @var string $handlerMessage Сообщение обработчика */
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
+          $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        /** @var string $handler_message Сообщение обработчика */
-        $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND')) : $handler_message;
-        $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+        /** @var string $handlerMessage Сообщение обработчика */
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
+        $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
-      $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_INVALID_INPUT_DATA_SET')) : $handler_message;
-      $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_AUTHORIZATION_ERROR_AUTHORIZATION_ALREADY')) : $handler_message;
-    $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_AUTHORIZATION_ALREADY');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 }
 
+<<<<<<< HEAD
 if ($system_core->urlp->get_path(2) == 'authorization' && $system_core->urlp->get_param('method') == 'admin') {
   if (!$system_core->client->is_logged(2)) {
     /** @var string|null $user_login */
@@ -337,133 +579,146 @@ if ($system_core->urlp->get_path(2) == 'authorization' && $system_core->urlp->ge
     /** @var bool $user_remember_me */
     $user_remember_me = isset($_POST['user_remember_me']);
     $admin_access_codes = (isset($_POST['admin_access-code'])) ? $_POST['admin_access-code'] : [];
+=======
+if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('method') === 'admin') {
+  if (!$CMSCore->client->isLogged(2)) {
+    $userLogin = trim($_POST['user_login']) ?? null;
+    $userPassword = trim($_POST['user_password']) ?? null;
+    $userRememberMe = isset($_POST['user_remember_me']);
+    $adminAccessCodes = $_POST['admin_access-code'] ?? [];
+>>>>>>> develop
 
-    if (!is_null($user_login) && !is_null($user_password) && !empty($admin_access_codes)) {
-      /** @var \core\PHPLibrary\User|null $user */
-      $user = \core\PHPLibrary\User::get_by_login($system_core, $user_login);
+    if ($userLogin !== null && !$userPassword !== null && !empty($adminAccessCodes)) {
+      $user = User::getByLogin($CMSCore, $userLogin);
 
-      if (!is_null($user)) {
+      if ($user !== null) {
         // Инициализация данных пользователя
-        $user->init_data(['password_hash', 'security_hash', 'metadata']);
-        $user_group = $user->get_group();
-        $user_group->init_data(['permissions']);
+        $user->initData(['passwordHash', 'securityHash', 'metadata']);
+        $userGroup = $user->getGroup();
+        $userGroup->initData(['permissions']);
         
-        if ($user_group->permission_check($user_group::PERMISSION_ADMIN_PANEL_AUTH)) {
-          $admin_access_codes_is_valid = true;
-          foreach ($admin_access_codes as $admin_access_code_index => $admin_access_code) {
-            switch ($admin_access_code_index) {
-              case 0: $code_char = 'a'; break;
-              case 1: $code_char = 'b'; break;
-              case 2: $code_char = 'c'; break;
-              case 3: $code_char = 'd'; break;
+        if ($userGroup->permissionCheck($userGroup::PERMISSION_ADMIN_PANEL_AUTH)) {
+          $adminAccessCodesIsValid = true;
+          foreach ($adminAccessCodes as $index => $code) {
+            switch ($index) {
+              case 0: $codeChar = 'a'; break;
+              case 1: $codeChar = 'b'; break;
+              case 2: $codeChar = 'c'; break;
+              case 3: $codeChar = 'd'; break;
             }
 
-            if (!password_verify($admin_access_code, $system_core->configurator->get_database_entry_value(sprintf('security_admin_code_%s', $code_char)))) {
-              $admin_access_codes_is_valid = false; break;
+            if (!password_verify($code, $CMSCore->configurator->getDatabaseEntryValue('security_admin_code_' . $codeChar))) {
+              $adminAccessCodesIsValid = false; break;
             }
           }
 
           // Проверяем правильность пароля
-          if ($user->password_verify($user_password) && $admin_access_codes_is_valid) {
-            /** @var string $user_ip */
-            $user_ip = $_SERVER['REMOTE_ADDR'];
-            /** @var string $user_token */
-            $user_token_base = ClientSession::generate_token();
-            $user_token_admin = ClientSession::generate_token();
+          if ($user->passwordVerify($userPassword) && $adminAccessCodesIsValid) {
+            /** @var string $userIP */
+            $userIP = $_SERVER['REMOTE_ADDR'];
+            /** @var string $userToken */
+            $userTokenBase = ClientSession::generateToken();
+            $userTokenAdmin = ClientSession::generateToken();
 
-            $user_session_base = null;
-            $user_session_admin = null;
+            $userSessionBase = null;
+            $userSessionAdmin = null;
 
             // Если сессия не была найдена, то создаем новую.
-            if (!ClientSession::exists_by_ip_and_user_id($system_core, $user_ip, $user->get_id(), 1)) {
-              /** @var ClientSession|null $user_session */
-              $user_session_base = ClientSession::create($system_core, [
-                'user_id' => $user->get_id(),
-                'token' => $user_token_base,
-                'user_ip' => $user_ip,
-                'type_id' => 1
+            if (!ClientSession::existsByIPAndUserID($CMSCore, $userIP, $user->getID(), 1)) {
+              /** @var ClientSession|null $userSession */
+              $userSessionBase = ClientSession::create($CMSCore, [
+                'userID' => $user->getID(),
+                'token' => $userTokenBase,
+                'userIP' => $userIP,
+                'typeID' => 1
               ]);
             } else {
-              $user_session_base = ClientSession::get_by_ip_and_user_id($system_core, $user_ip, $user->get_id(), 1);
-              $user_session_base->update([]);
+              $userSessionBase = ClientSession::getByIPAndUserID($CMSCore, $userIP, $user->getID(), 1);
+              $userSessionBase->update([]);
             }
 
             // Если сессия не была найдена, то создаем новую.
-            if (!ClientSession::exists_by_ip_and_user_id($system_core, $user_ip, $user->get_id(), 2)) {
-              /** @var ClientSession|null $user_session */
-              $user_session_admin = ClientSession::create($system_core, [
-                'user_id' => $user->get_id(),
-                'token' => $user_token_admin,
-                'user_ip' => $user_ip,
-                'type_id' => 2
+            if (!ClientSession::existsByIPAndUserID($CMSCore, $userIP, $user->getID(), 2)) {
+              /** @var ClientSession|null $userSession */
+              $userSessionAdmin = ClientSession::create($CMSCore, [
+                'userID' => $user->getID(),
+                'token' => $userTokenAdmin,
+                'userIP' => $userIP,
+                'typeID' => 2
               ]);
             } else {
-              $user_session_admin = ClientSession::get_by_ip_and_user_id($system_core, $user_ip, $user->get_id(), 2);
-              $user_session_admin->update([]);
+              $userSessionAdmin = ClientSession::getByIPAndUserID($CMSCore, $userIP, $user->getID(), 2);
+              $userSessionAdmin->update([]);
             }
 
-            if (!is_null($user_session_base)) {
-              $user_session_base->init_data(['updated_unix_timestamp', 'token']);
-              $user_session_base_expires = $user_session_base->get_updated_unix_timestamp() + $system_core->configurator->get('session_expires');
+            if (!is_null($userSessionBase)) {
+              $userSessionBase->initData(['updatedUnixTimestamp', 'token']);
+              $userSessionBaseExpires = $userSessionBase->getUpdatedUnixTimestamp() + $CMSCore->configurator->get('sessionExpires');
 
+<<<<<<< HEAD
               $system_core->client::create_cookie($system_core, '_grv_utoken', $user_session_base, ($user_remember_me) ? $user_session_base_expires : 0);
+=======
+              $CMSCore->client::createCookie($CMSCore, '_grv_utoken', $userSessionBase, $userRememberMe ? $userSessionBaseExpires : 0);
+>>>>>>> develop
             }
 
-            if (!is_null($user_session_admin)) {
-              $user_session_admin->init_data(['updated_unix_timestamp', 'token']);
-              $user_session_admin_expires = $user_session_admin->get_updated_unix_timestamp() + $system_core->configurator->get('session_expires');
+            if (!is_null($userSessionAdmin)) {
+              $userSessionAdmin->initData(['updatedUnixTimestamp', 'token']);
+              $userSessionAdmin_expires = $userSessionAdmin->getUpdatedUnixTimestamp() + $CMSCore->configurator->get('sessionExpires');
 
+<<<<<<< HEAD
               $system_core->client::create_cookie($system_core, '_grv_atoken', $user_session_admin, ($user_remember_me) ? $user_session_admin_expires : 0);
+=======
+              $CMSCore->client::createCookie($CMSCore, '_grv_atoken', $userSessionAdmin, $userRememberMe ? $userSessionAdmin_expires : 0);
+>>>>>>> develop
 
-              $sc_report = \core\PHPLibrary\SystemCore\Report::create($system_core, \core\PHPLibrary\SystemCore\Report::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS, [
-                'clientIP' => $system_core->client->get_ip_address(),
+              $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS, [
+                'clientIP' => $CMSCore->client->getIPAddress(),
                 'date' => date('Y/m/d H:i:s', time())
               ]);
 
-              $handler_output_data['reload'] = true;
+              $handlerOutputData['reload'] = true;
 
-              /** @var string $handler_message Сообщение обработчика */
-              $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_UTILS_USER_AUTHORIZATION_SUCCESS') : $handler_message;
-              $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+              /** @var string $handlerMessage Сообщение обработчика */
+              $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_SUCCESS');
+              $handlerStatusCode = $handlerStatusCode ?? 1;
             } else {
-              /** @var string $handler_message Сообщение обработчика */
-              $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN')) : $handler_message;
-              $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+              /** @var string $handlerMessage Сообщение обработчика */
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+              $handlerStatusCode = $handlerStatusCode ?? 0;
             }
 
           } else {
-            $sc_report = \core\PHPLibrary\SystemCore\Report::create($system_core, \core\PHPLibrary\SystemCore\Report::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
-              'clientIP' => $system_core->client->get_ip_address(),
+            $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
+              'clientIP' => $CMSCore->client->getIPAddress(),
               'date' => date('Y/m/d H:i:s', time())
             ]);
 
-            /** @var string $handler_message Сообщение обработчика */
-            $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND')) : $handler_message;
-            $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+            /** @var string $handlerMessage Сообщение обработчика */
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
-          $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS')) : $handler_message;
-          $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
+          $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $sc_report = \core\PHPLibrary\SystemCore\Report::create($system_core, \core\PHPLibrary\SystemCore\Report::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
-          'clientIP' => $system_core->client->get_ip_address(),
+        $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
+          'clientIP' => $CMSCore->client->getIPAddress(),
           'date' => date('Y/m/d H:i:s', time())
         ]);
         
-        /** @var string $handler_message Сообщение обработчика */
-        $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND')) : $handler_message;
-        $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+        /** @var string $handlerMessage Сообщение обработчика */
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
+        $handlerStatusCode = $handlerStatusCode ?? 0;
       }
 
     } else {
-      $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_INVALID_INPUT_DATA_SET')) : $handler_message;
-      $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_UTILS_USER_AUTHORIZATION_ERROR_AUTHORIZATION_ALREADY')) : $handler_message;
-    $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_AUTHORIZATION_ALREADY');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 }
-
-?>

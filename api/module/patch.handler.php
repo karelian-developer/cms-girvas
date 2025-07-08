@@ -15,69 +15,67 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\Module as Module;
 
-if ($system_core->client->is_logged(2)) {
-  $client_user = $system_core->client->get_user(2);
-  $client_user->init_data(['metadata']);
-  $client_user_group = $client_user->get_group();
-  $client_user_group->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($client_user_group->permission_check($client_user_group::PERMISSION_ADMIN_MODULES_MANAGEMENT)) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT)) {
     if (isset($_PATCH['module_name'])) {
-      $module_name = $_PATCH['module_name'];
-      $module = new Module($system_core, $module_name);
+      $moduleName = trim($_PATCH['module_name']);
+      $module = new Module($CMSCore, $moduleName);
 
       if (isset($_PATCH['module_event'])) {
-        $module_event = $_PATCH['module_event'];
+        $moduleEvent = $_PATCH['module_event'];
 
-        if ($module_event == 'enable') {
-          if (!$module->is_enabled()) {
+        if ($moduleEvent === 'enable') {
+          if (!$module->isEnabled()) {
             $module->enable();
 
-            if ($module->is_enabled()) {
+            if ($module->isEnabled()) {
               http_response_code(200);
-              $handler_message = $system_core->locale->get_single_value_by_key('API_MODULE_ENABLED');
-              $handler_status_code = 1;
+              $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_ENABLED');
+              $handlerStatusCode = $handlerStatusCode ?? 1;
             } else {
               http_response_code(500);
-              $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN'));
-              $handler_status_code = 0;
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+              $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           } else {
             http_response_code(500);
-            $handler_message = $system_core->locale->get_single_value_by_key('API_MODULE_ALREADY_ENABLED');
-            $handler_status_code = 0;
+            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_ALREADY_ENABLED');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         }
 
-        if ($module_event == 'disable') {
-          if ($module->is_enabled()) {
+        if ($moduleEvent === 'disable') {
+          if ($module->isEnabled()) {
             $module->disable();
 
-            if (!$module->is_enabled()) {
+            if (!$module->isEnabled()) {
               http_response_code(200);
-              $handler_message = $system_core->locale->get_single_value_by_key('API_MODULE_DISABLED');
-              $handler_status_code = 1;
+              $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_DISABLED');
+              $handlerStatusCode = $handlerStatusCode ?? 1;
             } else {
               http_response_code(500);
-              $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN'));
-              $handler_status_code = 0;
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+              $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           } else {
             http_response_code(500);
-            $handler_message = $system_core->locale->get_single_value_by_key('API_MODULE_ALREADY_DISABLED');
-            $handler_status_code = 0;
+            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_ALREADY_DISABLED');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         }
       }
     }
   } else {
-    $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS'));
-    $handler_status_code = 0;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
   http_response_code(401);
-  $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION'));
-  $handler_status_code = 0;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

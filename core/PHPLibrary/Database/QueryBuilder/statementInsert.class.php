@@ -8,105 +8,140 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Database\QueryBuilder {
-  use \core\PHPLibrary\Database\QueryBuilder as QueryBuilder;
-  use \core\PHPLibrary\Database\QueryBuilder\StatementInsert\ClauseReturning as ClauseReturning;
-  use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
+namespace core\PHPLibrary\Database\QueryBuilder;
 
-  final class StatementInsert implements InterfaceStatement {
-    public QueryBuilder $query_builder;
-    private array $columns = [];
-    public string $table_name = '';
-    public string $table_prefix = '';
-    public ClauseReturning|null $clause_returning = null;
-    public string $assembled = '';
+use \core\PHPLibrary\Database\QueryBuilder as QueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\Database\QueryBuilder\StatementInsert\ClauseReturning as ClauseReturning;
+use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
 
-    /**
-     * __construct
-     *
-     * @param  mixed $query_builder
-     * @return void
-     */
-    public function __construct(QueryBuilder $query_builder) {
-      $this->query_builder = $query_builder;
-    }
+final class StatementInsert implements InterfaceStatement
+{
+  public QueryBuilder $queryBuilder;
+  private array $columns = [];
+  public string $tableName = '';
+  public string $tablePrefix = '';
+  public ClauseReturning|null $clauseReturning = null;
+  public string $assembled = '';
 
-    public function set_clause_returning() : void {
-      $this->clause_returning = new ClauseReturning($this);
-    }
-    
-    /**
-     * Добавить значение столбца
-     *
-     * @param  mixed $column_name
-     * @param  mixed $value
-     * @return void
-     */
-    public function add_column(string $column_name) : void {
-      array_push($this->columns, $column_name);
-    }
-    
-    /**
-     * Назначить имя таблицы
-     *
-     * @param  string $name
-     * @param  string $prefix
-     * @return void
-     */
-    public function set_table(string $name, string $prefix = '') : void {
-      $this->table_name = $name;
-      $this->table_prefix = $prefix;
-    }
-    
-    /**
-     * Получить наименование таблицы
-     *
-     * @return string
-     */
-    public function get_table() : string {
-      $database_configurations = $this->query_builder->system_core->configurator->get('database');
-      
-      $table_fullname = '';
-      if (!is_null($database_configurations)) {
-        if ($database_configurations['scheme'] != '') {
-          $table_fullname .= sprintf('%s.', $database_configurations['scheme']);
-        }
-
-        if ($database_configurations['prefix'] != '' || $this->table_prefix != '') {
-          $table_prefix = ($this->table_prefix == '') ? $database_configurations['prefix'] : $this->table_prefix;
-          $table_fullname .= sprintf('%s_', $table_prefix);
-        }
-      }
-
-      $table_fullname .= $this->table_name;
-
-      return $table_fullname;
-    }
-
-    /**
-     * Сборка SQL-запроса
-     *
-     * @return void
-     */
-    public function assembly() : void {
-      $query_array = [];
-
-      $columns_values = [];
-      foreach ($this->columns as $column_name) {
-        array_push($columns_values, ':' . $column_name);
-      }
-
-      array_push($query_array, sprintf('(%s) VALUES (%s)', implode(', ', $this->columns), implode(', ', $columns_values)));
-
-      if (!is_null($this->clause_returning)) {
-        $this->clause_returning->assembly();
-        array_push($query_array, $this->clause_returning->assembled);
-      }
-
-      $this->assembled = sprintf('INSERT INTO %s %s;', $this->get_table(), implode(' ', $query_array));
-    }
+  /**
+   * __construct
+   *
+   * @param  mixed $queryBuilder
+   * @return void
+   */
+  public function __construct(QueryBuilder $queryBuilder)
+  {
+    $this->queryBuilder = $queryBuilder;
   }
 
-}
+  public function setClauseReturning() : void
+  {
+    $this->clauseReturning = new ClauseReturning($this);
+  }
+  
+  /**
+   * Добавить значение столбца
+   *
+   * @param  string $columnName
+   * 
+   * @return void
+   */
+  public function addColumn(string $name) : void
+  {
+    $this->columns[] = $name;
+  }
+  
+  /**
+   * Назначить имя таблицы
+   *
+   * @param  string $name
+   * @param  string $prefix
+   * 
+   * @return void
+   */
+  public function setTable(string $name, string $prefix = '') : void
+  {
+    $this->tableName = $name;
+    $this->tablePrefix = $prefix;
+  }
+  
+  /**
+   * Получить наименование таблицы
+   *
+   * @return string
+   */
+  public function getTable() : string
+  {
+    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+    
+    $tableFullname = '';
+    if ($CMSConfigDatabase !== null) {
+      if (
+        $CMSConfigDatabase['scheme'] !== ''
+        && $CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL
+      ) {
+        $tableFullname .= $CMSConfigDatabase['scheme'] . '.';
+      }
 
-?>
+      if ($CMSConfigDatabase['prefix'] !== '') {
+        $tableFullname .= $CMSConfigDatabase['prefix'] . '_';
+      }
+    }
+
+    $tableFullname .= $this->tableName;
+
+    return $tableFullname;
+  }
+
+  /**
+   * Сборка SQL-запроса
+   *
+   * @return void
+   */
+  public function assembly() : void
+  {
+    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+    $queryArray = [];
+
+    $columnsValues = [];
+    foreach ($this->columns as $index => $columnName) {
+      if (!preg_match('/\"[a-z0-9_]+\"/i', $columnName)) {
+        $this->columns[$index] = match ($CMSConfigDatabase['dms']) {
+          CMSDMS::MySQL => '`' . $columnName . '`',
+          CMSDMS::PostgreSQL => '"' . $columnName . '"',
+        };
+      }
+
+      $columnsValues[] = ':' . $columnName;
+    }
+
+    $queryArray[] = sprintf('(%s) VALUES (%s)', implode(', ', $this->columns), implode(', ', $columnsValues));
+
+    $clausesToPrecess = $this->getClausesToProcess();
+    foreach ($clausesToPrecess as $clause) {
+      if ($clause !== null) {
+        $clause->assembly();
+        $queryArray[] = $clause->assembled;
+      }
+    }
+
+    $this->assembled = sprintf('INSERT INTO %s %s;', $this->getTable(), implode(' ', $queryArray));
+  }
+
+  /**
+   * Получение массива объектов предложений
+   */
+  private function getClausesToProcess() : array
+  {
+    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+
+    if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+      return [
+        $this->clauseReturning
+      ];
+    }
+
+    return [];
+  }
+}

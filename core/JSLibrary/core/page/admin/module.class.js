@@ -31,7 +31,7 @@ export class PageModule {
             let computedStyleMarginLeft = Number(computedStyle.getPropertyValue('margin-left').replace(/px/, ''));
             let computedStyleWidth = Number(computedStyle.getPropertyValue('width').replace(/px/, ''));
 
-            if (element.getAttribute('role') == 'controller-left') {
+            if (element.getAttribute('role') === 'controller-left') {
               if (computedStyleMarginLeft < 0) {
                 computedStyleMarginLeft += computedStyleWidth;
               } else {
@@ -41,7 +41,7 @@ export class PageModule {
               slidesListItemsElements[0].style.marginLeft = `${computedStyleMarginLeft}px`;
             }
 
-            if (element.getAttribute('role') == 'controller-right') {
+            if (element.getAttribute('role') === 'controller-right') {
               if ((computedStyleMarginLeft * -1) >= computedStyleWidth * (slidesListItemsElements.length - 1)) {
                 computedStyleMarginLeft = 0;
               } else {
@@ -102,7 +102,7 @@ export class PageModule {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               buttons.enable.target.element.style.display = 'none';
               buttons.disable.target.element.style.display = 'flex';
     
@@ -127,7 +127,7 @@ export class PageModule {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               buttons.enable.target.element.style.display = 'flex';
               buttons.disable.target.element.style.display = 'none';
     
@@ -152,7 +152,7 @@ export class PageModule {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               buttons.install.target.element.style.display = 'none';
               buttons.delete.target.element.style.display = 'flex';
               buttons.enable.target.element.style.display = 'flex';
@@ -179,7 +179,7 @@ export class PageModule {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               buttons.install.target.element.style.display = 'flex';
               buttons.delete.target.element.style.display = 'none';
               buttons.enable.target.element.style.display = 'none';
@@ -192,12 +192,12 @@ export class PageModule {
         });
         buttons.delete.assembly();
     
-        if (moduleEnabledStatus == 'enabled') {
+        if (moduleEnabledStatus === 'enabled') {
           buttons.enable.target.element.style.display = 'none';
           buttons.disable.target.element.style.display = 'flex';
         }
   
-        if (moduleEnabledStatus == 'disabled') {
+        if (moduleEnabledStatus === 'disabled') {
           buttons.enable.target.element.style.display = 'flex';
           buttons.disable.target.element.style.display = 'none';
         }

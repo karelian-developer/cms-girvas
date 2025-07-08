@@ -8,184 +8,215 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary {
-  use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+namespace core\PHPLibrary;
 
-  final class Entries {
-    private SystemCore $system_core;
-    
-    /**
-     * __construct
-     *
-     * @param  mixed $system_core
-     * @return void
-     */
-    public function __construct(SystemCore $system_core) {
-      $this->system_core = $system_core;
-    }
-        
-    /**
-     * Получить все объекты записей
-     *
-     * @param   array $params_array
-     * @param   bool 
-     * @return  array
-     */
-    public function get_all(array $params_array = [], $only_published = false) : array {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries');
-      $query_builder->statement->clause_from->assembly();
+use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 
-      if ($only_published) {
-        $query_builder->statement->set_clause_where();
-        $query_builder->statement->clause_where->add_condition('(metadata::jsonb->>\'is_published\')::boolean = true');
-        $query_builder->statement->clause_where->assembly();
-      }
-
-      $query_builder->statement->set_clause_order_by();
-      $query_builder->statement->clause_order_by->set_column('created_unix_timestamp');
-      $query_builder->statement->clause_order_by->set_sort_type('DESC');
-      if (array_key_exists('limit', $params_array)) {
-        if (is_array($params_array['limit'])) {
-          $limit = (is_integer($params_array['limit'][0])) ? $params_array['limit'][0] : 0;
-          $offset = (is_integer($params_array['limit'][1])) ? $params_array['limit'][1] : 0;
-          $query_builder->statement->set_clause_limit($limit, $offset);
-        }
-      }
-      $query_builder->statement->assembly();
-
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      //$this->system_core->database_connector->database->bindParam(':id', $entry_id, \PDO::PARAM_INT);
-			$database_query->execute();
-
-      $entries = [];
-      $results = $database_query->fetchAll(\PDO::FETCH_ASSOC);
-      if ($results) {
-        foreach ($results as $data) {
-          array_push($entries, new Entry($this->system_core, $data['id']));
-        }
-      }
-
-      return $entries;
-    }
-        
-    /**
-     * Получить объекты записей для определенной категории
-     *
-     * @param  int $category_id
-     * @param  array $params_array
-     * @return array
-     */
-    public function get_by_category_id(int $category_id, array $params_array = [], $only_published = false) : array {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('category_id = :category_id');
-
-      if ($only_published) {
-        $query_builder->statement->clause_where->add_condition('AND (metadata::jsonb->>\'is_published\')::boolean = true');
-      }
-
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_order_by();
-      $query_builder->statement->clause_order_by->set_column('created_unix_timestamp');
-      $query_builder->statement->clause_order_by->set_sort_type('DESC');
-      if (array_key_exists('limit', $params_array)) {
-        if (is_array($params_array['limit'])) {
-          $limit = (is_integer($params_array['limit'][0])) ? $params_array['limit'][0] : 0;
-          $offset = (is_integer($params_array['limit'][1])) ? $params_array['limit'][1] : 0;
-          $query_builder->statement->set_clause_limit($limit, $offset);
-        }
-      }
-      $query_builder->statement->assembly();
-
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':category_id', $category_id, \PDO::PARAM_INT);
-			$database_query->execute();
-
-      $entries = [];
-      $results = $database_query->fetchAll(\PDO::FETCH_ASSOC);
-      if ($results) {
-        foreach ($results as $data) {
-          array_push($entries, new Entry($this->system_core, $data['id']));
-        }
-      }
-
-      return $entries;
-    }
-        
-    /**
-     * Получить количество записей для определенной категории
-     *
-     * @param  int $category_id
-     * @return int
-     */
-    public function get_count_by_category_id(int $category_id, $only_published = false) : int {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['count(*)']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('category_id = :category_id');
-
-      if ($only_published) {
-        $query_builder->statement->clause_where->add_condition('AND (metadata::jsonb->>\'is_published\')::boolean = true');
-      }
-
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
-
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-      $database_query->bindParam(':category_id', $category_id, \PDO::PARAM_INT);
-			$database_query->execute();
-
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-      return ($result) ? $result['count'] : 0;
-    }
-        
-    /**
-     * Получить общее количество записей
-     *
-     * @return int
-     */
-    public function get_count_total($only_published = false) : int {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['count(*)']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('entries');
-      $query_builder->statement->clause_from->assembly();
-
-      if ($only_published) {
-        $query_builder->statement->set_clause_where();
-        $query_builder->statement->clause_where->add_condition('(metadata::jsonb->>\'is_published\')::boolean = true');
-        $query_builder->statement->clause_where->assembly();
-      }
-
-      $query_builder->statement->assembly();
-
-      $database_connection = $this->system_core->database_connector->database->connection;
-      $database_query = $database_connection->prepare($query_builder->statement->assembled);
-			$database_query->execute();
-
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-      return ($result) ? $result['count'] : 0;
-    }
-
+final class Entries
+{
+  private SystemCore $CMSCore;
+  
+  /**
+   * __construct
+   *
+   * @param  mixed $CMSCore
+   * @return void
+   */
+  public function __construct(SystemCore $CMSCore)
+  {
+    $this->CMSCore = $CMSCore;
   }
+      
+  /**
+   * Получить все объекты записей
+   *
+   * @param   array $params
+   * @param   bool 
+   * @return  array
+   */
+  public function getAll(array $params = [], $isPublished = false) : array
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
 
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+
+    if ($isPublished) {
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => '(metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
+      $queryBuilder->statement->clauseWhere->assembly();
+    }
+
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
+    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    if (array_key_exists('limit', $params)) {
+      if (is_array($params['limit'])) {
+        $limit = (is_integer($params['limit'][0])) ? $params['limit'][0] : 0;
+        $offset = (is_integer($params['limit'][1])) ? $params['limit'][1] : 0;
+        $queryBuilder->statement->setClauseLimit($limit, $offset);
+      }
+    }
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->execute();
+
+    $entries = [];
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    if ($results) {
+      foreach ($results as $data) {
+        array_push($entries, new Entry($this->CMSCore, $data['id']));
+      }
+    }
+
+    return $entries;
+  }
+      
+  /**
+   * Получить объекты записей для определенной категории
+   *
+   * @param  int $id
+   * @param  array $params
+   * @return array
+   */
+  public function getByCategoryID(int $id, array $params = [], $isPublished = false) : array
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`categoryID` = :categoryID',
+      'postgresql' => '"categoryID" = :categoryID'
+    ]);
+
+    if ($isPublished) {
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => 'AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
+    }
+
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
+    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    if (array_key_exists('limit', $params)) {
+      if (is_array($params['limit'])) {
+        $limit = is_integer($params['limit'][0]) ? $params['limit'][0] : 0;
+        $offset = is_integer($params['limit'][1]) ? $params['limit'][1] : 0;
+        $queryBuilder->statement->setClauseLimit($limit, $offset);
+      }
+    }
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':categoryID', $id, \PDO::PARAM_INT);
+    $databaseQuery->execute();
+
+    $entries = [];
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    if ($results) {
+      foreach ($results as $data) {
+        array_push($entries, new Entry($this->CMSCore, $data['id']));
+      }
+    }
+
+    return $entries;
+  }
+      
+  /**
+   * Получить количество записей для определенной категории
+   *
+   * @param  int $id
+   * @return int
+   */
+  public function getCountByCategoryID(int $id, $isPublished = false) : int
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['count(*) AS count']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`categoryID` = :categoryID',
+      'postgresql' => '"categoryID" = :categoryID'
+    ]);
+
+    if ($isPublished) {
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => 'AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
+    }
+
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':categoryID', $id, \PDO::PARAM_INT);
+    $databaseQuery->execute();
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return ($result) ? $result['count'] : 0;
+  }
+      
+  /**
+   * Получить общее количество записей
+   *
+   * @return int
+   */
+  public function getCountTotal($isPublished = false) : int
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['count(*) AS count']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+
+    if ($isPublished) {
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => '(metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
+      $queryBuilder->statement->clauseWhere->assembly();
+    }
+
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->execute();
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? $result['count'] : 0;
+  }
 }
-
-?>

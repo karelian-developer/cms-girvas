@@ -210,7 +210,7 @@ export class PageEntry {
         }
       }
 
-      return fetch(`/handler/entry/${entryID}/comments?localeMessage=${window.CMSCore.locales.base.name}&limit=${this.commentsLimit}&offset=${this.commentsOffset}&sortColumn=created_unix_timestamp&sortType=desc&parentID=0`, {method: 'GET'});
+      return fetch(`/handler/entry/${entryID}/comments?localeMessage=${window.CMSCore.locales.base.name}&limit=${this.commentsLimit}&offset=${this.commentsOffset}&sortColumn=createdUnixTimestamp&sortType=desc&parentID=0`, {method: 'GET'});
     }, (rejectionReason) => {
       let interactiveNotification = new Interactive('notification');
       interactiveNotification.target.isPopup = true;
@@ -230,7 +230,7 @@ export class PageEntry {
       interactiveButtonCommentsLoad.target.setCallback((event) => {
         let request = new Interactive('request', {
           method: 'GET',
-          url: `/handler/entry/${entryID}/comments?localeMessage=${window.CMSCore.locales.base.name}&limit=${this.commentsLimit}&offset=${this.commentsOffset}&sortColumn=created_unix_timestamp&sortType=desc&parentID=0`
+          url: `/handler/entry/${entryID}/comments?localeMessage=${window.CMSCore.locales.base.name}&limit=${this.commentsLimit}&offset=${this.commentsOffset}&sortColumn=createdUnixTimestamp&sortType=desc&parentID=0`
         });
 
         request.target.showingNotification = false;

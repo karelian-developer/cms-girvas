@@ -8,41 +8,23 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Page {
-  use \core\PHPLibrary\InterfacePage as InterfacePage;
-  use \core\PHPLibrary\SystemCore as SystemCore;
-  use \core\PHPLibrary\Page as Page;
-  use \core\PHPLibrary\PageStatic as PageStatic;
-  use \core\PHPLibrary\Parsedown as Parsedown;
-  use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-  use \core\PHPLibrary\Template\Collector as TemplateCollector;
+namespace core\PHPLibrary\Page;
 
-  class PagePage implements InterfacePage {
-    public SystemCore $system_core;
-    public Page $page;
-    public string $assembled = '';
+use \core\PHPLibrary\InterfacePage as InterfacePage;
+use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\PageStatic as PageStatic;
+use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
-    /**
-     * __construct
-     *
-     * @param  SystemCore $system_core
-     * @param  Page $page
-     * @return void
-     */
-    public function __construct(SystemCore $system_core, Page $page) {
-      $this->system_core = $system_core;
-      $this->page = $page;
-    }
-    
-    /**
-     * Сборка шаблона страницы
-     *
-     * @return void
-     */
-    public function assembly() : void {
-      $this->system_core->template->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-      $this->system_core->template->add_style(['href' => 'styles/page/static.css', 'rel' => 'stylesheet']);
+class PagePage implements InterfacePage
+{
+  public SystemCore $CMSCore;
+  public Page $page;
+  public string $assembled = '';
 
+<<<<<<< HEAD
       $cms_base_locale_setted_name = $this->system_core->configurator->get_database_entry_value('base_locale');
       $url_base_locale_setted_name = $this->system_core->urlp->get_param('locale');
       $cookie_base_locale_setted_name = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
@@ -178,29 +160,166 @@ namespace core\PHPLibrary\Page {
             ]);
           } else {
             http_response_code(404);
+=======
+  /**
+   * __construct
+   *
+   * @param  SystemCore $CMSCore
+   * @param  Page $page
+   * @return void
+   */
+  public function __construct(SystemCore $CMSCore, Page $page)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->page = $page;
+  }
+>>>>>>> develop
   
-            $page_error = new PageError($this->system_core, $this->page, 404);
-            $page_error->assembly();
-            $this->assembled = $page_error->assembled;
+  /**
+   * Сборка шаблона страницы
+   *
+   * @return void
+   */
+  public function assembly() : void
+  {
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page/static.css', 'rel' => 'stylesheet']);
+
+    $localeData = $this->CMSCore->locale->getData();
+    $localeName = $this->CMSCore->locale->getName();
+
+    if (!is_null($this->CMSCore->urlp->getPath(1))) {
+      $pageStaticName = urldecode($this->CMSCore->urlp->getPath(1));
+
+      if (PageStatic::existsByName($this->CMSCore, $pageStaticName)) {
+        $pageStatic = PageStatic::getByName($this->CMSCore, $pageStaticName);
+        $pageStatic->initData(['id', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
+
+        if ($this->CMSCore->urlp->getParam('locale') === $localeName) {
+          $this->CMSCore->theme->addLinkCanonical('/page/' . $pageStatic->getName());
+        }
+
+        $isVisible = false;
+
+        $clientIsLogged = $this->CMSCore->client->isLogged(1);
+        $clientUser = ($clientIsLogged) ? $this->CMSCore->client->getUser(1) : null;
+
+        $isVisible = $pageStatic->isPublished();
+        if (!$isVisible && $clientUser !== null) {
+          $isVisible = $clientUser->getID() === 1 || $clientUser->getGroupID() === 1;
+        }
+
+        if ($isVisible) {
+          http_response_code(200);
+
+          $this->page->breadcrumbs->add($localeData['PAGE_STATIC_PAGE_BREADCRUMPS_INDEX_LABEL'], '/');
+          $this->page->breadcrumbs->add($pageStatic->getTitle($this->CMSCore->configurator->getDatabaseEntryValue('base_locale')), $pageStatic->getName());
+          $this->page->breadcrumbs->assembly();
+
+          $this->CMSCore->configurator->setMetaTitle($pageStatic->getTitle($localeName));
+          $this->CMSCore->configurator->setMetaDescription(str_replace('"', '&quot;', $pageStatic->getDescription($localeName)));
+          $this->CMSCore->configurator->setMetaKeywords(str_replace('"', '&quot;', $pageStatic->getKeywords($localeName)));
+
+          /**
+           * @var Parsedown Парсер markdown-разметки
+           */
+          $parsedown = new Parsedown();
+
+          /**
+           * @var string Заголовок статической страницы
+           */
+          $pageStaticTitle = $pageStatic->getTitle($localeName);
+          $pageStaticTitle = strip_tags($pageStaticTitle);
+          /**
+           * @var string Содержание статической страницы
+           */
+          $pageStaticContent = $pageStatic->getContent($localeName);
+
+          $createdDateTimestamp = date('d.m.Y H:i:s', $pageStatic->getCreatedUnixTimestamp());
+          $publishedDateTimestamp = date('d.m.Y H:i:s', $pageStatic->getPublishedUnixTimestamp());
+          $updatedDateTimestamp = date('d.m.Y H:i:s', $pageStatic->getUpdatedUnixTimestamp());
+
+          $createdDateTimestampWithoutTime = date('d.m.Y', $pageStatic->getCreatedUnixTimestamp());
+          $publishedDateTimestampWithoutTime = date('d.m.Y', $pageStatic->getPublishedUnixTimestamp());
+          $updatedDateTimestampWithoutTime = date('d.m.Y', $pageStatic->getUpdatedUnixTimestamp());
+  
+          $createdDateTimestampWithoutData = date('H:i:s', $pageStatic->getCreatedUnixTimestamp());
+          $publishedDateTimestampWithoutData = date('H:i:s', $pageStatic->getPublishedUnixTimestamp());
+          $updatedDateTimestampWithoutData = date('H:i:s', $pageStatic->getUpdatedUnixTimestamp());
+
+          $createdDateTimestampISO8601 = date('Y-m-dH:i:s', $pageStatic->getCreatedUnixTimestamp());
+          $publishedDateTimestampISO8601 = date('Y-m-dH:i:s', $pageStatic->getPublishedUnixTimestamp());
+          $updatedDateTimestampISO8601 = date('Y-m-dH:i:s', $pageStatic->getUpdatedUnixTimestamp());
+
+          $createdDateTimestampISO8601WithoutTime = date('Y-m-d', $pageStatic->getCreatedUnixTimestamp());
+          $publishedDateTimestampISO8601WithoutTime = date('Y-m-d', $pageStatic->getPublishedUnixTimestamp());
+          $updatedDateTimestampISO8601WithoutTime = date('Y-m-d', $pageStatic->getUpdatedUnixTimestamp());
+  
+          $createdDateTimestampISO8601WithoutData = date('H:i:s', $pageStatic->getCreatedUnixTimestamp());
+          $publishedDateTimestampISO8601WithoutData = date('H:i:s', $pageStatic->getPublishedUnixTimestamp());
+          $updatedDateTimestampISO8601WithoutData = date('H:i:s', $pageStatic->getUpdatedUnixTimestamp());
+
+          $pageTemplateVariables = [
+            'PAGE_ID' => $pageStatic->getID(),
+            'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
+            'PAGE_TITLE' => $pageStaticTitle,
+            'PAGE_CONTENT' => $parsedown->text($pageStaticContent),
+            'PAGE_PREVIEW_URL' => $pageStatic->getPreviewURL() !== '' ? $pageStatic->getPreviewURL() : PageStatic::getPreviewDefaultURL($this->CMSCore, 1024),
+            'PAGE_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
+            'PAGE_PUBLISHED_DATE_TIMESTAMP' => $pageStatic->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestamp : date('d.m.Y H:i:s', 0),
+            'PAGE_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp,
+            'PAGE_CREATED_DATE_TIMESTAMP_WITHOUT_TIME' => $createdDateTimestampWithoutTime,
+            'PAGE_PUBLISHED_DATE_TIMESTAMP_WITHOUT_TIME' => $pageStatic->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestampWithoutTime : date('d.m.Y', 0),
+            'PAGE_UPDATED_DATE_TIMESTAMP_WITHOUT_TIME' => $updatedDateTimestampWithoutTime,
+            'PAGE_CREATED_DATE_TIMESTAMP_WITHOUT_DATE' => $createdDateTimestampWithoutData,
+            'PAGE_PUBLISHED_DATE_TIMESTAMP_WITHOUT_DATE' => $pageStatic->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestampWithoutData : date('H:i:s', 0),
+            'PAGE_UPDATED_DATE_TIMESTAMP_WITHOUT_DATE' => $updatedDateTimestampWithoutData,
+            'PAGE_CREATED_DATE_TIMESTAMP_ISO_8601' => $createdDateTimestampISO8601,
+            'PAGE_PUBLISHED_DATE_TIMESTAMP_ISO_8601' => $publishedDateTimestampISO8601,
+            'PAGE_UPDATED_DATE_TIMESTAMP_ISO_8601' => $updatedDateTimestampISO8601,
+            'PAGE_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $createdDateTimestampISO8601WithoutTime,
+            'PAGE_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $publishedDateTimestampISO8601WithoutTime,
+            'PAGE_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $updatedDateTimestampISO8601WithoutTime,
+            'PAGE_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $createdDateTimestampISO8601WithoutData,
+            'PAGE_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $publishedDateTimestampISO8601WithoutData,
+            'PAGE_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $updatedDateTimestampISO8601WithoutData
+          ];
+
+          $additionalFieldsData = $pageStatic->getAdditionalFieldsData();
+          if (count($additionalFieldsData) > 0) {
+            foreach ($additionalFieldsData as $name => $data) {
+              $variableName = 'PAGE_ADDITIONAL_DATA_' . strtoupper($name);
+              $pageTemplateVariables[$variableName] = $data;
+            }
           }
+
+          /** @var string Путь до персонального шаблона */
+          $personalTemplatePath = $pageStatic->existsPersonalTemplateFile() ? 'templates/' . $pageStatic->getPersonalTemplatePath() : 'templates/page/static.tpl';
+
+          $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+            'PAGE_NAME' => 'static',
+            'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, $personalTemplatePath, $pageTemplateVariables)
+          ]);
         } else {
           http_response_code(404);
 
-          $page_error = new PageError($this->system_core, $this->page, 404);
-          $page_error->assembly();
-          $this->assembled = $page_error->assembled;
+          $pageError = new PageError($this->CMSCore, $this->page, 404);
+          $pageError->assembly();
+          $this->assembled = $pageError->assembled;
         }
       } else {
         http_response_code(404);
 
-        $page_error = new PageError($this->system_core, $this->page, 404);
-        $page_error->assembly();
-        $this->assembled = $page_error->assembled;
+        $pageError = new PageError($this->CMSCore, $this->page, 404);
+        $pageError->assembly();
+        $this->assembled = $pageError->assembled;
       }
+    } else {
+      http_response_code(404);
+
+      $pageError = new PageError($this->CMSCore, $this->page, 404);
+      $pageError->assembly();
+      $this->assembled = $pageError->assembled;
     }
-
   }
-
 }
-
-?>

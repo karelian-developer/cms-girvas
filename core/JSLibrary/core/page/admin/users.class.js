@@ -52,11 +52,11 @@ export class PageUsers {
 
         for (let button of buttons) {
           button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') == 'user-edit') {
+            if (button.getAttribute('role') === 'user-edit') {
               window.location.href = `./user/${userID}`;
             }
 
-            if (button.getAttribute('role') == 'user-remove') {
+            if (button.getAttribute('role') === 'user-remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_USER_DELETE_TITLE,
                 content: localeData.MODAL_USER_DELETE_DESCRIPTION
@@ -74,7 +74,7 @@ export class PageUsers {
                 request.target.data = formData;
       
                 request.target.send().then((data) => {
-                  if (data.statusCode == 1) {
+                  if (data.statusCode === 1) {
                     window.location.href = '/admin/users';
                   }
                 });

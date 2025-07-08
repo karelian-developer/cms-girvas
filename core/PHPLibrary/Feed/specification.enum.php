@@ -8,13 +8,12 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Feed {
-  enum EnumSpecification {
-    case RSS1_0;
-    case RSS2_0;
-    case Atom;
-    case YandexTurbo;
-  }
-}
+namespace core\PHPLibrary\Feed;
 
-?>
+enum EnumSpecification
+{
+  case RSS1_0;
+  case RSS2_0;
+  case Atom;
+  case YandexTurbo;
+}

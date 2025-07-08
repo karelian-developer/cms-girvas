@@ -8,80 +8,80 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Page {
-  use \core\PHPLibrary\InterfacePage as InterfacePage;
-  use \core\PHPLibrary\SystemCore as SystemCore;
-  use \core\PHPLibrary\Page as Page;
-  use \core\PHPLibrary\Parsedown as Parsedown;
-  use \core\PHPLibrary\Entry as Entry;
-  use \core\PHPLibrary\Template\Collector as TemplateCollector;
+namespace core\PHPLibrary\Page;
 
-  class PageError implements InterfacePage {
-    public SystemCore $system_core;
-    public Page $page;
-    public string $assembled = '';
-    public int $error_code;
-    private string $error_title;
-    private string $error_desription;
-    
-    /**
-     * __construct
-     *
-     * @param  SystemCore $system_core
-     * @param  Page $page
-     * @param  int $error_code
-     * @return void
-     */
-    public function __construct(SystemCore $system_core, Page $page, int $error_code) {
-      $this->system_core = $system_core;
-      $this->page = $page;
-      $this->error_code = $error_code;
+use \core\PHPLibrary\InterfacePage as InterfacePage;
+use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\Entry as Entry;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
-      $locale_data = $this->system_core->locale->get_data();
+class PageError implements InterfacePage
+{
+  public SystemCore $CMSCore;
+  public Page $page;
+  public string $assembled = '';
+  public int $errorCode;
+  private string $errorTitle;
+  private string $errorDescription;
+  
+  /**
+   * __construct
+   *
+   * @param  SystemCore $CMSCore
+   * @param  Page $page
+   * @param  int $errorCode
+   * @return void
+   */
+  public function __construct(SystemCore $CMSCore, Page $page, int $errorCode)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->page = $page;
+    $this->errorCode = $errorCode;
 
-      switch ($error_code) {
-        case 404:
-          $this->error_title = $locale_data['PAGE_ERROR_404_TITLE'];
-          $this->error_desription = sprintf($locale_data['PAGE_ERROR_404_DESCRIPTION'], strip_tags(urldecode($_SERVER['REQUEST_URI'])));
-          break;
-        case 500:
-          $this->error_title = $locale_data['PAGE_ERROR_500_TITLE'];
-          $this->error_desription = $locale_data['PAGE_ERROR_500_DESCRIPTION'];
-          break;
-        case 503:
-          $this->error_title = $locale_data['PAGE_ERROR_503_TITLE'];
-          $this->error_desription = $locale_data['PAGE_ERROR_503_DESCRIPTION'];
-          break;
-        default:
-          $this->error_title = $locale_data['PAGE_ERROR_UNKNOWN_TITLE'];
-          $this->error_desription = $locale_data['PAGE_ERROR_UNKNOWN_DESCRIPTION'];
-      }
+    $localeData = $this->CMSCore->locale->getData();
 
-    }
-    
-    /**
-     * Сборка шаблона страницы
-     *
-     * @return void
-     */
-    public function assembly() : void {
-      http_response_code($this->error_code);
-
-      $this->system_core->template->add_style(['href' => 'styles/page/error.css', 'rel' => 'stylesheet']);
-
-      $this->system_core->configurator->set_meta_title($this->error_title);
-
-      $this->assembled = TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page.tpl', [
-        'PAGE_NAME' => sprintf('error error_%d', $this->error_code),
-        'PAGE_CONTENT' => TemplateCollector::assembly_file_content($this->system_core->template, 'templates/page/error.tpl', [
-          'ERROR_TITLE' => $this->error_title,
-          'ERROR_DESCRIPTION' => sprintf('<div class="page__simple-note">%s</div>', $this->error_desription)
-        ])
-      ]);
+    switch ($errorCode) {
+      case 404:
+        $this->errorTitle = $localeData['PAGE_ERROR_404_TITLE'];
+        $this->errorDescription = sprintf($localeData['PAGE_ERROR_404_DESCRIPTION'], strip_tags(urldecode($_SERVER['REQUEST_URI'])));
+        break;
+      case 500:
+        $this->errorTitle = $localeData['PAGE_ERROR_500_TITLE'];
+        $this->errorDescription = $localeData['PAGE_ERROR_500_DESCRIPTION'];
+        break;
+      case 503:
+        $this->errorTitle = $localeData['PAGE_ERROR_503_TITLE'];
+        $this->errorDescription = $localeData['PAGE_ERROR_503_DESCRIPTION'];
+        break;
+      default:
+        $this->errorTitle = $localeData['PAGE_ERROR_UNKNOWN_TITLE'];
+        $this->errorDescription = $localeData['PAGE_ERROR_UNKNOWN_DESCRIPTION'];
     }
 
   }
+  
+  /**
+   * Сборка шаблона страницы
+   *
+   * @return void
+   */
+  public function assembly() : void
+  {
+    http_response_code($this->errorCode);
+
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page/error.css', 'rel' => 'stylesheet']);
+
+    $this->CMSCore->configurator->setMetaTitle($this->errorTitle);
+
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
+      'PAGE_NAME' => 'error error_' . (string) $this->errorCode,
+      'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/error.tpl', [
+        'ERROR_TITLE' => $this->errorTitle,
+        'ERROR_DESCRIPTION' => sprintf('<div class="page__simple-note">%s</div>', $this->errorDescription)
+      ])
+    ]);
+  }
 
 }
-
-?>

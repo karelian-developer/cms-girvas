@@ -8,71 +8,76 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
+use \core\PHPLibrary\Entries as Entries;
+use \core\PHPLibrary\EntryCategory as EntryCategory;
+use \core\PHPLibrary\Feed as Feed;
+use \core\PHPLibrary\Feed\Builder as FeedBuilder;
+use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
+
 if (!defined('IS_NOT_HACKED')) {
   http_response_code(503);
   die('An attempted hacker attack has been detected.');
 }
 
 if (defined('IS_NOT_HACKED')) {
-  if (!is_null($system_core->urlp->get_path(1))) {
-    if (\core\PHPLibrary\Feed::exists_by_name($system_core, $system_core->urlp->get_path(1))) {
+  if ($CMSCore->urlp->getPath(1) !== null) {
+    if (Feed::existsByName($CMSCore, $CMSCore->urlp->getPath(1))) {
       http_response_code(200);
       
-      $feed = \core\PHPLibrary\Feed::get_by_name($system_core, $system_core->urlp->get_path(1));
-      $feed->init_data(['name', 'texts', 'type_id', 'entries_category_id']);
+      $feed = Feed::getByName($CMSCore, $CMSCore->urlp->getPath(1));
+      $feed->initData(['name', 'texts', 'typeID', 'entriesCategoryID']);
       
-      $feed_builder = new \core\PHPLibrary\Feed\Builder($system_core, \core\PHPLibrary\Feed\Builder::get_type_enum($feed->get_type_id()));
-      $cms_base_locale_setted_name = $system_core->configurator->get_database_entry_value('base_locale');
-      $cms_base_locale_name = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $cms_base_locale_setted_name;
-      $cms_base_locale = new \core\PHPLibrary\SystemCore\Locale($system_core, $cms_base_locale_name);
-      if (!$cms_base_locale->exists_file_data_json()) {
-        $cms_base_locale_name = $cms_base_locale_setted_name;
-      }
+      $feedBuilder = new FeedBuilder($CMSCore, FeedBuilder::getTypeEnum($feed->getTypeID()));
+      $localeName = $CMSCore->locale->getName();
 
-      $feed_builder->set_language($cms_base_locale_name);
+      $feedBuilder->setLanguage($localeName);
 
-      $feed_builder->web_channel->set_title($feed->get_title($cms_base_locale_name));
-      $feed_builder->web_channel->set_description($feed->get_description($cms_base_locale_name));
+      $feedBuilder->feed->setTitle($feed->getTitle($localeName));
+      $feedBuilder->feed->setDescription($feed->getDescription($localeName));
 
-      $entries = new \core\PHPLibrary\Entries($system_core);
-      if ($feed->get_entries_category_id() == 0 || $feed->get_entries_category_id() == 1) {
-        $feed_builder->web_channel->set_link(sprintf('https://%s/entries', $system_core->configurator->get('domain')));
-        $entries_array = $entries->get_all();
+      $entries = new Entries($CMSCore);
+      if ($feed->getEntriesCategoryID() === 0) {
+        $feedLink = 'https://' . $CMSCore->configurator->get('domain') . '/entries';
+        $feedBuilder->feed->setLink($feedLink);
+        $entriesArray = $entries->getAll();
       } else {
-        $entries_category = new \core\PHPLibrary\EntryCategory($system_core, $feed->get_entries_category_id());
-        $entries_category->init_data(['name']);
+        $entriesCategory = new EntryCategory($CMSCore, $feed->getEntriesCategoryID());
+        $entriesCategory->initData(['name']);
 
-        $feed_builder->web_channel->set_link(sprintf('https://%s/entries/%s', $system_core->configurator->get('domain'), $entries_category->get_name()));
-        $entries_array = $entries->get_by_category_id($feed->get_entries_category_id());
+        $feedLink = 'https://' . $CMSCore->configurator->get('domain') . '/entries/' . $entriesCategory->getName();
+        $feedBuilder->feed->setLink($feedLink);
+        $entriesArray = $entries->getByCategoryID($feed->getEntriesCategoryID());
       }
 
       /**
        * @var Parsedown Парсер markdown-разметки
        */
-      $parsedown = new \core\PHPLibrary\Parsedown();
+      $parsedown = new Parsedown();
       $parsedown->setSafeMode(true);
       $parsedown->setMarkupEscaped(true);
 
-      foreach ($entries_array as $entry) {
-        $entry->init_data(['name', 'metadata', 'texts', 'updated_unix_timestamp']);
+      foreach ($entriesArray as $entry) {
+        $entry->initData(['name', 'metadata', 'texts', 'updatedUnixTimestamp']);
 
-        $entry_author = $entry->get_author();
+        $entryAuthor = $entry->getAuthor();
+        $entryLink = 'https://' . $CMSCore->configurator->get('domain') . '/entry/' . $entry->getName();
 
-        $feed_builder->web_channel->add_item([
-          'title' => $entry->get_title($cms_base_locale_name),
-          'description' => $entry->get_description($cms_base_locale_name),
-          'content' => $parsedown->text($entry->get_content($cms_base_locale_name)),
-          'preview_url' => $entry->get_preview_url(),
-          'link' => sprintf('https://%s/entry/%s', $system_core->configurator->get('domain'), $entry->get_name()),
-          'pubdate' => $entry->get_updated_unix_timestamp(),
-          'author' => ($entry_author != null) ? $entry_author->get_login() : 'User Unknown'
+        $feedBuilder->feed->addItem([
+          'title' => $entry->getTitle($localeName),
+          'description' => $entry->getDescription($localeName),
+          'content' => $parsedown->text($entry->getContent($localeName)),
+          'preview_url' => $entry->getPreviewURL(),
+          'link' => $entryLink,
+          'pubdate' => $entry->getUpdatedUnixTimestamp(),
+          'author' => $entryAuthor !== null ? $entryAuthor->getLogin() : 'User Unknown'
         ]);
       }
 
       header('Content-Type: text/xml');
 
-      $feed_builder->assembly();
-      echo $feed_builder->assembled;
+      $feedBuilder->assembly();
+      echo $feedBuilder->assembled;
     } else {
       http_response_code(404);
     }
@@ -80,5 +85,3 @@ if (defined('IS_NOT_HACKED')) {
     http_response_code(404);
   }
 }
-
-?>

@@ -52,11 +52,11 @@ export class PageEntriesSamples {
 
         for (let button of buttons) {
           button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') == 'entries-sample-edit') {
+            if (button.getAttribute('role') === 'entries-sample-edit') {
               window.location.href = `./entriesSample/${entriesSampleID}`;
             }
 
-            if (button.getAttribute('role') == 'entries-sample-delete') {
+            if (button.getAttribute('role') === 'entries-sample-delete') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_ENTRIES_CATEGORY_DELETE_TITLE,
                 content: localeData.MODAL_ENTRIES_CATEGORY_DELETE_DESCRIPTION
@@ -74,7 +74,7 @@ export class PageEntriesSamples {
                 request.target.data = formData;
       
                 request.target.send().then((data) => {
-                  if (data.statusCode == 1) {
+                  if (data.statusCode === 1) {
                     window.location.href = '/admin/entriesCategories';
                   }
                 });

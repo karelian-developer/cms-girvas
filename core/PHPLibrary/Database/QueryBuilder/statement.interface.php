@@ -8,14 +8,12 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Database\QueryBuilder {
-  use \core\PHPLibrary\Database\QueryBuilder as QueryBuilder;
-  
-  interface InterfaceStatement {
-    public function __construct(QueryBuilder $query_builder);
-    public function assembly() : void;
-  }
+namespace core\PHPLibrary\Database\QueryBuilder;
 
+use \core\PHPLibrary\Database\QueryBuilder as QueryBuilder;
+
+interface InterfaceStatement
+{
+  public function __construct(QueryBuilder $queryBuilder);
+  public function assembly() : void;
 }
-
-?>

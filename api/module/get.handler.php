@@ -15,8 +15,6 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\Module as Module;
 
-if ($system_core->client->is_logged(2)) {
-  //
+if ($CMSCore->client->isLogged(2)) {
+  // ...
 }
-
-?>

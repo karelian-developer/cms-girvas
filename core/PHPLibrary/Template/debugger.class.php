@@ -8,15 +8,16 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Template {
+namespace core\PHPLibrary\Template;
 
-  final class Debugger {
-    private \core\PHPLibrary\Template $template;
+use \core\PHPLibrary\Template as Theme;
 
-    public function __construct(\core\PHPLibrary\Template $template) {
-      $this->template = $template;
-    }
+final class Debugger
+{
+  private Theme $theme;
+
+  public function __construct(Theme $theme)
+  {
+    $this->theme = $theme;
   }
 }
-
-?>

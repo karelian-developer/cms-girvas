@@ -78,7 +78,7 @@ export class PageModules {
             request.target.send().then((data) => {
               interactiveModal.target.close();
 
-              if (data.statusCode == 1) {
+              if (data.statusCode === 1) {
                 if (searchParams.getPathPart(3) != 'repository') {
                   listItem.remove();
                 } else {
@@ -109,7 +109,7 @@ export class PageModules {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               buttons.install.target.element.style.display = 'none';
               buttons.delete.target.element.style.display = 'flex';
             }
@@ -133,7 +133,7 @@ export class PageModules {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               buttons.enable.target.element.style.display = 'none';
               buttons.disable.target.element.style.display = 'flex';
             }
@@ -157,7 +157,7 @@ export class PageModules {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               buttons.enable.target.element.style.display = 'flex';
               buttons.disable.target.element.style.display = 'none';
             }
@@ -171,12 +171,12 @@ export class PageModules {
         itemFooterContainer.appendChild(buttons.enable.target.element);
         itemFooterContainer.appendChild(buttons.disable.target.element);
 
-        buttons.install.target.element.style.display = (moduleInstalledStatus == 'installed') ? 'none' : 'flex';
-        buttons.delete.target.element.style.display = (moduleInstalledStatus == 'installed') ? 'flex' : 'none';
+        buttons.install.target.element.style.display = (moduleInstalledStatus === 'installed') ? 'none' : 'flex';
+        buttons.delete.target.element.style.display = (moduleInstalledStatus === 'installed') ? 'flex' : 'none';
 
-        if (moduleInstalledStatus == 'installed' && (searchParams.getPathPart(3) == 'local' || searchParams.getPathPart(3) == null)) {
-          buttons.enable.target.element.style.display = (moduleEnabledStatus == 'enabled') ? 'none' : 'flex';
-          buttons.disable.target.element.style.display = (moduleEnabledStatus == 'enabled') ? 'flex' : 'none';
+        if (moduleInstalledStatus === 'installed' && (searchParams.getPathPart(3) === 'local' || searchParams.getPathPart(3) === null)) {
+          buttons.enable.target.element.style.display = (moduleEnabledStatus === 'enabled') ? 'none' : 'flex';
+          buttons.disable.target.element.style.display = (moduleEnabledStatus === 'enabled') ? 'flex' : 'none';
         } else {
           buttons.enable.target.element.style.display = 'none';
           buttons.disable.target.element.style.display = 'none';

@@ -71,7 +71,7 @@ export class PageSettings {
         });
       }
 
-      if (searchParams.getPathPart(3) == null || searchParams.getPathPart(3) == 'base') {
+      if (searchParams.getPathPart(3) === null || searchParams.getPathPart(3) === 'base') {
         let timezones, charsets, timezoneSelected, charsetSelected;
         let interactiveChoicesSettingsTimezone = new Interactive('choices');
         let interactiveChoicesSettingsCharset = new Interactive('choices');
@@ -206,7 +206,7 @@ export class PageSettings {
         });
       }
 
-      if (searchParams.getPathPart(3) == 'files') {
+      if (searchParams.getPathPart(3) === 'files') {
         let extension;
         let interactiveChoicesSettingsAutoConvertImageExtension = new Interactive('choices');
 
@@ -220,7 +220,7 @@ export class PageSettings {
           ['webp', 'avif'].forEach((element, elementIndex) => {
             interactiveChoicesSettingsAutoConvertImageExtension.target.addItem(element.toUpperCase(), element);
 
-            if (element == extension) {
+            if (element === extension) {
               interactiveChoicesSettingsAutoConvertImageExtension.target.setItemSelectedIndex(elementIndex);
             }
           });
@@ -232,7 +232,7 @@ export class PageSettings {
         });
       }
 
-      if (searchParams.getPathPart(3) == 'users') {
+      if (searchParams.getPathPart(3) === 'users') {
         let buttons = {addField: null};
 
         let interactiveChoicesFieldsLocale = new Interactive('choices');
@@ -315,7 +315,7 @@ export class PageSettings {
         tableAdditionalFieldsButtonContainer.append(buttons.addField.target.element);
       }
 
-      if (searchParams.getPathPart(3) == 'entries') {
+      if (searchParams.getPathPart(3) === 'entries') {
         let buttons = {addField: null};
 
         let interactiveChoicesFieldsLocale = new Interactive('choices');
@@ -400,7 +400,7 @@ export class PageSettings {
         tableAdditionalFieldsButtonContainer.append(buttons.addField.target.element);
       }
 
-      if (searchParams.getPathPart(3) == 'pages') {
+      if (searchParams.getPathPart(3) === 'pages') {
         let buttons = {addField: null};
 
         let interactiveChoicesFieldsLocale = new Interactive('choices');
@@ -683,13 +683,21 @@ export class PageSettings {
     requestGetEntriesCategories.target.send().then((responseData) => {
       let interactiveChoicesCategoryField = new Interactive('choices');
 
+<<<<<<< HEAD
       if (responseData.statusCode == 1 && responseData.outputData.hasOwnProperty('entriesCategories')) {
+=======
+      if (responseData.statusCode === 1 && responseData.outputData.hasOwnProperty('entriesCategories')) {
+>>>>>>> develop
         let entriesCategories = responseData.outputData.entriesCategories;
         
         entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
           interactiveChoicesCategoryField.target.addItem(entriesCategory.title, entriesCategory.id);
 
+<<<<<<< HEAD
           if (entriesCategory.id == data.categoryID) {
+=======
+          if (entriesCategory.id === data.categoryID) {
+>>>>>>> develop
             interactiveChoicesCategoryField.target.setItemSelectedIndex(entriesCategoryIndex);
           }
         });

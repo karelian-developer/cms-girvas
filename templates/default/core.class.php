@@ -8,151 +8,301 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace templates\default {
-  use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-  use \core\PHPLibrary\Template\Collector as TemplateCollector;
-  use \DOMDocument as DOMDocument;
+namespace templates\default;
 
-  #[\AllowDynamicProperties]
-  final class Core implements \core\PHPLibrary\Template\InterfaceCore {
-    private \core\PHPLibrary\Template $template;
-    private SystemCoreLocale $locale;
-    public string $assembled = '';
-    public DOMDocument|null $source = null;
-    
-    /**
-     * __construct
-     *
-     * @param  mixed $template
-     * @return void
-     */
-    public function __construct(\core\PHPLibrary\Template $template) {
-      $this->template = $template;
-    }
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
+use \core\PHPLibrary\Template as Theme;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
+use \DOMDocument as DOMDocument;
 
-    public function assembly_page_index(array $template_replaces = []) : string {
-      return TemplateCollector::assembly_file_content($this->template, 'templates/page/index.tpl', [
-        'PAGE_NAME' => 'index',
-        'ENTRIES_LIST' => ''
-      ]);
-    }
-    
-    /**
-     * Сборка заглушки сайта
-     *
-     * @param  mixed $template_replaces Массив тегами шаблона и их значениями
-     * @return string
-     */
-    public function assembly_plug(array $template_replaces = []) : string {
-      return TemplateCollector::assembly_file_content($this->template, 'templates/plug.tpl', $template_replaces);
-    }
-    
-    /**
-     * Сборка шапки сайта
-     *
-     * @param  mixed $template_replaces Массив тегами шаблона и их значениями
-     * @return string
-     */
-    public function assembly_header(array $template_replaces = []) : string {
-      return TemplateCollector::assembly_file_content($this->template, 'templates/header.tpl', $template_replaces);
-    }
-    
-    /**
-     * Сборка главной секции сайта
-     *
-     * @param  mixed $template_replaces Массив тегами шаблона и их значениями
-     * @return string
-     */
-    public function assembly_main(array $template_replaces = []) : string {
-      $this->template->system_core->init_page($this->template->system_core->urlp->get_path_string());
-      $site_page = $this->template->system_core->get_inited_page();
-      $site_page->assembly();
-      
-      $template_replaces['SITE_PAGE'] = TemplateCollector::assembly($site_page->assembled, []);
-
-      return TemplateCollector::assembly_file_content($this->template, 'templates/main.tpl', $template_replaces);
-    }
-    
-    /**
-     * Сборка подвала сайта
-     *
-     * @param  mixed $template_replaces Массив тегами шаблона и их значениями
-     * @return string
-     */
-    public function assembly_footer(array $template_replaces = []) : string {
-      return TemplateCollector::assembly_file_content($this->template, 'templates/footer.tpl', $template_replaces);
-    }
-    
-    /**
-     * Сборка основной части документа
-     *
-     * @param  mixed $template_replaces Массив тегами шаблона и их значениями
-     * @return string
-     */
-    public function assembly_document(array $template_replaces = []) : string {
-      /** @var string $assembled Содержимое шаблона */
-      $assembled;
-
-      return TemplateCollector::assembly_file_content($this->template, 'templates/html.tpl', $template_replaces);
-    }
-    
-    /**
-     * Итоговая сборка шаблона
-     *
-     * @return void
-     */
-    public function assembly() : void {
-      $this->template->add_style(['href' => 'styles/colors.css', 'rel' => 'stylesheet']);
-      $this->template->add_style(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
-
-      $locale_data = $this->template->locale->get_data();
-
-      $client_is_logged = $this->template->system_core->client->is_logged(1);
-      $client_user = ($client_is_logged) ? $this->template->system_core->client->get_user(1) : null;
-      
-      if ($client_user != null) {
-        $client_user->init_data(['metadata']);
-      }
-
-      $client_user_group_id = ($client_user != null) ? $client_user->get_group_id() : 0;
-
-      if ($this->template->system_core->configurator->get_database_entry_value('base_engineering_works_status') == 'off' || $client_user_group_id == 1) {
-        $this->template->add_style(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
-        $this->template->add_style(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
-        $this->template->add_style(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
-        $this->template->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-        
-        $this->template->add_script(['src' => 'common.js'], true);
-        $this->template->add_script(['src' => 'core.class.js', 'type' => 'module'], true);
-        $this->template->add_script(['src' => 'core.class.js', 'type' => 'module']);
-
-        $profile_link = ($this->template->system_core->client->is_logged(1)) ? sprintf('<a class="header__nav-link display-block" href="/profile"><span class="header__nav-span">%s</span></a>', $locale_data['DEFAULT_TEXT_PROFILE']) : sprintf('<a id="SYSTEM_GE_IMC_00000001" class="header__nav-link display-block" href="#"><span class="header__nav-span">%s</span></a>', $locale_data['DEFAULT_TEXT_LOGIN']);
-        $registration_link = (!$this->template->system_core->client->is_logged(1)) ? sprintf('<a class="header__nav-link display-block" href="/registration"><span class="header__nav-span">%s</span></a>', $locale_data['DEFAULT_TEXT_REGISTRATION']) : '';
-        $exit_link = ($this->template->system_core->client->is_logged(1)) ? sprintf('<a class="header__nav-link display-block" href="#" role="profileNavigationExit"><span class="header__nav-span">%s</span></a>', $locale_data['DEFAULT_TEXT_EXIT']) : '';
-
-        /** @var string $this->assembled Итоговый шаблон в виде строки */
-        $this->assembled = TemplateCollector::assembly($this->assembly_document(), [
-          'SITE_HEADER' => $this->assembly_header([
-            'NAVIGATION_PROFILE_LINK' => $profile_link,
-            'NAVIGATION_REGISTRATION_LINK' => $registration_link,
-            'NAVIGATION_EXIT_LINK' => $exit_link
-          ]),
-          'SITE_MAIN' => $this->assembly_main(),
-          'SITE_FOOTER' => $this->assembly_footer()
-        ]);
-      } else {
-        $this->assembled = TemplateCollector::assembly($this->assembly_document(), [
-          'SITE_HEADER' => '',
-          'SITE_MAIN' => TemplateCollector::assembly($this->assembly_plug(), [
-            'SITE_CLOSED_REASON' => $this->template->system_core->configurator->get_database_entry_value('base_engineering_works_text')
-          ]),
-          'SITE_FOOTER' => ''
-        ]);
-      }
-    }
-
+#[\AllowDynamicProperties]
+final class Core implements ThemeInterfaceCore
+{
+  private Theme $theme;
+  private CMSLocale $locale;
+  public string $assembled = '';
+  public DOMDocument|null $source = null;
+  
+  /**
+   * __construct
+   *
+   * @param  mixed $theme
+   * 
+   * @return void
+   */
+  public function __construct(Theme $theme)
+  {
+    $this->theme = $theme;
   }
 
-}
+  /**
+   * Сборка стартовой страницы
+   * 
+   * @param  mixed $themeVars Массив с переменами темы и их значениями
+   * 
+   * @return string
+   */
+  public function assemblyPageIndex(array $themeVars = []) : string
+  {
+    return ThemeCollector::assemblyFileContent($this->theme, 'templates/page/index.tpl', [
+      'PAGE_NAME' => 'index',
+      'ENTRIES_LIST' => ''
+    ]);
+  }
+  
+  /**
+   * Сборка заглушки сайта
+   *
+   * @param  mixed $themeVars Массив с переменами темы и их значениями
+   * 
+   * @return string
+   */
+  public function assemblyPlug(array $themeVars = []) : string
+  {
+    return ThemeCollector::assemblyFileContent($this->theme, 'templates/plug.tpl', $themeVars);
+  }
+  
+  /**
+   * Сборка шапки сайта
+   *
+   * @param  mixed $themeVars Массив с переменами темы и их значениями
+   * 
+   * @return string
+   */
+  public function assemblyHeader(array $themeVars = []) : string
+  {
+    return ThemeCollector::assemblyFileContent($this->theme, 'templates/header.tpl', $themeVars);
+  }
+  
+  /**
+   * Сборка главной секции сайта
+   *
+   * @param  mixed $themeVars Массив с переменами темы и их значениями
+   * 
+   * @return string
+   */
+  public function assemblyMain(array $themeVars = []) : string
+  {
+    $this->theme->CMSCore->initPage($this->theme->CMSCore->urlp->getPathString());
+    $sitePage = $this->theme->CMSCore->getInitedPage();
+    $sitePage->assembly();
+    
+    $themeVars['SITE_PAGE'] = ThemeCollector::assembly($sitePage->assembled, []);
 
-?>
+    return ThemeCollector::assemblyFileContent($this->theme, 'templates/main.tpl', $themeVars);
+  }
+  
+  /**
+   * Сборка подвала сайта
+   *
+   * @param  mixed $themeVars Массив с переменами темы и их значениями
+   * 
+   * @return string
+   */
+  public function assemblyFooter(array $themeVars = []) : string
+  {
+    return ThemeCollector::assemblyFileContent($this->theme, 'templates/footer.tpl', $themeVars);
+  }
+  
+  /**
+   * Сборка основной части документа
+   *
+   * @param  mixed $themeVars Массив с переменами темы и их значениями
+   * 
+   * @return string
+   */
+  public function assemblyDocument(array $themeVars = []) : string
+  {
+    return ThemeCollector::assemblyFileContent($this->theme, 'templates/html.tpl', $themeVars);
+  }
+  
+  /**
+   * Итоговая сборка шаблона
+   *
+   * @return void
+   */
+  public function assembly() : void
+  {
+    $CMSTheme = $this->theme;
+    $CMSConfigurator = $CMSTheme->CMSCore->configurator;
+
+    $CMSTheme->addStyle(['href' => 'styles/colors.css', 'rel' => 'stylesheet']);
+    $CMSTheme->addStyle(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
+
+    $localeData = $CMSTheme->locale->getData();
+
+    $clientIsLogged = $CMSTheme->CMSCore->client->isLogged(1);
+    $user = $clientIsLogged ? $CMSTheme->CMSCore->client->getUser(1) : null;
+    
+    if ($user !== null) {
+      $user->initData(['metadata']);
+    }
+
+    $userGroupID = $user !== null ? $user->getGroupID() : 0;
+    $CMSConfigEngineeringWorksStatus = $CMSConfigurator->getDatabaseEntryValue('base_engineering_works_status');
+
+    if ($CMSConfigEngineeringWorksStatus === 'off' || $userGroupID === 1) {
+      $CMSTheme->addStyle(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
+      $CMSTheme->addStyle(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
+      $CMSTheme->addStyle(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
+      $CMSTheme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+      
+      $CMSTheme->addScript(['src' => 'common.js'], true);
+      $CMSTheme->addScript(['src' => 'core.class.js', 'type' => 'module'], true);
+      $CMSTheme->addScript(['src' => 'core.class.js', 'type' => 'module']);
+
+      $profileLink = $clientIsLogged
+        ? $this->assemblyProfileLink($localeData)
+        : $this->assemblyLoginLink($localeData);
+      $registrationLink = !$clientIsLogged
+        ? $this->assemblyRegistrationLink($localeData)
+        : '';
+      $exitLink = $clientIsLogged
+        ? $this->assemblyExitLink($localeData)
+        : '';
+
+      /** @var string $this->assembled Итоговый шаблон в виде строки */
+      $this->assembled = ThemeCollector::assembly(
+        $this->assemblyDocument(),
+        [
+          'SITE_HEADER' => $this->assemblyHeader(
+            [
+              'NAVIGATION_PROFILE_LINK' => $profileLink,
+              'NAVIGATION_REGISTRATION_LINK' => $registrationLink,
+              'NAVIGATION_EXIT_LINK' => $exitLink
+            ]
+          ),
+          'SITE_MAIN' => $this->assemblyMain(),
+          'SITE_FOOTER' => $this->assemblyFooter()
+        ]
+      );
+    } else {
+      $CMSConfigEngineeringWorksText = $CMSConfigurator->getDatabaseEntryValue('base_engineering_works_text');
+
+      $this->assembled = ThemeCollector::assembly(
+        $this->assemblyDocument(),
+        [
+          'SITE_HEADER' => '',
+          'SITE_MAIN' => ThemeCollector::assembly(
+            $this->assemblyPlug(),
+            [
+              'SITE_CLOSED_REASON' => $CMSConfigEngineeringWorksText
+            ]
+          ),
+          'SITE_FOOTER' => ''
+        ]
+      );
+    }
+  }
+
+  /**
+   * Сборка ссылки "Профиль"
+   * 
+   * @param array $localeData
+   * 
+   * @return string
+   */
+  private function assemblyProfileLink(array $localeData = []) : string
+  {
+    $document = new DOMDocument('1.0');
+
+    $documentFragment = $document->createDocumentFragment();
+
+    $linkElement = $document->createElement('a');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('href', '/profile');
+
+    $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_PROFILE']);
+    $linkLabelElement->setAttribute('class', 'header__nav-span nav-span');
+
+    $linkElement->appendChild($linkLabelElement);
+    $documentFragment->appendChild($linkElement);
+    $document->appendChild($documentFragment);
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Сборка ссылки "Войти"
+   * 
+   * @param array $localeData
+   * 
+   * @return string
+   */
+  private function assemblyLoginLink(array $localeData = []) : string
+  {
+    $document = new DOMDocument('1.0');
+
+    $documentFragment = $document->createDocumentFragment();
+
+    $linkElement = $document->createElement('a');
+    $linkElement->setAttribute('id', 'SYSTEM_GE_IMC_00000001');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('href', '#');
+
+    $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_LOGIN']);
+    $linkLabelElement->setAttribute('class', 'header__nav-span nav-span');
+
+    $linkElement->appendChild($linkLabelElement);
+    $documentFragment->appendChild($linkElement);
+    $document->appendChild($documentFragment);
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Сборка ссылки "Регистрация"
+   * 
+   * @param array $localeData
+   * 
+   * @return string
+   */
+  private function assemblyRegistrationLink(array $localeData = []) : string
+  {
+    $document = new DOMDocument('1.0');
+
+    $documentFragment = $document->createDocumentFragment();
+
+    $linkElement = $document->createElement('a');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('href', '/registration');
+
+    $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_REGISTRATION']);
+    $linkLabelElement->setAttribute('class', 'header__nav-span nav-span');
+
+    $linkElement->appendChild($linkLabelElement);
+    $documentFragment->appendChild($linkElement);
+    $document->appendChild($documentFragment);
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Сборка ссылки "Выход"
+   * 
+   * @param array $localeData
+   * 
+   * @return string
+   */
+  private function assemblyExitLink(array $localeData = []) : string
+  {
+    $document = new DOMDocument('1.0');
+
+    $documentFragment = $document->createDocumentFragment();
+
+    $linkElement = $document->createElement('a');
+    $linkElement->setAttribute('role', 'profileNavigationExit');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('href', '#');
+
+    $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_EXIT']);
+    $linkLabelElement->setAttribute('class', 'header__nav-span nav-span');
+
+    $linkElement->appendChild($linkLabelElement);
+    $documentFragment->appendChild($linkElement);
+    $document->appendChild($documentFragment);
+
+    return $document->saveHTML();
+  }
+}

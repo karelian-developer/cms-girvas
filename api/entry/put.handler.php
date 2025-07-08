@@ -15,130 +15,184 @@
 
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
-use \core\PHPLibrary\SystemCore\Locale as Locale;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
-if ($system_core->client->is_logged(2)) {
-  $client_user = $system_core->client->get_user(2);
-  $client_user->init_data(['metadata']);
-  $client_user_group = $client_user->get_group();
-  $client_user_group->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($system_core->urlp->get_path(2) == 'category') {
-    if ($client_user_group->permission_check($client_user_group::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT)) {
-      $entries_category_name = isset($_PUT['entries_category_name']) ? urlencode(htmlentities($_PUT['entries_category_name'])) : '';
-      $entries_category_parent_id = isset($_PUT['entries_category_parent_id']) ? (int)$_PUT['entries_category_parent_id'] : 0;
+  if ($CMSCore->urlp->getPath(2) === 'category') {
+    if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT)) {
+      $entriesCategoryName = isset($_PUT['entries_category_name']) ? urlencode(htmlentities($_PUT['entries_category_name'])) : '';
+      $entriesCategoryParentID = $_PUT['entries_category_parent_id'] ?? 0;
+      $entriesCategoryParentID = is_numeric($entriesCategoryParentID) ? (int) $entriesCategoryParentID : 0;
+
       $texts = [];
       $metadata = [];
       
-      $cms_locales_names = $system_core->get_array_locales_names();
-      if (count($cms_locales_names) > 0) {
-        foreach ($cms_locales_names as $index => $cms_locale_name) {
-          $cms_locale = new Locale($system_core, $cms_locale_name);
+      $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+      if (count($CMSLocalesNames) > 0) {
+        foreach ($CMSLocalesNames as $index => $localeName) {
+          $CMSLocale = new CMSLocale($CMSCore, $localeName);
+          $CMSLocale->setTypeName('handler');
+          $CMSLocale->initPathes();
+          
+          $CMSLocaleName = $CMSLocale->getName();
 
-          $entries_category_title_input_name = sprintf('entries_category_title_%s', $cms_locale->get_iso_639_2());
-          $entries_category_description_textarea_name = sprintf('entries_category_description_%s', $cms_locale->get_iso_639_2());
+          $inputTitleName = 'entries_category_title_' . $CMSLocale->getISO639(2);
+          $textareaDescriptionName = 'entries_category_description_' . $CMSLocale->getISO639(2);
 
-          if (array_key_exists($entries_category_title_input_name, $_PUT) || array_key_exists($entries_category_description_textarea_name, $_PUT)) {
-            if (!array_key_exists($cms_locale->get_name(), $texts)) $texts[$cms_locale->get_name()] = [];
+          if (array_key_exists($inputTitleName, $_PUT) || array_key_exists($textareaDescriptionName, $_PUT)) {
+            if (!array_key_exists($CMSLocaleName, $texts)) $texts[$CMSLocaleName] = [];
 
+<<<<<<< HEAD
             if (array_key_exists($entries_category_title_input_name, $_PUT)) {
               $input_value = $_PUT[$entries_category_title_input_name];
               $input_value = strip_tags($input_value);
               $input_value = str_replace('\'', '"', $input_value);
+=======
+            if (array_key_exists($inputTitleName, $_PUT)) {
+              $inputValue = $_PUT[$inputTitleName];
+              $inputValue = strip_tags($inputValue);
+              $inputValue = str_replace('\'', '"', $inputValue);
+>>>>>>> develop
   
-              $texts[$cms_locale->get_name()]['title'] = $input_value;
+              $texts[$CMSLocaleName]['title'] = $inputValue;
             }
 
+<<<<<<< HEAD
             if (array_key_exists($entries_category_description_textarea_name, $_PUT)) {
               $input_value = $_PUT[$entries_category_description_textarea_name];
               $input_value = strip_tags($input_value);
               $input_value = str_replace('\'', '"', $input_value);
+=======
+            if (array_key_exists($textareaDescriptionName, $_PUT)) {
+              $textareaValue = $_PUT[$textareaDescriptionName];
+              $textareaValue = strip_tags($textareaValue);
+              $textareaValue = str_replace('\'', '"', $textareaValue);
+>>>>>>> develop
   
-              $texts[$cms_locale->get_name()]['description'] = $input_value;
+              $texts[$CMSLocaleName]['description'] = $textareaValue;
             }
           }
         }
       }
 
-      $entries_category = EntryCategory::create($system_core, $entries_category_name, $entries_category_parent_id, $texts, $metadata);
-      if (!is_null($entries_category)) {
-        $entries_category->init_data(['metadata']);
+      $entriesCategory = EntryCategory::create($CMSCore, $entriesCategoryName, $entriesCategoryParentID, $texts, $metadata);
+      if (!is_null($entriesCategory)) {
+        $entriesCategory->initData(['metadata']);
 
         if (isset($_PUT['entries_category_show_index'])) {
-          if (!isset($entries_category_data['metadata'])) $entries_category_data['metadata'] = [];
-          $entries_category_data['metadata']['isShowedOnIndexPage'] = 1;
+          if (!isset($entriesCategoryData['metadata'])) $entriesCategoryData['metadata'] = [];
+          $entriesCategoryData['metadata']['isShowedOnIndexPage'] = 1;
         } else {
-          if (!isset($entries_category_data['metadata'])) $entries_category_data['metadata'] = [];
-          $entries_category_data['metadata']['isShowedOnIndexPage'] = 0;
+          if (!isset($entriesCategoryData['metadata'])) $entriesCategoryData['metadata'] = [];
+          $entriesCategoryData['metadata']['isShowedOnIndexPage'] = 0;
         }
 
-        $handler_output_data['entriesCategory'] = [];
-        $handler_output_data['entriesCategory']['id'] = $entries_category->get_id();
+        $handlerOutputData['entriesCategory'] = [];
+        $handlerOutputData['entriesCategory']['id'] = $entriesCategory->getID();
 
-        $handler_message = $system_core->locale->get_single_value_by_key('API_PUT_DATA_SUCCESS');
-        $handler_status_code = 1;
+        $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PUT_DATA_SUCCESS');
+        $handlerStatusCode = $handlerStatusCode ?? 1;
       } else {
-        $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN'));
-        $handler_status_code = 0;
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+        $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
-      $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS'));
-      $handler_status_code = 0;
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   }
 
-  if ($system_core->urlp->get_path(2) == null) {
-    $entry_title_length_max = 80;
-    $entry_description_length_max = 600;
+  if ($CMSCore->urlp->getPath(2) == null) {
+    $entryTitleLengthMax = 80;
+    $entryDescriptionLengthMax = 600;
 
-    if ($client_user_group->permission_check($client_user_group::PERMISSION_EDITOR_ENTRIES_EDIT)) {
-      $entry_name = isset($_PUT['entry_name']) ? urlencode(htmlentities($_PUT['entry_name'])) : '';
-      $entry_category_id = isset($_PUT['entry_category_id']) ? $_PUT['entry_category_id'] : 1;
+    if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_ENTRIES_EDIT)) {
+      $entryName = isset($_PUT['entry_name']) ? urlencode(htmlentities($_PUT['entry_name'])) : '';
+      $entryCategoryID = $_PUT['entry_category_id'] ?? 1;
+      $entryCategoryID = is_numeric($entryCategoryID) ? (int) $entryCategoryID : 0;
       $texts = [];
 
-      $cms_locales_names = $system_core->get_array_locales_names();
-      if (count($cms_locales_names) > 0) {
-        foreach ($cms_locales_names as $index => $cms_locale_name) {
-          $cms_locale = new Locale($system_core, $cms_locale_name);
+      $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+      if (count($CMSLocalesNames) > 0) {
+        foreach ($CMSLocalesNames as $index => $localeName) {
+          $CMSLocale = new CMSLocale($CMSCore, $localeName);
+          $CMSLocale->setTypeName('handler');
+          $CMSLocale->initPathes();
 
-          $entry_title_input_name = sprintf('entry_title_%s', $cms_locale->get_iso_639_2());
-          $entry_description_textarea_name = sprintf('entry_description_%s', $cms_locale->get_iso_639_2());
-          $entry_content_textarea_name = sprintf('entry_content_%s', $cms_locale->get_iso_639_2());
-          $entry_keywords_textarea_name = sprintf('entry_keywords_%s', $cms_locale->get_iso_639_2());
+          $CMSLocaleName = $CMSLocale->getName();
 
-          if (array_key_exists($entry_title_input_name, $_PUT) || array_key_exists($entry_description_textarea_name, $_PUT) || array_key_exists($entry_content_textarea_name, $_PUT)) {
-            if (!array_key_exists($cms_locale->get_name(), $texts)) $texts[$cms_locale->get_name()] = [];
+          $inputTitleName = 'entry_title_' . $CMSLocale->getISO639(2);
+          $textareaDescriptionName = 'entry_description_' . $CMSLocale->getISO639(2);
+          $textareaContentName = 'entry_content_' . $CMSLocale->getISO639(2);
+          $textareaKeywordsName = 'entry_keywords_' . $CMSLocale->getISO639(2);
 
+<<<<<<< HEAD
             if (array_key_exists($entry_title_input_name, $_PUT)) {
               $input_value = $_PUT[$entry_title_input_name];
               $input_value = strip_tags($input_value);
               $input_value = str_replace('\'', '"', $input_value);
+=======
+          if (array_key_exists($inputTitleName, $_PUT) || array_key_exists($textareaDescriptionName, $_PUT) || array_key_exists($textareaContentName, $_PUT)) {
+            if (!array_key_exists($CMSLocaleName, $texts)) $texts[$CMSLocaleName] = [];
+
+            if (array_key_exists($inputTitleName, $_PUT)) {
+              $inputValue = $_PUT[$inputTitleName];
+              $inputValue = strip_tags($inputValue);
+              $inputValue = str_replace('\'', '"', $inputValue);
+>>>>>>> develop
   
-              $texts[$cms_locale->get_name()]['title'] = $input_value;
+              $texts[$CMSLocaleName]['title'] = $inputValue;
             }
 
+<<<<<<< HEAD
             if (array_key_exists($entry_description_textarea_name, $_PUT)) {
               $textarea_value = $_PUT[$entry_description_textarea_name];
               $textarea_value = strip_tags($textarea_value);
               $textarea_value = str_replace('\'', '"', $textarea_value);
+=======
+            if (array_key_exists($textareaDescriptionName, $_PUT)) {
+              $textareaValue = $_PUT[$textareaDescriptionName];
+              $textareaValue = strip_tags($textareaValue);
+              $textareaValue = str_replace('\'', '"', $textareaValue);
+>>>>>>> develop
   
-              $texts[$cms_locale->get_name()]['description'] = $textarea_value;
+              $texts[$CMSLocaleName]['description'] = $textareaValue;
             }
             
+<<<<<<< HEAD
             if (array_key_exists($entry_content_textarea_name, $_PUT)) {
               $textarea_value = $_PUT[$entry_content_textarea_name];
               $textarea_value = strip_tags($textarea_value, '<table><tr><td><th><b><u><i><hr>');
               $textarea_value = str_replace('\'', '"', $textarea_value);
+=======
+            if (array_key_exists($textareaContentName, $_PUT)) {
+              $textareaValue = $_PUT[$textareaContentName];
+              $textareaValue = strip_tags($textareaValue, '<table><tr><td><th><b><u><i><hr>');
+              $textareaValue = str_replace('\'', '"', $textareaValue);
+>>>>>>> develop
   
-              $texts[$cms_locale->get_name()]['content'] = $textarea_value;
+              $texts[$CMSLocaleName]['content'] = $textareaValue;
             }
 
+<<<<<<< HEAD
             if (array_key_exists($entry_keywords_textarea_name, $_PUT)) {
               $textarea_value = $_PUT[$entry_keywords_textarea_name];
               $textarea_value = strip_tags($textarea_value);
               $textarea_value = str_replace('\'', '"', $textarea_value);
+=======
+            if (array_key_exists($textareaKeywordsName, $_PUT)) {
+              $textareaValue = $_PUT[$textareaKeywordsName];
+              $textareaValue = strip_tags($textareaValue);
+              $textareaValue = str_replace('\'', '"', $textareaValue);
+>>>>>>> develop
 
-              $texts[$cms_locale->get_name()]['keywords'] = preg_split('/\h*[\,]+\h*/', $textarea_value, -1, PREG_SPLIT_NO_EMPTY);
+              $texts[$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
             }
           }
         }
@@ -146,57 +200,55 @@ if ($system_core->client->is_logged(2)) {
 
       foreach ($_PUT as $key => $value) {
         if (preg_match('/^entry\_additional\_field\_([a-z0-9\_]+)$/i', $key, $key_matches, PREG_OFFSET_CAPTURE) && !empty($value)) {
-          if (!isset($entry_data)) $entry_data = [];
-          if (!isset($entry_data['metadata'])) $entry_data['metadata'] = [];
-          if (!isset($entry_data['metadata']['additionalFields'])) $entry_data['metadata']['additionalFields'] = [];
+          if (!isset($entryData)) $entryData = [];
+          if (!isset($entryData['metadata'])) $entryData['metadata'] = [];
+          if (!isset($entryData['metadata']['additionalFields'])) $entryData['metadata']['additionalFields'] = [];
           
-          $value_name_parts = explode('_', $key_matches[1][0]);
-          foreach ($value_name_parts as $part_index => $part) {
-            if ($part_index > 0) {
-              $value_name_parts[$part_index] = ucfirst($part);
+          $valueNameParts = explode('_', $key_matches[1][0]);
+          foreach ($valueNameParts as $index => $part) {
+            if ($index > 0) {
+              $valueNameParts[$index] = ucfirst($part);
             }
           }
   
-          if (is_bool($value)) $value = (int)$value;
+          if (is_bool($value)) $value = (int) $value;
   
-          $entry_data['metadata']['additionalFields'][implode($value_name_parts)] = htmlspecialchars(str_replace('\'', '"', $value));
+          $entryData['metadata']['additionalFields'][implode($valueNameParts)] = htmlspecialchars(str_replace('\'', '"', $value));
         }
       }
 
-      $client_session = $system_core->client->get_session(2, ['user_id']);
-      $entry = Entry::create($system_core, $entry_name, $client_session->get_user_id(), 1, $texts);
-      if (!is_null($entry)) {
-        $entry->init_data(['texts']);
+      $clientSession = $CMSCore->client->getSession(2, ['userID']);
+      $entry = Entry::create($CMSCore, $entryName, $clientSession->getUserID(), 1, $texts);
+      if ($entry !== null) {
+        $entry->initData(['texts']);
 
         // Обновление дополнительной информации
-        $entry_data['category_id'] = $entry_category_id;
-        $entry->update($entry_data);
+        $entryData['categoryID'] = $entryCategoryID;
+        $entry->update($entryData);
 
-        $sc_report = \core\PHPLibrary\SystemCore\Report::create($system_core, \core\PHPLibrary\SystemCore\Report::REPORT_TYPE_ID_AP_ENTRY_CREATED, [
-          'clientIP' => $system_core->client->get_ip_address(),
-          'entryTitle' => $entry->get_title(),
+        $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED, [
+          'clientIP' => $CMSCore->client->getIPAddress(),
+          'entryTitle' => $entry->getTitle(),
           'date' => date('Y/m/d H:i:s', time())
         ]);
         
-        $handler_message = $system_core->locale->get_single_value_by_key('API_PUT_DATA_SUCCESS');
-        $handler_status_code = 1;
+        $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_PUT_DATA_SUCCESS');
+        $handlerStatusCode = $handlerStatusCode ?? 1;
 
-        $handler_output_data['entry'] = [];
-        $handler_output_data['entry']['id'] = $entry->get_id();
+        $handlerOutputData['entry'] = [];
+        $handlerOutputData['entry']['id'] = $entry->getID();
 
-        $handler_output_data['href'] = sprintf('/admin/entry/%d', $entry->get_id());
+        $handlerOutputData['href'] = '/admin/entry/' . $entry->getID();
       } else {
-        $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN'));
-        $handler_status_code = 0;
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+        $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
-      $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS'));
-      $handler_status_code = 0;
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   }
 } else {
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

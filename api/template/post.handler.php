@@ -13,67 +13,65 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-if ($system_core->client->is_logged(2)) {
-  $client_user = $system_core->client->get_user(2);
-  $client_user->init_data(['metadata']);
-  $client_user_group = $client_user->get_group();
-  $client_user_group->init_data(['permissions']);
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
 
-  if ($client_user_group->permission_check($client_user_group::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT)) {
-    $template_name = $_POST['template_name'];
-    $template_url = 'https://repository.cms-girvas.ru/templates/' . $_POST['template_name'];
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT)) {
+    $themeName = $_POST['template_name'];
+    $themeURL = 'https://repository.cms-girvas.ru/templates/' . $themeName;
 
-    $ch = curl_init($template_url);
+    $ch = curl_init($themeURL);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    $curl_exucute_result = json_decode(curl_exec($ch), true);
+    $CURLExucuteResult = json_decode(curl_exec($ch), true);
     curl_close($ch);
 
-    if (!empty($curl_exucute_result['outputData'])) {
-      $template_dir_path = sprintf('%s/templates/%s', CMS_ROOT_DIRECTORY, $_POST['template_name']);
-      $template_archive_path = sprintf('%s/templates/%s.zip', CMS_ROOT_DIRECTORY, $_POST['template_name']);
+    if (!empty($CURLExucuteResult['outputData'])) {
+      $themeDirectoryPath = CMS_ROOT_DIRECTORY . '/templates/' . $themeName;
+      $themeArchivePath = CMS_ROOT_DIRECTORY . '/templates/' . $themeName . '.zip';
 
-      $ch_archive = curl_init();
-      curl_setopt($ch_archive, CURLOPT_URL, $curl_exucute_result['outputData']['download_url']);
-      curl_setopt($ch_archive, CURLOPT_RETURNTRANSFER, 1);
-      $curl_archive_exucute_result = curl_exec($ch_archive);
-      curl_close($ch_archive);
+      $chArchive = curl_init();
+      curl_setopt($chArchive, CURLOPT_URL, $CURLExucuteResult['outputData']['download_url']);
+      curl_setopt($chArchive, CURLOPT_RETURNTRANSFER, 1);
+      $CURLArchiveExucuteResult = curl_exec($chArchive);
+      curl_close($chArchive);
       
-      $file = fopen($template_archive_path, "w+");
-      fputs($file, $curl_archive_exucute_result);
+      $file = fopen($themeArchivePath, "w+");
+      fputs($file, $CURLArchiveExucuteResult);
       fclose($file);
 
-      if (file_exists($template_archive_path)) {
+      if (file_exists($themeArchivePath)) {
         $zip = new ZipArchive();
 
-        if ($zip->open($template_archive_path) === true) {
-          mkdir($template_dir_path);
+        if ($zip->open($themeArchivePath) === true) {
+          mkdir($themeDirectoryPath);
 
-          $zip->extractTo($template_dir_path);
+          $zip->extractTo($themeDirectoryPath);
           $zip->close();
 
-          unlink($template_archive_path);
+          unlink($themeArchivePath);
 
-          $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_TEMPLATE_UPLOADED') : $handler_message;
-          $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_TEMPLATE_UPLOADED');
+          $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {
-          $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNKNOWN')) : $handler_message;
-          $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+          $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_UNZIPPING_NOT_POSSIBLE')) : $handler_message;
-        $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNZIPPING_NOT_POSSIBLE');
+        $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
-      $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_TEMPLATE_ERROR_REPOSITORY_DATA_NOT_GETTED')) : $handler_message;
-      $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_TEMPLATE_ERROR_REPOSITORY_DATA_NOT_GETTED');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handler_message = sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_DONT_HAVE_PERMISSIONS'));
-    $handler_status_code = 0;
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
-
-?>

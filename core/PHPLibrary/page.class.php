@@ -8,87 +8,87 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary {
-  use \core\PHPLibrary\Template\Collector as TemplateCollector;
+namespace core\PHPLibrary;
 
-  class Page {
-    private SystemCore $system_core;
-    public PageBreadcrumbs $breadcrumbs;
-    private string $name;
-    public string $assembled = '';
-    
-    /**
-     * __construct
-     *
-     * @param  SystemCore $system_core
-     * @param  string $name
-     * @return void
-     */
-    public function __construct(SystemCore $system_core, array $dir_exploded) {
-      $this->set_system_core($system_core);
-      $this->breadcrumbs = new PageBreadcrumbs($system_core);
-    }
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
-    /**
-     * Назначить техническое имя страницы
-     *
-     * @param  string $value
-     * @return void
-     */
-    private function set_name(string $value) : void {
-      $this->name = $value;
-    }
+class Page
+{
+  private SystemCore $CMSCore;
+  public PageBreadcrumbs $breadcrumbs;
+  private string $name;
+  public string $assembled = '';
+  
+  /**
+   * __construct
+   *
+   * @param  SystemCore $CMSCore
+   * @param  string $name
+   * 
+   * @return void
+   */
+  public function __construct(SystemCore $CMSCore, array $directoryExploded)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->breadcrumbs = new PageBreadcrumbs($CMSCore);
+  }
 
-    /**
-     * Получить техническое имя страницы
-     *
-     * @param  string $value
-     * @return void
-     */
-    public function get_name() : string {
-      return $this->name;
-    }
+  /**
+   * Назначить техническое имя страницы
+   *
+   * @param  string $value
+   * 
+   * @return void
+   */
+  private function setName(string $value) : void
+  {
+    $this->name = $value;
+  }
 
-    /**
-     * Назначить объект шаблона
-     *
-     * @param  Template $template
-     * @return void
-     */
-    private function set_template(Template $template) : void {
-      $this->template = $template;
-    }
+  /**
+   * Получить техническое имя страницы
+   *
+   * @param  string $value
+   * 
+   * @return void
+   */
+  public function getName() : string
+  {
+    return $this->name;
+  }
 
-    /**
-     * Назначить объект системного ядра
-     *
-     * @param  Template $template
-     * @return void
-     */
-    private function set_system_core(SystemCore $system_core) : void {
-      $this->system_core = $system_core;
-    }
-    
-    /**
-     * Сборка шаблона страницы
-     *
-     * @return void
-     */
-    private function assembly() : string {
-      /** @var string $template_path Путь до шаблона */
-      $template_path = $this->template->get_path();
+  /**
+   * Назначить объект шаблона
+   *
+   * @param  Template $theme
+   * 
+   * @return void
+   */
+  private function setTemplate(Template $theme) : void
+  {
+    $this->theme = $theme;
+  }
+  
+  /**
+   * Сборка шаблона страницы
+   *
+   * @return void
+   */
+  private function assembly() : string
+  {
+    /** @var string $themePath Путь до шаблона */
+    $themePath = $this->theme->getPath();
+    $fileTemplatePath = $themePath . '/page.tpl';
 
-      if (file_exists(sprintf('%s/page.tpl', $template_path))) {
-        $page_template_path = sprintf('%s/page/%s.tpl', $template_path, $this->get_name());
-        if (file_exists($page_template_path)) {
-          $page_template = file_get_contents($page_template_path);
-          return TemplateCollector::assembly($page_template, [
-            'PAGE_NAME' => $this->get_name(),
-          ]);
-        }
+    if (file_exists($fileTemplatePath)) {
+      $pageThemePath = $themePath . '/page/' . $this->getName() . '.tpl';
+
+      if (file_exists($pageThemePath)) {
+        $pageTheme = file_get_contents($pageThemePath);
+        return ThemeCollector::assembly($pageTheme, [
+          'PAGE_NAME' => $this->getName(),
+        ]);
       }
     }
   }
 }
-
-?>

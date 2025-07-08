@@ -17,28 +17,26 @@ use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\UsersGroups as UsersGroups;
 
-$users_groups = (new UsersGroups($system_core))->get_all();
-$users_groups_locale = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $system_core->configurator->get_database_entry_value('base_locale');
+$usersGroups = (new UsersGroups($CMSCore))->getAll();
+$usersGroupsLocale = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
 
-$handler_output_data['usersGroups'] = [];
-if (count($users_groups) > 0) {
-  foreach ($users_groups as $users_group) {
-    $users_group->init_data(['id', 'texts', 'metadata', 'created_unix_timestamp', 'updated_unix_timestamp']);
+$handlerOutputData['usersGroups'] = [];
+if (count($usersGroups) > 0) {
+  foreach ($usersGroups as $usersGroup) {
+    $usersGroup->initData(['id', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
 
-    array_push($handler_output_data['usersGroups'], [
-      'id' => $users_group->get_id(),
-      'name' => $users_group->get_name(),
-      'title' => $users_group->get_title($users_groups_locale),
-      'createdUnixTimestamp' => $users_group->get_created_unix_timestamp(),
-      'updatedUnixTimestamp' => $users_group->get_updated_unix_timestamp()
+    array_push($handlerOutputData['usersGroups'], [
+      'id' => $usersGroup->getID(),
+      'name' => $usersGroup->getName(),
+      'title' => $usersGroup->getTitle($usersGroupsLocale),
+      'createdUnixTimestamp' => $usersGroup->getCreatedUnixTimestamp(),
+      'updatedUnixTimestamp' => $usersGroup->getUpdatedUnixTimestamp()
     ]);
   }
 
-  $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS') : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+  $handlerStatusCode = $handlerStatusCode ?? 1;
 } else {
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_USERS_GROUPS_ERROR_NOT_FOUND')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USERS_GROUPS_ERROR_NOT_FOUND');
+  $handlerStatusCode = $handlerStatusCode ?? 1;
 }
-
-?>

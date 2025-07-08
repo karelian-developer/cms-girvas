@@ -16,7 +16,7 @@ export class InstallationMaster {
   constructor(stepsCount) {
     this.searchParams = new URLParser();
 
-    if (this.searchParams.getParam('locale') != null) {
+    if (this.searchParams.getParam('locale') !== null) {
       this.setStepIndex(0);
     } else {
       this.setStepIndex(-1);
@@ -30,10 +30,17 @@ export class InstallationMaster {
     let installationProgress = document.querySelector('[role="installer-progress"]');
     let installationPages = document.querySelectorAll('[data-page-index]');
 
+<<<<<<< HEAD
     if (this.searchParams.getParam('locale') != null) {
       for (let stepIndex = 0; stepIndex < installationPages.length; stepIndex++) {
         let stepID = stepIndex + 1;
         let isBuilded = (stepIndex == 0) ? true : false;
+=======
+    if (this.searchParams.getParam('locale') !== null) {
+      for (let stepIndex = 0; stepIndex < installationPages.length; stepIndex++) {
+        let stepID = stepIndex + 1;
+        let isBuilded = stepIndex === 0;
+>>>>>>> develop
 
         this.stepsData.push({
           id: stepID,
@@ -43,11 +50,11 @@ export class InstallationMaster {
       }
 
       installationPages.forEach((element, elementIndex) => {
-        element.style.display = (elementIndex == 0) ? 'block' : 'none';
+        element.style.display = elementIndex == 0 ? 'block' : 'none';
 
         let installationProgressItem = document.createElement('li');
         installationProgressItem.classList.add('installer-progress__item');
-        if (elementIndex == 0) {
+        if (elementIndex === 0) {
           installationProgressItem.classList.add('item_current');
         }
 
@@ -60,14 +67,14 @@ export class InstallationMaster {
       });
 
       let languagePageElement = document.querySelector('[role="language-page"]');
-      if (languagePageElement != null) {
+      if (languagePageElement !== null) {
         languagePageElement.style.display = 'block';
 
         let interactiveLocaleChoices = new Interactive('choices', {isDisclosed: true});
         let languageSelectContainerElement = document.querySelector('[role="language-select"]');
 
         fetch('/handler/locales?installation-mode=true', {method: 'GET'}).then((response) => {
-          return (response.ok) ? response.json() : Promise.reject(response);
+          return response.ok ? response.json() : Promise.reject(response);
         }).then((data) => {
           return data.outputData.locales;
         }, (rejectionReason) => {
@@ -142,7 +149,7 @@ export class InstallationMaster {
         delete this.buttons[buttonName];
       }
       
-      if (this.getStepIndex() == -1) {
+      if (this.getStepIndex() === -1) {
         this.buttons.prevStepIndex = new Interactive('button');
         this.buttons.prevStepIndex.target.setLabel(localeData.BUTTON_APPLY_LABEL);
         this.buttons.prevStepIndex.target.setCallback((event) => {
@@ -172,7 +179,7 @@ export class InstallationMaster {
         this.buttons.prevStepIndex.assembly();
       }
       
-      if (this.getStepIndex() == 0) {
+      if (this.getStepIndex() === 0) {
         this.buttons.nextStepIndex = new Interactive('button');
         this.buttons.nextStepIndex.target.setLabel(localeData.BUTTON_SUBMIT_AND_CONTINUE_LABEL);
         this.buttons.nextStepIndex.target.setCallback((event) => {
@@ -180,7 +187,7 @@ export class InstallationMaster {
           this.nextStepIndex(localeData);
 
           fetch(`/handler/install?stepIndex=1&locale=${localeName}&installation-mode=true`, {method: 'GET'}).then((response) => {
-            return (response.ok) ? response.json() : Promise.reject(response);
+            return response.ok ? response.json() : Promise.reject(response);
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
@@ -203,14 +210,14 @@ export class InstallationMaster {
         this.buttons.nextStepIndex.assembly();
       }
 
-      if (this.getStepIndex() == 1) {
+      if (this.getStepIndex() === 1) {
         this.buttons.updateData = new Interactive('button');
         this.buttons.updateData.target.setLabel(localeData.BUTTON_UPDATE_DATA_LABEL);
         this.buttons.updateData.target.setCallback((event) => {
           event.preventDefault();
 
           fetch(`/handler/install?stepIndex=1&locale=${localeName}&installation-mode=true`, {method: 'GET'}).then((response) => {
-            return (response.ok) ? response.json() : Promise.reject(response);
+            return response.ok ? response.json() : Promise.reject(response);
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
@@ -234,14 +241,14 @@ export class InstallationMaster {
         this.buttons.updateData.assembly();
       }
 
-      if (this.getStepIndex() == 2) {
+      if (this.getStepIndex() === 2) {
         this.buttons.updateData = new Interactive('button');
         this.buttons.updateData.target.setLabel(localeData.BUTTON_UPDATE_DATA_LABEL);
         this.buttons.updateData.target.setCallback((event) => {
           event.preventDefault();
 
           fetch(`/handler/install?stepIndex=2&locale=${localeName}&installation-mode=true`, {method: 'GET'}).then((response) => {
-            return (response.ok) ? response.json() : Promise.reject(response);
+            return response.ok ? response.json() : Promise.reject(response);
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
@@ -265,14 +272,14 @@ export class InstallationMaster {
         this.buttons.updateData.assembly();
       }
 
-      if (this.getStepIndex() == 3) {
+      if (this.getStepIndex() === 3) {
         this.buttons.updateData = new Interactive('button');
         this.buttons.updateData.target.setLabel(localeData.BUTTON_UPDATE_DATA_LABEL);
         this.buttons.updateData.target.setCallback((event) => {
           event.preventDefault();
 
           fetch(`/handler/install?stepIndex=3&locale=${localeName}&installation-mode=true`, {method: 'GET'}).then((response) => {
-            return (response.ok) ? response.json() : Promise.reject(response);
+            return response.ok ? response.json() : Promise.reject(response);
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
@@ -296,14 +303,14 @@ export class InstallationMaster {
         this.buttons.updateData.assembly();
       }
 
-      if (this.getStepIndex() == 4) {
+      if (this.getStepIndex() === 4) {
         this.buttons.updateData = new Interactive('button');
         this.buttons.updateData.target.setLabel(localeData.BUTTON_UPDATE_DATA_LABEL);
         this.buttons.updateData.target.setCallback((event) => {
           event.preventDefault();
 
           fetch(`/handler/install?stepIndex=4&locale=${localeName}&installation-mode=true`, {method: 'GET'}).then((response) => {
-            return (response.ok) ? response.json() : Promise.reject(response);
+            return response.ok ? response.json() : Promise.reject(response);
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
@@ -327,7 +334,7 @@ export class InstallationMaster {
         this.buttons.updateData.assembly();
       }
 
-      if (this.getStepIndex() == 5) {
+      if (this.getStepIndex() === 5) {
         this.buttons.updateData = new Interactive('button');
         this.buttons.updateData.target.setLabel(localeData.BUTTON_CREATE_CONFIGURATIONS_LABEL);
         this.buttons.updateData.target.setCallback((event) => {
@@ -337,7 +344,7 @@ export class InstallationMaster {
           let formData = new FormData(formTarget);
 
           fetch(`/handler/install?stepIndex=5&locale=${localeName}&installation-mode=true&` + new URLSearchParams(formData).toString(), {method: 'GET'}).then((response) => {
-            return (response.ok) ? response.json() : Promise.reject(response);
+            return response.ok ? response.json() : Promise.reject(response);
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
@@ -363,14 +370,14 @@ export class InstallationMaster {
         this.buttons.updateData.assembly();
       }
 
-      if (this.getStepIndex() == 6) {
+      if (this.getStepIndex() === 6) {
         this.buttons.updateData = new Interactive('button');
         this.buttons.updateData.target.setLabel(localeData.BUTTON_GENERATE_TABLES_LABEL);
         this.buttons.updateData.target.setCallback((event) => {
           event.preventDefault();
 
           fetch(`/handler/install?stepIndex=6&locale=${localeName}&installation-mode=true`, {method: 'GET'}).then((response) => {
-            return (response.ok) ? response.json() : Promise.reject(response);
+            return response.ok ? response.json() : Promise.reject(response);
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
@@ -403,7 +410,11 @@ export class InstallationMaster {
        * - Выбор локализации сайта и административной панели
        * - Выбор временной зоны для расчета времени
        */
+<<<<<<< HEAD
       if (this.getStepIndex() == 7) {
+=======
+      if (this.getStepIndex() === 7) {
+>>>>>>> develop
         // Если сборка страница шага еще не осуществлялась ранее,
         // то делаем запросы к внутреннему API для получения списков
         // локализаций системы для формирования выпадающих списков
@@ -479,7 +490,7 @@ export class InstallationMaster {
           let formData = new FormData(formTarget);
           
           fetch(`/handler/install/set-locales-and-timezone?locale=${localeName}&installation-mode=true`, {method: 'POST', body: formData}).then((response) => {
-            return (response.ok) ? response.json() : Promise.reject(response);
+            return response.ok ? response.json() : Promise.reject(response);
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
@@ -513,7 +524,11 @@ export class InstallationMaster {
        * - Назначение описания сайту
        * - Назначение ключевых слов сайту
        */
+<<<<<<< HEAD
       if (this.getStepIndex() == 8) {
+=======
+      if (this.getStepIndex() === 8) {
+>>>>>>> develop
         this.buttons.updateData = new Interactive('button');
         this.buttons.updateData.target.setLabel(localeData.BUTTON_APPLY_LABEL);
         this.buttons.updateData.target.setCallback((event) => {
@@ -527,7 +542,11 @@ export class InstallationMaster {
             
             // Применение данных из формы
             fetch(`/handler/install/set-metadata?locale=${localeName}&installation-mode=true`, {method: 'POST', body: formData}).then((response) => {
+<<<<<<< HEAD
               return (response.ok) ? response.json() : Promise.reject(response);
+=======
+              return response.ok ? response.json() : Promise.reject(response);
+>>>>>>> develop
             }).then((data) => {
               let resultHTML = data.outputData.html;
               let statusCode = data.statusCode;
@@ -558,7 +577,7 @@ export class InstallationMaster {
         this.buttons.updateData.assembly();
       }
 
-      if (this.getStepIndex() == 9) {
+      if (this.getStepIndex() === 9) {
         this.buttons.updateData = new Interactive('button');
         this.buttons.updateData.target.setLabel(localeData.BUTTON_CREATE_ACCOUNT_LABEL);
         this.buttons.updateData.target.setCallback((event) => {
@@ -569,7 +588,7 @@ export class InstallationMaster {
           let formData = new FormData(formTarget);
           
           fetch(`/handler/install/create-admin?locale=${localeName}&installation-mode=true`, {method: 'POST', body: formData}).then((response) => {
-            return (response.ok) ? response.json() : Promise.reject(response);
+            return response.ok ? response.json() : Promise.reject(response);
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
@@ -597,14 +616,14 @@ export class InstallationMaster {
         this.buttons.updateData.assembly();
       }
 
-      if (this.getStepIndex() == 10) {
+      if (this.getStepIndex() === 10) {
         this.buttons.updateData = new Interactive('button');
         this.buttons.updateData.target.setLabel(localeData.BUTTON_GENERATE_KEY_LABEL);
         this.buttons.updateData.target.setCallback((event) => {
           event.preventDefault();
 
           fetch(`/handler/install/generate-secret-key?locale=${localeName}&installation-mode=true`, {method: 'POST'}).then((response) => {
-            return (response.ok) ? response.json() : Promise.reject(response);
+            return response.ok ? response.json() : Promise.reject(response);
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
@@ -639,9 +658,9 @@ export class InstallationMaster {
             this.stepsData[this.getStepIndex()].isCompleted = true;
             this.nextStepIndex(localeData);
 
-            if (this.getStepIndex() == 2) {
+            if (this.getStepIndex() === 2) {
               fetch(`/handler/install?stepIndex=2&locale=${localeName}&installation-mode=true`, {method: 'GET'}).then((response) => {
-                return (response.ok) ? response.json() : Promise.reject(response);
+                return response.ok ? response.json() : Promise.reject(response);
               }).then((data) => {
                 let resultHTML = data.outputData.html;
       
@@ -662,9 +681,9 @@ export class InstallationMaster {
               });
             }
 
-            if (this.getStepIndex() == 3) {
+            if (this.getStepIndex() === 3) {
               fetch(`/handler/install?stepIndex=3&locale=${localeName}&installation-mode=true`, {method: 'GET'}).then((response) => {
-                return (response.ok) ? response.json() : Promise.reject(response);
+                return response.ok ? response.json() : Promise.reject(response);
               }).then((data) => {
                 let resultHTML = data.outputData.html;
       
@@ -685,9 +704,9 @@ export class InstallationMaster {
               });
             }
 
-            if (this.getStepIndex() == 4) {
+            if (this.getStepIndex() === 4) {
               fetch(`/handler/install?stepIndex=4&locale=${localeName}&installation-mode=true`, {method: 'GET'}).then((response) => {
-                return (response.ok) ? response.json() : Promise.reject(response);
+                return response.ok ? response.json() : Promise.reject(response);
               }).then((data) => {
                 let resultHTML = data.outputData.html;
       
@@ -708,7 +727,7 @@ export class InstallationMaster {
               });
             }
 
-            if (this.getStepIndex() == 11) {
+            if (this.getStepIndex() === 11) {
               fetch(`/handler/install/finish?locale=${localeName}`, {method: 'POST'});
             }
 

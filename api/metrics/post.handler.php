@@ -16,74 +16,72 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\Metrics as Metrics;
 use \core\PHPLibrary\Metrics\Session as MetricsSession;
 
-if (array_key_exists('Metrics-Token', $handler_headers)) {
-  $client_ip = $system_core->client->get_ip_address();
-  $metrics_token = $handler_headers['Metrics-Token'];
-  $metrics_timestamp = (is_numeric($_POST['time'])) ? strtotime(date('Y/m/d', $_POST['time'])) : strtotime(date('Y/m/d', time()));
-  $metrics_current_url = strip_tags(str_replace('\'', '', $_POST['current_url']));
-  $metrics_referrer_url = strip_tags(str_replace('\'', '', $_POST['referrer_url']));
-  $metrics_is_visited_new = (bool)$_POST['is_visited_new'];
+if (array_key_exists('Metrics-Token', $handlerHeaders)) {
+  $clientIP = $CMSCore->client->getIPAddress();
+  $metricsToken = $handlerHeaders['Metrics-Token'];
+  $metricsTimestamp = (is_numeric($_POST['time'])) ? strtotime(date('Y/m/d', $_POST['time'])) : strtotime(date('Y/m/d', time()));
+  $metricsCurrentURL = strip_tags(str_replace('\'', '', $_POST['current_url']));
+  $metricsReferrerURL = strip_tags(str_replace('\'', '', $_POST['referrer_url']));
+  $metricsIsNewVisit = (bool) $_POST['is_visited_new'];
 
-  $metrics = new Metrics($system_core);
-  $metrics->set_timestamp($metrics_timestamp);
+  $metrics = new Metrics($CMSCore);
+  $metrics->setTimestamp($metricsTimestamp);
 
-  if (!MetricsSession::exists_by_timestamp($system_core, $metrics, $metrics_timestamp)) {
-    $metrics_session = MetricsSession::create($system_core, $metrics);
+  if (!MetricsSession::existsByTimestamp($CMSCore, $metrics, $metricsTimestamp)) {
+    $metricsSession = MetricsSession::create($CMSCore, $metrics);
   } else {
-    $metrics_session = MetricsSession::get_by_timestamp($system_core, $metrics, $metrics_timestamp);
+    $metricsSession = MetricsSession::getByTimestamp($CMSCore, $metrics, $metricsTimestamp);
   }
 
-  if (!is_null($metrics_session)) {
-    $metrics_session->init_data(['data']);
+  if (!is_null($metricsSession)) {
+    $metricsSession->initData(['data']);
     
-    $metrics_data = [];
-    $metrics_data_ = $metrics_session->get_data();
+    $metricsData = [];
+    $metricsDataSort = $metricsSession->getData();
 
-    if (isset($metrics_data_['metrics']['views'][$metrics_token])) {
-      if ($metrics_referrer_url != $metrics_current_url) {
-        array_push($metrics_data_['metrics']['views'][$metrics_token]['url_transfers'], [
-          $metrics_current_url => [
-            'referral' => $metrics_referrer_url,
-            'is_visited_new' => $metrics_is_visited_new,
+    if (isset($metricsDataSort['metrics']['views'][$metricsToken])) {
+      if ($metricsReferrerURL !== $metricsCurrentURL) {
+        array_push($metricsDataSort['metrics']['views'][$metricsToken]['URLTransfers'], [
+          $metricsCurrentURL => [
+            'referral' => $metricsReferrerURL,
+            'isVisitedNew' => $metricsIsNewVisit,
             'time' => time()
           ]
         ]);
       }
       
-      $metrics_data_['metrics']['time'] = $metrics_timestamp;
-      $metrics_data_['metrics']['views'][$metrics_token] = [
-        'ip' => $client_ip,
-        'time' => $metrics_timestamp,
-        'url_transfers' => $metrics_data_['metrics']['views'][$metrics_token]['url_transfers'],
-        'urls' => $metrics_data_['metrics']['views'][$metrics_token]['urls']
+      $metricsDataSort['metrics']['time'] = $metricsTimestamp;
+      $metricsDataSort['metrics']['views'][$metricsToken] = [
+        'ip' => $clientIP,
+        'time' => $metricsTimestamp,
+        'URLTransfers' => $metricsDataSort['metrics']['views'][$metricsToken]['URLTransfers'],
+        'urls' => $metricsDataSort['metrics']['views'][$metricsToken]['urls']
       ];
 
-      if (array_key_exists($metrics_current_url, $metrics_data_['metrics']['views'][$metrics_token]['urls'])) {
-        $url_value = $metrics_data_['metrics']['views'][$metrics_token]['urls'][$metrics_current_url];
-        $metrics_data_['metrics']['views'][$metrics_token]['urls'][$metrics_current_url] = $url_value + 1;
+      if (array_key_exists($metricsCurrentURL, $metricsDataSort['metrics']['views'][$metricsToken]['urls'])) {
+        $URLValue = $metricsDataSort['metrics']['views'][$metricsToken]['urls'][$metricsCurrentURL];
+        $metricsDataSort['metrics']['views'][$metricsToken]['urls'][$metricsCurrentURL] = $URLValue + 1;
       } else {
-        $metrics_data_['metrics']['views'][$metrics_token]['urls'][$metrics_current_url] = 1;
+        $metricsDataSort['metrics']['views'][$metricsToken]['urls'][$metricsCurrentURL] = 1;
       }
     } else {
-      $metrics_data_['metrics']['time'] = $metrics_timestamp;
-      $metrics_data_['metrics']['views'][$metrics_token] = [
-        'ip' => $client_ip,
-        'time' => $metrics_timestamp,
-        'url_transfers' => [
-          [$metrics_current_url => [
-            'referral' => $metrics_referrer_url,
-            'is_visited_new' => $metrics_is_visited_new,
+      $metricsDataSort['metrics']['time'] = $metricsTimestamp;
+      $metricsDataSort['metrics']['views'][$metricsToken] = [
+        'ip' => $clientIP,
+        'time' => $metricsTimestamp,
+        'URLTransfers' => [
+          [$metricsCurrentURL => [
+            'referral' => $metricsReferrerURL,
+            'isVisitedNew' => $metricsIsNewVisit,
             'time' => time()
           ]]
         ],
-        'urls' => [$metrics_current_url => 1]
+        'urls' => [$metricsCurrentURL => 1]
       ];
     }
 
-    $metrics_data['data'] = $metrics_data_;
+    $metricsData['data'] = $metricsDataSort;
 
-    $metrics_session->update($metrics_data);
+    $metricsSession->update($metricsData);
   }
 }
-
-?>

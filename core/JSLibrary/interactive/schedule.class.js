@@ -24,7 +24,7 @@ export class Schedule {
       position: {x: 25, y: 25},
       size: {width: 600, height: 200}
     };
-    this.context = (typeof(canvas) == 'object') ? canvas.getContext('2d') : null;
+    this.context = typeof(canvas) == 'object' ? canvas.getContext('2d') : null;
     this.dataDots = [];
     this.types = [];
     this.legend = new Legend();

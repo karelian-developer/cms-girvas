@@ -13,867 +13,999 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary {
-  use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-  use \core\PHPLibrary\SystemCore\Configurator as SystemCoreConfigurator;
-  use \core\PHPLibrary\SystemCore\Header as SystemCoreHeader;
-  use \core\PHPLibrary\SystemCore\Header\HTTPReferrerPolicy as SystemCoreHeaderHTTPReferrerPolicy;
-  use \core\PHPLibrary\SystemCore\Header\EnumHTTPReferrerPolicy as SystemCoreHeaderEnumHTTPReferrerPolicy;
-  use \core\PHPLibrary\SystemCore\EnumHeader as SystemCoreEnumHeader;
-  use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-  use \core\PHPLibrary\SystemCore\DatabaseConnector as SystemCoreDatabaseConnector;
-  use \core\PHPLibrary\SystemCore\FileConnector as SystemCoreFileConnector;
-  use \core\PHPLibrary\SystemCore\Report as SystemCoreReport;
-  use \core\PHPLibrary\Template\Collector as TemplateCollector;
-  use \core\PHPLibrary\Client as Client;
-  use \DOMDocument as DOMDocument;
+namespace core\PHPLibrary;
+
+use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\SystemCore\Configurator as CMSConfigurator;
+use \core\PHPLibrary\SystemCore\Header as CMSHeader;
+use \core\PHPLibrary\SystemCore\Header\HTTPReferrerPolicy as CMSHeaderHTTPReferrerPolicy;
+use \core\PHPLibrary\SystemCore\Header\EnumHTTPReferrerPolicy as CMSHeaderEnumHTTPReferrerPolicy;
+use \core\PHPLibrary\SystemCore\EnumHeader as CMSEnumHeader;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
+use \core\PHPLibrary\SystemCore\DatabaseConnector as CMSDatabaseConnector;
+use \core\PHPLibrary\SystemCore\FileConnector as CMSFileConnector;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
+use \core\PHPLibrary\Template as Theme;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\Client as Client;
+use \DOMDocument as DOMDocument;
+  
+/**
+ * Class SystemCore
+ * @package core\PHPLibrary
+ * 
+ * @property-read string CMS_CORE_PATH Полный путь до ядра CMS
+ * @property-read string CMS_CORE_PHP_LIBRARY_PATH Полный путь до PHP-библиотеки CMS
+ * @property-read string CMS_CORE_JS_LIBRARY_PATH Полный путь до JavaScript-библиотеки CMS
+ * @property-read string CMS_CORE_TS_LIBRARY_PATH Полный путь до TypeScript-библиотеки CMS
+ * @property      array $configuration Массив с конфигурациями CMS
+ * @property      URLParser $urlp Объект класса URLParser 
+ */
+final class SystemCore
+{
+  public const CMS_CORE_PATH = 'core';
+  public const CMS_CORE_PHP_LIBRARY_PATH = 'core/PHPLibrary';
+  public const CMS_CORE_JS_LIBRARY_PATH = 'core/JSLibrary';
+  public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
+  public const CMS_MODULES_PATH = 'modules';
+  public const CMS_TITLE = 'CMS GIRVAS';
+  public const CMS_VERSION = '0.2.0';
+  public const CMS_STAGE_DEVELOPING = 'voitsy';
+  public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
+  public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
+  public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
+  public const CMS_REESTR_DIGITAL_GOV_LINK = 'https://reestr.digital.gov.ru/reestr/2840045/?sphrase_id=5944628';
+  public string $CSPScriptsHash, $CSPStylesHash;
+
+  /** 
+   * @var CMSConfigurator Конфигуратор системы
+   */
+  public CMSConfigurator|null $configurator = null;
+  /** 
+   * @var CMSDatabaseConnector Класс системы подключения к БД 
+   */
+  public CMSDatabaseConnector|null $databaseConnector = null;
+  /** 
+   * @var CMSLocale Класс локализации ядра 
+   */
+  public CMSLocale|null $locale = null;
+  /**
+   * @var URLParser Класс парсера адресной строки 
+   */
+  public URLParser|null $urlp = null;
+  /** 
+   * @var Client Класс клиента
+   */
+  public Client|null $client = null;
+  /** 
+   * @var Theme Класс шаблона системы 
+   */
+  public Theme|null $theme = null;
+
+  /**
+   *  @var array Массив активированных модулей
+   * */
+  public array $modules = [];
+  /**
+   * @var array Массив элементов пути до инициализированной страницы
+   */
+  public array $pageDirArray = [];
+  /**
+   * @var array Объект текущей страницы
+   */
+  public mixed $page = null;
   
   /**
-   * Class SystemCore
-   * @package core\PHPLibrary
-   * 
-   * @property-read string CMS_CORE_PATH Полный путь до ядра CMS
-   * @property-read string CMS_CORE_PHP_LIBRARY_PATH Полный путь до PHP-библиотеки CMS
-   * @property-read string CMS_CORE_JS_LIBRARY_PATH Полный путь до JavaScript-библиотеки CMS
-   * @property-read string CMS_CORE_TS_LIBRARY_PATH Полный путь до TypeScript-библиотеки CMS
-   * @property      array $configuration Массив с конфигурациями CMS
-   * @property      URLParser $urlp Объект класса URLParser 
+   * __construct
+   *
+   * @return void
    */
-  final class SystemCore {
-    public const CMS_CORE_PATH = 'core';
-    public const CMS_CORE_PHP_LIBRARY_PATH = 'core/PHPLibrary';
-    public const CMS_CORE_JS_LIBRARY_PATH = 'core/JSLibrary';
-    public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
-    public const CMS_MODULES_PATH = 'modules';
-    public const CMS_TITLE = 'CMS GIRVAS';
-    public const CMS_VERSION = '0.1.36';
-    public const CMS_STAGE_DEVELOPING = 'alpha';
-    public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
-    public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
-    public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
-    public const CMS_REESTR_DIGITAL_GOV_LINK = 'https://reestr.digital.gov.ru/reestr/2840045/?sphrase_id=5944628';
-    public string $scp_scripts_hash, $scp_styles_hash;
+  public function __construct()
+  {
+    // Инициализация ядра системы
+    $this->init();
+  }
 
-    /** 
-     * @var \core\PHPLibrary\SystemCore\Configurator Конфигуратор системы
-     */
-    public SystemCoreConfigurator|null $configurator = null;
-    /** 
-     * @var \core\PHPLibrary\SystemCore\DatabaseConnector Класс системы подключения к БД 
-     */
-    public SystemCoreDatabaseConnector|null $database_connector = null;
-    /** 
-     * @var \core\PHPLibrary\SystemCore\Locale Класс локализации ядра 
-     */
-    public SystemCoreLocale|null $locale = null;
-    /**
-     * @var \core\PHPLibrary\URLParser Класс парсера адресной строки 
-     */
-    public URLParser|null $urlp = null;
-    /** 
-     * @var \core\PHPLibrary\Client Класс клиента
-     */
-    public Client|null $client = null;
-    /** 
-     * @var \core\PHPLibrary\Template Класс шаблона системы 
-     */
-    public Template|null $template = null;
+  /**
+   * Получить наименование системы
+   * 
+   * @return string
+   */
+  public function getCMSTitle() : string
+  {
+    return self::CMS_TITLE;
+  }
 
-    /**
-     *  @var array Массив активированных модулей
-     * */
-    public array $modules = [];
-    /**
-     * @var array Массив элементов пути до инициализированной страницы
-     */
-    public array $page_dir_array = [];
-    /**
-     * @var array Объект текущей страницы
-     */
-    public mixed $page = null;
+  /**
+   * Получить текущую версию системы
+   * 
+   * @return string
+   */
+  public function getCMSVersion() : string
+  {
+    return self::CMS_VERSION;
+  }
+
+  /**
+   * Получить наименование стадии разработки
+   * 
+   * @return string
+   */
+  public function getCMSStageDeveloping() : string
+  {
+    return self::CMS_STAGE_DEVELOPING;
+  }
+
+  /**
+   * Получить объект локализации ядра
+   * 
+   * Стандартный набор:
+   * base - базовая локализация (веб-сайт)
+   * admin - административная локализация (АП)
+   * 
+   * @param string $localeType
+   * 
+   * @return CMSLocale
+   */
+  public function getCMSLocale(string $localeType = 'base') : CMSLocale
+  {
+    $CMSConfigurator = $this->configurator;
+
+    $localeName = match ($localeType) {
+      'base' => $CMSConfigurator->getDatabaseEntryValue('base_locale') ?? CMSLocale::DEFAULT_LOCALE_NAME,
+      'admin' => $CMSConfigurator->getDatabaseEntryValue('base_admin_locale') ?? CMSLocale::DEFAULT_LOCALE_NAME,
+      default => $CMSConfigurator->getDatabaseEntryValue($localeType . '_locale') ?? CMSLocale::DEFAULT_LOCALE_NAME,
+    };
+
+    $CMSLocale = new CMSLocale($this, $localeName);
+    $CMSLocale->setTypeName($localeType);
+    $CMSLocale->initPathes();
+
+    return $CMSLocale;
+  }
+
+  /**
+   * Получить домен из конфигурации
+   * 
+   * @return string
+   */
+  public function getCMSDomain() : string
+  {
+    $CMSConfigurator = $this->configurator;
+    return $CMSConfigurator->get('domain') ?? 'errorhost';
+  }
+
+  /**
+   * Получить внешнюю ссылку на систему
+   * 
+   * @return string
+   */
+  public function getCMSLink() : string
+  {
+    $CMSConfigurator = $this->configurator;
+
+    if ($CMSConfigurator->get('domain') !== null) {
+      $CMSConfigDomain = $CMSConfigurator->get('domain');
+
+      return $CMSConfigurator->get('SSLIsEnabled')
+        ? 'https://' . $CMSConfigDomain . '/'
+        : 'http://' . $CMSConfigDomain . '/';
+    }
+
+    return 'errorhost';
+  }
+
+  /**
+   * Установить шаблон для системы
+   * 
+   * @param Theme $theme
+   * 
+   * @return void
+   */
+  public function setTheme(Theme $theme) : void
+  {
+    $this->theme = $theme;
+  }
+
+  /**
+   * Получить текущий шаблон
+   * 
+   * @return Theme
+   */
+  public function getTheme() : Theme
+  {
+    return $this->theme;
+  }
+
+  /**
+   * Получить инициализированную страницу
+   * 
+   * @return InterfacePage
+   */
+  public function getInitedPage() : InterfacePage
+  {
+    return $this->pageDirArray[array_key_last($this->pageDirArray)];
+  }
+
+  /**
+   * Получить копирайт в виде строки
+   * 
+   * @return string
+   */
+  public static function getCopyrightString() : string
+  {
+    // $document = new DOMDocument();
+
+    // $copyrightContainerElement = $document->createElement('div');
+    // $copyrightContainerElement->setAttribute('class', 'footer__copyright copyright');
+
+    // $copyrightLabelSymbolNodeElement = $document->createTextNode('copy');
+    // $copyrightLabelSpaceNodeElement = $document->createTextNode('nbsp');
+
+    // $copyrightLabelSiteLinkElement = $document->createElement('a', '&laquo;Карельский разработчик&raquo;');
+    // $copyrightLabelSiteLinkElement->setAttribute('href', 'https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai/');
+    // $copyrightLabelSiteLinkElement->setAttribute('title', 'Компания &laquo;Карельский разработчик&raquo;');
+    // $copyrightLabelSiteLinkElement->setAttribute('target', '_blank');
+
+    // $copyrightLabelDatesElement = $document->createElement('span', '&laquo;Карельский разработчик&raquo;');
+
+    // $copyrightContainerElement->appendChild($copyrightLabelSymbolNodeElement);
+    // $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement);
+    // $document->appendChild($copyrightContainerElement);
+
+    return sprintf('<div class="footer__copyright"><span>&copy;&nbsp;<a href="%s" title="Garbalo Site Official" target="_blank">%s</a>.</span> <span>2021&nbsp;&mdash;&nbsp;%d. <span>All&nbsp;rights&nbsp;reserved.</span> <span>Powered&nbsp;by&nbsp;<a href="%s" title="CMS Site Official" target="_blank">CMS&nbsp;&laquo;GIRVAS&raquo;</a>.</span></div>', self::CMS_DEVELOPER_SITE_LINK, self::CMS_DEVELOPER_TITLE, date('Y'), self::CMS_PRODUCT_SITE_LINK);
+  }
+
+  /**
+   * Инициализация страницы
+   * 
+   * @param string $dir
+   * 
+   * @return bool
+   */
+  public function initPage(string $dir) : bool
+  {
+    $CMSTheme = $this->theme;
+
+    $dir = $dir === '' ? 'index' : $dir;
+    $dir = rtrim($dir, '/');
     
-    /**
-     * __construct
-     *
-     * @return void
-     */
-    public function __construct() {
-      // Инициализация ядра системы
-      $this->init();
-    }
+    $this->pageDirArray = explode('/', $dir);
 
-    /**
-     * Получить наименование системы
-     * 
-     * @return string
-     */
-    public function get_cms_title() : string {
-      return self::CMS_TITLE;
-    }
+    $pageDirLastIndex = count($this->pageDirArray) - 1;
+    $pageDirFirstElement = $this->pageDirArray[0];
 
-    /**
-     * Получить текущую версию системы
-     * 
-     * @return string
-     */
-    public function get_cms_version() : string {
-      return self::CMS_VERSION;
-    }
-
-    /**
-     * Получить наименование стадии разработки
-     * 
-     * @return string
-     */
-    public function get_cms_stage_developing() : string {
-      return self::CMS_STAGE_DEVELOPING;
-    }
-
-    /**
-     * Получить объект локализации ядра
-     * 
-     * Стандартный набор:
-     * base - базовая локализация (веб-сайт)
-     * admin - административная локализация (АП)
-     * 
-     * @param string $locale_type
-     * 
-     * @return SystemCoreLocale
-     */
-    public function get_cms_locale(string $locale_type = 'base') : SystemCoreLocale {
-      switch ($locale_type) {
-        case 'base': $locale_name = (!is_null($this->configurator->get_database_entry_value('base_locale'))) ? $this->configurator->get_database_entry_value('base_locale') : SystemCoreLocale::DEFAULT_LOCALE_NAME; break;
-        case 'admin': $locale_name = (!is_null($this->configurator->get_database_entry_value('base_admin_locale'))) ? $this->configurator->get_database_entry_value('base_admin_locale') : SystemCoreLocale::DEFAULT_LOCALE_NAME; break;
-        default: $locale_name = (!is_null($this->configurator->get_database_entry_value($locale_type . '_locale'))) ? $this->configurator->get_database_entry_value($locale_type . '_locale') : SystemCoreLocale::DEFAULT_LOCALE_NAME;
-      }
-
-      return new SystemCoreLocale($this, $locale_name, $locale_type);
-    }
-
-    /**
-     * Получить домен из конфигурации
-     * 
-     * @return string
-     */
-    public function get_cms_domain() : string {
-      return (!is_null($this->configurator->get('domain'))) ? $this->configurator->get('domain') : 'errorhost';
-    }
-
-    /**
-     * Получить внешнюю ссылку на систему
-     * 
-     * @return string
-     */
-    public function get_cms_link() : string {
-      if (!is_null($this->configurator->get('domain'))) {
-        $domain = $this->configurator->get('domain');
-        return ($this->configurator->get('ssl_is_enabled')) ? sprintf('https://%s/', $domain) : sprintf('http://%s/', $domain);
-      }
-
-      return 'errorhost';
-    }
-
-    /**
-     * Установить шаблон для системы
-     * 
-     * @param Template $template
-     * 
-     * @return void
-     */
-    public function set_template(Template $template) : void {
-      $this->template = $template;
-    }
-
-    /**
-     * Получить текущий шаблон
-     * 
-     * @return Template
-     */
-    public function get_template() : Template {
-      return $this->template;
-    }
-
-    /**
-     * Получить инициализированную страницу
-     * 
-     * @return InterfacePage
-     */
-    public function get_inited_page() : InterfacePage {
-      return $this->page_dir_array[array_key_last($this->page_dir_array)];
-    }
-
-    /**
-     * Получить копирайт в виде строки
-     * 
-     * @return string
-     */
-    public static function get_copyright_string() : string {
-      return sprintf('<div class="footer__copyright"><span>&copy;&nbsp;<a href="%s" title="Garbalo Site Official" target="_blank">%s</a>.</span> <span>2021&nbsp;&mdash;&nbsp;%d. <span>All&nbsp;rights&nbsp;reserved.</span> <span>Powered&nbsp;by&nbsp;<a href="%s" title="CMS Site Official" target="_blank">CMS&nbsp;&laquo;GIRVAS&raquo;</a>.</span></div>', self::CMS_DEVELOPER_SITE_LINK, self::CMS_DEVELOPER_TITLE, date('Y'), self::CMS_PRODUCT_SITE_LINK);
-    }
-
-    /**
-     * Инициализация страницы
-     * 
-     * @param string $dir
-     * 
-     * @return bool
-     */
-    public function init_page(string $dir) : bool {
-      $dir = ($dir == '') ? 'index' : $dir;
-      $dir = rtrim($dir, '/');
-      
-      $this->page_dir_array = explode('/', $dir);
-      $this->page_dir_array[count($this->page_dir_array) - 1] = explode('?', $this->page_dir_array[count($this->page_dir_array) - 1]);
-      $this->page_dir_array[count($this->page_dir_array) - 1] = $this->page_dir_array[count($this->page_dir_array) - 1][0];
-      
-      if ($this->page_dir_array[0] == $this->template->get_category()) {
-        $this->page_dir_array[0] = ucfirst($this->page_dir_array[0]);
-        array_push($this->page_dir_array, 'index');
-      }
-      
-      $current_dir_final_array = [];
-      for ($index_a = 0; $index_a < count($this->page_dir_array); $index_a++) {
-        $current_dir_array = [];
-        for ($index_b = 0; $index_b < $index_a + 1; $index_b++) {
-          array_push($current_dir_array, $this->page_dir_array[$index_b]);
-        }
-
-        $current_dir = implode('/', $current_dir_array);
-        $class_path = sprintf('%s/core/PHPLibrary/Page/%s.class.php', CMS_ROOT_DIRECTORY, $current_dir);
-        
-        if (file_exists($class_path)) {
-          $current_dir_array[array_key_last($current_dir_array)] = 'Page' . ucfirst($current_dir_array[array_key_last($current_dir_array)]);
-          $current_dir = implode('/', $current_dir_array);
-          $current_dir = str_replace('/', '\\', $current_dir);
-          
-          $class = sprintf('\\core\\PHPLibrary\\Page\\%s', $current_dir);
-          $this->page = new $class($this, new Page($this, $current_dir_array));
-
-          if ($current_dir_array[0] == $this->template->get_category()) unset($current_dir_array[0]);
-          $current_dir_array[array_key_last($current_dir_array)] =& $this->page;
-          $current_dir_final_array = $current_dir_array;
-          break;
-        }
-      }
-
-      if (empty($current_dir_final_array)) {
-        $current_dir_final_array['oh_shit'] = 'karelia_forever';
-      }
-
-      if (gettype($current_dir_final_array[array_key_last($current_dir_final_array)]) == 'string') {
-        $this->template->add_style(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-        
-        $class = sprintf('\\core\\PHPLibrary\\Page\\PageError', $current_dir);
-        $this->page = new $class($this, new Page($this, $current_dir_final_array), 404);
-        $current_dir_final_array[array_key_last($current_dir_final_array)] =& $this->page;
-      }
-
-      $this->page_dir_array = $current_dir_final_array;
-
-      return true;
+    $this->pageDirArray[$pageDirLastIndex] = explode('?', $this->pageDirArray[$pageDirLastIndex]);
+    $this->pageDirArray[$pageDirLastIndex] = $this->pageDirArray[$pageDirLastIndex][0];
+    
+    if ($pageDirFirstElement === $CMSTheme->getCategory()) {
+      $this->pageDirArray[0] = ucfirst($pageDirFirstElement);
+      array_push($this->pageDirArray, 'index');
     }
     
-    /**
-     * Инициализация ядра системы и всех необходимых ее компонентов
-     *
-     * @return void
+    $currentDirFinalArray = [];
+    for ($indexA = 0; $indexA < count($this->pageDirArray); $indexA++) {
+      $currentDirArray = [];
+      for ($indexB = 0; $indexB < $indexA + 1; $indexB++) {
+        array_push($currentDirArray, $this->pageDirArray[$indexB]);
+      }
+
+      $currentDir = implode('/', $currentDirArray);
+      $classPath = CMS_ROOT_DIRECTORY . '/core/PHPLibrary/Page/' . $currentDir . '.class.php';
+      
+      if (file_exists($classPath)) {
+        $currentDirLastKey = array_key_last($currentDirArray);
+        $currentDirArray[$currentDirLastKey] = 'Page' . ucfirst($currentDirArray[$currentDirLastKey]);
+        $currentDir = implode('/', $currentDirArray);
+        $currentDir = str_replace('/', '\\', $currentDir);
+        
+        $class = '\\core\\PHPLibrary\\Page\\' . $currentDir;
+        $this->page = new $class($this, new Page($this, $currentDirArray));
+
+        if ($currentDirArray[0] === $CMSTheme->getCategory()) unset($currentDirArray[0]);
+        $currentDirArray[$currentDirLastKey] =& $this->page;
+        $currentDirFinalArray = $currentDirArray;
+        break;
+      }
+    }
+
+    if (empty($currentDirFinalArray)) {
+      $currentDirFinalArray['oh_shit'] = 'karelia_forever';
+    }
+
+    $currentDirFinalLastKey = array_key_last($currentDirFinalArray);
+
+    if (is_string($currentDirFinalArray[$currentDirFinalLastKey])) {
+      $CMSTheme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+      
+      $class = sprintf('\\core\\PHPLibrary\\Page\\PageError', $currentDir);
+      $this->page = new $class($this, new Page($this, $currentDirFinalArray), 404);
+      $currentDirFinalArray[$currentDirFinalLastKey] =& $this->page;
+    }
+
+    $this->pageDirArray = $currentDirFinalArray;
+
+    return true;
+  }
+  
+  /**
+   * Инициализация ядра системы и всех необходимых ее компонентов
+   *
+   * @return void
+   */
+  private function init()
+  {
+    // Принудительное подключение класса файлового подключателя
+    require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/fileConnector.interface.php';
+    require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/fileConnector.class.php';
+
+    /** @var string Равномерно выбранные случайные байты */
+    $bytes = random_bytes(16);
+
+    /** @var string Случайная хэш-строка для идентификации ранее встроенных скриптов */
+    $this->CSPScriptsHash = bin2hex($bytes);
+
+    /** @var string Равномерно выбранные случайные байты */
+    $bytes = random_bytes(16);
+
+    /** @var string Случайная хэш-строка для идентификации ранее встроенных стилей (CSS) */
+    $this->CSPStylesHash = bin2hex($bytes);
+
+    /** @var CMSFileConnector Объект подключателя файлов */
+    $CMSFileConnector = new CMSFileConnector($this);
+    $CMSFileConnector = $this->autoloadComponents(
+      $CMSFileConnector,
+      self::CMS_CORE_PHP_LIBRARY_PATH,
+      ['enum', 'interface', 'trait', 'class']
+    );
+
+    /** @var null Переменная для будущего объекта шаблона */
+    $theme = null;
+
+    // Инициализация URL-парсера
+    $this->initURLParser();
+    $CMSURLP = $this->urlp;
+
+    /*
+     * Если настройка системы не была произведена и пользователь не находится на странице
+     * инсталлятора, то его необходимо перенаправить на страницу инсталлятора.
      */
-    private function init() {
-      // Принудительное подключение класса файлового подключателя
-      require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/fileConnector.interface.php';
-      require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/fileConnector.class.php';
+    if (
+      !self::CMSIsInstall()
+      && $CMSURLP->getPath(0) !== 'install'
+      && $CMSURLP->getPath(0) !== 'handler'
+    ) {
+      header('location: /install');
+    }
 
-      /** @var string Равномерно выбранные случайные байты */
-      $bytes = random_bytes(16);
+    if ($this->isLocationInstallerActive() && self::CMSIsInstall()) {
+      die('This system is already installed!');
+    }
 
-      /** @var string Случайная хэш-строка для идентификации ранее встроенных скриптов */
-      $this->scp_scripts_hash = bin2hex($bytes);
+    /** @var CMSConfigurator Объект конфигуратора системного ядра */
+    $this->configurator = new CMSConfigurator($this);
+    $CMSConfigurator = $this->configurator;
 
-      /** @var string Равномерно выбранные случайные байты */
-      $bytes = random_bytes(16);
+    // Подключение к базе данных
+    if ($CMSURLP->getPath(0) !== 'install' && $CMSURLP->getPath(1) !== 'install' && $CMSURLP->getParam('installation-mode') !== 'true') {
+      /** @var CMSDatabaseConnector Объект подключения к базе данных */
+      $this->databaseConnector = new CMSDatabaseConnector($this, $CMSConfigurator);
 
-      /** @var string Случайная хэш-строка для идентификации ранее встроенных стилей (CSS) */
-      $this->scp_styles_hash = bin2hex($bytes);
+      /** @var Client Объект клиента */
+      $this->client = new Client($this);
 
-      /** @var SystemCoreFileConnector Объект файлового подключателя */
-      $file_connector = new SystemCoreFileConnector($this);
-      $file_connector->set_start_directory(self::CMS_CORE_PHP_LIBRARY_PATH);
-      $file_connector->set_current_directory(self::CMS_CORE_PHP_LIBRARY_PATH);
-
-      // Подключение файлов с перечислениями
-      $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.enum\.php$/');
-      $file_connector->reset_current_directory();
-
-      // Подключение файлов с интерфейсами
-      $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.interface\.php$/');
-      $file_connector->reset_current_directory();
-
-      // Подключение файлов с трейтами
-      $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.trait\.php$/');
-      $file_connector->reset_current_directory();
-
-      // Подключение файлов с классами
-      $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.class\.php$/');
-      $file_connector->reset_current_directory();
-
-      /** @var null Переменная для будущего объекта шаблона */
-      $template = null;
-
-      // Инициализация URL-парсера
-      $this->init_url_parser();
-
-      // Если настройка системы не была произведена и пользователь не находится на странице инсталлятора,
-      // то его необходимо перенаправить на страницу инсталлятора.
-      if (!self::system_is_install() && $this->urlp->get_path(0) != 'install' && $this->urlp->get_path(0) != 'handler') {
-        header('location: /install');
-      }
-
-      if ($this->is_location_installer_active() && self::system_is_install()) {
-        die('This system is already installed!');
-      }
-
-      /** @var SystemCoreConfigurator Объект конфигуратора системного ядра */
-      $this->configurator = new SystemCoreConfigurator($this);
-
-      // Подключение к базе данных
-      if ($this->urlp->get_path(0) != 'install' && $this->urlp->get_path(1) != 'install' && $this->urlp->get_param('installation-mode') != 'true') {
-        /** @var SystemCoreDatabaseConnector Объект подключения к базе данных */
-        $this->database_connector = new SystemCoreDatabaseConnector($this, $this->configurator);
-
-        /** @var Client Объект клиента */
-        $this->client = new Client($this);
-      }
-
-      /** @var string Проверка статуса HTTPS-протокола */
-      $server_https_status = (isset($_SERVER["HTTPS"])) ? strtolower($_SERVER["HTTPS"]) : 'off';
+      $serverHTTPHost = $_SERVER['HTTP_HOST'] ?? '';
+      $serverRequestURI = $_SERVER['REQUEST_URI'] ?? '';
 
       // Ядро перенаправляет клиент на HTTPS-протокол, в случае, если в CMS включена принудительная
       // переадресация на этот порт.
-      if ($server_https_status != 'on' && $this->configurator->get('ssl_perm_redirect')) {
-        // Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена в настройках CMS.
-        if ($this->configurator->get_permanent_redirect_to_www_status() && !preg_match('/^www\./', $_SERVER['HTTP_HOST'])) {
+      if (!self::isHTTPS() && $CMSConfigurator->get('SSLPermRedirect')) {
+        /* 
+        * Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена
+        * в настройках CMS.
+        */
+        if (
+          $CMSConfigurator->getPermanentRedirectToWWWStatus()
+          && !preg_match('/^www\./', $serverHTTPHost)
+        ) {
           /** @var string Адрес для переадресации по HTTPS-протоколу (поддомен www) */
-          $https_redirect = 'https://www.' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+          $HTTPSRedirect = 'https://www.' . $serverHTTPHost . $serverRequestURI;
         } else {
           /** @var string Адрес для переадресации по HTTPS-протоколу */
-          $https_redirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+          $HTTPSRedirect = 'https://' . $serverHTTPHost . $serverRequestURI;
         }
 
         // Сообщаем браузеру, что это принудительная переадресация
-        SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_RESPONSE_CODE, 301);
-        SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_LOCATION, $https_redirect);
+        CMSHeader::add(CMSEnumHeader::HTTP_RESPONSE_CODE, 301);
+        CMSHeader::add(CMSEnumHeader::HTTP_LOCATION, $HTTPSRedirect);
         exit();
       }
       
-      // Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена в настройках CMS.
-      if ($this->configurator->get_permanent_redirect_to_www_status() && !preg_match('/^www\./', $_SERVER['HTTP_HOST'])) {
+      /* 
+      * Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена
+      * в настройках CMS.
+      */
+      if (
+        $CMSConfigurator->getPermanentRedirectToWWWStatus()
+        && !preg_match('/^www\./', $serverHTTPHost)
+      ) {
         /** @var string Адрес для переадресации по HTTP-протоколу (поддомен www) */
-        $http_redirect = 'http://www.' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $HTTPRedirect = 'http://www.' . $serverHTTPHost . $serverRequestURI;
         
         // Сообщаем браузеру, что это принудительная переадресация
-        SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_RESPONSE_CODE, 301);
-        SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_LOCATION, $http_redirect);
+        CMSHeader::add(CMSEnumHeader::HTTP_RESPONSE_CODE, 301);
+        CMSHeader::add(CMSEnumHeader::HTTP_LOCATION, $HTTPRedirect);
         exit();
       }
 
       // Указываем серверу, что будем использовать временную зону для расчета времени, указанную в настройках CMS. 
-      date_default_timezone_set($this->configurator->get_site_timezone());
+      date_default_timezone_set($CMSConfigurator->getSiteTimezone());
 
       // Сообщаем браузеру, что для сайта деятсвуют особые правила безопасности
-      SystemCoreHeader::add(SystemCoreEnumHeader::HTTP_CONTENT_SECURITY_POLICY, $this->configurator->get_security_scp());
+      CMSHeader::add(CMSEnumHeader::HTTP_CONTENT_SECURITY_POLICY, $CMSConfigurator->getSecurityCSP());
       header('Referrer-Policy: strict-origin-when-cross-origin');
       header('X-Content-Type-Options: nosniff');
       
-      if ($this->configurator->get('ssl_is_enabled')) {
-        $hsts_vars = [];
+      if ($CMSConfigurator->get('SSLIsEnabled')) {
+        $HSTSVars = [];
 
-        if ($this->configurator->exists('ssl_hsts_max_age')) {
-          if (is_integer($this->configurator->get('ssl_hsts_max_age'))) {
-            array_push($hsts_vars, sprintf('max-age=%d', $this->configurator->get('ssl_hsts_max_age')));
+        if ($CMSConfigurator->exists('SSLHSTSMaxAge')) {
+          $CMSConfigSSLHSTSMaxAge = $CMSConfigurator->get('SSLHSTSMaxAge');
+
+          if (is_integer($CMSConfigSSLHSTSMaxAge)) {
+            array_push($HSTSVars, 'max-age=' . $CMSConfigSSLHSTSMaxAge);
           }
         }
 
-        if ($this->configurator->exists('ssl_hsts_include_subdomains')) {
-          if (is_bool($this->configurator->get('ssl_hsts_include_subdomains'))) {
-            if ($this->configurator->get('ssl_hsts_include_subdomains') === true) {
-              array_push($hsts_vars, 'includeSubDomains');
+        if ($CMSConfigurator->exists('SSLHSTSIncludeSubdomains')) {
+          $CMSConfigSSLHSTSIncludeSubdomains = $CMSConfigurator->get('SSLHSTSIncludeSubdomains');
+
+          if (is_bool($CMSConfigSSLHSTSIncludeSubdomains)) {
+            if ($CMSConfigSSLHSTSIncludeSubdomains === true) {
+              array_push($HSTSVars, 'includeSubDomains');
             }
           }
         }
 
-        if ($this->configurator->exists('ssl_hsts_preload')) {
-          if (is_bool($this->configurator->get('ssl_hsts_preload'))) {
-            if ($this->configurator->get('ssl_hsts_preload') === true) {
-              array_push($hsts_vars, 'preload');
-            }
+        if ($CMSConfigurator->exists('SSLHSTSPreload')) {
+          $CMSConfigSSLHSTSPreload = $CMSConfigurator->get('SSLHSTSPreload');
+
+          if (is_bool($CMSConfigSSLHSTSPreload) && $CMSConfigSSLHSTSPreload === true) {
+            array_push($HSTSVars, 'preload');
           }
         }
 
-        header(sprintf('Strict-Transport-Security: %s;', implode('; ', $hsts_vars)));
+        header('Strict-Transport-Security: ' . implode('; ', $HSTSVars));
       }
+    }
 
-      if ($this->urlp->get_path(0) == 'install' && $this->urlp->get_path(1) != 'install') {
-        $install_locale = (!is_null($this->urlp->get_param('locale'))) ? $this->urlp->get_param('locale') : 'en_US';
+    if ($CMSURLP->getPath(0) === 'install' && $CMSURLP->getPath(1) !== 'install') {
+      $installLocaleName = $CMSURLP->getParam('locale') ?? 'en_US';
+    }
+
+    /** @var array Массив установленных модулей в системе */
+    $modulesInstalled = Modules::getInstalledModulesArray();
+    if (!empty($modulesInstalled)) {
+      foreach ($modulesInstalled as $index => $directoryName) {
+        /** @var string Абсолютный путь до директории с модулями */
+        $modulesDirectoryPath = Modules::getAbsoluteModulesPath();
+        /** @var string Абсолютный путь до директории с модулем */
+        $moduleDirectoryPath = $modulesDirectoryPath . '/' . $directoryName;
+        /** @var Module Объект модуля */
+        $module = new Module($this, $directoryName);
+
+        if ($module->isEnabled()) {
+          /** @var CMSFileConnector Объект подключателя файлов */
+          $CMSFileConnector = new CMSFileConnector($this);
+          $CMSFileConnector = $this->autoloadComponents(
+            $CMSFileConnector,
+            $moduleDirectoryPath,
+            ['enum', 'interface', 'trait', 'class']
+          );
+          
+          Module::connectCore($this, $directoryName);
+        }
+
+        unset($module);
       }
+    }
 
-      /** @var array Массив установленных модулей в системе */
-      $modules_installed = Modules::get_installed_modules_array();
-      if (!empty($modules_installed)) {
-        foreach ($modules_installed as $index => $folder_name) {
-          /** @var string Абсолютный путь до директории с модулями */
-          $modules_path = Modules::get_absolute_modules_path();
-          /** @var string Абсолютный путь до директории с модулем */
-          $module_path = $modules_path . '/' . $folder_name;
-          /** @var Module Объект модуля */
-          $module = new Module($this, $folder_name);
+    /** @var array Массив установленных модулей в системе */
+    $modulesInstalled = Modules::getInstalledModulesArray();
+    if (!empty($this->modules)) {
+      foreach ($this->modules as $name => $moduleCore) {
+        $module = new Module($this, $name);
 
-          if ($module->is_enabled()) {
-            $file_connector->set_start_directory($module_path);
-            $file_connector->set_current_directory($module_path);
-
-            // Подключение файлов с перечислениями
-            $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.enum\.php$/');
-            $file_connector->reset_current_directory();
-            // Подключение файлов с интерфейсами
-            $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.interface\.php$/');
-            $file_connector->reset_current_directory();
-            // Подключение файлов с классами
-            $file_connector->connect_files_recursive('/^([a-zA-Z_0-9]+)\.class\.php$/');
-            $file_connector->reset_current_directory();
-
-            Module::connect_core($this, $folder_name);
-          }
-
-          unset($module);
+        if ($module->isInstalled() && $module->isEnabled()) {
+          $moduleCore->preparation();
         }
+
+        unset($module);
       }
+    }
 
-      /** @var array Массив установленных модулей в системе */
-      $modules_installed = Modules::get_installed_modules_array();
-      if (!empty($this->modules)) {
-        foreach ($this->modules as $name => $module_core) {
-          /** @var Module Объект модуля */
-          $module = new Module($this, $name);
+    // ============================================================
+    // Инициализация локализации системного ядра
+    // ============================================================
 
-          if ($module->is_installed() && $module->is_enabled()) {
-            $module_core->preparation();
-          }
-
-          unset($module);
-        }
+    // Проверка активности локаций обработчика и фида
+    if (!$this->isLocationHandlerActive() && !$this->isLocationFeedActive()) {
+      // Проверка активности локации инсталлятора
+      if (!$this->isLocationInstallerActive()) {
+        /** @var string Наименование шаблона сайта */
+        $themeBaseName = $CMSConfigurator->existsDatabaseEntryValue('base_template')
+          ? $CMSConfigurator->getDatabaseEntryValue('base_template')
+          : 'default';
+        /** @var string Наименование шаблона административной панели */
+        $themeAdminName = $CMSConfigurator->existsDatabaseEntryValue('admin_template')
+          ? $CMSConfigurator->getDatabaseEntryValue('admin_template')
+          : 'default';
       }
+      
+      /** @var string Имя локализации, определенное куки "locale" */
+      $CMSLocaleCookie = $_COOKIE['locale'] ?? null;
+      /** @var string Имя локализации, определенное параметром адресной строки параметром "locale" */
+      $CMSLocaleURLParam = $CMSURLP->getParam('locale') ?? null;
 
-      // ============================================================
-      // Инициализация локализации системного ядра
-      // ============================================================
-
-      // Проверка активности локаций обработчика и фида
-      if (!$this->is_location_handler_active() && !$this->is_location_feed_active()) {
-        // Проверка активности локации инсталлятора
-        if (!$this->is_location_installer_active()) {
-          /** @var string Наименование шаблона сайта */
-          $template_base_name = ($this->configurator->exists_database_entry_value('base_template')) ? $this->configurator->get_database_entry_value('base_template') : 'default';
-          /** @var string Наименование шаблона административной панели */
-          $template_admin_name = ($this->configurator->exists_database_entry_value('admin_template')) ? $this->configurator->get_database_entry_value('admin_template') : 'default';
-        }
-        
-        /** @var string Имя локализации, определенное куки "locale" */
-        $cms_locale_cookie = (isset($_COOKIE['locale'])) ? $_COOKIE['locale'] : null;
-        /** @var string Имя локализации, определенное параметром адресной строки параметром "locale" */
-        $cms_locale_url_param = ($this->urlp->get_param('locale') != null) ? $this->urlp->get_param('locale') : null;
-
-        // Проверка активности локации инсталлятора и статуса установки системы
-        if ($this->is_location_installer_active() && !self::system_is_install()) {
-          /** @var string Наименование локализации */
-          $system_core_locale_name = $install_locale;
-          /** @var string Наименование категории шаблона системного ядра */
-          $system_core_template_category_name = 'install';
-        } else {
-          // Определяем приоритетную локализацию системного ядра
-          /** @var string Наименование локализации */
-          $checked_locale_name = $cms_locale_url_param ?? $cms_locale_cookie;
-          // Если приоритетная локализация выбрана...
-          if ($checked_locale_name !== null) {
-            // Проверяем наличие локализации в системе
-            if (SystemCoreLocale::exists($this, $checked_locale_name)) {
-              /** @var string Наименование локализации */
-              $system_core_locale_name = $checked_locale_name;
-            }
-          }
-
-          /** @var string Наименование локализации сайта */
-          $cms_base_locale_name = ($this->configurator->exists_database_entry_value('base_locale')) ? $this->configurator->get_database_entry_value('base_locale') : 'en_US';
-          /** @var string Наименование локализации административной панели */
-          $cms_admin_locale_name = ($this->configurator->exists_database_entry_value('base_admin_locale')) ? $this->configurator->get_database_entry_value('base_admin_locale') : 'en_US';
-
-          // Проверка активности административной панели
-          if ($this->is_location_administrative_panel_active()) {
-            /** @var string Наименование категории шаблона системного ядра */
-            $system_core_template_category_name = 'admin';
-            /** @var string Наименование шаблона системного ядра */
-            $system_core_template_name = $template_admin_name;
-            /** @var string Наименование локализации */
-            $system_core_locale_name = (isset($system_core_locale_name)) ? $system_core_locale_name : $cms_admin_locale_name;
-          } else {
-            /** @var string Наименование категории шаблона системного ядра */
-            $system_core_template_category_name = 'base';
-            /** @var string Наименование шаблона системного ядра */
-            $system_core_template_name = $template_base_name;
-            /** @var string Наименование локализации */
-            $system_core_locale_name = (isset($system_core_locale_name)) ? $system_core_locale_name : $cms_base_locale_name;
-          }
-        }
-
-        // Если по какой-то причине имена категории шаблона и самого шаблона не определены,
-        // то необходимо установить типовые значения.
+      // Проверка активности локации инсталлятора и статуса установки системы
+      if ($this->isLocationInstallerActive() && !self::CMSIsInstall()) {
+        /** @var string Наименование локализации */
+        $CMSLocaleName = $installLocaleName;
         /** @var string Наименование категории шаблона системного ядра */
-        $system_core_template_category_name = (isset($system_core_template_category_name)) ? $system_core_template_category_name : 'base';
-        /** @var string Наименование шаблона системного ядра */
-        $system_core_template_name = (isset($system_core_template_name)) ? $system_core_template_name : 'default';
+        $CMSCoreThemeCategoryName = 'install';
+      } else {
+        // Определяем приоритетную локализацию системного ядра
+        /** @var string Наименование локализации */
+        $checkedLocaleName = $CMSLocaleURLParam ?? $CMSLocaleCookie;
+        // Если приоритетная локализация выбрана...
+        if ($checkedLocaleName !== null) {
+          // Проверяем наличие локализации в системе
+          if (CMSLocale::exists($this, $checkedLocaleName)) {
+            /** @var string Наименование локализации */
+            $CMSLocaleName = $checkedLocaleName;
+          }
+        }
 
-        /** @var SystemCoreLocale Объект локализации системного ядра */
-        $this->locale = new SystemCoreLocale($this, $system_core_locale_name, $system_core_template_category_name);
+        /** @var string Наименование локализации сайта */
+        $CMSBaseLocaleName = $CMSConfigurator->existsDatabaseEntryValue('base_locale') ? $CMSConfigurator->getDatabaseEntryValue('base_locale') : 'en_US';
+        /** @var string Наименование локализации административной панели */
+        $CMSAdminLocaleName = $CMSConfigurator->existsDatabaseEntryValue('base_admin_locale') ? $CMSConfigurator->getDatabaseEntryValue('base_admin_locale') : 'en_US';
+
+        // Проверка активности административной панели
+        if ($this->isLocationAdministrativePanelActive()) {
+          /** @var string Наименование категории шаблона системного ядра */
+          $CMSCoreThemeCategoryName = 'admin';
+          /** @var string Наименование шаблона системного ядра */
+          $CMSCoreThemeName = $themeAdminName;
+          /** @var string Наименование локализации */
+          $CMSLocaleName = $CMSLocaleName ?? $CMSAdminLocaleName;
+        } else {
+          /** @var string Наименование категории шаблона системного ядра */
+          $CMSCoreThemeCategoryName = 'base';
+          /** @var string Наименование шаблона системного ядра */
+          $CMSCoreThemeName = $themeBaseName;
+          /** @var string Наименование локализации */
+          $CMSLocaleName = $CMSLocaleName ?? $CMSBaseLocaleName;
+        }
+      }
+
+      // Если по какой-то причине имена категории шаблона и самого шаблона не определены,
+      // то необходимо установить типовые значения.
+      /** @var string Наименование категории шаблона системного ядра */
+      $CMSCoreThemeCategoryName = $CMSCoreThemeCategoryName ?? 'base';
+      /** @var string Наименование шаблона системного ядра */
+      $CMSCoreThemeName = $CMSCoreThemeName ?? 'default';
+
+      /** @var CMSLocale Объект локализации системного ядра */
+      $this->locale = new CMSLocale($this, $CMSLocaleName);
+      $this->locale->setTypeName($CMSCoreThemeCategoryName);
+      $this->locale->initPathes();
+      
+      if ($CMSURLP->getPath(0) !== 'sql-execute-forced') {
         // Устанавливаем объект шаблона для системного ядра
-        $this->set_template(new Template($this, $system_core_template_name, $system_core_template_category_name));
+        $this->setTheme(new Theme($this, $CMSCoreThemeName, $CMSCoreThemeCategoryName));
 
-        /** @var Template Объект шаблона системного ядра */
-        $template = $this->get_template();
+        /** @var Theme Объект шаблона системного ядра */
+        $theme = $this->getTheme();
         // Инициализация шаблона системного ядра
-        $template->init();
+        $theme->init();
+      }
+    } else {
+      if ($CMSURLP->getPath(1) === 'install') {
+        $localeName = $CMSURLP->getParam('locale') ?? 'en_US';
+        $this->locale = new CMSLocale($this, $localeName);
+        $this->locale->setTypeName('handler');
+        $this->locale->initPathes();
+      } else {
+        if ($CMSURLP->getParam('localeMessage') === null) {
+          $localeName = $CMSConfigurator->existsDatabaseEntryValue('base_locale') ? $CMSConfigurator->getDatabaseEntryValue('base_locale') : 'en_US';
+        } else {
+          $localeName = $CMSURLP->getParam('localeMessage');
+        }
+      }
+
+      $this->locale = new CMSLocale($this, $localeName);
+      $this->locale->setTypeName('handler');
+      $this->locale->initPathes();
+    }
+    
+    if ($theme !== null) {
+      $theme->core->assembled = $theme->getCoreAssembled();
+    }
+
+    $modulesInstalled = Modules::getInstalledModulesArray();
+    if (!empty($this->modules)) {
+      foreach ($this->modules as $name => $moduleCore) {
+        $module = new Module($this, $name);
         
-      } else {
-        if ($this->urlp->get_path(1) == 'install') {
-          $locale_name = (!is_null($this->urlp->get_param('locale'))) ? $this->urlp->get_param('locale') : 'en_US';
-          $this->locale = new SystemCoreLocale($this, $locale_name, 'handler');
+        if ($module->isInstalled() && $module->isEnabled() && $theme !== null) {
+          $theme->core->assembled = ThemeCollector::assemblyLocale(
+            $theme->core->assembled,
+            $module->locale
+          );
+        }
+
+        unset($module);
+      }
+    }
+
+    if ($theme !== null) {
+      $document = new DOMDocument();
+      @$document->loadHTML($theme->core->assembled);
+
+      $scriptElements = $document->getElementsByTagName('script');
+      foreach ($scriptElements as $scriptElement) {
+        $scriptElement->setAttribute('nonce', $this->CSPScriptsHash);
+      }
+
+      $styleElements = $document->getElementsByTagName('style');
+      foreach ($styleElements as $styleElement) {
+        $styleElement->setAttribute('nonce', $this->CSPStylesHash);
+      }
+
+      $theme->core->source = $document;
+
+      if ($CMSURLP->getPath(0) === 'admin') {
+        if (method_exists($theme->core, 'initMainNavigation')) {
+          $theme->core->initMainNavigation();
+        }
+
+        $CMSPage = $this->page;
+
+        if ($CMSPage !== null) {
+          if (method_exists($CMSPage, 'initSubnavigation')) {
+            $CMSPage->initSubnavigation();
+          }
+        }
+      }
+    }
+
+    if (!empty($this->modules)) {
+      foreach ($this->modules as $name => $moduleCore) {
+        $module = new Module($this, $name);
+        
+        if ($module->isInstalled() && $module->isEnabled()) {
+          $moduleCore->init();
+        }
+
+        unset($module);
+      }
+    }
+
+    if ($theme !== null) {
+      $theme->core->assembled = $document->saveHTML();
+    }
+  }
+  
+  /**
+   * Получить путь до корня ситемы
+   *
+   * @return string
+   */
+  public function getCMSPath() : string
+  {
+    return $_SERVER['DOCUMENT_ROOT'];
+  }
+  
+  /**
+   * Получить массив имен загруженных шаблонов
+   *
+   * @return array
+   */
+  public function getArrayUploadedTemplatesNames() : array
+  {
+    $path = $this->getCMSPath() . '/templates';
+    return array_diff(scandir($path), ['..', '.']);
+  }
+  
+  /**
+   * Получить массив имен загруженных модулей
+   *
+   * @return array
+   */
+  public function getArrayUploadedModulesNames() : array
+  {
+    $path = $this->getCMSPath() . '/modules';
+    return array_diff(scandir($path), ['..', '.']);
+  }
+  
+  /**
+   * Получить массив имен локализаций
+   *
+   * @return array
+   */
+  public function getArrayLocalesNames() : array
+  {
+    $path = $this->getCMSPath() . '/locales';
+    return array_diff(scandir($path), ['..', '.']);
+  }
+  
+  /**
+   * Получить внешнюю ссылку до сайта
+   *
+   * @return string
+   */
+  public function getSiteURL() : string
+  {
+    $CMSConfigurator = $this->configurator;
+    $CMSConfigSSLIsEnabled = $CMSConfigurator->get('SSLIsEnabled');
+    $CMSConfigDomainProtocol = $CMSConfigSSLIsEnabled ? 'https://' : 'http://';
+
+    return $CMSConfigDomainProtocol . $CMSConfigurator->get('domain');
+  }
+
+  /**
+   * Проверка активности инсталлятора (по локации клиента)
+   * 
+   * @return bool
+   */
+  public function isLocationInstallerActive() : bool
+  {
+    return $this->urlp->getPath(0) === 'install';
+  }
+
+  /**
+   * Проверка активности административной панели (по локации клиента)
+   * 
+   * @return bool
+   */
+  public function isLocationAdministrativePanelActive() : bool
+  {
+    return $this->urlp->getPath(0) === 'admin';
+  }
+
+  /**
+   * Проверка активности обработчика (по локации клиента)
+   * 
+   * @return bool
+   */
+  public function isLocationHandlerActive() : bool
+  {
+    return $this->urlp->getPath(0) === 'handler';
+  }
+
+  /**
+   * Проверка активности фида (по локации клиента)
+   * 
+   * @return bool
+   */
+  public function isLocationFeedActive() : bool
+  {
+    return $this->urlp->getPath(0) === 'feed';
+  }
+  
+  /**
+   * Инициализация URL-парсера
+   *
+   * @return void
+   */
+  private function initURLParser() : void
+  {
+    $this->urlp = new URLParser();
+  }
+
+  /**
+   * Рекурсивно удалить файлы
+   * 
+   * @param string $path
+   * 
+   * @return bool
+   */
+  public static function recursiveFilesRemove(string $path) : bool
+  {
+    $filesArrayOnPath = array_diff(scandir($path), ['..', '.']);
+
+    if (count($filesArrayOnPath) > 0) {
+      foreach ($filesArrayOnPath as $file) {
+        $path = $path . '/' . $file;
+        
+        if (is_dir($path)) {
+          self::recursiveFilesRemove($path);
         } else {
-          if (is_null($this->urlp->get_param('localeMessage'))) {
-            $locale_name = ($this->configurator->exists_database_entry_value('base_locale')) ? $this->configurator->get_database_entry_value('base_locale') : 'en_US';
-          } else {
-            $locale_name = $this->urlp->get_param('localeMessage');
-          }
-        }
-
-        $this->locale = new SystemCoreLocale($this, $locale_name, 'handler');
-      }
-      
-      if (!is_null($template)) {
-        $template->core->assembled = $template->get_core_assembled();
-      }
-
-      $modules_installed = Modules::get_installed_modules_array();
-      if (!empty($this->modules)) {
-        foreach ($this->modules as $name => $module_core) {
-          $module = new Module($this, $name);
-          
-          if ($module->is_installed() && $module->is_enabled()) {
-            if (!is_null($template)) {
-              $template->core->assembled = TemplateCollector::assembly_locale($template->core->assembled, $module->locale);
-            }
-          }
-
-          unset($module);
+          unlink($path);
         }
       }
 
-      if (!is_null($template)) {
-        $dom_document = new DOMDocument();
-        @$dom_document->loadHTML($template->core->assembled);
-
-        $script_elements = $dom_document->getElementsByTagName('script');
-        foreach ($script_elements as $script_element) {
-          $script_element->setAttribute('nonce', $this->scp_scripts_hash);
-        }
-
-        $style_elements = $dom_document->getElementsByTagName('style');
-        foreach ($style_elements as $style_element) {
-          $style_element->setAttribute('nonce', $this->scp_styles_hash);
-        }
-
-        $template->core->source = $dom_document;
-
-        if ($this->urlp->get_path(0) == 'admin') {
-          if (method_exists($template->core, 'init_main_navigation')) {
-            $template->core->init_main_navigation();
-          }
-
-          if (!is_null($this->page)) {
-            if (method_exists($this->page, 'init_subnavigation')) {
-              $this->page->init_subnavigation();
-            }
-          }
-        }
-      }
-
-      if (!empty($this->modules)) {
-        foreach ($this->modules as $name => $module_core) {
-          $module = new Module($this, $name);
-          
-          if ($module->is_installed() && $module->is_enabled()) {
-            $module_core->init();
-          }
-
-          unset($module);
-        }
-      }
-
-      if (!is_null($template)) {
-        $template->core->assembled = $dom_document->saveHTML();
-      }
+      rmdir($path);
+      return true;
+    } else {
+      rmdir($path);
+      return true;
     }
+
+    return false;
+  }
+  
+  /**
+   * Парсинг HTTP-запроса
+   *
+   * @param  string $inputString
+   * @param  string $contentType
+   * 
+   * @return array
+   */
+  public static function parseRawHTTPRequest(string $inputString, string $contentType) : array
+  {
+    // grab multipart boundary from content type header
+    preg_match('/boundary=(.*)$/', $contentType, $matches);
+    $boundary = $matches[1];
     
-    /**
-     * Получить путь до корня ситемы
-     *
-     * @return string
-     */
-    public function get_cms_path() : string {
-      return $_SERVER['DOCUMENT_ROOT'];
-    }
+    // split content by boundary and get rid of last -- element
+    $arrayBlocks = preg_split("/-+$boundary/", $inputString);
+    array_pop($arrayBlocks);
     
-    /**
-     * Получить массив имен загруженных шаблонов
-     *
-     * @return array
-     */
-    public function get_array_uploaded_templates_names() : array {
-      $path = sprintf('%s/templates', $this->get_cms_path());
-      return array_diff(scandir(sprintf($path)), ['..', '.']);
-    }
-    
-    /**
-     * Получить массив имен загруженных модулей
-     *
-     * @return array
-     */
-    public function get_array_uploaded_modules_names() : array {
-      $path = sprintf('%s/modules', $this->get_cms_path());
-      return array_diff(scandir(sprintf($path)), ['..', '.']);
-    }
-    
-    /**
-     * Получить массив имен локализаций
-     *
-     * @return array
-     */
-    public function get_array_locales_names() : array {
-      $locales_path = sprintf('%s/locales', $this->get_cms_path());
-      return array_diff(scandir(sprintf($locales_path)), ['..', '.']);
-    }
-    
-    /**
-     * Получить внешнюю ссылку до сайта
-     *
-     * @return string
-     */
-    public function get_site_url() : string {
-      return ($this->configurator->get('ssl_is_enabled')) ? sprintf('https://%s', $this->configurator->get('domain')) : sprintf('http://%s', $this->configurator->get('domain'));
-    }
+    $dataArray = [];
+    // loop data blocks
+    foreach ($arrayBlocks as $index => $block) {
+      if (empty($block)) continue;
 
-    /**
-     * Проверка активности инсталлятора (по локации клиента)
-     * 
-     * @return bool
-     */
-    public function is_location_installer_active() {
-      return ($this->urlp->get_path(0) == 'install') ? true : false;
-    }
-
-    /**
-     * Проверка активности административной панели (по локации клиента)
-     * 
-     * @return bool
-     */
-    public function is_location_administrative_panel_active() {
-      return ($this->urlp->get_path(0) == 'admin') ? true : false;
-    }
-
-    /**
-     * Проверка активности обработчика (по локации клиента)
-     * 
-     * @return bool
-     */
-    public function is_location_handler_active() {
-      return ($this->urlp->get_path(0) == 'handler') ? true : false;
-    }
-
-    /**
-     * Проверка активности фида (по локации клиента)
-     * 
-     * @return bool
-     */
-    public function is_location_feed_active() {
-      return ($this->urlp->get_path(0) == 'feed') ? true : false;
-    }
-    
-    /**
-     * Инициализация URL-парсера
-     *
-     * @return void
-     */
-    private function init_url_parser() {
-      $this->urlp = new URLParser();
-    }
-
-    /**
-     * Рекурсивно удалить файлы
-     * 
-     * @param string $path
-     * 
-     * @return bool
-     */
-    public static function recursive_files_remove(string $path) : bool {
-      $files_array_on_path = array_diff(scandir($path), ['..', '.']);
-
-      if (count($files_array_on_path) > 0) {
-        foreach ($files_array_on_path as $file) {
-          $file_path = sprintf('%s/%s', $path, $file);
-          
-          if (is_dir($file_path)) {
-            self::recursive_files_remove($file_path);
-          } else {
-            unlink($file_path);
-          }
-        }
-
-        rmdir($path);
-        return true;
+      // parse uploaded files
+      if (strpos($block, 'application/octet-stream') !== false) {
+        // match "name", then everything after "stream" (optional) except for prepending newlines 
+        preg_match('/name=\"([^\"]*)\".*stream[\n|\r]+(.*)?$/s', $block, $matches);
       } else {
-        rmdir($path);
-        return true;
+        // match "name" and optional value in between newline sequences
+        preg_match('/name=\"([^\"]*)\"[\n|\r]+(.*)?\r$/s', $block, $matches);
       }
 
-      return false;
-    }
-    
-    /**
-     * Парсинг HTTP-запроса
-     *
-     * @param  string $input_string
-     * @param  string $content_type
-     * 
-     * @return void
-     */
-    public static function parse_raw_http_request(string $input_string, string $content_type) {
-      // grab multipart boundary from content type header
-      preg_match('/boundary=(.*)$/', $content_type, $matches);
-      $boundary = $matches[1];
-      
-      // split content by boundary and get rid of last -- element
-      $array_blocks = preg_split("/-+$boundary/", $input_string);
-      array_pop($array_blocks);
-      
-      $data_array = [];
-      // loop data blocks
-      foreach ($array_blocks as $index => $block) {
-        if (empty($block)) continue;
-
-        // parse uploaded files
-        if (strpos($block, 'application/octet-stream') !== false) {
-          // match "name", then everything after "stream" (optional) except for prepending newlines 
-          preg_match('/name=\"([^\"]*)\".*stream[\n|\r]+(.*)?$/s', $block, $matches);
+      if (isset($matches[2])) {
+        if (preg_match('/(.*)\[\]$/', $matches[1], $matchesName)) {
+          $dataArray[$matchesName[1]][] = $matches[2];
         } else {
-          // match "name" and optional value in between newline sequences
-          preg_match('/name=\"([^\"]*)\"[\n|\r]+(.*)?\r$/s', $block, $matches);
+          $dataArray[$matches[1]] = $matches[2];
         }
-
-        if (isset($matches[2])) {
-          if (preg_match('/(.*)\[\]$/', $matches[1], $matches_name)) {
-            $data_array[$matches_name[1]][] = $matches[2];
-          } else {
-            $data_array[$matches[1]] = $matches[2];
-          }
-        }
-      }   
-      
-      return $data_array;
-    }
-
-    /**
-     * Получение куки REST API ядра
-     *
-     * @return int
-     */
-    public static function get_core_rest_cookie() : int {
-      if (isset($_COOKIE['_grv_rest'])) {
-        return (is_numeric($_COOKIE['_grv_rest'])) ? (int)$_COOKIE['_grv_rest'] : 0;
       }
+    }   
+    
+    return $dataArray;
+  }
 
-      return 0;
+  /**
+   * Получение куки REST API ядра
+   *
+   * @return int
+   */
+  public static function getCoreRESTCookie() : int
+  {
+    if (isset($_COOKIE['_grv_rest'])) {
+      return (is_numeric($_COOKIE['_grv_rest'])) ? (int) $_COOKIE['_grv_rest'] : 0;
     }
 
-    /**
-     * Проверка существования куки REST API ядра
-     *
-     * @return bool
-     */
-    public static function core_rest_cookie_exists() : bool {
-      return (isset($_COOKIE['_grv_rest'])) ? true : false;
+    return 0;
+  }
+
+  /**
+   * Проверка существования куки REST API ядра
+   *
+   * @return bool
+   */
+  public static function coreRESTCookieExists() : bool
+  {
+    return isset($_COOKIE['_grv_rest']);
+  }
+
+  /**
+   * Проверка валидации куки REST API ядра
+   *
+   * @param  int $value
+   * @param  string $ip
+   * 
+   * @return bool
+   */
+  public static function coreRESTCookieIsValid(int $value, string $ip) : bool
+  {
+    $ip = str_replace('.', '', $ip);
+
+    if ($value === (int) (((int) $ip * (round(asin(1) * strlen($ip)) << 3)) . strtotime(date('Y/m/d 00:00:00.0')))) {
+      return true;
     }
 
-    /**
-     * Проверка валидации куки REST API ядра
-     *
-     * @param  int $value
-     * @param  string $ip
-     * 
-     * @return bool
-     */
-    public static function core_rest_cookie_is_valid(int $value, string $ip) : bool {
-      $ip = str_replace('.', '', $ip);
+    return false;
+  }
 
-      if ($value == (int)(((int)$ip * (round(asin(1) * strlen($ip)) << 3)) . strtotime(date('Y/m/d 00:00:00.0')))) {
-        return true;
-      }
-
-      return false;
+  /**
+   * Аварийное завершение работы ядра
+   * 
+   * ВНИМАНИЕ! Вызов данного метода оборвет выполнение
+   * последующего кода и выведет сообщение об ошибке.
+   *
+   * @param  int $reasonID
+   * @param  int $statusCode
+   * @param  bool $isJSON
+   * 
+   * @return void
+   */
+  public static function abnormalTerminationOfWork(int $reasonID, int $statusCode, bool $isJSON = false) : void
+  {
+    if ($reasonID === 1) {
+      $message = 'An attempted hacker attack has been detected.';
     }
 
-    /**
-     * Аварийное завершение работы ядра
-     * 
-     * ВНИМАНИЕ! Вызов данного метода оборвет выполнение
-     * последующего кода и выведет сообщение об ошибке.
-     *
-     * @param  int $reason_id
-     * @param  int $status_code
-     * 
-     * @return bool
-     */
-    public static function abnormal_termination_of_work(int $reason_id, int $status_code, bool $is_json = false) : void {
-      if ($reason_id === 1) {
-        $message = 'An attempted hacker attack has been detected.';
-      }
+    $message = $message ?? 'The system core has terminated abnormally for an unknown reason.';
 
-      $message = (isset($message)) ? $message : 'The system core has terminated abnormally for an unknown reason.';
+    $outputData = isset($outputData) ? $outputData : [];
+    $outputData = is_array($outputData) ? $outputData : [];
 
-      $output_data = (isset($output_data)) ? $output_data : [];
-      $output_data = (is_array($output_data)) ? $output_data : [];
+    http_response_code($statusCode);
 
-      http_response_code($status_code);
-
-      if ($is_json) {
-        die(json_encode([
-          'message' => $message,
-          'statusCode' => $status_code,
-          'outputData' => $output_data
-        ]));
-      }
-
-      die($message);
+    if ($isJSON) {
+      die(json_encode([
+        'message' => $message,
+        'statusCode' => $statusCode,
+        'outputData' => $outputData
+      ]));
     }
 
-    /**
-     * Проверить статус установки системы
-     * 
-     * @return bool
-     */
-    public static function system_is_install() : bool {
-      /** @var string Абсолютный путь до файла-пустышки "INSTALLED" */
-      $file_installed_path = sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY);
-      return file_exists($file_installed_path);
+    die($message);
+  }
+
+  /**
+   * Проверить статус установки системы
+   * 
+   * @return bool
+   */
+  public static function CMSIsInstall() : bool
+  {
+    /** @var string Абсолютный путь до файла-пустышки "INSTALLED" */
+    $path = CMS_ROOT_DIRECTORY . '/INSTALLED';
+    return file_exists($path);
+  }
+
+  /**
+   * Автоподключение компонентов системы
+   * 
+   * @return void
+   */
+  private function autoloadComponents(CMSFileConnector $CMSFileConnector, string $pathToFiles, array $filesTypes = []) : void
+  {
+    $CMSFileConnector->setStartDirectory($pathToFiles);
+    $CMSFileConnector->setCurrentDirectory($pathToFiles);
+
+    foreach ($filesTypes as $type) {
+      $CMSFileConnector->connectFilesRecursive('/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/');
+      $CMSFileConnector->resetCurrentDirectory();
     }
   }
 
-}
+  /**
+   * Проверка наличия HTTPS-соединения
+   * 
+   * @return bool
+   */
+  public static function isHTTPS() : bool
+  {
+    $HTTPS = $_SERVER["HTTPS"] ?? '';
+    
+    // Основная проверка
+    if ($HTTPS === 'on' || $HTTPS === '1') {
+      return true;
+    }
 
-?>
+    // Проверка для облачных окружений и прокси
+    if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+      return $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https';
+    }
+
+    return ($_SERVER['SERVER_PORT'] ?? null) === 443;
+  }
+}

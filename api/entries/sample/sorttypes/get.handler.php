@@ -16,27 +16,27 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\EntriesSample\EnumSortTypeID as EnumSortTypeID;
 use \ReflectionEnum as ReflectionEnum;
 
-if ($system_core->client->is_logged(1) || $system_core->client->is_logged(2)) {
-  $handler_output_data['types'] = [];
+if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
+  $handlerOutputData['types'] = [];
 
-  $locale = (!is_null($system_core->urlp->get_param('locale'))) ? $system_core->urlp->get_param('locale') : $system_core->configurator->get_database_entry_value('base_locale');
-  $data_type = $system_core->urlp->get_param('dataType');
+  $localeName = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
+  $dataType = $CMSCore->urlp->getParam('dataType');
 
-  if ($data_type == 'names') {
-    $reflection_enum = new ReflectionEnum(EnumSortTypeID::class);
-    foreach ($reflection_enum->getCases() as $case_index => $case) {
-      $handler_output_data['types'][] = [
-        'id' => $case_index + 1,
+  if ($dataType === 'names') {
+    $reflectionEnum = new ReflectionEnum(EnumSortTypeID::class);
+    foreach ($reflectionEnum->getCases() as $index => $case) {
+      $handlerOutputData['types'][] = [
+        'id' => $index + 1,
         'name' => $case->getName()
       ];
     }
   }
 
-  $handler_message = $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS');
-  $handler_status_code = 1;
+  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+  $handlerStatusCode = $handlerStatusCode ?? 1;
 } else {
-  $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_AUTHORIZATION')) : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
 }
 
 ?>

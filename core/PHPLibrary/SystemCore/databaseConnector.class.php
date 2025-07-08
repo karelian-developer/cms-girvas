@@ -8,39 +8,40 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\SystemCore {
-  use \core\PHPLibrary\Database as Database;
-  use \core\PHPLibrary\Database\DatabaseManagementSystem as DatabaseManagementSystem;
-  use \core\PHPLibrary\SystemCore as SystemCore;
+namespace core\PHPLibrary\SystemCore;
 
-  final class DatabaseConnector {
-    private mixed $system_core = null;
-    public \core\PHPLibrary\Database|null $database = null;
+use \core\PHPLibrary\Database as CMSDatabase;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as DatabaseManagementSystem;
+use \core\PHPLibrary\SystemCore as CMSCore;
+
+final class DatabaseConnector
+{
+  private CMSCore|null $CMSCore = null;
+  public CMSDatabase|null $database = null;
+  
+  /**
+   * __construct
+   *
+   * @param CMSCore $CMSCore
+   * @param Configurator $configurator
+   * @param bool $isTest
+   * 
+   * @return void
+   */
+  public function __construct(CMSCore $CMSCore, Configurator $configurator, bool $isTest = false)
+  {
+    $this->CMSCore = $CMSCore;
+
+    $databaseConfigurations = $configurator->get('database');
+    $this->database = new CMSDatabase($databaseConfigurations['dms']);
+    $this->database->setDatabaseName($databaseConfigurations['name']);
+    $this->database->setDatabaseUser($databaseConfigurations['user']);
+    $this->database->setDatabaseHost($databaseConfigurations['host']);
+    $this->database->setDatabasePassword($databaseConfigurations['password']);
     
-    /**
-     * __construct
-     *
-     * @param  mixed $system_core
-     * @return void
-     */
-    public function __construct(SystemCore $system_core, Configurator $configurator, bool $is_test = false) {
-      $this->system_core = $system_core;
-
-      $database_configurations = $configurator->get('database');
-      $this->database = new Database($database_configurations['dms']);
-      $this->database->set_database_name($database_configurations['name']);
-      $this->database->set_database_user($database_configurations['user']);
-      $this->database->set_database_host($database_configurations['host']);
-      $this->database->set_database_password($database_configurations['password']);
-      
-      if (!$is_test) {
-        $error_is_json = ($system_core->urlp->get_path(0) == 'handler') ? true : false;
-        @$this->database->connect($error_is_json);
-      }
+    if (!$isTest) {
+      $errorIsJSON = $CMSCore->urlp->getPath(0) === 'handler';
+      @$this->database->connect($errorIsJSON);
     }
-
   }
-
 }
-
-?>

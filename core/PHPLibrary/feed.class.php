@@ -8,415 +8,578 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary {
-  use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-  use \PDOException as PDOException;
+namespace core\PHPLibrary;
 
-  #[\AllowDynamicProperties]
-  class Feed {
-    private readonly SystemCore $system_core;
-    private int $id;
-    
-    /**
-     * __construct
-     *
-     * @param  mixed $system_core
-     * @param  mixed $id
-     * @return void
-     */
-    public function __construct(SystemCore $system_core, int $id) {
-      $this->system_core = $system_core;
-      $this->set_id($id);
-    }
+use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\SystemCore as CMSCore;
+use \PDOException as PDOException;
 
-    public function init_data(array $columns = ['*']) {
-      $columns_data = $this->get_database_columns_data($columns);
-      foreach ($columns_data as $column_name => $column_data) {
-        $this->{$column_name} = $column_data;
-      }
-    }
+#[\AllowDynamicProperties]
+class Feed
+{
+  private readonly CMSCore $CMSCore;
+  private int $id;
+  
+  /**
+   * __construct
+   *
+   * @param  mixed $CMSCore
+   * @param  mixed $id
+   * 
+   * @return void
+   */
+  public function __construct(CMSCore $CMSCore, int $id)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->setID($id);
+  }
 
-    /**
-     * Назначить идентификатор
-     *
-     * @param  mixed $value
-     * @return void
-     */
-    private function set_id(int $value) : void {
-      $this->id = $value;
-    }
-    
-    /**
-     * Получить идентификатор
-     *
-     * @param  mixed $value
-     * @return int
-     */
-    public function get_id() : int {
-      return $this->id;
-    }
-
-    public function get_name() : string {
-      return (property_exists($this, 'name')) ? $this->name : '';
-    }
-
-    public function get_type_id() : int {
-      return (property_exists($this, 'type_id')) ? $this->type_id : 0;
-    }
-
-    public function get_entries_category_id() : int {
-      return (property_exists($this, 'entries_category_id')) ? $this->entries_category_id : 0;
-    }
-
-    public function get_entries() : array {
-      return Entries::get_by_category_id($this->entries_category_id());
-    }
-
-    public function get_entries_count() : int {
-      return Entries::get_count_by_category_id($this->entries_category_id());
-    }
-
-    public function get_created_unix_timestamp() : int {
-      return (property_exists($this, 'created_unix_timestamp')) ? $this->created_unix_timestamp : 0;
-    }
-
-    public function get_updated_unix_timestamp() : int {
-      return (property_exists($this, 'updated_unix_timestamp')) ? $this->updated_unix_timestamp : 0;
-    }
-    
-    /**
-     * Получить заголовок
-     *
-     * @return string
-     */
-    public function get_title($locale_name = 'en_US') : string {
-      if (property_exists($this, 'texts')) {
-        $texts_array = json_decode($this->texts, true);
-        if (isset($texts_array[$locale_name]['title'])) {
-          return $texts_array[$locale_name]['title'];
-        }
-      }
-
-      return '';
-    }
-    
-    /**
-     * Получить описание
-     *
-     * @return string
-     */
-    public function get_description($locale_name = 'en_US') : string {
-      if (property_exists($this, 'texts')) {
-        $texts_array = json_decode($this->texts, true);
-        if (isset($texts_array[$locale_name]['description'])) {
-          return $texts_array[$locale_name]['description'];
-        }
-      }
-
-      return '';
-    }
-
-    private function get_database_columns_data(array $columns = ['*']) : array|null {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections($columns);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('web_channels');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
-      
-      /** @var int $user_group_id Идентификационный номер записи */
-      $user_group_id = $this->get_id();
-
-      try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $user_group_id, \PDO::PARAM_INT);
-        $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-      return ($result) ? $result : null;
-    }
-    
-    /**
-     * Получить объект группы пользователя по наименованию
-     *
-     * @param  mixed $system_core
-     * @param  mixed $name
-     * @return Feed
-     */
-    public static function get_by_name(SystemCore $system_core, string $name) : Feed|null {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['id']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('web_channels');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('LOWER(name) = :name');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
-
-      $name = strtolower($name);
-
-      try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
-        $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-
-      $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-      
-      return ($result) ? new Feed($system_core, (int)$result['id']) : null;
-    }
-    
-    /**
-     * Проверить существование группы пользователей по наименованию
-     *
-     * @param  mixed $system_core
-     * @param  string $name
-     * @return void
-     */
-    public static function exists_by_name(\core\PHPLibrary\SystemCore $system_core, string $name) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['1']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('web_channels');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('LOWER(name) = :name');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
-
-      $name = strtolower($name);
-
-      try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
-        $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-      
-      return ($database_query->fetchColumn()) ? true : false;
-    }
-    
-    /**
-     * Проверить существование группы пользователей по ID
-     *
-     * @param  mixed $system_core
-     * @param  int $id
-     * @return void
-     */
-    public static function exists_by_id(\core\PHPLibrary\SystemCore $system_core, int $id) : bool {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_select();
-      $query_builder->statement->add_selections(['1']);
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('web_channels');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->set_clause_limit(1);
-      $query_builder->statement->assembly();
-
-      try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $id, \PDO::PARAM_INT);
-        $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-
-      return ($database_query->fetchColumn()) ? true : false;
-    }
-
-    /**
-     * Удаление существующей группы пользователей
-     *
-     * @return bool
-     */
-    public function delete() : bool {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_delete();
-      $query_builder->statement->set_clause_from();
-      $query_builder->statement->clause_from->add_table('web_channels');
-      $query_builder->statement->clause_from->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
-
-      try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-        $execute = $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-
-      return ($execute) ? true : false;
-    }
-
-    /**
-     * Обновление данных веб-канала
-     *
-     * @param  array $data Массив данных
-     * @return bool
-     */
-    public function update(array $data) : bool {
-      $query_builder = new DatabaseQueryBuilder($this->system_core);
-      $query_builder->set_statement_update();
-      $query_builder->statement->set_table('web_channels');
-      $query_builder->statement->set_clause_set();
-
-      foreach ($data as $data_name => $data_value) {
-        if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'texts'])) {
-          $query_builder->statement->clause_set->add_column($data_name);
-        }
-      }
-
-      if (array_key_exists('texts', $data)) {
-        $json_fields = [];
-
-        foreach ($data['texts'] as $name => $value) {
-          array_push($json_fields, sprintf('\'{"%s": %s}\'::jsonb', $name, json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
-        }
-
-        if (!empty($data['texts'])) {
-          $query_builder->statement->clause_set->add_column('texts', 'texts::jsonb || ' . implode(' || ', $json_fields));
-        }
-      }
-
-      $query_builder->statement->clause_set->add_column('updated_unix_timestamp');
-      $query_builder->statement->clause_set->assembly();
-      $query_builder->statement->set_clause_where();
-      $query_builder->statement->clause_where->add_condition('id = :id');
-      $query_builder->statement->clause_where->assembly();
-      $query_builder->statement->assembly();
-
-      /** @var int $updated_unix_timestamp Текущее время в UNIX-формате */
-      $updated_unix_timestamp = time();
-
-      try {
-        $database_connection = $this->system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        error_log($query_builder->statement->assembled);
-        foreach ($data as $data_name => $data_value) {
-          if (!in_array($data_name, ['id', 'created_unix_timestamp', 'updated_unix_timestamp', 'texts'])) {
-            switch (gettype($data_value)) {
-              case 'boolean': $data_value_type = \PDO::PARAM_BOOL; break;
-              case 'integer': $data_value_type = \PDO::PARAM_INT; break;
-              case 'string': $data_value_type = \PDO::PARAM_STR; break;
-              case 'null': $data_value_type = \PDO::PARAM_NULL; break;
-            }
-
-            $database_query->bindParam(':' . $data_name, $data[$data_name], $data_value_type);
-          }
-        }
-
-        $database_query->bindParam(':id', $this->id, \PDO::PARAM_INT);
-        $database_query->bindParam(':updated_unix_timestamp', $updated_unix_timestamp, \PDO::PARAM_INT);
-        $execute = $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-
-      return ($execute) ? true : false;
-    }
-
-    public static function create(SystemCore $system_core, string $name, int $entries_category_id, int $type_id, array $texts) : Feed|null {
-      $query_builder = new DatabaseQueryBuilder($system_core);
-      $query_builder->set_statement_insert();
-      $query_builder->statement->set_table('web_channels');
-      $query_builder->statement->add_column('entries_category_id');
-      $query_builder->statement->add_column('type_id');
-      $query_builder->statement->add_column('name');
-      $query_builder->statement->add_column('texts');
-      $query_builder->statement->add_column('created_unix_timestamp');
-      $query_builder->statement->add_column('updated_unix_timestamp');
-      $query_builder->statement->set_clause_returning();
-      $query_builder->statement->clause_returning->add_column('id');
-      $query_builder->statement->assembly();
-
-      $created_unix_timestamp = time();
-      $updated_unix_timestamp = $created_unix_timestamp;
-
-      $texts_json = json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-
-      try {
-        $database_connection = $system_core->database_connector->database->connection;
-        $database_query = $database_connection->prepare($query_builder->statement->assembled);
-        $database_query->bindParam(':entries_category_id', $entries_category_id, \PDO::PARAM_INT);
-        $database_query->bindParam(':type_id', $type_id, \PDO::PARAM_INT);
-        $database_query->bindParam(':name', $name, \PDO::PARAM_STR);
-        $database_query->bindParam(':texts', $texts_json, \PDO::PARAM_STR);
-        $database_query->bindParam(':created_unix_timestamp', $created_unix_timestamp, \PDO::PARAM_INT);
-        $database_query->bindParam(':updated_unix_timestamp', $updated_unix_timestamp, \PDO::PARAM_INT);
-        $execute = $database_query->execute();
-      } catch (PDOException $exception) {
-        die(json_encode([
-          'message' => $exception->getMessage(),
-          'statusCode' => 0,
-          'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-      }
-
-      if ($execute) {
-        $result = $database_query->fetch(\PDO::FETCH_ASSOC);
-        return ($result) ? new Feed($system_core, $result['id']) : null;
-      }
-
-      return null;
+  /**
+   * Инициализировать данные
+   * 
+   * @param array $columns
+   * 
+   * @return void
+   */
+  public function initData(array $columns = ['*'])
+  {
+    $columnsData = $this->getDatabaseColumnsData($columns);
+    foreach ($columnsData as $name => $data) {
+      $this->{$name} = $data;
     }
   }
-}
 
-?>
+  /**
+   * Назначить идентификатор
+   *
+   * @param  mixed $value
+   * 
+   * @return void
+   */
+  private function setID(int $value) : void
+  {
+    $this->id = $value;
+  }
+  
+  /**
+   * Получить идентификатор
+   *
+   * @param  mixed $value
+   * 
+   * @return int
+   */
+  public function getID() : int
+  {
+    return $this->id;
+  }
+
+  /**
+   * Получить имя
+   * 
+   * @return string
+   */
+  public function getName() : string
+  {
+    return $this->name ?? '';
+  }
+
+  /**
+   * Получить ID типа
+   * 
+   * @return int
+   */
+  public function getTypeID() : int
+  {
+    return $this->typeID ?? 0;
+  }
+
+  /**
+   * Получить ID категории
+   * 
+   * @return int
+   */
+  public function getEntriesCategoryID() : int
+  {
+    return $this->entriesCategoryID ?? 0;
+  }
+
+  /**
+   * Получить массив записей
+   * 
+   * @return array
+   */
+  public function getEntries() : array
+  {
+    return Entries::getByCategoryID($this->getEntriesCategoryID());
+  }
+
+  /**
+   * Получить количество записей
+   * 
+   * @return int
+   */
+  public function getEntries_count() : int
+  {
+    return Entries::getCountByCategoryID($this->getEntriesCategoryID());
+  }
+
+  /**
+   * Получить временную отментку создания данных в UNIX-формате
+   * 
+   * @return int
+   */
+  public function getCreatedUnixTimestamp() : int
+  {
+    return $this->createdUnixTimestamp ?? 0;
+  }
+
+  /**
+   * Получить временную отментку обновления данных в UNIX-формате
+   * 
+   * @return int
+   */
+  public function getUpdatedUnixTimestamp() : int
+  {
+    return $this->updatedUnixTimestamp ?? 0;
+  }
+  
+  /**
+   * Получить заголовок
+   *
+   * @param  string $localeName Наименование локализации
+   * 
+   * @return string
+   */
+  public function getTitle(string $localeName = 'en_US') : string
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      if (isset($texts[$localeName]['title'])) {
+        return $texts[$localeName]['title'];
+      }
+    }
+
+    return '';
+  }
+  
+  /**
+   * Получить описание
+   *
+   * @param  string $localeName Наименование локализации
+   * 
+   * @return string
+   */
+  public function getDescription(string $localeName = 'en_US') : string
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      if (isset($texts[$localeName]['description'])) {
+        return $texts[$localeName]['description'];
+      }
+    }
+
+    return '';
+  }
+
+  /**
+   * Получить данные колонок в базе данных
+   *
+   * @param  array $columns
+   * 
+   * @return void
+   */
+  private function getDatabaseColumnsData(array $columns = ['*']) : array|null
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections($columns);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('web_channels');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+    
+    /** @var int $userGroupID Идентификационный номер записи */
+    $userGroupID = $this->getID();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $userGroupID, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? $result : null;
+  }
+  
+  /**
+   * Получить объект группы пользователя по наименованию
+   *
+   * @param  mixed $CMSCore
+   * @param  mixed $name
+   * 
+   * @return Feed
+   */
+  public static function getByName(CMSCore $CMSCore, string $name) : Feed|null
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('web_channels');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'LOWER(`name`) = :name',
+      'postgresql' => 'LOWER("name") = :name'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    $name = strtolower($name);
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    
+    return ($result) ? new Feed($CMSCore, (int)$result['id']) : null;
+  }
+  
+  /**
+   * Проверить существование группы пользователей по наименованию
+   *
+   * @param  mixed $CMSCore
+   * @param  string $name
+   * 
+   * @return void
+   */
+  public static function existsByName(CMSCore $CMSCore, string $name) : bool
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['1']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('web_channels');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'LOWER(`name`) = :name',
+      'postgresql' => 'LOWER("name") = :name'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    $name = strtolower($name);
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+    
+    return $databaseQuery->fetchColumn() ? true : false;
+  }
+  
+  /**
+   * Проверить существование группы пользователей по ID
+   *
+   * @param  mixed $CMSCore
+   * @param  int $id
+   * 
+   * @return bool
+   */
+  public static function existsByID(CMSCore $CMSCore, int $id) : bool
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['1']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('web_channels');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $id, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    return $databaseQuery->fetchColumn() ? true : false;
+  }
+
+  /**
+   * Удаление существующей группы пользователей
+   *
+   * @return bool
+   */
+  public function delete() : bool
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementDelete();
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('web_channels');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+      $execute = $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    return $execute ? true : false;
+  }
+
+  /**
+   * Обновление данных веб-канала
+   *
+   * @param  array $data Массив данных
+   * @return bool
+   */
+  public function update(array $data) : bool
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementUpdate();
+    $queryBuilder->statement->setTable('web_channels');
+    $queryBuilder->statement->setClauseSet();
+
+    foreach ($data as $name => $value) {
+      if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts'])) {
+        $queryBuilder->statement->clauseSet->addColumn($name);
+      }
+    }
+
+    foreach (['texts'] as $columnName) {
+      $fieldsJSON = [];
+      
+      if (!isset($data[$columnName])) {
+        continue;
+      }
+
+      foreach ($data[$columnName] as $name => $value) {
+        $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $fieldsJSON[] = match ($queryBuilder->DMS) {
+          CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
+          CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
+        };
+      }
+
+      if (!empty($data[$columnName])) {
+        $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
+          'mysql' => 'JSON_MERGE_PATCH(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
+          'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
+        ]);
+      }
+    }
+
+    $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
+    $queryBuilder->statement->clauseSet->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    /** @var int $updatedUnixTimestamp Текущее время в UNIX-формате */
+    $updatedUnixTimestamp = time();
+
+    error_log($queryBuilder->statement->assembled);
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      
+      foreach ($data as $name => $value) {
+        if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts'])) {
+          $valueTypeName = gettype($value);
+          $valueType = match ($valueTypeName) {
+            'boolean' => \PDO::PARAM_BOOL,
+            'integer' => \PDO::PARAM_INT,
+            'string' => \PDO::PARAM_STR,
+            'null' => \PDO::PARAM_NULL,
+          };
+
+          $databaseQuery->bindParam(':' . $name, $data[$name], $valueType);
+        }
+      }
+
+      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+      $execute = $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    return $execute ? true : false;
+  }
+
+  public static function create(CMSCore $CMSCore, string $name, int $entriesCategoryID, int $typeID, array $texts) : Feed|null
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementInsert();
+    $queryBuilder->statement->setTable('web_channels');
+    $queryBuilder->statement->addColumn('entriesCategoryID');
+    $queryBuilder->statement->addColumn('typeID');
+    $queryBuilder->statement->addColumn('name');
+    $queryBuilder->statement->addColumn('texts');
+    $queryBuilder->statement->addColumn('createdUnixTimestamp');
+    $queryBuilder->statement->addColumn('updatedUnixTimestamp');
+    $queryBuilder->statement->setClauseReturning();
+    $queryBuilder->statement->clauseReturning->addColumn('id');
+    $queryBuilder->statement->assembly();
+
+    $createdUnixTimestamp = time();
+    $updatedUnixTimestamp = $createdUnixTimestamp;
+
+    $texts = json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':entriesCategoryID', $entriesCategoryID, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':texts', $texts, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+      $execute = $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementSelect();
+      $queryBuilder->statement->addSelections(['id']);
+      $queryBuilder->statement->setClauseFrom();
+      $queryBuilder->statement->clauseFrom->addTable('web_channels');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
+
+      error_log('SQL: ' . $queryBuilder->statement->assembled);
+
+      try {
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
+    }
+
+    if ($execute) {
+      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+      return $result ? new Feed($CMSCore, $result['id']) : null;
+    }
+
+    return null;
+  }
+}

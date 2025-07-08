@@ -18,20 +18,27 @@
 
 $configuration = [
   'domain' => 'example.com',
+<<<<<<< HEAD
   'domain_aliases' => ['127.0.0.1', 'localhost'],
   'domain_email' => 'example.com',
   'domain_cookies' => 'example.com',
+=======
+  'domainAliases' => ['127.0.0.1', 'localhost'],
+  'domainEmail' => 'example.com',
+  'domainCookies' => 'example.com',
+  'SSLIsEnabled' => false,
+>>>>>>> develop
   'database' => ['host' => '', 'user' => '', 'password' => '', 'name' => '', 'scheme' => '', 'prefix' => ''],
   // Системная соль (необходима для хеширования некоторых данных)
   // Пример: ?d7R(TF1f30br7tl=!PeIrk) <== (НЕ ИСПОЛЬЗУЙТЕ ЭТУ СОЛЬ)
-  'system_salt' => '',
+  'salt' => '',
   // Алгоритм хеширования пароля (PASSWORD_DEFAULT, PASSWORD_BCRYPT, PASSWORD_ARGON2I, PASSWORD_ARGON2ID)
   // Подробнее: https://www.php.net/manual/en/function.password-hash.php
-  'password_hashing_algorithm' => PASSWORD_DEFAULT,
-  'session_expires' => 86400,
-  'session_admin_expires' => 86400,
-  'www_perm_redirect' => false,
-  'ssl_csp' => [
+  'passwordHashingAlgorithm' => PASSWORD_DEFAULT,
+  'sessionExpires' => 86400,
+  'sessionAdminExpires' => 86400,
+  'WWWPermRedirect' => false,
+  'SSLCSP' => [
     'default-src \'self\'',
     'style-src \'unsafe-inline\' {DOMAIN} {DOMAIN_ALIASES}',
     'script-src \'unsafe-inline\' \'nonce-{SCRIPT_HASH}\'',
@@ -39,10 +46,8 @@ $configuration = [
     'manifest-src \'self\'',
     'img-src \'self\' data:'
   ],
-  'ssl_perm_redirect' => false,
-  'ssl_hsts_max_age' => 63072000,
-  'ssl_hsts_include_subdomains' => false,
-  'ssl_hsts_preload' => false
+  'SSLPermRedirect' => false,
+  'SSLHSTSMaxAge' => 63072000,
+  'SSLHSTSIncludeSubdomains' => false,
+  'SSLHSTSPreload' => false
 ];
-
-?>

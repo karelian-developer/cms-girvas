@@ -75,7 +75,7 @@ export class PageUsersGroup {
             request.target.showingNotification = false;
 
             request.target.send().then((data) => {
-              if (data.statusCode == 1 && data.outputData.hasOwnProperty('usersGroup')) {
+              if (data.statusCode === 1 && data.outputData.hasOwnProperty('usersGroup')) {
                 let usersGroupData = data.outputData.usersGroup;
                 usersGroupTitleInputElement.value = usersGroupData.title;
               }
@@ -119,7 +119,7 @@ export class PageUsersGroup {
               request.target.showingNotification = false;
   
               request.target.send().then((data) => {
-                if (data.statusCode == 1 && data.outputData.hasOwnProperty('usersGroup')) {
+                if (data.statusCode === 1 && data.outputData.hasOwnProperty('usersGroup')) {
                   let usersGroupData = data.outputData.usersGroup;
                   usersGroupTitleInputElement.value = usersGroupData.title;
                 }
@@ -141,14 +141,14 @@ export class PageUsersGroup {
           let formData = new FormData(elementForm);
 
           let request = new Interactive('request', {
-            method: (searchParams.getPathPart(3) == null) ? 'PUT' : 'PATCH',
+            method: (searchParams.getPathPart(3) === null) ? 'PUT' : 'PATCH',
             url: '/handler/usersGroup?localeMessage=' + window.CMSCore.locales.admin.name
           });
 
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1 && searchParams.getPathPart(3) == null) {
+            if (data.statusCode === 1 && searchParams.getPathPart(3) === null) {
               let usersGroupData = data.outputData.usersGroup;
               window.location.href = '/admin/userGroup/' + usersGroupData.id;
             }
@@ -189,7 +189,7 @@ export class PageUsersGroup {
           request.target.data = formData;
 
           request.target.send().then((data) => {
-            if (data.statusCode == 1) {
+            if (data.statusCode === 1) {
               window.location.href = '/admin/usersGroups';
             }
           });
@@ -205,7 +205,7 @@ export class PageUsersGroup {
       });
       this.buttons.delete.assembly();
 
-      if (searchParams.getPathPart(3) == null) {
+      if (searchParams.getPathPart(3) === null) {
         this.buttons.delete.target.element.style.display = 'none';
         this.buttons.save.target.element.style.display = 'flex';
       } else {

@@ -8,276 +8,335 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\SystemCore {
-  use \core\PHPLibrary\SystemCore as SystemCore;
+namespace core\PHPLibrary\SystemCore;
 
-  final class Locale {
-    public SystemCore $system_core;
+use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\LocaleInterface as LocaleInterface;
+use \DOMDocument as DOMDocument;
 
-    public const DEFAULT_LOCALE_NAME = 'en_US';
-    public const LOCALE_CORE_PATH_PATTERN = '%s/locales/%s';
-    public const LOCALE_DATA_PATH_PATTERN = '%s/locales/%s/%s';
+final class Locale implements LocaleInterface
+{
+  public SystemCore $CMSCore;
 
-    private string $name;
-    private string $core_path;
-    private string $data_path;
+  public const DEFAULT_LOCALE_NAME = 'en_US';
+  public const LOCALE_CORE_PATH_PATTERN = '%s/locales/%s';
+  public const LOCALE_DATA_PATH_PATTERN = '%s/locales/%s/%s';
 
-    /**
-     * __construct
-     * 
-     * @param SystemCore $system_core
-     * @param string $name
-     * @param string $dir
-     */
-    public function __construct(SystemCore $system_core, string $name, string $dir = 'base') {
-      $this->system_core = $system_core;
-      $this->set_name($name);
+  private string $name;
+  private string $corePath;
+  private string $dataPath;
+  private string $typeName = 'base';
 
-      /** @var string Абсолютный путь до корня локализации */
-      $locale_core_path = sprintf('%s/locales/%s', $system_core->get_cms_path(), $name);
-      /** @var string Абсолютный путь до корня категории локализации */
-      $locale_data_path = sprintf('%s/locales/%s/%s', $system_core->get_cms_path(), $name, $dir);
-      
-      $this->set_core_path($locale_core_path);
-      $this->set_data_path($locale_data_path);
-    }
-
-    /**
-     * Получить URL до иконки локализации
-     * 
-     * @return string
-     */
-    public function get_icon_url() : string {
-      return sprintf('/locales/%s/icons/16.png', $this->get_name());
-    }
-  
-    /**
-     * Установить наименование локализации
-     * 
-     * @param string $value
-     * 
-     * @return void
-     */
-    private function set_name(string $value) : void {
-      $this->name = $value;
-    }
-  
-    /**
-     * Получить наименование локализации
-     * 
-     * @return string
-     */
-    public function get_name() : string {
-      return $this->name;
-    }
-    
-    /**
-     * Назначить путь до локализации
-     *
-     * @param  string $path Путь до локализации
-     * @return void
-     */
-    public function set_core_path(string $path) : void {
-      $this->core_path = $path;
-    }
-    
-    /**
-     * Получить путь до локализации
-     *
-     * @return string
-     */
-    public function get_core_path() : string {
-      return $this->core_path;
-    }
-    
-    /**
-     * Назначить путь до данных локализации
-     *
-     * @param  string $path Путь до локализации
-     * @return void
-     */
-    public function set_data_path(string $path) : void {
-      $this->data_path = $path;
-    }
-    
-    /**
-     * Получить путь до данных локализации
-     *
-     * @return string
-     */
-    public function get_data_path() : string {
-      return $this->data_path;
-    }
-
-    /**
-     * Получить заголовок локализации
-     * 
-     * @return string
-     */
-    public function get_title() : string {
-      $metadata = $this->get_metadata();
-      return (isset($metadata['title'])) ? $metadata['title'] : '';
-    }
-
-    /**
-     * Получить имя автора локализации
-     * 
-     * @return string
-     */
-    public function get_author_name() : string {
-      $metadata = $this->get_metadata();
-      return (isset($metadata['authorName'])) ? $metadata['authorName'] : '';
-    }
-
-    /**
-     * Получить код локализации стандарта ISO-639-1
-     * 
-     * @return string
-     */
-    public function get_iso_639_1() : string {
-      $metadata = $this->get_metadata();
-      return (isset($metadata['iso639_1'])) ? $metadata['iso639_1'] : '';
-    }
-
-    /**
-     * Получить код локализации стандарта ISO-639-2
-     * 
-     * @return string
-     */
-    public function get_iso_639_2() : string {
-      $metadata = $this->get_metadata();
-      return (isset($metadata['iso639_2'])) ? $metadata['iso639_2'] : '';
-    }
-
-    /**
-     * Проверить наличие файла с данными локализации в формате JSON
-     * 
-     * @return bool
-     */
-    public function exists_file_data_json() : bool {
-      return file_exists($this->get_file_data_json_path());
-    }
-
-    /**
-     * Получить абсолютный путь до файла с данными локализации в формате JSON
-     * 
-     * @return string
-     */
-    public function get_file_data_json_path() : string {
-      return sprintf('%s/data.json', $this->get_data_path());
-    }
-
-    /**
-     * Проверить наличие файла с реестром локализации в формате JSON
-     * 
-     * @return bool
-     */
-    public function exists_file_registry_json() : bool {
-      return file_exists($this->get_file_data_json_path());
-    }
-
-    /**
-     * Получить абсолютный путь до файла с реестром локализации в формате JSON
-     * 
-     * @return string
-     */
-    public function get_file_registry_json_path() : string {
-      return sprintf('%s/registry.json', $this->get_data_path());
-    }
-
-    /**
-     * Получить данные локализации
-     * 
-     * @return array
-     */
-    public function get_data() : array|bool|null {
-      $file_path = $this->get_file_data_json_path();
-      $file_content = (file_exists($file_path)) ? file_get_contents($file_path) : '{}';
-
-      return json_decode($file_content, true);
-    }
-
-    /**
-     * Получить значение элемента локализации
-     * 
-     * @param array $data
-     * @param string $name
-     * 
-     * @return array
-     */
-    public static function get_data_value(array $data, string $name) : string {
-      if (array_key_exists($name, $data)) {
-        return $data[$name];
-      }
-
-      return sprintf('<span style="background-color: red;color: white;">[%s]</span>', $name);
-    }
-
-    /**
-     * Получить данные реестра локализации
-     * 
-     * @return array
-     */
-    public function get_registry_array() : array {
-      $file_path = $this->get_file_registry_json_path();
-      $file_content = (file_exists($file_path)) ? file_get_contents($file_path) : '{}';
-
-      return json_decode($file_content, true);
-    }
-
-    /**
-     * Получить одиночное значение из данных локализации
-     * 
-     * @param string $key
-     * 
-     * @return string
-     */
-    public function get_single_value_by_key(string $key) : string {
-      $locale_data = $this->get_data();
-      return (isset($locale_data[$key])) ? $locale_data[$key] : '[ ??? ]';
-    }
-
-    /**
-     * Проверить наличие файла с метаданными локализации в формате JSON
-     * 
-     * @return bool
-     */
-    public function exists_file_metadata_json() : bool {
-      return file_exists($this->get_file_metadata_json_path());
-    }
-
-    /**
-     * Получить абсолютный путь до файла с метаданными локализации в формате JSON
-     * 
-     * @return string
-     */
-    public function get_file_metadata_json_path() : string {
-      return sprintf('%s/metadata.json', $this->get_core_path());
-    }
-
-    /**
-     * Получить метаданные локализации
-     * 
-     * @return array
-     */
-    public function get_metadata() : array|null {
-      $file_path = $this->get_file_metadata_json_path();
-      $file_content = file_get_contents($file_path);
-
-      return json_decode($file_content, true);
-    }
-
-    /**
-     * Получить статус наличия локализации в системе
-     * 
-     * @return bool
-     */
-    public static function exists(SystemCore $system_core, string $locale_name) : bool {
-      /** @var string Абсолютный путь до директории локализации */
-      $locale_core_path = sprintf(self::LOCALE_CORE_PATH_PATTERN, $system_core->get_cms_path(), $locale_name);
-      return file_exists($locale_core_path);
-    } 
+  /**
+   * __construct
+   * 
+   * @param mixed $CMSCore
+   * @param string $name
+   * @param string $dir
+   */
+  public function __construct(mixed $CMSCore, string $name)
+  {
+    $this->CMSCore = $CMSCore;
+    $this->setName($name);
   }
-}
 
-?>
+  public function initPathes() : void
+  {
+    $CMSCore = $this->CMSCore;
+
+    $corePath = $CMSCore->getCMSPath() . '/locales/' . $this->name;
+    $dataPath = $CMSCore->getCMSPath() . '/locales/' . $this->name . '/' . $this->typeName;
+
+    $this->setCorePath($corePath);
+    $this->setDataPath($dataPath);
+  }
+
+  public function setTypeName(string $name) : void
+  {
+    $this->typeName = $name;
+  }
+
+  public function getTypeName() : string
+  {
+    return $this->typeName;
+  }
+
+  /**
+   * Получить URL до иконки локализации
+   * 
+   * @return string
+   */
+  public function getIconURL() : string
+  {
+    return '/locales/' . $this->getName() . '/icons/16.png';
+  }
+
+  /**
+   * Установить наименование локализации
+   * 
+   * @param string $value
+   * 
+   * @return void
+   */
+  private function setName(string $value) : void
+  {
+    $this->name = $value;
+  }
+
+  /**
+   * Получить наименование локализации
+   * 
+   * @return string
+   */
+  public function getName() : string
+  {
+    return $this->name;
+  }
+  
+  /**
+   * Назначить путь до локализации
+   *
+   * @param  string $path Путь до локализации
+   * @return void
+   */
+  public function setCorePath(string $path) : void
+  {
+    $this->corePath = $path;
+  }
+  
+  /**
+   * Получить путь до локализации
+   *
+   * @return string
+   */
+  public function getCorePath() : string
+  {
+    return $this->corePath;
+  }
+  
+  /**
+   * Назначить путь до данных локализации
+   *
+   * @param  string $path Путь до локализации
+   * 
+   * @return void
+   */
+  public function setDataPath(string $path) : void
+  {
+    $this->dataPath = $path;
+  }
+  
+  /**
+   * Получить путь до данных локализации
+   *
+   * @return string
+   */
+  public function getDataPath() : string
+  {
+    return $this->dataPath;
+  }
+
+  /**
+   * Получить заголовок локализации
+   * 
+   * @return string
+   */
+  public function getTitle() : string
+  {
+    $metadata = $this->getMetadata();
+    return $metadata['title'] ?? '';
+  }
+
+  /**
+   * Получить имя автора локализации
+   * 
+   * @return string
+   */
+  public function getAuthorName() : string {
+    $metadata = $this->getMetadata();
+    return $metadata['authorName'] ?? '';
+  }
+  
+  /**
+   * Получить код локализации одного из стандартов ISO-639
+   * 
+   * @param int $index Индекс стандарта
+   * 
+   * @return string
+   */
+  public function getISO639(int $index) : string
+  {
+    $metadata = $this->getMetadata();
+    return $metadata['iso639_' . $index] ?? '';
+  }
+
+  /**
+   * Получить код локализации стандарта ISO-639-1
+   * 
+   * @return string
+   */
+  public function getISO639_1() : string
+  {
+    $metadata = $this->getMetadata();
+    return $metadata['iso639_1'] ?? '';
+  }
+
+  /**
+   * Получить код локализации стандарта ISO-639-2
+   * 
+   * @return string
+   */
+  public function getISO639_2() : string
+  {
+    $metadata = $this->getMetadata();
+    return $metadata['iso639_2'] ?? '';
+  }
+
+  /**
+   * Проверить наличие файла с данными локализации в формате JSON
+   * 
+   * @return bool
+   */
+  public function existsFileDataJSON() : bool
+  {
+    return file_exists($this->getFileDataJSONPath());
+  }
+
+  /**
+   * Получить абсолютный путь до файла с данными локализации в формате JSON
+   * 
+   * @return string
+   */
+  public function getFileDataJSONPath() : string
+  {
+    return $this->getDataPath() . '/data.json';
+  }
+
+  /**
+   * Проверить наличие файла с реестром локализации в формате JSON
+   * 
+   * @return bool
+   */
+  public function existsFileRegistryJSON() : bool
+  {
+    return file_exists($this->getFileDataJSONPath());
+  }
+
+  /**
+   * Получить абсолютный путь до файла с реестром локализации в формате JSON
+   * 
+   * @return string
+   */
+  public function getFileRegistryJSONPath() : string
+  {
+    return $this->getDataPath() . '/registry.json';
+  }
+
+  /**
+   * Получить данные локализации
+   * 
+   * @return array
+   */
+  public function getData() : array|bool|null
+  {
+    $filePath = $this->getFileDataJSONPath();
+    $fileContent = file_exists($filePath) ? file_get_contents($filePath) : '{}';
+
+    return json_decode($fileContent, true);
+  }
+
+  /**
+   * Получить значение элемента локализации
+   * 
+   * @param array $data
+   * @param string $name
+   * 
+   * @return array
+   */
+  public static function getDataValue(array $data, string $name) : string
+  {
+    if (array_key_exists($name, $data)) {
+      return $data[$name];
+    }
+
+    $document = new DOMDocument();
+
+    $spanElement = $DOMDocument->createElement('span', '[' . $name . ']');
+    $spanElement->setAttribute('style', 'background-color: red;color: white;');
+
+    $document->appendChild($spanElement);
+
+    return $DOMDocument->saveHTML();
+  }
+
+  /**
+   * Получить данные реестра локализации
+   * 
+   * @return array
+   */
+  public function getRegistryArray() : array
+  {
+    $filePath = $this->getFileRegistryJSONPath();
+    $fileContent = file_exists($filePath) ? file_get_contents($filePath) : '{}';
+
+    return json_decode($fileContent, true);
+  }
+
+  /**
+   * Получить одиночное значение из данных локализации
+   * 
+   * @param string $key
+   * 
+   * @return string
+   */
+  public function getSingleValueByKey(string $key) : string
+  {
+    $data = $this->getData();
+    return $data[$key] ?? '[ ??? ]';
+  }
+
+  /**
+   * Проверить наличие файла с метаданными локализации в формате JSON
+   * 
+   * @return bool
+   */
+  public function existsFileMetadataJSON() : bool
+  {
+    return file_exists($this->getFileMetadataJSONPath());
+  }
+
+  /**
+   * Получить абсолютный путь до файла с метаданными локализации в формате JSON
+   * 
+   * @return string
+   */
+  public function getFileMetadataJSONPath() : string
+  {
+    return $this->getCorePath() . '/metadata.json';
+  }
+
+  /**
+   * Получить метаданные локализации
+   * 
+   * @return array
+   */
+  public function getMetadata() : array|null
+  {
+    $filePath = $this->getFileMetadataJSONPath();
+    $fileContent = file_get_contents($filePath);
+
+    return json_decode($fileContent, true);
+  }
+
+  /**
+   * Получить статус наличия локализации в системе
+   * 
+   * @return bool
+   */
+  public static function exists(SystemCore $CMSCore, string $localeName) : bool
+  {
+    /** @var string Абсолютный путь до директории локализации */
+    $path = sprintf(self::LOCALE_CORE_PATH_PATTERN, $CMSCore->getCMSPath(), $localeName);
+    return file_exists($path);
+  } 
+}

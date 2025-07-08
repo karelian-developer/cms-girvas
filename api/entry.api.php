@@ -4,7 +4,7 @@
  * CMS GIRVAS (https://www.cms-girvas.ru/)
  * 
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * @copyright   Copyright (c) 2022 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
@@ -13,34 +13,34 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-if ($system_core->urlp->get_path(2) == 'comment') {
-  $api_file_path = sprintf('%s/api/entry/comment.api.php', CMS_ROOT_DIRECTORY);
-  include_once($api_file_path);
+if ($CMSCore->urlp->getPath(2) === 'comment') {
+  $APIFilePath =  CMS_ROOT_DIRECTORY . '/api/entry/comment.api.php';
+  include_once $APIFilePath;
 } else {
-  define('API_HANDLERS_ABSOLUTE_PATH', sprintf('%s/api/entry', CMS_ROOT_DIRECTORY));
+  define('API_HANDLERS_ABSOLUTE_PATH', CMS_ROOT_DIRECTORY . '/api/entry');
 
-  if (isset($system_core)) {
+  if (isset($CMSCore)) {
     // Определение абсолютного пути до обработчика текущего API
-    switch ($_SERVER['REQUEST_METHOD']) {
-      case 'POST': $handler_path = sprintf('%s/post.handler.php', API_HANDLERS_ABSOLUTE_PATH); break;
-      case 'GET': $handler_path = sprintf('%s/get.handler.php', API_HANDLERS_ABSOLUTE_PATH); break;
-      case 'PATCH': $handler_path = sprintf('%s/patch.handler.php', API_HANDLERS_ABSOLUTE_PATH); break;
-      case 'DELETE': $handler_path = sprintf('%s/delete.handler.php', API_HANDLERS_ABSOLUTE_PATH); break;
-      case 'PUT': $handler_path = sprintf('%s/put.handler.php', API_HANDLERS_ABSOLUTE_PATH); break;
-    }
+    $handlerPath = match ($_SERVER['REQUEST_METHOD']) {
+      'POST' => API_HANDLERS_ABSOLUTE_PATH . '/post.handler.php',
+      'GET' => API_HANDLERS_ABSOLUTE_PATH . '/get.handler.php',
+      'PATCH' => API_HANDLERS_ABSOLUTE_PATH . '/patch.handler.php',
+      'DELETE' => API_HANDLERS_ABSOLUTE_PATH . '/delete.handler.php',
+      'PUT' => API_HANDLERS_ABSOLUTE_PATH . '/put.handler.php',
+    };
+
+    $handlerIsExists = isset($handlerPath) && file_exists($handlerPath);
 
     // Если абсолютный путь не был инициализирован, то запрещаем дальше работать с API
-    if (!isset($handler_path)) {
+    if (!$handlerIsExists) {
       http_response_code(500);
-      $handler_message = (!isset($handler_message)) ? sprintf('API ERROR: %s', $system_core->locale->get_single_value_by_key('API_ERROR_HANDLER_NOT_FOUND')) : $handler_message;
-      $handler_status_code = (!isset($handler_status_code)) ? 0 : $handler_status_code;
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_HANDLER_NOT_FOUND');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
 
     // Подключаем файл необходимого обработчика
-    if (file_exists($handler_path)) {
-      include_once($handler_path);
+    if ($handlerIsExists) {
+      include_once $handlerPath;
     }
   }
 }
-
-?>

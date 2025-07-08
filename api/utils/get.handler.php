@@ -14,19 +14,17 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 // Получение версии CMS
-if ($system_core->urlp->get_path(2) == 'cms-version') {
-  $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS') : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+if ($CMSCore->urlp->getPath(2) === 'cms-version') {
+  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+  $handlerStatusCode = $handlerStatusCode ?? 1;
 
-  $handler_output_data['result'] = $system_core::CMS_VERSION;
+  $handlerOutputData['result'] = $CMSCore::CMS_VERSION;
 }
 
 // Получение наименования CMS
-if ($system_core->urlp->get_path(2) == 'cms-title') {
-  $handler_message = (!isset($handler_message)) ? $system_core->locale->get_single_value_by_key('API_GET_DATA_SUCCESS') : $handler_message;
-  $handler_status_code = (!isset($handler_status_code)) ? 1 : $handler_status_code;
+if ($CMSCore->urlp->getPath(2) === 'cms-title') {
+  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+  $handlerStatusCode = $handlerStatusCode ?? 1;
 
-  $handler_output_data['result'] = $system_core::CMS_TITLE;
+  $handlerOutputData['result'] = $CMSCore::CMS_TITLE;
 }
-
-?>

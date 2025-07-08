@@ -8,23 +8,22 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary\Feed {
-  use \core\PHPLibrary\SystemCore as SystemCore;
-  use \core\PHPLibrary\Feed\Builder as FeedBuilder;
+namespace core\PHPLibrary\Feed;
 
-  interface InterfaceSpecification {
-    public function __construct(SystemCore $system_core, FeedBuilder $web_channel_builder);
-    public function set_title(string $value) : void;
-    public function set_description(string $value) : void;
-    public function set_language(string $value) : void;
-    public function set_link(string $value) : void;
-    public function add_item(array $item) : void;
-    public function get_title() : string;
-    public function get_description() : string;
-    public function get_language() : string;
-    public function get_link() : string;
-    public function get_items() : array;
-  }
+use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\Feed\Builder as FeedBuilder;
+
+interface InterfaceSpecification
+{
+  public function __construct(SystemCore $CMSCore, FeedBuilder $feedBuilder);
+  public function setTitle(string $value) : void;
+  public function setDescription(string $value) : void;
+  public function setLanguage(string $value) : void;
+  public function setLink(string $value) : void;
+  public function addItem(array $item) : void;
+  public function getTitle() : string;
+  public function getDescription() : string;
+  public function getLanguage() : string;
+  public function getLink() : string;
+  public function getItems() : array;
 }
-
-?>
