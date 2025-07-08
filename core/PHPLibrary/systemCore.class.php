@@ -49,8 +49,8 @@ final class SystemCore
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS GIRVAS';
-  public const CMS_VERSION = '0.1.36-21';
-  public const CMS_STAGE_DEVELOPING = 'alpha';
+  public const CMS_VERSION = '0.2.0';
+  public const CMS_STAGE_DEVELOPING = 'voitsy';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
   public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
