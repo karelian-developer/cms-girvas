@@ -111,26 +111,47 @@ final class FileConnector implements InterfaceFileConnector
    */
   public function connectFilesRecursive(string $fileNamePattern, int $level = 0) : void
   {
-    /** @var string $filesPath Полный путь до файлов */
     $filesPath = $this->getCurrentDirectory();
-    /** @var array $filesList Массив файлов */
-    $filesList = array_diff(scandir($filesPath), ['..', '.']);
-    foreach ($filesList as $fileName) {
-      if ($level === 0) {
-        $this->resetCurrentDirectory();
-      }
-      
-      $filePath = $filesPath . '/' . $fileName;
-      
-      if (preg_match($fileNamePattern, $fileName)) {
-        // Подключаем файл
-        $this->connectFile($filePath);
-      } else {
-        if (is_dir($filePath)) {
-          $this->setCurrentDirectory($filePath);
-          // Погружаемся во вложенную папку для последующих подключений
-          $this->connectFilesRecursive($fileNamePattern, $level + 1);
+    
+    $cacheKey = md5($fileNamePattern);
+    $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
+
+    if (!file_exists($cacheFile)) {
+      $filesList = array_diff(scandir($filesPath), ['..', '.']);
+      $foundFiles = [];
+
+      foreach ($filesList as $fileName) {
+        $filePath = $filesPath . '/' . $fileName;
+        
+        if (preg_match($fileNamePattern, $fileName)) {
+          $foundFiles[] = $filePath;
+          $this->connectFile($filePath);
+
+          $cacheData = [
+            'dirMtime' => filemtime($filesPath),
+            'expires' => time() + 300, // 5 минут
+            'files' => $foundFiles
+          ];
+
+          file_put_contents($cacheFile, json_encode($cacheData));
+        } else {
+          if (is_dir($filePath)) {
+            $this->setCurrentDirectory($filePath);
+            // Погружаемся во вложенную папку для последующих подключений
+            $this->connectFilesRecursive($fileNamePattern, $level + 1);
+          }
         }
+      }
+    } else {
+      $cachedData = json_decode(file_get_contents($cacheFile), true);
+      $cacheIsValid = $cachedData['dirMtime'] ?? 0 === filemtime($filesPath);
+
+      if ($cacheIsValid && time() < $cachedData['expires']) {
+        foreach ($cachedData['files'] as $file) {
+          $this->connectFile(strtr(CMS_ROOT_DIRECTORY . '/' . $file, ['\\' => '']));
+        }
+
+        return;
       }
     }
   }
