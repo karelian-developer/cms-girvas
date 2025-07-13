@@ -141,7 +141,7 @@ final class FileConnector implements InterfaceFileConnector
     
     foreach ($filesList as $fileName) {
       $filePath = $filesPath . '/' . $fileName;
-      
+      error_log('Scan: ' . $filePath);
       if (preg_match($fileNamePattern, $fileName)) {
         $foundFiles[] = $filePath;
         $this->connectFile($filePath);
