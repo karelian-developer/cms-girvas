@@ -128,7 +128,7 @@ final class FileConnector implements InterfaceFileConnector
 
       if ($cacheIsValid && time() < $cachedData['expires']) {
         foreach ($cachedData['files'] as $file) {
-          $this->connectFile($file);
+          $this->connectFile(strtr($file, ['\\' => '']));
         }
 
         return;
