@@ -999,7 +999,13 @@ final class SystemCore
         $CMSFileConnector->generateCachePathesFiles('/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/');
         $CMSFileConnector->resetCurrentDirectory();
       }
+    }
 
+    foreach ($filesTypes as $type) {
+      $fileNamePattern = '/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/';
+      $cacheKey = md5($fileNamePattern);
+      $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
+      
       if (file_exists($cacheFile)) {
         $cachedData = json_decode(file_get_contents($cacheFile), true);
         $cacheIsValid = $cachedData['dirMtime'] ?? 0 === filemtime($filesPath);
