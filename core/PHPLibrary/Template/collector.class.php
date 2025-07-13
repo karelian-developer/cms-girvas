@@ -198,7 +198,7 @@ final class Collector
 
     foreach($variables as $name => $value) {
       if (preg_match(self::TEMPLATE_TAG_PATTERN, $template)) {
-        $template = str_replace("{{$name}}", $value, $template);
+        $template = strtr($template, ["{{$name}}" => $value]);
       }
     }
 
