@@ -1005,14 +1005,14 @@ final class SystemCore
       $fileNamePattern = '/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/';
       $cacheKey = md5($fileNamePattern);
       $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
-      
+
       if (file_exists($cacheFile)) {
         $cachedData = json_decode(file_get_contents($cacheFile), true);
         $cacheIsValid = $cachedData['dirMtime'] ?? 0 === filemtime($filesPath);
 
         if ($cacheIsValid && time() < $cachedData['expires']) {
           foreach ($cachedData['files'] as $file) {
-            $this->connectFile(strtr(CMS_ROOT_DIRECTORY . '/' . $file, ['\\' => '']));
+            $CMSFileConnector->connectFile(strtr(CMS_ROOT_DIRECTORY . '/' . $file, ['\\' => '']));
           }
         }
       }
