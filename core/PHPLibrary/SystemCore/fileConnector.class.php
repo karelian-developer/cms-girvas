@@ -128,6 +128,7 @@ final class FileConnector implements InterfaceFileConnector
 
       if ($cacheIsValid && time() < $cachedData['expires']) {
         foreach ($cachedData['files'] as $file) {
+          error_log(strtr(CMS_ROOT_DIRECTORY . '/' . $file, ['\\' => '']));
           $this->connectFile(strtr(CMS_ROOT_DIRECTORY . '/' . $file, ['\\' => '']));
         }
 
