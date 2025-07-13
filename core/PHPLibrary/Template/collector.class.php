@@ -263,6 +263,13 @@ final class Collector
       return self::assembly($fileContent, $themeVariables);
     }
 
-    return sprintf('{ERROR:FILE_IS_NOT_EXISTS=%s}', $filePath);
+    $document = new DOMDocument();
+    $containerElement = $document->createElement('div');
+    $containerElement->setAttribute('style', 'background-color: pink; border: 1px solid red; color: red; padding: 10px 20px; font-size: 14px;');
+    
+    $spanElement = $document->createElement('span', 'Template is not exists: ' . $filePath);
+    $containerElement->appendChild($spanElement);
+    $document->appendChild($containerElement);
+    return $document->saveHTML();
   }
 }

@@ -325,8 +325,8 @@ final class Template
    */
   public function getScreenshotsArray() : array
   {
-    $screenshotsPath = $this->getScreenshotsPath();
-    return array_diff(scandir($screenshotsPath), ['.', '..']);
+    $path = $this->getScreenshotsPath();
+    return file_exists($path) ? array_diff(scandir($path), ['.', '..']) : [];
   }
   
   /**
@@ -358,7 +358,7 @@ final class Template
    */
   public function addStyle(array $data) : void
   {
-    array_push($this->styles, $data);
+    $this->styles[] = $data;
   }
   
   /**
@@ -371,7 +371,7 @@ final class Template
   public function addScript(array $data, bool $isCMSCore = false) : void
   {
     $data['isCMSCore'] = $isCMSCore;
-    array_push($this->scripts, $data);
+    $this->scripts[] = $data;
   }
   
   /**
@@ -397,6 +397,7 @@ final class Template
     $totalWeight = 0;
     
     $directoryFiles = array_diff(scandir($themePath), ['.', '..']);
+    
     $callbackFunction = function(string $path, array $files, $callback, &$totalWeight) : void
     {
       foreach ($files as $file) {
@@ -440,6 +441,7 @@ final class Template
 
     foreach ($importantFiles as $file) {
       $filePath = $themePath . '/' . $file;
+      
       if (!file_exists($filePath)) {
         return false;
       }

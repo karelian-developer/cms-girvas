@@ -113,25 +113,60 @@ final class FileConnector implements InterfaceFileConnector
   {
     /** @var string $filesPath Полный путь до файлов */
     $filesPath = $this->getCurrentDirectory();
-    /** @var array $filesList Массив файлов */
-    $filesList = array_diff(scandir($filesPath), ['..', '.']);
-    foreach ($filesList as $fileName) {
-      if ($level === 0) {
-        $this->resetCurrentDirectory();
+    
+    if ($level === 0) {
+      $this->resetCurrentDirectory();
+
+      $cacheKey = md5($filesPath . $fileNamePattern);
+      $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.json';
+      $cacheIsValid = false;
+      $cachedData = [];
+
+      if (file_exists($cacheFile)) {
+        $cachedData = json_decode(file_get_contents($cacheFile), true);
+        $cacheIsValid = $cachedData['dirMtime'] ?? 0 === filemtime($filesPath);
       }
-      
+
+      if ($cacheIsValid && time() < $cachedData['expires']) {
+        foreach ($cachedData['files'] as $file) {
+          $this->connectFile($file);
+        }
+
+        return;
+      }
+    }
+
+    $filesList = array_diff(scandir($filesPath), ['..', '.']);
+    $foundFiles = [];
+    
+    foreach ($filesList as $fileName) {
       $filePath = $filesPath . '/' . $fileName;
       
       if (preg_match($fileNamePattern, $fileName)) {
-        // Подключаем файл
+        $foundFiles[] = $filePath;
         $this->connectFile($filePath);
-      } else {
+      } elseif (is_dir($filePath)) {
         if (is_dir($filePath)) {
           $this->setCurrentDirectory($filePath);
           // Погружаемся во вложенную папку для последующих подключений
           $this->connectFilesRecursive($fileNamePattern, $level + 1);
+          $this->resetCurrentDirectory();
         }
       }
+    }
+
+    if ($level === 0) {
+      $cacheData = [
+        'dirMtime' => filemtime($filesPath),
+        'expires' => time() + 300, // 5 минут
+        'files' => $foundFiles
+      ];
+        
+      if (!is_dir(CMS_ROOT_DIRECTORY . '/cache')) {
+        mkdir(CMS_ROOT_DIRECTORY . '/cache', 0777, true);
+      }
+
+      file_put_contents($cacheFile, json_encode($cacheData));
     }
   }
 }
