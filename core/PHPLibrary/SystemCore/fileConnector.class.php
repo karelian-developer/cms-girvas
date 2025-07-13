@@ -121,6 +121,10 @@ final class FileConnector implements InterfaceFileConnector
       $foundFiles = [];
 
       foreach ($filesList as $fileName) {
+        if ($level === 0) {
+          $this->resetCurrentDirectory();
+        }
+
         $filePath = $filesPath . '/' . $fileName;
         
         if (is_dir($filePath)) {
