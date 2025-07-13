@@ -155,14 +155,14 @@ final class FileConnector implements InterfaceFileConnector
       }
     }
 
-    error_log(json_encode($foundFiles));
-
     if ($level === 0) {
       $cacheData = [
         'dirMtime' => filemtime($filesPath),
         'expires' => time() + 300, // 5 минут
         'files' => $foundFiles
       ];
+
+      error_log(json_encode($foundFiles));
         
       if (!is_dir(CMS_ROOT_DIRECTORY . '/cache')) {
         mkdir(CMS_ROOT_DIRECTORY . '/cache', 0777, true);
