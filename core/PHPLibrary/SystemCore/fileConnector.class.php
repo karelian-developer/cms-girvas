@@ -116,6 +116,8 @@ final class FileConnector implements InterfaceFileConnector
     $filesPath = $this->getCurrentDirectory();
     
     if ($level === 0) {
+      $this->resetCurrentDirectory();
+      
       $cacheKey = md5($filesPath . $fileNamePattern);
       $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.json';
       $cacheIsValid = false;
