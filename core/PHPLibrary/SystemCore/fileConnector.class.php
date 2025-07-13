@@ -87,8 +87,7 @@ final class FileConnector implements InterfaceFileConnector
   /**
    * Подключение файла
    *
-   * @param string $path
-   * 
+   * @param  mixed $path
    * @return bool
    */
   public function connectFile(string $path) : bool
@@ -114,63 +113,25 @@ final class FileConnector implements InterfaceFileConnector
   {
     /** @var string $filesPath Полный путь до файлов */
     $filesPath = $this->getCurrentDirectory();
-    
-    if ($level === 0) {
-      $this->resetCurrentDirectory();
-      
-      $cacheKey = md5($filesPath . $fileNamePattern);
-      $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.json';
-      $cacheIsValid = false;
-      $cachedData = [];
-
-      if (file_exists($cacheFile)) {
-        $cachedData = json_decode(file_get_contents($cacheFile), true);
-        $cacheIsValid = $cachedData['dirMtime'] ?? 0 === filemtime($filesPath);
-      }
-
-      if ($cacheIsValid && time() < $cachedData['expires']) {
-        foreach ($cachedData['files'] as $file) {
-          error_log(strtr(CMS_ROOT_DIRECTORY . '/' . $file, ['\\' => '']));
-          $this->connectFile(strtr(CMS_ROOT_DIRECTORY . '/' . $file, ['\\' => '']));
-        }
-
-        return;
-      }
-    }
-
+    /** @var array $filesList Массив файлов */
     $filesList = array_diff(scandir($filesPath), ['..', '.']);
-    $foundFiles = [];
-    
     foreach ($filesList as $fileName) {
+      if ($level === 0) {
+        $this->resetCurrentDirectory();
+      }
+      
       $filePath = $filesPath . '/' . $fileName;
       
       if (preg_match($fileNamePattern, $fileName)) {
-        $foundFiles[] = $filePath;
+        // Подключаем файл
         $this->connectFile($filePath);
       } else {
         if (is_dir($filePath)) {
           $this->setCurrentDirectory($filePath);
           // Погружаемся во вложенную папку для последующих подключений
           $this->connectFilesRecursive($fileNamePattern, $level + 1);
-          $this->resetCurrentDirectory();
         }
       }
-    }
-
-    if ($level === 0) {
-      $cacheData = [
-        'dirMtime' => filemtime($filesPath),
-        'expires' => time() + 300, // 5 минут
-        'files' => $foundFiles
-      ];
-
-      error_log(json_encode($foundFiles));
-        
-      if (!is_dir(CMS_ROOT_DIRECTORY . '/cache')) {
-        mkdir(CMS_ROOT_DIRECTORY . '/cache', 0777, true);
-      }
-
-      file_put_contents($cacheFile, json_encode($cacheData));
     }
   }
 }
