@@ -133,7 +133,14 @@ final class FileConnector implements InterfaceFileConnector
             'files' => $foundFiles
           ];
 
-          file_put_contents($cacheFile, json_encode($cacheData));
+           if (!file_exists($cacheFile)) {
+            $cachedData = json_decode(file_get_contents($cacheFile), true);
+            $cachedData['files'][] = $filePath;
+            
+            file_put_contents($cacheFile, json_encode($cachedData));
+           } else {
+            file_put_contents($cacheFile, json_encode($cacheData));
+           }
         } else {
           if (is_dir($filePath)) {
             $this->setCurrentDirectory($filePath);
