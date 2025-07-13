@@ -120,6 +120,8 @@ final class FileConnector implements InterfaceFileConnector
       $filesList = array_diff(scandir($filesPath), ['..', '.']);
       $foundFiles = [];
 
+      error_log(print_r($filesList, true));
+
       foreach ($filesList as $fileName) {
         if ($level === 0) {
           $this->resetCurrentDirectory();
@@ -154,6 +156,8 @@ final class FileConnector implements InterfaceFileConnector
     } else {
       $cachedData = json_decode(file_get_contents($cacheFile), true);
       $cacheIsValid = $cachedData['dirMtime'] ?? 0 === filemtime($filesPath);
+error_log("TEST");
+      error_log(print_r($cachedData, true));
 
       if ($cacheIsValid && time() < $cachedData['expires']) {
         foreach ($cachedData['files'] as $file) {
