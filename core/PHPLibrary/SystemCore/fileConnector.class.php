@@ -123,7 +123,11 @@ final class FileConnector implements InterfaceFileConnector
       foreach ($filesList as $fileName) {
         $filePath = $filesPath . '/' . $fileName;
         
-        if (preg_match($fileNamePattern, $fileName)) {
+        if (is_dir($filePath)) {
+          $this->setCurrentDirectory($filePath);
+          // Погружаемся во вложенную папку для последующих подключений
+          $this->connectFilesRecursive($fileNamePattern, $level + 1);
+        } else if (preg_match($fileNamePattern, $fileName)) {
           $foundFiles[] = $filePath;
           $this->connectFile($filePath);
 
@@ -141,12 +145,6 @@ final class FileConnector implements InterfaceFileConnector
            } else {
             file_put_contents($cacheFile, json_encode($cacheData));
            }
-        } else {
-          if (is_dir($filePath)) {
-            $this->setCurrentDirectory($filePath);
-            // Погружаемся во вложенную папку для последующих подключений
-            $this->connectFilesRecursive($fileNamePattern, $level + 1);
-          }
         }
       }
     } else {
