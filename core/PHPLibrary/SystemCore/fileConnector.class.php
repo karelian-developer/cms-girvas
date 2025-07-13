@@ -145,7 +145,7 @@ final class FileConnector implements InterfaceFileConnector
       if (preg_match($fileNamePattern, $fileName)) {
         $foundFiles[] = $filePath;
         $this->connectFile($filePath);
-      } elseif (is_dir($filePath)) {
+      } else {
         if (is_dir($filePath)) {
           $this->setCurrentDirectory($filePath);
           // Погружаемся во вложенную папку для последующих подключений
