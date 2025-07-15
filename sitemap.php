@@ -33,7 +33,7 @@ if (defined('IS_NOT_HACKED')) {
       if ($entry->isPublished()) {
         foreach ($CMSLocalesNames as $index => $localeName) {
           if (!empty($entry->getTitle($localeName)) && !empty($entry->getDescription($localeName)) && !empty($entry->getContent($localeName))) {
-            $CMSConfigDomain = $CMSConfigurator->get('domain');
+            $CMSConfigDomain = trim($CMSConfigurator->get('domain'));
             $entryURL = sprintf('https://%s/entry/%s?locale=%s', $CMSConfigDomain, $entry->getName(), $localeName);
 
             $sitemapBuilder->addURL($entryURL, $entry->getUpdatedUnixTimestamp(), 'weekly', 0.8);
@@ -49,7 +49,7 @@ if (defined('IS_NOT_HACKED')) {
       if ($pageStatic->isPublished()) {
         foreach ($CMSLocalesNames as $index => $localeName) {
           if (!empty($pageStatic->getTitle($localeName)) && !empty($pageStatic->getDescription($localeName)) && !empty($pageStatic->getContent($localeName))) {
-            $CMSConfigDomain = $CMSConfigurator->get('domain');
+            $CMSConfigDomain = trim($CMSConfigurator->get('domain'));
             $pageStaticURL = sprintf('https://%s/page/%s?locale=%s', $CMSConfigDomain, $pageStatic->getName(), $localeName);
 
             $sitemapBuilder->addURL($pageStaticURL, $pageStatic->getUpdatedUnixTimestamp(), 'weekly', 0.8);
