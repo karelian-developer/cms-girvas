@@ -49,7 +49,7 @@ final class SystemCore
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS GIRVAS';
-  public const CMS_VERSION = '0.2.2-2';
+  public const CMS_VERSION = '0.2.2-3';
   public const CMS_STAGE_DEVELOPING = 'voitsy';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -888,7 +888,7 @@ final class SystemCore
   public static function getCoreRESTCookie() : int
   {
     if (isset($_COOKIE['_grv_rest'])) {
-      return (is_numeric($_COOKIE['_grv_rest'])) ? (int) $_COOKIE['_grv_rest'] : 0;
+      return is_numeric($_COOKIE['_grv_rest']) ? (int) $_COOKIE['_grv_rest'] : 0;
     }
 
     return 0;
