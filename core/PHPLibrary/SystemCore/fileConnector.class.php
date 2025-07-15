@@ -109,12 +109,18 @@ final class FileConnector implements InterfaceFileConnector
    * 
    * @return void
    */
-  public function connectFilesRecursive(string $fileNamePattern, int $level = 0) : void
+  public function generateCachePathesFiles(string $fileNamePattern, int $level = 0) : void
   {
     /** @var string $filesPath Полный путь до файлов */
     $filesPath = $this->getCurrentDirectory();
+
+    $cacheKey = md5($fileNamePattern);
+    $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
+
     /** @var array $filesList Массив файлов */
     $filesList = array_diff(scandir($filesPath), ['..', '.']);
+    $foundFiles = [];
+
     foreach ($filesList as $fileName) {
       if ($level === 0) {
         $this->resetCurrentDirectory();
@@ -123,13 +129,29 @@ final class FileConnector implements InterfaceFileConnector
       $filePath = $filesPath . '/' . $fileName;
       
       if (preg_match($fileNamePattern, $fileName)) {
+        $foundFiles[] = $filePath;
+
+        $cacheData = [
+          'dirMtime' => filemtime($filesPath),
+          'expires' => time() + 300, // 5 минут
+          'files' => $foundFiles
+        ];
+
+        if (file_exists($cacheFile)) {
+          $cachedData = json_decode(file_get_contents($cacheFile), true);
+          $cachedData['files'][] = $filePath;
+          
+          file_put_contents($cacheFile, json_encode($cachedData));
+        } else {
+          file_put_contents($cacheFile, json_encode($cacheData));
+        }
         // Подключаем файл
-        $this->connectFile($filePath);
+        //$this->connectFile($filePath);
       } else {
         if (is_dir($filePath)) {
           $this->setCurrentDirectory($filePath);
           // Погружаемся во вложенную папку для последующих подключений
-          $this->connectFilesRecursive($fileNamePattern, $level + 1);
+          $this->generateCachePathesFiles($fileNamePattern, $level + 1);
         }
       }
     }

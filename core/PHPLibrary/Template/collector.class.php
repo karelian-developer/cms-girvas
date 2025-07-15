@@ -134,7 +134,7 @@ final class Collector
     if (!empty($localeData)) {
       foreach ($localeData as $name => $value) {
         if (preg_match(self::TEMPLATE_TAG_LANG_PATTERN, $themeTransformed)) {
-          $themeTransformed = str_replace("{LANG:{$name}}", $value, $themeTransformed);
+          $themeTransformed = strtr($themeTransformed, ["{LANG:{$name}}" => $value]);
         }
       }
     }
@@ -159,7 +159,7 @@ final class Collector
     if (!empty($localeRegistryArray)) {
       foreach ($localeRegistryArray as $name => $value) {
         if (preg_match(self::TEMPLATE_TAG_LANG_MARKDOWN_PATTERN, $themeTransformed)) {
-          $fileMarkdownPath = sprintf('%s/%s', $localeCorePath, $value);
+          $fileMarkdownPath = $localeCorePath . '/' . $value;
           
           if (file_exists($fileMarkdownPath)) {
             /**
@@ -170,7 +170,7 @@ final class Collector
             $parsedown->setMarkupEscaped(true);
 
             $fileMarkdownContent = file_get_contents($fileMarkdownPath);
-            $themeTransformed = str_replace("{LANG:MD:{$name}}", $parsedown->text($fileMarkdownContent), $themeTransformed);
+            $themeTransformed = strtr($themeTransformed, ["{LANG:MD:{$name}}" => $parsedown->text($fileMarkdownContent)]);
           }
         }
       }
@@ -198,7 +198,7 @@ final class Collector
 
     foreach($variables as $name => $value) {
       if (preg_match(self::TEMPLATE_TAG_PATTERN, $template)) {
-        $template = str_replace("{{$name}}", $value, $template);
+        $template = strtr($template, ["{{$name}}" => $value]);
       }
     }
 
@@ -263,6 +263,13 @@ final class Collector
       return self::assembly($fileContent, $themeVariables);
     }
 
-    return sprintf('{ERROR:FILE_IS_NOT_EXISTS=%s}', $filePath);
+    $document = new DOMDocument();
+    $containerElement = $document->createElement('div');
+    $containerElement->setAttribute('style', 'background-color: pink; border: 1px solid red; color: red; padding: 10px 20px; font-size: 14px;');
+    
+    $spanElement = $document->createElement('span', 'Template is not exists: ' . $filePath);
+    $containerElement->appendChild($spanElement);
+    $document->appendChild($containerElement);
+    return $document->saveHTML();
   }
 }
