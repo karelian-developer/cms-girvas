@@ -141,9 +141,9 @@ final class FileConnector implements InterfaceFileConnector
           $cachedData = json_decode(file_get_contents($cacheFile), true);
           $cachedData['files'][] = $filePath;
           
-          file_put_contents($cacheFile, json_encode($cachedData));
+          file_put_contents($cacheFile, json_encode($cachedData), LOCK_EX);
         } else {
-          file_put_contents($cacheFile, json_encode($cacheData));
+          file_put_contents($cacheFile, json_encode($cacheData), LOCK_EX);
         }
         // Подключаем файл
         //$this->connectFile($filePath);
