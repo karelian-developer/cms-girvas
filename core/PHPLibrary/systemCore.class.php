@@ -976,10 +976,10 @@ final class SystemCore
    * 
    * @return void
    */
-  private function autoloadComponents(CMSFileConnector $CMSFileConnector, string $pathToFiles, array $filesTypes = []) : void
+  private function autoloadComponents(CMSFileConnector $CMSFileConnector, string $filesPath, array $filesTypes = []) : void
   {
-    $CMSFileConnector->setStartDirectory($pathToFiles);
-    $CMSFileConnector->setCurrentDirectory($pathToFiles);
+    $CMSFileConnector->setStartDirectory($filesPath);
+    $CMSFileConnector->setCurrentDirectory($filesPath);
 
     foreach ($filesTypes as $type) {
       $fileNamePattern = '/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/';
