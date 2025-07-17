@@ -49,7 +49,7 @@ final class SystemCore
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS GIRVAS';
-  public const CMS_VERSION = '0.2.2.1';
+  public const CMS_VERSION = '0.2.2.2';
   public const CMS_STAGE_DEVELOPING = 'voitsy';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -988,9 +988,8 @@ final class SystemCore
 
       if (file_exists($cacheFile)) {
         $cachedData = json_decode(file_get_contents($cacheFile), true);
-        $cacheIsValid = $cachedData['dirMtime'] ?? 0 === filemtime($filesPath);
 
-        if ($cacheIsValid && time() >= $cachedData['expires']) {
+        if (time() >= $cachedData['expires']) {
           unlink($cacheFile);
         }
       };
@@ -1008,9 +1007,8 @@ final class SystemCore
 
       if (file_exists($cacheFile)) {
         $cachedData = json_decode(file_get_contents($cacheFile), true);
-        $cacheIsValid = $cachedData['dirMtime'] ?? 0 === filemtime($filesPath);
 
-        if ($cacheIsValid && time() < $cachedData['expires']) {
+        if (time() < $cachedData['expires']) {
           foreach ($cachedData['files'] as $file) {
             $CMSFileConnector->connectFile(strtr(CMS_ROOT_DIRECTORY . '/' . $file, ['\\' => '']));
           }

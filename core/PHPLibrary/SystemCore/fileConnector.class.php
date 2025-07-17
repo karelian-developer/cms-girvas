@@ -132,7 +132,6 @@ final class FileConnector implements InterfaceFileConnector
         $foundFiles[] = $filePath;
 
         $cacheData = [
-          'dirMtime' => filemtime($filesPath),
           'expires' => time() + 300, // 5 минут
           'files' => $foundFiles
         ];
