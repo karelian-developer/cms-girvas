@@ -107,7 +107,11 @@ class PagePage implements InterfacePage
         $clientIsLogged = $this->CMSCore->client->isLogged(1);
         $clientUser = $clientIsLogged ? $this->CMSCore->client->getUser(1) : null;
 
-        $isPublished = $entry->isPublished();
+        if ($clientUser !== null) {
+          $clientUser->initData(['metadata']);
+        }
+
+        $isPublished = $pageStatic->isPublished();
 
         if ($this->isVisible($isPublished, $clientUser)) {
           http_response_code(200);

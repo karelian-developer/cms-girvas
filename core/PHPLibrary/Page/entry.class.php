@@ -107,6 +107,10 @@ class PageEntry implements InterfacePage
         $clientIsLogged = $this->CMSCore->client->isLogged(1);
         $clientUser = $clientIsLogged ? $this->CMSCore->client->getUser(1) : null;
 
+        if ($clientUser !== null) {
+          $clientUser->initData(['metadata']);
+        }
+
         $isPublished = $entry->isPublished();
         
         if ($this->isVisible($isPublished, $clientUser)) {
