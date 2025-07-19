@@ -48,8 +48,8 @@ export class PageFeed {
         event.preventDefault();
         
         let interactiveModal = new Interactive('modal', {
-          title: localeData.MODAL_WEB_CHANNEL_DELETE_TITLE,
-          content: localeData.MODAL_WEB_CHANNEL_DELETE_DESCRIPTION
+          title: localeData.MODAL_FEED_DELETE_TITLE,
+          content: localeData.MODAL_FEED_DELETE_DESCRIPTION
         });
         
         interactiveModal.target.addButton(localeData.BUTTON_DELETE_LABEL, () => {
