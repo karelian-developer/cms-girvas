@@ -61,7 +61,7 @@ class PageError implements InterfacePage
         $this->errorDescription = $localeData['PAGE_ERROR_UNKNOWN_DESCRIPTION'];
     }
   }
-
+  
   /**
    * Добавление обязательных CSS-файлов
    * 
@@ -109,5 +109,4 @@ class PageError implements InterfacePage
       ]
     );
   }
-
 }

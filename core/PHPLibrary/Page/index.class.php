@@ -36,7 +36,7 @@ class PageIndex implements InterfacePage
     $this->CMSCore = $CMSCore;
     $this->page = $page;
   }
-
+  
   /**
    * Добавление обязательных CSS-файлов
    * 

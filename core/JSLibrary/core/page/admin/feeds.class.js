@@ -37,7 +37,7 @@ export class PageFeeds {
     }).then((localeData) => {
 
       let interactiveCreatePageButton = new Interactive('button');
-      interactiveCreatePageButton.target.setLabel(localeData.BUTTON_NEW_WEB_CHANNEL_LABEL);
+      interactiveCreatePageButton.target.setLabel(localeData.BUTTON_NEW_FEED_LABEL);
       interactiveCreatePageButton.target.setCallback(() => {
         window.location.href = `./feed`;
       });
@@ -65,8 +65,8 @@ export class PageFeeds {
 
             if (button.getAttribute('role') === 'web-channel-remove') {
               let interactiveModal = new Interactive('modal', {
-                title: localeData.MODAL_WEB_CHANNEL_DELETE_TITLE,
-                content: localeData.MODAL_WEB_CHANNEL_DELETE_DESCRIPTION
+                title: localeData.MODAL_FEED_DELETE_TITLE,
+                content: localeData.MODAL_FEED_DELETE_DESCRIPTION
               });
               
               interactiveModal.target.addButton(localeData.BUTTON_DELETE_LABEL, () => {

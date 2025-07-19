@@ -89,6 +89,7 @@
   "PAGE_PROFILE_USER_BIRTHDATE_DESCRIPTION": "Реальная дата рождения пользователя.",
   "PAGE_PROFILE_ADDITIONAL_FIELDS_GROUP_TITLE": "Дополнительная информация",
   "PAGE_PROFILE_SECURITY_GROUP_TITLE": "Безопасность",
+  "PAGE_REGISTRATION_TITLE": "Регистрация на сайте",
   "PAGE_ERROR_404_TITLE": "Страница не найдена",
   "PAGE_ERROR_404_DESCRIPTION": "К сожалению, искомая Вами страница по адресу \"%s\" была удалена, либо перенесена. Рекомендуем вернуться на <a href=\"/\" title=\"{SITE_TITLE}\">главную страницу</a>.",
   "PAGE_ERROR_500_TITLE": "Внутренняя ошибка сервера",
