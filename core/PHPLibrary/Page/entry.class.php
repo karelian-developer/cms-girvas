@@ -11,31 +11,74 @@
 namespace core\PHPLibrary\Page;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
-use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\User as User;
-use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class PageEntry implements InterfacePage
 {
-  public SystemCore $CMSCore;
+  public CMSCore $CMSCore;
   public Page $page;
   public string $assembled = '';
 
   /**
    * __construct
    *
-   * @param  SystemCore $CMSCore
+   * @param  CMSCore $CMSCore
    * @param  Page $page
    * @return void
    */
-  public function __construct(SystemCore $CMSCore, Page $page)
+  public function __construct(CMSCore $CMSCore, Page $page)
   {
     $this->CMSCore = $CMSCore;
     $this->page = $page;
+  }
+
+  /**
+   * Добавление обязательных CSS-файлов
+   * 
+   * @return void
+   */
+  private function addRequiredStyles() : void
+  {
+    foreach (['page.css', 'page/entry.css'] as $stylePath) {
+      $this->CMSCore->theme->addStyle(
+        [
+          'href' => 'styles/' . $stylePath,
+          'rel' => 'stylesheet'
+        ]
+      );
+    }
+  }
+
+  /**
+   * Проверка возможности отображения для пользователя
+   * 
+   * Объект User должен передаваться с инициализированными данными:
+   * - metadata
+   * 
+   * @param bool $isPublished
+   * @param ?User $user
+   * 
+   * @return bool
+   */
+  public function isVisible(bool $isPublished, ?User $user) : bool
+  {
+    if ($isPublished && $user !== null) {
+      $userGroup = $user->getGroup();
+
+      if ($userGroup !== null) {
+        return $user->isSuperAdmin()
+          || $userGroup->isSuperGroup()
+          || $userGroup->hasPermissionEditorEntriesEdit();
+      }
+    }
+
+    return false;
   }
   
   /**
@@ -45,8 +88,7 @@ class PageEntry implements InterfacePage
    */
   public function assembly() : void
   {
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page/entry.css', 'rel' => 'stylesheet']);
+    $this->addRequiredStyles();
 
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
@@ -62,17 +104,12 @@ class PageEntry implements InterfacePage
           $this->CMSCore->theme->addLinkCanonical('/entry/' . $entry->getName());
         }
 
-        $isVisible = false;
-
         $clientIsLogged = $this->CMSCore->client->isLogged(1);
         $clientUser = $clientIsLogged ? $this->CMSCore->client->getUser(1) : null;
 
-        $isVisible = $entry->isPublished();
-        if (!$isVisible && $clientUser !== null) {
-          $isVisible = $clientUser->getID() === 1 || $clientUser->getGroupID() === 1;
-        }
-
-        if ($isVisible) {
+        $isPublished = $entry->isPublished();
+        
+        if ($this->isVisible($isPublished, $clientUser)) {
           http_response_code(200);
 
           $category = $entry->getCategory();

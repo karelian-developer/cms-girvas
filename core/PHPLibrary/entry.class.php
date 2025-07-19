@@ -302,7 +302,9 @@ class Entry implements EntityTypeContent
       $metadata = json_decode($this->metadata, true);
 
       if (isset($metadata['publishedUnixTimestamp'])) {
-        return $metadata['publishedUnixTimestamp'];
+        return is_numeric($metadata['publishedUnixTimestamp'])
+          ? (int) $metadata['publishedUnixTimestamp']
+          : 0;
       }
     }
 
@@ -719,6 +721,7 @@ class Entry implements EntityTypeContent
 
     if ($execute) {
       $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+      
       return $result ? FactoryContent::create($CMSCore, 'entry', [
         'id' => (int) $result['id']
       ]) : null;

@@ -20,6 +20,7 @@ use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\User as User;
 
 class PageEntries implements InterfacePage
 {
@@ -40,6 +41,49 @@ class PageEntries implements InterfacePage
     $this->CMSCore = $CMSCore;
     $this->page = $page;
   }
+
+  /**
+   * Добавление обязательных CSS-файлов
+   * 
+   * @return void
+   */
+  private function addRequiredStyles() : void
+  {
+    foreach (['page.css', 'page/entries.css'] as $stylePath) {
+      $this->CMSCore->theme->addStyle(
+        [
+          'href' => 'styles/' . $stylePath,
+          'rel' => 'stylesheet'
+        ]
+      );
+    }
+  }
+
+  /**
+   * Проверка возможности отображения записи для пользователя
+   * 
+   * Объект User должен передаваться с инициализированными данными:
+   * - metadata
+   * 
+   * @param bool $isPublished
+   * @param ?User $user
+   * 
+   * @return bool
+   */
+  public function entryIsVisible(bool $isPublished, ?User $user) : bool
+  {
+    if ($isPublished && $user !== null) {
+      $userGroup = $user->getGroup();
+
+      if ($userGroup !== null) {
+        return $user->isSuperAdmin()
+          || $userGroup->isSuperGroup()
+          || $userGroup->hasPermissionEditorEntriesEdit();
+      }
+    }
+
+    return false;
+  }
   
   /**
    * Сборка шаблона страницы
@@ -48,8 +92,7 @@ class PageEntries implements InterfacePage
    */
   public function assembly() : void
   {
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page/entries.css', 'rel' => 'stylesheet']);
+    $this->addRequiredStyles();
 
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
@@ -66,11 +109,13 @@ class PageEntries implements InterfacePage
       $this->page->breadcrumbs->add($localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_LABEL'], '/entries');
 
       $clientIsLogged = $this->CMSCore->client->isLogged(1);
+      
       $clientUser = $clientIsLogged ? $this->CMSCore->client->getUser(1) : null;
-
       if ($clientUser !== null) {
         $clientUser->initData(['metadata']);
+      }
 
+      if ($clientUser !== null) {
         $isPublished = $clientUser->getID() !== 1 || $clientUser->getGroupID() !== 1;
       } else {
         $isPublished = true;

@@ -113,22 +113,22 @@ class PageFeeds implements InterfacePage
       $indexCurrent = $index + 1;
 
       array_push($feedsItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds/tableItem.tpl', [
-        'WEB_CHANNEL_ID' => $feedID,
-        'WEB_CHANNEL_INDEX' => $indexCurrent,
-        'WEB_CHANNEL_NAME' => $feedName,
-        'WEB_CHANNEL_TITLE' => $feedTitle,
-        'WEB_CHANNEL_TYPE_TITLE' => $feedTypeTitle,
-        'WEB_CHANNEL_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
-        'WEB_CHANNEL_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
+        'FEED_ID' => $feedID,
+        'FEED_INDEX' => $indexCurrent,
+        'FEED_NAME' => $feedName,
+        'FEED_TITLE' => $feedTitle,
+        'FEED_TYPE_TITLE' => $feedTypeTitle,
+        'FEED_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
+        'FEED_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
       ]));
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds.tpl', [
-      'PAGE_WEB_CHANNELS_PAGINATION' => $pagination->assembled,
+      'PAGE_FEEDS_PAGINATION' => $pagination->assembled,
       'ADMIN_PANEL_PAGE_NAME' => 'web-channels',
-      'ADMIN_PANEL_WEB_CHANNELS_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds/table.tpl', [
-        'ADMIN_PANEL_WEB_CHANNELS_TABLE_ITEMS' => implode($feedsItemsAssembled)
+      'ADMIN_PANEL_FEEDS_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds/table.tpl', [
+        'ADMIN_PANEL_FEEDS_TABLE_ITEMS' => implode($feedsItemsAssembled)
       ])
     ]);
   }

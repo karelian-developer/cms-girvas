@@ -17,6 +17,10 @@ use \PDOException as PDOException;
 #[\AllowDynamicProperties]
 class UserGroup
 {
+  // ID первичных групп пользователей
+  public const GROUP_SUPER_ID   = 1;
+  public const GROUP_USER_ID    = 4;
+
   // Административные права
   public const PERMISSION_ADMIN_PANEL_AUTH                    = 1 << 0;
   public const PERMISSION_ADMIN_USERS_MANAGEMENT              = 1 << 1;
@@ -256,6 +260,206 @@ class UserGroup
     }
 
     return '';
+  }
+
+  /**
+   * Проверка группы на супергруппу
+   * 
+   * @return bool
+   */
+  public function isSuperGroup() : bool
+  {
+    return $this->id === self::GROUP_SUPER_ID;
+  }
+  
+  /**
+   * Проверка группы на пользователя (первичная группа)
+   * 
+   * @return bool
+   */
+  public function isUserGroup() : bool
+  {
+    return $this->id === self::GROUP_USER_ID;
+  }
+
+  /**
+   * Проверить наличие права авторизации в панели управления
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminPanelAuth() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_PANEL_AUTH);
+  }
+
+  /**
+   * Проверить наличие права управления пользователями
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminUsersManagement() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_USERS_MANAGEMENT);
+  }
+
+  /**
+   * Проверить наличие права управления группами пользователей
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminUsersGroupsManagement() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_USERS_GROUPS_MANAGEMENT);
+  }
+
+  /**
+   * Проверить наличие права управления темами
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminThemesManagement() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT);
+  }
+
+  /**
+   * Проверить наличие права управления настройками системы
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminSettingsManagement() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_SETTINGS_MANAGEMENT);
+  }
+
+  /**
+   * Проверить наличие права просмотра логов
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminViewingLogs() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_VIEWING_LOGS);
+  }
+
+  /**
+   * Проверить наличие права управления фидами
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminFeedsManagement() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_FEEDS_MANAGEMENT);
+  }
+
+  /**
+   * Проверить наличие права суперпользователя
+   * 
+   * @return bool
+   */
+  public function hasPermissionSuperUser() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_SUPERUSER);
+  }
+
+  /**
+   * Проверить наличие права блокировки пользователей
+   * 
+   * @return bool
+   */
+  public function hasPermissionModerUsersBan() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_MODER_USERS_BAN);
+  }
+
+  /**
+   * Проверить наличие права управления комментариями к записям
+   * 
+   * @return bool
+   */
+  public function hasPermissionModerEntriesCommentsManagement() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT);
+  }
+
+  /**
+   * Проверить наличие права выдачи предупреждений пользователям
+   * 
+   * @return bool
+   */
+  public function hasPermissionModerUsersWarns() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_MODER_USERS_WARNS);
+  }
+
+  /**
+   * Проверить наличие права управления медиа-файлами
+   * 
+   * @return bool
+   */
+  public function hasPermissionEditorMediaFilesManagement() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_EDITOR_MEDIA_FILES_MANAGEMENT);
+  }
+
+  /**
+   * Проверить наличие права редактирования записей
+   * 
+   * @return bool
+   */
+  public function hasPermissionEditorEntriesEdit() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_EDITOR_ENTRIES_EDIT);
+  }
+
+  /**
+   * Проверить наличие права редактирования категорий записей
+   * 
+   * @return bool
+   */
+  public function hasPermissionEditorEntriesCategoriesEdit() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT);
+  }
+
+  /**
+   * Проверить наличие права редактирования статических страниц
+   * 
+   * @return bool
+   */
+  public function hasPermissionEditorPagesStaticEdit() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_EDITOR_PAGES_STATIC_EDIT);
+  }
+
+  /**
+   * Проверить наличие права создания комментариев к записям
+   * 
+   * @return bool
+   */
+  public function hasPermissionBaseEntryCommentCreate() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_BASE_ENTRY_COMMENT_CREATE);
+  }
+
+  /**
+   * Проверить наличие права изменения комментариев к записям
+   * 
+   * @return bool
+   */
+  public function hasPermissionBaseEntryCommentChange() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_BASE_ENTRY_COMMENT_CHANGE);
+  }
+
+  /**
+   * Проверить наличие права изменения рейтинга комментариев к записям
+   * 
+   * @return bool
+   */
+  public function hasPermissionBaseEntryCommentRate() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_BASE_ENTRY_COMMENT_RATE);
   }
 
   /**

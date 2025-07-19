@@ -38,6 +38,23 @@ class PageIndex implements InterfacePage
   }
   
   /**
+   * Добавление обязательных CSS-файлов
+   * 
+   * @return void
+   */
+  private function addRequiredStyles() : void
+  {
+    foreach (['page.css', 'page/index.css'] as $stylePath) {
+      $this->CMSCore->theme->addStyle(
+        [
+          'href' => 'styles/' . $stylePath,
+          'rel' => 'stylesheet'
+        ]
+      );
+    }
+  }
+  
+  /**
    * Сборка шаблона страницы
    *
    * @return void
@@ -48,8 +65,7 @@ class PageIndex implements InterfacePage
     $CMSTheme = $CMSCore->theme;
     $CMSLocale = $CMSCore->locale;
 
-    $CMSTheme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-    $CMSTheme->addStyle(['href' => 'styles/page/index.css', 'rel' => 'stylesheet']);
+    $this->addRequiredStyles();
 
     $localeData = $CMSLocale->getData();
     $localeName = $CMSLocale->getName();

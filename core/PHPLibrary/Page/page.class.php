@@ -17,6 +17,7 @@ use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\User as User;
 
 class PagePage implements InterfacePage
 {
@@ -36,6 +37,49 @@ class PagePage implements InterfacePage
     $this->CMSCore = $CMSCore;
     $this->page = $page;
   }
+
+  /**
+   * Добавление обязательных CSS-файлов
+   * 
+   * @return void
+   */
+  private function addRequiredStyles() : void
+  {
+    foreach (['page.css', 'page/static.css'] as $stylePath) {
+      $this->CMSCore->theme->addStyle(
+        [
+          'href' => 'styles/' . $stylePath,
+          'rel' => 'stylesheet'
+        ]
+      );
+    }
+  }
+
+  /**
+   * Проверка возможности отображения для пользователя
+   * 
+   * Объект User должен передаваться с инициализированными данными:
+   * - metadata
+   * 
+   * @param bool $isPublished
+   * @param ?User $user
+   * 
+   * @return bool
+   */
+  public function isVisible(bool $isPublished, ?User $user) : bool
+  {
+    if ($isPublished && $user !== null) {
+      $userGroup = $user->getGroup();
+
+      if ($userGroup !== null) {
+        return $user->isSuperAdmin()
+          || $userGroup->isSuperGroup()
+          || $userGroup->hasPermissionEditorEntriesEdit();
+      }
+    }
+
+    return false;
+  }
   
   /**
    * Сборка шаблона страницы
@@ -44,8 +88,7 @@ class PagePage implements InterfacePage
    */
   public function assembly() : void
   {
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page/static.css', 'rel' => 'stylesheet']);
+    $this->addRequiredStyles();
 
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
@@ -61,17 +104,12 @@ class PagePage implements InterfacePage
           $this->CMSCore->theme->addLinkCanonical('/page/' . $pageStatic->getName());
         }
 
-        $isVisible = false;
-
         $clientIsLogged = $this->CMSCore->client->isLogged(1);
-        $clientUser = ($clientIsLogged) ? $this->CMSCore->client->getUser(1) : null;
+        $clientUser = $clientIsLogged ? $this->CMSCore->client->getUser(1) : null;
 
-        $isVisible = $pageStatic->isPublished();
-        if (!$isVisible && $clientUser !== null) {
-          $isVisible = $clientUser->getID() === 1 || $clientUser->getGroupID() === 1;
-        }
+        $isPublished = $entry->isPublished();
 
-        if ($isVisible) {
+        if ($this->isVisible($isPublished, $clientUser)) {
           http_response_code(200);
 
           $this->page->breadcrumbs->add($localeData['PAGE_STATIC_PAGE_BREADCRUMPS_INDEX_LABEL'], '/');
