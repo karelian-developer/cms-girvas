@@ -78,7 +78,7 @@ class PagePage implements InterfacePage
       }
     }
 
-    return false;
+    return $isPublished;
   }
   
   /**

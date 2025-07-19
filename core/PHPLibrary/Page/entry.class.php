@@ -77,8 +77,8 @@ class PageEntry implements InterfacePage
           || $userGroup->hasPermissionEditorEntriesEdit();
       }
     }
-
-    return false;
+    
+    return $isPublished;
   }
   
   /**
