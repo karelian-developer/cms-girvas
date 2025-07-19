@@ -35,6 +35,23 @@ class PageRegistration implements InterfacePage
     $this->CMSCore = $CMSCore;
     $this->page = $page;
   }
+
+  /**
+   * Добавление обязательных CSS-файлов
+   * 
+   * @return void
+   */
+  private function addRequiredStyles() : void
+  {
+    foreach (['page.css', 'page/registration.css'] as $stylePath) {
+      $this->CMSCore->theme->addStyle(
+        [
+          'href' => 'styles/' . $stylePath,
+          'rel' => 'stylesheet'
+        ]
+      );
+    }
+  }
   
   /**
    * Сборка шаблона страницы
@@ -43,8 +60,7 @@ class PageRegistration implements InterfacePage
    */
   public function assembly() : void
   {
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page/registration.css', 'rel' => 'stylesheet']);
+    $this->addRequiredStyles();
     
     $localeData = $this->CMSCore->locale->getData();
 

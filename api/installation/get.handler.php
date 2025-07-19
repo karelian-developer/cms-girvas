@@ -365,15 +365,17 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     }
 
     if (!file_exists($fileCMSConfigurationPath)) {
-      $domain = (isset($_GET['domain'])) ? idn_to_ascii($_GET['domain']) : '';
+      $domain = isset($_GET['domain']) ? idn_to_ascii(trim($_GET['domain'])) : '';
 
       $domainAliases = $_GET['domain_aliases'] ?? '';
       $domainAliases = trim($domainAliases);
 
       $domainAliasesExploaded = explode(',', $domainAliases);
+      
       if (count($domainAliasesExploaded) > 0) {
-        foreach ($domainAliasesExploaded as $index => $domain) {
-          $domainAliasesExploaded[$index] = '\'' . idn_to_ascii(trim($domain) . '\'');
+        foreach ($domainAliasesExploaded as $index => $domainAliase) {
+          $domainAliase = idn_to_ascii(trim($domainAliase));
+          $domainAliasesExploaded[$index] = '\'' . $domainAliase . '\'';
         }
       }
 
@@ -429,7 +431,6 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       fwrite($file, '  \'SSLHSTSPreload\' => false,' . PHP_EOL);
       fwrite($file, '];' . PHP_EOL);
       fwrite($file, PHP_EOL);
-      fwrite($file, '?>');
       fclose($file);
       chmod($fileCMSConfigurationPath, 0664);
     }

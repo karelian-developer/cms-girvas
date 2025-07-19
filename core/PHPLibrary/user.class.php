@@ -25,6 +25,9 @@ use \PDOException as PDOException;
  */
 class User
 {
+  // ID администратора системы (суперпользователя)
+  public const ADMIN_ID = 1;
+
   private readonly CMSCore $CMSCore;
   private int $id;
   
@@ -244,9 +247,9 @@ class User
   /**
    * Получить объект группы пользователя
    *
-   * @return UserGroup|null
+   * @return ?UserGroup
    */
-  public function getGroup() : UserGroup|null
+  public function getGroup() : ?UserGroup
   {
     $groupID = $this->getGroupID();
     
@@ -408,6 +411,16 @@ class User
   {
     $CMSSalt = $CMSCore->configurator->get('salt');
     return md5(sprintf('{GIRVAS:%s+%d}', $CMSSalt, time()));
+  }
+
+  /**
+   * Проверка пользователя на суперпользователя
+   * 
+   * @return bool
+   */
+  public function isSuperAdmin() : bool
+  {
+    return $this->id === self::ADMIN_ID;
   }
 
   /**

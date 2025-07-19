@@ -38,13 +38,20 @@ class PageProfile implements InterfacePage
   }
 
   /**
-   * Получение массива дополнительных полей
+   * Добавление обязательных CSS-файлов
    * 
-   * @return array
+   * @return void
    */
-  private function getAdditionalFields() : array
+  private function addRequiredStyles() : void
   {
-    // ...
+    foreach (['page.css', 'page/profile.css'] as $stylePath) {
+      $this->CMSCore->theme->addStyle(
+        [
+          'href' => 'styles/' . $stylePath,
+          'rel' => 'stylesheet'
+        ]
+      );
+    }
   }
   
   /**
@@ -54,8 +61,7 @@ class PageProfile implements InterfacePage
    */
   public function assembly() : void
   {
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page/profile.css', 'rel' => 'stylesheet']);
+    $this->addRequiredStyles();
     
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();

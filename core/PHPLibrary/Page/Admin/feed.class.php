@@ -71,11 +71,11 @@ class PageFeed implements InterfacePage
     /** @var string $site_page Содержимое шаблона страницы */
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feed.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'web-channel',
-      'WEB_CHANNEL_ID' => $feed !== null ? $feed->getID() : 0,
-      'WEB_CHANNEL_NAME' => $feed !== null ? $feed->getName() : '',
-      'WEB_CHANNEL_TITLE' => $feed !== null ? $feed->getTitle($localeName) : '',
-      'WEB_CHANNEL_DESCRIPTION' => $feed !== null ? $feed->getDescription($localeName) : '',
-      'WEB_CHANNEL_FORM_METHOD' => $feed !== null ? 'PATCH' : 'PUT',
+      'FEED_ID' => $feed !== null ? $feed->getID() : 0,
+      'FEED_NAME' => $feed !== null ? $feed->getName() : '',
+      'FEED_TITLE' => $feed !== null ? $feed->getTitle($localeName) : '',
+      'FEED_DESCRIPTION' => $feed !== null ? $feed->getDescription($localeName) : '',
+      'FEED_FORM_METHOD' => $feed !== null ? 'PATCH' : 'PUT',
     ]);
   }
 

@@ -274,7 +274,9 @@ class PageStatic implements EntityTypeContent
       $metadata = json_decode($this->metadata, true);
 
       if (isset($metadata['publishedUnixTimestamp'])) {
-        return $metadata['publishedUnixTimestamp'];
+        return is_numeric($metadata['publishedUnixTimestamp'])
+          ? (int) $metadata['publishedUnixTimestamp']
+          : 0;
       }
     }
 
@@ -325,9 +327,11 @@ class PageStatic implements EntityTypeContent
   {
     if (property_exists($this, 'metadata')) {
       $metadata = json_decode($this->metadata, true);
-
+      
       if (isset($metadata['personalTemplatePath'])) {
-        return $metadata['personalTemplatePath'] ?? 'templates/page/static.tpl';
+        $personalTemplatePath = trim($metadata['personalTemplatePath']);
+
+        return $personalTemplatePath !== '' ? $personalTemplatePath : 'templates/page/static.tpl';
       }
     }
 

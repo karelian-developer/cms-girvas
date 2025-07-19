@@ -32,6 +32,7 @@ class PageError implements InterfacePage
    * @param  SystemCore $CMSCore
    * @param  Page $page
    * @param  int $errorCode
+   * 
    * @return void
    */
   public function __construct(SystemCore $CMSCore, Page $page, int $errorCode)
@@ -59,7 +60,23 @@ class PageError implements InterfacePage
         $this->errorTitle = $localeData['PAGE_ERROR_UNKNOWN_TITLE'];
         $this->errorDescription = $localeData['PAGE_ERROR_UNKNOWN_DESCRIPTION'];
     }
+  }
 
+  /**
+   * Добавление обязательных CSS-файлов
+   * 
+   * @return void
+   */
+  private function addRequiredStyles() : void
+  {
+    foreach (['page/error.css'] as $stylePath) {
+      $this->CMSCore->theme->addStyle(
+        [
+          'href' => 'styles/' . $stylePath,
+          'rel' => 'stylesheet'
+        ]
+      );
+    }
   }
   
   /**
@@ -71,17 +88,26 @@ class PageError implements InterfacePage
   {
     http_response_code($this->errorCode);
 
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page/error.css', 'rel' => 'stylesheet']);
+    $this->addRequiredStyles();
 
     $this->CMSCore->configurator->setMetaTitle($this->errorTitle);
 
-    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
-      'PAGE_NAME' => 'error error_' . (string) $this->errorCode,
-      'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/error.tpl', [
-        'ERROR_TITLE' => $this->errorTitle,
-        'ERROR_DESCRIPTION' => sprintf('<div class="page__simple-note">%s</div>', $this->errorDescription)
-      ])
-    ]);
+    $this->assembled = ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme, 'templates/page.tpl',
+      [
+        'PAGE_NAME' => 'error error_' . $this->errorCode,
+        'PAGE_CONTENT' => ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme, 'templates/page/error.tpl',
+          [
+            'ERROR_TITLE' => $this->errorTitle,
+            'ERROR_DESCRIPTION' => sprintf(
+              '<div class="page__simple-note">%s</div>',
+              $this->errorDescription
+            )
+          ]
+        )
+      ]
+    );
   }
 
 }

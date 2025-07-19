@@ -248,7 +248,7 @@ class PageAnalytics implements InterfacePage
         $tableCellViewsElement->setAttribute('class', 'table__cell cell table__cell_views');
 
         $tableCellTitleLinkElement = $document->createElement('a');
-        $tableCellTitleLinkElement->setAttribute('href', $page->get_url());
+        $tableCellTitleLinkElement->setAttribute('href', $page->getURL());
         $tableCellTitleLinkElement->setAttribute('target', '_blank');
 
         $tableCellIndexText = $document->createTextNode(sprintf('#%d', $pageIndex));

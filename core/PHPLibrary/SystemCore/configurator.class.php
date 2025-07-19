@@ -642,7 +642,7 @@ final class Configurator
     if (is_array($CSP)) $CSP = implode('; ', $CSP);
 
     $CSP = str_replace('{SCRIPT_HASH}', $this->CMSCore->CSPScriptsHash, $CSP);
-    $CSP = str_replace('{DOMAIN}', $domainAddress, $CSP);
+    $CSP = str_replace('{DOMAIN}', idn_to_ascii($domainAddress), $CSP);
     $CSP = str_replace('{DOMAIN_ALIASES}', $domainAliases, $CSP);
     return str_replace('&quot;', '\'', $CSP);
   }
