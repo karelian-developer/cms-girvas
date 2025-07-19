@@ -78,7 +78,7 @@ class PageEntries implements InterfacePage
       if ($userGroup !== null) {
         return $user->isSuperAdmin()
           || $userGroup->isSuperGroup()
-          || $userGroup->hasPermissionEditorEntriesEdit()
+          || $userGroup->hasPermissionEditorEntriesEdit();
       }
     }
 
@@ -171,7 +171,7 @@ class PageEntries implements InterfacePage
         $createdDateTimestamp = date('d.m.Y H:i:s', $entryObject->getCreatedUnixTimestamp());
         $publishedDateTimestamp = date('d.m.Y H:i:s', $entryObject->getPublishedUnixTimestamp());
         $updatedDateTimestamp = date('d.m.Y H:i:s', $entryObject->getUpdatedUnixTimestamp());
-        
+
         $createdDateTimestampWithoutTime = date('d.m.Y', $entryObject->getCreatedUnixTimestamp());
         $publishedDateTimestampWithoutTime = date('d.m.Y', $entryObject->getPublishedUnixTimestamp());
         $updatedDateTimestampWithoutTime = date('d.m.Y', $entryObject->getUpdatedUnixTimestamp());

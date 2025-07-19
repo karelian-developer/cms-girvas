@@ -74,7 +74,7 @@ class PageEntry implements InterfacePage
       if ($userGroup !== null) {
         return $user->isSuperAdmin()
           || $userGroup->isSuperGroup()
-          || $userGroup->hasPermissionEditorEntriesEdit()
+          || $userGroup->hasPermissionEditorEntriesEdit();
       }
     }
 
