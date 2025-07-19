@@ -68,6 +68,10 @@ class PagePage implements InterfacePage
    */
   public function isVisible(bool $isPublished, ?User $user) : bool
   {
+    if ($isPublished) {
+      return true;
+    }
+
     if ($isPublished && $user !== null) {
       $userGroup = $user->getGroup();
 
@@ -78,7 +82,7 @@ class PagePage implements InterfacePage
       }
     }
 
-    return $isPublished;
+    return false;
   }
   
   /**
