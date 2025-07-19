@@ -122,8 +122,4 @@ if ($CMSCore->urlp->getPath(2) === null && $CMSCore->urlp->getParam('categoryNam
 
   $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
   $handlerStatusCode = $handlerStatusCode ?? 1;
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> develop
