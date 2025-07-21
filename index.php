@@ -31,6 +31,7 @@ if (PHP_VERSION_ID < 80200) {
 
 $startTime = microtime(true);
 
+require_once CMS_ROOT_DIRECTORY . '/core/PHPLibrary/core.interface.php';
 require_once CMS_ROOT_DIRECTORY . '/core/PHPLibrary/systemCore.class.php';
 
 $CMSCore = new CMSCore();
