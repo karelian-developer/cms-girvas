@@ -660,7 +660,6 @@ class EntryComment implements EntityTypeContent
         }
 
         if (!empty($metadataAssignments)) {
-          $queryBuilder->statement->clauseSet->addColumn('metadata', sprintf('metadata::jsonb || %s', implode(' || ', $metadataAssignments)));
           $queryBuilder->statement->clauseSet->addColumnAdaptive('metadata', [
             'mysql' => 'JSON_MERGE_PRESERVE(COALESCE(`metadata`, \'{}\'), CAST(\'{' . implode(', ', $metadataAssignments) . '}\' AS JSON))',
             'postgresql' => sprintf('metadata::jsonb || %s', implode(' || ', $metadataAssignments))
