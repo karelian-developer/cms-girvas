@@ -378,7 +378,7 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->assembly();
     
     /** @var int $entryID Идентификационный номер записи */
-    $entryID = $this->geID();
+    $entryID = $this->getID();
 
     try {
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
