@@ -18,7 +18,7 @@ use \core\PHPLibrary\EntryComment as EntryComment;
 if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(1);
   $clientUser->initData(['metadata']);
-  $clientUserGroup = $clientUser->get_group();
+  $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
   if (isset($_DELETE['comment_id'])) {
