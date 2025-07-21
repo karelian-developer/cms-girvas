@@ -118,11 +118,11 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               $commentPatchingIsAllowed = true;
             }
           } else {
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRY_COMMENT_ERROR_MAX_CHARACTERS'));
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRY_COMMENT_ERROR_MAX_CHARACTERS');
             $commentPatchingIsAllowed = false;
           }
         } else {
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRY_COMMENT_ERROR_FEW_CHARACTERS'));
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRY_COMMENT_ERROR_FEW_CHARACTERS');
           $commentPatchingIsAllowed = false;
         }
       }
@@ -162,8 +162,8 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
 
           if ($allowVoting) {
-            $commentData['metadata']['rating_vote'] = [
-              'voter_id' => $clientUserID,
+            $commentData['metadata']['ratingVote'] = [
+              'voterID' => $clientUserID,
               'vote' => $commentRatingVote
             ];
           }
@@ -175,7 +175,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
       }
       
       if ($commentPatchingIsAllowed) {
-        $isUpdated = (!empty($commentData)) ? $comment->update($commentData) : false;
+        $isUpdated = !empty($commentData) ? $comment->update($commentData) : false;
 
         if ($isUpdated) {
           $comment = new EntryComment($CMSCore, $commentID);
