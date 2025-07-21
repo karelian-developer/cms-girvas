@@ -462,7 +462,7 @@ export class EntryComment {
     let createdSeconds = createdDate.getSeconds().toString().padStart(2, '0');
 
     let requestData = {
-      templateCategory: 'default',
+      templateCategory: 'base',
       templateFilePath: 'templates/page/entry/comment.tpl',
       patternNames: [
         'COMMENT_ID',
