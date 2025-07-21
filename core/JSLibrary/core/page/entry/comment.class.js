@@ -57,7 +57,7 @@ export class EntryComment {
 
       let request = new Interactive('request', {
         method: 'GET',
-        url: `/handler/entry/${this.entryID}/comments?sortColumn=created_unix_timestamp&sortType=desc&parentID=${this.id}&limit=${this.answersLoadingLimit}&offset=${answersCount}&localeMessage=${window.CMSCore.locales.base.name}`
+        url: `/handler/entry/${this.entryID}/comments?sortColumn=createdUnixTimestamp&sortType=desc&parentID=${this.id}&limit=${this.answersLoadingLimit}&offset=${answersCount}&localeMessage=${window.CMSCore.locales.base.name}`
       });
 
       request.target.showingNotification = false;
