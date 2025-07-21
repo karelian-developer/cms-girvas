@@ -13,5 +13,4 @@ namespace core\PHPLibrary;
 interface CoreInterface
 {
   public function __construct();
-  private function init() : void;
 }
