@@ -13,13 +13,14 @@ namespace core\PHPLibrary\SystemCore;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CMSCoreInterface;
 use \PDOException as PDOException;
 use \PDO as PDO;
 
 /**
  * Class Configurator
  */
-final class Configurator
+final class Configurator implements ConfiguratorInterface
 {
   const FILE_PATH = 'core/configuration.php';
 
@@ -27,7 +28,7 @@ final class Configurator
   public string $metaDescription = '';
   public array $metaKeywords = [];
   private array $data = [];
-  private CMSCore $CMSCore;
+  private CMSCoreInterface $CMSCore;
   
   /**
    * __construct
@@ -35,7 +36,7 @@ final class Configurator
    * @param  mixed $CMSCore
    * @return void
    */
-  public function __construct(CMSCore $CMSCore)
+  public function __construct(CMSCoreInterface $CMSCore)
   {
     $this->CMSCore = $CMSCore;
     $filePath = CMS_ROOT_DIRECTORY . '/' . self::FILE_PATH;

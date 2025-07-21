@@ -17,6 +17,7 @@ namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\SystemCore\Configurator as CMSConfigurator;
+use \core\PHPLibrary\SystemCore\ConfiguratorInterface as CMSConfiguratorInterface;
 use \core\PHPLibrary\SystemCore\Header as CMSHeader;
 use \core\PHPLibrary\SystemCore\Header\HTTPReferrerPolicy as CMSHeaderHTTPReferrerPolicy;
 use \core\PHPLibrary\SystemCore\Header\EnumHTTPReferrerPolicy as CMSHeaderEnumHTTPReferrerPolicy;
@@ -41,7 +42,7 @@ use \DOMDocument as DOMDocument;
  * @property      array $configuration Массив с конфигурациями CMS
  * @property      URLParser $urlp Объект класса URLParser 
  */
-final class SystemCore implements CoreInterface
+final class SystemCore
 {
   public const CMS_CORE_PATH = 'core';
   public const CMS_CORE_PHP_LIBRARY_PATH = 'core/PHPLibrary';
@@ -49,7 +50,7 @@ final class SystemCore implements CoreInterface
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS GIRVAS';
-  public const CMS_VERSION = '0.2.4.1';
+  public const CMS_VERSION = '0.2.4.2';
   public const CMS_STAGE_DEVELOPING = 'voitsy';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -58,9 +59,9 @@ final class SystemCore implements CoreInterface
   public string $CSPScriptsHash, $CSPStylesHash;
 
   /** 
-   * @var CMSConfigurator Конфигуратор системы
+   * @var CMSConfiguratorInterface Конфигуратор системы
    */
-  public ?CMSConfigurator $configurator = null;
+  public ?CMSConfiguratorInterface $configurator = null;
   /** 
    * @var CMSDatabaseConnector Класс системы подключения к БД 
    */
@@ -134,46 +135,6 @@ final class SystemCore implements CoreInterface
   public function getCMSStageDeveloping() : string
   {
     return self::CMS_STAGE_DEVELOPING;
-  }
-
-  /**
-   * Получить наименование производителя
-   * 
-   * @return string
-   */
-  public function getCMSDeveloperTitle() : string
-  {
-    return self::CMS_DEVELOPER_TITLE;
-  }
-
-  /**
-   * Получить ссылку на сайт производителя
-   * 
-   * @return string
-   */
-  public function getCMSDeveloperSiteLink() : string
-  {
-    return self::CMS_DEVELOPER_SITE_LINK;
-  }
-
-  /**
-   * Получить ссылку на официальный сайт продукта
-   * 
-   * @return string
-   */
-  public function getCMSProductSiteLink() : string
-  {
-    return self::CMS_PRODUCT_SITE_LINK;
-  }
-
-  /**
-   * Получить ссылку на выписку из Реестра российского ПО Минцифры
-   * 
-   * @return string
-   */
-  public function getCMSReestrDigitalGovLink() : string
-  {
-    return self::CMS_REESTR_DIGITAL_GOV_LINK;
   }
 
   /**
