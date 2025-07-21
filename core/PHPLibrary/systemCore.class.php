@@ -42,7 +42,7 @@ use \DOMDocument as DOMDocument;
  * @property      array $configuration Массив с конфигурациями CMS
  * @property      URLParser $urlp Объект класса URLParser 
  */
-final class SystemCore
+final class SystemCore implements CoreInterface
 {
   public const CMS_CORE_PATH = 'core';
   public const CMS_CORE_PHP_LIBRARY_PATH = 'core/PHPLibrary';
