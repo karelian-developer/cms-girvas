@@ -35,7 +35,7 @@ if (is_numeric($CMSCore->urlp->getPath(2))) {
       }
 
       if (isset($_GET['sortColumn']) && isset($_GET['sortType'])) {
-        $commentsParamsData['order_by'] = [
+        $commentsParamsData['orderBy'] = [
           'column' => $_GET['sortColumn'],
           'sort' => $_GET['sortType']
         ];
