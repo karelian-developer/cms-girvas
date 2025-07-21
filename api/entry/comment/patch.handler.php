@@ -110,11 +110,11 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
 
             if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_BASE_ENTRY_COMMENT_CHANGE) && $comment->getAuthorID() === $clientUser->getID()) {
               $commentData['content'] = $commentContent;
-              $commentData['metadata']['parentID'] = $commentParentID;
+              //$commentData['metadata']['parentID'] = $commentParentID;
               $commentPatchingIsAllowed = true;
             } elseif ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT)) {
               $commentData['content'] = $commentContent;
-              $commentData['metadata']['parentID'] = $commentParentID;
+              //$commentData['metadata']['parentID'] = $commentParentID;
               $commentPatchingIsAllowed = true;
             }
           } else {
