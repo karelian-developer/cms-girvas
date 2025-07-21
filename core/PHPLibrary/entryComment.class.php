@@ -64,7 +64,7 @@ class EntryComment implements EntityTypeContent
    *
    * @return int
    */
-  public function geID() : int
+  public function getID() : int
   {
     return $this->id;
   }
@@ -187,12 +187,15 @@ class EntryComment implements EntityTypeContent
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections(['count(id)']);
+    $queryBuilder->statement->addSelections(['count(id) AS count']);
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('(metadata::jsonb->\'parentID\')::int = :parentID::int');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'JSON_EXTRACT(`metadata`, \'$.parentID\') = :parentID',
+      'postgresql' => '(metadata::jsonb->>\'parentID\')::int = :parentID'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -231,7 +234,10 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('(metadata::jsonb->\'parentID\')::int = :parentID::int');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'JSON_EXTRACT(`metadata`, \'$.parentID\') = :parentID',
+      'postgresql' => '(metadata::jsonb->>\'parentID\')::int = :parentID'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -543,8 +549,6 @@ class EntryComment implements EntityTypeContent
       $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
-
-      error_log('SQL: ' . $queryBuilder->statement->assembled);
 
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;
