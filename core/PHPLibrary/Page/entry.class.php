@@ -139,11 +139,11 @@ class PageEntry implements InterfacePage
 
           $commentsArray = $entry->getComments([
             'limit' => [2, 0],
-            'order_by' => [
+            'orderBy' => [
               'column' => 'createdUnixTimestamp',
               'sort' => 'desc'
             ],
-            'parent_id' => 0
+            'parentID' => 0
           ]);
 
           foreach ($commentsArray as $entryComment) {

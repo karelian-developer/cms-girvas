@@ -113,7 +113,7 @@ if ($CMSCore->client->isLogged(1)) {
                 }
               }
 
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_PUT_DATA_SUCCESS');
+              $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PUT_DATA_SUCCESS');
               $handlerStatusCode = $handlerStatusCode ?? 1;
 
               $handlerOutputData['comment'] = [];

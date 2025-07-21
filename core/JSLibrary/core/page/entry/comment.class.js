@@ -57,7 +57,7 @@ export class EntryComment {
 
       let request = new Interactive('request', {
         method: 'GET',
-        url: `/handler/entry/${this.entryID}/comments?sortColumn=created_unix_timestamp&sortType=desc&parentID=${this.id}&limit=${this.answersLoadingLimit}&offset=${answersCount}&localeMessage=${window.CMSCore.locales.base.name}`
+        url: `/handler/entry/${this.entryID}/comments?sortColumn=createdUnixTimestamp&sortType=desc&parentID=${this.id}&limit=${this.answersLoadingLimit}&offset=${answersCount}&localeMessage=${window.CMSCore.locales.base.name}`
       });
 
       request.target.showingNotification = false;
@@ -462,7 +462,7 @@ export class EntryComment {
     let createdSeconds = createdDate.getSeconds().toString().padStart(2, '0');
 
     let requestData = {
-      templateCategory: 'default',
+      templateCategory: 'base',
       templateFilePath: 'templates/page/entry/comment.tpl',
       patternNames: [
         'COMMENT_ID',

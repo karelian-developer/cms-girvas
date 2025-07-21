@@ -104,10 +104,10 @@ final class EntryComments
       'mysql' => '`entryID` = :entryID',
       'postgresql' => '"entryID" = :entryID'
     ]);
-    if (array_key_exists('parent_id', $params)) {
+    if (array_key_exists('parentID', $params)) {
       $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => sprintf('AND JSON_EXTRACT(`metadata`, \'$.parentID\') = %d', $params['parent_id']),
-        'postgresql' => sprintf('AND (metadata::jsonb->\'parentID\')::int = %d', $params['parent_id'])
+        'mysql' => sprintf('AND JSON_EXTRACT(`metadata`, \'$.parentID\') = %d', $params['parentID']),
+        'postgresql' => sprintf('AND (metadata::jsonb->\'parentID\')::int = %d', $params['parentID'])
       ]);
     }
 
@@ -120,11 +120,11 @@ final class EntryComments
       }
     }
 
-    if (array_key_exists('order_by', $params)) {
-      if (isset($params['order_by']['column']) && isset($params['order_by']['sort'])) {
+    if (array_key_exists('orderBy', $params)) {
+      if (isset($params['orderBy']['column']) && isset($params['orderBy']['sort'])) {
         $queryBuilder->statement->setClauseOrderBy();
-        $queryBuilder->statement->clauseOrderBy->setColumn($params['order_by']['column']);
-        $queryBuilder->statement->clauseOrderBy->setSortType($params['order_by']['sort']);
+        $queryBuilder->statement->clauseOrderBy->setColumn($params['orderBy']['column']);
+        $queryBuilder->statement->clauseOrderBy->setSortType($params['orderBy']['sort']);
         $queryBuilder->statement->clauseOrderBy->assembly();
       }
     }

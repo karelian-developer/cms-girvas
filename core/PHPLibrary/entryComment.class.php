@@ -64,7 +64,7 @@ class EntryComment implements EntityTypeContent
    *
    * @return int
    */
-  public function geID() : int
+  public function getID() : int
   {
     return $this->id;
   }
@@ -187,12 +187,15 @@ class EntryComment implements EntityTypeContent
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections(['count(id)']);
+    $queryBuilder->statement->addSelections(['count(id) AS count']);
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('(metadata::jsonb->\'parentID\')::int = :parentID::int');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'JSON_EXTRACT(`metadata`, \'$.parentID\') = :parentID',
+      'postgresql' => '(metadata::jsonb->>\'parentID\')::int = :parentID'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -231,7 +234,10 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('(metadata::jsonb->\'parentID\')::int = :parentID::int');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'JSON_EXTRACT(`metadata`, \'$.parentID\') = :parentID',
+      'postgresql' => '(metadata::jsonb->>\'parentID\')::int = :parentID'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -372,7 +378,7 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->assembly();
     
     /** @var int $entryID Идентификационный номер записи */
-    $entryID = $this->geID();
+    $entryID = $this->getID();
 
     try {
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
@@ -544,8 +550,6 @@ class EntryComment implements EntityTypeContent
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
-      error_log('SQL: ' . $queryBuilder->statement->assembled);
-
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;
         $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
@@ -656,7 +660,6 @@ class EntryComment implements EntityTypeContent
         }
 
         if (!empty($metadataAssignments)) {
-          $queryBuilder->statement->clauseSet->addColumn('metadata', sprintf('metadata::jsonb || %s', implode(' || ', $metadataAssignments)));
           $queryBuilder->statement->clauseSet->addColumnAdaptive('metadata', [
             'mysql' => 'JSON_MERGE_PRESERVE(COALESCE(`metadata`, \'{}\'), CAST(\'{' . implode(', ', $metadataAssignments) . '}\' AS JSON))',
             'postgresql' => sprintf('metadata::jsonb || %s', implode(' || ', $metadataAssignments))

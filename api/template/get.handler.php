@@ -13,7 +13,7 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-use \core\PHPLibrary\SystemCore\Locale as  CMSLocale;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
@@ -43,6 +43,7 @@ if ($CMSCore->urlp->getPath(2) === 'assembly') {
         break;
       default:
         $themeConfigName = $themeCategory . '_template';
+        $localeName = $CMSCore->urlp->getParam('locale') ?? 'en_US';
         break;
     }
 
@@ -50,7 +51,7 @@ if ($CMSCore->urlp->getPath(2) === 'assembly') {
       'base' => new CMSLocale($CMSCore, $localeName, 'base'),
       'admin' => new CMSLocale($CMSCore, $localeName, 'admin'),
       'install' => new CMSLocale($CMSCore, $localeName, 'install'),
-      default => $themeCategory . '_template'
+      default => new CMSLocale($CMSCore, $localeName, $themeCategory)
     };
 
     $CMSCore->locale->setTypeName($themeCategory);
@@ -100,6 +101,7 @@ if ($CMSCore->urlp->getPath(2) === null && $CMSCore->urlp->getParam('categoryNam
       break;
     default:
       $themeConfigName = $themeCategoryName . '_template';
+      $localeName = $CMSCore->urlp->getParam('locale') ?? 'en_US';
       break;
   }
 
@@ -107,7 +109,7 @@ if ($CMSCore->urlp->getPath(2) === null && $CMSCore->urlp->getParam('categoryNam
     'base' => new  CMSLocale($CMSCore, $localeName, 'base'),
     'admin' => new  CMSLocale($CMSCore, $localeName, 'admin'),
     'install' => new  CMSLocale($CMSCore, $localeName, 'install'),
-    default => $themeCategoryName . '_template'
+    default => new CMSLocale($CMSCore, $localeName, $themeCategory)
   };
 
   $CMSCore->locale->setTypeName($themeCategoryName);
