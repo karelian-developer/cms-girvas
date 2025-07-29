@@ -163,6 +163,36 @@ export class PageTemplate {
 
         if (templateInstalledStatus === 'installed') {
           const themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
+          const propertiesFilesValues = themePropertiesContainerElement.querySelectorAll('input[type="file"]');
+          propertiesFilesValues.forEach((property) => {
+            property.addEventListener('change', (event) => {
+              event.preventDefault();
+
+              property.setAttribute('disabled', 'disabled');
+
+              let file = event.target.files[0], fileReader = new FileReader();
+
+              if (!fileReader) {
+                console.error(`[CMSCore] ${localeData.REPORT_JS_CMSCORE_ERROR_FILEREADER_IS_NOT_SUPPORTED}.`);
+                return;
+              }
+
+              if (event.target.files.length === 0) {
+                console.error(`[CMSCore] ${localeData.REPORT_JS_CMSCORE_ERROR_IMAGES_WHERE_NOT_LOADED}.`);
+                return;
+              }
+
+              fileReader.onload = (event) => {
+                property.removeAttribute('disabled');
+              };
+
+              fileReader.onerror = (event) => {
+                console.error(fileReader.result);
+              };
+
+              fileReader.readAsDataURL(file);
+            });
+          });
 
           buttons.saveProperties = new Interactive('button');
           buttons.saveProperties.target.setLabel(localeData.BUTTON_SAVE_LABEL);
@@ -175,10 +205,12 @@ export class PageTemplate {
 
               const propertiesValues = themePropertiesContainerElement.querySelectorAll('input, select');
               propertiesValues.forEach((property) => {
-                const propertyName = property.name;
-                const propertyValue = property.value;
+                if (!property.hasAttribute('disabled')) {
+                  const propertyName = property.name;
+                  const propertyValue = property.value;
 
-                formData.append(propertyName, propertyValue);
+                  formData.append(propertyName, propertyValue);
+                }
               });
 
               const request = new Interactive('request', {
