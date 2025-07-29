@@ -162,10 +162,11 @@ export class PageTemplate {
         });
 
         if (searchParams.getPathPart(2) !== 'repository' && searchParams.getPathPart(3) === null) {
+          const themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
+
           buttons.saveProperties = new Interactive('button');
           buttons.saveProperties.target.setLabel(localeData.BUTTON_SAVE_LABEL);
           buttons.saveProperties.target.setCallback(() => {
-            const themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
             if (themePropertiesContainerElement !== null) {
               const formData = new FormData();
 
@@ -191,6 +192,8 @@ export class PageTemplate {
           });
 
           buttons.saveProperties.assembly();
+
+          themePropertiesContainerElement.append(buttons.saveProperties.target.element);
         }
 
         buttons.delete.assembly();
