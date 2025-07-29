@@ -80,7 +80,7 @@ export class PageTemplate {
 
       interactiveNotification.target.show();
     }).then((localeData) => {
-      if (searchParams.getPathPart(2) != null) {
+      if (searchParams.getPathPart(2) !== null) {
         let pageGalleryElement = templateBlock.querySelector('[role="gallery"]');
         if (pageGalleryElement != null) {
           this.initGallery(pageGalleryElement); 
@@ -161,6 +161,38 @@ export class PageTemplate {
           });
         });
 
+        if (searchParams.getPathPart(2) !== 'repository' && searchParams.getPathPart(3) === null) {
+          buttons.saveProperties = new Interactive('button');
+          buttons.saveProperties.target.setLabel(localeData.BUTTON_SAVE_LABEL);
+          buttons.saveProperties.target.setCallback(() => {
+            const themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
+            if (themePropertiesContainerElement !== null) {
+              const formData = new FormData();
+
+              const propertiesValues = themePropertiesContainerElement.querySelectorAll('input, select');
+              propertiesValues.forEach((property) => {
+                const propertyName = property.name;
+                const propertyValue = property.value;
+
+                formData.append(propertyName, propertyValue);
+              });
+
+              const request = new Interactive('request', {
+                method: 'PATCH',
+                url: '/handler/template?localeMessage=' + window.CMSCore.locales.admin.name
+              });
+
+              request.target.data = formData;
+
+              request.target.send().then((data) => {
+                console.log(data);
+              });
+            }
+          });
+
+          buttons.saveProperties.assembly();
+        }
+
         buttons.delete.assembly();
         buttons.install.assembly();
         buttons.download.assembly();
@@ -169,6 +201,10 @@ export class PageTemplate {
           buttons.download.target.element.style.display = 'none';
           buttons.delete.target.element.style.display = 'none';
           buttons.install.target.element.style.display = 'none';
+
+          if (buttons.hasOwnProperty('saveProperties')) {
+            buttons.saveProperties.target.element.style.display = 'flex';
+          }
         } else {
           buttons.download.target.element.style.display = (templateDownloadedStatus === 'downloaded') ? 'none' : 'flex';
           buttons.delete.target.element.style.display = (templateDownloadedStatus === 'downloaded') ? 'flex' : 'none';

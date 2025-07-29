@@ -1,10 +1,116 @@
 {
-  "COLOR_SCHEME": "default",
-  "IMAGE_HEADER_LOGOTYPE_URL": "{SITE_TEMPLATE_URL}/images/header-logo.png",
-  "IMAGE_HEADER_LOGOTYPE_ALT": "{CMS_TITLE}",
-  "IMAGE_FOOTER_LOGOTYPE_URL": "{SITE_TEMPLATE_URL}/images/footer-logo.png",
-  "IMAGE_FOOTER_LOGOTYPE_ALT": "{CMS_TITLE}",
-  "LINK_DOCUMENT_LICENSE_AGREEMENT": "#",
-  "LINK_DOCUMENT_TERMS_OF_USE": "#",
-  "LINK_DOCUMENT_COOKIE_ABOUT": "#"
+  "COLOR_SCHEME": {
+    "value": "default",
+    "type": "colorScheme",
+    "locale": {
+      "title": {
+        "en_US": "Color scheme",
+        "ru_RU": "Цветовая схема"
+      },
+      "description": {
+        "en_US": "The color scheme allows you to customize the global designations for the site theme colors.",
+        "ru_RU": "Цветовая схема позволяет настроить глобальные обозначения для цветов темы сайта."
+      }
+    }
+  },
+  "IMAGE_HEADER_LOGOTYPE_URL": {
+    "value": "images/header-logo.png",
+    "type": "file",
+    "file": "png/jpg/svg/webp/avif",
+    "locale": {
+      "title": {
+        "en_US": "Logo for the site header",
+        "ru_RU": "Логотип для шапки сайта"
+      },
+      "description": {
+        "en_US": "File with the logo that will be placed in the site header. Pay attention to the original image dimensions before replacing.",
+        "ru_RU": "Файл с логотипом, который будет размещен в шапке сайта. Обращайте внимание на первоначальные размеры изображения перед заменой."
+      }
+    }
+  },
+  "IMAGE_HEADER_LOGOTYPE_ALT": {
+    "value": "{CMS_TITLE}",
+    "type": "text",
+    "locale": {
+      "title": {
+        "en_US": "Image caption",
+        "ru_RU": "Подпись для изображения"
+      },
+      "description": {
+        "en_US": "Text to be embedded in the image's ALT attribute (useful for SEO).",
+        "ru_RU": "Текст, который будет внедрен в атрибут ALT изображения (полезно для SEO)."
+      }
+    }
+  },
+  "IMAGE_FOOTER_LOGOTYPE_URL": {
+    "value": "images/footer-logo.png",
+    "type": "file",
+    "file": "png/jpg/svg/webp/avif",
+    "locale": {
+      "title": {
+        "en_US": "Logo for the site footer",
+        "ru_RU": "Логотип для подвала сайта"
+      },
+      "description": {
+        "en_US": "File with the logo that will be placed in the site footer. Pay attention to the original image dimensions before replacing.",
+        "ru_RU": "Файл с логотипом, который будет размещен в подвале сайта. Обращайте внимание на первоначальные размеры изображения перед заменой."
+      }
+    }
+  },
+  "IMAGE_FOOTER_LOGOTYPE_ALT": {
+    "value": "{CMS_TITLE}",
+    "type": "text",
+    "locale": {
+      "title": {
+        "en_US": "Image caption",
+        "ru_RU": "Подпись для изображения"
+      },
+      "description": {
+        "en_US": "Text to be embedded in the image's ALT attribute (useful for SEO).",
+        "ru_RU": "Текст, который будет внедрен в атрибут ALT изображения (полезно для SEO)."
+      }
+    }
+  },
+  "LINK_DOCUMENT_LICENSE_AGREEMENT": {
+    "value": "#",
+    "type": "text",
+    "locale": {
+      "title": {
+        "en_US": "Link to the license agreement document",
+        "ru_RU": "Ссылка на документ лицензионного соглашения"
+      },
+      "description": {
+        "en_US": "Link to the normative document. We recommend using PDF format.",
+        "ru_RU": "Ссылка на нормативный документ. Рекомендуем использовать PDF-формат."
+      }
+    }
+  },
+  "LINK_DOCUMENT_TERMS_OF_USE": {
+    "value": "#",
+    "type": "text",
+    "locale": {
+      "title": {
+        "en_US": "Link to the terms of use document",
+        "ru_RU": "Ссылка на документ пользовательского соглашения"
+      },
+      "description": {
+        "en_US": "Link to the normative document. We recommend using PDF format.",
+        "ru_RU": "Ссылка на нормативный документ. Рекомендуем использовать PDF-формат."
+      }
+    }
+  },
+  "LINK_DOCUMENT_COOKIE_ABOUT": {
+    "value": "#",
+    "type": "text",
+    "locale": {
+      "title": {
+        "en_US": "Link to the cookie about document",
+        "ru_RU": "Ссылка на документ о работе с Cookie"
+      },
+      "description": {
+        "en_US": "Link to the normative document. We recommend using PDF format.",
+        "ru_RU": "Ссылка на нормативный документ. Рекомендуем использовать PDF-формат."
+      }
+    }
+  }
 }

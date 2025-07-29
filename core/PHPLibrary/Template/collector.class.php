@@ -193,9 +193,11 @@ final class Collector
     $themeTransformed = $themeString;
 
     if (!empty($propertiesData)) {
-      foreach ($propertiesData as $name => $value) {
-        if (preg_match(self::TEMPLATE_TAG_PROPERTY_PATTERN, $themeTransformed)) {
-          $themeTransformed = strtr($themeTransformed, ["{PROP:{$name}}" => $value]);
+      foreach ($propertiesData as $name => $data) {
+        if (isset($propertiesData[$name]['value'])) {
+          if (preg_match(self::TEMPLATE_TAG_PROPERTY_PATTERN, $themeTransformed)) {
+            $themeTransformed = strtr($themeTransformed, ["{PROP:{$name}}" => $data['value']]);
+          }
         }
       }
     }
