@@ -194,7 +194,7 @@ export class PageTemplate {
           buttons.saveProperties.assembly();
 
           if (themePropertiesContainerElement !== null) {
-            themePropertiesContainerElement.append(buttons.saveProperties.target.element);
+            themePropertiesContainerElement.after(buttons.saveProperties.target.element);
           }
         }
 
@@ -211,9 +211,9 @@ export class PageTemplate {
             buttons.saveProperties.target.element.style.display = 'flex';
           }
         } else {
-          buttons.download.target.element.style.display = (templateDownloadedStatus === 'downloaded') ? 'none' : 'flex';
-          buttons.delete.target.element.style.display = (templateDownloadedStatus === 'downloaded') ? 'flex' : 'none';
-          buttons.install.target.element.style.display = (templateDownloadedStatus === 'downloaded') ? 'flex' : 'none';
+          buttons.download.target.element.style.display = templateDownloadedStatus === 'downloaded' ? 'none' : 'flex';
+          buttons.delete.target.element.style.display = templateDownloadedStatus === 'downloaded' ? 'flex' : 'none';
+          buttons.install.target.element.style.display = templateDownloadedStatus === 'downloaded' ? 'flex' : 'none';
         }
     
         interactiveContainerElement.append(buttons.download.target.element);
