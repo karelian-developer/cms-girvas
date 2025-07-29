@@ -128,7 +128,7 @@ final class Core implements ThemeInterfaceCore
     $CMSConfigurator = $CMSTheme->CMSCore->configurator;
     $CMSThemeProperties = $CMSTheme->getFilePropertiesData();
     $CMSThemeColorScheme = isset($CMSThemeProperties['COLOR_SCHEME'])
-      ? $CMSThemeProperties['COLOR_SCHEME']
+      ? $CMSThemeProperties['COLOR_SCHEME']['value']
       : 'default';
 
     if (!file_exists($CMSTheme->getPath() . '/styles/colors/' . $CMSThemeColorScheme . '.css')) {
