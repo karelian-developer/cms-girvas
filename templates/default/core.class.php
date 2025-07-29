@@ -126,8 +126,16 @@ final class Core implements ThemeInterfaceCore
   {
     $CMSTheme = $this->theme;
     $CMSConfigurator = $CMSTheme->CMSCore->configurator;
+    $CMSThemeProperties = $CMSTheme->getFilePropertiesData();
+    $CMSThemeColorScheme = isset($CMSThemeProperties['COLOR_SCHEME'])
+      ? $CMSThemeProperties['COLOR_SCHEME']
+      : 'default';
 
-    $CMSTheme->addStyle(['href' => 'styles/colors.css', 'rel' => 'stylesheet']);
+    if (!file_exists($CMSTheme->getPath() . '/styles/colors/' . $CMSThemeColorScheme . '.css')) {
+      $CMSThemeColorScheme = 'default';
+    }
+
+    $CMSTheme->addStyle(['href' => 'styles/colors/' . $CMSThemeColorScheme . '.css', 'rel' => 'stylesheet']);
     $CMSTheme->addStyle(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
 
     $localeData = $CMSTheme->locale->getData();
