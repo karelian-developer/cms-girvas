@@ -40,6 +40,9 @@ if ($CMSCore->client->isLogged(2)) {
           }
         }
 
+        error_log(print_r($_FILES, true));
+        error_log(print_r($_PATCH, true));
+
         file_put_contents($theme->getFilePropertiesPath(), json_encode($propertiesData));
 
         http_response_code(200);
