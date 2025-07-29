@@ -687,6 +687,9 @@ final class Template
       // Внедрение значений глобальных шаблонных переменных
       $this->core->assembled = ThemeCollector::assembly($this->core->assembled, $themeVariablesArray);
 
+      // Сборка локализации по общим данным (глобальные языковые переменные)
+      $this->core->assembled = ThemeCollector::assemblyLocale($this->core->assembled, $this->CMSCore->locale);
+
       if ($this->CMSCore->urlp->getPath(0) !== 'install') {
         $this->core->assembled = ThemeCollector::assemblyLocale($this->core->assembled, $this->locale);
       }

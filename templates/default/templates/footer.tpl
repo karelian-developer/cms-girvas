@@ -32,7 +32,7 @@
     <div class="footer-top__right">
       <a class="footer-top__logo-link display-block" href="/" title="CMS GIRVAS">
         <picture>
-          <img src="{SITE_TEMPLATE_URL}/images/footer-logo.png" alt="CMS GIRVAS">
+          <img src="{PROP:IMAGE_FOOTER_LOGOTYPE_URL}" alt="{PROP:IMAGE_FOOTER_LOGOTYPE_ALT}">
         </picture>
       </a>
     </div>
@@ -41,13 +41,13 @@
     <div class="footer__bottom-left-block">{CMS_COPYRIGHT}</div>
     <ul class="information-list footer__bottom-information-list flex">
       <li class="information-list__item">
-        <a class="information-list__link" href="#">{LANG:DEFAULT_FOOTER_META_LINK_LICENSE_AGREEMENT}</a>
+        <a class="information-list__link" href="{PROP:LINK_DOCUMENT_LICENSE_AGREEMENT}">{LANG:DEFAULT_FOOTER_META_LINK_LICENSE_AGREEMENT}</a>
       </li>
       <li class="information-list__item">
-        <a class="information-list__link" href="#">{LANG:DEFAULT_FOOTER_META_LINK_TERMS_OF_USE}</a>
+        <a class="information-list__link" href="{PROP:LINK_DOCUMENT_TERMS_OF_USE}">{LANG:DEFAULT_FOOTER_META_LINK_TERMS_OF_USE}</a>
       </li>
       <li class="information-list__item">
-        <a class="information-list__link" href="#">{LANG:DEFAULT_FOOTER_META_LINK_COOKIE_ABOUT}</a>
+        <a class="information-list__link" href="{PROP:LINK_DOCUMENT_COOKIE_ABOUT}">{LANG:DEFAULT_FOOTER_META_LINK_COOKIE_ABOUT}</a>
       </li>
     </ul>
   </div>
