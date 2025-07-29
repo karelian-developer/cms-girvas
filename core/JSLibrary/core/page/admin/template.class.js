@@ -115,7 +115,7 @@ export class PageTemplate {
         buttons.delete.target.setCallback(() => {
           let formData = new FormData();
           formData.append('template_name', templateName);
-          formData.append('template_category', 'default');
+          formData.append('template_category', 'base');
 
           let request = new Interactive('request', {
             method: 'DELETE',
@@ -169,6 +169,9 @@ export class PageTemplate {
           buttons.saveProperties.target.setCallback(() => {
             if (themePropertiesContainerElement !== null) {
               const formData = new FormData();
+
+              formData.append('template_name', templateName);
+              formData.append('template_category', 'base');
 
               const propertiesValues = themePropertiesContainerElement.querySelectorAll('input, select');
               propertiesValues.forEach((property) => {
