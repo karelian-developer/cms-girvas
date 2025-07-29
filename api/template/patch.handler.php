@@ -13,6 +13,8 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
+use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as FileConverterEnumFileFormat;
+use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
 use \core\PHPLibrary\Template as Theme;
 
 if ($CMSCore->client->isLogged(2)) {
@@ -38,10 +40,21 @@ if ($CMSCore->client->isLogged(2)) {
           if (preg_match('/^theme_property_/', $name) && isset($propertiesData[$propertyName])) {
             $propertiesData[$propertyName]['value'] = $data;
           }
-        }
 
-        error_log(print_r($_FILES, true));
-        error_log(print_r($_PATCH, true));
+          if ($propertiesData[$propertyName]['type'] === 'file') {
+            $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
+            $fileConverter = new FileConverter($CMSCore);
+            $fileConverted = $fileConverter->convert(
+              $propertiesData[$propertyName]['value'],
+              $fileDirectoryPath,
+              FileConverterEnumFileFormat::WEBP, true
+            );
+            
+            if (is_array($fileConverted)) {
+              $propertiesData[$propertyName]['value'] = '/uploads/media/' . $fileConverted['fileName'];
+            }
+          }
+        }
 
         file_put_contents($theme->getFilePropertiesPath(), json_encode($propertiesData));
 
