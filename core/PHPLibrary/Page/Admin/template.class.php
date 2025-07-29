@@ -132,6 +132,8 @@ class PageTemplate implements InterfacePage
             ]);
           }
         }
+
+        $isExistsFileMetadata = true;
       }
 
       $themeVariables['TEMPLATE_PROPERTIES'] = 'Changing properties is only available for installed themes.';
