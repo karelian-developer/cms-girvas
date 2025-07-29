@@ -32,7 +32,7 @@
     <div class="footer-top__right">
       <a class="footer-top__logo-link display-block" href="/" title="CMS GIRVAS">
         <picture>
-          <img src="{SITE_TEMPLATE_URL}/{PROP:IMAGE_FOOTER_LOGOTYPE_URL}" alt="{PROP:IMAGE_FOOTER_LOGOTYPE_ALT}">
+          <img src="{PROP:IMAGE_FOOTER_LOGOTYPE_URL}" alt="{PROP:IMAGE_FOOTER_LOGOTYPE_ALT}">
         </picture>
       </a>
     </div>

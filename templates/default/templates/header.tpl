@@ -2,7 +2,7 @@
   <div class="header__container container">
     <div class="header__logo-block">
       <a class="header__logo-link display-block" href="/" title="{CMS_TITLE}">
-        <img src="{SITE_TEMPLATE_URL}/{PROP:IMAGE_HEADER_LOGOTYPE_URL}" alt="{PROP:IMAGE_HEADER_LOGOTYPE_ALT}">
+        <img src="{PROP:IMAGE_HEADER_LOGOTYPE_URL}" alt="{PROP:IMAGE_HEADER_LOGOTYPE_ALT}">
       </a>
     </div>
     <nav class="header__nav"> 
