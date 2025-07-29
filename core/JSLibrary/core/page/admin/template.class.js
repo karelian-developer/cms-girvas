@@ -161,7 +161,7 @@ export class PageTemplate {
           });
         });
 
-        if (searchParams.getPathPart(2) !== 'repository' && searchParams.getPathPart(3) === null) {
+        if (templateInstalledStatus === 'installed') {
           const themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
 
           buttons.saveProperties = new Interactive('button');
@@ -193,11 +193,8 @@ export class PageTemplate {
 
           buttons.saveProperties.assembly();
 
-          if (templateInstalledStatus === 'installed') {
-            console.log('test');
-            buttons.saveProperties.target.element.style.display = templateInstalledStatus === 'installed' ? 'flex' : 'none';
-            themePropertiesContainerElement.after(buttons.saveProperties.target.element);
-          }
+          buttons.saveProperties.target.element.style.display = templateInstalledStatus === 'installed' ? 'flex' : 'none';
+          themePropertiesContainerElement.after(buttons.saveProperties.target.element);
         }
 
         buttons.delete.assembly();
