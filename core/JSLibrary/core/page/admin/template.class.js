@@ -165,6 +165,16 @@ export class PageTemplate {
           const themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
           const propertiesFilesValues = themePropertiesContainerElement.querySelectorAll('input[type="file"]');
           propertiesFilesValues.forEach((property) => {
+            let buttonTrigger = new Interactive('button');
+            buttonTrigger.target.setLabel(localeData.BUTTON_DOWNLOAD_LABEL);
+            buttonTrigger.target.setCallback(() => {
+              property.click();
+            });
+
+            buttonTrigger.assembly();
+
+            property.after(buttonTrigger.target.element);
+
             property.addEventListener('change', (event) => {
               event.preventDefault();
 

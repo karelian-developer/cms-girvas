@@ -273,3 +273,55 @@
 .page.page_template .template__metadata-item:not(:last-child) {
   margin-bottom: 10px;
 }
+
+.page.page_template .template__properties > .item {
+  display: flex;
+  flex-direction: column;
+}
+
+.page.page_template .template__properties > .item .label {
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--common-main-color-4);
+  margin-bottom: 5px;
+}
+
+.page.page_template .template__properties > .item .input[type="text"] {
+  box-sizing: border-box;
+  font-size: 14px;
+  border-width: 1px;
+  border-style: solid;
+  outline: 0;
+  padding: 10px;
+  transition: background-color .2s, border-color .2s;
+}
+
+.page.page_template .template__properties > .item .input[type="text"]:hover {
+  background-color: var(--form-input-background-color--hover);
+  border-color: var(--form-input-border-color--hover);
+}
+
+.page.page_template .template__properties > .item .input[type="text"]:focus {
+  background-color: var(--form-input-background-color--focus);
+  border-color: var(--form-input-border-color--focus);
+}
+
+.page.page_template .template__properties > .item .input[type="text"]:active {
+  background-color: var(--form-input-background-color--active);
+  border-color: var(--form-input-border-color--active);
+}
+
+.page.page_template .template__properties > .item .input[type="text"]:disabled {
+  background-color: var(--common-main-color-2);
+}
+
+.page.page_template .template__properties > .item .file-path {
+  box-sizing: border-box;
+  background-color: var(--common-main-color-2);
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--common-main-color-3);
+  margin-bottom: 5px;
+}
