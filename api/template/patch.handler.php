@@ -39,17 +39,7 @@ if ($CMSCore->client->isLogged(2)) {
 
           if (preg_match('/^theme_property_/', $name) && isset($propertiesData[$propertyName])) {
             if ($propertiesData[$propertyName]['type'] === 'file') {
-              $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
-              $fileConverter = new FileConverter($CMSCore);
-              $fileConverted = $fileConverter->convert(
-                $data,
-                $fileDirectoryPath,
-                FileConverterEnumFileFormat::WEBP, true
-              );
-              
-              if (is_array($fileConverted)) {
-                $propertiesData[$propertyName]['value'] = '/uploads/media/' . $fileConverted['fileName'];
-              }
+              $propertiesData[$propertyName]['value'] = 'FILE';
             } else {
               $propertiesData[$propertyName]['value'] = $data;
             }
