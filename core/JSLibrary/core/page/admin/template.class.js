@@ -166,22 +166,22 @@ export class PageTemplate {
           buttons.saveProperties.target.setLabel(localeData.BUTTON_SAVE_LABEL);
           buttons.saveProperties.target.setCallback(() => {
             if (themePropertiesContainerElement !== null && !buttons.saveProperties.target.isDisabled()) {
-              const formData = new FormData();
+              let formData = new FormData();
 
               formData.append('template_name', templateName);
               formData.append('template_category', 'base');
 
-              const propertiesValues = themePropertiesContainerElement.querySelectorAll('input, select');
+              let propertiesValues = themePropertiesContainerElement.querySelectorAll('input, select');
               propertiesValues.forEach((property) => {
                 if (!property.hasAttribute('disabled')) {
-                  const propertyName = property.name;
-                  const propertyValue = (!property.hasAttribute('data-file')) ? property.value : property.getAttribute('data-file');
+                  let propertyName = property.name;
+                  let propertyValue = (!property.hasAttribute('data-file')) ? property.value : property.getAttribute('data-file');
 
                   formData.append(propertyName, propertyValue);
                 }
               });
 
-              const request = new Interactive('request', {
+              let request = new Interactive('request', {
                 method: 'PATCH',
                 url: '/handler/template?localeMessage=' + window.CMSCore.locales.admin.name
               });
@@ -192,8 +192,8 @@ export class PageTemplate {
             }
           });
 
-          const themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
-          const propertiesFilesValues = themePropertiesContainerElement.querySelectorAll('input[type="file"]');
+          let themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
+          let propertiesFilesValues = themePropertiesContainerElement.querySelectorAll('input[type="file"]');
           propertiesFilesValues.forEach((property) => {
             let buttonTrigger = new Interactive('button');
             buttonTrigger.target.setLabel(localeData.BUTTON_DOWNLOAD_LABEL);
@@ -207,7 +207,7 @@ export class PageTemplate {
 
             property.addEventListener('change', (event) => {
               buttons.saveProperties.target.disable();
-              
+
               event.preventDefault();
 
               property.setAttribute('disabled', 'disabled');
