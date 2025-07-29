@@ -184,6 +184,7 @@ export class PageTemplate {
 
               fileReader.onload = (event) => {
                 property.removeAttribute('disabled');
+                property.setAttribute('data-file', fileReader.result);
               };
 
               fileReader.onerror = (event) => {
@@ -207,7 +208,7 @@ export class PageTemplate {
               propertiesValues.forEach((property) => {
                 if (!property.hasAttribute('disabled')) {
                   const propertyName = property.name;
-                  const propertyValue = property.value;
+                  const propertyValue = (!property.hasAttribute('data-file')) ? property.value : property.getAttribute('data-file');
 
                   formData.append(propertyName, propertyValue);
                 }
