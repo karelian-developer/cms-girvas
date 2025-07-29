@@ -195,8 +195,6 @@ export class PageTemplate {
           const themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
           const propertiesFilesValues = themePropertiesContainerElement.querySelectorAll('input[type="file"]');
           propertiesFilesValues.forEach((property) => {
-            buttons.saveProperties.target.disable();
-
             let buttonTrigger = new Interactive('button');
             buttonTrigger.target.setLabel(localeData.BUTTON_DOWNLOAD_LABEL);
             buttonTrigger.target.setCallback(() => {
@@ -208,6 +206,8 @@ export class PageTemplate {
             property.after(buttonTrigger.target.element);
 
             property.addEventListener('change', (event) => {
+              buttons.saveProperties.target.disable();
+              
               event.preventDefault();
 
               property.setAttribute('disabled', 'disabled');
