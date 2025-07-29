@@ -43,7 +43,7 @@ if ($CMSCore->client->isLogged(2)) {
                 preg_match('/data:(\w+)\/([\w.]+);base64,/', $data, $matches);
                 $fileExtension = $matches[2];
 
-                $enumFileFormat = match ($convertTo) {
+                $enumFileFormat = match ($fileExtension) {
                   'jpeg' => FileConverterEnumFileFormat::JPG,
                   'png' => FileConverterEnumFileFormat::PNG,
                   'webp' => FileConverterEnumFileFormat::WEBP,
