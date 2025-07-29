@@ -216,6 +216,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
 
     $clientIP = Client::getRealIPAddress();
 
+    $externalIP = @file_get_contents('https://api.ipify.org');
+    if ($externalIP === false) {
+      $externalIP = $_SERVER['SERVER_ADDR'];
+    }
+
     $CMSCore->databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
     $CMSCore->client = new Client($CMSCore);
 
