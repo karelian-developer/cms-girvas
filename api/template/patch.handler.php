@@ -40,12 +40,23 @@ if ($CMSCore->client->isLogged(2)) {
           if (preg_match('/^theme_property_/', $name) && isset($propertiesData[$propertyName])) {
             if (!empty($data)) {
               if ($propertiesData[$propertyName]['type'] === 'file') {
+                preg_match('/data:(\w+)\/([\w.]+);base64,/', $data, $matches);
+                $fileExtension = $matches[2];
+
+                $enumFileFormat = match ($convertTo) {
+                  'jpeg' => FileConverterEnumFileFormat::JPG,
+                  'png' => FileConverterEnumFileFormat::PNG,
+                  'webp' => FileConverterEnumFileFormat::WEBP,
+                  'avif' => FileConverterEnumFileFormat::AVIF
+                };
+
                 $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
                 $fileConverter = new FileConverter($CMSCore);
                 $fileConverted = $fileConverter->convert(
                   $data,
                   $fileDirectoryPath,
-                  FileConverterEnumFileFormat::WEBP, true
+                  $enumFileFormat,
+                  true
                 );
                 
                 if (is_array($fileConverted)) {
