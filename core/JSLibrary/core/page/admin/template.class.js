@@ -58,7 +58,7 @@ export class PageTemplate {
 
   init() {
     let searchParams = new URLParser(), locales;
-    let buttons = {install: null, download: null, delete: null};
+    let buttons = {install: null, download: null, delete: null, saveProperties: null};
 
     let templateBlock = document.querySelector('.template');
     let templateName = templateBlock.getAttribute('data-template-name');
