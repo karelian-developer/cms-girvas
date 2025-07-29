@@ -209,6 +209,36 @@ export class PageTemplate {
             });
           });
 
+          buttons.saveProperties = new Interactive('button');
+          buttons.saveProperties.target.setLabel(localeData.BUTTON_SAVE_LABEL);
+          buttons.saveProperties.target.setCallback(() => {
+            if (themePropertiesContainerElement !== null && !buttons.saveProperties.target.isDisabled()) {
+              const formData = new FormData();
+
+              formData.append('template_name', templateName);
+              formData.append('template_category', 'base');
+
+              const propertiesValues = themePropertiesContainerElement.querySelectorAll('input, select');
+              propertiesValues.forEach((property) => {
+                if (!property.hasAttribute('disabled')) {
+                  const propertyName = property.name;
+                  const propertyValue = (!property.hasAttribute('data-file')) ? property.value : property.getAttribute('data-file');
+
+                  formData.append(propertyName, propertyValue);
+                }
+              });
+
+              const request = new Interactive('request', {
+                method: 'PATCH',
+                url: '/handler/template?localeMessage=' + window.CMSCore.locales.admin.name
+              });
+
+              request.target.data = formData;
+
+              request.target.send();
+            }
+          });
+
           buttons.saveProperties.assembly();
 
           buttons.saveProperties.target.element.style.display = templateInstalledStatus === 'installed' ? 'flex' : 'none';
