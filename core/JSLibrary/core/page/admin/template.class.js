@@ -194,6 +194,7 @@ export class PageTemplate {
           buttons.saveProperties.assembly();
 
           if (templateInstalledStatus === 'installed') {
+            console.log('test');
             buttons.saveProperties.target.element.style.display = templateInstalledStatus === 'installed' ? 'flex' : 'none';
             themePropertiesContainerElement.after(buttons.saveProperties.target.element);
           }
