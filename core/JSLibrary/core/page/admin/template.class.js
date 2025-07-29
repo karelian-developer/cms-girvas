@@ -193,7 +193,8 @@ export class PageTemplate {
 
           buttons.saveProperties.assembly();
 
-          if (themePropertiesContainerElement !== null) {
+          if (templateInstalledStatus === 'installed') {
+            buttons.saveProperties.target.element.style.display = templateInstalledStatus === 'installed' ? 'flex' : 'none';
             themePropertiesContainerElement.after(buttons.saveProperties.target.element);
           }
         }
@@ -206,10 +207,6 @@ export class PageTemplate {
           buttons.download.target.element.style.display = 'none';
           buttons.delete.target.element.style.display = 'none';
           buttons.install.target.element.style.display = 'none';
-
-          if (buttons.hasOwnProperty('saveProperties')) {
-            buttons.saveProperties.target.element.style.display = 'flex';
-          }
         } else {
           buttons.download.target.element.style.display = templateDownloadedStatus === 'downloaded' ? 'none' : 'flex';
           buttons.delete.target.element.style.display = templateDownloadedStatus === 'downloaded' ? 'flex' : 'none';
