@@ -35,7 +35,7 @@ if ($CMSCore->client->isLogged(2)) {
           $propertyName = strtr($name, ['theme_property_' => '']);
           $propertyName = strtoupper($propertyName);
 
-          if (preg_match('^theme_property_', $name) && isset($propertiesData[$propertyName])) {
+          if (preg_match('/^theme_property_/', $name) && isset($propertiesData[$propertyName])) {
             $propertiesData[$propertyName] = $data;
           }
         }
