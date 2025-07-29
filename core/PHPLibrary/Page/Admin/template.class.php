@@ -157,8 +157,8 @@ class PageTemplate implements InterfacePage
                   ? $data['locale']['title'][$localeName]
                   : 'Property anonymouse';
 
-                $inputElement = $document->createElement('div', $inputLabel);
-                $inputElement->setAttribute('class', 'item__label label');
+                $labelElement = $document->createElement('div', $inputLabel);
+                $labelElement->setAttribute('class', 'item__label label');
 
                 $inputName = 'theme_property_' . strtolower($name);
                 $inputElement = $document->createElement('input');
@@ -167,7 +167,7 @@ class PageTemplate implements InterfacePage
                 $inputElement->setAttribute('class', 'item__input input input_text');
                 $inputElement->setAttribute('value', $data['value']);
 
-                $propertyContainerElement->appendChild($inputLabel);
+                $propertyContainerElement->appendChild($labelElement);
                 $propertyContainerElement->appendChild($inputElement);
               }
 
@@ -178,8 +178,8 @@ class PageTemplate implements InterfacePage
                   ? $data['locale']['title'][$localeName]
                   : 'Property anonymouse';
 
-                $inputElement = $document->createElement('div', $inputLabel);
-                $inputElement->setAttribute('class', 'item__label label');
+                $labelElement = $document->createElement('div', $inputLabel);
+                $labelElement->setAttribute('class', 'item__label label');
 
                 $inputName = 'theme_property_' . strtolower($name);
                 $inputElement = $document->createElement('input');
@@ -188,7 +188,7 @@ class PageTemplate implements InterfacePage
                 $inputElement->setAttribute('class', 'item__input input input_text');
                 $inputElement->setAttribute('value', $data['value']);
 
-                $propertyContainerElement->appendChild($inputLabel);
+                $propertyContainerElement->appendChild($labelElement);
                 $propertyContainerElement->appendChild($inputElement);
               }
 
@@ -199,8 +199,8 @@ class PageTemplate implements InterfacePage
                   ? $data['locale']['title'][$localeName]
                   : 'Property anonymouse';
 
-                $inputElement = $document->createElement('div', $inputLabel);
-                $inputElement->setAttribute('class', 'item__label label');
+                $labelElement = $document->createElement('div', $inputLabel);
+                $labelElement->setAttribute('class', 'item__label label');
 
                 $filePathElement = $document->createElement('div', $data['value']);
                 $filePathElement->setAttribute('class', 'item__file-path file-path');
@@ -212,7 +212,7 @@ class PageTemplate implements InterfacePage
                 $inputElement->setAttribute('class', 'item__input input input_file');
                 $inputElement->setAttribute('value', $data['value']);
 
-                $propertyContainerElement->appendChild($inputLabel);
+                $propertyContainerElement->appendChild($labelElement);
                 $propertyContainerElement->appendChild($filePathElement);
                 $propertyContainerElement->appendChild($inputElement);
               }
