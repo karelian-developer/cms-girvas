@@ -22,6 +22,7 @@ final class Collector
   private const TEMPLATE_TAG_PATTERN = '/\{([a-zA-Z0-9_]+)\}/';
   private const TEMPLATE_TAG_LANG_PATTERN = '/\{LANG\:([a-zA-Z0-9_]+)\}/';
   private const TEMPLATE_TAG_LANG_MARKDOWN_PATTERN = '/\{LANG\:MD\:([a-zA-Z0-9_]+)\}/';
+  private const TEMPLATE_TAG_PROPERTY_PATTERN = '/\{PROP\:([a-zA-Z0-9_]+)\}/';
   private const TEMPLATE_LOGIC_IF_PATTERN = '/\{\?IF\:([a-zA-Z0-9_]+)([=<>!]+)([a-zA-Z0-9_]+)\?\}(.*)\{\?ENDIF\?\}/is';
   private const TEMPLATE_LOGIC_IF_ELSE_PATTERN = '/\{\?IF\:([a-zA-Z0-9_]+)([=<>!]+)([a-zA-Z0-9_]+)\?\}(.*){\?ELSE\?\}(.*)\{\?ENDIF\?\}/is';
   private Theme $theme;
@@ -172,6 +173,29 @@ final class Collector
             $fileMarkdownContent = file_get_contents($fileMarkdownPath);
             $themeTransformed = strtr($themeTransformed, ["{LANG:MD:{$name}}" => $parsedown->text($fileMarkdownContent)]);
           }
+        }
+      }
+    }
+
+    return $themeTransformed;
+  }
+
+  /**
+   * Сборка шаблона на основе значений свойств темы
+   * 
+   * @param string $themeString
+   * @param array $propertiesData
+   * 
+   * @return string
+   */
+  public static function assemblyPropertiesValues(string $themeString, array $propertiesData) : string
+  {
+    $themeTransformed = $themeString;
+
+    if (!empty($propertiesData)) {
+      foreach ($propertiesData as $name => $value) {
+        if (preg_match(self::TEMPLATE_TAG_PROPERTY_PATTERN, $themeTransformed)) {
+          $themeTransformed = strtr($themeTransformed, ["{PROP:{$name}}" => $value]);
         }
       }
     }

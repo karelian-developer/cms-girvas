@@ -684,6 +684,9 @@ final class Template
       // Внедрение значений глобальных шаблонных переменных
       $this->core->assembled = ThemeCollector::assembly($this->core->assembled, $themeVariablesArray);
 
+      // Внедрение значений свойств темы
+      $this->core->assembled = ThemeCollector::assemblyPropertiesValues($this->core->assembled, $this->getFilePropertiesData());
+
       // Сборка локализации по общим данным (глобальные языковые переменные)
       $this->core->assembled = ThemeCollector::assemblyLocale($this->core->assembled, $this->CMSCore->locale);
 
@@ -937,5 +940,40 @@ final class Template
   public function existsFileReadmeMD() : bool
   {
     return file_exists($this->getFileReadmeMDPath());
+  }
+
+  /**
+   * Получить абсолютный путь файла со свойствами темы
+   * 
+   * @return string
+   */
+  public function getFilePropertiesPath() : string
+  {
+    return $this->getPath() . '/properties.json';
+  }
+
+  /**
+   * Получить статус наличия файла со свойствами темы
+   * 
+   * @return bool
+   */
+  public function existsFileProperties() : bool
+  {
+    return file_exists($this->getFilePropertiesPath());
+  }
+
+  /**
+   * Получить данные свойств темы из файла
+   * 
+   * @return array
+   */
+  public function getFilePropertiesData() : array
+  {
+    $fileData = ($this->existsFileProperties())
+      ? file_get_contents($this->getFilePropertiesPath())
+      : '{}';
+    $dataJSON = json_decode($fileData, true);
+
+    return $dataJSON !== null ? $dataJSON : [];
   }
 }

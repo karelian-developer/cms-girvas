@@ -16,6 +16,7 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Factories\LocaleFactory as CMSLocaleFactory;
 use \core\PHPLibrary\SystemCore\Configurator as CMSConfigurator;
 use \core\PHPLibrary\SystemCore\ConfiguratorInterface as CMSConfiguratorInterface;
 use \core\PHPLibrary\SystemCore\Header as CMSHeader;
@@ -49,8 +50,8 @@ final class SystemCore implements CoreInterface
   public const CMS_CORE_JS_LIBRARY_PATH = 'core/JSLibrary';
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
-  public const CMS_TITLE = 'CMS GIRVAS';
-  public const CMS_VERSION = '0.2.4.2';
+  public const CMS_TITLE = 'CMS «GIRVAS»';
+  public const CMS_VERSION = '0.2.4.3';
   public const CMS_STAGE_DEVELOPING = 'voitsy';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -67,9 +68,9 @@ final class SystemCore implements CoreInterface
    */
   public ?CMSDatabaseConnector $databaseConnector = null;
   /** 
-   * @var CMSLocale Класс локализации ядра 
+   * @var LocaleInterface Класс локализации ядра 
    */
-  public ?CMSLocale $locale = null;
+  public ?LocaleInterface $locale = null;
   /**
    * @var URLParser Класс парсера адресной строки 
    */
@@ -82,6 +83,8 @@ final class SystemCore implements CoreInterface
    * @var Theme Класс шаблона системы 
    */
   public ?Theme $theme = null;
+
+  private CMSLocaleFactory $CMSLocaleFactory;
 
   /**
    *  @var array Массив активированных модулей
@@ -146,9 +149,9 @@ final class SystemCore implements CoreInterface
    * 
    * @param string $localeType
    * 
-   * @return CMSLocale
+   * @return LocaleInterface
    */
-  public function getCMSLocale(string $localeType = 'base') : CMSLocale
+  public function getCMSLocale(string $localeType = 'base') : LocaleInterface
   {
     $CMSConfigurator = $this->configurator;
 

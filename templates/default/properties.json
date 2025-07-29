@@ -1,0 +1,5 @@
+{
+  "COLOR_SCHEME": "default",
+  "IMAGE_HEADER_LOGOTYPE_URL": "{SITE_TEMPLATE_URL}/images/header-logo.png",
+  "IMAGE_HEADER_LOGOTYPE_ALT": "{CMS_TITLE}"
+}
