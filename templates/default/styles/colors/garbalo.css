@@ -1,0 +1,47 @@
+/**
+ * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
+ * @copyright   Copyright (c) 2021 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ */
+
+:root {
+    --primary-color-1: #160000;
+    --primary-color-2: #320000;
+    --primary-color-2--opacity-0-8: rgba(35, 35, 35, .8);
+    --primary-color-2--opacity-0-4: rgba(35, 35, 35, .4);
+    --primary-color-3: #e7d8d8;
+    --primary-color-4: #FFFFFF;
+    --primary-color-5: #6f5d5d;
+    --common-secondary-color-1: #EEF7FF;
+    --common-secondary-color-2: #C4E4FF;
+    --common-secondary-color-3: #285E8E;
+    --common-secondary-color-4: #FFEEEE;
+    --common-secondary-color-5: #FFC4C4;
+    --common-secondary-color-6: #932929;
+    --common-secondary-color-7: #F0FFEE;
+    --common-secondary-color-8: #C6FFC4;
+    --common-secondary-color-9: #2B9432;
+    --bcg-body-color: #CACACA;
+    --container-and-text-white-color:#FFF;
+    --dark-gray-color: #220000;
+    --grey-color: #480000;
+    --sidebar-bcg-color: #F1F1F1;
+    --sidebat-bcg2-color: #353535;
+    --footer-black-color: #000;
+    --comments-color-bcg1: #F9F9F9;
+    --comments-color-bcg2: #F5F5F5;
+    --light-gray-color: #A0A0A0;
+    --light-blue-color: #3A9FD8;
+    --blue-color: #1D74A5;
+    --dark-blue-color: #00446A;
+    --red-color: #E15C5C;
+    --light2-gray-color: #EAEAEA;
+    --brown-color: #A67676;
+    --bright-red-color: #FF0000;
+    --dark-green-color: #76A67B;
+    --green-color: #00FF47;
+    --grey-color2: #818181;
+}
+
