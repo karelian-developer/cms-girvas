@@ -274,6 +274,10 @@
   margin-bottom: 10px;
 }
 
+.page.page_template .template__properties {
+  margin-bottom: 20px;
+}
+
 .page.page_template .template__properties > .item {
   display: flex;
   flex-direction: column;
@@ -327,7 +331,6 @@
 .page.page_template .template__properties > .item .file-path {
   box-sizing: border-box;
   background-color: var(--common-main-color-2);
-  text-transform: uppercase;
   font-size: 14px;
   color: var(--common-main-color-3);
   padding: 5px 10px;
@@ -336,4 +339,8 @@
 
 .page.page_template .template__properties > .item .interactive {
   align-self: flex-end;
+}
+
+.page.page_template .template__properties .template__properties-container > .interactive {
+  justify-self: end;
 }

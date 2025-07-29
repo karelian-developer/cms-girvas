@@ -165,6 +165,8 @@ export class PageTemplate {
           const themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
           const propertiesFilesValues = themePropertiesContainerElement.querySelectorAll('input[type="file"]');
           propertiesFilesValues.forEach((property) => {
+            buttons.saveProperties.target.disable();
+
             let buttonTrigger = new Interactive('button');
             buttonTrigger.target.setLabel(localeData.BUTTON_DOWNLOAD_LABEL);
             buttonTrigger.target.setCallback(() => {
@@ -193,48 +195,18 @@ export class PageTemplate {
               }
 
               fileReader.onload = (event) => {
+                buttons.saveProperties.target.enable();
                 property.removeAttribute('disabled');
                 property.setAttribute('data-file', fileReader.result);
               };
 
               fileReader.onerror = (event) => {
+                buttons.saveProperties.target.enable();
                 console.error(fileReader.result);
               };
 
               fileReader.readAsDataURL(file);
             });
-          });
-
-          buttons.saveProperties = new Interactive('button');
-          buttons.saveProperties.target.setLabel(localeData.BUTTON_SAVE_LABEL);
-          buttons.saveProperties.target.setCallback(() => {
-            if (themePropertiesContainerElement !== null) {
-              const formData = new FormData();
-
-              formData.append('template_name', templateName);
-              formData.append('template_category', 'base');
-
-              const propertiesValues = themePropertiesContainerElement.querySelectorAll('input, select');
-              propertiesValues.forEach((property) => {
-                if (!property.hasAttribute('disabled')) {
-                  const propertyName = property.name;
-                  const propertyValue = (!property.hasAttribute('data-file')) ? property.value : property.getAttribute('data-file');
-
-                  formData.append(propertyName, propertyValue);
-                }
-              });
-
-              const request = new Interactive('request', {
-                method: 'PATCH',
-                url: '/handler/template?localeMessage=' + window.CMSCore.locales.admin.name
-              });
-
-              request.target.data = formData;
-
-              request.target.send().then((data) => {
-                console.log(data);
-              });
-            }
           });
 
           buttons.saveProperties.assembly();

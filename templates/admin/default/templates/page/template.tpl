@@ -32,7 +32,7 @@
           <h2 class="template__description-label description-label">{LANG:PAGE_TEMPLATE_DESCRIPTION_TITLE}</h2>
           <div class="template__description description">{TEMPLATE_DESCRIPTION}</div>
         </div>
-        <div class="template__properties-containe properties-container" data-role="theme-properties-editor">
+        <div class="template__properties-container properties-container" data-role="theme-properties-editor">
           <h2 class="template__properties-label properties-label">{LANG:PAGE_TEMPLATE_PROPERTIES_TITLE}</h2>
           <div id="THEME_PROPERTIES" class="template__properties properties">{TEMPLATE_PROPERTIES}</div>
         </div>
