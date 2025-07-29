@@ -56,7 +56,8 @@ if ($CMSCore->client->isLogged(2)) {
                   $data,
                   $fileDirectoryPath,
                   $enumFileFormat,
-                  true
+                  true,
+                  $name
                 );
                 
                 if (is_array($fileConverted)) {
