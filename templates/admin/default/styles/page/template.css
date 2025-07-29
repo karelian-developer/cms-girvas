@@ -279,12 +279,20 @@
   flex-direction: column;
 }
 
+.page.page_template .template__properties > .item:not(:last-child) {
+  margin-bottom: 10px;
+}
+
 .page.page_template .template__properties > .item .label {
   text-transform: uppercase;
   font-weight: 700;
   font-size: 14px;
   color: var(--common-main-color-4);
   margin-bottom: 5px;
+}
+
+.page.page_template .template__properties > .item .input[type="file"] {
+  display: none;
 }
 
 .page.page_template .template__properties > .item .input[type="text"] {
@@ -320,8 +328,12 @@
   box-sizing: border-box;
   background-color: var(--common-main-color-2);
   text-transform: uppercase;
-  font-weight: 700;
   font-size: 14px;
   color: var(--common-main-color-3);
+  padding: 5px 10px;
   margin-bottom: 5px;
+}
+
+.page.page_template .template__properties > .item .interactive {
+  align-self: flex-end;
 }
