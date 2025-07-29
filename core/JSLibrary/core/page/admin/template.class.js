@@ -193,7 +193,9 @@ export class PageTemplate {
 
           buttons.saveProperties.assembly();
 
-          themePropertiesContainerElement.append(buttons.saveProperties.target.element);
+          if (themePropertiesContainerElement !== null) {
+            themePropertiesContainerElement.append(buttons.saveProperties.target.element);
+          }
         }
 
         buttons.delete.assembly();
