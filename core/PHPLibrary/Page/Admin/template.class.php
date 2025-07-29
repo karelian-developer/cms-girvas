@@ -218,13 +218,14 @@ class PageTemplate implements InterfacePage
               }
 
               $document->appendChild($propertyContainerElement);
-              $propertiesElements[] = $document->saveHTML();
             }
           }
+
+          $propertiesElements = $document->saveHTML();
         }
 
-        $themeVariables['TEMPLATE_PROPERTIES'] = !empty($properties)
-          ? implode('', $propertiesElements)
+        $themeVariables['TEMPLATE_PROPERTIES'] = isset($propertiesElements)
+          ? $propertiesElements
           : 'Properties.json is not exists.';
       }
 
