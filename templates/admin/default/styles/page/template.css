@@ -101,7 +101,8 @@
 }
 
 .page.page_template .template__metadata-label,
-.page.page_template .template__description-label {
+.page.page_template .template__description-label,
+.page.page_template .template__properties-label {
   background-color: var(--common-main-color-2);
   font-size: 14px;
   text-transform: uppercase;
@@ -110,11 +111,9 @@
   margin-bottom: 10px;
 }
 
-.page.page_template .template__metadata-label {
-  color: var(--common-main-color-4);
-}
-
-.page.page_template .template__description-label {
+.page.page_template .template__metadata-label,
+.page.page_template .template__description-label,
+.page.page_template .template__properties-label {
   color: var(--common-main-color-4);
 }
 
