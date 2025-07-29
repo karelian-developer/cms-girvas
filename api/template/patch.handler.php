@@ -42,7 +42,7 @@ if ($CMSCore->client->isLogged(2)) {
               $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
               $fileConverter = new FileConverter($CMSCore);
               $fileConverted = $fileConverter->convert(
-                $propertiesData[$propertyName]['value'],
+                $data,
                 $fileDirectoryPath,
                 FileConverterEnumFileFormat::WEBP, true
               );
