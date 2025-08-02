@@ -77,64 +77,71 @@ class PageModules implements InterfacePage
     $localeName = $this->CMSCore->locale->getName();
 
     $parsedown = new Parsedown();
-
     $subpageName =  $this->CMSCore->urlp->getPath(2) ?? 'local';
+
     if (isset($this->navigationSubsections[$subpageName])) {
       $this->navigationSubsections[$subpageName]['isActive'] = true;
     }
 
-    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
-    $paginationItemsOnPage = 12;
+    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null
+      ? (int) $this->CMSCore->urlp->getParam('pageNumber')
+      : 0;
 
+    $paginationItemsOnPage = 12;
     $modulesCount = 0;
 
-    if ($this->CMSCore->urlp->getPath(2) === 'repository') {
-      
-      if ($this->CMSCore->urlp->getPath(3) !== null) {
-        $ch = curl_init('https://repository.cms-girvas.ru/modules');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        $CURLExucuteResult = json_decode(curl_exec($ch), true);
-        curl_close($ch);
+    if (
+      $this->CMSCore->urlp->getPath(2) === 'repository'
+      && $this->CMSCore->urlp->getPath(3) === null
+    ) {
+      $ch = curl_init('https://repository.cms-girvas.ru/modules');
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+      $CURLExucuteResult = json_decode(curl_exec($ch), true);
+      curl_close($ch);
 
-        if (isset($CURLExucuteResult['outputData'])) {
-          $modulesListItemsTransformed = [];
+      if (isset($CURLExucuteResult['outputData'])) {
+        $modulesListItemsTransformed = [];
 
-          if (count($CURLExucuteResult['outputData']) > 0) {
-            $modulesCount = count($CURLExucuteResult['outputData']);
-            $CURLExucuteResult['outputData'] = array_slice($CURLExucuteResult['outputData'], $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
+        if (count($CURLExucuteResult['outputData']) > 0) {
+          $modulesCount = count($CURLExucuteResult['outputData']);
+          $CURLExucuteResult['outputData'] = array_slice($CURLExucuteResult['outputData'], $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
 
-            foreach ($CURLExucuteResult['outputData'] as $name => $data) {
-              $module = new Module($this->CMSCore, $name);
-              $moduleInstalledStatus = $module->existsFileMetadataJSON() ? 'installed' : 'not-installed';
-              $moduleEnabledStatus = $module->isEnabled() ? 'enabled' : 'disabled';
+          foreach ($CURLExucuteResult['outputData'] as $name => $data) {
+            $module = new Module($this->CMSCore, $name);
+            $moduleInstalledStatus = $module->existsFileMetadataJSON() ? 'installed' : 'not-installed';
+            $moduleEnabledStatus = $module->isEnabled() ? 'enabled' : 'disabled';
 
-              $metadataTitle = isset($data['metadata']['title']) ? $data['metadata']['title'] : 'Anonymous Module';
-              $metadataDescription = isset($data['metadata']['description']) ? $data['metadata']['description'] : 'Without description.';
-              $metadataDatetimeCreatedUnix = isset($data['metadata']['datetimeCreatedUnix']) ? $data['metadata']['datetimeCreatedUnix'] : 0;
-              $metadataAuthorName = isset($data['metadata']['authorName']) ? $data['metadata']['authorName'] : 'Anonymous';
-              $metadataCategoryName = isset($data['metadata']['categoryName']) ? $data['metadata']['categoryName'] : 'default';
+            $metadataTitle = isset($data['metadata']['title']) ? $data['metadata']['title'] : 'Anonymous Module';
+            $metadataDescription = isset($data['metadata']['description']) ? $data['metadata']['description'] : 'Without description.';
+            $metadataDatetimeCreatedUnix = isset($data['metadata']['datetimeCreatedUnix']) ? $data['metadata']['datetimeCreatedUnix'] : 0;
+            $metadataAuthorName = isset($data['metadata']['authorName']) ? $data['metadata']['authorName'] : 'Anonymous';
+            $metadataCategoryName = isset($data['metadata']['categoryName']) ? $data['metadata']['categoryName'] : 'default';
 
-              array_push($modulesListItemsTransformed, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/modules/listItem.tpl', [
+            $modulesListItemsTransformed[] = ThemeCollector::assemblyFileContent(
+              $this->CMSCore->theme,
+              'templates/page/modules/listItem.tpl',
+              [
                 'MODULE_NAME' => $name,
                 'MODULE_TITLE' => $metadataTitle,
                 'MODULE_DESCRIPTION' => $parsedown->text($metadataDescription),
                 'MODULE_CREATED_TIMESTAMP' => date('d.m.Y', $metadataDatetimeCreatedUnix),
                 'MODULE_AUTHOR_NAME' => $metadataAuthorName,
-                'MODULE_LINK' => sprintf('/admin/modules/repository/%s', $module->getName()),
+                'MODULE_LINK' => '/admin/modules/repository/' . $module->getName(),
                 'MODULE_PREVIEW_URL' => $data['preview'],
                 'MODULE_INSTALLED_STATUS' => $moduleInstalledStatus,
                 'MODULE_ENABLED_STATUS' => $moduleEnabledStatus,
                 'TEMPLATE_CATEGORY_NAME' => $metadataCategoryName
-              ]));
-            }
+              ]
+            );
           }
-        } else {
-          $modulesListItemsTransformed = [];
         }
+      } else {
+        $modulesListItemsTransformed = [];
       }
-
-    } elseif ($this->CMSCore->urlp->getPath(2) === 'local' || $this->CMSCore->urlp->getPath(2) === null) {
-
+    } elseif (
+      $this->CMSCore->urlp->getPath(2) === 'local'
+      || $this->CMSCore->urlp->getPath(2) === null
+    ) {
       $modulesListItemsTransformed = [];
       $uploadedModulesNames = $this->CMSCore->getArrayUploadedModulesNames();
       if (count($uploadedModulesNames) > 0) {
@@ -147,23 +154,26 @@ class PageModules implements InterfacePage
           $moduleEnabledStatus = $module->isEnabled() ? 'enabled' : 'disabled';
 
           if ($module->existsFileMetadataJSON()) {
-            array_push($modulesListItemsTransformed, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/modules/listItem.tpl', [
-              'MODULE_NAME' => $module->getName(),
-              'MODULE_TITLE' => $module->getTitle(),
-              'MODULE_DESCRIPTION' => $parsedown->text($module->getDescription()),
-              'MODULE_CREATED_TIMESTAMP' => date('d.m.Y', $module->getCoreCreatedUnixTimestamp()),
-              'MODULE_AUTHOR' => $module->getAuthorName(),
-              'MODULE_PREVIEW_URL' => $module->getPreviewURL(),
-              'MODULE_LINK' => '/admin/module/' . $module->getName(),
-              'MODULE_INSTALLED_STATUS' => $moduleInstalledStatus,
-              'MODULE_ENABLED_STATUS' => $moduleEnabledStatus
-            ]));
+            $modulesListItemsTransformed[] =  ThemeCollector::assemblyFileContent(
+              $this->CMSCore->theme,
+              'templates/page/modules/listItem.tpl',
+              [
+                'MODULE_NAME' => $module->getName(),
+                'MODULE_TITLE' => $module->getTitle(),
+                'MODULE_DESCRIPTION' => $parsedown->text($module->getDescription()),
+                'MODULE_CREATED_TIMESTAMP' => date('d.m.Y', $module->getCoreCreatedUnixTimestamp()),
+                'MODULE_AUTHOR' => $module->getAuthorName(),
+                'MODULE_PREVIEW_URL' => $module->getPreviewURL(),
+                'MODULE_LINK' => '/admin/module/' . $module->getName(),
+                'MODULE_INSTALLED_STATUS' => $moduleInstalledStatus,
+                'MODULE_ENABLED_STATUS' => $moduleEnabledStatus
+              ]
+            );
           }
 
           unset($module);
         }
       }
-
     }
 
     $pagination = new Pagination($this->CMSCore, $modulesCount, $paginationItemsOnPage, $paginationItemCurrent);
@@ -176,13 +186,17 @@ class PageModules implements InterfacePage
       $this->assembled = $modulePage->assembled;
     } else {
       /** @var string $assembled Содержимое шаблона страницы */
-      $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/modules.tpl', [
-        'PAGE_MODULES_PAGINATION' => $pagination->assembled,
-        'ADMIN_PANEL_PAGE_NAME' => 'modules',
-        'MODULES_LIST' => !empty($modulesListItemsTransformed) ? ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/modules/list.tpl', [
-          'MODULES_LIST_ITEMS' => implode($modulesListItemsTransformed)
-        ]) : sprintf('<p class="page__content-phar">%s</p>', $localeData['PAGE_MODULES_MODULES_INSTALLED_NOT_FOUND_TITLE'])
-      ]);
+      $this->assembled = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/modules.tpl',
+        [
+          'PAGE_MODULES_PAGINATION' => $pagination->assembled,
+          'ADMIN_PANEL_PAGE_NAME' => 'modules',
+          'MODULES_LIST' => !empty($modulesListItemsTransformed)? ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/modules/list.tpl', [
+            'MODULES_LIST_ITEMS' => implode($modulesListItemsTransformed)
+          ]) : sprintf('<p class="page__content-phar">%s</p>', $localeData['PAGE_MODULES_MODULES_INSTALLED_NOT_FOUND_TITLE'])
+        ]
+      );
     }
   }
 }
