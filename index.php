@@ -57,7 +57,7 @@ if ($CMSURLPathes[0] === 'handler') {
 
   $theme = $CMSCore->getTheme();
 
-  $manifest = new ThemeManifest($CMSCore->configurator, $theme);
+  $manifest = new ThemeManifest($CMSCore->configurator, $theme->core);
   foreach([256, 128, 96, 64, 48, 32, 16] as $faviconWidth) {
     $faviconSizesLabel = $faviconWidth . 'x' . $faviconWidth;
     $faviconURL = '/favicons/favicon-' . $faviconSizesLabel . '.png';

@@ -16,6 +16,7 @@ use \core\PHPLibrary\SystemCore\FileConnector as SystemCoreFileConnector;
 use \core\PHPLibrary\Template\EnumMetadata as ThemeEnumMetadata;
 use \core\PHPLibrary\Template\EnumWeight as ThemeEnumWeight;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \core\PHPLibrary\Template\Locale as ThemeLocale;
 use \DOMDocument as DOMDocument;
 
@@ -23,7 +24,7 @@ final class Template
 {
   public SystemCore $CMSCore;
   public ThemeLocale $locale;
-  public mixed $core;
+  public ThemeInterfaceCore $core;
   private string $path;
   private string $url;
   private string $name;
