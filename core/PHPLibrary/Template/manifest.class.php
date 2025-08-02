@@ -11,7 +11,7 @@
 namespace core\PHPLibrary\Template;
 
 use \core\PHPLibrary\SystemCore\ConfiguratorInterface as CMSConfiguratorInterface;
-use \core\PHPLibrary\TemplateInterface as ThemeInterface;
+use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \InvalidArgumentException as InvalidArgumentException;
 
 class Manifest
@@ -28,13 +28,13 @@ class Manifest
    * __construct
    * 
    * @param CMSConfiguratorInterface $CMSConfigurator;
-   * @param ThemeInterface $theme;
+   * @param ThemeInterfaceCore $theme;
    * 
    * @return void
    */
   public function __construct (
     private CMSConfiguratorInterface $CMSConfigurator,
-    private ThemeInterface $theme
+    private ThemeInterfaceCore $theme
   ) {
     $this->setName($CMSConfigurator->getSiteTitle());
     $this->setShortName($CMSConfigurator->getSiteTitle());
