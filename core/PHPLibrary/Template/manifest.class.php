@@ -34,7 +34,7 @@ class Manifest
    */
   public function __construct (
     private CMSConfiguratorInterface $CMSConfigurator,
-    private ThemeInterfaceCore $theme
+    private ThemeInterfaceCore $themeCore
   ) {
     $this->setName($CMSConfigurator->getSiteTitle());
     $this->setShortName($CMSConfigurator->getSiteTitle());
@@ -179,7 +179,7 @@ class Manifest
       $height = (int)$height;
 
       $sizesLabel = $width . 'x' . $height;
-      $themeURL = $this->theme->getURL();
+      $themeURL = $this->themeCore->theme->getURL();
 
       $this->data['icons'][] = [
         'src' => $themeURL . '/' . $URL,
