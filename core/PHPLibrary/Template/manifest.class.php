@@ -52,7 +52,7 @@ class Manifest
    */
   public function getJSON() : string
   {
-    return json_encode($this->data, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    return json_encode($this->data, JSON_UNESCAPED_SLASHES);
   }
 
   /**
