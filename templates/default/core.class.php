@@ -12,6 +12,7 @@ namespace templates\default;
 
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Template as Theme;
+use \core\PHPLibrary\InterfaceTemplate as InterfaceTheme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \DOMDocument as DOMDocument;
@@ -43,6 +44,16 @@ final class Core implements ThemeInterfaceCore
   public function getPrimaryColor() : string
   {
     return $this->primaryColor;
+  }
+
+  /**
+   * Получить основной объект темы
+   * 
+   * @return InterfaceTheme
+   */
+  public function getThemeFrame() : InterfaceTheme
+  {
+    return $this->theme;
   }
 
   /**
