@@ -34,7 +34,7 @@ class Manifest
    */
   public function __construct (
     private CMSConfiguratorInterface $CMSConfigurator,
-    private ThemeInterface $theme;
+    private ThemeInterface $theme
   ) {
     $this->setName($CMSConfigurator->getSiteTitle());
     $this->setShortName($CMSConfigurator->getSiteTitle());
