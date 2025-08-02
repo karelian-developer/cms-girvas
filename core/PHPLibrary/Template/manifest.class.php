@@ -39,7 +39,7 @@ class Manifest
     $this->setName($CMSConfigurator->getSiteTitle());
     $this->setShortName($CMSConfigurator->getSiteTitle());
     $this->setDescription($CMSConfigurator->getSiteDescription());
-    $this->setThemeColor($theme->getPrimaryColor());
+    $this->setThemeColor($themeCore->getPrimaryColor());
     $this->setDisplay(self::DISPLAY_STANDALONE);
 
     $this->data['icons'] = [];
