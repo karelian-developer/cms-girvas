@@ -202,7 +202,7 @@ final class Core implements ThemeInterfaceCore
     $linkManifestElement->setAttribute('href', '/manifest');
     $headElement->appendChild($linkManifestElement);
 
-    $bodyElement = $document->createElement('body');
+    $bodyElement = $document->createElement('body', '{SITE_HEADER}{SITE_MAIN}{SITE_FOOTER}');
 
     $HTMLElement->appendChild($headElement);
     $HTMLElement->appendChild($bodyElement);
