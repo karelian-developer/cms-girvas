@@ -184,7 +184,7 @@ class Manifest
       $themeURL = $themeFrame->getURL();
 
       $this->data['icons'][] = [
-        'src' => $themeURL . '/' . $URL,
+        'src' => $themeURL . $URL,
         'sizes' => $sizesLabel,
         'type' => $type
       ];
