@@ -15,6 +15,7 @@ use \core\PHPLibrary\Template as Theme;
 interface InterfaceCore
 {
   public function __construct(Theme $themeBase);
+  public function getPrimaryColor() : string;
   public function assembly() : void;
   public function assemblyDocument() : string;
   public function assemblyHeader() : string;

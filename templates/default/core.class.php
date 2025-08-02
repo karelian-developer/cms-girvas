@@ -19,21 +19,30 @@ use \DOMDocument as DOMDocument;
 #[\AllowDynamicProperties]
 final class Core implements ThemeInterfaceCore
 {
-  private Theme $theme;
   private CMSLocale $locale;
+  private string $primaryColor = '#EAEAEA';
   public string $assembled = '';
   public DOMDocument|null $source = null;
   
   /**
    * __construct
    *
-   * @param  mixed $theme
+   * @param  Theme $theme
    * 
    * @return void
    */
-  public function __construct(Theme $theme)
+  public function __construct(
+    private Theme $theme
+  ) {}
+
+  /**
+   * Получение начального цвета темы
+   * 
+   * @return string
+   */
+  public function getPrimaryColor() : string
   {
-    $this->theme = $theme;
+    return $this->primaryColor;
   }
 
   /**
