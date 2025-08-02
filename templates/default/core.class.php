@@ -143,7 +143,9 @@ final class Core implements ThemeInterfaceCore
     $documentLang = strtolower($documentLang);
 
     $document = new DOMDocument('1.0', 'UTF-8');
-    $document->appendChild(new DOMImplementation())->createDocumentType('html');
+    $implementation = new DOMImplementation();
+    $documentType = $implementation->createDocumentType('html');
+    $document->appendChild($documentType);
 
     $HTMLElement = $document->createElement('html');
     $HTMLElement->setAttribute('lang', $documentLang);
