@@ -41,6 +41,7 @@ class Manifest
     $this->setDescription($CMSConfigurator->getSiteDescription());
     $this->setThemeColor($themeCore->getPrimaryColor());
     $this->setDisplay(self::DISPLAY_STANDALONE);
+    $this->setStartURL('/');
 
     $this->data['icons'] = [];
   }
