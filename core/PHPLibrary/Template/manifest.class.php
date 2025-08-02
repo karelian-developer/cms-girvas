@@ -174,7 +174,9 @@ class Manifest
         throw new InvalidArgumentException('Размеры переданы в неверном формате - они должны быть представлены в виде целых чисел.');
       }
 
-      [(int)$width, (int)$height] = $sizes;
+      [$width, $height] = $sizes;
+      $width = (int)$width;
+      $height = (int)$height;
 
       $sizesLabel = $width . 'x' . $height;
       $themeURL = $this->theme->getURL();
