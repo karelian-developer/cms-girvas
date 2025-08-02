@@ -179,7 +179,8 @@ class Manifest
       $height = (int)$height;
 
       $sizesLabel = $width . 'x' . $height;
-      $themeURL = $this->themeCore->theme->getURL();
+      $themeFrame = $this->themeCore->getThemeFrame();
+      $themeURL = $themeFrame->getURL();
 
       $this->data['icons'][] = [
         'src' => $themeURL . '/' . $URL,
