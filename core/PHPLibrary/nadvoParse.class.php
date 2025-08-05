@@ -21,7 +21,7 @@ class NadvoParse
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(>+)\s?(.+)/m',
     'code_block' => '/^\`{3}([a-z]*)\n([\s\S]*?)\n\`{3}/m',
-    'inline_code' => '/\`{1}([^`]+)\`{1}/',
+    'inline_code' => '/(?<!`)`([^`]+)`(?!`)',
     'text' => '/[^\*_!\[\]]+/s'
   ];
 
@@ -244,8 +244,8 @@ class NadvoParse
       if (str_starts_with(trim($line), '```')) {
         if (!$inCodeBlock) {
           if (!empty($currentParagraph)) {
-              $html .= '<p>' . $currentParagraph . '</p>';
-              $currentParagraph = '';
+            $html .= '<p>' . $currentParagraph . '</p>';
+            $currentParagraph = '';
           }
 
           $inCodeBlock = true;
