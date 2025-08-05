@@ -18,7 +18,7 @@ class NadvoParse
     'italic' => '/\*(.+?)\*|_(.+?)_/s',
     'link' => '/\[([^\[\]]+)\]\(\s*(\S+)\s*\)/',
     'image' => '/!\[(.+?)\]\((.+?)\)/',
-    'table' => '/^(\|.+)+\|$/m',
+    'table' => '/(\|.+)+\|/m',
     'text' => '/[^\*_!\[\]]+/s'
   ];
 
@@ -159,7 +159,7 @@ class NadvoParse
 
           $inTable = true;
         }
-
+        
         continue;
       }
 
