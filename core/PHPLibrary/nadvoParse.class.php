@@ -237,8 +237,30 @@ class NadvoParse
     $html = '';
     $currentParagraph = '';
     $inTable = false;
+    $inBlockCode = false;
 
     foreach ($lines as $line) {
+      if (strpos($line, '<pre><code') !== false) {
+        $inBlockCode = true;
+
+        if (!empty($currentParagraph)) {
+          $html .= '<p>' . $currentParagraph . '</p>';
+          $currentParagraph = '';
+        }
+
+        $html .= $line;
+        continue;
+      } elseif (strpos($line, '</code></pre>') !== false) {
+        $inBlockCode = false;
+        $html .= $line;
+
+        continue;
+      } elseif ($inBlockCode) {
+        $html .= $line . "\n";
+
+        continue;
+      }
+
       if (str_starts_with(trim($line), '|')) {
         if (!$inTable) {
           if (!empty($currentParagraph)) {
