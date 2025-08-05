@@ -150,14 +150,16 @@ class NadvoParse
     $inTable = false;
 
     foreach ($lines as $line) {
-      if (str_starts_with(trim($line), '|')) {
+      if (str_starts_with(trim($line), '<table>')) {
         if (!$inTable) {
           if (!empty($currentParagraph)) {
             $html .= '<p>' . $currentParagraph . '</p>';
             $currentParagraph = '';
           }
+
           $inTable = true;
         }
+
         continue;
       }
 
