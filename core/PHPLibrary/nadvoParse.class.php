@@ -19,6 +19,7 @@ class NadvoParse
     'link' => '/\[([^\[\]]+)\]\(\s*(\S+)\s*\)/',
     'image' => '/!\[(.+?)\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
+    'quote' => '/^(>+)\s?(.+)/m',
     'text' => '/[^\*_!\[\]]+/s'
   ];
 
@@ -28,6 +29,7 @@ class NadvoParse
   public function parse(string $markdown) : string
   {
     $markdown = $this->parseTables($markdown);
+    $markdown = $this->parseQuotes($markdown);
     $markdown = $this->parseBlocks($markdown);
     return $this->parseInlineElements($markdown);
   }
@@ -140,6 +142,59 @@ class NadvoParse
     }
     
     return $aligns;
+  }
+
+  private function parseQuotes(string $markdown) : string
+  {
+    $lines = explode("\n", $markdown);
+    $result = [];
+    $quoteStack = [];
+    $currentLevel = 0;
+
+    foreach ($lines as $line) {
+      if (preg_match(self::PATTERNS['quote'], $line, $matches)) {
+        $level = strlen($matches[1]); // Количество '>' определяет уровень вложенности
+        $content = $matches[2];
+
+        if ($level > $currentLevel) {
+          // Начало новой вложенной цитаты
+          for ($i = $currentLevel; $i < $level; $i++) {
+            $quoteStack[] = "<blockquote>";
+            $result[] = $quoteStack[$i];
+          }
+        } elseif ($level < $currentLevel) {
+          // Выход из вложенных цитат
+          for ($i = $currentLevel - 1; $i >= $level; $i--) {
+            $result[] = "</blockquote>";
+            array_pop($quoteStack);
+          }
+        }
+
+        $currentLevel = $level;
+        $result[] = $content;
+      } else {
+        if ($currentLevel > 0 && trim($line) !== '') {
+          // Продолжение цитаты
+          $result[] = $line;
+        } else {
+          // Выход из всех цитат
+          while ($currentLevel > 0) {
+            $result[] = "</blockquote>";
+            array_pop($quoteStack);
+            $currentLevel--;
+          }
+          $result[] = $line;
+        }
+      }
+    }
+
+    // Закрываем все открытые цитаты в конце
+    while ($currentLevel > 0) {
+      $result[] = "</blockquote>";
+      $currentLevel--;
+    }
+
+    return implode("\n", $result);
   }
 
   private function parseBlocks(string $markdown) : string
