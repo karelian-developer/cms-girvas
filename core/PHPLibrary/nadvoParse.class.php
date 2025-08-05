@@ -23,7 +23,8 @@ class NadvoParse
     'quote' => '/^(>+)\s?(.+)/m',
     'code_block' => '/\`\`\`([a-z]*)\R([\s\S]*?)\R\`\`\`/',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
-    'text' => '/[^\*_!\[\]]+/s'
+    'text' => '/[^\*_!\[\]]+/s',
+    'dangerous_tags' => '/<\?(?:php)?.*?\?>|<(script|iframe)[^>]*>.*?<\/\1>/is'
   ];
 
   public function __construct()
@@ -31,11 +32,20 @@ class NadvoParse
 
   public function parse(string $markdown) : string
   {
+    $markdown = $this->sanitizeInput($markdown);
     $markdown = $this->parseCodeBlocks($markdown);
     $markdown = $this->parseTables($markdown);
     $markdown = $this->parseQuotes($markdown);
     $markdown = $this->parseBlocks($markdown);
     return $this->parseInlineElements($markdown);
+  }
+
+  private function sanitizeInput(string $markdown) : string
+  {
+    $markdown = preg_replace(self::PATTERNS['dangerous_tags'], '', $markdown);
+    $markdown = htmlspecialchars($markdown, ENT_NOQUOTES, 'UTF-8', false);
+    
+    return $markdown;
   }
 
   private function parseTables(string $markdown) : string
@@ -311,7 +321,9 @@ class NadvoParse
             $json = json_decode('{' . $matches[3] . '}', true);
             if ($json) {
               foreach ($json as $key => $value) {
-                $attrs[] = $key . '="' . htmlspecialchars($value) . '"';
+                if (in_array($key, ['class', 'id'])) {
+                  $attrs[] = $key . '="' . htmlspecialchars($value) . '"';
+                }
               }
             }
           } catch (Exception $e) {
@@ -323,7 +335,7 @@ class NadvoParse
       },
       $html
     );
-    
+
     $html = preg_replace_callback(
       self::PATTERNS['link'],
       function($matches) {
@@ -336,7 +348,9 @@ class NadvoParse
             $json = json_decode('{' . $matches[3] . '}', true);
             if ($json) {
               foreach ($json as $key => $value) {
-                $attrs[] = $key . '="' . htmlspecialchars($value) . '"';
+                if (in_array($key, ['class', 'id', 'target', 'rel'])) {
+                  $attrs[] = $key . '="' . htmlspecialchars($value) . '"';
+                }
               }
             }
           } catch (Exception $e) {
