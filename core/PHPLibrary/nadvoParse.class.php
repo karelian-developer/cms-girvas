@@ -20,7 +20,7 @@ class NadvoParse
     'image' => '/!\[(.+?)\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(>+)\s?(.+)/m',
-    'code_block' => '/\`\`\`([a-z]*)\n([\s\S]*?)\n\`\`\`/',
+    'code_block' => '/\`\`\`([a-z]*)\n([\s\S]*?)\n\`\`\`/m',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s'
   ];
@@ -221,7 +221,7 @@ class NadvoParse
       self::PATTERNS['inline_code'],
       function($matches) {
         $code = htmlspecialchars(trim($matches[1]), ENT_NOQUOTES);
-        return '<code> . $code . </code>';
+        return '<code>' . $code . '</code>';
       },
       $markdown
     );
