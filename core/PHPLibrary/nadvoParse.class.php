@@ -59,32 +59,46 @@ class NadvoParse
   {
     $tokens = [];
     $offset = 0;
+    $length = mb_strlen($markdown, 'UTF-8');
 
-    while ($offset < strlen($markdown)) {
+    while ($offset < $length) {
+      $matched = false;
+      $substr = mb_substr($markdown, $offset, null, 'UTF-8');
+
       foreach (self::PATTERNS as $type => $pattern) {
-        if (preg_match($pattern, $markdown, $matches, 0, $offset)) {
-          if ($type === 'HEADER') {
-            $tokens[] = [
-              'type' => 'header',
-              'level' => strlen($matches[1]),
-              'content' => $matches[2],
-              'position' => $offset,
-            ];
-          } else {
-            $tokens[] = [
-              'type' => $type,
-              'value' => $matches[0],
-              'content' => $matches[1] ?? null,
-              'position' => $offset,
-            ];
+        if (preg_match($pattern, $substr, $matches, PREG_OFFSET_CAPTURE)) {
+          $matchLength = mb_strlen($matches[0][0], 'UTF-8');
+          $matchPos = $offset + $matches[0][1];
+
+          $token = [
+            'type' => $type,
+            'value' => $matches[0][0],
+            'position' => $matchPos,
+          ];
+
+          if ($type === 'header') {
+            $token['level'] = strlen($matches[1][0]);
+            $token['content'] = $matches[2][0];
+          } elseif (isset($matches[1])) {
+            $token['content'] = $matches[1][0];
           }
 
-          $offset += strlen($matches[0]);
-          continue 2;
+          $tokens[] = $token;
+          $offset += $matchLength;
+          $matched = true;
+          break;
         }
       }
 
-      $offset++;
+      if (!$matched) {
+        $char = mb_substr($markdown, $offset, 1, 'UTF-8');
+        $tokens[] = [
+          'type' => 'text',
+          'value' => $char,
+          'position' => $offset
+        ];
+        $offset++;
+      }
     }
 
     return $tokens;
