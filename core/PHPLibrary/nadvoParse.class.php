@@ -67,9 +67,8 @@ class NadvoParse
     
     $html = preg_replace('/\*([^*]+)\*/s', '<em>$1</em>', $html);
     $html = preg_replace('/_([^_]+)_/s', '<em>$1</em>', $html);
-    
-    // И наконец ссылки
-    return preg_replace_callback(
+
+    $html = preg_replace_callback(
       '/\[([^]]+)\]\(([^)]+)\)/s',
       function($matches) {
         return '<a href="' . htmlspecialchars($matches[2]) . '">' 
@@ -77,5 +76,15 @@ class NadvoParse
       },
       $html
     );
+
+    $html = preg_replace_callback(
+      '/\!\[([^]]+)\]\(([^)]+)\)/s',
+      function($matches) {
+        return '<img src="' . htmlspecialchars($matches[2]) . '" alt="' . htmlspecialchars($matches[1]) . '">';
+      },
+      $html
+    );
+    
+    return $html;
   }
 }
