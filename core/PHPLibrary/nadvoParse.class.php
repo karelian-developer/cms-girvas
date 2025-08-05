@@ -18,6 +18,7 @@ class NadvoParse
     'italic' => '/\*(.+?)\*|_(.+?)_/s',
     'link' => '/\[([^\[\]]+)\]\(\s*(\S+)\s*\)/',
     'image' => '/!\[(.+?)\]\((.+?)\)/',
+    'video' => '/!\[video\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(>+)\s?(.+)/m',
     'code_block' => '/\`\`\`([a-z]*)\R([\s\S]*?)\R\`\`\`/',
@@ -289,6 +290,19 @@ class NadvoParse
       '/!\[(.+?)\]\((.+?)\)/',
       function($matches) {
         return '<img src="' . htmlspecialchars($matches[2]) . '" alt="' . htmlspecialchars($matches[1]) . '">';
+      },
+      $html
+    );
+
+    $html = preg_replace_callback(
+      '/!\[video\]\((.+?)\)/',
+      function($matches) {
+        $url = htmlspecialchars(trim($matches[1]));
+        $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+        
+        // Basic video HTML with controls
+        return '<div class="video-container"><video controls><source src="' . $url . '" type="video/' . $extension . '">' .
+               'Ваш браузер не поддерживает работу с видео.</video></div>';
       },
       $html
     );
