@@ -3,9 +3,9 @@
 /**
  * CMS GIRVAS (https://www.cms-girvas.ru/)
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
+ * @link    https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
  * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
- * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
 namespace core\PHPLibrary;
@@ -26,8 +26,9 @@ class NadvoParse
 
   public function parse(string $markdown) : string
   {
-    $this->normalizeEncoding($markdown);
-
+    // Нормализация кодировки перед обработкой
+    $markdown = $this->normalizeEncoding($markdown);
+    
     $lines = preg_split('/\R/', $markdown);
     $HTML = '';
     $currentParagraph = '';
@@ -38,7 +39,6 @@ class NadvoParse
           $HTML .= $this->parseParagraph($currentParagraph);
           $currentParagraph = '';
         }
-
         $HTML .= $this->parseHeader($line);
       } elseif (trim($line) === '') {
         if ($currentParagraph !== '') {
@@ -55,6 +55,19 @@ class NadvoParse
     }
 
     return $HTML;
+  }
+
+  private function normalizeEncoding(string $text) : string
+  {
+    // Проверяем кодировку
+    $encoding = mb_detect_encoding($text, ['UTF-8', 'Windows-1251', 'CP866'], true);
+    
+    if ($encoding !== 'UTF-8') {
+      $text = mb_convert_encoding($text, 'UTF-8', $encoding ?: 'Windows-1251');
+    }
+
+    // Удаляем битые символы
+    return preg_replace('/[^\x{0000}-\x{FFFF}]/u', '', $text);
   }
 
   private function tokenize(string $markdown) : array
@@ -98,9 +111,9 @@ class NadvoParse
       if (!$matched) {
         $char = mb_substr($markdown, $offset, 1, 'UTF-8');
         $tokens[] = [
-            'type' => 'text',
-            'value' => $char,
-            'position' => $offset
+          'type' => 'text',
+          'value' => $char,
+          'position' => $offset
         ];
         $offset++;
       }
@@ -125,14 +138,9 @@ class NadvoParse
           ];
           break;
         case 'bold':
-          $AST[] = [
-            'type' => 'bold',
-            'children' => $this->parseTokens($this->tokenize($token['content'])),
-          ];
-          break;
         case 'italic':
           $AST[] = [
-            'type' => 'italic',
+            'type' => $token['type'],
             'children' => $this->parseTokens($this->tokenize($token['content'])),
           ];
           break;
@@ -140,7 +148,7 @@ class NadvoParse
           $AST[] = [
             'type' => 'link',
             'url' => $this->sanitizeUrl($matches[2][0] ?? ''),
-            'children' => $this->parseTokens($this->tokenize($token['content'][1])),
+            'children' => $this->parseTokens($this->tokenize($token['content'])),
           ];
           break;
         case 'image':
@@ -158,17 +166,16 @@ class NadvoParse
     return $AST;
   }
 
-  private function normalizeEncoding(string $text): string
+  private function sanitizeUrl(string $url) : string
   {
-    // Проверяем кодировку
-    $encoding = mb_detect_encoding($text, ['UTF-8', 'Windows-1251', 'CP866'], true);
+    $url = trim($url);
+    $url = preg_replace('/[\s<>"\']/', '', $url);
     
-    if ($encoding !== 'UTF-8') {
-        $text = mb_convert_encoding($text, 'UTF-8', $encoding ?: 'Windows-1251');
+    if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
+      $url = 'https://' . $url;
     }
 
-    // Удаляем битые символы
-    return preg_replace('/[^\x{0000}-\x{FFFF}]/u', '', $text);
+    return htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
   }
 
   private function ASTToHTML(array $AST) : string
@@ -188,8 +195,10 @@ class NadvoParse
           $HTML .= '<em>' . $this->ASTToHTML($node['children']) . '</em>';
           break;
         case 'link':
-          $HTML .= '<a href="' . htmlspecialchars($node['url']) . '">' 
-            . $this->ASTToHTML($node['children']) . '</a>';
+          $HTML .= '<a href="' . $node['url'] . '">' . $this->ASTToHTML($node['children']) . '</a>';
+          break;
+        case 'image':
+          $HTML .= '<img src="' . $node['url'] . '" alt="' . htmlspecialchars($node['alt']) . '">';
           break;
         default:
           $HTML .= htmlspecialchars($node['value'], ENT_QUOTES, 'UTF-8');
@@ -197,18 +206,6 @@ class NadvoParse
     }
 
     return $HTML;
-  }
-
-  private function sanitizeUrl(string $url): string
-  {
-    $url = trim($url);
-    $url = preg_replace('/[\s<>"\']/', '', $url);
-    
-    if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
-        $url = 'https://' . $url;
-    }
-
-    return htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
   }
 
   private function parseHeader(string $line) : string
