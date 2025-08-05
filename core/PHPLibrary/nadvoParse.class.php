@@ -16,7 +16,7 @@ class NadvoParse
     'header' => '/^(#{1,6})\s(.+)/m',
     'bold' => '/\*\*(.+?)\*\*|__(.+?)__/s',
     'italic' => '/\*(.+?)\*|_(.+?)_/s',
-    'link' => '/\[([^\[\]]+)\]\(\s*(\S+)\s*\)/',
+    'link' => '/\[([^\[\]]+)\]\(\s*(\S+)\s*\)(?:\{([^\}]+)\})?/',
     'image' => '/!\[(.+?)\]\((.+?)\)/',
     'video' => '/!\[video\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
@@ -308,9 +308,12 @@ class NadvoParse
     );
 
     $html = preg_replace_callback(
-      '/\[([^\[\]]+)\]\(\s*(\S+)\s*\)/',
+      self::PATTERNS['link'],
       function($matches) {
-        return '<a href="' . htmlspecialchars($matches[2]) . '">' . htmlspecialchars($matches[1]) . '</a>';
+        $href = htmlspecialchars($matches[2]);
+        $text = htmlspecialchars($matches[1]);
+        $classes = isset($matches[3]) ? ' class="' . htmlspecialchars($matches[3]) . '"' : '';
+        return '<a href="' . $href . '"' . $classes . '>' . $text . '</a>';
       },
       $html
     );
