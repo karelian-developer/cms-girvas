@@ -16,7 +16,7 @@ class NadvoParse
     'header' => '/^(#{1,6})\s(.+)/m',
     'bold' => '/\*\*(.+?)\*\*|__(.+?)__/s',
     'italic' => '/\*(.+?)\*|_(.+?)_/s',
-    'link' => '/\[(.+?)\]\((.+?)\)/',
+    'link' => '/\[([^\[\]]+)\]\(\s*(\S+)\s*\)/',
     'image' => '/!\[(.+?)\]\((.+?)\)/',
     'text' => '/[^\*_!\[\]]+/s'
   ];
@@ -26,6 +26,8 @@ class NadvoParse
 
   public function parse(string $markdown) : string
   {
+    $this->normalizeEncoding($markdown);
+
     $lines = preg_split('/\R/', $markdown);
     $HTML = '';
     $currentParagraph = '';
@@ -77,7 +79,7 @@ class NadvoParse
           ];
 
           if ($type === 'header') {
-            $token['level'] = strlen($matches[1][0]);
+            $token['level'] = mb_strlen($matches[1][0], 'UTF-8');
             $token['content'] = $matches[2][0];
           } elseif (isset($matches[1])) {
             $token['content'] = $matches[1][0];
@@ -146,6 +148,19 @@ class NadvoParse
     return $AST;
   }
 
+  private function normalizeEncoding(string $text): string
+  {
+    // Проверяем кодировку
+    $encoding = mb_detect_encoding($text, ['UTF-8', 'Windows-1251', 'CP866'], true);
+    
+    if ($encoding !== 'UTF-8') {
+        $text = mb_convert_encoding($text, 'UTF-8', $encoding ?: 'Windows-1251');
+    }
+
+    // Удаляем битые символы
+    return preg_replace('/[^\x{0000}-\x{FFFF}]/u', '', $text);
+  }
+
   private function ASTToHTML(array $AST) : string
   {
     $HTML = '';
@@ -177,7 +192,7 @@ class NadvoParse
   private function parseHeader(string $line) : string
   {
     preg_match('/^(#{1,6})\s(.+)/', $line, $matches);
-    $level = strlen($matches[1]);
+    $level = mb_strlen($matches[1], 'UTF-8');
     $content = $matches[2];
     $tokens = $this->tokenize($content);
     $AST = $this->parseTokens($tokens);
