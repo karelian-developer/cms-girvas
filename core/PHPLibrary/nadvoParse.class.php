@@ -20,7 +20,7 @@ class NadvoParse
     'image' => '/!\[(.+?)\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(>+)\s?(.+)/m',
-    'code_block' => '/\`{3}([a-z]*)\n([\s\S]*?)\n\`{3}/m',
+    'code_block' => '/^\`{3}([a-z]*)\n([\s\S]*?)\n\`{3}/m',
     'inline_code' => '/\`{1}([^`]+)\`{1}/',
     'text' => '/[^\*_!\[\]]+/s'
   ];
@@ -207,8 +207,10 @@ class NadvoParse
       self::PATTERNS['code_block'],
       function($matches) {
         $language = trim($matches[1]);
-        $code = htmlspecialchars(trim($matches[2]));
+        $code = htmlspecialchars(trim($matches[2]), ENT_NOQUOTES);
         
+        $code = preg_replace('/^\n|\n$/', '', $code);
+
         if ($language) {
           return '<pre><code class="language-' . $language . '">' . $code . '</code></pre>';
         } else {
