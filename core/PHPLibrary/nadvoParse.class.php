@@ -34,54 +34,105 @@ class NadvoParse
 
   private function parseTables(string $markdown) : string
   {
-    return preg_replace_callback(
-      '/^([^\n\|]+\|[^\n]+)\n([\-:\| ]+)+\n((?:[^\n]+\|.+\n?)+)/m',
-      function($matches) {
-        $headers = explode('|', trim($matches[1], "| \t\n\r\0\x0B"));
-        $aligns = $this->parseTableAligns(trim($matches[2], "| \t\n\r\0\x0B"));
-        $rows = explode("\n", trim($matches[3]));
-        
-        $html = "<table>\n<thead>\n<tr>\n";
-        
-        // Заголовки таблицы
-        foreach ($headers as $i => $header) {
-          $align = $aligns[$i] ?? '';
-          $html .= "  <th style=\"text-align:$align\">" . trim($header) . "</th>\n";
+    // Разбиваем текст на строки
+    $lines = explode("\n", $markdown);
+    $result = [];
+    $tableLines = [];
+    $inTable = false;
+
+    foreach ($lines as $line) {
+      if (preg_match('/^\|.+\|$/', $line)) {
+        if (!$inTable) {
+          $inTable = true;
         }
-        
-        $html .= "</tr>\n</thead>\n<tbody>\n";
-        
-        // Строки таблицы
-        foreach ($rows as $row) {
-          $cells = explode('|', trim($row, "| \t\n\r\0\x0B"));
-          $html .= "<tr>\n";
-          
-          foreach ($cells as $i => $cell) {
-            $align = $aligns[$i] ?? '';
-            $html .= "  <td style=\"text-align:$align\">" . trim($cell) . "</td>\n";
-          }
-          
-          $html .= "</tr>\n";
+
+        $tableLines[] = $line;
+      } else {
+        if ($inTable) {
+          $result[] = $this->buildTable($tableLines);
+          $tableLines = [];
+          $inTable = false;
         }
-        
-        return $html . "</tbody>\n</table>";
-      },
-      $markdown
-    );
+
+        $result[] = $line;
+      }
+    }
+
+    if ($inTable) {
+      $result[] = $this->buildTable($tableLines);
+    }
+
+    return implode("\n", $result);
   }
 
-  private function parseTableAligns(string $alignRow) : array
+  private function buildTable(array $lines): string
+  {
+    if (count($lines) < 2) {
+      return implode("\n", $lines); // Недостаточно строк для таблицы
+    }
+
+    $headers = $this->parseTableRow($lines[0]);
+    $aligns = $this->parseTableAligns($lines[1]);
+    $rows = [];
+
+    for ($i = 2; $i < count($lines); $i++) {
+      $rows[] = $this->parseTableRow($lines[$i]);
+    }
+
+    // Генерация HTML
+    $html = "<table>\n<thead>\n<tr>\n";
+    
+    // Заголовки
+    foreach ($headers as $i => $header) {
+      $align = $aligns[$i] ?? '';
+      $html .= "  <th style=\"text-align:$align\">" . trim($this->parseInlineElements($header)) . "</th>\n";
+    }
+    
+    $html .= "</tr>\n</thead>\n<tbody>\n";
+    
+    // Строки
+    foreach ($rows as $row) {
+      $html .= "<tr>\n";
+
+      foreach ($row as $i => $cell) {
+        $align = $aligns[$i] ?? '';
+        $html .= "  <td style=\"text-align:$align\">" . trim($this->parseInlineElements($cell)) . "</td>\n";
+      }
+
+      $html .= "</tr>\n";
+    }
+    
+    return $html . "</tbody>\n</table>";
+  }
+
+  private function parseTableRow(string $line): array
+  {
+    $cells = explode('|', $line);
+
+    if (count($cells) > 0 && trim($cells[0]) === '') {
+      array_shift($cells);
+    }
+
+    if (count($cells) > 0 && trim($cells[count($cells)-1]) === '') {
+      array_pop($cells);
+    }
+
+    return $cells;
+  }
+
+  private function parseTableAligns(string $line): array
   {
     $aligns = [];
-    $parts = explode('|', trim($alignRow, "| "));
+    $cells = $this->parseTableRow($line);
     
-    foreach ($parts as $part) {
-      $part = trim($part);
-      if (str_starts_with($part, ':') && str_ends_with($part, ':')) {
+    foreach ($cells as $cell) {
+      $cell = trim($cell);
+      
+      if (preg_match('/^:[-]+:$/', $cell)) {
         $aligns[] = 'center';
-      } elseif (str_ends_with($part, ':')) {
+      } elseif (preg_match('/^[-]+:$/', $cell)) {
         $aligns[] = 'right';
-      } elseif (str_starts_with($part, ':')) {
+      } elseif (preg_match('/^:[-]+$/', $cell)) {
         $aligns[] = 'left';
       } else {
         $aligns[] = '';
