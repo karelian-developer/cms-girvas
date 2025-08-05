@@ -52,7 +52,7 @@ class NadvoParse
       $HTML .= $this->parseParagraph($currentParagraph);
     }
 
-    return preg_replace('/[^\x{0000}-\x{FFFF}]/u', '', $HTML);
+    return $HTML;
   }
 
   private function tokenize(string $markdown) : array
@@ -63,28 +63,34 @@ class NadvoParse
     while ($offset < strlen($markdown)) {
       foreach (self::PATTERNS as $type => $pattern) {
         if (preg_match($pattern, $markdown, $matches, 0, $offset)) {
-          if ($type === 'HEADER') {
-            $tokens[] = [
-              'type' => 'header',
-              'level' => strlen($matches[1]),
-              'content' => $matches[2],
-              'position' => $offset,
-            ];
-          } else {
-            $tokens[] = [
-              'type' => $type,
-              'value' => $matches[0],
-              'content' => $matches[1] ?? null,
-              'position' => $offset,
-            ];
+          $token = [
+            'type' => $type,
+            'value' => $matches[0],
+            'position' => $offset,
+          ];
+
+          if ($type === 'header') {
+            $token['level'] = strlen($matches[1]);
+            $token['content'] = $matches[2];
+          } elseif (in_array($type, ['bold', 'italic', 'link', 'image'])) {
+            $token['content'] = $matches[1] ?? ($matches[2] ?? '');
           }
 
+          $tokens[] = $token;
           $offset += strlen($matches[0]);
+
           continue 2;
         }
       }
 
-      $offset++;
+      $char = mb_substr($markdown, $offset, 1);
+      $tokens[] = [
+        'type' => 'text',
+        'value' => $char,
+        'position' => $offset
+      ];
+      
+      $offset += strlen($char);
     }
 
     return $tokens;
