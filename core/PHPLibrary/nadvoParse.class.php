@@ -24,13 +24,13 @@ class NadvoParse
   public function __construct()
   {}
 
-  public function parse(string $markdown): string
+  public function parse(string $markdown) : string
   {
     $markdown = $this->parseBlocks($markdown);
     return $this->parseInlineElements($markdown);
   }
 
-  private function parseBlocks(string $markdown): string
+  private function parseBlocks(string $markdown) : string
   {
     $lines = explode("\n", $markdown);
     $html = '';
@@ -60,7 +60,7 @@ class NadvoParse
     return $html;
   }
 
-  private function parseInlineElements(string $html): string
+  private function parseInlineElements(string $html) : string
   {
     $html = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $html);
     $html = preg_replace('/__(.+?)__/s', '<strong>$1</strong>', $html);
@@ -69,18 +69,17 @@ class NadvoParse
     $html = preg_replace('/_([^_]+)_/s', '<em>$1</em>', $html);
 
     $html = preg_replace_callback(
-      '/\[([^\[\]]+)\]\(\s*(\S+)\s*\)/',
+      '/!\[(.+?)\]\((.+?)\)/',
       function($matches) {
-        return '<a href="' . htmlspecialchars($matches[2]) . '">' 
-           . htmlspecialchars($matches[1]) . '</a>';
+        return '<img src="' . htmlspecialchars($matches[2]) . '" alt="' . htmlspecialchars($matches[1]) . '">';
       },
       $html
     );
 
     $html = preg_replace_callback(
-      '/!\[(.+?)\]\((.+?)\)/',
+      '/\[([^\[\]]+)\]\(\s*(\S+)\s*\)/',
       function($matches) {
-        return '<img src="' . htmlspecialchars($matches[2]) . '" alt="' . htmlspecialchars($matches[1]) . '">';
+        return '<a href="' . htmlspecialchars($matches[2]) . '">' . htmlspecialchars($matches[1]) . '</a>';
       },
       $html
     );
