@@ -20,6 +20,8 @@ class NadvoParse
     'image' => '/!\[(.+?)\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(>+)\s?(.+)/m',
+    'code_block' => '/```([a-z]*)\n([\s\S]*?)\n```/',
+    'inline_code' => '/`([^`]+)`/',
     'text' => '/[^\*_!\[\]]+/s'
   ];
 
@@ -28,6 +30,7 @@ class NadvoParse
 
   public function parse(string $markdown) : string
   {
+    $markdown = $this->parseCodeBlocks($markdown);
     $markdown = $this->parseTables($markdown);
     $markdown = $this->parseQuotes($markdown);
     $markdown = $this->parseBlocks($markdown);
@@ -195,6 +198,36 @@ class NadvoParse
     }
 
     return implode("\n", $result);
+  }
+
+  private function parseCodeBlocks(string $markdown) : string
+  {
+    // Обработка многострочных блоков кода
+    $markdown = preg_replace_callback(
+      self::PATTERNS['code_block'],
+      function($matches) {
+        $language = trim($matches[1]);
+        $code = htmlspecialchars(trim($matches[2]));
+        
+        if ($language) {
+          return '<pre><code class="language-' . $language . '">' . $code . '</code></pre>';
+        } else {
+          return '<pre><code>' . $code . '</code></pre>';
+        }
+      },
+      $markdown
+    );
+
+    // Обработка inline кода
+    $markdown = preg_replace_callback(
+      self::PATTERNS['inline_code'],
+      function($matches) {
+        return '<code>' . htmlspecialchars($matches[1]) . '</code>';
+      },
+      $markdown
+    );
+
+    return $markdown;
   }
 
   private function parseBlocks(string $markdown) : string
