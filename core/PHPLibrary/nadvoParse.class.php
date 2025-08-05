@@ -64,7 +64,11 @@ class NadvoParse
     
     $encoding = mb_detect_encoding($text, ['UTF-8', 'Windows-1251', 'CP866'], true);
     
-    return $encoding ? mb_convert_encoding($text, 'UTF-8', $encoding) : $text;
+    if ($encoding) {
+      return mb_convert_encoding($text, 'UTF-8', $encoding);
+    } else {
+      return iconv('Windows-1251', 'UTF-8//IGNORE', $text) ?: $text;
+    }
   }
 
   private function tokenize(string $markdown) : array
