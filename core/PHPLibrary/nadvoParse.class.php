@@ -24,27 +24,28 @@ class NadvoParse
   public function __construct()
   {}
 
-  public function parse(string $markdown) : string
+  public function parse(string $markdown): string
   {
-    // Предварительная очистка текста
-    $markdown = $this->preprocessText($markdown);
-    
+    $markdown = $this->parseBlocks($markdown);
+    return $this->parseInlineElements($markdown);
+  }
+
+  private function parseBlocks(string $markdown): string
+  {
     $lines = explode("\n", $markdown);
     $html = '';
     $currentParagraph = '';
 
     foreach ($lines as $line) {
-      $line = trim($line);
-      
       if (preg_match('/^(#{1,6})\s+(.+)/', $line, $matches)) {
         if (!empty($currentParagraph)) {
-          $html .= $this->parseParagraph($currentParagraph);
+          $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
         }
-        $html .= $this->parseHeader($line);
-      } elseif (empty($line)) {
+        $html .= '<h' . strlen($matches[1]) . '>' . $matches[2] . '</h' . strlen($matches[1]) . '>';
+      } elseif (trim($line) === '') {
         if (!empty($currentParagraph)) {
-          $html .= $this->parseParagraph($currentParagraph);
+          $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
         }
       } else {
@@ -53,52 +54,28 @@ class NadvoParse
     }
 
     if (!empty($currentParagraph)) {
-      $html .= $this->parseParagraph($currentParagraph);
+      $html .= '<p>' . $currentParagraph . '</p>';
     }
 
     return $html;
   }
 
-  private function preprocessText(string $text) : string
+  private function parseInlineElements(string $html): string
   {
-    $text = preg_replace('/[^\x{0000}-\x{FFFF}]/u', '', $text);
+    $html = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $html);
+    $html = preg_replace('/__(.+?)__/s', '<strong>$1</strong>', $html);
     
-    return str_replace(["\r\n", "\r"], "\n", $text);
-  }
-
-  private function parseHeader(string $line) : string
-  {
-    preg_match('/^(#{1,6})\s+(.+)/', $line, $matches);
-    $level = strlen($matches[1]);
-    $content = $matches[2];
+    $html = preg_replace('/\*([^*]+)\*/s', '<em>$1</em>', $html);
+    $html = preg_replace('/_([^_]+)_/s', '<em>$1</em>', $html);
     
-    return "<h$level>" . $this->parseInline($content) . "</h$level>";
-  }
-
-  private function parseParagraph(string $text) : string
-  {
-    return '<p>' . $this->parseInline($text) . '</p>';
-  }
-
-  private function parseInline(string $text) : string
-  {
-    // Обработка ссылок
-    $text = preg_replace_callback(
-      '/\[([^]]+)]\(([^)]+)\)/',
-      function ($matches) {
-        $url = htmlspecialchars(trim($matches[2]), ENT_QUOTES, 'UTF-8');
-        $title = htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8');
-        return "<a href=\"$url\">$title</a>";
+    // И наконец ссылки
+    return preg_replace_callback(
+      '/\[([^]]+)\]\(([^)]+)\)/s',
+      function($matches) {
+        return '<a href="' . htmlspecialchars($matches[2]) . '">' 
+           . htmlspecialchars($matches[1]) . '</a>';
       },
-      $text
+      $html
     );
-
-    // Обработка жирного текста
-    $text = preg_replace('/\*\*([^*]+)\*\*/', '<strong>$1</strong>', $text);
-    
-    // Обработка курсива
-    $text = preg_replace('/\*([^*]+)\*/', '<em>$1</em>', $text);
-
-    return htmlspecialchars_decode($text);
   }
 }
