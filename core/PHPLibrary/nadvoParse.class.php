@@ -233,22 +233,6 @@ class NadvoParse
 
   private function parseBlocks(string $markdown) : string
   {
-    // Временные маркеры для защиты блоков кода
-    $markers = [];
-    $markerCount = 0;
-    
-    // Защищаем блоки кода перед обработкой других элементов
-    $markdown = preg_replace_callback(
-      '/<pre><code(?: class="[^"]*")?>[\s\S]*?<\/code><\/pre>/',
-      function($matches) use (&$markers, &$markerCount) {
-        $marker = "###CODE_BLOCK_{$markerCount}###";
-        $markers[$marker] = $matches[0];
-        $markerCount++;
-        return $marker;
-      },
-      $markdown
-    );
-
     $lines = explode("\n", $markdown);
     $html = '';
     $currentParagraph = '';
@@ -288,10 +272,6 @@ class NadvoParse
 
     if (!empty($currentParagraph)) {
       $html .= '<p>' . $currentParagraph . '</p>';
-    }
-
-    foreach ($markers as $marker => $code) {
-      $html = str_replace($marker, $code, $html);
     }
 
     return $html;
