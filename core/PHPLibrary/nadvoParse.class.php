@@ -16,7 +16,7 @@ class NadvoParse
     'header' => '/^(#{1,6})\s(.+)/m',
     'bold' => '/\*\*(.+?)\*\*|__(.+?)__/s',
     'italic' => '/\*(.+?)\*|_(.+?)_/s',
-    'link' => '\[([^\[\]]+)\]\((\S+)\)/',
+    'link' => '/\[(.+?)\]\((.+?)\)/',
     'image' => '/!\[(.+?)\]\((.+?)\)/',
     'text' => '/[^\*_!\[\]]+/s'
   ];
@@ -26,7 +26,7 @@ class NadvoParse
 
   public function parse(string $markdown) : string
   {
-    $lines = preg_split('/\R/', $markdown);
+    $lines = preg_split('/\R/', $markdown); // Разбиваем текст на строки
     $HTML = '';
     $currentParagraph = '';
 
@@ -63,34 +63,28 @@ class NadvoParse
     while ($offset < strlen($markdown)) {
       foreach (self::PATTERNS as $type => $pattern) {
         if (preg_match($pattern, $markdown, $matches, 0, $offset)) {
-          $token = [
-            'type' => $type,
-            'value' => $matches[0],
-            'position' => $offset,
-          ];
-
-          if ($type === 'header') {
-            $token['level'] = strlen($matches[1]);
-            $token['content'] = $matches[2];
-          } elseif (in_array($type, ['bold', 'italic', 'link', 'image'])) {
-            $token['content'] = $matches[1] ?? ($matches[2] ?? '');
+          if ($type === 'HEADER') {
+            $tokens[] = [
+              'type' => 'header',
+              'level' => strlen($matches[1]),
+              'content' => $matches[2],
+              'position' => $offset,
+            ];
+          } else {
+            $tokens[] = [
+              'type' => $type,
+              'value' => $matches[0],
+              'content' => $matches[1] ?? null,
+              'position' => $offset,
+            ];
           }
 
-          $tokens[] = $token;
           $offset += strlen($matches[0]);
-
           continue 2;
         }
       }
 
-      $char = mb_substr($markdown, $offset, 1);
-      $tokens[] = [
-        'type' => 'text',
-        'value' => $char,
-        'position' => $offset
-      ];
-      
-      $offset += strlen($char);
+      $offset++;
     }
 
     return $tokens;
@@ -126,7 +120,7 @@ class NadvoParse
         case 'link':
           $AST[] = [
             'type' => 'link',
-            'url' => $this->sanitizeUrl($token['content'][2] ?? ''),
+            'url' => $token['content'][2],
             'children' => $this->parseTokens($this->tokenize($token['content'][1])),
           ];
           break;
@@ -136,18 +130,6 @@ class NadvoParse
     }
 
     return $AST;
-  }
-
-  private function sanitizeUrl(string $URL) : string
-  {
-    $URL = trim($URL);
-    $URL = preg_replace('/[\s<>"\']/', '', $URL);
-    
-    if (!preg_match('~^(?:f|ht)tps?://~i', $URL)) {
-      $URL = 'https://' . $URL;
-    }
-
-    return htmlspecialchars($URL, ENT_QUOTES, 'UTF-8');
   }
 
   private function ASTToHTML(array $AST) : string
@@ -178,8 +160,7 @@ class NadvoParse
     return $HTML;
   }
 
-  private function parseHeader(string $line) : string
-  {
+  private function parseHeader(string $line): string {
     preg_match('/^(#{1,6})\s(.+)/', $line, $matches);
     $level = strlen($matches[1]);
     $content = $matches[2];
@@ -189,23 +170,8 @@ class NadvoParse
     return sprintf('<h%d>%s</h%d>', $level, $this->ASTToHTML($AST), $level);
   }
 
-  private function parseParagraph(string $text) : string
-  {
-    $text = trim($text);
-    $text = preg_replace_callback(
-      '/^(.*)(?:\n|$)/m',
-      function ($matches) {
-        $line = $matches[1];
-        
-        if (preg_match('/^(?:-|\*|\d+\.|#)\s/', $line)) {
-          return $line;
-        }
-
-        return str_replace("\n", '<br>', $line);
-      },
-      $text
-    );
-
+  private function parseParagraph(string $text): string {
+    $text = preg_replace('/(?<!\n)\n(?!\n)/', '<br>', trim($text));
     $tokens = $this->tokenize($text);
     $AST = $this->parseTokens($tokens);
 
