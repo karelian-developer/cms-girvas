@@ -28,6 +28,7 @@ class NadvoParse
   public function parse(string $markdown) : string
   {
     $markdown = $this->parseTables($markdown);
+    error_log(print_r($markdown, true));
     $markdown = $this->parseBlocks($markdown);
     return $this->parseInlineElements($markdown);
   }
@@ -65,7 +66,7 @@ class NadvoParse
     return implode("\n", $result);
   }
 
-  private function buildTable(array $lines): string
+  private function buildTable(array $lines) : string
   {
     if (count($lines) < 2) {
       return implode("\n", $lines); // Недостаточно строк для таблицы
@@ -85,7 +86,7 @@ class NadvoParse
     // Заголовки
     foreach ($headers as $i => $header) {
       $align = $aligns[$i] ?? '';
-      $html .= "  <th style=\"text-align:$align\">" . trim($this->parseInlineElements($header)) . "</th>\n";
+      $html .= "<th style=\"text-align:$align\">" . trim($this->parseInlineElements($header)) . "</th>\n";
     }
     
     $html .= "</tr>\n</thead>\n<tbody>\n";
@@ -96,7 +97,7 @@ class NadvoParse
 
       foreach ($row as $i => $cell) {
         $align = $aligns[$i] ?? '';
-        $html .= "  <td style=\"text-align:$align\">" . trim($this->parseInlineElements($cell)) . "</td>\n";
+        $html .= "<td style=\"text-align:$align\">" . trim($this->parseInlineElements($cell)) . "</td>\n";
       }
 
       $html .= "</tr>\n";
@@ -105,7 +106,7 @@ class NadvoParse
     return $html . "</tbody>\n</table>";
   }
 
-  private function parseTableRow(string $line): array
+  private function parseTableRow(string $line) : array
   {
     $cells = explode('|', $line);
 
@@ -120,14 +121,14 @@ class NadvoParse
     return $cells;
   }
 
-  private function parseTableAligns(string $line): array
+  private function parseTableAligns(string $line) : array
   {
     $aligns = [];
     $cells = $this->parseTableRow($line);
     
     foreach ($cells as $cell) {
       $cell = trim($cell);
-      
+
       if (preg_match('/^:[-]+:$/', $cell)) {
         $aligns[] = 'center';
       } elseif (preg_match('/^[-]+:$/', $cell)) {
