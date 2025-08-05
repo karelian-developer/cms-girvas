@@ -26,7 +26,7 @@ class NadvoParse
 
   public function parse(string $markdown) : string
   {
-    $lines = preg_split('/\R/', $markdown); // Разбиваем текст на строки
+    $lines = preg_split('/\R/', $markdown);
     $HTML = '';
     $currentParagraph = '';
 
@@ -160,7 +160,8 @@ class NadvoParse
     return $HTML;
   }
 
-  private function parseHeader(string $line): string {
+  private function parseHeader(string $line) : string
+  {
     preg_match('/^(#{1,6})\s(.+)/', $line, $matches);
     $level = strlen($matches[1]);
     $content = $matches[2];
@@ -170,8 +171,23 @@ class NadvoParse
     return sprintf('<h%d>%s</h%d>', $level, $this->ASTToHTML($AST), $level);
   }
 
-  private function parseParagraph(string $text): string {
-    $text = preg_replace('/(?<!\n)\n(?!\n)/', '<br>', trim($text));
+  private function parseParagraph(string $text) : string
+  {
+    $text = trim($text);
+    $text = preg_replace_callback(
+      '/^(.*)(?:\n|$)/m',
+      function ($matches) {
+        $line = $matches[1];
+        
+        if (preg_match('/^(?:-|\*|\d+\.|#)\s/', $line)) {
+          return $line;
+        }
+
+        return str_replace("\n", '<br>', $line);
+      },
+      $text
+    );
+
     $tokens = $this->tokenize($text);
     $AST = $this->parseTokens($tokens);
 
