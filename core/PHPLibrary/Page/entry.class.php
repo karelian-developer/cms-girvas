@@ -13,7 +13,7 @@ namespace core\PHPLibrary\Page;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Page as Page;
-use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
@@ -132,10 +132,7 @@ class PageEntry implements InterfacePage
           $this->page->breadcrumbs->add($entry->getTitle($localeName), '/entry/' . $entry->getName());
           $this->page->breadcrumbs->assembly();
 
-          /**
-           * @var Parsedown Парсер markdown-разметки
-           */
-          $parsedown = new Parsedown();
+          $nadvoParse = new NadvoParse();
 
           $commentsArray = $entry->getComments([
             'limit' => [2, 0],
@@ -206,7 +203,7 @@ class PageEntry implements InterfacePage
           /**
            * @var string Содержание записи
            */
-          $entry_content = $entry->getContent($localeName);
+          $entryContent = $entry->getContent($localeName);
           
           $createdDateTimestamp = date('d.m.Y H:i:s', $entry->getCreatedUnixTimestamp());
           $publishedDateTimestamp = date('d.m.Y H:i:s', $entry->getPublishedUnixTimestamp());
@@ -236,7 +233,7 @@ class PageEntry implements InterfacePage
             'ENTRY_ID' => $entry->getID(),
             'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
             'ENTRY_TITLE' => $entryTitle,
-            'ENTRY_CONTENT' => $parsedown->text($entry_content),
+            'ENTRY_CONTENT' => $nadvoParse->parse($entryContent),
             'ENTRY_PREVIEW_URL' => $entry->getPreviewURL() !== '' ? $entry->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 1024),
             'ENTRY_CATEGORY_TITLE' => $categoryTitle,
             'ENTRY_CATEGORY_URL' => $category->getURL(),
