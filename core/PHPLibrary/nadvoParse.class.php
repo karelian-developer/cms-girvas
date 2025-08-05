@@ -16,7 +16,7 @@ class NadvoParse
     'header' => '/^(#{1,6})\s(.+)/m',
     'bold' => '/\*\*(.+?)\*\*|__(.+?)__/s',
     'italic' => '/\*(.+?)\*|_(.+?)_/s',
-    'link' => '/\[(.+?)\]\((.+?)\)/',
+    'link' => '\[([^\[\]]+)\]\((\S+)\)/',
     'image' => '/!\[(.+?)\]\((.+?)\)/',
     'text' => '/[^\*_!\[\]]+/s'
   ];
@@ -136,7 +136,7 @@ class NadvoParse
         case 'link':
           $AST[] = [
             'type' => 'link',
-            'url' => $token['content'][2],
+            'url' => $this->sanitizeUrl($token['content'][2] ?? ''),
             'children' => $this->parseTokens($this->tokenize($token['content'][1])),
           ];
           break;
@@ -146,6 +146,18 @@ class NadvoParse
     }
 
     return $AST;
+  }
+
+  private function sanitizeUrl(string $URL) : string
+  {
+    $URL = trim($URL);
+    $URL = preg_replace('/[\s<>"\']/', '', $URL);
+    
+    if (!preg_match('~^(?:f|ht)tps?://~i', $URL)) {
+      $URL = 'https://' . $URL;
+    }
+
+    return htmlspecialchars($URL, ENT_QUOTES, 'UTF-8');
   }
 
   private function ASTToHTML(array $AST) : string
