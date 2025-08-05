@@ -28,7 +28,6 @@ class NadvoParse
   public function parse(string $markdown) : string
   {
     $markdown = $this->parseTables($markdown);
-    error_log(print_r($markdown, true));
     $markdown = $this->parseBlocks($markdown);
     return $this->parseInlineElements($markdown);
   }
@@ -42,7 +41,7 @@ class NadvoParse
     $inTable = false;
 
     foreach ($lines as $line) {
-      if (preg_match('/^\|.+\|$/', $line)) {
+      if (preg_match(self::PATTERNS['table'], $line)) {
         if (!$inTable) {
           $inTable = true;
         }
