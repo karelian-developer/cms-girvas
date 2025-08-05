@@ -59,11 +59,15 @@ class NadvoParse
 
   private function normalizeEncoding(string $text) : string
   {
+    if (mb_detect_encoding($text, 'UTF-8', true) === 'UTF-8') {
+      return $text;
+    }
+
     // Проверяем кодировку
-    $encoding = mb_detect_encoding($text, ['UTF-8', 'Windows-1251', 'CP866'], true);
+    $encoding = mb_detect_encoding($text, ['Windows-1251', 'CP866'], true);
     
-    if ($encoding !== 'UTF-8') {
-      $text = mb_convert_encoding($text, 'UTF-8', $encoding ?: 'Windows-1251');
+    if ($encoding) {
+      $text = mb_convert_encoding($text, 'UTF-8', $encoding);
     }
 
     // Удаляем битые символы
