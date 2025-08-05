@@ -209,8 +209,6 @@ class NadvoParse
         $language = trim($matches[1]);
         $code = htmlspecialchars(trim($matches[2]), ENT_NOQUOTES);
         
-        $code = preg_replace('/^\n|\n$/', '', $code);
-
         if ($language) {
           return '<pre><code class="language-' . $language . '">' . $code . '</code></pre>';
         } else {
@@ -224,7 +222,8 @@ class NadvoParse
     $markdown = preg_replace_callback(
       self::PATTERNS['inline_code'],
       function($matches) {
-        return '<code>' . htmlspecialchars($matches[1]) . '</code>';
+        $code = htmlspecialchars(trim($matches[1]), ENT_NOQUOTES);
+        return "<code>{$code}</code>";
       },
       $markdown
     );
