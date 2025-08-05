@@ -287,14 +287,6 @@ class NadvoParse
     $html = preg_replace('/\~\~(.+?)\~\~/s', '<u>$1</u>', $html);
 
     $html = preg_replace_callback(
-      '/!\[(.+?)\]\((.+?)\)/',
-      function($matches) {
-        return '<img src="' . htmlspecialchars($matches[2]) . '" alt="' . htmlspecialchars($matches[1]) . '">';
-      },
-      $html
-    );
-
-    $html = preg_replace_callback(
       '/!\[video\]\((.+?)\)/',
       function($matches) {
         $url = htmlspecialchars(trim($matches[1]));
@@ -303,6 +295,14 @@ class NadvoParse
         // Basic video HTML with controls
         return '<div class="video-container"><video controls><source src="' . $url . '" type="video/' . $extension . '">' .
                'Ваш браузер не поддерживает работу с видео.</video></div>';
+      },
+      $html
+    );
+
+    $html = preg_replace_callback(
+      '/!\[(.+?)\]\((.+?)\)/',
+      function($matches) {
+        return '<img src="' . htmlspecialchars($matches[2]) . '" alt="' . htmlspecialchars($matches[1]) . '">';
       },
       $html
     );
