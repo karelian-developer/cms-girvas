@@ -26,7 +26,7 @@ class NadvoParse
 
   public function parse(string $markdown) : string
   {
-    $markdown = $this->ensureUtf8($markdown);
+    //$markdown = $this->ensureUtf8($markdown);
     $lines = preg_split('/\R/', $markdown);
     $HTML = '';
     $currentParagraph = '';
