@@ -20,7 +20,7 @@ class NadvoParse
     'image' => '/!\[(.+?)\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(>+)\s?(.+)/m',
-    'code_block' => '/^\`{3}([a-z]*)\n([\s\S]*?)\n\`{3}/m',
+    'code_block' => '/```([a-z]*)\n([\s\S]*?)\n```/',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s'
   ];
@@ -234,32 +234,28 @@ class NadvoParse
 
   private function parseBlocks(string $markdown) : string
   {
+    // Временные маркеры для защиты блоков кода
+    $markers = [];
+    $markerCount = 0;
+    
+    // Защищаем блоки кода перед обработкой других элементов
+    $markdown = preg_replace_callback(
+      '/<pre><code(?: class="[^"]*")?>[\s\S]*?<\/code><\/pre>/',
+      function($matches) use (&$markers, &$markerCount) {
+        $marker = "###CODE_BLOCK_{$markerCount}###";
+        $markers[$marker] = $matches[0];
+        $markerCount++;
+        return $marker;
+      },
+      $markdown
+    );
+
     $lines = explode("\n", $markdown);
     $html = '';
     $currentParagraph = '';
     $inTable = false;
-    $inCodeBlock = false;
 
     foreach ($lines as $line) {
-      if (str_starts_with(trim($line), '```')) {
-        if (!$inCodeBlock) {
-          if (!empty($currentParagraph)) {
-            $html .= '<p>' . $currentParagraph . '</p>';
-            $currentParagraph = '';
-          }
-
-          $inCodeBlock = true;
-          continue;
-        } else {
-          $inCodeBlock = false;
-          continue;
-        }
-      }
-
-      if ($inCodeBlock) {
-        continue;
-      }
-
       if (str_starts_with(trim($line), '|')) {
         if (!$inTable) {
           if (!empty($currentParagraph)) {
@@ -293,6 +289,10 @@ class NadvoParse
 
     if (!empty($currentParagraph)) {
       $html .= '<p>' . $currentParagraph . '</p>';
+    }
+
+    foreach ($markers as $marker => $code) {
+      $html = str_replace($marker, $code, $html);
     }
 
     return $html;
