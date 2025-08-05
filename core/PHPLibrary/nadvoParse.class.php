@@ -202,7 +202,6 @@ class NadvoParse
 
   private function parseCodeBlocks(string $markdown) : string
   {
-    // Обработка многострочных блоков кода
     $markdown = preg_replace_callback(
       self::PATTERNS['code_block'],
       function($matches) {
@@ -218,12 +217,11 @@ class NadvoParse
       $markdown
     );
 
-    // Обработка inline кода
     $markdown = preg_replace_callback(
       self::PATTERNS['inline_code'],
       function($matches) {
         $code = htmlspecialchars(trim($matches[1]), ENT_NOQUOTES);
-        return "<code>{$code}</code>";
+        return '<code> . $code . </code>';
       },
       $markdown
     );
@@ -237,30 +235,8 @@ class NadvoParse
     $html = '';
     $currentParagraph = '';
     $inTable = false;
-    $inBlockCode = false;
 
     foreach ($lines as $line) {
-      if (strpos($line, '<pre><code') !== false) {
-        $inBlockCode = true;
-
-        if (!empty($currentParagraph)) {
-          $html .= '<p>' . $currentParagraph . '</p>';
-          $currentParagraph = '';
-        }
-
-        $html .= $line;
-        continue;
-      } elseif (strpos($line, '</code></pre>') !== false) {
-        $inBlockCode = false;
-        $html .= $line;
-
-        continue;
-      } elseif ($inBlockCode) {
-        $html .= $line . "\n";
-
-        continue;
-      }
-
       if (str_starts_with(trim($line), '|')) {
         if (!$inTable) {
           if (!empty($currentParagraph)) {
