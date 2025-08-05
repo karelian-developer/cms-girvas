@@ -16,7 +16,7 @@ class NadvoParse
     'header' => '/^(#{1,6})\s(.+)/m',
     'bold' => '/\*\*(.+?)\*\*|__(.+?)__/s',
     'italic' => '/\*(.+?)\*|_(.+?)_/s',
-    'link' => '/\[([^\[\]]+)\]\(\s*(\S+)\s*\)(?:\{([^\}]+)\})?/',
+    'link' => '/\[([^\[\]]+)\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'image' => '/!\[(.+?)\]\((.+?)\)/',
     'video' => '/!\[video\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
@@ -300,20 +300,51 @@ class NadvoParse
     );
 
     $html = preg_replace_callback(
-      '/!\[(.+?)\]\((.+?)\)/',
+      self::PATTERNS['image'],
       function($matches) {
-        return '<img src="' . htmlspecialchars($matches[2]) . '" alt="' . htmlspecialchars($matches[1]) . '">';
+        $src = htmlspecialchars($matches[2]);
+        $alt = htmlspecialchars($matches[1]);
+        $attrs = [];
+        
+        if (isset($matches[3])) {
+          try {
+            $json = json_decode('{' . $matches[3] . '}', true);
+            if ($json) {
+              foreach ($json as $key => $value) {
+                $attrs[] = $key . '="' . htmlspecialchars($value) . '"';
+              }
+            }
+          } catch (Exception $e) {
+            // ...
+          }
+        }
+        
+        return '<img src="' . $src . '" alt="' . $alt . '"' . (count($attrs) ? ' ' . implode(' ', $attrs) : '') . '>';
       },
       $html
     );
-
+    
     $html = preg_replace_callback(
       self::PATTERNS['link'],
       function($matches) {
         $href = htmlspecialchars($matches[2]);
         $text = htmlspecialchars($matches[1]);
-        $classes = isset($matches[3]) ? ' class="' . htmlspecialchars($matches[3]) . '"' : '';
-        return '<a href="' . $href . '"' . $classes . '>' . $text . '</a>';
+        $attrs = [];
+        
+        if (isset($matches[3])) {
+          try {
+            $json = json_decode('{' . $matches[3] . '}', true);
+            if ($json) {
+              foreach ($json as $key => $value) {
+                $attrs[] = $key . '="' . htmlspecialchars($value) . '"';
+              }
+            }
+          } catch (Exception $e) {
+            // ...
+          }
+        }
+        
+        return '<a href="' . $href . '"' . (count($attrs) ? ' ' . implode(' ', $attrs) : '') . '>' . $text . '</a>';
       },
       $html
     );
