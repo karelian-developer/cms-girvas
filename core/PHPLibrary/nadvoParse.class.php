@@ -65,24 +65,27 @@ class NadvoParse
 
     while ($offset < $length) {
       $matched = false;
-      $substr = mb_substr($markdown, $offset, null, 'UTF-8');
+      $substr = mb_substr($markdown, $offset, $length - $offset, 'UTF-8');
 
       foreach (self::PATTERNS as $type => $pattern) {
         if (preg_match($pattern, $substr, $matches, PREG_OFFSET_CAPTURE)) {
-          $matchLength = mb_strlen($matches[0][0], 'UTF-8');
+          $matchText = $matches[0][0];
+          $matchLength = mb_strlen($matchText, 'UTF-8');
           $matchPos = $offset + $matches[0][1];
 
           $token = [
             'type' => $type,
-            'value' => $matches[0][0],
+            'value' => $matchText,
             'position' => $matchPos,
           ];
 
           if ($type === 'header') {
             $token['level'] = mb_strlen($matches[1][0], 'UTF-8');
             $token['content'] = $matches[2][0];
-          } elseif (isset($matches[1])) {
-            $token['content'] = $matches[1][0];
+          } elseif (in_array($type, ['bold', 'italic', 'link', 'image'])) {
+            // Для link и image используем первую capture-группу
+            $contentKey = ($type === 'link' || $type === 'image') ? 1 : 0;
+            $token['content'] = $matches[$contentKey + 1][0] ?? $matchText;
           }
 
           $tokens[] = $token;
@@ -95,9 +98,9 @@ class NadvoParse
       if (!$matched) {
         $char = mb_substr($markdown, $offset, 1, 'UTF-8');
         $tokens[] = [
-          'type' => 'text',
-          'value' => $char,
-          'position' => $offset
+            'type' => 'text',
+            'value' => $char,
+            'position' => $offset
         ];
         $offset++;
       }
@@ -136,8 +139,15 @@ class NadvoParse
         case 'link':
           $AST[] = [
             'type' => 'link',
-            'url' => $token['content'][2],
+            'url' => $this->sanitizeUrl($matches[2][0] ?? ''),
             'children' => $this->parseTokens($this->tokenize($token['content'][1])),
+          ];
+          break;
+        case 'image':
+          $AST[] = [
+            'type' => 'image',
+            'url' => $this->sanitizeUrl($matches[2][0] ?? ''),
+            'alt' => $token['content'],
           ];
           break;
         default:
@@ -182,11 +192,23 @@ class NadvoParse
             . $this->ASTToHTML($node['children']) . '</a>';
           break;
         default:
-          $HTML .= htmlspecialchars($node['value']);
+          $HTML .= htmlspecialchars($node['value'], ENT_QUOTES, 'UTF-8');
       }
     }
 
     return $HTML;
+  }
+
+  private function sanitizeUrl(string $url): string
+  {
+    $url = trim($url);
+    $url = preg_replace('/[\s<>"\']/', '', $url);
+    
+    if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
+        $url = 'https://' . $url;
+    }
+
+    return htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
   }
 
   private function parseHeader(string $line) : string
@@ -203,19 +225,7 @@ class NadvoParse
   private function parseParagraph(string $text) : string
   {
     $text = trim($text);
-    $text = preg_replace_callback(
-      '/^(.*)(?:\n|$)/m',
-      function ($matches) {
-        $line = $matches[1];
-        
-        if (preg_match('/^(?:-|\*|\d+\.|#)\s/', $line)) {
-          return $line;
-        }
-
-        return str_replace("\n", '<br>', $line);
-      },
-      $text
-    );
+    $text = preg_replace('/([^\n])\n([^\n])/', '$1<br>$2', $text);
 
     $tokens = $this->tokenize($text);
     $AST = $this->parseTokens($tokens);
