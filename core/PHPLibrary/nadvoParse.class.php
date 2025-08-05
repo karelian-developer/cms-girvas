@@ -26,7 +26,8 @@ class NadvoParse
 
   public function parse(string $markdown) : string
   {
-    $lines = preg_split('/\R/', $markdown); // Разбиваем текст на строки
+    $markdown = $this->ensureUtf8($markdown);
+    $lines = preg_split('/\R/', $markdown);
     $HTML = '';
     $currentParagraph = '';
 
@@ -53,6 +54,17 @@ class NadvoParse
     }
 
     return $HTML;
+  }
+
+  private function ensureUtf8(string $text) : string
+  {
+    if (mb_detect_encoding($text, 'UTF-8', true)) {
+      return $text;
+    }
+    
+    $encoding = mb_detect_encoding($text, ['UTF-8', 'Windows-1251', 'CP866'], true);
+    
+    return $encoding ? mb_convert_encoding($text, 'UTF-8', $encoding) : $text;
   }
 
   private function tokenize(string $markdown) : array
