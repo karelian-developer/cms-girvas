@@ -55,7 +55,7 @@ class NadvoParse
     return $HTML;
   }
 
-  private function tokenize(string $markdown) : string
+  private function tokenize(string $markdown) : array
   {
     $tokens = [];
     $offset = 0;
