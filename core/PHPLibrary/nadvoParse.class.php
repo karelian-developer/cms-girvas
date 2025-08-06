@@ -36,8 +36,8 @@ class NadvoParse
   {
     $markdown = $this->sanitizeInput($markdown);
     $markdown = $this->parseCodeBlocks($markdown);
-    $markdown = $this->parseTables($markdown);
     $markdown = $this->parseQuotes($markdown);
+    $markdown = $this->parseTables($markdown);
     $markdown = $this->parseBlocks($markdown);
     return $this->parseInlineElements($markdown);
   }
