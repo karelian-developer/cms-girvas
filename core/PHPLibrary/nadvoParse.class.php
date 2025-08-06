@@ -22,7 +22,7 @@ class NadvoParse
     'video' => '/!\[video\]\((.+?)\)/',
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
-    'quote' => '/^(>+)\s?(.+)/g',
+    'quote' => '/^(>+)\s?(.*)/',
     'code_block' => '/\`\`\`([a-z]*)\R([\s\S]*?)\R\`\`\`/',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s',
@@ -36,8 +36,8 @@ class NadvoParse
   {
     $markdown = $this->sanitizeInput($markdown);
     $markdown = $this->parseCodeBlocks($markdown);
-    $markdown = $this->parseTables($markdown);
     $markdown = $this->parseQuotes($markdown);
+    $markdown = $this->parseTables($markdown);
     $markdown = $this->parseBlocks($markdown);
     return $this->parseInlineElements($markdown);
   }
@@ -166,48 +166,56 @@ class NadvoParse
     $result = [];
     $quoteStack = [];
     $currentLevel = 0;
+    $inQuote = false;
 
     foreach ($lines as $line) {
       if (preg_match(self::PATTERNS['quote'], $line, $matches)) {
-        $level = strlen($matches[1]); // Количество '>' определяет уровень вложенности
-        $content = $matches[2];
-
-        if ($level > $currentLevel) {
-          // Начало новой вложенной цитаты
-          for ($i = $currentLevel; $i < $level; $i++) {
-            $quoteStack[] = "<blockquote>";
-            $result[] = $quoteStack[$i];
-          }
-        } elseif ($level < $currentLevel) {
-          // Выход из вложенных цитат
-          for ($i = $currentLevel - 1; $i >= $level; $i--) {
-            $result[] = "</blockquote>";
-            array_pop($quoteStack);
-          }
+        $level = strlen($matches[1]);
+        $content = trim($matches[2]);
+        
+        if (!$inQuote) {
+          $inQuote = true;
+          $result[] = "<blockquote>";
         }
 
-        $currentLevel = $level;
-        $result[] = $content;
-      } else {
-        if ($currentLevel > 0 && trim($line) !== '') {
-          // Продолжение цитаты
-          $result[] = $line;
-        } else {
-          // Выход из всех цитат
-          while ($currentLevel > 0) {
-            $result[] = "</blockquote>";
-            array_pop($quoteStack);
-            $currentLevel--;
+        if ($level > $currentLevel) {
+          for ($i = $currentLevel; $i < $level; $i++) {
+            $result[] = "<blockquote>";
           }
-          $result[] = $line;
+        } elseif ($level < $currentLevel) {
+          for ($i = $currentLevel; $i > $level; $i--) {
+            $result[] = "</blockquote>";
+          }
+        }
+        
+        $currentLevel = $level;
+
+        if (!empty($content)) {
+          $result[] = $content;
+        }
+      } else {
+        if ($inQuote) {
+          if (trim($line) === '') {
+            for ($i = 0; $i < $currentLevel; $i++) {
+              $result[] = "</blockquote>";
+            }
+
+            $currentLevel = 0;
+            $inQuote = false;
+          } else {
+            $result[] = $line;
+          }
+        } else {
+            $result[] = $line;
         }
       }
     }
-
+    
     // Закрываем все открытые цитаты в конце
-    while ($currentLevel > 0) {
-      $result[] = "</blockquote>";
-      $currentLevel--;
+    if ($inQuote) {
+      for ($i = 0; $i < $currentLevel; $i++) {
+        $result[] = "</blockquote>";
+      }
     }
 
     return implode("\n", $result);
