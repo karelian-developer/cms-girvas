@@ -164,7 +164,7 @@ class NadvoParse
   {
     $currentLevel = 0;
 
-    $markdown = preg_replace('/^(&gt;+)/m', '>', $markdown);
+    $markdown = preg_replace('/^(&gt;)+/m', '>', $markdown);
     
     return preg_replace_callback(
       self::PATTERNS['quote'],
