@@ -162,38 +162,54 @@ class NadvoParse
 
   private function parseQuotes(string $markdown) : string
   {
-    $currentLevel = 0;
-
+    // Сначала восстанавливаем > из &gt; в цитатах
     $markdown = preg_replace('/^(&gt;)+/m', '>', $markdown);
     
-    return preg_replace_callback(
-      self::PATTERNS['quote'],
-      function($matches) use (&$currentLevel) {
+    // Обрабатываем вложенные цитаты
+    $lines = explode("\n", $markdown);
+    $result = [];
+    $quoteStack = [];
+    
+    foreach ($lines as $line) {
+      if (preg_match(self::PATTERNS['quote'], $line, $matches)) {
         $level = strlen($matches[1]);
         $content = trim($matches[2]);
-        $output = '';
         
         // Закрываем лишние уровни
-        if ($currentLevel > $level) {
-          $output .= str_repeat('</blockquote>', $currentLevel - $level);
+        while (!empty($quoteStack) && count($quoteStack) > $level) {
+          $result[] = '</blockquote>';
+          array_pop($quoteStack);
         }
         
         // Открываем новые уровни
-        if ($currentLevel < $level) {
-          $output .= str_repeat('<blockquote>', $level - $currentLevel);
+        while (count($quoteStack) < $level) {
+          $result[] = '<blockquote>';
+          $quoteStack[] = true;
         }
-        
-        $currentLevel = $level;
         
         // Добавляем содержимое
         if ($content !== '') {
-          $output .= '<p>' . $content . '</p>';
+          $result[] = '<p>' . $content . '</p>';
+        }
+      } else {
+        // Закрываем все цитаты для обычных строк
+        while (!empty($quoteStack)) {
+          $result[] = '</blockquote>';
+          array_pop($quoteStack);
         }
         
-        return $output;
-      },
-      $markdown
-    ) . str_repeat('</blockquote>', $currentLevel);
+        // Добавляем саму строку
+        $result[] = $line;
+      }
+    }
+    
+    // Закрываем все оставшиеся цитаты
+    while (!empty($quoteStack)) {
+      $result[] = '</blockquote>';
+      array_pop($quoteStack);
+    }
+    
+    return implode("\n", $result);
   }
 
   private function parseCodeBlocks(string $markdown) : string
