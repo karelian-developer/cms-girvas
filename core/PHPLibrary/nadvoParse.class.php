@@ -163,7 +163,16 @@ class NadvoParse
   private function parseQuotes(string $markdown) : string
   {
     // Сначала восстанавливаем > из &gt; в цитатах
-    $markdown = preg_replace('/^(&gt;)+/m', '>', $markdown);
+    $markdown = preg_replace_callback(
+      '/^(&gt;)+/m',
+      function($matches) {
+        // Количество &gt; в совпадении
+        $count = substr_count($matches[0], '&gt;');
+        // Возвращаем соответствующее количество >
+        return str_repeat('>', $count);
+      },
+      $markdown
+    );
     
     // Обрабатываем вложенные цитаты
     $lines = explode("\n", $markdown);
