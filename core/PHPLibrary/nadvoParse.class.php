@@ -22,7 +22,7 @@ class NadvoParse
     'video' => '/!\[video\]\((.+?)\)/',
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
-    'quote' => '/^(>+)\s?(.*)$/m',
+    'quote' => '/^(\>+)\s?(.*)$/m',
     'code_block' => '/\`\`\`([a-z]*)\R([\s\S]*?)\R\`\`\`/',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s',
@@ -45,6 +45,15 @@ class NadvoParse
   private function sanitizeInput(string $markdown) : string
   {
     $markdown = preg_replace(self::PATTERNS['dangerous_tags'], '', $markdown);
+
+    $markdown = preg_replace_callback(
+        '/^(>*)/m',
+        function($matches) {
+          return $matches[1];
+        },
+        $markdown
+    );
+
     $markdown = htmlspecialchars($markdown, ENT_NOQUOTES, 'UTF-8', false);
     
     return $markdown;
