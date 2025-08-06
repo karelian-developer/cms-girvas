@@ -69,7 +69,7 @@ if ($CMSCore->client->isLogged(2)) {
                 $inputValue = strip_tags($inputValue);
                 $inputValue = str_replace('\'', '"', $inputValue);
     
-                $entryData['texts'][$CMSLocaleName]['SEOTitle'] = $inputValue;
+                $pageStaticData['texts'][$CMSLocaleName]['SEOTitle'] = $inputValue;
               }
 
               if (array_key_exists($textareaDescriptionName, $_PATCH)) {
@@ -85,7 +85,7 @@ if ($CMSCore->client->isLogged(2)) {
                 $textareaValue = strip_tags($textareaValue);
                 $textareaValue = str_replace('\'', '"', $textareaValue);
     
-                $entryData['texts'][$CMSLocaleName]['SEODescription'] = $textareaValue;
+                $pageStaticData['texts'][$CMSLocaleName]['SEODescription'] = $textareaValue;
               }
 
               if (array_key_exists($textareaContentName, $_PATCH)) {
