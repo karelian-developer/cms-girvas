@@ -95,7 +95,9 @@ if (is_numeric($CMSCore->urlp->getPath(2))) {
       $handlerOutputData['entry']['id'] = $entry->getID();
       $handlerOutputData['entry']['name'] = $entry->getName();
       $handlerOutputData['entry']['title'] = $entry->getTitle($entryLocale);
+      $handlerOutputData['entry']['SEOTitle'] = $entry->getSEOTitle($entryLocale);
       $handlerOutputData['entry']['description'] = $entry->getDescription($entryLocale);
+      $handlerOutputData['entry']['SEODescription'] = $entry->getSEODescription($entryLocale);
       $handlerOutputData['entry']['content'] = $entry->getContent($entryLocale);
       $handlerOutputData['entry']['keywords'] = $entry->getKeywords($entryLocale);
       $handlerOutputData['entry']['authorID'] = $entry->getAuthorID();

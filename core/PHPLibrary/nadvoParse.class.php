@@ -16,11 +16,13 @@ class NadvoParse
     'header' => '/^(#{1,6})\s(.+)/m',
     'bold' => '/\*\*(.+?)\*\*|__(.+?)__/s',
     'italic' => '/\*(.+?)\*|_(.+?)_/s',
+    'underline' => '/\~\~(.+?)\~\~/s',
     'link' => '/\[([^\[\]]+)\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'image' => '/!\[(.+?)\]\((.+?)\)/',
     'video' => '/!\[video\]\((.+?)\)/',
+    'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
-    'quote' => '/^(>+)\s?(.+)/m',
+    'quote' => '/^(>+)\s?(.+)/g',
     'code_block' => '/\`\`\`([a-z]*)\R([\s\S]*?)\R\`\`\`/',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s',
@@ -288,21 +290,16 @@ class NadvoParse
 
   private function parseInlineElements(string $html) : string
   {
-    $html = preg_replace('/\*\*(.+?)\*\*/s', '<strong>$1</strong>', $html);
-    $html = preg_replace('/__(.+?)__/s', '<strong>$1</strong>', $html);
-    
-    $html = preg_replace('/\*([^*]+)\*/s', '<em>$1</em>', $html);
-    $html = preg_replace('/_([^_]+)_/s', '<em>$1</em>', $html);
-    
-    $html = preg_replace('/\~\~(.+?)\~\~/s', '<u>$1</u>', $html);
+    $html = preg_replace(self::PATTERNS['bold'], '<strong>$1</strong>', $html);
+    $html = preg_replace(self::PATTERNS['italic'], '<em>$1</em>', $html);
+    $html = preg_replace(self::PATTERNS['underline'], '<u>$1</u>', $html);
 
     $html = preg_replace_callback(
-      '/!\[video\]\((.+?)\)/',
+      self::PATTERNS['video'],
       function($matches) {
         $url = htmlspecialchars(trim($matches[1]));
         $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
         
-        // Basic video HTML with controls
         return '<div class="video-container"><video controls><source src="' . $url . '" type="video/' . $extension . '">' .
                'Ваш браузер не поддерживает работу с видео.</video></div>';
       },

@@ -28,7 +28,9 @@ if ($CMSCore->client->isLogged(2)) {
     $handlerOutputData['pageStatic']['id'] = $pageStatic->getID();
     $handlerOutputData['pageStatic']['name'] = $pageStatic->getName();
     $handlerOutputData['pageStatic']['title'] = $pageStatic->getTitle($pageStaticLocale);
+    $handlerOutputData['pageStatic']['SEOTitle'] = $pageStatic->getSEOTitle($pageStaticLocale);
     $handlerOutputData['pageStatic']['description'] = $pageStatic->getDescription($pageStaticLocale);
+    $handlerOutputData['pageStatic']['SEODescription'] = $pageStatic->getSEODescription($pageStaticLocale);
     $handlerOutputData['pageStatic']['content'] = $pageStatic->getContent($pageStaticLocale);
     $handlerOutputData['pageStatic']['keywords'] = $pageStatic->getKeywords($pageStaticLocale);
     $handlerOutputData['pageStatic']['authorID'] = $pageStatic->getAuthorID();

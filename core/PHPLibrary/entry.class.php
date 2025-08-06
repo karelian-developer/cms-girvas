@@ -182,7 +182,8 @@ class Entry implements EntityTypeContent
   /**
    * Получить заголовок записи
    *
-   * @param  mixed $localeName Наименование локализации
+   * @param string $localeName Наименование локализации
+   * 
    * @return string
    */
   public function getTitle(string $localeName = 'en_US') : string
@@ -192,6 +193,26 @@ class Entry implements EntityTypeContent
 
       if (isset($texts[$localeName]['title'])) {
         return $texts[$localeName]['title'];
+      }
+    }
+
+    return '';
+  }
+  
+  /**
+   * Получить заголовок SEO-записи
+   *
+   * @param string Наименование локализации
+   * 
+   * @return string
+   */
+  public function getSEOTitle(string $localeName = 'en_US') : string
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      if (isset($texts[$localeName]['SEOTitle'])) {
+        return $texts[$localeName]['SEOTitle'];
       }
     }
 
@@ -211,6 +232,25 @@ class Entry implements EntityTypeContent
 
       if (isset($texts[$localeName]['description'])) {
         return $texts[$localeName]['description'];
+      }
+    }
+
+    return '';
+  }
+
+  /**
+   * Получить SEO-описание записи
+   *
+   * @param string $localeName Наименование локализации
+   * @return string
+   */
+  public function getSEODescription(string $localeName = 'en_US') : string
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      if (isset($texts[$localeName]['SEODescription'])) {
+        return $texts[$localeName]['SEODescription'];
       }
     }
 

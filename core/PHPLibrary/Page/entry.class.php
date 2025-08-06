@@ -123,13 +123,29 @@ class PageEntry implements InterfacePage
           $category = $entry->getCategory();
           $categoryTitle = $category->getTitle($localeName);
 
-          $this->CMSCore->configurator->setMetaTitle($entry->getTitle($localeName));
-          $this->CMSCore->configurator->setMetaDescription(str_replace('"', '&quot;', $entry->getDescription($localeName)));
-          $this->CMSCore->configurator->setMetaKeywords(str_replace('"', '&quot;', $entry->getKeywords($localeName)));
+          $entryTitle = strip_tags($entry->getTitle($localeName));
+          $entrySEOTitle = strip_tags($entry->getSEOTitle($localeName));
+          $entrySEOTitle = $entrySEOTitle !== ''
+            ? $entrySEOTitle
+            : $entryTitle;
+
+          $entryDescription = strip_tags($entry->getTitle($localeName));
+          $entrySEODescription = strip_tags($entry->getSEOTitle($localeName));
+          $entrySEODescription = $entrySEODescription !== ''
+            ? $entrySEODescription
+            : $entryDescription;
+          $entrySEODescription = str_replace('"', '&quot;', $entrySEODescription);
+
+          $entryKeywords = $entry->getKeywords($localeName);
+          $entryKeywords = str_replace('"', '&quot;', $entryKeywords);
+
+          $this->CMSCore->configurator->setMetaTitle($entrySEOTitle);
+          $this->CMSCore->configurator->setMetaDescription($entrySEODescription);
+          $this->CMSCore->configurator->setMetaKeywords($entryKeywords);
 
           $this->page->breadcrumbs->add($localeData['PAGE_ENTRY_BREADCRUMPS_ALL_ENTRIES_LABEL'], '/entries');
           $this->page->breadcrumbs->add($categoryTitle, '/entries/' . $category->getName());
-          $this->page->breadcrumbs->add($entry->getTitle($localeName), '/entry/' . $entry->getName());
+          $this->page->breadcrumbs->add($entryTitle, '/entry/' . $entry->getName());
           $this->page->breadcrumbs->assembly();
 
           $nadvoParse = new NadvoParse();
@@ -195,12 +211,6 @@ class PageEntry implements InterfacePage
           }
 
           /**
-           * @var string Заголовок записи
-           */
-          $entryTitle = $entry->getTitle($localeName);
-          $entryTitle = strip_tags($entryTitle);
-          
-          /**
            * @var string Содержание записи
            */
           $entryContent = $entry->getContent($localeName);
@@ -233,6 +243,7 @@ class PageEntry implements InterfacePage
             'ENTRY_ID' => $entry->getID(),
             'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
             'ENTRY_TITLE' => $entryTitle,
+            'ENTRY_DESCRIPTION' => $entryDescription,
             'ENTRY_CONTENT' => $nadvoParse->parse($entryContent),
             'ENTRY_PREVIEW_URL' => $entry->getPreviewURL() !== '' ? $entry->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 1024),
             'ENTRY_CATEGORY_TITLE' => $categoryTitle,
