@@ -22,7 +22,7 @@ class NadvoParse
     'video' => '/!\[video\]\((.+?)\)/',
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
-    'quote' => '/^(>+)\s?(.*)/',
+    'quote' => '/^(>+)\s?(.*)$/m',
     'code_block' => '/\`\`\`([a-z]*)\R([\s\S]*?)\R\`\`\`/',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s',
@@ -162,55 +162,36 @@ class NadvoParse
 
   private function parseQuotes(string $markdown) : string
   {
-    $lines = explode("\n", $markdown);
-    $result = [];
-    $quoteStack = [];
     $currentLevel = 0;
-
-    foreach ($lines as $line) {
-      if (preg_match(self::PATTERNS['quote'], $line, $matches)) {
-        $level = strlen($matches[1]); // Количество '>' определяет уровень вложенности
-        $content = $matches[2];
-
-        if ($level > $currentLevel) {
-          // Начало новой вложенной цитаты
-          for ($i = $currentLevel; $i < $level; $i++) {
-            $quoteStack[] = "<blockquote>";
-            $result[] = $quoteStack[$i];
-          }
-        } elseif ($level < $currentLevel) {
-          // Выход из вложенных цитат
-          for ($i = $currentLevel - 1; $i >= $level; $i--) {
-            $result[] = "</blockquote>";
-            array_pop($quoteStack);
-          }
+    
+    return preg_replace_callback(
+      self::PATTERNS['quote'],
+      function($matches) use (&$currentLevel) {
+        $level = strlen($matches[1]);
+        $content = trim($matches[2]);
+        $output = '';
+        
+        // Закрываем лишние уровни
+        if ($currentLevel > $level) {
+          $output .= str_repeat('</blockquote>', $currentLevel - $level);
         }
-
+        
+        // Открываем новые уровни
+        if ($currentLevel < $level) {
+          $output .= str_repeat('<blockquote>', $level - $currentLevel);
+        }
+        
         $currentLevel = $level;
-        $result[] = $content;
-      } else {
-        if ($currentLevel > 0 && trim($line) !== '') {
-          // Продолжение цитаты
-          $result[] = $line;
-        } else {
-          // Выход из всех цитат
-          while ($currentLevel > 0) {
-            $result[] = "</blockquote>";
-            array_pop($quoteStack);
-            $currentLevel--;
-          }
-          $result[] = $line;
+        
+        // Добавляем содержимое
+        if ($content !== '') {
+          $output .= '<p>' . $content . '</p>';
         }
-      }
-    }
-
-    // Закрываем все открытые цитаты в конце
-    while ($currentLevel > 0) {
-      $result[] = "</blockquote>";
-      $currentLevel--;
-    }
-
-    return implode("\n", $result);
+        
+        return $output;
+      },
+      $markdown
+    ) . str_repeat('</blockquote>', $currentLevel);
   }
 
   private function parseCodeBlocks(string $markdown) : string
