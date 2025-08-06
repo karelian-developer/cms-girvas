@@ -265,10 +265,20 @@ class NadvoParse
     $inQuote = false;
 
     foreach ($lines as $line) {
-      if (strpos($line, '<blockquote>') !== false || $inQuote) {
-        $inQuote = strpos($line, '</blockquote>') === false;
+      if (str_starts_with(trim($line), '>')) {
+        if (!$inQuote) {
+          if (!empty($currentParagraph)) {
+            $html .= '<p>' . $currentParagraph . '</p>';
+            $currentParagraph = '';
+          }
+
+          $inQuote = true;
+        }
+        
         continue;
       }
+
+      $inQuote = false;
 
       if (str_starts_with(trim($line), '|')) {
         if (!$inTable) {
