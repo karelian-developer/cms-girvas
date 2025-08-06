@@ -22,7 +22,7 @@ class NadvoParse
     'video' => '/!\[video\]\((.+?)\)/',
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
-    'quote' => '/^(>+)\s?(.*)/',
+    'quote' => '/(>+)\s?(.*)/',
     'code_block' => '/\`\`\`([a-z]*)\R([\s\S]*?)\R\`\`\`/',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s',
@@ -168,7 +168,7 @@ class NadvoParse
     $inQuoteBlock = false;
 
     foreach ($lines as $line) {
-      if (preg_match('/^(>+)\s?(.*)/', $line, $matches)) {
+      if (preg_match(self::PATTERNS['quote'], $line, $matches)) {
         $level = strlen($matches[1]);
         $content = trim($matches[2]);
         
