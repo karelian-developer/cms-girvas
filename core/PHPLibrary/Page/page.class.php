@@ -120,24 +120,35 @@ class PagePage implements InterfacePage
         if ($this->isVisible($isPublished, $clientUser)) {
           http_response_code(200);
 
+          $pageStaticTitle = strip_tags($pageStatic->getTitle($localeName));
+          $pageStaticSEOTitle = strip_tags($pageStatic->getSEOTitle($localeName));
+          $pageStaticSEOTitle = $pageStaticSEOTitle !== ''
+            ? $pageStaticSEOTitle
+            : $pageStaticTitle;
+
+          $pageStaticDescription = strip_tags($pageStatic->getTitle($localeName));
+          $pageStaticSEODescription = strip_tags($pageStatic->getSEOTitle($localeName));
+          $pageStaticSEODescription = $pageStaticSEODescription !== ''
+            ? $pageStaticSEODescription
+            : $pageStaticDescription;
+          $pageStaticSEODescription = str_replace('"', '&quot;', $pageStaticSEODescription);
+
+          $pageStaticKeywords = $pageStatic->getKeywords($localeName);
+          $pageStaticKeywords = str_replace('"', '&quot;', $pageStaticKeywords);
+
           $this->page->breadcrumbs->add($localeData['PAGE_STATIC_PAGE_BREADCRUMPS_INDEX_LABEL'], '/');
-          $this->page->breadcrumbs->add($pageStatic->getTitle($this->CMSCore->configurator->getDatabaseEntryValue('base_locale')), $pageStatic->getName());
+          $this->page->breadcrumbs->add($pageStaticTitle, $pageStatic->getName());
           $this->page->breadcrumbs->assembly();
 
-          $this->CMSCore->configurator->setMetaTitle($pageStatic->getTitle($localeName));
-          $this->CMSCore->configurator->setMetaDescription(str_replace('"', '&quot;', $pageStatic->getDescription($localeName)));
-          $this->CMSCore->configurator->setMetaKeywords(str_replace('"', '&quot;', $pageStatic->getKeywords($localeName)));
+          $this->CMSCore->configurator->setMetaTitle($pageStaticSEOTitle);
+          $this->CMSCore->configurator->setMetaDescription($pageStaticSEODescription);
+          $this->CMSCore->configurator->setMetaKeywords($pageStaticKeywords);
 
           /**
            * @var Parsedown Парсер markdown-разметки
            */
           $parsedown = new Parsedown();
 
-          /**
-           * @var string Заголовок статической страницы
-           */
-          $pageStaticTitle = $pageStatic->getTitle($localeName);
-          $pageStaticTitle = strip_tags($pageStaticTitle);
           /**
            * @var string Содержание статической страницы
            */

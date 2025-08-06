@@ -43,7 +43,9 @@ export class PageEntry {
     }).then((localeData) => {
       let contentTextareaElement = document.querySelector('[role="entryContent"]');
       let descriptionTextareaElement = document.querySelector('[role="entryDescription"]');
+      let SEODescriptionTextareaElement = document.querySelector('[role="entrySEODescription"]');
       let titleInputElement = document.querySelector('[role="entryTitle"]');
+      let SEOTitleInputElement = document.querySelector('[role="entrySEOTitle"]');
       let keywordsInputElement = document.querySelector('[role="entryKeywords"]');
       let urlInputElement = document.querySelector('[role="entryURL"]');
 
@@ -75,7 +77,9 @@ export class PageEntry {
         if (locale.name === window.CMSCore.locales.admin.name) {
           contentTextareaElement.setAttribute('name', 'entry_content_' + locale.iso639_2);
           descriptionTextareaElement.setAttribute('name', 'entry_description_' + locale.iso639_2);
+          SEODescriptionTextareaElement.setAttribute('name', 'entry_seo_description_' + locale.iso639_2);
           titleInputElement.setAttribute('name', 'entry_title_' + locale.iso639_2);
+          SEOTitleInputElement.setAttribute('name', 'entry_seo_title_' + locale.iso639_2);
           keywordsInputElement.setAttribute('name', 'entry_keywords_' + locale.iso639_2);
 
           if (searchParams.getPathPart(3) !== null) {
@@ -90,7 +94,9 @@ export class PageEntry {
               if (data.statusCode === 1) {
                 contentTextareaElement.value = data.outputData.entry.content;
                 descriptionTextareaElement.value = data.outputData.entry.description;
+                SEODescriptionTextareaElement.value = data.outputData.entry.SEODescription;
                 titleInputElement.value = data.outputData.entry.title;
+                SEOTitleInputElement.value = data.outputData.entry.SEOTitle;
                 keywordsInputElement.value = data.outputData.entry.keywords.join(', ');
               }
             });
@@ -124,7 +130,9 @@ export class PageEntry {
           if (locale.name === event.target.value) {
             contentTextareaElement.setAttribute('name', 'entry_content_' + locale.iso639_2);
             descriptionTextareaElement.setAttribute('name', 'entry_description_' + locale.iso639_2);
+            SEODescriptionTextareaElement.setAttribute('name', 'entry_seo_description_' + locale.iso639_2);
             titleInputElement.setAttribute('name', 'entry_title_' + locale.iso639_2);
+            SEOTitleInputElement.setAttribute('name', 'entry_seo_title_' + locale.iso639_2);
             keywordsInputElement.setAttribute('name', 'entry_keywords_' + locale.iso639_2);
             
             if (searchParams.getPathPart(3) !== null) {
@@ -137,7 +145,9 @@ export class PageEntry {
                 if (data.statusCode === 1) {
                   contentTextareaElement.value = data.outputData.entry.content;
                   descriptionTextareaElement.value = data.outputData.entry.description;
+                  SEODescriptionTextareaElement.value = data.outputData.entry.SEODescription;
                   titleInputElement.value = data.outputData.entry.title;
+                  SEOTitleInputElement.value = data.outputData.entry.SEOTitle;
                   keywordsInputElement.value = data.outputData.entry.keywords.join(', ');
                 }
               });
