@@ -153,6 +153,7 @@ final class Core implements ThemeInterfaceCore
     $headElement = $document->createElement('head');
 
     $titleElement = $document->createElement('title', '{SITE_TITLE}');
+    $headElement->appendChild($titleElement);
 
     $metaCharsetElement = $document->createElement('meta');
     $metaCharsetElement->setAttribute('charset', '{SITE_CHARSET}');
