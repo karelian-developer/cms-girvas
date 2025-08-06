@@ -243,8 +243,24 @@ class NadvoParse
     $html = '';
     $currentParagraph = '';
     $inTable = false;
+    $inQuotes = false;
 
     foreach ($lines as $line) {
+      if (str_starts_with(trim($line), '>')) {
+        if (!$inQuotes) {
+          if (!empty($currentParagraph)) {
+            $html .= '<p>' . $currentParagraph . '</p>';
+            $currentParagraph = '';
+          }
+
+          $inQuotes = true;
+        }
+        
+        continue;
+      }
+
+      $inQuotes = false;
+
       if (str_starts_with(trim($line), '|')) {
         if (!$inTable) {
           if (!empty($currentParagraph)) {
