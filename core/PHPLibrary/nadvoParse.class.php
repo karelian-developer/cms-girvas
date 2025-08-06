@@ -45,15 +45,6 @@ class NadvoParse
   private function sanitizeInput(string $markdown) : string
   {
     $markdown = preg_replace(self::PATTERNS['dangerous_tags'], '', $markdown);
-
-    $markdown = preg_replace_callback(
-        '/^(>*)/m',
-        function($matches) {
-          return $matches[1];
-        },
-        $markdown
-    );
-
     $markdown = htmlspecialchars($markdown, ENT_NOQUOTES, 'UTF-8', false);
     
     return $markdown;
@@ -172,6 +163,8 @@ class NadvoParse
   private function parseQuotes(string $markdown) : string
   {
     $currentLevel = 0;
+
+    $markdown = preg_replace('/^(&gt;+)/m', '>', $markdown);
     
     return preg_replace_callback(
       self::PATTERNS['quote'],
