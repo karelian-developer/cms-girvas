@@ -22,7 +22,7 @@ class NadvoParse
     'video' => '/!\[video\]\((.+?)\)/',
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
-    'quote' => '/(>+)\s?(.*)/',
+    'quote' => '/(\>+)\s?(.*)/m',
     'code_block' => '/\`\`\`([a-z]*)\R([\s\S]*?)\R\`\`\`/',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s',
@@ -36,8 +36,8 @@ class NadvoParse
   {
     $markdown = $this->sanitizeInput($markdown);
     $markdown = $this->parseCodeBlocks($markdown);
-    $markdown = $this->parseQuotes($markdown);
     $markdown = $this->parseTables($markdown);
+    $markdown = $this->parseQuotes($markdown);
     $markdown = $this->parseBlocks($markdown);
     return $this->parseInlineElements($markdown);
   }
@@ -164,64 +164,50 @@ class NadvoParse
   {
     $lines = explode("\n", $markdown);
     $result = [];
+    $quoteStack = [];
     $currentLevel = 0;
-    $inQuoteBlock = false;
 
     foreach ($lines as $line) {
       if (preg_match(self::PATTERNS['quote'], $line, $matches)) {
-        $level = strlen($matches[1]);
-        $content = trim($matches[2]);
-        
-        // Если это начало цитаты
-        if (!$inQuoteBlock) {
-          $result[] = "<blockquote>";
-          $inQuoteBlock = true;
-        }
-        
-        // Обработка изменения уровня вложенности
-        while ($currentLevel < $level) {
-          $result[] = "<blockquote>";
-          $currentLevel++;
-        }
-        
-        while ($currentLevel > $level) {
-          $result[] = "</blockquote>";
-          $currentLevel--;
-        }
-        
-        // Добавляем содержимое
-        if ($content !== '') {
-          $result[] = "<p>" . $content . "</p>";
-        }
-      } else {
-        // Если строка не цитата
-        if ($inQuoteBlock) {
-          // Если строка пустая, закрываем все цитаты
-          if (trim($line) === '') {
-            while ($currentLevel > 0) {
-              $result[] = "</blockquote>";
-              $currentLevel--;
-            }
-            $result[] = "</blockquote>";
-            $inQuoteBlock = false;
-          } else {
-            // Иначе добавляем как обычный текст внутри цитаты
-            $result[] = "<p>" . $line . "</p>";
+        $level = strlen($matches[1]); // Количество '>' определяет уровень вложенности
+        $content = $matches[2];
+
+        if ($level > $currentLevel) {
+          // Начало новой вложенной цитаты
+          for ($i = $currentLevel; $i < $level; $i++) {
+            $quoteStack[] = "<blockquote>";
+            $result[] = $quoteStack[$i];
           }
+        } elseif ($level < $currentLevel) {
+          // Выход из вложенных цитат
+          for ($i = $currentLevel - 1; $i >= $level; $i--) {
+            $result[] = "</blockquote>";
+            array_pop($quoteStack);
+          }
+        }
+
+        $currentLevel = $level;
+        $result[] = $content;
+      } else {
+        if ($currentLevel > 0 && trim($line) !== '') {
+          // Продолжение цитаты
+          $result[] = $line;
         } else {
+          // Выход из всех цитат
+          while ($currentLevel > 0) {
+            $result[] = "</blockquote>";
+            array_pop($quoteStack);
+            $currentLevel--;
+          }
           $result[] = $line;
         }
       }
     }
-    
-    // Закрываем все открытые цитаты в конце
-    if ($inQuoteBlock) {
-      while ($currentLevel > 0) {
-        $result[] = "</blockquote>";
-        $currentLevel--;
-      }
 
+    // Закрываем все открытые цитаты в конце
+    while ($currentLevel > 0) {
       $result[] = "</blockquote>";
+      $currentLevel--;
     }
 
     return implode("\n", $result);
@@ -262,24 +248,8 @@ class NadvoParse
     $html = '';
     $currentParagraph = '';
     $inTable = false;
-    $inQuote = false;
 
     foreach ($lines as $line) {
-      if (str_starts_with(trim($line), '>')) {
-        if (!$inQuote) {
-          if (!empty($currentParagraph)) {
-            $html .= '<p>' . $currentParagraph . '</p>';
-            $currentParagraph = '';
-          }
-
-          $inQuote = true;
-        }
-        
-        continue;
-      }
-
-      $inQuote = false;
-
       if (str_starts_with(trim($line), '|')) {
         if (!$inTable) {
           if (!empty($currentParagraph)) {
