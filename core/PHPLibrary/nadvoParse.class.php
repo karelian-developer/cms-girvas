@@ -164,14 +164,21 @@ class NadvoParse
   {
     $lines = explode("\n", $markdown);
     $result = [];
-    $quoteStack = [];
     $currentLevel = 0;
+    $inQuoteBlock = false;
 
     foreach ($lines as $line) {
       if (preg_match('/^(>+)\s?(.*)/', $line, $matches)) {
         $level = strlen($matches[1]);
-        $content = $matches[2];
-
+        $content = trim($matches[2]);
+        
+        // Если это начало цитаты
+        if (!$inQuoteBlock) {
+          $result[] = "<blockquote>";
+          $inQuoteBlock = true;
+        }
+        
+        // Обработка изменения уровня вложенности
         while ($currentLevel < $level) {
           $result[] = "<blockquote>";
           $currentLevel++;
@@ -181,31 +188,43 @@ class NadvoParse
           $result[] = "</blockquote>";
           $currentLevel--;
         }
-
-        if (trim($content) !== '') {
-          $result[] = $content;
+        
+        // Добавляем содержимое
+        if ($content !== '') {
+          $result[] = "<p>" . $content . "</p>";
         }
       } else {
-        if (trim($line) === '') {
-          while ($currentLevel > 0) {
+        // Если строка не цитата
+        if ($inQuoteBlock) {
+          // Если строка пустая, закрываем все цитаты
+          if (trim($line) === '') {
+            while ($currentLevel > 0) {
+              $result[] = "</blockquote>";
+              $currentLevel--;
+            }
             $result[] = "</blockquote>";
-            $currentLevel--;
+            $inQuoteBlock = false;
+          } else {
+            // Иначе добавляем как обычный текст внутри цитаты
+            $result[] = "<p>" . $line . "</p>";
           }
+        } else {
+          $result[] = $line;
         }
-        
-        $result[] = $line;
       }
     }
+    
+    // Закрываем все открытые цитаты в конце
+    if ($inQuoteBlock) {
+      while ($currentLevel > 0) {
+        $result[] = "</blockquote>";
+        $currentLevel--;
+      }
 
-    while ($currentLevel > 0) {
       $result[] = "</blockquote>";
-      $currentLevel--;
     }
 
-    $output = implode("\n", $result);
-    $output = preg_replace('/<blockquote>\s*<\/blockquote>/', '', $output);
-    
-    return $output;
+    return implode("\n", $result);
   }
 
   private function parseCodeBlocks(string $markdown) : string
@@ -243,23 +262,13 @@ class NadvoParse
     $html = '';
     $currentParagraph = '';
     $inTable = false;
-    $inQuotes = false;
+    $inQuote = false;
 
     foreach ($lines as $line) {
-      if (str_starts_with(trim($line), '>')) {
-        if (!$inQuotes) {
-          if (!empty($currentParagraph)) {
-            $html .= '<p>' . $currentParagraph . '</p>';
-            $currentParagraph = '';
-          }
-
-          $inQuotes = true;
-        }
-        
+      if (strpos($line, '<blockquote>') !== false || $inQuote) {
+        $inQuote = strpos($line, '</blockquote>') === false;
         continue;
       }
-
-      $inQuotes = false;
 
       if (str_starts_with(trim($line), '|')) {
         if (!$inTable) {
