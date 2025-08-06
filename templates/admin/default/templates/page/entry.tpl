@@ -43,7 +43,7 @@
           </td>
           <td class="table__cell cell">
             <div class="page__phar-block">
-              <input name="entry_seo_title_rus" type="text" class="form__input entry-form__input" role="entryTitle" value="{ENTRY_SEO_TITLE}" placeholder="{LANG:PAGE_ENTRY_INPUT_SEO_TITLE_LABEL}">
+              <input name="entry_seo_title_rus" type="text" class="form__input entry-form__input" role="entrySEOTitle" value="{ENTRY_SEO_TITLE}" placeholder="{LANG:PAGE_ENTRY_INPUT_SEO_TITLE_LABEL}">
             </div>
           </td>
         </tr>
@@ -69,7 +69,7 @@
           </td>
           <td class="table__cell cell">
             <div class="page__phar-block">
-              <textarea name="entry_seo_description_rus" class="form__textarea entry-form__textarea" role="entryDescription" placeholder="{LANG:PAGE_ENTRY_INPUT_SEO_DESCRIPTION_LABEL}">{ENTRY_SEO_DESCRIPTION}</textarea>
+              <textarea name="entry_seo_description_rus" class="form__textarea entry-form__textarea" role="entrySEODescription" placeholder="{LANG:PAGE_ENTRY_INPUT_SEO_DESCRIPTION_LABEL}">{ENTRY_SEO_DESCRIPTION}</textarea>
             </div>
           </td>
         </tr>

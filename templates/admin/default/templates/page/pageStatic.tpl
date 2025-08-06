@@ -43,7 +43,7 @@
           </td>
           <td class="table__cell cell">
             <div class="page__phar-block">
-              <input name="page_static_seo_title_rus" type="text" class="form__input page-static-form__input" role="pageStaticTitle" value="{PAGE_STATIC_SEO_TITLE}" placeholder="{LANG:PAGE_STATIC_PAGE_INPUT_SEO_TITLE_LABEL}">
+              <input name="page_static_seo_title_rus" type="text" class="form__input page-static-form__input" role="pageStaticSEOTitle" value="{PAGE_STATIC_SEO_TITLE}" placeholder="{LANG:PAGE_STATIC_PAGE_INPUT_SEO_TITLE_LABEL}">
             </div>
           </td>
         </tr>
@@ -69,7 +69,7 @@
           </td>
           <td class="table__cell cell">
             <div class="page__phar-block">
-              <textarea name="page_static_seo_description_rus" class="form__textarea page-static-form__textarea" role="pageStaticDescription" placeholder="{LANG:PAGE_STATIC_PAGE_INPUT_SEO_DESCRIPTION_LABEL}">{PAGE_STATIC_SEO_DESCRIPTION}</textarea>
+              <textarea name="page_static_seo_description_rus" class="form__textarea page-static-form__textarea" role="pageStaticSEODescription" placeholder="{LANG:PAGE_STATIC_PAGE_INPUT_SEO_DESCRIPTION_LABEL}">{PAGE_STATIC_SEO_DESCRIPTION}</textarea>
             </div>
           </td>
         </tr>
