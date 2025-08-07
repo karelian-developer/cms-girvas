@@ -23,6 +23,7 @@ use \core\PHPLibrary\Users as Users;
 use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\Client\Session as ClientSession;
 use \DOMDocument as DOMDocument;
+use \DOMImplementation as DOMImplementation;
 
 #[\AllowDynamicProperties]
 final class Core implements ThemeInterfaceCore
