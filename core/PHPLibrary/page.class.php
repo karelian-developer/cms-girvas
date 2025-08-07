@@ -27,7 +27,9 @@ class Page
    */
   public function __construct(
     private CoreInterface $CMSCore
-  ) {}
+  ) {
+    $this->setBreadcrumps();
+  }
 
   /**
    * Установить "хлебные" крошки
