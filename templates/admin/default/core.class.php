@@ -435,13 +435,13 @@ final class Core implements ThemeInterfaceCore
 
     $bodyElement = $document->createElement('body');
 
-    if ($this->theme->CMSCore->client->isLogged(2)) {
-      $bodyElement->setAttribute('class', 'body body_base admin-panel');
+    if (!$this->theme->CMSCore->client->isLogged(2)) {
+      $bodyElement->setAttribute('class', 'body body_auth');
       $bodyContentElement = $document->createTextNode('{ADMIN_PANEL_HEADER}{ADMIN_PANEL_MAIN}{ADMIN_PANEL_FOOTER}');
       
       $bodyElement->appendChild($bodyContentElement);
     } else {
-      $bodyElement->setAttribute('class', 'body body_auth');
+      $bodyElement->setAttribute('class', 'body body_base admin-panel');
 
       $adminPanelWrapperElement = $document->createElement('div');
       $adminPanelWrapperElement->setAttribute('class', 'admin-panel__wrapper wrapper');
