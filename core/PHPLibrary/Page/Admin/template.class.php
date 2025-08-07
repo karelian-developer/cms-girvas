@@ -15,7 +15,7 @@ use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\EnumMetadata as ThemeEnumMetadata;
 use \core\PHPLibrary\Template\EnumWeight as ThemeEnumWeight;
-use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
@@ -118,12 +118,14 @@ class PageTemplate implements InterfacePage
       $isExists = isset($themeData['metadata']);
 
       if ($isExists) {
-        $parsedown = new Parsedown();
+        $nadvoParse = new NadvoParse();
 
         $themeMetadata = $themeData['metadata'];
         $themeTitle = $themeMetadata['title'];
         $themeDescription = file_get_contents($themeData['readme_url']);
-        $themeDescription = !empty($themeDescription) ? $parsedown->text($themeDescription) : $localeData['DEFAULT_TEXT_DESCRIPTION_NOT_FOUND'];
+        $themeDescription = !empty($themeDescription)
+          ? $nadvoParse->parse($themeDescription)
+          : $localeData['DEFAULT_TEXT_DESCRIPTION_NOT_FOUND'];
 
         if (count($themeData['screenshots']) > 0) {
           foreach ($themeData['screenshots'] as $screenshotURL) {
@@ -232,12 +234,12 @@ class PageTemplate implements InterfacePage
       }
 
       if ($isExistsFileMetadata) {
-        $parsedown = new Parsedown();
+        $nadvoParse = new NadvoParse();
 
         $themeMetadata = $theme->getMetadata();
         $themeTitle = $theme->getTitle();
         $themeDescription = $theme->getContentFileReadmeMD();
-        $themeDescription = $parsedown->text($themeDescription);
+        $themeDescription = $nadvoParse->parse($themeDescription);
 
         $themeScreenshotsFiles = $theme->getScreenshotsArray();
         if (count($themeScreenshotsFiles) > 0) {
@@ -335,8 +337,6 @@ class PageTemplate implements InterfacePage
       } else {
         $themeMetadataListTransformed = $localeData['PAGE_TEMPLATE_METADATA_BLOCK_METADATA_NOT_FOUND_TITLE'];
       }
-
-      $parsedown = new Parsedown();
 
       $themeVariables['ADMIN_PANEL_PAGE_NAME'] = 'template';
       $themeVariables['TEMPLATE_NAME'] = $themeName;

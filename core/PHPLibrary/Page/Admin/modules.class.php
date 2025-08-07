@@ -12,7 +12,7 @@ namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
-use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\Module as Module;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
@@ -76,7 +76,7 @@ class PageModules implements InterfacePage
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
 
-    $parsedown = new Parsedown();
+    $nadvoParse = new NadvoParse();
     $subpageName =  $this->CMSCore->urlp->getPath(2) ?? 'local';
 
     if (isset($this->navigationSubsections[$subpageName])) {
@@ -123,7 +123,7 @@ class PageModules implements InterfacePage
               [
                 'MODULE_NAME' => $name,
                 'MODULE_TITLE' => $metadataTitle,
-                'MODULE_DESCRIPTION' => $parsedown->text($metadataDescription),
+                'MODULE_DESCRIPTION' => $nadvoParse->parse($metadataDescription),
                 'MODULE_CREATED_TIMESTAMP' => date('d.m.Y', $metadataDatetimeCreatedUnix),
                 'MODULE_AUTHOR_NAME' => $metadataAuthorName,
                 'MODULE_LINK' => '/admin/modules/repository/' . $module->getName(),
@@ -160,7 +160,7 @@ class PageModules implements InterfacePage
               [
                 'MODULE_NAME' => $module->getName(),
                 'MODULE_TITLE' => $module->getTitle(),
-                'MODULE_DESCRIPTION' => $parsedown->text($module->getDescription()),
+                'MODULE_DESCRIPTION' => $nadvoParse->parse($module->getDescription()),
                 'MODULE_CREATED_TIMESTAMP' => date('d.m.Y', $module->getCoreCreatedUnixTimestamp()),
                 'MODULE_AUTHOR' => $module->getAuthorName(),
                 'MODULE_PREVIEW_URL' => $module->getPreviewURL(),

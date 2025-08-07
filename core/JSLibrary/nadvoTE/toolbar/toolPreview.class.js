@@ -48,7 +48,7 @@ export class ToolPreview extends Tool {
 
           let iFrameElementDocument = iFrameElement.contentDocument || iFrameElement.contentWindow.document;
 
-          iFrameElementDocument.body.innerHTML = data.outputData.parsedown;
+          iFrameElementDocument.body.innerHTML = data.outputData.nadvoparse;
           this.resizePreviewIFrame(iFrameElement);
         }).catch((error) => {
           console.error(error);

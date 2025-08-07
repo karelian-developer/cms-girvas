@@ -12,7 +12,7 @@ namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
-use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
@@ -76,7 +76,7 @@ class PageTemplates implements InterfacePage
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
 
-    $parsedown = new Parsedown();
+    $nadvoParse = new NadvoParse();
 
     $subpageName =  $this->CMSCore->urlp->getPath(2) ?? 'local';
     if (isset($this->navigationSubsections[$subpageName])) {
@@ -111,17 +111,17 @@ class PageTemplates implements InterfacePage
             $metadataAuthorName = isset($data['metadata']['authorName']) ? $data['metadata']['authorName'] : 'Anonymous';
             $metadataCategoryName = isset($data['metadata']['categoryName']) ? $data['metadata']['categoryName'] : 'default';
 
-            array_push($themesListItemsTransformed, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates/listItem.tpl', [
+            $themesListItemsTransformed[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates/listItem.tpl', [
               'TEMPLATE_NAME' => $name,
               'TEMPLATE_TITLE' => $metadataTitle,
-              'TEMPLATE_DESCRIPTION' => $parsedown->text($metadataDescription),
+              'TEMPLATE_DESCRIPTION' => $nadvoParse->parse($metadataDescription),
               'TEMPLATE_CREATED_TIMESTAMP' => date('d.m.Y', $metadataDatetimeCreatedUnix),
               'TEMPLATE_AUTHOR_NAME' => $metadataAuthorName,
               'TEMPLATE_LINK' => '/admin/templates/repository/' . $theme->getName(),
               'TEMPLATE_PREVIEW_URL' => $data['preview'],
               'TEMPLATE_INSTALLED_STATUS' => $themeInstalledStatus,
               'TEMPLATE_CATEGORY_NAME' => $metadataCategoryName
-            ]));
+            ]);
           }
         }
       }
@@ -138,17 +138,17 @@ class PageTemplates implements InterfacePage
           $themeInstalledStatus = $theme->existsFileMetadataJSON() ? 'installed' : 'not-installed';
           
           if ($theme->existsFileMetadataJSON()) {
-            array_push($themesListItemsTransformed, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates/listItem.tpl', [
+            $themesListItemsTransformed[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates/listItem.tpl', [
               'TEMPLATE_NAME' => $theme->getName(),
               'TEMPLATE_TITLE' => $theme->getTitle(),
-              'TEMPLATE_DESCRIPTION' => $parsedown->text($theme->getDescription()),
+              'TEMPLATE_DESCRIPTION' => $nadvoParse->parse($theme->getDescription()),
               'TEMPLATE_CREATED_TIMESTAMP' => date('d.m.Y', $theme->getCoreCreatedUnixTimestamp()),
               'TEMPLATE_AUTHOR' => $theme->getAuthorName(),
               'TEMPLATE_PREVIEW_URL' => $theme->getPreviewURL(),
               'TEMPLATE_LINK' => '/admin/template/' . $theme->getName(),
               'TEMPLATE_INSTALLED_STATUS' => $themeInstalledStatus,
               'TEMPLATE_CATEGORY_NAME' => $theme->getCategoryName(),
-            ]));
+            ]);
           }
 
           unset($theme);
