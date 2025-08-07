@@ -56,3 +56,16 @@ pre > code.language-css::before {
 pre > code.language-bash::before {
   content: 'bash';
 }
+
+blockquote {
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  font-style: italic;
+  font-size: 12px;
+  color: var(--primary-color-2);
+  border-left: 4px dashed var(--primary-color-3);
+  padding-left: 10px;
+  margin: 0;
+  max-width: 100%;
+}
