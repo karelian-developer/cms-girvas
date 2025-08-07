@@ -431,7 +431,7 @@ final class Core implements ThemeInterfaceCore
 
     if ($this->theme->CMSCore->client->isLogged(2)) {
       $bodyElement->setAttribute('class', 'body body_base admin-panel');
-      $bodyContentElement->createTextNode('{ADMIN_PANEL_HEADER}{ADMIN_PANEL_MAIN}{ADMIN_PANEL_FOOTER}');
+      $document->createTextNode('{ADMIN_PANEL_HEADER}{ADMIN_PANEL_MAIN}{ADMIN_PANEL_FOOTER}');
       
       $bodyElement->appendChild($bodyContentElement);
     } else {
@@ -443,7 +443,7 @@ final class Core implements ThemeInterfaceCore
       $adminPanelBasisElement = $document->createElement('div');
       $adminPanelBasisElement->setAttribute('class', 'admin-panel__basis basis');
 
-      $adminPanelBasisContentElement->createTextNode('{ADMIN_PANEL_HEADER}{ADMIN_PANEL_MAIN}{ADMIN_PANEL_FOOTER}');
+      $document->createTextNode('{ADMIN_PANEL_HEADER}{ADMIN_PANEL_MAIN}{ADMIN_PANEL_FOOTER}');
 
       $adminPanelBasisElement->appendChild($adminPanelBasisContentElement);
       $adminPanelWrapperElement->appendChild($adminPanelBasisElement);
