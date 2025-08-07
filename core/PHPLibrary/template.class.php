@@ -22,13 +22,10 @@ use \DOMDocument as DOMDocument;
 
 final class Template implements InterfaceTemplate
 {
-  public SystemCore $CMSCore;
   public ThemeLocale $locale;
   public ThemeInterfaceCore $core;
   private string $path;
   private string $url;
-  private string $name;
-  private string $category;
   
   private array $styles = [];
   private array $scripts = [];
@@ -52,31 +49,26 @@ final class Template implements InterfaceTemplate
   /**
    * __construct
    *
-   * @param  SystemCore $CMSCore Объект SystemCore
-   * @param  string $themeName Наименование шаблона
-   * @param  string $themeCategory Категория шаблона
+   * @param  CoreInterface $CMSCore
+   * @param  string $name
+   * @param  string $category
    * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore, string $themeName = 'default', string $themeCategory = 'base')
-  {
-    // Установка технического имени шаблона
-    $this->setName($themeName);
-    // Установка категории шаблона
-    $this->setCategory($themeCategory);
-
-    /** @var SystemCore Объект системного ядра */
-    $this->CMSCore = $CMSCore;
-
+  public function __construct(
+    public CoreInterface $CMSCore,
+    private string $name = 'default',
+    private string $category = 'base'
+  ) {
     if ($this->CMSCore->urlp->getPath(0) !== 'install') {
       /** @var ThemeLocale Объект локализации шаблона */
       $this->locale = new ThemeLocale($this, $this->CMSCore->locale->getName());
     }
 
     /** @var string Абсолютный путь до корневой директории шаблона */
-    $themePath = $themeCategory !== 'base' ? CMS_ROOT_DIRECTORY . '/templates/' . $themeCategory . '/' . $themeName : CMS_ROOT_DIRECTORY . '/templates/' . $themeName;
+    $themePath = $this->category !== 'base' ? CMS_ROOT_DIRECTORY . '/templates/' . $this->category . '/' . $this->name : CMS_ROOT_DIRECTORY . '/templates/' . $this->name;
     /** @var string Относительный URL до корневой директории шаблона */
-    $themeURL = $themeCategory !== 'base' ? 'templates/' . $themeCategory . '/' . $themeName : 'templates/' . $themeName;
+    $themeURL = $this->category !== 'base' ? 'templates/' . $this->category . '/' . $this->name : 'templates/' . $this->name;
     
     // Установка абсолютного пути до шаблона
     $this->setPath($themePath);

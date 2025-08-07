@@ -14,7 +14,6 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class Page
 {
-  private SystemCore $CMSCore;
   public PageBreadcrumbs $breadcrumbs;
   private string $name;
   public string $assembled = '';
@@ -22,14 +21,21 @@ class Page
   /**
    * __construct
    *
-   * @param  SystemCore $CMSCore
-   * @param  string $name
+   * @param CoreInterface $CMSCore
    * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore, array $directoryExploded)
+  public function __construct(
+    private CoreInterface $CMSCore
+  ) {}
+
+  /**
+   * Установить "хлебные" крошки
+   * 
+   * @return void
+   */
+  private function setBreadcrumps() : void
   {
-    $this->CMSCore = $CMSCore;
     $this->breadcrumbs = new PageBreadcrumbs($CMSCore);
   }
 
