@@ -28,7 +28,7 @@ class Page
   public function __construct(
     private CoreInterface $CMSCore
   ) {
-    $this->setBreadcrumps();
+    $this->setBreadcrumps($this->CMSCore);
   }
 
   /**
@@ -36,7 +36,7 @@ class Page
    * 
    * @return void
    */
-  private function setBreadcrumps() : void
+  private function setBreadcrumps(CoreInterface $CMSCore) : void
   {
     $this->breadcrumbs = new PageBreadcrumbs($CMSCore);
   }
