@@ -300,6 +300,11 @@ final class Core implements ThemeInterfaceCore
   {
     return ThemeCollector::assemblyFileContent($this->theme, 'templates/page/auth.tpl', $themeReplaces);
   }
+
+  public function assemblyAdminPanelNavigation(array $themeReplaces = []) : string
+  {
+    return ThemeCollector::assemblyFileContent($this->theme, 'templates/navigation.tpl', $themeReplaces);
+  }
   
   /**
    * Итоговая сборка шаблона
@@ -337,7 +342,8 @@ final class Core implements ThemeInterfaceCore
       $this->assembled = ThemeCollector::assembly($this->assemblyDocument(), [
         'ADMIN_PANEL_HEADER' => $this->assemblyHeader(),
         'ADMIN_PANEL_MAIN' => $this->assemblyMain(),
-        'ADMIN_PANEL_FOOTER' => $this->assemblyFooter()
+        'ADMIN_PANEL_FOOTER' => $this->assemblyFooter(),
+        'ADMIN_PANEL_NAVIGATION' => $this->assemblyAdminPanelNavigation()
       ]);
     } else {
       $this->theme->addStyle(['href' => 'styles/page/auth.css', 'rel' => 'stylesheet']);
