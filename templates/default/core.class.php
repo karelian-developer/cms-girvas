@@ -185,13 +185,13 @@ final class Core implements ThemeInterfaceCore
 
       if (in_array($faviconWidth, [192, 180, 167, 152, 120])) {
         $linkFaviconElement->setAttribute('rel', 'apple-touch-icon');
-        $linkFaviconElement->setAttribute('href', $themeURL . '/favicons/apple-touch-icon-' . $faviconSizesLabel . '.png');
+        $linkFaviconElement->setAttribute('href', '/' . $themeURL . '/favicons/apple-touch-icon-' . $faviconSizesLabel . '.png');
       }
 
       if (in_array($faviconWidth, [512, 256, 128, 96, 64, 48, 32, 16])) {
         $linkFaviconElement->setAttribute('rel', 'icon');
         $linkFaviconElement->setAttribute('type', 'image/png');
-        $linkFaviconElement->setAttribute('href', $themeURL . '/favicons/favicon-' . $faviconSizesLabel . '.png');
+        $linkFaviconElement->setAttribute('href', '/' . $themeURL . '/favicons/favicon-' . $faviconSizesLabel . '.png');
       }
 
       $linkFaviconElement->setAttribute('sizes', $faviconSizesLabel);

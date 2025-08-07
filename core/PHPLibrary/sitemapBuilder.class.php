@@ -24,7 +24,7 @@ final class SitemapBuilder
   /**
    * __construct
    * 
-   * @param SystemCore $CMSCore
+   * @param CoreInterface $CMSCore
    */
   public function __construct(
     private CoreInterface $CMSCore

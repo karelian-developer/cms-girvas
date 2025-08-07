@@ -294,26 +294,6 @@ final class Core implements ThemeInterfaceCore
   {
     return ThemeCollector::assemblyFileContent($this->theme, 'templates/footer.tpl', $themeReplaces);
   }
-  
-  /**
-   * Сборка основной части документа
-   *
-   * @param  mixed $themeReplaces Массив тегами шаблона и их значениями
-   * @return string
-   */
-  public function assemblyDocument(array $themeReplaces = []) : string
-  {
-    /** @var string $assembled Содержимое шаблона */
-    $assembled;
-
-    if ($this->theme->CMSCore->client->isLogged(2)) {
-      $themeContent = ThemeCollector::assemblyFileContent($this->theme, 'templates/documentBase.tpl', $themeReplaces);
-    } else {
-      $themeContent = ThemeCollector::assemblyFileContent($this->theme, 'templates/documentAuth.tpl', $themeReplaces);
-    }
-
-    return $themeContent;
-  }
 
   public function assemblyAuthAdminPage(array $themeReplaces = []) : string
   {
@@ -367,5 +347,112 @@ final class Core implements ThemeInterfaceCore
         'ADMIN_PANEL_FOOTER' => ''
       ]);
     }
+  }
+  
+  /**
+   * Сборка основной части документа
+   *
+   * @param  mixed $themeVars Массив с переменами темы и их значениями
+   * 
+   * @return string
+   */
+  public function assemblyDocument(array $themeVars = []) : string
+  {
+    $themeURL = $this->theme->getURL();
+    $themeLocale = $this->theme->locale;
+    $themeLocaleName = $themeLocale->getName();
+
+    $documentLang = mb_substr($themeLocaleName, 0, 2);
+    $documentLang = strtolower($documentLang);
+
+    $document = new DOMDocument('1.0', 'UTF-8');
+    $implementation = new DOMImplementation();
+    $documentType = $implementation->createDocumentType('html');
+    $document->appendChild($documentType);
+
+    $HTMLElement = $document->createElement('html');
+    $HTMLElement->setAttribute('lang', $documentLang);
+
+    $headElement = $document->createElement('head');
+
+    $titleElement = $document->createElement('title', '{SITE_TITLE}');
+    $headElement->appendChild($titleElement);
+
+    $metaCharsetElement = $document->createElement('meta');
+    $metaCharsetElement->setAttribute('charset', '{SITE_CHARSET}');
+    $headElement->appendChild($metaCharsetElement);
+
+    $metaHTTPEquivElement = $document->createElement('meta');
+    $metaHTTPEquivElement->setAttribute('http-equiv', 'X-UA-Compatible');
+    $metaHTTPEquivElement->setAttribute('content', 'IE=edge');
+    $headElement->appendChild($metaHTTPEquivElement);
+
+    $metaViewportElement = $document->createElement('meta');
+    $metaViewportElement->setAttribute('name', 'viewport');
+    $metaViewportElement->setAttribute('content', 'width=device-width, initial-scale=1.0');
+    $headElement->appendChild($metaViewportElement);
+
+    $metaDescriptionElement = $document->createElement('meta');
+    $metaDescriptionElement->setAttribute('name', 'description');
+    $metaDescriptionElement->setAttribute('content', '{SITE_DESCRIPTION}');
+    $headElement->appendChild($metaDescriptionElement);
+
+    $metaKeywordsElement = $document->createElement('meta');
+    $metaKeywordsElement->setAttribute('name', 'keywords');
+    $metaKeywordsElement->setAttribute('content', '{SITE_KEYWORDS}');
+    $headElement->appendChild($metaKeywordsElement);
+
+    foreach ([256, 192, 180, 167, 152, 128, 120, 96, 64, 48, 32, 16] as $faviconWidth) {
+      $linkFaviconElement = $document->createElement('link');
+      $faviconSizesLabel = $faviconWidth . 'x' . $faviconWidth;
+
+      if (in_array($faviconWidth, [192, 180, 167, 152, 120])) {
+        $linkFaviconElement->setAttribute('rel', 'apple-touch-icon');
+        $linkFaviconElement->setAttribute('href', '/' . $themeURL . '/favicons/apple-touch-icon-' . $faviconSizesLabel . '.png');
+      }
+
+      if (in_array($faviconWidth, [512, 256, 128, 96, 64, 48, 32, 16])) {
+        $linkFaviconElement->setAttribute('rel', 'icon');
+        $linkFaviconElement->setAttribute('type', 'image/png');
+        $linkFaviconElement->setAttribute('href', '/' . $themeURL . '/favicons/favicon-' . $faviconSizesLabel . '.png');
+      }
+
+      $linkFaviconElement->setAttribute('sizes', $faviconSizesLabel);
+      $headElement->appendChild($linkFaviconElement);
+    }
+
+    $linkManifestElement = $document->createElement('link');
+    $linkManifestElement->setAttribute('rel', 'manifest');
+    $linkManifestElement->setAttribute('href', '/manifest');
+    $headElement->appendChild($linkManifestElement);
+
+    $bodyElement = $document->createElement('body', '{ADMIN_PANEL_HEADER}{ADMIN_PANEL_MAIN}{ADMIN_PANEL_FOOTER}');
+
+    if ($this->theme->CMSCore->client->isLogged(2)) {
+      $bodyElement->setAttribute('class', 'body body_base admin-panel');
+      $bodyContentElement->createTextNode('{ADMIN_PANEL_HEADER}{ADMIN_PANEL_MAIN}{ADMIN_PANEL_FOOTER}');
+      
+      $bodyElement->appendChild($bodyContentElement);
+    } else {
+      $bodyElement->setAttribute('class', 'body body_auth');
+
+      $adminPanelWrapperElement = $document->createElement('div');
+      $adminPanelWrapperElement->setAttribute('class', 'admin-panel__wrapper wrapper');
+
+      $adminPanelBasisElement = $document->createElement('div');
+      $adminPanelBasisElement->setAttribute('class', 'admin-panel__basis basis');
+
+      $adminPanelBasisContentElement->createTextNode('{ADMIN_PANEL_HEADER}{ADMIN_PANEL_MAIN}{ADMIN_PANEL_FOOTER}');
+
+      $adminPanelBasisElement->appendChild($adminPanelBasisContentElement);
+      $adminPanelWrapperElement->appendChild($adminPanelBasisElement);
+      $bodyElement->appendChild($adminPanelWrapperElement);
+    }
+
+    $HTMLElement->appendChild($headElement);
+    $HTMLElement->appendChild($bodyElement);
+    $document->appendChild($HTMLElement);
+
+    return $document->saveHTML();
   }
 }
