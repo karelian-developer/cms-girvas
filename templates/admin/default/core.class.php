@@ -382,7 +382,7 @@ final class Core implements ThemeInterfaceCore
 
     $headElement = $document->createElement('head');
 
-    $titleElement = $document->createElement('title', '{SITE_TITLE}');
+    $titleElement = $document->createElement('title', '{SITE_TITLE} | Admin');
     $headElement->appendChild($titleElement);
 
     $metaCharsetElement = $document->createElement('meta');
