@@ -94,11 +94,11 @@ final class Template implements InterfaceTemplate
     $this->addStyle(['href' => 'normalize.css', 'rel' => 'stylesheet', 'isCore' => true]);
     $this->addStyle(['href' => 'default-colors-scheme.css', 'rel' => 'stylesheet', 'isCore' => true]);
     $this->addStyle(['href' => 'default-base.css', 'rel' => 'stylesheet', 'isCore' => true]);
-    $this->addStyle(['href' => 'default-fonts.css', 'rel' => 'stylesheet', 'isCore' => true]);
+    $this->addStyle(['href' => 'default-fonts.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
     $this->addStyle(['href' => 'default-forms.css', 'rel' => 'stylesheet', 'isCore' => true]);
     $this->addStyle(['href' => 'default-tables.css', 'rel' => 'stylesheet', 'isCore' => true]);
-    $this->addStyle(['href' => 'default-interactive.css', 'rel' => 'stylesheet', 'isCore' => true]);
-    $this->addStyle(['href' => 'default-notifications.css', 'rel' => 'stylesheet', 'isCore' => true]);
+    $this->addStyle(['href' => 'default-interactive.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
+    $this->addStyle(['href' => 'default-notifications.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
 
     /** @var string $corePath Путь до файла ядра шаблона */
     $corePath = $this->getCorePath();
@@ -120,7 +120,7 @@ final class Template implements InterfaceTemplate
     }
 
     // Если ядро не было найдено - завершаем работу с ошибкой
-    die(sprintf('Template core "%s" is not exists!', $coreClass));
+    die('Template core "' . $coreClass . '" is not exists!');
   }
   
   /**

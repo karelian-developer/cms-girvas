@@ -15,20 +15,28 @@ use \DOMDocument as DOMDocument;
 final class FeedBuilder
 {
   private DOMDocument $document;
-  private SystemCore $CMSCore;
   private array $items = [];
   private string $language = 'en-us';
   public string $assembled = '';
   
   /**
    * __construct
-   *
-   * @param  SystemCore $CMSCore
+   * 
+   * @param CoreInterface $CMSCore
+   */
+  public function __construct(
+    private CoreInterface $CMSCore
+  ) {
+    $this->setDocument();
+  }
+
+  /**
+   * Назначить пустой документа
+   * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore)
+  private function setDocument() : void
   {
-    $this->CMSCore = $CMSCore;
     $this->document = new DOMDocument('1.0');
   }
   

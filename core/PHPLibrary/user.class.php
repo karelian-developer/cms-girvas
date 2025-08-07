@@ -28,21 +28,18 @@ class User
   // ID администратора системы (суперпользователя)
   public const ADMIN_ID = 1;
 
-  private readonly CMSCore $CMSCore;
-  private int $id;
-  
   /**
    * __construct
    *
-   * @param  CMSCore $CMSCore
-   * @param  mixed $id
+   * @param CoreInterface $CMSCore
+   * @param int $id
+   * 
    * @return void
    */
-  public function __construct(CMSCore $CMSCore, int $id)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->setID($id);
-  }
+  public function __construct(
+    private CoreInterface $CMSCore,
+    private int $id
+  ) {}
 
   /**
    * Инициализировать данные
@@ -57,17 +54,6 @@ class User
     foreach ($columns as $name => $data) {
       $this->{$name} = $data;
     }
-  }
-
-  /**
-   * Назначить ID
-   *
-   * @param  mixed $value
-   * @return void
-   */
-  private function setID(int $value) : void
-  {
-    $this->id = $value;
   }
   
   /**

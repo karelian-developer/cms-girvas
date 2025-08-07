@@ -20,20 +20,18 @@ namespace core\PHPLibrary;
  */
 class Timestamp
 {
-  public SystemCore $CMSCore;
-  private int $time;
-
   /**
    * __construct
-   * 
-   * @param SystemCore $CMSCore
+   *
+   * @param CoreInterface $CMSCore
    * @param int $time
+   * 
+   * @return void
    */
-  public function __construct(SystemCore $CMSCore, int $time)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->setTime($time);
-  }
+  public function __construct(
+    private CoreInterface $CMSCore,
+    private int $time
+  ) {}
 
   /**
    * Установить время (UNIX)
