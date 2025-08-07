@@ -11,7 +11,7 @@
 namespace core\PHPLibrary\Template;
 
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\LocaleInterface as LocaleInterface;
 use \core\PHPLibrary\Module\Locale as ModuleLocale;
 use \core\PHPLibrary\Template as Theme;
@@ -163,15 +163,10 @@ final class Collector
           $fileMarkdownPath = $localeCorePath . '/' . $value;
           
           if (file_exists($fileMarkdownPath)) {
-            /**
-             * @var Parsedown Парсер markdown-разметки
-             */
-            $parsedown = new Parsedown();
-            $parsedown->setSafeMode(true);
-            $parsedown->setMarkupEscaped(true);
+            $nadvoParse = new NadvoParse();
 
             $fileMarkdownContent = file_get_contents($fileMarkdownPath);
-            $themeTransformed = strtr($themeTransformed, ["{LANG:MD:{$name}}" => $parsedown->text($fileMarkdownContent)]);
+            $themeTransformed = strtr($themeTransformed, ["{LANG:MD:{$name}}" => $nadvoParse->parse($fileMarkdownContent)]);
           }
         }
       }
