@@ -72,7 +72,7 @@ class PagePage implements InterfacePage
       return true;
     }
 
-    if ($isPublished && $user !== null) {
+    if ($user !== null) {
       $userGroup = $user->getGroup();
 
       if ($userGroup !== null) {
