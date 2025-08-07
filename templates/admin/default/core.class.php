@@ -446,12 +446,15 @@ final class Core implements ThemeInterfaceCore
       $adminPanelWrapperElement = $document->createElement('div');
       $adminPanelWrapperElement->setAttribute('class', 'admin-panel__wrapper wrapper');
 
+      $adminPanelNavigationElement = $document->createTextNode('{ADMIN_PANEL_NAVIGATION}');
+
       $adminPanelBasisElement = $document->createElement('div');
       $adminPanelBasisElement->setAttribute('class', 'admin-panel__basis basis');
 
       $adminPanelBasisContentElement = $document->createTextNode('{ADMIN_PANEL_HEADER}{ADMIN_PANEL_MAIN}{ADMIN_PANEL_FOOTER}');
 
       $adminPanelBasisElement->appendChild($adminPanelBasisContentElement);
+      $adminPanelWrapperElement->appendChild($adminPanelNavigationElement);
       $adminPanelWrapperElement->appendChild($adminPanelBasisElement);
       $bodyElement->appendChild($adminPanelWrapperElement);
     }
