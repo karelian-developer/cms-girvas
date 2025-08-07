@@ -710,7 +710,6 @@ final class Template implements InterfaceTemplate
       /**
        * Добавление стилей в секцию HEAD
        */
-
       $headStyles = $this->getStyles();
       if (isset($elementHead[0])) {
         foreach ($headStyles as $elementData) {
@@ -734,11 +733,16 @@ final class Template implements InterfaceTemplate
               $styleHref = $themeCategoryName !== 'base' ? $styleHrefIsNotBase : $styleHrefIsBase;
             }
 
-            $attributeRel = $document->createAttribute('rel');
-            $attributeRel->value = $elementData['rel'];
+            $linkElement->setAttribute('href', $styleHref);
+            $linkElement->setAttribute('rel', $elementData['rel']);
 
-            $attributeHref = $document->createAttribute('href');
-            $attributeHref->value = $styleHref;
+            if (isset($elementData['as'])) {
+              $elementLink->setAttribute('as', $elementData['as']);
+            }
+
+            if (isset($elementData['onload'])) {
+              $elementLink->setAttribute('onload', $elementData['onload']);
+            }
             
             $elementLink->appendChild($attributeRel);
             $elementLink->appendChild($attributeHref);
