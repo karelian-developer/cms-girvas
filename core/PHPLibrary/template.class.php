@@ -733,8 +733,8 @@ final class Template implements InterfaceTemplate
               $styleHref = $themeCategoryName !== 'base' ? $styleHrefIsNotBase : $styleHrefIsBase;
             }
 
-            $linkElement->setAttribute('href', $styleHref);
-            $linkElement->setAttribute('rel', $elementData['rel']);
+            $elementLink->setAttribute('href', $styleHref);
+            $elementLink->setAttribute('rel', $elementData['rel']);
 
             if (isset($elementData['as'])) {
               $elementLink->setAttribute('as', $elementData['as']);
