@@ -69,6 +69,14 @@ final class Collector
         $linkElement->setAttribute('href', $styleHref);
         $linkElement->setAttribute('rel', $style['rel']);
 
+        if (isset($style['as'])) {
+          $linkElement->setAttribute('as', $style['as']);
+        }
+
+        if (isset($style['onload'])) {
+          $linkElement->setAttribute('onload', $style['onload']);
+        }
+
         $document->appendChild($linkElement);
       }
     }
