@@ -427,7 +427,7 @@ final class Core implements ThemeInterfaceCore
     $linkManifestElement->setAttribute('href', '/manifest');
     $headElement->appendChild($linkManifestElement);
 
-    $bodyElement = $document->createElement('body', '{ADMIN_PANEL_HEADER}{ADMIN_PANEL_MAIN}{ADMIN_PANEL_FOOTER}');
+    $bodyElement = $document->createElement('body');
 
     if ($this->theme->CMSCore->client->isLogged(2)) {
       $bodyElement->setAttribute('class', 'body body_base admin-panel');
