@@ -26,20 +26,19 @@ use \PDOException as PDOException;
 #[\AllowDynamicProperties]
 final class Metrics
 {
-  /** @var SystemCore|null Объект системного ядра */
-  public SystemCore|null $CMSCore = null;
   /** @var string Временная отметка */
   public int $timestamp = 0;
 
   /**
    * __construct
+   *
+   * @param CoreInterface $CMSCore
    * 
-   * @param SystemCore $CMSCore
+   * @return void
    */
-  public function __construct(SystemCore $CMSCore)
-  {
-    $this->CMSCore = $CMSCore;
-  }
+  public function __construct(
+    public CoreInterface $CMSCore
+  ) {}
 
   /**
    * Установить временную отметку

@@ -15,19 +15,16 @@ use \PDOException as PDOException;
 
 final class Feeds
 {
-  private SystemCore $CMSCore;
-  
   /**
    * __construct
    *
-   * @param  mixed $CMSCore
+   * @param CoreInterface $CMSCore
    * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore)
-  {
-    $this->CMSCore = $CMSCore;
-  }
+  public function __construct(
+    private CoreInterface $CMSCore
+  ) {}
   
   public function getAll(array $params = []) : array
   {

@@ -18,20 +18,18 @@ use \PDOException as PDOException;
 #[\AllowDynamicProperties]
 class EntryCategory implements EntityTypeContent
 {
-  private readonly SystemCore $CMSCore;
-  private int $id;
-
   /**
    * __construct
    *
-   * @param  SystemCore $CMSCore
+   * @param CoreInterface $CMSCore
+   * @param int $id
+   * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore, int $id)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->setID($id);
-  }
+  public function __construct(
+    private CoreInterface $CMSCore,
+    private int $id
+  ) {}
   
   /**
    * Инициализация данных из БД
@@ -45,17 +43,6 @@ class EntryCategory implements EntityTypeContent
     foreach ($columnsData as $name => $data) {
       $this->{$name} = $data;
     }
-  }
-  
-  /**
-   * Назначить идентификатор записи
-   *
-   * @param  mixed $value
-   * @return void
-   */
-  private function setID(int $value) : void
-  {
-    $this->id = $value;
   }
   
   /**
