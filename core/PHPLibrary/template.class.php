@@ -743,9 +743,6 @@ final class Template implements InterfaceTemplate
             if (isset($elementData['onload'])) {
               $elementLink->setAttribute('onload', $elementData['onload']);
             }
-            
-            $elementLink->appendChild($attributeRel);
-            $elementLink->appendChild($attributeHref);
           }
 
           $elementHead[0]->appendChild($elementLink);
