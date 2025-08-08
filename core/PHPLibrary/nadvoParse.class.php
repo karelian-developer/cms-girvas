@@ -373,7 +373,7 @@ class NadvoParse
       function($matches) {
         $alt = htmlspecialchars(trim($matches[1]), ENT_QUOTES);
         $src = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
-        $src = str_replace('_', '&lowbar;', $src);
+        $src = str_replace('_', '&#95;', $src);
         $attrs = [];
         
         if (isset($matches[3])) {
