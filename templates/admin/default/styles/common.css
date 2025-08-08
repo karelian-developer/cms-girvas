@@ -57,6 +57,10 @@ a:active {
   margin: 0 auto;
 }
 
+.body.body_base {
+  display: block;
+}
+
 .body.body_base .container {
   width: calc(100% - 40px);
 }

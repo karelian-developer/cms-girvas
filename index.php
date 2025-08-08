@@ -18,7 +18,6 @@ use \core\PHPLibrary\SystemCore as CMSCore;
 
 // Абсолютный путь до корневой директории CMS
 define('CMS_ROOT_DIRECTORY', preg_replace('/[\/]*$/', '', $_SERVER['DOCUMENT_ROOT']));
-
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 ini_set('error_log', CMS_ROOT_DIRECTORY . '/logs/girvas-error.log');
