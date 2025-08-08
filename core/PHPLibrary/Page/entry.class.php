@@ -29,13 +29,13 @@ class PageEntry implements InterfacePage
    * __construct
    *
    * @param  CMSCore $CMSCore
-   * @param  Page $page
+   * @param  InterfacePage $page
    * 
    * @return void
    */
   public function __construct(
     public CMSCore $CMSCore,
-    public Page $page
+    public InterfacePage $page
   ) {
     $this->initTargetObject();
     $this->targetObject->initData(
@@ -139,7 +139,9 @@ class PageEntry implements InterfacePage
     $entry = $this->targetObject;
 
     if ($entry !== null) {
-      $entryName = urldecode($this->CMSCore->urlp->getPath(1));
+      $entryName = $this->CMSCore->urlp->getPath(1);
+      $entryName = urldecode($entryName);
+
       if ($this->CMSCore->urlp->getParam('locale') === $localeName) {
         $this->CMSCore->theme->addLinkCanonical('/entry/' . $entry->getName());
       }
