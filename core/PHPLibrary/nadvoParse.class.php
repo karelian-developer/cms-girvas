@@ -375,7 +375,7 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['image'],
       function($matches) {
-        $src = htmlspecialchars($matches[2]);
+        $src = $matches[2];
         $alt = htmlspecialchars($matches[1]);
         $attrs = [];
         
@@ -402,7 +402,7 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['link'],
       function($matches) {
-        $href = urldecode($matches[2]);
+        $href = htmlspecialchars($matches[2]);
         $text = htmlspecialchars($matches[1]);
         $attrs = [];
         
