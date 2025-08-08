@@ -12,7 +12,7 @@ namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
-class Page
+class Page implements InterfacePage
 {
   public PageBreadcrumbs $breadcrumbs;
   private string $name;
