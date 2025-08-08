@@ -403,7 +403,7 @@ class NadvoParse
         $href = str_replace('_', '&#95;', $href);
         
         $text = htmlspecialchars(trim($matches[1]));
-        $text = !empty($text) ? $href;
+        $text = !empty($text) ? $href : $text;
         $attrs = [];
         
         if (isset($matches[3])) {
