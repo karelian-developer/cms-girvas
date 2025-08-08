@@ -528,6 +528,8 @@ final class Template implements InterfaceTemplate
         $systemLocaleName = $CMSLocale->getName();
 
         $siteTitle = $CMSConfigurator->getMetaTitle() ?: $CMSConfigurator->getSiteTitle();
+        $siteMetaTitle = $CMSConfigurator->getMetaTitle();
+        $siteConfigTitle = $CMSConfigurator->getSiteTitle();
         $siteDescription = $CMSConfigurator->getMetaDescription() ?: $CMSConfigurator->getSiteDescription();
         $siteKeywords = $CMSConfigurator->getMetaKeywordsImploded() ?: $CMSConfigurator->getSiteKeywords();
         $siteCharset = $CMSConfigurator->getSiteCharset();
@@ -543,6 +545,8 @@ final class Template implements InterfaceTemplate
         'SITE_SCRIPTS' => ThemeCollector::assemblyScripts($this, $this->getScripts()),
         'SITE_TEMPLATE_URL' => $themeCategory !== 'base' ? '/templates/' . $themeCategory . '/' . $this->getName() : '/templates/' . $this->getName(),
         'SITE_TITLE' => $siteTitle,
+        'SITE_CONFIG_TITLE' => $siteConfigTitle,
+        'SITE_META_TITLE' => $siteMetaTitle,
         'SITE_DESCRIPTION' => $siteDescription,
         'SITE_KEYWORDS' => $siteKeywords,
         'SITE_CHARSET' => $siteCharset,
