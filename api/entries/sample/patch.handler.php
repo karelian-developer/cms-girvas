@@ -60,6 +60,9 @@ if ($CMSCore->client->isLogged(2)) {
     if (count($CMSLocalesNames) > 0) {
       foreach ($CMSLocalesNames as $index => $localeName) {
         $CMSLocale = new Locale($CMSCore, $localeName);
+        $CMSLocale->setTypeName('handler');
+        $CMSLocale->initPathes();
+        
         $CMSLocaleName = $CMSLocale->getName();
 
         $inputTitleName = 'entries_sample_title_' . $CMSLocale->getISO639(2);
