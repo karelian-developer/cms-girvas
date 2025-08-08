@@ -10,6 +10,7 @@
 
 namespace core\PHPLibrary\Page;
 
+use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Page as Page;
@@ -21,21 +22,33 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class PageEntry implements InterfacePage
 {
-  public CMSCore $CMSCore;
-  public Page $page;
   public string $assembled = '';
+  private ?EntityTypeContent $targetObject = null;
 
   /**
    * __construct
    *
    * @param  CMSCore $CMSCore
    * @param  Page $page
+   * 
    * @return void
    */
-  public function __construct(CMSCore $CMSCore, Page $page)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->page = $page;
+  public function __construct(
+    public CMSCore $CMSCore,
+    public Page $page
+  ) {
+    $this->initTargetObject();
+    $this->targetObject->initData(
+      [
+        'id',
+        'categoryID',
+        'texts',
+        'name',
+        'createdUnixTimestamp',
+        'updatedUnixTimestamp',
+        'metadata'
+      ]
+    );
   }
 
   /**
@@ -83,6 +96,32 @@ class PageEntry implements InterfacePage
     }
     
     return false;
+  }
+
+  /**
+   * Инициализировать целевой объект страницы
+   * 
+   * @return void
+   */
+  private function initTargetObject() : void
+  {
+    if ($this->CMSCore->urlp->getPath(1) !== null) {
+      $entryName = urldecode($this->CMSCore->urlp->getPath(1));
+
+      if (Entry::existsByName($this->CMSCore, $entryName)) {
+        $this->targetObject = Entry::getByName($this->CMSCore, $entryName);
+      }
+    }
+  }
+
+  /**
+   * Получить целевой объект страницы
+   * 
+   * @return ?EntityTypeContent
+   */
+  public function getTargetObject() : ?EntityTypeContent
+  {
+    return $this->targetObject;
   }
   
   /**
