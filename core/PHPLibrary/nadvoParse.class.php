@@ -400,6 +400,7 @@ class NadvoParse
       self::PATTERNS['link'],
       function($matches) {
         $href = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
+        $href = str_replace('_', '&#95;', $href);
 
         $text = htmlspecialchars($matches[1]);
         $attrs = [];
