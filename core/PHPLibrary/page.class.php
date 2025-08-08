@@ -82,21 +82,8 @@ class Page implements InterfacePage
    *
    * @return void
    */
-  public function assembly() : string
+  public function assembly() : void
   {
-    /** @var string $themePath Путь до шаблона */
-    $themePath = $this->theme->getPath();
-    $fileTemplatePath = $themePath . '/page.tpl';
-
-    if (file_exists($fileTemplatePath)) {
-      $pageThemePath = $themePath . '/page/' . $this->getName() . '.tpl';
-
-      if (file_exists($pageThemePath)) {
-        $pageTheme = file_get_contents($pageThemePath);
-        return ThemeCollector::assembly($pageTheme, [
-          'PAGE_NAME' => $this->getName(),
-        ]);
-      }
-    }
+    
   }
 }
