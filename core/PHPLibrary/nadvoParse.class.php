@@ -356,10 +356,6 @@ class NadvoParse
 
   private function parseInlineElements(string $html) : string
   {
-    $html = preg_replace(self::PATTERNS['bold'], '<strong>$1</strong>', $html);
-    $html = preg_replace(self::PATTERNS['italic'], '<em>$1</em>', $html);
-    $html = preg_replace(self::PATTERNS['underline'], '<u>$1</u>', $html);
-
     $html = preg_replace_callback(
       self::PATTERNS['video'],
       function($matches) {
@@ -403,6 +399,7 @@ class NadvoParse
       self::PATTERNS['link'],
       function($matches) {
         $href = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
+
         $text = htmlspecialchars($matches[1]);
         $attrs = [];
         
@@ -425,6 +422,10 @@ class NadvoParse
       },
       $html
     );
+
+    $html = preg_replace(self::PATTERNS['bold'], '<strong>$1</strong>', $html);
+    $html = preg_replace(self::PATTERNS['italic'], '<em>$1</em>', $html);
+    $html = preg_replace(self::PATTERNS['underline'], '<u>$1</u>', $html);
     
     return $html;
   }
