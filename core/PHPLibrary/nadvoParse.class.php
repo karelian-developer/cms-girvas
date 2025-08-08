@@ -401,8 +401,9 @@ class NadvoParse
       function($matches) {
         $href = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
         $href = str_replace('_', '&#95;', $href);
-
-        $text = htmlspecialchars($matches[1]);
+        
+        $text = htmlspecialchars(trim($matches[1]));
+        $text = !empty($text) ? $href;
         $attrs = [];
         
         if (isset($matches[3])) {
