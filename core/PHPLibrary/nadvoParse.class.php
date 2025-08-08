@@ -402,7 +402,7 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['link'],
       function($matches) {
-        $href = htmlspecialchars($matches[2]);
+        $href = urldecode($matches[2]);
         $text = htmlspecialchars($matches[1]);
         $attrs = [];
         
