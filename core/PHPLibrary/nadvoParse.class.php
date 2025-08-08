@@ -56,50 +56,65 @@ class NadvoParse
 
   private function parseLists(string $markdown) : string
   {
-    return preg_replace_callback(
-      self::PATTERNS['list_group'],
-      function($matches) {
-        $lines = explode("\n", $matches[0]);
-        $stack = [];
-        $result = [];
-        $currentLevel = 0;
+    $lines = explode("\n", $markdown);
+    $result = [];
+    $stack = [];
+    $currentLevel = 0;
+    
+    foreach ($lines as $line) {
+      // Определяем тип элемента списка
+      if (preg_match('/^(\s*)(\d+\.|\*|\+|\-)\s+(.+)/', $line, $matches)) {
+        $indent = strlen($matches[1]);
+        $isOrdered = is_numeric($matches[2][0]);
+        $content = $matches[3];
+        $level = floor($indent / 4) + 1; // 4 пробела = 1 уровень
         
-        foreach ($lines as $line) {
-          if (preg_match(self::PATTERNS['ul_item'], $line, $m) || preg_match(self::PATTERNS['ol_item'], $line, $m)) {
-            $level = strlen($m[1]);
-            $isOrdered = is_numeric($m[1][0]);
-            $content = $m[2];
-            
-            // Закрываем лишние уровни
-            while ($currentLevel > $level) {
-              $result[] = array_pop($stack)['close'];
-              $currentLevel--;
-            }
-            
-            // Открываем новые уровни
-            if ($currentLevel < $level) {
-              $tag = $isOrdered ? 'ol' : 'ul';
-              $result[] = "<{$tag}>";
-              $stack[] = [
-                'tag' => $tag,
-                'close' => "</{$tag}>"
-              ];
-              $currentLevel = $level;
-            }
-            
-            $result[] = "<li>{$content}</li>";
-          }
+        // Закрываем предыдущие уровни
+        while ($currentLevel > $level) {
+          $result[] = array_pop($stack)['close'];
+          $currentLevel--;
         }
         
-        // Закрываем все открытые теги
+        // Открываем новые уровни
+        if ($currentLevel < $level) {
+          $tag = $isOrdered ? 'ol' : 'ul';
+          $result[] = "<{$tag}>";
+          $stack[] = [
+            'tag' => $tag,
+            'close' => "</{$tag}>",
+            'isOrdered' => $isOrdered
+          ];
+          $currentLevel = $level;
+        }
+        // Если изменился тип списка на том же уровне
+        elseif (end($stack)['isOrdered'] !== $isOrdered) {
+          $result[] = array_pop($stack)['close'];
+          $tag = $isOrdered ? 'ol' : 'ul';
+          $result[] = "<{$tag}>";
+          $stack[] = [
+            'tag' => $tag,
+            'close' => "</{$tag}>",
+            'isOrdered' => $isOrdered
+          ];
+        }
+        
+        $result[] = "<li>{$content}</li>";
+      } else {
+        // Закрываем все списки для обычного текста
         while (!empty($stack)) {
           $result[] = array_pop($stack)['close'];
+          $currentLevel--;
         }
-        
-        return implode("\n", $result);
-      },
-      $markdown
-    );
+        $result[] = $line;
+      }
+    }
+    
+    // Закрываем все оставшиеся списки
+    while (!empty($stack)) {
+      $result[] = array_pop($stack)['close'];
+    }
+    
+    return implode("\n", $result);
   }
 
   private function parseTables(string $markdown) : string
