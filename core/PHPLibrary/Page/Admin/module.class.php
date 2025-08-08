@@ -251,7 +251,7 @@ class PageModule implements InterfacePage
         'ADMIN_PANEL_PAGE_NAME' => 'module',
         'MODULE_NAME' => $moduleName,
         'MODULE_TITLE' => $moduleTitle,
-        'MODULE_DESCRIPTION' => $nadvoParse->parse($moduleDescription),
+        'MODULE_DESCRIPTION' => $moduleDescription,
         'MODULE_GALLARY_LIST' => $moduleGalleryList,
         'MODULE_METADATA_LIST' => $metadataListTransformed,
         'MODULE_ENABLED_STATUS' => $module->isEnabled() ? 'enabled' : 'disabled',

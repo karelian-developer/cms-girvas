@@ -26,6 +26,9 @@ class NadvoParse
     'code_block' => '/\`\`\`([a-z]*)\R([\s\S]*?)\R\`\`\`/',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s',
+    'unordered_list' => '/^([*+-])\s+(.+)$/m',
+    'ordered_list' => '/^(\d+)\.\s+(.+)$/m',
+    'list_item' => '/^([*+-]|\d+\.)\s+(.+)$/m',
     'dangerous_tags' => '/<\?(?:php)?.*?\?>|<(script|iframe)[^>]*>.*?<\/\1>/is'
   ];
 
@@ -37,6 +40,7 @@ class NadvoParse
     $markdown = $this->sanitizeInput($markdown);
     $markdown = $this->parseCodeBlocks($markdown);
     $markdown = $this->parseQuotes($markdown);
+    $markdown = $this->parseLists($markdown);
     $markdown = $this->parseTables($markdown);
     $markdown = $this->parseBlocks($markdown);
     return $this->parseInlineElements($markdown);
@@ -48,6 +52,60 @@ class NadvoParse
     $markdown = htmlspecialchars($markdown, ENT_NOQUOTES, 'UTF-8', false);
     
     return $markdown;
+  }
+
+  private function parseLists(string $markdown) : string
+  {
+    $lines = explode("\n", $markdown);
+    $result = [];
+    $listStack = [];
+    $currentIndent = 0;
+    
+    foreach ($lines as $line) {
+      if (preg_match('/^(\s*)([*+-]|\d+\.)\s+(.+)$/', $line, $matches)) {
+        $indent = strlen($matches[1]);
+        $isOrdered = is_numeric(substr($matches[2], 0, 1));
+        $content = $matches[3];
+        
+        // Закрываем лишние уровни
+        while ($currentIndent > $indent && !empty($listStack)) {
+          $result[] = str_repeat('</li></' . array_pop($listStack) . '>', $currentIndent - $indent);
+          $currentIndent = $indent;
+        }
+        
+        // Открываем новые уровни
+        if ($indent > $currentIndent) {
+          $type = $isOrdered ? 'ol' : 'ul';
+          $result[] = str_repeat("<{$type}><li>", $indent - $currentIndent);
+          $listStack = array_merge($listStack, array_fill(0, $indent - $currentIndent, $type));
+          $currentIndent = $indent;
+        } elseif (!empty($listStack)) {
+          $result[] = '</li><li>';
+        } else {
+          $type = $isOrdered ? 'ol' : 'ul';
+          $result[] = "<{$type}><li>";
+          $listStack[] = $type;
+          $currentIndent = 1;
+        }
+        
+        $result[] = $content;
+      } else {
+        // Закрываем все списки для обычных строк
+        if (!empty($listStack)) {
+          $result[] = str_repeat('</li></' . array_pop($listStack) . '>', $currentIndent);
+          $currentIndent = 0;
+        }
+
+        $result[] = $line;
+      }
+    }
+    
+    // Закрываем все оставшиеся списки
+    if (!empty($listStack)) {
+      $result[] = str_repeat('</li></' . array_pop($listStack) . '>', $currentIndent);
+    }
+    
+    return implode("\n", $result);
   }
 
   private function parseTables(string $markdown) : string
