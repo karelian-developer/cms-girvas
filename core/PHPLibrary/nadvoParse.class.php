@@ -88,7 +88,7 @@ class NadvoParse
           $currentIndent = 1;
         }
         
-        $result[] = $content;
+        $result[] = $this->parseInlineElements($matches[3]);
       } else {
         // Закрываем все списки для обычных строк
         if (!empty($listStack)) {
