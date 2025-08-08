@@ -82,7 +82,7 @@ class Page implements InterfacePage
    *
    * @return void
    */
-  private function assembly() : string
+  public function assembly() : string
   {
     /** @var string $themePath Путь до шаблона */
     $themePath = $this->theme->getPath();
