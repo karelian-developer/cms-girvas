@@ -12,7 +12,7 @@ use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\Feed as Feed;
 use \core\PHPLibrary\Feed\Builder as FeedBuilder;
-use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
 if (!defined('IS_NOT_HACKED')) {
@@ -50,12 +50,7 @@ if (defined('IS_NOT_HACKED')) {
         $entriesArray = $entries->getByCategoryID($feed->getEntriesCategoryID());
       }
 
-      /**
-       * @var Parsedown Парсер markdown-разметки
-       */
-      $parsedown = new Parsedown();
-      $parsedown->setSafeMode(true);
-      $parsedown->setMarkupEscaped(true);
+      $nadvoParse = new NadvoParse();
 
       foreach ($entriesArray as $entry) {
         $entry->initData(['name', 'metadata', 'texts', 'updatedUnixTimestamp']);
@@ -66,7 +61,7 @@ if (defined('IS_NOT_HACKED')) {
         $feedBuilder->feed->addItem([
           'title' => $entry->getTitle($localeName),
           'description' => $entry->getDescription($localeName),
-          'content' => $parsedown->text($entry->getContent($localeName)),
+          'content' => $nadvoParse->parse($entry->getContent($localeName)),
           'preview_url' => $entry->getPreviewURL(),
           'link' => $entryLink,
           'pubdate' => $entry->getUpdatedUnixTimestamp(),
