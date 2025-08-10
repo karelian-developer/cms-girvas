@@ -238,6 +238,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       curl_setopt($ch, CURLOPT_POST, true);
       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
         'ip' => $clientIP,
+        'external_ip' => $externalIP,
         'domain' => $CMSCore->configurator->get('domain'),
         'system_salt' => $CMSCore->configurator->get('salt'),
         'php_version' => phpversion(),
