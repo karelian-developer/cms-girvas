@@ -12,6 +12,7 @@ use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\EmailSender as EmailSender;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\Template\Manifest as ThemeManifest;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\SystemCore as CMSCore;
 
@@ -31,6 +32,7 @@ if (PHP_VERSION_ID < 80200) {
 
 $startTime = microtime(true);
 
+require_once CMS_ROOT_DIRECTORY . '/core/PHPLibrary/core.interface.php';
 require_once CMS_ROOT_DIRECTORY . '/core/PHPLibrary/systemCore.class.php';
 
 $CMSCore = new CMSCore();
@@ -50,6 +52,20 @@ if ($CMSURLPathes[0] === 'handler') {
 } else if ($CMSURLPathes[0] === 'feed') {
 
   include_once CMS_ROOT_DIRECTORY . '/feed.php';
+
+} else if ($CMSURLPathes[0] === 'manifest') {
+
+  $theme = $CMSCore->getTheme();
+
+  $manifest = new ThemeManifest($CMSCore->configurator, $theme->core);
+  foreach([256, 128, 96, 64, 48, 32, 16] as $faviconWidth) {
+    $faviconSizesLabel = $faviconWidth . 'x' . $faviconWidth;
+    $faviconURL = '/favicons/favicon-' . $faviconSizesLabel . '.png';
+    $manifest->addIcon($faviconURL, [$faviconWidth, $faviconWidth], 'image/png');
+  }
+
+  header('Content-Type: application/json');
+  echo $manifest->getJSON();
 
 } else if ($CMSURLPathes[0] === 'password-reset') {
 

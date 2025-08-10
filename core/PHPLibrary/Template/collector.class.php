@@ -11,7 +11,7 @@
 namespace core\PHPLibrary\Template;
 
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\LocaleInterface as LocaleInterface;
 use \core\PHPLibrary\Module\Locale as ModuleLocale;
 use \core\PHPLibrary\Template as Theme;
@@ -22,6 +22,7 @@ final class Collector
   private const TEMPLATE_TAG_PATTERN = '/\{([a-zA-Z0-9_]+)\}/';
   private const TEMPLATE_TAG_LANG_PATTERN = '/\{LANG\:([a-zA-Z0-9_]+)\}/';
   private const TEMPLATE_TAG_LANG_MARKDOWN_PATTERN = '/\{LANG\:MD\:([a-zA-Z0-9_]+)\}/';
+  private const TEMPLATE_TAG_PROPERTY_PATTERN = '/\{PROP\:([a-zA-Z0-9_]+)\}/';
   private const TEMPLATE_LOGIC_IF_PATTERN = '/\{\?IF\:([a-zA-Z0-9_]+)([=<>!]+)([a-zA-Z0-9_]+)\?\}(.*)\{\?ENDIF\?\}/is';
   private const TEMPLATE_LOGIC_IF_ELSE_PATTERN = '/\{\?IF\:([a-zA-Z0-9_]+)([=<>!]+)([a-zA-Z0-9_]+)\?\}(.*){\?ELSE\?\}(.*)\{\?ENDIF\?\}/is';
   private Theme $theme;
@@ -67,6 +68,14 @@ final class Collector
         $linkElement = $document->createElement('link');
         $linkElement->setAttribute('href', $styleHref);
         $linkElement->setAttribute('rel', $style['rel']);
+
+        if (isset($style['as'])) {
+          $linkElement->setAttribute('as', $style['as']);
+        }
+
+        if (isset($style['onload'])) {
+          $linkElement->setAttribute('onload', $style['onload']);
+        }
 
         $document->appendChild($linkElement);
       }
@@ -162,15 +171,35 @@ final class Collector
           $fileMarkdownPath = $localeCorePath . '/' . $value;
           
           if (file_exists($fileMarkdownPath)) {
-            /**
-             * @var Parsedown Парсер markdown-разметки
-             */
-            $parsedown = new Parsedown();
-            $parsedown->setSafeMode(true);
-            $parsedown->setMarkupEscaped(true);
+            $nadvoParse = new NadvoParse();
 
             $fileMarkdownContent = file_get_contents($fileMarkdownPath);
-            $themeTransformed = strtr($themeTransformed, ["{LANG:MD:{$name}}" => $parsedown->text($fileMarkdownContent)]);
+            $themeTransformed = strtr($themeTransformed, ["{LANG:MD:{$name}}" => $nadvoParse->parse($fileMarkdownContent)]);
+          }
+        }
+      }
+    }
+
+    return $themeTransformed;
+  }
+
+  /**
+   * Сборка шаблона на основе значений свойств темы
+   * 
+   * @param string $themeString
+   * @param array $propertiesData
+   * 
+   * @return string
+   */
+  public static function assemblyPropertiesValues(string $themeString, array $propertiesData) : string
+  {
+    $themeTransformed = $themeString;
+
+    if (!empty($propertiesData)) {
+      foreach ($propertiesData as $name => $data) {
+        if (isset($propertiesData[$name]['value'])) {
+          if (preg_match(self::TEMPLATE_TAG_PROPERTY_PATTERN, $themeTransformed)) {
+            $themeTransformed = strtr($themeTransformed, ["{PROP:{$name}}" => $data['value']]);
           }
         }
       }

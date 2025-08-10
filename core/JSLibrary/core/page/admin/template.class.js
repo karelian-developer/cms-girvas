@@ -58,7 +58,7 @@ export class PageTemplate {
 
   init() {
     let searchParams = new URLParser(), locales;
-    let buttons = {install: null, download: null, delete: null};
+    let buttons = {install: null, download: null, delete: null, saveProperties: null};
 
     let templateBlock = document.querySelector('.template');
     let templateName = templateBlock.getAttribute('data-template-name');
@@ -80,7 +80,7 @@ export class PageTemplate {
 
       interactiveNotification.target.show();
     }).then((localeData) => {
-      if (searchParams.getPathPart(2) != null) {
+      if (searchParams.getPathPart(2) !== null) {
         let pageGalleryElement = templateBlock.querySelector('[role="gallery"]');
         if (pageGalleryElement != null) {
           this.initGallery(pageGalleryElement); 
@@ -115,7 +115,7 @@ export class PageTemplate {
         buttons.delete.target.setCallback(() => {
           let formData = new FormData();
           formData.append('template_name', templateName);
-          formData.append('template_category', 'default');
+          formData.append('template_category', 'base');
 
           let request = new Interactive('request', {
             method: 'DELETE',
@@ -161,6 +161,90 @@ export class PageTemplate {
           });
         });
 
+        if (templateInstalledStatus === 'installed') {
+          buttons.saveProperties = new Interactive('button');
+          buttons.saveProperties.target.setLabel(localeData.BUTTON_SAVE_LABEL);
+          buttons.saveProperties.target.setCallback(() => {
+            if (themePropertiesContainerElement !== null && !buttons.saveProperties.target.isDisabled()) {
+              let formData = new FormData();
+
+              formData.append('template_name', templateName);
+              formData.append('template_category', 'base');
+
+              let propertiesValues = themePropertiesContainerElement.querySelectorAll('input, select');
+              propertiesValues.forEach((property) => {
+                if (!property.hasAttribute('disabled')) {
+                  let propertyName = property.name;
+                  let propertyValue = (!property.hasAttribute('data-file')) ? property.value : property.getAttribute('data-file');
+
+                  formData.append(propertyName, propertyValue);
+                }
+              });
+
+              let request = new Interactive('request', {
+                method: 'PATCH',
+                url: '/handler/template?localeMessage=' + window.CMSCore.locales.admin.name
+              });
+
+              request.target.data = formData;
+
+              request.target.send();
+            }
+          });
+
+          let themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
+          let propertiesFilesValues = themePropertiesContainerElement.querySelectorAll('input[type="file"]');
+          propertiesFilesValues.forEach((property) => {
+            let buttonTrigger = new Interactive('button');
+            buttonTrigger.target.setLabel(localeData.BUTTON_DOWNLOAD_LABEL);
+            buttonTrigger.target.setCallback(() => {
+              property.click();
+            });
+
+            buttonTrigger.assembly();
+
+            property.after(buttonTrigger.target.element);
+
+            property.addEventListener('change', (event) => {
+              buttons.saveProperties.target.disable();
+
+              event.preventDefault();
+
+              property.setAttribute('disabled', 'disabled');
+
+              let file = event.target.files[0], fileReader = new FileReader();
+
+              if (!fileReader) {
+                console.error(`[CMSCore] ${localeData.REPORT_JS_CMSCORE_ERROR_FILEREADER_IS_NOT_SUPPORTED}.`);
+                return;
+              }
+
+              if (event.target.files.length === 0) {
+                console.error(`[CMSCore] ${localeData.REPORT_JS_CMSCORE_ERROR_IMAGES_WHERE_NOT_LOADED}.`);
+                return;
+              }
+
+              fileReader.onload = (event) => {
+                buttons.saveProperties.target.enable();
+                property.removeAttribute('disabled');
+                property.setAttribute('data-file', fileReader.result);
+              };
+
+              fileReader.onerror = (event) => {
+                buttons.saveProperties.target.enable();
+                console.error(fileReader.result);
+              };
+
+              fileReader.readAsDataURL(file);
+            });
+          });
+
+          buttons.saveProperties.assembly();
+
+          buttons.saveProperties.target.element.style.display = templateInstalledStatus === 'installed' ? 'flex' : 'none';
+          themePropertiesContainerElement.after(buttons.saveProperties.target.element);
+        }
+
         buttons.delete.assembly();
         buttons.install.assembly();
         buttons.download.assembly();
@@ -170,9 +254,9 @@ export class PageTemplate {
           buttons.delete.target.element.style.display = 'none';
           buttons.install.target.element.style.display = 'none';
         } else {
-          buttons.download.target.element.style.display = (templateDownloadedStatus === 'downloaded') ? 'none' : 'flex';
-          buttons.delete.target.element.style.display = (templateDownloadedStatus === 'downloaded') ? 'flex' : 'none';
-          buttons.install.target.element.style.display = (templateDownloadedStatus === 'downloaded') ? 'flex' : 'none';
+          buttons.download.target.element.style.display = templateDownloadedStatus === 'downloaded' ? 'none' : 'flex';
+          buttons.delete.target.element.style.display = templateDownloadedStatus === 'downloaded' ? 'flex' : 'none';
+          buttons.install.target.element.style.display = templateDownloadedStatus === 'downloaded' ? 'flex' : 'none';
         }
     
         interactiveContainerElement.append(buttons.download.target.element);

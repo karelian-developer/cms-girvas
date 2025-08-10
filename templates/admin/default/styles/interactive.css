@@ -102,6 +102,9 @@
 .interactive .interactive__button:active {
   background-color: var(--interactive-button-background-color--active);
 }
+.interactive .interactive__button:disabled {
+  background-color: var(--common-main-color-2);
+}
 .interactive .interactive__button-icon {
   margin-right: 10px;
   width: 16px;

@@ -14,18 +14,16 @@ use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 
 final class EntriesCategories
 {
-  private SystemCore $CMSCore;
-  
   /**
    * __construct
    *
-   * @param  mixed $CMSCore
+   * @param CoreInterface $CMSCore
+   * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore)
-  {
-    $this->CMSCore = $CMSCore;
-  }
+  public function __construct(
+    private CoreInterface $CMSCore,
+  ) {}
   
   /**
    * Получить массив объектов всех категорий

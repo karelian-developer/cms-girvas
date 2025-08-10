@@ -36,6 +36,19 @@
         </tr>
         <tr class="table__row">
           <td class="table__cell cell">
+            <div class="cell__title">{LANG:PAGE_STATIC_PAGE_INPUT_SEO_TITLE_LABEL}</div>
+            <div class="cell__description">
+              <div class="page__phar-block">{LANG:PAGE_STATIC_PAGE_INPUT_SEO_TITLE_DESCRIPTION}</div>
+            </div>
+          </td>
+          <td class="table__cell cell">
+            <div class="page__phar-block">
+              <input name="page_static_seo_title_rus" type="text" class="form__input page-static-form__input" role="pageStaticSEOTitle" value="{PAGE_STATIC_SEO_TITLE}" placeholder="{LANG:PAGE_STATIC_PAGE_INPUT_SEO_TITLE_LABEL}">
+            </div>
+          </td>
+        </tr>
+        <tr class="table__row">
+          <td class="table__cell cell">
             <div class="cell__title">{LANG:PAGE_STATIC_PAGE_INPUT_DESCRIPTION_LABEL}</div>
             <div class="cell__description">
               <div class="page__phar-block">{LANG:PAGE_STATIC_PAGE_INPUT_DESCRIPTION_DESCRIPTION}</div>
@@ -44,6 +57,19 @@
           <td class="table__cell cell">
             <div class="page__phar-block">
               <textarea name="page_static_description_rus" class="form__textarea page-static-form__textarea" role="pageStaticDescription" placeholder="{LANG:PAGE_STATIC_PAGE_INPUT_DESCRIPTION_LABEL}" required>{PAGE_STATIC_DESCRIPTION}</textarea>
+            </div>
+          </td>
+        </tr>
+        <tr class="table__row">
+          <td class="table__cell cell">
+            <div class="cell__title">{LANG:PAGE_STATIC_PAGE_INPUT_SEO_DESCRIPTION_LABEL}</div>
+            <div class="cell__description">
+              <div class="page__phar-block">{LANG:PAGE_STATIC_PAGE_INPUT_SEO_DESCRIPTION_DESCRIPTION}</div>
+            </div>
+          </td>
+          <td class="table__cell cell">
+            <div class="page__phar-block">
+              <textarea name="page_static_seo_description_rus" class="form__textarea page-static-form__textarea" role="pageStaticSEODescription" placeholder="{LANG:PAGE_STATIC_PAGE_INPUT_SEO_DESCRIPTION_LABEL}">{PAGE_STATIC_SEO_DESCRIPTION}</textarea>
             </div>
           </td>
         </tr>

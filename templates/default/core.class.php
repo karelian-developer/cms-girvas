@@ -12,28 +12,49 @@ namespace templates\default;
 
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Template as Theme;
+use \core\PHPLibrary\InterfaceTemplate as InterfaceTheme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \DOMDocument as DOMDocument;
+use \DOMImplementation as DOMImplementation;
 
 #[\AllowDynamicProperties]
 final class Core implements ThemeInterfaceCore
 {
-  private Theme $theme;
   private CMSLocale $locale;
+  private string $primaryColor = '#EAEAEA';
   public string $assembled = '';
   public DOMDocument|null $source = null;
   
   /**
    * __construct
    *
-   * @param  mixed $theme
+   * @param  Theme $theme
    * 
    * @return void
    */
-  public function __construct(Theme $theme)
+  public function __construct(
+    private Theme $theme
+  ) {}
+
+  /**
+   * Получение начального цвета темы
+   * 
+   * @return string
+   */
+  public function getPrimaryColor() : string
   {
-    $this->theme = $theme;
+    return $this->primaryColor;
+  }
+
+  /**
+   * Получить основной объект темы
+   * 
+   * @return InterfaceTheme
+   */
+  public function getThemeFrame() : InterfaceTheme
+  {
+    return $this->theme;
   }
 
   /**
@@ -114,7 +135,81 @@ final class Core implements ThemeInterfaceCore
    */
   public function assemblyDocument(array $themeVars = []) : string
   {
-    return ThemeCollector::assemblyFileContent($this->theme, 'templates/html.tpl', $themeVars);
+    $themeURL = $this->theme->getURL();
+    $themeLocale = $this->theme->locale;
+    $themeLocaleName = $themeLocale->getName();
+
+    $documentLang = mb_substr($themeLocaleName, 0, 2);
+    $documentLang = strtolower($documentLang);
+
+    $document = new DOMDocument('1.0', 'UTF-8');
+    $implementation = new DOMImplementation();
+    $documentType = $implementation->createDocumentType('html');
+    $document->appendChild($documentType);
+
+    $HTMLElement = $document->createElement('html');
+    $HTMLElement->setAttribute('lang', $documentLang);
+
+    $headElement = $document->createElement('head');
+
+    $titleElement = $document->createElement('title', '{SITE_TITLE}');
+    $headElement->appendChild($titleElement);
+
+    $metaCharsetElement = $document->createElement('meta');
+    $metaCharsetElement->setAttribute('charset', '{SITE_CHARSET}');
+    $headElement->appendChild($metaCharsetElement);
+
+    $metaHTTPEquivElement = $document->createElement('meta');
+    $metaHTTPEquivElement->setAttribute('http-equiv', 'X-UA-Compatible');
+    $metaHTTPEquivElement->setAttribute('content', 'IE=edge');
+    $headElement->appendChild($metaHTTPEquivElement);
+
+    $metaViewportElement = $document->createElement('meta');
+    $metaViewportElement->setAttribute('name', 'viewport');
+    $metaViewportElement->setAttribute('content', 'width=device-width, initial-scale=1.0');
+    $headElement->appendChild($metaViewportElement);
+
+    $metaDescriptionElement = $document->createElement('meta');
+    $metaDescriptionElement->setAttribute('name', 'description');
+    $metaDescriptionElement->setAttribute('content', '{SITE_DESCRIPTION}');
+    $headElement->appendChild($metaDescriptionElement);
+
+    $metaKeywordsElement = $document->createElement('meta');
+    $metaKeywordsElement->setAttribute('name', 'keywords');
+    $metaKeywordsElement->setAttribute('content', '{SITE_KEYWORDS}');
+    $headElement->appendChild($metaKeywordsElement);
+
+    foreach ([256, 192, 180, 167, 152, 128, 120, 96, 64, 48, 32, 16] as $faviconWidth) {
+      $linkFaviconElement = $document->createElement('link');
+      $faviconSizesLabel = $faviconWidth . 'x' . $faviconWidth;
+
+      if (in_array($faviconWidth, [192, 180, 167, 152, 120])) {
+        $linkFaviconElement->setAttribute('rel', 'apple-touch-icon');
+        $linkFaviconElement->setAttribute('href', '/' . $themeURL . '/favicons/apple-touch-icon-' . $faviconSizesLabel . '.png');
+      }
+
+      if (in_array($faviconWidth, [512, 256, 128, 96, 64, 48, 32, 16])) {
+        $linkFaviconElement->setAttribute('rel', 'icon');
+        $linkFaviconElement->setAttribute('type', 'image/png');
+        $linkFaviconElement->setAttribute('href', '/' . $themeURL . '/favicons/favicon-' . $faviconSizesLabel . '.png');
+      }
+
+      $linkFaviconElement->setAttribute('sizes', $faviconSizesLabel);
+      $headElement->appendChild($linkFaviconElement);
+    }
+
+    $linkManifestElement = $document->createElement('link');
+    $linkManifestElement->setAttribute('rel', 'manifest');
+    $linkManifestElement->setAttribute('href', '/manifest');
+    $headElement->appendChild($linkManifestElement);
+
+    $bodyElement = $document->createElement('body', '{SITE_HEADER}{SITE_MAIN}{SITE_FOOTER}');
+
+    $HTMLElement->appendChild($headElement);
+    $HTMLElement->appendChild($bodyElement);
+    $document->appendChild($HTMLElement);
+
+    return $document->saveHTML();
   }
   
   /**
@@ -126,8 +221,16 @@ final class Core implements ThemeInterfaceCore
   {
     $CMSTheme = $this->theme;
     $CMSConfigurator = $CMSTheme->CMSCore->configurator;
+    $CMSThemeProperties = $CMSTheme->getFilePropertiesData();
+    $CMSThemeColorScheme = isset($CMSThemeProperties['COLOR_SCHEME'])
+      ? $CMSThemeProperties['COLOR_SCHEME']['value']
+      : 'default';
 
-    $CMSTheme->addStyle(['href' => 'styles/colors.css', 'rel' => 'stylesheet']);
+    if (!file_exists($CMSTheme->getPath() . '/styles/colors/' . $CMSThemeColorScheme . '.css')) {
+      $CMSThemeColorScheme = 'default';
+    }
+
+    $CMSTheme->addStyle(['href' => 'styles/colors/' . $CMSThemeColorScheme . '.css', 'rel' => 'stylesheet']);
     $CMSTheme->addStyle(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
 
     $localeData = $CMSTheme->locale->getData();

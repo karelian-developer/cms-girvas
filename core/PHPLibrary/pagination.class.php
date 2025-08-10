@@ -19,29 +19,24 @@ if (!defined('IS_NOT_HACKED')) {
 
 class Pagination
 {
-  private readonly SystemCore $CMSCore;
-  private int $itemsTotalCount;
-  private int $itemsInPageCount;
-  private int $itemCurrent;
   public string $assembled = '';
   
   /**
    * __construct
    *
-   * @param  SystemCore $CMSCore
-   * @param  int $itemsTotalCount
-   * @param  int $itemsInPageCount
-   * @param  int $itemCurrent
+   * @param CoreInterface $CMSCore
+   * @param int $itemsTotalCount
+   * @param int $itemsInPageCount
+   * @param int $itemCurrent
    * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore, int $itemsTotalCount, int $itemsInPageCount, int $itemCurrent = 0)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->itemsTotalCount = $itemsTotalCount;
-    $this->itemsInPageCount = $itemsInPageCount;
-    $this->itemCurrent = $itemCurrent;
-  }
+  public function __construct(
+    private CoreInterface $CMSCore,
+    private int $itemsTotalCount,
+    private int $itemsInPageCount,
+    private int $itemCurrent = 0
+  ) {}
   
   /**
    * Получить количество страниц

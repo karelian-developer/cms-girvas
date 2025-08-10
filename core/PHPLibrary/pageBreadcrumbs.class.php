@@ -14,19 +14,19 @@ use \core\PHPLibrary\Template\Collector as TemplateCollector;
 
 final class PageBreadcrumbs
 {
-  private SystemCore $CMSCore;
   private array $array = [];
   public string $assembled = '';
 
   /**
    * __construct
+   *
+   * @param CoreInterface $CMSCore
    * 
-   * @param SystemCore $CMSCore
+   * @return void
    */
-  public function __construct(SystemCore $CMSCore)
-  {
-    $this->CMSCore = $CMSCore;
-  }
+  public function __construct(
+    private CoreInterface $CMSCore
+  ) {}
 
   /**
    * Добавить элемент

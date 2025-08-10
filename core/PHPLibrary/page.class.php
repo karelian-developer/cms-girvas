@@ -12,9 +12,8 @@ namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
-class Page
+class Page implements InterfacePage
 {
-  private SystemCore $CMSCore;
   public PageBreadcrumbs $breadcrumbs;
   private string $name;
   public string $assembled = '';
@@ -22,14 +21,23 @@ class Page
   /**
    * __construct
    *
-   * @param  SystemCore $CMSCore
-   * @param  string $name
+   * @param CoreInterface $CMSCore
    * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore, array $directoryExploded)
+  public function __construct(
+    private CoreInterface $CMSCore
+  ) {
+    $this->setBreadcrumps($this->CMSCore);
+  }
+
+  /**
+   * Установить "хлебные" крошки
+   * 
+   * @return void
+   */
+  private function setBreadcrumps(CoreInterface $CMSCore) : void
   {
-    $this->CMSCore = $CMSCore;
     $this->breadcrumbs = new PageBreadcrumbs($CMSCore);
   }
 
@@ -74,21 +82,8 @@ class Page
    *
    * @return void
    */
-  private function assembly() : string
+  public function assembly() : void
   {
-    /** @var string $themePath Путь до шаблона */
-    $themePath = $this->theme->getPath();
-    $fileTemplatePath = $themePath . '/page.tpl';
-
-    if (file_exists($fileTemplatePath)) {
-      $pageThemePath = $themePath . '/page/' . $this->getName() . '.tpl';
-
-      if (file_exists($pageThemePath)) {
-        $pageTheme = file_get_contents($pageThemePath);
-        return ThemeCollector::assembly($pageTheme, [
-          'PAGE_NAME' => $this->getName(),
-        ]);
-      }
-    }
+    
   }
 }

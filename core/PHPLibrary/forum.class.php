@@ -16,23 +16,18 @@ namespace core\PHPLibrary;
  * @author Andrey Shestakov <drelagas.new@gmail.com>
  * @version 0.0.1
  */
-#[\AllowDynamicProperties]
 final class Forum
 {
-  /** @var SystemCore|null Объект системного ядра */
-  public SystemCore|null $CMSCore = null;
-
   /**
    * __construct
    *
-   * @param  SystemCore $CMSCore
+   * @param CoreInterface $CMSCore
    * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore)
-  {
-    $this->CMSCore = $CMSCore;
-  }
+  public function __construct(
+    public CoreInterface $CMSCore
+  ) {}
 
   public function getCategories()
   {

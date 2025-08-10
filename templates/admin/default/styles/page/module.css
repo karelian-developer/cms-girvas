@@ -10,10 +10,22 @@
   display: flex;
 }
 
+@media (max-width: 900px) {
+  .page.page_module .module {
+    flex-direction: column;
+  }
+}
+
 .page.page_module .module__left-block {
   display: flex;
   flex-direction: column;
   flex: 0 0 400px;
+}
+
+@media (max-width: 900px) {
+  .page.page_module .template__left-block {
+    margin-bottom: 20px;
+  }
 }
 
 .page.page_module .module__right-block {
@@ -23,6 +35,13 @@
   flex-grow: 1;
   padding-left: 10px;
 }
+
+@media (max-width: 900px) {
+  .page.page_module .module__right-block {
+    padding-left: unset;
+  }
+}
+
 
 .page.page_module .module__gallary-container {
   background-image: url('../../images/pages/module/screenshots-not-found.png');

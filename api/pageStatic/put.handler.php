@@ -37,7 +37,9 @@ if ($CMSCore->client->isLogged(2)) {
         $CMSLocaleName = $CMSLocale->getName();
 
         $inputTitleName = 'page_static_title_' . $CMSLocale->getISO639(2);
+        $inputSEOTitleName = 'page_static_seo_title_' . $CMSLocale->getISO639(2);
         $textareaDescriptionName = 'page_static_description_' . $CMSLocale->getISO639(2);
+        $textareaSEODescriptionName = 'page_static_seo_description_' . $CMSLocale->getISO639(2);
         $textareaContentName = 'page_static_content_' . $CMSLocale->getISO639(2);
         $textareaKeywordsName = 'page_static_keywords_' . $CMSLocale->getISO639(2);
 
@@ -52,12 +54,28 @@ if ($CMSCore->client->isLogged(2)) {
             $texts[$CMSLocaleName]['title'] = $inputValue;
           }
 
+          if (array_key_exists($inputSEOTitleName, $_PUT)) {
+            $inputValue = $_PUT[$inputSEOTitleName];
+            $inputValue = strip_tags($inputValue);
+            $inputValue = str_replace('\'', '"', $inputValue);
+
+            $texts[$CMSLocaleName]['SEOTitle'] = $inputValue;
+          }
+
           if (array_key_exists($textareaDescriptionName, $_PUT)) {
             $textareaValue = $_PUT[$textareaDescriptionName];
             $textareaValue = strip_tags($textareaValue);
             $textareaValue = str_replace('\'', '"', $textareaValue);
 
             $texts[$CMSLocaleName]['description'] = $textareaValue;
+          }
+
+          if (array_key_exists($textareaSEODescriptionName, $_PUT)) {
+            $textareaValue = $_PUT[$textareaSEODescriptionName];
+            $textareaValue = strip_tags($textareaValue);
+            $textareaValue = str_replace('\'', '"', $textareaValue);
+
+            $texts[$CMSLocaleName]['SEODescription'] = $textareaValue;
           }
 
           if (array_key_exists($textareaContentName, $_PUT)) {

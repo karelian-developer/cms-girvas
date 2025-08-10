@@ -18,22 +18,18 @@ use \PDOException as PDOException;
 #[\AllowDynamicProperties]
 class Feed
 {
-  private readonly CMSCore $CMSCore;
-  private int $id;
-  
   /**
    * __construct
    *
-   * @param  mixed $CMSCore
-   * @param  mixed $id
+   * @param CoreInterface $CMSCore
+   * @param int $id
    * 
    * @return void
    */
-  public function __construct(CMSCore $CMSCore, int $id)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->setID($id);
-  }
+  public function __construct(
+    private CoreInterface $CMSCore,
+    private int $id
+  ) {}
 
   /**
    * Инициализировать данные
@@ -48,18 +44,6 @@ class Feed
     foreach ($columnsData as $name => $data) {
       $this->{$name} = $data;
     }
-  }
-
-  /**
-   * Назначить идентификатор
-   *
-   * @param  mixed $value
-   * 
-   * @return void
-   */
-  private function setID(int $value) : void
-  {
-    $this->id = $value;
   }
   
   /**

@@ -22,12 +22,8 @@ use \core\PHPLibrary\Module\EnumWeight as ModuleEnumWeight;
  */
 #[\AllowDynamicProperties]
 final class Module {
-  /** @var SystemCore|null Объект системного ядра */
-  public SystemCore|null $CMSCore = null;
   /** @var ModuleLocale|null Объект локализации */
   public ModuleLocale|null $locale = null;
-  /** @var string|null Техническое наименование модуля */
-  private string|null $name = null;
   /** @var string|null Абсолютный путь до файлов модуля */
   private string|null $path = null;
   /** @var string|null URL до файлов модуля */
@@ -36,18 +32,17 @@ final class Module {
   /**
    * __construct
    *
-   * @param  SystemCore $CMSCore
+   * @param  CoreInterface $CMSCore
    * @param  string $name
    * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore, string $name)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->setName($name);
-    
-    $CMSBaseLocaleSettedName = $CMSCore->configurator->getDatabaseEntryValue('base_locale');
-    $URLBaseLocaleSettedName = $CMSCore->urlp->getParam('locale');
+  public function __construct(
+    public CoreInterface $CMSCore,
+    private string $name
+  ) {
+    $CMSBaseLocaleSettedName = $this->CMSCore->configurator->getDatabaseEntryValue('base_locale');
+    $URLBaseLocaleSettedName = $this->CMSCore->urlp->getParam('locale');
     $CookieBaseLocaleSettedName = $_COOKIE['locale'] ?? null;
 
     $CMSBaseLocaleName = $URLBaseLocaleSettedName ?? $CookieBaseLocaleSettedName;
@@ -61,8 +56,8 @@ final class Module {
 
     $this->locale = $CMSBaseLocale;
 
-    $modulePath = CMS_ROOT_DIRECTORY . '/modules/' . $name;
-    $moduleURL = 'modules/' . $name;
+    $modulePath = CMS_ROOT_DIRECTORY . '/modules/' . $this->name;
+    $moduleURL = 'modules/' . $this->name;
 
     $this->setPath($modulePath);
     $this->setURL($moduleURL);

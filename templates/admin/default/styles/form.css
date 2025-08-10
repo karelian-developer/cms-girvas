@@ -99,7 +99,7 @@
 }
 .form__checkbox-container {
   position: relative;
-  background-color: #EAEAEA;
+  background-color: var(--common-main-color-2);
   width: 72px;
   height: 40px;
 }
@@ -110,7 +110,7 @@
   position: absolute;
   display: block;
   box-sizing: border-box;
-  background-color: #CCCCCC;
+  background-color: var(--common-secondary-color-13);
   border-width: 4px;
   border-style: solid;
   border-color: #FFF;
@@ -123,6 +123,6 @@
   cursor: pointer;
 }
 .form__checkbox-container .checkbox-container__input:checked + .checkbox-container__label {
-  background-color: #232323;
+  background-color: var(--common-main-color-4);
   left: calc(100% - 32px - 4px);
 }

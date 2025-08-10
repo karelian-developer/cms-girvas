@@ -15,11 +15,12 @@ use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\EnumMetadata as ThemeEnumMetadata;
 use \core\PHPLibrary\Template\EnumWeight as ThemeEnumWeight;
-use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
+use \DOMDocument as DOMDocument;
 
 class PageTemplate implements InterfacePage
 {
@@ -94,6 +95,8 @@ class PageTemplate implements InterfacePage
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/template.css', 'rel' => 'stylesheet']);
 
+    $themeVariables = [];
+      
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
 
@@ -112,52 +115,146 @@ class PageTemplate implements InterfacePage
       curl_close($ch);
 
       $themeData = $CURLExucuteResult['outputData'];
-      if (isset($themeData['metadata'])) {
-        $isExists = true;
-      }
+      $isExists = isset($themeData['metadata']);
 
       if ($isExists) {
-        $parsedown = new Parsedown();
+        $nadvoParse = new NadvoParse();
 
         $themeMetadata = $themeData['metadata'];
         $themeTitle = $themeMetadata['title'];
         $themeDescription = file_get_contents($themeData['readme_url']);
-        $themeDescription = !empty($themeDescription) ? $parsedown->text($themeDescription) : $localeData['DEFAULT_TEXT_DESCRIPTION_NOT_FOUND'];
+        $themeDescription = !empty($themeDescription)
+          ? $nadvoParse->parse($themeDescription)
+          : $localeData['DEFAULT_TEXT_DESCRIPTION_NOT_FOUND'];
 
         if (count($themeData['screenshots']) > 0) {
           foreach ($themeData['screenshots'] as $screenshotURL) {
-            array_push($themeScreenshotsListItems, ThemeCollector::assembly('<li class="gallery__item"><img class="gallery__item-image item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
+            $themeScreenshotsListItems[] = ThemeCollector::assembly('<li class="gallery__item"><img class="gallery__item-image item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
               'TEMPLATE_SCREENSHOT_URL' => $screenshotURL
-            ]));
+            ]);
           }
         }
-      }
-    } else {
-      if ($theme->existsFileMetadataJSON()) {
-        $isExists = true;
+
+        $isExistsFileMetadata = true;
       }
 
-      if ($isExists) {
-        $parsedown = new Parsedown();
+      $themeVariables['TEMPLATE_PROPERTIES'] = 'Changing properties is only available for installed themes.';
+    } else {
+      $isExistsFileMetadata = $theme->existsFileMetadataJSON();
+      $isExistsFileProperties = $theme->existsFileProperties();
+
+      if ($isExistsFileProperties) {
+        $properties = $theme->getFilePropertiesData();
+
+        if (!empty($properties)) {
+          $document = new DOMDocument();
+
+          foreach ($properties as $name => $data) {
+            if (isset($data['value'], $data['type'])) {
+              $propertyContainerElement = $document->createElement('div');
+              $propertyContainerElement->setAttribute('class', 'properties__item item');
+
+              if ($data['type'] === 'text') {
+                $propertyContainerElement->setAttribute('class', 'properties__item item item_text');
+                
+                $inputLabel = isset($data['locale']['title'][$localeName])
+                  ? $data['locale']['title'][$localeName]
+                  : 'Property anonymouse';
+
+                $labelElement = $document->createElement('div', $inputLabel);
+                $labelElement->setAttribute('class', 'item__label label');
+
+                $inputName = 'theme_property_' . strtolower($name);
+                $inputElement = $document->createElement('input');
+                $inputElement->setAttribute('name', $inputName);
+                $inputElement->setAttribute('type', 'text');
+                $inputElement->setAttribute('class', 'item__input input input_text');
+                $inputElement->setAttribute('value', $data['value']);
+
+                $propertyContainerElement->appendChild($labelElement);
+                $propertyContainerElement->appendChild($inputElement);
+              }
+
+              if ($data['type'] === 'colorScheme') {
+                $propertyContainerElement->setAttribute('class', 'properties__item item item_text');
+                
+                $inputLabel = isset($data['locale']['title'][$localeName])
+                  ? $data['locale']['title'][$localeName]
+                  : 'Property anonymouse';
+
+                $labelElement = $document->createElement('div', $inputLabel);
+                $labelElement->setAttribute('class', 'item__label label');
+
+                $inputName = 'theme_property_' . strtolower($name);
+                $inputElement = $document->createElement('input');
+                $inputElement->setAttribute('name', $inputName);
+                $inputElement->setAttribute('type', 'text');
+                $inputElement->setAttribute('class', 'item__input input input_text');
+                $inputElement->setAttribute('value', $data['value']);
+
+                $propertyContainerElement->appendChild($labelElement);
+                $propertyContainerElement->appendChild($inputElement);
+              }
+
+              if ($data['type'] === 'file') {
+                $propertyContainerElement->setAttribute('class', 'properties__item item item_file');
+                
+                $inputLabel = isset($data['locale']['title'][$localeName])
+                  ? $data['locale']['title'][$localeName]
+                  : 'Property anonymouse';
+
+                $labelElement = $document->createElement('div', $inputLabel);
+                $labelElement->setAttribute('class', 'item__label label');
+
+                $filePathElement = $document->createElement('div', $data['value']);
+                $filePathElement->setAttribute('class', 'item__file-path file-path');
+
+                $inputName = 'theme_property_' . strtolower($name);
+                $inputElement = $document->createElement('input');
+                $inputElement->setAttribute('name', $inputName);
+                $inputElement->setAttribute('type', 'file');
+                $inputElement->setAttribute('class', 'item__input input input_file');
+                $inputElement->setAttribute('value', $data['value']);
+
+                $propertyContainerElement->appendChild($labelElement);
+                $propertyContainerElement->appendChild($filePathElement);
+                $propertyContainerElement->appendChild($inputElement);
+              }
+
+              $document->appendChild($propertyContainerElement);
+            }
+          }
+
+          $propertiesElements = $document->saveHTML();
+        }
+
+        $themeVariables['TEMPLATE_PROPERTIES'] = isset($propertiesElements)
+          ? $propertiesElements
+          : 'Properties.json is not exists.';
+      }
+
+      if ($isExistsFileMetadata) {
+        $nadvoParse = new NadvoParse();
 
         $themeMetadata = $theme->getMetadata();
         $themeTitle = $theme->getTitle();
         $themeDescription = $theme->getContentFileReadmeMD();
-        $themeDescription = $parsedown->text($themeDescription);
+        $themeDescription = $nadvoParse->parse($themeDescription);
 
         $themeScreenshotsFiles = $theme->getScreenshotsArray();
         if (count($themeScreenshotsFiles) > 0) {
           $themeScreenshotsURL = $theme->getScreenshotsURL();
+
           foreach ($themeScreenshotsFiles as $file) {
-            array_push($themeScreenshotsListItems, ThemeCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
+            $themeScreenshotsListItems[] = ThemeCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
               'TEMPLATE_SCREENSHOT_URL' => $themeScreenshotsURL . '/' . $file
-            ]));
+            ]);
           }
         }
       }
     }
 
-    if ($isExists) {
+    if ($isExistsFileMetadata) {
       foreach ($this->allowedMetadata as $enumMetadata) {
         /** @var string Имя ячейки метаданных */
         $metadataName = Theme::getMetadataName($enumMetadata);
@@ -218,10 +315,10 @@ class PageTemplate implements InterfacePage
             default => '<li class="template__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> {METADATA_VALUE}</li>',
           };
 
-          array_push($themeMetadataItemsTransformed, ThemeCollector::assembly($metadataValueTemplate, [
+          $themeMetadataItemsTransformed[] = ThemeCollector::assembly($metadataValueTemplate, [
             'METADATA_TITLE' => $metadataTitle,
             'METADATA_VALUE' => $getMetadataValue($theme, $themeMetadata, $enumMetadata)
-          ]));
+          ]);
         }
       }
 
@@ -241,18 +338,20 @@ class PageTemplate implements InterfacePage
         $themeMetadataListTransformed = $localeData['PAGE_TEMPLATE_METADATA_BLOCK_METADATA_NOT_FOUND_TITLE'];
       }
 
-      $parsedown = new Parsedown();
+      $themeVariables['ADMIN_PANEL_PAGE_NAME'] = 'template';
+      $themeVariables['TEMPLATE_NAME'] = $themeName;
+      $themeVariables['TEMPLATE_TITLE'] = $themeTitle;
+      $themeVariables['TEMPLATE_DESCRIPTION'] = $themeDescription;
+      $themeVariables['TEMPLATE_GALLARY_LIST'] = $themeGalleryList;
+      $themeVariables['TEMPLATE_METADATA_LIST'] = $themeMetadataListTransformed;
+      $themeVariables['TEMPLATE_DOWNLOADED_STATUS'] = $theme->existsFileMetadataJSON() ? 'downloaded' : 'not-downloaded';
+      $themeVariables['TEMPLATE_INSTALLED_STATUS'] = $theme->getName() === $this->CMSCore->configurator->getDatabaseEntryValue('base_template') ? 'installed' : 'not-installed';
 
-      $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/template.tpl', [
-        'ADMIN_PANEL_PAGE_NAME' => 'template',
-        'TEMPLATE_NAME' => $themeName,
-        'TEMPLATE_TITLE' => $themeTitle,
-        'TEMPLATE_DESCRIPTION' => $themeDescription,
-        'TEMPLATE_GALLARY_LIST' => $themeGalleryList,
-        'TEMPLATE_METADATA_LIST' => $themeMetadataListTransformed,
-        'TEMPLATE_DOWNLOADED_STATUS' => $theme->existsFileMetadataJSON() ? 'downloaded' : 'not-downloaded',
-        'TEMPLATE_INSTALLED_STATUS' => $theme->getName() === $this->CMSCore->configurator->getDatabaseEntryValue('base_template') ? 'installed' : 'not-installed'
-      ]);
+      $this->assembled = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/template.tpl',
+        $themeVariables
+      );
     } else {
       http_response_code(404);
 

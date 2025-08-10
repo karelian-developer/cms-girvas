@@ -28,9 +28,13 @@
         </div>
       </div>
       <div class="template__right-block">
-        <div class="template__description-container">
-          <h2 class="template__description-label">{LANG:PAGE_TEMPLATE_DESCRIPTION_TITLE}</h2>
-          <div class="template__description">{TEMPLATE_DESCRIPTION}</div>
+        <div class="template__description-container description-container">
+          <h2 class="template__description-label description-label">{LANG:PAGE_TEMPLATE_DESCRIPTION_TITLE}</h2>
+          <div class="template__description description">{TEMPLATE_DESCRIPTION}</div>
+        </div>
+        <div class="template__properties-container properties-container" data-role="theme-properties-editor">
+          <h2 class="template__properties-label properties-label">{LANG:PAGE_TEMPLATE_PROPERTIES_TITLE}</h2>
+          <div id="THEME_PROPERTIES" class="template__properties properties">{TEMPLATE_PROPERTIES}</div>
         </div>
       </div>
     </div>

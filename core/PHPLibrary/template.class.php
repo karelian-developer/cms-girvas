@@ -16,18 +16,16 @@ use \core\PHPLibrary\SystemCore\FileConnector as SystemCoreFileConnector;
 use \core\PHPLibrary\Template\EnumMetadata as ThemeEnumMetadata;
 use \core\PHPLibrary\Template\EnumWeight as ThemeEnumWeight;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \core\PHPLibrary\Template\Locale as ThemeLocale;
 use \DOMDocument as DOMDocument;
 
-final class Template
+final class Template implements InterfaceTemplate
 {
-  public SystemCore $CMSCore;
   public ThemeLocale $locale;
-  public mixed $core;
+  public ThemeInterfaceCore $core;
   private string $path;
   private string $url;
-  private string $name;
-  private string $category;
   
   private array $styles = [];
   private array $scripts = [];
@@ -51,31 +49,26 @@ final class Template
   /**
    * __construct
    *
-   * @param  SystemCore $CMSCore Объект SystemCore
-   * @param  string $themeName Наименование шаблона
-   * @param  string $themeCategory Категория шаблона
+   * @param  CoreInterface $CMSCore
+   * @param  string $name
+   * @param  string $category
    * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore, string $themeName = 'default', string $themeCategory = 'base')
-  {
-    // Установка технического имени шаблона
-    $this->setName($themeName);
-    // Установка категории шаблона
-    $this->setCategory($themeCategory);
-
-    /** @var SystemCore Объект системного ядра */
-    $this->CMSCore = $CMSCore;
-
+  public function __construct(
+    public CoreInterface $CMSCore,
+    private string $name = 'default',
+    private string $category = 'base'
+  ) {
     if ($this->CMSCore->urlp->getPath(0) !== 'install') {
       /** @var ThemeLocale Объект локализации шаблона */
       $this->locale = new ThemeLocale($this, $this->CMSCore->locale->getName());
     }
 
     /** @var string Абсолютный путь до корневой директории шаблона */
-    $themePath = $themeCategory !== 'base' ? CMS_ROOT_DIRECTORY . '/templates/' . $themeCategory . '/' . $themeName : CMS_ROOT_DIRECTORY . '/templates/' . $themeName;
+    $themePath = $this->category !== 'base' ? CMS_ROOT_DIRECTORY . '/templates/' . $this->category . '/' . $this->name : CMS_ROOT_DIRECTORY . '/templates/' . $this->name;
     /** @var string Относительный URL до корневой директории шаблона */
-    $themeURL = $themeCategory !== 'base' ? 'templates/' . $themeCategory . '/' . $themeName : 'templates/' . $themeName;
+    $themeURL = $this->category !== 'base' ? 'templates/' . $this->category . '/' . $this->name : 'templates/' . $this->name;
     
     // Установка абсолютного пути до шаблона
     $this->setPath($themePath);
@@ -93,11 +86,11 @@ final class Template
     $this->addStyle(['href' => 'normalize.css', 'rel' => 'stylesheet', 'isCore' => true]);
     $this->addStyle(['href' => 'default-colors-scheme.css', 'rel' => 'stylesheet', 'isCore' => true]);
     $this->addStyle(['href' => 'default-base.css', 'rel' => 'stylesheet', 'isCore' => true]);
-    $this->addStyle(['href' => 'default-fonts.css', 'rel' => 'stylesheet', 'isCore' => true]);
+    $this->addStyle(['href' => 'default-fonts.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
     $this->addStyle(['href' => 'default-forms.css', 'rel' => 'stylesheet', 'isCore' => true]);
     $this->addStyle(['href' => 'default-tables.css', 'rel' => 'stylesheet', 'isCore' => true]);
-    $this->addStyle(['href' => 'default-interactive.css', 'rel' => 'stylesheet', 'isCore' => true]);
-    $this->addStyle(['href' => 'default-notifications.css', 'rel' => 'stylesheet', 'isCore' => true]);
+    $this->addStyle(['href' => 'default-interactive.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
+    $this->addStyle(['href' => 'default-notifications.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
 
     /** @var string $corePath Путь до файла ядра шаблона */
     $corePath = $this->getCorePath();
@@ -119,7 +112,7 @@ final class Template
     }
 
     // Если ядро не было найдено - завершаем работу с ошибкой
-    die(sprintf('Template core "%s" is not exists!', $coreClass));
+    die('Template core "' . $coreClass . '" is not exists!');
   }
   
   /**
@@ -535,6 +528,8 @@ final class Template
         $systemLocaleName = $CMSLocale->getName();
 
         $siteTitle = $CMSConfigurator->getMetaTitle() ?: $CMSConfigurator->getSiteTitle();
+        $siteMetaTitle = $CMSConfigurator->getMetaTitle();
+        $siteConfigTitle = $CMSConfigurator->getSiteTitle();
         $siteDescription = $CMSConfigurator->getMetaDescription() ?: $CMSConfigurator->getSiteDescription();
         $siteKeywords = $CMSConfigurator->getMetaKeywordsImploded() ?: $CMSConfigurator->getSiteKeywords();
         $siteCharset = $CMSConfigurator->getSiteCharset();
@@ -550,6 +545,8 @@ final class Template
         'SITE_SCRIPTS' => ThemeCollector::assemblyScripts($this, $this->getScripts()),
         'SITE_TEMPLATE_URL' => $themeCategory !== 'base' ? '/templates/' . $themeCategory . '/' . $this->getName() : '/templates/' . $this->getName(),
         'SITE_TITLE' => $siteTitle,
+        'SITE_CONFIG_TITLE' => $siteConfigTitle,
+        'SITE_META_TITLE' => $siteMetaTitle,
         'SITE_DESCRIPTION' => $siteDescription,
         'SITE_KEYWORDS' => $siteKeywords,
         'SITE_CHARSET' => $siteCharset,
@@ -681,6 +678,9 @@ final class Template
         }
       }
 
+      // Внедрение значений свойств темы
+      $this->core->assembled = ThemeCollector::assemblyPropertiesValues($this->core->assembled, $this->getFilePropertiesData());
+
       // Внедрение значений глобальных шаблонных переменных
       $this->core->assembled = ThemeCollector::assembly($this->core->assembled, $themeVariablesArray);
 
@@ -714,7 +714,6 @@ final class Template
       /**
        * Добавление стилей в секцию HEAD
        */
-
       $headStyles = $this->getStyles();
       if (isset($elementHead[0])) {
         foreach ($headStyles as $elementData) {
@@ -738,14 +737,16 @@ final class Template
               $styleHref = $themeCategoryName !== 'base' ? $styleHrefIsNotBase : $styleHrefIsBase;
             }
 
-            $attributeRel = $document->createAttribute('rel');
-            $attributeRel->value = $elementData['rel'];
+            $elementLink->setAttribute('href', $styleHref);
+            $elementLink->setAttribute('rel', $elementData['rel']);
 
-            $attributeHref = $document->createAttribute('href');
-            $attributeHref->value = $styleHref;
-            
-            $elementLink->appendChild($attributeRel);
-            $elementLink->appendChild($attributeHref);
+            if (isset($elementData['as'])) {
+              $elementLink->setAttribute('as', $elementData['as']);
+            }
+
+            if (isset($elementData['onload'])) {
+              $elementLink->setAttribute('onload', $elementData['onload']);
+            }
           }
 
           $elementHead[0]->appendChild($elementLink);
@@ -937,5 +938,40 @@ final class Template
   public function existsFileReadmeMD() : bool
   {
     return file_exists($this->getFileReadmeMDPath());
+  }
+
+  /**
+   * Получить абсолютный путь файла со свойствами темы
+   * 
+   * @return string
+   */
+  public function getFilePropertiesPath() : string
+  {
+    return $this->getPath() . '/properties.json';
+  }
+
+  /**
+   * Получить статус наличия файла со свойствами темы
+   * 
+   * @return bool
+   */
+  public function existsFileProperties() : bool
+  {
+    return file_exists($this->getFilePropertiesPath());
+  }
+
+  /**
+   * Получить данные свойств темы из файла
+   * 
+   * @return array
+   */
+  public function getFilePropertiesData() : array
+  {
+    $fileData = ($this->existsFileProperties())
+      ? file_get_contents($this->getFilePropertiesPath())
+      : '{}';
+    $dataJSON = json_decode($fileData, true);
+
+    return $dataJSON !== null ? $dataJSON : [];
   }
 }

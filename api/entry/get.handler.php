@@ -16,7 +16,7 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntriesCategories as EntriesCategories;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
-use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\NadvoParse as NadvoParse;
 
 if (is_numeric($CMSCore->urlp->getPath(2))) {
   if ($CMSCore->urlp->getPath(3) === 'comments') {
@@ -87,15 +87,13 @@ if (is_numeric($CMSCore->urlp->getPath(2))) {
       $entry->initData(['name', 'authorID', 'categoryID', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
       $entryLocale = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
 
-      $parsedown = new Parsedown();
-      $parsedown->setSafeMode(true);
-      $parsedown->setMarkupEscaped(true);
-
       $handlerOutputData['entry'] = [];
       $handlerOutputData['entry']['id'] = $entry->getID();
       $handlerOutputData['entry']['name'] = $entry->getName();
       $handlerOutputData['entry']['title'] = $entry->getTitle($entryLocale);
+      $handlerOutputData['entry']['SEOTitle'] = $entry->getSEOTitle($entryLocale);
       $handlerOutputData['entry']['description'] = $entry->getDescription($entryLocale);
+      $handlerOutputData['entry']['SEODescription'] = $entry->getSEODescription($entryLocale);
       $handlerOutputData['entry']['content'] = $entry->getContent($entryLocale);
       $handlerOutputData['entry']['keywords'] = $entry->getKeywords($entryLocale);
       $handlerOutputData['entry']['authorID'] = $entry->getAuthorID();

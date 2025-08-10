@@ -14,7 +14,7 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\PageStatic as PageStatic;
-use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\User as User;
@@ -72,7 +72,7 @@ class PagePage implements InterfacePage
       return true;
     }
 
-    if ($isPublished && $user !== null) {
+    if ($user !== null) {
       $userGroup = $user->getGroup();
 
       if ($userGroup !== null) {
@@ -120,24 +120,32 @@ class PagePage implements InterfacePage
         if ($this->isVisible($isPublished, $clientUser)) {
           http_response_code(200);
 
+          $pageStaticTitle = strip_tags($pageStatic->getTitle($localeName));
+          $pageStaticSEOTitle = strip_tags($pageStatic->getSEOTitle($localeName));
+          $pageStaticSEOTitle = $pageStaticSEOTitle !== ''
+            ? $pageStaticSEOTitle
+            : $pageStaticTitle;
+
+          $pageStaticDescription = strip_tags($pageStatic->getTitle($localeName));
+          $pageStaticSEODescription = strip_tags($pageStatic->getSEOTitle($localeName));
+          $pageStaticSEODescription = $pageStaticSEODescription !== ''
+            ? $pageStaticSEODescription
+            : $pageStaticDescription;
+          $pageStaticSEODescription = str_replace('"', '&quot;', $pageStaticSEODescription);
+
+          $pageStaticKeywords = $pageStatic->getKeywords($localeName);
+          $pageStaticKeywords = str_replace('"', '&quot;', $pageStaticKeywords);
+
           $this->page->breadcrumbs->add($localeData['PAGE_STATIC_PAGE_BREADCRUMPS_INDEX_LABEL'], '/');
-          $this->page->breadcrumbs->add($pageStatic->getTitle($this->CMSCore->configurator->getDatabaseEntryValue('base_locale')), $pageStatic->getName());
+          $this->page->breadcrumbs->add($pageStaticTitle, $pageStatic->getName());
           $this->page->breadcrumbs->assembly();
 
-          $this->CMSCore->configurator->setMetaTitle($pageStatic->getTitle($localeName));
-          $this->CMSCore->configurator->setMetaDescription(str_replace('"', '&quot;', $pageStatic->getDescription($localeName)));
-          $this->CMSCore->configurator->setMetaKeywords(str_replace('"', '&quot;', $pageStatic->getKeywords($localeName)));
+          $this->CMSCore->configurator->setMetaTitle($pageStaticSEOTitle);
+          $this->CMSCore->configurator->setMetaDescription($pageStaticSEODescription);
+          $this->CMSCore->configurator->setMetaKeywords($pageStaticKeywords);
 
-          /**
-           * @var Parsedown Парсер markdown-разметки
-           */
-          $parsedown = new Parsedown();
+          $nadvoParse = new NadvoParse();
 
-          /**
-           * @var string Заголовок статической страницы
-           */
-          $pageStaticTitle = $pageStatic->getTitle($localeName);
-          $pageStaticTitle = strip_tags($pageStaticTitle);
           /**
            * @var string Содержание статической страницы
            */
@@ -171,7 +179,7 @@ class PagePage implements InterfacePage
             'PAGE_ID' => $pageStatic->getID(),
             'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
             'PAGE_TITLE' => $pageStaticTitle,
-            'PAGE_CONTENT' => $parsedown->text($pageStaticContent),
+            'PAGE_CONTENT' => $nadvoParse->parse($pageStaticContent),
             'PAGE_PREVIEW_URL' => $pageStatic->getPreviewURL() !== '' ? $pageStatic->getPreviewURL() : PageStatic::getPreviewDefaultURL($this->CMSCore, 1024),
             'PAGE_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
             'PAGE_PUBLISHED_DATE_TIMESTAMP' => $pageStatic->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestamp : date('d.m.Y H:i:s', 0),

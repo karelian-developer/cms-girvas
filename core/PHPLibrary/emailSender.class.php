@@ -12,7 +12,6 @@ namespace core\PHPLibrary;
 
 class EmailSender
 {
-  private readonly SystemCore $CMSCore;
   private array $fromUser = [];
   private string $toUserEmail = '';
   private string $subject = '';
@@ -22,13 +21,13 @@ class EmailSender
   /**
    * __construct
    *
-   * @param  mixed $CMSCore
+   * @param CoreInterface $CMSCore
+   * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore)
-  {
-    $this->CMSCore = $CMSCore;
-  }
+  public function __construct(
+    private CoreInterface $CMSCore
+  ) {}
   
   /**
    * Назначить данные отправителя

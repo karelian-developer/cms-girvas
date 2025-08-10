@@ -54,10 +54,10 @@ final class FileConverter
    * 
    * @return bool
    */
-  public function convert(array|string $file, string $fileOutputFolderPath, EnumFileFormat $convertTo, bool $deleteOldFile = false) : bool|array
+  public function convert(array|string $file, string $fileOutputFolderPath, EnumFileFormat $convertTo, bool $deleteOldFile = false, mixed $salt = 0) : bool|array
   {
     $CMSSalt = $this->CMSCore->configurator->get('salt');
-    $fileOutputName = md5(sprintf('{GIRVAS:CONVERTER:%s:%d}', $CMSSalt, time()));
+    $fileOutputName = md5(sprintf('{GIRVAS:CONVERTER:%s:%d+%s}', $CMSSalt, time(), $salt));
     
     if (file_exists($fileOutputFolderPath)) {
       $convertToExtension = match ($convertTo) {

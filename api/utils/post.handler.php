@@ -16,16 +16,16 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\Client\Session as ClientSession;
 use \core\PHPLibrary\EmailSender as EmailSender;
-use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
-if ($CMSCore->urlp->getPath(2) === 'parsedown') {
+if ($CMSCore->urlp->getPath(2) === 'nadvoparse') {
   if ($CMSCore->client->isLogged(1)) {
-    $parsedown = new Parsedown();
-    $handlerOutputData['parsedown'] = $parsedown->text($_POST['markdown_text']);
+    $nadvoParse = new NadvoParse();
+    $handlerOutputData['nadvoparse'] = $nadvoParse->parse($_POST['markdown_text']);
 
     $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_PARSEDOWN_TRANSFORMED_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;

@@ -15,7 +15,7 @@ use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Module as Module;
 use \core\PHPLibrary\Module\EnumMetadata as ModuleEnumMetadata;
 use \core\PHPLibrary\Module\EnumWeight as ModuleEnumWeight;
-use \core\PHPLibrary\Parsedown as Parsedown;
+use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
@@ -117,18 +117,18 @@ class PageModule implements InterfacePage
       }
 
       if ($isExists) {
-        $parsedown = new Parsedown();
+        $nadvoParse = new NadvoParse();
 
         $moduleMetadata = $moduleData['metadata'];
         $moduleTitle = $moduleMetadata['title'];
         $moduleDescription = file_get_contents($moduleData['readme_url']);
-        $moduleDescription = $parsedown->text($moduleDescription);
+        $moduleDescription = $nadvoParse->parse($moduleDescription);
 
         if (count($moduleData['screenshots']) > 0) {
           foreach ($moduleData['screenshots'] as $screenshotURL) {
-            array_push($moduleScreenshotsListItems, ThemeCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{MODULE_SCREENSHOT_URL}"></li>', [
+            $moduleScreenshotsListItems[] = ThemeCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{MODULE_SCREENSHOT_URL}"></li>', [
               'MODULE_SCREENSHOT_URL' => $screenshotURL
-            ]));
+            ]);
           }
         }
       }
@@ -140,20 +140,22 @@ class PageModule implements InterfacePage
       }
 
       if ($isExists) {
-        $parsedown = new Parsedown();
+        $nadvoParse = new NadvoParse();
 
         $moduleMetadata = $module->getMetadata();
         $moduleTitle = $module->getTitle();
         $moduleDescription = $module->getContentFileReadmeMD();
-        $moduleDescription = !empty($moduleDescription) ? $parsedown->text($moduleDescription) : $localeData['DEFAULT_TEXT_DESCRIPTION_NOT_FOUND'];
+        $moduleDescription = !empty($moduleDescription)
+          ? $nadvoParse->parse($moduleDescription)
+          : $localeData['DEFAULT_TEXT_DESCRIPTION_NOT_FOUND'];
 
         $moduleScreenshotsFiles = $module->getScreenshotsArray();
         if (count($moduleScreenshotsFiles) > 0) {
           $moduleScreenshotsDirectoryURL = $module->getScreenshotsURL();
           foreach ($moduleScreenshotsFiles as $file) {
-            array_push($moduleScreenshotsListItems, ThemeCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{MODULE_SCREENSHOT_URL}"></li>', [
+            $moduleScreenshotsListItems[] = ThemeCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{MODULE_SCREENSHOT_URL}"></li>', [
               'MODULE_SCREENSHOT_URL' => $moduleScreenshotsDirectoryURL . '/' . $file
-            ]));
+            ]);
           }
         }
       }
@@ -243,13 +245,13 @@ class PageModule implements InterfacePage
         $metadataListTransformed = $localeData['PAGE_MODULE_METADATA_BLOCK_METADATA_NOT_FOUND_TITLE'];
       }
 
-      $parsedown = new Parsedown();
+      $nadvoParse = new NadvoParse();
 
       $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/module.tpl', [
         'ADMIN_PANEL_PAGE_NAME' => 'module',
         'MODULE_NAME' => $moduleName,
         'MODULE_TITLE' => $moduleTitle,
-        'MODULE_DESCRIPTION' => $parsedown->text($moduleDescription),
+        'MODULE_DESCRIPTION' => $moduleDescription,
         'MODULE_GALLARY_LIST' => $moduleGalleryList,
         'MODULE_METADATA_LIST' => $metadataListTransformed,
         'MODULE_ENABLED_STATUS' => $module->isEnabled() ? 'enabled' : 'disabled',

@@ -11,6 +11,7 @@
 namespace core\PHPLibrary\Client;
 
 use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
@@ -18,7 +19,7 @@ use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 #[\AllowDynamicProperties]
 class Session
 {
-  private readonly CMSCore $CMSCore;
+  private readonly CoreInterface $CMSCore;
   private int $id;
   
   /**
@@ -28,7 +29,7 @@ class Session
    * @param  mixed $id
    * @return void
    */
-  public function __construct(CMSCore $CMSCore, int $id)
+  public function __construct(CoreInterface $CMSCore, int $id)
   {
     $this->CMSCore = $CMSCore;
     $this->setID($id);
@@ -233,13 +234,13 @@ class Session
   /**
    * Получить при помощи IP-адреса
    * 
-   * @param CMSCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param string $userIP
    * @param int $typeID
    * 
    * @return Session|null
    */
-  public static function getByIP(CMSCore $CMSCore, string $userIP, int $typeID) : Session|null
+  public static function getByIP(CoreInterface $CMSCore, string $userIP, int $typeID) : Session|null
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -272,14 +273,14 @@ class Session
   /**
    * Получить при помощи IP-адреса и ID пользователя
    * 
-   * @param CMSCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param string $userIP
    * @param int $userID
    * @param int $typeID
    * 
    * @return Session|null
    */
-  public static function getByIPAndUserID(CMSCore $CMSCore, string $userIP, int $userID, int $typeID) : Session|null
+  public static function getByIPAndUserID(CoreInterface $CMSCore, string $userIP, int $userID, int $typeID) : Session|null
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -313,14 +314,14 @@ class Session
   /**
    * Получить при помощи IP-адреса и токена
    * 
-   * @param CMSCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param string $userIP
    * @param string $token
    * @param int $typeID
    * 
    * @return Session|null
    */
-  public static function getByIPAndToken(CMSCore $CMSCore, string $userIP, string $token, int $typeID) : Session|null
+  public static function getByIPAndToken(CoreInterface $CMSCore, string $userIP, string $token, int $typeID) : Session|null
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -354,14 +355,14 @@ class Session
   /**
    * Проверить существование сессии по IP-адресу и ID пользователя
    *
-   * @param CMSCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param string $userIP
    * @param int $userID
    * @param int $typeID
    * 
    * @return bool
    */
-  public static function existsByIPAndUserID(CMSCore $CMSCore, string $userIP, int $userID, int $typeID) : bool
+  public static function existsByIPAndUserID(CoreInterface $CMSCore, string $userIP, int $userID, int $typeID) : bool
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -394,14 +395,14 @@ class Session
   /**
    * Проверить существование сессии по IP-адресу и токену
    *
-   * @param CMSCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param string $userIP
    * @param string $token
    * @param int $typeID
    * 
    * @return bool
    */
-  public static function existsByIPAndToken(CMSCore $CMSCore, string $userIP, string $token, int $typeID) : bool
+  public static function existsByIPAndToken(CoreInterface $CMSCore, string $userIP, string $token, int $typeID) : bool
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -440,13 +441,13 @@ class Session
   /**
    * Проверить существование сессии по IP-адресу
    *
-   * @param CMSCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param string $userIP
    * @param int $typeID
    * 
    * @return bool
    */
-  public static function existsByIP(CMSCore $CMSCore, string $userIP, int $typeID) : bool
+  public static function existsByIP(CoreInterface $CMSCore, string $userIP, int $typeID) : bool
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -539,12 +540,12 @@ class Session
   /**
    * Создать
    *
-   * @param  CMSCore $CMSCore
+   * @param  CoreInterface $CMSCore
    * @param  array $data (userID, token, userIP, typeID)
    * 
    * @return Session
    */
-  public static function create(CMSCore $CMSCore, array $data = []) : Session|null
+  public static function create(CoreInterface $CMSCore, array $data = []) : Session|null
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');

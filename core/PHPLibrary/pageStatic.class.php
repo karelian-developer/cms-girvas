@@ -18,8 +18,6 @@ use \PDOException as PDOException;
 #[\AllowDynamicProperties]
 class PageStatic implements EntityTypeContent
 {
-  private readonly SystemCore $CMSCore;
-  private int $id;
   private int $categoryID;
   private int $viewsCount = 0;
   private string $name;
@@ -27,14 +25,15 @@ class PageStatic implements EntityTypeContent
   /**
    * __construct
    *
-   * @param  SystemCore $CMSCore
+   * @param CoreInterface $CMSCore
+   * @param int $id
+   * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore, int $id)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->setID($id);
-  }
+  public function __construct(
+    private CoreInterface $CMSCore,
+    private int $id
+  ) {}
   
   /**
    * Инициализация данных из БД
@@ -48,17 +47,6 @@ class PageStatic implements EntityTypeContent
     foreach ($columnsData as $name => $data) {
       $this->{$name} = $data;
     }
-  }
-  
-  /**
-   * Назначить ID страницы
-   *
-   * @param  mixed $value
-   * @return void
-   */
-  private function setID(int $value) : void
-  {
-    $this->id = $value;
   }
   
   /**
@@ -145,6 +133,26 @@ class PageStatic implements EntityTypeContent
 
     return '';
   }
+  
+  /**
+   * Получить SEO-заголовок страницы
+   *
+   * @param  string $localeName Наименование локализации
+   * 
+   * @return string
+   */
+  public function getSEOTitle(string $localeName = 'en_US') : string
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      if (isset($texts[$localeName]['SEOTitle'])) {
+        return $texts[$localeName]['SEOTitle'];
+      }
+    }
+
+    return '';
+  }
 
   /**
    * Получить объект автора страницы
@@ -181,6 +189,26 @@ class PageStatic implements EntityTypeContent
 
       if (isset($texts[$localeName]['description'])) {
         return $texts[$localeName]['description'];
+      }
+    }
+
+    return '';
+  }
+
+  /**
+   * Получить SEO-описание страницы
+   *
+   * @param  string $localeName Наименование локализации
+   * 
+   * @return string
+   */
+  public function getSEODescription(string $localeName = 'en_US') : string
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      if (isset($texts[$localeName]['SEODescription'])) {
+        return $texts[$localeName]['SEODescription'];
       }
     }
 

@@ -16,7 +16,9 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Factories\LocaleFactory as CMSLocaleFactory;
 use \core\PHPLibrary\SystemCore\Configurator as CMSConfigurator;
+use \core\PHPLibrary\SystemCore\ConfiguratorInterface as CMSConfiguratorInterface;
 use \core\PHPLibrary\SystemCore\Header as CMSHeader;
 use \core\PHPLibrary\SystemCore\Header\HTTPReferrerPolicy as CMSHeaderHTTPReferrerPolicy;
 use \core\PHPLibrary\SystemCore\Header\EnumHTTPReferrerPolicy as CMSHeaderEnumHTTPReferrerPolicy;
@@ -41,15 +43,15 @@ use \DOMDocument as DOMDocument;
  * @property      array $configuration Массив с конфигурациями CMS
  * @property      URLParser $urlp Объект класса URLParser 
  */
-final class SystemCore
+final class SystemCore implements CoreInterface
 {
   public const CMS_CORE_PATH = 'core';
   public const CMS_CORE_PHP_LIBRARY_PATH = 'core/PHPLibrary';
   public const CMS_CORE_JS_LIBRARY_PATH = 'core/JSLibrary';
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
-  public const CMS_TITLE = 'CMS GIRVAS';
-  public const CMS_VERSION = '0.2.4';
+  public const CMS_TITLE = 'CMS «GIRVAS»';
+  public const CMS_VERSION = '0.2.5';
   public const CMS_STAGE_DEVELOPING = 'voitsy';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -58,29 +60,31 @@ final class SystemCore
   public string $CSPScriptsHash, $CSPStylesHash;
 
   /** 
-   * @var CMSConfigurator Конфигуратор системы
+   * @var CMSConfiguratorInterface Конфигуратор системы
    */
-  public CMSConfigurator|null $configurator = null;
+  public ?CMSConfiguratorInterface $configurator = null;
   /** 
    * @var CMSDatabaseConnector Класс системы подключения к БД 
    */
-  public CMSDatabaseConnector|null $databaseConnector = null;
+  public ?CMSDatabaseConnector $databaseConnector = null;
   /** 
-   * @var CMSLocale Класс локализации ядра 
+   * @var LocaleInterface Класс локализации ядра 
    */
-  public CMSLocale|null $locale = null;
+  public ?LocaleInterface $locale = null;
   /**
    * @var URLParser Класс парсера адресной строки 
    */
-  public URLParser|null $urlp = null;
+  public ?URLParser $urlp = null;
   /** 
    * @var Client Класс клиента
    */
-  public Client|null $client = null;
+  public ?Client $client = null;
   /** 
    * @var Theme Класс шаблона системы 
    */
-  public Theme|null $theme = null;
+  public ?Theme $theme = null;
+
+  private CMSLocaleFactory $CMSLocaleFactory;
 
   /**
    *  @var array Массив активированных модулей
@@ -145,9 +149,9 @@ final class SystemCore
    * 
    * @param string $localeType
    * 
-   * @return CMSLocale
+   * @return LocaleInterface
    */
-  public function getCMSLocale(string $localeType = 'base') : CMSLocale
+  public function getCMSLocale(string $localeType = 'base') : LocaleInterface
   {
     $CMSConfigurator = $this->configurator;
 
