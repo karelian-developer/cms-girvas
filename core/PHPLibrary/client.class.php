@@ -17,16 +17,12 @@ use \core\PHPLibrary\Client\Session as ClientSession;
  */
 class Client
 {
-<<<<<<< HEAD
   private readonly SystemCore $CMSCore;
-=======
->>>>>>> develop
   private string $ip;
   
   /**
    * __construct
    *
-<<<<<<< HEAD
    * @param  SystemCore $CMSCore
    * @return void
    */
@@ -34,15 +30,6 @@ class Client
   {
     $this->CMSCore = $CMSCore;
 
-=======
-   * @param CoreInterface $CMSCore
-   * 
-   * @return void
-   */
-  public function __construct(
-    private CoreInterface $CMSCore
-  ) {
->>>>>>> develop
     $this->setIPAddress();
   }
 
@@ -121,9 +108,9 @@ class Client
   /**
    * Получить объект пользователя, к которому привязана сессия
    *
-   * @return User|null
+   * @return ?User
    */
-  public function getUser(int $typeID) : User|null
+  public function getUser(int $typeID) : ?User
   {
     $cookieTokenName = match ($typeID) {
       2 => '_grv_atoken',
