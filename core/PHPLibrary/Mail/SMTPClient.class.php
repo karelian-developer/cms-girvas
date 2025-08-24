@@ -58,8 +58,20 @@ class SMTPClient
       default => 'ssl'
     };
 
+    if ($this->port === 465) {
+      $context = stream_context_create([
+        'ssl' => [
+          'verify_peer' => false,
+          'verify_peer_name' => false,
+          'allow_self_signed' => true
+        ]
+      ]);
+    } else {
+      $context = null;
+    }
+
     $address = $protocol . '://' . $this->host . ':' . $this->port;
-    $this->socket = stream_socket_client($address, $errorNo, $errorString, 30);
+    $this->socket = stream_socket_client($address, $errorNo, $errorString, $this->timeout, STREAM_CLIENT_CONNECT, $context);
 
     if (!$this->socket) {
       throw new Exception("Connection failed: {$errorNo} - {$errorString}");
