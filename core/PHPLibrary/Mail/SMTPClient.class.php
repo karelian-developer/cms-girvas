@@ -51,30 +51,29 @@ class SMTPClient
    */
   public function connect() : self
   {
-    // Для fsockopen сначала подключаемся без SSL
-    $address = "tcp://{$this->host}";
+    $protocol = match ($this->port) {
+      465 => 'ssl',
+      587 => 'tcp',
+      25 => 'tcp',
+      default => 'ssl'
+    };
+
+    $address = $protocol . '://' . $this->host;
     $this->socket = fsockopen($address, $this->port, $errorNo, $errorString, 30);
 
     if (!$this->socket) {
-      throw new \Exception("Connection failed: {$errorNo} - {$errorString}");
+      throw new Exception("Connection failed: {$errorNo} - {$errorString}");
     }
 
-    // Читаем приветствие сервера
-    $response = fgets($this->socket);
-    if ($response === false || strpos($response, '220') === false) {
-      throw new \Exception("SMTP server error: " . ($response ?: 'No response'));
-    }
-
-    // Если используем SSL - включаем его после подключения
-    if ($this->encryption === 'ssl') {
-      $this->enableSSL();
-    }
-    
-    // Если используем STARTTLS на порту 587
-    if ($this->port === 587 || $this->encryption === 'tls') {
+    if ($this->port === 587) {
       $this->startTLS();
     }
 
+    $response = fgets($this->socket);
+    if (strpos($response, '220') === false) {
+      throw new Exception("SMTP error: {$response}");
+    }
+    
     return $this;
   }
 
@@ -152,26 +151,6 @@ class SMTPClient
     fclose($this->socket);
   }
 
-  private function enableSSL(): void {
-    // Устанавливаем SSL контекст для существующего соединения
-    $context = stream_context_create([
-      'ssl' => [
-        'verify_peer' => false,
-        'verify_peer_name' => false,
-        'allow_self_signed' => true,
-        'crypto_method' => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT
-      ]
-    ]);
-    
-    // Применяем контекст к существующему сокету
-    stream_context_set_option($this->socket, $context);
-    
-    // Включаем SSL шифрование
-    if (!stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT)) {
-      throw new \Exception("SSL encryption failed");
-    }
-  }
-
   /**
    * Начать TLS-подключение
    * 
@@ -179,12 +158,7 @@ class SMTPClient
    */
   private function startTLS() : void
   {
-    // Отправляем команду STARTTLS
-    $this->sendCommand("STARTTLS", "220");
-    
-    // Включаем шифрование
-    if (!stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT)) {
-      throw new \Exception("STARTTLS negotiation failed");
-    }
+    $this->sendCommand('STARTTLS', '220');
+    stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
   }
 }
