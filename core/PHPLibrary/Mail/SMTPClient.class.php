@@ -14,7 +14,7 @@ use \Exception as Exception;
 
 class SMTPClient
 {
-  private resource|false $socket;
+  private mixed $socket;
   private int $timeout = 30;
 
   /**
