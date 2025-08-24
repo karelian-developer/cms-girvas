@@ -701,6 +701,16 @@ final class Configurator implements ConfiguratorInterface
   }
 
   /**
+   * Получить домен для рассылки сообщений через SMTP-сервер
+   * 
+   * @return string
+   */
+  public function getSMTPDomain() : string
+  {
+    return $this->existsDatabaseEntryValue('email_smtp_domain') ? $this->getDatabaseEntryValue('email_smtp_domain') : '';
+  }
+
+  /**
    * Получить данные конфигурации CMS из базы данных
    *
    * @return mixed

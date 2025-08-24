@@ -87,7 +87,8 @@ class SettingsEmail
       'SETTING_SMTP_PORT_VALUE' => $this->CMSCore->configurator->getSMTPPort(),
       'SETTING_SMTP_HOST_VALUE' => $this->CMSCore->configurator->getSMTPHost(),
       'SETTING_SMTP_USERNAME_VALUE' => $this->CMSCore->configurator->getSMTPUsername(),
-      'SETTING_SMTP_PASSWORD_VALUE' => $this->CMSCore->configurator->getSMTPPassword()
+      'SETTING_SMTP_PASSWORD_VALUE' => $this->CMSCore->configurator->getSMTPPassword(),
+      'SETTING_SMTP_DOMAIN_VALUE' => $this->CMSCore->configurator->getSMTPDomain()
     ]);
   }
 }
