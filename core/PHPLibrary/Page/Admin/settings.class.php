@@ -101,13 +101,13 @@ class PageSettings implements InterfacePage
   }
 
   /**
-   * Получить класс страницы с настройками
+   * Получить пространство имен страницы с настройками
    * 
    * @param string $settingName
    * 
-   * @return SettingsPageInterface
+   * @return string
    */
-  private function getSettingsPageClass(string $settingName) : SettingsPageInterface
+  private function getSettingsPageClassNamespace(string $settingName) : string
   {
     return '\\core\\PHPLibrary\\Page\\Admin\\Settings\\Settings' . ucfirst($settingsName);
   }
@@ -125,7 +125,7 @@ class PageSettings implements InterfacePage
     if (file_exists($settingsCorePath)) {
       http_response_code(200);
 
-      $classNamespace = $this->getSettingsPageClass($settingsName);
+      $classNamespace = $this->getSettingsPageClassNamespace($settingsName);
       $settings = new $classNamespace($this->CMSCore, $settingsName);
       
       $settingsNameConstant = $this->convertSettingNameToConstant();
