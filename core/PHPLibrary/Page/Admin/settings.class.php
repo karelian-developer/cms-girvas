@@ -107,7 +107,7 @@ class PageSettings implements InterfacePage
    * 
    * @return string
    */
-  private function getSettingsPageClassNamespace(string $settingName) : string
+  private function getSettingsPageClassNamespace(string $settingsName) : string
   {
     return '\\core\\PHPLibrary\\Page\\Admin\\Settings\\Settings' . ucfirst($settingsName);
   }
