@@ -81,14 +81,15 @@ class SettingsEmail
   public function assembly(array $templateValues = []) : void
   {
     $formTemplatePath = self::FORM_PATH . '/' . $this->name . '.tpl';
+    $SMTPConfiguration = $this->CMSCore->configurator->getOtherCollection('smtp');
     
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
       'SETTINGS_NAME' => $this->name,
-      'SETTING_SMTP_PORT_VALUE' => $this->CMSCore->configurator->getSMTPPort(),
-      'SETTING_SMTP_HOST_VALUE' => $this->CMSCore->configurator->getSMTPHost(),
-      'SETTING_SMTP_USERNAME_VALUE' => $this->CMSCore->configurator->getSMTPUsername(),
-      'SETTING_SMTP_PASSWORD_VALUE' => $this->CMSCore->configurator->getSMTPPassword(),
-      'SETTING_SMTP_DOMAIN_VALUE' => $this->CMSCore->configurator->getSMTPDomain()
+      'SETTING_SMTP_PORT_VALUE' => $SMTPConfiguration['port'],
+      'SETTING_SMTP_HOST_VALUE' => $SMTPConfiguration['host'],
+      'SETTING_SMTP_USERNAME_VALUE' => $SMTPConfiguration['username'],
+      'SETTING_SMTP_PASSWORD_VALUE' => $SMTPConfiguration['password'],
+      'SETTING_SMTP_DOMAIN_VALUE' => $SMTPConfiguration['domain']
     ]);
   }
 }

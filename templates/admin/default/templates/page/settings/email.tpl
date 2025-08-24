@@ -8,7 +8,9 @@
         </div>
       </td>
       <td class="table__cell cell">
-        <div class="page__phar-block"><input name="setting_{SETTINGS_NAME}_smtp_host" type="string" class="form__input form__input_text" placeholder="smtp.example.ru" value="{SETTING_SMTP_HOST_VALUE}" required></div>
+        <div class="page__phar-block">
+          <input name="setting_{SETTINGS_NAME}_smtp_host" type="string" class="form__input form__input_text" placeholder="smtp.example.ru" value="{SETTING_SMTP_HOST_VALUE}" required>
+        </div>
       </td>
     </tr>
     <tr class="table__row">
@@ -19,7 +21,9 @@
         </div>
       </td>
       <td class="table__cell cell">
-        <div class="page__phar-block"><input name="setting_{SETTINGS_NAME}_smtp_port" type="number" class="form__input form__input_number" placeholder="465" value="{SETTING_SMTP_PORT_VALUE}" min="0" required></div>
+        <div class="page__phar-block">
+          <input name="setting_{SETTINGS_NAME}_smtp_port" type="number" class="form__input form__input_number" placeholder="465" value="{SETTING_SMTP_PORT_VALUE}" min="0" required>
+        </div>
       </td>
     </tr>
     <tr class="table__row">
@@ -30,7 +34,9 @@
         </div>
       </td>
       <td class="table__cell cell">
-        <div class="page__phar-block"><input name="setting_{SETTINGS_NAME}_smtp_username" type="text" class="form__input form__input_text" placeholder="Username" value="{SETTING_SMTP_USERNAME_VALUE}" required></div>
+        <div class="page__phar-block">
+          <input name="setting_{SETTINGS_NAME}_smtp_username" type="text" class="form__input form__input_text" placeholder="Username" value="{SETTING_SMTP_USERNAME_VALUE}" required>
+        </div>
       </td>
     </tr>
     <tr class="table__row">
@@ -41,7 +47,9 @@
         </div>
       </td>
       <td class="table__cell cell">
-        <div class="page__phar-block"><input name="setting_{SETTINGS_NAME}_smtp_password" type="password" class="form__input form__input_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" cmsg-password-checker required></div>
+        <div class="page__phar-block">
+          <input name="setting_{SETTINGS_NAME}_smtp_password" type="password" class="form__input form__input_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" cmsg-password-checker required>
+        </div>
       </td>
     </tr>
     <tr class="table__row">
@@ -52,7 +60,9 @@
         </div>
       </td>
       <td class="table__cell cell">
-        <div class="page__phar-block"><input name="setting_{SETTINGS_NAME}_smtp_domain" type="text" class="form__input form__input_text" placeholder="example.ru" value="{SETTING_SMTP_DOMAIN_VALUE}" required></div>
+        <div class="page__phar-block">
+          <input name="setting_{SETTINGS_NAME}_smtp_domain" type="text" class="form__input form__input_text" placeholder="example.ru" value="{SETTING_SMTP_DOMAIN_VALUE}" required>
+        </div>
       </td>
     </tr>
   </table>
