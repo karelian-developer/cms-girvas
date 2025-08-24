@@ -23,6 +23,9 @@ if ($CMSCore->client->isLogged(2)) {
 
   // Проверка прав пользователя на доступ к данному действию
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT)) {
+    ini_set('mail.log', CMS_ROOT_DIRECTORY . '/logs/mail.log');
+    ini_set('mail.add_x_header', 'On');
+
     $handlerEvent = $_POST['event'] ?? '';
 
     if ($handlerEvent === 'testSend') {
