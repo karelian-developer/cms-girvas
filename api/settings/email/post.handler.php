@@ -23,35 +23,39 @@ if ($CMSCore->client->isLogged(2)) {
 
   // Проверка прав пользователя на доступ к данному действию
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT)) {
-    $SMTPConfiguration = $CMSCore->configurator->getOtherCollection('smtp');
-    
-    if (!empty($SMTPConfiguration)) {
-      try {
-        $SMTPClient = new SMTPClient(
-          $SMTPConfiguration['host'],
-          $SMTPConfiguration['port'],
-          $SMTPConfiguration['username'],
-          $SMTPConfiguration['password']
-        );
+    $handlerEvent = $_POST['event'] ?? '';
 
-        $SMTPClient->connect();
-        $SMTPClient->login();
+    if ($handlerEvent === 'testSend') {
+      $SMTPConfiguration = $CMSCore->configurator->getOtherCollection('smtp');
+      
+      if (!empty($SMTPConfiguration)) {
+        try {
+          $SMTPClient = new SMTPClient(
+            $SMTPConfiguration['host'],
+            $SMTPConfiguration['port'],
+            $SMTPConfiguration['username'],
+            $SMTPConfiguration['password']
+          );
 
-        $SMTPClient->sendEmail(
-          'no-reply@' . $SMTPConfiguration['domain'],
-          $clientUser->getEmail(),
-          'Test Subject',
-          'This is test message'
-        );
+          $SMTPClient->connect();
+          $SMTPClient->login();
 
-        $SMTPClient->disconnect();
-      } catch (Exception $exception) {
-        $handlerMessage = 'API ERROR: ' . $exception;
+          $SMTPClient->sendEmail(
+            'no-reply@' . $SMTPConfiguration['domain'],
+            $clientUser->getEmail(),
+            'Test Subject',
+            'This is test message'
+          );
+
+          $SMTPClient->disconnect();
+        } catch (Exception $exception) {
+          $handlerMessage = 'API ERROR: ' . $exception;
+          $handlerStatusCode = 0;
+        }
+      } else {
+        $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_SMTP_NOT_CONFIGRED');
         $handlerStatusCode = 0;
       }
-    } else {
-      $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_SMTP_NOT_CONFIGRED');
-      $handlerStatusCode = 0;
     }
   } else {
     $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
