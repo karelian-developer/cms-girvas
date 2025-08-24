@@ -51,15 +51,7 @@ class SMTPClient
    */
   public function connect() : self
   {
-    $protocol = match ($this->port) {
-      465 => 'ssl',
-      587 => 'tcp',
-      25 => 'tcp',
-      default => 'ssl'
-    };
-
-    $address = $protocol . '://' . $this->host;
-    $this->socket = fsockopen($address, $this->port, $errorNo, $errorString, 30);
+    $this->socket = fsockopen($this->host, $this->port, $errorNo, $errorString, 30);
 
     if (!$this->socket) {
       throw new Exception("Connection failed: {$errorNo} - {$errorString}");
