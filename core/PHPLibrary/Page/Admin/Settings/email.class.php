@@ -14,7 +14,7 @@ namespace core\PHPLibrary\Page\Admin\Settings;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
-class SettingsEMail
+class SettingsEmail
 {
   const FORM_PATH = 'templates/page/settings';
 
