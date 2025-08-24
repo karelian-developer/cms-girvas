@@ -8,7 +8,7 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-namespace core\PHPLibrary;
+namespace core\PHPLibrary\Page\Admin\Settings;
 
 interface SettingsPageInterface
 {
