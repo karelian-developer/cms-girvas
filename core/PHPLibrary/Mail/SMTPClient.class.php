@@ -56,9 +56,9 @@ class SMTPClient
       587 => 'tcp',
       25 => 'tcp',
       default => 'ssl'
-    }
+    };
 
-    $address = $protocol . '://' .  $this->host;
+    $address = $protocol . '://' . $this->host;
     $this->socket = fsockopen($address, $this->port, $errorNo, $errorString, 30);
 
     if (!$this->socket) {
