@@ -119,7 +119,7 @@ if ($CMSCore->client->isLogged(2)) {
               continue;
             }
 
-            if (in_array($settingName, ['email_smtp_host', 'email_smtp_port', 'email_smtp_username', 'email_smtp_password'])) {
+            if (in_array($settingName, ['email_smtp_host', 'email_smtp_port', 'email_smtp_username', 'email_smtp_password', 'email_smtp_domain'])) {
               $SMTPConfugration[$settingName] = $settingValue;
               continue;
             }
