@@ -101,13 +101,34 @@ class SMTPClient
   public function sendCommand(string $command, string $expectedCode) : string
   {
     fwrite($this->socket, $command . "\r\n");
-    $response = fgets($this->socket);
+    $response = $this->getResponse();
     
     if (strpos($response, $expectedCode) !== 0) {
       throw new Exception("Command failed: {$command} - Response: {$response}");
     }
     
     return $response;
+  }
+
+  private function getResponse()
+  {
+    $response = '';
+    
+    while (true) {
+      $line = fgets($this->socket);
+      if ($line === false) {
+        throw new Exception("No response from server");
+      }
+      
+      $response .= $line;
+      
+      // Если строка начинается с кода и пробела (не дефиса) - это конец ответа
+      if (preg_match('/^\d{3} /', $line)) {
+        break;
+      }
+    }
+    
+    return trim($response);
   }
 
   /**
