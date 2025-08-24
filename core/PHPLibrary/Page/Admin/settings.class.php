@@ -88,22 +88,22 @@ class PageSettings implements InterfacePage
   /**
    * Конвертировать имя настройки в константу
    * 
-   * @param string $settingName
+   * @param string $settingsName
    * 
    * @return string
    */
-  private function convertSettingNameToConstant(string $settingName) : string
+  private function convertSettingNameToConstant(string $settingsName) : string
   {
-    return match ($settingName) {
+    return match ($settingsName) {
       'pages' => 'STATIC_PAGES',
-      default => strtoupper($settingName)
+      default => strtoupper($settingsName)
     };
   }
 
   /**
    * Получить пространство имен страницы с настройками
    * 
-   * @param string $settingName
+   * @param string $settingsName
    * 
    * @return string
    */
@@ -128,7 +128,7 @@ class PageSettings implements InterfacePage
       $classNamespace = $this->getSettingsPageClassNamespace($settingsName);
       $settings = new $classNamespace($this->CMSCore, $settingsName);
       
-      $settingsNameConstant = $this->convertSettingNameToConstant();
+      $settingsNameConstant = $this->convertSettingNameToConstant($settingsName);
 
       $settings->setTitle('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_' . $settingsNameConstant . '_TITLE}');
       $settings->setDescription('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_' . $settingsNameConstant . '_DESCRIPTION}');
