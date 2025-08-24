@@ -103,7 +103,7 @@ class SMTPClient
     fwrite($this->socket, $command . "\r\n");
     $response = fgets($this->socket);
     
-    if (strpos($response, $expectedCode) === false) {
+    if (strpos($response, $expectedCode) !== 0) {
       throw new Exception("Command failed: {$command} - Response: {$response}");
     }
     
