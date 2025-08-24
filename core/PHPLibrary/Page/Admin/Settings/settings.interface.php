@@ -10,6 +10,8 @@
 
 namespace core\PHPLibrary\Page\Admin\Settings;
 
+use \core\PHPLibrary\SystemCore as CMSCore;
+
 interface SettingsPageInterface
 {
   public function __construct(CMSCore $CMSCore, string $name);
