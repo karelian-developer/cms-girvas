@@ -28,7 +28,6 @@ final class Configurator implements ConfiguratorInterface
   public string $metaDescription = '';
   public array $metaKeywords = [];
   private array $data = [];
-  private CMSCoreInterface $CMSCore;
   
   /**
    * __construct
@@ -36,10 +35,13 @@ final class Configurator implements ConfiguratorInterface
    * @param  mixed $CMSCore
    * @return void
    */
-  public function __construct(CMSCoreInterface $CMSCore)
-  {
-    $this->CMSCore = $CMSCore;
-    $filePath = CMS_ROOT_DIRECTORY . '/' . self::FILE_PATH;
+  public function __construct(
+    private CMSCoreInterface $CMSCore,
+    private string $collection = ''
+  ) {
+    $filePath = $this->collection === ''
+      ? CMS_ROOT_DIRECTORY . '/core/configuration.php'
+      : CMS_ROOT_DIRECTORY . '/core/configuration.' . $this->collection . '.php';
 
     if (file_exists($filePath)) {
       $this->merge($this->getFileData());
@@ -659,6 +661,46 @@ final class Configurator implements ConfiguratorInterface
   }
 
   /**
+   * Получить порт SMTP-сервера
+   * 
+   * @return int
+   */
+  public function getSMTPPort() : int
+  {
+    return $this->existsDatabaseEntryValue('email_smtp_port') ? (int) $this->getDatabaseEntryValue('email_smtp_port') : 465;
+  }
+
+  /**
+   * Получить хост SMTP-сервера
+   * 
+   * @return string
+   */
+  public function getSMTPHost() : string
+  {
+    return $this->existsDatabaseEntryValue('email_smtp_host') ? $this->getDatabaseEntryValue('email_smtp_host') : 'localhost';
+  }
+
+  /**
+   * Получить имя пользователя SMTP-сервера
+   * 
+   * @return string
+   */
+  public function getSMTPUsername() : string
+  {
+    return $this->existsDatabaseEntryValue('email_smtp_username') ? $this->getDatabaseEntryValue('email_smtp_username') : '';
+  }
+
+  /**
+   * Получить пароль пользователя SMTP-сервера
+   * 
+   * @return string
+   */
+  public function getSMTPPassword() : string
+  {
+    return $this->existsDatabaseEntryValue('email_smtp_password') ? $this->getDatabaseEntryValue('email_smtp_password') : '';
+  }
+
+  /**
    * Получить данные конфигурации CMS из базы данных
    *
    * @return mixed
@@ -873,7 +915,11 @@ final class Configurator implements ConfiguratorInterface
    */
   private function getFileData() : array
   {
-    require_once CMS_ROOT_DIRECTORY . '/' . self::FILE_PATH;
+    $filePath = $this->collection === ''
+      ? CMS_ROOT_DIRECTORY . '/core/configuration.php'
+      : CMS_ROOT_DIRECTORY . '/core/configuration.' . $this->collection . '.php';
+
+    require_once $filePath;
     return $configuration ?? [];
   }
   
@@ -882,6 +928,7 @@ final class Configurator implements ConfiguratorInterface
    *
    * @param  mixed $name
    * @param  mixed $value
+   * 
    * @return void
    */
   public function set(string $name, mixed $value) : void
@@ -893,32 +940,52 @@ final class Configurator implements ConfiguratorInterface
    * Получить отдельного параметра конфигураций CMS
    *
    * @param  mixed $name Наименование конфигурации
+   * 
    * @return mixed
    */
   public function get(string $name) : mixed
   {
-    return array_key_exists($name, $this->data) ? $this->data[$name] : null;
+    return $this->data[$name] ?? null;
   }
 
   /**
    * Проверить наличие отдельного параметра конфигураций CMS
    *
    * @param  string $name Наименование конфигурации
+   * 
    * @return bool
    */
   public function exists(string $name) : bool
   {
-    return array_key_exists($name, $this->data);
+    return isset($this->data[$name]);
   }
   
   /**
    * Объединить данные для конфигураций CMS
    *
    * @param  mixed $data
+   * 
    * @return void
    */
   private function merge(array $data) : void
   {
     $this->data = array_merge($this->data, $data);
+  }
+
+  /**
+   * Получение параметров другой коллекции конфигураций
+   * 
+   * @param string $collection
+   * 
+   * @return array
+   */
+  public function getOtherCollection(string $collection) : array
+  {
+    $filePath = CMS_ROOT_DIRECTORY . '/core/configuration.' . $collection . '.php';
+
+    if (file_exists($filePath)) {
+      require_once $filePath;
+      return $configuration ?? [];
+    }
   }
 }

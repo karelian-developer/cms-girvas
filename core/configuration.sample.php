@@ -17,10 +17,10 @@
  */
 
 $configuration = [
-  'domain' => 'example.com',
+  'domain' => 'example.ru',
   'domainAliases' => ['127.0.0.1', 'localhost'],
-  'domainEmail' => 'example.com',
-  'domainCookies' => 'example.com',
+  'domainEmail' => 'example.ru',
+  'domainCookies' => 'example.ru',
   'SSLIsEnabled' => false,
   'database' => ['host' => '', 'user' => '', 'password' => '', 'name' => '', 'scheme' => '', 'prefix' => ''],
   // Системная соль (необходима для хеширования некоторых данных)

@@ -120,6 +120,7 @@
   "API_UTILS_USER_AUTHORIZATION_ERROR_AUTHORIZATION_ALREADY": "Авторизация недоступна, поскольку Вы уже авторизованы в системе.",
   "API_FEED_ERROR_NOT_FOUND": "Веб-канал не найден.",
   "API_FEED_EMPTY_LOCALE_DEFAULT_UPDATED_ERROR": "Невозможно сохранить фид, так как в нем отсутствует стандартная локализация [%s].",
+  "API_ERROR_SMTP_NOT_CONFIGRED": "SMTP-клиент не настроен. Проверьте конфигурации системы или обратитесь к администратору.",
   "API_INSTALLATION_ENABLED": "Включен",
   "API_INSTALLATION_DISABLED": "Выключен",
   "API_INSTALLATION_PHP_VERSION_LABEL": "Версия PHP",

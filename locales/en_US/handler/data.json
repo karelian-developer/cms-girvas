@@ -118,6 +118,7 @@
   "API_UTILS_USER_AUTHORIZATION_ERROR_AUTHORIZATION_ALREADY": "Authorization is not available because you are already authorized in the system.",
   "API_FEED_ERROR_NOT_FOUND": "Feed not found.",
   "API_FEED_EMPTY_LOCALE_DEFAULT_UPDATED_ERROR": "The feed cannot be saved because it does not have default localization [%s].",
+  "API_ERROR_SMTP_NOT_CONFIGRED": "SMTP client is not configured. Check your system configuration or contact your administrator.",
   "API_INSTALLATION_ENABLED": "Enabled",
   "API_INSTALLATION_DISABLED": "Disabled",
   "API_INSTALLATION_PHP_VERSION_LABEL": "PHP version",

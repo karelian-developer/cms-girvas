@@ -82,9 +82,9 @@ class Pagination
       $itemClass = $this->itemCurrent === $itemIndex ? 'pagination-list__item pagination-list__item_active' : 'pagination-list__item';
       $pageNumber = $itemIndex + 1;
 
-      $aElement = $DOMDocument->createElement('a', $itemIndex + 1);
+      $aElement = $DOMDocument->createElement('a', $pageNumber);
       $aElement->setAttribute('class', 'pagination-list__item-link item-link');
-      $aElement->setAttribute('href', '?pageNumber=' . $pageNumber);
+      $aElement->setAttribute('href', '?pageNumber=' . $itemIndex);
 
       $liElement = $DOMDocument->createElement('li');
       $liElement->setAttribute('class', $itemClass);

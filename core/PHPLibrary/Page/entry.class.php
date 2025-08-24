@@ -167,8 +167,8 @@ class PageEntry implements InterfacePage
           ? $entrySEOTitle
           : $entryTitle;
 
-        $entryDescription = strip_tags($entry->getTitle($localeName));
-        $entrySEODescription = strip_tags($entry->getSEOTitle($localeName));
+        $entryDescription = strip_tags($entry->getDescription($localeName));
+        $entrySEODescription = strip_tags($entry->getSEODescription($localeName));
         $entrySEODescription = $entrySEODescription !== ''
           ? $entrySEODescription
           : $entryDescription;

@@ -107,9 +107,9 @@ class Client
   /**
    * Получить объект пользователя, к которому привязана сессия
    *
-   * @return User|null
+   * @return ?User
    */
-  public function getUser(int $typeID) : User|null
+  public function getUser(int $typeID) : ?User
   {
     $cookieTokenName = match ($typeID) {
       2 => '_grv_atoken',
