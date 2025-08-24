@@ -63,7 +63,8 @@ class SMTPClient
         'ssl' => [
           'verify_peer' => false,
           'verify_peer_name' => false,
-          'allow_self_signed' => true
+          'allow_self_signed' => true,
+          'crypto_method' => STREAM_CRYPTO_METHOD_SSLv23_CLIENT
         ]
       ]);
     } else {
