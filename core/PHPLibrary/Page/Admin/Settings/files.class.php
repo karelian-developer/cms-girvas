@@ -11,32 +11,30 @@
 
 namespace core\PHPLibrary\Page\Admin\Settings;
 
-use \core\PHPLibrary\SystemCore as SystemCore;
-use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
-class SettingsFiles
+class SettingsFiles implements SettingsPageInterface
 {
   const FORM_PATH = 'templates/page/settings';
 
-  public SystemCore $CMSCore;
   public string $title;
-  public string $name;
   public string $description;
   public string $assembled = '';
 
   /**
    * __construct
    * 
-   * @param SystemCore $CMSCore
+   * @param CMSCore $CMSCore
    * @param string $name
+   * 
+   * @return void
    */
-  public function __construct(SystemCore $CMSCore, string $name)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->name = $name;
-  }
+  public function __construct(
+    public CMSCore $CMSCore,
+    public string $name
+  ) {}
 
   /**
    * Установить заголовок
@@ -91,21 +89,13 @@ class SettingsFiles
 
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
       'SETTINGS_NAME' => $this->name,
-      // Максимальный вес файла
       'SETTING_UPLOAD_FILE_WEIGHT_MAX_VALUE' => $this->CMSCore->configurator->getUploadFileWeightMax(),
-      // Максимальная ширина изображения
       'SETTING_UPLOAD_FILE_IMAGE_WIDTH_MAX_VALUE' => $this->CMSCore->configurator->getUploadFileImageWidthMax(),
-      // Максимальная высота изображения
       'SETTING_UPLOAD_FILE_IMAGE_HEIGHT_MAX_VALUE' => $this->CMSCore->configurator->getUploadFileImageHeightMax(),
-      // Максимальный вес изображения аватара
       'SETTING_UPLOAD_FILE_IMAGE_AVATAR_WEIGHT_MAX_VALUE' => $this->CMSCore->configurator->getUploadFileImageAvatarWeightMax(),
-      // Максимальная ширина изображения аватара
       'SETTING_UPLOAD_FILE_IMAGE_AVATAR_WIDTH_MAX_VALUE' => $this->CMSCore->configurator->getUploadFileImageAvatarWidthMax(),
-      // Максимальная высота изображения аватара
       'SETTING_UPLOAD_FILE_IMAGE_AVATAR_HEIGHT_MAX_VALUE' => $this->CMSCore->configurator->getUploadFileImageAvatarHeightMax(),
-      // Формат изображения для автоматической конвертации
       'SETTING_AUTO_CONVERT_FILE_IMAGE_FORMAT_VALUE' => $this->CMSCore->configurator->getAutoConvertFileImageExtension(),
-      // Статус автоматической конвертации изображения
       'SETTING_AUTO_CONVERT_FILE_IMAGE_STATUS_VALUE' => $settingAutoConvertFileImageStatusValue,
       'SETTING_AUTO_CONVERT_FILE_IMAGE_CHECKED_VALUE' => $settingAutoConvertFileImageStatusValue === 'on' ? 'checked' : '',
     ]);

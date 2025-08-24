@@ -14,7 +14,7 @@ namespace core\PHPLibrary\Page\Admin\Settings;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
-class SettingsEmail
+class SettingsEmail implements SettingsPageInterface
 {
   const FORM_PATH = 'templates/page/settings';
 
@@ -27,6 +27,8 @@ class SettingsEmail
    * 
    * @param CMSCore $CMSCore
    * @param string $name
+   * 
+   * @return void
    */
   public function __construct(
     public CMSCore $CMSCore,

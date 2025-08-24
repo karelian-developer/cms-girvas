@@ -11,26 +11,30 @@
 
 namespace core\PHPLibrary\Page\Admin\Settings;
 
-use \core\PHPLibrary\SystemCore as SystemCore;
-use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
-class SettingsSeo
+class SettingsSeo implements SettingsPageInterface
 {
   const FORM_PATH = 'templates/page/settings';
 
-  public SystemCore $CMSCore;
   public string $title;
-  public string $name;
   public string $description;
   public string $assembled = '';
 
-  public function __construct(SystemCore $CMSCore, string $name)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->name = $name;
-  }
+  /**
+   * __construct
+   * 
+   * @param CMSCore $CMSCore
+   * @param string $name
+   * 
+   * @return void
+   */
+  public function __construct(
+    public CMSCore $CMSCore,
+    public string $name
+  ) {}
 
   public function setTitle(string $value) : void
   {

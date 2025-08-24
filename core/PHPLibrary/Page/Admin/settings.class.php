@@ -11,9 +11,10 @@
 namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
-use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\Page\Admin\Settings\SettingsPageInterface as SettingsPageInterface;
 use \core\PHPLibrary\TraitPage as TraitPage;
 
 class PageSettings implements InterfacePage
@@ -22,8 +23,6 @@ class PageSettings implements InterfacePage
 
   const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_SETTINGS_NAVIGATION_%s_LABEL';
 
-  public SystemCore $CMSCore;
-  public Page $page;
   public string $assembled = '';
   public array $navigationSubsections = [
     'index' => [
@@ -35,11 +34,13 @@ class PageSettings implements InterfacePage
     ],
   ];
 
-  public function __construct(SystemCore $CMSCore, Page $page)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->page = $page;
-  }
+  /**
+   * __construct
+   */
+  public function __construct(
+    public CMSCore $CMSCore,
+    public Page $page
+  ) {}
 
   /**
    * Инициализация подразделов
@@ -84,6 +85,33 @@ class PageSettings implements InterfacePage
     return $settings;
   }
 
+  /**
+   * Конвертировать имя настройки в константу
+   * 
+   * @param string $settingName
+   * 
+   * @return string
+   */
+  private function convertSettingNameToConstant(string $settingName) : string
+  {
+    return match ($settingName) {
+      'pages' => 'STATIC_PAGES',
+      default => strtoupper($settingName)
+    };
+  }
+
+  /**
+   * Получить класс страницы с настройками
+   * 
+   * @param string $settingName
+   * 
+   * @return SettingsPageInterface
+   */
+  private function getSettingsPageClass(string $settingName) : SettingsPageInterface
+  {
+    return '\\core\\PHPLibrary\\Page\\Admin\\Settings\\Settings' . ucfirst($settingsName);
+  }
+
   public function assembly() : void
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/settings.css', 'rel' => 'stylesheet']);
@@ -97,43 +125,13 @@ class PageSettings implements InterfacePage
     if (file_exists($settingsCorePath)) {
       http_response_code(200);
 
-      $classNamespace = '\\core\\PHPLibrary\\Page\\Admin\\Settings\\Settings' . ucfirst($settingsName);
+      $classNamespace = $this->getSettingsPageClass($settingsName);
       $settings = new $classNamespace($this->CMSCore, $settingsName);
+      
+      $settingsNameConstant = $this->convertSettingNameToConstant();
 
-      if ($settingsName == 'base') {
-        $settings->setTitle('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_BASE_TITLE}');
-        $settings->setDescription('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_BASE_DESCRIPTION}');
-      }
-
-      if ($settingsName == 'files') {
-        $settings->setTitle('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_FILES_TITLE}');
-        $settings->setDescription('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_FILES_DESCRIPTION}');
-      }
-
-      if ($settingsName == 'seo') {
-        $settings->setTitle('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_SEO_TITLE}');
-        $settings->setDescription('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_SEO_DESCRIPTION}');
-      }
-
-      if ($settingsName == 'security') {
-        $settings->setTitle('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_SECURITY_TITLE}');
-        $settings->setDescription('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_SECURITY_DESCRIPTION}');
-      }
-
-      if ($settingsName == 'users') {
-        $settings->setTitle('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_USERS_TITLE}');
-        $settings->setDescription('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_USERS_DESCRIPTION}');
-      }
-
-      if ($settingsName == 'entries') {
-        $settings->setTitle('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_ENTRIES_TITLE}');
-        $settings->setDescription('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_ENTRIES_DESCRIPTION}');
-      }
-
-      if ($settingsName == 'pages') {
-        $settings->setTitle('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_STATIC_PAGES_TITLE}');
-        $settings->setDescription('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_STATIC_PAGES_DESCRIPTION}');
-      }
+      $settings->setTitle('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_' . $settingsNameConstant . '_TITLE}');
+      $settings->setDescription('{LANG:PAGE_SETTINGS_SETTINGS_GROUP_' . $settingsNameConstant . '_DESCRIPTION}');
 
       $settingsTitle = $settings->getTitle();
       $settingsDescription = $settings->getDescription();
