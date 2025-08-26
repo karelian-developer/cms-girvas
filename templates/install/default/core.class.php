@@ -16,6 +16,7 @@ use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \DOMDocument as DOMDocument;
+use \DOMImplementation as DOMImplementation;
 
 #[\AllowDynamicProperties]
 final class Core implements ThemeInterfaceCore
