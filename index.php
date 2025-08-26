@@ -132,7 +132,7 @@ if ($CMSURLPathes[0] === 'handler') {
             'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')
           ]);
 
-          $SMTPClient->sendEmail($CMSEmail, $userEmail, $mailTitle, $mailContent, true);
+          $SMTPClient->sendEmail($CMSEmail, $user->getEmail(), $mailTitle, $mailContent, true);
           $SMTPClient->disconnect();
 
           echo $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_PASSWORD_RESETED_SUCCESS');
