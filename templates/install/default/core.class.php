@@ -10,6 +10,7 @@
 
 namespace templates\install\default;
 
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
@@ -19,6 +20,7 @@ use \DOMDocument as DOMDocument;
 #[\AllowDynamicProperties]
 final class Core implements ThemeInterfaceCore
 {
+  private CMSLocale $locale;
   private string $primaryColor = '#EAEAEA';
   public string $assembled = '';
   public ?DOMDocument $source = null;
