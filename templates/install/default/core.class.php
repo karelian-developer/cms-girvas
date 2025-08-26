@@ -201,9 +201,9 @@ final class Core implements ThemeInterfaceCore
     $this->assembled = ThemeCollector::assembly(
       $this->assemblyDocument(),
       [
-        'PAGE_HEADER' => $this->assemblyHeader(),
-        'PAGE_MAIN' => $this->assemblyMain(),
-        'PAGE_FOOTER' => $this->assemblyFooter()
+        'SITE_HEADER' => $this->assemblyHeader(),
+        'SITE_MAIN' => $this->assemblyMain(),
+        'SITE_FOOTER' => $this->assemblyFooter()
       ]
     );
   }
