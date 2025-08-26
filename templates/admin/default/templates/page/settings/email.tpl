@@ -48,7 +48,7 @@
       </td>
       <td class="table__cell cell">
         <div class="page__phar-block">
-          <input name="setting_{SETTINGS_NAME}_smtp_password" type="password" class="form__input form__input_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" cmsg-password-checker required>
+          <input name="setting_{SETTINGS_NAME}_smtp_password" type="password" class="form__input form__input_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" value="{SETTING_SMTP_PASSWORD_VALUE}" cmsg-password-checker required>
         </div>
       </td>
     </tr>
