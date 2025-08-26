@@ -32,6 +32,8 @@ if ($CMSCore->client->isLogged(2)) {
       $SMTPConfiguration = $CMSCore->configurator->getOtherCollection('smtp');
       
       if (!empty($SMTPConfiguration)) {
+        $CMSEmail = 'no-reply@' . $SMTPConfiguration['domain'];
+
         try {
           $SMTPClient = new SMTPClient(
             $SMTPConfiguration['host'],
@@ -44,7 +46,7 @@ if ($CMSCore->client->isLogged(2)) {
           $SMTPClient->login();
 
           $SMTPClient->sendEmail(
-            'no-reply@' . $SMTPConfiguration['domain'],
+            $CMSEmail,
             $clientUser->getEmail(),
             'Test Subject',
             'This is test message'
