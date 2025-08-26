@@ -710,7 +710,7 @@ class User
    */
   public function delete() : bool
   {
-    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
