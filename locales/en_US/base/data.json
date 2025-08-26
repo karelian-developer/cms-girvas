@@ -34,6 +34,7 @@
   "BUTTON_REGISTRATION_LABEL": "Registration",
   "BUTTON_RECOVERY_LABEL": "Recovery",
   "BUTTON_RESET_LABEL": "Reset",
+  "BUTTON_SEND_TEST_EMAIL": "Send test email",
   "MODAL_COOKIE_SITE_USING_TITLE": "Use of cookies",
   "MODAL_COOKIE_SITE_USING_DESCRIPTION": "Attention! Our website uses cookies to improve your site experience, efficiency and usability. By continuing to use the site, you agree to the use of cookies.",
   "MODAL_AUTHORIZATION_INPUT_LOGIN_PLACEHOLDER": "Login",

@@ -34,6 +34,7 @@
   "BUTTON_REGISTRATION_LABEL": "Регистрация",
   "BUTTON_RECOVERY_LABEL": "Восстановить",
   "BUTTON_RESET_LABEL": "Сброс",
+  "BUTTON_SEND_TEST_EMAIL": "Отправить тестовое письмо",
   "MODAL_COOKIE_SITE_USING_TITLE": "Использование Cookie",
   "MODAL_COOKIE_SITE_USING_DESCRIPTION": "Внимание! Наш сайт использует файлы cookie, чтобы улучшить работу сайта, повысить его эффективность и удобство. Продолжая использовать сайт, вы соглашаетесь на использование файлов cookie.",
   "MODAL_AUTHORIZATION_INPUT_LOGIN_PLACEHOLDER": "Логин",
