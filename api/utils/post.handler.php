@@ -200,37 +200,41 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                           $siteTitle = empty($CMSCore->configurator->getMetaTitle()) ? $CMSCore->configurator->getSiteTitle() : $CMSCore->configurator->getMetaTitle();
                           $SMTPConfiguration = $CMSCore->configurator->getOtherCollection('smtp');
 
-                          try {
-                            $SMTPClient = new SMTPClient(
-                              $SMTPConfiguration['host'],
-                              $SMTPConfiguration['port'],
-                              $SMTPConfiguration['username'],
-                              $SMTPConfiguration['password']
-                            );
+                          if (!empty($SMTPConfiguration)) {
+                            $CMSEmail = 'no-reply@' . $SMTPConfiguration['domain'];
+                            
+                            try {
+                              $SMTPClient = new SMTPClient(
+                                $SMTPConfiguration['host'],
+                                $SMTPConfiguration['port'],
+                                $SMTPConfiguration['username'],
+                                $SMTPConfiguration['password']
+                              );
 
-                            $SMTPClient->connect();
-                            $SMTPClient->login();
+                              $SMTPClient->connect();
+                              $SMTPClient->login();
 
-                            $mailTitle = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_TITLE');
-                            $mailContent = sprintf(
-                              $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_CONTENT'),
-                              $userLogin,
-                              $CMSCore->getSiteURL() . '/registration?submit=' . $registrationSubmit['submitToken'],
-                              $CMSCore->getSiteURL() . '/registration?refusal=' . $registrationSubmit['refusalToken']
-                            );
+                              $mailTitle = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_TITLE');
+                              $mailContent = sprintf(
+                                $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_CONTENT'),
+                                $userLogin,
+                                $CMSCore->getSiteURL() . '/registration?submit=' . $registrationSubmit['submitToken'],
+                                $CMSCore->getSiteURL() . '/registration?refusal=' . $registrationSubmit['refusalToken']
+                              );
 
-                            $SMTPClient->sendEmail($CMSEmail, $userEmail, $mailTitle, $mailContent);
-                            $SMTPClient->disconnect();
+                              $SMTPClient->sendEmail($CMSEmail, $userEmail, $mailTitle, $mailContent);
+                              $SMTPClient->disconnect();
 
-                            /** @var int Временная отметка в UNIX-формате создания заявки на сброс пароля */
-                            $resetPasswordCreatedUnixTimestamp = time();
-                            $user->update(['metadata' => ['passwordResetToken' => $resetPasswordToken, 'passwordResetTokenCreatedUnixTimestamp' => $resetPasswordCreatedUnixTimestamp]]);
+                              /** @var int Временная отметка в UNIX-формате создания заявки на сброс пароля */
+                              $resetPasswordCreatedUnixTimestamp = time();
+                              $user->update(['metadata' => ['passwordResetToken' => $resetPasswordToken, 'passwordResetTokenCreatedUnixTimestamp' => $resetPasswordCreatedUnixTimestamp]]);
 
-                            $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_SENDED_SUCCESS');
-                            $handlerStatusCode = $handlerStatusCode ?? 1;
-                          } catch (Exception $exception) {
-                            $handlerMessage = 'API ERROR: ' . $exception;
-                            $handlerStatusCode = 0;
+                              $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_SENDED_SUCCESS');
+                              $handlerStatusCode = $handlerStatusCode ?? 1;
+                            } catch (Exception $exception) {
+                              $handlerMessage = 'API ERROR: ' . $exception;
+                              $handlerStatusCode = 0;
+                            }
                           }
                           
                           $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_SENDED_SUCCESS');
