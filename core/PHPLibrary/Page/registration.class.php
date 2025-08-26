@@ -84,6 +84,7 @@ class PageRegistration implements InterfacePage
           $user = new User($this->CMSCore, $userID);
           $userData['emailIsSubmitted'] = true;
           $userDataIsUpdated = $user->update($userData);
+
           if ($userDataIsUpdated) {
             User::deleteRegistrationSubmitBySubmitToken($this->CMSCore, $this->CMSCore->urlp->getParam('submit'));
 

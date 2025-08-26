@@ -120,7 +120,6 @@ if ($CMSCore->urlp->getPath(2) == 'reset') {
       
       $userEmail = $user->getEmail();
       $userLogin = $user->getLogin();
-      $CMSEmail = 'no-reply@' . $SMTPConfiguration['domain'];
 
       $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template')
         ? $CMSCore->configurator->getDatabaseEntryValue('base_template')
@@ -128,6 +127,7 @@ if ($CMSCore->urlp->getPath(2) == 'reset') {
       $theme = new Theme($CMSCore, $themeBaseName);
 
       $SMTPConfiguration = $CMSCore->configurator->getOtherCollection('smtp');
+      $CMSEmail = 'no-reply@' . $SMTPConfiguration['domain'];
       /** @var int Временная отметка в UNIX-формате создания заявки на сброс пароля */
       $resetPasswordCreatedUnixTimestamp = time();
       /** @var string Токен сброса пароля */
