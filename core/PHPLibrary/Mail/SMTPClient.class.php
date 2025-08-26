@@ -163,13 +163,14 @@ class SMTPClient
     $headers = "From: {$from}\r\n";
     $headers .= "To: {$to}\r\n";
     $headers .= "Subject: {$subject}\r\n";
-    $headers .= "Content-Type: text/plain; charset=utf-8\r\n";
+    $headers .= (!$isHTML)
+      ? "Content-Type: text/plain; charset=utf-8\r\n"
+      : "Content-type: text/html; charset=UTF-8\r\n";
     $headers .= "Date: " . date('r') . "\r\n";
 
     if ($isHTML) {
       $headers .= "X-Mailer: PHP/" . phpversion();
       $headers .= "\r\nMIME-Version: 1.0";
-      $headers .= "\r\nContent-type: text/html; charset=UTF-8";
       $headers .= "\r\n";
     }
 
