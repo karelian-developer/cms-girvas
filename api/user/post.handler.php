@@ -13,9 +13,9 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-use \core\PHPLibrary\EmailSender as EmailSender;
 use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Mail\SMTPClient as SMTPClient;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
@@ -114,48 +114,56 @@ if ($CMSCore->urlp->getPath(2) == 'reset') {
     if (!is_null($user)) {
       $user->initData(['login', 'email', 'metadata']);
       /** @var string Заголовок веб-сайта */
-      $siteTitle = empty($CMSCore->configurator->getMetaTitle()) ? $CMSCore->configurator->getSiteTitle() : $CMSCore->configurator->getMetaTitle();
-      /** @var string E-Mail получателя */
+      $siteTitle = $CMSCore->configurator->getMetaTitle() === ''
+        ? $CMSCore->configurator->getSiteTitle()
+        : $CMSCore->configurator->getMetaTitle();
+      
       $userEmail = $user->getEmail();
-      /** @var string Логин получателя */
       $userLogin = $user->getLogin();
+      $CMSEmail = 'no-reply@' . $SMTPConfiguration['domain'];
 
-      $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template') ? $CMSCore->configurator->getDatabaseEntryValue('base_template') : 'default';
+      // $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template') ? $CMSCore->configurator->getDatabaseEntryValue('base_template') : 'default';
 
       /** @var Template Объект шаблона */
-      $theme = new Template($CMSCore, $themeBaseName);
+      // $theme = new Template($CMSCore, $themeBaseName);
 
-      /** @var EmailSender Объект отправителя E-Mail */
-      $emailSender = new EmailSender($CMSCore);
-      $emailSenderSystemSenderEmail = EmailSender::getSystemSenderEmail($CMSCore);
-      $emailSender->setFromUser($siteTitle, $emailSenderSystemSenderEmail);
-      $emailSender->setToUserEmail($userEmail);
-      $emailSender->addHeader(sprintf("From: %s <%s>", $siteTitle, $emailSenderSystemSenderEmail));
-      $emailSender->addHeader(sprintf("\r\nX-Mailer: PHP/%s", phpversion()));
-      $emailSender->addHeader("\r\nMIME-Version: 1.0");
-      $emailSender->addHeader("\r\nContent-type: text/html; charset=UTF-8");
-      $emailSender->addHeader("\r\n");
-
+      $SMTPConfiguration = $CMSCore->configurator->getOtherCollection('smtp');
       /** @var int Временная отметка в UNIX-формате создания заявки на сброс пароля */
       $resetPasswordCreatedUnixTimestamp = time();
       /** @var string Токен сброса пароля */
       $resetPasswordToken = md5($resetPasswordCreatedUnixTimestamp . $CMSCore::CMS_VERSION);
 
-      $emailSender->setSubject($CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_SUBJECT'));
-      $emailSender->setContent(TemplateCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
-        'EMAIL_TITLE' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_TITLE'),
-        'EMAIL_CONTENT' => sprintf($CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_CONTENT'), $userLogin, $CMSCore->getSiteURL() . '/password-reset?token=' . $resetPasswordToken),
-        'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')
-      ]));
+      try {
+        $SMTPClient = new SMTPClient(
+          $SMTPConfiguration['host'],
+          $SMTPConfiguration['port'],
+          $SMTPConfiguration['username'],
+          $SMTPConfiguration['password']
+        );
 
-      $emailSender->send();
+        $SMTPClient->connect();
+        $SMTPClient->login();
 
-      /** @var int Временная отметка в UNIX-формате создания заявки на сброс пароля */
-      $resetPasswordCreatedUnixTimestamp = time();
-      $user->update(['metadata' => ['passwordResetToken' => $resetPasswordToken, 'passwordResetTokenCreatedUnixTimestamp' => $resetPasswordCreatedUnixTimestamp]]);
+        $mailTitle = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_TITLE');
+        $mailContent = sprintf(
+          $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_CONTENT'),
+          $userLogin,
+          $CMSCore->getSiteURL() . '/password-reset?token=' . $resetPasswordToken
+        );
 
-      $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_SENDED_SUCCESS');
-      $handlerStatusCode = $handlerStatusCode ?? 1;
+        $SMTPClient->sendEmail($CMSEmail, $userEmail, $mailTitle, $mailContent);
+        $SMTPClient->disconnect();
+
+        /** @var int Временная отметка в UNIX-формате создания заявки на сброс пароля */
+        $resetPasswordCreatedUnixTimestamp = time();
+        $user->update(['metadata' => ['passwordResetToken' => $resetPasswordToken, 'passwordResetTokenCreatedUnixTimestamp' => $resetPasswordCreatedUnixTimestamp]]);
+
+        $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_SENDED_SUCCESS');
+        $handlerStatusCode = $handlerStatusCode ?? 1;
+      } catch (Exception $exception) {
+        $handlerMessage = 'API ERROR: ' . $exception;
+        $handlerStatusCode = 0;
+      }
     } else {
       $handlerMessage = 'API ERROR: ' .$CMSCore->locale->getSingleValueByKey('API_USER_ERROR_NOT_FOUND');
       $handlerStatusCode = $handlerStatusCode ?? 0;

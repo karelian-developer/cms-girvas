@@ -154,7 +154,7 @@ class SMTPClient
    * 
    * @return void
    */
-  public function sendEmail(string $from, string $to, string $subject, string $message) : void
+  public function sendEmail(string $from, string $to, string $subject, string $message, bool $isHTML = false) : void
   {
     $this->sendCommand("MAIL FROM: <{$from}>", '250');
     $this->sendCommand("RCPT TO: <{$to}>", '250');
@@ -165,6 +165,13 @@ class SMTPClient
     $headers .= "Subject: {$subject}\r\n";
     $headers .= "Content-Type: text/plain; charset=utf-8\r\n";
     $headers .= "Date: " . date('r') . "\r\n";
+
+    if ($isHTML) {
+      $headers .= "X-Mailer: PHP/" . phpversion();
+      $headers .= "\r\nMIME-Version: 1.0";
+      $headers .= "\r\nContent-type: text/html; charset=UTF-8";
+      $headers .= "\r\n";
+    }
 
     fwrite($this->socket, $headers . "\r\n" . $message . "\r\n.\r\n");
 
