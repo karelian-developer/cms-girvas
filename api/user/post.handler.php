@@ -13,8 +13,8 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-use \core\PHPLibrary\Template as Template;
-use \core\PHPLibrary\Template\Collector as TemplateCollector;
+use \core\PHPLibrary\Template as Theme;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Mail\SMTPClient as SMTPClient;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\UserGroup as UserGroup;
@@ -125,7 +125,7 @@ if ($CMSCore->urlp->getPath(2) == 'reset') {
       $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template')
         ? $CMSCore->configurator->getDatabaseEntryValue('base_template')
         : 'default';
-      $theme = new Template($CMSCore, $themeBaseName);
+      $theme = new Theme($CMSCore, $themeBaseName);
 
       $SMTPConfiguration = $CMSCore->configurator->getOtherCollection('smtp');
       /** @var int Временная отметка в UNIX-формате создания заявки на сброс пароля */
@@ -148,7 +148,7 @@ if ($CMSCore->urlp->getPath(2) == 'reset') {
         $mailTitle = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_TITLE');
         $mailContentText = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_CONTENT');
         $mailContent = sprintf(
-          TemplateCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
+          ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
             'EMAIL_TITLE' => $mailTitle,
             'EMAIL_CONTENT' => sprintf($mailContentText, $userLogin, $CMSCore->getSiteURL() . '/password-reset?token=' . $resetPasswordToken),
             'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')

@@ -191,8 +191,9 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                       $user = User::create($CMSCore, $userLogin, $userEmail, $userPassword);
                       
                       if ($user !== null) {
-                        $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template') ? $CMSCore->configurator->getDatabaseEntryValue('base_template') : 'default';
-
+                        $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template')
+                          ? $CMSCore->configurator->getDatabaseEntryValue('base_template')
+                          : 'default';
                         $theme = new Theme($CMSCore, $themeBaseName);
                         $registrationSubmit = $user->createRegistrationSubmit();
 
@@ -218,7 +219,7 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                               $mailTitle = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_TITLE');
                               $mailContentText = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_CONTENT');
                               $mailContent = sprintf(
-                                TemplateCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
+                                ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
                                   'EMAIL_TITLE' => $mailTitle,
                                   'EMAIL_CONTENT' => sprintf($mailContentText, $userLogin, $CMSCore->getSiteURL() . '/password-reset?token=' . $resetPasswordToken),
                                   'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')
