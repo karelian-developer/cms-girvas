@@ -20,7 +20,6 @@ use \DOMDocument as DOMDocument;
 #[\AllowDynamicProperties]
 final class Core implements ThemeInterfaceCore
 {
-  private CMSLocale $locale;
   private string $primaryColor = '#EAEAEA';
   public string $assembled = '';
   public ?DOMDocument $source = null;
@@ -113,7 +112,7 @@ final class Core implements ThemeInterfaceCore
   public function assemblyDocument(array $themeVars = []) : string
   {
     $themeURL = $this->theme->getURL();
-    $themeLocale = $this->theme->locale;
+    $themeLocale = $this->theme->CMSCore->locale;
     $themeLocaleName = $themeLocale->getName();
 
     $documentLang = mb_substr($themeLocaleName, 0, 2);
