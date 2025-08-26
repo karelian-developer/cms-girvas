@@ -198,7 +198,9 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                         $registrationSubmit = $user->createRegistrationSubmit();
 
                         if (is_array($registrationSubmit)) {
-                          $siteTitle = empty($CMSCore->configurator->getMetaTitle()) ? $CMSCore->configurator->getSiteTitle() : $CMSCore->configurator->getMetaTitle();
+                          $siteTitle = empty($CMSCore->configurator->getMetaTitle())
+                            ? $CMSCore->configurator->getSiteTitle()
+                            : $CMSCore->configurator->getMetaTitle();
                           $SMTPConfiguration = $CMSCore->configurator->getOtherCollection('smtp');
 
                           if (!empty($SMTPConfiguration)) {
@@ -220,7 +222,7 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                               $mailContent = ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
                                 'EMAIL_TITLE' => $mailTitle,
                                 'EMAIL_CONTENT' => sprintf(
-                                  $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_CONTENT'),
+                                  $mailContentText,
                                   $userLogin,
                                   $CMSCore->getSiteURL() . '/registration?submit=' . $registrationSubmit['submitToken'],
                                   $CMSCore->getSiteURL() . '/registration?refusal=' . $registrationSubmit['refusalToken']

@@ -9,10 +9,10 @@
  */
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\EmailSender as EmailSender;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Template\Manifest as ThemeManifest;
+use \core\PHPLibrary\Mail\SMTPClient as SMTPClient;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\SystemCore as CMSCore;
 
@@ -96,37 +96,55 @@ if ($CMSURLPathes[0] === 'handler') {
       $userPasswordNew = random_int(10000000, 99999999);
       $user->update(['passwordHash' => User::passwordHash($CMSCore, $user->getSecurityHash(), $userPasswordNew), 'metadata' => ['passwordResetToken' => '', 'passwordResetTokenCreatedTimestamp' => 0]]);
       
-      $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template') ? $CMSCore->configurator->getDatabaseEntryValue('base_template') : 'default';
-
+      $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template')
+        ? $CMSCore->configurator->getDatabaseEntryValue('base_template')
+        : 'default';
       $theme = new Theme($CMSCore, $themeBaseName);
 
-      $emailSender = new EmailSender($CMSCore);
-      $emailSender->setFromUser('CMS GIRVAS', 'support@garbalo.com');
-      $emailSender->setToUserEmail($user->getEmail());
-      $emailSender->addHeader(sprintf("From: %s <%s>", 'CMS GIRVAS', 'support@garbalo.com'));
-      $emailSender->addHeader(sprintf("\r\nX-Mailer: PHP/%s", phpversion()));
-      $emailSender->addHeader("\r\nMIME-Version: 1.0");
-      $emailSender->addHeader("\r\nContent-type: text/html; charset=UTF-8");
-      $emailSender->addHeader("\r\n");
+      $siteTitle = empty($CMSCore->configurator->getMetaTitle())
+        ? $CMSCore->configurator->getSiteTitle()
+        : $CMSCore->configurator->getMetaTitle();
+      $SMTPConfiguration = $CMSCore->configurator->getOtherCollection('smtp');
 
-      $resetPasswordCreatedUnixTimestamp = time();
-      $resetPasswordToken = md5($resetPasswordCreatedUnixTimestamp . $CMSCore::CMS_VERSION);
+      if (!empty($SMTPConfiguration)) {
+        $CMSEmail = 'no-reply@' . $SMTPConfiguration['domain'];
 
-      $emailSender->setSubject('Новый пароль');
-      $emailSender->setContent(ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
-        'EMAIL_TITLE' => 'Новый пароль',
-        'EMAIL_CONTENT' => sprintf('%s, здравствуйте! Используйте свой новый пароль для авторизации: <b>%d</b>. После авторизации рекомендуем сразу же его сменить.', $user->getLogin(), $userPasswordNew),
-        'EMAIL_COPYRIGHT' => 'С уважением, администрация сайта.'
-      ]));
+        try {
+          $SMTPClient = new SMTPClient(
+            $SMTPConfiguration['host'],
+            $SMTPConfiguration['port'],
+            $SMTPConfiguration['username'],
+            $SMTPConfiguration['password']
+          );
 
-      $emailSender->send();
+          $SMTPClient->connect();
+          $SMTPClient->login();
 
-      echo 'Your password reseted!';
+          $mailTitle = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_PASSWORD_RESETED_EMAIL_TITLE');
+          $mailContentText = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_PASSWORD_RESETED_EMAIL_CONTENT');
+          $mailContent = ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
+            'EMAIL_TITLE' => $mailTitle,
+            'EMAIL_CONTENT' => sprintf(
+              $mailContentText,
+              $user->getLogin(),
+              $userPasswordNew
+            ),
+            'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')
+          ]);
+
+          $SMTPClient->sendEmail($CMSEmail, $userEmail, $mailTitle, $mailContent, true);
+          $SMTPClient->disconnect();
+
+          echo $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_PASSWORD_RESETED_SUCCESS');
+        } catch (Exception $exception) {
+          echo $CMSCore->locale->getSingleValueByKey('API_ERROR_EXCEPTION') . $exception;
+        }
+      }
     } else {
-      echo 'Application is out of date!';
+      echo $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_PASSWORD_RESETED_TOKEN_IS_NOT_ACTIVE');
     }
   } else {
-    echo 'Request is not exists!';
+    echo $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
   }
 } else {
   if ($CMSURLP->getParam('mode') !== 'install' && file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
