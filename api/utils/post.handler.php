@@ -231,17 +231,6 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                               $SMTPClient->sendEmail($CMSEmail, $userEmail, $mailTitle, $mailContent, true);
                               $SMTPClient->disconnect();
 
-                              /** @var int Временная отметка в UNIX-формате создания заявки на сброс пароля */
-                              $resetPasswordCreatedUnixTimestamp = time();
-                              $user->update(
-                                [
-                                  'metadata' => [
-                                    'passwordResetToken' => $resetPasswordToken,
-                                    'passwordResetTokenCreatedUnixTimestamp' => $resetPasswordCreatedUnixTimestamp
-                                  ]
-                                ]
-                              );
-
                               $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_SENDED_SUCCESS');
                               $handlerStatusCode = $handlerStatusCode ?? 1;
                             } catch (Exception $exception) {
