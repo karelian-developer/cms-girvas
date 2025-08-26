@@ -231,16 +231,13 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                               $SMTPClient->sendEmail($CMSEmail, $userEmail, $mailTitle, $mailContent, true);
                               $SMTPClient->disconnect();
 
-                              $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_SENDED_SUCCESS');
+                              $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_SENDED_SUCCESS');
                               $handlerStatusCode = $handlerStatusCode ?? 1;
                             } catch (Exception $exception) {
                               $handlerMessage = 'API ERROR: ' . $exception;
-                              $handlerStatusCode = 0;
+                              $handlerStatusCode = $handlerStatusCode ?? 0;
                             }
                           }
-                          
-                          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_SENDED_SUCCESS');
-                          $handlerStatusCode = $handlerStatusCode ?? 1;
                         } else {
                           $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
                           $handlerStatusCode = $handlerStatusCode ?? 0;
