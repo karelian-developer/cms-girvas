@@ -69,6 +69,9 @@ if ($CMSURLPathes[0] === 'handler') {
 
 } else if ($CMSURLPathes[0] === 'password-reset') {
 
+  $CMSCore->locale->setTypeName('handler');
+  $CMSCore->locale->initPathes();
+
   $queryBuilder = new DatabaseQueryBuilder($CMSCore);
   $queryBuilder->setStatementSelect();
   $queryBuilder->statement->addSelections(['id']);
