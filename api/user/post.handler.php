@@ -138,8 +138,7 @@ if ($CMSCore->urlp->getPath(2) == 'reset') {
           $SMTPConfiguration['host'],
           $SMTPConfiguration['port'],
           $SMTPConfiguration['username'],
-          $SMTPConfiguration['password'],
-          true
+          $SMTPConfiguration['password']
         );
 
         $SMTPClient->connect();
@@ -157,7 +156,7 @@ if ($CMSCore->urlp->getPath(2) == 'reset') {
           'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')
         ]);
 
-        $SMTPClient->sendEmail($CMSEmail, $userEmail, $mailTitle, $mailContent);
+        $SMTPClient->sendEmail($CMSEmail, $userEmail, $mailTitle, $mailContent, true);
         $SMTPClient->disconnect();
 
         /** @var int Временная отметка в UNIX-формате создания заявки на сброс пароля */
