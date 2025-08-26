@@ -122,10 +122,10 @@ if ($CMSCore->urlp->getPath(2) == 'reset') {
       $userLogin = $user->getLogin();
       $CMSEmail = 'no-reply@' . $SMTPConfiguration['domain'];
 
-      // $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template') ? $CMSCore->configurator->getDatabaseEntryValue('base_template') : 'default';
-
-      /** @var Template Объект шаблона */
-      // $theme = new Template($CMSCore, $themeBaseName);
+      $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template')
+        ? $CMSCore->configurator->getDatabaseEntryValue('base_template')
+        : 'default';
+      $theme = new Template($CMSCore, $themeBaseName);
 
       $SMTPConfiguration = $CMSCore->configurator->getOtherCollection('smtp');
       /** @var int Временная отметка в UNIX-формате создания заявки на сброс пароля */
@@ -138,15 +138,21 @@ if ($CMSCore->urlp->getPath(2) == 'reset') {
           $SMTPConfiguration['host'],
           $SMTPConfiguration['port'],
           $SMTPConfiguration['username'],
-          $SMTPConfiguration['password']
+          $SMTPConfiguration['password'],
+          true
         );
 
         $SMTPClient->connect();
         $SMTPClient->login();
 
         $mailTitle = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_TITLE');
+        $mailContentText = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_CONTENT');
         $mailContent = sprintf(
-          $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_CONTENT'),
+          TemplateCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
+            'EMAIL_TITLE' => $mailTitle,
+            'EMAIL_CONTENT' => sprintf($mailContentText, $userLogin, $CMSCore->getSiteURL() . '/password-reset?token=' . $resetPasswordToken),
+            'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')
+          ]),
           $userLogin,
           $CMSCore->getSiteURL() . '/password-reset?token=' . $resetPasswordToken
         );

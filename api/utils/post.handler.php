@@ -202,20 +202,27 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
 
                           if (!empty($SMTPConfiguration)) {
                             $CMSEmail = 'no-reply@' . $SMTPConfiguration['domain'];
-                            
+
                             try {
                               $SMTPClient = new SMTPClient(
                                 $SMTPConfiguration['host'],
                                 $SMTPConfiguration['port'],
                                 $SMTPConfiguration['username'],
-                                $SMTPConfiguration['password']
+                                $SMTPConfiguration['password'],
+                                true
                               );
 
                               $SMTPClient->connect();
                               $SMTPClient->login();
 
                               $mailTitle = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_TITLE');
+                              $mailContentText = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_CONTENT');
                               $mailContent = sprintf(
+                                TemplateCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
+                                  'EMAIL_TITLE' => $mailTitle,
+                                  'EMAIL_CONTENT' => sprintf($mailContentText, $userLogin, $CMSCore->getSiteURL() . '/password-reset?token=' . $resetPasswordToken),
+                                  'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')
+                                ]),
                                 $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_CONTENT'),
                                 $userLogin,
                                 $CMSCore->getSiteURL() . '/registration?submit=' . $registrationSubmit['submitToken'],
