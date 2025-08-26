@@ -147,22 +147,29 @@ if ($CMSCore->urlp->getPath(2) == 'reset') {
 
         $mailTitle = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_TITLE');
         $mailContentText = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_CONTENT');
-        $mailContent = sprintf(
-          ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
-            'EMAIL_TITLE' => $mailTitle,
-            'EMAIL_CONTENT' => sprintf($mailContentText, $userLogin, $CMSCore->getSiteURL() . '/password-reset?token=' . $resetPasswordToken),
-            'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')
-          ]),
-          $userLogin,
-          $CMSCore->getSiteURL() . '/password-reset?token=' . $resetPasswordToken
-        );
+        $mailContent = ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
+          'EMAIL_TITLE' => $mailTitle,
+          'EMAIL_CONTENT' => sprintf(
+            $mailContentText,
+            $userLogin,
+            $CMSCore->getSiteURL() . '/password-reset?token=' . $resetPasswordToken
+          ),
+          'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')
+        ]);
 
         $SMTPClient->sendEmail($CMSEmail, $userEmail, $mailTitle, $mailContent);
         $SMTPClient->disconnect();
 
         /** @var int Временная отметка в UNIX-формате создания заявки на сброс пароля */
         $resetPasswordCreatedUnixTimestamp = time();
-        $user->update(['metadata' => ['passwordResetToken' => $resetPasswordToken, 'passwordResetTokenCreatedUnixTimestamp' => $resetPasswordCreatedUnixTimestamp]]);
+        $user->update(
+          [
+            'metadata' => [
+              'passwordResetToken' => $resetPasswordToken,
+              'passwordResetTokenCreatedUnixTimestamp' => $resetPasswordCreatedUnixTimestamp
+            ]
+          ]
+        );
 
         $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_SENDED_SUCCESS');
         $handlerStatusCode = $handlerStatusCode ?? 1;
