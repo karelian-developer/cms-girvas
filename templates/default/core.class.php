@@ -24,7 +24,7 @@ final class Core implements ThemeInterfaceCore
   private CMSLocale $locale;
   private string $primaryColor = '#EAEAEA';
   public string $assembled = '';
-  public DOMDocument|null $source = null;
+  public ?DOMDocument $source = null;
   
   /**
    * __construct
