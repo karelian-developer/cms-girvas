@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
+ * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ */
+
+namespace core\PHPLibrary\Page\Admin\Settings;
+
+use \core\PHPLibrary\SystemCore as CMSCore;
+
+interface SettingsPageInterface
+{
+  public function __construct(CMSCore $CMSCore, string $name);
+  public function setTitle(string $value) : void;
+  public function setDescription(string $value) : void;
+  public function getTitle() : string;
+  public function getDescription() : string;
+  public function assembly(array $templateValues = []) : void;
+}

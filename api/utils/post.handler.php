@@ -15,10 +15,10 @@ if (!defined('IS_NOT_HACKED')) {
 
 
 use \core\PHPLibrary\Client\Session as ClientSession;
-use \core\PHPLibrary\EmailSender as EmailSender;
 use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\Mail\SMTPClient as SMTPClient;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
@@ -191,34 +191,55 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                       $user = User::create($CMSCore, $userLogin, $userEmail, $userPassword);
                       
                       if ($user !== null) {
-                        $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template') ? $CMSCore->configurator->getDatabaseEntryValue('base_template') : 'default';
-
+                        $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template')
+                          ? $CMSCore->configurator->getDatabaseEntryValue('base_template')
+                          : 'default';
                         $theme = new Theme($CMSCore, $themeBaseName);
                         $registrationSubmit = $user->createRegistrationSubmit();
 
                         if (is_array($registrationSubmit)) {
-                          $siteTitle = empty($CMSCore->configurator->getMetaTitle()) ? $CMSCore->configurator->getSiteTitle() : $CMSCore->configurator->getMetaTitle();
+                          $siteTitle = empty($CMSCore->configurator->getMetaTitle())
+                            ? $CMSCore->configurator->getSiteTitle()
+                            : $CMSCore->configurator->getMetaTitle();
+                          $SMTPConfiguration = $CMSCore->configurator->getOtherCollection('smtp');
 
-                          $emailSender = new EmailSender($CMSCore);
-                          $emailSenderSystemSenderEmail = EmailSender::getSystemSenderEmail($CMSCore);
-                          $emailSender->setFromUser($siteTitle, $emailSenderSystemSenderEmail);
-                          $emailSender->setToUserEmail($userEmail);
-                          $emailSender->addHeader(sprintf('From: %s <%s>', $siteTitle, $emailSenderSystemSenderEmail));
-                          $emailSender->addHeader(sprintf("\r\nX-Mailer: PHP/%s", phpversion()));
-                          $emailSender->addHeader("\r\nMIME-Version: 1.0");
-                          $emailSender->addHeader("\r\nContent-type: text/html; charset=UTF-8");
+                          if (!empty($SMTPConfiguration)) {
+                            $CMSEmail = 'no-reply@' . $SMTPConfiguration['domain'];
 
-                          $emailSender->setSubject($CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_SUBJECT'));
-                          $emailSender->setContent(ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
-                            'EMAIL_TITLE' => $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_TITLE'),
-                            'EMAIL_CONTENT' => sprintf($CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_CONTENT'), $userLogin, sprintf('%s/registration?submit=%s', $CMSCore->getSiteURL(), $registrationSubmit['submitToken']), sprintf('%s/registration?refusal=%s', $CMSCore->getSiteURL(), $registrationSubmit['refusalToken'])),
-                            'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_COPYRIGHT')
-                          ]));
+                            try {
+                              $SMTPClient = new SMTPClient(
+                                $SMTPConfiguration['host'],
+                                $SMTPConfiguration['port'],
+                                $SMTPConfiguration['username'],
+                                $SMTPConfiguration['password']
+                              );
 
-                          $emailSender->send();
-                          
-                          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_SENDED_SUCCESS');
-                          $handlerStatusCode = $handlerStatusCode ?? 1;
+                              $SMTPClient->connect();
+                              $SMTPClient->login();
+
+                              $mailTitle = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_TITLE');
+                              $mailContentText = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_CONTENT');
+                              $mailContent = ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
+                                'EMAIL_TITLE' => $mailTitle,
+                                'EMAIL_CONTENT' => sprintf(
+                                  $mailContentText,
+                                  $userLogin,
+                                  $CMSCore->getSiteURL() . '/registration?submit=' . $registrationSubmit['submitToken'],
+                                  $CMSCore->getSiteURL() . '/registration?refusal=' . $registrationSubmit['refusalToken']
+                                ),
+                                'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')
+                              ]);
+
+                              $SMTPClient->sendEmail($CMSEmail, $userEmail, $mailTitle, $mailContent, true);
+                              $SMTPClient->disconnect();
+
+                              $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_SENDED_SUCCESS');
+                              $handlerStatusCode = $handlerStatusCode ?? 1;
+                            } catch (Exception $exception) {
+                              $handlerMessage = 'API ERROR: ' . $exception;
+                              $handlerStatusCode = $handlerStatusCode ?? 0;
+                            }
+                          }
                         } else {
                           $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
                           $handlerStatusCode = $handlerStatusCode ?? 0;

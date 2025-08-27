@@ -710,7 +710,7 @@ class User
    */
   public function delete() : bool
   {
-    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
@@ -1095,7 +1095,7 @@ class User
    * 
    * @return bool
    */
-  public static function existsUserIDByRegistrationSubmitToken(CMSCore $CMSCore, string $token) : bool
+  public static function existsByRegistrationSubmitToken(CMSCore $CMSCore, string $token) : bool
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -1140,7 +1140,7 @@ class User
    * 
    * @return bool
    */
-  public static function existsUserIDByRegistrationRefusalToken(CMSCore $CMSCore, string $token) : bool
+  public static function existsByRegistrationRefusalToken(CMSCore $CMSCore, string $token) : bool
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');

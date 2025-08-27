@@ -21,7 +21,6 @@ if ($CMSCore->client->isLogged(2)) {
 
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT)) {
     if (!empty($_POST)) {
-
       /** @var int Количество пользовательских полей для пользователей */
       $usersAdditionalFieldsCount = 0;
       /** @var int Количество пользовательских полей для записей */
@@ -92,6 +91,8 @@ if ($CMSCore->client->isLogged(2)) {
       }
       
       if (!$errorIsDetected) {
+        $SMTPConfugration = [];
+
         foreach ($_POST as $settingName => $settingValue) {
           if (preg_match('/^setting_([a-z0-9_]+)$/', $settingName, $matches, PREG_OFFSET_CAPTURE)) {
             $settingName = $matches[1][0];
@@ -115,6 +116,11 @@ if ($CMSCore->client->isLogged(2)) {
                 $handlerStatusCode = $handlerStatusCode ?? 0;
               }
 
+              continue;
+            }
+
+            if (in_array($settingName, ['email_smtp_host', 'email_smtp_port', 'email_smtp_username', 'email_smtp_password', 'email_smtp_domain'])) {
+              $SMTPConfugration[$settingName] = $settingValue;
               continue;
             }
 
@@ -300,6 +306,32 @@ if ($CMSCore->client->isLogged(2)) {
               $CMSCore->configurator->insertDatabaseEntryValue($settingName, $settingValue);
             }
           }
+        }
+
+        if (!empty($SMTPConfugration)) {
+          $configurationFilePath = CMS_ROOT_DIRECTORY . '/core/configuration.smtp.php';
+
+          $file = fopen($configurationFilePath, 'w+');
+          fwrite($file, '<?php' . PHP_EOL);
+          fwrite($file, PHP_EOL);
+          fwrite($file, '$configuration = [' . PHP_EOL);
+
+          foreach ($SMTPConfugration as $settingName => $settingValue) {
+            $paramName = match ($settingName) {
+              'email_smtp_host' => 'host',
+              'email_smtp_port' => 'port',
+              'email_smtp_username' => 'username',
+              'email_smtp_password' => 'password',
+              'email_smtp_domain' => 'domain'
+            };
+
+            fwrite($file, sprintf('  \'' . $paramName .'\' => \'%s\',', $settingValue) . PHP_EOL);
+          }
+
+          fwrite($file, '];' . PHP_EOL);
+          fwrite($file, PHP_EOL);
+          fclose($file);
+          chmod($configurationFilePath, 0664);
         }
 
         if ($usersAdditionalFieldsCount === 0 && isset($_POST['_users_additional_fields_locale'])) {

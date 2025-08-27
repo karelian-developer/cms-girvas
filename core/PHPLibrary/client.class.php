@@ -17,19 +17,18 @@ use \core\PHPLibrary\Client\Session as ClientSession;
  */
 class Client
 {
-  private readonly SystemCore $CMSCore;
   private string $ip;
   
   /**
    * __construct
    *
-   * @param  SystemCore $CMSCore
+   * @param CoreInterface $CMSCore
+   * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore)
-  {
-    $this->CMSCore = $CMSCore;
-
+  public function __construct(
+    private CoreInterface $CMSCore
+  ) {
     $this->setIPAddress();
   }
 

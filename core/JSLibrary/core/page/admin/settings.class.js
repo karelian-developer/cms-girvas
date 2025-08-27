@@ -19,7 +19,7 @@ export class PageSettings {
   constructor(page, params = {}) {
     this.page = page;
 
-    this.buttons = {save: null};
+    this.buttons = {save: null, sendTestEmail: null};
   }
 
   init() {
@@ -483,6 +483,27 @@ export class PageSettings {
         tableAdditionalFieldsButtonContainer.append(buttons.addField.target.element);
       }
 
+      if (searchParams.getPathPart(3) === 'email') {
+        this.buttons.sendTestEmail = new Interactive('button');
+        this.buttons.sendTestEmail.target.setLabel(localeData.BUTTON_SEND_TEST_EMAIL);
+        this.buttons.sendTestEmail.target.setCallback((event) => {
+          event.preventDefault();
+
+          let formData = new FormData();
+          formData.append('event', 'testSend');
+
+          let request = new Interactive('request', {
+            method: 'POST',
+            url: '/handler/settings/email?localeMessage=' + window.CMSCore.locales.admin.name
+          });
+
+          request.target.data = formData;
+          request.target.send();
+        });
+        
+        this.buttons.sendTestEmail.assembly();
+      }
+
       this.buttons.save = new Interactive('button');
       this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
       this.buttons.save.target.setCallback((event) => {
@@ -517,6 +538,11 @@ export class PageSettings {
       this.buttons.save.assembly();
 
       let interactiveFormPanelContainer = document.querySelector('#SYSTEM_E3724126170');
+
+      if (searchParams.getPathPart(3) === 'email') {
+        interactiveFormPanelContainer.append(this.buttons.sendTestEmail.target.element);
+      }
+
       interactiveFormPanelContainer.append(this.buttons.save.target.element);
     }, (rejectionReason) => {
       let interactiveNotification = new Interactive('notification');
