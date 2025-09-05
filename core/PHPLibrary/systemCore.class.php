@@ -51,7 +51,7 @@ final class SystemCore implements CoreInterface
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS «GIRVAS»';
-  public const CMS_VERSION = '0.2.6';
+  public const CMS_VERSION = '0.2.6.1';
   public const CMS_STAGE_DEVELOPING = 'voitsy';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
@@ -449,6 +449,7 @@ final class SystemCore implements CoreInterface
       CMSHeader::add(CMSEnumHeader::HTTP_CONTENT_SECURITY_POLICY, $CMSConfigurator->getSecurityCSP());
       header('Referrer-Policy: strict-origin-when-cross-origin');
       header('X-Content-Type-Options: nosniff');
+      header('Permissions-Policy: browsing-topics=()');
       
       if ($CMSConfigurator->get('SSLIsEnabled')) {
         $HSTSVars = [];
