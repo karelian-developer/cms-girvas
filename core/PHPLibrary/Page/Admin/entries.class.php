@@ -126,7 +126,7 @@ class PageEntries implements InterfacePage
 
     $entryNumber = 1;
     foreach ($entriesObjects as $entryObject) {
-      $entryObject->initData(['id', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata', 'categoryID']);
+      $entryObject->initData(['id', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata', 'categoryID', 'authorID']);
 
       $entryCategoryID = $entryObject->getCategoryID();
       $entryCategory = new EntryCategory($this->CMSCore, $entryCategoryID);
@@ -144,6 +144,13 @@ class PageEntries implements InterfacePage
       $entryDescription = strip_tags($entryDescription);
       $entryCategoryTitle = strip_tags($entryCategoryTitle);
 
+      $entryAuthor = $entryCategory->getAuthor();
+      if ($entryAuthor !== null) {
+        $entryAuthor->initData(['login']);
+      }
+
+      $entryAuthorLogin = $entryAuthor !== null ? $entryAuthor->getLogin() : 'User deleted';
+
       array_push($entriesTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/tableItem.tpl', [
         'ENTRY_ID' => $entryObject->getID(),
         'ENTRY_NAME' => $entryObject->getName(),
@@ -153,6 +160,7 @@ class PageEntries implements InterfacePage
         'ENTRY_CATEGORY_TITLE' => !empty($entryCategoryTitle) ? $entryCategoryTitle : sprintf('[ CATEGORY TITLE NOT FOUND IN LOCALE %s ]', $localeName),
         'ENTRY_PUBLISHED_STATUS' => $entryObject->isPublished() ? 'published' : 'not-published',
         'ENTRY_URL' => $entryObject->getURL(),
+        'ENTRY_AUTHOR_LOGIN' => $entryAuthorLogin,
         'ENTRY_CREATED_DATE_TIMESTAMP' => $entryCreatedDateTimestamp,
         'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $entryObject->getPublishedUnixTimestamp() > 0 ? $entryPublishedDateTimestamp : '-',
         'ENTRY_UPDATED_DATE_TIMESTAMP' => $entryUpdatedDateTimestamp,

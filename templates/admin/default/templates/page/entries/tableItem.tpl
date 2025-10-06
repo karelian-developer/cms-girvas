@@ -8,19 +8,23 @@
   </div>
   <div class="grid-table__cell grid-table__cell_metadata">
     <ul class="grid-table__metadata-list">
-      <li class="grid-table__metadata">
+      <li class="grid-table__metadata grid-table__metadata_category">
         <span class="grid-table__metadata-label">Категория</span>
         <span class="grid-table__metadata-value">{ENTRY_CATEGORY_TITLE}</span>
       </li>
-      <li class="grid-table__metadata">
+      <li class="grid-table__metadata grid-table__metadata_author">
+        <span class="grid-table__metadata-label">Автор</span>
+        <span class="grid-table__metadata-value">{ENTRY_AUTHOR_LOGIN}</span>
+      </li>
+      <li class="grid-table__metadata grid-table__metadata_date-created">
         <span class="grid-table__metadata-label">Дата создания</span>
         <span class="grid-table__metadata-value">{ENTRY_CREATED_DATE_TIMESTAMP}</span>
       </li>
-      <li class="grid-table__metadata">
+      <li class="grid-table__metadata grid-table__metadata_date-published">
         <span class="grid-table__metadata-label">Дата публикации</span>
         <span class="grid-table__metadata-value">{ENTRY_PUBLISHED_DATE_TIMESTAMP}</span>
       </li>
-      <li class="grid-table__metadata">
+      <li class="grid-table__metadata grid-table__metadata_date-updated">
         <span class="grid-table__metadata-label">Дата обновления</span>
         <span class="grid-table__metadata-value">{ENTRY_UPDATED_DATE_TIMESTAMP}</span>
       </li>
