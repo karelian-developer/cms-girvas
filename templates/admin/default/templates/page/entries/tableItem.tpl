@@ -1,4 +1,4 @@
-<div class="grid-table__item grid-table__item_entry" data-is-published="{ENTRY_PUBLISHED_STATUS}">
+<div class="grid-table__item grid-table__item_entry" data-element="entry" data-is-published="{ENTRY_PUBLISHED_STATUS}" data-id="{ENTRY_ID}">
   <div class="grid-table__cell grid-table__cell_title">
     <a class="grid-table__link" href="/admin/entry/{ENTRY_ID}" target="_blank">{ENTRY_TITLE}</a>
     <span class="grid-table__draft">черновик</span>

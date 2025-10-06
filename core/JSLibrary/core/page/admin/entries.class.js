@@ -44,28 +44,17 @@ export class PageEntries {
       let interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
-      let tableItemsEntries = document.querySelectorAll('.table-entries__item');
+      const tableItems = document.querySelectorAll('[data-element="entry"]');
+      for (let tableItem of tableItems) {
+        let entryID = tableItem.getAttribute('data-id');
+        const panelElement = tableItem.querySelector('[data-element="panel"]');
+        const panelEventElements = panelElement.querySelectorAll('[data-event]');
 
-      for (let tableItemEntry of tableItemsEntries) {
-        let entryID = tableItemEntry.getAttribute('data-entry-id');
-        let entryName = tableItemEntry.getAttribute('data-name');
-        let buttons = tableItemEntry.querySelectorAll('button[role]');
-
-        for (let button of buttons) {
-          button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') === 'entry-edit') {
-              window.location.href = `./entry/${entryID}`;
-            }
+        for (let eventElement of panelEventElements) {
+          eventElement.addEventListener('click', (event) => {
+            event.preventDefault();
             
-            if (button.getAttribute('role') === 'entry-view') {
-              window.open(`/entry/${entryName}`, '_blank');
-            }
-            
-            if (button.getAttribute('role') === 'entry-analytics') {
-              window.open(`/admin/analytics/entry/${entryID}`, '_blank');
-            }
-
-            if (button.getAttribute('role') === 'entry-remove') {
+            if (eventElement.getAttribute('data-event') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_ENTRY_DELETE_TITLE,
                 content: localeData.MODAL_ENTRY_DELETE_DESCRIPTION
