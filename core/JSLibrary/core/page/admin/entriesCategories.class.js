@@ -54,7 +54,7 @@ export class PageEntriesCategories {
           eventElement.addEventListener('click', (event) => {
             event.preventDefault();
 
-            if (eventElement.getAttribute('data-event') === 'data-event') {
+            if (eventElement.getAttribute('data-event') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_ENTRIES_CATEGORY_DELETE_TITLE,
                 content: localeData.MODAL_ENTRIES_CATEGORY_DELETE_DESCRIPTION
