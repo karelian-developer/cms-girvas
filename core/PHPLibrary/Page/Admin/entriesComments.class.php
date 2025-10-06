@@ -138,7 +138,7 @@ class PageEntriesComments implements InterfacePage
         $updatedDateTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
         array_push($commentsTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesComments/tableItem.tpl', [
-          'COMMENT_ID' => $object->get_id(),
+          'COMMENT_ID' => $object->getID(),
           'COMMENT_IS_HIDDEN_STATUS' => var_export($object->isHidden(), true),
           'COMMENT_HIDDEN_REASON' => strip_tags($object->getHiddenReason()),
           'COMMENT_INDEX' => $index + 1,
