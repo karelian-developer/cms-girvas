@@ -242,10 +242,23 @@
 
 @media (max-width: 500px) {
   .grid-table__panel-link {
+    box-sizing: border-box;
+    background-color: var(--color-brand-primary);
     text-transform: uppercase;
     font-weight: 700;
+    text-align: center;
     color: var(--color-neutral-light);
     padding: 5px 10px;
+    width: 100%;
+  }
+
+  .grid-table__panel-link_red {
+    background-color: var(--color-link-negative);
+  }
+
+  .grid-table__panel-link:hover,
+  .grid-table__panel-link:focus {
+    filter: brightness(120%);
   }
 }
 
