@@ -149,6 +149,9 @@ class PagePages implements InterfacePage
         'PAGE_STATIC_DESCRIPTION' => !empty($pageStaticDescription) ? $pageStaticDescription : sprintf('[ DESCRIPTION NOT FOUND IN LOCALE %s ]', $pagesStaticLocale->getName()),
         'PAGE_STATIC_PUBLISHED_STATUS' => $object->isPublished() ? 'published' : 'not-published',
         'PAGE_STATIC_URL' => $object->getURL(),
+        'PAGE_STATIC_AUTHOR_LOGIN' => $pageStaticAuthorLogin,
+        'PAGE_STATIC_LOCALES_LIST' => $pageStaticCompletedLocales,
+        'PAGE_STATIC_SEO_STATUS' => $pageStaticSEOStatus,
         'PAGE_STATIC_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
         'PAGE_STATIC_PUBLISHED_DATE_TIMESTAMP' => $object->getPublishedUnixTimestamp() > 0 ? $publishedUnixTimestamp : '-',
         'PAGE_STATIC_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
