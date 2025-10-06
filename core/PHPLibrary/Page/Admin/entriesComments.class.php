@@ -93,7 +93,7 @@ class PageEntriesComments implements InterfacePage
     $localeName = $this->CMSCore->locale->getName();
 
     $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
-    $$paginationItemsOnPage = 12;
+    $paginationItemsOnPage = 12;
 
     $entries = new Entries($this->CMSCore);
     $entriesObjects = $entries->getAll();
