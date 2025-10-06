@@ -71,6 +71,9 @@
 }
 
 .grid-table__cell_panel {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
   font-size: 12px;
   grid-area: panel;
 }
@@ -123,6 +126,7 @@
 }
 
 .grid-table__panel-link {
+  font-size: inherit;
   text-transform: lowercase;
   color: var(--color-link-default);
 }
