@@ -54,7 +54,7 @@
 }
 
 .grid-table__cell_content {
-  grid-area: description;
+  grid-area: content;
 }
 
 .grid-table__cell_metadata {
@@ -80,11 +80,6 @@
   }
 }
 
-.grid-table__locales-title {
-  font-weight: 500;
-  margin-right: 3px;
-}
-
 .grid-table__panel-list {
   display: flex;
   list-style-type: none;
@@ -106,7 +101,7 @@
   display: grid;
   list-style-type: none;
   grid-template-areas: 
-    'parent-category count-entries'
+    'entry-title author'
     'date-created date-updated';
   grid-template-columns: max-content max-content;
   column-gap: 10px;
@@ -125,12 +120,12 @@
   margin-right: 2px;
 }
 
-.grid-table__metadata_parent-category {
-  grid-area: parent-category;
+.grid-table__metadata_entry-title {
+  grid-area: entry-title;
 }
 
 .grid-table__metadata_author {
-  grid-area: count-entries;
+  grid-area: author;
 }
 
 .grid-table__metadata_date-created {
