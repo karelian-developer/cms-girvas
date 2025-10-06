@@ -125,10 +125,10 @@ class PageEntriesComments implements InterfacePage
         return 0;
       });
 
-      $entriesCommentsObjectsSorted = array_slice($entriesCommentsObjectsSorted, $paginationItemCurrent * $$paginationItemsOnPage, $$paginationItemsOnPage);
+      $entriesCommentsObjectsSorted = array_slice($entriesCommentsObjectsSorted, $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
     }
 
-    $pagination = new Pagination($this->CMSCore, count($entriesCommentsObjectsSorted), $$paginationItemsOnPage, $paginationItemCurrent);
+    $pagination = new Pagination($this->CMSCore, count($entriesCommentsObjectsSorted), $paginationItemsOnPage, $paginationItemCurrent);
     $pagination->assembly();
     
     $commentsTableItemsAssembled = [];
