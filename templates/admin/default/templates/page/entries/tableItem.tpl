@@ -2,6 +2,7 @@
   <div class="grid-table__cell grid-table__cell_title">
     <a class="grid-table__link" href="/admin/entry/{ENTRY_ID}" target="_blank">{ENTRY_TITLE}</a>
     <span class="grid-table__draft">черновик</span>
+    <span class="grid-table__id">ID: {ENTRY_ID}</span>
   </div>
   <div class="grid-table__cell grid-table__cell_description">
     {ENTRY_DESCRIPTION}
@@ -42,7 +43,7 @@
         <a href="#" class="grid-table__panel-link grid-table__panel-link_red">Удалить</a>
       </li>
       <li class="grid-table__panel-item">
-        <a href="/entry/{ENTRY_ID}" class="grid-table__panel-link">Посмотреть на сайте</a>
+        <a href="{ENTRY_URL}" class="grid-table__panel-link">Посмотреть на сайте</a>
       </li>
     </ul>
   </div>
