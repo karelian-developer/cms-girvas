@@ -83,12 +83,8 @@ final class Template implements InterfaceTemplate
    */
   public function init() : mixed
   {
-    $this->addStyle(['href' => 'normalize.css', 'rel' => 'stylesheet', 'isCore' => true]);
-    $this->addStyle(['href' => 'default-colors-scheme.css', 'rel' => 'stylesheet', 'isCore' => true]);
-    $this->addStyle(['href' => 'default-base.css', 'rel' => 'stylesheet', 'isCore' => true]);
+    $this->addStyle(['href' => 'default-base.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
     $this->addStyle(['href' => 'default-fonts.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
-    $this->addStyle(['href' => 'default-forms.css', 'rel' => 'stylesheet', 'isCore' => true]);
-    $this->addStyle(['href' => 'default-tables.css', 'rel' => 'stylesheet', 'isCore' => true]);
     $this->addStyle(['href' => 'default-interactive.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
     $this->addStyle(['href' => 'default-notifications.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
 
@@ -357,13 +353,26 @@ final class Template implements InterfaceTemplate
   /**
    * Добавить скрипт в массив стилей
    *
-   * @param  mixed $data
+   * @param array $data
    * 
    * @return void
    */
   public function addScript(array $data, bool $isCMSCore = false) : void
   {
     $data['isCMSCore'] = $isCMSCore;
+    $this->scripts[] = $data;
+  }
+  
+  /**
+   * Добавить внешний скрипт в массив стилей
+   *
+   * @param array $data
+   * 
+   * @return void
+   */
+  public function addExternalScript(array $data) : void
+  {
+    $data['isExternal'] = true;
     $this->scripts[] = $data;
   }
   
@@ -757,16 +766,26 @@ final class Template implements InterfaceTemplate
       if (isset($elementHead[0])) {
         foreach ($headScripts as $elementData) {
           $elementScript = $document->createElement('script');
-
-          if ($this->getCategory() !== 'base') {
-            $scriptURL = !$elementData['isCMSCore'] ? '/templates/' . $this->getCategory() . '/' . $this->getName() . '/' . $elementData['src'] : '/core/JSLibrary/' . $elementData['src'];
-          } else {
-            $scriptURL = !$elementData['isCMSCore'] ? '/templates/' . $this->getName() . '/' . $elementData['src'] : '/core/JSLibrary/' . $elementData['src'];
-          }
-
-          if (array_key_exists('src', $elementData)) {
+          $scriptIsExternal = isset($elementData['isExternal'])
+            ? $elementData['isExternal']
+            : false;
+          $scriptIsExternal = is_bool($scriptIsExternal)
+            ? $scriptIsExternal
+            : false;
+          
+          if (isset($elementData['src'])) {
+            if (!$scriptIsExternal) {
+              if ($this->getCategory() !== 'base') {
+                $scriptURL = !$elementData['isCMSCore'] ? '/templates/' . $this->getCategory() . '/' . $this->getName() . '/' . $elementData['src'] : '/core/JSLibrary/' . $elementData['src'];
+              } else {
+                $scriptURL = !$elementData['isCMSCore'] ? '/templates/' . $this->getName() . '/' . $elementData['src'] : '/core/JSLibrary/' . $elementData['src'];
+              }
+            } else {
+              $scriptURL = $elementData['src'];
+            }
+            
             foreach ($elementData as $attributeName => $attributeValue) {
-              if ($attributeName !== 'isCMSCore') {
+              if (!in_array($attributeName, ['isCMSCore', 'isExternal'])) {
                 $attribute = $document->createAttribute($attributeName);
                 $attribute->value = $attributeName !== 'src' ? $attributeValue : $scriptURL;
                 
@@ -778,7 +797,6 @@ final class Template implements InterfaceTemplate
           }
         }
       }
-
 
       if (isset($elementHead[0])) {
         foreach ($this->headLinks as $elementData) {

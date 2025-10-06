@@ -64,6 +64,7 @@ if ($CMSURLPathes[0] === 'handler') {
     $manifest->addIcon($faviconURL, [$faviconWidth, $faviconWidth], 'image/png');
   }
 
+  http_response_code(200);
   header('Content-Type: application/json');
   echo $manifest->getJSON();
 

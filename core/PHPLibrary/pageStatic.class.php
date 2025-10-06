@@ -167,7 +167,7 @@ class PageStatic implements EntityTypeContent
 
     if (User::existsByID($this->CMSCore, $authorID)) {
       $author = new User($this->CMSCore, $authorID);
-      $author->iniiData($initData);
+      $author->initData($initData);
 
       return $author;
     }

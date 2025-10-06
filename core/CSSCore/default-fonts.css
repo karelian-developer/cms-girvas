@@ -18,6 +18,7 @@
   src: url('../FontsCore/Roboto/thin.ttf');
   font-weight: 200;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -25,6 +26,7 @@
   src: url('../FontsCore/Roboto/thin-italic.ttf');
   font-weight: 200;
   font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
@@ -32,6 +34,7 @@
   src: url('../FontsCore/Roboto/regular.ttf');
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -39,6 +42,7 @@
   src: url('../FontsCore/Roboto/italic.ttf');
   font-weight: 400;
   font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
@@ -46,6 +50,7 @@
   src: url('../FontsCore/Roboto/medium.ttf');
   font-weight: 500;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -53,6 +58,7 @@
   src: url('../FontsCore/Roboto/medium-italic.ttf');
   font-weight: 500;
   font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
@@ -60,6 +66,7 @@
   src: url('../FontsCore/Roboto/bold.ttf');
   font-weight: 700;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -67,6 +74,7 @@
   src: url('../FontsCore/Roboto/bold-italic.ttf');
   font-weight: 700;
   font-style: italic;
+  font-display: swap;
 }
 
 @font-face {
@@ -74,6 +82,7 @@
   src: url('../FontsCore/Roboto/black.ttf');
   font-weight: 900;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
@@ -81,4 +90,5 @@
   src: url('../FontsCore/Roboto/black-italic.ttf');
   font-weight: 900;
   font-style: italic;
+  font-display: swap;
 }

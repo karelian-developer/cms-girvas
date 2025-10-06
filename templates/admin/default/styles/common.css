@@ -78,6 +78,7 @@ a:active {
 .admin-panel__wrapper {
   display: flex;
   flex: 0 0 100%;
+  min-height: 100%;
 }
 
 .admin-panel__navigation {

@@ -19,6 +19,7 @@ use \PDOException as PDOException;
 #[\AllowDynamicProperties]
 class Entry implements EntityTypeContent
 {
+  private int $authorID;
   private int $categoryID;
   private int $viewsCount = 0;
   private string $name;
@@ -486,6 +487,93 @@ class Entry implements EntityTypeContent
 
     return ($viewsCount * 0.5) + ($commentsCount * 2);
   }
+
+  /**
+   * Получить предыдущую запись
+   * 
+   * @return ?EntityTypeContent
+   */
+  public function getPreviousEntry() : ?EntityTypeContent {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` < :id AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+      'postgresql' => '"id" < :id AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
+    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? new Entry($this->CMSCore, (int) $result['id']) : null;
+  }
+
+  /**
+   * Получить следущую запись
+   * 
+   * @return ?EntityTypeContent
+   */
+  public function getNextEntry() : ?EntityTypeContent {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` > :id AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+      'postgresql' => '"id" > :id AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? new Entry($this->CMSCore, (int) $result['id']) : null;
+  }
   
   /**
    * Получить объект записи по его наименованию
@@ -495,7 +583,7 @@ class Entry implements EntityTypeContent
    * 
    * @return Entry
    */
-  public static function getByName(SystemCore $CMSCore, string $name) : Entry|null
+  public static function getByName(SystemCore $CMSCore, string $name) : ?Entry
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');

@@ -227,7 +227,13 @@ class EntriesSample implements EntityTypeContent
         $categoryArray = $category->getEntries($params, $isPublished);
         
         if (count($categoryArray) > 0) {
-          foreach ($categoryArray as $entry) {
+          $limit = $this->getLimitCount();
+
+          foreach ($categoryArray as $entryIndex => $entry) {
+            if ($limit <= $entryIndex) {
+              break;
+            }
+
             array_push($entries, $entry);
           }
         }

@@ -18,6 +18,8 @@ use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\User as User;
+use \DateTime as DateTime;
+use \DateTimeZone as DateTimeZone;
 
 class PagePage implements InterfacePage
 {
@@ -102,7 +104,7 @@ class PagePage implements InterfacePage
 
       if (PageStatic::existsByName($this->CMSCore, $pageStaticName)) {
         $pageStatic = PageStatic::getByName($this->CMSCore, $pageStaticName);
-        $pageStatic->initData(['id', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
+        $pageStatic->initData(['id', 'texts', 'name', 'authorID', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
 
         if ($this->CMSCore->urlp->getParam('locale') === $localeName) {
           $this->CMSCore->theme->addLinkCanonical('/page/' . $pageStatic->getName());
@@ -151,6 +153,8 @@ class PagePage implements InterfacePage
            */
           $pageStaticContent = $pageStatic->getContent($localeName);
 
+          $siteTimezone = $this->CMSCore->configurator->getSiteTimezone();
+
           $createdDateTimestamp = date('d.m.Y H:i:s', $pageStatic->getCreatedUnixTimestamp());
           $publishedDateTimestamp = date('d.m.Y H:i:s', $pageStatic->getPublishedUnixTimestamp());
           $updatedDateTimestamp = date('d.m.Y H:i:s', $pageStatic->getUpdatedUnixTimestamp());
@@ -175,12 +179,34 @@ class PagePage implements InterfacePage
           $publishedDateTimestampISO8601WithoutData = date('H:i:s', $pageStatic->getPublishedUnixTimestamp());
           $updatedDateTimestampISO8601WithoutData = date('H:i:s', $pageStatic->getUpdatedUnixTimestamp());
 
+          $createdDateTimestampISO8601TZ = new DateTime();
+          $createdDateTimestampISO8601TZ->setTimestamp($pageStatic->getCreatedUnixTimestamp());
+          $createdDateTimestampISO8601TZ->setTimezone(new DateTimeZone($siteTimezone));
+
+          $publishedDateTimestampISO8601TZ = new DateTime();
+          $publishedDateTimestampISO8601TZ->setTimestamp($pageStatic->getPublishedUnixTimestamp());
+          $publishedDateTimestampISO8601TZ->setTimezone(new DateTimeZone($siteTimezone));
+
+          $updatedDateTimestampISO8601TZ = new DateTime();
+          $updatedDateTimestampISO8601TZ->setTimestamp($pageStatic->getUpdatedUnixTimestamp());
+          $updatedDateTimestampISO8601TZ->setTimezone(new DateTimeZone($siteTimezone));
+
+          $author = $pageStatic->getAuthor();
+          $authorLogin = $author->getLogin();
+          $authorName = $author->getName();
+          $authorSurname = $author->getSurname();
+          $authorPatronymic = $author->getPatronymic();
+
           $pageTemplateVariables = [
             'PAGE_ID' => $pageStatic->getID(),
             'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
             'PAGE_TITLE' => $pageStaticTitle,
             'PAGE_CONTENT' => $nadvoParse->parse($pageStaticContent),
             'PAGE_PREVIEW_URL' => $pageStatic->getPreviewURL() !== '' ? $pageStatic->getPreviewURL() : PageStatic::getPreviewDefaultURL($this->CMSCore, 1024),
+            'PAGE_AUTHOR_LOGIN' => $authorLogin,
+            'PAGE_AUTHOR_NAME' => $authorName,
+            'PAGE_AUTHOR_SURNAME' => $authorSurname,
+            'PAGE_AUTHOR_PATRONYMIC' => $authorPatronymic,
             'PAGE_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
             'PAGE_PUBLISHED_DATE_TIMESTAMP' => $pageStatic->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestamp : date('d.m.Y H:i:s', 0),
             'PAGE_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp,
@@ -193,6 +219,9 @@ class PagePage implements InterfacePage
             'PAGE_CREATED_DATE_TIMESTAMP_ISO_8601' => $createdDateTimestampISO8601,
             'PAGE_PUBLISHED_DATE_TIMESTAMP_ISO_8601' => $publishedDateTimestampISO8601,
             'PAGE_UPDATED_DATE_TIMESTAMP_ISO_8601' => $updatedDateTimestampISO8601,
+            'PAGE_CREATED_DATE_TIMESTAMP_ISO_8601_TIMEZONE' => $createdDateTimestampISO8601TZ->format('c'),
+            'PAGE_PUBLISHED_DATE_TIMESTAMP_ISO_8601_TIMEZONE' => $publishedDateTimestampISO8601TZ->format('c'),
+            'PAGE_UPDATED_DATE_TIMESTAMP_ISO_8601_TIMEZONE' => $updatedDateTimestampISO8601TZ->format('c'),
             'PAGE_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $createdDateTimestampISO8601WithoutTime,
             'PAGE_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $publishedDateTimestampISO8601WithoutTime,
             'PAGE_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $updatedDateTimestampISO8601WithoutTime,

@@ -195,6 +195,8 @@ class PageEntries implements InterfacePage
         $category = $entryObject->getCategory();
         $categoryTitle = $category->getTitle($localeName);
         $categoryTitle = strip_tags($categoryTitle);
+        $categoryDescription = $category->getDescription($localeName);
+        $categoryDescription = strip_tags($categoryDescription);
 
         if (!empty($entryTitle) && !empty($entryDescription) && !empty($entryContent)) {
           array_push($entriesArrayRemplates, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/entriesList/item.tpl', [
@@ -204,6 +206,7 @@ class PageEntries implements InterfacePage
             'ENTRY_URL' => $entryObject->getURL(),
             'ENTRY_PREVIEW_URL' => $entryObject->getPreviewURL() !== '' ? $entryObject->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 512),
             'ENTRY_CATEGORY_TITLE' => $categoryTitle,
+            'ENTRY_DESCRIPTION_TITLE' => $categoryDescription,
             'ENTRY_CATEGORY_URL' => $category->getURL(),
             'ENTRY_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
             'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $entryObject->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestamp : date('d.m.Y H:i:s', 0),
@@ -239,6 +242,7 @@ class PageEntries implements InterfacePage
         'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries.tpl', [
           'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
           'ENTRIES_CATEGORY_TITLE' => ($categoryName == 'all') ? $localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_LABEL'] : $category->getTitle($localeName),
+          'ENTRIES_CATEGORY_DESCRIPTION' => ($categoryName == 'all') ? $localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_DESCRIPTION'] : $category->getDescription($localeName),
           'ENTRIES_LIST' => (!empty($entriesArrayRemplates)) ? ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/entriesList/list.tpl', [
             'ENTRIES_LIST_ITEMS' => implode($entriesArrayRemplates)
           ]) : sprintf('<div class="page__simple-note">%s</div>', $localeData['PAGE_ENTRIES_NOT_FOUND_LABEL']),
