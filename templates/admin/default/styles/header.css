@@ -145,3 +145,9 @@
 .header__buttons-container > *:not(:last-child) {
   margin-right: 10px;
 }
+
+@media (max-width: 400px) {
+  .header__buttons-container > *:first-child {
+    display: none;
+  }
+}
