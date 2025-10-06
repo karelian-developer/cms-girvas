@@ -1,4 +1,4 @@
-<div class="grid-table__item grid-table__item_entries-category" data-id="{ENTRIES_CATEGORY_ID}">
+<div class="grid-table__item grid-table__item_entries-category" data-element="entries-category" data-id="{ENTRIES_CATEGORY_ID}">
   <div class="grid-table__cell grid-table__cell_title">
     <a class="grid-table__link" href="/admin/entriesCategory/{ENTRIES_CATEGORY_ID}" target="_blank">{ENTRIES_CATEGORY_TITLE}</a>
     <span class="grid-table__id">ID: {ENTRIES_CATEGORY_ID}</span>
@@ -32,7 +32,7 @@
       </li>
     </ul>
   </div>
-  <div class="grid-table__cell grid-table__cell_panel">
+  <div class="grid-table__cell grid-table__cell_panel" data-element="panel">
     <ul class="grid-table__panel-list">
       <li class="grid-table__panel-item grid-table__panel-item_edit">
         <a href="/admin/entriesCategory/{ENTRIES_CATEGORY_ID}" class="grid-table__panel-link">Редактировать</a>

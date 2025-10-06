@@ -781,7 +781,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       ],
       'ru_RU' => [
         'title' => 'Новости',
-        'content' => 'Все новости'
+        'description' => 'Все новости'
       ]
     ];
 
@@ -792,7 +792,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       ],
       'ru_RU' => [
         'title' => 'Статьи',
-        'content' => 'Все статьи'
+        'description' => 'Все статьи'
       ]
     ];
 
