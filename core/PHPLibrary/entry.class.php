@@ -198,8 +198,8 @@ class Entry implements EntityTypeContent
           return false;
         };
 
-        foreach ($locale as $value) {
-          if (empty($value)) {
+        foreach ($locale as $key => $value) {
+          if (empty($value) && in_array($key, ['title', 'description', 'content'])) {
             return false;
           }
         }
