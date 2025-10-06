@@ -84,6 +84,34 @@ class PageEntriesCategories implements InterfacePage
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
+  /**
+   * Сборка списка локализаций для записи
+   * 
+   * @param array $localesData
+   * 
+   * @return string
+   */
+  private function assemblyLocalesItems(array $localesData) : string
+  {
+    $document = new DOMDocument('1.0', 'UTF-8');
+
+    foreach ($localesData as $localeData) {
+      $itemElement = $document->createElement('li', $localeData['title']);
+      $itemElement->setAttribute('class', 'grid-table__locale');
+
+      if (!empty($localeData['iconURL'])) {
+        $iconElement = $document->createElement('img');
+        $iconElement->setAttribute('class', 'grid-table__locale-icon');
+        $iconElement->setAttribute('src', $localeData['iconURL']);
+        $itemElement->prepend($iconElement);
+      }
+
+      $document->appendChild($itemElement);
+    }
+
+    return $document->saveHTML();
+  }
+
   public function assembly() : void
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/entriesCategories.css', 'rel' => 'stylesheet']);
@@ -118,11 +146,19 @@ class PageEntriesCategories implements InterfacePage
       $entriesCategoryTitle = $object->getTitle($entriesCategoriesLocaleName);
       $entriesCategoryTitle = strip_tags($entriesCategoryTitle);
 
+      $entriesCategoryDescription = $object->getTitle($entriesCategoriesLocaleName);
+      $entriesCategoryDescription = strip_tags($entriesCategoryDescription);
+
+      $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
+      $completedLocales = $this->assemblyLocalesItems($completedLocalesData);
+
       array_push($entriesCategoriesTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesCategories/tableItem.tpl', [
         'ENTRIES_CATEGORY_ID' => $object->getID(),
         'ENTRIES_CATEGORY_INDEX' => $index + 1,
         'ENTRIES_CATEGORY_TITLE' => !empty($entriesCategoryTitle) ? $entriesCategoryTitle : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $entriesCategoriesLocaleName),
+        'ENTRIES_CATEGORY_DESCRIPTION' => !empty($entriesCategoryDescription) ? $entriesCategoryDescription : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $entriesCategoriesLocaleName),
         'ENTRIES_CATEGORY_URL' => $object->getURL(),
+        'ENTRIES_CATEGORY_LOCALES_LIST' => $completedLocales,
         'ENTRIES_CATEGORY_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
         'ENTRIES_CATEGORY_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp
       ]));
