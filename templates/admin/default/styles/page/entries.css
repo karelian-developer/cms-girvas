@@ -73,6 +73,7 @@
 }
 
 .grid-table__cell_locales {
+  display: flex;
   font-size: 12px;
   grid-area: locales;
 }
@@ -96,6 +97,7 @@
 
 .grid-table__locales-title {
   font-weight: 500;
+  margin-right: 3px;
 }
 
 .grid-table__locales-title::after {
@@ -111,6 +113,8 @@
 }
 
 .grid-table__locale {
+  display: flex;
+  align-items: center;
   font-size: inherit !important;
   text-transform: lowercase;
 }
@@ -118,6 +122,10 @@
 .grid-table__locale:not(:last-child) {
   content: ',';
   margin-right: 3px;
+}
+
+.grid-table__locale-icon {
+  margin-right: 2px;
 }
 
 .grid-table__panel-list {
