@@ -44,7 +44,7 @@ export class PageEntriesCategories {
       let interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
-      const tableItems = document.querySelectorAll('[data-element="entries-categories-list"]');
+      const tableItems = document.querySelectorAll('[data-element="entries-category"]');
       for (let tableItem of tableItems) {
         const entriesCategoryID = tableItem.getAttribute('data-id');
         const panelElement = tableItem.querySelector('[data-element="panel"]');
@@ -52,6 +52,8 @@ export class PageEntriesCategories {
 
         for (let eventElement of panelEventElements) {
           eventElement.addEventListener('click', (event) => {
+            event.preventDefault();
+
             if (eventElement.getAttribute('data-event') === 'data-event') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_ENTRIES_CATEGORY_DELETE_TITLE,
