@@ -1,7 +1,7 @@
 <div class="grid-table__item grid-table__item_entries-category" data-id="{ENTRIES_CATEGORY_ID}">
   <div class="grid-table__cell grid-table__cell_title">
     <a class="grid-table__link" href="/admin/entriesCategory/{ENTRIES_CATEGORY_ID}" target="_blank">{ENTRIES_CATEGORY_TITLE}</a>
-    <span class="grid-table__id">ID: {ENTRY_ID}</span>
+    <span class="grid-table__id">ID: {ENTRIES_CATEGORY_ID}</span>
   </div>
   <div class="grid-table__cell grid-table__cell_description">
     {ENTRIES_CATEGORY_DESCRIPTION}
