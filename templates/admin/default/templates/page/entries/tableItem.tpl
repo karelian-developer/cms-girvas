@@ -43,16 +43,16 @@
   </div>
   <div class="grid-table__cell grid-table__cell_panel">
     <ul class="grid-table__panel-list">
-      <li class="grid-table__panel-item">
+      <li class="grid-table__panel-item grid-table__panel-item_stat">
         <a href="/admin/analytics/entry/{ENTRY_ID}" class="grid-table__panel-link">Статистика</a>
       </li>
-      <li class="grid-table__panel-item">
+      <li class="grid-table__panel-item grid-table__panel-item_edit">
         <a href="/admin/entry/{ENTRY_ID}" class="grid-table__panel-link">Редактировать</a>
       </li>
-      <li class="grid-table__panel-item" data-event="remove" data-params="entryID={ENTRY_ID}">
+      <li class="grid-table__panel-item grid-table__panel-item_remove" data-event="remove" data-params="entryID={ENTRY_ID}">
         <a href="#" class="grid-table__panel-link grid-table__panel-link_red">Удалить</a>
       </li>
-      <li class="grid-table__panel-item">
+      <li class="grid-table__panel-item grid-table__panel-item_view">
         <a href="{ENTRY_URL}" class="grid-table__panel-link">Посмотреть на сайте</a>
       </li>
     </ul>
