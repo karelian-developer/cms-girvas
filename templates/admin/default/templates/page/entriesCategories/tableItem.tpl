@@ -1,27 +1,45 @@
-<tr class="table__row table-entries-categories__item" data-entries-category-id="{ENTRIES_CATEGORY_ID}">
-  <td class="table__cell" style="width: fit-content;">#{ENTRIES_CATEGORY_INDEX}</td>
-  <td class="table__cell">{ENTRIES_CATEGORY_TITLE}</td>
-  <td class="table__cell">{ENTRIES_CATEGORY_CREATED_DATE_TIMESTAMP}</td>
-  <td class="table__cell">{ENTRIES_CATEGORY_UPDATED_DATE_TIMESTAMP}</td>
-  <td class="table__cell">
-    <ul class="table-entries-categories__item-buttons-list buttons-list list-reset">
-      <li class="buttons-list__item">
-        <button class="table-entries-categories__item-button" role="entries-category-edit">
-          <svg class="table-entries-categories__item-button-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 64 64" xml:space="preserve">
-            <rect x="17.5" y="16.3" transform="matrix(0.7071 0.7071 -0.7071 0.7071 33.6798 -9.1993)" width="20.9" height="39.6"/>
-            <polygon points="0,64 19.7,59.1 4.9,44.3 "/>
-            <rect x="39.6" y="4.9" transform="matrix(0.7071 0.7071 -0.7071 0.7071 24.5317 -31.2849)" width="20.9" height="18.2"/>
-          </svg>
-        </button>
+<div class="grid-table__item grid-table__item_entries-category" data-id="{ENTRIES_CATEGORY_ID}">
+  <div class="grid-table__cell grid-table__cell_title">
+    <a class="grid-table__link" href="/admin/entriesCategory/{ENTRIES_CATEGORY_ID}" target="_blank">{ENTRIES_CATEGORY_TITLE}</a>
+    <span class="grid-table__id">ID: {ENTRY_ID}</span>
+  </div>
+  <div class="grid-table__cell grid-table__cell_description">
+    {ENTRIES_CATEGORY_DESCRIPTION}
+  </div>
+  <div class="grid-table__cell grid-table__cell_locales">
+    <span class="grid-table__locales-title">Локализации</span>
+    <ul class="grid-table__locales">
+      {ENTRIES_CATEGORY_LOCALES_LIST}
+    </ul>
+  </div>
+  <div class="grid-table__cell grid-table__cell_metadata">
+    <ul class="grid-table__metadata-list">
+      <li class="grid-table__metadata grid-table__metadata_parent-category">
+        <span class="grid-table__metadata-label">Род. категория</span>
+        <span class="grid-table__metadata-value">{ENTRY_CATEGORY_PARENT_TITLE}</span>
       </li>
-      <li class="buttons-list__item">
-        <button class="table-entries-categories__item-button" role="entries-category-delete">
-          <svg class="table-entries-categories__item-button-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 64 64" xml:space="preserve">
-            <rect x="13.9" y="16.1" width="37.3" height="47.9"/>
-            <path d="M41.4,10l1-7.3L24.7,0.3l-1,7.3L10.2,5.7l-1,7.3l44.6,6.2l1-7.3L41.4,10z M25.6,7.8l0.7-5l13.8,1.9l-0.7,5L25.6,7.8z"/>
-          </svg>
-        </button>
+      <li class="grid-table__metadata grid-table__metadata_count-entries">
+        <span class="grid-table__metadata-label">Кол-во записей</span>
+        <span class="grid-table__metadata-value">{ENTRIES_CATEGORY_ENTRIES_COUNT}</span>
+      </li>
+      <li class="grid-table__metadata grid-table__metadata_date-created">
+        <span class="grid-table__metadata-label">Дата создания</span><br>
+        <span class="grid-table__metadata-value">{ENTRIES_CATEGORY_CREATED_DATE_TIMESTAMP}</span>
+      </li>
+      <li class="grid-table__metadata grid-table__metadata_date-updated">
+        <span class="grid-table__metadata-label">Дата обновления</span><br>
+        <span class="grid-table__metadata-value">{ENTRIES_CATEGORY_UPDATED_DATE_TIMESTAMP}</span>
       </li>
     </ul>
-  </td>
-</tr>
+  </div>
+  <div class="grid-table__cell grid-table__cell_panel">
+    <ul class="grid-table__panel-list">
+      <li class="grid-table__panel-item grid-table__panel-item_edit">
+        <a href="/admin/entriesCategory/{ENTRIES_CATEGORY_ID}" class="grid-table__panel-link">Редактировать</a>
+      </li>
+      <li class="grid-table__panel-item grid-table__panel-item_remove" data-event="remove">
+        <a href="#" class="grid-table__panel-link grid-table__panel-link_red">Удалить</a>
+      </li>
+    </ul>
+  </div>
+</div>
