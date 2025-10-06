@@ -107,6 +107,12 @@
   grid-area: panel;
 }
 
+@media (max-width: 700px) {
+  .grid-table__cell_panel {
+    justify-content: center;
+  }
+}
+
 .grid-table__locales-title {
   font-weight: 500;
   margin-right: 3px;
@@ -153,9 +159,16 @@
   grid-template-areas: 
     'category author seo'
     'date-created date-published date-updated';
+  column-gap: 10px;
   padding: 0;
   margin: 0;
   row-gap: 5px;
+}
+
+@media (min-width: 601px) {
+  .grid-table__metadata-list {
+    grid-template-columns: max-content max-content max-content;
+  }
 }
 
 .grid-table__metadata-label {
