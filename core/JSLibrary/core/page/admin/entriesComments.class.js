@@ -42,11 +42,11 @@ export class PageEntriesComments {
         
         for (let panelEventElement of panelEventElements) {
           if (panelEventElement.getAttribute('data-event') === 'hide' && commentIsHidden === 'true') {
-            panelEventElement.parentElement.style.display = 'none';
+            panelEventElement.style.display = 'none';
           }
 
           if (panelEventElement.getAttribute('data-event') === 'show' && commentIsHidden === 'false') {
-            panelEventElement.parentElement.style.display = 'none';
+            panelEventElement.style.display = 'none';
           }
 
           panelEventElement.addEventListener('click', (event) => {
@@ -90,7 +90,7 @@ export class PageEntriesComments {
             if (panelEventElement.getAttribute('data-event') === 'hide') {
               let elementForm = document.createElement('form');
               elementForm.classList.add('form');
-              
+
               let elementTextarea = document.createElement('textarea');
               elementTextarea.classList.add('form__textarea');
               elementTextarea.style.width = '100%';
