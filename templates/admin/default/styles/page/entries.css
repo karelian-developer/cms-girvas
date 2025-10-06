@@ -191,8 +191,13 @@
   color: var(--color-link-negative);
 }
 
+.grid-table__panel-item {
+  display: flex;
+}
+
 .grid-table__panel-item:not(:last-child)::after {
   content: '|';
   margin-left: 3px;
   margin-right: 3px;
+  opacity: .6;
 }
