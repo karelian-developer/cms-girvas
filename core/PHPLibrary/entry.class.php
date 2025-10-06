@@ -226,6 +226,7 @@ class Entry implements EntityTypeContent
 
       foreach ($texts as $localeName => $data) {
         $CMSLocale = new CMSLocale($CMSCore, $localeName);
+        $CMSLocale->initPathes();
         $locales[$localeName] = [
           'title' => $CMSLocale->getTitle(),
           'iconURL' => $CMSLocale->getIconURL()
