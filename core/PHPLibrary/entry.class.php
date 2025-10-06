@@ -232,6 +232,8 @@ class Entry implements EntityTypeContent
           'iconURL' => $CMSLocale->getIconURL()
         ];
       }
+
+      return $locales;
     }
 
     return [];
