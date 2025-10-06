@@ -144,6 +144,7 @@
     'date-created date-published date-updated';
   padding: 0;
   margin: 0;
+  row-gap: 5px;
 }
 
 .grid-table__metadata-label {
