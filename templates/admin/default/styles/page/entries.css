@@ -160,6 +160,7 @@
       'stat edit'
       'remove view';
     gap: 10px;
+    width: 100%;
   }
 }
 
@@ -249,7 +250,7 @@
     font-weight: 700;
     text-align: center;
     color: var(--color-neutral-light);
-    padding: 5px 10px;
+    padding: 10px;
     width: 100%;
   }
 
