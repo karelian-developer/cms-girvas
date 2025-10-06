@@ -144,7 +144,7 @@ class PageEntries implements InterfacePage
       $entryDescription = strip_tags($entryDescription);
       $entryCategoryTitle = strip_tags($entryCategoryTitle);
 
-      $entryAuthor = $entryCategory->getAuthor();
+      $entryAuthor = $entryObject->getAuthor();
       if ($entryAuthor !== null) {
         $entryAuthor->initData(['login']);
       }
