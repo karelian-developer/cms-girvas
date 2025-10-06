@@ -137,12 +137,28 @@ class PageEntriesComments implements InterfacePage
         $createdDateTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
         $updatedDateTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
+        $author = $object->getAuthor();
+        if ($author !== null) {
+          $author->initData(['login']);
+        }
+
+        $authorLogin = $author !== null ? $author->getLogin() : 'User deleted';
+
+        $entry = $object->getEntry();
+        if ($entry !== null) {
+          $entry->initData(['texts']);
+        }
+
+        $entryTitle = $entry !== null ? $entry->getTitle($localeName) : 'Entry deleted';
+
         array_push($commentsTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesComments/tableItem.tpl', [
           'COMMENT_ID' => $object->getID(),
           'COMMENT_IS_HIDDEN_STATUS' => var_export($object->isHidden(), true),
           'COMMENT_HIDDEN_REASON' => strip_tags($object->getHiddenReason()),
           'COMMENT_INDEX' => $index + 1,
           'COMMENT_CONTENT' => strip_tags($object->getContent()),
+          'COMMENT_AUTHOR_LOGIN' => $authorLogin,
+          'COMMENT_ENTRY_TITLE' => $entryTitle,
           'COMMENT_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
           'COMMENT_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp
         ]));
