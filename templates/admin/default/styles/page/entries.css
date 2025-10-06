@@ -126,7 +126,7 @@
 }
 
 .grid-table__panel-link {
-  font-size: inherit;
+  font-size: inherit !important;
   text-transform: lowercase;
   color: var(--color-link-default);
 }
