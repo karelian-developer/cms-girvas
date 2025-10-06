@@ -284,6 +284,19 @@ class EntryCategory implements EntityTypeContent
   {
     return (new Entries($this->CMSCore))->getByCategoryID($this->id, $params, $isPublished);
   }
+
+  /**
+   * Получить количество объектов записей
+   *
+   * @param  array $params
+   * @param  bool $isPublished
+   * 
+   * @return int
+   */
+  public function getEntriesCount(array $params = [], $isPublished = false) : int
+  {
+    return count($this->getEntries($params, $isPublished));
+  }
   
   /**
    * Получить данные колонок записи в базе данных

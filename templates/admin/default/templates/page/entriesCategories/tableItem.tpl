@@ -16,7 +16,7 @@
     <ul class="grid-table__metadata-list">
       <li class="grid-table__metadata grid-table__metadata_parent-category">
         <span class="grid-table__metadata-label">Род. категория</span>
-        <span class="grid-table__metadata-value">{ENTRY_CATEGORY_PARENT_TITLE}</span>
+        <span class="grid-table__metadata-value">{ENTRIES_CATEGORY_PARENT_TITLE}</span>
       </li>
       <li class="grid-table__metadata grid-table__metadata_count-entries">
         <span class="grid-table__metadata-label">Кол-во записей</span>

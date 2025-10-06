@@ -146,11 +146,18 @@ class PageEntriesCategories implements InterfacePage
       $entriesCategoryTitle = $object->getTitle($entriesCategoriesLocaleName);
       $entriesCategoryTitle = strip_tags($entriesCategoryTitle);
 
-      $entriesCategoryDescription = $object->getTitle($entriesCategoriesLocaleName);
+      $entriesCategoryDescription = $object->getDescription($entriesCategoriesLocaleName);
       $entriesCategoryDescription = strip_tags($entriesCategoryDescription);
 
       $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
       $completedLocales = $this->assemblyLocalesItems($completedLocalesData);
+
+      $objectParent = $object->getParent();
+      if ($objectParent !== null) {
+        $objectParent->initData(['texts']);
+      }
+
+      $objectParentTitle = $objectParent !== null ? $objectParent->getTitle($entriesCategoriesLocaleName) : 'Нет родителя';
 
       array_push($entriesCategoriesTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesCategories/tableItem.tpl', [
         'ENTRIES_CATEGORY_ID' => $object->getID(),
@@ -159,6 +166,8 @@ class PageEntriesCategories implements InterfacePage
         'ENTRIES_CATEGORY_DESCRIPTION' => !empty($entriesCategoryDescription) ? $entriesCategoryDescription : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $entriesCategoriesLocaleName),
         'ENTRIES_CATEGORY_URL' => $object->getURL(),
         'ENTRIES_CATEGORY_LOCALES_LIST' => $completedLocales,
+        'ENTRIES_CATEGORY_ENTRIES_COUNT' => $object->getEntriesCount(),
+        'ENTRIES_CATEGORY_PARENT_TITLE' => $objectParentTitle,
         'ENTRIES_CATEGORY_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
         'ENTRIES_CATEGORY_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp
       ]));
