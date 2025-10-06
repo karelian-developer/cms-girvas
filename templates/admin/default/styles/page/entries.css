@@ -13,6 +13,7 @@
     'description description'
     'locales locales'
     'metadata panel';
+  grid-template-columns: metadata 1fr;
   font-size: 14px;
 }
 
