@@ -356,7 +356,7 @@
   box-shadow: 0 0 5px 1px var(--common-main-color-4--opacity-0-2);
   background-color: var(--common-main-color-1);
   margin-bottom: 20px;
-  overflow-x: scroll;
+  overflow-x: auto;
 }
 
 .page__navigation .navigation__list {
