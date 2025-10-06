@@ -45,7 +45,7 @@ export class PageEntriesCategories {
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
       const tableItems = document.querySelectorAll('[data-element="entries-categories-list"]');
-      for (const tableItem of tableItems) {
+      for (let tableItem of tableItems) {
         const entriesCategoryID = tableItem.getAttribute('data-id');
         const panelElement = tableItem.querySelector('[data-element="panel"]');
         const panelEventElements = panelElement.querySelectorAll('[data-event]');
