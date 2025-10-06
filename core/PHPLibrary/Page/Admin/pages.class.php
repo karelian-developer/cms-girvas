@@ -18,6 +18,8 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
+use \DOMDocument as DOMDocument;
+use \DOMImplementation as DOMImplementation;
 
 class PagePages implements InterfacePage
 {
