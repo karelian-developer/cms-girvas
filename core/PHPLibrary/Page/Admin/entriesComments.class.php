@@ -105,7 +105,7 @@ class PageEntriesComments implements InterfacePage
 
         if (!empty($entryCommentsObjects)) {
           foreach ($entryCommentsObjects as $object) {
-            $object->initData(['content', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
+            $object->initData(['content', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata', 'authorID']);
             array_push($entriesCommentsObjectsSorted, $object);
           }
         }
