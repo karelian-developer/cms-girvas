@@ -39,7 +39,6 @@
 }
 
 .grid-table__item[data-is-published='not-published'] {
-  display: inline;
   background-color: var(--common-main-color-2);
 }
 
@@ -56,6 +55,7 @@
 }
 
 .grid-table__item[data-is-published='not-published'] .grid-table__draft {
+  display: inline;
   color: red;
 }
 
