@@ -41,7 +41,7 @@
       </li>
     </ul>
   </div>
-  <div class="grid-table__cell grid-table__cell_panel">
+  <div class="grid-table__cell grid-table__cell_panel" data-element="panel">
     <ul class="grid-table__panel-list">
       <li class="grid-table__panel-item grid-table__panel-item_stat">
         <a href="/admin/analytics/entry/{ENTRY_ID}" class="grid-table__panel-link">Статистика</a>
