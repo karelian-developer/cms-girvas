@@ -212,6 +212,34 @@ class Entry implements EntityTypeContent
   }
 
   /**
+   * Получить заполненные SEO-тексты
+   * 
+   * @return array
+   */
+  public function getCompletedSEOTexts() : array
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      return array_filter($texts, function ($locale) {
+        if (!is_array($locale) || empty($locale)) {
+          return false;
+        };
+
+        foreach ($locale as $key => $value) {
+          if (empty($value) && in_array($key, ['SEOTitle', 'SEODescription', 'keywords'])) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
+
+    return [];
+  }
+
+  /**
    * Получить данные по заполненным локализациям
    * 
    * @param CoreInterface $CMSCore

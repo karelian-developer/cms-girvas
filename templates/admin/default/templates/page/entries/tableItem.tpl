@@ -23,6 +23,10 @@
         <span class="grid-table__metadata-label">Автор</span>
         <span class="grid-table__metadata-value">{ENTRY_AUTHOR_LOGIN}</span>
       </li>
+      <li class="grid-table__metadata grid-table__metadata_seo">
+        <span class="grid-table__metadata-label">SEO</span>
+        <span class="grid-table__metadata-value">{ENTRY_SEO_STATUS}</span>
+      </li>
       <li class="grid-table__metadata grid-table__metadata_date-created">
         <span class="grid-table__metadata-label">Дата создания</span><br>
         <span class="grid-table__metadata-value">{ENTRY_CREATED_DATE_TIMESTAMP}</span>

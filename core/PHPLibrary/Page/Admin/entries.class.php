@@ -181,6 +181,9 @@ class PageEntries implements InterfacePage
 
       $entryCompletedLocalesData = $entryObject->getCompletedLocalesData($this->CMSCore);
       $entryCompletedLocales = $this->assemblyLocalesItems($entryCompletedLocalesData);
+      $entrySEOStatus = !empty($entryObject->getCompletedSEOTexts())
+        ? 'Оптимизировано'
+        : 'Не оптимизировано';
 
       $entryAuthorLogin = $entryAuthor !== null ? $entryAuthor->getLogin() : 'User deleted';
 
@@ -195,6 +198,7 @@ class PageEntries implements InterfacePage
         'ENTRY_URL' => $entryObject->getURL(),
         'ENTRY_AUTHOR_LOGIN' => $entryAuthorLogin,
         'ENTRY_LOCALES_LIST' => $entryCompletedLocales,
+        'ENTRY_SEO_STATUS' => $entrySEOStatus,
         'ENTRY_CREATED_DATE_TIMESTAMP' => $entryCreatedDateTimestamp,
         'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $entryObject->getPublishedUnixTimestamp() > 0 ? $entryPublishedDateTimestamp : '-',
         'ENTRY_UPDATED_DATE_TIMESTAMP' => $entryUpdatedDateTimestamp,
