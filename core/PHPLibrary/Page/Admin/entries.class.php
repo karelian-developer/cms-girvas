@@ -107,16 +107,17 @@ class PageEntries implements InterfacePage
     $document = new DOMDocument('1.0', 'UTF-8');
 
     foreach ($localesData as $localeData) {
-      $LiElement = $document->createElement('li', $localeData['title']);
-      $LiElement->setAttribute('class', 'grid-table__locale');
-      $document->appendChild($LiElement);
+      $itemElement = $document->createElement('li', $localeData['title']);
+      $itemElement->setAttribute('class', 'grid-table__locale');
 
       if (!empty($localeData['iconURL'])) {
-        $LiElement = $document->createElement('img');
-        $LiElement->setAttribute('class', 'grid-table__locale-icon');
-        $LiElement->setAttribute('src', $localeData['iconURL']);
-        $document->prepend($LiElement);
+        $iconElement = $document->createElement('img');
+        $iconElement->setAttribute('class', 'grid-table__locale-icon');
+        $iconElement->setAttribute('src', $localeData['iconURL']);
+        $itemElement->prepend($iconElement);
       }
+
+      $document->appendChild($itemElement);
     }
 
     return $document->saveHTML();
