@@ -52,8 +52,6 @@ export class PageEntriesCategories {
 
         for (let eventElement of panelEventElements) {
           eventElement.addEventListener('click', (event) => {
-            event.preventDefault();
-
             if (eventElement.getAttribute('data-event') === 'data-event') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_ENTRIES_CATEGORY_DELETE_TITLE,
