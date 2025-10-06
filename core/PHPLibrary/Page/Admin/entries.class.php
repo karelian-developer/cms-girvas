@@ -182,8 +182,8 @@ class PageEntries implements InterfacePage
       $entryCompletedLocalesData = $entryObject->getCompletedLocalesData($this->CMSCore);
       $entryCompletedLocales = $this->assemblyLocalesItems($entryCompletedLocalesData);
       $entrySEOStatus = !empty($entryObject->getCompletedSEOTexts())
-        ? 'Оптимизировано'
-        : 'Не оптимизировано';
+        ? '<span style="color: green;">Оптимизировано</span>'
+        : '<span style="color: red;">Не оптимизировано</span>';
 
       $entryAuthorLogin = $entryAuthor !== null ? $entryAuthor->getLogin() : 'User deleted';
 
