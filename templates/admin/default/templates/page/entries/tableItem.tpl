@@ -1,6 +1,7 @@
-<div class="grid-table__item grid-table__item_entry">
+<div class="grid-table__item grid-table__item_entry" data-is-published="{ENTRY_PUBLISHED_STATUS}">
   <div class="grid-table__cell grid-table__cell_title">
     <a class="grid-table__link" href="/admin/entry/{ENTRY_ID}" target="_blank">{ENTRY_TITLE}</a>
+    <span class="grid-table__draft">черновик</span>
   </div>
   <div class="grid-table__cell grid-table__cell_description">
     {ENTRY_DESCRIPTION}
@@ -34,7 +35,7 @@
         <a href="/admin/entry/{ENTRY_ID}" class="grid-table__panel-link">Редактировать</a>
       </li>
       <li class="grid-table__panel-item" data-event="remove" data-params="entryID={ENTRY_ID}">
-        <a href="#" class="grid-table__panel-link">Удалить</a>
+        <a href="#" class="grid-table__panel-link grid-table__panel-link_red">Удалить</a>
       </li>
       <li class="grid-table__panel-item">
         <a href="/entry/{ENTRY_ID}" class="grid-table__panel-link">Посмотреть на сайте</a>

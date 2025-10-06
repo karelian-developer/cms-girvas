@@ -6,48 +6,97 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-.table-entries__item[data-is-published="not-published"] {
+.grid-table__item {
+  display: grid;
+  grid-template-areas:
+    'title title'
+    'description description'
+    'metadata panel';
+  font-size: 14px;
+}
+
+.grid-table__item[data-is-published='not-published'] {
   background-color: var(--common-main-color-2);
 }
 
-.table-entries__item td {
-  background-color: inherit !important;
+.grid-table__item[data-is-published='not-published'] .grid-table__draft {
+  font-size: 12px;
+  font-style: italic;
+  color: red;
+  margin-left: 5px;
 }
 
-.table-entries__item-buttons-list {
+.grid-table__item[data-is-published='not-published'] .grid-table__draft::before {
+  content: '(';
+}
+
+
+.grid-table__item[data-is-published='not-published'] .grid-table__draft::after {
+  content: ')';
+}
+
+.grid-table__cell {
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.grid-table__cell_title {
+  font-weight: 700;
+  grid-area: title;
+}
+
+.grid-table__cell_description {
+  grid-area: description;
+}
+
+.grid-table__cell_metadata {
+  grid-area: metadata;
+}
+
+.grid-table__cell_metadata > * {
+  opacity: .8;
+}
+
+.grid-table__cell_panel {
+  grid-area: panel;
+}
+
+.grid-table__metadata-list,
+.grid-table__panel-list {
   display: flex;
-}
-
-.buttons-list__item {
-  margin-right: 10px;
-}
-
-.buttons-list__item:last-child {
-  margin-right: 0;
-}
-
-.table-entries__item-button {
-  display: flex;
-  box-sizing: border-box;
-  background: none;
-  border: 0;
+  list-style-type: none;
   padding: 0;
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
+  margin: 0;
 }
 
-.table-entries__item-button-icon {
-  fill: var(--common-main-color-4);
-  width: 100%;
-  transition: fill .2s;
+.grid-table__metadata-label {
+  font-weight: 500;
 }
 
-.table-entries__item-button:hover .table-entries__item-button-icon,
-.table-entries__item-button:focus .table-entries__item-button-icon {
-  fill: var(--common-secondary-color-3);
+.grid-table__metadata-label::after {
+  font-weight: 500;
+  content: ':';
+  margin-right: 5px;
 }
 
-.table-entries__item-button:active .table-entries__item-button-icon {
-  fill: var(--common-main-color-5);
+.grid-table__metadata:not(:last-child)::after {
+  content: '|';
+  margin-left: 5px;
+  margin-right: 5px;
+  opacity: .8;
+}
+
+.grid-table__panel-link {
+  text-transform: lowercase;
+  color: var(--color-link-default);
+}
+
+.grid-table__panel-link_red {
+  color: var(--color-link-negative);
+}
+
+.grid-table__panel-item:not(:last-child) {
+  margin-right: 5px;
 }

@@ -186,4 +186,7 @@
   --interactive-button-font-color--hover: var(--common-secondary-color-3);
   --interactive-button-font-color--focus: var(--common-secondary-color-3);
   --interactive-button-font-color--active: var(--common-secondary-color-3);
+
+  --color-link-default: #285E8E;
+  --color-link-negative: #8E2828;
 }
