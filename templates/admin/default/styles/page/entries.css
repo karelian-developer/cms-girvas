@@ -62,10 +62,6 @@
 }
 
 .grid-table__cell_metadata {
-  display: grid;
-  grid-template-areas: 
-    'category author author'
-    'date-created date-published date-updated';
   font-size: 12px;
   grid-area: metadata;
 }
@@ -79,12 +75,18 @@
   grid-area: panel;
 }
 
-.grid-table__metadata-list,
 .grid-table__panel-list {
   display: flex;
   list-style-type: none;
   padding: 0;
   margin: 0;
+}
+
+.grid-table__metadata-list {
+  display: grid;
+  grid-template-areas: 
+    'category author author'
+    'date-created date-published date-updated';
 }
 
 .grid-table__metadata-label {
