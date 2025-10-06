@@ -11,6 +11,7 @@
   grid-template-areas:
     'title title'
     'description description'
+    'locales locales'
     'metadata panel';
   font-size: 14px;
 }
@@ -71,6 +72,11 @@
   grid-area: description;
 }
 
+.grid-table__cell_locales {
+  font-size: 12px;
+  grid-area: locales;
+}
+
 .grid-table__cell_metadata {
   font-size: 12px;
   grid-area: metadata;
@@ -86,6 +92,32 @@
   align-items: flex-end;
   font-size: 12px;
   grid-area: panel;
+}
+
+.grid-table__locales-title {
+  font-weight: 500;
+}
+
+.grid-table__locales-title::after {
+  content: ':';
+}
+
+.grid-table__locales {
+  display: flex;
+  flex-wrap: wrap;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.grid-table__locale {
+  font-size: inherit !important;
+  text-transform: lowercase;
+}
+
+.grid-table__locale:not(:last-child) {
+  content: ',';
+  margin-right: 3px;
 }
 
 .grid-table__panel-list {

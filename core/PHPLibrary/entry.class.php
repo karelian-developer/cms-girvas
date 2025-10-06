@@ -14,6 +14,7 @@ use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\Factories\Content as FactoryContent;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \PDOException as PDOException;
 
 #[\AllowDynamicProperties]
@@ -166,6 +167,73 @@ class Entry implements EntityTypeContent
     }
 
     return null;
+  }
+
+  /**
+   * Получить тексты
+   * 
+   * @return array
+   */
+  public function getTexts() : array
+  {
+    if (property_exists($this, 'texts')) {
+      return json_decode($this->texts, true);
+    }
+
+    return [];
+  }
+
+  /**
+   * Получить заполненные тексты
+   * 
+   * @return array
+   */
+  public function getCompletedTexts() : array
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      return array_filter($texts, function ($locale) {
+        if (!is_array($locale) || empty($locale)) {
+          return false;
+        };
+
+        foreach ($locale as $value) {
+          if (empty($value)) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
+
+    return [];
+  }
+
+  /**
+   * Получить данные по заполненным локализациям
+   * 
+   * @param CoreInterface $CMSCore
+   * 
+   * @return array
+   */
+  public function getCompletedLocalesData(CoreInterface $CMSCore) : array
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = $this->getCompletedTexts();
+      $locales = [];
+
+      foreach ($texts as $localeName => $data) {
+        $CMSLocale = new CMSLocale($this, $localeName);
+        $locales[$localeName] = [
+          'title' => $CMSLocale->getTitle(),
+          'iconURL' => $CMSLocale->getIconURL()
+        ];
+      }
+    }
+
+    return [];
   }
   
   /**

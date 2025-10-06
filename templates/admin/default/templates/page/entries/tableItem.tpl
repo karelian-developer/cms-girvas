@@ -7,6 +7,12 @@
   <div class="grid-table__cell grid-table__cell_description">
     {ENTRY_DESCRIPTION}
   </div>
+  <div class="grid-table__cell grid-table__cell_locales">
+    <span class="grid-table__locales-title">Локализации</span>
+    <ul class="grid-table__locales">
+      {ENTRY_LOCALES_LIST}
+    </ul>
+  </div>
   <div class="grid-table__cell grid-table__cell_metadata">
     <ul class="grid-table__metadata-list">
       <li class="grid-table__metadata grid-table__metadata_category">

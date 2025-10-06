@@ -19,6 +19,8 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
+use \DOMDocument as DOMDocument;
+use \DOMImplementation as DOMImplementation;
 
 /**
  * Страница со списком записей
@@ -94,6 +96,33 @@ class PageEntries implements InterfacePage
   }
 
   /**
+   * Сборка списка локализаций для записи
+   * 
+   * @param array
+   * 
+   * @return string
+   */
+  private function assemblyLocalesItems(array $localesData) : string
+  {
+    $document = new DOMDocument('1.0', 'UTF-8');
+
+    foreach ($localesData as $localeData) {
+      $LiElement = $document->createElement('li', $localeData['title']);
+      $LiElement->setAttribute('class', 'grid-table__locale');
+      $document->appendChild($LiElement);
+
+      if (!empty($localeData['iconURL'])) {
+        $LiElement = $document->createElement('img');
+        $LiElement->setAttribute('class', 'grid-table__locale-icon');
+        $LiElement->setAttribute('src', $localeData['iconURL']);
+        $document->appendChild($LiElement);
+      }
+    }
+
+    return $document->saveHTML();
+  }
+
+  /**
    * Сборка
    * 
    * @return void
@@ -149,6 +178,9 @@ class PageEntries implements InterfacePage
         $entryAuthor->initData(['login']);
       }
 
+      $entryCompletedLocalesData = $entryObject->getCompletedLocalesData($this->CMSCore);
+      $entryCompletedLocales = $this->assemblyLocalesItems($entryCompletedLocalesData);
+
       $entryAuthorLogin = $entryAuthor !== null ? $entryAuthor->getLogin() : 'User deleted';
 
       array_push($entriesTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/tableItem.tpl', [
@@ -161,6 +193,7 @@ class PageEntries implements InterfacePage
         'ENTRY_PUBLISHED_STATUS' => $entryObject->isPublished() ? 'published' : 'not-published',
         'ENTRY_URL' => $entryObject->getURL(),
         'ENTRY_AUTHOR_LOGIN' => $entryAuthorLogin,
+        'ENTRY_LOCALES_LIST' => $entryCompletedLocales,
         'ENTRY_CREATED_DATE_TIMESTAMP' => $entryCreatedDateTimestamp,
         'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $entryObject->getPublishedUnixTimestamp() > 0 ? $entryPublishedDateTimestamp : '-',
         'ENTRY_UPDATED_DATE_TIMESTAMP' => $entryUpdatedDateTimestamp,
