@@ -169,7 +169,7 @@
   display: grid;
   list-style-type: none;
   grid-template-areas: 
-    'category author seo'
+    'author seo seo'
     'date-created date-published date-updated';
   column-gap: 10px;
   padding: 0;
@@ -180,7 +180,7 @@
 @media (max-width: 600px) {
   .grid-table__metadata-list {
     grid-template-areas: 
-      'category author'
+      'author author'
       'seo seo'
       'date-created date-created'
       'date-published date-updated';
@@ -202,10 +202,6 @@
   font-weight: 500;
   content: ':';
   margin-right: 2px;
-}
-
-.grid-table__metadata_category {
-  grid-area: category;
 }
 
 .grid-table__metadata_author {

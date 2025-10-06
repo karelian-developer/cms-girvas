@@ -15,10 +15,6 @@
   </div>
   <div class="grid-table__cell grid-table__cell_metadata">
     <ul class="grid-table__metadata-list">
-      <li class="grid-table__metadata grid-table__metadata_category">
-        <span class="grid-table__metadata-label">Категория</span>
-        <span class="grid-table__metadata-value">{PAGE_STATIC_CATEGORY_TITLE}</span>
-      </li>
       <li class="grid-table__metadata grid-table__metadata_author">
         <span class="grid-table__metadata-label">Автор</span>
         <span class="grid-table__metadata-value">{PAGE_STATIC_AUTHOR_LOGIN}</span>
