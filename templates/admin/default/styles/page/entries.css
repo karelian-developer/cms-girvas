@@ -245,6 +245,7 @@
     box-sizing: border-box;
     background-color: var(--color-brand-primary);
     text-transform: uppercase;
+    text-decoration: none;
     font-weight: 700;
     text-align: center;
     color: var(--color-neutral-light);
