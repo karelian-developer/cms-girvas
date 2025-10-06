@@ -115,7 +115,7 @@ class PageEntries implements InterfacePage
         $LiElement = $document->createElement('img');
         $LiElement->setAttribute('class', 'grid-table__locale-icon');
         $LiElement->setAttribute('src', $localeData['iconURL']);
-        $document->prependChild($LiElement);
+        $document->prepend($LiElement);
       }
     }
 
