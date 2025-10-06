@@ -15,6 +15,10 @@
   font-size: 14px;
 }
 
+.grid-table__item .grid-table__draft {
+  display: none;
+}
+
 .grid-table__item[data-is-published='not-published'] {
   background-color: var(--common-main-color-2);
 }
@@ -43,7 +47,7 @@
 }
 
 .grid-table__cell_title {
-  font-weight: 700;
+  font-weight: 500;
   grid-area: title;
 }
 
@@ -52,6 +56,7 @@
 }
 
 .grid-table__cell_metadata {
+  font-size: 12px;
   grid-area: metadata;
 }
 
