@@ -98,7 +98,7 @@ class PageEntries implements InterfacePage
   /**
    * Сборка списка локализаций для записи
    * 
-   * @param array
+   * @param array $localesData
    * 
    * @return string
    */
