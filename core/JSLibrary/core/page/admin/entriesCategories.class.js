@@ -44,17 +44,19 @@ export class PageEntriesCategories {
       let interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
-      const tableItems = document.querySelectorAll('[data-element="entries-category"]');
+      let tableItems = document.querySelectorAll('.table-entries-categories__item');
+
       for (let tableItem of tableItems) {
-        const entriesCategoryID = tableItem.getAttribute('data-id');
-        const panelElement = tableItem.querySelector('[data-element="panel"]');
-        const panelEventElements = panelElement.querySelectorAll('[data-event]');
+        let entriesCategoryID = tableItem.getAttribute('data-entries-category-id');
+        let buttons = tableItem.querySelectorAll('button[role]');
 
-        for (let eventElement of panelEventElements) {
-          eventElement.addEventListener('click', (event) => {
-            event.preventDefault();
+        for (let button of buttons) {
+          button.addEventListener('click', (event) => {
+            if (button.getAttribute('role') === 'entries-category-edit') {
+              window.location.href = `./entriesCategory/${entriesCategoryID}`;
+            }
 
-            if (eventElement.getAttribute('data-event') === 'data-event') {
+            if (button.getAttribute('role') === 'entries-category-delete') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_ENTRIES_CATEGORY_DELETE_TITLE,
                 content: localeData.MODAL_ENTRIES_CATEGORY_DELETE_DESCRIPTION
