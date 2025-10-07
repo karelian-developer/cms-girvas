@@ -46,14 +46,14 @@ export class PageEntries {
 
       const tableItems = document.querySelectorAll('[data-element="entry"]');
       for (let tableItem of tableItems) {
-        let entryID = tableItem.getAttribute('data-id');
+        const entryID = tableItem.getAttribute('data-id');
         const panelElement = tableItem.querySelector('[data-element="panel"]');
         const panelEventElements = panelElement.querySelectorAll('[data-event]');
 
         for (let eventElement of panelEventElements) {
           eventElement.addEventListener('click', (event) => {
             event.preventDefault();
-            
+
             if (eventElement.getAttribute('data-event') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_ENTRY_DELETE_TITLE,

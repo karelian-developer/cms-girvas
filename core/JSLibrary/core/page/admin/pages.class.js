@@ -25,13 +25,7 @@ export class PagePages {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
 
       let interactiveCreatePageButton = new Interactive('button');
@@ -44,28 +38,16 @@ export class PagePages {
       let interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
-      let tableItemsPagesStatic = document.querySelectorAll('.table-pages-static__item');
+      const tableItems = document.querySelectorAll('[data-element="page"]');
 
-      for (let tableItemPageStatic of tableItemsPagesStatic) {
-        let pageStaticID = tableItemPageStatic.getAttribute('data-page-static-id');
-        let pageStaticName = tableItemPageStatic.getAttribute('data-name');
-        let buttons = tableItemPageStatic.querySelectorAll('button[role]');
+      for (let tableItem of tableItems) {
+        const pageStaticID = tableItem.getAttribute('data-id');
+        const panelElement = tableItem.querySelector('[data-element="panel"]');
+        const panelEventElements = panelElement.querySelectorAll('[data-event]');
 
-        for (let button of buttons) {
-          button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') === 'page-static-edit') {
-              window.location.href = `./page/${pageStaticID}`;
-            }
-            
-            if (button.getAttribute('role') === 'page-static-analytics') {
-              window.open(`/admin/analytics/page/${pageStaticID}`, '_blank');
-            }
-            
-            if (button.getAttribute('role') === 'page-static-view') {
-              window.open(`/page/${pageStaticName}`, '_blank');
-            }
-
-            if (button.getAttribute('role') === 'page-static-remove') {
+        for (let eventElement of panelEventElements) {
+          eventElement.addEventListener('click', (event) => {
+            if (eventElement.getAttribute('data-event') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_PAGE_DELETE_TITLE,
                 content: localeData.MODAL_PAGE_DELETE_DESCRIPTION
@@ -101,13 +83,7 @@ export class PagePages {
         }
       }
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }

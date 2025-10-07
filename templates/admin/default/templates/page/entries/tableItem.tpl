@@ -49,7 +49,7 @@
       <li class="grid-table__panel-item grid-table__panel-item_edit">
         <a href="/admin/entry/{ENTRY_ID}" class="grid-table__panel-link">Редактировать</a>
       </li>
-      <li class="grid-table__panel-item grid-table__panel-item_remove" data-event="remove" data-params="entryID={ENTRY_ID}">
+      <li class="grid-table__panel-item grid-table__panel-item_remove" data-event="remove">
         <a href="#" class="grid-table__panel-link grid-table__panel-link_red">Удалить</a>
       </li>
       <li class="grid-table__panel-item grid-table__panel-item_view">

@@ -1,4 +1,4 @@
-<div class="grid-table__item grid-table__item_page" data-is-published="{PAGE_STATIC_PUBLISHED_STATUS}">
+<div class="grid-table__item grid-table__item_page" data-element="entry" data-is-published="{PAGE_STATIC_PUBLISHED_STATUS}" data-id="{PAGE_STATIC_ID}">
   <div class="grid-table__cell grid-table__cell_title">
     <a class="grid-table__link" href="/admin/page/{PAGE_STATIC_ID}" target="_blank">{PAGE_STATIC_TITLE}</a>
     <span class="grid-table__draft">черновик</span>
@@ -37,7 +37,7 @@
       </li>
     </ul>
   </div>
-  <div class="grid-table__cell grid-table__cell_panel">
+  <div class="grid-table__cell grid-table__cell_panel" data-element="panel">
     <ul class="grid-table__panel-list">
       <li class="grid-table__panel-item grid-table__panel-item_stat">
         <a href="/admin/analytics/page/{PAGE_STATIC_ID}" class="grid-table__panel-link">Статистика</a>
