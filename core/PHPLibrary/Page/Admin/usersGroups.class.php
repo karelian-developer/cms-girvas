@@ -18,6 +18,7 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
+use \DOMDocument as DOMDocument;
 
 class PageUsersGroups implements InterfacePage
 {
