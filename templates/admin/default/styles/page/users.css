@@ -131,8 +131,7 @@
   .grid-table__panel-list {
     display: grid;
     grid-template-areas: 
-      'stat edit'
-      'remove view';
+      'remove edit';
     gap: 10px;
     width: 100%;
   }
