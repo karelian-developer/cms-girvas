@@ -114,10 +114,10 @@ class PageUsers implements InterfacePage
       if (!$object->isBlocked()) {
         $statusLabel = $object->emailIsSubmitted()
           ? '<span style="color: green;">Активен</span>'
-          : '<span style="color: red;">Почта не подтверждена</span>';
+          : '<span style="color: orange;">Почта не подтверждена</span>';
       } else {
         $statusLabel = $object->emailIsSubmitted()
-          ? '<span style="color: green;">Заблокирован</span>'
+          ? '<span style="color: red;">Заблокирован</span>'
           : '<span style="color: red;">Почта не подтверждена (заблокирован)</span>';
       }
 

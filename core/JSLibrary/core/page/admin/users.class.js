@@ -38,19 +38,17 @@ export class PageUsers {
       let interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
-      let tableItemsUsers = document.querySelectorAll('.table-users__item');
-      
-      for (let tableItemUser of tableItemsUsers) {
-        let userID = tableItemUser.getAttribute('data-user-id');
-        let buttons = tableItemUser.querySelectorAll('button[role]');
+      const tableItems = document.querySelectorAll('[data-element="page"]');
+      for (let tableItem of tableItems) {
+        const userID = tableItem.getAttribute('data-id');
+        const panelElement = tableItem.querySelector('[data-element="panel"]');
+        const panelEventElements = panelElement.querySelectorAll('[data-event]');
 
-        for (let button of buttons) {
-          button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') === 'user-edit') {
-              window.location.href = `./user/${userID}`;
-            }
+        for (let panelElement of panelEventElements) {
+          panelElement.addEventListener('click', (event) => {
+            event.preventDefault();
 
-            if (button.getAttribute('role') === 'user-remove') {
+            if (panelElement.getAttribute('role') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_USER_DELETE_TITLE,
                 content: localeData.MODAL_USER_DELETE_DESCRIPTION
