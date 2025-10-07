@@ -115,6 +115,8 @@ class PageUsers implements InterfacePage
         'USER_ID' => $object->getID(),
         'USER_INDEX' => $userNumber,
         'USER_LOGIN' => strip_tags($object->getLogin()),
+        'USER_AVATAR_URL' => $object->getAvatarURL(64),
+        'USER_REGISTRATION_IP' => $object->getRegistrationIP(),
         'USER_GROUP_TITLE' => $usersGroupTitle,
         'USER_EMAIL' => $object->getEmail(),
         'USER_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,

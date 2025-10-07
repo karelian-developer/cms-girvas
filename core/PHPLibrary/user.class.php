@@ -141,6 +141,24 @@ class User
   }
   
   /**
+   * Получить регистрационный IP
+   *
+   * @return string
+   */
+  public function getRegistrationIP() : string
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+
+      if (isset($metadata['registrationIP'])) {
+        return $metadata['registrationIP'];
+      }
+    }
+
+    return '0.0.0.0';
+  }
+  
+  /**
    * Получить имя пользователя
    *
    * @return string
@@ -783,6 +801,7 @@ class User
       'surname' => '',
       'patronymic' => '',
       'groupID' => 4,
+      'registrationIP' => Client::getRealIPAddress(),
       'passwordResetToken' => '',
       'passwordResetTokenCreatedUnixTimestamp' => '',
     ];
