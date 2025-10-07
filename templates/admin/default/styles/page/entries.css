@@ -138,7 +138,7 @@
   text-transform: lowercase;
 }
 
-.grid-table__locale:not(:last-child) {
+.grid-table__locale:not(:last-child)::after {
   content: ',';
   margin-right: 3px;
 }
