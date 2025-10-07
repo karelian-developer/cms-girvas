@@ -25,13 +25,7 @@ export class PageEntriesSamples {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
 
       let interactiveCreatePageButton = new Interactive('button');
@@ -44,19 +38,15 @@ export class PageEntriesSamples {
       let interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
-      let tableItems = document.querySelectorAll('.table-entries-categories__item');
-
+      const tableItems = document.querySelectorAll('[data-element="entries-sample"]');
       for (let tableItem of tableItems) {
-        let entriesSampleID = tableItem.getAttribute('data-entries-sample-id');
-        let buttons = tableItem.querySelectorAll('button[role]');
+        const entriesSampleID = tableItem.getAttribute('data-id');
+        const panelElement = tableItem.querySelector('[data-element="panel"]');
+        const panelEventElements = panelElement.querySelectorAll('[data-event]');
 
-        for (let button of buttons) {
-          button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') === 'entries-sample-edit') {
-              window.location.href = `./entriesSample/${entriesSampleID}`;
-            }
-
-            if (button.getAttribute('role') === 'entries-sample-delete') {
+        for (let panelElement of panelEventElements) {
+          panelElement.addEventListener('click', (event) => {
+            if (panelElement.getAttribute('data-event') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_ENTRIES_CATEGORY_DELETE_TITLE,
                 content: localeData.MODAL_ENTRIES_CATEGORY_DELETE_DESCRIPTION
@@ -92,13 +82,7 @@ export class PageEntriesSamples {
         }
       }
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }

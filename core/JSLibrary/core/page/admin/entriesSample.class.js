@@ -34,13 +34,7 @@ export class PageEntriesSample {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
       let descriptionTextareaElement = document.querySelector('[role="entriesSampleDescription"]');
       let titleInputElement = document.querySelector('[role="entriesSampleTitle"]');
@@ -93,13 +87,7 @@ export class PageEntriesSample {
               }
 
             }, (rejectionReason) => {
-              let interactiveNotification = new Interactive('notification');
-              interactiveNotification.target.isPopup = true;
-              interactiveNotification.target.setStatusCode(0);
-              interactiveNotification.target.setContent(rejectionReason);
-              interactiveNotification.target.assembly();
-        
-              interactiveNotification.target.show();
+              this.page.showPopupNotification(rejectionReason, 0);
             });
           }
         }
@@ -121,13 +109,7 @@ export class PageEntriesSample {
 
           return fetch(`/handler/entries/sample/sorttypes?locale=${window.CMSCore.locales.admin.name}&dataType=names`, {method: 'GET'});
         }, (rejectionReason) => {
-          let interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(rejectionReason);
-          interactiveNotification.target.assembly();
-    
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(rejectionReason, 0);
         }).then((response) => {
           return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
@@ -177,13 +159,7 @@ export class PageEntriesSample {
           let sampleID = (searchParams.getPathPart(3) != null) ? searchParams.getPathPart(3) : 0;
           return fetch(`/handler/entries/sample/${sampleID}/categories?locale=${window.CMSCore.locales.admin.name}`, {method: 'GET'});
         }, (rejectionReason) => {
-          let interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(rejectionReason);
-          interactiveNotification.target.assembly();
-    
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(rejectionReason, 0);
         }).then((response) => {
           return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
@@ -278,15 +254,7 @@ export class PageEntriesSample {
             }
           });
         } else {
-          let interactiveNotification;
-        
-          interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY);
-          interactiveNotification.target.assembly();
-
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY, 0);
         }
       });
       this.buttons.save.assembly();
@@ -341,13 +309,7 @@ export class PageEntriesSample {
       interactiveContainer.append(this.buttons.delete.target.element);
       interactiveContainer.append(this.buttons.save.target.element);
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }
