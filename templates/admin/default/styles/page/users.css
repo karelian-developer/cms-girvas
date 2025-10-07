@@ -142,7 +142,7 @@
   display: grid;
   list-style-type: none;
   grid-template-areas: 
-    'category author seo'
+    'ip-registration status-label'
     'date-created date-published date-updated';
   column-gap: 10px;
   padding: 0;
@@ -153,9 +153,7 @@
 @media (max-width: 600px) {
   .grid-table__metadata-list {
     grid-template-areas: 
-      'category author'
-      'seo seo'
-      'date-created date-created'
+      'ip-registration status-label'
       'date-published date-updated';
     grid-template-columns: max-content max-content;
   }
@@ -177,12 +175,12 @@
   margin-right: 2px;
 }
 
-.grid-table__metadata_category {
-  grid-area: category;
+.grid-table__metadata_ip-registration {
+  grid-area: ip-registration;
 }
 
-.grid-table__metadata_author {
-  grid-area: author;
+.grid-table__metadata_status-label {
+  grid-area: status-label;
 }
 
 .grid-table__metadata_seo {
