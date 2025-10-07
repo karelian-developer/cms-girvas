@@ -45,9 +45,9 @@ export class PageUsersGroups {
         const panelElement = tableItem.querySelector('[data-element="panel"]');
         const panelEventElements = panelElement.querySelectorAll('[data-event]');
 
-        for (let panelElement of panelEventElements) {
-          panelElement.addEventListener('click', (event) => {
-            if (panelElement.getAttribute('data-event') === 'remove') {
+        for (let eventElement of panelEventElements) {
+          eventElement.addEventListener('click', (event) => {
+            if (eventElement.getAttribute('data-event') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_USERS_GROUP_DELETE_TITLE,
                 content: localeData.MODAL_USERS_GROUP_DELETE_DESCRIPTION

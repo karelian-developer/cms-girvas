@@ -38,17 +38,17 @@ export class PageUsers {
       let interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
-      const tableItems = document.querySelectorAll('[data-element="page"]');
+      const tableItems = document.querySelectorAll('[data-element="user"]');
       for (let tableItem of tableItems) {
         const userID = tableItem.getAttribute('data-id');
         const panelElement = tableItem.querySelector('[data-element="panel"]');
         const panelEventElements = panelElement.querySelectorAll('[data-event]');
 
-        for (let panelElement of panelEventElements) {
-          panelElement.addEventListener('click', (event) => {
+        for (let eventElement of eventElement) {
+          eventElement.addEventListener('click', (event) => {
             event.preventDefault();
 
-            if (panelElement.getAttribute('data-event') === 'remove') {
+            if (eventElement.getAttribute('data-event') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_USER_DELETE_TITLE,
                 content: localeData.MODAL_USER_DELETE_DESCRIPTION
