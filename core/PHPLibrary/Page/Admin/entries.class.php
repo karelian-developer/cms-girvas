@@ -179,8 +179,8 @@ class PageEntries implements InterfacePage
         $entryAuthor->initData(['login']);
       }
 
-      $entryCompletedLocalesData = $entryObject->getCompletedLocalesData($this->CMSCore);
-      $entryCompletedLocales = $this->assemblyLocalesItems($entryCompletedLocalesData);
+      $completedLocalesData = $entryObject->getCompletedLocalesData($this->CMSCore);
+      $completedLocales = $this->assemblyLocalesItems($completedLocalesData);
       $entrySEOStatus = !empty($entryObject->getCompletedSEOTexts())
         ? '<span style="color: green;">Оптимизировано</span>'
         : '<span style="color: red;">Не оптимизировано</span>';
@@ -197,7 +197,7 @@ class PageEntries implements InterfacePage
         'ENTRY_PUBLISHED_STATUS' => $entryObject->isPublished() ? 'published' : 'not-published',
         'ENTRY_URL' => $entryObject->getURL(),
         'ENTRY_AUTHOR_LOGIN' => $entryAuthorLogin,
-        'ENTRY_LOCALES_LIST' => $entryCompletedLocales,
+        'ENTRY_LOCALES_LIST' => $completedLocales,
         'ENTRY_SEO_STATUS' => $entrySEOStatus,
         'ENTRY_CREATED_DATE_TIMESTAMP' => $entryCreatedDateTimestamp,
         'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $entryObject->getPublishedUnixTimestamp() > 0 ? $entryPublishedDateTimestamp : '-',

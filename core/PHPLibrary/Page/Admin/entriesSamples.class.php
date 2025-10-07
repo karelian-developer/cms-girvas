@@ -84,6 +84,62 @@ class PageEntriesSamples implements InterfacePage
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
+  /**
+   * Сборка списка локализаций для записи
+   * 
+   * @param array $localesData
+   * 
+   * @return string
+   */
+  private function assemblyLocalesItems(array $localesData) : string
+  {
+    $document = new DOMDocument('1.0', 'UTF-8');
+
+    foreach ($localesData as $localeData) {
+      $itemElement = $document->createElement('li', $localeData['title']);
+      $itemElement->setAttribute('class', 'grid-table__locale');
+
+      if (!empty($localeData['iconURL'])) {
+        $iconElement = $document->createElement('img');
+        $iconElement->setAttribute('class', 'grid-table__locale-icon');
+        $iconElement->setAttribute('src', $localeData['iconURL']);
+        $itemElement->prepend($iconElement);
+      }
+
+      $document->appendChild($itemElement);
+    }
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Сборка списка локализаций для записи
+   * 
+   * @param array $localesData
+   * 
+   * @return string
+   */
+  private function assemblyCategoriesItems(string $localeName, array $categories) : string
+  {
+    $document = new DOMDocument('1.0', 'UTF-8');
+
+    foreach ($categoriesData as $category) {
+      $category->initData(['texts']);
+
+      $itemElement = $document->createElement('li', $category->getTitle($localeName));
+      $itemElement->setAttribute('class', 'grid-table__locale');
+
+      $document->appendChild($itemElement);
+    }
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Сборка
+   * 
+   * @return void
+   */
   public function assembly() : void
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/entriesSamples.css', 'rel' => 'stylesheet']);
@@ -98,10 +154,7 @@ class PageEntriesSamples implements InterfacePage
 
     $entriesSamplesTableItemsAssembled = [];
 
-    // $entries_categories_table_items_assembled = [];
     $entriesSamples = new EntriesSamples($this->CMSCore);
-    $entriesSamplesLocale = $this->CMSCore->getCMSLocale('admin');
-    $entriesSamplesLocaleName = $entriesSamplesLocale->getName();
 
     /** @var array Массив объектов выборок */
     $entriesSamplesObjects = $entriesSamples->getAll([
@@ -123,11 +176,24 @@ class PageEntriesSamples implements InterfacePage
       $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
       /** @var string Заголовок выборки */
-      $entriesSampleTitle = $object->getTitle($entriesSamplesLocaleName);
+      $entriesSampleTitle = $object->getTitle($localeName);
       $entriesSampleTitle = strip_tags($entriesSampleTitle);
+
+      /** @var string Описание выборки */
+      $entriesSampleDescription = $object->getDescription($localeName);
+      $entriesSampleDescription = strip_tags($entriesSampleDescription);
       
       /** @var int Количество записей в выборке */
       $entriesSampleEntriesCount = $object->getEntriesCount();
+      
+      /** @var int Лимит на количество записей в выборке */
+      $entriesSampleEntriesLimitCount = $object->getLimitCount();
+
+      $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
+      $completedLocalesList = $this->assemblyLocalesItems($completedLocalesData);
+
+      $categories = $object->getCategories();
+      $categoriesList = $this->assemblyCategoriesItems($localeName, $categories);
 
       array_push($entriesSamplesTableItemsAssembled,
         ThemeCollector::assemblyFileContent(
@@ -138,7 +204,11 @@ class PageEntriesSamples implements InterfacePage
             'ENTRIES_SAMPLE_ID' => $objectID,
             'ENTRIES_SAMPLE_NAME' => $object->getName(),
             'ENTRIES_SAMPLE_TITLE' => $entriesSampleTitle,
+            'ENTRIES_SAMPLE_DESCRIPTION' => $entriesSampleDescription,
             'ENTRIES_SAMPLE_ENTRIES_COUNT' => $entriesSampleEntriesCount,
+            'ENTRIES_SAMPLE_ENTRIES_LIMIT_COUNT' => $entriesSampleEntriesLimitCount,
+            'ENTRIES_SAMPLE_LOCALES_LIST' => $completedLocalesList,
+            'ENTRIES_SAMPLE_CATEGORIES_LIST' => $categoriesList,
             'ENTRIES_SAMPLE_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
             'ENTRIES_SAMPLE_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
           ]
