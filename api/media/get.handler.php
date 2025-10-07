@@ -44,7 +44,6 @@ if ($CMSCore->client->isLogged(2)) {
   });
 
   $filesSorted = [];
-  $filesTransformed = array_map(fn($file) => '/uploads/media/' . $file, $filesSorted);
   foreach ($filesData as $data) {
     array_push($filesSorted, $data['fileURL']);
   }

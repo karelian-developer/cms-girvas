@@ -16,7 +16,7 @@
       </li>
       <li class="grid-table__data grid-table__data-email">
         <span class="grid-table__data-label">Электронная почта</span>
-        <span class="grid-table__data-value">{USER_EMAIL}</span>
+        <a class="grid-table__data-value" href="mailto:{USER_EMAIL}">{USER_EMAIL}</a>
       </li>
     </ul>
   </div>

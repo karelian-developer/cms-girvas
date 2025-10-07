@@ -12,7 +12,7 @@
     'avatar login'
     'avatar data'
     'metadata panel';
-  grid-template-columns: [avatar] max-content;
+  grid-template-columns: [avatar] 84px;
   font-size: 14px;
 }
 
@@ -77,6 +77,7 @@
 }
 
 .grid-table__cell_data {
+  font-size: 14px;
   grid-area: data;
 }
 
@@ -103,36 +104,13 @@
   }
 }
 
-.grid-table__locales-login {
+.grid-table__data-label {
   font-weight: 500;
-  margin-right: 3px;
 }
 
-.grid-table__locales-login::after {
+.grid-table__data-label::after {
+  font-weight: 500;
   content: ':';
-}
-
-.grid-table__locales {
-  display: flex;
-  flex-wrap: wrap;
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.grid-table__locale {
-  display: flex;
-  align-items: center;
-  font-size: inherit !important;
-  text-transform: lowercase;
-}
-
-.grid-table__locale:not(:last-child)::after {
-  content: ',';
-  margin-right: 3px;
-}
-
-.grid-table__locale-icon {
   margin-right: 2px;
 }
 
