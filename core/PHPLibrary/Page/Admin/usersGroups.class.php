@@ -69,6 +69,39 @@ class PageUsersGroups implements InterfacePage
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
+  /**
+   * Сборка списка локализаций для записи
+   * 
+   * @param array $localesData
+   * 
+   * @return string
+   */
+  private function assemblyLocalesItems(array $localesData) : string
+  {
+    $document = new DOMDocument('1.0', 'UTF-8');
+
+    foreach ($localesData as $localeData) {
+      $itemElement = $document->createElement('li', $localeData['title']);
+      $itemElement->setAttribute('class', 'grid-table__locale');
+
+      if (!empty($localeData['iconURL'])) {
+        $iconElement = $document->createElement('img');
+        $iconElement->setAttribute('class', 'grid-table__locale-icon');
+        $iconElement->setAttribute('src', $localeData['iconURL']);
+        $itemElement->prepend($iconElement);
+      }
+
+      $document->appendChild($itemElement);
+    }
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Сборка
+   * 
+   * @return void
+   */
   public function assembly() : void
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/usersGroups.css', 'rel' => 'stylesheet']);
@@ -105,14 +138,18 @@ class PageUsersGroups implements InterfacePage
       $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
       $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
+      $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
+      $completedLocales = $this->assemblyLocalesItems($completedLocalesData);
+
       array_push($usersGroupsTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/usersGroups/tableItem.tpl', [
-        'USER_GROUP_ID' => $object->getID(),
-        'USER_GROUP_INDEX' => $userGroupNumber,
-        'USER_GROUP_NAME' => $object->getName(),
-        'USER_GROUP_TITLE' => $usersGroupTitle,
-        'USER_GROUP_USERS_COUNT' => $object->getUsersCount(),
-        'USER_GROUP_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
-        'USER_GROUP_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
+        'USERS_GROUP_ID' => $object->getID(),
+        'USERS_GROUP_INDEX' => $userGroupNumber,
+        'USERS_GROUP_NAME' => $object->getName(),
+        'USERS_GROUP_TITLE' => $usersGroupTitle,
+        'USERS_GROUP_LOCALES_LIST' => $completedLocales,
+        'USERS_GROUP_USERS_COUNT' => $object->getUsersCount(),
+        'USERS_GROUP_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
+        'USERS_GROUP_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
       ]));
 
       $userGroupNumber++;

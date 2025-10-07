@@ -6,22 +6,22 @@
   <div class="grid-table__cell grid-table__cell_locales">
     <span class="grid-table__locales-title">Локализации</span>
     <ul class="grid-table__locales">
-      {ENTRIES_CATEGORY_LOCALES_LIST}
+      {USERS_GROUP_LOCALES_LIST}
     </ul>
   </div>
   <div class="grid-table__cell grid-table__cell_metadata">
     <ul class="grid-table__metadata-list">
       <li class="grid-table__metadata grid-table__metadata_count-users">
         <span class="grid-table__metadata-label">Кол-во пользователей</span>
-        <span class="grid-table__metadata-value">{ENTRIES_CATEGORY_ENTRIES_COUNT}</span>
+        <span class="grid-table__metadata-value">{USERS_GROUP_USERS_COUNT}</span>
       </li>
       <li class="grid-table__metadata grid-table__metadata_date-created">
         <span class="grid-table__metadata-label">Дата создания</span><br>
-        <span class="grid-table__metadata-value">{ENTRIES_CATEGORY_CREATED_DATE_TIMESTAMP}</span>
+        <span class="grid-table__metadata-value">{USERS_GROUP_CREATED_DATE_TIMESTAMP}</span>
       </li>
       <li class="grid-table__metadata grid-table__metadata_date-updated">
         <span class="grid-table__metadata-label">Дата обновления</span><br>
-        <span class="grid-table__metadata-value">{ENTRIES_CATEGORY_UPDATED_DATE_TIMESTAMP}</span>
+        <span class="grid-table__metadata-value">{USERS_GROUP_UPDATED_DATE_TIMESTAMP}</span>
       </li>
     </ul>
   </div>

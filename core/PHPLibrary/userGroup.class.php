@@ -248,6 +248,76 @@ class UserGroup
   }
 
   /**
+   * Получить тексты
+   * 
+   * @return array
+   */
+  public function getTexts() : array
+  {
+    if (property_exists($this, 'texts')) {
+      return json_decode($this->texts, true);
+    }
+
+    return [];
+  }
+
+  /**
+   * Получить заполненные тексты
+   * 
+   * @return array
+   */
+  public function getCompletedTexts() : array
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      return array_filter($texts, function ($locale) {
+        if (!is_array($locale) || empty($locale)) {
+          return false;
+        };
+
+        foreach ($locale as $key => $value) {
+          if (empty($value) && in_array($key, ['title'])) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
+
+    return [];
+  }
+
+  /**
+   * Получить данные по заполненным локализациям
+   * 
+   * @param CoreInterface $CMSCore
+   * 
+   * @return array
+   */
+  public function getCompletedLocalesData(CoreInterface $CMSCore) : array
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = $this->getCompletedTexts();
+      $locales = [];
+
+      foreach ($texts as $localeName => $data) {
+        $CMSLocale = new CMSLocale($CMSCore, $localeName);
+        $CMSLocale->initPathes();
+        $locales[$localeName] = [
+          'title' => $CMSLocale->getTitle(),
+          'iconURL' => $CMSLocale->getIconURL()
+        ];
+      }
+
+      return $locales;
+    }
+
+    return [];
+  }
+
+  /**
    * Проверка группы на супергруппу
    * 
    * @return bool
