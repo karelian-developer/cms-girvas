@@ -44,7 +44,7 @@ export class PageUsers {
         const panelElement = tableItem.querySelector('[data-element="panel"]');
         const panelEventElements = panelElement.querySelectorAll('[data-event]');
 
-        for (let eventElement of eventElement) {
+        for (let eventElement of panelEventElements) {
           eventElement.addEventListener('click', (event) => {
             event.preventDefault();
 
