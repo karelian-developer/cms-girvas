@@ -35,7 +35,7 @@ export class PageEntriesCategories {
       });
       interactiveCreatePageButton.assembly();
     
-      let interactiveContainerElement = document.querySelector('#E8548530785');
+      const interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
       const tableItems = document.querySelectorAll('[data-element="entries-category"]');

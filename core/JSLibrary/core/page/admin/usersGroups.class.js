@@ -35,13 +35,12 @@ export class PageUsersGroups {
       });
       interactiveCreatePageButton.assembly();
     
-      let interactiveContainerElement = document.querySelector('#E8548530785');
+      const interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
-      let tableItemsUsersGroups = document.querySelectorAll('[data-element="users-group"]');
-
-      for (let tableItemUserGroup of tableItemsUsersGroups) {
-        const userGroupID = tableItemUserGroup.getAttribute('data-id');
+      const tableItems = document.querySelectorAll('[data-element="users-group"]');
+      for (let tableItem of tableItems) {
+        const userGroupID = tableItem.getAttribute('data-id');
         const panelElement = tableItem.querySelector('[data-element="panel"]');
         const panelEventElements = panelElement.querySelectorAll('[data-event]');
 
