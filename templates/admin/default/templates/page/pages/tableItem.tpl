@@ -1,4 +1,4 @@
-<div class="grid-table__item grid-table__item_page" data-element="entry" data-is-published="{PAGE_STATIC_PUBLISHED_STATUS}" data-id="{PAGE_STATIC_ID}">
+<div class="grid-table__item grid-table__item_page" data-element="page" data-is-published="{PAGE_STATIC_PUBLISHED_STATUS}" data-id="{PAGE_STATIC_ID}">
   <div class="grid-table__cell grid-table__cell_title">
     <a class="grid-table__link" href="/admin/page/{PAGE_STATIC_ID}" target="_blank">{PAGE_STATIC_TITLE}</a>
     <span class="grid-table__draft">черновик</span>
@@ -45,7 +45,7 @@
       <li class="grid-table__panel-item grid-table__panel-item_edit">
         <a href="/admin/page/{PAGE_STATIC_ID}" class="grid-table__panel-link">Редактировать</a>
       </li>
-      <li class="grid-table__panel-item grid-table__panel-item_remove" data-event="remove" data-params="pageStaticID={PAGE_STATIC_ID}">
+      <li class="grid-table__panel-item grid-table__panel-item_remove" data-event="remove">
         <a href="#" class="grid-table__panel-link grid-table__panel-link_red">Удалить</a>
       </li>
       <li class="grid-table__panel-item grid-table__panel-item_view">
