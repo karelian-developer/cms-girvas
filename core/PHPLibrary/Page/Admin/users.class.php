@@ -99,7 +99,7 @@ class PageUsers implements InterfacePage
 
     $userNumber = 1;
     foreach ($usersObjects as $object) {
-      $object->initData(['id', 'login', 'email', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
+      $object->initData(['id', 'login', 'email', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata', 'emailIsSubmitted']);
       
       $objectID = $object->getGroupID();
       $userGroupObject = new UserGroup($this->CMSCore, $objectID);
@@ -111,12 +111,23 @@ class PageUsers implements InterfacePage
       $usersGroupTitle = $userGroupObject->getTitle($usersLocaleName);
       $usersGroupTitle = strip_tags($usersGroupTitle);
 
+      if ($object->isBlocked()) {
+        $statusLabel = $object->emailIsSubmitted()
+          ? '<span style="color: green;">Активен</span>'
+          : '<span style="color: red;">Почта не подтверждена</span>';
+      } else {
+        $statusLabel = $object->emailIsSubmitted()
+          ? '<span style="color: green;">Заблокирован</span>'
+          : '<span style="color: red;">Почта не подтверждена (заблокирован)</span>';
+      }
+
       array_push($usersTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/users/tableItem.tpl', [
         'USER_ID' => $object->getID(),
         'USER_INDEX' => $userNumber,
         'USER_LOGIN' => strip_tags($object->getLogin()),
         'USER_AVATAR_URL' => $object->getAvatarURL(64),
         'USER_REGISTRATION_IP' => $object->getRegistrationIP(),
+        'USER_STATUS_LABEL' => $statusLabel,
         'USER_GROUP_TITLE' => $usersGroupTitle,
         'USER_EMAIL' => $object->getEmail(),
         'USER_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,

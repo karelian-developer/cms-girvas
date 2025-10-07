@@ -247,6 +247,16 @@ class User
 
     return false;
   }
+
+  /**
+   * Получить статус подтверждения E-Mail
+   * 
+   * @return string
+   */
+  public function emailIsSubmitted() : string
+  {
+    return $this->emailIsSubmitted ?? '';
+  }
   
   /**
    * Получить объект группы пользователя
