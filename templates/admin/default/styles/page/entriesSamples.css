@@ -120,6 +120,23 @@
   margin: 0;
 }
 
+.grid-table__categories-title {
+  font-weight: 500;
+  margin-right: 3px;
+}
+
+.grid-table__categories-title::after {
+  content: ':';
+}
+
+.grid-table__categories {
+  display: flex;
+  flex-wrap: wrap;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
 .grid-table__locale {
   display: flex;
   align-items: center;

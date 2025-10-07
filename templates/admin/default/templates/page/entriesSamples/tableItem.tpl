@@ -12,9 +12,9 @@
       {ENTRIES_SAMPLE_LOCALES_LIST}
     </ul>
   </div>
-  <div class="grid-table__cell grid-table__cell_locales">
-    <span class="grid-table__locales-title">Категории</span>
-    <ul class="grid-table__locales">
+  <div class="grid-table__cell grid-table__cell_categories">
+    <span class="grid-table__categories-title">Категории</span>
+    <ul class="grid-table__categories">
       {ENTRIES_SAMPLE_CATEGORIES_LIST}
     </ul>
   </div>
