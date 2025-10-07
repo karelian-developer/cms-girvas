@@ -24,6 +24,7 @@
       'data'
       'metadata'
       'panel';
+    grid-template-columns: 1fr;
   }
 }
 
