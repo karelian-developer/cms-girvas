@@ -66,26 +66,34 @@ class PageMedia implements InterfacePage
 
     $mediaFilesSorted = [];
     foreach ($mediaFilesData as $data) {
-      array_push($mediaFilesSorted, $data['fileURL']);
+      $mediaFilesSorted[] = $data['fileURL'];
     }
 
     $mediaFilesTransformed = [];
     foreach ($mediaFilesSorted as $file) {
       $URL = '/uploads/media/' . $file;
-      array_push($mediaFilesTransformed, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/media/listItem.tpl', [
-        'MEDIA_FILE_URL' => $URL,
-        'MEDIA_FILE_FULLNAME' => $file
-      ]));
+      $mediaFilesTransformed[] = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/media/listItem.tpl',
+        [
+          'MEDIA_FILE_URL' => $URL,
+          'MEDIA_FILE_FULLNAME' => $file
+        ]
+      );
     }
 
     $pagination = new Pagination($this->CMSCore, $mediaFilesCount, $paginationItemsOnPage, $paginationItemCurrent);
     $pagination->assembly();
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/media.tpl', [
-      'ADMIN_PANEL_PAGE_NAME' => 'media',
-      'PAGE_MEDIA_PAGINATION' => $pagination->assembled,
-      'MEDIA_LIST_ITEMS' => implode($mediaFilesTransformed)
-    ]);
+    $this->assembled = ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme,
+      'templates/page/media.tpl',
+      [
+        'ADMIN_PANEL_PAGE_NAME' => 'media',
+        'PAGE_MEDIA_PAGINATION' => $pagination->assembled,
+        'MEDIA_LIST_ITEMS' => implode($mediaFilesTransformed)
+      ]
+    );
   }
 }
