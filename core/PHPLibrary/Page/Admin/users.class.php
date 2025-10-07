@@ -111,7 +111,7 @@ class PageUsers implements InterfacePage
       $usersGroupTitle = $userGroupObject->getTitle($usersLocaleName);
       $usersGroupTitle = strip_tags($usersGroupTitle);
 
-      if ($object->isBlocked()) {
+      if (!$object->isBlocked()) {
         $statusLabel = $object->emailIsSubmitted()
           ? '<span style="color: green;">Активен</span>'
           : '<span style="color: red;">Почта не подтверждена</span>';
