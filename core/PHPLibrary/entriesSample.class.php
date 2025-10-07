@@ -251,6 +251,34 @@ class EntriesSample implements EntityTypeContent
   }
 
   /**
+   * Получить данные по заполненным локализациям
+   * 
+   * @param CoreInterface $CMSCore
+   * 
+   * @return array
+   */
+  public function getCompletedLocalesData(CoreInterface $CMSCore) : array
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = $this->getCompletedTexts();
+      $locales = [];
+
+      foreach ($texts as $localeName => $data) {
+        $CMSLocale = new CMSLocale($CMSCore, $localeName);
+        $CMSLocale->initPathes();
+        $locales[$localeName] = [
+          'title' => $CMSLocale->getTitle(),
+          'iconURL' => $CMSLocale->getIconURL()
+        ];
+      }
+
+      return $locales;
+    }
+
+    return [];
+  }
+
+  /**
    * Получить массив объектов записей для выборки
    * 
    * @param  array $params
