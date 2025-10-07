@@ -29,7 +29,7 @@ export class PageEntriesSamples {
     }).then((localeData) => {
 
       let interactiveCreatePageButton = new Interactive('button');
-      interactiveCreatePageButton.target.setLabel(localeData.BUTTON_NEW_ENTRIES_CATEGORY_LABEL);
+      interactiveCreatePageButton.target.setLabel(localeData.BUTTON_NEW_ENTRIES_SAMPLE_LABEL);
       interactiveCreatePageButton.target.setCallback(() => {
         window.location.href = `./entriesSample`;
       });
@@ -65,7 +65,7 @@ export class PageEntriesSamples {
       
                 request.target.send().then((data) => {
                   if (data.statusCode === 1) {
-                    window.location.href = '/admin/entriesCategories';
+                    window.location.href = '/admin/entriesSamples';
                   }
                 });
               });
