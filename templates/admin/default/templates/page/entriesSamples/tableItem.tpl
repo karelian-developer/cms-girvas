@@ -41,7 +41,7 @@
   <div class="grid-table__cell grid-table__cell_panel" data-element="panel">
     <ul class="grid-table__panel-list">
       <li class="grid-table__panel-item grid-table__panel-item_edit">
-        <a href="/admin/entriesSamples/{ENTRIES_SAMPLE_ID}" class="grid-table__panel-link">Редактировать</a>
+        <a href="/admin/entriesSample/{ENTRIES_SAMPLE_ID}" class="grid-table__panel-link">Редактировать</a>
       </li>
       <li class="grid-table__panel-item grid-table__panel-item_remove" data-event="remove">
         <a href="#" class="grid-table__panel-link grid-table__panel-link_red">Удалить</a>

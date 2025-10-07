@@ -15,10 +15,12 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\EntriesSamples as EntriesSamples;
+use \core\PHPLibrary\EntriesSample\EnumSortTypeID as EnumSortTypeID;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
+use \ReflectionEnum as ReflectionEnum;
 
 class PageEntriesSamples implements InterfacePage
 {
@@ -195,6 +197,11 @@ class PageEntriesSamples implements InterfacePage
       $categories = $object->getCategories();
       $categoriesList = $this->assemblyCategoriesItems($localeName, $categories);
 
+      $reflectionEnumSortType = new ReflectionEnum(EnumSortTypeID::class);
+      $reflectionEnumSortTypeCases = $reflectionEnum->getCases();
+      $reflectionEnumSortTypeName = $reflectionEnumSortTypeCases[$objectID - 1]->getName();
+      $reflectionEnumSortTypeLabel = $localeData['PAGE_ENTRIES_SAMPLE_SORT_TYPE_' . $reflectionEnumSortTypeName . '_LABEL'];
+
       array_push($entriesSamplesTableItemsAssembled,
         ThemeCollector::assemblyFileContent(
           $this->CMSCore->theme,
@@ -209,6 +216,7 @@ class PageEntriesSamples implements InterfacePage
             'ENTRIES_SAMPLE_ENTRIES_LIMIT_COUNT' => $entriesSampleEntriesLimitCount,
             'ENTRIES_SAMPLE_LOCALES_LIST' => $completedLocalesList,
             'ENTRIES_SAMPLE_CATEGORIES_LIST' => $categoriesList,
+            'ENTRIES_SAMPLE_METHOD_SORT_LABEL' => $reflectionEnumSortTypeLabel,
             'ENTRIES_SAMPLE_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
             'ENTRIES_SAMPLE_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
           ]
