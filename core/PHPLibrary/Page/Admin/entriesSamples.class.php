@@ -198,7 +198,7 @@ class PageEntriesSamples implements InterfacePage
       $categoriesList = $this->assemblyCategoriesItems($localeName, $categories);
 
       $reflectionEnumSortType = new ReflectionEnum(EnumSortTypeID::class);
-      $reflectionEnumSortTypeCases = $reflectionEnum->getCases();
+      $reflectionEnumSortTypeCases = $reflectionEnumSortType->getCases();
       $reflectionEnumSortTypeName = $reflectionEnumSortTypeCases[$objectID - 1]->getName();
       $reflectionEnumSortTypeLabel = $localeData['PAGE_ENTRIES_SAMPLE_SORT_TYPE_' . $reflectionEnumSortTypeName . '_LABEL'];
 
