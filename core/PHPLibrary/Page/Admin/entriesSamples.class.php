@@ -129,7 +129,7 @@ class PageEntriesSamples implements InterfacePage
       $category->initData(['texts']);
 
       $itemElement = $document->createElement('li', $category->getTitle($localeName));
-      $itemElement->setAttribute('class', 'grid-table__locale');
+      $itemElement->setAttribute('class', 'grid-table__category');
 
       $document->appendChild($itemElement);
     }
