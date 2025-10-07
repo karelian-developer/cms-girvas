@@ -38,19 +38,16 @@ export class PageUsersGroups {
       let interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
-      let tableItemsUsersGroups = document.querySelectorAll('.table-users-groups__item');
+      let tableItemsUsersGroups = document.querySelectorAll('[data-element="users-group"]');
 
       for (let tableItemUserGroup of tableItemsUsersGroups) {
-        let userGroupID = tableItemUserGroup.getAttribute('data-user-group-id');
-        let buttons = tableItemUserGroup.querySelectorAll('button[role]');
+        const userGroupID = tableItemUserGroup.getAttribute('data-id');
+        const panelElement = tableItem.querySelector('[data-element="panel"]');
+        const panelEventElements = panelElement.querySelectorAll('[data-event]');
 
-        for (let button of buttons) {
-          button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') === 'user-group-edit') {
-              window.location.href = `./userGroup/${userGroupID}`;
-            }
-
-            if (button.getAttribute('role') === 'user-group-remove') {
+        for (let panelElement of panelEventElements) {
+          panelElement.addEventListener('click', (event) => {
+            if (panelElement.getAttribute('data-event') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_USERS_GROUP_DELETE_TITLE,
                 content: localeData.MODAL_USERS_GROUP_DELETE_DESCRIPTION

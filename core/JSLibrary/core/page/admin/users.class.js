@@ -48,7 +48,7 @@ export class PageUsers {
           panelElement.addEventListener('click', (event) => {
             event.preventDefault();
 
-            if (panelElement.getAttribute('role') === 'remove') {
+            if (panelElement.getAttribute('data-event') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_USER_DELETE_TITLE,
                 content: localeData.MODAL_USER_DELETE_DESCRIPTION
