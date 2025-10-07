@@ -16,7 +16,7 @@
   font-size: 14px;
 }
 
-@media (max-width: 1600px) {
+@media (max-width: 800px) {
   .grid-table__item {
     grid-template-areas:
       'avatar'
