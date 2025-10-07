@@ -123,7 +123,7 @@ class PageEntriesSamples implements InterfacePage
   {
     $document = new DOMDocument('1.0', 'UTF-8');
 
-    foreach ($categoriesData as $category) {
+    foreach ($categories as $category) {
       $category->initData(['texts']);
 
       $itemElement = $document->createElement('li', $category->getTitle($localeName));
