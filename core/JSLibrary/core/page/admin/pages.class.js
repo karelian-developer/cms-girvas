@@ -47,6 +47,8 @@ export class PagePages {
 
         for (let eventElement of panelEventElements) {
           eventElement.addEventListener('click', (event) => {
+            event.preventDefault();
+
             if (eventElement.getAttribute('data-event') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_PAGE_DELETE_TITLE,
