@@ -39,7 +39,6 @@ export class PagePages {
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
       const tableItems = document.querySelectorAll('[data-element="page"]');
-
       for (let tableItem of tableItems) {
         const pageStaticID = tableItem.getAttribute('data-id');
         const panelElement = tableItem.querySelector('[data-element="panel"]');
