@@ -209,6 +209,48 @@ class EntriesSample implements EntityTypeContent
   }
 
   /**
+   * Получить тексты
+   * 
+   * @return array
+   */
+  public function getTexts() : array
+  {
+    if (property_exists($this, 'texts')) {
+      return json_decode($this->texts, true);
+    }
+
+    return [];
+  }
+
+  /**
+   * Получить заполненные тексты
+   * 
+   * @return array
+   */
+  public function getCompletedTexts() : array
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      return array_filter($texts, function ($locale) {
+        if (!is_array($locale) || empty($locale)) {
+          return false;
+        };
+
+        foreach ($locale as $key => $value) {
+          if (empty($value) && in_array($key, ['title', 'description'])) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
+
+    return [];
+  }
+
+  /**
    * Получить массив объектов записей для выборки
    * 
    * @param  array $params
