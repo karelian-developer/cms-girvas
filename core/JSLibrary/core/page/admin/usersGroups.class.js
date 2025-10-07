@@ -40,7 +40,7 @@ export class PageUsersGroups {
 
       const tableItems = document.querySelectorAll('[data-element="users-group"]');
       for (let tableItem of tableItems) {
-        const userGroupID = tableItem.getAttribute('data-id');
+        const usersGroupID = tableItem.getAttribute('data-id');
         const panelElement = tableItem.querySelector('[data-element="panel"]');
         const panelEventElements = panelElement.querySelectorAll('[data-event]');
 
@@ -54,11 +54,11 @@ export class PageUsersGroups {
               
               interactiveModal.target.addButton(localeData.BUTTON_DELETE_LABEL, () => {
                 let formData = new FormData();
-                formData.append('user_group_id', userGroupID);
+                formData.append('user_group_id', usersGroupID);
 
                 let request = new Interactive('request', {
                   method: 'DELETE',
-                  url: '/handler/usersGroup/' + userGroupID + '?localeMessage=' + window.CMSCore.locales.admin.name
+                  url: '/handler/usersGroup/' + usersGroupID + '?localeMessage=' + window.CMSCore.locales.admin.name
                 });
       
                 request.target.data = formData;

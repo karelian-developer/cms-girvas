@@ -104,7 +104,6 @@ final class Users
       'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.groupID\') = :groupID',
       'postgresql' => '(metadata::jsonb->>\'groupID\')::int = :groupID'
     ]);
-    $queryBuilder->statement->clauseWhere->addCondition('(metadata::jsonb->>\'groupID\')::int = :groupID');
 
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
