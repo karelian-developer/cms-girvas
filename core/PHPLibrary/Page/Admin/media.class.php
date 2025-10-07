@@ -34,28 +34,23 @@ class PageMedia implements InterfacePage
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/media.css', 'rel' => 'stylesheet']);
     
-    $mediaFilesPath = $this->CMSCore->getCMSPath() . '/uploads/media';
-    $mediaFiles = array_diff(scandir($mediaFilesPath), ['.', '..']);
-    $mediaFilesCount = count($mediaFiles);
+    $filesPath =  CMS_ROOT_DIRECTORY . '/uploads/media';
+    $files = array_diff(scandir($filesPath), ['.', '..']);
+    $filesCount = count($files);
 
-    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
-    $paginationItemsOnPage = 12;
-
-    $mediaFiles = array_slice($mediaFiles, $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
-
-    $mediaFilesData = [];
-    foreach ($mediaFiles as $file) {
+    $filesData = [];
+    foreach ($files as $file) {
       /** @var string */
-      $path = $mediaFilesPath . '/' . $file;
+      $path = $filesPath . '/' . $file;
       $URL = $file;
       
-      array_push($mediaFilesData, [
+      array_push($filesData, [
         'fileURL' => $URL,
         'createdUnixTimestamp' => filemtime($path)
       ]);
     }
 
-    usort($mediaFilesData, function($a, $b)
+    usort($filesData, function($a, $b)
     {
       if ($a['createdUnixTimestamp'] === $b['createdUnixTimestamp']) {
         return 0;
@@ -64,15 +59,20 @@ class PageMedia implements InterfacePage
       return $a['createdUnixTimestamp'] > $b['createdUnixTimestamp'] ? -1 : 1;
     });
 
-    $mediaFilesSorted = [];
-    foreach ($mediaFilesData as $data) {
-      $mediaFilesSorted[] = $data['fileURL'];
+    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
+    $paginationItemsOnPage = 12;
+
+    $filesData = array_slice($filesData, $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
+
+    $filesSorted = [];
+    foreach ($filesData as $data) {
+      $filesSorted[] = $data['fileURL'];
     }
 
-    $mediaFilesTransformed = [];
-    foreach ($mediaFilesSorted as $file) {
+    $filesTransformed = [];
+    foreach ($filesSorted as $file) {
       $URL = '/uploads/media/' . $file;
-      $mediaFilesTransformed[] = ThemeCollector::assemblyFileContent(
+      $filesTransformed[] = ThemeCollector::assemblyFileContent(
         $this->CMSCore->theme,
         'templates/page/media/listItem.tpl',
         [
@@ -82,7 +82,7 @@ class PageMedia implements InterfacePage
       );
     }
 
-    $pagination = new Pagination($this->CMSCore, $mediaFilesCount, $paginationItemsOnPage, $paginationItemCurrent);
+    $pagination = new Pagination($this->CMSCore, $filesCount, $paginationItemsOnPage, $paginationItemCurrent);
     $pagination->assembly();
 
     /** @var string $site_page Содержимое шаблона страницы */
@@ -92,7 +92,7 @@ class PageMedia implements InterfacePage
       [
         'ADMIN_PANEL_PAGE_NAME' => 'media',
         'PAGE_MEDIA_PAGINATION' => $pagination->assembled,
-        'MEDIA_LIST_ITEMS' => implode($mediaFilesTransformed)
+        'MEDIA_LIST_ITEMS' => implode($filesTransformed)
       ]
     );
   }

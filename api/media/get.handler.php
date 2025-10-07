@@ -25,13 +25,13 @@ if ($CMSCore->client->isLogged(2)) {
 
   foreach ($files as $file) {
     /** @var string */
-    $filePath = $filesDirectoryPath . '/' . $file;
+    $path = $filesDirectoryPath . '/' . $file;
     /** @var string */
-    $fileURL = $file;
+    $URL = $file;
     
     array_push($filesData, [
-      'fileURL' => $fileURL,
-      'createdUnixTimestamp' => filemtime($filePath)
+      'fileURL' => $URL,
+      'createdUnixTimestamp' => filemtime($path)
     ]);
   }
 
@@ -44,6 +44,7 @@ if ($CMSCore->client->isLogged(2)) {
   });
 
   $filesSorted = [];
+  $filesTransformed = array_map(fn($file) => '/uploads/media/' . $file, $filesSorted);
   foreach ($filesData as $data) {
     array_push($filesSorted, $data['fileURL']);
   }
