@@ -195,9 +195,9 @@ class EntryCategory implements EntityTypeContent
   }
   
   /**
-   * Получить заголовок записи
+   * Получить заголовок
    *
-   * @param  string $localeName Наименование локализации
+   * @param  string $localeName
    * 
    * @return string
    */
@@ -208,6 +208,26 @@ class EntryCategory implements EntityTypeContent
 
       if (isset($texts[$localeName]['title'])) {
         return $texts[$localeName]['title'];
+      }
+    }
+
+    return '';
+  }
+  
+  /**
+   * Получить SEO-заголовок
+   *
+   * @param  string $localeName Наименование локализации
+   * 
+   * @return string
+   */
+  public function getSEOTitle(string $localeName = 'en_US') : string
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      if (isset($texts[$localeName]['SEOTitle'])) {
+        return $texts[$localeName]['SEOTitle'];
       }
     }
 
@@ -233,9 +253,9 @@ class EntryCategory implements EntityTypeContent
   }
 
   /**
-   * Получить описание записи
+   * Получить описание
    *
-   * @param  string $localeName Наименование локализации
+   * @param  string $localeName
    * 
    * @return string
    */
@@ -250,6 +270,45 @@ class EntryCategory implements EntityTypeContent
     }
 
     return '';
+  }
+
+  /**
+   * Получить SEO-описание
+   *
+   * @param  string $localeName
+   * 
+   * @return string
+   */
+  public function getSEODescription(string $localeName = 'en_US') : string
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      if (isset($texts[$localeName]['SEDescription'])) {
+        return $texts[$localeName]['SEDescription'];
+      }
+    }
+
+    return '';
+  }
+  
+  /**
+   * Получить ключевые слова
+   *
+   * @param  mixed $localeName Наименование локализации
+   * @return array
+   */
+  public function getKeywords($localeName = 'en_US') : array
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      if (isset($texts[$localeName]['keywords'])) {
+        return $texts[$localeName]['keywords'];
+      }
+    }
+
+    return [];
   }
   
   /**
