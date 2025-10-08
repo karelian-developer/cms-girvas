@@ -19,6 +19,7 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
+use \DOMDocument as DOMDocument;
 
 class PageFeeds implements InterfacePage
 {
@@ -137,7 +138,7 @@ class PageFeeds implements InterfacePage
       $feedTitle = strip_tags($feedTitle);
 
       $feedName = $object->getName();
-      $feedTypeTitle = FeedBuilder::getTypeTitle($object->getTypeID());
+      $feedSpecificationTitle = FeedBuilder::getTypeTitle($object->getTypeID());
       $indexCurrent = $index + 1;
 
       $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
@@ -150,7 +151,8 @@ class PageFeeds implements InterfacePage
           'FEED_INDEX' => $indexCurrent,
           'FEED_NAME' => $feedName,
           'FEED_TITLE' => $feedTitle,
-          'FEED_TYPE_TITLE' => $feedTypeTitle,
+          'FEED_CATEGORY_TITLE' => 
+          'FEED_SPECIFICATION_TITLE' => $feedSpecificationTitle,
           'FEED_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
           'FEED_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
         ]
@@ -168,7 +170,7 @@ class PageFeeds implements InterfacePage
           [
             'PAGE_FEEDS_TABLE_ITEMS' => implode($feedsItemsAssembled)
           ]
-          )
+        )
       ]
     );
   }
