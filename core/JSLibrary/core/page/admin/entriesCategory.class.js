@@ -179,8 +179,10 @@ export class PageEntriesCategory {
               interactiveParentChoices.target.addItem(entriesCategory.title, entriesCategory.id);
             }
 
+            console.log(entriesCategory);
+            console.log(entriesCategoryData);
+
             if (entriesCategory.id === entriesCategoryData.parentID) {
-              console.log(entriesCategoryIndex);
               interactiveParentChoices.target.setItemSelectedIndex(entriesCategoryIndex);
             }
           });
