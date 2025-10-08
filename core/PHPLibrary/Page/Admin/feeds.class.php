@@ -128,7 +128,7 @@ class PageFeeds implements InterfacePage
     unset($feeds);
 
     foreach ($feedsObjects as $index => $object) {
-      $object->initData(['id', 'name', 'typeID', 'texts', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+      $object->initData(['id', 'name', 'typeID', 'entriesCategoryID', 'texts', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
 
       $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
       $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
@@ -138,7 +138,7 @@ class PageFeeds implements InterfacePage
       $feedTitle = strip_tags($feedTitle);
 
       $feedName = $object->getName();
-      $feedCategory = $object->getEntriesCategory(['entriesCategoryID', 'texts']);
+      $feedCategory = $object->getEntriesCategory(['texts']);
       $feedCategoryTitle = $feedCategory->getTitle($localeName);
 
       $feedSpecificationTitle = FeedBuilder::getTypeTitle($object->getTypeID());
