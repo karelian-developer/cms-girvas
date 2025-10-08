@@ -14,14 +14,15 @@
 
 .main__page_entry .grid-table__cell:not(:last-child) {
   border-bottom: 1px solid var(--color-neutral-lightgray);
+  padding-bottom: 20px;
 }
 
 @media (min-width: 801px) {
-  .main__page_entry .grid-table__cell:nth-child(odd) {
+  .main__page_entry .grid-table__cell_text {
     padding-right: 20px;
   }
-  
-  .main__page_entry .grid-table__cell:nth-child(even) {
+
+  .main__page_entry .grid-table__cell_data {
     padding-left: 20px;
   }
 }
@@ -61,27 +62,15 @@
   grid-column: 1 / -1;
 }
 
-.main__page_entry .page__form > .table {
-  margin-bottom: 10px;
+.main__page_entry .grid-table__cell_panel {
+  display: flex;
+  justify-content: flex-end;
 }
 
-.main__page_entry .page__form .table_entry tr > td:first-child {
-  width: calc(100% - 300px);
-}
-
-.main__page_entry .page__form .table_entry tr > td:last-child {
-  width: 400px;
-}
-
-.main__page_entry .page__form .table__cell {
-  box-sizing: border-box;
-  vertical-align: top;
-}
-
-.main__page_entry .page__form .cell__title {
-  font-weight: 700;
-  text-transform: uppercase;
-  margin-bottom: 10px;
+.main__page_entry .grid-table__cell_panel > * {
+  &:not(:last-child) {
+    margin-right: 10px;
+  }
 }
 
 .main__page_entry .page__form input,
@@ -108,17 +97,6 @@
 
 .main__page_entry .page__form .interactive__select-imitation {
   width: 100% !important;
-}
-
-.main__page_entry .page__form .form__bottom-panel {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.main__page_entry .page__form .form__bottom-panel > * {
-  &:not(:last-child) {
-    margin-right: 10px;
-  }
 }
 
 /* Боковая колонка инструмента */
