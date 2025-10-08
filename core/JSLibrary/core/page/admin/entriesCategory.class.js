@@ -24,8 +24,8 @@ export class PageEntriesCategory {
     let elementForm = document.querySelector('[data-element="main-form"]');
 
     let locales;
-    let interactiveLocaleChoices = new Interactive('choices');
-    let interactiveParentChoices = new Interactive('choices');
+    const interactiveLocaleChoices = new Interactive('choices');
+    const interactiveParentChoices = new Interactive('choices');
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
@@ -180,6 +180,7 @@ export class PageEntriesCategory {
             }
 
             if (entriesCategory.id === entriesCategoryData.parentID) {
+              console.log(entriesCategoryIndex);
               interactiveParentChoices.target.setItemSelectedIndex(entriesCategoryIndex);
             }
           });
