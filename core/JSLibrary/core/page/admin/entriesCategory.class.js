@@ -179,6 +179,9 @@ export class PageEntriesCategory {
               interactiveParentChoices.target.addItem(entriesCategory.title, entriesCategory.id);
             }
 
+            console.log(entriesCategory);
+            console.log(entriesCategoryData);
+            console.log('>>>>');
             console.log(entriesCategory.id);
             console.log(entriesCategoryData.parentID);
             console.log('====');
