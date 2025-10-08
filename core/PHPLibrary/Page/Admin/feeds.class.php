@@ -138,7 +138,7 @@ class PageFeeds implements InterfacePage
       $feedTitle = strip_tags($feedTitle);
 
       $feedName = $object->getName();
-      $feedCategory = $object->getEntriesCategory(['texts']);
+      $feedCategory = $object->getEntriesCategory(['entriesCategoryID', 'texts']);
       $feedCategoryTitle = $feedCategory->getTitle($localeName);
 
       $feedSpecificationTitle = FeedBuilder::getTypeTitle($object->getTypeID());
