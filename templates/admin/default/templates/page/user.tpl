@@ -8,7 +8,7 @@
   </div>
   <div class="page__content">
     <form class="form page__form" action="/handler/user" data-element="main-form">
-      <input name="entry_id" type="hidden" value="{ENTRY_ID}">
+      <input name="user_id" type="hidden" value="{USER_ID}">
       <div class="grid-table page__grid-table">
         <!-- Поле: Логин -->
         <div class="cell grid-table__cell grid-table__cell_text">
