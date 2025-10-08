@@ -198,13 +198,13 @@ export class PageEntriesSample {
       
       let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
-        let entryDescriptionTextareaElement = document.querySelector('[role="entriesSampleDescription"]');
-        let entryTitleInputElement = document.querySelector('[role="entriesSampleTitle"]');
+        let entryTitleInputElement = document.querySelector('[data-element="input-title"]');
+        let entryDescriptionTextareaElement = document.querySelector('[data-element="input-description"]');
         
         locales.forEach((locale, localeIndex) => {
           if (locale.name == event.target.value) {
-            entryDescriptionTextareaElement.setAttribute('name', 'entries_sample_description_' + locale.iso639_2);
             entryTitleInputElement.setAttribute('name', 'entries_sample_title_' + locale.iso639_2);
+            entryDescriptionTextareaElement.setAttribute('name', 'entries_sample_description_' + locale.iso639_2);
 
             if (searchParams.getPathPart(3) != null) {
               let request = new Interactive('request', {
