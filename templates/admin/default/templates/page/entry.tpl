@@ -11,7 +11,7 @@
       <input name="entry_id" type="hidden" value="{ENTRY_ID}">
       <div class="grid-table page__grid-table">
         <!-- Поле: Техническое наименование записи -->
-        <div class="cell grid-table__cell_text">
+        <div class="cell grid-table__cell grid-table__cell_text">
           <div class="cell__title">
             {LANG:PAGE_ENTRY_INPUT_TECH_NAME_LABEL}
           </div>
@@ -19,11 +19,11 @@
             {LANG:PAGE_ENTRY_INPUT_TECH_NAME_DESCRIPTION}
           </div>
         </div>
-        <div class="cell grid-table__cell_data">
+        <div class="cell grid-table__cell grid-table__cell_data">
           <input name="entry_name" type="text" class="input form__input form__input_text" value="{ENTRY_NAME}" placeholder="my-first-entry" data-element="input-url" required>
         </div>
         <!-- Поле: Заголовок записи -->
-        <div class="cell grid-table__cell_text">
+        <div class="cell grid-table__cell grid-table__cell_text">
           <div class="cell__title">
             {LANG:PAGE_ENTRY_INPUT_TITLE_LABEL}
           </div>
@@ -31,11 +31,11 @@
             {LANG:PAGE_ENTRY_INPUT_TITLE_DESCRIPTION}
           </div>
         </div>
-        <div class="cell grid-table__cell_data">
+        <div class="cell grid-table__cell grid-table__cell_data">
           <input name="entry_title_rus" type="text" class="input form__input form__input_text" value="{ENTRY_TITLE}" placeholder="{LANG:PAGE_ENTRY_INPUT_TITLE_LABEL}" data-element="input-title" required>
         </div>
         <!-- Поле: SEO-заголовок записи -->
-        <div class="cell grid-table__cell_text">
+        <div class="cell grid-table__cell grid-table__cell_text">
           <div class="cell__title">
             {LANG:PAGE_ENTRY_INPUT_SEO_TITLE_LABEL}
           </div>
@@ -43,11 +43,11 @@
             {LANG:PAGE_ENTRY_INPUT_SEO_TITLE_DESCRIPTION}
           </div>
         </div>
-        <div class="cell grid-table__cell_data">
+        <div class="cell grid-table__cell grid-table__cell_data">
           <input name="entry_seo_title_rus" type="text" class="input form__input form__input_text" value="{ENTRY_SEO_TITLE}" placeholder="{LANG:PAGE_ENTRY_INPUT_SEO_TITLE_LABEL}" data-element="input-seo-title">
         </div>
         <!-- Поле: Описание записи -->
-        <div class="cell grid-table__cell_text">
+        <div class="cell grid-table__cell grid-table__cell_text">
           <div class="cell__title">
             {LANG:PAGE_ENTRY_INPUT_DESCRIPTION_LABEL}
           </div>
@@ -55,11 +55,11 @@
             {LANG:PAGE_ENTRY_INPUT_DESCRIPTION_DESCRIPTION}
           </div>
         </div>
-        <div class="cell grid-table__cell_data">
+        <div class="cell grid-table__cell grid-table__cell_data">
           <textarea name="entry_description_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRY_INPUT_DESCRIPTION_LABEL}" data-element="input-description" required>{ENTRY_DESCRIPTION}</textarea>
         </div>
         <!-- Поле: SEO-описание записи -->
-        <div class="cell grid-table__cell_text">
+        <div class="cell grid-table__cell grid-table__cell_text">
           <div class="cell__title">
             {LANG:PAGE_ENTRY_INPUT_SEO_DESCRIPTION_LABEL}
           </div>
@@ -67,11 +67,11 @@
             {LANG:PAGE_ENTRY_INPUT_SEO_DESCRIPTION_DESCRIPTION}
           </div>
         </div>
-        <div class="cell grid-table__cell_data">
+        <div class="cell grid-table__cell grid-table__cell_data">
           <textarea name="entry_seo_description_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRY_INPUT_SEO_DESCRIPTION_LABEL}" data-element="input-seo-description">{ENTRY_SEO_DESCRIPTION}</textarea>
         </div>
         <!-- Поле: Ключевые фразы/слова записи -->
-        <div class="cell grid-table__cell_text">
+        <div class="cell grid-table__cell grid-table__cell_text">
           <div class="cell__title">
             {LANG:PAGE_ENTRY_INPUT_KEYWORDS_LABEL}
           </div>
@@ -79,11 +79,11 @@
             {LANG:PAGE_ENTRY_INPUT_KEYWORDS_DESCRIPTION}
           </div>
         </div>
-        <div class="cell grid-table__cell_data">
+        <div class="cell grid-table__cell grid-table__cell_data">
           <textarea name="entry_keywords_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRY_INPUT_KEYWORDS_PLACEHOLDER}" data-element="input-keywords">{ENTRY_KEYWORDS}</textarea>
         </div>
         <!-- Поле: Категория записи -->
-        <div class="cell grid-table__cell_text">
+        <div class="cell grid-table__cell grid-table__cell_text">
           <div class="cell__title">
             {LANG:PAGE_ENTRY_SELECT_CATEGORY_LABEL}
           </div>
@@ -91,14 +91,14 @@
             {LANG:PAGE_ENTRY_SELECT_CATEGORY_DESCRIPTION}
           </div>
         </div>
-        <div class="cell grid-table__cell_data">
+        <div class="cell grid-table__cell grid-table__cell_data">
           <div data-element="choice" data-choice="category"></div>
         </div>
-        <div class="cell grid-table__cell_editor" data-element="editor">
+        <div class="cell grid-table__cell grid-table__cell_editor" data-element="editor">
           {ENTRY_EDITOR}
         </div>
         <!-- Панель формы -->
-        <div class="cell grid-table__cell_panel" data-element="panel"></div>
+        <div class="cell grid-table__cell grid-table__cell_panel" data-element="panel"></div>
       </div>
     </form>
   </div>
