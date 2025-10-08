@@ -54,7 +54,7 @@ export class Form {
           passwordProgressLevelContainerElement.append(passwordProgressLevelElement);
 
           passwordProgressLevelContainerElement.style.height = '5px';
-          passwordProgressLevelContainerElement.style.width = '100%';
+          passwordProgressLevelContainerElement.style.width = element.offsetWidth + 'px';
           passwordProgressLevelContainerElement.style.position = 'absolute';
           passwordProgressLevelContainerElement.style.top = element.offsetHeight + 'px';
 
