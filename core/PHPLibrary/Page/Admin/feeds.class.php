@@ -135,7 +135,7 @@ class PageFeeds implements InterfacePage
       $feedTitle = $object->getTitle($localeName);
       $feedTitle = strip_tags($feedTitle);
 
-      $feedDescription = $object->getTitle($localeName);
+      $feedDescription = $object->getDescription($localeName);
       $feedDescription = strip_tags($feedDescription);
 
       $feedName = $object->getName();
