@@ -100,18 +100,6 @@
         <div class="cell grid-table__cell_data">
           <div data-element="choice" data-choice="category"></div>
         </div>
-        <!-- Поле: Категория записи -->
-        <div class="cell grid-table__cell_text">
-          <div class="cell__title">
-            {LANG:PAGE_ENTRY_SELECT_CATEGORY_LABEL}
-          </div>
-          <div class="cell__description">
-            {LANG:PAGE_ENTRY_SELECT_CATEGORY_DESCRIPTION}
-          </div>
-        </div>
-        <div class="cell grid-table__cell_data">
-          <div data-element="choice" data-choice="category"></div>
-        </div>
         <div class="cell grid-table__cell_editor" data-element="editor">
           {ENTRY_EDITOR}
         </div>
