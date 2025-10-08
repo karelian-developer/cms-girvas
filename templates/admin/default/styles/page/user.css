@@ -17,6 +17,25 @@
   padding-bottom: 20px;
 }
 
+.main__page_user .grid-table__cell_data {
+  position: relative;
+}
+
+.main__page_user .grid-table__cell_data > .form__input-tip {
+  position: absolute;
+  font-size: 12px;
+  height: 15px;
+  top: -15px;
+  right: 0;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.main__page_user .grid-table__cell_data:hover > .form__input-tip,
+.main__page_user .grid-table__cell_data:focus > .form__input-tip {
+  opacity: 1;
+}
+
 @media (min-width: 801px) {
   .main__page_user .grid-table__cell_text {
     padding-right: 20px;
