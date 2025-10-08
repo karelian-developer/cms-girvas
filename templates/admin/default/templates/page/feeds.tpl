@@ -8,7 +8,7 @@
     {PAGE_FEEDS_PAGINATION}
   </div>
   <div class="page__content">
-    {ADMIN_PANEL_FEEDS_TABLE}
+    {PAGE_FEEDS_TABLE}
   </div>
   <div class="page__pagination">
     {PAGE_FEEDS_PAGINATION}

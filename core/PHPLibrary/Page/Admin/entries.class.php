@@ -154,67 +154,73 @@ class PageEntries implements InterfacePage
 
     unset($entries);
 
-    $entryNumber = 1;
-    foreach ($entriesObjects as $entryObject) {
-      $entryObject->initData(['id', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata', 'categoryID', 'authorID']);
+    foreach ($entriesObjects as $index => $object) {
+      $object->initData(['id', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata', 'categoryID', 'authorID']);
 
-      $entryCategoryID = $entryObject->getCategoryID();
+      $entryCategoryID = $object->getCategoryID();
       $entryCategory = new EntryCategory($this->CMSCore, $entryCategoryID);
       $entryCategory->initData(['texts']);
 
-      $entryCreatedDateTimestamp = date('d.m.Y H:i:s', $entryObject->getCreatedUnixTimestamp());
-      $entryPublishedDateTimestamp = date('d.m.Y H:i:s', $entryObject->getPublishedUnixTimestamp());
-      $entryUpdatedDateTimestamp = date('d.m.Y H:i:s', $entryObject->getUpdatedUnixTimestamp());
+      $entryCreatedDateTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
+      $entryPublishedDateTimestamp = date('d.m.Y H:i:s', $object->getPublishedUnixTimestamp());
+      $entryUpdatedDateTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
-      $entryTitle = $entryObject->getTitle($entriesLocaleName);
-      $entryDescription = $entryObject->getDescription($entriesLocaleName);
+      $entryTitle = $object->getTitle($entriesLocaleName);
+      $entryDescription = $object->getDescription($entriesLocaleName);
       $entryCategoryTitle = $entryCategory->getTitle($localeName);
 
       $entryTitle = strip_tags($entryTitle);
       $entryDescription = strip_tags($entryDescription);
       $entryCategoryTitle = strip_tags($entryCategoryTitle);
 
-      $entryAuthor = $entryObject->getAuthor();
+      $entryAuthor = $object->getAuthor();
       if ($entryAuthor !== null) {
         $entryAuthor->initData(['login']);
       }
 
-      $completedLocalesData = $entryObject->getCompletedLocalesData($this->CMSCore);
+      $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
       $completedLocales = $this->assemblyLocalesItems($completedLocalesData);
-      $entrySEOStatus = !empty($entryObject->getCompletedSEOTexts())
+      $entrySEOStatus = !empty($object->getCompletedSEOTexts())
         ? '<span style="color: green;">Оптимизировано</span>'
         : '<span style="color: red;">Не оптимизировано</span>';
 
       $entryAuthorLogin = $entryAuthor !== null ? $entryAuthor->getLogin() : 'User deleted';
 
-      array_push($entriesTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/tableItem.tpl', [
-        'ENTRY_ID' => $entryObject->getID(),
-        'ENTRY_NAME' => $entryObject->getName(),
-        'ENTRY_INDEX' => $entryNumber,
-        'ENTRY_TITLE' => !empty($entryTitle) ? $entryTitle : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $entriesLocale->getName()),
-        'ENTRY_DESCRIPTION' => !empty($entryDescription) ? $entryDescription : sprintf('[ DESCRIPTION NOT FOUND IN LOCALE %s ]', $entriesLocale->getName()),
-        'ENTRY_CATEGORY_TITLE' => !empty($entryCategoryTitle) ? $entryCategoryTitle : sprintf('[ CATEGORY TITLE NOT FOUND IN LOCALE %s ]', $localeName),
-        'ENTRY_PUBLISHED_STATUS' => $entryObject->isPublished() ? 'published' : 'not-published',
-        'ENTRY_URL' => $entryObject->getURL(),
-        'ENTRY_AUTHOR_LOGIN' => $entryAuthorLogin,
-        'ENTRY_LOCALES_LIST' => $completedLocales,
-        'ENTRY_SEO_STATUS' => $entrySEOStatus,
-        'ENTRY_CREATED_DATE_TIMESTAMP' => $entryCreatedDateTimestamp,
-        'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $entryObject->getPublishedUnixTimestamp() > 0 ? $entryPublishedDateTimestamp : '-',
-        'ENTRY_UPDATED_DATE_TIMESTAMP' => $entryUpdatedDateTimestamp,
-      ]));
-
-      $entryNumber++;
+      $entriesTableItemsAssembled[] =  ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme, 'templates/page/entries/tableItem.tpl',
+        [
+          'ENTRY_ID' => $object->getID(),
+          'ENTRY_NAME' => $object->getName(),
+          'ENTRY_INDEX' => $index + 1,
+          'ENTRY_TITLE' => !empty($entryTitle) ? $entryTitle : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $entriesLocale->getName()),
+          'ENTRY_DESCRIPTION' => !empty($entryDescription) ? $entryDescription : sprintf('[ DESCRIPTION NOT FOUND IN LOCALE %s ]', $entriesLocale->getName()),
+          'ENTRY_CATEGORY_TITLE' => !empty($entryCategoryTitle) ? $entryCategoryTitle : sprintf('[ CATEGORY TITLE NOT FOUND IN LOCALE %s ]', $localeName),
+          'ENTRY_PUBLISHED_STATUS' => $object->isPublished() ? 'published' : 'not-published',
+          'ENTRY_URL' => $object->getURL(),
+          'ENTRY_AUTHOR_LOGIN' => $entryAuthorLogin,
+          'ENTRY_LOCALES_LIST' => $completedLocales,
+          'ENTRY_SEO_STATUS' => $entrySEOStatus,
+          'ENTRY_CREATED_DATE_TIMESTAMP' => $entryCreatedDateTimestamp,
+          'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $object->getPublishedUnixTimestamp() > 0 ? $entryPublishedDateTimestamp : '-',
+          'ENTRY_UPDATED_DATE_TIMESTAMP' => $entryUpdatedDateTimestamp,
+        ]
+      );
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries.tpl', [
-      'PAGE_ENTRIES_PAGINATION' => $pagination->assembled,
-      'ADMIN_PANEL_PAGE_NAME' => 'entries',
-      'ADMIN_PANEL_ENTRIES_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/table.tpl', [
-        'ADMIN_PANEL_ENTRIES_TABLE_ITEMS' => implode($entriesTableItemsAssembled)
-      ])
-    ]);
+    $this->assembled = ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme, 'templates/page/entries.tpl',
+      [
+        'PAGE_ENTRIES_PAGINATION' => $pagination->assembled,
+        'ADMIN_PANEL_PAGE_NAME' => 'entries',
+        'ADMIN_PANEL_ENTRIES_TABLE' => ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme, 'templates/page/entries/table.tpl',
+          [
+            'ADMIN_PANEL_ENTRIES_TABLE_ITEMS' => implode($entriesTableItemsAssembled)
+          ]
+        )
+      ]
+    );
   }
 
 }

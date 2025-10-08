@@ -9,7 +9,6 @@
 'use strict';
 
 import {Interactive} from "../../../interactive.class.js";
-import {URLParser} from "../../../urlParser.class.js";
 
 export class PageFeeds {
   constructor(page, params = {}) {
@@ -19,8 +18,6 @@ export class PageFeeds {
   }
 
   init() {
-    let searchParams = new URLParser(), locales;
-
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
@@ -30,35 +27,26 @@ export class PageFeeds {
       this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
 
-      let interactiveCreatePageButton = new Interactive('button');
+      const interactiveCreatePageButton = new Interactive('button');
       interactiveCreatePageButton.target.setLabel(localeData.BUTTON_NEW_FEED_LABEL);
       interactiveCreatePageButton.target.setCallback(() => {
         window.location.href = `./feed`;
       });
       interactiveCreatePageButton.assembly();
     
-      let interactiveContainerElement = document.querySelector('#E8548530785');
+      const interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
-      let tableItems = document.querySelectorAll('.table-web-channels__item');
-
+      const tableItems = document.querySelectorAll('.table-web-channels__item');
       for (let tableItem of tableItems) {
-        let feedID = tableItem.getAttribute('data-web-channel-id');
-        let feedName = tableItem.getAttribute('data-web-channel-name');
-        let buttons = tableItem.querySelectorAll('button[role]');
+        const feedID = tableItem.getAttribute('data-web-channel-id');
+        const panelElement = tableItem.querySelector('[data-element="panel"]');
+        const panelEventElements = panelElement.querySelectorAll('[data-event]');
         
-        for (let button of buttons) {
-          button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') === 'web-channel-edit') {
-              window.location.href = `./feed/${feedID}`;
-            }
-            
-            if (button.getAttribute('role') === 'web-channel-view') {
-              window.open(`/feed/${feedName}`, '_blank');
-            }
-
-            if (button.getAttribute('role') === 'web-channel-remove') {
-              let interactiveModal = new Interactive('modal', {
+        for (let eventElement of panelEventElements) {
+          eventElement.addEventListener('click', (event) => {
+            if (eventElement.getAttribute('data-event') === 'remove') {
+              const interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_FEED_DELETE_TITLE,
                 content: localeData.MODAL_FEED_DELETE_DESCRIPTION
               });

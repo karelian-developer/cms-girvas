@@ -70,6 +70,34 @@ class PageFeeds implements InterfacePage
   }
 
   /**
+   * Сборка списка локализаций
+   * 
+   * @param array $localesData
+   * 
+   * @return string
+   */
+  private function assemblyLocalesItems(array $localesData) : string
+  {
+    $document = new DOMDocument('1.0', 'UTF-8');
+
+    foreach ($localesData as $localeData) {
+      $itemElement = $document->createElement('li', $localeData['title']);
+      $itemElement->setAttribute('class', 'grid-table__locale');
+
+      if (!empty($localeData['iconURL'])) {
+        $iconElement = $document->createElement('img');
+        $iconElement->setAttribute('class', 'grid-table__locale-icon');
+        $iconElement->setAttribute('src', $localeData['iconURL']);
+        $itemElement->prepend($iconElement);
+      }
+
+      $document->appendChild($itemElement);
+    }
+
+    return $document->saveHTML();
+  }
+
+  /**
    * Сборка
    * 
    * @return void
@@ -112,24 +140,36 @@ class PageFeeds implements InterfacePage
       $feedTypeTitle = FeedBuilder::getTypeTitle($object->getTypeID());
       $indexCurrent = $index + 1;
 
-      array_push($feedsItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds/tableItem.tpl', [
-        'FEED_ID' => $feedID,
-        'FEED_INDEX' => $indexCurrent,
-        'FEED_NAME' => $feedName,
-        'FEED_TITLE' => $feedTitle,
-        'FEED_TYPE_TITLE' => $feedTypeTitle,
-        'FEED_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
-        'FEED_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
-      ]));
+      $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
+      $completedLocales = $this->assemblyLocalesItems($completedLocalesData);
+
+      $feedsItemsAssembled[] = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme, 'templates/page/feeds/tableItem.tpl',
+        [
+          'FEED_ID' => $feedID,
+          'FEED_INDEX' => $indexCurrent,
+          'FEED_NAME' => $feedName,
+          'FEED_TITLE' => $feedTitle,
+          'FEED_TYPE_TITLE' => $feedTypeTitle,
+          'FEED_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
+          'FEED_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
+        ]
+      );
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds.tpl', [
-      'PAGE_FEEDS_PAGINATION' => $pagination->assembled,
-      'ADMIN_PANEL_PAGE_NAME' => 'web-channels',
-      'ADMIN_PANEL_FEEDS_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/feeds/table.tpl', [
-        'ADMIN_PANEL_FEEDS_TABLE_ITEMS' => implode($feedsItemsAssembled)
-      ])
-    ]);
+    $this->assembled = ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme, 'templates/page/feeds.tpl',
+      [
+        'PAGE_FEEDS_PAGINATION' => $pagination->assembled,
+        'ADMIN_PANEL_PAGE_NAME' => 'feeds',
+        'PAGE_FEEDS_TABLE' => ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme, 'templates/page/feeds/table.tpl',
+          [
+            'PAGE_FEEDS_TABLE_ITEMS' => implode($feedsItemsAssembled)
+          ]
+          )
+      ]
+    );
   }
 }
