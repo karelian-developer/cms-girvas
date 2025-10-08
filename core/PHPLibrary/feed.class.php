@@ -13,6 +13,7 @@ namespace core\PHPLibrary;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \PDOException as PDOException;
 
