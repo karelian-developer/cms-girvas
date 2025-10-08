@@ -138,6 +138,9 @@ class PageFeeds implements InterfacePage
       $feedTitle = strip_tags($feedTitle);
 
       $feedName = $object->getName();
+      $feedCategory = $object->getEntriesCategory(['texts']);
+      $feedCategoryTitle = $feedCategory->getTitle($localeName);
+
       $feedSpecificationTitle = FeedBuilder::getTypeTitle($object->getTypeID());
       $indexCurrent = $index + 1;
 
@@ -151,7 +154,7 @@ class PageFeeds implements InterfacePage
           'FEED_INDEX' => $indexCurrent,
           'FEED_NAME' => $feedName,
           'FEED_TITLE' => $feedTitle,
-          'FEED_CATEGORY_TITLE' => 
+          'FEED_CATEGORY_TITLE' => $feedCategoryTitle,
           'FEED_SPECIFICATION_TITLE' => $feedSpecificationTitle,
           'FEED_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
           'FEED_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
