@@ -44,7 +44,7 @@
           </div>
         </div>
         <div class="cell grid-table__cell grid-table__cell_data">
-          <input name="page_static_seo_title_rus" type="text" class="input form__input form__input_text" value="{PAGE_STATIC_SEO_TITLE}" placeholder="{LANG:PAGE_ENTRY_INPUT_SEO_TITLE_PLACEHOLDER}" data-element="input-seo-title">
+          <input name="page_static_seo_title_rus" type="text" class="input form__input form__input_text" value="{PAGE_STATIC_SEO_TITLE}" placeholder="{LANG:PAGE_STATIC_PAGE_INPUT_SEO_TITLE_PLACEHOLDER}" data-element="input-seo-title">
         </div>
         <!-- Поле: Описание -->
         <div class="cell grid-table__cell grid-table__cell_text">
