@@ -284,8 +284,8 @@ class EntryCategory implements EntityTypeContent
     if (property_exists($this, 'texts')) {
       $texts = json_decode($this->texts, true);
 
-      if (isset($texts[$localeName]['SEDescription'])) {
-        return $texts[$localeName]['SEDescription'];
+      if (isset($texts[$localeName]['SEODescription'])) {
+        return $texts[$localeName]['SEODescription'];
       }
     }
 

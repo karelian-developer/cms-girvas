@@ -147,7 +147,7 @@ if (is_numeric($CMSCore->urlp->getPath(2))) {
     foreach ($entriesCategories as $category) {
       $category->initData(['id', 'texts', 'metadata', 'name', 'parentID', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
       
-      array_push($handlerOutputData['entriesCategories'], [
+      $handlerOutputData['entriesCategories'][] = [
         'id' => $category->getID(),
         'name' => $category->getName(),
         'title' => $category->getTitle($entriesCategoriesLocale),
@@ -158,7 +158,7 @@ if (is_numeric($CMSCore->urlp->getPath(2))) {
         'parentID' => $category->getParentID(),
         'createdUnixTimestamp' => $category->getCreatedUnixTimestamp(),
         'updatedUnixTimestamp' => $category->getUpdatedUnixTimestamp()
-      ]);
+      ];
     }
 
     $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
