@@ -175,7 +175,7 @@ export class PageEntriesCategory {
           interactiveParentChoices.target.addItem('', 0);
 
           entriesCategoriesData.forEach((entriesCategory, entriesCategoryIndex) => {
-            if (entriesCategoryData.id !== entriesCategory.id) {
+            if (entriesCategoryData.id != entriesCategory.id) {
               interactiveParentChoices.target.addItem(entriesCategory.title, entriesCategory.id);
             }
 
