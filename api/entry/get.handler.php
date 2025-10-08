@@ -124,7 +124,10 @@ if (is_numeric($CMSCore->urlp->getPath(2))) {
     $handlerOutputData['entriesCategory']['id'] = $entriesCategory->getID();
     $handlerOutputData['entriesCategory']['name'] = $entriesCategory->getName();
     $handlerOutputData['entriesCategory']['title'] = $entriesCategory->getTitle($entriesCategoryLocale);
+    $handlerOutputData['entriesCategory']['SEOTitle'] = $entriesCategory->getSEOTitle($entriesCategoryLocale);
     $handlerOutputData['entriesCategory']['description'] = $entriesCategory->getDescription($entriesCategoryLocale);
+    $handlerOutputData['entriesCategory']['SEODescription'] = $entriesCategory->getSEODescription($entriesCategoryLocale);
+    $handlerOutputData['entriesCategory']['keywords'] = $entriesCategory->getKeywords($entriesCategoryLocale);
     $handlerOutputData['entriesCategory']['parentID'] = $entriesCategory->getParentID();
     $handlerOutputData['entriesCategory']['createdUnixTimestamp'] = $entriesCategory->getCreatedUnixTimestamp();
     $handlerOutputData['entriesCategory']['updatedUnixTimestamp'] = $entriesCategory->getUpdatedUnixTimestamp();
@@ -148,7 +151,10 @@ if (is_numeric($CMSCore->urlp->getPath(2))) {
         'id' => $category->getID(),
         'name' => $category->getName(),
         'title' => $category->getTitle($entriesCategoriesLocale),
+        'SEOTitle' => $category->getSEOTitle($entriesCategoriesLocale),
         'description' => $category->getDescription($entriesCategoriesLocale),
+        'SEODescription' => $category->getSEODescription($entriesCategoriesLocale),
+        'keywords' => $entriesCategory->getKeywords($entriesCategoryLocale),
         'parentID' => $category->getParentID(),
         'createdUnixTimestamp' => $category->getCreatedUnixTimestamp(),
         'updatedUnixTimestamp' => $category->getUpdatedUnixTimestamp()

@@ -47,7 +47,10 @@ if ($CMSCore->client->isLogged(2)) {
               $CMSLocaleName = $CMSLocale->getName();
 
               $inputTitleName = 'entries_category_title_' . $CMSLocale->getISO639(2);
+              $inputSEOTitleName = 'entries_category_seo_title_' . $CMSLocale->getISO639(2);
               $textareaDescriptionName = 'entries_category_description_' . $CMSLocale->getISO639(2);
+              $textareaSEODescriptionName = 'entries_category_seo_description_' . $CMSLocale->getISO639(2);
+              $textareaKeywordsName = 'entries_category_keywords_' . $CMSLocale->getISO639(2);
 
               if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH)) {
                 if (!array_key_exists('texts', $entriesCategoryData)) $entriesCategoryData['texts'] = [];
@@ -61,6 +64,15 @@ if ($CMSCore->client->isLogged(2)) {
       
                   $entriesCategoryData['texts'][$CMSLocaleName]['title'] = $inputValue;
                 }
+
+                if (array_key_exists($inputSEOTitleName, $_PATCH)) {
+                  $inputValue = $_PATCH[$inputSEOTitleName];
+                  $inputValue = strip_tags($inputValue);
+                  $inputValue = str_replace('\'', '"', $inputValue);
+                  $inputValue = htmlspecialchars($inputValue);
+      
+                  $entriesCategoryData['texts'][$CMSLocaleName]['SEOTitle'] = $inputValue;
+                }
     
                 if (array_key_exists($textareaDescriptionName, $_PATCH)) {
                   $textareaValue = $_PATCH[$textareaDescriptionName];
@@ -70,20 +82,29 @@ if ($CMSCore->client->isLogged(2)) {
       
                   $entriesCategoryData['texts'][$CMSLocaleName]['description'] = $textareaValue;
                 }
+    
+                if (array_key_exists($textareaSEODescriptionName, $_PATCH)) {
+                  $textareaValue = $_PATCH[$textareaSEODescriptionName];
+                  $textareaValue = strip_tags($textareaValue);
+                  $textareaValue = str_replace('\'', '"', $textareaValue);
+                  $textareaValue = htmlspecialchars($textareaValue);
+      
+                  $entriesCategoryData['texts'][$CMSLocaleName]['SEODescription'] = $textareaValue;
+                }
+    
+                if (array_key_exists($textareaKeywordsName, $_PATCH)) {
+                  $textareaValue = $_PATCH[$textareaKeywordsName];
+                  $textareaValue = strip_tags($textareaValue);
+                  $textareaValue = str_replace('\'', '"', $textareaValue);
+    
+                  $entriesCategoryData['texts'][$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
+                }
               }
             }
           }
           
           if (isset($_PATCH['entries_category_name'])) $entriesCategoryData['name'] = urlencode(htmlentities($_PATCH['entries_category_name']));
           if (isset($_PATCH['entries_category_parent_id'])) $entriesCategoryData['parentID'] = $_PATCH['entries_category_parent_id'];
-          
-          if (isset($_PATCH['entries_category_show_index'])) {
-            if (!isset($entriesCategoryData['metadata'])) $entriesCategoryData['metadata'] = [];
-            $entriesCategoryData['metadata']['isShowedOnIndexPage'] = 1;
-          } else {
-            if (!isset($entriesCategoryData['metadata'])) $entriesCategoryData['metadata'] = [];
-            $entriesCategoryData['metadata']['isShowedOnIndexPage'] = 0;
-          }
           
           $entriesCategoryIsUpdated = $entriesCategory->update($entriesCategoryData);
 
