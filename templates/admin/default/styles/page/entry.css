@@ -8,33 +8,21 @@
 
 .main__page_entry .grid-table {
   display: grid;
-  grid-template-areas:
-    'text data'
-    'text data'
-    'text data'
-    'text data'
-    'text data'
-    'text data'
-    'text data'
-    'editor editor'
-    'panel panel';
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
 .main__page_entry .grid-table__cell_text {
-  grid-area: text;
+  grid-column: 1;
 }
 
 .main__page_entry .grid-table__cell_data {
-  grid-area: data;
+  grid-column: 2;
 }
 
-.main__page_entry .grid-table__cell_editor {
-  grid-area: editor;
-}
-
+.main__page_entry .grid-table__cell_editor,
 .main__page_entry .grid-table__cell_panel {
-  grid-area: panel;
+  grid-column: 1 / -1;
 }
 
 .main__page_entry .page__form > .table {
