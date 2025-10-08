@@ -20,6 +20,13 @@
   grid-column: 2;
 }
 
+@media (max-width: 800px) {
+  .main__page_entry .grid-table__cell_text,
+  .main__page_entry .grid-table__cell_data {
+    grid-column: 1 / -1;
+  }
+}
+
 .main__page_entry .grid-table__cell_editor,
 .main__page_entry .grid-table__cell_panel {
   grid-column: 1 / -1;
