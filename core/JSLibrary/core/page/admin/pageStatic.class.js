@@ -31,13 +31,7 @@ export class PagePageStatic {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
       let urlInputElement = document.querySelector('[data-element="input-url"]');
       let titleInputElement = document.querySelector('[data-element="input-title"]');
@@ -208,15 +202,7 @@ export class PagePageStatic {
             }
           });
         } else {
-          let interactiveNotification;
-        
-          interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY);
-          interactiveNotification.target.assembly();
-
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(rejectionReason, 0);
         }
       });
       this.buttons.save.assembly();
@@ -426,13 +412,6 @@ export class PagePageStatic {
             this.buttons.delete.target.element.style.display = 'none';
             this.buttons.save.target.element.style.display = 'flex';
           }
-
-          let interactiveNotificationLoading = new Interactive('notification');
-          interactiveNotificationLoading.target.isPopup = true;
-          interactiveNotificationLoading.target.setStatusCode(data1.statusCode);
-          interactiveNotificationLoading.target.setContent(data1.message);
-          interactiveNotificationLoading.target.assembly();
-          interactiveNotificationLoading.target.show();
         });
       }
 
@@ -442,13 +421,7 @@ export class PagePageStatic {
       interactiveContainer.append(this.buttons.publish.target.element);
       interactiveContainer.append(this.buttons.save.target.element);
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }
