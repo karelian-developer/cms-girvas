@@ -11,7 +11,7 @@
 All files that were supplied with this software have their owners. The current build, together with the register of subsequent changes to the file structure and source code can always be found on the **domestic platform "GitFlic"**, where the [official repository](https://gitflic.ru/project/garbalo/cms-girvas) of the content management system "GIRVAS" is located. All other resources where the software is published, or its individual files, are automatically recognized as modified or fake.
 
 ### Other resources
-* **Official manufacturer website:** [https://карельский-разработчик.рф](https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai/)
-* **Official manufacturer Telegram channel:** https://t.me/karelian_developer
-* **Official manufacturer VKontakte community:** https://vk.ru/karelian_developer
-* **Official manufacturer Odnoklassniki community:** https://ok.ru/karelian_developer
+* **Official manufacturer website:** [https://карельский-производитель.рф](https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai/)
+* **Official manufacturer Telegram channel:** [https://t.me/karelian_developer](https://t.me/karelian_developer)
+* **Official manufacturer VKontakte community:** [https://vk.ru/karelian_developer](https://vk.ru/karelian_developer)
+* **Official manufacturer Odnoklassniki community:** [https://ok.ru/kareliandeveloper](https://ok.ru/kareliandeveloper)
