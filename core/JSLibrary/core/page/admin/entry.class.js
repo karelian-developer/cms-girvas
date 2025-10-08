@@ -37,11 +37,11 @@ export class PageEntry {
     }).then((localeData) => {
       let contentTextareaElement = document.querySelector('[data-element="input-content"]');
       let descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
-      let SEODescriptionTextareaElement = document.querySelector('data-element="input-seo-description"');
+      let SEODescriptionTextareaElement = document.querySelector('[data-element="input-seo-description"]');
       let titleInputElement = document.querySelector('[data-element="input-title"]');
       let SEOTitleInputElement = document.querySelector('[data-element="input-seo-title"]');
-      let keywordsInputElement = document.querySelector('data-element="input-keywords"');
-      let urlInputElement = document.querySelector('data-element="input-url"');
+      let keywordsInputElement = document.querySelector('[data-element="input-keywords"]');
+      let urlInputElement = document.querySelector('[data-element="input-url"]');
 
       locales.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
