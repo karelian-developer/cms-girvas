@@ -104,11 +104,11 @@
   </div>
 </article>
 <aside class="main__page-aside page-aside">
-  <article id="SYSTEM_E3754926184" class="page-aside__block">
+  <div class="page-aside__block" data-element="aside-block-cover">
     <h2 class="page-aside__block-title">{LANG:PAGE_ENTRY_SIDEBAR_BLOCK_COVER_TITLE}</h2>
     <div class="page-aside__block-content block-content"></div>
-  </article>
-  <article id="SYSTEM_E3754926185" class="page-aside__block">
+  </div>
+  <div class="page-aside__block" data-element="aside-block-additional-fields">
     <h2 class="page-aside__block-title">{LANG:PAGE_ENTRY_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TITLE}</h2>
     <div class="page-aside__block-content block-content">
       {LANG:MD:PAGE_ENTRY_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TIP}
@@ -116,8 +116,8 @@
         {ENTRY_ADDITIONAL_FIELDS}
       </div>
     </div>
-  </article>
-  <article class="page-aside__block">
+  </div>
+  <div class="page-aside__block">
     <h2 class="page-aside__block-title">{LANG:PAGE_ENTRY_SIDEBAR_BLOCK_ABOUT_TITLE}</h2>
     <div class="page-aside__block-content block-content">
       <div class="note-block note-block_blue">
@@ -126,5 +126,5 @@
         <p class="block-content__phar">{LANG:PAGE_ENTRY_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_3}</p>
       </div>
     </div>
-  </article>
+  </div>
 </aside>

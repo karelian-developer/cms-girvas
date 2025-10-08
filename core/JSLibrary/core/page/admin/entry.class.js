@@ -320,7 +320,7 @@ export class PageEntry {
                 let fields = responseEntryAdditionalFields.outputData.additionalFields;
                 
                 fields.forEach((field) => {
-                  let sidebarBlockAdditionaFieldsElement = document.querySelector('#SYSTEM_E3754926185');
+                  let sidebarBlockAdditionaFieldsElement = document.querySelector('[data-element="aside-block-additional-fields"]');
                   if (sidebarBlockAdditionaFieldsElement !== null) {
                     
                     let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
@@ -344,7 +344,7 @@ export class PageEntry {
               let fields = responseEntryAdditionalFields.outputData.additionalFields;
               
               fields.forEach((field) => {
-                let sidebarBlockAdditionaFieldsElement = document.querySelector('#SYSTEM_E3754926185');
+                let sidebarBlockAdditionaFieldsElement = document.querySelector('[data-element="aside-block-additional-fields"]');
                 if (sidebarBlockAdditionaFieldsElement !== null) {
                   
                   let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
@@ -371,7 +371,7 @@ export class PageEntry {
       } else {
         let interactiveButtonPreviewUpload = new Interactive('button');
 
-        let previewBlockElement = document.querySelector('#SYSTEM_E3754926184');
+        let previewBlockElement = document.querySelector('[data-element="aside-block-cover"]');
         let previewBlockContentContainerElement = previewBlockElement.querySelector('.page-aside__block-content');
         
         let previewFormElement = document.createElement('form');
@@ -508,7 +508,7 @@ export class PageEntry {
                 let fields = responseEntryAdditionalFields.outputData.additionalFields;
                 
                 fields.forEach((field) => {
-                  let sidebarBlockAdditionaFieldsElement = document.querySelector('#SYSTEM_E3754926185');
+                  let sidebarBlockAdditionaFieldsElement = document.querySelector('[data-element="aside-block-additional-fields"]');
                   if (sidebarBlockAdditionaFieldsElement !== null) {
                     
                     let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
@@ -532,7 +532,7 @@ export class PageEntry {
               let fields = responseEntryAdditionalFields.outputData.additionalFields;
               
               fields.forEach((field) => {
-                let sidebarBlockAdditionaFieldsElement = document.querySelector('#SYSTEM_E3754926185');
+                let sidebarBlockAdditionaFieldsElement = document.querySelector('[data-element="aside-block-additional-fields"]');
                 if (sidebarBlockAdditionaFieldsElement !== null) {
                   
                   let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
