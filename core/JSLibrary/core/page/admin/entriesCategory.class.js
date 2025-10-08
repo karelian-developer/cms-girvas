@@ -175,14 +175,16 @@ export class PageEntriesCategory {
           interactiveParentChoices.target.addItem('', 0);
 
           entriesCategoriesData.forEach((entriesCategory, entriesCategoryIndex) => {
-            if (entriesCategoryData.id != entriesCategory.id) {
+            if (entriesCategoryData.id !== entriesCategory.id) {
               interactiveParentChoices.target.addItem(entriesCategory.title, entriesCategory.id);
             }
 
-            if (entriesCategory.id == entriesCategoryData.parentID) {
+            if (entriesCategory.id === entriesCategoryData.parentID) {
+              console.log(entriesCategoryIndex);
               interactiveParentChoices.target.setItemSelectedIndex(entriesCategoryIndex);
             }
           });
+
           interactiveParentChoices.target.setName('entries_category_parent_id');
           interactiveParentChoices.assembly();
 
