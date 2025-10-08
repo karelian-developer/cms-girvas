@@ -58,7 +58,7 @@
         </div>
         <div class="cell grid-table__cell grid-table__cell_data">
           <div class="form__input-tip input-tip" role="passwords-show">{LANG:BUTTON_SHOW_HIDE_LABEL}</div>
-          <input name="user_password-repeat" type="password" class="input form__input form__input_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" data-element="input-password-repeat" cmsg-password-checker>
+          <input name="user_password_repeat" type="password" class="input form__input form__input_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" data-element="input-password-repeat" cmsg-password-checker>
         </div>
         <!-- Поле: Имя -->
         <div class="cell grid-table__cell grid-table__cell_text">
