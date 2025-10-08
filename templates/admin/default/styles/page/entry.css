@@ -17,13 +17,6 @@
   padding-bottom: 20px;
 }
 
-@media (max-width: 800px) {
-  .main__page_entry .grid-table__cell_text {
-    border-bottom: 0;
-    padding-bottom: 0;
-  }
-}
-
 @media (min-width: 801px) {
   .main__page_entry .grid-table__cell_text {
     padding-right: 20px;
@@ -36,6 +29,13 @@
 
 .main__page_entry .grid-table__cell_text {
   grid-column: 1;
+}
+
+@media (max-width: 800px) {
+  .main__page_entry .grid-table__cell_text {
+    border-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
 }
 
 .main__page_entry .grid-table__cell_text .cell__title {
