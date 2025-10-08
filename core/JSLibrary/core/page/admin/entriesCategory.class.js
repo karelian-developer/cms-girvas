@@ -187,6 +187,8 @@ export class PageEntriesCategory {
             console.log('====');
 
             if (entriesCategory.id === entriesCategoryData.parentID) {
+              console.log('Index: ' + entriesCategoryIndex);
+              console.log(entriesCategoryData);
               interactiveParentChoices.target.setItemSelectedIndex(entriesCategoryIndex);
             }
           });
