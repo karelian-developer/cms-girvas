@@ -47,8 +47,6 @@ export class Form {
 
     if (inputsArray.length > 0) {
       inputsArray.forEach((element) => {
-        const elementStyle = element.getComputedStyle();
-
         if (element.hasAttribute('cmsg-password-checker')) {
           const passwordProgressLevelElement = document.createElement('div');
           const passwordProgressLevelContainerElement = document.createElement('div');
@@ -58,7 +56,7 @@ export class Form {
           passwordProgressLevelContainerElement.style.height = '5px';
           passwordProgressLevelContainerElement.style.width = '100%';
           passwordProgressLevelContainerElement.style.position = 'absolute';
-          passwordProgressLevelContainerElement.style.top = elementStyle.height + 'px';
+          passwordProgressLevelContainerElement.style.top = element.offsetHeight + 'px';
 
           passwordProgressLevelElement.style.height = '100%';
           passwordProgressLevelElement.style.width = '25%';
