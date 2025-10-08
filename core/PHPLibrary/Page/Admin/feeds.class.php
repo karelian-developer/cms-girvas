@@ -115,8 +115,6 @@ class PageFeeds implements InterfacePage
 
     $feedsItemsAssembled = [];
     $feeds = new Feeds($this->CMSCore);
-    $feedsLocale = $this->CMSCore->getCMSLocale('admin');
-    $feedsLocaleName = $feedsLocale->getName();
 
     $feedsObjects = $feeds->getAll([
       'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
@@ -134,8 +132,11 @@ class PageFeeds implements InterfacePage
       $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
       $feedID = $object->getID();
-      $feedTitle = $object->getTitle($feedsLocaleName);
+      $feedTitle = $object->getTitle($localeName);
       $feedTitle = strip_tags($feedTitle);
+
+      $feedDescription = $object->getTitle($localeName);
+      $feedDescription = strip_tags($feedDescription);
 
       $feedName = $object->getName();
       $feedCategory = $object->getEntriesCategory(['texts']);
@@ -154,6 +155,7 @@ class PageFeeds implements InterfacePage
           'FEED_INDEX' => $indexCurrent,
           'FEED_NAME' => $feedName,
           'FEED_TITLE' => $feedTitle,
+          'FEED_DESCRIPTION' => $feedDescription,
           'FEED_CATEGORY_TITLE' => $feedCategoryTitle,
           'FEED_SPECIFICATION_TITLE' => $feedSpecificationTitle,
           'FEED_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,

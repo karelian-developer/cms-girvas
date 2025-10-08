@@ -18,6 +18,8 @@ export class PageFeeds {
   }
 
   init() {
+    let locales;
+
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
