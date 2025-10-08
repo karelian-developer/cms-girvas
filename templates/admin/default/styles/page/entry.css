@@ -9,11 +9,27 @@
 .main__page_entry .grid-table {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  row-gap: 20px;
+  column-gap: 10px;
 }
 
 .main__page_entry .grid-table__cell_text {
   grid-column: 1;
+}
+
+.main__page_entry .grid-table__cell_text .cell__title {
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.main__page_entry .grid-table__cell_text .cell__title:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.main__page_entry .grid-table__cell_text .cell__description {
+  font-size: 14px;
+  opacity: .6;
 }
 
 .main__page_entry .grid-table__cell_data {
