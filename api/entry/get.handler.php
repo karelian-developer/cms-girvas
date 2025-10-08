@@ -154,7 +154,7 @@ if (is_numeric($CMSCore->urlp->getPath(2))) {
         'SEOTitle' => $category->getSEOTitle($entriesCategoriesLocale),
         'description' => $category->getDescription($entriesCategoriesLocale),
         'SEODescription' => $category->getSEODescription($entriesCategoriesLocale),
-        'keywords' => $entriesCategory->getKeywords($entriesCategoryLocale),
+        'keywords' => $category->getKeywords($entriesCategoryLocale),
         'parentID' => $category->getParentID(),
         'createdUnixTimestamp' => $category->getCreatedUnixTimestamp(),
         'updatedUnixTimestamp' => $category->getUpdatedUnixTimestamp()
