@@ -56,9 +56,7 @@
           </div>
         </div>
         <div class="cell grid-table__cell_data">
-          <textarea name="entry_description_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRY_INPUT_DESCRIPTION_LABEL}" data-element="input-description" required>
-            {ENTRY_DESCRIPTION}
-          </textarea>
+          <textarea name="entry_description_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRY_INPUT_DESCRIPTION_LABEL}" data-element="input-description" required>{ENTRY_DESCRIPTION}</textarea>
         </div>
         <!-- Поле: SEO-описание записи -->
         <div class="cell grid-table__cell_text">
@@ -70,9 +68,7 @@
           </div>
         </div>
         <div class="cell grid-table__cell_data">
-          <textarea name="entry_seo_description_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRY_INPUT_SEO_DESCRIPTION_LABEL}" data-element="input-seo-description">
-            {ENTRY_SEO_DESCRIPTION}
-          </textarea>
+          <textarea name="entry_seo_description_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRY_INPUT_SEO_DESCRIPTION_LABEL}" data-element="input-seo-description">{ENTRY_SEO_DESCRIPTION}</textarea>
         </div>
         <!-- Поле: Ключевые фразы/слова записи -->
         <div class="cell grid-table__cell_text">
@@ -84,9 +80,7 @@
           </div>
         </div>
         <div class="cell grid-table__cell_data">
-          <textarea name="entry_keywords_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRY_INPUT_KEYWORDS_PLACEHOLDER}" data-element="input-keywords">
-            {ENTRY_KEYWORDS}
-          </textarea>
+          <textarea name="entry_keywords_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRY_INPUT_KEYWORDS_PLACEHOLDER}" data-element="input-keywords">{ENTRY_KEYWORDS}</textarea>
         </div>
         <!-- Поле: Категория записи -->
         <div class="cell grid-table__cell_text">
