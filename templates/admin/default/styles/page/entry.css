@@ -17,9 +17,15 @@
   padding-bottom: 20px;
 }
 
-@media (min-width: 801px) {
+@media (max-width: 800px) {
   .main__page_entry .grid-table__cell_text {
     border-bottom: 0;
+    padding-bottom: 0;
+  }
+}
+
+@media (min-width: 801px) {
+  .main__page_entry .grid-table__cell_text {
     padding-right: 20px;
   }
 
