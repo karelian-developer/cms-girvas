@@ -15,63 +15,81 @@
   padding: 10px;
   transition: background-color .2s, border-color .2s;
 }
+
 .form__input {
   background-color: var(--form-input-background-color);
   border-color: var(--form-input-border-color);
+  height: 40px;
 }
+
 .form__input:hover {
   background-color: var(--form-input-background-color--hover);
   border-color: var(--form-input-border-color--hover);
 }
+
 .form__input:focus {
   background-color: var(--form-input-background-color--focus);
   border-color: var(--form-input-border-color--focus);
 }
+
 .form__input:active {
   background-color: var(--form-input-background-color--active);
   border-color: var(--form-input-border-color--active);
 }
+
 .form__input:invalid,
 .form__textarea:invalid {
   background-color: var(--common-secondary-color-5);
   border-color: var(--common-secondary-color-6);
 }
+
 .form__select {
   background-color: var(--form-input-background-color);
   border-color: var(--form-input-border-color);
+  height: 40px;
 }
+
 .form__select:hover {
   background-color: var(--form-input-background-color--hover);
   border-color: var(--form-input-border-color--hover);
 }
+
 .form__select:focus {
   background-color: var(--form-input-background-color--focus);
   border-color: var(--form-input-border-color--focus);
 }
+
 .form__select:active {
   background-color: var(--form-input-background-color--active);
   border-color: var(--form-input-border-color--active);
 }
+
 .form__textarea {
   background-color: var(--form-textarea-background-color);
   border-color: var(--form-textarea-border-color);
+  min-height: 40px;
 }
+
 .form__textarea:hover {
   background-color: var(--form-textarea-background-color--hover);
   border-color: var(--form-textarea-border-color--hover);
 }
+
 .form__textarea:focus {
   background-color: var(--form-textarea-background-color--focus);
   border-color: var(--form-textarea-border-color--focus);
 }
+
 .form__textarea:active {
   background-color: var(--form-textarea-background-color--active);
   border-color: var(--form-textarea-border-color--active);
 }
+
 .form__input:disabled,
 .form__textarea:disabled {
   background-color: #EAEAEA;
 }
+
 .form__button, .form__input_submit {
   box-sizing: border-box;
   background-color: var(--form-button-background-color);
@@ -85,27 +103,33 @@
   transition: background-color .2s, color .2s;
   cursor: pointer;
 }
+
 .form__button:hover, .form__input_submit:hover{
   background-color: var(--form-button-background-color--hover);
   color: var(--form-button-font-color--hover);
 }
+
 .form__button:focus, .form__input_submit:focus {
   background-color: var(--form-button-background-color--focus);
   color: var(--form-button-font-color--focus);
 }
+
 .form__button:active, .form__input_submit:active {
   background-color: var(--form-button-background-color--active);
   color: var(--form-button-font-color--active);
 }
+
 .form__checkbox-container {
   position: relative;
   background-color: var(--common-main-color-2);
   width: 72px;
   height: 40px;
 }
+
 .form__checkbox-container .checkbox-container__input {
   display: none;
 }
+
 .form__checkbox-container .checkbox-container__label {
   position: absolute;
   display: block;
@@ -122,6 +146,7 @@
   transition: left .2s, background-color .2s;
   cursor: pointer;
 }
+
 .form__checkbox-container .checkbox-container__input:checked + .checkbox-container__label {
   background-color: var(--common-main-color-4);
   left: calc(100% - 32px - 4px);
