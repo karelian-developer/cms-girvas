@@ -179,17 +179,8 @@ export class PageEntriesCategory {
               interactiveParentChoices.target.addItem(entriesCategory.title, entriesCategory.id);
             }
 
-            console.log(entriesCategory);
-            console.log(entriesCategoryData);
-            console.log('>>>>');
-            console.log(entriesCategory.id);
-            console.log(entriesCategoryData.parentID);
-            console.log('====');
-
             if (entriesCategory.id === entriesCategoryData.parentID) {
-              console.log('Index: ' + entriesCategoryIndex);
-              console.log(entriesCategoryData);
-              interactiveParentChoices.target.setItemSelectedIndex(entriesCategoryIndex);
+              interactiveParentChoices.target.setItemSelectedIndex(entriesCategoryIndex + 1);
             }
           });
 
