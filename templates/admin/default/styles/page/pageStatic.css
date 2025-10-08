@@ -6,68 +6,107 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-.form.form_page-static > .table {
-  margin-bottom: 10px;
+.main__page_page-static .grid-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 20px;
 }
 
-.form.form_page-static .table_page-static tr > td:first-child {
-  width: calc(100% - 300px);
+.main__page_page-static .grid-table__cell:not(:last-child) {
+  border-bottom: 1px solid var(--color-neutral-lightgray);
+  padding-bottom: 20px;
 }
 
-.form.form_page-static .table_page-static tr > td:last-child {
-  width: 400px;
+@media (min-width: 801px) {
+  .main__page_page-static .grid-table__cell_text {
+    padding-right: 20px;
+  }
+
+  .main__page_page-static .grid-table__cell_data {
+    padding-left: 20px;
+  }
 }
 
-.form.form_page-static .table__cell {
-  vertical-align: top;
+.main__page_page-static .grid-table__cell_text {
+  grid-column: 1;
 }
 
-.form.form_page-static .table__cell:last-child {
-  width: 400px;
+@media (max-width: 800px) {
+  .main__page_page-static .grid-table__cell_text {
+    border-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
 }
 
-.form.form_page-static .cell__title {
-  font-weight: 700;
+.main__page_page-static .grid-table__cell_text .cell__title {
   text-transform: uppercase;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.main__page_page-static .grid-table__cell_text .cell__title:not(:last-child) {
   margin-bottom: 10px;
 }
 
-.form.form_page-static input,
-.form.form_page-static select,
-.form.form_page-static textarea {
-  width: 100%;
+.main__page_page-static .grid-table__cell_text .cell__description {
+  font-size: 14px;
+  opacity: .6;
 }
 
-.form.form_page-static input:not(:nth-last-child()),
-.form.form_page-static select:not(:nth-last-child()),
-.form.form_page-static textarea:not(:nth-last-child()) {
-  margin-bottom: 10px;
+.main__page_page-static .grid-table__cell_data {
+  grid-column: 2;
 }
 
-.form.form_page-static textarea {
-  resize: vertical;
-  min-height: 100px;
+@media (max-width: 800px) {
+  .main__page_page-static .grid-table__cell_text,
+  .main__page_page-static .grid-table__cell_data {
+    grid-column: 1 / -1;
+  }
 }
 
-.form.form_page-static .form__input[type="submit"] {
-  width: fit-content;
-  float: right;
+.main__page_page-static .grid-table__cell_editor,
+.main__page_page-static .grid-table__cell_panel {
+  grid-column: 1 / -1;
 }
 
-.form.form_page-static .interactive__select-imitation {
-  width: 100% !important;
-}
-
-.form.form_page-static .form__bottom-panel {
+.main__page_page-static .grid-table__cell_panel {
   display: flex;
   justify-content: flex-end;
 }
 
-.form.form_page-static .form__bottom-panel > * {
+.main__page_page-static .grid-table__cell_panel > * {
   &:not(:last-child) {
     margin-right: 10px;
   }
 }
+
+.main__page_page-static .page__form input,
+.main__page_page-static .page__form select,
+.main__page_page-static .page__form textarea {
+  width: 100%;
+}
+
+.main__page_page-static .page__form input:not(:nth-last-child()),
+.main__page_page-static .page__form select:not(:nth-last-child()),
+.main__page_page-static .page__form textarea:not(:nth-last-child()) {
+  margin-bottom: 10px;
+}
+
+.main__page_page-static .page__form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.main__page_page-static .page__form .form__input[type="submit"] {
+  width: fit-content;
+  float: right;
+}
+
+.main__page_page-static .page__form .interactive__select-imitation {
+  width: 100% !important;
+}
+
+/* Боковая колонка инструмента */
 
 .main__page-aside .form-page-static-preview__container-image {
   display: flex;

@@ -309,7 +309,7 @@ export class PageEntry {
             interactiveCategoriesChoices.target.setName('entry_category_id');
             interactiveCategoriesChoices.assembly();
             
-            let interactiveContainer = document.querySelector('#TC6474389611');
+            let interactiveContainer = document.querySelector('[data-element="choice"][data-choice="category"]');
             interactiveContainer.append(interactiveCategoriesChoices.target.element);
 
             let interactiveCategoriesChoicesSelectElement = interactiveCategoriesChoices.target.element.querySelector('select');

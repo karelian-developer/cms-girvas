@@ -32,7 +32,7 @@
           </div>
         </div>
         <div class="cell grid-table__cell grid-table__cell_data">
-          <input name="entry_title_rus" type="text" class="input form__input form__input_text" value="{ENTRY_TITLE}" placeholder="{LANG:PAGE_ENTRY_INPUT_TITLE_LABEL}" data-element="input-title" required>
+          <input name="entry_title_rus" type="text" class="input form__input form__input_text" value="{ENTRY_TITLE}" placeholder="{LANG:PAGE_ENTRY_INPUT_TITLE_PLACEHOLDER}" data-element="input-title" required>
         </div>
         <!-- Поле: SEO-заголовок записи -->
         <div class="cell grid-table__cell grid-table__cell_text">
@@ -44,7 +44,7 @@
           </div>
         </div>
         <div class="cell grid-table__cell grid-table__cell_data">
-          <input name="entry_seo_title_rus" type="text" class="input form__input form__input_text" value="{ENTRY_SEO_TITLE}" placeholder="{LANG:PAGE_ENTRY_INPUT_SEO_TITLE_LABEL}" data-element="input-seo-title">
+          <input name="entry_seo_title_rus" type="text" class="input form__input form__input_text" value="{ENTRY_SEO_TITLE}" placeholder="{LANG:PAGE_ENTRY_INPUT_SEO_TITLE_PLACEHOLDER}" data-element="input-seo-title">
         </div>
         <!-- Поле: Описание записи -->
         <div class="cell grid-table__cell grid-table__cell_text">
@@ -56,7 +56,7 @@
           </div>
         </div>
         <div class="cell grid-table__cell grid-table__cell_data">
-          <textarea name="entry_description_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRY_INPUT_DESCRIPTION_LABEL}" data-element="input-description" required>{ENTRY_DESCRIPTION}</textarea>
+          <textarea name="entry_description_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRY_INPUT_DESCRIPTION_PLACEHOLDER}" data-element="input-description" required>{ENTRY_DESCRIPTION}</textarea>
         </div>
         <!-- Поле: SEO-описание записи -->
         <div class="cell grid-table__cell grid-table__cell_text">
@@ -68,7 +68,7 @@
           </div>
         </div>
         <div class="cell grid-table__cell grid-table__cell_data">
-          <textarea name="entry_seo_description_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRY_INPUT_SEO_DESCRIPTION_LABEL}" data-element="input-seo-description">{ENTRY_SEO_DESCRIPTION}</textarea>
+          <textarea name="entry_seo_description_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRY_INPUT_SEO_DESCRIPTION_PLACEHOLDER}" data-element="input-seo-description">{ENTRY_SEO_DESCRIPTION}</textarea>
         </div>
         <!-- Поле: Ключевые фразы/слова записи -->
         <div class="cell grid-table__cell grid-table__cell_text">
