@@ -158,6 +158,7 @@ class PageFeeds implements InterfacePage
           'FEED_DESCRIPTION' => $feedDescription,
           'FEED_CATEGORY_TITLE' => $feedCategoryTitle,
           'FEED_SPECIFICATION_TITLE' => $feedSpecificationTitle,
+          'FEED_LOCALES_LIST' => $completedLocales,
           'FEED_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
           'FEED_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
         ]
