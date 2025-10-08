@@ -323,7 +323,7 @@ export class PageEntry {
                   let sidebarBlockAdditionaFieldsElement = document.querySelector('[data-element="aside-block-additional-fields"]');
                   if (sidebarBlockAdditionaFieldsElement !== null) {
                     
-                    let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
+                    let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-element="additional-field"]');
                     fieldsArrayElements.forEach((element) => {
                       let fieldInputElement = element.querySelector('input, textarea');
 
@@ -347,7 +347,7 @@ export class PageEntry {
                 let sidebarBlockAdditionaFieldsElement = document.querySelector('[data-element="aside-block-additional-fields"]');
                 if (sidebarBlockAdditionaFieldsElement !== null) {
                   
-                  let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
+                  let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-element="additional-field"]');
                   fieldsArrayElements.forEach((element) => {
                     let fieldInputElement = element.querySelector('input, textarea');
 
@@ -511,7 +511,7 @@ export class PageEntry {
                   let sidebarBlockAdditionaFieldsElement = document.querySelector('[data-element="aside-block-additional-fields"]');
                   if (sidebarBlockAdditionaFieldsElement !== null) {
                     
-                    let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
+                    let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-element="additional-field"]');
                     fieldsArrayElements.forEach((element) => {
                       let fieldInputElement = element.querySelector('input, textarea');
 
@@ -535,7 +535,7 @@ export class PageEntry {
                 let sidebarBlockAdditionaFieldsElement = document.querySelector('[data-element="aside-block-additional-fields"]');
                 if (sidebarBlockAdditionaFieldsElement !== null) {
                   
-                  let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
+                  let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-element="additional-field"]');
                   fieldsArrayElements.forEach((element) => {
                     let fieldInputElement = element.querySelector('input, textarea');
 

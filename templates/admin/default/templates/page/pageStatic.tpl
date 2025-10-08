@@ -84,7 +84,7 @@
         </div>
         <!-- Редактор -->
         <div class="cell grid-table__cell grid-table__cell_editor" data-element="editor">
-          {ENTRY_EDITOR}
+          {PAGE_STATIC_EDITOR}
         </div>
         <!-- Панель формы -->
         <div class="cell grid-table__cell grid-table__cell_panel" data-element="panel"></div>
