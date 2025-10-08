@@ -39,14 +39,16 @@ export class PageFeeds {
       const interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
-      const tableItems = document.querySelectorAll('.table-web-channels__item');
+      const tableItems = document.querySelectorAll('[data-element="feed"]');
       for (let tableItem of tableItems) {
-        const feedID = tableItem.getAttribute('data-web-channel-id');
+        const feedID = tableItem.getAttribute('data-id');
         const panelElement = tableItem.querySelector('[data-element="panel"]');
         const panelEventElements = panelElement.querySelectorAll('[data-event]');
         
         for (let eventElement of panelEventElements) {
           eventElement.addEventListener('click', (event) => {
+            event.preventDefault();
+
             if (eventElement.getAttribute('data-event') === 'remove') {
               const interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_FEED_DELETE_TITLE,
