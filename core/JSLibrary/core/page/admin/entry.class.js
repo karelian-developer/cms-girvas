@@ -496,11 +496,11 @@ export class PageEntry {
             interactiveCategoriesChoices.target.setName('entry_category_id');
             interactiveCategoriesChoices.assembly();
     
-            let interactiveContainer = document.querySelector('#TC6474389611');
+            const interactiveContainer = document.querySelector('[data-element="choice"][data-choice="category"]');
             interactiveContainer.append(interactiveCategoriesChoices.target.element);
             interactiveHeaderContainerElement.append(this.buttons.viewOnSite.target.element);
 
-            let interactiveCategoriesChoicesSelectElement = interactiveCategoriesChoices.target.element.querySelector('select');
+            const interactiveCategoriesChoicesSelectElement = interactiveCategoriesChoices.target.element.querySelector('select');
             interactiveCategoriesChoicesSelectElement.addEventListener('change', (event) => {
               fetch('/handler/entries/additional-fields?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
                 return (response.ok) ? response.json() : Promise.reject(response);
