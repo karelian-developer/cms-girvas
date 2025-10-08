@@ -102,6 +102,7 @@
 
 @media (max-width: 800px) {
   .page__title {
+    text-align: center;
     margin-bottom: 20px;
   }
 }
@@ -431,11 +432,23 @@
   }
 }
 
+@media (max-width: 500px) {
+  .page__interactive-container {
+    flex-direction: column;
+  }
+}
+
 .page__interactive-container > .interactive {
   margin-right: 10px;
 
   &:last-child {
     margin-right: 0;
+  }
+}
+
+@media (max-width: 500px) {
+  .page__interactive-container > .interactive:not(:last-child) {
+    margin-bottom: 10px;
   }
 }
 
