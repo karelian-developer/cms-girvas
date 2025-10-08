@@ -42,6 +42,13 @@
   height: 32px;
 }
 
+@media (max-width: 600px) {
+  .nadvo-te__toolbar-button {
+    width: 48px;
+    height: 48px;
+  }
+}
+
 .nadvo-te__toolbar-button-icon {
   fill: var(--nadvo-te-button-icon-color);
   width: 100%;
