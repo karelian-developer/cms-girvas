@@ -12,6 +12,7 @@ namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \PDOException as PDOException;
 
@@ -86,6 +87,25 @@ class Feed
   public function getEntriesCategoryID() : int
   {
     return $this->entriesCategoryID ?? 0;
+  }
+
+  /**
+   * Получить ID категории
+   * 
+   * @param array $dataScope
+   * 
+   * @return ?EntityTypeContent
+   */
+  public function getEntriesCategory(array $dataScope = []) : ?EntityTypeContent
+  {
+    if (EntryCategory::existsByID($this->CMSCore, $this->entriesCategoryID)) {
+      $category = new EntryCategory($this->CMSCore, $this->entriesCategoryID);
+      $category->initData($dataScope);
+
+      return $category;
+    }
+
+    return null;
   }
 
   /**

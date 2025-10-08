@@ -15,6 +15,7 @@ use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\Factories\Content as FactoryContent;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
+use \core\PHPLibrary\SystemCore as CMSCore;
 use \PDOException as PDOException;
 
 #[\AllowDynamicProperties]
@@ -132,9 +133,9 @@ class Entry implements EntityTypeContent
    * 
    * @param array $data
    * 
-   * @return EntryCategory
+   * @return ?EntryCategory
    */
-  public function getCategory(array $data = ['*']) : EntryCategory|null
+  public function getCategory(array $data = ['*']) : ?EntryCategory
   {
     $categoryID = $this->getCategoryID();
 
@@ -153,9 +154,9 @@ class Entry implements EntityTypeContent
    * 
    * @param array $data
    * 
-   * @return User
+   * @return ?User
    */
-  public function getAuthor(array $data = ['*']) : User|null
+  public function getAuthor(array $data = ['*']) : ?User
   {
     $authorID = $this->getAuthorID();
 
@@ -478,12 +479,12 @@ class Entry implements EntityTypeContent
   /**
    * Получить URL дефолтной заставки
    * 
-   * @param SystemCore $CMSCore
+   * @param CMSCore $CMSCore
    * @param int $size
    * 
    * @return string
    */
-  public static function getPreviewDefaultURL(SystemCore $CMSCore, int $size) : string
+  public static function getPreviewDefaultURL(CMSCore $CMSCore, int $size) : string
   {
     return '/' . $CMSCore->theme->getURL() . '/images/entry/default_' . (string) $size . '.png';
   }
@@ -513,9 +514,9 @@ class Entry implements EntityTypeContent
    *
    * @param  array $columns
    * 
-   * @return array|null
+   * @return ?array
    */
-  private function getDatabaseColumnsData(array $columns = ['*']) : array|null
+  private function getDatabaseColumnsData(array $columns = ['*']) : ?array
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -677,12 +678,12 @@ class Entry implements EntityTypeContent
   /**
    * Получить объект записи по его наименованию
    *
-   * @param  mixed $CMSCore
-   * @param  mixed $name
+   * @param CMSCore $CMSCore
+   * @param string $name
    * 
    * @return Entry
    */
-  public static function getByName(SystemCore $CMSCore, string $name) : ?Entry
+  public static function getByName(CMSCore $CMSCore, string $name) : ?Entry
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -723,11 +724,12 @@ class Entry implements EntityTypeContent
   /**
    * Проверка наличия записи
    *
-   * @param  mixed $CMSCore
-   * @param  mixed $name
-   * @return Entry
+   * @param CMSCore $CMSCore
+   * @param string $name
+   * 
+   * @return bool
    */
-  public static function existsByName(SystemCore $CMSCore, string $name) : bool
+  public static function existsByName(CMSCore $CMSCore, string $name) : bool
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -767,11 +769,12 @@ class Entry implements EntityTypeContent
   /**
    * Проверка наличия записи по идентификационному номеру
    *
-   * @param  SystemCore $CMSCore
-   * @param  int $id
+   * @param CMSCore $CMSCore
+   * @param int $id
+   * 
    * @return bool
    */
-  public static function existsByID(SystemCore $CMSCore, int $id) : bool
+  public static function existsByID(CMSCore $CMSCore, int $id) : bool
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -851,14 +854,16 @@ class Entry implements EntityTypeContent
   /**
    * Создание новой записи
    *
-   * @param  mixed $CMSCore
-   * @param  mixed $name
-   * @param  mixed $authorID
-   * @param  mixed $categoryID
-   * @param  mixed $texts
-   * @return Entry
+   * @param  CMSCore $CMSCore
+   * @param  string $name
+   * @param  int $authorID
+   * @param  int $categoryID
+   * @param  array $texts
+   * @param  array $metadata
+   * 
+   * @return ?Entry
    */
-  public static function create(SystemCore $CMSCore, string $name, int $authorID, int $categoryID, array $texts, array $metadata = []) : Entry|null
+  public static function create(CMSCore $CMSCore, string $name, int $authorID, int $categoryID, array $texts, array $metadata = []) : ?Entry
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');

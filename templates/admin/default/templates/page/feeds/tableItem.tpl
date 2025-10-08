@@ -16,11 +16,11 @@
     <ul class="grid-table__metadata-list">
       <li class="grid-table__metadata grid-table__metadata_category">
         <span class="grid-table__metadata-label">Категория</span>
-        <span class="grid-table__metadata-value">{FEED_SPECIFICATION_LABEL}</span>
+        <span class="grid-table__metadata-value">{FEED_CATEGORY_TITLE}</span>
       </li>
       <li class="grid-table__metadata grid-table__metadata_specification">
         <span class="grid-table__metadata-label">Спецификация</span>
-        <span class="grid-table__metadata-value">{FEED_SPECIFICATION_LABEL}</span>
+        <span class="grid-table__metadata-value">{FEED_SPECIFICATION_TITLE}</span>
       </li>
       <li class="grid-table__metadata grid-table__metadata_date-created">
         <span class="grid-table__metadata-label">Дата создания</span><br>
