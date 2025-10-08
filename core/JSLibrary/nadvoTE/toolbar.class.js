@@ -37,6 +37,7 @@ export class Toolbar {
       for (let optionItem of this.options) {
         let optionItemElement = this.editor.createElementLi();
         optionItemElement.classList.add('nadvo-te__toolbar-item');
+        optionItemElement.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
         
         let optionItemInteractiveElement;
         if (optionItem.type == 'button') {
@@ -47,10 +48,6 @@ export class Toolbar {
 
           optionItemInteractiveElement = buttonTest.target.element;
           optionItemInteractiveElement.firstChild.classList.add('nadvo-te__toolbar-button');
-        }
-
-        if (optionItem.name === 'preview') {
-          optionItemElement.style.marginLeft = 'auto';
         }
         
         switch (optionItem.name) {
