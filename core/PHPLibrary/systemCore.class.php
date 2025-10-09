@@ -822,23 +822,17 @@ final class SystemCore implements CoreInterface
 
     if (count($filesArrayOnPath) > 0) {
       foreach ($filesArrayOnPath as $file) {
-        $path = $path . '/' . $file;
-        
-        if (is_dir($path)) {
-          self::recursiveFilesRemove($path);
+        $fullPath = $path . '/' . $file;
+
+        if (is_dir($fullPath)) {
+          self::recursiveFilesRemove($fullPath);
         } else {
-          unlink($path);
+          unlink($fullPath);
         }
       }
-
-      rmdir($path);
-      return true;
-    } else {
-      rmdir($path);
-      return true;
     }
 
-    return false;
+    return rmdir($path);
   }
   
   /**
