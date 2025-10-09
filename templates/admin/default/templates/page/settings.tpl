@@ -1,4 +1,4 @@
-<article class="main__page page page_{ADMIN_PANEL_PAGE_NAME}">
+<article class="page main__page main__page_settings">
   <nav id="SYSTEM_AP_SUBNAVIGATION" class="page__navigation navigation"></nav>
   <div class="page__title-container">
     <h1 class="page__title">
