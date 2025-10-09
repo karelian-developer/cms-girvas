@@ -31,9 +31,12 @@
             {LANG:PAGE_USERS_GROUP_TITLE_DESCRIPTION}
           </div>
         </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <input name="user_group_title_rus" type="text" class="input form__input form__input_text" value="{USERS_GROUP_TITLE}" placeholder="{PAGE_USERS_GROUP_TITLE_PLACEHOLDER}" data-element="input-title" required>
+        </div>
         <!-- Раздел: Административные права -->
         <div class="cell grid-table__cell grid-table__cell_header">
-          {PAGE_USERS_GROUP_PERSMISSIONS_GROUP_ADMIN_TITLE}
+          {LANG:PAGE_USERS_GROUP_PERSMISSIONS_GROUP_ADMIN_TITLE}
         </div>
         <!-- Поле: Авторизация в административной панели -->
         <div class="cell grid-table__cell grid-table__cell_text">
@@ -133,7 +136,7 @@
         </div>
         <!-- Раздел: Права модерации -->
         <div class="cell grid-table__cell grid-table__cell_header">
-          {PAGE_USERS_GROUP_PERSMISSIONS_GROUP_MODERATOR_TITLE}
+          {LANG:PAGE_USERS_GROUP_PERSMISSIONS_GROUP_MODERATOR_TITLE}
         </div>
         <!-- Поле: Блокировка пользователей -->
         <div class="cell grid-table__cell grid-table__cell_text">
@@ -173,7 +176,7 @@
         </div>
         <!-- Раздел: Права редакции -->
         <div class="cell grid-table__cell grid-table__cell_header">
-          {PAGE_USERS_GROUP_PERSMISSIONS_GROUP_EDITOR_TITLE}
+          {LANG:PAGE_USERS_GROUP_PERSMISSIONS_GROUP_EDITOR_TITLE}
         </div>
         <!-- Поле: Редактирование записей -->
         <div class="cell grid-table__cell grid-table__cell_text">
@@ -225,7 +228,7 @@
         </div>
         <!-- Раздел: Базовые права -->
         <div class="cell grid-table__cell grid-table__cell_header">
-          {PAGE_USERS_GROUP_PERSMISSIONS_GROUP_BASE_TITLE}
+          {LANG:PAGE_USERS_GROUP_PERSMISSIONS_GROUP_BASE_TITLE}
         </div>
         <!-- Поле: Создание новых комментариев -->
         <div class="cell grid-table__cell grid-table__cell_text">
