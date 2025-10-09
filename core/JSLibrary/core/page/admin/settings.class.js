@@ -234,7 +234,7 @@ export class PageSettings {
         interactiveChoicesFieldsLocale.target.setName('_users_additional_fields_locale');
 
         let tableAdditionalFields = document.querySelector('[data-element="profile-table-additional-fields"]');
-        let tableAdditionalFieldsButtonContainer = document.querySelector('[role="profile-add-field"]');
+        let tableAdditionalFieldsButtonContainer = document.querySelector('[data-element="button-add-field"]');
         
         buttons.addField = new Interactive('button');
         buttons.addField.target.setLabel(localeData.BUTTON_NEW_FIELD_LABEL);
@@ -317,7 +317,7 @@ export class PageSettings {
         interactiveChoicesFieldsLocale.target.setName('_entries_additional_fields_locale');
 
         let tableAdditionalFields = document.querySelector('[data-element="table-additional-fields"]');
-        let tableAdditionalFieldsButtonContainer = document.querySelector('[role="add-field"]');
+        let tableAdditionalFieldsButtonContainer = document.querySelector('[data-element="button-add-field"]');
         
         buttons.addField = new Interactive('button');
         buttons.addField.target.setLabel(localeData.BUTTON_NEW_FIELD_LABEL);
@@ -402,7 +402,7 @@ export class PageSettings {
         interactiveChoicesFieldsLocale.target.setName('_static_pages_additional_fields_locale');
 
         let tableAdditionalFields = document.querySelector('[data-element="table-additional-fields"]');
-        let tableAdditionalFieldsButtonContainer = document.querySelector('[role="add-field"]');
+        let tableAdditionalFieldsButtonContainer = document.querySelector('[data-element="button-add-field"]');
         
         buttons.addField = new Interactive('button');
         buttons.addField.target.setLabel(localeData.BUTTON_NEW_FIELD_LABEL);
