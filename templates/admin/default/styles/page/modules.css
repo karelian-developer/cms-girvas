@@ -93,6 +93,10 @@
   grid-column: 2;
 }
 
+.page.page_modules .modules-list .item__footer-container .interactive .interactive__button {
+  width: 100%;
+}
+
 .page.page_modules .modules-list .item__footer-container .interactive .interactive__button-label {
   font-size: 12px;
 }
