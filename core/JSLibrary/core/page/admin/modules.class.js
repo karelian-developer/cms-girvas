@@ -47,6 +47,7 @@ export class PageModules {
             default: window.location.href = `/admin/module/${moduleName}`;
           }
         });
+        buttons.more.target.element.classList.add('interactive_button-more');
         buttons.more.assembly();
 
         // Кнопка "Удалить"
@@ -86,6 +87,7 @@ export class PageModules {
           document.body.appendChild(interactiveModal.target.element);
           interactiveModal.target.show();
         });
+        buttons.delete.target.element.classList.add('interactive_button-delete');
         buttons.delete.assembly();
 
         // Кнопка "Установить"
@@ -109,6 +111,7 @@ export class PageModules {
             }
           });
         });
+        buttons.install.target.element.classList.add('interactive_button-install');
         buttons.install.assembly();
 
         // Кнопка "Активировать"
@@ -133,6 +136,7 @@ export class PageModules {
             }
           });
         });
+        buttons.enable.target.element.classList.add('interactive_button-activation');
         buttons.enable.assembly();
 
         // Кнопка "Деактивировать"
@@ -157,6 +161,7 @@ export class PageModules {
             }
           });
         });
+        buttons.disable.target.element.classList.add('interactive_button-activation');
         buttons.disable.assembly();
 
         itemFooterContainer.appendChild(buttons.more.target.element);
