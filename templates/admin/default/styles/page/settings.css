@@ -76,6 +76,10 @@
   grid-column: 2;
 }
 
+.main__page_settings .grid-table__cell_data > *:not(:last-child) {
+  margin-bottom: 10px;
+}
+
 @media (max-width: 800px) {
   .main__page_settings .grid-table__cell_text,
   .main__page_settings .grid-table__cell_data {
