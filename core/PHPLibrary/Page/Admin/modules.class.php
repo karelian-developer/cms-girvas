@@ -198,7 +198,6 @@ class PageModules implements InterfacePage
         'templates/page/modules.tpl',
         [
           'PAGE_MODULES_PAGINATION' => $pagination->assembled,
-          'ADMIN_PANEL_PAGE_NAME' => 'modules',
           'MODULES_LIST' => !empty($modulesListItemsTransformed)
             ? ThemeCollector::assemblyFileContent(
               $this->CMSCore->theme,

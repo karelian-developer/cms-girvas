@@ -11,7 +11,7 @@
 import {Interactive} from "../../../interactive.class.js";
 import {URLParser} from "../../../urlParser.class.js";
 
-export class PageTemplates {
+export class PageThemes {
   constructor(page, params = {}) {
     this.page = page;
   }
@@ -40,10 +40,10 @@ export class PageTemplates {
         buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
         buttons.install.target.setLabel(localeData.BUTTON_INSTALL_LABEL)
 
-        let templateName = listItem.getAttribute('data-template-name');
-        let templateCategory = listItem.getAttribute('data-template-category');
-        let templateInstalledStatus = listItem.getAttribute('data-template-installed-status');
-        let itemFooterContainer = listItem.querySelector('[role="item-footer-panel"]');
+        let templateName = listItem.getAttribute('data-name');
+        let templateCategory = listItem.getAttribute('data-category');
+        let templateInstalledStatus = listItem.getAttribute('data-installed-status');
+        let itemFooterContainer = listItem.querySelector('[data-element="item-footer-panel"]');
 
         buttons.more.target.setCallback((event) => {
           switch (searchParams.getPathPart(3)) {
