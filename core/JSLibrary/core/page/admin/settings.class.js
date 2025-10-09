@@ -658,10 +658,10 @@ export class PageSettings {
     cellDataElement.classList.add('grid-table__cell');
     cellDataElement.classList.add('grid-table__cell_data');
 
-    container.parentElement.prepend(cellHeaderElement);
-    container.parentElement.prepend(cellTextElement);
+    container.parentElement.parentElement.prepend(cellHeaderElement);
+    container.parentElement.parentElement.prepend(cellTextElement);
     cellTextElement.appendChild(cellTextTitleElement);
-    container.parentElement.prepend(cellDataElement);
+    container.parentElement.parentElement.prepend(cellDataElement);
   }
 
   addEntriesAdditionalFieldOld(localeData, container, data = {}) {
