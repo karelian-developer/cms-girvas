@@ -24,7 +24,7 @@ export class PageSettings {
 
   init() {
     let searchParams = new URLParser(), locales;
-    let elementForm = document.querySelector('.form_settings');
+    let elementForm = document.querySelector('[data-element="main-form"]');
     let interactiveLocaleChoices = new Interactive('choices');
     
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
@@ -67,10 +67,10 @@ export class PageSettings {
 
       if (searchParams.getPathPart(3) === null || searchParams.getPathPart(3) === 'base') {
         let timezones, charsets, timezoneSelected, charsetSelected;
-        let interactiveChoicesSettingsTimezone = new Interactive('choices');
-        let interactiveChoicesSettingsCharset = new Interactive('choices');
-        let interactiveChoicesSettingsBaseLocale = new Interactive('choices');
-        let interactiveChoicesSettingsAdminLocale = new Interactive('choices');
+        const interactiveChoicesSettingsTimezone = new Interactive('choices');
+        const interactiveChoicesSettingsCharset = new Interactive('choices');
+        const interactiveChoicesSettingsBaseLocale = new Interactive('choices');
+        const interactiveChoicesSettingsAdminLocale = new Interactive('choices');
 
         fetch('/handler/timezones', {
           method: 'GET'
@@ -193,10 +193,10 @@ export class PageSettings {
           interactiveChoicesSettingsAdminLocale.target.setName('setting_base_admin_locale');
           interactiveChoicesSettingsAdminLocale.assembly();
 
-          document.querySelector('#TC6474389679').prepend(interactiveChoicesSettingsTimezone.target.element);
-          document.querySelector('#TC6474389682').append(interactiveChoicesSettingsCharset.target.element);
-          document.querySelector('#TC6474389680').append(interactiveChoicesSettingsBaseLocale.target.element);
-          document.querySelector('#TC6474389681').append(interactiveChoicesSettingsAdminLocale.target.element);
+          document.querySelector('[data-element="choice"][data-element="timezone"]').prepend(interactiveChoicesSettingsTimezone.target.element);
+          document.querySelector('[data-element="choice"][data-element="charset"]').append(interactiveChoicesSettingsCharset.target.element);
+          document.querySelector('[data-element="choice"][data-element="locale-site"]').append(interactiveChoicesSettingsBaseLocale.target.element);
+          document.querySelector('[data-element="choice"][data-element="locale-admin"]').append(interactiveChoicesSettingsAdminLocale.target.element);
         });
       }
 
@@ -503,7 +503,7 @@ export class PageSettings {
       this.buttons.save.target.setCallback((event) => {
         event.preventDefault();
         
-        let elementForm = document.querySelector('.form_settings');
+        let elementForm = document.querySelector('[data-element="main-form"]');
         let form = new Interactive('form');
         form.target.replaceElement(elementForm);
 
@@ -523,7 +523,7 @@ export class PageSettings {
       });
       this.buttons.save.assembly();
 
-      let interactiveFormPanelContainer = document.querySelector('#SYSTEM_E3724126170');
+      let interactiveFormPanelContainer = document.querySelector('[data-element="panel"]');
 
       if (searchParams.getPathPart(3) === 'email') {
         interactiveFormPanelContainer.append(this.buttons.sendTestEmail.target.element);
