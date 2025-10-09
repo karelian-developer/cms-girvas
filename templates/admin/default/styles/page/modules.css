@@ -78,6 +78,7 @@
 
 .page.page_modules .modules-list .item__description {
   font-size: 14px;
+  opacity: .6;
 }
 
 .page.page_modules .modules-list .item__footer-container {
