@@ -1,4 +1,4 @@
-<article class="page main__page main__page_entry">
+<article class="page main__page main__page_feed">
   <nav id="SYSTEM_AP_SUBNAVIGATION" class="page__navigation navigation"></nav>
   <div class="page__title-container">
     <h1 class="page__title">
@@ -68,7 +68,7 @@
           </div>
         </div>
         <div class="cell grid-table__cell grid-table__cell_data">
-          <div data-element="choice" data-choice="category"></div>
+          <div data-element="choice"z data-choice="category"></div>
         </div>
         <!-- Панель формы -->
         <div class="cell grid-table__cell grid-table__cell_panel" data-element="panel"></div>
