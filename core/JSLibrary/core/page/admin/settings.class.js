@@ -658,8 +658,8 @@ export class PageSettings {
     cellDataElement.classList.add('grid-table__cell');
     cellDataElement.classList.add('grid-table__cell_data');
 
-    container.parentElement.parentElement.prepend(cellHeaderElement);
-    container.parentElement.parentElement.prepend(cellTextElement);
+    container.parentElement.prepend(cellHeaderElement);
+    container.parentElement.prepend(cellTextElement);
     cellTextElement.appendChild(cellTextTitleElement);
     container.parentElement.prepend(cellDataElement);
   }
