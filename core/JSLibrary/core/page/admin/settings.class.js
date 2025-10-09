@@ -640,14 +640,27 @@ export class PageSettings {
   }
 
   addEntriesAdditionalField(localeData, container, data = {}) {
-    const cellHeaderElement = document.createElement('div', 'Поле');
+    const cellHeaderElement = document.createElement('div');
     const cellTextElement = document.createElement('div');
     const cellTextTitleElement = document.createElement('div');
     const cellDataElement = document.createElement('div');
 
+    cellHeaderElement.classList.add('cell');
+    cellHeaderElement.classList.add('grid-table__cell');
+    cellHeaderElement.classList.add('grid-table__cell_header');
+    cellHeaderElement.innerText = 'Поле';
+
+    cellTextElement.classList.add('cell');
+    cellTextElement.classList.add('grid-table__cell');
+    cellTextElement.classList.add('grid-table__cell_text');
+
+    cellDataElement.classList.add('cell');
+    cellDataElement.classList.add('grid-table__cell');
+    cellDataElement.classList.add('grid-table__cell_data');
+
+    container.before(cellHeaderElement);
     container.before(cellTextElement);
     cellTextElement.appendChild(cellTextTitleElement);
-    container.before(cellHeaderElement);
     container.before(cellDataElement);
   }
 
