@@ -783,8 +783,6 @@ export class PageSettings {
         container.parentElement.previousElementSibling
       );
     });
-    
-    cellTextElement.appendChild(cellTextTitleElement);
   }
 
   addEntriesAdditionalFieldOld(localeData, container, data = {}) {
