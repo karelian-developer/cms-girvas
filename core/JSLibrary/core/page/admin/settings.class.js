@@ -651,6 +651,8 @@ export class PageSettings {
     cellDataElement.classList.add('cell');
     cellDataElement.classList.add('grid-table__cell');
     cellDataElement.classList.add('grid-table__cell_data');
+
+    cellTextTitleElement.innerText = title;
     
     cellTextElement.appendChild(cellTextTitleElement);
     cellDataElement.appendChild(dataElement);
@@ -689,6 +691,55 @@ export class PageSettings {
     additionalFieldInputName.classList.add('form__input');
     additionalFieldInputName.classList.add('form__input_text');
     additionalFieldInputDescription.classList.add('form__textarea');
+
+    const interactiveChoicesTypeField = new Interactive('choices');
+    interactiveChoicesTypeField.target.addItem('String', 'text');
+    interactiveChoicesTypeField.target.addItem('Number', 'number');
+    interactiveChoicesTypeField.target.addItem('Date', 'date');
+    interactiveChoicesTypeField.target.addItem('Text', 'textarea');
+    interactiveChoicesTypeField.target.setName('setting_entries_additional_field_type[]');
+    
+    if (typeof data.type != 'undefined') {
+      switch (data.type) {
+        case 'text': interactiveChoicesTypeField.target.setItemSelectedIndex(0); break;
+        case 'number': interactiveChoicesTypeField.target.setItemSelectedIndex(1); break;
+        case 'date': interactiveChoicesTypeField.target.setItemSelectedIndex(2); break;
+        case 'textarea': interactiveChoicesTypeField.target.setItemSelectedIndex(3); break;
+        default: interactiveChoicesTypeField.target.setItemSelectedIndex(0);
+      }
+    }
+
+    let requestGetEntriesCategories = new Interactive('request', {
+      method: 'GET',
+      url: '/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name,
+    });
+
+    requestGetEntriesCategories.target.showingNotification = false;
+    requestGetEntriesCategories.target.send().then((responseData) => {
+      let interactiveChoicesCategoryField = new Interactive('choices');
+
+      if (responseData.statusCode === 1 && responseData.outputData.hasOwnProperty('entriesCategories')) {
+        let entriesCategories = responseData.outputData.entriesCategories;
+        
+        entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
+          interactiveChoicesCategoryField.target.addItem(entriesCategory.title, entriesCategory.id);
+
+          if (entriesCategory.id === data.categoryID) {
+            interactiveChoicesCategoryField.target.setItemSelectedIndex(entriesCategoryIndex);
+          }
+        });
+        
+        interactiveChoicesCategoryField.target.setName('setting_entries_additional_field_category_id[]');
+        interactiveChoicesCategoryField.assembly();
+
+        const cellElementsForType = this.createCellAdditionalFieldElements(
+          localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_TYPE_FIELD_TITLE,
+          additionalFieldInputTitle
+        );
+
+        cellElementsForType[1].append(interactiveChoicesCategoryField.target.element);
+      }
+    });
 
     const cellElementsForTitle = this.createCellAdditionalFieldElements(
       localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_NAME_TITLE,
