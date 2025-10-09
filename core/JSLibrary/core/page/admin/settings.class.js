@@ -193,10 +193,10 @@ export class PageSettings {
           interactiveChoicesSettingsAdminLocale.target.setName('setting_base_admin_locale');
           interactiveChoicesSettingsAdminLocale.assembly();
 
-          document.querySelector('[data-element="choice"][data-element="timezone"]').prepend(interactiveChoicesSettingsTimezone.target.element);
-          document.querySelector('[data-element="choice"][data-element="charset"]').append(interactiveChoicesSettingsCharset.target.element);
-          document.querySelector('[data-element="choice"][data-element="locale-site"]').append(interactiveChoicesSettingsBaseLocale.target.element);
-          document.querySelector('[data-element="choice"][data-element="locale-admin"]').append(interactiveChoicesSettingsAdminLocale.target.element);
+          document.querySelector('[data-element="choice"][data-choice="timezone"]').prepend(interactiveChoicesSettingsTimezone.target.element);
+          document.querySelector('[data-element="choice"][data-choice="charset"]').append(interactiveChoicesSettingsCharset.target.element);
+          document.querySelector('[data-element="choice"][data-choice="locale-site"]').append(interactiveChoicesSettingsBaseLocale.target.element);
+          document.querySelector('[data-element="choice"][data-choice="locale-admin"]').append(interactiveChoicesSettingsAdminLocale.target.element);
         });
       }
 
