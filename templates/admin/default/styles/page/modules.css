@@ -70,7 +70,7 @@
 .page.page_modules .modules-list .item__footer-container {
   display: grid;
   grid-template-areas:
-    'button-more'
+    'button-more button-more'
     'button-remove button-activation';
   background-color: var(--common-main-color-7);
   border-top: 1px solid var(--common-main-color-2);
