@@ -655,10 +655,10 @@ export class PageSettings {
     cellTextElement.appendChild(cellTextTitleElement);
     cellDataElement.appendChild(dataElement);
 
-    return {
-      'text': cellTextElement,
-      'data': cellDataElement
-    };
+    return [
+      cellTextElement,
+      cellDataElement
+    ];
   }
 
   addEntriesAdditionalField(localeData, container, data = {}) {
