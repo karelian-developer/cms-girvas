@@ -81,13 +81,20 @@
 
 .page.page_modules .modules-list .item__footer-container {
   display: grid;
-  grid-template-areas:
-    'button-more button-more'
-    'button-remove button-activation';
   background-color: var(--common-main-color-7);
   border-top: 1px solid var(--common-main-color-2);
   padding: 10px;
   gap: 10px;
+}
+
+.page.page_modules .page__modules-list_repository .item__footer-container {
+  grid-template-columns: 1fr;
+}
+
+.page.page_modules .page__modules-list_local .item__footer-container {
+  grid-template-areas:
+    'button-more button-more'
+    'button-remove button-activation';
 }
 
 .page.page_modules .modules-list .item__footer-container .interactive_button-more {

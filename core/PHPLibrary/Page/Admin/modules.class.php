@@ -90,6 +90,10 @@ class PageModules implements InterfacePage
     $paginationItemsOnPage = 12;
     $modulesCount = 0;
 
+    $locationPlaceName = $this->CMSCore->urlp->getPath(2) === 'repository'
+      ? 'repository'
+      : 'local'; 
+
     if (
       $this->CMSCore->urlp->getPath(2) === 'repository'
       && $this->CMSCore->urlp->getPath(3) === null
@@ -179,7 +183,10 @@ class PageModules implements InterfacePage
     $pagination = new Pagination($this->CMSCore, $modulesCount, $paginationItemsOnPage, $paginationItemCurrent);
     $pagination->assembly();
 
-    if ($this->CMSCore->urlp->getPath(2) === 'repository' && $this->CMSCore->urlp->getPath(3) !== null) {
+    if (
+      $this->CMSCore->urlp->getPath(2) === 'repository'
+      && $this->CMSCore->urlp->getPath(3) !== null
+    ) {
       $modulePage = new PageModule($this->CMSCore, $this->page);
       $modulePage->assembly();
 
@@ -192,9 +199,19 @@ class PageModules implements InterfacePage
         [
           'PAGE_MODULES_PAGINATION' => $pagination->assembled,
           'ADMIN_PANEL_PAGE_NAME' => 'modules',
-          'MODULES_LIST' => !empty($modulesListItemsTransformed)? ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/modules/list.tpl', [
-            'MODULES_LIST_ITEMS' => implode($modulesListItemsTransformed)
-          ]) : sprintf('<p class="page__content-phar">%s</p>', $localeData['PAGE_MODULES_MODULES_INSTALLED_NOT_FOUND_TITLE'])
+          'MODULES_LIST' => !empty($modulesListItemsTransformed)
+            ? ThemeCollector::assemblyFileContent(
+              $this->CMSCore->theme,
+              'templates/page/modules/list.tpl',
+              [
+                'MODULES_PLACE_NAME' => $locationPlaceName,
+                'MODULES_LIST_ITEMS' => implode($modulesListItemsTransformed)
+              ]
+            )
+            : sprintf(
+                '<p class="page__content-phar">%s</p>',
+                $localeData['PAGE_MODULES_MODULES_INSTALLED_NOT_FOUND_TITLE']
+              )
         ]
       );
     }
