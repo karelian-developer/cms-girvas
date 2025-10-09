@@ -8,6 +8,10 @@
     <div class="cell grid-table__cell grid-table__cell_data">
       <div data-element="additional-fields-locale"></div>
     </div>
+    <div class="cell grid-table__cell grid-table__cell_text"></div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <div data-element="add-field"></div>
+    </div>
     <!-- Панель формы -->
     <div class="cell grid-table__cell grid-table__cell_panel" data-element="panel"></div>
   </div>
