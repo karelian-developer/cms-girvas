@@ -47,8 +47,8 @@ export class PageModules {
             default: window.location.href = `/admin/module/${moduleName}`;
           }
         });
-        buttons.more.target.element.classList.add('interactive_button-more');
         buttons.more.assembly();
+        buttons.more.target.element.classList.add('interactive_button-more');
 
         // Кнопка "Удалить"
         buttons.delete = new Interactive('button');
@@ -87,8 +87,8 @@ export class PageModules {
           document.body.appendChild(interactiveModal.target.element);
           interactiveModal.target.show();
         });
-        buttons.delete.target.element.classList.add('interactive_button-delete');
         buttons.delete.assembly();
+        buttons.delete.target.element.classList.add('interactive_button-delete');
 
         // Кнопка "Установить"
         buttons.install = new Interactive('button');
@@ -111,8 +111,8 @@ export class PageModules {
             }
           });
         });
-        buttons.install.target.element.classList.add('interactive_button-install');
         buttons.install.assembly();
+        buttons.install.target.element.classList.add('interactive_button-install');
 
         // Кнопка "Активировать"
         buttons.enable = new Interactive('button');
@@ -136,8 +136,8 @@ export class PageModules {
             }
           });
         });
-        buttons.enable.target.element.classList.add('interactive_button-activation');
         buttons.enable.assembly();
+        buttons.enable.target.element.classList.add('interactive_button-activation');
 
         // Кнопка "Деактивировать"
         buttons.disable = new Interactive('button');
@@ -161,8 +161,8 @@ export class PageModules {
             }
           });
         });
-        buttons.disable.target.element.classList.add('interactive_button-activation');
         buttons.disable.assembly();
+        buttons.disable.target.element.classList.add('interactive_button-activation');
 
         itemFooterContainer.appendChild(buttons.more.target.element);
         itemFooterContainer.appendChild(buttons.install.target.element);

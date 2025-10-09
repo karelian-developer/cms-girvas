@@ -38,9 +38,6 @@
   flex-direction: column;
   box-sizing: border-box;
   border: 1px solid var(--common-main-color-2);
-  margin-right: 10px;
-  margin-bottom: 10px;
-  flex: 0 0 calc(25% - (10px * 3));
 }
 
 .page.page_modules .modules-list .item__icon-container {
