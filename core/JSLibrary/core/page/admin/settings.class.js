@@ -639,16 +639,10 @@ export class PageSettings {
     container.parentElement.before(tableRow);
   }
 
-  addEntriesAdditionalField(localeData, container, data = {}) {
-    const cellHeaderElement = document.createElement('div');
+  createCellAdditionalFieldElements(title, dataElement) {
     const cellTextElement = document.createElement('div');
     const cellTextTitleElement = document.createElement('div');
     const cellDataElement = document.createElement('div');
-
-    cellHeaderElement.classList.add('cell');
-    cellHeaderElement.classList.add('grid-table__cell');
-    cellHeaderElement.classList.add('grid-table__cell_header');
-    cellHeaderElement.innerText = 'Поле';
 
     cellTextElement.classList.add('cell');
     cellTextElement.classList.add('grid-table__cell');
@@ -657,11 +651,95 @@ export class PageSettings {
     cellDataElement.classList.add('cell');
     cellDataElement.classList.add('grid-table__cell');
     cellDataElement.classList.add('grid-table__cell_data');
-
-    container.parentElement.parentElement.insertBefore(cellHeaderElement, container.parentElement.previousElementSibling);
-    container.parentElement.parentElement.insertBefore(cellTextElement, container.parentElement.previousElementSibling);
+    
     cellTextElement.appendChild(cellTextTitleElement);
-    container.parentElement.parentElement.insertBefore(cellDataElement, container.parentElement.previousElementSibling);
+    cellDataElement.appendChild(dataElement);
+
+    return {
+      'text': cellTextElement,
+      'data': cellDataElement
+    };
+  }
+
+  addEntriesAdditionalField(localeData, container, data = {}) {
+    const cellHeaderElement = document.createElement('div');
+    const additionalFieldInputTitle = document.createElement('input');
+    const additionalFieldInputName = document.createElement('input');
+    const additionalFieldInputDescription = document.createElement('textarea');
+    
+    cellHeaderElement.classList.add('cell');
+    cellHeaderElement.classList.add('grid-table__cell');
+    cellHeaderElement.classList.add('grid-table__cell_header');
+    cellHeaderElement.innerText = 'Поле';
+
+    additionalFieldInputTitle.setAttribute('type', 'text');
+    additionalFieldInputTitle.setAttribute('name', 'setting_users_additional_field_title[]');
+    additionalFieldInputTitle.setAttribute('placeholder', 'My field');
+    additionalFieldInputTitle.setAttribute('required', 'required');
+    additionalFieldInputName.setAttribute('pattern', '[a-z0-9_]+');
+    additionalFieldInputName.setAttribute('type', 'text');
+    additionalFieldInputName.setAttribute('name', 'setting_users_additional_field_name[]');
+    additionalFieldInputName.setAttribute('placeholder', 'my_field');
+    additionalFieldInputName.setAttribute('required', 'required');
+    additionalFieldInputDescription.setAttribute('name', 'setting_users_additional_field_description[]');
+    additionalFieldInputDescription.setAttribute('placeholder', localeData.SETTINGS_PAGE_SETTING_USERS_ADDITIONAL_FIELD_DESCRIPTION_PLACEHOLDER);
+
+    additionalFieldInputTitle.classList.add('form__input');
+    additionalFieldInputTitle.classList.add('form__input_text');
+    additionalFieldInputName.classList.add('form__input');
+    additionalFieldInputName.classList.add('form__input_text');
+    additionalFieldInputDescription.classList.add('form__textarea');
+
+    const cellElementsForTitle = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_NAME_TITLE,
+      additionalFieldInputTitle
+    );
+
+    const cellElementsForName = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_TECHNICAL_NAME_TITLE,
+      additionalFieldInputName
+    );
+
+    const cellElementsForDescription = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_DESCRIPTION_TITLE,
+      additionalFieldInputDescription
+    );
+
+    container.parentElement.parentElement.insertBefore(
+      cellHeaderElement,
+      container.parentElement.previousElementSibling
+    );
+    container.parentElement.parentElement.insertBefore(
+      cellTextElement,
+      container.parentElement.previousElementSibling
+    );
+    container.parentElement.parentElement.insertBefore(
+      cellDataElement,
+      container.parentElement.previousElementSibling
+    );
+
+    cellElementsForTitle.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    cellElementsForName.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    cellElementsForDescription.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+    
+    cellTextElement.appendChild(cellTextTitleElement);
   }
 
   addEntriesAdditionalFieldOld(localeData, container, data = {}) {
