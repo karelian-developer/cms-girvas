@@ -8,7 +8,7 @@
   </div>
   <div class="page__content">
     <form class="form page__form" action="/handler/usersGroup" data-element="main-form">
-      <input name="user_id" type="hidden" value="{USERS_GROUP_ID}">
+      <input name="user_group_id" type="hidden" value="{USERS_GROUP_ID}">
       <div class="grid-table page__grid-table">
         <!-- Поле: Техническое наименование -->
         <div class="cell grid-table__cell grid-table__cell_text">
