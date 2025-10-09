@@ -233,7 +233,7 @@ export class PageSettings {
 
         interactiveChoicesFieldsLocale.target.setName('_users_additional_fields_locale');
 
-        let tableAdditionalFields = document.querySelector('[role="profile-table-additional-fields"]');
+        let tableAdditionalFields = document.querySelector('[data-element="profile-table-additional-fields"]');
         let tableAdditionalFieldsButtonContainer = document.querySelector('[role="profile-add-field"]');
         
         buttons.addField = new Interactive('button');
@@ -288,7 +288,7 @@ export class PageSettings {
           });
         });
 
-        let profileAdditionalFieldsLocaleContainer = document.querySelector('[role="profile-additional-fields-locale"]');
+        let profileAdditionalFieldsLocaleContainer = document.querySelector('[data-element="profile-additional-fields-locale"]');
         profileAdditionalFieldsLocaleContainer.append(interactiveChoicesFieldsLocale.target.element);
 
         // Получаем все установленные языковые пакеты
@@ -316,7 +316,7 @@ export class PageSettings {
 
         interactiveChoicesFieldsLocale.target.setName('_entries_additional_fields_locale');
 
-        let tableAdditionalFields = document.querySelector('[role="table-additional-fields"]');
+        let tableAdditionalFields = document.querySelector('[data-element="table-additional-fields"]');
         let tableAdditionalFieldsButtonContainer = document.querySelector('[role="add-field"]');
         
         buttons.addField = new Interactive('button');
@@ -372,7 +372,7 @@ export class PageSettings {
           });
         });
 
-        let profileAdditionalFieldsLocaleContainer = document.querySelector('[role="additional-fields-locale"]');
+        let profileAdditionalFieldsLocaleContainer = document.querySelector('[data-element="additional-fields-locale"]');
         profileAdditionalFieldsLocaleContainer.append(interactiveChoicesFieldsLocale.target.element);
 
         // Получаем все установленные языковые пакеты
@@ -401,7 +401,7 @@ export class PageSettings {
 
         interactiveChoicesFieldsLocale.target.setName('_static_pages_additional_fields_locale');
 
-        let tableAdditionalFields = document.querySelector('[role="table-additional-fields"]');
+        let tableAdditionalFields = document.querySelector('[data-element="table-additional-fields"]');
         let tableAdditionalFieldsButtonContainer = document.querySelector('[role="add-field"]');
         
         buttons.addField = new Interactive('button');
@@ -456,7 +456,7 @@ export class PageSettings {
           });
         });
 
-        let profileAdditionalFieldsLocaleContainer = document.querySelector('[role="additional-fields-locale"]');
+        let profileAdditionalFieldsLocaleContainer = document.querySelector('[data-element="additional-fields-locale"]');
         profileAdditionalFieldsLocaleContainer.append(interactiveChoicesFieldsLocale.target.element);
 
         // Получаем все установленные языковые пакеты
