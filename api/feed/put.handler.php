@@ -23,13 +23,13 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUserGroup->initData(['permissions']);
 
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_FEEDS_MANAGEMENT)) {
-    $feedName = (isset($_PUT['web_channel_name'])) ? urlencode(htmlentities($_PUT['web_channel_name'])) : '';
+    $feedName = (isset($_PUT['feed_name'])) ? urlencode(htmlentities($_PUT['feed_name'])) : '';
     
-    $feedEntriesCategoryID = $_PUT['web_channel_entries_category_id'] ?? 0;
-    $feedEntriesCategoryID = (is_numeric($_PUT['web_channel_entries_category_id'])) ? (int)$_PUT['web_channel_entries_category_id'] : 0;
+    $feedEntriesCategoryID = $_PUT['feed_entries_category_id'] ?? 0;
+    $feedEntriesCategoryID = (is_numeric($_PUT['feed_entries_category_id'])) ? (int)$_PUT['feed_entries_category_id'] : 0;
     
-    $feedTypeID = $_PUT['web_channel_type_id'] ?? 0;
-    $feedTypeID = (is_numeric($_PUT['web_channel_type_id'])) ? (int)$_PUT['web_channel_type_id'] : 0;
+    $feedTypeID = $_PUT['feed_type_id'] ?? 0;
+    $feedTypeID = (is_numeric($_PUT['feed_type_id'])) ? (int)$_PUT['feed_type_id'] : 0;
 
     $texts = [];
 
@@ -42,8 +42,8 @@ if ($CMSCore->client->isLogged(2)) {
 
         $CMSLocaleName = $CMSLocale->getName();
 
-        $inputTitleName = 'web_channel_title_' . $CMSLocale->getISO639(2);
-        $textareaDescriptionName = 'web_channel_description_' . $CMSLocale->getISO639(2);
+        $inputTitleName = 'feed_title_' . $CMSLocale->getISO639(2);
+        $textareaDescriptionName = 'feed_description_' . $CMSLocale->getISO639(2);
 
         if (array_key_exists($inputTitleName, $_PUT) || array_key_exists($textareaDescriptionName, $_PUT)) {
           if (!array_key_exists($CMSLocaleName, $texts)) $texts[$CMSLocaleName] = [];

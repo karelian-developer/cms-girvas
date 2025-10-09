@@ -22,7 +22,7 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUserGroup->initData(['permissions']);
 
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_FEEDS_MANAGEMENT)) {
-    $feedID = $_DELETE['web_channel_id'] ?? 0;
+    $feedID = $_DELETE['feed_id'] ?? 0;
     $feedID = (is_numeric($feedID)) ? (int)$feedID : 0;
 
     if ($feedID != 0) {
