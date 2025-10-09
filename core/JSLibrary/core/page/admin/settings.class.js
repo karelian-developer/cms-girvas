@@ -658,10 +658,10 @@ export class PageSettings {
     cellDataElement.classList.add('grid-table__cell');
     cellDataElement.classList.add('grid-table__cell_data');
 
-    container.parentElement.parentElement.insertBefore(cellHeaderElement, container.parentElement);
-    container.parentElement.parentElement.insertBefore(cellTextElement, container.parentElement);
+    container.parentElement.parentElement.insertBefore(cellHeaderElement, container.parentElement.previousElementSibling);
+    container.parentElement.parentElement.insertBefore(cellTextElement, container.parentElement.previousElementSibling);
     cellTextElement.appendChild(cellTextTitleElement);
-    container.parentElement.parentElement.insertBefore(cellDataElement, container.parentElement);
+    container.parentElement.parentElement.insertBefore(cellDataElement, container.parentElement.previousElementSibling);
   }
 
   addEntriesAdditionalFieldOld(localeData, container, data = {}) {
