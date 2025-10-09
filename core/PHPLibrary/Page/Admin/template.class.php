@@ -93,7 +93,7 @@ class PageTemplate implements InterfacePage
    */
   public function assembly() : void
   {
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page/template.css', 'rel' => 'stylesheet']);
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page/theme.css', 'rel' => 'stylesheet']);
 
     $themeVariables = [];
       
@@ -349,7 +349,7 @@ class PageTemplate implements InterfacePage
 
       $this->assembled = ThemeCollector::assemblyFileContent(
         $this->CMSCore->theme,
-        'templates/page/template.tpl',
+        'templates/page/theme.tpl',
         $themeVariables
       );
     } else {

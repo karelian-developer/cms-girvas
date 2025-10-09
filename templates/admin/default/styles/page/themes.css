@@ -90,29 +90,8 @@
   gap: 10px;
 }
 
-.page.page_themes .page__themes-list_repository .item__footer-container {
+.page.page_themes .page__themes-list .item__footer-container {
   grid-template-columns: 1fr;
-}
-
-.page.page_themes .page__themes-list_local .item__footer-container {
-  grid-template-areas:
-    'button-more button-more'
-    'button-remove button-activation';
-}
-
-.page.page_themes .themes-list .item__footer-container .interactive_button-more {
-  grid-area: button-more;
-  grid-column: 1 / -1;
-}
-
-.page.page_themes .themes-list .item__footer-container .interactive_button-remove {
-  grid-area: button-remove;
-  grid-column: 1;
-}
-
-.page.page_themes .themes-list .item__footer-container .interactive_button-activation {
-  grid-area: button-activation;
-  grid-column: 2;
 }
 
 .page.page_themes .themes-list .item__footer-container .interactive .interactive__button {

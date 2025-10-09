@@ -32,10 +32,10 @@ export class PageModules {
       for (let listItem of listItems) {
         let buttons = {delete: null, install: null, enable: null, disable: null, more: null};
 
-        let moduleName = listItem.getAttribute('data-name');
-        let moduleInstalledStatus = (listItem.hasAttribute('data-installed-status')) ? listItem.getAttribute('data-module-installed-status') : 'not-installed';
-        let moduleEnabledStatus = (listItem.hasAttribute('data-enabled-status')) ? listItem.getAttribute('data-module-enabled-status') : 'disabled';
-        let itemFooterContainer = listItem.querySelector('[data-element="item-footer-panel"]');
+        const moduleName = listItem.getAttribute('data-name');
+        const moduleInstalledStatus = (listItem.hasAttribute('data-installed-status')) ? listItem.getAttribute('data-module-installed-status') : 'not-installed';
+        const moduleEnabledStatus = (listItem.hasAttribute('data-enabled-status')) ? listItem.getAttribute('data-module-enabled-status') : 'disabled';
+        const itemFooterContainer = listItem.querySelector('[data-element="item-footer-panel"]');
 
         // Добавление интерактивных элементов
         // Кнопка "Подробнее"
@@ -87,8 +87,6 @@ export class PageModules {
           document.body.appendChild(interactiveModal.target.element);
           interactiveModal.target.show();
         });
-        buttons.delete.assembly();
-        buttons.delete.target.element.classList.add('interactive_button-delete');
 
         // Кнопка "Установить"
         buttons.install = new Interactive('button');
@@ -111,8 +109,6 @@ export class PageModules {
             }
           });
         });
-        buttons.install.assembly();
-        buttons.install.target.element.classList.add('interactive_button-install');
 
         // Кнопка "Активировать"
         buttons.enable = new Interactive('button');
@@ -136,8 +132,6 @@ export class PageModules {
             }
           });
         });
-        buttons.enable.assembly();
-        buttons.enable.target.element.classList.add('interactive_button-activation');
 
         // Кнопка "Деактивировать"
         buttons.disable = new Interactive('button');
@@ -161,19 +155,39 @@ export class PageModules {
             }
           });
         });
+        
+        buttons.enable.assembly();
         buttons.disable.assembly();
+        buttons.install.assembly();
+        buttons.delete.assembly();
+
+        buttons.enable.target.element.classList.add('interactive_button-activation');
         buttons.disable.target.element.classList.add('interactive_button-activation');
+        buttons.install.target.element.classList.add('interactive_button-install');
+        buttons.delete.target.element.classList.add('interactive_button-delete');
 
-        itemFooterContainer.appendChild(buttons.more.target.element);
-        itemFooterContainer.appendChild(buttons.install.target.element);
-        itemFooterContainer.appendChild(buttons.delete.target.element);
-        itemFooterContainer.appendChild(buttons.enable.target.element);
-        itemFooterContainer.appendChild(buttons.disable.target.element);
+        if (itemFooterContainer !== null) {
+          itemFooterContainer.appendChild(buttons.more.target.element);
+          itemFooterContainer.appendChild(buttons.install.target.element);
+          itemFooterContainer.appendChild(buttons.delete.target.element);
+          itemFooterContainer.appendChild(buttons.enable.target.element);
+          itemFooterContainer.appendChild(buttons.disable.target.element);
+        }
 
-        buttons.install.target.element.style.display = (moduleInstalledStatus === 'installed') ? 'none' : 'flex';
-        buttons.delete.target.element.style.display = (moduleInstalledStatus === 'installed') ? 'flex' : 'none';
+        buttons.install.target.element.style.display = moduleInstalledStatus === 'installed'
+          ? 'none'
+          : 'flex';
+        buttons.delete.target.element.style.display = moduleInstalledStatus === 'installed'
+          ? 'flex'
+          : 'none';
 
-        if (moduleInstalledStatus === 'installed' && (searchParams.getPathPart(3) === 'local' || searchParams.getPathPart(3) === null)) {
+        if (
+          moduleInstalledStatus === 'installed'
+          && (
+            searchParams.getPathPart(3) === 'local'
+            || searchParams.getPathPart(3) === null
+          )
+        ) {
           buttons.enable.target.element.style.display = (moduleEnabledStatus === 'enabled') ? 'none' : 'flex';
           buttons.disable.target.element.style.display = (moduleEnabledStatus === 'enabled') ? 'flex' : 'none';
         } else {
