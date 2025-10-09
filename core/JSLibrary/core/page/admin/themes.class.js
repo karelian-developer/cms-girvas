@@ -27,7 +27,7 @@ export class PageThemes {
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let listItems = document.querySelectorAll('.templates-list .list__item');
+      let listItems = document.querySelectorAll('.themes-list .list__item');
     
       for (let listItem of listItems) {
         let buttons = {more: null, delete: null, install: null};
