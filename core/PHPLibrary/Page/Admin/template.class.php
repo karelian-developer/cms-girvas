@@ -26,7 +26,7 @@ class PageTemplate implements InterfacePage
 {
   use TraitPage;
 
-  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_TEMPLATE_NAVIGATION_%s_LABEL';
+  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_THEME_NAVIGATION_%s_LABEL';
 
   /** @property SystemCore Объект системного ядра*/
   public SystemCore $CMSCore;
@@ -292,20 +292,20 @@ class PageTemplate implements InterfacePage
 
           /** @var string Заголовок ячейки метаданных */
           $metadataTitle = match ($enumMetadata) {
-            ThemeEnumMetadata::AUTHOR_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_NAME_LABEL'),
-            ThemeEnumMetadata::AUTHOR_CODE_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_CODE_NAME_LABEL'),
-            ThemeEnumMetadata::AUTHOR_CODE_SERVER_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_CODE_SERVER_NAME_LABEL'),
-            ThemeEnumMetadata::AUTHOR_CODE_CLIENT_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_CODE_CLIENT_NAME_LABEL'),
-            ThemeEnumMetadata::AUTHOR_DESIGNER_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_DESIGNER_NAME_LABEL'),
-            ThemeEnumMetadata::AUTHOR_LAYOUT_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_LAYOUT_NAME_LABEL'),
-            ThemeEnumMetadata::AUTHOR_SITE_LINK => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_SITE_LINK_LABEL'),
-            ThemeEnumMetadata::AUTHOR_SOCIAL_VK_LINK => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_SOCIAL_VK_LINK_LABEL'),
-            ThemeEnumMetadata::AUTHOR_SOCIAL_OK_LINK => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_AUTHOR_SOCIAL_OK_LINK_LABEL'),
-            ThemeEnumMetadata::CATEGORY_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_CATEGORY_NAME_LABEL'),
-            ThemeEnumMetadata::WEIGHT => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_SIZE_LABEL'),
-            ThemeEnumMetadata::DATETIME_CREATED_UNIX => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_DATETIME_CREATED_UNIX_LABEL'),
-            ThemeEnumMetadata::DATETIME_UPDATED_UNIX => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_DATETIME_UPDATED_UNIX_LABEL'),
-            ThemeEnumMetadata::VERSION => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_TEMPLATE_VERSION_LABEL')
+            ThemeEnumMetadata::AUTHOR_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_AUTHOR_NAME_LABEL'),
+            ThemeEnumMetadata::AUTHOR_CODE_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_AUTHOR_CODE_NAME_LABEL'),
+            ThemeEnumMetadata::AUTHOR_CODE_SERVER_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_AUTHOR_CODE_SERVER_NAME_LABEL'),
+            ThemeEnumMetadata::AUTHOR_CODE_CLIENT_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_AUTHOR_CODE_CLIENT_NAME_LABEL'),
+            ThemeEnumMetadata::AUTHOR_DESIGNER_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_AUTHOR_DESIGNER_NAME_LABEL'),
+            ThemeEnumMetadata::AUTHOR_LAYOUT_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_AUTHOR_LAYOUT_NAME_LABEL'),
+            ThemeEnumMetadata::AUTHOR_SITE_LINK => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_AUTHOR_SITE_LINK_LABEL'),
+            ThemeEnumMetadata::AUTHOR_SOCIAL_VK_LINK => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_AUTHOR_SOCIAL_VK_LINK_LABEL'),
+            ThemeEnumMetadata::AUTHOR_SOCIAL_OK_LINK => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_AUTHOR_SOCIAL_OK_LINK_LABEL'),
+            ThemeEnumMetadata::CATEGORY_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_CATEGORY_NAME_LABEL'),
+            ThemeEnumMetadata::WEIGHT => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_SIZE_LABEL'),
+            ThemeEnumMetadata::DATETIME_CREATED_UNIX => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_DATETIME_CREATED_UNIX_LABEL'),
+            ThemeEnumMetadata::DATETIME_UPDATED_UNIX => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_DATETIME_UPDATED_UNIX_LABEL'),
+            ThemeEnumMetadata::VERSION => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_VERSION_LABEL')
           };
 
           $metadataValueTemplate = match ($enumMetadata) {
@@ -335,7 +335,7 @@ class PageTemplate implements InterfacePage
           'METADATA_LIST' => implode($themeMetadataItemsTransformed)
         ]);
       } else {
-        $themeMetadataListTransformed = $localeData['PAGE_TEMPLATE_METADATA_BLOCK_METADATA_NOT_FOUND_TITLE'];
+        $themeMetadataListTransformed = $localeData['PAGE_THEME_METADATA_BLOCK_METADATA_NOT_FOUND_TITLE'];
       }
 
       $themeVariables['ADMIN_PANEL_PAGE_NAME'] = 'template';
