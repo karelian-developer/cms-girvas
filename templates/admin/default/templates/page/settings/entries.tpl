@@ -6,9 +6,7 @@
     </div>
     <div class="cell grid-table__cell grid-table__cell_text"></div>
     <div class="cell grid-table__cell grid-table__cell_data">
-      <div class="form__checkbox-container checkbox-container">
-        <div data-element="additional-fields-locale"></div>
-      </div>
+      <div data-element="additional-fields-locale"></div>
     </div>
     <!-- Панель формы -->
     <div class="cell grid-table__cell grid-table__cell_panel" data-element="panel"></div>
