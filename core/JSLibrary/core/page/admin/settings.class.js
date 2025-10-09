@@ -639,7 +639,7 @@ export class PageSettings {
     container.parentElement.before(tableRow);
   }
 
-  createCellAdditionalFieldElements(title, dataElement) {
+  createCellAdditionalFieldElements(title, dataElement = null) {
     const cellTextElement = document.createElement('div');
     const cellTextTitleElement = document.createElement('div');
     const cellDataElement = document.createElement('div');
@@ -655,7 +655,10 @@ export class PageSettings {
     cellTextTitleElement.innerText = title;
     
     cellTextElement.appendChild(cellTextTitleElement);
-    cellDataElement.appendChild(dataElement);
+
+    if (dataElement !== null) {
+      cellDataElement.appendChild(dataElement);
+    }
 
     return [
       cellTextElement,
@@ -733,8 +736,7 @@ export class PageSettings {
         interactiveChoicesCategoryField.assembly();
 
         const cellElementsForType = this.createCellAdditionalFieldElements(
-          localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_TYPE_FIELD_TITLE,
-          additionalFieldInputTitle
+          localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_CATEGORY_FIELD_TITLE
         );
 
         cellElementsForType[1].append(interactiveChoicesCategoryField.target.element);
