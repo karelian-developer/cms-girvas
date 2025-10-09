@@ -72,6 +72,7 @@
 
 .page.page_modules .modules-list .item__title-link {
   text-decoration: none;
+  font-size: inherit;
   color: inherit;
 }
 
@@ -84,6 +85,7 @@
   background-color: var(--common-main-color-7);
   border-top: 1px solid var(--common-main-color-2);
   padding: 10px;
+  margin-top: auto;
   gap: 10px;
 }
 
@@ -117,5 +119,7 @@
 }
 
 .page.page_modules .modules-list .item__footer-container .interactive .interactive__button-label {
+  text-transform: uppercase;
+  font-weight: 500;
   font-size: 12px;
 }
