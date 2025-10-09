@@ -85,8 +85,8 @@
 
 .main__page_users-group .grid-table__cell_header {
   grid-column: 1 / -1;
-  background-color: var(--color-neutral-light);
   text-transform: uppercase;
+  text-align: center;
   font-weight: 500;
   padding-top: 20px;
   padding-bottom: 20px;
