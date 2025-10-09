@@ -641,11 +641,14 @@ export class PageSettings {
 
   addEntriesAdditionalField(localeData, container, data = {}) {
     const cellHeaderElement = document.createElement('div', 'Поле');
-    // const cellTextElement = document.createElement('div');
-    // const cellTextTitleElement = document.createElement('div');
-    // const cellDataElement = document.createElement('div');
+    const cellTextElement = document.createElement('div');
+    const cellTextTitleElement = document.createElement('div');
+    const cellDataElement = document.createElement('div');
 
+    container.before(cellTextElement);
+    cellTextElement.appendChild(cellTextTitleElement);
     container.before(cellHeaderElement);
+    container.before(cellDataElement);
   }
 
   addEntriesAdditionalFieldOld(localeData, container, data = {}) {
