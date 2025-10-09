@@ -536,17 +536,19 @@ export class PageSettings {
   }
 
   addUserAdditionalField(localeData, container, data = {}) {
-    let tableRow = document.createElement('tr');
-    let tableCellTypeField = document.createElement('td');
-    let tableCellTitleField = document.createElement('td');
-    let tableCellNameField = document.createElement('td');
-    let tableCellDescriptionField = document.createElement('td');
-    let tableCellEventField = document.createElement('td');
-    let additionalFieldInputTitle = document.createElement('input');
-    let additionalFieldInputName = document.createElement('input');
-    let additionalFieldInputDescription = document.createElement('textarea');
-    
-    tableRow.setAttribute('role', 'additional-field');
+    const cellHeaderElement = document.createElement('div', 'Поле');
+    // const cellTextElement = document.createElement('div');
+    // const cellTextTitleElement = document.createElement('div');
+    // const cellDataElement = document.createElement('div');
+
+    container.before(cellHeaderElement);
+  }
+
+  addUserAdditionalFieldOld(localeData, container, data = {}) {
+    const additionalFieldInputTitle = document.createElement('input');
+    const additionalFieldInputName = document.createElement('input');
+    const additionalFieldInputDescription = document.createElement('textarea');
+
     additionalFieldInputTitle.setAttribute('type', 'text');
     additionalFieldInputTitle.setAttribute('name', 'setting_users_additional_field_title[]');
     additionalFieldInputTitle.setAttribute('placeholder', 'My field');
@@ -559,11 +561,16 @@ export class PageSettings {
     additionalFieldInputDescription.setAttribute('name', 'setting_users_additional_field_description[]');
     additionalFieldInputDescription.setAttribute('placeholder', localeData.SETTINGS_PAGE_SETTING_USERS_ADDITIONAL_FIELD_DESCRIPTION_PLACEHOLDER);
     
-    tableRow.classList.add('table__row');
-    tableCellTypeField.classList.add('table__cell');
-    tableCellTitleField.classList.add('table__cell');
-    tableCellNameField.classList.add('table__cell');
-    tableCellDescriptionField.classList.add('table__cell');
+    cellTextElement.classList.add('cell');
+    cellTextElement.classList.add('grid-table__cell');
+    cellTextElement.classList.add('grid-table__cell_text');
+
+    cellDataElement.classList.add('cell');
+    cellDataElement.classList.add('grid-table__cell');
+    cellDataElement.classList.add('grid-table__cell_data');
+
+    cellTextTitleElement.classList.add('cell__title');
+
     additionalFieldInputTitle.classList.add('form__input');
     additionalFieldInputTitle.classList.add('form__input_text');
     additionalFieldInputName.classList.add('form__input');
@@ -609,6 +616,12 @@ export class PageSettings {
 
     if (typeof data.description != 'undefined') {
       additionalFieldInputDescription.innerText = data.description;
+    }
+
+    for (let i = 0; i < 4; i++) {
+      const cellTextElement = document.createElement('div');
+      const cellTextTitleElement = document.createElement('div');
+      const cellDataElement = document.createElement('div');
     }
 
     tableCellTypeField.append(interactiveChoicesTypeField.target.element);
