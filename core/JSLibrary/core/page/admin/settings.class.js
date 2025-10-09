@@ -709,14 +709,6 @@ export class PageSettings {
       cellHeaderElement,
       container.parentElement.previousElementSibling
     );
-    container.parentElement.parentElement.insertBefore(
-      cellTextElement,
-      container.parentElement.previousElementSibling
-    );
-    container.parentElement.parentElement.insertBefore(
-      cellDataElement,
-      container.parentElement.previousElementSibling
-    );
 
     cellElementsForTitle.forEach(element => {
       container.parentElement.parentElement.insertBefore(
