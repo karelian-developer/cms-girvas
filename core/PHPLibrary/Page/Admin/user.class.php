@@ -16,6 +16,7 @@ use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
+use \DOMDocument as DOMDocument;
 
 class PageUser implements InterfacePage
 {
