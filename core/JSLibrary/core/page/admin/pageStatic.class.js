@@ -180,7 +180,7 @@ export class PagePageStatic {
 
           const additionalDataContainerElement = document.querySelector('[data-element="additional-data"]');
           if (additionalDataContainerElement !== null) {
-            const additionalDataInputs = additionalDataContainerElement.querySelectorAll('[data-element="additional-field"]');
+            const additionalDataInputs = additionalDataContainerElement.querySelectorAll('input');
             additionalDataInputs.forEach(element => {
               formData.append(element.name, element.value);
             });
