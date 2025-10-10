@@ -134,12 +134,11 @@
 }
 
 .article__interactive-block {
+  background-color: rgba(0, 0, 0, .6);
+  color: var(--primary-color-3);
+  padding: 20px;
   width: 100%;
-  padding: 17px 15px;
-  opacity: 0.85;
-  color: var(--primary-color-2);
   transition: var(--transistion);
-  background-color: var(--container-and-text-white-color);
   cursor: pointer;
 }
 
