@@ -676,7 +676,7 @@ export class PageSettings {
     cellHeaderElement.classList.add('grid-table__cell');
     cellHeaderElement.classList.add('grid-table__cell_header');
     cellHeaderElement.innerText = data.title !== undefined
-      ? `Поле &laquo;${data.title}&raquo;`
+      ? `Поле: ${data.title}`
       : `Новое поле`;
 
     additionalFieldInputTitle.setAttribute('type', 'text');
