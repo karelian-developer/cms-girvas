@@ -717,6 +717,10 @@ export class PageSettings {
       url: '/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name,
     });
 
+    const cellElementsForType = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_CATEGORY_FIELD_TITLE
+    );
+
     requestGetEntriesCategories.target.showingNotification = false;
     requestGetEntriesCategories.target.send().then((responseData) => {
       let interactiveChoicesCategoryField = new Interactive('choices');
@@ -734,10 +738,6 @@ export class PageSettings {
         
         interactiveChoicesCategoryField.target.setName('setting_entries_additional_field_category_id[]');
         interactiveChoicesCategoryField.assembly();
-
-        const cellElementsForType = this.createCellAdditionalFieldElements(
-          localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_CATEGORY_FIELD_TITLE
-        );
 
         cellElementsForType[1].append(interactiveChoicesCategoryField.target.element);
       }
@@ -762,6 +762,13 @@ export class PageSettings {
       cellHeaderElement,
       container.parentElement.previousElementSibling
     );
+
+    cellElementsForType.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
 
     cellElementsForTitle.forEach(element => {
       container.parentElement.parentElement.insertBefore(
