@@ -109,8 +109,8 @@ class PageUser implements InterfacePage
       $gridTableCellTextTitleElement = $document->createElement('div');
       $gridTableCellTextDescriptionElement = $document->createElement('div');
 
-      $gridTableCellTextTitleTextNode = $dom->createTextNode($fieldsTitles[$localeName][$index]);
-      $gridTableCellTextDescriptionTextNode = $dom->createTextNode($fieldsDescriptions[$localeName][$index]);
+      $gridTableCellTextTitleTextNode = $document->createTextNode($fieldsTitles[$localeName][$index]);
+      $gridTableCellTextDescriptionTextNode = $document->createTextNode($fieldsDescriptions[$localeName][$index]);
 
       if ($user !== null) {
         $fieldValue = $user->getAdditionalFieldData($fieldNameTransformed) !== null
@@ -120,7 +120,7 @@ class PageUser implements InterfacePage
 
       if ($type === 'textarea') {
         $inputElement = $document->createElement('textarea');
-        $textNode = $dom->createTextNode($fieldValue);
+        $textNode = $document->createTextNode($fieldValue);
         $inputElement->appendChild($textNode);
       } else {
         $inputElement = $document->createElement('input');
