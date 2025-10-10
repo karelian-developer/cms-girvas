@@ -499,6 +499,7 @@
   "PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_EXTERNAL_LINKS_DESCRIPTION": "В случае, если данная опция будет активирована, то каждый комментарий, который будет содержать стороннюю ссылку, будет скрываться до проверки.",
   "PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_TITLE": "Фильтр слов для комментариев",
   "PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_DESCRIPTION": "Фильтр слов позволит автоматически скрывать комментарии, которые будут содержать указанные слова.",
+  "PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_PLACEHOLDER": "слово 1, слово 2, слово 3",
   "PAGE_SETTINGS_SETTING_CONTENT_SECURITY_POLICY_VALUE_TITLE": "Content Security Policy (CSP)",
   "PAGE_SETTINGS_SETTING_CONTENT_SECURITY_POLICY_VALUE_DESCRIPTION": "<b>Content Security Policy (CSP)</b> - это дополнительный уровень безопасности, позволяющий распознавать и устранять определённые типы атак, таких как Cross Site Scripting (XSS) и атаки внедрения данных. Спектр применения этих атак включает, но не ограничивается кражей данных, подменой страниц и распространением зловредного ПО. [<a href=\"https://www.w3.org/TR/CSP/\" target=\"_blank\">О технологии</a>]",
   "PAGE_SETTINGS_SETTING_SEO_SITE_DESCRIPTION_TITLE": "Описание сайта",

@@ -499,6 +499,7 @@
   "PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_EXTERNAL_LINKS_DESCRIPTION": "If this option is activated, then each comment that contains a third-party link will be hidden until verified.",
   "PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_TITLE": "Word filter for comments",
   "PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_DESCRIPTION": "The word filter will allow you to automatically hide comments that contain the specified words.",
+  "PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_PLACEHOLDER": "word 1, word 2, word 3",
   "PAGE_SETTINGS_SETTING_CONTENT_SECURITY_POLICY_VALUE_TITLE": "Content Security Policy (CSP)",
   "PAGE_SETTINGS_SETTING_CONTENT_SECURITY_POLICY_VALUE_DESCRIPTION": "<b>Content Security Policy (CSP)</b> is an additional layer of security that allows you to recognize and prevent certain types of attacks, such as cross-site scripting (XSS), and correct the state of data. The range of applications for these attacks includes, but is not limited to, data theft, page substitution, and malware distribution. [<a href=\"https://www.w3.org/TR/CSP/\" target=\"_blank\">About the technology</a>]",
   "PAGE_SETTINGS_SETTING_SEO_SITE_DESCRIPTION_TITLE": "Description of the site",
