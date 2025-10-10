@@ -651,7 +651,8 @@ export class PageSettings {
     cellDataElement.classList.add('cell');
     cellDataElement.classList.add('grid-table__cell');
     cellDataElement.classList.add('grid-table__cell_data');
-
+    
+    cellTextTitleElement.classList.add('cell__title');
     cellTextTitleElement.innerText = title;
     
     cellTextElement.appendChild(cellTextTitleElement);
@@ -814,17 +815,17 @@ export class PageSettings {
       );
     });
 
-    if (typeof data.title !== undefined) {
-      additionalFieldInputTitle.value = data.title;
-    }
+    additionalFieldInputTitle.value = typeof data.title !== undefined
+      ? data.title
+      : '';
 
-    if (typeof data.name !== undefined) {
-      additionalFieldInputName.value = data.name;
-    }
+    additionalFieldInputName.value = typeof data.name !== undefined
+      ? data.name
+      : '';
 
-    if (typeof data.description !== undefined) {
-      additionalFieldInputDescription.innerText = data.description;
-    }
+    additionalFieldInputDescription.value = typeof data.description !== undefined
+      ? data.description
+      : '';
   }
 
   addStaticPagesAdditionalField(localeData, container, data = {}) {
