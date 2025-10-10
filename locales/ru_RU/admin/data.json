@@ -455,6 +455,8 @@
   "PAGE_SETTINGS_SETTINGS_GROUP_EMAIL_DESCRIPTION": "Здесь можно настроить систему работы с электронными письмами.",
   "PAGE_SETTINGS_SETTING_ON": "Включено",
   "PAGE_SETTINGS_SETTING_OFF": "Отключено",
+  "PAGE_SETTINGS_SETTING_NEW_FIELD": "Новое поле",
+  "PAGE_SETTINGS_SETTING_FIELD": "Поле",
   "PAGE_SETTINGS_SETTING_BASE_TITLE_TITLE": "Наименование сайта",
   "PAGE_SETTINGS_SETTING_BASE_TITLE_DESCRIPTION": "Наименование сайта служит важным атрибутом для поиска в сети Интернет, поэтому назоваите сайт таким образом, чтобы оно отображало суть его содержимого.",
   "PAGE_SETTINGS_SETTING_BASE_TITLE_PLACEHOLDER": "Мой сайт",

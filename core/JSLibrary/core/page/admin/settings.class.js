@@ -540,8 +540,8 @@ export class PageSettings {
     cellHeaderElement.classList.add('grid-table__cell');
     cellHeaderElement.classList.add('grid-table__cell_header');
     cellHeaderElement.innerText = data.title !== undefined
-      ? `Поле: ${data.title}`
-      : `Новое поле`;
+      ? `${localeData.PAGE_SETTINGS_SETTING_FIELD}: ${data.title}`
+      : localeData.PAGE_SETTINGS_SETTING_NEW_FIELD;
 
     cellHeaderElement.setAttribute('data-element', 'additional-field-part-element');
 
@@ -732,8 +732,8 @@ export class PageSettings {
     cellHeaderElement.classList.add('grid-table__cell');
     cellHeaderElement.classList.add('grid-table__cell_header');
     cellHeaderElement.innerText = data.title !== undefined
-      ? `Поле: ${data.title}`
-      : `Новое поле`;
+      ? `${localeData.PAGE_SETTINGS_SETTING_FIELD}: ${data.title}`
+      : localeData.PAGE_SETTINGS_SETTING_NEW_FIELD;
 
     cellHeaderElement.setAttribute('data-element', 'additional-field-part-element');
 
@@ -939,8 +939,8 @@ export class PageSettings {
     cellHeaderElement.classList.add('grid-table__cell');
     cellHeaderElement.classList.add('grid-table__cell_header');
     cellHeaderElement.innerText = data.title !== undefined
-      ? `Поле: ${data.title}`
-      : `Новое поле`;
+      ? `${localeData.PAGE_SETTINGS_SETTING_FIELD}: ${data.title}`
+      : localeData.PAGE_SETTINGS_SETTING_NEW_FIELD;
 
     cellHeaderElement.setAttribute('data-element', 'additional-field-part-element');
 

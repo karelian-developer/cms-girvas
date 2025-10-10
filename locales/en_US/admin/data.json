@@ -455,6 +455,8 @@
   "PAGE_SETTINGS_SETTINGS_GROUP_EMAIL_DESCRIPTION": "Here you can configure how the system works with emails.",
   "PAGE_SETTINGS_SETTING_ON": "Enabled",
   "PAGE_SETTINGS_SETTING_OFF": "Disabled",
+  "PAGE_SETTINGS_SETTING_NEW_FIELD": "New Field",
+  "PAGE_SETTINGS_SETTING_FIELD": "Field",
   "PAGE_SETTINGS_SETTING_BASE_TITLE_TITLE": "Site name",
   "PAGE_SETTINGS_SETTING_BASE_TITLE_DESCRIPTION": "The name of the site is an important attribute for searching the Internet, so name the site in such a way that it reflects the essence of its content.",
   "PAGE_SETTINGS_SETTING_BASE_TITLE_PLACEHOLDER": "My site",
