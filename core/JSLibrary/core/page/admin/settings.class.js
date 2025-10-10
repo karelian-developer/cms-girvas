@@ -350,7 +350,7 @@ export class PageSettings {
           fetch('/handler/entries/additional-fields?locale=' + interactiveChoicesFieldsLocaleSelectElement.value + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
             return (response.ok) ? response.json() : Promise.reject(response);
           }).then((data1) => {
-            let additionalFields = document.querySelectorAll('[role="additional-field"]');
+            let additionalFields = document.querySelectorAll('[data-element="additional-field"]');
             additionalFields.forEach((element) => {
               element.remove();
             })
@@ -434,7 +434,7 @@ export class PageSettings {
           fetch('/handler/pages/additional-fields?locale=' + interactiveChoicesFieldsLocaleSelectElement.value + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
             return (response.ok) ? response.json() : Promise.reject(response);
           }).then((data1) => {
-            let additionalFields = document.querySelectorAll('[role="additional-field"]');
+            let additionalFields = document.querySelectorAll('[data-element="additional-field"]');
             additionalFields.forEach((element) => {
               element.remove();
             })
