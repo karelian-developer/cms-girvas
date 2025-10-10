@@ -268,7 +268,7 @@ export class PageSettings {
           fetch('/handler/profile/additional-fields?locale=' + interactiveChoicesFieldsLocaleSelectElement.value + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
             return (response.ok) ? response.json() : Promise.reject(response);
           }).then((data1) => {
-            let additionalFields = document.querySelectorAll('[data-element="additional-field"]');
+            let additionalFields = document.querySelectorAll('[data-element="additional-field-part-element"]');
             additionalFields.forEach((element) => {
               element.remove();
             })
@@ -350,7 +350,7 @@ export class PageSettings {
           fetch('/handler/entries/additional-fields?locale=' + interactiveChoicesFieldsLocaleSelectElement.value + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
             return (response.ok) ? response.json() : Promise.reject(response);
           }).then((data1) => {
-            let additionalFields = document.querySelectorAll('[data-element="additional-field"]');
+            let additionalFields = document.querySelectorAll('[data-element="additional-field-part-element"]');
             additionalFields.forEach((element) => {
               element.remove();
             })
@@ -434,7 +434,7 @@ export class PageSettings {
           fetch('/handler/pages/additional-fields?locale=' + interactiveChoicesFieldsLocaleSelectElement.value + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
             return (response.ok) ? response.json() : Promise.reject(response);
           }).then((data1) => {
-            let additionalFields = document.querySelectorAll('[data-element="additional-field"]');
+            let additionalFields = document.querySelectorAll('[data-element="additional-field-part-element"]');
             additionalFields.forEach((element) => {
               element.remove();
             })
@@ -542,6 +542,8 @@ export class PageSettings {
     cellHeaderElement.innerText = data.title !== undefined
       ? `Поле: ${data.title}`
       : `Новое поле`;
+
+    cellHeaderElement.setAttribute('data-element', 'additional-field-part-element');
 
     additionalFieldInputTitle.setAttribute('type', 'text');
     additionalFieldInputTitle.setAttribute('name', 'setting_users_additional_field_title[]');
@@ -661,6 +663,9 @@ export class PageSettings {
     cellDataElement.classList.add('cell');
     cellDataElement.classList.add('grid-table__cell');
     cellDataElement.classList.add('grid-table__cell_data');
+
+    cellTextElement.setAttribute('data-element', 'additional-field-part-element');
+    cellDataElement.setAttribute('data-element', 'additional-field-part-element');
     
     cellTextTitleElement.classList.add('cell__title');
     cellTextTitleElement.innerText = title;
@@ -689,6 +694,8 @@ export class PageSettings {
     cellHeaderElement.innerText = data.title !== undefined
       ? `Поле: ${data.title}`
       : `Новое поле`;
+
+    cellHeaderElement.setAttribute('data-element', 'additional-field-part-element');
 
     additionalFieldInputTitle.setAttribute('type', 'text');
     additionalFieldInputTitle.setAttribute('name', 'setting_entries_additional_field_title[]');
@@ -850,6 +857,8 @@ export class PageSettings {
     cellHeaderElement.innerText = data.title !== undefined
       ? `Поле: ${data.title}`
       : `Новое поле`;
+
+    cellHeaderElement.setAttribute('data-element', 'additional-field-part-element');
 
     additionalFieldInputTitle.setAttribute('type', 'text');
     additionalFieldInputTitle.setAttribute('name', 'setting_static_pages_additional_field_title[]');
