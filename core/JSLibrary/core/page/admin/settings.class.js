@@ -201,15 +201,13 @@ export class PageSettings {
       }
 
       if (searchParams.getPathPart(3) === 'files') {
-        let extension;
-        let interactiveChoicesSettingsAutoConvertImageExtension = new Interactive('choices');
-
         fetch('/handler/file-auto-convert-image-extension', {
           method: 'GET'
         }).then((response) => {
           return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
-          extension = data.outputData.extension;
+          const extension = data.outputData.extension;
+          const interactiveChoicesSettingsAutoConvertImageExtension = new Interactive('choices');
 
           ['webp', 'avif'].forEach((element, elementIndex) => {
             interactiveChoicesSettingsAutoConvertImageExtension.target.addItem(element.toUpperCase(), element);
@@ -222,7 +220,7 @@ export class PageSettings {
           interactiveChoicesSettingsAutoConvertImageExtension.target.setName('setting_files_auto_convert_file_image_extension');
           interactiveChoicesSettingsAutoConvertImageExtension.assembly();
 
-          document.querySelector('#TC7499045295').prepend(interactiveChoicesSettingsAutoConvertImageExtension.target.element);
+          document.querySelector('[data-element="choice"][data-choice="convert-extension"]').prepend(interactiveChoicesSettingsAutoConvertImageExtension.target.element);
         });
       }
 
