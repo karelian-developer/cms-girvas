@@ -817,8 +817,8 @@ export class PageSettings {
         element.remove();
       });
 
-      buttonRemoveField.parentElement.previousElementSibling.remove();
-      buttonRemoveField.parentElement.remove();
+      buttonRemoveField.target.element.parentElement.previousElementSibling.remove();
+      buttonRemoveField.target.element.parentElement.remove();
 
       cellHeaderElement.remove();
     });
