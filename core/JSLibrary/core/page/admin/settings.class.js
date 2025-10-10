@@ -699,11 +699,11 @@ export class PageSettings {
     additionalFieldInputDescription.classList.add('form__textarea');
 
     const cellElementsForType = this.createCellAdditionalFieldElements(
-      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_TYPE_FIELD_TITLE
+      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELD_TYPE_FIELD_TITLE
     );
 
     const cellElementsForCategory = this.createCellAdditionalFieldElements(
-      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_CATEGORY_FIELD_TITLE
+      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELD_CATEGORY_FIELD_TITLE
     );
 
     /* Выпадающий список с типами полей */
@@ -761,17 +761,17 @@ export class PageSettings {
     /* ======= */
 
     const cellElementsForTitle = this.createCellAdditionalFieldElements(
-      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_NAME_TITLE,
+      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELD_TITLE_TITLE,
       additionalFieldInputTitle
     );
 
     const cellElementsForName = this.createCellAdditionalFieldElements(
-      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_TECHNICAL_NAME_TITLE,
+      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELD_TECHNICAL_NAME_TITLE,
       additionalFieldInputName
     );
 
     const cellElementsForDescription = this.createCellAdditionalFieldElements(
-      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_DESCRIPTION_TITLE,
+      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELD_DESCRIPTION_TITLE,
       additionalFieldInputDescription
     );
 
@@ -843,7 +843,7 @@ export class PageSettings {
 
     additionalFieldInputTitle.setAttribute('type', 'text');
     additionalFieldInputTitle.setAttribute('name', 'setting_static_pages_additional_field_title[]');
-    additionalFieldInputTitle.setAttribute('placeholder', localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELD_TITLE_PLACEHOLDER);
+    additionalFieldInputTitle.setAttribute('placeholder', localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_TITLE_PLACEHOLDER);
     additionalFieldInputTitle.setAttribute('required', 'required');
     additionalFieldInputName.setAttribute('pattern', '[a-z0-9_]+');
     additionalFieldInputName.setAttribute('type', 'text');
@@ -851,7 +851,7 @@ export class PageSettings {
     additionalFieldInputName.setAttribute('placeholder', 'my_field');
     additionalFieldInputName.setAttribute('required', 'required');
     additionalFieldInputDescription.setAttribute('name', 'setting_static_pages_additional_field_description[]');
-    additionalFieldInputDescription.setAttribute('placeholder', localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELD_DESCRIPTION_PLACEHOLDER);
+    additionalFieldInputDescription.setAttribute('placeholder', localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_DESCRIPTION_PLACEHOLDER);
 
     additionalFieldInputTitle.classList.add('form__input');
     additionalFieldInputTitle.classList.add('form__input_text');
@@ -860,7 +860,7 @@ export class PageSettings {
     additionalFieldInputDescription.classList.add('form__textarea');
 
     const cellElementsForType = this.createCellAdditionalFieldElements(
-      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_TYPE_FIELD_TITLE
+      localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_TYPE_FIELD_TITLE
     );
 
     /* Выпадающий список с типами полей */
@@ -887,17 +887,17 @@ export class PageSettings {
     cellElementsForType[1].append(interactiveChoicesTypeField.target.element);
 
     const cellElementsForTitle = this.createCellAdditionalFieldElements(
-      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_NAME_TITLE,
+      localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_TITLE_TITLE,
       additionalFieldInputTitle
     );
 
     const cellElementsForName = this.createCellAdditionalFieldElements(
-      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_TECHNICAL_NAME_TITLE,
+      localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_TECHNICAL_NAME_TITLE,
       additionalFieldInputName
     );
 
     const cellElementsForDescription = this.createCellAdditionalFieldElements(
-      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_DESCRIPTION_TITLE,
+      localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_DESCRIPTION_TITLE,
       additionalFieldInputDescription
     );
 
