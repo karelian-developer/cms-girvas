@@ -12,36 +12,42 @@
   font-weight: 400;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'Roboto';
   src: url('../fonts/Roboto-Medium.ttf');
   font-weight: 500;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'Roboto';
   src: url('../fonts/Roboto-MediumItalic.ttf');
   font-weight: 500;
   font-style: italic;
 }
+
 @font-face {
   font-family: 'Roboto';
   src: url('../fonts/Roboto-Bold.ttf');
   font-weight: 700;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'Roboto';
   src: url('../fonts/Roboto-BoldItalic.ttf');
   font-weight: 700;
   font-style: italic;
 }
+
 @font-face {
   font-family: 'Roboto';
   src: url('../fonts/Roboto-Black.ttf');
   font-weight: 900;
   font-style: normal;
 }
+
 @font-face {
   font-family: 'Roboto';
   src: url('../fonts/Roboto-BlackItalic.ttf');
