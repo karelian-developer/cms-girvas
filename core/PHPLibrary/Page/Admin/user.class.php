@@ -139,6 +139,7 @@ class PageUser implements InterfacePage
       $gridTableCellTextDescriptionElement->appendChild($gridTableCellTextDescriptionTextNode);
       $gridTableCellTextElement->appendChild($gridTableCellTextTitleElement);
       $gridTableCellTextElement->appendChild($gridTableCellTextDescriptionElement);
+      $gridTableCellDataElement->appendChild($inputElement);
       $documentFragment->appendChild($gridTableCellTextElement);
       $documentFragment->appendChild($gridTableCellDataElement);
       $document->appendChild($documentFragment);
