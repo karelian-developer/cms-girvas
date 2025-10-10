@@ -815,15 +815,15 @@ export class PageSettings {
       );
     });
 
-    additionalFieldInputTitle.value = typeof data.title !== undefined
+    additionalFieldInputTitle.value = data.title !== undefined
       ? data.title
       : '';
 
-    additionalFieldInputName.value = typeof data.name !== undefined
+    additionalFieldInputName.value = data.name !== undefined
       ? data.name
       : '';
 
-    additionalFieldInputDescription.value = typeof data.description !== undefined
+    additionalFieldInputDescription.value = data.description !== undefined
       ? data.description
       : '';
   }
