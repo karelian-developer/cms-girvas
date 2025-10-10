@@ -135,21 +135,18 @@
     <div class="page-content-block page-content-block_copyright">
     </div>
   </div>
-  <div class="page__notice notice notice_yellow">
-    <p class="page__notice-phar">{LANG:PAGE_WARNING_DEVELOPED_PROCESS}</p>
-  </div>
 </article>
 <aside class="main__page-aside page-aside">
   <article class="page-aside__block">
     <h2 class="page-aside__block-title">{LANG:PAGE_INDEX_SIDEBAR_BLOCK_LATEST_NEWS_TITLE}</h2>
     <div class="page-aside__block-content">
-      {WEB_CHANNEL_LATEST_NEWS_LIST}
+      {FEED_LATEST_NEWS_LIST}
     </div>
   </article>
   <article class="page-aside__block">
     <h2 class="page-aside__block-title">{LANG:PAGE_INDEX_SIDEBAR_BLOCK_LATEST_RELEASES_TITLE}</h2>
     <div class="page-aside__block-content">
-      {WEB_CHANNEL_LATEST_RELEASES_LIST}
+      {FEED_LATEST_RELEASES_LIST}
     </div>
   </article>
 </aside>

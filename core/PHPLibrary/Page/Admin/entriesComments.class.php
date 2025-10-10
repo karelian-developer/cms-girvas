@@ -93,7 +93,7 @@ class PageEntriesComments implements InterfacePage
     $localeName = $this->CMSCore->locale->getName();
 
     $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
-    $$paginationItemsOnPage = 12;
+    $paginationItemsOnPage = 12;
 
     $entries = new Entries($this->CMSCore);
     $entriesObjects = $entries->getAll();
@@ -105,7 +105,7 @@ class PageEntriesComments implements InterfacePage
 
         if (!empty($entryCommentsObjects)) {
           foreach ($entryCommentsObjects as $object) {
-            $object->initData(['content', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
+            $object->initData(['content', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata', 'authorID', 'entryID']);
             array_push($entriesCommentsObjectsSorted, $object);
           }
         }
@@ -125,10 +125,10 @@ class PageEntriesComments implements InterfacePage
         return 0;
       });
 
-      $entriesCommentsObjectsSorted = array_slice($entriesCommentsObjectsSorted, $paginationItemCurrent * $$paginationItemsOnPage, $$paginationItemsOnPage);
+      $entriesCommentsObjectsSorted = array_slice($entriesCommentsObjectsSorted, $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
     }
 
-    $pagination = new Pagination($this->CMSCore, count($entriesCommentsObjectsSorted), $$paginationItemsOnPage, $paginationItemCurrent);
+    $pagination = new Pagination($this->CMSCore, count($entriesCommentsObjectsSorted), $paginationItemsOnPage, $paginationItemCurrent);
     $pagination->assembly();
     
     $commentsTableItemsAssembled = [];
@@ -137,12 +137,28 @@ class PageEntriesComments implements InterfacePage
         $createdDateTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
         $updatedDateTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
+        $author = $object->getAuthor();
+        if ($author !== null) {
+          $author->initData(['login']);
+        }
+
+        $authorLogin = $author !== null ? $author->getLogin() : 'User deleted';
+
+        $entry = $object->getEntry();
+        if ($entry !== null) {
+          $entry->initData(['texts']);
+        }
+
+        $entryTitle = $entry !== null ? $entry->getTitle($localeName) : 'Entry deleted';
+
         array_push($commentsTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesComments/tableItem.tpl', [
-          'COMMENT_ID' => $object->get_id(),
+          'COMMENT_ID' => $object->getID(),
           'COMMENT_IS_HIDDEN_STATUS' => var_export($object->isHidden(), true),
           'COMMENT_HIDDEN_REASON' => strip_tags($object->getHiddenReason()),
           'COMMENT_INDEX' => $index + 1,
           'COMMENT_CONTENT' => strip_tags($object->getContent()),
+          'COMMENT_AUTHOR_LOGIN' => $authorLogin,
+          'COMMENT_ENTRY_TITLE' => $entryTitle,
           'COMMENT_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
           'COMMENT_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp
         ]));

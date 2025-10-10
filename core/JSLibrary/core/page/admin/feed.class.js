@@ -21,26 +21,21 @@ export class PageFeed {
 
   init() {
     let searchParams = new URLParser(), locales;
-    let elementForm = document.querySelector('.form_webchannel');
+    let elementForm = document.querySelector('[data-element="main-form"]');
 
-    let interactiveLocalesChoices = new Interactive('choices');
-    let interactiveChoicesEntriesCategories = new Interactive('choices');
+    const interactiveLocalesChoices = new Interactive('choices');
+    const interactiveChoicesEntriesCategories = new Interactive('choices');
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
       locales = data.outputData.locales;
+
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let urlInputElement = document.querySelector('[role="feedURL"]');
+      let urlInputElement = document.querySelector('[data-element="input-url"]');
 
       this.buttons.delete = new Interactive('button');
       this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
@@ -54,7 +49,7 @@ export class PageFeed {
         
         interactiveModal.target.addButton(localeData.BUTTON_DELETE_LABEL, () => {
           let formData = new FormData();
-          formData.append('web_channel_id', searchParams.getPathPart(3));
+          formData.append('feed_id', searchParams.getPathPart(3));
           
           let request = new Interactive('request', {
             method: 'DELETE',
@@ -107,15 +102,7 @@ export class PageFeed {
             }
           });
         } else {
-          let interactiveNotification;
-        
-          interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY);
-          interactiveNotification.target.assembly();
-
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY, 0);
         }
       });
       this.buttons.save.assembly();
@@ -123,8 +110,8 @@ export class PageFeed {
       if (searchParams.getPathPart(3) !== null) {
         let feedsTypes;
         let interactiveChoicesWebChannelsTypes = new Interactive('choices');
-        let feedDescriptionTextareaElement = document.querySelector('[role="feedDescription"]');
-        let feedTitleInputElement = document.querySelector('[role="feedTitle"]');
+        let feedTitleInputElement = document.querySelector('[data-element="input-title"]');
+        let feedDescriptionTextareaElement = document.querySelector('[data-element="input-description"]');
 
         fetch('/handler/feeds/types?localeMessage=' + window.CMSCore.locales.admin.name, {
           method: 'GET'
@@ -146,10 +133,10 @@ export class PageFeed {
             }
           });
 
-          interactiveChoicesWebChannelsTypes.target.setName('web_channel_type_id');
+          interactiveChoicesWebChannelsTypes.target.setName('feed_type_id');
           interactiveChoicesWebChannelsTypes.assembly();
 
-          document.querySelector('#TC6474387201').append(interactiveChoicesWebChannelsTypes.target.element);
+          document.querySelector('[data-element="choice"][data-choice="specification"]').append(interactiveChoicesWebChannelsTypes.target.element);
         });
 
         let entriesCategories;
@@ -174,10 +161,10 @@ export class PageFeed {
             }
           });
 
-          interactiveChoicesEntriesCategories.target.setName('web_channel_entries_category_id');
+          interactiveChoicesEntriesCategories.target.setName('feed_entries_category_id');
           interactiveChoicesEntriesCategories.assembly();
 
-          document.querySelector('#TC6474387200').append(interactiveChoicesEntriesCategories.target.element);
+          document.querySelector('[data-element="choice"][data-choice="category"]').append(interactiveChoicesEntriesCategories.target.element);
         });
 
         locales.forEach((locale, localeIndex) => {
@@ -206,8 +193,8 @@ export class PageFeed {
           }
 
           if (locale.name === window.CMSCore.locales.admin.name) {
-            feedDescriptionTextareaElement.setAttribute('name', 'web_channel_description_' + locale.iso639_2);
-            feedTitleInputElement.setAttribute('name', 'web_channel_title_' + locale.iso639_2);
+            feedDescriptionTextareaElement.setAttribute('name', 'feed_description_' + locale.iso639_2);
+            feedTitleInputElement.setAttribute('name', 'feed_title_' + locale.iso639_2);
             
             let request = new Interactive('request', {
               method: 'GET',
@@ -227,7 +214,7 @@ export class PageFeed {
 
         interactiveLocalesChoices.assembly();
 
-        let interactiveContainerElement = document.querySelector('#E8548530785');
+        let interactiveContainerElement = document.querySelector('[data-element="header-interactive"]');
         interactiveContainerElement.append(interactiveLocalesChoices.target.element);
 
         urlInputElement.addEventListener('input', (event) => {
@@ -249,8 +236,8 @@ export class PageFeed {
         interactiveChoicesSelectElement.addEventListener('change', (event) => {
           locales.forEach((locale, localeIndex) => {
             if (locale.name === event.target.value) {
-              feedDescriptionTextareaElement.setAttribute('name', 'web_channel_description_' + locale.iso639_2);
-              feedTitleInputElement.setAttribute('name', 'web_channel_title_' + locale.iso639_2);
+              feedDescriptionTextareaElement.setAttribute('name', 'feed_description_' + locale.iso639_2);
+              feedTitleInputElement.setAttribute('name', 'feed_title_' + locale.iso639_2);
               
               let request = new Interactive('request', {
                 method: 'GET',
@@ -281,10 +268,10 @@ export class PageFeed {
             interactiveChoicesWebChannelsTypes.target.addItem(type.title, type.id);
           });
   
-          interactiveChoicesWebChannelsTypes.target.setName('web_channel_type_id');
+          interactiveChoicesWebChannelsTypes.target.setName('feed_type_id');
           interactiveChoicesWebChannelsTypes.assembly();
   
-          document.querySelector('#TC6474387201').append(interactiveChoicesWebChannelsTypes.target.element);
+          document.querySelector('[data-element="choice"][data-choice="specification"]').append(interactiveChoicesWebChannelsTypes.target.element);
   
           return fetch('/handler/entries/categories?localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
         }).then((response) => {
@@ -297,10 +284,10 @@ export class PageFeed {
             interactiveChoicesEntriesCategories.target.addItem(entryCategory.title, entryCategory.id);
           });
   
-          interactiveChoicesEntriesCategories.target.setName('web_channel_entries_category_id');
+          interactiveChoicesEntriesCategories.target.setName('feed_entries_category_id');
           interactiveChoicesEntriesCategories.assembly();
   
-          document.querySelector('#TC6474387200').append(interactiveChoicesEntriesCategories.target.element);
+          document.querySelector('[data-element="choice"][data-choice="category"]').append(interactiveChoicesEntriesCategories.target.element);
         });
       }
 
@@ -312,17 +299,11 @@ export class PageFeed {
         this.buttons.save.target.element.style.display = 'flex';
       }
 
-      let interactiveFormPanelContainer = document.querySelector('#SYSTEM_E3724126170');
+      let interactiveFormPanelContainer = document.querySelector('[data-element="panel"]');
       interactiveFormPanelContainer.append(this.buttons.delete.target.element);
       interactiveFormPanelContainer.append(this.buttons.save.target.element);
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }

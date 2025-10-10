@@ -17,7 +17,7 @@ export class PageEntriesComments {
   }
 
   init() {
-    let tableItems = document.querySelectorAll('.table-entries-comments__item');
+    const tableItems = document.querySelectorAll('[data-element="entry-comment"]');
     let locales;
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
@@ -26,30 +26,25 @@ export class PageEntriesComments {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
       for (let tableItem of tableItems) {
-        let commentID = tableItem.getAttribute('data-comment-id');
-        let commentIsHidden = tableItem.getAttribute('data-comment-is-hidden');
-        let buttons = tableItem.querySelectorAll('button[role]');
+        let commentID = tableItem.getAttribute('data-id');
+        let commentIsHidden = tableItem.getAttribute('data-is-hidden');
+        const panelElement = tableItem.querySelector('[data-element="panel"]');
+        const panelEventElements = panelElement.querySelectorAll('[data-event]');
         
-        for (let button of buttons) {
-          if (button.getAttribute('role') === 'comment-hide' && commentIsHidden === 'true') {
-            button.parentElement.style.display = 'none';
+        for (let panelEventElement of panelEventElements) {
+          if (panelEventElement.getAttribute('data-event') === 'hide' && commentIsHidden === 'true') {
+            panelEventElement.style.display = 'none';
           }
 
-          if (button.getAttribute('role') === 'comment-show' && commentIsHidden === 'false') {
-            button.parentElement.style.display = 'none';
+          if (panelEventElement.getAttribute('data-event') === 'show' && commentIsHidden === 'false') {
+            panelEventElement.style.display = 'none';
           }
 
-          button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') === 'comment-show') {
+          panelEventElement.addEventListener('click', (event) => {
+            if (panelEventElement.getAttribute('data-event') === 'show') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_COMMENT_SHOW_TITLE,
                 content: localeData.MODAL_COMMENT_SHOW_DESCRIPTION
@@ -86,9 +81,10 @@ export class PageEntriesComments {
               interactiveModal.target.show();
             }
 
-            if (button.getAttribute('role') === 'comment-hide') {
+            if (panelEventElement.getAttribute('data-event') === 'hide') {
               let elementForm = document.createElement('form');
               elementForm.classList.add('form');
+
               let elementTextarea = document.createElement('textarea');
               elementTextarea.classList.add('form__textarea');
               elementTextarea.style.width = '100%';
@@ -132,7 +128,7 @@ export class PageEntriesComments {
               interactiveModal.target.show();
             }
 
-            if (button.getAttribute('role') === 'comment-delete') {
+            if (panelEventElement.getAttribute('data-event') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_ENTRY_COMMENT_DELETE_TITLE,
                 content: localeData.MODAL_ENTRY_COMMENT_DELETE_DESCRIPTION
@@ -171,13 +167,7 @@ export class PageEntriesComments {
         }
       }
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }

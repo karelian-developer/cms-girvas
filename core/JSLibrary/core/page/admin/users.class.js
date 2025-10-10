@@ -25,13 +25,7 @@ export class PageUsers {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
       let interactiveCreatePageButton = new Interactive('button');
       
@@ -41,22 +35,20 @@ export class PageUsers {
       });
       interactiveCreatePageButton.assembly();
     
-      let interactiveContainerElement = document.querySelector('#E8548530785');
+      const interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
-      let tableItemsUsers = document.querySelectorAll('.table-users__item');
-      
-      for (let tableItemUser of tableItemsUsers) {
-        let userID = tableItemUser.getAttribute('data-user-id');
-        let buttons = tableItemUser.querySelectorAll('button[role]');
+      const tableItems = document.querySelectorAll('[data-element="user"]');
+      for (let tableItem of tableItems) {
+        const userID = tableItem.getAttribute('data-id');
+        const panelElement = tableItem.querySelector('[data-element="panel"]');
+        const panelEventElements = panelElement.querySelectorAll('[data-event]');
 
-        for (let button of buttons) {
-          button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') === 'user-edit') {
-              window.location.href = `./user/${userID}`;
-            }
+        for (let eventElement of panelEventElements) {
+          eventElement.addEventListener('click', (event) => {
+            event.preventDefault();
 
-            if (button.getAttribute('role') === 'user-remove') {
+            if (eventElement.getAttribute('data-event') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_USER_DELETE_TITLE,
                 content: localeData.MODAL_USER_DELETE_DESCRIPTION
@@ -92,13 +84,7 @@ export class PageUsers {
         }
       }
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }

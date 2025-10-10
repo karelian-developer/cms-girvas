@@ -22,8 +22,8 @@ export class PagePageStatic {
   init() {
     let searchParams = new URLParser(), locales;
 
-    let elementForm = document.querySelector('.form_page-static');
-    let interactiveLocaleChoices = new Interactive('choices');
+    const elementForm = document.querySelector('[data-element="main-form"]');
+    const interactiveLocaleChoices = new Interactive('choices');
     
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
@@ -31,21 +31,15 @@ export class PagePageStatic {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let contentTextareaElement = document.querySelector('[role="pageStaticContent"]');
-      let descriptionTextareaElement = document.querySelector('[role="pageStaticDescription"]');
-      let SEODescriptionTextareaElement = document.querySelector('[role="pageStaticSEODescription"]');
-      let titleInputElement = document.querySelector('[role="pageStaticTitle"]');
-      let SEOTitleInputElement = document.querySelector('[role="pageStaticSEOTitle"]');
-      let keywordsInputElement = document.querySelector('[role="pageStaticKeywords"]');
-      let urlInputElement = document.querySelector('[role="pageStaticURL"]');
+      let urlInputElement = document.querySelector('[data-element="input-url"]');
+      let titleInputElement = document.querySelector('[data-element="input-title"]');
+      let SEOTitleInputElement = document.querySelector('[data-element="input-seo-title"]');
+      let descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
+      let SEODescriptionTextareaElement = document.querySelector('[data-element="input-seo-description"]');
+      let keywordsInputElement = document.querySelector('[data-element="input-keywords"]');
+      let contentTextareaElement = document.querySelector('[data-element="input-content"]');
 
       locales.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
@@ -104,7 +98,7 @@ export class PagePageStatic {
 
       interactiveLocaleChoices.assembly();
 
-      let interactiveContainerElement = document.querySelector('#E8548530785');
+      let interactiveContainerElement = document.querySelector('[data-element="header-interactive"]');
       interactiveContainerElement.append(interactiveLocaleChoices.target.element);
 
       urlInputElement.addEventListener('input', (event) => {
@@ -184,16 +178,16 @@ export class PagePageStatic {
             formData.append(inputPersonalTemplatePath.name, inputPersonalTemplatePath.value);
           }
 
-          let additionalDataContainerElement = document.querySelector('[role="additional-data"]');
+          const additionalDataContainerElement = document.querySelector('[data-element="additional-data"]');
           if (additionalDataContainerElement !== null) {
-            let additionalDataInputs = additionalDataContainerElement.querySelectorAll('input');
-            additionalDataInputs.forEach((element) => {
+            const additionalDataInputs = additionalDataContainerElement.querySelectorAll('input');
+            additionalDataInputs.forEach(element => {
               formData.append(element.name, element.value);
             });
           }
 
           let request = new Interactive('request', {
-            method: (searchParams.getPathPart(3) === null) ? 'PUT' : 'PATCH',
+            method: searchParams.getPathPart(3) === null ? 'PUT' : 'PATCH',
             url: '/handler/pageStatic?localeMessage=' + window.CMSCore.locales.admin.name
           });
 
@@ -208,15 +202,7 @@ export class PagePageStatic {
             }
           });
         } else {
-          let interactiveNotification;
-        
-          interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY);
-          interactiveNotification.target.assembly();
-
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(rejectionReason, 0);
         }
       });
       this.buttons.save.assembly();
@@ -318,7 +304,7 @@ export class PagePageStatic {
       } else {
         let interactiveButtonPreviewUpload = new Interactive('button');
 
-        let previewBlockElement = document.querySelector('#SYSTEM_E3754926184');
+        let previewBlockElement = document.querySelector('[data-element="aside-block-cover"]');
         let previewBlockContentContainerElement = previewBlockElement.querySelector('.page-aside__block-content');
         
         let previewFormElement = document.createElement('form');
@@ -426,29 +412,16 @@ export class PagePageStatic {
             this.buttons.delete.target.element.style.display = 'none';
             this.buttons.save.target.element.style.display = 'flex';
           }
-
-          let interactiveNotificationLoading = new Interactive('notification');
-          interactiveNotificationLoading.target.isPopup = true;
-          interactiveNotificationLoading.target.setStatusCode(data1.statusCode);
-          interactiveNotificationLoading.target.setContent(data1.message);
-          interactiveNotificationLoading.target.assembly();
-          interactiveNotificationLoading.target.show();
         });
       }
 
-      let interactiveContainer = document.querySelector('#SYSTEM_E3724126170');
+      let interactiveContainer = document.querySelector('[data-element="panel"]');
       interactiveContainer.append(this.buttons.delete.target.element);
       interactiveContainer.append(this.buttons.unpublish.target.element);
       interactiveContainer.append(this.buttons.publish.target.element);
       interactiveContainer.append(this.buttons.save.target.element);
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }

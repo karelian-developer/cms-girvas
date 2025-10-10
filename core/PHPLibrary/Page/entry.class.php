@@ -19,6 +19,8 @@ use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \DateTime as DateTime;
+use \DateTimeZone as DateTimeZone;
 
 class PageEntry implements InterfacePage
 {
@@ -38,17 +40,21 @@ class PageEntry implements InterfacePage
     public InterfacePage $page
   ) {
     $this->initTargetObject();
-    $this->targetObject->initData(
-      [
-        'id',
-        'categoryID',
-        'texts',
-        'name',
-        'createdUnixTimestamp',
-        'updatedUnixTimestamp',
-        'metadata'
-      ]
-    );
+
+    if ($this->targetObject !== null) {
+      $this->targetObject->initData(
+        [
+          'id',
+          'categoryID',
+          'authorID',
+          'texts',
+          'name',
+          'createdUnixTimestamp',
+          'updatedUnixTimestamp',
+          'metadata'
+        ]
+      );
+    }
   }
 
   /**
@@ -252,6 +258,8 @@ class PageEntry implements InterfacePage
          * @var string Содержание записи
          */
         $entryContent = $entry->getContent($localeName);
+
+        $siteTimezone = $this->CMSCore->configurator->getSiteTimezone();
         
         $createdDateTimestamp = date('d.m.Y H:i:s', $entry->getCreatedUnixTimestamp());
         $publishedDateTimestamp = date('d.m.Y H:i:s', $entry->getPublishedUnixTimestamp());
@@ -277,6 +285,35 @@ class PageEntry implements InterfacePage
         $publishedDateTimestampISO8601WithoutDate = date('H:i:s', $entry->getPublishedUnixTimestamp());
         $updatedDateTimestampISO8601WithoutDate = date('H:i:s', $entry->getUpdatedUnixTimestamp());
 
+        $createdDateTimestampISO8601TZ = new DateTime();
+        $createdDateTimestampISO8601TZ->setTimestamp($entry->getCreatedUnixTimestamp());
+        $createdDateTimestampISO8601TZ->setTimezone(new DateTimeZone($siteTimezone));
+
+        $publishedDateTimestampISO8601TZ = new DateTime();
+        $publishedDateTimestampISO8601TZ->setTimestamp($entry->getPublishedUnixTimestamp());
+        $publishedDateTimestampISO8601TZ->setTimezone(new DateTimeZone($siteTimezone));
+
+        $updatedDateTimestampISO8601TZ = new DateTime();
+        $updatedDateTimestampISO8601TZ->setTimestamp($entry->getUpdatedUnixTimestamp());
+        $updatedDateTimestampISO8601TZ->setTimezone(new DateTimeZone($siteTimezone));
+
+        $author = $entry->getAuthor();
+        $authorLogin = $author->getLogin();
+        $authorName = $author->getName();
+        $authorSurname = $author->getSurname();
+        $authorPatronymic = $author->getPatronymic();
+
+        $entryPrevious = $entry->getPreviousEntry();
+        $entryNext = $entry->getNextEntry();
+
+        if ($entryPrevious !== null) {
+          $entryPrevious->initData(['name', 'texts', 'metadata']);
+        }
+
+        if ($entryNext !== null) {
+          $entryNext->initData(['name', 'texts', 'metadata']);
+        }
+
         $pageTemplateVariables = [
           'ENTRY_ID' => $entry->getID(),
           'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
@@ -287,6 +324,28 @@ class PageEntry implements InterfacePage
           'ENTRY_CATEGORY_TITLE' => $categoryTitle,
           'ENTRY_CATEGORY_URL' => $category->getURL(),
           'ENTRY_COMMENTS_LIST' => count($commentsArray) > 0 ? $entryCommentsTransformed : $localeData['PAGE_ENTRY_COMMENTS_NOT_FOUND_LABEL'],
+          'ENTRY_AUTHOR_LOGIN' => $authorLogin,
+          'ENTRY_AUTHOR_NAME' => $authorName,
+          'ENTRY_AUTHOR_SURNAME' => $authorSurname,
+          'ENTRY_AUTHOR_PATRONYMIC' => $authorPatronymic,
+          'ENTRY_PREVIOUS_TITLE' => ($entryPrevious !== null)
+            ? strip_tags($entryPrevious->getTitle($localeName))
+            : '',
+          'ENTRY_PREVIOUS_DESCRIPTION' => ($entryPrevious !== null)
+            ? strip_tags($entryPrevious->getDescription($localeName))
+            : '',
+          'ENTRY_PREVIOUS_URL' => ($entryPrevious !== null)
+            ? $entryPrevious->getURL()
+            : '#',
+          'ENTRY_NEXT_TITLE' => ($entryNext !== null)
+            ? strip_tags($entryNext->getTitle($localeName))
+            : '',
+          'ENTRY_NEXT_DESCRIPTION' => ($entryNext !== null)
+            ? strip_tags($entryNext->getDescription($localeName))
+            : '',
+          'ENTRY_NEXT_URL' => ($entryNext !== null)
+            ? $entryNext->getURL()
+            : '#',
           'ENTRY_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
           'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $entry->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestamp : date('d.m.Y H:i:s', 0),
           'ENTRY_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp,
@@ -299,6 +358,9 @@ class PageEntry implements InterfacePage
           'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601' => $createdDateTimestampISO8601,
           'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601' => $publishedDateTimestampISO8601,
           'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601' => $updatedDateTimestampISO8601,
+          'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_TIMEZONE' => $createdDateTimestampISO8601TZ->format('c'),
+          'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_TIMEZONE' => $publishedDateTimestampISO8601TZ->format('c'),
+          'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_TIMEZONE' => $updatedDateTimestampISO8601TZ->format('c'),
           'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $createdDateTimestampISO8601WithoutTime,
           'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $publishedDateTimestampISO8601WithoutTime,
           'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $updatedDateTimestampISO8601WithoutTime,

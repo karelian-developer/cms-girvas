@@ -320,6 +320,7 @@
 @media (min-width: 600px) {
   .interactive .interactive__modal {
     max-width: calc(100% - 400px);
+    max-height: calc(100% - 100px);
   }
 }
 
@@ -366,6 +367,7 @@
 .interactive .interactive__modal .modal__body-container {
   font-size: 14px;
   padding: 10px;
+  overflow-y: scroll;
 }
 
 .interactive .interactive__modal .modal__body-container > *:not(:last-child) {

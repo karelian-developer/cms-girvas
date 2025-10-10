@@ -11,7 +11,7 @@
 import {Interactive} from "../../../interactive.class.js";
 import {URLParser} from "../../../urlParser.class.js";
 
-export class PageTemplates {
+export class PageThemes {
   constructor(page, params = {}) {
     this.page = page;
   }
@@ -25,15 +25,9 @@ export class PageTemplates {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let listItems = document.querySelectorAll('.templates-list .list__item');
+      let listItems = document.querySelectorAll('.themes-list .list__item');
     
       for (let listItem of listItems) {
         let buttons = {more: null, delete: null, install: null};
@@ -46,15 +40,15 @@ export class PageTemplates {
         buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
         buttons.install.target.setLabel(localeData.BUTTON_INSTALL_LABEL)
 
-        let templateName = listItem.getAttribute('data-template-name');
-        let templateCategory = listItem.getAttribute('data-template-category');
-        let templateInstalledStatus = listItem.getAttribute('data-template-installed-status');
-        let itemFooterContainer = listItem.querySelector('[role="item-footer-panel"]');
+        let themeName = listItem.getAttribute('data-name');
+        let themeCategory = listItem.getAttribute('data-category');
+        let themeInstalledStatus = listItem.getAttribute('data-installed-status');
+        let itemFooterContainer = listItem.querySelector('[data-element="item-footer-panel"]');
 
         buttons.more.target.setCallback((event) => {
           switch (searchParams.getPathPart(3)) {
-            case 'repository': window.location.href = `/admin/templates/repository/${templateName}`; break;
-            default: window.location.href = `/admin/template/${templateName}`;
+            case 'repository': window.location.href = `/admin/templates/repository/${themeName}`; break;
+            default: window.location.href = `/admin/template/${themeName}`;
           }
         });
 
@@ -66,8 +60,8 @@ export class PageTemplates {
           
           interactiveModal.target.addButton(localeData.BUTTON_DELETE_LABEL, () => {
             let formData = new FormData();
-            formData.append('template_name', templateName);
-            formData.append('template_category', templateCategory);
+            formData.append('template_name', themeName);
+            formData.append('template_category', themeCategory);
 
             let request = new Interactive('request', {
               method: 'DELETE',
@@ -96,8 +90,8 @@ export class PageTemplates {
 
         buttons.install.target.setCallback((event) => {
           let formData = new FormData();
-          formData.append('template_name', templateName);
-          formData.append('template_category', templateCategory);
+          formData.append('template_name', themeName);
+          formData.append('template_category', themeCategory);
 
           let request = new Interactive('request', {
             method: 'POST',
@@ -117,22 +111,27 @@ export class PageTemplates {
         buttons.more.assembly();
         buttons.delete.assembly();
         buttons.install.assembly();
+        
+        buttons.more.target.element.classList.add('interactive_button-more');
+        buttons.delete.target.element.classList.add('interactive_button-activation');
+        buttons.install.target.element.classList.add('interactive_button-activation');
 
-        itemFooterContainer.appendChild(buttons.more.target.element);
-        itemFooterContainer.appendChild(buttons.delete.target.element);
-        itemFooterContainer.appendChild(buttons.install.target.element);
+        if (itemFooterContainer !== null) {
+          itemFooterContainer.appendChild(buttons.more.target.element);
+          itemFooterContainer.appendChild(buttons.delete.target.element);
+          itemFooterContainer.appendChild(buttons.install.target.element);
+        }
 
-        buttons.install.target.element.style.display = (templateInstalledStatus === 'installed') ? 'none' : 'flex';
-        buttons.delete.target.element.style.display = (templateInstalledStatus === 'installed') ? 'flex' : 'none';
+        buttons.install.target.element.style.display = themeInstalledStatus === 'installed'
+          ? 'none'
+          : 'flex';
+
+        buttons.delete.target.element.style.display = themeInstalledStatus === 'installed'
+          ? 'flex'
+          : 'none';
       }
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }

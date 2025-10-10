@@ -342,7 +342,7 @@ final class Module {
    */
   public function delete() : bool
   {
-    if (!$this->isInstalled()) {
+    if ($this->isInstalled()) {
       $path = CMS_ROOT_DIRECTORY . '/modules/' . $this->getName();
       $this->CMSCore::recursiveFilesRemove($path);
 

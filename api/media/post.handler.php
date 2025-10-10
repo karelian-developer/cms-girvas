@@ -103,9 +103,9 @@ if ($CMSCore->client->isLogged(2)) {
                   /** @var array Данные конвертированного файла */
                   $fileData = [];
                   // URL до конвертированного файла
-                  $fileData['url'] = '/uploads/media/' . $fileConverted['file_name'];
+                  $fileData['url'] = '/uploads/media/' . $fileConverted['fileName'];
                   // Полное наименование конвертированного файла
-                  $fileData['fullname'] = $fileConverted['file_name'];
+                  $fileData['fullname'] = $fileConverted['fileName'];
 
                   // Передача данных о загруженном файле в глобальную переменную обработчика
                   $handlerOutputData['file'] = $fileData;

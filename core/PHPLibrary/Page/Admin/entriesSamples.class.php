@@ -15,10 +15,12 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\EntriesSamples as EntriesSamples;
+use \core\PHPLibrary\EntriesSample\EnumSortTypeID as EnumSortTypeID;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
+use \ReflectionEnum as ReflectionEnum;
 
 class PageEntriesSamples implements InterfacePage
 {
@@ -84,6 +86,62 @@ class PageEntriesSamples implements InterfacePage
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
+  /**
+   * Сборка списка локализаций для записи
+   * 
+   * @param array $localesData
+   * 
+   * @return string
+   */
+  private function assemblyLocalesItems(array $localesData) : string
+  {
+    $document = new DOMDocument('1.0', 'UTF-8');
+
+    foreach ($localesData as $localeData) {
+      $itemElement = $document->createElement('li', $localeData['title']);
+      $itemElement->setAttribute('class', 'grid-table__locale');
+
+      if (!empty($localeData['iconURL'])) {
+        $iconElement = $document->createElement('img');
+        $iconElement->setAttribute('class', 'grid-table__locale-icon');
+        $iconElement->setAttribute('src', $localeData['iconURL']);
+        $itemElement->prepend($iconElement);
+      }
+
+      $document->appendChild($itemElement);
+    }
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Сборка списка локализаций для записи
+   * 
+   * @param array $localesData
+   * 
+   * @return string
+   */
+  private function assemblyCategoriesItems(string $localeName, array $categories) : string
+  {
+    $document = new DOMDocument('1.0', 'UTF-8');
+
+    foreach ($categories as $category) {
+      $category->initData(['texts']);
+
+      $itemElement = $document->createElement('li', $category->getTitle($localeName));
+      $itemElement->setAttribute('class', 'grid-table__category');
+
+      $document->appendChild($itemElement);
+    }
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Сборка
+   * 
+   * @return void
+   */
   public function assembly() : void
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/entriesSamples.css', 'rel' => 'stylesheet']);
@@ -96,10 +154,9 @@ class PageEntriesSamples implements InterfacePage
     /** @var int Максимальное количество элементов на странице */
     $paginationItemsOnPage = 12;
 
-    // $entries_categories_table_items_assembled = [];
+    $entriesSamplesTableItemsAssembled = [];
+
     $entriesSamples = new EntriesSamples($this->CMSCore);
-    $entriesSamplesLocale = $this->CMSCore->getCMSLocale('admin');
-    $entriesSamplesLocaleName = $entriesSamplesLocale->getName();
 
     /** @var array Массив объектов выборок */
     $entriesSamplesObjects = $entriesSamples->getAll([
@@ -111,56 +168,6 @@ class PageEntriesSamples implements InterfacePage
 
     unset($entriesSamples);
 
-    /** @var DOMDocument $dom_document Конструктор DOM-документа */
-    $document = new DOMDocument();
-    
-    /** @var DOMElement $tableElement DOM-элемент таблицы */
-    $tableElement = $document->createElement('table');
-    $tableElement->setAttribute('class', 'table');
-    
-    /** @var DOMElement $tableRowHeaderElement DOM-элемент строки с заголовками колонок таблицы */
-    $tableRowHeaderElement = $document->createElement('tr');
-
-    /** @var array $tableCellsHeadersElements массив для DOM-элементов с заголовками колонок таблицы */
-    $tableCellsHeadersElements = [];
-
-    // Генерация ячеек для строки с заголовками колонок таблицы
-    for ($i = 0; $i < 6; $i++) {
-      /*
-        * 0 => Индекс
-        * 1 => Заголовок
-        * 2 => Количество записей
-        * 3 => Дата создания
-        * 4 => Дата обновления
-        * 5 => Панель
-        */
-
-      /** @var DOMElement $tableCellsHeadersElements[] DOM-элемент ячейки с заголовком колонки таблицы */
-      $tableCellsHeadersElements[] = $document->createElement('th');
-    }
-
-    /* Перебор каждого DOM-элемента с заголовками колонок таблицы
-      * для последующего назначения необходимых классов и стилей CSS
-      */
-    foreach ($tableCellsHeadersElements as $tableCellElement) {
-      $tableCellElement->setAttribute('class', 'table__cell table__cell_header');
-      $tableCellElement->setAttribute('style', 'font-weight: 700;');
-    }
-
-    // Присвоение значений заголовкам колонок таблицы
-    $tableCellsHeadersElements[1]->nodeValue = $this->CMSCore->locale->getSingleValueByKey('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_TITLE_LABEL');
-    $tableCellsHeadersElements[2]->nodeValue = $this->CMSCore->locale->getSingleValueByKey('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_COUNT_LABEL');
-    $tableCellsHeadersElements[3]->nodeValue = $this->CMSCore->locale->getSingleValueByKey('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_CREATED_DATE_TIMESTAMP_LABEL');
-    $tableCellsHeadersElements[4]->nodeValue = $this->CMSCore->locale->getSingleValueByKey('PAGE_ENTRIES_SAMPLES_TABLE_COLUMN_UPDATED_DATE_TIMESTAMP_LABEL');
-
-    // Добавление DOM-элементов в DOM-элемент $tableRowHeaderElement
-    foreach ($tableCellsHeadersElements as $index => $element) {
-      $tableRowHeaderElement->appendChild($tableCellsHeadersElements[$index]);
-    }
-    
-    // Добавление DOM-элемента в DOM-элемент $tableElement
-    $tableElement->appendChild($tableRowHeaderElement);
-
     foreach ($entriesSamplesObjects as $index => $object) {
       $object->initData(['id', 'texts', 'name', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
       $objectID = $object->getID();
@@ -171,70 +178,65 @@ class PageEntriesSamples implements InterfacePage
       $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
       /** @var string Заголовок выборки */
-      $entriesSampleTitle = $object->getTitle($entriesSamplesLocaleName);
+      $entriesSampleTitle = $object->getTitle($localeName);
       $entriesSampleTitle = strip_tags($entriesSampleTitle);
+
+      /** @var string Описание выборки */
+      $entriesSampleDescription = $object->getDescription($localeName);
+      $entriesSampleDescription = strip_tags($entriesSampleDescription);
       
       /** @var int Количество записей в выборке */
       $entriesSampleEntriesCount = $object->getEntriesCount();
+      
+      /** @var int Лимит на количество записей в выборке */
+      $entriesSampleEntriesLimitCount = $object->getLimitCount();
 
-      /** @var DOMElement $tableRowItemElement DOM-элемент строки */
-      $tableRowItemElement = $document->createElement('tr');
+      $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
+      $completedLocalesList = $this->assemblyLocalesItems($completedLocalesData);
 
-      /** @var array $tableCellsItemElements массив для DOM-элементов со значениями для колонок */
-      $tableCellsItemElements = [];
+      $categories = $object->getCategories();
+      $categoriesList = $this->assemblyCategoriesItems($localeName, $categories);
 
-      // Генерация ячеек для строки с заголовками колонок таблицы
-      for ($i = 0; $i < 6; $i++) {
-        /*
-        * 0 => Индекс
-        * 1 => Заголовок
-        * 2 => Количество записей
-        * 3 => Дата создания
-        * 4 => Дата обновления
-        * 5 => Панель
-        */
+      $reflectionEnumSortType = new ReflectionEnum(EnumSortTypeID::class);
+      $reflectionEnumSortTypeCases = $reflectionEnumSortType->getCases();
+      $reflectionEnumSortTypeName = $reflectionEnumSortTypeCases[$objectID - 1]->getName();
+      $reflectionEnumSortTypeLabel = $localeData['PAGE_ENTRIES_SAMPLE_SORT_TYPE_' . $reflectionEnumSortTypeName . '_LABEL'];
 
-        /** @var DOMElement $tableCellsItemElements[] DOM-элемент ячейки */
-        $tableCellsItemElements[] = $document->createElement('td');
-        $tableCellsItemElements[$i]->setAttribute('class', 'table__cell table__cell');
-
-        if ($i == 0) {
-          $tableCellsItemElements[$i]->nodeValue = $index + 1;
-        }
-
-        if ($i == 1) {
-          $tableCellLinkElement = $document->createElement('a');
-          $tableCellLinkElement->setAttribute('href', '/admin/entriesSample/' . $objectID);
-          $tableCellLinkElement->setAttribute('target', '_blank');
-          $tableCellLinkElement->nodeValue = $entriesSampleTitle;
-
-          $tableCellsItemElements[$i]->appendChild($tableCellLinkElement);
-        }
-
-        if ($i == 2) {
-          $tableCellsItemElements[$i]->nodeValue = $entriesSampleEntriesCount;
-        }
-
-        if ($i == 3) {
-          $tableCellsItemElements[$i]->nodeValue = $createdUnixTimestamp;
-        }
-
-        if ($i == 4) {
-          $tableCellsItemElements[$i]->nodeValue = $updatedUnixTimestamp;
-        }
-
-        $tableRowItemElement->appendChild($tableCellsItemElements[$i]);
-      }
-
-      $tableElement->appendChild($tableRowItemElement);
+      array_push($entriesSamplesTableItemsAssembled,
+        ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme,
+          'templates/page/entriesSamples/tableItem.tpl',
+          [
+            'ENTRIES_SAMPLE_INDEX' => $index,
+            'ENTRIES_SAMPLE_ID' => $objectID,
+            'ENTRIES_SAMPLE_NAME' => $object->getName(),
+            'ENTRIES_SAMPLE_TITLE' => $entriesSampleTitle,
+            'ENTRIES_SAMPLE_DESCRIPTION' => $entriesSampleDescription,
+            'ENTRIES_SAMPLE_ENTRIES_COUNT' => $entriesSampleEntriesCount,
+            'ENTRIES_SAMPLE_ENTRIES_LIMIT_COUNT' => $entriesSampleEntriesLimitCount,
+            'ENTRIES_SAMPLE_LOCALES_LIST' => $completedLocalesList,
+            'ENTRIES_SAMPLE_CATEGORIES_LIST' => $categoriesList,
+            'ENTRIES_SAMPLE_METHOD_SORT_LABEL' => $reflectionEnumSortTypeLabel,
+            'ENTRIES_SAMPLE_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
+            'ENTRIES_SAMPLE_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
+          ]
+        )
+      );
     }
 
-    // Добавление DOM-элемента в конструктор DOM-документ
-    $document->appendChild($tableElement);
-
-    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesSamples.tpl', [
-      'PAGE_ENTRIES_SAMPLES_PAGINATION' => $pagination->assembled,
-      'PAGE_ENTRIES_SAMPLES_TABLE' => $document->saveHTML()
-    ]);
+    $this->assembled = ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme,
+      'templates/page/entriesSamples.tpl',
+      [
+        'PAGE_ENTRIES_SAMPLES_PAGINATION' => $pagination->assembled,
+        'PAGE_ENTRIES_SAMPLES_TABLE' => ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme,
+          'templates/page/entriesSamples/table.tpl',
+          [
+            'PAGE_ENTRIES_SAMPLES_TABLE_ITEMS' => implode($entriesSamplesTableItemsAssembled)
+          ]
+        )
+      ]
+    );
   }
 }

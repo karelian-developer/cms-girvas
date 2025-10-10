@@ -1,0 +1,105 @@
+/**
+ * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
+ * @copyright   Copyright (c) 2021 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ */
+
+.page.page_themes .themes-list {
+  display: grid;
+  list-style-type: none;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+@media (max-width: 1400px) {
+  .page.page_themes .themes-list {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media (max-width: 1200px) {
+  .page.page_themes .themes-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 1000px) {
+  .page.page_themes .themes-list {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media (max-width: 800px) {
+  .page.page_themes .themes-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .page.page_themes .themes-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.page.page_themes .themes-list .list__item {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  border: 1px solid var(--common-main-color-2);
+}
+
+.page.page_themes .themes-list .item__icon-container {
+  background-color: var(--common-main-color-4);
+  background-size: cover;
+  background-position: center center;
+  height: 180px;
+}
+
+.page.page_themes .themes-list .item__body-container {
+  padding: 10px;
+}
+
+.page.page_themes .themes-list .item__title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.page.page_themes .themes-list .item__title-link {
+  text-decoration: none;
+  font-size: inherit;
+  color: inherit;
+}
+
+.page.page_themes .themes-list .item__description {
+  font-size: 14px;
+  opacity: .6;
+}
+
+.page.page_themes .themes-list .item__footer-container {
+  display: grid;
+  background-color: var(--common-main-color-7);
+  border-top: 1px solid var(--common-main-color-2);
+  padding: 10px;
+  margin-top: auto;
+  gap: 10px;
+}
+
+.page.page_themes .page__themes-list .item__footer-container {
+  grid-template-columns: 1fr;
+}
+
+.page.page_themes .themes-list .item__footer-container .interactive .interactive__button {
+  width: 100%;
+}
+
+.page.page_themes .themes-list .item__footer-container .interactive .interactive__button-label {
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 12px;
+}

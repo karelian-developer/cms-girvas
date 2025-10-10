@@ -10,13 +10,13 @@
 
 namespace core\PHPLibrary\SystemCore;
 
-use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\LocaleInterface as LocaleInterface;
 use \DOMDocument as DOMDocument;
 
 final class Locale implements LocaleInterface
 {
-  public SystemCore $CMSCore;
+  public CMSCore $CMSCore;
 
   public const DEFAULT_LOCALE_NAME = 'en_US';
   public const LOCALE_CORE_PATH_PATTERN = '%s/locales/%s';

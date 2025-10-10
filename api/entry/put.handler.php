@@ -43,7 +43,10 @@ if ($CMSCore->client->isLogged(2)) {
           $CMSLocaleName = $CMSLocale->getName();
 
           $inputTitleName = 'entries_category_title_' . $CMSLocale->getISO639(2);
+          $inputSEOTitleName = 'entries_category_seo_title_' . $CMSLocale->getISO639(2);
           $textareaDescriptionName = 'entries_category_description_' . $CMSLocale->getISO639(2);
+          $textareaSEODescriptionName = 'entries_category_seo_description_' . $CMSLocale->getISO639(2);
+          $textareaKeywordsName = 'entries_category_keywords_' . $CMSLocale->getISO639(2);
 
           if (array_key_exists($inputTitleName, $_PUT) || array_key_exists($textareaDescriptionName, $_PUT)) {
             if (!array_key_exists($CMSLocaleName, $texts)) $texts[$CMSLocaleName] = [];
@@ -56,12 +59,36 @@ if ($CMSCore->client->isLogged(2)) {
               $texts[$CMSLocaleName]['title'] = $inputValue;
             }
 
+            if (array_key_exists($inputSEOTitleName, $_PUT)) {
+              $inputValue = $_PUT[$inputSEOTitleName];
+              $inputValue = strip_tags($inputValue);
+              $inputValue = str_replace('\'', '"', $inputValue);
+  
+              $texts[$CMSLocaleName]['SEOTitle'] = $inputValue;
+            }
+
             if (array_key_exists($textareaDescriptionName, $_PUT)) {
               $textareaValue = $_PUT[$textareaDescriptionName];
               $textareaValue = strip_tags($textareaValue);
               $textareaValue = str_replace('\'', '"', $textareaValue);
   
               $texts[$CMSLocaleName]['description'] = $textareaValue;
+            }
+
+            if (array_key_exists($textareaSEODescriptionName, $_PUT)) {
+              $textareaValue = $_PUT[$textareaSEODescriptionName];
+              $textareaValue = strip_tags($textareaValue);
+              $textareaValue = str_replace('\'', '"', $textareaValue);
+  
+              $texts[$CMSLocaleName]['SEODescription'] = $textareaValue;
+            }
+
+            if (array_key_exists($textareaKeywordsName, $_PATCH)) {
+              $textareaValue = $_PUT[$textareaKeywordsName];
+              $textareaValue = strip_tags($textareaValue);
+              $textareaValue = str_replace('\'', '"', $textareaValue);
+
+              $texts[$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
             }
           }
         }
@@ -70,14 +97,6 @@ if ($CMSCore->client->isLogged(2)) {
       $entriesCategory = EntryCategory::create($CMSCore, $entriesCategoryName, $entriesCategoryParentID, $texts, $metadata);
       if (!is_null($entriesCategory)) {
         $entriesCategory->initData(['metadata']);
-
-        if (isset($_PUT['entries_category_show_index'])) {
-          if (!isset($entriesCategoryData['metadata'])) $entriesCategoryData['metadata'] = [];
-          $entriesCategoryData['metadata']['isShowedOnIndexPage'] = 1;
-        } else {
-          if (!isset($entriesCategoryData['metadata'])) $entriesCategoryData['metadata'] = [];
-          $entriesCategoryData['metadata']['isShowedOnIndexPage'] = 0;
-        }
 
         $handlerOutputData['entriesCategory'] = [];
         $handlerOutputData['entriesCategory']['id'] = $entriesCategory->getID();

@@ -18,6 +18,8 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
+use \DOMDocument as DOMDocument;
+use \DOMImplementation as DOMImplementation;
 
 class PagePages implements InterfacePage
 {
@@ -62,6 +64,34 @@ class PagePages implements InterfacePage
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
+  /**
+   * Сборка списка локализаций
+   * 
+   * @param array $localesData
+   * 
+   * @return string
+   */
+  private function assemblyLocalesItems(array $localesData) : string
+  {
+    $document = new DOMDocument('1.0', 'UTF-8');
+
+    foreach ($localesData as $localeData) {
+      $itemElement = $document->createElement('li', $localeData['title']);
+      $itemElement->setAttribute('class', 'grid-table__locale');
+
+      if (!empty($localeData['iconURL'])) {
+        $iconElement = $document->createElement('img');
+        $iconElement->setAttribute('class', 'grid-table__locale-icon');
+        $iconElement->setAttribute('src', $localeData['iconURL']);
+        $itemElement->prepend($iconElement);
+      }
+
+      $document->appendChild($itemElement);
+    }
+
+    return $document->saveHTML();
+  }
+
   public function assembly() : void
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/pages.css', 'rel' => 'stylesheet']);
@@ -88,7 +118,7 @@ class PagePages implements InterfacePage
 
     $pageStaticNumber = 1;
     foreach ($pagesStaticObjects as $object) {
-      $object->initData(['id', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
+      $object->initData(['id', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata', 'authorID']);
 
       $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
       $publishedUnixTimestamp = date('d.m.Y H:i:s', $object->getPublishedUnixTimestamp());
@@ -100,6 +130,19 @@ class PagePages implements InterfacePage
       $pageStaticTitle = strip_tags($pageStaticTitle);
       $pageStaticDescription = strip_tags($pageStaticDescription);
 
+      $pageStaticAuthor = $object->getAuthor();
+      if ($pageStaticAuthor !== null) {
+        $pageStaticAuthor->initData(['login']);
+      }
+
+      $pageStaticCompletedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
+      $pageStaticCompletedLocales = $this->assemblyLocalesItems($pageStaticCompletedLocalesData);
+      $pageStaticSEOStatus = !empty($object->getCompletedSEOTexts())
+        ? '<span style="color: green;">Оптимизировано</span>'
+        : '<span style="color: red;">Не оптимизировано</span>';
+
+      $pageStaticAuthorLogin = $pageStaticAuthor !== null ? $pageStaticAuthor->getLogin() : 'User deleted';
+
       array_push($pagesStaticTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/pages/tableItem.tpl', [
         'PAGE_STATIC_ID' => $object->getID(),
         'PAGE_STATIC_NAME' => $object->getName(),
@@ -108,6 +151,9 @@ class PagePages implements InterfacePage
         'PAGE_STATIC_DESCRIPTION' => !empty($pageStaticDescription) ? $pageStaticDescription : sprintf('[ DESCRIPTION NOT FOUND IN LOCALE %s ]', $pagesStaticLocale->getName()),
         'PAGE_STATIC_PUBLISHED_STATUS' => $object->isPublished() ? 'published' : 'not-published',
         'PAGE_STATIC_URL' => $object->getURL(),
+        'PAGE_STATIC_AUTHOR_LOGIN' => $pageStaticAuthorLogin,
+        'PAGE_STATIC_LOCALES_LIST' => $pageStaticCompletedLocales,
+        'PAGE_STATIC_SEO_STATUS' => $pageStaticSEOStatus,
         'PAGE_STATIC_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
         'PAGE_STATIC_PUBLISHED_DATE_TIMESTAMP' => $object->getPublishedUnixTimestamp() > 0 ? $publishedUnixTimestamp : '-',
         'PAGE_STATIC_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp

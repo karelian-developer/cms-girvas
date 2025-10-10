@@ -218,8 +218,17 @@
 }
 
 .page__article .article__title {
+  background-color: rgba(0, 0, 0, .6);
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--primary-color-3);
   padding: 16px 24px;
-  background: rgba(255, 255, 255, 0.85);
+}
+
+@media (max-width: 800px) {
+  .page__article .article__title {
+    font-size: 18px;
+  }
 }
 
 .page__article .article__metadata {

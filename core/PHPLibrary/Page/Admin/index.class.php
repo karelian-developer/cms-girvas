@@ -73,13 +73,13 @@ class PageIndex implements InterfacePage
     unset($feedImporter);
     unset($feedXML);
 
-    $feedLastNewsList = $localeData['PAGE_INDEX_SIDEBAR_BLOCK_WEB_CHANNEL_ENTRIES_NOT_FOUND_LABEL'];
+    $feedLastNewsList = $localeData['PAGE_INDEX_SIDEBAR_BLOCK_FEED_ENTRIES_NOT_FOUND_LABEL'];
     if (count($feedItemsAssembled) > 0) {
       $feedLastNewsList = ThemeCollector::assemblyFileContent(
         $CMSTheme,
         'templates/page/index/feed/list.tpl',
         [
-          'WEB_CHANNEL_ITEMS' => implode($feedItemsAssembled)
+          'FEED_ITEMS' => implode($feedItemsAssembled)
         ]
       );
     }
@@ -117,13 +117,13 @@ class PageIndex implements InterfacePage
     unset($feedImporter);
     unset($feedXML);
 
-    $feedLastReleasesList = $localeData['PAGE_INDEX_SIDEBAR_BLOCK_WEB_CHANNEL_ENTRIES_NOT_FOUND_LABEL'];
+    $feedLastReleasesList = $localeData['PAGE_INDEX_SIDEBAR_BLOCK_FEED_ENTRIES_NOT_FOUND_LABEL'];
     if (count($feedItemsAssembled) > 0) {
       $feedLastReleasesList = ThemeCollector::assemblyFileContent(
         $CMSTheme,
         'templates/page/index/feed/list.tpl',
         [
-          'WEB_CHANNEL_ITEMS' => implode($feedItemsAssembled)
+          'FEED_ITEMS' => implode($feedItemsAssembled)
         ]
       );
     }
@@ -131,8 +131,8 @@ class PageIndex implements InterfacePage
     /** @var string $site_page Содержимое шаблона страницы */
     $this->assembled = ThemeCollector::assemblyFileContent($CMSTheme, 'templates/page/index.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'index',
-      'WEB_CHANNEL_LATEST_NEWS_LIST' => $feedLastNewsList,
-      'WEB_CHANNEL_LATEST_RELEASES_LIST' => $feedLastReleasesList,
+      'FEED_LATEST_NEWS_LIST' => $feedLastNewsList,
+      'FEED_LATEST_RELEASES_LIST' => $feedLastReleasesList,
     ]);
   }
 }

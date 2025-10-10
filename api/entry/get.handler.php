@@ -124,7 +124,10 @@ if (is_numeric($CMSCore->urlp->getPath(2))) {
     $handlerOutputData['entriesCategory']['id'] = $entriesCategory->getID();
     $handlerOutputData['entriesCategory']['name'] = $entriesCategory->getName();
     $handlerOutputData['entriesCategory']['title'] = $entriesCategory->getTitle($entriesCategoryLocale);
+    $handlerOutputData['entriesCategory']['SEOTitle'] = $entriesCategory->getSEOTitle($entriesCategoryLocale);
     $handlerOutputData['entriesCategory']['description'] = $entriesCategory->getDescription($entriesCategoryLocale);
+    $handlerOutputData['entriesCategory']['SEODescription'] = $entriesCategory->getSEODescription($entriesCategoryLocale);
+    $handlerOutputData['entriesCategory']['keywords'] = $entriesCategory->getKeywords($entriesCategoryLocale);
     $handlerOutputData['entriesCategory']['parentID'] = $entriesCategory->getParentID();
     $handlerOutputData['entriesCategory']['createdUnixTimestamp'] = $entriesCategory->getCreatedUnixTimestamp();
     $handlerOutputData['entriesCategory']['updatedUnixTimestamp'] = $entriesCategory->getUpdatedUnixTimestamp();
@@ -144,15 +147,18 @@ if (is_numeric($CMSCore->urlp->getPath(2))) {
     foreach ($entriesCategories as $category) {
       $category->initData(['id', 'texts', 'metadata', 'name', 'parentID', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
       
-      array_push($handlerOutputData['entriesCategories'], [
+      $handlerOutputData['entriesCategories'][] = [
         'id' => $category->getID(),
         'name' => $category->getName(),
         'title' => $category->getTitle($entriesCategoriesLocale),
+        'SEOTitle' => $category->getSEOTitle($entriesCategoriesLocale),
         'description' => $category->getDescription($entriesCategoriesLocale),
+        'SEODescription' => $category->getSEODescription($entriesCategoriesLocale),
+        'keywords' => $category->getKeywords($entriesCategoryLocale),
         'parentID' => $category->getParentID(),
         'createdUnixTimestamp' => $category->getCreatedUnixTimestamp(),
         'updatedUnixTimestamp' => $category->getUpdatedUnixTimestamp()
-      ]);
+      ];
     }
 
     $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');

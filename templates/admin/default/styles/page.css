@@ -100,25 +100,39 @@
   margin: 0;
 }
 
-.page__title::after {
-  clip-path: polygon(0 0, 100% 0, 0 100%);
-  background-color: var(--common-main-color-6);
-  left: 0;
-  top: 0;
+@media (max-width: 800px) {
+  .page__title {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .page__title-container:has(.page__interactive-container:empty) .page__title {
+    margin-bottom: 0;
+  }
 }
 
-.page__title::before {
-  clip-path: polygon(0 0, 100% 100%, 0 100%);
-  background-color: var(--common-main-color-2);
-  left: 0;
-  bottom: 0;
-}
+@media (min-width: 501px) {
+  .page__title::after {
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+    background-color: var(--common-main-color-6);
+    left: 0;
+    top: 0;
+  }
 
-.page__title::after, .page__title::before {
-  position: absolute;
-  content: '';
-  width: 50px;
-  height: 100%;
+  .page__title::before {
+    clip-path: polygon(0 0, 100% 100%, 0 100%);
+    background-color: var(--common-main-color-2);
+    left: 0;
+    bottom: 0;
+  }
+
+  .page__title::after, .page__title::before {
+    position: absolute;
+    content: '';
+    width: 50px;
+    height: 100%;
+  }
 }
 
 .page__title-container {
@@ -128,12 +142,24 @@
   box-sizing: border-box;
   box-shadow: 0 0 5px 1px var(--common-main-color-4--opacity-0-2);
   background-color: var(--common-main-color-1);
-  padding-left: 70px;
+  padding-left: 20px;
   padding-right: 20px;
   padding-top: 20px;
   padding-bottom: 20px;
   margin-top: 0;
   margin-bottom: 20px;
+}
+
+@media (min-width: 501px) {
+  .page__title-container {
+    padding-left: 70px;
+  }
+}
+
+@media (max-width: 800px) {
+  .page__title-container {
+    flex-direction: column;
+  }
 }
 
 .page__pagination {
@@ -356,6 +382,7 @@
   box-shadow: 0 0 5px 1px var(--common-main-color-4--opacity-0-2);
   background-color: var(--common-main-color-1);
   margin-bottom: 20px;
+  overflow-x: auto;
 }
 
 .page__navigation .navigation__list {
@@ -412,11 +439,29 @@
   align-items: center;
 }
 
+@media (max-width: 800px) {
+  .page__interactive-container {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 500px) {
+  .page__interactive-container {
+    flex-direction: column;
+  }
+}
+
 .page__interactive-container > .interactive {
   margin-right: 10px;
 
   &:last-child {
     margin-right: 0;
+  }
+}
+
+@media (max-width: 500px) {
+  .page__interactive-container > .interactive:not(:last-child) {
+    margin-bottom: 10px;
   }
 }
 

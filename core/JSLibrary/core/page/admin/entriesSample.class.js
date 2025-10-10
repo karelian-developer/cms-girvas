@@ -21,12 +21,12 @@ export class PageEntriesSample {
 
   init() {
     let searchParams = new URLParser();
-    let elementForm = document.querySelector('.form_entries-sample');
+    let elementForm = document.querySelector('[data-element="main-form"]');
 
     let locales;
-    let interactiveLocaleChoices = new Interactive('choices');
-    let interactiveCategoriesChoices = new Interactive('choices');
-    let interactiveSortTypeChoices = new Interactive('choices');
+    const interactiveLocaleChoices = new Interactive('choices');
+    const interactiveCategoriesChoices = new Interactive('choices');
+    const interactiveSortTypeChoices = new Interactive('choices');
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
@@ -34,17 +34,11 @@ export class PageEntriesSample {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let descriptionTextareaElement = document.querySelector('[role="entriesSampleDescription"]');
-      let titleInputElement = document.querySelector('[role="entriesSampleTitle"]');
-      let urlInputElement = document.querySelector('[role="entriesSampleName"]');
+      let urlInputElement = document.querySelector('[data-element="input-name"]');
+      let titleInputElement = document.querySelector('[data-element="input-title"]');
+      let descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
 
       locales.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
@@ -93,13 +87,7 @@ export class PageEntriesSample {
               }
 
             }, (rejectionReason) => {
-              let interactiveNotification = new Interactive('notification');
-              interactiveNotification.target.isPopup = true;
-              interactiveNotification.target.setStatusCode(0);
-              interactiveNotification.target.setContent(rejectionReason);
-              interactiveNotification.target.assembly();
-        
-              interactiveNotification.target.show();
+              this.page.showPopupNotification(rejectionReason, 0);
             });
           }
         }
@@ -107,10 +95,10 @@ export class PageEntriesSample {
 
       interactiveLocaleChoices.assembly();
 
-      let interactiveContainerElement = document.querySelector('#E8548530785');
+      let interactiveContainerElement = document.querySelector('[data-element="header-interactive"]');
       interactiveContainerElement.append(interactiveLocaleChoices.target.element);
 
-      let interactiveSortByChoiceMultipleContainerElement = document.querySelector('#TC6474389603');
+      let interactiveSortByChoiceMultipleContainerElement = document.querySelector('[data-element="choice"][data-choice="sort-method"]');
       if (interactiveSortByChoiceMultipleContainerElement != null) {
         let entriesSampleData;
 
@@ -121,13 +109,7 @@ export class PageEntriesSample {
 
           return fetch(`/handler/entries/sample/sorttypes?locale=${window.CMSCore.locales.admin.name}&dataType=names`, {method: 'GET'});
         }, (rejectionReason) => {
-          let interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(rejectionReason);
-          interactiveNotification.target.assembly();
-    
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(rejectionReason, 0);
         }).then((response) => {
           return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
@@ -155,7 +137,7 @@ export class PageEntriesSample {
         });
       }
 
-      let interactiveCategoriesChoiceMultipleContainerElement = document.querySelector('#TC6474389602');
+      let interactiveCategoriesChoiceMultipleContainerElement = document.querySelector('[data-element="choice"][data-choice="categories"]');
       if (interactiveCategoriesChoiceMultipleContainerElement != null) {
         let entriesCategories, entriesSampleCategories;
         
@@ -177,13 +159,7 @@ export class PageEntriesSample {
           let sampleID = (searchParams.getPathPart(3) != null) ? searchParams.getPathPart(3) : 0;
           return fetch(`/handler/entries/sample/${sampleID}/categories?locale=${window.CMSCore.locales.admin.name}`, {method: 'GET'});
         }, (rejectionReason) => {
-          let interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(rejectionReason);
-          interactiveNotification.target.assembly();
-    
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(rejectionReason, 0);
         }).then((response) => {
           return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data) => {
@@ -222,13 +198,13 @@ export class PageEntriesSample {
       
       let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
-        let entryDescriptionTextareaElement = document.querySelector('[role="entriesSampleDescription"]');
-        let entryTitleInputElement = document.querySelector('[role="entriesSampleTitle"]');
+        let entryTitleInputElement = document.querySelector('[data-element="input-title"]');
+        let entryDescriptionTextareaElement = document.querySelector('[data-element="input-description"]');
         
         locales.forEach((locale, localeIndex) => {
           if (locale.name == event.target.value) {
-            entryDescriptionTextareaElement.setAttribute('name', 'entries_sample_description_' + locale.iso639_2);
             entryTitleInputElement.setAttribute('name', 'entries_sample_title_' + locale.iso639_2);
+            entryDescriptionTextareaElement.setAttribute('name', 'entries_sample_description_' + locale.iso639_2);
 
             if (searchParams.getPathPart(3) != null) {
               let request = new Interactive('request', {
@@ -254,15 +230,17 @@ export class PageEntriesSample {
       this.buttons.save.target.setCallback((event) => {
         event.preventDefault();
 
-        elementForm = document.querySelector('.form_entries-sample');
+        elementForm = document.querySelector('[data-element="main-form"]');
 
         let form = new Interactive('form');
         form.target.replaceElement(elementForm);
         
         if (form.target.checkRequiredFields()) {
           let formData = new FormData(elementForm);
-          let fetchLink = (searchParams.getPathPart(3) == null) ? '/handler/entries/sample?localeMessage=' + window.CMSCore.locales.admin.name : '/handler/entries/sample/' + searchParams.getPathPart(3) + '?localeMessage=' + window.CMSCore.locales.admin.name;
-          let fetchMethod = (searchParams.getPathPart(3) == null) ? 'PUT' : 'PATCH';
+          let fetchLink = searchParams.getPathPart(3) === null
+            ? '/handler/entries/sample?localeMessage=' + window.CMSCore.locales.admin.name
+            : '/handler/entries/sample/' + searchParams.getPathPart(3) + '?localeMessage=' + window.CMSCore.locales.admin.name;
+          let fetchMethod = searchParams.getPathPart(3) === null ? 'PUT' : 'PATCH';
 
           let request = new Interactive('request', {
             method: fetchMethod,
@@ -278,15 +256,7 @@ export class PageEntriesSample {
             }
           });
         } else {
-          let interactiveNotification;
-        
-          interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY);
-          interactiveNotification.target.assembly();
-
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY, 0);
         }
       });
       this.buttons.save.assembly();
@@ -329,7 +299,7 @@ export class PageEntriesSample {
       });
       this.buttons.delete.assembly();
 
-      if (searchParams.getPathPart(3) == null) {
+      if (searchParams.getPathPart(3) === null) {
         this.buttons.delete.target.element.style.display = 'none';
         this.buttons.save.target.element.style.display = 'flex';
       } else {
@@ -337,17 +307,11 @@ export class PageEntriesSample {
         this.buttons.save.target.element.style.display = 'flex';
       }
 
-      let interactiveContainer = document.querySelector('#SYSTEM_E3724126170');
+      let interactiveContainer = document.querySelector('[data-element="panel"]');
       interactiveContainer.append(this.buttons.delete.target.element);
       interactiveContainer.append(this.buttons.save.target.element);
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }

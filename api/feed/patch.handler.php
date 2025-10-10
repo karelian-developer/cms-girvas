@@ -23,7 +23,7 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUserGroup->initData(['permissions']);
 
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_FEEDS_MANAGEMENT)) {
-    $feedID = (isset($_PATCH['web_channel_id'])) ? $_PATCH['web_channel_id'] : 0;
+    $feedID = (isset($_PATCH['feed_id'])) ? $_PATCH['feed_id'] : 0;
     $feedID = (is_numeric($feedID)) ? (int)$feedID : 0;
 
     if (Feed::existsByID($CMSCore, $feedID)) {
@@ -39,8 +39,8 @@ if ($CMSCore->client->isLogged(2)) {
 
           $CMSLocaleName = $CMSLocale->getName();
 
-          $inputTitleName = 'web_channel_title_' . $CMSLocale->getISO639(2);
-          $textareaDescriptionName = 'web_channel_description_' . $CMSLocale->getISO639(2);
+          $inputTitleName = 'feed_title_' . $CMSLocale->getISO639(2);
+          $textareaDescriptionName = 'feed_description_' . $CMSLocale->getISO639(2);
 
           if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH)) {
             if (!array_key_exists('texts', $feedData)) $feedData['texts'] = [];
@@ -52,9 +52,9 @@ if ($CMSCore->client->isLogged(2)) {
         }
       }
 
-      if (isset($_PATCH['web_channel_name'])) $feedData['name'] = urlencode(htmlentities($_PATCH['web_channel_name']));
-      if (isset($_PATCH['web_channel_type_id'])) $feedData['typeID'] = $_PATCH['web_channel_type_id'];
-      if (isset($_PATCH['web_channel_entries_category_id'])) $feedData['entriesCategoryID'] = $_PATCH['web_channel_entries_category_id'];
+      if (isset($_PATCH['feed_name'])) $feedData['name'] = urlencode(htmlentities($_PATCH['feed_name']));
+      if (isset($_PATCH['feed_type_id'])) $feedData['typeID'] = $_PATCH['feed_type_id'];
+      if (isset($_PATCH['feed_entries_category_id'])) $feedData['entriesCategoryID'] = $_PATCH['feed_entries_category_id'];
 
       $feedIsUpdated = $feed->update($feedData);
 

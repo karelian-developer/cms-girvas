@@ -18,14 +18,14 @@ use \core\PHPLibrary\EntriesSamples as EntriesSamples;
 
 if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
   /** @var int ID выборки */
-  $sampleID = $CMSCore->urlp->get_path(3) ?? 0;
+  $sampleID = $CMSCore->urlp->getPath(3) ?? 0;
   $sampleID = is_numeric($sampleID) ? (int) $sampleID : 0;
   
   if (EntriesSample::existsByID($CMSCore, $sampleID)) {
     $sample = new EntriesSample($CMSCore, $sampleID);
     $sample->initData(['metadata']);
     
-    $localeName = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->get_database_entry_value('base_locale');
+    $localeName = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
 
     $handlerOutputData['entriesSample'] = ['categories' => []];
     $handlerOutputData['entriesSample']['id'] = $sample->getID();

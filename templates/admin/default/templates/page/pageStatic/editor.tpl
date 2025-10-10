@@ -26,10 +26,11 @@
       ]
     });
     nadvoTE.init();
+    nadvoTE.textarea.element.classList.add('textarea');
     nadvoTE.textarea.element.classList.add('form__textarea');
     nadvoTE.textarea.element.value = editorContent.innerHTML;
     nadvoTE.textarea.element.setAttribute('name', 'page_static_content_rus');
-    nadvoTE.textarea.element.setAttribute('role', 'pageStaticContent');
+    nadvoTE.textarea.element.setAttribute('data-element', 'input-content');
 
     editorContent.remove();
   });

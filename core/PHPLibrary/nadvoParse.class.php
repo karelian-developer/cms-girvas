@@ -18,7 +18,7 @@ class NadvoParse
     'italic' => '/\*(.+?)\*/s',
     'underline' => '/\~\~(.+?)\~\~/s',
     'link' => '/\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
-    'image' => '/!\[(.+?)?\]\((.+?)\)/',
+    'image' => '/!\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'video' => '/!\[video\]\((.+?)\)/',
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
@@ -48,7 +48,7 @@ class NadvoParse
 
   private function sanitizeInput(string $markdown) : string
   {
-    $markdown = preg_replace(self::PATTERNS['dangerous_tags'], '', $markdown);
+    //$markdown = preg_replace(self::PATTERNS['dangerous_tags'], '', $markdown);
     $markdown = htmlspecialchars($markdown, ENT_NOQUOTES, 'UTF-8', false);
     
     return $markdown;
@@ -264,7 +264,7 @@ class NadvoParse
         }
         
         // Добавляем содержимое
-        if ($content !== '') {
+        if (!empty($content)) {
           $result[] = '<p>' . $content . '</p>';
         }
       } else {
@@ -345,8 +345,9 @@ class NadvoParse
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
         }
+
         $html .= '<h' . strlen($matches[1]) . '>' . $matches[2] . '</h' . strlen($matches[1]) . '>';
-      } elseif (trim($line) === '') {
+      } elseif (empty(trim($line))) {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';

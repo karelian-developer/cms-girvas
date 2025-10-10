@@ -21,7 +21,7 @@ export class PageUsersGroup {
 
   init() {
     let searchParams = new URLParser(), locales;
-    let elementForm = document.querySelector('.form_user-group');
+    const elementForm = document.querySelector('[data-element="main-form"]');
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
@@ -29,17 +29,12 @@ export class PageUsersGroup {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let interactiveChoicesLocales = new Interactive('choices');
-      let usersGroupTitleInputElement = document.querySelector('[role="usersGroupTitle"]');
-      let urlInputElement = document.querySelector('[role="usersGroupName"]');
+      const interactiveChoicesLocales = new Interactive('choices');
+
+      const urlInputElement = document.querySelector('[data-element="input-name"]');
+      const usersGroupTitleInputElement = document.querySelector('[data-element="input-title"]');
 
       locales.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
@@ -86,7 +81,7 @@ export class PageUsersGroup {
 
       interactiveChoicesLocales.assembly();
 
-      let interactiveContainerElement = document.querySelector('#E8548530785');
+      let interactiveContainerElement = document.querySelector('[data-element="header-interactive"]');
       interactiveContainerElement.append(interactiveChoicesLocales.target.element);
 
       urlInputElement.addEventListener('input', (event) => {
@@ -154,15 +149,7 @@ export class PageUsersGroup {
             }
           });
         } else {
-          let interactiveNotification;
-        
-          interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY);
-          interactiveNotification.target.assembly();
-
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY, 0);
         }
       });
       this.buttons.save.assembly();
@@ -213,17 +200,11 @@ export class PageUsersGroup {
         this.buttons.save.target.element.style.display = 'flex';
       }
   
-      let interactiveFormPanelContainer = document.querySelector('#SYSTEM_E3724126170');
+      let interactiveFormPanelContainer = document.querySelector('[data-element="panel"]');
       interactiveFormPanelContainer.append(this.buttons.delete.target.element);
       interactiveFormPanelContainer.append(this.buttons.save.target.element);
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }

@@ -8,6 +8,11 @@
 => @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
 ============================================================================================= */
 
+@import url('./normalize.css');
+@import url('./default-colors-scheme.css');
+@import url('./default-forms.css');
+@import url('./default-tables.css');
+
 pre, p {
   margin-top: 0;
 }

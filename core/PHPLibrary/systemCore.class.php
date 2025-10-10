@@ -51,11 +51,11 @@ final class SystemCore implements CoreInterface
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS «GIRVAS»';
-  public const CMS_VERSION = '0.2.6';
+  public const CMS_VERSION = '0.2.7';
   public const CMS_STAGE_DEVELOPING = 'voitsy';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
-  public const CMS_DEVELOPER_SITE_LINK = 'https://www.garbalo.com';
-  public const CMS_PRODUCT_SITE_LINK = 'https://www.cms-girvas.ru';
+  public const CMS_DEVELOPER_SITE_LINK = 'https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai';
+  public const CMS_PRODUCT_SITE_LINK = 'https://cms-girvas.ru';
   public const CMS_REESTR_DIGITAL_GOV_LINK = 'https://reestr.digital.gov.ru/reestr/2840045/?sphrase_id=5944628';
   public string $CSPScriptsHash, $CSPStylesHash;
 
@@ -449,6 +449,7 @@ final class SystemCore implements CoreInterface
       CMSHeader::add(CMSEnumHeader::HTTP_CONTENT_SECURITY_POLICY, $CMSConfigurator->getSecurityCSP());
       header('Referrer-Policy: strict-origin-when-cross-origin');
       header('X-Content-Type-Options: nosniff');
+      header('Permissions-Policy: browsing-topics=()');
       
       if ($CMSConfigurator->get('SSLIsEnabled')) {
         $HSTSVars = [];
@@ -821,23 +822,17 @@ final class SystemCore implements CoreInterface
 
     if (count($filesArrayOnPath) > 0) {
       foreach ($filesArrayOnPath as $file) {
-        $path = $path . '/' . $file;
-        
-        if (is_dir($path)) {
-          self::recursiveFilesRemove($path);
+        $fullPath = $path . '/' . $file;
+
+        if (is_dir($fullPath)) {
+          self::recursiveFilesRemove($fullPath);
         } else {
-          unlink($path);
+          unlink($fullPath);
         }
       }
-
-      rmdir($path);
-      return true;
-    } else {
-      rmdir($path);
-      return true;
     }
 
-    return false;
+    return rmdir($path);
   }
   
   /**

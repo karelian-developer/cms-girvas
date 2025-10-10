@@ -65,13 +65,23 @@ class SettingsSeo implements SettingsPageInterface
     
     $settingPermanentRedirectWWWStatusValue = $this->CMSCore->configurator->getPermanentRedirectToWWWStatus();
 
-    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
-      'SETTINGS_NAME' => $this->name,
-      'SETTING_SITE_DESCRIPTION_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('seo_site_description') ? $this->CMSCore->configurator->getDatabaseEntryValue('seo_site_description') : '',
-      'SETTING_SITE_KEYWORDS_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('seo_site_keywords') ? implode(', ', json_decode($this->CMSCore->configurator->getDatabaseEntryValue('seo_site_keywords'), true)) : '',
-      'SETTING_SITE_ROBOTS_TXT_VALUE' => $fileRobotsTXTContent,
-      'SETTING_PERMANENT_REDIRECT_WWW_STATUS_VALUE' => $settingPermanentRedirectWWWStatusValue ? 'on' : 'off',
-      'SETTING_PERMANENT_REDIRECT_WWW_CHECKED_VALUE' => $settingPermanentRedirectWWWStatusValue ? 'checked' : '',
-    ]);
+    $this->assembled = ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme, $formTemplatePath,
+      [
+        'SETTINGS_NAME' => $this->name,
+        'SETTING_CODE_YANDEX_WEBMASTER_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('seo_code_yandex_webmaster')
+          ? $this->CMSCore->configurator->getDatabaseEntryValue('seo_code_yandex_webmaster')
+          : '',
+        'SETTING_SITE_DESCRIPTION_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('seo_site_description')
+          ? $this->CMSCore->configurator->getDatabaseEntryValue('seo_site_description')
+          : '',
+        'SETTING_SITE_KEYWORDS_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('seo_site_keywords')
+          ? implode(', ', json_decode($this->CMSCore->configurator->getDatabaseEntryValue('seo_site_keywords'), true))
+          : '',
+        'SETTING_SITE_ROBOTS_TXT_VALUE' => $fileRobotsTXTContent,
+        'SETTING_PERMANENT_REDIRECT_WWW_STATUS_VALUE' => $settingPermanentRedirectWWWStatusValue ? 'on' : 'off',
+        'SETTING_PERMANENT_REDIRECT_WWW_CHECKED_VALUE' => $settingPermanentRedirectWWWStatusValue ? 'checked' : '',
+      ]
+    );
   }
 }

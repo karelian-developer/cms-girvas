@@ -12,6 +12,8 @@ namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \PDOException as PDOException;
 
@@ -89,6 +91,25 @@ class Feed
   }
 
   /**
+   * Получить ID категории
+   * 
+   * @param array $dataScope
+   * 
+   * @return ?EntityTypeContent
+   */
+  public function getEntriesCategory(array $dataScope = []) : ?EntityTypeContent
+  {
+    if (EntryCategory::existsByID($this->CMSCore, $this->entriesCategoryID)) {
+      $category = new EntryCategory($this->CMSCore, $this->entriesCategoryID);
+      $category->initData($dataScope);
+
+      return $category;
+    }
+
+    return null;
+  }
+
+  /**
    * Получить массив записей
    * 
    * @return array
@@ -103,7 +124,7 @@ class Feed
    * 
    * @return int
    */
-  public function getEntries_count() : int
+  public function getEntriesCount() : int
   {
     return Entries::getCountByCategoryID($this->getEntriesCategoryID());
   }
@@ -126,6 +147,76 @@ class Feed
   public function getUpdatedUnixTimestamp() : int
   {
     return $this->updatedUnixTimestamp ?? 0;
+  }
+
+  /**
+   * Получить тексты
+   * 
+   * @return array
+   */
+  public function getTexts() : array
+  {
+    if (property_exists($this, 'texts')) {
+      return json_decode($this->texts, true);
+    }
+
+    return [];
+  }
+
+  /**
+   * Получить заполненные тексты
+   * 
+   * @return array
+   */
+  public function getCompletedTexts() : array
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      return array_filter($texts, function ($locale) {
+        if (!is_array($locale) || empty($locale)) {
+          return false;
+        };
+
+        foreach ($locale as $key => $value) {
+          if (empty($value) && in_array($key, ['title', 'description'])) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
+
+    return [];
+  }
+
+  /**
+   * Получить данные по заполненным локализациям
+   * 
+   * @param CoreInterface $CMSCore
+   * 
+   * @return array
+   */
+  public function getCompletedLocalesData(CoreInterface $CMSCore) : array
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = $this->getCompletedTexts();
+      $locales = [];
+
+      foreach ($texts as $localeName => $data) {
+        $CMSLocale = new CMSLocale($CMSCore, $localeName);
+        $CMSLocale->initPathes();
+        $locales[$localeName] = [
+          'title' => $CMSLocale->getTitle(),
+          'iconURL' => $CMSLocale->getIconURL()
+        ];
+      }
+
+      return $locales;
+    }
+
+    return [];
   }
   
   /**

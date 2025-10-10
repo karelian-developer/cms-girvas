@@ -21,11 +21,11 @@ export class PageEntriesCategory {
 
   init() {
     let searchParams = new URLParser();
-    let elementForm = document.querySelector('.form_entries-category');
+    let elementForm = document.querySelector('[data-element="main-form"]');
 
     let locales;
-    let interactiveLocaleChoices = new Interactive('choices');
-    let interactiveParentChoices = new Interactive('choices');
+    const interactiveLocaleChoices = new Interactive('choices');
+    const interactiveParentChoices = new Interactive('choices');
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
@@ -33,17 +33,14 @@ export class PageEntriesCategory {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let descriptionTextareaElement = document.querySelector('[role="entriesCategoryDescription"]');
-      let titleInputElement = document.querySelector('[role="entriesCategoryTitle"]');
-      let urlInputElement = document.querySelector('[role="entriesCategoryURL"]');
+      const urlInputElement = document.querySelector('[data-element="input-url"]');
+      const titleInputElement = document.querySelector('[data-element="input-title"]');
+      const SEOTitleInputElement = document.querySelector('[data-element="input-seo-title"]');
+      const descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
+      const SEODescriptionTextareaElement = document.querySelector('[data-element="input-seo-description"]');
+      const keywordsTextareaElement = document.querySelector('[data-element="input-keywords"]');
 
       locales.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
@@ -71,8 +68,11 @@ export class PageEntriesCategory {
         }
 
         if (locale.name === window.CMSCore.locales.admin.name) {
-          descriptionTextareaElement.setAttribute('name', 'entries_category_description_' + locale.iso639_2);
           titleInputElement.setAttribute('name', 'entries_category_title_' + locale.iso639_2);
+          SEOTitleInputElement.setAttribute('name', 'entries_category_seo_title_' + locale.iso639_2);
+          descriptionTextareaElement.setAttribute('name', 'entries_category_description_' + locale.iso639_2);
+          SEODescriptionTextareaElement.setAttribute('name', 'entries_category_seo_description_' + locale.iso639_2);
+          keywordsTextareaElement.setAttribute('name', 'entries_category_keywords_' + locale.iso639_2);
 
           if (searchParams.getPathPart(3) != null) {
             let request = new Interactive('request', {
@@ -84,8 +84,11 @@ export class PageEntriesCategory {
     
             request.target.send().then((data) => {
               if (data.statusCode === 1 && data.outputData.hasOwnProperty('entriesCategory')) {
-                descriptionTextareaElement.value = data.outputData.entriesCategory.description;
                 titleInputElement.value = data.outputData.entriesCategory.title;
+                SEOTitleInputElement.value = data.outputData.entriesCategory.SEOTitle;
+                descriptionTextareaElement.value = data.outputData.entriesCategory.description;
+                SEODescriptionTextareaElement.value = data.outputData.entriesCategory.SEODescription;
+                keywordsTextareaElement.value = data.outputData.entriesCategory.keywords.join(', ');
               }
             });
           }
@@ -93,7 +96,7 @@ export class PageEntriesCategory {
       });
       interactiveLocaleChoices.assembly();
 
-      let interactiveContainerElement = document.querySelector('#E8548530785');
+      let interactiveContainerElement = document.querySelector('[data-element="header-interactive"]');
       interactiveContainerElement.append(interactiveLocaleChoices.target.element);
 
       urlInputElement.addEventListener('input', (event) => {
@@ -113,13 +116,19 @@ export class PageEntriesCategory {
       
       let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
-        let entryDescriptionTextareaElement = document.querySelector('[role="entriesCategoryDescription"]');
-        let entryTitleInputElement = document.querySelector('[role="entriesCategoryTitle"]');
+        const titleInputElement = document.querySelector('[data-element="input-title"]');
+        const SEOTitleInputElement = document.querySelector('[data-element="input-seo-title"]');
+        const descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
+        const SEODescriptionTextareaElement = document.querySelector('[data-element="input-seo-description"]');
+        const keywordsTextareaElement = document.querySelector('[data-element="input-keywords"]');
         
         locales.forEach((locale, localeIndex) => {
           if (locale.name === event.target.value) {
-            entryDescriptionTextareaElement.setAttribute('name', 'entries_category_description_' + locale.iso639_2);
-            entryTitleInputElement.setAttribute('name', 'entries_category_title_' + locale.iso639_2);
+            titleInputElement.setAttribute('name', 'entries_category_title_' + locale.iso639_2);
+            SEOTitleInputElement.setAttribute('name', 'entries_category_seo_title_' + locale.iso639_2);
+            descriptionTextareaElement.setAttribute('name', 'entries_category_description_' + locale.iso639_2);
+            SEODescriptionTextareaElement.setAttribute('name', 'entries_category_seo_description_' + locale.iso639_2);
+            keywordsTextareaElement.setAttribute('name', 'entries_category_keywords_' + locale.iso639_2);
 
             if (searchParams.getPathPart(3) != null) {
               let request = new Interactive('request', {
@@ -131,8 +140,11 @@ export class PageEntriesCategory {
       
               request.target.send().then((data) => {
                 if (data.statusCode === 1 && data.outputData.hasOwnProperty('entriesCategory')) {
-                  entryDescriptionTextareaElement.value = data.outputData.entriesCategory.description;
-                  entryTitleInputElement.value = data.outputData.entriesCategory.title;
+                  titleInputElement.value = data.outputData.entriesCategory.title;
+                  SEOTitleInputElement.value = data.outputData.entriesCategory.SEOTitle;
+                  descriptionTextareaElement.value = data.outputData.entriesCategory.description;
+                  SEODescriptionTextareaElement.value = data.outputData.entriesCategory.SEODescription;
+                  keywordsTextareaElement.value = data.outputData.entriesCategory.keywords.join(', ');
                 }
               });
             }
@@ -153,13 +165,7 @@ export class PageEntriesCategory {
 
         return fetch('/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
       }, (rejectionReason) => {
-        let interactiveNotification = new Interactive('notification');
-        interactiveNotification.target.isPopup = true;
-        interactiveNotification.target.setStatusCode(0);
-        interactiveNotification.target.setContent(rejectionReason);
-        interactiveNotification.target.assembly();
-  
-        interactiveNotification.target.show();
+        this.page.showPopupNotification(rejectionReason, 0);
       }).then((response) => {
         return (response.ok) ? response.json() : Promise.reject(response);
       }).then((data1) => {
@@ -169,29 +175,24 @@ export class PageEntriesCategory {
           interactiveParentChoices.target.addItem('', 0);
 
           entriesCategoriesData.forEach((entriesCategory, entriesCategoryIndex) => {
-            if (entriesCategoryData.id != entriesCategory.id) {
+            if (entriesCategoryData.id !== entriesCategory.id) {
               interactiveParentChoices.target.addItem(entriesCategory.title, entriesCategory.id);
             }
 
             if (entriesCategory.id === entriesCategoryData.parentID) {
-              interactiveParentChoices.target.setItemSelectedIndex(entriesCategoryIndex);
+              interactiveParentChoices.target.setItemSelectedIndex(entriesCategoryIndex + 1);
             }
           });
+
           interactiveParentChoices.target.setName('entries_category_parent_id');
           interactiveParentChoices.assembly();
 
-          let interactiveContainer = document.querySelector('#TC6474389602');
+          let interactiveContainer = document.querySelector('[data-element="choice"][data-choice="parent-category"]');
           interactiveContainer.innerHTML = '';
           interactiveContainer.append(interactiveParentChoices.target.element);
         }
       }, (rejectionReason) => {
-        let interactiveNotification = new Interactive('notification');
-        interactiveNotification.target.isPopup = true;
-        interactiveNotification.target.setStatusCode(0);
-        interactiveNotification.target.setContent(rejectionReason);
-        interactiveNotification.target.assembly();
-  
-        interactiveNotification.target.show();
+        this.page.showPopupNotification(rejectionReason, 0);
       });
 
       this.buttons.save = new Interactive('button');
@@ -221,15 +222,7 @@ export class PageEntriesCategory {
             }
           });
         } else {
-          let interactiveNotification;
-        
-          interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY);
-          interactiveNotification.target.assembly();
-
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(rejectionReason, 0);
         }
       });
       this.buttons.save.assembly();
@@ -278,17 +271,11 @@ export class PageEntriesCategory {
         this.buttons.save.target.element.style.display = 'flex';
       }
 
-      let interactiveContainer = document.querySelector('#SYSTEM_E3724126170');
+      let interactiveContainer = document.querySelector('[data-element="panel"]');
       interactiveContainer.append(this.buttons.delete.target.element);
       interactiveContainer.append(this.buttons.save.target.element);
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }

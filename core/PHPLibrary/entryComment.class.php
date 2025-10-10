@@ -72,7 +72,7 @@ class EntryComment implements EntityTypeContent
    */
   public function getEntry() : Entry|null
   {
-    return new User($this->CMSCore, $this->entryID) ?? null;
+    return new Entry($this->CMSCore, $this->entryID) ?? null;
   }
   
   /**

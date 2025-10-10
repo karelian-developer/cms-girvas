@@ -6,65 +6,107 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-.form.form_entry > .table {
-  margin-bottom: 10px;
+.main__page_entry .grid-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 20px;
 }
 
-.form.form_entry .table_entry tr > td:first-child {
-  width: calc(100% - 300px);
+.main__page_entry .grid-table__cell:not(:last-child) {
+  border-bottom: 1px solid var(--color-neutral-lightgray);
+  padding-bottom: 20px;
 }
 
-.form.form_entry .table_entry tr > td:last-child {
-  width: 400px;
+@media (min-width: 801px) {
+  .main__page_entry .grid-table__cell_text {
+    padding-right: 20px;
+  }
+
+  .main__page_entry .grid-table__cell_data {
+    padding-left: 20px;
+  }
 }
 
-.form.form_entry .table__cell {
-  box-sizing: border-box;
-  vertical-align: top;
+.main__page_entry .grid-table__cell_text {
+  grid-column: 1;
 }
 
-.form.form_entry .cell__title {
-  font-weight: 700;
+@media (max-width: 800px) {
+  .main__page_entry .grid-table__cell_text {
+    border-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}
+
+.main__page_entry .grid-table__cell_text .cell__title {
   text-transform: uppercase;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.main__page_entry .grid-table__cell_text .cell__title:not(:last-child) {
   margin-bottom: 10px;
 }
 
-.form.form_entry input,
-.form.form_entry select,
-.form.form_entry textarea {
-  width: 100%;
+.main__page_entry .grid-table__cell_text .cell__description {
+  font-size: 14px;
+  opacity: .6;
 }
 
-.form.form_entry input:not(:nth-last-child()),
-.form.form_entry select:not(:nth-last-child()),
-.form.form_entry textarea:not(:nth-last-child()) {
-  margin-bottom: 10px;
+.main__page_entry .grid-table__cell_data {
+  grid-column: 2;
 }
 
-.form.form_entry textarea {
-  resize: vertical;
-  min-height: 100px;
+@media (max-width: 800px) {
+  .main__page_entry .grid-table__cell_text,
+  .main__page_entry .grid-table__cell_data {
+    grid-column: 1 / -1;
+  }
 }
 
-.form.form_entry .form__input[type="submit"] {
-  width: fit-content;
-  float: right;
+.main__page_entry .grid-table__cell_editor,
+.main__page_entry .grid-table__cell_panel {
+  grid-column: 1 / -1;
 }
 
-.form.form_entry .interactive__select-imitation {
-  width: 100% !important;
-}
-
-.form.form_entry .form__bottom-panel {
+.main__page_entry .grid-table__cell_panel {
   display: flex;
   justify-content: flex-end;
 }
 
-.form.form_entry .form__bottom-panel > * {
+.main__page_entry .grid-table__cell_panel > * {
   &:not(:last-child) {
     margin-right: 10px;
   }
 }
+
+.main__page_entry .page__form input,
+.main__page_entry .page__form select,
+.main__page_entry .page__form textarea {
+  width: 100%;
+}
+
+.main__page_entry .page__form input:not(:nth-last-child()),
+.main__page_entry .page__form select:not(:nth-last-child()),
+.main__page_entry .page__form textarea:not(:nth-last-child()) {
+  margin-bottom: 10px;
+}
+
+.main__page_entry .page__form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.main__page_entry .page__form .form__input[type="submit"] {
+  width: fit-content;
+  float: right;
+}
+
+.main__page_entry .page__form .interactive__select-imitation {
+  width: 100% !important;
+}
+
+/* Боковая колонка инструмента */
 
 .main__page-aside .form-entry-preview__container-image {
   display: flex;

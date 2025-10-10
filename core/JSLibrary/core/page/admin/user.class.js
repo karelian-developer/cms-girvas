@@ -20,9 +20,9 @@ export class PageUser {
 
   init() {
     let searchParams = new URLParser(), locales, userData, usersGroups;
-    let elementForm = document.querySelector('.form_user');
+    let elementForm = document.querySelector('[data-element="main-form"]');
     
-    let interactiveChoicesUsersGroups = new Interactive('choices');
+    const interactiveChoicesUsersGroups = new Interactive('choices');
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
@@ -30,19 +30,12 @@ export class PageUser {
       locales = data.outputData.locales;
       return fetch('/handler/usersGroups' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
       usersGroups = data.outputData.usersGroups;
-
-      usersGroups.forEach((usersGroup, usersGroupIndex) => {
+      usersGroups.forEach((usersGroup) => {
         interactiveChoicesUsersGroups.target.addItem(usersGroup.title, usersGroup.id);
       });
 
@@ -50,59 +43,52 @@ export class PageUser {
 
       return fetch('/handler/user/' + searchParams.getPathPart(3) + '?localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
       userData = data.outputData.user;
+
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let userPasswordInput = document.querySelector('[role="userFormInputUserPassword"]');
-      let userPasswordRepeatInput = document.querySelector('[role="userFormInputUserPasswordRepeat"]');
+      const userPasswordInput = document.querySelector('[data-element="input-password"]');
+      const userPasswordRepeatInput = document.querySelector('[data-element="input-password-repeat"]');
 
-      userPasswordInput.addEventListener('change', (event) => {
-        event.preventDefault();
+      if (userPasswordInput !== null) {
+        userPasswordInput.addEventListener('change', (event) => {
+          event.preventDefault();
 
-        if (event.target.value != '') {
-          userPasswordInput.setAttribute('required', '');
-          userPasswordRepeatInput.setAttribute('required', '');
-        } else {
-          if (userPasswordRepeatInput.value === '') {
-            userPasswordInput.removeAttribute('required');
-            userPasswordRepeatInput.removeAttribute('required');
+          if (event.target.value !== '') {
+            userPasswordInput.setAttribute('required', '');
+            userPasswordRepeatInput.setAttribute('required', '');
+          } else {
+            if (userPasswordRepeatInput.value === '') {
+              userPasswordInput.removeAttribute('required');
+              userPasswordRepeatInput.removeAttribute('required');
+            }
           }
-        }
-      });
+        });
+      }
 
-      userPasswordRepeatInput.addEventListener('change', (event) => {
-        event.preventDefault();
+      if (userPasswordRepeatInput !== null) {
+        userPasswordRepeatInput.addEventListener('change', (event) => {
+          event.preventDefault();
 
-        if (event.target.value != '') {
-          userPasswordInput.setAttribute('required', '');
-          userPasswordRepeatInput.setAttribute('required', '');
-        } else {
-          if (userPasswordRepeatInput.value === '') {
-            userPasswordInput.removeAttribute('required');
-            userPasswordRepeatInput.removeAttribute('required');
+          if (event.target.value !== '') {
+            userPasswordInput.setAttribute('required', '');
+            userPasswordRepeatInput.setAttribute('required', '');
+          } else {
+            if (userPasswordRepeatInput.value === '') {
+              userPasswordInput.removeAttribute('required');
+              userPasswordRepeatInput.removeAttribute('required');
+            }
           }
-        }
-      });
+        });
+      }
 
-      if (searchParams.getPathPart(3) != null) {
+      if (searchParams.getPathPart(3) !== null) {
         usersGroups.forEach((usersGroup, usersGroupIndex) => {
           if (usersGroup.id === userData.groupID) {
             interactiveChoicesUsersGroups.target.setItemSelectedIndex(usersGroupIndex);
@@ -134,15 +120,7 @@ export class PageUser {
             }
           });
         } else {
-          let interactiveNotification;
-        
-          interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY);
-          interactiveNotification.target.assembly();
-
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY, 0);
         }
       });
       this.buttons.save.assembly();
@@ -233,6 +211,7 @@ export class PageUser {
         document.body.appendChild(interactiveModal.target.element);
         interactiveModal.target.show();
       });
+
       this.buttons.delete.assembly();
   
       if (searchParams.getPathPart(3) === null) {
@@ -249,22 +228,21 @@ export class PageUser {
 
       interactiveChoicesUsersGroups.assembly();
   
-      let interactiveFormPanelContainer = document.querySelector('#SYSTEM_E3724126170');
-      interactiveFormPanelContainer.append(this.buttons.delete.target.element);
-      interactiveFormPanelContainer.append(this.buttons.unblock.target.element);
-      interactiveFormPanelContainer.append(this.buttons.block.target.element);
-      interactiveFormPanelContainer.append(this.buttons.save.target.element);
+      const interactiveFormPanelContainer = document.querySelector('[data-element="panel"]');
+      const interactiveChoicesUsersGroupsContainer = document.querySelector('[data-element="choice"][data-choice="group"]');
 
-      let interactiveChoicesUsersGroupsContainer = document.querySelector('#SYSTEM_E6372840180');
-      interactiveChoicesUsersGroupsContainer.append(interactiveChoicesUsersGroups.target.element);
+      if (interactiveFormPanelContainer !== null) {
+        interactiveFormPanelContainer.append(this.buttons.delete.target.element);
+        interactiveFormPanelContainer.append(this.buttons.unblock.target.element);
+        interactiveFormPanelContainer.append(this.buttons.block.target.element);
+        interactiveFormPanelContainer.append(this.buttons.save.target.element);
+      }
+
+      if (interactiveChoicesUsersGroupsContainer !== null) {
+        interactiveChoicesUsersGroupsContainer.append(interactiveChoicesUsersGroups.target.element);
+      }
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }

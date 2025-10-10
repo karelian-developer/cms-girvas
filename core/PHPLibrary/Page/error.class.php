@@ -99,6 +99,7 @@ class PageError implements InterfacePage
         'PAGE_CONTENT' => ThemeCollector::assemblyFileContent(
           $this->CMSCore->theme, 'templates/page/error.tpl',
           [
+            'ERROR_CODE' => $this->errorCode,
             'ERROR_TITLE' => $this->errorTitle,
             'ERROR_DESCRIPTION' => sprintf(
               '<div class="page__simple-note">%s</div>',

@@ -21,11 +21,11 @@ export class PageEntry {
 
   init() {
     let searchParams = new URLParser();
-    let elementForm = document.querySelector('.form_entry');
+    const elementForm = document.querySelector('[data-element="main-form"]');
 
     let locales;
-    let interactiveLocaleChoices = new Interactive('choices');
-    let interactiveCategoriesChoices = new Interactive('choices');
+    const interactiveLocaleChoices = new Interactive('choices');
+    const interactiveCategoriesChoices = new Interactive('choices');
     
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
@@ -33,21 +33,15 @@ export class PageEntry {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let contentTextareaElement = document.querySelector('[role="entryContent"]');
-      let descriptionTextareaElement = document.querySelector('[role="entryDescription"]');
-      let SEODescriptionTextareaElement = document.querySelector('[role="entrySEODescription"]');
-      let titleInputElement = document.querySelector('[role="entryTitle"]');
-      let SEOTitleInputElement = document.querySelector('[role="entrySEOTitle"]');
-      let keywordsInputElement = document.querySelector('[role="entryKeywords"]');
-      let urlInputElement = document.querySelector('[role="entryURL"]');
+      let contentTextareaElement = document.querySelector('[data-element="input-content"]');
+      let descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
+      let SEODescriptionTextareaElement = document.querySelector('[data-element="input-seo-description"]');
+      let titleInputElement = document.querySelector('[data-element="input-title"]');
+      let SEOTitleInputElement = document.querySelector('[data-element="input-seo-title"]');
+      let keywordsInputElement = document.querySelector('[data-element="input-keywords"]');
+      let urlInputElement = document.querySelector('[data-element="input-url"]');
 
       locales.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
@@ -106,7 +100,7 @@ export class PageEntry {
 
       interactiveLocaleChoices.assembly();
 
-      let interactiveHeaderContainerElement = document.querySelector('#E8548530785');
+      let interactiveHeaderContainerElement = document.querySelector('[data-element="header-interactive"]');
       interactiveHeaderContainerElement.append(interactiveLocaleChoices.target.element);
 
       urlInputElement.addEventListener('input', (event) => {
@@ -179,16 +173,16 @@ export class PageEntry {
         if (form.target.checkRequiredFields()) {
           let formData = new FormData(elementForm);
 
-          let additionalDataContainerElement = document.querySelector('[role="additional-data"]');
+          const additionalDataContainerElement = document.querySelector('[data-element="additional-data"]');
           if (additionalDataContainerElement !== null) {
-            let additionalDataInputs = additionalDataContainerElement.querySelectorAll('input');
-            additionalDataInputs.forEach((element) => {
+            const additionalDataInputs = additionalDataContainerElement.querySelectorAll('input');
+            additionalDataInputs.forEach(element => {
               formData.append(element.name, element.value);
             });
           }
 
           let request = new Interactive('request', {
-            method: (searchParams.getPathPart(3) === null) ? 'PUT' : 'PATCH',
+            method: searchParams.getPathPart(3) === null ? 'PUT' : 'PATCH',
             url: '/handler/entry?localeMessage=' + window.CMSCore.locales.admin.name
           });
   
@@ -203,15 +197,7 @@ export class PageEntry {
             }
           });
         } else {
-          let interactiveNotification;
-        
-          interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY);
-          interactiveNotification.target.assembly();
-
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(rejectionReason, 0);
         }
       });
       this.buttons.save.assembly();
@@ -323,7 +309,7 @@ export class PageEntry {
             interactiveCategoriesChoices.target.setName('entry_category_id');
             interactiveCategoriesChoices.assembly();
             
-            let interactiveContainer = document.querySelector('#TC6474389611');
+            let interactiveContainer = document.querySelector('[data-element="choice"][data-choice="category"]');
             interactiveContainer.append(interactiveCategoriesChoices.target.element);
 
             let interactiveCategoriesChoicesSelectElement = interactiveCategoriesChoices.target.element.querySelector('select');
@@ -334,10 +320,10 @@ export class PageEntry {
                 let fields = responseEntryAdditionalFields.outputData.additionalFields;
                 
                 fields.forEach((field) => {
-                  let sidebarBlockAdditionaFieldsElement = document.querySelector('#SYSTEM_E3754926185');
+                  let sidebarBlockAdditionaFieldsElement = document.querySelector('[data-element="aside-block-additional-fields"]');
                   if (sidebarBlockAdditionaFieldsElement !== null) {
                     
-                    let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
+                    let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-element="additional-field"]');
                     fieldsArrayElements.forEach((element) => {
                       let fieldInputElement = element.querySelector('input, textarea');
 
@@ -358,10 +344,10 @@ export class PageEntry {
               let fields = responseEntryAdditionalFields.outputData.additionalFields;
               
               fields.forEach((field) => {
-                let sidebarBlockAdditionaFieldsElement = document.querySelector('#SYSTEM_E3754926185');
+                let sidebarBlockAdditionaFieldsElement = document.querySelector('[data-element="aside-block-additional-fields"]');
                 if (sidebarBlockAdditionaFieldsElement !== null) {
                   
-                  let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
+                  let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-element="additional-field"]');
                   fieldsArrayElements.forEach((element) => {
                     let fieldInputElement = element.querySelector('input, textarea');
 
@@ -385,7 +371,7 @@ export class PageEntry {
       } else {
         let interactiveButtonPreviewUpload = new Interactive('button');
 
-        let previewBlockElement = document.querySelector('#SYSTEM_E3754926184');
+        let previewBlockElement = document.querySelector('[data-element="aside-block-cover"]');
         let previewBlockContentContainerElement = previewBlockElement.querySelector('.page-aside__block-content');
         
         let previewFormElement = document.createElement('form');
@@ -490,13 +476,7 @@ export class PageEntry {
           
           return fetch('/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
         }, (rejectionReason) => {
-          let interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(rejectionReason);
-          interactiveNotification.target.assembly();
-    
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(rejectionReason, 0);
         }).then((response) => {
           return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data1) => {
@@ -516,11 +496,11 @@ export class PageEntry {
             interactiveCategoriesChoices.target.setName('entry_category_id');
             interactiveCategoriesChoices.assembly();
     
-            let interactiveContainer = document.querySelector('#TC6474389611');
+            const interactiveContainer = document.querySelector('[data-element="choice"][data-choice="category"]');
             interactiveContainer.append(interactiveCategoriesChoices.target.element);
             interactiveHeaderContainerElement.append(this.buttons.viewOnSite.target.element);
 
-            let interactiveCategoriesChoicesSelectElement = interactiveCategoriesChoices.target.element.querySelector('select');
+            const interactiveCategoriesChoicesSelectElement = interactiveCategoriesChoices.target.element.querySelector('select');
             interactiveCategoriesChoicesSelectElement.addEventListener('change', (event) => {
               fetch('/handler/entries/additional-fields?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
                 return (response.ok) ? response.json() : Promise.reject(response);
@@ -528,10 +508,10 @@ export class PageEntry {
                 let fields = responseEntryAdditionalFields.outputData.additionalFields;
                 
                 fields.forEach((field) => {
-                  let sidebarBlockAdditionaFieldsElement = document.querySelector('#SYSTEM_E3754926185');
+                  let sidebarBlockAdditionaFieldsElement = document.querySelector('[data-element="aside-block-additional-fields"]');
                   if (sidebarBlockAdditionaFieldsElement !== null) {
                     
-                    let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
+                    let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-element="additional-field"]');
                     fieldsArrayElements.forEach((element) => {
                       let fieldInputElement = element.querySelector('input, textarea');
 
@@ -552,10 +532,10 @@ export class PageEntry {
               let fields = responseEntryAdditionalFields.outputData.additionalFields;
               
               fields.forEach((field) => {
-                let sidebarBlockAdditionaFieldsElement = document.querySelector('#SYSTEM_E3754926185');
+                let sidebarBlockAdditionaFieldsElement = document.querySelector('[data-element="aside-block-additional-fields"]');
                 if (sidebarBlockAdditionaFieldsElement !== null) {
                   
-                  let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-role="additional-field"]');
+                  let fieldsArrayElements = sidebarBlockAdditionaFieldsElement.querySelectorAll('[data-element="additional-field"]');
                   fieldsArrayElements.forEach((element) => {
                     let fieldInputElement = element.querySelector('input, textarea');
 
@@ -570,17 +550,11 @@ export class PageEntry {
             });
           }
         }, (rejectionReason) => {
-          let interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(0);
-          interactiveNotification.target.setContent(rejectionReason);
-          interactiveNotification.target.assembly();
-    
-          interactiveNotification.target.show();
+          this.page.showPopupNotification(rejectionReason, 0);
         });
       }
 
-      let interactiveFooterContainer = document.querySelector('#SYSTEM_E3724126170');
+      let interactiveFooterContainer = document.querySelector('[data-element="panel"]');
       interactiveFooterContainer.append(this.buttons.delete.target.element);
       interactiveFooterContainer.append(this.buttons.unpublish.target.element);
       interactiveFooterContainer.append(this.buttons.publish.target.element);

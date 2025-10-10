@@ -186,7 +186,7 @@ final class Core implements ThemeInterfaceCore
             $sectionAllowed = false;
 
             if (!$navigationSectionPermanentStatus) {
-              $methodSectionCheckerName = 'get_section_' . (string) $navigationSectionIndex . '_status';
+              $methodSectionCheckerName = 'getSection' . ucfirst((string) $navigationSectionIndex) . 'Status';
               
               if (method_exists($this->theme->CMSCore->configurator, $methodSectionCheckerName)) {
                 if ($this->theme->CMSCore->configurator->{$methodSectionCheckerName}(true)) {

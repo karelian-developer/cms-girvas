@@ -7,22 +7,32 @@
  */
 
 .analytic {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  display: grid;
+  grid-template-areas: 
+    'attendance-schedule attendance-schedule'
+    'entries-popular pages-popular';
+  gap: 20px;
 }
 
-.analytic .analytic__block:first-child {
-  flex: 0 0 100%;
+@media (max-width: 1600px) {
+  .analytic {
+    grid-template-areas: 
+      'attendance-schedule'
+      'entries-popular'
+      'pages-popular';
+  }
 }
 
-.analytic .analytic__block:nth-child(1) {
-  margin-bottom: 20px;
+.analytic__block_attendance-schedule {
+  grid-area: attendance-schedule;
 }
 
-.analytic .analytic__block:nth-child(2),
-.analytic .analytic__block:nth-child(3) {
-  flex: 0 0 calc((100% / 2) - 10px);
+.analytic__block_entries-popular {
+  grid-area: entries-popular;
+}
+
+.analytic__block_pages-popular {
+  grid-area: pages-popular;
 }
 
 .analytic .analytic__block .block__title {

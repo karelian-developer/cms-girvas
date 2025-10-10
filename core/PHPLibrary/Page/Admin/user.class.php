@@ -16,6 +16,7 @@ use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
+use \DOMDocument as DOMDocument;
 
 class PageUser implements InterfacePage
 {
@@ -100,30 +101,54 @@ class PageUser implements InterfacePage
 
       $fieldNameTransformed = implode($field_name_exploded);
 
-      if ($type === 'textarea') {
-        if ($user !== null) {
-          $fieldValue = $user->getAdditionalFieldData($fieldNameTransformed) !== null ? $user->getAdditionalFieldData($fieldNameTransformed) : '';
-        }
+      $document = new DOMDocument('1.0');
+      $documentFragment = $document->createDocumentFragment();
 
-        array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/user/form/fieldTextarea.tpl', [
-          'FIELD_NAME' => $fieldsNames[$index],
-          'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
-          'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
-          'FIELD_VALUE' => $fieldValue ?? ''
-        ]));
-      } else {
-        if ($user !== null) {
-          $fieldValue = $user->getAdditionalFieldData($fieldNameTransformed) !== null ? $user->getAdditionalFieldData($fieldNameTransformed) : '';
-        }
+      $gridTableCellTextElement = $document->createElement('div');
+      $gridTableCellDataElement = $document->createElement('div');
+      $gridTableCellTextTitleElement = $document->createElement('div');
+      $gridTableCellTextDescriptionElement = $document->createElement('div');
 
-        array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/user/form/fieldInput.tpl', [
-          'FIELD_NAME' => $fieldsNames[$index],
-          'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
-          'FIELD_TYPE' => $fieldsTypes[$index],
-          'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
-          'FIELD_VALUE' => $fieldValue ?? ''
-        ]));
+      $gridTableCellTextTitleTextNode = $document->createTextNode($fieldsTitles[$localeName][$index]);
+      $gridTableCellTextDescriptionTextNode = $document->createTextNode($fieldsDescriptions[$localeName][$index]);
+
+      if ($user !== null) {
+        $fieldValue = $user->getAdditionalFieldData($fieldNameTransformed) !== null
+          ? $user->getAdditionalFieldData($fieldNameTransformed)
+          : '';
       }
+
+      if ($type === 'textarea') {
+        $inputElement = $document->createElement('textarea');
+        $textNode = $document->createTextNode($fieldValue);
+        $inputElement->appendChild($textNode);
+
+        $inputElement->setAttribute('class', 'textarea form__textarea');
+      } else {
+        $inputElement = $document->createElement('input');
+        $inputElement->setAttribute('type', $fieldsTypes[$index]);
+        $inputElement->setAttribute('value', $fieldValue);
+
+        $inputElement->setAttribute('class', 'input form__input form__input_' . $fieldsTypes[$index]);
+      }
+
+      $inputElement->setAttribute('name', 'user_additional_field_' . $fieldsNames[$index]);
+
+      $gridTableCellTextElement->setAttribute('class', 'cell grid-table__cell grid-table__cell_text');
+      $gridTableCellDataElement->setAttribute('class', 'cell grid-table__cell grid-table__cell_data');
+      $gridTableCellTextTitleElement->setAttribute('class', 'cell__title');
+      $gridTableCellTextDescriptionElement->setAttribute('class', 'cell__description');
+
+      $gridTableCellTextTitleElement->appendChild($gridTableCellTextTitleTextNode);
+      $gridTableCellTextDescriptionElement->appendChild($gridTableCellTextDescriptionTextNode);
+      $gridTableCellTextElement->appendChild($gridTableCellTextTitleElement);
+      $gridTableCellTextElement->appendChild($gridTableCellTextDescriptionElement);
+      $gridTableCellDataElement->appendChild($inputElement);
+      $documentFragment->appendChild($gridTableCellTextElement);
+      $documentFragment->appendChild($gridTableCellDataElement);
+      $document->appendChild($documentFragment);
+
+      $additionalFieldsElements[] = $document->saveHTML();
     }
 
     /** @var string Содержимое шаблона страницы */

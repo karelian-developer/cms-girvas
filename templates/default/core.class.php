@@ -21,6 +21,7 @@ use \DOMImplementation as DOMImplementation;
 #[\AllowDynamicProperties]
 final class Core implements ThemeInterfaceCore
 {
+  private CMSLocale $locale;
   private string $primaryColor = '#EAEAEA';
   public string $assembled = '';
   public ?DOMDocument $source = null;
@@ -177,6 +178,15 @@ final class Core implements ThemeInterfaceCore
     $metaKeywordsElement->setAttribute('name', 'keywords');
     $metaKeywordsElement->setAttribute('content', '{SITE_KEYWORDS}');
     $headElement->appendChild($metaKeywordsElement);
+
+    if ($this->theme->CMSCore->configurator->existsDatabaseEntryValue('seo_code_yandex_webmaster')) {
+      $code = $this->theme->CMSCore->configurator->getDatabaseEntryValue('seo_code_yandex_webmaster');
+      
+      $metaCodeYandexWebmasterElement = $document->createElement('meta');
+      $metaCodeYandexWebmasterElement->setAttribute('name', 'yandex-verification');
+      $metaCodeYandexWebmasterElement->setAttribute('content', $code);
+      $headElement->appendChild($metaCodeYandexWebmasterElement);
+    }
 
     foreach ([256, 192, 180, 167, 152, 128, 120, 96, 64, 48, 32, 16] as $faviconWidth) {
       $linkFaviconElement = $document->createElement('link');

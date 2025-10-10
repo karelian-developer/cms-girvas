@@ -186,4 +186,14 @@
   --interactive-button-font-color--hover: var(--common-secondary-color-3);
   --interactive-button-font-color--focus: var(--common-secondary-color-3);
   --interactive-button-font-color--active: var(--common-secondary-color-3);
+
+  --color-brand-dark: #000000;
+  --color-brand-primary: #232323;
+  --color-brand-darkgray2: #424242;
+
+  --color-neutral-light: #EAEAEA;
+  --color-neutral-lightgray: #C7C7C7;
+
+  --color-link-default: #285E8E;
+  --color-link-negative: #8E2828;
 }

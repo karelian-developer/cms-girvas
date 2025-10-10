@@ -71,7 +71,7 @@ class Pagination
 
         $aElement = $DOMDocument->createElement('a', $itemIndex === 0 ? '&#10094;&#10094;' : '&#10094;');
         $aElement->setAttribute('class', 'pagination-list__item-link item-link');
-        $aElement->setAttribute('href', '?pageNumber=' . $pageNumber);
+        $aElement->setAttribute('href', '?pageNumber=' . $pageNumber . '#window-target');
 
         $liElement->appendChild($aElement);
         $ulElement->appendChild($liElement);
@@ -84,7 +84,7 @@ class Pagination
 
       $aElement = $DOMDocument->createElement('a', $pageNumber);
       $aElement->setAttribute('class', 'pagination-list__item-link item-link');
-      $aElement->setAttribute('href', '?pageNumber=' . $itemIndex);
+      $aElement->setAttribute('href', '?pageNumber=' . $itemIndex . '#window-target');
 
       $liElement = $DOMDocument->createElement('li');
       $liElement->setAttribute('class', $itemClass);
@@ -102,7 +102,7 @@ class Pagination
 
         $aElement = $DOMDocument->createElement('a', $itemIndex === 0 ? '&#10095;' : '&#10095;&#10095;');
         $aElement->setAttribute('class', 'pagination-list__item-link item-link');
-        $aElement->setAttribute('href', '?pageNumber=' . $pageNumber);
+        $aElement->setAttribute('href', '?pageNumber=' . $pageNumber . '#window-target');
 
         $liElement->appendChild($aElement);
         $ulElement->appendChild($liElement);

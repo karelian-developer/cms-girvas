@@ -25,13 +25,7 @@ export class PageEntries {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
 
       let interactiveCreatePageButton = new Interactive('button');
@@ -41,31 +35,20 @@ export class PageEntries {
       });
       interactiveCreatePageButton.assembly();
     
-      let interactiveContainerElement = document.querySelector('#E8548530785');
+      const interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
-      let tableItemsEntries = document.querySelectorAll('.table-entries__item');
+      const tableItems = document.querySelectorAll('[data-element="entry"]');
+      for (let tableItem of tableItems) {
+        const entryID = tableItem.getAttribute('data-id');
+        const panelElement = tableItem.querySelector('[data-element="panel"]');
+        const panelEventElements = panelElement.querySelectorAll('[data-event]');
 
-      for (let tableItemEntry of tableItemsEntries) {
-        let entryID = tableItemEntry.getAttribute('data-entry-id');
-        let entryName = tableItemEntry.getAttribute('data-name');
-        let buttons = tableItemEntry.querySelectorAll('button[role]');
+        for (let eventElement of panelEventElements) {
+          eventElement.addEventListener('click', (event) => {
+            event.preventDefault();
 
-        for (let button of buttons) {
-          button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') === 'entry-edit') {
-              window.location.href = `./entry/${entryID}`;
-            }
-            
-            if (button.getAttribute('role') === 'entry-view') {
-              window.open(`/entry/${entryName}`, '_blank');
-            }
-            
-            if (button.getAttribute('role') === 'entry-analytics') {
-              window.open(`/admin/analytics/entry/${entryID}`, '_blank');
-            }
-
-            if (button.getAttribute('role') === 'entry-remove') {
+            if (eventElement.getAttribute('data-event') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_ENTRY_DELETE_TITLE,
                 content: localeData.MODAL_ENTRY_DELETE_DESCRIPTION
@@ -101,13 +84,7 @@ export class PageEntries {
         }
       }
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }

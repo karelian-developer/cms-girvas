@@ -23,7 +23,7 @@ class PageTemplates implements InterfacePage
 {
   use TraitPage;
 
-  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_TEMPLATES_NAVIGATION_%s_LABEL';
+  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_THEMES_NAVIGATION_%s_LABEL';
 
   public SystemCore $CMSCore;
   public Page $page;
@@ -71,7 +71,7 @@ class PageTemplates implements InterfacePage
 
   public function assembly() : void
   {
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page/templates.css', 'rel' => 'stylesheet']);
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page/themes.css', 'rel' => 'stylesheet']);
     
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
@@ -83,10 +83,16 @@ class PageTemplates implements InterfacePage
       $this->navigationSubsections[$subpageName]['isActive'] = true;
     }
 
-    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
-    $paginationItemsOnPage = 12;
+    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null
+      ? (int) $this->CMSCore->urlp->getParam('pageNumber')
+      : 0;
 
+    $paginationItemsOnPage = 12;
     $themesCount = 0;
+
+    $locationPlaceName = $this->CMSCore->urlp->getPath(2) === 'repository'
+      ? 'repository'
+      : 'local'; 
 
     $themesListItemsTransformed = [];
 
@@ -111,16 +117,16 @@ class PageTemplates implements InterfacePage
             $metadataAuthorName = isset($data['metadata']['authorName']) ? $data['metadata']['authorName'] : 'Anonymous';
             $metadataCategoryName = isset($data['metadata']['categoryName']) ? $data['metadata']['categoryName'] : 'default';
 
-            $themesListItemsTransformed[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates/listItem.tpl', [
-              'TEMPLATE_NAME' => $name,
-              'TEMPLATE_TITLE' => $metadataTitle,
-              'TEMPLATE_DESCRIPTION' => $nadvoParse->parse($metadataDescription),
-              'TEMPLATE_CREATED_TIMESTAMP' => date('d.m.Y', $metadataDatetimeCreatedUnix),
-              'TEMPLATE_AUTHOR_NAME' => $metadataAuthorName,
-              'TEMPLATE_LINK' => '/admin/templates/repository/' . $theme->getName(),
-              'TEMPLATE_PREVIEW_URL' => $data['preview'],
-              'TEMPLATE_INSTALLED_STATUS' => $themeInstalledStatus,
-              'TEMPLATE_CATEGORY_NAME' => $metadataCategoryName
+            $themesListItemsTransformed[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/themes/listItem.tpl', [
+              'THEME_NAME' => $name,
+              'THEME_TITLE' => $metadataTitle,
+              'THEME_DESCRIPTION' => $nadvoParse->parse($metadataDescription),
+              'THEME_CREATED_TIMESTAMP' => date('d.m.Y', $metadataDatetimeCreatedUnix),
+              'THEME_AUTHOR_NAME' => $metadataAuthorName,
+              'THEME_LINK' => '/admin/templates/repository/' . $theme->getName(),
+              'THEME_PREVIEW_URL' => $data['preview'],
+              'THEME_INSTALLED_STATUS' => $themeInstalledStatus,
+              'THEME_CATEGORY_NAME' => $metadataCategoryName
             ]);
           }
         }
@@ -138,16 +144,16 @@ class PageTemplates implements InterfacePage
           $themeInstalledStatus = $theme->existsFileMetadataJSON() ? 'installed' : 'not-installed';
           
           if ($theme->existsFileMetadataJSON()) {
-            $themesListItemsTransformed[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates/listItem.tpl', [
-              'TEMPLATE_NAME' => $theme->getName(),
-              'TEMPLATE_TITLE' => $theme->getTitle(),
-              'TEMPLATE_DESCRIPTION' => $nadvoParse->parse($theme->getDescription()),
-              'TEMPLATE_CREATED_TIMESTAMP' => date('d.m.Y', $theme->getCoreCreatedUnixTimestamp()),
-              'TEMPLATE_AUTHOR' => $theme->getAuthorName(),
-              'TEMPLATE_PREVIEW_URL' => $theme->getPreviewURL(),
-              'TEMPLATE_LINK' => '/admin/template/' . $theme->getName(),
-              'TEMPLATE_INSTALLED_STATUS' => $themeInstalledStatus,
-              'TEMPLATE_CATEGORY_NAME' => $theme->getCategoryName(),
+            $themesListItemsTransformed[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/themes/listItem.tpl', [
+              'THEME_NAME' => $theme->getName(),
+              'THEME_TITLE' => $theme->getTitle(),
+              'THEME_DESCRIPTION' => $nadvoParse->parse($theme->getDescription()),
+              'THEME_CREATED_TIMESTAMP' => date('d.m.Y', $theme->getCoreCreatedUnixTimestamp()),
+              'THEME_AUTHOR' => $theme->getAuthorName(),
+              'THEME_PREVIEW_URL' => $theme->getPreviewURL(),
+              'THEME_LINK' => '/admin/template/' . $theme->getName(),
+              'THEME_INSTALLED_STATUS' => $themeInstalledStatus,
+              'THEME_CATEGORY_NAME' => $theme->getCategoryName(),
             ]);
           }
 
@@ -159,7 +165,10 @@ class PageTemplates implements InterfacePage
     $pagination = new Pagination($this->CMSCore, $themesCount, $paginationItemsOnPage, $paginationItemCurrent);
     $pagination->assembly();
 
-    if ($this->CMSCore->urlp->getPath(2) === 'repository' && !is_null($this->CMSCore->urlp->getPath(3))) {
+    if (
+      $this->CMSCore->urlp->getPath(2) === 'repository'
+      && $this->CMSCore->urlp->getPath(3) !== null
+    ) {
       $name = $this->CMSCore->urlp->getPath(3);
       $themePage = new PageTemplate($this->CMSCore, $this->page);
       
@@ -167,13 +176,20 @@ class PageTemplates implements InterfacePage
       $this->assembled = $themePage->assembled;
     } else {
       /** @var string $site_page Содержимое шаблона страницы */
-      $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates.tpl', [
-        'PAGE_TEMPLATES_PAGINATION' => $pagination->assembled,
-        'ADMIN_PANEL_PAGE_NAME' => 'templates',
-        'TEMPLATES_LIST' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/templates/list.tpl', [
-          'TEMPLATES_LIST_ITEMS' => implode('', $themesListItemsTransformed)
-        ])
-      ]);
+      $this->assembled = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme, 'templates/page/themes.tpl',
+        [
+          'PAGE_THEMES_PAGINATION' => $pagination->assembled,
+          'THEMES_LIST' => ThemeCollector::assemblyFileContent(
+            $this->CMSCore->theme,
+            'templates/page/themes/list.tpl',
+            [
+              'THEMES_PLACE_NAME' => $locationPlaceName,
+              'THEMES_LIST_ITEMS' => implode('', $themesListItemsTransformed)
+            ]
+          )
+        ]
+      );
     }
   }
 }

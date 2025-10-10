@@ -25,13 +25,7 @@ export class PageUsersGroups {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
 
       let interactiveCreatePageButton = new Interactive('button');
@@ -41,22 +35,18 @@ export class PageUsersGroups {
       });
       interactiveCreatePageButton.assembly();
     
-      let interactiveContainerElement = document.querySelector('#E8548530785');
+      const interactiveContainerElement = document.querySelector('#E8548530785');
       interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
-      let tableItemsUsersGroups = document.querySelectorAll('.table-users-groups__item');
+      const tableItems = document.querySelectorAll('[data-element="users-group"]');
+      for (let tableItem of tableItems) {
+        const usersGroupID = tableItem.getAttribute('data-id');
+        const panelElement = tableItem.querySelector('[data-element="panel"]');
+        const panelEventElements = panelElement.querySelectorAll('[data-event]');
 
-      for (let tableItemUserGroup of tableItemsUsersGroups) {
-        let userGroupID = tableItemUserGroup.getAttribute('data-user-group-id');
-        let buttons = tableItemUserGroup.querySelectorAll('button[role]');
-
-        for (let button of buttons) {
-          button.addEventListener('click', (event) => {
-            if (button.getAttribute('role') === 'user-group-edit') {
-              window.location.href = `./userGroup/${userGroupID}`;
-            }
-
-            if (button.getAttribute('role') === 'user-group-remove') {
+        for (let eventElement of panelEventElements) {
+          eventElement.addEventListener('click', (event) => {
+            if (eventElement.getAttribute('data-event') === 'remove') {
               let interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_USERS_GROUP_DELETE_TITLE,
                 content: localeData.MODAL_USERS_GROUP_DELETE_DESCRIPTION
@@ -64,11 +54,11 @@ export class PageUsersGroups {
               
               interactiveModal.target.addButton(localeData.BUTTON_DELETE_LABEL, () => {
                 let formData = new FormData();
-                formData.append('user_group_id', userGroupID);
+                formData.append('user_group_id', usersGroupID);
 
                 let request = new Interactive('request', {
                   method: 'DELETE',
-                  url: '/handler/usersGroup/' + userGroupID + '?localeMessage=' + window.CMSCore.locales.admin.name
+                  url: '/handler/usersGroup/' + usersGroupID + '?localeMessage=' + window.CMSCore.locales.admin.name
                 });
       
                 request.target.data = formData;
@@ -92,13 +82,7 @@ export class PageUsersGroups {
         }
       }
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }

@@ -6,40 +6,234 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-.table-users-groups__item-buttons-list {
+.grid-table__item {
+  display: grid;
+  grid-template-areas:
+    'title title'
+    'locales locales'
+    'metadata panel';
+  grid-template-columns: metadata 1fr;
+  font-size: 14px;
+}
+
+@media (max-width: 1600px) {
+  .grid-table__item {
+    grid-template-areas:
+      'title'
+      'locales'
+      'metadata'
+      'panel';
+  }
+}
+
+.grid-table__item .grid-table__id {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--color-brand-darkgray2);
+  margin-left: 5px;
+  opacity: .6;
+}
+
+.grid-table__item .grid-table__id::before {
+  content: '(';
+}
+
+.grid-table__item .grid-table__id::after {
+  content: ')';
+}
+
+.grid-table__item:not(:last-child) {
+  border-bottom: 1px solid var(--color-neutral-lightgray);
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+}
+
+.grid-table__cell {
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.grid-table__cell_title {
+  font-weight: 500;
+  grid-area: title;
+}
+
+.grid-table__cell_locales {
   display: flex;
+  font-size: 12px;
+  grid-area: locales;
 }
 
-.buttons-list__item {
-  margin-right: 10px;
+.grid-table__cell_metadata {
+  font-size: 12px;
+  grid-area: metadata;
 }
 
-.buttons-list__item:last-child {
-  margin-right: 0;
+.grid-table__cell_metadata > * {
+  opacity: .6;
 }
 
-.table-users-groups__item-button {
+.grid-table__cell_panel {
   display: flex;
-  box-sizing: border-box;
-  background: none;
-  border: 0;
+  justify-content: flex-end;
+  align-items: flex-end;
+  font-size: 12px;
+  grid-area: panel;
+}
+
+@media (max-width: 700px) {
+  .grid-table__cell_panel {
+    justify-content: center;
+  }
+}
+
+.grid-table__locales-title {
+  font-weight: 500;
+  margin-right: 3px;
+}
+
+.grid-table__locales-title::after {
+  content: ':';
+}
+
+.grid-table__locales {
+  display: flex;
+  flex-wrap: wrap;
+  list-style-type: none;
   padding: 0;
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
+  margin: 0;
 }
 
-.table-users-groups__item-button-icon {
-  fill: var(--common-main-color-4);
-  width: 100%;
-  transition: fill .2s;
+.grid-table__locale {
+  display: flex;
+  align-items: center;
+  font-size: inherit !important;
+  text-transform: lowercase;
 }
 
-.table-users-groups__item-button:hover .table-users-groups__item-button-icon,
-.table-users-groups__item-button:focus .table-users-groups__item-button-icon {
-  fill: var(--common-secondary-color-3);
+.grid-table__locale:not(:last-child)::after {
+  content: ',';
+  margin-right: 3px;
 }
 
-.table-users-groups__item-button:active .table-users-groups__item-button-icon {
-  fill: var(--common-main-color-5);
+.grid-table__locale-icon {
+  margin-right: 2px;
+}
+
+.grid-table__panel-list {
+  display: flex;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+@media (max-width: 500px) {
+  .grid-table__panel-list {
+    display: grid;
+    grid-template-areas: 
+      'edit remove';
+    gap: 10px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  .grid-table__panel-list {
+    grid-template-areas: 
+      'edit'
+      'remove';
+  }
+}
+
+.grid-table__metadata-list {
+  display: grid;
+  list-style-type: none;
+  grid-template-areas: 
+    'count-users count-users'
+    'date-created date-updated';
+  grid-template-columns: max-content max-content;
+  column-gap: 10px;
+  padding: 0;
+  margin: 0;
+  row-gap: 5px;
+}
+
+@media (max-width: 400px) {
+  .grid-table__metadata-list {
+    grid-template-areas: 
+      'count-users'
+      'count-users'
+      'date-created'
+      'date-updated';
+  }
+}
+
+.grid-table__metadata-label {
+  font-weight: 500;
+}
+
+.grid-table__metadata-label::after {
+  font-weight: 500;
+  content: ':';
+  margin-right: 2px;
+}
+
+.grid-table__metadata_count-users {
+  grid-area: count-users;
+}
+
+.grid-table__metadata_date-created {
+  grid-area: date-created;
+}
+
+.grid-table__metadata_date-updated {
+  grid-area: date-updated;
+}
+
+.grid-table__panel-link {
+  font-size: inherit !important;
+  text-transform: lowercase;
+  color: var(--color-link-default);
+}
+
+.grid-table__panel-link_red {
+  color: var(--color-link-negative);
+}
+
+.grid-table__panel-item {
+  display: flex;
+}
+
+@media (max-width: 500px) {
+  .grid-table__panel-link {
+    box-sizing: border-box;
+    background-color: var(--color-brand-primary);
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 700;
+    text-align: center;
+    color: var(--color-neutral-light);
+    padding: 10px;
+    width: 100%;
+  }
+
+  .grid-table__panel-link_red {
+    background-color: var(--color-link-negative);
+  }
+
+  .grid-table__panel-link:hover,
+  .grid-table__panel-link:focus {
+    filter: brightness(120%);
+  }
+}
+
+@media (min-width: 501px) {
+  .grid-table__panel-item:not(:last-child)::after {
+    content: '|';
+    margin-left: 3px;
+    margin-right: 3px;
+    opacity: .6;
+  }
 }

@@ -137,7 +137,25 @@ class User
    */
   public static function getAvatarDefaultURL(CMSCore $CMSCore, int $size) : string
   {
-    return '/' . $CMSCore->theme->getURL() . '/images/avatar_default_' . $size;
+    return '/' . $CMSCore->theme->getURL() . '/images/avatar_default_' . $size . '.webp';
+  }
+  
+  /**
+   * Получить регистрационный IP
+   *
+   * @return string
+   */
+  public function getRegistrationIP() : string
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+
+      if (isset($metadata['registrationIP'])) {
+        return $metadata['registrationIP'];
+      }
+    }
+
+    return '0.0.0.0';
   }
   
   /**
@@ -228,6 +246,16 @@ class User
     }
 
     return false;
+  }
+
+  /**
+   * Получить статус подтверждения E-Mail
+   * 
+   * @return string
+   */
+  public function emailIsSubmitted() : string
+  {
+    return $this->emailIsSubmitted ?? '';
   }
   
   /**
@@ -783,6 +811,7 @@ class User
       'surname' => '',
       'patronymic' => '',
       'groupID' => 4,
+      'registrationIP' => Client::getRealIPAddress(),
       'passwordResetToken' => '',
       'passwordResetTokenCreatedUnixTimestamp' => '',
     ];

@@ -14,11 +14,14 @@ use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\Factories\Content as FactoryContent;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
+use \core\PHPLibrary\SystemCore as CMSCore;
 use \PDOException as PDOException;
 
 #[\AllowDynamicProperties]
 class Entry implements EntityTypeContent
 {
+  private int $authorID;
   private int $categoryID;
   private int $viewsCount = 0;
   private string $name;
@@ -130,9 +133,9 @@ class Entry implements EntityTypeContent
    * 
    * @param array $data
    * 
-   * @return EntryCategory
+   * @return ?EntryCategory
    */
-  public function getCategory(array $data = ['*']) : EntryCategory|null
+  public function getCategory(array $data = ['*']) : ?EntryCategory
   {
     $categoryID = $this->getCategoryID();
 
@@ -151,9 +154,9 @@ class Entry implements EntityTypeContent
    * 
    * @param array $data
    * 
-   * @return User
+   * @return ?User
    */
-  public function getAuthor(array $data = ['*']) : User|null
+  public function getAuthor(array $data = ['*']) : ?User
   {
     $authorID = $this->getAuthorID();
 
@@ -165,6 +168,104 @@ class Entry implements EntityTypeContent
     }
 
     return null;
+  }
+
+  /**
+   * Получить тексты
+   * 
+   * @return array
+   */
+  public function getTexts() : array
+  {
+    if (property_exists($this, 'texts')) {
+      return json_decode($this->texts, true);
+    }
+
+    return [];
+  }
+
+  /**
+   * Получить заполненные тексты
+   * 
+   * @return array
+   */
+  public function getCompletedTexts() : array
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      return array_filter($texts, function ($locale) {
+        if (!is_array($locale) || empty($locale)) {
+          return false;
+        };
+
+        foreach ($locale as $key => $value) {
+          if (empty($value) && in_array($key, ['title', 'description', 'content'])) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
+
+    return [];
+  }
+
+  /**
+   * Получить заполненные SEO-тексты
+   * 
+   * @return array
+   */
+  public function getCompletedSEOTexts() : array
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = json_decode($this->texts, true);
+
+      return array_filter($texts, function ($locale) {
+        if (!is_array($locale) || empty($locale)) {
+          return false;
+        };
+
+        foreach ($locale as $key => $value) {
+          if (empty($value) && in_array($key, ['SEOTitle', 'SEODescription', 'keywords'])) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
+
+    return [];
+  }
+
+  /**
+   * Получить данные по заполненным локализациям
+   * 
+   * @param CoreInterface $CMSCore
+   * 
+   * @return array
+   */
+  public function getCompletedLocalesData(CoreInterface $CMSCore) : array
+  {
+    if (property_exists($this, 'texts')) {
+      $texts = $this->getCompletedTexts();
+      $locales = [];
+
+      foreach ($texts as $localeName => $data) {
+        $CMSLocale = new CMSLocale($CMSCore, $localeName);
+        $CMSLocale->initPathes();
+        $locales[$localeName] = [
+          'title' => $CMSLocale->getTitle(),
+          'iconURL' => $CMSLocale->getIconURL()
+        ];
+      }
+
+      return $locales;
+    }
+
+    return [];
   }
   
   /**
@@ -378,12 +479,12 @@ class Entry implements EntityTypeContent
   /**
    * Получить URL дефолтной заставки
    * 
-   * @param SystemCore $CMSCore
+   * @param CMSCore $CMSCore
    * @param int $size
    * 
    * @return string
    */
-  public static function getPreviewDefaultURL(SystemCore $CMSCore, int $size) : string
+  public static function getPreviewDefaultURL(CMSCore $CMSCore, int $size) : string
   {
     return '/' . $CMSCore->theme->getURL() . '/images/entry/default_' . (string) $size . '.png';
   }
@@ -413,9 +514,9 @@ class Entry implements EntityTypeContent
    *
    * @param  array $columns
    * 
-   * @return array|null
+   * @return ?array
    */
-  private function getDatabaseColumnsData(array $columns = ['*']) : array|null
+  private function getDatabaseColumnsData(array $columns = ['*']) : ?array
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -486,16 +587,103 @@ class Entry implements EntityTypeContent
 
     return ($viewsCount * 0.5) + ($commentsCount * 2);
   }
+
+  /**
+   * Получить предыдущую запись
+   * 
+   * @return ?EntityTypeContent
+   */
+  public function getPreviousEntry() : ?EntityTypeContent {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` < :id AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+      'postgresql' => '"id" < :id AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
+    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? new Entry($this->CMSCore, (int) $result['id']) : null;
+  }
+
+  /**
+   * Получить следущую запись
+   * 
+   * @return ?EntityTypeContent
+   */
+  public function getNextEntry() : ?EntityTypeContent {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` > :id AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+      'postgresql' => '"id" > :id AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? new Entry($this->CMSCore, (int) $result['id']) : null;
+  }
   
   /**
    * Получить объект записи по его наименованию
    *
-   * @param  mixed $CMSCore
-   * @param  mixed $name
+   * @param CMSCore $CMSCore
+   * @param string $name
    * 
    * @return Entry
    */
-  public static function getByName(SystemCore $CMSCore, string $name) : Entry|null
+  public static function getByName(CMSCore $CMSCore, string $name) : ?Entry
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -536,11 +724,12 @@ class Entry implements EntityTypeContent
   /**
    * Проверка наличия записи
    *
-   * @param  mixed $CMSCore
-   * @param  mixed $name
-   * @return Entry
+   * @param CMSCore $CMSCore
+   * @param string $name
+   * 
+   * @return bool
    */
-  public static function existsByName(SystemCore $CMSCore, string $name) : bool
+  public static function existsByName(CMSCore $CMSCore, string $name) : bool
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -580,11 +769,12 @@ class Entry implements EntityTypeContent
   /**
    * Проверка наличия записи по идентификационному номеру
    *
-   * @param  SystemCore $CMSCore
-   * @param  int $id
+   * @param CMSCore $CMSCore
+   * @param int $id
+   * 
    * @return bool
    */
-  public static function existsByID(SystemCore $CMSCore, int $id) : bool
+  public static function existsByID(CMSCore $CMSCore, int $id) : bool
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -664,14 +854,16 @@ class Entry implements EntityTypeContent
   /**
    * Создание новой записи
    *
-   * @param  mixed $CMSCore
-   * @param  mixed $name
-   * @param  mixed $authorID
-   * @param  mixed $categoryID
-   * @param  mixed $texts
-   * @return Entry
+   * @param  CMSCore $CMSCore
+   * @param  string $name
+   * @param  int $authorID
+   * @param  int $categoryID
+   * @param  array $texts
+   * @param  array $metadata
+   * 
+   * @return ?Entry
    */
-  public static function create(SystemCore $CMSCore, string $name, int $authorID, int $categoryID, array $texts, array $metadata = []) : Entry|null
+  public static function create(CMSCore $CMSCore, string $name, int $authorID, int $categoryID, array $texts, array $metadata = []) : ?Entry
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');

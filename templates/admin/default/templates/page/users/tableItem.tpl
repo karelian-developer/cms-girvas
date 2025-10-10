@@ -1,29 +1,53 @@
-<tr class="table__row table-users__item" data-user-id="{USER_ID}">
-  <td class="table__cell" style="width: fit-content;">#{USER_INDEX}</td>
-  <td class="table__cell" style="font-weight: 700;"><a href="/admin/user/{USER_ID}">{USER_LOGIN}</a></td>
-  <td class="table__cell"><a href="mailto:{USER_EMAIL}">{USER_EMAIL}</a></td>
-  <td class="table__cell" style="font-weight: 700;">{USER_GROUP_TITLE}</td>
-  <td class="table__cell">{USER_CREATED_DATE_TIMESTAMP}</td>
-  <td class="table__cell">{USER_UPDATED_DATE_TIMESTAMP}</td>
-  <td class="table__cell">
-    <ul class="table-users__item-buttons-list buttons-list list-reset">
-      <li class="buttons-list__item">
-        <button class="table-users__item-button" role="user-edit">
-          <svg class="table-users__item-button-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 64 64" xml:space="preserve">
-            <rect x="17.5" y="16.3" transform="matrix(0.7071 0.7071 -0.7071 0.7071 33.6798 -9.1993)" width="20.9" height="39.6"/>
-            <polygon points="0,64 19.7,59.1 4.9,44.3 "/>
-            <rect x="39.6" y="4.9" transform="matrix(0.7071 0.7071 -0.7071 0.7071 24.5317 -31.2849)" width="20.9" height="18.2"/>
-          </svg>
-        </button>
+<div class="grid-table__item grid-table__item_user" data-element="user" data-id="{USER_ID}">
+  <div class="grid-table__cell grid-table__cell_avatar">
+    <a class="grid-table__link" href="/admin/user/{USER_ID}" target="_blank">
+      <img class="grid-table__avatar" src="{USER_AVATAR_URL}" alt="{USER_LOGIN}">
+    </a>
+  </div>
+  <div class="grid-table__cell grid-table__cell_title">
+    <a class="grid-table__link" href="/admin/user/{USER_ID}" target="_blank">{USER_LOGIN}</a>
+    <span class="grid-table__id">ID: {USER_ID}</span>
+  </div>
+  <div class="grid-table__cell grid-table__cell_data">
+    <ul class="grid-table__data-list">
+      <li class="grid-table__data grid-table__data-group">
+        <span class="grid-table__data-label">Группа</span>
+        <span class="grid-table__data-value">{USER_GROUP_TITLE}</span>
       </li>
-      <li class="buttons-list__item">
-        <button class="table-users__item-button" role="user-remove" data-modal-call="admin-user-delete" data-modal-params="userID={USER_ID}">
-          <svg class="table-users__item-button-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 64 64" xml:space="preserve">
-            <rect x="13.9" y="16.1" width="37.3" height="47.9"/>
-            <path d="M41.4,10l1-7.3L24.7,0.3l-1,7.3L10.2,5.7l-1,7.3l44.6,6.2l1-7.3L41.4,10z M25.6,7.8l0.7-5l13.8,1.9l-0.7,5L25.6,7.8z"/>
-          </svg>
-        </button>
+      <li class="grid-table__data grid-table__data-email">
+        <span class="grid-table__data-label">Электронная почта</span>
+        <a class="grid-table__data-value" href="mailto:{USER_EMAIL}">{USER_EMAIL}</a>
       </li>
     </ul>
-  </td>
-</tr>
+  </div>
+  <div class="grid-table__cell grid-table__cell_metadata">
+    <ul class="grid-table__metadata-list">
+      <li class="grid-table__metadata grid-table__metadata_ip-registration">
+        <span class="grid-table__metadata-label">IP регистрации</span>
+        <span class="grid-table__metadata-value">{USER_REGISTRATION_IP}</span>
+      </li>
+      <li class="grid-table__metadata grid-table__metadata_status-label">
+        <span class="grid-table__metadata-label">Статус</span>
+        <span class="grid-table__metadata-value">{USER_STATUS_LABEL}</span>
+      </li>
+      <li class="grid-table__metadata grid-table__metadata_date-created">
+        <span class="grid-table__metadata-label">Дата создания</span><br>
+        <span class="grid-table__metadata-value">{USER_CREATED_DATE_TIMESTAMP}</span>
+      </li>
+      <li class="grid-table__metadata grid-table__metadata_date-updated">
+        <span class="grid-table__metadata-label">Дата обновления</span><br>
+        <span class="grid-table__metadata-value">{USER_UPDATED_DATE_TIMESTAMP}</span>
+      </li>
+    </ul>
+  </div>
+  <div class="grid-table__cell grid-table__cell_panel" data-element="panel">
+    <ul class="grid-table__panel-list">
+      <li class="grid-table__panel-item grid-table__panel-item_edit">
+        <a href="/admin/user/{USER_ID}" class="grid-table__panel-link">Редактировать</a>
+      </li>
+      <li class="grid-table__panel-item grid-table__panel-item_remove" data-event="remove">
+        <a href="#" class="grid-table__panel-link grid-table__panel-link_red">Удалить</a>
+      </li>
+    </ul>
+  </div>
+</div>
