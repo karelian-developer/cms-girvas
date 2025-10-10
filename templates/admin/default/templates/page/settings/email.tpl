@@ -22,7 +22,7 @@
       </div>
     </div>
     <div class="cell grid-table__cell grid-table__cell_data">
-      <input name="setting_{SETTINGS_NAME}_smtp_host" type="number" class="input form__input form__input_number" value="{SETTING_SMTP_PORT_VALUE}" placeholder="465" min="0" data-element="input-port" required>
+      <input name="setting_{SETTINGS_NAME}_smtp_port" type="number" class="input form__input form__input_number" value="{SETTING_SMTP_PORT_VALUE}" placeholder="465" min="0" data-element="input-port" required>
     </div>
     <!-- Поле: Имя пользователя SMTP-клиента -->
     <div class="cell grid-table__cell grid-table__cell_text">
