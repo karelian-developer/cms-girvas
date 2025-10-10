@@ -106,6 +106,10 @@
     justify-content: center;
     margin-bottom: 20px;
   }
+
+  .page__title-container:has(.page__interactive-container:empty) .page__title {
+    margin-bottom: 0;
+  }
 }
 
 @media (min-width: 501px) {

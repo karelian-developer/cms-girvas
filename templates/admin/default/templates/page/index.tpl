@@ -135,9 +135,6 @@
     <div class="page-content-block page-content-block_copyright">
     </div>
   </div>
-  <div class="page__notice notice notice_yellow">
-    <p class="page__notice-phar">{LANG:PAGE_WARNING_DEVELOPED_PROCESS}</p>
-  </div>
 </article>
 <aside class="main__page-aside page-aside">
   <article class="page-aside__block">
