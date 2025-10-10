@@ -678,15 +678,15 @@ export class PageSettings {
     cellHeaderElement.innerText = 'Поле';
 
     additionalFieldInputTitle.setAttribute('type', 'text');
-    additionalFieldInputTitle.setAttribute('name', 'setting_users_additional_field_title[]');
+    additionalFieldInputTitle.setAttribute('name', 'setting_entries_additional_field_title[]');
     additionalFieldInputTitle.setAttribute('placeholder', 'My field');
     additionalFieldInputTitle.setAttribute('required', 'required');
     additionalFieldInputName.setAttribute('pattern', '[a-z0-9_]+');
     additionalFieldInputName.setAttribute('type', 'text');
-    additionalFieldInputName.setAttribute('name', 'setting_users_additional_field_name[]');
+    additionalFieldInputName.setAttribute('name', 'setting_entries_additional_field_name[]');
     additionalFieldInputName.setAttribute('placeholder', 'my_field');
     additionalFieldInputName.setAttribute('required', 'required');
-    additionalFieldInputDescription.setAttribute('name', 'setting_users_additional_field_description[]');
+    additionalFieldInputDescription.setAttribute('name', 'setting_entries_additional_field_description[]');
     additionalFieldInputDescription.setAttribute('placeholder', localeData.SETTINGS_PAGE_SETTING_USERS_ADDITIONAL_FIELD_DESCRIPTION_PLACEHOLDER);
 
     additionalFieldInputTitle.classList.add('form__input');
