@@ -6,7 +6,7 @@
         {LANG:PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_WEBMASTER_TITLE}
       </div>
       <div class="cell__description">
-        {LANG:MD:PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_WEBMASTER_DESCRIPTION}
+        {LANG:PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_WEBMASTER_DESCRIPTION}
       </div>
     </div>
     <div class="cell grid-table__cell grid-table__cell_data">
@@ -34,7 +34,7 @@
         {LANG:PAGE_SETTINGS_SETTING_SEO_SITE_DESCRIPTION_TITLE}
       </div>
       <div class="cell__description">
-        {LANG:MD:PAGE_SETTINGS_SETTING_SEO_SITE_DESCRIPTION_DESCRIPTION}
+        {LANG:PAGE_SETTINGS_SETTING_SEO_SITE_DESCRIPTION_DESCRIPTION}
       </div>
     </div>
     <div class="cell grid-table__cell grid-table__cell_data">
@@ -46,7 +46,7 @@
         {LANG:PAGE_SETTINGS_SETTING_SEO_KEYWORDS_TITLE}
       </div>
       <div class="cell__description">
-        {LANG:MD:PAGE_SETTINGS_SETTING_SEO_KEYWORDS_DESCRIPTION}
+        {LANG:PAGE_SETTINGS_SETTING_SEO_KEYWORDS_DESCRIPTION}
       </div>
     </div>
     <div class="cell grid-table__cell grid-table__cell_data">
@@ -58,7 +58,7 @@
         {LANG:PAGE_SETTINGS_SETTING_SEO_ROBOTS_TXT_TITLE}
       </div>
       <div class="cell__description">
-        {LANG:MD:PAGE_SETTINGS_SETTING_SEO_ROBOTS_TXT_DESCRIPTION}
+        {LANG:PAGE_SETTINGS_SETTING_SEO_ROBOTS_TXT_DESCRIPTION}
       </div>
     </div>
     <div class="cell grid-table__cell grid-table__cell_data">
