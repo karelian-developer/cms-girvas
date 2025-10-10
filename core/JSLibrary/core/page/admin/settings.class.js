@@ -675,7 +675,9 @@ export class PageSettings {
     cellHeaderElement.classList.add('cell');
     cellHeaderElement.classList.add('grid-table__cell');
     cellHeaderElement.classList.add('grid-table__cell_header');
-    cellHeaderElement.innerText = 'Поле';
+    cellHeaderElement.innerText = data.title !== undefined
+      ? `Поле &laquo;${data.title}&raquo;`
+      : `Новое поле`;
 
     additionalFieldInputTitle.setAttribute('type', 'text');
     additionalFieldInputTitle.setAttribute('name', 'setting_entries_additional_field_title[]');
@@ -812,15 +814,15 @@ export class PageSettings {
       );
     });
 
-    if (typeof data.title !== 'undefined') {
+    if (typeof data.title !== undefined) {
       additionalFieldInputTitle.value = data.title;
     }
 
-    if (typeof data.name !== 'undefined') {
+    if (typeof data.name !== undefined) {
       additionalFieldInputName.value = data.name;
     }
 
-    if (typeof data.description !== 'undefined') {
+    if (typeof data.description !== undefined) {
       additionalFieldInputDescription.innerText = data.description;
     }
   }
