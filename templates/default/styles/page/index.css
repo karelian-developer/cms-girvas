@@ -49,12 +49,12 @@
 }
 
 .entries-list-container__list-item .article__description {
-  opacity: 0;
   visibility: hidden;
-  padding-top: 0;
-  font-size: 0;
   font-weight: 400;
+  font-size: 0;
   color: inherit;
+  padding-top: 0;
+  opacity: 0;
 }
 
 .entries-list-container__list-item .article__metadata {
@@ -120,14 +120,14 @@
 
 @keyframes entries-group-hidden-text {
   from {
-    font-size: 14px;
+    font-size: 12px;
     padding-top: 0;
     opacity: 0;
   }
 
   to {
     visibility: visible;
-    font-size: 14px;
+    font-size: 12px;
     padding-top: 10px;
     opacity: 1;
   }

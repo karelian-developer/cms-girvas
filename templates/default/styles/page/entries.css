@@ -59,12 +59,12 @@
 }
 
 .page__entries-list .entries-list__item .article__description {
-  opacity: 0;
   visibility: hidden;
-  padding-top: 0;
-  font-size: 0;
   font-weight: 400;
+  font-size: 0;
   color: inherit;
+  padding-top: 0;
+  opacity: 0;
 }
 
 .page__entries-list .entries-list__item .article__metadata {
@@ -130,14 +130,14 @@
 
 @keyframes entries-group-hidden-text {
   from {
-    font-size: 14px;
+    font-size: 12px;
     padding-top: 0;
     opacity: 0;
   }
 
   to {
     visibility: visible;
-    font-size: 14px;
+    font-size: 12px;
     padding-top: 10px;
     opacity: 1;
   }
@@ -148,7 +148,6 @@
   color: var(--primary-color-3);
   padding: 20px;
   width: 100%;
-  opacity: .85;
   transition: var(--transistion);
   cursor: pointer;
 }
