@@ -792,6 +792,41 @@ export class PageSettings {
       additionalFieldInputDescription
     );
 
+    const buttonRemoveField = new Interactive('button');
+    buttonRemoveField.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+    buttonRemoveField.target.setCallback((event) => {
+      event.preventDefault();
+      
+      cellElementsForType.forEach(element => {
+        element.remove();
+      });
+
+      cellElementsForCategory.forEach(element => {
+        element.remove();
+      });
+
+      cellElementsForTitle.forEach(element => {
+        element.remove();
+      });
+
+      cellElementsForName.forEach(element => {
+        element.remove();
+      });
+
+      cellElementsForDescription.forEach(element => {
+        element.remove();
+      });
+
+      container.parentElement.previousElementSibling.remove();
+      container.parentElement.remove();
+    });
+
+    buttonRemoveField.assembly();
+
+    const cellElementsForEvents = this.createCellAdditionalFieldElements(
+      '', buttonRemoveField.target.element
+    );
+
     container.parentElement.parentElement.insertBefore(
       cellHeaderElement,
       container.parentElement.previousElementSibling
@@ -826,6 +861,13 @@ export class PageSettings {
     });
 
     cellElementsForDescription.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    cellElementsForEvents.forEach(element => {
       container.parentElement.parentElement.insertBefore(
         element,
         container.parentElement.previousElementSibling
