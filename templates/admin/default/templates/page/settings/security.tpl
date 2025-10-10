@@ -111,5 +111,7 @@
       </div>
       <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_premoderation_words_filter_list" id="I1474308815" cols="30" rows="10" placeholder="PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_PLACEHOLDER">{SETTING_PREMODERATION_WORDS_FILTER_LIST_VALUE}</textarea>
     </div>
+    <!-- Панель формы -->
+    <div class="cell grid-table__cell grid-table__cell_panel" data-element="panel"></div>
   </div>
 </form>
