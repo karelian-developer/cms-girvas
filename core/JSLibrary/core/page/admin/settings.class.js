@@ -811,6 +811,18 @@ export class PageSettings {
         container.parentElement.previousElementSibling
       );
     });
+
+    if (typeof data.title !== 'undefined') {
+      additionalFieldInputTitle.value = data.title;
+    }
+
+    if (typeof data.name !== 'undefined') {
+      additionalFieldInputName.value = data.name;
+    }
+
+    if (typeof data.description !== 'undefined') {
+      additionalFieldInputDescription.innerText = data.description;
+    }
   }
 
   addStaticPagesAdditionalField(localeData, container, data = {}) {
