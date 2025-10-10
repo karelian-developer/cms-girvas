@@ -682,7 +682,7 @@ export class PageSettings {
 
     additionalFieldInputTitle.setAttribute('type', 'text');
     additionalFieldInputTitle.setAttribute('name', 'setting_entries_additional_field_title[]');
-    additionalFieldInputTitle.setAttribute('placeholder', 'My field');
+    additionalFieldInputTitle.setAttribute('placeholder', localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELD_TITLE_PLACEHOLDER);
     additionalFieldInputTitle.setAttribute('required', 'required');
     additionalFieldInputName.setAttribute('pattern', '[a-z0-9_]+');
     additionalFieldInputName.setAttribute('type', 'text');
@@ -690,7 +690,7 @@ export class PageSettings {
     additionalFieldInputName.setAttribute('placeholder', 'my_field');
     additionalFieldInputName.setAttribute('required', 'required');
     additionalFieldInputDescription.setAttribute('name', 'setting_entries_additional_field_description[]');
-    additionalFieldInputDescription.setAttribute('placeholder', localeData.SETTINGS_PAGE_SETTING_USERS_ADDITIONAL_FIELD_DESCRIPTION_PLACEHOLDER);
+    additionalFieldInputDescription.setAttribute('placeholder', localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELD_DESCRIPTION_PLACEHOLDER);
 
     additionalFieldInputTitle.classList.add('form__input');
     additionalFieldInputTitle.classList.add('form__input_text');
@@ -829,20 +829,21 @@ export class PageSettings {
   }
 
   addStaticPagesAdditionalField(localeData, container, data = {}) {
-    let tableRow = document.createElement('tr');
-    let tableCellTypeField = document.createElement('td');
-    let tableCellTitleField = document.createElement('td');
-    let tableCellNameField = document.createElement('td');
-    let tableCellDescriptionField = document.createElement('td');
-    let tableCellEventField = document.createElement('td');
-    let additionalFieldInputTitle = document.createElement('input');
-    let additionalFieldInputName = document.createElement('input');
-    let additionalFieldInputDescription = document.createElement('textarea');
+    const cellHeaderElement = document.createElement('div');
+    const additionalFieldInputTitle = document.createElement('input');
+    const additionalFieldInputName = document.createElement('input');
+    const additionalFieldInputDescription = document.createElement('textarea');
     
-    tableRow.setAttribute('role', 'additional-field');
+    cellHeaderElement.classList.add('cell');
+    cellHeaderElement.classList.add('grid-table__cell');
+    cellHeaderElement.classList.add('grid-table__cell_header');
+    cellHeaderElement.innerText = data.title !== undefined
+      ? `Поле: ${data.title}`
+      : `Новое поле`;
+
     additionalFieldInputTitle.setAttribute('type', 'text');
     additionalFieldInputTitle.setAttribute('name', 'setting_static_pages_additional_field_title[]');
-    additionalFieldInputTitle.setAttribute('placeholder', 'My field');
+    additionalFieldInputTitle.setAttribute('placeholder', localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELD_TITLE_PLACEHOLDER);
     additionalFieldInputTitle.setAttribute('required', 'required');
     additionalFieldInputName.setAttribute('pattern', '[a-z0-9_]+');
     additionalFieldInputName.setAttribute('type', 'text');
@@ -850,26 +851,27 @@ export class PageSettings {
     additionalFieldInputName.setAttribute('placeholder', 'my_field');
     additionalFieldInputName.setAttribute('required', 'required');
     additionalFieldInputDescription.setAttribute('name', 'setting_static_pages_additional_field_description[]');
-    additionalFieldInputDescription.setAttribute('placeholder', localeData.SETTINGS_PAGE_SETTING_USERS_ADDITIONAL_FIELD_DESCRIPTION_PLACEHOLDER);
-    
-    tableRow.classList.add('table__row');
-    tableCellTypeField.classList.add('table__cell');
-    tableCellTitleField.classList.add('table__cell');
-    tableCellNameField.classList.add('table__cell');
-    tableCellDescriptionField.classList.add('table__cell');
+    additionalFieldInputDescription.setAttribute('placeholder', localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELD_DESCRIPTION_PLACEHOLDER);
+
     additionalFieldInputTitle.classList.add('form__input');
     additionalFieldInputTitle.classList.add('form__input_text');
     additionalFieldInputName.classList.add('form__input');
     additionalFieldInputName.classList.add('form__input_text');
     additionalFieldInputDescription.classList.add('form__textarea');
 
-    let interactiveChoicesTypeField = new Interactive('choices');
+    const cellElementsForType = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_TYPE_FIELD_TITLE
+    );
+
+    /* Выпадающий список с типами полей */
+
+    const interactiveChoicesTypeField = new Interactive('choices');
     interactiveChoicesTypeField.target.addItem('String', 'text');
     interactiveChoicesTypeField.target.addItem('Number', 'number');
     interactiveChoicesTypeField.target.addItem('Date', 'date');
     interactiveChoicesTypeField.target.addItem('Text', 'textarea');
     interactiveChoicesTypeField.target.setName('setting_static_pages_additional_field_type[]');
-
+    
     if (typeof data.type != 'undefined') {
       switch (data.type) {
         case 'text': interactiveChoicesTypeField.target.setItemSelectedIndex(0); break;
@@ -880,42 +882,68 @@ export class PageSettings {
       }
     }
 
-    let buttons = {delete: null};
-    buttons.delete = new Interactive('button');
-    buttons.delete.target.setLabel(PageSettings.buttonIcons.trash);
-    buttons.delete.target.setCallback((event) => {
-      event.preventDefault();
-      tableRow.remove();
-    });
-
-    buttons.delete.assembly();
-
     interactiveChoicesTypeField.assembly();
 
-    if (typeof data.title != 'undefined') {
-      additionalFieldInputTitle.value = data.title;
-    }
+    cellElementsForType[1].append(interactiveChoicesTypeField.target.element);
 
-    if (typeof data.name != 'undefined') {
-      additionalFieldInputName.value = data.name;
-    }
+    const cellElementsForTitle = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_NAME_TITLE,
+      additionalFieldInputTitle
+    );
 
-    if (typeof data.description != 'undefined') {
-      additionalFieldInputDescription.innerText = data.description;
-    }
+    const cellElementsForName = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_TECHNICAL_NAME_TITLE,
+      additionalFieldInputName
+    );
 
-    tableCellTypeField.append(interactiveChoicesTypeField.target.element);
-    tableCellTitleField.append(additionalFieldInputTitle);
-    tableCellNameField.append(additionalFieldInputName);
-    tableCellDescriptionField.append(additionalFieldInputDescription);
-    tableCellEventField.append(buttons.delete.target.element);
+    const cellElementsForDescription = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_ENTRIES_ADDITIONAL_FIELDS_TABLE_COLUMN_DESCRIPTION_TITLE,
+      additionalFieldInputDescription
+    );
 
-    tableRow.append(tableCellTypeField);
-    tableRow.append(tableCellTitleField);
-    tableRow.append(tableCellNameField);
-    tableRow.append(tableCellDescriptionField);
-    tableRow.append(tableCellEventField);
+    container.parentElement.parentElement.insertBefore(
+      cellHeaderElement,
+      container.parentElement.previousElementSibling
+    );
 
-    container.parentElement.before(tableRow);
+    cellElementsForType.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    cellElementsForTitle.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    cellElementsForName.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    cellElementsForDescription.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    additionalFieldInputTitle.value = data.title !== undefined
+      ? data.title
+      : '';
+
+    additionalFieldInputName.value = data.name !== undefined
+      ? data.name
+      : '';
+
+    additionalFieldInputDescription.value = data.description !== undefined
+      ? data.description
+      : '';
   }
 }
