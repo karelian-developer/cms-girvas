@@ -122,10 +122,14 @@ class PageUser implements InterfacePage
         $inputElement = $document->createElement('textarea');
         $textNode = $document->createTextNode($fieldValue);
         $inputElement->appendChild($textNode);
+
+        $inputElement->setAttribute('class', 'textarea form__textarea');
       } else {
         $inputElement = $document->createElement('input');
         $inputElement->setAttribute('type', $fieldsTypes[$index]);
         $inputElement->setAttribute('value', $fieldValue);
+
+        $inputElement->setAttribute('class', 'input form__input form__input_' . $fieldsTypes[$index]);
       }
 
       $inputElement->setAttribute('name', $fieldsNames[$index]);
