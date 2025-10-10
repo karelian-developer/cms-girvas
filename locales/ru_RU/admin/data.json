@@ -489,8 +489,6 @@
   "PAGE_SETTINGS_SETTING_SECURITY_REGISTRATION_USERS_TITLE": "Регистрация пользователей",
   "PAGE_SETTINGS_SETTING_SECURITY_REGISTRATION_USERS_DESCRIPTION": "Данная опция разрешает или запрещает регистрироваться пользователям в системе.",
   "PAGE_SETTINGS_SETTING_SECURITY_RESTRICTING_ACCESS_TO_AP_BY_IP_TITLE": "Ограничение доступа к административной панели по IP-адресу",
-  "PAGE_SETTINGS_SETTING_SECURITY_RESTRICTING_ACCESS_TO_AP_BY_IP_DESCRIPTION_1": "Ограничение доступа к административной панели по IP-адресу позволит давать доступ к административной панели исключительно по IP-адресам.",
-  "PAGE_SETTINGS_SETTING_SECURITY_RESTRICTING_ACCESS_TO_AP_BY_IP_DESCRIPTION_2": "В случае, если группы пользователя имеется доступ к административной панели, но включен данный фильтр, то в случае отсутствия IP-адреса пользователя в данном списке - ему доступ будет закрыт.",
   "PAGE_SETTINGS_SETTING_SECURITY_FILTER_REGISTRATION_BY_EMAIL_TITLE": "Фильтр почтовых адресов при регистрации",
   "PAGE_SETTINGS_SETTING_SECURITY_FILTER_REGISTRATION_BY_EMAIL_DESCRIPTION": "Фильтр почтовых адресов поможет отсеять нежелательные регистрации со стороны различных почтовых адресов. Система не будет пропускать к регистрации тех пользователей, которые пытаются создать аккаунт через почтовые сервисы, которые НЕ внесены в данный список.",
   "PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_TITLE": "Премодерация создаваемых комментариев",

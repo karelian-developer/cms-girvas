@@ -489,8 +489,6 @@
   "PAGE_SETTINGS_SETTING_SECURITY_REGISTRATION_USERS_TITLE": "User registration",
   "PAGE_SETTINGS_SETTING_SECURITY_REGISTRATION_USERS_DESCRIPTION": "This option allows or denies users registration in the system.",
   "PAGE_SETTINGS_SETTING_SECURITY_RESTRICTING_ACCESS_TO_AP_BY_IP_TITLE": "Restricting access to the administrative panel by IP address.",
-  "PAGE_SETTINGS_SETTING_SECURITY_RESTRICTING_ACCESS_TO_AP_BY_IP_DESCRIPTION_1": "Restricting access to the administrative panel by IP address will allow access to the administrative panel exclusively by IP addresses.",
-  "PAGE_SETTINGS_SETTING_SECURITY_RESTRICTING_ACCESS_TO_AP_BY_IP_DESCRIPTION_2": "If a user's group has access to the administrative panel, but this filter is enabled, then if the user's IP address is not in this list, access will be denied to him.",
   "PAGE_SETTINGS_SETTING_SECURITY_FILTER_REGISTRATION_BY_EMAIL_TITLE": "Filter email addresses during registration",
   "PAGE_SETTINGS_SETTING_SECURITY_FILTER_REGISTRATION_BY_EMAIL_DESCRIPTION": "The email address filter will help filter out unwanted registrations from various email addresses. The system will not allow registration for those users who are trying to create an account through email services that are NOT included in this list.",
   "PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_TITLE": "Pre-moderation of created comments",
