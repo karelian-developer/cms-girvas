@@ -180,7 +180,7 @@ final class Core implements ThemeInterfaceCore
     $headElement->appendChild($metaKeywordsElement);
 
     if ($this->theme->CMSCore->configurator->existsDatabaseEntryValue('seo_code_yandex_webmaster')) {
-      $code = $this->CMSCore->configurator->getDatabaseEntryValue('seo_code_yandex_webmaster');
+      $code = $this->theme->CMSCore->configurator->getDatabaseEntryValue('seo_code_yandex_webmaster');
       
       $metaCodeYandexWebmasterElement = $document->createElement('meta');
       $metaCodeYandexWebmasterElement->setAttribute('name', 'yandex-verification');
