@@ -138,6 +138,14 @@
   }
 }
 
+@media (max-width: 400px) {
+  .grid-table__panel-list {
+    grid-template-areas: 
+      'edit'
+      'remove';
+  }
+}
+
 .grid-table__metadata-list {
   display: grid;
   list-style-type: none;
@@ -156,6 +164,16 @@
       'ip-registration status-label'
       'date-created date-updated';
     grid-template-columns: max-content max-content;
+  }
+}
+
+@media (max-width: 400px) {
+  .grid-table__metadata-list {
+    grid-template-areas: 
+      'ip-registration'
+      'status-label'
+      'date-created'
+      'date-updated';
   }
 }
 

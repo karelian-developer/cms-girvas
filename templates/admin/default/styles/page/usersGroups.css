@@ -139,6 +139,14 @@
   }
 }
 
+@media (max-width: 400px) {
+  .grid-table__panel-list {
+    grid-template-areas: 
+      'edit'
+      'remove';
+  }
+}
+
 .grid-table__metadata-list {
   display: grid;
   list-style-type: none;
@@ -150,6 +158,16 @@
   padding: 0;
   margin: 0;
   row-gap: 5px;
+}
+
+@media (max-width: 400px) {
+  .grid-table__metadata-list {
+    grid-template-areas: 
+      'count-users'
+      'count-users'
+      'date-created'
+      'date-updated';
+  }
 }
 
 .grid-table__metadata-label {
