@@ -100,30 +100,49 @@ class PageUser implements InterfacePage
 
       $fieldNameTransformed = implode($field_name_exploded);
 
-      if ($type === 'textarea') {
-        if ($user !== null) {
-          $fieldValue = $user->getAdditionalFieldData($fieldNameTransformed) !== null ? $user->getAdditionalFieldData($fieldNameTransformed) : '';
-        }
+      $document = new DOMDocument('1.0');
+      $documentFragment = $document->createDocumentFragment();
 
-        array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/user/form/fieldTextarea.tpl', [
-          'FIELD_NAME' => $fieldsNames[$index],
-          'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
-          'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
-          'FIELD_VALUE' => $fieldValue ?? ''
-        ]));
-      } else {
-        if ($user !== null) {
-          $fieldValue = $user->getAdditionalFieldData($fieldNameTransformed) !== null ? $user->getAdditionalFieldData($fieldNameTransformed) : '';
-        }
+      $gridTableCellTextElement = $document->createElement('div');
+      $gridTableCellDataElement = $document->createElement('div');
+      $gridTableCellTextTitleElement = $document->createElement('div');
+      $gridTableCellTextDescriptionElement = $document->createElement('div');
 
-        array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/user/form/fieldInput.tpl', [
-          'FIELD_NAME' => $fieldsNames[$index],
-          'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
-          'FIELD_TYPE' => $fieldsTypes[$index],
-          'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
-          'FIELD_VALUE' => $fieldValue ?? ''
-        ]));
+      $gridTableCellTextTitleTextNode = $dom->createTextNode($fieldsTitles[$localeName][$index]);
+      $gridTableCellTextDescriptionTextNode = $dom->createTextNode($fieldsDescriptions[$localeName][$index]);
+
+      if ($user !== null) {
+        $fieldValue = $user->getAdditionalFieldData($fieldNameTransformed) !== null
+          ? $user->getAdditionalFieldData($fieldNameTransformed)
+          : '';
       }
+
+      if ($type === 'textarea') {
+        $inputElement = $document->createElement('textarea');
+        $textNode = $dom->createTextNode($fieldValue);
+        $inputElement->appendChild($textNode);
+      } else {
+        $inputElement = $document->createElement('input');
+        $inputElement->setAttribute('type', $fieldsTypes[$index]);
+        $inputElement->setAttribute('value', $fieldValue);
+      }
+
+      $inputElement->setAttribute('name', $fieldsNames[$index]);
+
+      $gridTableCellTextElement->setAttribute('class', 'cell grid-table__cell grid-table__cell_text');
+      $gridTableCellDataElement->setAttribute('class', 'cell grid-table__cell grid-table__cell_data');
+      $gridTableCellTextTitleElement->setAttribute('class', 'cell__title');
+      $gridTableCellTextDescriptionElement->setAttribute('class', 'cell__description');
+
+      $gridTableCellTextTitleElement->appendChild($gridTableCellTextTitleTextNode);
+      $gridTableCellTextDescriptionElement->appendChild($gridTableCellTextDescriptionTextNode);
+      $gridTableCellTextElement->appendChild($gridTableCellTextTitleElement);
+      $gridTableCellTextElement->appendChild($gridTableCellTextDescriptionElement);
+      $documentFragment->appendChild($gridTableCellTextElement);
+      $documentFragment->appendChild($gridTableCellDataElement);
+      $document->appendChild($documentFragment);
+
+      $additionalFieldsElements[] = $document->saveHTML();
     }
 
     /** @var string Содержимое шаблона страницы */
