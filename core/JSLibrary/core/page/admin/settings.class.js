@@ -231,7 +231,6 @@ export class PageSettings {
 
         interactiveChoicesFieldsLocale.target.setName('_users_additional_fields_locale');
 
-        let tableAdditionalFields = document.querySelector('[data-element="profile-table-additional-fields"]');
         let tableAdditionalFieldsButtonContainer = document.querySelector('[data-element="button-add-field"]');
         
         buttons.addField = new Interactive('button');
@@ -269,7 +268,7 @@ export class PageSettings {
           fetch('/handler/profile/additional-fields?locale=' + interactiveChoicesFieldsLocaleSelectElement.value + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
             return (response.ok) ? response.json() : Promise.reject(response);
           }).then((data1) => {
-            let additionalFields = document.querySelectorAll('[role="additional-field"]');
+            let additionalFields = document.querySelectorAll('[data-element="additional-field"]');
             additionalFields.forEach((element) => {
               element.remove();
             })
@@ -286,7 +285,7 @@ export class PageSettings {
           });
         });
 
-        let profileAdditionalFieldsLocaleContainer = document.querySelector('[data-element="profile-additional-fields-locale"]');
+        let profileAdditionalFieldsLocaleContainer = document.querySelector('[data-element="additional-fields-locale"]');
         profileAdditionalFieldsLocaleContainer.append(interactiveChoicesFieldsLocale.target.element);
 
         // Получаем все установленные языковые пакеты
@@ -314,7 +313,6 @@ export class PageSettings {
 
         interactiveChoicesFieldsLocale.target.setName('_entries_additional_fields_locale');
 
-        let tableAdditionalFields = document.querySelector('[data-element="table-additional-fields"]');
         let tableAdditionalFieldsButtonContainer = document.querySelector('[data-element="button-add-field"]');
         
         buttons.addField = new Interactive('button');
@@ -399,7 +397,6 @@ export class PageSettings {
 
         interactiveChoicesFieldsLocale.target.setName('_static_pages_additional_fields_locale');
 
-        let tableAdditionalFields = document.querySelector('[data-element="table-additional-fields"]');
         let tableAdditionalFieldsButtonContainer = document.querySelector('[data-element="button-add-field"]');
         
         buttons.addField = new Interactive('button');
@@ -534,22 +531,21 @@ export class PageSettings {
   }
 
   addUserAdditionalField(localeData, container, data = {}) {
-    const cellHeaderElement = document.createElement('div', 'Поле');
-    // const cellTextElement = document.createElement('div');
-    // const cellTextTitleElement = document.createElement('div');
-    // const cellDataElement = document.createElement('div');
-
-    container.before(cellHeaderElement);
-  }
-
-  addUserAdditionalFieldOld(localeData, container, data = {}) {
+    const cellHeaderElement = document.createElement('div');
     const additionalFieldInputTitle = document.createElement('input');
     const additionalFieldInputName = document.createElement('input');
     const additionalFieldInputDescription = document.createElement('textarea');
+    
+    cellHeaderElement.classList.add('cell');
+    cellHeaderElement.classList.add('grid-table__cell');
+    cellHeaderElement.classList.add('grid-table__cell_header');
+    cellHeaderElement.innerText = data.title !== undefined
+      ? `Поле: ${data.title}`
+      : `Новое поле`;
 
     additionalFieldInputTitle.setAttribute('type', 'text');
     additionalFieldInputTitle.setAttribute('name', 'setting_users_additional_field_title[]');
-    additionalFieldInputTitle.setAttribute('placeholder', 'My field');
+    additionalFieldInputTitle.setAttribute('placeholder', localeData.PAGE_SETTINGS_SETTING_USERS_ADDITIONAL_FIELD_TITLE_PLACEHOLDER);
     additionalFieldInputTitle.setAttribute('required', 'required');
     additionalFieldInputName.setAttribute('pattern', '[a-z0-9_]+');
     additionalFieldInputName.setAttribute('type', 'text');
@@ -557,17 +553,7 @@ export class PageSettings {
     additionalFieldInputName.setAttribute('placeholder', 'my_field');
     additionalFieldInputName.setAttribute('required', 'required');
     additionalFieldInputDescription.setAttribute('name', 'setting_users_additional_field_description[]');
-    additionalFieldInputDescription.setAttribute('placeholder', localeData.SETTINGS_PAGE_SETTING_USERS_ADDITIONAL_FIELD_DESCRIPTION_PLACEHOLDER);
-    
-    cellTextElement.classList.add('cell');
-    cellTextElement.classList.add('grid-table__cell');
-    cellTextElement.classList.add('grid-table__cell_text');
-
-    cellDataElement.classList.add('cell');
-    cellDataElement.classList.add('grid-table__cell');
-    cellDataElement.classList.add('grid-table__cell_data');
-
-    cellTextTitleElement.classList.add('cell__title');
+    additionalFieldInputDescription.setAttribute('placeholder', localeData.PAGE_SETTINGS_SETTING_USERS_ADDITIONAL_FIELD_DESCRIPTION_PLACEHOLDER);
 
     additionalFieldInputTitle.classList.add('form__input');
     additionalFieldInputTitle.classList.add('form__input_text');
@@ -575,13 +561,19 @@ export class PageSettings {
     additionalFieldInputName.classList.add('form__input_text');
     additionalFieldInputDescription.classList.add('form__textarea');
 
-    let interactiveChoicesTypeField = new Interactive('choices');
+    const cellElementsForType = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_USERS_ADDITIONAL_FIELD_TYPE_FIELD_TITLE
+    );
+
+    /* Выпадающий список с типами полей */
+
+    const interactiveChoicesTypeField = new Interactive('choices');
     interactiveChoicesTypeField.target.addItem('String', 'text');
     interactiveChoicesTypeField.target.addItem('Number', 'number');
     interactiveChoicesTypeField.target.addItem('Date', 'date');
     interactiveChoicesTypeField.target.addItem('Text', 'textarea');
     interactiveChoicesTypeField.target.setName('setting_users_additional_field_type[]');
-
+    
     if (typeof data.type != 'undefined') {
       switch (data.type) {
         case 'text': interactiveChoicesTypeField.target.setItemSelectedIndex(0); break;
@@ -592,49 +584,69 @@ export class PageSettings {
       }
     }
 
-    let buttons = {delete: null};
-    buttons.delete = new Interactive('button');
-    buttons.delete.target.setLabel(PageSettings.buttonIcons.trash);
-    buttons.delete.target.setCallback((event) => {
-      event.preventDefault();
-      tableRow.remove();
-    });
-
-    buttons.delete.assembly();
-
     interactiveChoicesTypeField.assembly();
 
-    if (typeof data.title != 'undefined') {
-      additionalFieldInputTitle.value = data.title;
-    }
+    cellElementsForType[1].append(interactiveChoicesTypeField.target.element);
 
-    if (typeof data.name != 'undefined') {
-      additionalFieldInputName.value = data.name;
-    }
+    const cellElementsForTitle = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_USERS_ADDITIONAL_FIELD_TITLE_TITLE,
+      additionalFieldInputTitle
+    );
 
-    if (typeof data.description != 'undefined') {
-      additionalFieldInputDescription.innerText = data.description;
-    }
+    const cellElementsForName = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_USERS_ADDITIONAL_FIELD_TECHNICAL_NAME_TITLE,
+      additionalFieldInputName
+    );
 
-    for (let i = 0; i < 4; i++) {
-      const cellTextElement = document.createElement('div');
-      const cellTextTitleElement = document.createElement('div');
-      const cellDataElement = document.createElement('div');
-    }
+    const cellElementsForDescription = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_USERS_ADDITIONAL_FIELD_DESCRIPTION_TITLE,
+      additionalFieldInputDescription
+    );
 
-    tableCellTypeField.append(interactiveChoicesTypeField.target.element);
-    tableCellTitleField.append(additionalFieldInputTitle);
-    tableCellNameField.append(additionalFieldInputName);
-    tableCellDescriptionField.append(additionalFieldInputDescription);
-    tableCellEventField.append(buttons.delete.target.element);
+    container.parentElement.parentElement.insertBefore(
+      cellHeaderElement,
+      container.parentElement.previousElementSibling
+    );
 
-    tableRow.append(tableCellTypeField);
-    tableRow.append(tableCellTitleField);
-    tableRow.append(tableCellNameField);
-    tableRow.append(tableCellDescriptionField);
-    tableRow.append(tableCellEventField);
+    cellElementsForType.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
 
-    container.parentElement.before(tableRow);
+    cellElementsForTitle.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    cellElementsForName.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    cellElementsForDescription.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    additionalFieldInputTitle.value = data.title !== undefined
+      ? data.title
+      : '';
+
+    additionalFieldInputName.value = data.name !== undefined
+      ? data.name
+      : '';
+
+    additionalFieldInputDescription.value = data.description !== undefined
+      ? data.description
+      : '';
   }
 
   createCellAdditionalFieldElements(title, dataElement = null) {
