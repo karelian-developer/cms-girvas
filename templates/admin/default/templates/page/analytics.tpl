@@ -6,17 +6,17 @@
   </div>
   <div class="page__content">
     <div id="analytic-app" class="analytic">
-      <div class="analytic__block block block_attendance">
+      <div class="block analytic__block analytic__block_attendance-schedule">
         <h2 class="block__title">{LANG:PAGE_ANALYTICS_BLOCK_SITE_VISITS_TITLE}</h2>
         <div class="block__content" role="attendance-schedule"></div>
       </div>
-      <div class="analytic__block block block_entries-popular">
+      <div class="block analytic__block analytic__block_entries-popular">
         <h2 class="block__title">{LANG:PAGE_ANALYTICS_BLOCK_ENTRIES_VIEWS_TITLE}</h2>
         <div class="block__content">
           {ENTRIES_LIST_ITEMS}
         </div>
       </div>
-      <div class="analytic__block block block_pages-popular">
+      <div class="block analytic__block analytic__block_pages-popular">
         <h2 class="block__title">{LANG:PAGE_ANALYTICS_BLOCK_PAGES_VIEWS_TITLE}</h2>
         <div class="block__content">
           {PAGES_LIST_ITEMS}
