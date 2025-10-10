@@ -173,16 +173,16 @@ export class PageEntry {
         if (form.target.checkRequiredFields()) {
           let formData = new FormData(elementForm);
 
-          let additionalDataContainerElement = document.querySelector('[data-element="additional-data"]');
+          const additionalDataContainerElement = document.querySelector('[data-element="additional-data"]');
           if (additionalDataContainerElement !== null) {
-            let additionalDataInputs = additionalDataContainerElement.querySelectorAll('input');
-            additionalDataInputs.forEach((element) => {
+            const additionalDataInputs = additionalDataContainerElement.querySelectorAll('input');
+            additionalDataInputs.forEach(element => {
               formData.append(element.name, element.value);
             });
           }
 
           let request = new Interactive('request', {
-            method: (searchParams.getPathPart(3) === null) ? 'PUT' : 'PATCH',
+            method: searchParams.getPathPart(3) === null ? 'PUT' : 'PATCH',
             url: '/handler/entry?localeMessage=' + window.CMSCore.locales.admin.name
           });
   

@@ -178,16 +178,16 @@ export class PagePageStatic {
             formData.append(inputPersonalTemplatePath.name, inputPersonalTemplatePath.value);
           }
 
-          let additionalDataContainerElement = document.querySelector('[data-element="additional-data"]');
+          const additionalDataContainerElement = document.querySelector('[data-element="additional-data"]');
           if (additionalDataContainerElement !== null) {
-            let additionalDataInputs = additionalDataContainerElement.querySelectorAll('[data-element="additional-field"]');
-            additionalDataInputs.forEach((element) => {
+            const additionalDataInputs = additionalDataContainerElement.querySelectorAll('[data-element="additional-field"]');
+            additionalDataInputs.forEach(element => {
               formData.append(element.name, element.value);
             });
           }
 
           let request = new Interactive('request', {
-            method: (searchParams.getPathPart(3) === null) ? 'PUT' : 'PATCH',
+            method: searchParams.getPathPart(3) === null ? 'PUT' : 'PATCH',
             url: '/handler/pageStatic?localeMessage=' + window.CMSCore.locales.admin.name
           });
 

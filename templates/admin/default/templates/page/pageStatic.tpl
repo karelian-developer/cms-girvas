@@ -94,11 +94,15 @@
 </article>
 <aside class="main__page-aside page-aside">
   <div class="page-aside__block block" data-element="aside-block-cover">
-    <h2 class="page-aside__block-title">{LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_COVER_TITLE}</h2>
+    <h2 class="page-aside__block-title">
+      {LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_COVER_TITLE}
+    </h2>
     <div class="page-aside__block-content block-content"></div>
   </div>
   <div class="page-aside__block block">
-    <h2 class="page-aside__block-title">{LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_PERSONAL_TEMPLATE_TITLE}</h2>
+    <h2 class="page-aside__block-title">
+      {LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_PERSONAL_TEMPLATE_TITLE}
+    </h2>
     <div class="page-aside__block-content block-content">
       <div class="block__input-container input-container">
         {LANG:MD:PAGE_PAGE_STATIC_SIDEBAR_BLOCK_PERSONAL_TEMPLATE_TIP}
@@ -107,7 +111,9 @@
     </div>
   </div>
   <div class="page-aside__block block">
-    <h2 class="page-aside__block-title">{LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TITLE}</h2>
+    <h2 class="page-aside__block-title">
+      {LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TITLE}
+    </h2>
     <div class="page-aside__block-content block-content">
       {LANG:MD:PAGE_PAGE_STATIC_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TIP}
       <div class="additional-data" data-element="additional-data">
@@ -116,7 +122,9 @@
     </div>
   </div>
   <div class="page-aside__block">
-    <h2 class="page-aside__block-title">{LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_ABOUT_TITLE}</h2>
+    <h2 class="page-aside__block-title">
+      {LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_ABOUT_TITLE}
+    </h2>
     <div class="page-aside__block-content block-content">
       <div class="note-block note-block_blue">
         <p class="block-content__phar">{LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_1}</p>
