@@ -18,6 +18,12 @@
   gap: 20px;
 }
 
+@media (max-width: 1200px) {
+  .entries-list-container__list {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
 .entries-list-container__list-item {
   background-repeat: no-repeat;
   background-size: cover;
@@ -34,7 +40,6 @@
 }
 
 .entries-list-container__list-item .article__title {
-  white-space: nowrap;
   font-size: 14px;
   font-weight: 700;
   color: inherit;
