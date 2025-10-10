@@ -132,7 +132,7 @@ class PageUser implements InterfacePage
         $inputElement->setAttribute('class', 'input form__input form__input_' . $fieldsTypes[$index]);
       }
 
-      $inputElement->setAttribute('name', $fieldsNames[$index]);
+      $inputElement->setAttribute('name', 'user_additional_field_' . $fieldsNames[$index]);
 
       $gridTableCellTextElement->setAttribute('class', 'cell grid-table__cell grid-table__cell_text');
       $gridTableCellDataElement->setAttribute('class', 'cell grid-table__cell grid-table__cell_data');
