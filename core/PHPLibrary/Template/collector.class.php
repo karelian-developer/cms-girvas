@@ -301,4 +301,46 @@ final class Collector
     $document->appendChild($containerElement);
     return $document->saveHTML();
   }
+
+  /**
+   * Получить содержимое файла шаблона
+   * 
+   * @param ThemeInterfaceCore $theme
+   * @param string $path
+   * 
+   * @return string
+   */
+  public static function getTemplateFileContent(ThemeInterfaceCore $theme, string $path) : string
+  {
+    $filePath = $theme->getPath() . '/' . $filePath;
+
+    return file_exists($filePath) ? file_get_contents($filePath) : '';
+  }
+
+  /**
+   * Проверить наличие шаблонной переменной
+   * 
+   * @param string $template
+   * @param string $name
+   * 
+   * @return bool
+   */
+  public static function existsTemplateVariable(string $template, string $name) : bool
+  {
+    return preg_match("{{$name}}", $template);
+  }
+
+  /**
+   * Добавить значение для шаблонной переменной
+   * 
+   * @param array $templateVariables
+   * @param string $name
+   * @param string $value
+   * 
+   * @return void
+   */
+  public static function addTemplateVariable(array &$templateVariables, string $name, mixed $value) : void
+  {
+    $templateVariables[$name] = $value;
+  }
 }
