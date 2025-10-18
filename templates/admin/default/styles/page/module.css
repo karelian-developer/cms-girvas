@@ -57,6 +57,12 @@
   min-height: 225px;
 }
 
+@media (max-width: 600px) {
+  .page.page_module .module__gallary-container {
+    min-height: unset;
+  }
+}
+
 .page.page_module .module__gallary-container:hover .gallery__controllers-list {
   opacity: 1;
 }

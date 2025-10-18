@@ -166,6 +166,7 @@
   box-sizing: border-box;
   box-shadow: 0 0 5px 1px var(--common-main-color-4--opacity-0-2);
   background-color: var(--common-main-color-1);
+  overflow-x: scroll;
 }
 
 .page__pagination:not(:last-child) {
@@ -451,17 +452,27 @@
   }
 }
 
-.page__interactive-container > .interactive {
-  margin-right: 10px;
+@media (min-width: 501px) {
+  .page__interactive-container > .interactive {
+    margin-right: 10px;
 
-  &:last-child {
-    margin-right: 0;
+    &:last-child {
+      margin-right: 0;
+    }
   }
 }
 
 @media (max-width: 500px) {
+  .page__interactive-container > .interactive {
+    width: 100%;
+  }
+
   .page__interactive-container > .interactive:not(:last-child) {
     margin-bottom: 10px;
+  }
+
+  .page__interactive-container .interactive__button {
+    width: 100%;
   }
 }
 

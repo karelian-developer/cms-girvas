@@ -103,7 +103,8 @@ class PageEntries implements InterfacePage
       http_response_code(200);
 
       $entriesCountOnPage = 6;
-      $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') ?? 0;
+      $pageIndex = $this->CMSCore->urlp->getParam('pageNumber');
+      $paginationItemCurrent = $pageIndex ?? 0;
       $paginationItemCurrent = is_numeric($paginationItemCurrent) ? (int) $paginationItemCurrent : 0;
 
       $this->page->breadcrumbs->add($localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_LABEL'], '/entries');
@@ -126,7 +127,24 @@ class PageEntries implements InterfacePage
         $category->initData(['name', 'texts']);
         $categoryID = $category->getID();
 
-        $this->CMSCore->configurator->setMetaTitle($category->getTitle($localeName) . ' | ' . $this->CMSCore->configurator->getSiteTitle());
+        $categoryTitle = strip_tags($category->getTitle($localeName));
+        $categorySEOTitle = strip_tags($category->getSEOTitle($localeName));
+        $categorySEOTitle = $categorySEOTitle !== ''
+          ? $categorySEOTitle
+          : $categoryTitle;
+        
+        $categoryDescription = strip_tags($category->getDescription($localeName));
+        $categorySEODescription = strip_tags($category->getSEODescription($localeName));
+        $categorySEODescription = $categorySEODescription !== ''
+          ? $categorySEODescription
+          : $categoryDescription;
+        $categorySEODescription = str_replace('"', '&quot;', $categorySEODescription);
+        $categoryKeywords = $category->getKeywords($localeName);
+        $categoryKeywords = str_replace('"', '&quot;', $categoryKeywords);
+
+        $this->CMSCore->configurator->setMetaTitle($categorySEOTitle . ' | ' . $localeData['DEFAULT_PAGE'] . ' ' . $pageIndex + 1);
+        $this->CMSCore->configurator->setMetaDescription($categorySEODescription);
+        $this->CMSCore->configurator->setMetaKeywords($categoryKeywords);
 
         $this->page->breadcrumbs->add($category->getTitle($this->CMSCore->configurator->getDatabaseEntryValue('base_locale')), '/entries/' . $category->getName());
         $this->page->breadcrumbs->assembly();

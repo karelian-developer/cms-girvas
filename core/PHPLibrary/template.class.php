@@ -648,7 +648,7 @@ final class Template implements InterfaceTemplate
             $entryPublishedDateTimestampISO8601WithoutDate = date('H:i:s', $entryPublishedUnixTimestamp);
             $entryUpdatedDateTimestampISO8601WithoutDate = date('H:i:s', $entryUpdatedUnixTimestamp);
 
-            array_push($entriesAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, $themeSamplePath . '/item.tpl', [
+            $sampleItemTemplatesVars = [
               'ENTRY_ID' => $entry->getID(),
               'ENTRY_NAME' => $entry->getName(),
               'ENTRY_TITLE' => $entry->getTitle($systemLocaleName),
@@ -675,7 +675,14 @@ final class Template implements InterfaceTemplate
               'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entryCreatedDateTimestampISO8601WithoutDate,
               'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entryPublishedDateTimestampISO8601WithoutDate,
               'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $entryUpdatedDateTimestampISO8601WithoutDate
-            ]));
+            ];
+
+            $sampleItemTemplatesVars = array_merge($sampleItemTemplatesVars, $themeVariablesArray);
+
+            $entriesAssembled[] = ThemeCollector::assemblyFileContent(
+              $this->CMSCore->theme, $themeSamplePath . '/item.tpl',
+              $sampleItemTemplatesVars
+            );
           }
 
           $themeSampleNameVariable = strtoupper(str_replace('-', '_', $entriesSample->getName()));

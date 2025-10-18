@@ -96,8 +96,9 @@
 
 .page.page_modules .page__modules-list_local .item__footer-container {
   grid-template-areas:
-    'button-more button-more'
-    'button-remove button-activation';
+    'button-more'
+    'button-activation'
+    'button-remove';
 }
 
 .page.page_modules .modules-list .item__footer-container .interactive_button-more {

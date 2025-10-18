@@ -333,7 +333,7 @@ final class Locale implements LocaleInterface
    * 
    * @return bool
    */
-  public static function exists(SystemCore $CMSCore, string $localeName) : bool
+  public static function exists(CMSCore $CMSCore, string $localeName) : bool
   {
     /** @var string Абсолютный путь до директории локализации */
     $path = sprintf(self::LOCALE_CORE_PATH_PATTERN, $CMSCore->getCMSPath(), $localeName);
