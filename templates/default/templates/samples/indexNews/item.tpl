@@ -1,4 +1,4 @@
-<li id="SYSTEM_ENTRY_{ENTRY_ID}" class="entries-list-container__list-item item" data-item-id="{ENTRY_ID}" style="background-image: url('{ENTRY_PREVIEW_URL}');">
+<div id="SYSTEM_ENTRY_{ENTRY_ID}" class="entries-list-container__list-item item" data-item-id="{ENTRY_ID}" style="background-image: url('{ENTRY_PREVIEW_URL}');">
   <article class="item__article article">
     <a href="{ENTRY_URL}" title="{ENTRY_TITLE}" class="article__interactive-block display-block" tabindex="0">
       <h2 class="article__title">{ENTRY_TITLE}</h2>
@@ -22,4 +22,4 @@
       <a class="article__group-link" href="{ENTRY_CATEGORY_URL}">{ENTRY_CATEGORY_TITLE}</a>
     </div>
   </article>
-</li>
+</div>
