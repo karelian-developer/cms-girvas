@@ -29,6 +29,7 @@ use \core\PHPLibrary\SystemCore\FileConnector as CMSFileConnector;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \core\PHPLibrary\Client as Client;
 use \DOMDocument as DOMDocument;
   
