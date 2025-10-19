@@ -333,6 +333,22 @@ final class Collector
   }
 
   /**
+   * Проверить наличие языковой шаблонной переменной
+   * 
+   * @param string $template
+   * @param string $name
+   * @param bool $isMD
+   * 
+   * @return bool
+   */
+  public static function existsTemplateLocaleVariable(string $template, string $name, bool $isMD = false) : bool
+  {
+    return !$isMD
+      ? preg_match("/\{LANG\:" . $name . "\}/", $template)
+      : preg_match("/\{LANG\:MD\:" . $name . "\}/", $template);
+  }
+
+  /**
    * Добавить значение для шаблонной переменной
    * 
    * @param array $templateVariables

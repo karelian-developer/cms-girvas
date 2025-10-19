@@ -121,12 +121,12 @@ final class Core implements ThemeInterfaceCore
   /**
    * __construct
    *
-   * @param  Theme $theme
+   * @param InterfaceTheme $theme
    * 
    * @return void
    */
   public function __construct(
-    private Theme $theme
+    private InterfaceTheme $theme
   ) {}
 
   /**
