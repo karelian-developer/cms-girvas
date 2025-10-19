@@ -20,7 +20,7 @@ use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \core\PHPLibrary\Template\Locale as ThemeLocale;
 use \DOMDocument as DOMDocument;
 
-final class Template implements InterfaceTemplate
+final class Template implements ThemeInterface
 {
   public ThemeLocale $locale;
   public ThemeInterfaceCore $core;

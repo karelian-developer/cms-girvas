@@ -610,7 +610,7 @@ final class SystemCore implements CoreInterface
         // Устанавливаем объект шаблона для системного ядра
         $this->setTheme(new Theme($this, $CMSCoreThemeName, $CMSCoreThemeCategoryName));
 
-        /** @var Theme Объект шаблона системного ядра */
+        /** @var ThemeInterface Объект шаблона системного ядра */
         $theme = $this->getTheme();
         // Инициализация шаблона системного ядра
         $theme->init();

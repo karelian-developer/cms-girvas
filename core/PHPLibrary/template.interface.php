@@ -10,7 +10,7 @@
 
 namespace core\PHPLibrary;
 
-interface InterfaceTemplate
+interface ThemeInterface
 {
   // ...
 }
