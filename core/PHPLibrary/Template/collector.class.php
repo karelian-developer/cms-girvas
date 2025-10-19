@@ -15,6 +15,7 @@ use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\LocaleInterface as LocaleInterface;
 use \core\PHPLibrary\Module\Locale as ModuleLocale;
 use \core\PHPLibrary\Template as Theme;
+use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \DOMDocument as DOMDocument;
 
 final class Collector
