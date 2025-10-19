@@ -329,7 +329,7 @@ final class Collector
    */
   public static function existsTemplateVariable(string $template, string $name) : bool
   {
-    return preg_match("\{\{$name\}\}", $template);
+    return preg_match("/\{\{$name\}\}/", $template);
   }
 
   /**
