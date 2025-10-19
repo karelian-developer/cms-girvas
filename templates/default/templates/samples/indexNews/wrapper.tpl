@@ -1,3 +1,3 @@
-<div class="age__entries-list entries-list">
+<div class="entries-list-container__list">
   {SAMPLE_ENTRIES_LIST}
 </div>
