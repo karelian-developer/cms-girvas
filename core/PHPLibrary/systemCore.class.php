@@ -202,11 +202,11 @@ final class SystemCore implements CoreInterface
   /**
    * Установить шаблон для системы
    * 
-   * @param ThemeInterfaceCore $theme
+   * @param ThemeInterface $theme
    * 
    * @return void
    */
-  public function setTheme(ThemeInterfaceCore $theme) : void
+  public function setTheme(ThemeInterface $theme) : void
   {
     $this->theme = $theme;
   }
@@ -214,9 +214,9 @@ final class SystemCore implements CoreInterface
   /**
    * Получить текущий шаблон
    * 
-   * @return ThemeInterfaceCore
+   * @return ThemeInterface
    */
-  public function getTheme() : ThemeInterfaceCore
+  public function getTheme() : ThemeInterface
   {
     return $this->theme;
   }
