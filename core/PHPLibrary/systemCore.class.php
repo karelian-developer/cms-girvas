@@ -608,9 +608,9 @@ final class SystemCore implements CoreInterface
       
       if ($CMSURLP->getPath(0) !== 'sql-execute-forced') {
         // Устанавливаем объект шаблона для системного ядра
-        $this->setTheme(new Theme($this, $CMSCoreThemeName, $CMSCoreThemeCategoryName));
+        $this->setTheme(new ThemeInterfaceCore($this, $CMSCoreThemeName, $CMSCoreThemeCategoryName));
 
-        /** @var Theme Объект шаблона системного ядра */
+        /** @var ThemeInterfaceCore Объект шаблона системного ядра */
         $theme = $this->getTheme();
         // Инициализация шаблона системного ядра
         $theme->init();
