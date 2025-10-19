@@ -1,5 +1,5 @@
 <div class="page__entries-list-container entries-list-container">
-  {ENTRIES_LIST}
+  {ENTRIES_SAMPLE_INDEX_NEWS}
 </div>
 <aside class="sidebar" role="siteSidebarRight">
   <div class="sidebar__block block">
