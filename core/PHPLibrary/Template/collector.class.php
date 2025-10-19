@@ -308,11 +308,11 @@ final class Collector
    * Получить содержимое файла шаблона
    * 
    * @param ThemeInterface $theme
-   * @param string $path
+   * @param string $filePath
    * 
    * @return string
    */
-  public static function getTemplateFileContent(ThemeInterface $theme, string $path) : string
+  public static function getTemplateFileContent(ThemeInterface $theme, string $filePath) : string
   {
     $filePath = $theme->getPath() . '/' . $filePath;
 
