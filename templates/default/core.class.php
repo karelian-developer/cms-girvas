@@ -50,9 +50,9 @@ final class Core implements ThemeInterfaceCore
   /**
    * Получить основной объект темы
    * 
-   * @return InterfaceTheme
+   * @return ThemeInterface
    */
-  public function getThemeFrame() : InterfaceTheme
+  public function getThemeFrame() : ThemeInterface
   {
     return $this->theme;
   }
