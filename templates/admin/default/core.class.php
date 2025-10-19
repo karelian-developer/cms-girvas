@@ -12,7 +12,7 @@ namespace templates\admin\default;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Template as Theme;
-use \core\PHPLibrary\InterfaceTheme as ThemeInterface;
+use \core\PHPLibrary\ThemeInterface as ThemeInterface;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \core\PHPLibrary\Entry as Entry;
