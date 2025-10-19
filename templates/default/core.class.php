@@ -12,7 +12,7 @@ namespace templates\default;
 
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Template as Theme;
-use \core\PHPLibrary\InterfaceTemplate as InterfaceTheme;
+use \core\PHPLibrary\InterfaceTheme as InterfaceTheme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \DOMDocument as DOMDocument;
