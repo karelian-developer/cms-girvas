@@ -15,6 +15,7 @@ use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\LocaleInterface as LocaleInterface;
 use \core\PHPLibrary\Module\Locale as ModuleLocale;
 use \core\PHPLibrary\Template as Theme;
+use \core\PHPLibrary\ThemeInterface as ThemeInterface;
 use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \DOMDocument as DOMDocument;
 
@@ -306,12 +307,12 @@ final class Collector
   /**
    * Получить содержимое файла шаблона
    * 
-   * @param ThemeInterfaceCore $theme
+   * @param ThemeInterface $theme
    * @param string $path
    * 
    * @return string
    */
-  public static function getTemplateFileContent(ThemeInterfaceCore $theme, string $path) : string
+  public static function getTemplateFileContent(ThemeInterface $theme, string $path) : string
   {
     $filePath = $theme->getPath() . '/' . $filePath;
 
