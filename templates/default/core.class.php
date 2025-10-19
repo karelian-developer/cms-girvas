@@ -12,7 +12,7 @@ namespace templates\default;
 
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Template as Theme;
-use \core\PHPLibrary\InterfaceTheme as InterfaceTheme;
+use \core\PHPLibrary\ThemeInterface as ThemeInterface;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \DOMDocument as DOMDocument;
@@ -29,12 +29,12 @@ final class Core implements ThemeInterfaceCore
   /**
    * __construct
    *
-   * @param InterfaceTheme $theme
+   * @param ThemeInterface $theme
    * 
    * @return void
    */
   public function __construct(
-    private InterfaceTheme $theme
+    private ThemeInterface $theme
   ) {}
 
   /**

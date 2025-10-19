@@ -12,7 +12,7 @@ namespace templates\admin\default;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Template as Theme;
-use \core\PHPLibrary\InterfaceTheme as InterfaceTheme;
+use \core\PHPLibrary\InterfaceTheme as ThemeInterface;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \core\PHPLibrary\Entry as Entry;
@@ -121,20 +121,20 @@ final class Core implements ThemeInterfaceCore
   /**
    * __construct
    *
-   * @param InterfaceTheme $theme
+   * @param ThemeInterface $theme
    * 
    * @return void
    */
   public function __construct(
-    private InterfaceTheme $theme
+    private ThemeInterface $theme
   ) {}
 
   /**
    * Получить основной объект темы
    * 
-   * @return InterfaceTheme
+   * @return ThemeInterface
    */
-  public function getThemeFrame() : InterfaceTheme
+  public function getThemeFrame() : ThemeInterface
   {
     return $this->theme;
   }
