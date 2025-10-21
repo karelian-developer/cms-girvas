@@ -505,7 +505,7 @@ final class SystemCore implements CoreInterface
           $CMSFileConnector = new CMSFileConnector($this);
           $CMSFileConnector = $this->autoloadComponents(
             $CMSFileConnector,
-            $moduleDirectoryPath . '/core',
+            self::CMS_MODULES_PATH . '/core',
             ['enum', 'interface', 'trait', 'class'],
             'module_' . $directoryName
           );
