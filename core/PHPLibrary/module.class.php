@@ -10,7 +10,8 @@
 
 namespace core\PHPLibrary;
 
-use \core\PHPLibrary\Module\Locale as ModuleCollector;
+use \core\PHPLibrary\InterfaceModule as ModuleInterface;
+use \core\PHPLibrary\Module\Collector as ModuleCollector;
 use \core\PHPLibrary\Module\Locale as ModuleLocale;
 use \core\PHPLibrary\Module\EnumMetadata as ModuleEnumMetadata;
 use \core\PHPLibrary\Module\EnumWeight as ModuleEnumWeight;
@@ -22,7 +23,7 @@ use \core\PHPLibrary\Module\EnumWeight as ModuleEnumWeight;
  * @version 0.0.2
  */
 #[\AllowDynamicProperties]
-final class Module
+final class Module implements ModuleInterface
 {
   /** @var ModuleLocale|null Объект локализации */
   public ModuleLocale|null $locale = null;
