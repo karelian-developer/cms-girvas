@@ -360,7 +360,6 @@ final class SystemCore implements CoreInterface
     $CMSFileConnector = $this->autoloadComponents(
       $CMSFileConnector,
       self::CMS_CORE_PHP_LIBRARY_PATH,
-      'base',
       ['enum', 'interface', 'trait', 'class']
     );
 
@@ -500,16 +499,17 @@ final class SystemCore implements CoreInterface
         /** @var Module Объект модуля */
         $module = new Module($this, $directoryName);
 
-        /** @var CMSFileConnector Объект подключателя файлов */
-        $CMSFileConnector = new CMSFileConnector($this);
-        $CMSFileConnector = $this->autoloadComponents(
-          $CMSFileConnector,
-          self::CMS_MODULES_PATH,
-          'modules',
-          ['enum', 'interface', 'trait', 'class']
-        );
-        
-        //Module::connectCore($this, $directoryName);
+        if ($module->isEnabled()) {
+          /** @var CMSFileConnector Объект подключателя файлов */
+          $CMSFileConnector = new CMSFileConnector($this);
+          $CMSFileConnector = $this->autoloadComponents(
+            $CMSFileConnector,
+            $moduleDirectoryPath,
+            ['enum', 'interface', 'trait', 'class']
+          );
+          
+          Module::connectCore($this, $directoryName);
+        }
 
         unset($module);
       }
@@ -975,7 +975,7 @@ final class SystemCore implements CoreInterface
    * 
    * @return void
    */
-  public function autoloadComponents(CMSFileConnector $CMSFileConnector, string $filesPath, string $cacheDir = 'base', array $filesTypes = []) : void
+  public function autoloadComponents(CMSFileConnector $CMSFileConnector, string $filesPath, array $filesTypes = []) : void
   {
     $CMSFileConnector->setStartDirectory($filesPath);
     $CMSFileConnector->setCurrentDirectory($filesPath);
@@ -983,7 +983,7 @@ final class SystemCore implements CoreInterface
     foreach ($filesTypes as $type) {
       $fileNamePattern = '/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/';
       $cacheKey = md5($fileNamePattern);
-      $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheDir . '/' . $cacheKey . '.cache';
+      $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
 
       if (file_exists($cacheFile)) {
         $cachedData = json_decode(file_get_contents($cacheFile), true);
@@ -994,7 +994,7 @@ final class SystemCore implements CoreInterface
       };
 
       if (!file_exists($cacheFile)) {
-        $CMSFileConnector->generateCachePathesFiles('/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/', $cacheDir);
+        $CMSFileConnector->generateCachePathesFiles('/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/');
         $CMSFileConnector->resetCurrentDirectory();
       }
     }
@@ -1002,7 +1002,7 @@ final class SystemCore implements CoreInterface
     foreach ($filesTypes as $type) {
       $fileNamePattern = '/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/';
       $cacheKey = md5($fileNamePattern);
-      $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheDir . '/' . $cacheKey . '.cache';
+      $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
 
       if (file_exists($cacheFile)) {
         $cachedData = json_decode(file_get_contents($cacheFile), true);

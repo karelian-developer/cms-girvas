@@ -109,13 +109,13 @@ final class FileConnector implements InterfaceFileConnector
    * 
    * @return void
    */
-  public function generateCachePathesFiles(string $fileNamePattern, string $cacheDir, int $level = 0) : void
+  public function generateCachePathesFiles(string $fileNamePattern, int $level = 0) : void
   {
     /** @var string $filesPath Полный путь до файлов */
     $filesPath = $this->getCurrentDirectory();
 
     $cacheKey = md5($fileNamePattern);
-    $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheDir . '/' . $cacheKey . '.cache';
+    $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
 
     /** @var array $filesList Массив файлов */
     $filesList = array_diff(scandir($filesPath), ['..', '.']);
