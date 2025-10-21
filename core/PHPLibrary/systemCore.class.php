@@ -981,7 +981,7 @@ final class SystemCore implements CoreInterface
     $CMSFileConnector->setCurrentDirectory($filesPath);
 
     foreach ($filesTypes as $type) {
-      $fileNamePattern = '/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/';
+      $fileNamePattern = '/^([a-zA-Z_0-9]+)\.' . $type . $filesPath . '\.php$/';
       $cacheKey = md5($fileNamePattern);
       $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
 
