@@ -17,6 +17,7 @@ use \core\PHPLibrary\Module\Locale as ModuleLocale;
 use \core\PHPLibrary\InterfaceModule as ModuleInterface;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\ThemeInterface as ThemeInterface;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \DOMDocument as DOMDocument;
 
@@ -75,6 +76,6 @@ final class Collector
    */
   public static function assembly(string $template, array $TPLVariables = []) : string
   {
-    return Theme::assembly($template, $TPLVariables);
+    return ThemeCollector::assembly($template, $TPLVariables);
   }
 }
