@@ -271,8 +271,6 @@ final class SystemCore implements CoreInterface
   {
     $CMSTheme = $this->theme;
 
-    echo get_class($this->page);
-
     $dir = $dir === '' ? 'index' : $dir;
     $dir = rtrim($dir, '/');
     
@@ -329,7 +327,7 @@ final class SystemCore implements CoreInterface
       $currentDirFinalArray[$currentDirFinalLastKey] =& $this->page;
     }
 
-    print_r($this->pageDirArray);
+    echo 'asdasdasd';
 
     $this->pageDirArray = $currentDirFinalArray;
 
