@@ -1001,7 +1001,7 @@ final class SystemCore implements CoreInterface
 
     foreach ($filesTypes as $type) {
       $fileNamePattern = '/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/';
-      $cacheKey = md5($fileNamePattern);
+      $cacheKey = md5($fileNamePattern . $filesPath);
       $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
 
       if (file_exists($cacheFile)) {
