@@ -17,7 +17,6 @@ use \core\PHPLibrary\Module\EnumWeight as ModuleEnumWeight;
 interface InterfaceModule
 {
   public function __construct(CoreInterface $CMSCore, string $name);
-  public function getStatus() : bool;
   public function setURL(string $url) : void;
   public function getPreviewURL() : string;
   public function getScreenshotsPath() : string;
