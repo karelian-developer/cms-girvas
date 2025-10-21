@@ -523,13 +523,13 @@ final class SystemCore implements CoreInterface
 
         if ($module->isInstalled() && $module->isEnabled()) {
           $moduleCore->preparation();
+
+          echo 'Preapa ' . $name;
         }
 
         unset($module);
       }
     }
-
-    echo 'Preapa';
 
     // ============================================================
     // Инициализация локализации системного ядра
