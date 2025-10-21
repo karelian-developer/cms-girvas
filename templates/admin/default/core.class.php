@@ -274,7 +274,7 @@ final class Core implements ThemeInterfaceCore
   public function assemblyMain(array $themeReplaces = []) : string
   {
     $this->theme->CMSCore->initPage(ltrim($_SERVER['REQUEST_URI'], '/'));
-    $sitePage = $this->theme->CMSCore->getInitedPage();
+    $sitePage = $this->theme->CMSCore->page;
     $sitePage->assembly();
 
     $themeReplaces['ADMIN_PANEL_PAGE_WRAPPER'] = ThemeCollector::assemblyFileContent($this->theme, 'templates/page.tpl', [
