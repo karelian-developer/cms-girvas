@@ -271,6 +271,8 @@ final class SystemCore implements CoreInterface
   {
     $CMSTheme = $this->theme;
 
+    echo get_class($this->page);
+
     $dir = $dir === '' ? 'index' : $dir;
     $dir = rtrim($dir, '/');
     
