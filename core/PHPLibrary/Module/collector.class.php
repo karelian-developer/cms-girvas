@@ -65,4 +65,16 @@ final class Collector
 
     return file_exists($filePath) ? file_get_contents($filePath) : '';
   }
+
+  /**
+   * Сборка шаблона на основе строки
+   *
+   * @param string $template Содержимое шаблона
+   * @param array $TPLVariables Массив с тегами шаблона и их значениями
+   * @return string
+   */
+  public static function assembly(string $template, array $TPLVariables = []) : string
+  {
+    return Theme::assembly($template, $TPLVariables);
+  }
 }
