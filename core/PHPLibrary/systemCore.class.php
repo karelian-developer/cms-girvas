@@ -304,7 +304,7 @@ final class SystemCore implements CoreInterface
         $currentDir = str_replace('/', '\\', $currentDir);
         
         $class = '\\core\\PHPLibrary\\Page\\' . $currentDir;
-        $this->page = new $class($this, new Page($this, $currentDirArray));
+        $this->page = $this->page ?? new $class($this, new Page($this, $currentDirArray));
 
         if ($currentDirArray[0] === $CMSTheme->getCategory()) unset($currentDirArray[0]);
         $currentDirArray[$currentDirLastKey] =& $this->page;
@@ -323,11 +323,9 @@ final class SystemCore implements CoreInterface
       $CMSTheme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
       
       $class = sprintf('\\core\\PHPLibrary\\Page\\PageError', $currentDir);
-      $this->page = new $class($this, new Page($this, $currentDirFinalArray), 404);
+      $this->page = $this->page ?? new $class($this, new Page($this, $currentDirFinalArray), 404);
       $currentDirFinalArray[$currentDirFinalLastKey] =& $this->page;
     }
-
-    print_r($currentDirFinalArray);
 
     $this->pageDirArray = $currentDirFinalArray;
 
