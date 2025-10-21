@@ -22,7 +22,8 @@ use \core\PHPLibrary\Module\EnumWeight as ModuleEnumWeight;
  * @version 0.0.2
  */
 #[\AllowDynamicProperties]
-final class Module {
+final class Module
+{
   /** @var ModuleLocale|null Объект локализации */
   public ModuleLocale|null $locale = null;
   /** @var string|null Абсолютный путь до файлов модуля */
@@ -277,12 +278,12 @@ final class Module {
   /**
    * Подключние файла ядра модуля
    *
-   * @param  SystemCore $CMSCore
+   * @param  CoreInterface $CMSCore
    * @param  string $name
    * 
    * @return bool
    */
-  public static function connectCore(SystemCore $CMSCore, string $name) : bool
+  public static function connectCore(CoreInterface $CMSCore, string $name) : bool
   {
     $module = new Module($CMSCore, $name);
     

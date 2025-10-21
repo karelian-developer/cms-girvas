@@ -975,7 +975,7 @@ final class SystemCore implements CoreInterface
    * 
    * @return void
    */
-  private function autoloadComponents(CMSFileConnector $CMSFileConnector, string $filesPath, array $filesTypes = []) : void
+  public function autoloadComponents(CMSFileConnector $CMSFileConnector, string $filesPath, array $filesTypes = []) : void
   {
     $CMSFileConnector->setStartDirectory($filesPath);
     $CMSFileConnector->setCurrentDirectory($filesPath);
