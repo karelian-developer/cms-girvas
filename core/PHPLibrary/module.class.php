@@ -10,6 +10,7 @@
 
 namespace core\PHPLibrary;
 
+use \core\PHPLibrary\Module\Locale as ModuleCollector;
 use \core\PHPLibrary\Module\Locale as ModuleLocale;
 use \core\PHPLibrary\Module\EnumMetadata as ModuleEnumMetadata;
 use \core\PHPLibrary\Module\EnumWeight as ModuleEnumWeight;

@@ -458,7 +458,7 @@ final class SystemCore implements CoreInterface
           $CMSConfigSSLHSTSMaxAge = $CMSConfigurator->get('SSLHSTSMaxAge');
 
           if (is_integer($CMSConfigSSLHSTSMaxAge)) {
-            array_push($HSTSVars, 'max-age=' . $CMSConfigSSLHSTSMaxAge);
+            $HSTSVars[] = 'max-age=' . $CMSConfigSSLHSTSMaxAge;
           }
         }
 
@@ -467,7 +467,7 @@ final class SystemCore implements CoreInterface
 
           if (is_bool($CMSConfigSSLHSTSIncludeSubdomains)) {
             if ($CMSConfigSSLHSTSIncludeSubdomains === true) {
-              array_push($HSTSVars, 'includeSubDomains');
+              $HSTSVars[] = 'includeSubDomains';
             }
           }
         }
@@ -476,7 +476,7 @@ final class SystemCore implements CoreInterface
           $CMSConfigSSLHSTSPreload = $CMSConfigurator->get('SSLHSTSPreload');
 
           if (is_bool($CMSConfigSSLHSTSPreload) && $CMSConfigSSLHSTSPreload === true) {
-            array_push($HSTSVars, 'preload');
+            $HSTSVars[] = 'preload';
           }
         }
 

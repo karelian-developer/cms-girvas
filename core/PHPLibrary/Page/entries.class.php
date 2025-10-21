@@ -172,19 +172,57 @@ class PageEntries implements InterfacePage
 
       unset($entries);
 
-      $entriesArrayRemplates = [];
+      $entriesArrayTemplates = [];
+      $entriesTemplateContent = ThemeCollector::getTemplateFileContent(
+        $this->CMSCore->theme,
+        'templates/page/entries/entriesList/item.tpl'
+      );
+
+      $templatesAssembled = [];
       foreach ($entriesObjects as $entryObject) {
         $entryObject->initData(['id', 'categoryID', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
+        
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_ID')) {
+          $entryID = $entryObject->getID();
+          
+          ThemeCollector::addTemplateVariable($templatesAssembled, 'ENTRY_ID', $entryID);
+        }
 
-        /** @var string Заголовок записи */
-        $entryTitle = $entryObject->getTitle($localeName);
-        $entryTitle = strip_tags($entryTitle); 
-        /** @var string Описание записи */
-        $entryDescription = $entryObject->getDescription($localeName);
-        $entryDescription = strip_tags($entryDescription);
-        /** @var string Содержание записи */
-        $entryContent = $entryObject->getContent($localeName);
-        $entryContent = strip_tags($entryContent);
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_TITLE')) {
+          $entryTitle = $entryObject->getTitle($localeName);
+          $entryTitle = strip_tags($entryTitle);
+          
+          ThemeCollector::addTemplateVariable($templatesAssembled, 'ENTRY_TITLE', $entryTitle);
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_DESCRIPTION')) {
+          $entryDescription = $entryObject->getDescription($localeName);
+          $entryDescription = strip_tags($entryDescription);
+          
+          ThemeCollector::addTemplateVariable($templatesAssembled, 'ENTRY_DESCRIPTION', $entryTitle);
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_DESCRIPTION')) {
+          $entryContent = $entryObject->getContent($localeName);
+          $entryContent = strip_tags($entryContent);
+          
+          ThemeCollector::addTemplateVariable($templatesAssembled, 'ENTRY_DESCRIPTION', $entryTitle);
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_URL')) {
+          $entryURL = $entryObject->getURL();
+          
+          ThemeCollector::addTemplateVariable($templatesAssembled, 'ENTRY_URL', $entryURL);
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_PREVIEW_URL')) {
+          $entryPreviewURL = $entryObject->getPreviewURL();
+          $entryPreviewURL = $entryPreviewURL !== ''
+            ? $entryPreviewURL
+            : Entry::getPreviewDefaultURL($this->CMSCore, 512);
+          
+          ThemeCollector::addTemplateVariable($templatesAssembled, 'ENTRY_PREVIEW_URL', $entryPreviewURL);
+        }
 
         $createdDateTimestamp = date('d.m.Y H:i:s', $entryObject->getCreatedUnixTimestamp());
         $publishedDateTimestamp = date('d.m.Y H:i:s', $entryObject->getPublishedUnixTimestamp());
@@ -217,14 +255,14 @@ class PageEntries implements InterfacePage
         $categoryDescription = strip_tags($categoryDescription);
 
         if (!empty($entryTitle) && !empty($entryDescription) && !empty($entryContent)) {
-          array_push($entriesArrayRemplates, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/entriesList/item.tpl', [
-            'ENTRY_ID' => $entryObject->getID(),
-            'ENTRY_TITLE' => $entryTitle,
-            'ENTRY_DESCRIPTION' => $entryDescription,
-            'ENTRY_URL' => $entryObject->getURL(),
-            'ENTRY_PREVIEW_URL' => $entryObject->getPreviewURL() !== '' ? $entryObject->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 512),
+          array_push($entriesArrayTemplates, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/entriesList/item.tpl', [
+            //'ENTRY_ID' => $entryObject->getID(),
+            //'ENTRY_TITLE' => $entryTitle,
+            //'ENTRY_DESCRIPTION' => $entryDescription,
+            //'ENTRY_URL' => $entryObject->getURL(),
+            //'ENTRY_PREVIEW_URL' => $entryObject->getPreviewURL() !== '' ? $entryObject->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 512),
             'ENTRY_CATEGORY_TITLE' => $categoryTitle,
-            'ENTRY_DESCRIPTION_TITLE' => $categoryDescription,
+            'ENTRY_CATEGORY_DESCRIPTION' => $categoryDescription,
             'ENTRY_CATEGORY_URL' => $category->getURL(),
             'ENTRY_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
             'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $entryObject->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestamp : date('d.m.Y H:i:s', 0),
@@ -261,14 +299,14 @@ class PageEntries implements InterfacePage
           'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
           'ENTRIES_CATEGORY_TITLE' => ($categoryName == 'all') ? $localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_LABEL'] : $category->getTitle($localeName),
           'ENTRIES_CATEGORY_DESCRIPTION' => ($categoryName == 'all') ? $localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_DESCRIPTION'] : $category->getDescription($localeName),
-          'ENTRIES_LIST' => (!empty($entriesArrayRemplates)) ? ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/entriesList/list.tpl', [
-            'ENTRIES_LIST_ITEMS' => implode($entriesArrayRemplates)
+          'ENTRIES_LIST' => (!empty($entriesArrayTemplates)) ? ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/entriesList/list.tpl', [
+            'ENTRIES_LIST_ITEMS' => implode($entriesArrayTemplates)
           ]) : sprintf('<div class="page__simple-note">%s</div>', $localeData['PAGE_ENTRIES_NOT_FOUND_LABEL']),
-          'ENTRIES_PAGINATION' => (!empty($entriesArrayRemplates)) ? $pagination->assembled : ''
+          'ENTRIES_PAGINATION' => (!empty($entriesArrayTemplates)) ? $pagination->assembled : ''
         ])
       ]);
 
-      unset($entriesArrayRemplates);
+      unset($entriesArrayTemplates);
     } else {
       http_response_code(404);
 
