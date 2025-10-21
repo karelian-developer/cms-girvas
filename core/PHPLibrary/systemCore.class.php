@@ -327,8 +327,6 @@ final class SystemCore implements CoreInterface
       $currentDirFinalArray[$currentDirFinalLastKey] =& $this->page;
     }
 
-    echo 'asdasdasd';
-
     $this->pageDirArray = $currentDirFinalArray;
 
     return true;
