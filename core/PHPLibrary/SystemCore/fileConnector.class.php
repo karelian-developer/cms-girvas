@@ -114,7 +114,7 @@ final class FileConnector implements InterfaceFileConnector
     /** @var string $filesPath Полный путь до файлов */
     $filesPath = $this->getCurrentDirectory();
 
-    $cacheKey = md5($fileNamePattern);
+    $cacheKey = md5($fileNamePattern . $salt);
     $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
 
     /** @var array $filesList Массив файлов */
@@ -150,7 +150,7 @@ final class FileConnector implements InterfaceFileConnector
         if (is_dir($filePath)) {
           $this->setCurrentDirectory($filePath);
           // Погружаемся во вложенную папку для последующих подключений
-          $this->generateCachePathesFiles($fileNamePattern, $level + 1);
+          $this->generateCachePathesFiles($fileNamePattern, $salt, $level + 1);
         }
       }
     }
