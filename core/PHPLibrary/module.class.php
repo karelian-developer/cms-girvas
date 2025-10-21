@@ -454,9 +454,9 @@ final class Module implements ModuleInterface
   /**
    * Получение массива метаданных модуля
    *
-   * @return array
+   * @return ?array
    */
-  public function getMetadata() : array|null
+  public function getMetadata() : ?array
   {
     $filePath = $this->getFileMetadataJSONPath();
     $fileContent = file_get_contents($filePath);
