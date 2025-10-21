@@ -360,7 +360,8 @@ final class SystemCore implements CoreInterface
     $CMSFileConnector = $this->autoloadComponents(
       $CMSFileConnector,
       self::CMS_CORE_PHP_LIBRARY_PATH,
-      ['enum', 'interface', 'trait', 'class']
+      ['enum', 'interface', 'trait', 'class'],
+      'base'
     );
 
     /** @var null Переменная для будущего объекта шаблона */
@@ -505,7 +506,8 @@ final class SystemCore implements CoreInterface
           $CMSFileConnector = $this->autoloadComponents(
             $CMSFileConnector,
             $moduleDirectoryPath,
-            ['enum', 'interface', 'trait', 'class']
+            ['enum', 'interface', 'trait', 'class'],
+            'module_' . $directoryName
           );
           
           Module::connectCore($this, $directoryName);
@@ -975,14 +977,14 @@ final class SystemCore implements CoreInterface
    * 
    * @return void
    */
-  public function autoloadComponents(CMSFileConnector $CMSFileConnector, string $filesPath, array $filesTypes = []) : void
+  public function autoloadComponents(CMSFileConnector $CMSFileConnector, string $filesPath, array $filesTypes = [], string $salt = '') : void
   {
     $CMSFileConnector->setStartDirectory($filesPath);
     $CMSFileConnector->setCurrentDirectory($filesPath);
 
     foreach ($filesTypes as $type) {
       $fileNamePattern = '/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/';
-      $cacheKey = md5($fileNamePattern);
+      $cacheKey = md5($fileNamePattern . $salt);
       $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
 
       if (file_exists($cacheFile)) {
@@ -1001,7 +1003,7 @@ final class SystemCore implements CoreInterface
 
     foreach ($filesTypes as $type) {
       $fileNamePattern = '/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/';
-      $cacheKey = md5($fileNamePattern);
+      $cacheKey = md5($fileNamePattern . $salt);
       $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
 
       if (file_exists($cacheFile)) {
