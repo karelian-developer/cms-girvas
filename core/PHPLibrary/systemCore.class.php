@@ -509,7 +509,7 @@ final class SystemCore implements CoreInterface
           ['enum', 'interface', 'trait', 'class']
         );
         
-        Module::connectCore($this, $directoryName);
+        //Module::connectCore($this, $directoryName);
 
         unset($module);
       }
@@ -994,7 +994,7 @@ final class SystemCore implements CoreInterface
       };
 
       if (!file_exists($cacheFile)) {
-        $CMSFileConnector->generateCachePathesFiles('/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/');
+        $CMSFileConnector->generateCachePathesFiles('/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/', $cacheDir);
         $CMSFileConnector->resetCurrentDirectory();
       }
     }
