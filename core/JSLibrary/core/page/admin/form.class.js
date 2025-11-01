@@ -106,7 +106,7 @@ export class PageForm {
         }).then((data) => {
           formConstrData = data.outputData.form;
 
-          return fetch(`/handler/form/methods?locale=${window.CMSCore.locales.admin.name}`, {method: 'GET'});
+          return fetch(`/handler/forms/methods?locale=${window.CMSCore.locales.admin.name}`, {method: 'GET'});
         }, (rejectionReason) => {
           this.page.showPopupNotification(rejectionReason, 0);
         }).then((response) => {
