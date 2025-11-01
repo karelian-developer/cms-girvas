@@ -119,7 +119,7 @@ export class PageForm {
                 interactiveMethodChoices.target.addItem(methodTitle, method.id);
                 
                 if (formConstrData !== undefined) {
-                  if (formConstrData.sortTypeID == method.id) {
+                  if (formConstrData.methodID == method.id) {
                     interactiveMethodChoices.target.setItemSelectedIndex(methodIndex);
                   }
                 }
