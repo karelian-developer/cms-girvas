@@ -503,11 +503,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries');
       $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('categoryID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('authorID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
       $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -526,10 +526,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries_categories');
       $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('parentID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
       $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -570,9 +570,31 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries_samples');
       $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
       $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      $execute = $databaseQuery->execute();
+
+      // =======================
+      // ТАБЛИЦА ФОРМ
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('forms');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
       $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('elements', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();

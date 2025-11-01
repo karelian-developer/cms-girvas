@@ -39,17 +39,10 @@ final class Core implements ThemeInterfaceCore
       'permanent' => true,
       'role' => ''
     ],
-    'entries' => [
-      'name' => 'entries',
-      'iconName' => 'entries',
-      'link' => '/entries',
-      'permanent' => false,
-      'role' => ''
-    ],
-    'static_pages' => [
-      'name' => 'pages',
-      'iconName' => 'pages',
-      'link' => '/pages',
+    'content' => [
+      'name' => 'content',
+      'iconName' => 'content',
+      'link' => '/content',
       'permanent' => false,
       'role' => ''
     ],

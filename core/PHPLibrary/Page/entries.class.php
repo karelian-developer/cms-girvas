@@ -224,6 +224,30 @@ class PageEntries implements InterfacePage
           ThemeCollector::addTemplateVariable($templatesAssembled, 'ENTRY_PREVIEW_URL', $entryPreviewURL);
         }
 
+        $entryCategory = $entryObject->getCategory();
+
+        if ($entryCategory !== null) {
+          if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CATEGORY_TITLE')) {
+            $categoryTitle = $entryCategory->getTitle($localeName);
+            $categoryTitle = strip_tags($categoryTitle);
+            
+            ThemeCollector::addTemplateVariable($templatesAssembled, 'ENTRY_CATEGORY_TITLE', $categoryTitle);
+          }
+
+          if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CATEGORY_DESCRIPTION')) {
+            $categoryDescription = $entryCategory->getDescription($localeName);
+            $categoryDescription = strip_tags($categoryDescription);
+            
+            ThemeCollector::addTemplateVariable($templatesAssembled, 'ENTRY_CATEGORY_DESCRIPTION', $categoryDescription);
+          }
+
+          if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CATEGORY_URL')) {
+            $categoryURL = $entryCategory->getURL();
+            
+            ThemeCollector::addTemplateVariable($templatesAssembled, 'ENTRY_CATEGORY_URL', $categoryURL);
+          }
+        }
+
         $createdDateTimestamp = date('d.m.Y H:i:s', $entryObject->getCreatedUnixTimestamp());
         $publishedDateTimestamp = date('d.m.Y H:i:s', $entryObject->getPublishedUnixTimestamp());
         $updatedDateTimestamp = date('d.m.Y H:i:s', $entryObject->getUpdatedUnixTimestamp());
@@ -261,9 +285,9 @@ class PageEntries implements InterfacePage
             //'ENTRY_DESCRIPTION' => $entryDescription,
             //'ENTRY_URL' => $entryObject->getURL(),
             //'ENTRY_PREVIEW_URL' => $entryObject->getPreviewURL() !== '' ? $entryObject->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 512),
-            'ENTRY_CATEGORY_TITLE' => $categoryTitle,
-            'ENTRY_CATEGORY_DESCRIPTION' => $categoryDescription,
-            'ENTRY_CATEGORY_URL' => $category->getURL(),
+            //'ENTRY_CATEGORY_TITLE' => $categoryTitle,
+            //'ENTRY_CATEGORY_DESCRIPTION' => $categoryDescription,
+            //'ENTRY_CATEGORY_URL' => $category->getURL(),
             'ENTRY_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
             'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $entryObject->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestamp : date('d.m.Y H:i:s', 0),
             'ENTRY_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp,

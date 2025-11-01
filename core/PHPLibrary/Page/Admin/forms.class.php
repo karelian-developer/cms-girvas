@@ -14,15 +14,13 @@ use \DOMDocument as DOMDocument;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-use \core\PHPLibrary\EntriesSamples as EntriesSamples;
-use \core\PHPLibrary\EntriesSample\EnumSortTypeID as EnumSortTypeID;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
 use \ReflectionEnum as ReflectionEnum;
 
-class PageEntriesSamples implements InterfacePage
+class PageForms implements InterfacePage
 {
   use TraitPage;
 
@@ -72,14 +70,14 @@ class PageEntriesSamples implements InterfacePage
       'iconName' => 'entriesSamples',
       'link' => '/entriesSamples',
       'permanent' => false,
-      'isActive' => true
+      'isActive' => false
     ],
     'forms' => [
       'name' => 'forms',
       'iconName' => 'forms',
       'link' => '/forms',
       'permanent' => false,
-      'isActive' => false
+      'isActive' => true
     ]
   ];
 

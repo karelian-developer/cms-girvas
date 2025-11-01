@@ -1,16 +1,21 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * Класс системного ядра является главным классом в CMS GIRVAS, поскольку он управляет
- * подключением всех необходимых файлов для работы системы, а также проводит иницилизацию
- * необходимых объектов, таких как: шаблон системы, локализация системы, парсер адресной строки,
- * сборщик шаблона, клиент и так далее.
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary;
@@ -34,6 +39,12 @@ use \DOMDocument as DOMDocument;
   
 /**
  * Class SystemCore
+ * 
+ * Класс системного ядра является главным классом в CMS «ГИРВАС», поскольку он управляет
+ * подключением всех необходимых файлов для работы системы, а также проводит иницилизацию
+ * необходимых объектов, таких как: шаблон системы, локализация системы, парсер адресной строки,
+ * сборщик шаблона, клиент и так далее.
+ * 
  * @package core\PHPLibrary
  * 
  * @property-read string CMS_CORE_PATH Полный путь до ядра CMS
@@ -51,7 +62,7 @@ final class SystemCore implements CoreInterface
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS «GIRVAS»';
-  public const CMS_VERSION = '0.2.7';
+  public const CMS_VERSION = '0.2.8';
   public const CMS_STAGE_DEVELOPING = 'voitsy';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai';

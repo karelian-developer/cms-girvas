@@ -1,11 +1,21 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary\Page\Admin;
@@ -38,6 +48,13 @@ class PagePages implements InterfacePage
       'permanent' => true,
       'isActive' => false
     ],
+    'entries' => [
+      'name' => 'entries',
+      'iconName' => 'entries',
+      'link' => '/entries',
+      'permanent' => false,
+      'isActive' => false
+    ],
     'pages' => [
       'name' => 'pages',
       'iconName' => 'pages',
@@ -45,6 +62,34 @@ class PagePages implements InterfacePage
       'permanent' => false,
       'isActive' => true
     ],
+    'categories' => [
+      'name' => 'categories',
+      'iconName' => 'entriesCategories',
+      'link' => '/entriesCategories',
+      'permanent' => false,
+      'isActive' => false
+    ],
+    'comments' => [
+      'name' => 'comments',
+      'iconName' => 'entriesComments',
+      'link' => '/entriesComments',
+      'permanent' => false,
+      'isActive' => false
+    ],
+    'samples' => [
+      'name' => 'samples',
+      'iconName' => 'entriesSamples',
+      'link' => '/entriesSamples',
+      'permanent' => false,
+      'isActive' => false
+    ],
+    'forms' => [
+      'name' => 'forms',
+      'iconName' => 'forms',
+      'link' => '/forms',
+      'permanent' => false,
+      'isActive' => false
+    ]
   ];
 
   public function __construct(SystemCore $CMSCore, Page $page)
