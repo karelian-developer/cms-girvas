@@ -136,6 +136,38 @@ class Form implements EntityTypeContent
   }
 
   /**
+   * Получить элементы
+   * 
+   * @return array
+   */
+  public function getElements() : array
+  {
+    if (property_exists($this, 'elements')) {
+      return json_decode($this->elements, true);
+    }
+
+    return [];
+  }
+  
+  /**
+   * Получить метод
+   *
+   * @return string
+   */
+  public function getMethod() : string
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+      
+      if (isset($metadata['method'])) {
+        return strtoupper($metadata['method']);
+      }
+    }
+
+    return 'POST';
+  }
+
+  /**
    * Получить тексты
    * 
    * @return array
