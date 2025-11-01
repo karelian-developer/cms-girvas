@@ -75,8 +75,6 @@ class PageForm implements InterfacePage
         $formTitle = $form->getTitle($localeName);
         $formTitle = strip_tags($formTitle);
 
-        $formMethod = $form->getMethod();
-
         /** @var string Описание */
         $formDescription = $form->getDescription($localeName);
         $formDescription = strip_tags($formDescription);
