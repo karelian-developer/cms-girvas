@@ -12,7 +12,7 @@ import {Interactive} from "../../../interactive.class.js";
 import {URLParser} from "../../../urlParser.class.js";
 import {Utils} from "../../../utils.class.js";
 
-export class PageEntriesSample {
+export class PageForm {
   constructor(page, params = {}) {
     this.page = page;
     

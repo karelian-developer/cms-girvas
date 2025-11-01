@@ -32,6 +32,8 @@ import {PageUsersGroup as PageAdminUsersGroup} from './page/admin/usersGroup.cla
 import {PageUsersGroups as PageAdminUsersGroups} from './page/admin/usersGroups.class.js';
 import {PageFeed as PageAdminFeed} from './page/admin/feed.class.js';
 import {PageFeeds as PageAdminFeeds} from './page/admin/feeds.class.js';
+import {PageForm as PageAdminForm} from './page/admin/form.class.js';
+import {PageForms as PageAdminForms} from './page/admin/forms.class.js';
 import {PageGlobal as PageAdminGlobal} from './page/admin/global.class.js';
 import {PageGlobal as PageDefaultGlobal} from './page/global.class.js';
 import {Interactive} from '../interactive.class.js';
@@ -76,6 +78,8 @@ export class Page {
         case 'usersGroups': this.target = new PageAdminUsersGroups(this, params); break;
         case 'feed': this.target = new PageAdminFeed(this, params); break;
         case 'feeds': this.target = new PageAdminFeeds(this, params); break;
+        case 'form': this.target = new PageAdminForm(this, params); break;
+        case 'forms': this.target = new PageAdminForms(this, params); break;
         case 'global': this.target = new PageAdminGlobal(this, params); break;
       }
     }

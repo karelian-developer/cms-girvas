@@ -10,7 +10,7 @@
 
 import {Interactive} from "../../../interactive.class.js";
 
-export class PageFeeds {
+export class PageForms {
   constructor(page, params = {}) {
     this.page = page;
 
