@@ -20,7 +20,7 @@
           </div>
         </div>
         <div class="cell grid-table__cell grid-table__cell_data">
-          <input name="form_name" type="text" class="input form__input form__input_text" value="{FORM_NAME}" placeholder="my-first-feed" data-element="input-url" required>
+          <input name="form_name" type="text" class="input form__input form__input_text" value="{FORM_NAME}" placeholder="my-first-form" data-element="input-name" required>
         </div>
         <!-- Поле: Заголовок -->
         <div class="cell grid-table__cell grid-table__cell_text">
