@@ -152,10 +152,10 @@ export class PageForm {
       let tableFormElementsButtonContainer = document.querySelector('[data-element="button-add-element"]');
 
       // Получаем все установленные языковые пакеты
-      fetch('/handler/form/' + searchParams.getPathPart(3) + '/elements?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
+      fetch('/handler/form/' + searchParams.getPathPart(3) + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
         return (response.ok) ? response.json() : Promise.reject(response);
       }).then((data) => {
-        let elements = data.outputData.elements;
+        let elements = data.outputData.form.elements;
         elements.forEach((element) => {
           this.addElement(localeData, tableFormElementsButtonContainer, {
             type: element.type,
