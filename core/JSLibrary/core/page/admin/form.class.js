@@ -296,6 +296,37 @@ export class PageForm {
     });
   }
 
+  createCellFormElementElements(title, dataElement = null) {
+    const cellTextElement = document.createElement('div');
+    const cellTextTitleElement = document.createElement('div');
+    const cellDataElement = document.createElement('div');
+
+    cellTextElement.classList.add('cell');
+    cellTextElement.classList.add('grid-table__cell');
+    cellTextElement.classList.add('grid-table__cell_text');
+
+    cellDataElement.classList.add('cell');
+    cellDataElement.classList.add('grid-table__cell');
+    cellDataElement.classList.add('grid-table__cell_data');
+
+    cellTextElement.setAttribute('data-element', 'form-element-part-element');
+    cellDataElement.setAttribute('data-element', 'form-element-part-element');
+    
+    cellTextTitleElement.classList.add('cell__title');
+    cellTextTitleElement.innerText = title;
+    
+    cellTextElement.appendChild(cellTextTitleElement);
+
+    if (dataElement !== null) {
+      cellDataElement.appendChild(dataElement);
+    }
+
+    return [
+      cellTextElement,
+      cellDataElement
+    ];
+  }
+
   addElement(localeData, container, data = {}) {
     const cellHeaderElement = document.createElement('div');
     const formElementInputTitle = document.createElement('input');
@@ -309,7 +340,7 @@ export class PageForm {
       ? `${localeData.PAGE_FORM_ELEMENT}: ${data.title}`
       : localeData.PAGE_FORM_NEW_ELEMENT;
 
-    cellHeaderElement.setAttribute('data-element', 'additional-field-part-element');
+    cellHeaderElement.setAttribute('data-element', 'form-element-part-element');
 
     formElementInputTitle.setAttribute('type', 'text');
     formElementInputTitle.setAttribute('name', 'form_element_title[]');
@@ -329,7 +360,7 @@ export class PageForm {
     formElementInputName.classList.add('form__input_text');
     formElementInputDescription.classList.add('form__textarea');
 
-    const cellElementsForType = this.createCellAdditionalFieldElements(
+    const cellElementsForType = this.createCellFormElementElements(
       localeData.PAGE_FORM_ELEMENT_TYPE_FIELD_TITLE
     );
 
@@ -356,17 +387,17 @@ export class PageForm {
 
     cellElementsForType[1].append(interactiveChoicesTypeField.target.element);
 
-    const cellElementsForTitle = this.createCellAdditionalFieldElements(
+    const cellElementsForTitle = this.createCellFormElementElements(
       localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_TITLE_TITLE,
       formElementInputTitle
     );
 
-    const cellElementsForName = this.createCellAdditionalFieldElements(
+    const cellElementsForName = this.createCellFormElementElements(
       localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_TECHNICAL_NAME_TITLE,
       formElementInputName
     );
 
-    const cellElementsForDescription = this.createCellAdditionalFieldElements(
+    const cellElementsForDescription = this.createCellFormElementElements(
       localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_DESCRIPTION_TITLE,
       formElementInputDescription
     );
@@ -400,7 +431,7 @@ export class PageForm {
 
     buttonRemoveField.assembly();
 
-    const cellElementsForEvents = this.createCellAdditionalFieldElements(
+    const cellElementsForEvents = this.createCellFormElementElements(
       '', buttonRemoveField.target.element
     );
 
