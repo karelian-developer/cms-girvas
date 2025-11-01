@@ -16,7 +16,7 @@ export class PageForm {
   constructor(page, params = {}) {
     this.page = page;
     
-    this.buttons = {save: null, delete: null};
+    this.buttons = {save: null, delete: null, addElement: null};
   }
 
   init() {
@@ -148,6 +148,25 @@ export class PageForm {
 
         event.target.value = uString.source;
       });
+
+      let tableFormElementsButtonContainer = document.querySelector('[data-element="button-add-element"]');
+
+      // Получаем все установленные языковые пакеты
+      fetch('/handler/form/' + searchParams.getPathPart(3) + '/elements?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
+        return (response.ok) ? response.json() : Promise.reject(response);
+      }).then((data) => {
+        let elements = data.outputData.elements;
+        elements.forEach((element) => {
+          this.addElement(localeData, tableFormElementsButtonContainer, {
+            type: element.type,
+            title: element.title,
+            description: element.description,
+            name: element.name
+          });
+        });
+      });
+
+      tableFormElementsButtonContainer.append(this.buttons.addElement.target.element);
       
       let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
@@ -266,5 +285,166 @@ export class PageForm {
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     });
+  }
+
+  addElement(localeData, container, data = {}) {
+    const cellHeaderElement = document.createElement('div');
+    const formElementInputTitle = document.createElement('input');
+    const formElementInputName = document.createElement('input');
+    const formElementInputDescription = document.createElement('textarea');
+    
+    cellHeaderElement.classList.add('cell');
+    cellHeaderElement.classList.add('grid-table__cell');
+    cellHeaderElement.classList.add('grid-table__cell_header');
+    cellHeaderElement.innerText = data.title !== undefined
+      ? `${localeData.PAGE_FORM_ELEMENT}: ${data.title}`
+      : localeData.PAGE_FORM_NEW_ELEMENT;
+
+    cellHeaderElement.setAttribute('data-element', 'additional-field-part-element');
+
+    formElementInputTitle.setAttribute('type', 'text');
+    formElementInputTitle.setAttribute('name', 'form_element_title[]');
+    formElementInputTitle.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_TITLE_PLACEHOLDER);
+    formElementInputTitle.setAttribute('required', 'required');
+    formElementInputName.setAttribute('pattern', '[a-z0-9_]+');
+    formElementInputName.setAttribute('type', 'text');
+    formElementInputName.setAttribute('name', 'form_element_name[]');
+    formElementInputName.setAttribute('placeholder', 'my_field');
+    formElementInputName.setAttribute('required', 'required');
+    formElementInputDescription.setAttribute('name', 'form_element_description[]');
+    formElementInputDescription.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_DESCRIPTION_PLACEHOLDER);
+
+    formElementInputTitle.classList.add('form__input');
+    formElementInputTitle.classList.add('form__input_text');
+    formElementInputName.classList.add('form__input');
+    formElementInputName.classList.add('form__input_text');
+    formElementInputDescription.classList.add('form__textarea');
+
+    const cellElementsForType = this.createCellAdditionalFieldElements(
+      localeData.PAGE_FORM_ELEMENT_TYPE_FIELD_TITLE
+    );
+
+    /* Выпадающий список с типами полей */
+
+    const interactiveChoicesTypeField = new Interactive('choices');
+    interactiveChoicesTypeField.target.addItem('String', 'text');
+    interactiveChoicesTypeField.target.addItem('Number', 'number');
+    interactiveChoicesTypeField.target.addItem('Date', 'date');
+    interactiveChoicesTypeField.target.addItem('Text', 'textarea');
+    interactiveChoicesTypeField.target.setName('form_element_type[]');
+    
+    if (typeof data.type != 'undefined') {
+      switch (data.type) {
+        case 'text': interactiveChoicesTypeField.target.setItemSelectedIndex(0); break;
+        case 'number': interactiveChoicesTypeField.target.setItemSelectedIndex(1); break;
+        case 'date': interactiveChoicesTypeField.target.setItemSelectedIndex(2); break;
+        case 'textarea': interactiveChoicesTypeField.target.setItemSelectedIndex(3); break;
+        default: interactiveChoicesTypeField.target.setItemSelectedIndex(0);
+      }
+    }
+
+    interactiveChoicesTypeField.assembly();
+
+    cellElementsForType[1].append(interactiveChoicesTypeField.target.element);
+
+    const cellElementsForTitle = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_TITLE_TITLE,
+      formElementInputTitle
+    );
+
+    const cellElementsForName = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_TECHNICAL_NAME_TITLE,
+      formElementInputName
+    );
+
+    const cellElementsForDescription = this.createCellAdditionalFieldElements(
+      localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_DESCRIPTION_TITLE,
+      formElementInputDescription
+    );
+
+    const buttonRemoveField = new Interactive('button');
+    buttonRemoveField.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+    buttonRemoveField.target.setCallback((event) => {
+      event.preventDefault();
+      
+      cellElementsForType.forEach(element => {
+        element.remove();
+      });
+
+      cellElementsForTitle.forEach(element => {
+        element.remove();
+      });
+
+      cellElementsForName.forEach(element => {
+        element.remove();
+      });
+
+      cellElementsForDescription.forEach(element => {
+        element.remove();
+      });
+
+      buttonRemoveField.target.element.parentElement.previousElementSibling.remove();
+      buttonRemoveField.target.element.parentElement.remove();
+
+      cellHeaderElement.remove();
+    });
+
+    buttonRemoveField.assembly();
+
+    const cellElementsForEvents = this.createCellAdditionalFieldElements(
+      '', buttonRemoveField.target.element
+    );
+
+    container.parentElement.parentElement.insertBefore(
+      cellHeaderElement,
+      container.parentElement.previousElementSibling
+    );
+
+    cellElementsForType.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    cellElementsForTitle.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    cellElementsForName.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    cellElementsForDescription.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    cellElementsForEvents.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
+    formElementInputTitle.value = data.title !== undefined
+      ? data.title
+      : '';
+
+    formElementInputName.value = data.name !== undefined
+      ? data.name
+      : '';
+
+    formElementInputDescription.value = data.description !== undefined
+      ? data.description
+      : '';
   }
 }

@@ -62,6 +62,14 @@
         <div class="cell grid-table__cell grid-table__cell_header">
           {LANG:PAGE_FORM_ELEMENTS_TITLE}
         </div>
+        <div class="cell grid-table__cell grid-table__cell_text"></div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <div data-element="form-elements-locale"></div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_text"></div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <div data-element="button-add-element"></div>
+        </div>
         <!-- Панель формы -->
         <div class="cell grid-table__cell grid-table__cell_panel" data-element="panel"></div>
       </div>
