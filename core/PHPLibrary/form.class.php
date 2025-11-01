@@ -154,13 +154,13 @@ class Form implements EntityTypeContent
    *
    * @return string
    */
-  public function getMethod() : string
+  public function getMethodID() : string
   {
     if (property_exists($this, 'metadata')) {
       $metadata = json_decode($this->metadata, true);
       
-      if (isset($metadata['method'])) {
-        return strtoupper($metadata['method']);
+      if (isset($metadata['methodID'])) {
+        return strtoupper($metadata['methodID']);
       }
     }
 
@@ -492,8 +492,6 @@ class Form implements EntityTypeContent
       $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
-
-      error_log('SQL: ' . $queryBuilder->statement->assembled);
 
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;
