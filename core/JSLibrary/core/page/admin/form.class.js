@@ -118,7 +118,6 @@ export class PageForm {
                 let methodTitle = method.name.toUpperCase();
                 interactiveMethodChoices.target.addItem(methodTitle, method.id);
                 
-                console.log(formConstrData);
                 if (formConstrData !== undefined) {
                   if (formConstrData.sortTypeID == method.id) {
                     interactiveMethodChoices.target.setItemSelectedIndex(methodIndex);

@@ -21,4 +21,7 @@ if ($CMSCore->urlp->getPath(2) === 'methods') {
     ['id' => 4, 'name' => 'DELETE'],
     ['id' => 5, 'name' => 'PATCH']
   ];
+
+  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+  $handlerStatusCode = $handlerStatusCode ?? 1;
 }
