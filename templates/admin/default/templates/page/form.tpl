@@ -66,10 +66,10 @@
 </article>
 <aside class="main__page-aside page-aside">
   <div class="page-aside__block">
-    <h2 class="page-aside__block-title">{LANG:PAGE_FORM_SIDEBAR_BLOCK_ABOUT_TITLE}</h2>
+    <h2 class="page-aside__block-title">{LANG:PAGE_FORMS_SIDEBAR_BLOCK_ABOUT_TITLE}</h2>
     <div class="page-aside__block-content block-content">
       <div class="note-block note-block_blue">
-        {LANG:MD:PAGE_FORM_SIDEBAR_BLOCK_ABOUT_DESCRIPTION}
+        {LANG:MD:PAGE_FORMS_SIDEBAR_BLOCK_ABOUT_DESCRIPTION}
       </div>
     </div>
   </div>
