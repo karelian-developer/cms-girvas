@@ -335,6 +335,7 @@
   "PAGE_FORM_DESCRIPTION_PLACEHOLDER": "Describe your project using our form...",
   "PAGE_FORM_METHOD_TITLE": "Submission Method",
   "PAGE_FORM_METHOD_DESCRIPTION": "The submission method will determine how data is sent to the server.",
+  "PAGE_FORM_ELEMENTS_TITLE": "Form elements",
   "PAGE_REPORTS_TITLE": "System reports",
   "PAGE_REPORTS_NAVIGATION_INDEX_LABEL": "Dashboard",
   "PAGE_REPORTS_COMMON_TITLE": "Common events",

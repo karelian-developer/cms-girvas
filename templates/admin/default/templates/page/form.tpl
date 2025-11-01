@@ -58,6 +58,10 @@
         <div class="cell grid-table__cell grid-table__cell_data">
           <div data-element="choice" data-choice="method"></div>
         </div>
+        <!-- Раздел: Элементы формы -->
+        <div class="cell grid-table__cell grid-table__cell_header">
+          {LANG:PAGE_FORM_ELEMENTS_TITLE}
+        </div>
         <!-- Панель формы -->
         <div class="cell grid-table__cell grid-table__cell_panel" data-element="panel"></div>
       </div>

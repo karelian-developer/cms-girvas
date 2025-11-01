@@ -335,6 +335,7 @@
   "PAGE_FORM_DESCRIPTION_PLACEHOLDER": "Опишите Ваш проект при помощи нашей формы...",
   "PAGE_FORM_METHOD_TITLE": "Метод отправки",
   "PAGE_FORM_METHOD_DESCRIPTION": "Метод отправки позволит определить способ отправки данных на сервер.",
+  "PAGE_FORM_ELEMENTS_TITLE": "Элементы формы",
   "PAGE_REPORTS_TITLE": "Системные отчеты",
   "PAGE_REPORTS_NAVIGATION_INDEX_LABEL": "Дашборд",
   "PAGE_REPORTS_COMMON_TITLE": "Общие события",
