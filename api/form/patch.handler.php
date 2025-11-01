@@ -53,7 +53,7 @@ if ($CMSCore->client->isLogged(2)) {
       }
 
       if (isset($_PATCH['form_name'])) $formData['name'] = urlencode(htmlentities($_PATCH['form_name']));
-      if (isset($_PATCH['form_method_id'])) $formData['methodID'] = $_PATCH['form_method_id'];
+      if (isset($_PATCH['form_method_id'])) $formData['metadata']['methodID'] = $_PATCH['form_method_id'];
 
       $isUpdated = $form->update($formData);
 
