@@ -2,7 +2,7 @@
   <nav id="SYSTEM_AP_SUBNAVIGATION" class="page__navigation navigation"></nav>
   <div class="page__title-container">
     <h1 class="page__title">
-      {LANG:PAGE_FEED_TITLE}
+      {LANG:PAGE_FORM_TITLE}
     </h1>
     <div class="page__interactive-container" data-element="header-interactive"></div>
   </div>
