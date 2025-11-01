@@ -30,6 +30,7 @@ if ($CMSCore->urlp->getPath(3) == 'permissions') {
     $handlerOutputData['usersGroup']['permissions']['admin_modules_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT);
     $handlerOutputData['usersGroup']['permissions']['admin_templates_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT);
     $handlerOutputData['usersGroup']['permissions']['admin_feeds_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_FEEDS_MANAGEMENT);
+    $handlerOutputData['usersGroup']['permissions']['admin_forms_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT);
     $handlerOutputData['usersGroup']['permissions']['admin_settings_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT);
     $handlerOutputData['usersGroup']['permissions']['admin_viewing_logs'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_VIEWING_LOGS);
     $handlerOutputData['usersGroup']['permissions']['moder_users_ban'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_MODER_USERS_BAN);

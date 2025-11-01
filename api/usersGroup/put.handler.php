@@ -43,6 +43,7 @@ if ($CMSCore->client->isLogged(2)) {
                   'admin_templates_management' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT,
                   'admin_settings_management' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT,
                   'admin_feeds_management' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_FEEDS_MANAGEMENT,
+                  'admin_forms_management' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT,
                   'admin_viewing_logs' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_VIEWING_LOGS,
                   'moder_users_ban' => $usersGroupPermissions | UserGroup::PERMISSION_MODER_USERS_BAN,
                   'moder_entries_comments_management' => $usersGroupPermissions | UserGroup::PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT,

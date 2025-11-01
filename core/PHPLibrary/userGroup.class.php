@@ -31,6 +31,7 @@ class UserGroup
   public const PERMISSION_ADMIN_SETTINGS_MANAGEMENT           = 1 << 5;
   public const PERMISSION_ADMIN_VIEWING_LOGS                  = 1 << 6;
   public const PERMISSION_ADMIN_FEEDS_MANAGEMENT              = 1 << 17;
+  public const PERMISSION_ADMIN_FORMS_MANAGEMENT              = 1 << 19;
   public const PERMISSION_ADMIN_SUPERUSER                     = 1 << 18;
   // Права модерации
   public const PERMISSION_MODER_USERS_BAN                     = 1 << 7;
@@ -406,6 +407,16 @@ class UserGroup
   public function hasPermissionAdminFeedsManagement() : bool
   {
     return $this->permissionCheck(self::PERMISSION_ADMIN_FEEDS_MANAGEMENT);
+  }
+
+  /**
+   * Проверить наличие права управления формами
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminFormsManagement() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_FORMS_MANAGEMENT);
   }
 
   /**

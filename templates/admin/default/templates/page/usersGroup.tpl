@@ -110,6 +110,18 @@
             <label class="checkbox-container__label form__label" for="I1474308977"></label>
           </div>
         </div>
+        <!-- Поле: Управление формами CMS -->
+        <div class="cell grid-table__cell grid-table__cell_text">
+          <div class="cell__title">
+            {LANG:PAGE_USERS_GROUP_PERSMISSION_MANAGE_CMS_FORMS_TITLE}
+          </div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <div class="form__checkbox-container checkbox-container">
+            <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308912" name="user_group_permissions[]" type="checkbox" value="admin_forms_management" {USERS_GROUP_PERMISSION_ADMIN_FORMS_MANAGEMENT_VALUE}>
+            <label class="checkbox-container__label form__label" for="I1474308912"></label>
+          </div>
+        </div>
         <!-- Поле: Управление настройками CMS -->
         <div class="cell grid-table__cell grid-table__cell_text">
           <div class="cell__title">

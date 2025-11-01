@@ -83,6 +83,7 @@ class PageUserGroup implements InterfacePage
       'USERS_GROUP_PERMISSION_ADMIN_MODULES_MANAGEMENT_VALUE' => $usersGroup === null ? '' : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT)) ? 'checked' : ''),
       'USERS_GROUP_PERMISSION_ADMIN_TEMPLATES_MANAGEMENT_VALUE' => $usersGroup === null ? '' : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT)) ? 'checked' : ''),
       'USERS_GROUP_PERMISSION_ADMIN_FEEDS_MANAGEMENT_VALUE' => $usersGroup === null ? '' : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_FEEDS_MANAGEMENT)) ? 'checked' : ''),
+      'USERS_GROUP_PERMISSION_ADMIN_FORMS_MANAGEMENT_VALUE' => $usersGroup === null ? '' : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT)) ? 'checked' : ''),
       'USERS_GROUP_PERMISSION_ADMIN_SETTINGS_MANAGEMENT_VALUE' => $usersGroup === null ? '' : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT)) ? 'checked' : ''),
       'USERS_GROUP_PERMISSION_ADMIN_VIEWING_LOGS_VALUE' => $usersGroup === null ? '' : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_VIEWING_LOGS)) ? 'checked' : ''),
       'USERS_GROUP_PERMISSION_MODER_USERS_BAN_VALUE' => $usersGroup === null ? '' : (($usersGroup->permissionCheck(UserGroup::PERMISSION_MODER_USERS_BAN)) ? 'checked' : ''),
