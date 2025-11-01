@@ -320,6 +320,7 @@
   "PAGE_STATIC_PAGE_SIDEBAR_BLOCK_PERSONAL_TEMPLATE_TITLE": "The path to a personal template",
   "PAGE_FORMS_TITLE": "Forms",
   "PAGE_FORM_TITLE": "Editing a form",
+  "PAGE_FORM_NAVIGATION_BACK_LABEL": "Back",
   "PAGE_REPORTS_TITLE": "System reports",
   "PAGE_REPORTS_NAVIGATION_INDEX_LABEL": "Dashboard",
   "PAGE_REPORTS_COMMON_TITLE": "Common events",

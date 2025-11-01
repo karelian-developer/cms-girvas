@@ -320,6 +320,7 @@
   "PAGE_STATIC_PAGE_SIDEBAR_BLOCK_PERSONAL_TEMPLATE_TITLE": "Путь до персонального шаблона",
   "PAGE_FORMS_TITLE": "Формы",
   "PAGE_FORM_TITLE": "Редактирование формы",
+  "PAGE_FORM_NAVIGATION_BACK_LABEL": "Назад",
   "PAGE_REPORTS_TITLE": "Системные отчеты",
   "PAGE_REPORTS_NAVIGATION_INDEX_LABEL": "Дашборд",
   "PAGE_REPORTS_COMMON_TITLE": "Общие события",

@@ -1,0 +1,107 @@
+/**
+ * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
+ * @copyright   Copyright (c) 2021 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ */
+
+.main__page_form .grid-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 20px;
+}
+
+.main__page_form .grid-table__cell:not(:last-child) {
+  border-bottom: 1px solid var(--color-neutral-lightgray);
+  padding-bottom: 20px;
+}
+
+@media (min-width: 801px) {
+  .main__page_form .grid-table__cell_text {
+    padding-right: 20px;
+  }
+
+  .main__page_form .grid-table__cell_data {
+    padding-left: 20px;
+  }
+}
+
+.main__page_form .grid-table__cell_text {
+  grid-column: 1;
+}
+
+@media (max-width: 800px) {
+  .main__page_form .grid-table__cell_text {
+    border-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}
+
+.main__page_form .grid-table__cell_text .cell__title {
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.main__page_form .grid-table__cell_text .cell__title:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.main__page_form .grid-table__cell_text .cell__description {
+  font-size: 14px;
+  opacity: .6;
+}
+
+.main__page_form .grid-table__cell_data {
+  grid-column: 2;
+}
+
+@media (max-width: 800px) {
+  .main__page_form .grid-table__cell_text,
+  .main__page_form .grid-table__cell_data {
+    grid-column: 1 / -1;
+  }
+}
+
+.main__page_form .grid-table__cell_editor,
+.main__page_form .grid-table__cell_panel {
+  grid-column: 1 / -1;
+}
+
+.main__page_form .grid-table__cell_panel {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.main__page_form .grid-table__cell_panel > * {
+  &:not(:last-child) {
+    margin-right: 10px;
+  }
+}
+
+.main__page_form .page__form input,
+.main__page_form .page__form select,
+.main__page_form .page__form textarea {
+  width: 100%;
+}
+
+.main__page_form .page__form input:not(:nth-last-child()),
+.main__page_form .page__form select:not(:nth-last-child()),
+.main__page_form .page__form textarea:not(:nth-last-child()) {
+  margin-bottom: 10px;
+}
+
+.main__page_form .page__form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.main__page_form .page__form .form__input[type="submit"] {
+  width: fit-content;
+  float: right;
+}
+
+.main__page_form .page__form .interactive__select-imitation {
+  width: 100% !important;
+}
