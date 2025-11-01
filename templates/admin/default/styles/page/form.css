@@ -57,6 +57,15 @@
   grid-column: 2;
 }
 
+.main__page_form .grid-table__cell_header {
+  grid-column: 1 / -1;
+  text-transform: uppercase;
+  text-align: center;
+  font-weight: 500;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
 @media (max-width: 800px) {
   .main__page_form .grid-table__cell_text,
   .main__page_form .grid-table__cell_data {
