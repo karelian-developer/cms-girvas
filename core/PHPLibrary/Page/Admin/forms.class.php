@@ -24,7 +24,7 @@ class PageForms implements InterfacePage
 {
   use TraitPage;
 
-  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_NAVIGATION_%s_LABEL';
+  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_CONTENT_NAVIGATION_%s_LABEL';
 
   public SystemCore $CMSCore;
   public Page $page;
@@ -127,42 +127,22 @@ class PageForms implements InterfacePage
   }
 
   /**
-   * Сборка списка локализаций для записи
-   * 
-   * @param array $localesData
-   * 
-   * @return string
-   */
-  private function assemblyCategoriesItems(string $localeName, array $categories) : string
-  {
-    $document = new DOMDocument('1.0', 'UTF-8');
-
-    foreach ($categories as $category) {
-      $category->initData(['texts']);
-
-      $itemElement = $document->createElement('li', $category->getTitle($localeName));
-      $itemElement->setAttribute('class', 'grid-table__category');
-
-      $document->appendChild($itemElement);
-    }
-
-    return $document->saveHTML();
-  }
-
-  /**
    * Сборка
    * 
    * @return void
    */
   public function assembly() : void
   {
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page/entriesSamples.css', 'rel' => 'stylesheet']);
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page/forms.css', 'rel' => 'stylesheet']);
     
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
 
     /** @var int Текущий номер страницы */
-    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
+    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null
+      ? (int) $this->CMSCore->urlp->getParam('pageNumber')
+      : 0;
+
     /** @var int Максимальное количество элементов на странице */
     $paginationItemsOnPage = 12;
 

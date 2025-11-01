@@ -42,7 +42,7 @@ final class Core implements ThemeInterfaceCore
     'content' => [
       'name' => 'content',
       'iconName' => 'content',
-      'link' => '/content',
+      'link' => '/entries',
       'permanent' => false,
       'role' => ''
     ],
