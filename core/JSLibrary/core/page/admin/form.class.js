@@ -171,7 +171,7 @@ export class PageForm {
           const elementTitle = elementTexts.length > 0 ? elementTexts.title : '';
           const elementDescription = elementTexts.length > 0 ? elementTexts.description : '';
           const elementPlaceholder = elementTexts.length > 0 ? elementTexts.placeholder : '';
-
+          console.log(elementTitle);
           this.addElement(localeData, tableFormElementsButtonContainer, {
             type: element.type,
             title: elementTitle,
