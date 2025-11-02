@@ -59,7 +59,7 @@ if ($CMSCore->client->isLogged(2)) {
           $formElementNames = isset($_PATCH['form_element_name']) ? $_PATCH['form_element_name'] : [];
 
           if (count($formElementTitles) > 0) {
-            if (!array_key_exists('elements', $formData)) $formData['elements'] = $form->getElements();
+            $formData['elements'] = [];
             
             for ($i = 0; $i < count($formElementTitles); $i++) {
               $elements = $form;
