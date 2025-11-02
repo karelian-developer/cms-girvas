@@ -165,7 +165,7 @@ export class PageForm {
       }).then((data) => {
         const elements = data.outputData.form.elements;
         elements.forEach((element, elementIndex) => {
-          const elementTexts = element['texts'][window.CMSCore.locales.admin.name];
+          let elementTexts = element['texts'][window.CMSCore.locales.admin.name];
           elementTexts = elementTexts !== undefined ? elementTexts : [];
 
           const elementTitle = elementTexts.length > 0 ? elementTexts.title : '';
@@ -174,8 +174,9 @@ export class PageForm {
 
           this.addElement(localeData, tableFormElementsButtonContainer, {
             type: element.type,
-            title: element.title,
-            description: element.description,
+            title: elementTitle,
+            description: elementDescription,
+            placeholder: elementPlaceholder,
             name: element.name
           });
         });
@@ -511,8 +512,8 @@ export class PageForm {
       ? data.name
       : '';
 
-    formElementInputPlaceholder.value = data.name !== undefined
-      ? data.name
+    formElementInputPlaceholder.value = data.placeholder !== undefined
+      ? data.placeholder
       : '';
 
     formElementInputDescription.value = data.description !== undefined
