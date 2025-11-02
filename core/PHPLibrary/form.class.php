@@ -533,7 +533,7 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->setClauseSet();
 
     foreach ($data as $name => $value) {
-      if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata'])) {
+      if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata', 'elements'])) {
         $queryBuilder->statement->clauseSet->addColumn($name);
       }
     }
@@ -579,7 +579,7 @@ class Form implements EntityTypeContent
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       
       foreach ($data as $name => $value) {
-        if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata'])) {
+        if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata', 'elements'])) {
           $valueTypeName = gettype($value);
           $valueType = match ($valueTypeName) {
             'boolean' => \PDO::PARAM_BOOL,
