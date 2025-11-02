@@ -14,6 +14,7 @@ use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
+use \DOMDocument as DOMDocument;
 use \PDOException as PDOException;
 
 #[\AllowDynamicProperties]
@@ -245,6 +246,42 @@ class Form implements EntityTypeContent
   public function getEntriesCount() : int {
     $entries = $this->getEntries();
     return count($entries);
+  }
+
+  public function assembly() : string {
+    $elements = $this->getElements();
+    $document = new DOMDocument('1.0', 'UTF-8');
+
+    $formElement = $document->createElement('form');
+    $formElement->setAttribute('method', match ($this->getMethodID()) {
+      1 => 'GET',
+      2 => 'POST',
+      3 => 'PUT',
+      4 => 'DELETE',
+      5 => 'PATCH'
+    });
+
+    foreach ($elements as $index => $element) {
+      $DOMElement = $element['type'] === 'text' 
+        ? $document->createElement('textarea')
+        : $document->createElement('input');
+
+      if ($element['type'] !== 'text') {
+        $DOMElementType = match ($element['type']) {
+          'string' => 'text',
+          'number' => 'number',
+          'date' => 'date'
+        };
+
+        $DOMElement->setAttribute('type', $DOMElementType);
+      }
+      
+      $formElement->appendChild($DOMElement);
+    }
+
+    $document->appendChild($formElement);
+
+    return $document->saveHTML();
   }
   
   /**

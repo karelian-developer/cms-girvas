@@ -574,6 +574,16 @@ final class Template implements ThemeInterface
       ];
 
       if (!$isInstallationMode && $this->CMSCore->urlp->getPath(0) !== 'install') {
+        $forms = new Forms($this->CMSCore);
+        $formsArray = $forms->getAll();
+
+        foreach ($formsArray as $form) {
+          $form->initData(['name', 'texts', 'metadata', 'elements']);
+
+          $themeFormNameVariable = strtoupper(str_replace('-', '_', $form->getName()));
+          $themeVariablesArray['FORM_' . $themeFormNameVariable] = '';
+        }
+
         $entriesSamples = new EntriesSamples($this->CMSCore);
         $entriesSamplesArray = $entriesSamples->getAll();
 
