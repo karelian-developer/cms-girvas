@@ -168,9 +168,9 @@ export class PageForm {
           let elementTexts = element['texts'][window.CMSCore.locales.admin.name];
           elementTexts = elementTexts !== undefined ? elementTexts : [];
 
-          const elementTitle = elementTexts.length > 0 ? elementTexts.title : '';
-          const elementDescription = elementTexts.length > 0 ? elementTexts.description : '';
-          const elementPlaceholder = elementTexts.length > 0 ? elementTexts.placeholder : '';
+          const elementTitle = elementTexts.title;
+          const elementDescription = elementTexts.description;
+          const elementPlaceholder = elementTexts.placeholder;
           console.log(elementTitle);
           this.addElement(localeData, tableFormElementsButtonContainer, {
             type: element.type,
