@@ -249,6 +249,9 @@ class Form implements EntityTypeContent
   }
 
   public function assembly() : string {
+    $CMSLocale = $this->CMSCore->locale;
+    $CMSLocaleName = $CMSLocale->getName();
+
     $elements = $this->getElements();
     $document = new DOMDocument('1.0', 'UTF-8');
 
@@ -261,10 +264,16 @@ class Form implements EntityTypeContent
       5 => 'PATCH'
     });
 
+    $DOMElement->setAttribute('class', 'form form_' . $this->getName());
+
     foreach ($elements as $index => $element) {
+      $DOMElementPlaceholder = $element['texts'][$CMSLocaleName]['placeholder'];
+
       $DOMElement = $element['type'] === 'textarea' 
         ? $document->createElement('textarea')
         : $document->createElement('input');
+
+      $DOMElementName = $element['name'];
       
       if ($element['type'] !== 'textarea') {
         $DOMElementType = match ($element['type']) {
@@ -276,6 +285,9 @@ class Form implements EntityTypeContent
         $DOMElement->setAttribute('type', $DOMElementType);
       }
       
+      $DOMElement->setAttribute('placeholder', $DOMElementPlaceholder);
+      $DOMElement->setAttribute('name', $DOMElementName);
+
       $formElement->appendChild($DOMElement);
     }
 
