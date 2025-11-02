@@ -581,7 +581,7 @@ final class Template implements ThemeInterface
           $form->initData(['name', 'texts', 'metadata', 'elements']);
 
           $themeFormNameVariable = strtoupper(str_replace('-', '_', $form->getName()));
-          $themeVariablesArray['FORM_' . $themeFormNameVariable] = '';
+          $themeVariablesArray['FORM_' . $themeFormNameVariable] = $form->assembly();
         }
 
         $entriesSamples = new EntriesSamples($this->CMSCore);
