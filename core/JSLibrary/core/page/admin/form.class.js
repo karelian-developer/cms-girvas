@@ -165,6 +165,7 @@ export class PageForm {
       }).then((data) => {
         const elements = data.outputData.form.elements;
         elements.forEach((element, elementIndex) => {
+          console.log(element);
           const elementTexts = element[elementIndex]['texts'][window.CMSCore.locales.admin.name];
           elementTexts = elementTexts !== undefined ? elementTexts : [];
 
