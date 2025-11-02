@@ -76,13 +76,12 @@ export class PageForm {
     
             request.target.showingNotification = false;
             
-            let formConstrData;
             request.target.send().then((data) => {
               if (data.statusCode == 1 && data.outputData.hasOwnProperty('form')) {
-                formConstrData = data.outputData.form;
+                let formConstrData = data.outputData.form;
 
-                descriptionTextareaElement.value = data.outputData.form.description;
-                titleInputElement.value = data.outputData.form.title;
+                descriptionTextareaElement.value = formConstrData.description;
+                titleInputElement.value = formConstrData.title;
               }
 
             }, (rejectionReason) => {
@@ -164,8 +163,15 @@ export class PageForm {
       fetch('/handler/form/' + searchParams.getPathPart(3) + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
         return (response.ok) ? response.json() : Promise.reject(response);
       }).then((data) => {
-        let elements = data.outputData.form.elements;
-        elements.forEach((element) => {
+        const elements = data.outputData.form.elements;
+        elements.forEach((element, elementIndex) => {
+          const elementTexts = element[elementIndex]['texts'][window.CMSCore.locales.admin.name];
+          elementTexts = elementTexts !== undefined ? elementTexts : [];
+
+          const elementTitle = elementTexts.length > 0 ? elementTexts.title : '';
+          const elementDescription = elementTexts.length > 0 ? elementTexts.description : '';
+          const elementPlaceholder = elementTexts.length > 0 ? elementTexts.placeholder : '';
+
           this.addElement(localeData, tableFormElementsButtonContainer, {
             type: element.type,
             title: element.title,
