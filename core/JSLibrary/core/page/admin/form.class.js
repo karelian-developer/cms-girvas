@@ -332,6 +332,7 @@ export class PageForm {
     const formElementInputTitle = document.createElement('input');
     const formElementInputName = document.createElement('input');
     const formElementInputDescription = document.createElement('textarea');
+    const formElementInputPlaceholder = document.createElement('input');
     
     cellHeaderElement.classList.add('cell');
     cellHeaderElement.classList.add('grid-table__cell');
@@ -346,6 +347,9 @@ export class PageForm {
     formElementInputTitle.setAttribute('name', 'form_element_title[]');
     formElementInputTitle.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_TITLE_PLACEHOLDER);
     formElementInputTitle.setAttribute('required', 'required');
+    formElementInputPlaceholder.setAttribute('type', 'text');
+    formElementInputPlaceholder.setAttribute('name', 'form_element_placeholder[]');
+    formElementInputPlaceholder.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_PLACEHOLDER_PLACEHOLDER);
     formElementInputName.setAttribute('pattern', '[a-z0-9_]+');
     formElementInputName.setAttribute('type', 'text');
     formElementInputName.setAttribute('name', 'form_element_name[]');
@@ -356,6 +360,8 @@ export class PageForm {
 
     formElementInputTitle.classList.add('form__input');
     formElementInputTitle.classList.add('form__input_text');
+    formElementInputPlaceholder.classList.add('form__input');
+    formElementInputPlaceholder.classList.add('form__input_text');
     formElementInputName.classList.add('form__input');
     formElementInputName.classList.add('form__input_text');
     formElementInputDescription.classList.add('form__textarea');
@@ -388,17 +394,22 @@ export class PageForm {
     cellElementsForType[1].append(interactiveChoicesTypeField.target.element);
 
     const cellElementsForTitle = this.createCellFormElementElements(
-      localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_TITLE_TITLE,
+      localeData.PAGE_FORM_ELEMENT_TITLE_TITLE,
       formElementInputTitle
     );
 
+    const cellElementsForPlaceholder = this.createCellFormElementElements(
+      localeData.PAGE_FORM_ELEMENT_PLACEHOLDER_TITLE,
+      formElementInputPlaceholder
+    );
+
     const cellElementsForName = this.createCellFormElementElements(
-      localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_TECHNICAL_NAME_TITLE,
+      localeData.PAGE_FORM_ELEMENT_TECHNICAL_NAME_TITLE,
       formElementInputName
     );
 
     const cellElementsForDescription = this.createCellFormElementElements(
-      localeData.PAGE_SETTINGS_SETTING_STATIC_PAGES_ADDITIONAL_FIELD_DESCRIPTION_TITLE,
+      localeData.PAGE_FORM_ELEMENT_DESCRIPTION_TITLE,
       formElementInputDescription
     );
 
@@ -412,6 +423,10 @@ export class PageForm {
       });
 
       cellElementsForTitle.forEach(element => {
+        element.remove();
+      });
+
+      cellElementsForPlaceholder.forEach(element => {
         element.remove();
       });
 
@@ -468,6 +483,13 @@ export class PageForm {
       );
     });
 
+    cellElementsForPlaceholder.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
     cellElementsForEvents.forEach(element => {
       container.parentElement.parentElement.insertBefore(
         element,
@@ -480,6 +502,10 @@ export class PageForm {
       : '';
 
     formElementInputName.value = data.name !== undefined
+      ? data.name
+      : '';
+
+    formElementInputPlaceholder.value = data.name !== undefined
       ? data.name
       : '';
 

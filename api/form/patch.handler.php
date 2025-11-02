@@ -28,6 +28,8 @@ if ($CMSCore->client->isLogged(2)) {
 
     if (Form::existsByID($CMSCore, $formID)) {
       $form = new Form($CMSCore, $formID);
+      $form->initData(['elements']);
+
       $formData = [];
 
       $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
@@ -48,6 +50,32 @@ if ($CMSCore->client->isLogged(2)) {
 
             if (array_key_exists($inputTitleName, $_PATCH)) $formData['texts'][$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$inputTitleName]));
             if (array_key_exists($textareaDescriptionName, $_PATCH)) $formData['texts'][$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$textareaDescriptionName]));
+          }
+
+          $formElementTitles = isset($_PATCH['form_element_title']) ? $_PATCH['form_element_title'] : [];
+          $formElementDescriptions = isset($_PATCH['form_element_description']) ? $_PATCH['form_element_description'] : [];
+          $formElementPlaceholders = isset($_PATCH['form_element_placeholder']) ? $_PATCH['form_element_placeholder'] : [];
+          $formElementTypes = isset($_PATCH['form_element_type']) ? $_PATCH['form_element_type'] : [];
+          $formElementNames = isset($_PATCH['form_element_name']) ? $_PATCH['form_element_name'] : [];
+
+          if (count($formElementTitles) > 0) {
+            if (!array_key_exists('elements', $formData)) $formData['elements'] = $form->getElements();
+            
+            for ($i = 0; $i < count($formElementTitles); $i++) {
+              $elements = $form;
+
+              if (!isset($formData['elements'][$i])) $formData['elements'][$i] = [];
+              if (!isset($formData['elements'][$i]['texts'][$CMSLocaleName])) $formData['elements'][$i]['texts'][$CMSLocaleName] = [];
+
+              $formData['elements'][$i]['number'] = $i + 1;
+              $formData['elements'][$i]['type'] = $formElementTypes[$i];
+              $formData['elements'][$i]['name'] = $formElementNames[$i];
+              $formData['elements'][$i]['texts'][$CMSLocaleName] = [
+                'title' => $formElementTitles[$i],
+                'description' => $formElementDescriptions[$i],
+                'placeholder' => $formElementPlaceholders[$i]
+              ];
+            }
           }
         }
       }
