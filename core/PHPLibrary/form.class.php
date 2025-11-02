@@ -440,7 +440,7 @@ class Form implements EntityTypeContent
    * 
    * @return EntityTypeContent
    */
-  public static function create(CoreInterface $CMSCore, string $name, array $texts, array $metadata = []) : ?EntityTypeContent
+  public static function create(CoreInterface $CMSCore, string $name, array $texts, array $elements, array $metadata = []) : ?EntityTypeContent
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -462,6 +462,7 @@ class Form implements EntityTypeContent
 
     $texts = !empty($texts) ? json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
     $metadata = !empty($metadata) ? json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
+    $elements = !empty($elements) ? json_encode($elements, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '[]';
 
     try {
       $databaseConnection = $CMSCore->databaseConnector->database->connection;
@@ -469,6 +470,7 @@ class Form implements EntityTypeContent
       $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
       $databaseQuery->bindParam(':texts', $texts, \PDO::PARAM_STR);
       $databaseQuery->bindParam(':metadata', $metadata, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':elements', $elements, \PDO::PARAM_STR);
       $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
       $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
       $execute = $databaseQuery->execute();
@@ -538,7 +540,7 @@ class Form implements EntityTypeContent
       }
     }
 
-    foreach (['texts', 'metadata'] as $columnName) {
+    foreach (['texts', 'metadata', 'elements'] as $columnName) {
       $fieldsJSON = [];
       
       if (!isset($data[$columnName])) {
