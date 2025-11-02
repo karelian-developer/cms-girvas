@@ -264,7 +264,7 @@ class Form implements EntityTypeContent
       5 => 'PATCH'
     });
 
-    $DOMElement->setAttribute('class', 'form form_' . $this->getName());
+    $formElement->setAttribute('class', 'form form_' . $this->getName());
 
     foreach ($elements as $index => $element) {
       $DOMElementPlaceholder = $element['texts'][$CMSLocaleName]['placeholder'];
