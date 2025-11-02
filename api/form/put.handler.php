@@ -27,6 +27,8 @@ if ($CMSCore->client->isLogged(2)) {
     
     $formMethodID = $_PUT['form_method_id'] ?? 0;
     $formMethodID = (is_numeric($_PUT['form_method_id'])) ? (int)$_PUT['form_method_id'] : 0;
+    
+    $formAction = $_PUT['form_action'] ?? '';
 
     $texts = [];
 
@@ -53,8 +55,9 @@ if ($CMSCore->client->isLogged(2)) {
 
     $metadata = [];
     $metadata['methodID'] = $formMethodID;
+    $metadata['action'] = $formAction;
 
-    $form = Form::create($CMSCore, $formName, $texts, $metadata);
+    $form = Form::create($CMSCore, $formName, $texts, $elements, $metadata);
     if (!is_null($form)) {
       $handlerOutputData['form'] = [];
       $handlerOutputData['form']['id'] = $form->getID();

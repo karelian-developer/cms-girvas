@@ -27,6 +27,7 @@ if (is_numeric($CMSCore->urlp->getPath(2))) {
     $handlerOutputData['form']['id'] = $form->getID();
     $handlerOutputData['form']['name'] = $form->getName();
     $handlerOutputData['form']['methodID'] = $form->getMethodID();
+    $handlerOutputData['form']['action'] = $form->getAction();
     $handlerOutputData['form']['elements'] = $form->getElements();
     $handlerOutputData['form']['title'] = $form->getTitle($formLocale);
     $handlerOutputData['form']['description'] = $form->getDescription($formLocale);
