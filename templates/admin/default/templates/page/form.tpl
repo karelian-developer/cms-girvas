@@ -46,6 +46,18 @@
         <div class="cell grid-table__cell grid-table__cell_data">
           <textarea name="form_description_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_FORM_DESCRIPTION_PLACEHOLDER}" data-element="input-description" required>{FORM_DESCRIPTION}</textarea>
         </div>
+        <!-- Поле: Ссылка обработки -->
+        <div class="cell grid-table__cell grid-table__cell_text">
+          <div class="cell__title">
+            {LANG:PAGE_FORM_ACTION_TITLE}
+          </div>
+          <div class="cell__description">
+            {LANG:PAGE_FORM_ACTION_DESCRIPTION}
+          </div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <input name="form_action" type="text" class="input form__input form__input_text" value="{FORM_ACTION}" placeholder="{LANG:PAGE_FORM_ACTION_PLACEHOLDER}" data-element="input-action" required>
+        </div>
         <!-- Поле: Спецификация -->
         <div class="cell grid-table__cell grid-table__cell_text">
           <div class="cell__title">

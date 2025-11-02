@@ -78,6 +78,10 @@ class PageForm implements InterfacePage
         /** @var string Описание */
         $formDescription = $form->getDescription($localeName);
         $formDescription = strip_tags($formDescription);
+
+        /** @var string Ссылка обработки */
+        $formAction = $form->getAction();
+        $formAction = strip_tags($formAction);
       }
     }
     
@@ -87,7 +91,8 @@ class PageForm implements InterfacePage
         'FORM_ID' => $form !== null ? $formID : 0,
         'FORM_TITLE' => $form !== null ? $formTitle : '',
         'FORM_DESCRIPTION' => $form !== null ? $formDescription : '',
-        'FORM_NAME' => $form !== null ? $formName : ''
+        'FORM_NAME' => $form !== null ? $formName : '',
+        'FORM_ACTION' => $form !== null ? $formAction : ''
       ]
     );
   }

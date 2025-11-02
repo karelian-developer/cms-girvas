@@ -167,6 +167,24 @@ class Form implements EntityTypeContent
 
     return 'POST';
   }
+  
+  /**
+   * Получить ссылку обработки
+   *
+   * @return string
+   */
+  public function getAction() : string
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+      
+      if (isset($metadata['action'])) {
+        return $metadata['action'];
+      }
+    }
+
+    return '';
+  }
 
   /**
    * Получить тексты
