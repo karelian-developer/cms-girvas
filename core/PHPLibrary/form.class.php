@@ -283,6 +283,7 @@ class Form implements EntityTypeContent
     });
 
     $formElement->setAttribute('class', 'form form_' . $this->getName());
+    $formElement->setAttribute('action', $this->getAction());
 
     foreach ($elements as $index => $element) {
       $DOMElementPlaceholder = $element['texts'][$CMSLocaleName]['placeholder'];
