@@ -153,15 +153,15 @@ class Form implements EntityTypeContent
   /**
    * Получить метод
    *
-   * @return string
+   * @return int
    */
-  public function getMethodID() : string
+  public function getMethodID() : int
   {
     if (property_exists($this, 'metadata')) {
       $metadata = json_decode($this->metadata, true);
       
       if (isset($metadata['methodID'])) {
-        return strtoupper($metadata['methodID']);
+        return (int) $metadata['methodID'];
       }
     }
 
