@@ -262,13 +262,13 @@ class Form implements EntityTypeContent
     });
 
     foreach ($elements as $index => $element) {
-      $DOMElement = $element['type'] === 'text' 
+      $DOMElement = $element['type'] === 'textarea' 
         ? $document->createElement('textarea')
         : $document->createElement('input');
-      error_log(print_r($element, true));
-      if ($element['type'] !== 'text') {
+      
+      if ($element['type'] !== 'textarea') {
         $DOMElementType = match ($element['type']) {
-          'string' => 'text',
+          'text' => 'text',
           'number' => 'number',
           'date' => 'date'
         };
