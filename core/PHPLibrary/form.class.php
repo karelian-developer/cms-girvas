@@ -310,15 +310,19 @@ class Form implements EntityTypeContent
       $DOMElement->setAttribute('name', $DOMElementName);
 
       if ($DOMElementType === 'checkbox') {
-        $DOMElementDescription = html_entity_decode($DOMElementDescription, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $documentFragment = new DOMDocument();
+        $documentFragment->loadHTML('<div>' . $DOMElementDescription . '</div>');
+        $descriptionElements = $documentFragment->documentElement;
+        $descriptionElement = $document->importNode($descriptionElement->childNodes[0], true);
 
         $checkboxContainerElement = $document->createElement('div');
-        $checkboxContainerLabelElement = $document->createElement('div', $DOMElementDescription);
+        $checkboxContainerLabelElement = $document->createElement('div');
 
         $checkboxContainerElement->setAttribute('class', 'form__input-container input-container input-container_flex-checkbox');
         $checkboxContainerLabelElement->setAttribute('class', 'input-container__label label');
 
         $checkboxContainerElement->appendChild($DOMElement);
+        $checkboxContainerLabelElement->appendChild($descriptionElement);
         $checkboxContainerElement->appendChild($checkboxContainerLabelElement);
 
         $formElement->appendChild($checkboxContainerElement);
