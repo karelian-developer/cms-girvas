@@ -391,10 +391,10 @@ export class PageForm {
     interactiveChoicesTypeField.target.addItem('Text', 'text');
     interactiveChoicesTypeField.target.addItem('Number', 'number');
     interactiveChoicesTypeField.target.addItem('Date', 'date');
+    interactiveChoicesTypeField.target.addItem('Textarea', 'textarea');
     interactiveChoicesTypeField.target.addItem('EMail', 'email');
     interactiveChoicesTypeField.target.addItem('Phone', 'tel');
     interactiveChoicesTypeField.target.addItem('Checkbox', 'checkbox');
-    interactiveChoicesTypeField.target.addItem('Textarea', 'textarea');
     interactiveChoicesTypeField.target.setName('form_element_type[]');
     
     if (data.type !== undefined) {
