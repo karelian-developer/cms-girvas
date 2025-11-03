@@ -306,7 +306,10 @@ class Form implements EntityTypeContent
       
       if ($DOMElementType !== 'textarea') {
         $DOMElement->setAttribute('type', $DOMElementType);
+        $DOMElement->setAttribute('class', 'form__input form__' . $DOMElementType);
         $DOMElement->setAttribute('autocomplete', 'off');
+      } else {
+        $DOMElement->setAttribute('class', 'form__textarea');
       }
       
       $DOMElement->setAttribute('id', $DOMElementID);
