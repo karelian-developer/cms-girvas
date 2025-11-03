@@ -773,10 +773,10 @@ class Form implements EntityTypeContent
    */
   public function saveData(array $data) : bool
   {
-    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
     
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementInsert();
     $queryBuilder->statement->setTable('forms_data');
     $queryBuilder->statement->addColumn('form_id');
@@ -795,7 +795,7 @@ class Form implements EntityTypeContent
     try {
       $formID = $this->getID();
 
-      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       $databaseQuery->bindParam(':form_id', $formID, \PDO::PARAM_INT);
       $databaseQuery->bindParam(':data', $data, \PDO::PARAM_STR);
@@ -812,7 +812,7 @@ class Form implements EntityTypeContent
     }
 
     if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
-      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
       $queryBuilder->statement->setClauseFrom();
@@ -824,7 +824,7 @@ class Form implements EntityTypeContent
       $queryBuilder->statement->assembly();
 
       try {
-        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
         $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
         $databaseQuery->execute();
       } catch (PDOException $exception) {
@@ -847,10 +847,10 @@ class Form implements EntityTypeContent
    */
   public function getData() : array
   {
-    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
-    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['data']);
     $queryBuilder->statement->setClauseFrom();
@@ -868,7 +868,7 @@ class Form implements EntityTypeContent
     try {
       $formID = $this->getID();
 
-      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       $databaseQuery->bindParam(':form_id', $formID, \PDO::PARAM_INT);
       $databaseQuery->execute();
