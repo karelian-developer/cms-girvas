@@ -319,7 +319,7 @@ class Form implements EntityTypeContent
 
       if (!in_array($DOMElementType, ['submit', 'reset', 'checkbox'])) {
         $labelElement = $document->createElement('label', $DOMElementTitle);
-        $DOMElement->setAttribute('for', $DOMElementID);
+        $labelElement->setAttribute('for', $DOMElementID);
         $formElement->appendChild($labelElement);
       }
 
