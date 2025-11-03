@@ -274,6 +274,8 @@ class Form implements EntityTypeContent
     $elements = $this->getElements();
     $document = new DOMDocument('1.0', 'UTF-8');
 
+    $formName = $this->getName();
+
     $formElement = $document->createElement('form');
     $formElement->setAttribute('method', match ($this->getMethodID()) {
       1 => 'GET',
@@ -283,7 +285,7 @@ class Form implements EntityTypeContent
       5 => 'PATCH'
     });
 
-    $formElement->setAttribute('class', 'form form_' . $this->getName());
+    $formElement->setAttribute('class', 'form form_' . $formName);
     $formElement->setAttribute('action', $this->getAction());
 
     usort($elements, function($a, $b) {
@@ -291,26 +293,34 @@ class Form implements EntityTypeContent
     });
 
     foreach ($elements as $index => $element) {
+      $DOMElementName = $element['name'];
       $DOMElementTitle = $element['texts'][$CMSLocaleName]['title'];
       $DOMElementDescription = $element['texts'][$CMSLocaleName]['description'];
       $DOMElementPlaceholder = $element['texts'][$CMSLocaleName]['placeholder'];
       $DOMElementType = $element['type'];
+      $DOMElementID = 'FORM_' . strtoupper(str_replace('-', '_', $formName)) . '_' . strtoupper($DOMElementName);
 
       $DOMElement = $DOMElementType === 'textarea' 
         ? $document->createElement('textarea')
         : $document->createElement('input');
-
-      $DOMElementName = $element['name'];
       
       if ($DOMElementType !== 'textarea') {
         $DOMElement->setAttribute('type', $DOMElementType);
+        $DOMElement->setAttribute('autocomplete', 'off');
       }
       
+      $DOMElement->setAttribute('id', $DOMElementID);
       $DOMElement->setAttribute('placeholder', $DOMElementPlaceholder);
       $DOMElement->setAttribute('name', $DOMElementName);
 
-      if ($DOMElementType === 'submit' || $DOMElementType === 'reset') {
+      if (in_array($DOMElementType, ['submit', 'reset'])) {
         $DOMElement->setAttribute('value', $DOMElementTitle);
+      }
+
+      if (!in_array($DOMElementType, ['submit', 'reset', 'checkbox'])) {
+        $labelElement = $document->createElement('label', $DOMElementTitle);
+        $DOMElement->setAttribute('for', $DOMElementID);
+        $formElement->appendChild($labelElement);
       }
 
       if ($DOMElementType === 'checkbox') {
