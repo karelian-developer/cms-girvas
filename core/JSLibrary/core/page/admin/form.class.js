@@ -395,6 +395,8 @@ export class PageForm {
     interactiveChoicesTypeField.target.addItem('EMail', 'email');
     interactiveChoicesTypeField.target.addItem('Phone', 'tel');
     interactiveChoicesTypeField.target.addItem('Checkbox', 'checkbox');
+    interactiveChoicesTypeField.target.addItem('Button Submit', 'submit');
+    interactiveChoicesTypeField.target.addItem('Button Reset', 'reset');
     interactiveChoicesTypeField.target.setName('form_element_type[]');
     
     if (data.type !== undefined) {
@@ -406,6 +408,8 @@ export class PageForm {
         case 'email': interactiveChoicesTypeField.target.setItemSelectedIndex(4); break;
         case 'tel': interactiveChoicesTypeField.target.setItemSelectedIndex(5); break;
         case 'checkbox': interactiveChoicesTypeField.target.setItemSelectedIndex(6); break;
+        case 'submit': interactiveChoicesTypeField.target.setItemSelectedIndex(7); break;
+        case 'reset': interactiveChoicesTypeField.target.setItemSelectedIndex(8); break;
         default: interactiveChoicesTypeField.target.setItemSelectedIndex(0);
       }
     }
