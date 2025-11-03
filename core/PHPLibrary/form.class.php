@@ -261,7 +261,8 @@ class Form implements EntityTypeContent
    * 
    * @return int
    */
-  public function getEntriesCount() : int {
+  public function getEntriesCount() : int
+  {
     $entries = $this->getEntries();
     return count($entries);
   }
@@ -284,6 +285,10 @@ class Form implements EntityTypeContent
 
     $formElement->setAttribute('class', 'form form_' . $this->getName());
     $formElement->setAttribute('action', $this->getAction());
+
+    usort($elements, function($a, $b) {
+      return $a['sequenceNumber'] <=> $b['sequenceNumber']
+    });
 
     foreach ($elements as $index => $element) {
       $DOMElementPlaceholder = $element['texts'][$CMSLocaleName]['placeholder'];
@@ -327,9 +332,9 @@ class Form implements EntityTypeContent
    *
    * @param  array $columns
    * 
-   * @return void
+   * @return ?array
    */
-  private function getDatabaseColumnsData(array $columns = ['*']) : array|null
+  private function getDatabaseColumnsData(array $columns = ['*']) : ?array
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
