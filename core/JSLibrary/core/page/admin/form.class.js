@@ -109,7 +109,7 @@ export class PageForm {
         }, (rejectionReason) => {
           this.page.showPopupNotification(rejectionReason, 0);
         }).then((response) => {
-          return (response.ok) ? response.json() : Promise.reject(response);
+          return response.ok ? response.json() : Promise.reject(response);
         }).then((data) => {
           if (data.outputData.hasOwnProperty('methods')) {
             if (data.outputData.methods.length > 0) {
@@ -161,7 +161,7 @@ export class PageForm {
 
       // Получаем все установленные языковые пакеты
       fetch('/handler/form/' + searchParams.getPathPart(3) + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
-        return (response.ok) ? response.json() : Promise.reject(response);
+        return response.ok ? response.json() : Promise.reject(response);
       }).then((data) => {
         const elements = data.outputData.form.elements;
         elements.forEach((element, elementIndex) => {
@@ -177,7 +177,8 @@ export class PageForm {
             title: elementTitle,
             description: elementDescription,
             placeholder: elementPlaceholder,
-            name: element.name
+            name: element.name,
+            sequenceNumber: element.sequenceNumber
           });
         });
       });
@@ -340,6 +341,7 @@ export class PageForm {
     const formElementInputName = document.createElement('input');
     const formElementInputDescription = document.createElement('textarea');
     const formElementInputPlaceholder = document.createElement('input');
+    const formElementInputSequenceNumber = document.createElement('input');
     
     cellHeaderElement.classList.add('cell');
     cellHeaderElement.classList.add('grid-table__cell');
@@ -364,6 +366,10 @@ export class PageForm {
     formElementInputName.setAttribute('required', 'required');
     formElementInputDescription.setAttribute('name', 'form_element_description[]');
     formElementInputDescription.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_DESCRIPTION_PLACEHOLDER);
+    formElementInputSequenceNumber.setAttribute('type', 'number');
+    formElementInputSequenceNumber.setAttribute('name', 'form_element_sequence_number[]');
+    formElementInputSequenceNumber.setAttribute('placeholder', 4);
+    formElementInputSequenceNumber.setAttribute('required', 'required');
 
     formElementInputTitle.classList.add('form__input');
     formElementInputTitle.classList.add('form__input_text');
@@ -372,26 +378,34 @@ export class PageForm {
     formElementInputName.classList.add('form__input');
     formElementInputName.classList.add('form__input_text');
     formElementInputDescription.classList.add('form__textarea');
+    formElementInputSequenceNumber.classList.add('form__input');
+    formElementInputSequenceNumber.classList.add('form__input_number');
 
     const cellElementsForType = this.createCellFormElementElements(
-      localeData.PAGE_FORM_ELEMENT_TYPE_FIELD_TITLE
+      localeData.PAGE_FORM_ELEMENT_TYPE_TITLE
     );
 
     /* Выпадающий список с типами полей */
 
     const interactiveChoicesTypeField = new Interactive('choices');
-    interactiveChoicesTypeField.target.addItem('String', 'text');
+    interactiveChoicesTypeField.target.addItem('Text', 'text');
     interactiveChoicesTypeField.target.addItem('Number', 'number');
     interactiveChoicesTypeField.target.addItem('Date', 'date');
-    interactiveChoicesTypeField.target.addItem('Text', 'textarea');
+    interactiveChoicesTypeField.target.addItem('EMail', 'email');
+    interactiveChoicesTypeField.target.addItem('Phone', 'tel');
+    interactiveChoicesTypeField.target.addItem('Checkbox', 'checkbox');
+    interactiveChoicesTypeField.target.addItem('Textarea', 'textarea');
     interactiveChoicesTypeField.target.setName('form_element_type[]');
     
-    if (typeof data.type != 'undefined') {
+    if (data.type !== undefined) {
       switch (data.type) {
         case 'text': interactiveChoicesTypeField.target.setItemSelectedIndex(0); break;
         case 'number': interactiveChoicesTypeField.target.setItemSelectedIndex(1); break;
         case 'date': interactiveChoicesTypeField.target.setItemSelectedIndex(2); break;
         case 'textarea': interactiveChoicesTypeField.target.setItemSelectedIndex(3); break;
+        case 'email': interactiveChoicesTypeField.target.setItemSelectedIndex(4); break;
+        case 'tel': interactiveChoicesTypeField.target.setItemSelectedIndex(5); break;
+        case 'checkbox': interactiveChoicesTypeField.target.setItemSelectedIndex(6); break;
         default: interactiveChoicesTypeField.target.setItemSelectedIndex(0);
       }
     }
@@ -420,6 +434,11 @@ export class PageForm {
       formElementInputDescription
     );
 
+    const cellElementsForSequenceNumber = this.createCellFormElementElements(
+      localeData.PAGE_FORM_ELEMENT_SEQUENCE_NUMBER_TITLE,
+      formElementInputSequenceNumber
+    );
+
     const buttonRemoveField = new Interactive('button');
     buttonRemoveField.target.setLabel(localeData.BUTTON_DELETE_LABEL);
     buttonRemoveField.target.setCallback((event) => {
@@ -442,6 +461,10 @@ export class PageForm {
       });
 
       cellElementsForDescription.forEach(element => {
+        element.remove();
+      });
+
+      cellElementsForSequenceNumber.forEach(element => {
         element.remove();
       });
 
@@ -497,6 +520,13 @@ export class PageForm {
       );
     });
 
+    cellElementsForSequenceNumber.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
     cellElementsForEvents.forEach(element => {
       container.parentElement.parentElement.insertBefore(
         element,
@@ -519,5 +549,9 @@ export class PageForm {
     formElementInputDescription.value = data.description !== undefined
       ? data.description
       : '';
+
+    formElementInputSequenceNumber.value = data.sequenceNumber !== undefined
+      ? data.sequenceNumber
+      : 0;
   }
 }

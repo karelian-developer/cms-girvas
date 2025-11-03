@@ -83,7 +83,7 @@ if ($CMSCore->client->isLogged(2)) {
               $texts[$CMSLocaleName]['SEODescription'] = $textareaValue;
             }
 
-            if (array_key_exists($textareaKeywordsName, $_PATCH)) {
+            if (array_key_exists($textareaKeywordsName, $_PUT)) {
               $textareaValue = $_PUT[$textareaKeywordsName];
               $textareaValue = strip_tags($textareaValue);
               $textareaValue = str_replace('\'', '"', $textareaValue);

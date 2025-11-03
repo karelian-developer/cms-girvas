@@ -295,19 +295,26 @@ class Form implements EntityTypeContent
       $DOMElementName = $element['name'];
       
       if ($element['type'] !== 'textarea') {
-        $DOMElementType = match ($element['type']) {
-          'text' => 'text',
-          'number' => 'number',
-          'date' => 'date'
-        };
-
         $DOMElement->setAttribute('type', $DOMElementType);
       }
       
       $DOMElement->setAttribute('placeholder', $DOMElementPlaceholder);
       $DOMElement->setAttribute('name', $DOMElementName);
 
-      $formElement->appendChild($DOMElement);
+      if ($element['type'] === 'checkbox') {
+        $checkboxContainerElement = $document->createElement('div');
+        $checkboxContainerLabelElement = $document->createElement('div');
+
+        $checkboxContainerElement->setAttribute('class', 'form__input-container input-container input-container_flex-checkbox');
+        $checkboxContainerLabelElement->setAttribute('class', 'input-container__label label');
+
+        $checkboxContainerElement->appendChild($DOMElement);
+        $checkboxContainerElement->appendChild($checkboxContainerLabelElement);
+
+        $formElement->appendChild($checkboxContainerElement);
+      } else {
+        $formElement->appendChild($DOMElement);
+      }
     }
 
     $document->appendChild($formElement);
@@ -624,10 +631,17 @@ class Form implements EntityTypeContent
       }
 
       if (!empty($data[$columnName])) {
-        $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-          'mysql' => 'JSON_MERGE_PATCH(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
-          'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
-        ]);
+        if ($columnName === 'elements') {
+          $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
+            'mysql' => 'CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON)',
+            'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
+          ]);
+        } else {
+          $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
+            'mysql' => 'JSON_MERGE_PATCH(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
+            'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
+          ]);
+        }
       }
     }
 
