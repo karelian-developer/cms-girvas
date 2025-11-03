@@ -182,7 +182,7 @@ class PageEntries implements InterfacePage
       foreach ($entriesObjects as $entryObject) {
         $entryObject->initData(['id', 'categoryID', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
         
-        $entryCategory = $entry->getCategory();
+        $entryCategory = $entryObject->getCategory();
             
         if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CATEGORY_TITLE')) {
           ThemeCollector::addTemplateVariable(
@@ -192,9 +192,9 @@ class PageEntries implements InterfacePage
           );
         }
 
-        $entryCreatedUnixTimestamp = $entry->getCreatedUnixTimestamp();
-        $entryPublishedUnixTimestamp = $entry->getPublishedUnixTimestamp();
-        $entryUpdatedUnixTimestamp = $entry->getUpdatedUnixTimestamp();
+        $entryCreatedUnixTimestamp = $entryObject->getCreatedUnixTimestamp();
+        $entryPublishedUnixTimestamp = $entryObject->getPublishedUnixTimestamp();
+        $entryUpdatedUnixTimestamp = $entryObject->getUpdatedUnixTimestamp();
 
         if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CREATED_DATE_TIMESTAMP')) {
           ThemeCollector::addTemplateVariable(
@@ -356,7 +356,7 @@ class PageEntries implements InterfacePage
           ThemeCollector::addTemplateVariable(
             $templatesAssembled,
             'ENTRY_ID',
-            $entry->getID()
+            $entryObject->getID()
           );
         }
 
@@ -364,7 +364,7 @@ class PageEntries implements InterfacePage
           ThemeCollector::addTemplateVariable(
             $templatesAssembled,
             'ENTRY_NAME',
-            $entry->getName()
+            $entryObject->getName()
           );
         }
 
@@ -372,7 +372,7 @@ class PageEntries implements InterfacePage
           ThemeCollector::addTemplateVariable(
             $templatesAssembled,
             'ENTRY_TITLE',
-            $entry->getTitle($localeName)
+            $entryObject->getTitle($localeName)
           );
         }
 
@@ -380,7 +380,7 @@ class PageEntries implements InterfacePage
           ThemeCollector::addTemplateVariable(
             $templatesAssembled,
             'ENTRY_DESCRIPTION',
-            $entry->getDescription($localeName)
+            $entryObject->getDescription($localeName)
           );
         }
 
@@ -388,7 +388,7 @@ class PageEntries implements InterfacePage
           ThemeCollector::addTemplateVariable(
             $templatesAssembled,
             'ENTRY_URL',
-            $entry->getURL()
+            $entryObject->getURL()
           );
         }
 
@@ -396,7 +396,7 @@ class PageEntries implements InterfacePage
           ThemeCollector::addTemplateVariable(
             $templatesAssembled,
             'ENTRY_PREVIEW_URL',
-            $entry->getPreviewURL() !== '' ? $entry->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 512)
+            $entryObject->getPreviewURL() !== '' ? $entryObject->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 512)
           );
         }
 
