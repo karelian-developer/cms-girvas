@@ -408,7 +408,7 @@ class PageEntries implements InterfacePage
           );
         }
 
-        if (!empty($entryTitle) && !empty($entryDescription) && !empty($entryContent)) {
+        if (isset($templatesAssembled['ENTRY_TITLE']) && isset($templatesAssembled['ENTRY_DESCRIPTION'])) {
           $entriesArrayTemplates[] = ThemeCollector::assemblyFileContent(
             $this->CMSCore->theme,
             'templates/page/entries/entriesList/item.tpl',
