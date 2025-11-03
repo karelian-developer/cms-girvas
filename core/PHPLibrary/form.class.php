@@ -292,21 +292,22 @@ class Form implements EntityTypeContent
 
     foreach ($elements as $index => $element) {
       $DOMElementPlaceholder = $element['texts'][$CMSLocaleName]['placeholder'];
+      $DOMElementType = $element['type'];
 
-      $DOMElement = $element['type'] === 'textarea' 
+      $DOMElement = $DOMElementType === 'textarea' 
         ? $document->createElement('textarea')
         : $document->createElement('input');
 
       $DOMElementName = $element['name'];
       
-      if ($element['type'] !== 'textarea') {
+      if ($DOMElementType !== 'textarea') {
         $DOMElement->setAttribute('type', $DOMElementType);
       }
       
       $DOMElement->setAttribute('placeholder', $DOMElementPlaceholder);
       $DOMElement->setAttribute('name', $DOMElementName);
 
-      if ($element['type'] === 'checkbox') {
+      if ($DOMElementType === 'checkbox') {
         $checkboxContainerElement = $document->createElement('div');
         $checkboxContainerLabelElement = $document->createElement('div');
 
