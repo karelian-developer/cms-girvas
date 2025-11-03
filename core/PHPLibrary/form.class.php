@@ -310,6 +310,8 @@ class Form implements EntityTypeContent
       $DOMElement->setAttribute('name', $DOMElementName);
 
       if ($DOMElementType === 'checkbox') {
+        $DOMElementDescription = html_entity_decode($DOMElementDescription, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
         $checkboxContainerElement = $document->createElement('div');
         $checkboxContainerLabelElement = $document->createElement('div', $DOMElementDescription);
 
