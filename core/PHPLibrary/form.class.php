@@ -291,6 +291,8 @@ class Form implements EntityTypeContent
     });
 
     foreach ($elements as $index => $element) {
+      $DOMElementTitle = $element['texts'][$CMSLocaleName]['title'];
+      $DOMElementDescription = $element['texts'][$CMSLocaleName]['description'];
       $DOMElementPlaceholder = $element['texts'][$CMSLocaleName]['placeholder'];
       $DOMElementType = $element['type'];
 
@@ -309,7 +311,7 @@ class Form implements EntityTypeContent
 
       if ($DOMElementType === 'checkbox') {
         $checkboxContainerElement = $document->createElement('div');
-        $checkboxContainerLabelElement = $document->createElement('div');
+        $checkboxContainerLabelElement = $document->createElement('div', $DOMElementDescription);
 
         $checkboxContainerElement->setAttribute('class', 'form__input-container input-container input-container_flex-checkbox');
         $checkboxContainerLabelElement->setAttribute('class', 'input-container__label label');
