@@ -360,7 +360,8 @@
   margin-bottom: 10px;
 }
 
-.form__input-container > input {
+.form__input-container > input,
+.form__input-container > textarea {
   box-sizing: border-box;
   width: 100%;
 }
