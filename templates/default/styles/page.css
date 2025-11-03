@@ -352,21 +352,25 @@
   width: fit-content;
 }
 
-.form__input-container {
+.form .form__input-container {
   position: relative;
 }
 
-.form__input-container ~ .form__label {
+.form .form__input-container.form__input_checkbox {
   margin-bottom: 10px;
 }
 
-.form__input-container > input,
-.form__input-container > textarea {
+.form .form__label {
+  margin-bottom: 10px;
+}
+
+.form .form__input-container > input,
+.form .form__input-container > textarea {
   box-sizing: border-box;
   width: 100%;
 }
 
-.form__input-container > .form__input-tip {
+.form .form__input-container > .form__input-tip {
   position: absolute;
   font-size: 12px;
   height: 15px;
@@ -376,6 +380,6 @@
   transition: opacity .2s;
 }
 
-.form__input-container:hover > .form__input-tip {
+.form .form__input-container:hover > .form__input-tip {
   opacity: 1;
 }
