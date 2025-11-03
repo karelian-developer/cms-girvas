@@ -287,7 +287,7 @@ class Form implements EntityTypeContent
     $formElement->setAttribute('action', $this->getAction());
 
     usort($elements, function($a, $b) {
-      return $a['sequenceNumber'] <=> $b['sequenceNumber']
+      return $a['sequenceNumber'] <=> $b['sequenceNumber'];
     });
 
     foreach ($elements as $index => $element) {
