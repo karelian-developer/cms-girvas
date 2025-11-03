@@ -313,7 +313,7 @@ class Form implements EntityTypeContent
         $DOMElementDescription = mb_convert_encoding($DOMElementDescription, 'HTML-ENTITIES', 'UTF-8');
 
         $documentFragment = new DOMDocument('1.0', 'UTF-8');
-        $documentFragment->loadHTML($DOMElementDescription, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $documentFragment->loadHTML('<div>' . $DOMElementDescription . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         $descriptionElement = $document->importNode($documentFragment->documentElement->firstChild, true);
 
         $checkboxContainerElement = $document->createElement('div');
