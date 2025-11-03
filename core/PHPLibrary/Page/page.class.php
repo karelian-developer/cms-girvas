@@ -1,15 +1,26 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary\Page;
 
+use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Page as Page;
@@ -23,21 +34,36 @@ use \DateTimeZone as DateTimeZone;
 
 class PagePage implements InterfacePage
 {
-  public SystemCore $CMSCore;
-  public Page $page;
   public string $assembled = '';
+  private ?EntityTypeContent $targetObject = null;
 
   /**
    * __construct
    *
-   * @param  SystemCore $CMSCore
-   * @param  Page $page
+   * @param  CMSCore $CMSCore
+   * @param  InterfacePage $page
+   * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore, Page $page)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->page = $page;
+  public function __construct(
+    public CMSCore $CMSCore,
+    public InterfacePage $page
+  ) {
+    $this->initTargetObject();
+
+    if ($this->targetObject !== null) {
+      $this->targetObject->initData(
+        [
+          'id',
+          'authorID',
+          'texts',
+          'name',
+          'createdUnixTimestamp',
+          'updatedUnixTimestamp',
+          'metadata'
+        ]
+      );
+    }
   }
 
   /**
@@ -70,6 +96,8 @@ class PagePage implements InterfacePage
    */
   public function isVisible(bool $isPublished, ?User $user) : bool
   {
+    $publishedUnixTimestamp = $this->targetObject->getPublishedUnixTimestamp();
+
     if ($isPublished) {
       return true;
     }
@@ -85,6 +113,32 @@ class PagePage implements InterfacePage
     }
 
     return false;
+  }
+
+  /**
+   * Инициализировать целевой объект страницы
+   * 
+   * @return void
+   */
+  private function initTargetObject() : void
+  {
+    if ($this->CMSCore->urlp->getPath(1) !== null) {
+      $name = urldecode($this->CMSCore->urlp->getPath(1));
+
+      if (PageStatic::existsByName($this->CMSCore, $name)) {
+        $this->targetObject = PageStatic::getByName($this->CMSCore, $name);
+      }
+    }
+  }
+
+  /**
+   * Получить целевой объект страницы
+   * 
+   * @return ?EntityTypeContent
+   */
+  public function getTargetObject() : ?EntityTypeContent
+  {
+    return $this->targetObject;
   }
   
   /**
