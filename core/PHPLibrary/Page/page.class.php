@@ -22,7 +22,8 @@ namespace core\PHPLibrary\Page;
 
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
-use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\NadvoParse as NadvoParse;
@@ -40,13 +41,13 @@ class PagePage implements InterfacePage
   /**
    * __construct
    *
-   * @param  CMSCore $CMSCore
+   * @param  CoreInterface $CMSCore
    * @param  InterfacePage $page
    * 
    * @return void
    */
   public function __construct(
-    public CMSCore $CMSCore,
+    public CoreInterface $CMSCore,
     public InterfacePage $page
   ) {
     $this->initTargetObject();
