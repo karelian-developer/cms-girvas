@@ -309,6 +309,10 @@ class Form implements EntityTypeContent
       $DOMElement->setAttribute('placeholder', $DOMElementPlaceholder);
       $DOMElement->setAttribute('name', $DOMElementName);
 
+      if ($DOMElementType === 'submit' || $DOMElementType === 'reset') {
+        $DOMElement->setAttribute('value', $DOMElementTitle);
+      }
+
       if ($DOMElementType === 'checkbox') {
         $DOMElementDescription = mb_convert_encoding($DOMElementDescription, 'HTML-ENTITIES', 'UTF-8');
 
