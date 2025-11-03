@@ -343,7 +343,7 @@ class Form implements EntityTypeContent
         $DOMElementContainerElement->appendChild($DOMElementContainerLabelElement);
       }
 
-      $formElement->->appendChild($DOMElementContainerElement);
+      $formElement->appendChild($DOMElementContainerElement);
     }
 
     $document->appendChild($formElement);
