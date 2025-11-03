@@ -317,6 +317,10 @@ class Form implements EntityTypeContent
         $DOMElement->setAttribute('value', $DOMElementTitle);
       }
 
+      $DOMElementContainerElement = $document->createElement('div');
+      $DOMElementContainerElement->setAttribute('class', 'form__input-container input-container');
+      $DOMElementContainerElement->appendChild($DOMElement);
+
       if (!in_array($DOMElementType, ['submit', 'reset', 'checkbox'])) {
         $labelElement = $document->createElement('label', $DOMElementTitle);
         $labelElement->setAttribute('for', $DOMElementID);
@@ -330,20 +334,16 @@ class Form implements EntityTypeContent
         $documentFragment->loadHTML($DOMElementDescription, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         $descriptionElement = $document->importNode($documentFragment->documentElement, true);
 
-        $checkboxContainerElement = $document->createElement('div');
-        $checkboxContainerLabelElement = $document->createElement('div');
+        $DOMElementContainerLabelElement = $document->createElement('div');
 
-        $checkboxContainerElement->setAttribute('class', 'form__input-container input-container input-container_flex-checkbox');
-        $checkboxContainerLabelElement->setAttribute('class', 'input-container__label label');
+        $DOMElementContainerElement->setAttribute('class', 'form__input-container input-container input-container_flex-checkbox');
+        $DOMElementContainerLabelElement->setAttribute('class', 'input-container__label label');
 
-        $checkboxContainerElement->appendChild($DOMElement);
-        $checkboxContainerLabelElement->appendChild($descriptionElement);
-        $checkboxContainerElement->appendChild($checkboxContainerLabelElement);
-
-        $formElement->appendChild($checkboxContainerElement);
-      } else {
-        $formElement->appendChild($DOMElement);
+        $DOMElementContainerLabelElement->appendChild($descriptionElement);
+        $DOMElementContainerElement->appendChild($DOMElementContainerLabelElement);
       }
+
+      $formElement->->appendChild($DOMElementContainerElement);
     }
 
     $document->appendChild($formElement);
