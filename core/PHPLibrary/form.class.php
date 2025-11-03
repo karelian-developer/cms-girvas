@@ -313,7 +313,7 @@ class Form implements EntityTypeContent
         $documentFragment = new DOMDocument();
         $documentFragment->loadHTML('<div>' . $DOMElementDescription . '</div>');
         $descriptionElements = $documentFragment->documentElement;
-        $descriptionElement = $document->importNode($descriptionElement->childNodes[0], true);
+        $descriptionElement = $document->importNode($descriptionElements->childNodes[0], true);
 
         $checkboxContainerElement = $document->createElement('div');
         $checkboxContainerLabelElement = $document->createElement('div');
