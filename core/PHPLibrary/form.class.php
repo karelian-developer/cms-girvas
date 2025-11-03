@@ -763,4 +763,125 @@ class Form implements EntityTypeContent
 
     return $execute ? true : false;
   }
+
+  /**
+   * Сохранение данных с формы
+   *
+   * @param  array $data
+   * 
+   * @return bool
+   */
+  public function saveData(array $data) : bool
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementInsert();
+    $queryBuilder->statement->setTable('forms_data');
+    $queryBuilder->statement->addColumn('form_id');
+    $queryBuilder->statement->addColumn('data');
+    $queryBuilder->statement->addColumn('createdUnixTimestamp');
+    $queryBuilder->statement->addColumn('updatedUnixTimestamp');
+    $queryBuilder->statement->setClauseReturning();
+    $queryBuilder->statement->clauseReturning->addColumn('id');
+    $queryBuilder->statement->assembly();
+
+    $createdUnixTimestamp = time();
+    $updatedUnixTimestamp = $createdUnixTimestamp;
+
+    $data = !empty($data) ? json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
+    
+    try {
+      $formID = $this->getID();
+
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':form_id', $formID, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':data', $data, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+      $execute = $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementSelect();
+      $queryBuilder->statement->addSelections(['id']);
+      $queryBuilder->statement->setClauseFrom();
+      $queryBuilder->statement->clauseFrom->addTable('forms');
+      $queryBuilder->statement->clauseFrom->assembly();
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->assembly();
+      $queryBuilder->statement->assembly();
+
+      try {
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
+    }
+
+    return $execute ? true : false;
+  }
+
+  /**
+   * Полученить данных с формы
+   * 
+   * @return array
+   */
+  public function getData() : array
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['data']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('forms_data');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`form_id` = :form_id',
+      'postgresql' => '"form_id" = :form_id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $formID = $this->getID();
+
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':form_id', $formID, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ?? null;
+  }
 }

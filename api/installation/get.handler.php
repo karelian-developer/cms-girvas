@@ -605,6 +605,26 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $execute = $databaseQuery->execute();
 
       // =======================
+      // ТАБЛИЦА ДЛЯ ДАННЫХ С ФОРМ
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('forms_data');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('form_id', 'integer', 'NOT NULL');
+      $queryBuilder->statement->addColumn('data', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      $execute = $databaseQuery->execute();
+
+      // =======================
       // ТАБЛИЦА СТАТИЧЕСКИХ СТРАНИЦ
       // =======================
 

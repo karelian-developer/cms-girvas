@@ -30,21 +30,22 @@ if (is_numeric($CMSCore->urlp->getPath(2))) {
 
   if (Form::existsByID($CMSCore, $formID)) {
     $form = new Form($CMSCore, $formID);
-    $form->initData(['name', 'texts', 'metadata', 'elements', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+    $form->initData(['name', 'metadata', 'elements']);
     $formLocale = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
 
-    $handlerOutputData['form'] = [];
-    $handlerOutputData['form']['id'] = $form->getID();
-    $handlerOutputData['form']['name'] = $form->getName();
-    $handlerOutputData['form']['methodID'] = $form->getMethodID();
-    $handlerOutputData['form']['action'] = $form->getAction();
-    $handlerOutputData['form']['elements'] = $form->getElements();
-    $handlerOutputData['form']['title'] = $form->getTitle($formLocale);
-    $handlerOutputData['form']['description'] = $form->getDescription($formLocale);
-    $handlerOutputData['form']['createdUnixTimestamp'] = $form->getCreatedUnixTimestamp();
-    $handlerOutputData['form']['updatedUnixTimestamp'] = $form->getUpdatedUnixTimestamp();
+    $formName = $form->getName();
+    $formData = [];
 
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+    foreach($_POST as $POSTDataKey => $POSTData) {
+      if (preg_match('/^' . $formName . '_([a-z0-9_]+)$/', $POSTDataKey, $matches, PREG_OFFSET_CAPTURE)) {
+        $formFieldName = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $matches[1][0]))));
+        $formData[$formFieldName] = $POSTData;
+      }
+    };
+
+    $form->saveData($formData);
+
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_POST_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
   } else {
     $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_FORM_ERROR_NOT_FOUND');
