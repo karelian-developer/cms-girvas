@@ -310,8 +310,8 @@ class Form implements EntityTypeContent
       $DOMElement->setAttribute('name', $DOMElementName);
 
       if ($DOMElementType === 'checkbox') {
-        $documentFragment = new DOMDocument();
-        $documentFragment->loadHTML('<div>' . mb_convert_encoding($DOMElementDescription, 'UTF-8', 'Windows-1252') . '</div>');
+        $documentFragment = new DOMDocument('1.0', 'UTF-8');
+        $documentFragment->loadHTML('<div>' . $DOMElementDescription . '</div>');
         $descriptionElements = $documentFragment->documentElement;
         $descriptionElement = $document->importNode($descriptionElements->childNodes[0], true);
 
