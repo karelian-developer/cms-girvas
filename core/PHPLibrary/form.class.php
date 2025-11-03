@@ -293,7 +293,7 @@ class Form implements EntityTypeContent
     });
 
     foreach ($elements as $index => $element) {
-      $DOMElementName = $element['name'];
+      $DOMElementName = $formName . '_' . $element['name'];
       $DOMElementTitle = $element['texts'][$CMSLocaleName]['title'];
       $DOMElementDescription = $element['texts'][$CMSLocaleName]['description'];
       $DOMElementPlaceholder = $element['texts'][$CMSLocaleName]['placeholder'];
