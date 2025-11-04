@@ -311,6 +311,7 @@ class PageAnalytics implements InterfacePage
     $CMSTheme->addStyle(['href' => 'styles/page/analytics.css', 'rel' => 'stylesheet']);
     
     $localeData = $CMSLocale->getData();
+    $localeName = $CMSLocale->getName();
 
     if ($CMSURLP->getPath(2) === 'entry' && $CMSURLP->getPath(3) !== null) {
       $entry = null;
