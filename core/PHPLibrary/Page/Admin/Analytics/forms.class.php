@@ -46,10 +46,17 @@ class PageForms implements InterfacePage
     'index' => [
       'name' => 'index',
       'iconName' => 'index',
-      'link' => '/analytics',
+      'link' => '/',
       'permanent' => true,
       'isActive' => false
     ],
+    'forms' => [
+      'name' => 'forms',
+      'iconName' => 'forms',
+      'link' => '/analytics/forms',
+      'permanent' => true,
+      'isActive' => true
+    ]
   ];
 
   /**
@@ -113,81 +120,81 @@ class PageForms implements InterfacePage
     $localeName = $this->CMSCore->locale->getName();
 
     $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null
-        ? (int) $this->CMSCore->urlp->getParam('pageNumber')
-        : 0;
-      $paginationItemsOnPage = 12;
+      ? (int) $this->CMSCore->urlp->getParam('pageNumber')
+      : 0;
+    $paginationItemsOnPage = 12;
 
-      $formsTableItemsAssembled = [];
-      $forms = new Forms($this->CMSCore);
-      $formsObjects = $forms->getAll([
-        'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
-      ]);
+    $formsTableItemsAssembled = [];
+    $forms = new Forms($this->CMSCore);
+    $formsObjects = $forms->getAll([
+      'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
+    ]);
 
-      $pagination = new Pagination($this->CMSCore, $forms->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
-      $pagination->assembly();
+    $pagination = new Pagination($this->CMSCore, $forms->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
+    $pagination->assembly();
 
-      unset($forms);
+    unset($forms);
 
-      foreach ($formsObjects as $index => $object) {
-        $object->initData(['id', 'texts', 'name', 'elements', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
-        $objectID = $object->getID();
-        $objectName = $object->getName();
+    foreach ($formsObjects as $index => $object) {
+      $object->initData(['id', 'texts', 'name', 'elements', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+      $objectID = $object->getID();
+      $objectName = $object->getName();
 
-        /** @var string Дата создания в формате d.m.Y H:i:s */
-        $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
-        /** @var string Дата обновления в формате d.m.Y H:i:s */
-        $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
+      /** @var string Дата создания в формате d.m.Y H:i:s */
+      $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
+      /** @var string Дата обновления в формате d.m.Y H:i:s */
+      $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
-        /** @var string Заголовок */
-        $objectTitle = $object->getTitle($localeName);
-        $objectTitle = strip_tags($objectTitle);
+      /** @var string Заголовок */
+      $objectTitle = $object->getTitle($localeName);
+      $objectTitle = strip_tags($objectTitle);
 
-        /** @var string Описание */
-        $objectDescription = $object->getDescription($localeName);
-        $objectDescription = strip_tags($objectDescription);
-        
-        $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
-        $completedLocalesList = $this->assemblyLocalesItems($completedLocalesData);
+      /** @var string Описание */
+      $objectDescription = $object->getDescription($localeName);
+      $objectDescription = strip_tags($objectDescription);
+      
+      $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
+      $completedLocalesList = $this->assemblyLocalesItems($completedLocalesData);
 
-        $formMethodID = $object->getMethodID();
-        $formMethod = match ($formMethodID) {
-          1 => 'GET',
-          2 => 'POST',
-          3 => 'PUT',
-          4 => 'DELETE',
-          5 => 'PATCH',
-        };
+      $formMethodID = $object->getMethodID();
+      $formMethod = match ($formMethodID) {
+        1 => 'GET',
+        2 => 'POST',
+        3 => 'PUT',
+        4 => 'DELETE',
+        5 => 'PATCH',
+      };
 
-        $formsTableItemsAssembled[] = ThemeCollector::assemblyFileContent(
-          $this->CMSCore->theme,
-          'templates/page/analytics/forms/item.tpl',
-          [
-            'FORM_INDEX' => $index,
-            'FORM_ID' => $objectID,
-            'FORM_NAME' => $objectName,
-            'FORM_TITLE' => $objectTitle,
-            'FORM_DESCRIPTION' => $objectDescription,
-            'FORM_METHOD' => $formMethod,
-            'FORM_LOCALES_LIST' => $completedLocalesList,
-            'FORM_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
-            'FORM_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
-          ]
-        );
-      }
-
-      $this->assembled = ThemeCollector::assemblyFileContent(
+      $formsTableItemsAssembled[] = ThemeCollector::assemblyFileContent(
         $this->CMSCore->theme,
-        'templates/page/analytics/forms.tpl',
+        'templates/page/analytics/forms/item.tpl',
         [
-          'PAGE_PAGINATION' => $pagination->assembled,
-          'PAGE_TABLE' => ThemeCollector::assemblyFileContent(
-            $this->CMSCore->theme,
-            'templates/page/analytics/forms/wrapper.tpl',
-            [
-              'PAGE_ITEMS' => implode($formsTableItemsAssembled)
-            ]
-          )
+          'FORM_INDEX' => $index,
+          'FORM_ID' => $objectID,
+          'FORM_NAME' => $objectName,
+          'FORM_TITLE' => $objectTitle,
+          'FORM_DESCRIPTION' => $objectDescription,
+          'FORM_METHOD' => $formMethod,
+          'FORM_LOCALES_LIST' => $completedLocalesList,
+          'FORM_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
+          'FORM_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
         ]
       );
+    }
+
+    $this->assembled = ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme,
+      'templates/page/analytics/forms.tpl',
+      [
+        'PAGE_PAGINATION' => $pagination->assembled,
+        'PAGE_TABLE' => ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme,
+          'templates/page/analytics/forms/wrapper.tpl',
+          [
+            'PAGE_ITEMS' => implode($formsTableItemsAssembled)
+          ]
+        )
+      ]
+    );
   }
 }

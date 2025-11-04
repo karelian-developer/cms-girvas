@@ -779,7 +779,7 @@ class Form implements EntityTypeContent
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementInsert();
     $queryBuilder->statement->setTable('forms_data');
-    $queryBuilder->statement->addColumn('form_id');
+    $queryBuilder->statement->addColumn('formID');
     $queryBuilder->statement->addColumn('data');
     $queryBuilder->statement->addColumn('createdUnixTimestamp');
     $queryBuilder->statement->addColumn('updatedUnixTimestamp');
@@ -797,7 +797,7 @@ class Form implements EntityTypeContent
 
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':form_id', $formID, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':formID', $formID, \PDO::PARAM_INT);
       $databaseQuery->bindParam(':data', $data, \PDO::PARAM_STR);
       $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
       $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
@@ -852,14 +852,14 @@ class Form implements EntityTypeContent
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections(['data']);
+    $queryBuilder->statement->addSelections(['*']);
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('forms_data');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
     $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`form_id` = :form_id',
-      'postgresql' => '"form_id" = :form_id'
+      'mysql' => '`formID` = :formID',
+      'postgresql' => '"formID" = :formID'
     ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
@@ -870,7 +870,7 @@ class Form implements EntityTypeContent
 
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':form_id', $formID, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':formID', $formID, \PDO::PARAM_INT);
       $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
