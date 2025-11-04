@@ -99,21 +99,22 @@ class PageForm implements InterfacePage
     $pagination->assembly();
 
     foreach ($formsDatas as $dataIndex => $data) {
+      $dataArray = json_decode($data['data'], true);
+
       $document = new DOMDocument('1.0', 'UTF-8');
       $documentFragment = $document->createDocumentFragment();
 
       $listElement = $document->createElement('ul');
 
-      print_r(json_decode($data['data'], true));
       foreach ($formsElements as $elementIndex => $elementData) {
         $elementName = $elementData['name'];
         
-        if (isset($data['data'][$elementName])) {
+        if (isset($dataArray[$elementName])) {
           $elementTitle = isset($elementData['texts'][$localeName]['title'])
             ? $elementData['texts'][$localeName]['title']
             : $elementName;
           
-          $itemElement = $document->createElement('li', $elementTitle . ': ' . $data['data'][$elementName]);
+          $itemElement = $document->createElement('li', $elementTitle . ': ' . $dataArray[$elementName]);
           $listElement->appendChild($itemElement);
         }
       }
