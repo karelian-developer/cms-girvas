@@ -89,7 +89,6 @@ class PageEntry implements InterfacePage
       ? $entryTitle
       : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $localeName);
 
-    /** @var string $site_page Содержимое шаблона страницы */
     $this->assembled = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme, 'templates/page/analytics/entry.tpl',
       [

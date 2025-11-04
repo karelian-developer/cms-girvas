@@ -1,12 +1,23 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
+
 
 namespace core\PHPLibrary\Page\Admin;
 
@@ -302,8 +313,8 @@ class PageAnalytics implements InterfacePage
 
         $page = new PageAnalyticsEntry($this->CMSCore, $this->page, $entry);
         
-        if (method_exists($page, 'initSubnavigation')) {
-          $page->initSubnavigation();
+        if (property_exists($page, 'navigationSubsections')) {
+          $this->navigationSubsections = $page->navigationSubsections;
         }
 
         $page->assembly();
@@ -327,8 +338,8 @@ class PageAnalytics implements InterfacePage
 
         $page = new PageAnalyticsPageStatic($this->CMSCore, $this->page, $pageStatic);
         
-        if (method_exists($page, 'initSubnavigation')) {
-          $page->initSubnavigation();
+        if (property_exists($page, 'navigationSubsections')) {
+          $this->navigationSubsections = $page->navigationSubsections;
         }
 
         $page->assembly();

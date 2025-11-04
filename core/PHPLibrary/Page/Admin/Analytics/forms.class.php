@@ -25,16 +25,17 @@ use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
-use \core\PHPLibrary\PageStatic as PageStatic;
+use \core\PHPLibrary\Entry as Entry;
+use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
 
 /**
- * Страница со списком записей
+ * Страница со списком форм
  */
-class PagePage implements InterfacePage
+class PageForms implements InterfacePage
 {
   use TraitPage;
 
@@ -54,12 +55,12 @@ class PagePage implements InterfacePage
    * 
    * @param CoreInterface $CMSCore
    * @param InterfacePage $page
-   * @param EntityTypeContent $pageStatic
+   * @param EntityTypeContent $entry
    */
   public function __construct(
     public CoreInterface $CMSCore,
     public InterfacePage $page,
-    public PageStatic $pageStatic
+    public EntityTypeContent $entry
   ) {}
 
   /**
@@ -83,19 +84,14 @@ class PagePage implements InterfacePage
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
 
-    $pageStaticTitle = $this->pageStatic->getTitle($localeName);
-    $pageStaticTitle = !empty($pageStaticTitle)
-      ? $pageStaticTitle
+    $entryTitle = $this->entry->getTitle($localeName);
+    $entryTitle = !empty($entryTitle)
+      ? $entryTitle
       : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $localeName);
 
     $this->assembled = ThemeCollector::assemblyFileContent(
-      $this->CMSCore->theme,
-      'templates/page/analytics/page.tpl',
-      [
-        'ADMIN_PANEL_PAGE_NAME' => 'analytics',
-        'PAGE_ANALYTICS_PAGE_STATIC_TITLE' => sprintf($localeData['PAGE_ANALYTICS_PAGE_STATIC_TITLE'], $pageStaticTitle),
-        'PAGE_STATIC_NAME' => $this->pageStatic->getName()
-      ]
+      $this->CMSCore->theme, 'templates/page/analytics/forms.tpl',
+      []
     );
   }
 }
