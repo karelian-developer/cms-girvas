@@ -24,6 +24,7 @@ namespace core\PHPLibrary\Page\Admin;
 use \core\PHPLibrary\Page\Admin\Analytics\PageEntry as PageAnalyticsEntry;
 use \core\PHPLibrary\Page\Admin\Analytics\PagePage as PageAnalyticsPageStatic;
 use \core\PHPLibrary\Page\Admin\Analytics\PageForms as PageAnalyticsForms;
+use \core\PHPLibrary\Page\Admin\Analytics\PageForm as PageAnalyticsForm;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
@@ -382,7 +383,18 @@ class PageAnalytics implements InterfacePage
       $page->assembly();
 
       $this->assembled = $page->assembled;
+    } elseif ($CMSURLP->getPath(2) === 'form' && $CMSURLP->getPath(3) !== null) {
+      $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics/form.css', 'rel' => 'stylesheet']);
 
+      $page = new PageAnalyticsForm($this->CMSCore, $this->page);
+        
+      if (property_exists($page, 'navigationSubsections')) {
+        $this->navigationSubsections = $page->navigationSubsections;
+      }
+
+      $page->assembly();
+
+      $this->assembled = $page->assembled;
     } else {
       $metrics = new Metrics($this->CMSCore);
       $metricsEntries = $metrics->getEntriesViewsByTimestamp(time());
