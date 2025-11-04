@@ -106,7 +106,9 @@ class PageForm implements InterfacePage
 
       foreach ($formsElements as $elementIndex => $elementData) {
         $elementName = $elementData['name'];
-
+        error_log(print_r($elementData, true));
+        error_log(print_r($data['data'], true));
+        error_log('======');
         if (isset($data['data'][$elementName])) {
           $elementTitle = isset($elementData['texts'][$localeName]['title'])
             ? $elementData['texts'][$localeName]['title']
