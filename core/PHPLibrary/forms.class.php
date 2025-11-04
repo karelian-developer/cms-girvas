@@ -75,7 +75,7 @@ final class Forms
 
     if ($results) {
       foreach ($results as $data) {
-        array_push($array, new Form($this->CMSCore, $data['id']));
+        $array[] = new Form($this->CMSCore, $data['id']);
       }
     }
 

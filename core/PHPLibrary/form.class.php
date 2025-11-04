@@ -881,7 +881,15 @@ class Form implements EntityTypeContent
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-    return $result ?? null;
+    $array = [];
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+
+    if ($results) {
+      foreach ($results as $data) {
+        $array[] = $data;
+      }
+    }
+
+    return $array;
   }
 }
