@@ -149,6 +149,15 @@ class PageForms implements InterfacePage
         $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
         $completedLocalesList = $this->assemblyLocalesItems($completedLocalesData);
 
+        $formMethodID = $object->getMethodID();
+        $formMethod = match ($formMethodID) {
+          1 => 'GET',
+          2 => 'POST',
+          3 => 'PUT',
+          4 => 'DELETE',
+          5 => 'PATCH',
+        };
+
         $formsTableItemsAssembled[] = ThemeCollector::assemblyFileContent(
           $this->CMSCore->theme,
           'templates/page/analytics/forms/item.tpl',
