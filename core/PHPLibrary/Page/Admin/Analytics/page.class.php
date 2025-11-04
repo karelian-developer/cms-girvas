@@ -24,6 +24,7 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
+use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;

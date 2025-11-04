@@ -13,11 +13,13 @@ namespace core\PHPLibrary\Page\Admin;
 use \core\PHPLibrary\Page\Admin\Analytics\PageEntry as PageAnalyticsEntry;
 use \core\PHPLibrary\Page\Admin\Analytics\PagePage as PageAnalyticsPageStatic;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
-use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\Metrics as Metrics;
+use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\Pages as PagesStatic;
@@ -38,8 +40,6 @@ class PageAnalytics implements InterfacePage
 
   const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ANALYTICS_NAVIGATION_%s_LABEL';
 
-  public SystemCore $CMSCore;
-  public Page $page;
   public string $assembled = '';
   public array $navigationSubsections = [
     'back' => [
@@ -54,14 +54,13 @@ class PageAnalytics implements InterfacePage
   /**
    * __construct
    * 
-   * @param SystemCore $CMSCore
-   * @param Page $page
+   * @param CoreInterface $CMSCore
+   * @param InterfacePage $page
    */
-  public function __construct(SystemCore $CMSCore, Page $page)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->page = $page;
-  }
+  public function __construct(
+    public CoreInterface $CMSCore,
+    public InterfacePage $page
+  ) {}
 
   /**
    * Инициализация подразделов
@@ -394,39 +393,45 @@ class PageAnalytics implements InterfacePage
   /**
    * Получение объекта статической страницы по ID
    * 
-   * @param SystemCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param int $id
    * 
    * @return ?PageStatic
    */
-  private function getPageStaticObjectByID(SystemCore $CMSCore, int $id) : ?PageStatic
+  private function getPageStaticObjectByID(CoreInterface $CMSCore, int $id) : ?PageStatic
   {
-    return PageStatic::existsByID($CMSCore, $id) ? new PageStatic($CMSCore, $id) : null;
+    return PageStatic::existsByID($CMSCore, $id)
+      ? new PageStatic($CMSCore, $id)
+      : null;
   }
 
   /**
    * Получение объекта записи по ID
    * 
-   * @param SystemCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param int $id
    * 
-   * @return ?Entry
+   * @return ?EntityTypeContent
    */
-  private function getEntryObjectByID(SystemCore $CMSCore, int $id) : ?Entry
+  private function getEntryObjectByID(CoreInterface $CMSCore, int $id) : ?EntityTypeContent
   {
-    return Entry::existsByID($CMSCore, $id) ? new Entry($CMSCore, $id) : null;
+    return Entry::existsByID($CMSCore, $id)
+      ? new Entry($CMSCore, $id)
+      : null;
   }
 
   /**
    * Получение ID сущности контента через URL
    * 
-   * @param SystemCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param CMSURLP $CMSURLP
    * 
    * @return int
    */
-  private function getContentEntityIDFromURL(SystemCore $CMSCore, CMSURLP $CMSURLP) : int
+  private function getContentEntityIDFromURL(CoreInterface $CMSCore, CMSURLP $CMSURLP) : int
   {
-    return is_numeric($CMSURLP->getPath(3)) ? (int) $CMSURLP->getPath(3) : 0;
+    return is_numeric($CMSURLP->getPath(3))
+      ? (int) $CMSURLP->getPath(3)
+      : 0;
   }
 }
