@@ -95,7 +95,6 @@ class PageForm implements InterfacePage
     $formsElements = $this->form->getElements();
     $formsData = $this->form->getData();
     $formsDatas = array_slice($formsData, $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
-    error_log(print_r($formsDatas, true));
     $pagination = new Pagination($this->CMSCore, count($formsData), $paginationItemsOnPage, $paginationItemCurrent);
     $pagination->assembly();
 
@@ -108,12 +107,12 @@ class PageForm implements InterfacePage
       foreach ($formsElements as $elementIndex => $elementData) {
         $elementName = $elementData['name'];
 
-        if ($data[$elementName]) {
+        if (isset($data[$data][$elementName])) {
           $elementTitle = isset($elementData['texts'][$localeName]['title'])
             ? $elementData['texts'][$localeName]['title']
             : $elementName;
           
-          $itemElement = $document->createElement('li', $elementTitle . ': ' . $data[$elementName]);
+          $itemElement = $document->createElement('li', $elementTitle . ': ' . $data[$data][$elementName]);
           $listElement->appendChild($itemElement);
         }
       }
