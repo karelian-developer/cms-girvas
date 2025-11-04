@@ -390,6 +390,7 @@ class PageAnalytics implements InterfacePage
       $form = $this->getFormObjectByID($this->CMSCore, $formID);
       
       if ($form !== null) {
+        $form->initData(['texts', 'elements']);
         $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics/form.css', 'rel' => 'stylesheet']);
 
         $page = new PageAnalyticsForm($this->CMSCore, $this->page, $form);
