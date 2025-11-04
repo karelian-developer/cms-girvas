@@ -105,6 +105,7 @@ class PageForm implements InterfacePage
       $documentFragment = $document->createDocumentFragment();
 
       $listElement = $document->createElement('ul');
+      $listElement->setAttribute('class', 'list');
 
       foreach ($formsElements as $elementIndex => $elementData) {
         $elementName = $elementData['name'];
@@ -116,6 +117,12 @@ class PageForm implements InterfacePage
           
           $itemElement = $document->createElement('li', $elementTitle . ': ' . $dataArray[$elementName]);
           $listElement->appendChild($itemElement);
+
+          $titleElement =  $document->createElement('span', $elementTitle);
+          $dataElement =  $document->createElement('span', $dataArray[$elementName]);
+
+          $titleElement->setAttribute('class', 'list__title');
+          $dataElement->setAttribute('class', 'list__data');
         }
       }
 

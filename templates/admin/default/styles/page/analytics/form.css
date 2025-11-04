@@ -66,6 +66,25 @@
   grid-area: description;
 }
 
+.grid-table__cell_description ul {
+  padding-left: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.grid-table__cell_description li .list__title {
+  font-weight: 500;
+  margin-right: 5px;
+}
+
+.grid-table__cell_description li .list__title::after {
+  content: ':';
+}
+
+.grid-table__cell_description li .list__data {
+  opacity: .6;
+}
+
 .grid-table__cell_locales {
   display: flex;
   font-size: 12px;
