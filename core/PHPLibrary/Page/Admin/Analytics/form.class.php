@@ -104,9 +104,9 @@ class PageForm implements InterfacePage
 
       $listElement = $document->createElement('ul');
 
+      print_r($data['data']);
       foreach ($formsElements as $elementIndex => $elementData) {
         $elementName = $elementData['name'];
-        print_r($data['data'][$elementName]);
         
         if (isset($data['data'][$elementName])) {
           $elementTitle = isset($elementData['texts'][$localeName]['title'])
