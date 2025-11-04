@@ -139,7 +139,7 @@
   .grid-table__panel-list {
     display: grid;
     grid-template-areas: 
-      'edit remove';
+      'result';
     gap: 10px;
     width: 100%;
   }
@@ -148,8 +148,7 @@
 @media (max-width: 400px) {
   .grid-table__panel-list {
     grid-template-areas:
-      'edit'
-      'remove';
+      'result';
   }
 }
 

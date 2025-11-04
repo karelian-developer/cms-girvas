@@ -401,74 +401,15 @@ class PageAnalytics implements InterfacePage
     } elseif ($CMSURLP->getPath(2) === 'forms') {
       $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics/forms.css', 'rel' => 'stylesheet']);
 
-      $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null
-        ? (int) $this->CMSCore->urlp->getParam('pageNumber')
-        : 0;
-      $paginationItemsOnPage = 12;
-
-      $formsTableItemsAssembled = [];
-      $forms = new Forms($this->CMSCore);
-      $formsObjects = $forms->getAll([
-        'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
-      ]);
-
-      $pagination = new Pagination($this->CMSCore, $forms->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
-      $pagination->assembly();
-
-      unset($forms);
-
-      foreach ($formsObjects as $index => $object) {
-        $object->initData(['id', 'texts', 'name', 'elements', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
-        $objectID = $object->getID();
-        $objectName = $object->getName();
-
-        /** @var string Дата создания в формате d.m.Y H:i:s */
-        $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
-        /** @var string Дата обновления в формате d.m.Y H:i:s */
-        $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
-
-        /** @var string Заголовок */
-        $objectTitle = $object->getTitle($localeName);
-        $objectTitle = strip_tags($objectTitle);
-
-        /** @var string Описание */
-        $objectDescription = $object->getDescription($localeName);
-        $objectDescription = strip_tags($objectDescription);
+      $page = new PageAnalyticsForms($this->CMSCore, $this->page);
         
-        $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
-        $completedLocalesList = $this->assemblyLocalesItems($completedLocalesData);
-
-        $formsTableItemsAssembled[] = ThemeCollector::assemblyFileContent(
-          $this->CMSCore->theme,
-          'templates/page/analytics/forms/item.tpl',
-          [
-            'FORM_INDEX' => $index,
-            'FORM_ID' => $objectID,
-            'FORM_NAME' => $objectName,
-            'FORM_TITLE' => $objectTitle,
-            'FORM_DESCRIPTION' => $objectDescription,
-            'FORM_METHOD' => $formMethod,
-            'FORM_LOCALES_LIST' => $completedLocalesList,
-            'FORM_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
-            'FORM_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
-          ]
-        );
+      if (property_exists($page, 'navigationSubsections')) {
+        $this->navigationSubsections = $page->navigationSubsections;
       }
 
-      $this->assembled = ThemeCollector::assemblyFileContent(
-        $this->CMSCore->theme,
-        'templates/page/analytics/forms.tpl',
-        [
-          'PAGE_PAGINATION' => $pagination->assembled,
-          'PAGE_TABLE' => ThemeCollector::assemblyFileContent(
-            $this->CMSCore->theme,
-            'templates/page/analytics/forms/wrapper.tpl',
-            [
-              'PAGE_ITEMS' => implode($formsTableItemsAssembled)
-            ]
-          )
-        ]
-      );
+      $page->assembly();
+
+      $this->assembled = $page->assembled;
 
     } else {
       $metrics = new Metrics($this->CMSCore);

@@ -55,12 +55,10 @@ class PageForms implements InterfacePage
    * 
    * @param CoreInterface $CMSCore
    * @param InterfacePage $page
-   * @param EntityTypeContent $entry
    */
   public function __construct(
     public CoreInterface $CMSCore,
-    public InterfacePage $page,
-    public EntityTypeContent $entry
+    public InterfacePage $page
   ) {}
 
   /**
@@ -84,14 +82,73 @@ class PageForms implements InterfacePage
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
 
-    $entryTitle = $this->entry->getTitle($localeName);
-    $entryTitle = !empty($entryTitle)
-      ? $entryTitle
-      : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $localeName);
+    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null
+        ? (int) $this->CMSCore->urlp->getParam('pageNumber')
+        : 0;
+      $paginationItemsOnPage = 12;
 
-    $this->assembled = ThemeCollector::assemblyFileContent(
-      $this->CMSCore->theme, 'templates/page/analytics/forms.tpl',
-      []
-    );
+      $formsTableItemsAssembled = [];
+      $forms = new Forms($this->CMSCore);
+      $formsObjects = $forms->getAll([
+        'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
+      ]);
+
+      $pagination = new Pagination($this->CMSCore, $forms->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
+      $pagination->assembly();
+
+      unset($forms);
+
+      foreach ($formsObjects as $index => $object) {
+        $object->initData(['id', 'texts', 'name', 'elements', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+        $objectID = $object->getID();
+        $objectName = $object->getName();
+
+        /** @var string Дата создания в формате d.m.Y H:i:s */
+        $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
+        /** @var string Дата обновления в формате d.m.Y H:i:s */
+        $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
+
+        /** @var string Заголовок */
+        $objectTitle = $object->getTitle($localeName);
+        $objectTitle = strip_tags($objectTitle);
+
+        /** @var string Описание */
+        $objectDescription = $object->getDescription($localeName);
+        $objectDescription = strip_tags($objectDescription);
+        
+        $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
+        $completedLocalesList = $this->assemblyLocalesItems($completedLocalesData);
+
+        $formsTableItemsAssembled[] = ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme,
+          'templates/page/analytics/forms/item.tpl',
+          [
+            'FORM_INDEX' => $index,
+            'FORM_ID' => $objectID,
+            'FORM_NAME' => $objectName,
+            'FORM_TITLE' => $objectTitle,
+            'FORM_DESCRIPTION' => $objectDescription,
+            'FORM_METHOD' => $formMethod,
+            'FORM_LOCALES_LIST' => $completedLocalesList,
+            'FORM_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
+            'FORM_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
+          ]
+        );
+      }
+
+      $this->assembled = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/analytics/forms.tpl',
+        [
+          'PAGE_PAGINATION' => $pagination->assembled,
+          'PAGE_TABLE' => ThemeCollector::assemblyFileContent(
+            $this->CMSCore->theme,
+            'templates/page/analytics/forms/wrapper.tpl',
+            [
+              'PAGE_ITEMS' => implode($formsTableItemsAssembled)
+            ]
+          )
+        ]
+      );
   }
 }

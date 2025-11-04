@@ -1,7 +1,7 @@
 <article class="main__page page page_forms">
   <nav id="SYSTEM_AP_SUBNAVIGATION" class="page__navigation navigation"></nav>
   <div class="page__title-container">
-    <h1 class="page__title">{LANG:PAGE_FORMS_TITLE}</h1>
+    <h1 class="page__title">{LANG:PAGE_ANALYTICS_FORMS_TITLE}</h1>
     <div id="E8548530785" class="page__interactive-container"></div>
   </div>
   <div class="page__pagination">

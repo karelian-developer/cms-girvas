@@ -1,6 +1,6 @@
 <div class="grid-table__item grid-table__item_form" data-element="form" data-id="{FORM_ID}">
   <div class="grid-table__cell grid-table__cell_title">
-    <a class="grid-table__link" href="/admin/form/{FORM_ID}" target="_blank">{FORM_TITLE}</a>
+    <a class="grid-table__link" href="/admin/analytics/form/{FORM_ID}" target="_blank">{FORM_TITLE}</a>
     <span class="grid-table__id">ID: {FORM_ID}</span>
   </div>
   <div class="grid-table__cell grid-table__cell_description">
@@ -30,11 +30,8 @@
   </div>
   <div class="grid-table__cell grid-table__cell_panel" data-element="panel">
     <ul class="grid-table__panel-list">
-      <li class="grid-table__panel-item grid-table__panel-item_edit">
-        <a href="/admin/form/{FORM_ID}" class="grid-table__panel-link">Редактировать</a>
-      </li>
-      <li class="grid-table__panel-item grid-table__panel-item_remove" data-event="remove">
-        <a href="#" class="grid-table__panel-link grid-table__panel-link_red">Удалить</a>
+      <li class="grid-table__panel-item grid-table__panel-item_result">
+        <a href="/admin/analytics/form/{FORM_ID}" class="grid-table__panel-link">Результаты</a>
       </li>
     </ul>
   </div>
