@@ -104,7 +104,7 @@ class PageForm implements InterfacePage
 
       $listElement = $document->createElement('ul');
 
-      print_r($data['data']);
+      print_r(json_decode($data['data'], true));
       foreach ($formsElements as $elementIndex => $elementData) {
         $elementName = $elementData['name'];
         
