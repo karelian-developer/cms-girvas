@@ -107,12 +107,12 @@ class PageForm implements InterfacePage
       foreach ($formsElements as $elementIndex => $elementData) {
         $elementName = $elementData['name'];
 
-        if (isset($data[$data][$elementName])) {
+        if (isset($data['data'][$elementName])) {
           $elementTitle = isset($elementData['texts'][$localeName]['title'])
             ? $elementData['texts'][$localeName]['title']
             : $elementName;
           
-          $itemElement = $document->createElement('li', $elementTitle . ': ' . $data[$data][$elementName]);
+          $itemElement = $document->createElement('li', $elementTitle . ': ' . $data['data'][$elementName]);
           $listElement->appendChild($itemElement);
         }
       }
@@ -124,10 +124,10 @@ class PageForm implements InterfacePage
         $this->CMSCore->theme,
         'templates/page/analytics/form/item.tpl',
         [
-          'FORM_DATA_ID' => $formsData['id'],
+          'FORM_DATA_ID' => $data['id'],
           'FORM_DATA_INDEX' => $dataIndex,
           'FORM_DATA' => $document->saveHTML(),
-          'FORM_DATA_CREATED_DATE_TIMESTAMP' => $formsData['createdUnixTimestamp']
+          'FORM_DATA_CREATED_DATE_TIMESTAMP' => date('d.m.Y H:i:s', $data['createdUnixTimestamp'])
         ]
       );
     }
