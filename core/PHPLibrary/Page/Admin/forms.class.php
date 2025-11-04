@@ -110,7 +110,7 @@ class PageForms implements InterfacePage
   }
 
   /**
-   * Сборка списка локализаций для записи
+   * Сборка списка локализаций для форм
    * 
    * @param array $localesData
    * 
