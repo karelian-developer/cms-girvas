@@ -38,6 +38,7 @@ use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\Pages as PagesStatic;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\Form as Form;
 use \core\PHPLibrary\Forms as Forms;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
@@ -384,17 +385,30 @@ class PageAnalytics implements InterfacePage
 
       $this->assembled = $page->assembled;
     } elseif ($CMSURLP->getPath(2) === 'form' && $CMSURLP->getPath(3) !== null) {
-      $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics/form.css', 'rel' => 'stylesheet']);
+      $form = null;
+      $formID = $this->getContentEntityIDFromURL($this->CMSCore, $CMSURLP);
+      $form = $this->getFormObjectByID($this->CMSCore, $formID);
+      
+      if ($form !== null) {
+        $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics/form.css', 'rel' => 'stylesheet']);
 
-      $page = new PageAnalyticsForm($this->CMSCore, $this->page);
+        $page = new PageAnalyticsForm($this->CMSCore, $this->page);
+          
+        if (property_exists($page, 'navigationSubsections')) {
+          $this->navigationSubsections = $page->navigationSubsections;
+        }
+
+        $page->assembly();
+
+        $this->assembled = $page->assembled;
+      } else {
+        http_response_code(404);
+
+        $pageError = new PageError($this->CMSCore, $this->page, 404);
+        $pageError->assembly();
         
-      if (property_exists($page, 'navigationSubsections')) {
-        $this->navigationSubsections = $page->navigationSubsections;
+        $this->assembled = $pageError->assembled;
       }
-
-      $page->assembly();
-
-      $this->assembled = $page->assembled;
     } else {
       $metrics = new Metrics($this->CMSCore);
       $metricsEntries = $metrics->getEntriesViewsByTimestamp(time());
@@ -449,12 +463,27 @@ class PageAnalytics implements InterfacePage
    * @param CoreInterface $CMSCore
    * @param int $id
    * 
-   * @return ?PageStatic
+   * @return ?EntityTypeContent
    */
-  private function getPageStaticObjectByID(CoreInterface $CMSCore, int $id) : ?PageStatic
+  private function getPageStaticObjectByID(CoreInterface $CMSCore, int $id) : ?EntityTypeContent
   {
-    return PageStatic::existsByID($CMSCore, $id)
-      ? new PageStatic($CMSCore, $id)
+    return Form::existsByID($CMSCore, $id)
+      ? new Form($CMSCore, $id)
+      : null;
+  }
+
+  /**
+   * Получение объекта формы по ID
+   * 
+   * @param CoreInterface $CMSCore
+   * @param int $id
+   * 
+   * @return ?EntityTypeContent
+   */
+  private function getFormObjectByID(CoreInterface $CMSCore, int $id) : ?EntityTypeContent
+  {
+    return Form::existsByID($CMSCore, $id)
+      ? new Form($CMSCore, $id)
       : null;
   }
 
