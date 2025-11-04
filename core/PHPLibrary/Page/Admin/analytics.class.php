@@ -94,34 +94,6 @@ class PageAnalytics implements InterfacePage
   }
 
   /**
-   * Сборка списка локализаций для форм
-   * 
-   * @param array $localesData
-   * 
-   * @return string
-   */
-  private function assemblyLocalesItems(array $localesData) : string
-  {
-    $document = new DOMDocument('1.0', 'UTF-8');
-
-    foreach ($localesData as $localeData) {
-      $itemElement = $document->createElement('li', $localeData['title']);
-      $itemElement->setAttribute('class', 'grid-table__locale');
-
-      if (!empty($localeData['iconURL'])) {
-        $iconElement = $document->createElement('img');
-        $iconElement->setAttribute('class', 'grid-table__locale-icon');
-        $iconElement->setAttribute('src', $localeData['iconURL']);
-        $itemElement->prepend($iconElement);
-      }
-
-      $document->appendChild($itemElement);
-    }
-
-    return $document->saveHTML();
-  }
-
-  /**
    * Сборка таблицы с записями
    * 
    * @param array $entries
