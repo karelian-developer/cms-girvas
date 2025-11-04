@@ -862,7 +862,6 @@ class Form implements EntityTypeContent
       'postgresql' => '"formID" = :formID'
     ]);
     $queryBuilder->statement->clauseWhere->assembly();
-    $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
 
     try {
