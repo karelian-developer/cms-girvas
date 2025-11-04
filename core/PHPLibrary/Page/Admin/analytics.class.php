@@ -23,6 +23,7 @@ namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\Page\Admin\Analytics\PageEntry as PageAnalyticsEntry;
 use \core\PHPLibrary\Page\Admin\Analytics\PagePage as PageAnalyticsPageStatic;
+use \core\PHPLibrary\Page\Admin\Analytics\PageForms as PageAnalyticsForms;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
@@ -36,6 +37,7 @@ use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\Pages as PagesStatic;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\Forms as Forms;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
 use \core\PHPLibrary\Users as Users;
@@ -360,6 +362,78 @@ class PageAnalytics implements InterfacePage
         
         $this->assembled = $pageError->assembled;
       }
+    } elseif ($CMSURLP->getPath(2) === 'forms') {
+      $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics/forms.css', 'rel' => 'stylesheet']);
+
+      $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null
+        ? (int) $this->CMSCore->urlp->getParam('pageNumber')
+        : 0;
+      $paginationItemsOnPage = 12;
+
+      $formsTableItemsAssembled = [];
+      $forms = new Forms($this->CMSCore);
+      $formsObjects = $forms->getAll([
+        'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
+      ]);
+
+      $pagination = new Pagination($this->CMSCore, $forms->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
+      $pagination->assembly();
+
+      unset($forms);
+
+      foreach ($formsObjects as $index => $object) {
+        $object->initData(['id', 'texts', 'name', 'elements', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+        $objectID = $object->getID();
+        $objectName = $object->getName();
+
+        /** @var string Дата создания в формате d.m.Y H:i:s */
+        $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
+        /** @var string Дата обновления в формате d.m.Y H:i:s */
+        $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
+
+        /** @var string Заголовок */
+        $objectTitle = $object->getTitle($localeName);
+        $objectTitle = strip_tags($objectTitle);
+
+        /** @var string Описание */
+        $objectDescription = $object->getDescription($localeName);
+        $objectDescription = strip_tags($objectDescription);
+        
+        $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
+        $completedLocalesList = $this->assemblyLocalesItems($completedLocalesData);
+
+        $formsTableItemsAssembled[] = ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme,
+          'templates/page/analytics/forms/item.tpl',
+          [
+            'FORM_INDEX' => $index,
+            'FORM_ID' => $objectID,
+            'FORM_NAME' => $objectName,
+            'FORM_TITLE' => $objectTitle,
+            'FORM_DESCRIPTION' => $objectDescription,
+            'FORM_METHOD' => $formMethod,
+            'FORM_LOCALES_LIST' => $completedLocalesList,
+            'FORM_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
+            'FORM_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
+          ]
+        );
+      }
+
+      $this->assembled = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/analytics/forms.tpl',
+        [
+          'PAGE_PAGINATION' => $pagination->assembled,
+          'PAGE_TABLE' => ThemeCollector::assemblyFileContent(
+            $this->CMSCore->theme,
+            'templates/page/analytics/forms/wrapper.tpl',
+            [
+              'PAGE_ITEMS' => implode($formsTableItemsAssembled)
+            ]
+          )
+        ]
+      );
+
     } else {
       $metrics = new Metrics($this->CMSCore);
       $metricsEntries = $metrics->getEntriesViewsByTimestamp(time());
