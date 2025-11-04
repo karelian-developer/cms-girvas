@@ -60,6 +60,13 @@ class PageAnalytics implements InterfacePage
       'permanent' => true,
       'isActive' => false
     ],
+    'forms' => [
+      'name' => 'forms',
+      'iconName' => 'forms',
+      'link' => '/analytics/forms',
+      'permanent' => false,
+      'isActive' => false
+    ]
   ];
 
   /**

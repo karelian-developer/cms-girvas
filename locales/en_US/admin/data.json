@@ -98,6 +98,7 @@
   "PAGE_ANALYTICS_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_3": "Using website analytics data, resource owners can make informed decisions to improve user experience, increase conversions, and improve overall site performance. Analytics helps to identify the successes and weaknesses of the site, as well as evaluate the effectiveness of marketing campaigns, which allows you to optimize your development strategy and achieve your goals.",
   "PAGE_ANALYTICS_NAVIGATION_BACK_LABEL": "Dashboard",
   "PAGE_ANALYTICS_NAVIGATION_INDEX_LABEL": "General analytics",
+  "PAGE_ANALYTICS_NAVIGATION_FORMS_LABEL": "Forms",
   "PAGE_INDEX_TITLE": "Content management system \"GIRVAS\"",
   "PAGE_INDEX_STEP_START_SETTINGS_TITLE": "Initial setup",
   "PAGE_INDEX_STEP_START_SETTINGS_DESCRIPTION": "Conduct your first content management system setup. An intuitive interface will help you with this.",
