@@ -94,7 +94,7 @@ class PageForm implements InterfacePage
     $formsDataItemsAssembled = [];
     $formsElements = $this->form->getElements();
     $formsData = $this->form->getData();
-    $formsDatas = array_slice($formsData['data'], $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
+    $formsDatas = array_slice($formsData, $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
 
     $pagination = new Pagination($this->CMSCore, count($formsData), $paginationItemsOnPage, $paginationItemCurrent);
     $pagination->assembly();
