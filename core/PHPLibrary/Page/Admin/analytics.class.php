@@ -392,7 +392,7 @@ class PageAnalytics implements InterfacePage
       if ($form !== null) {
         $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics/form.css', 'rel' => 'stylesheet']);
 
-        $page = new PageAnalyticsForm($this->CMSCore, $this->page);
+        $page = new PageAnalyticsForm($this->CMSCore, $this->page, $form);
           
         if (property_exists($page, 'navigationSubsections')) {
           $this->navigationSubsections = $page->navigationSubsections;
