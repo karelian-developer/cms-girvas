@@ -37,7 +37,7 @@ use \DOMDocument as DOMDocument;
 /**
  * Страница со списком форм
  */
-class PageForms implements InterfacePage
+class PageForm implements InterfacePage
 {
   use TraitPage;
 
