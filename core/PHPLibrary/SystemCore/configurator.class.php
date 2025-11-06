@@ -997,5 +997,7 @@ final class Configurator implements ConfiguratorInterface
       require_once $filePath;
       return $configuration ?? [];
     }
+
+    return [];
   }
 }
