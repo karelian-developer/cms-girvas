@@ -33,7 +33,7 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUserGroup->initData(['permissions']);
 
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT)) {
-    $formID = (isset($_PATCH['formID'])) ? $_PATCH['formID'] : 0;
+    $formID = (isset($_PATCH['form_id'])) ? $_PATCH['form_id'] : 0;
     $formID = (is_numeric($formID)) ? (int)$formID : 0;
 
     if (Form::existsByID($CMSCore, $formID)) {

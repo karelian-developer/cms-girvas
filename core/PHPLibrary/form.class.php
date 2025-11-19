@@ -816,7 +816,7 @@ class Form implements EntityTypeContent
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
       $queryBuilder->statement->setClauseFrom();
-      $queryBuilder->statement->clauseFrom->addTable('forms');
+      $queryBuilder->statement->clauseFrom->addTable('forms_data');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
       $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');

@@ -138,6 +138,7 @@ final class FileConnector implements InterfaceFileConnector
 
         if (file_exists($cacheFile)) {
           $cachedData = json_decode(file_get_contents($cacheFile), true);
+          $cacheData['expires'] = time() + 300;
           $cachedData['files'][] = $filePath;
           
           file_put_contents($cacheFile, json_encode($cachedData), LOCK_EX);

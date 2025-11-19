@@ -67,7 +67,7 @@ if ($CMSCore->client->isLogged(2)) {
     $metadata['methodID'] = $formMethodID;
     $metadata['action'] = $formAction;
 
-    $form = Form::create($CMSCore, $formName, $texts, $elements, $metadata);
+    $form = Form::create($CMSCore, $formName, $texts, [], $metadata);
     if (!is_null($form)) {
       $handlerOutputData['form'] = [];
       $handlerOutputData['form']['id'] = $form->getID();
