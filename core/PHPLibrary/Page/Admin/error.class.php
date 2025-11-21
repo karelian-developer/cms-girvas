@@ -21,7 +21,7 @@
 namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
-use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\Entry as Entry;
@@ -29,7 +29,7 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class PageError implements InterfacePage
 {
-  public SystemCore $CMSCore;
+  public CMSCore $CMSCore;
   public Page $page;
   public string $assembled = '';
   public int $errorCode;
@@ -39,12 +39,12 @@ class PageError implements InterfacePage
   /**
    * __construct
    *
-   * @param  SystemCore $CMSCore
+   * @param  CMSCore $CMSCore
    * @param  Page $page
    * @param  int $errorCode
    * @return void
    */
-  public function __construct(SystemCore $CMSCore, Page $page, int $errorCode)
+  public function __construct(CMSCore $CMSCore, Page $page, int $errorCode)
   {
     $this->CMSCore = $CMSCore;
     $this->page = $page;

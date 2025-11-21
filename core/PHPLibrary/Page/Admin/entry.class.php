@@ -84,6 +84,8 @@ class PageEntry implements InterfacePage
       
       if ($entry !== null) {
         $entry->initData(['id', 'texts', 'name', 'metadata']);
+      } else {
+        http_response_code(404);
       }
     }
 
