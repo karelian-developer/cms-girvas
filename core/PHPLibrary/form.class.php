@@ -559,6 +559,7 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->addColumn('name');
     $queryBuilder->statement->addColumn('texts');
     $queryBuilder->statement->addColumn('metadata');
+    $queryBuilder->statement->addColumn('elements');
     $queryBuilder->statement->addColumn('createdUnixTimestamp');
     $queryBuilder->statement->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->setClauseReturning();
