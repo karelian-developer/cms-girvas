@@ -15,6 +15,7 @@ import {Utils} from "../../../utils.class.js";
 export class PageEntry {
   constructor(page, params = {}) {
     this.page = page;
+    this.statusCode = this.page.getPageStatusCode()
 
     this.buttons = {save: null, delete: null, publish: null, unpublish: null};
   }
@@ -182,7 +183,9 @@ export class PageEntry {
           }
 
           let request = new Interactive('request', {
-            method: searchParams.getPathPart(3) === null ? 'PUT' : 'PATCH',
+            method: searchParams.getPathPart(3) === null || this.statusCode === 404
+              ? 'PUT'
+              : 'PATCH',
             url: '/handler/entry?localeMessage=' + window.CMSCore.locales.admin.name
           });
   

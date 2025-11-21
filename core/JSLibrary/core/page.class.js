@@ -89,6 +89,11 @@ export class Page {
     }
   }
 
+  /**
+   * Показать всплывающее уведомление
+   * @param {String} message 
+   * @param {Number} code 
+   */
   showPopupNotification(message, code = -1) {
     let interactiveNotification = new Interactive('notification');
     interactiveNotification.target.isPopup = true;
@@ -99,6 +104,18 @@ export class Page {
     interactiveNotification.target.show();
   }
 
+  /**
+   * Получить статус-код текущей страницы
+   * @returns {Number}
+   */
+  getPageStatusCode() {
+    const navigation = performance.getEntriesByType('navigation')[0];
+    return navigation ? navigation.responseStatus : null;
+  }
+
+  /**
+   * Инициализация страницы
+   */
   init() {
     this.target.init();
 
