@@ -211,18 +211,19 @@ export class PageForm {
                   formDescriptionTextareaElement.value = data.outputData.form.description;
                   formTitleInputElement.value = data.outputData.form.title;
 
-                  console.log(data.outputData.form.elements);
-
                   formElementTitleInputElements.forEach((element, elementIndex) => {
-                    element.value = data.outputData.form.elements[elementIndex]['texts'][locale.name]['title'];
+                    const elementData = data.outputData.form.elements[elementIndex];
+                    element.value = this.getLocalizedFormElementText(elementData, 'title', locale.name);
                   });
 
                   formElementDescriptionInputElements.forEach((element, elementIndex) => {
-                    element.value = data.outputData.form.elements[elementIndex]['texts'][locale.name]['description'];
+                    const elementData = data.outputData.form.elements[elementIndex];
+                    element.value = this.getLocalizedFormElementText(elementData, 'description', locale.name);
                   });
 
                   formElementPlaceholderInputElements.forEach((element, elementIndex) => {
-                    element.value = data.outputData.form.elements[elementIndex]['texts'][locale.name]['placeholder'];
+                    const elementData = data.outputData.form.elements[elementIndex];
+                    element.value = this.getLocalizedFormElementText(elementData, 'placeholder', locale.name);
                   });
                 }
               });
@@ -319,6 +320,18 @@ export class PageForm {
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     });
+  }
+
+  getLocalizedFormElementText(elementData, field, preferredLocale) {
+    const texts = elementData?.texts;
+    if (!texts) return '';
+    
+    if (texts[preferredLocale]?.[field]) {
+      return texts[preferredLocale][field];
+    }
+    
+    const firstLocale = Object.keys(texts)[0];
+    return texts[firstLocale]?.[field] || '';
   }
 
   createCellFormElementElements(title, dataElement = null) {
