@@ -490,11 +490,13 @@ export class PageEntry {
               interactiveCategoriesChoices.target.addItem(entriesCategory.title, entriesCategory.id);
             });
 
-            entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
-              if (entriesCategory.id === entryData.categoryID) {
-                interactiveCategoriesChoices.target.setItemSelectedIndex(entriesCategoryIndex);
-              }
-            });
+            if (this.statusCode !== 404) {
+              entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
+                if (entriesCategory.id === entryData.categoryID) {
+                  interactiveCategoriesChoices.target.setItemSelectedIndex(entriesCategoryIndex);
+                }
+              });
+            }
             
             interactiveCategoriesChoices.target.setName('entry_category_id');
             interactiveCategoriesChoices.assembly();
