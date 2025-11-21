@@ -51,6 +51,7 @@ if ($CMSCore->client->isLogged(2)) {
           $CMSLocale->initPathes();
 
           $CMSLocaleName = $CMSLocale->getName();
+          $commonLocale = $_PATCH['common_locale'];
 
           $inputTitleName = 'form_title_' . $CMSLocale->getISO639(2);
           $textareaDescriptionName = 'form_description_' . $CMSLocale->getISO639(2);
@@ -83,11 +84,14 @@ if ($CMSCore->client->isLogged(2)) {
               $formElements[$i]['sequenceNumber'] = is_numeric($formElementSequenceNumbers[$i])
                 ? $formElementSequenceNumbers[$i]
                 : 0;
-              $formElements[$i]['texts'][$CMSLocaleName] = [
-                'title' => htmlspecialchars(str_replace('\'', '"', (trim($formElementTitles[$i])))),
-                'description' => htmlspecialchars(str_replace('\'', '"', (trim($formElementDescriptions[$i])))),
-                'placeholder' => htmlspecialchars(str_replace('\'', '"', (trim($formElementPlaceholders[$i]))))
-              ];
+              
+              if ($CMSLocaleName === $commonLocale) {
+                $formElements[$i]['texts'][$CMSLocaleName] = [
+                  'title' => htmlspecialchars(str_replace('\'', '"', (trim($formElementTitles[$i])))),
+                  'description' => htmlspecialchars(str_replace('\'', '"', (trim($formElementDescriptions[$i])))),
+                  'placeholder' => htmlspecialchars(str_replace('\'', '"', (trim($formElementPlaceholders[$i]))))
+                ];
+              }
             }
           }
         }
