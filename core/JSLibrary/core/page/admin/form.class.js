@@ -25,6 +25,8 @@ export class PageForm {
 
     let locales;
     const interactiveLocaleChoices = new Interactive('choices');
+    interactiveLocaleChoices.target.setName('common_locale');
+
     const interactiveMethodChoices = new Interactive('choices');
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
@@ -244,6 +246,8 @@ export class PageForm {
         
         if (form.target.checkRequiredFields()) {
           let formData = new FormData(elementForm);
+          formData.append('common_locale', interactiveLocaleChoices.target.getValue());
+
           let fetchLink = searchParams.getPathPart(3) === null
             ? '/handler/form?localeMessage=' + window.CMSCore.locales.admin.name
             : '/handler/form/' + searchParams.getPathPart(3) + '?localeMessage=' + window.CMSCore.locales.admin.name;

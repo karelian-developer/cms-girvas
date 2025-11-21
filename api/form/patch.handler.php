@@ -41,6 +41,7 @@ if ($CMSCore->client->isLogged(2)) {
       $form->initData(['elements']);
 
       $formData = [];
+      $formElements = $form->getElements();
 
       $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
       if (count($CMSLocalesNames) > 0) {
@@ -70,21 +71,21 @@ if ($CMSCore->client->isLogged(2)) {
           $formElementSequenceNumbers = isset($_PATCH['form_element_sequence_number']) ? $_PATCH['form_element_sequence_number'] : [];
 
           if (count($formElementTitles) > 0) {
-            $formData['elements'] = [];
+            $formElements = $form->getElements();
             
             for ($i = 0; $i < count($formElementTitles); $i++) {
               $elements = $form;
 
-              if (!isset($formData['elements'][$i])) $formData['elements'][$i] = [];
-              if (!isset($formData['elements'][$i]['texts'][$CMSLocaleName])) $formData['elements'][$i]['texts'][$CMSLocaleName] = [];
+              if (!isset($formElements[$i])) $formElements[$i] = [];
+              if (!isset($formElements[$i]['texts'][$CMSLocaleName])) $formElements[$i]['texts'][$CMSLocaleName] = [];
 
-              $formData['elements'][$i]['number'] = $i + 1;
-              $formData['elements'][$i]['type'] = $formElementTypes[$i];
-              $formData['elements'][$i]['name'] = trim($formElementNames[$i]);
-              $formData['elements'][$i]['sequenceNumber'] = is_numeric($formElementSequenceNumbers[$i])
+              $formElements[$i]['number'] = $i + 1;
+              $formElements[$i]['type'] = $formElementTypes[$i];
+              $formElements[$i]['name'] = trim($formElementNames[$i]);
+              $formElements[$i]['sequenceNumber'] = is_numeric($formElementSequenceNumbers[$i])
                 ? $formElementSequenceNumbers[$i]
                 : 0;
-              $formData['elements'][$i]['texts'][$CMSLocaleName] = [
+              $formElements[$i]['texts'][$CMSLocaleName] = [
                 'title' => htmlspecialchars(str_replace('\'', '"', (trim($formElementTitles[$i])))),
                 'description' => htmlspecialchars(str_replace('\'', '"', (trim($formElementDescriptions[$i])))),
                 'placeholder' => htmlspecialchars(str_replace('\'', '"', (trim($formElementPlaceholders[$i]))))
@@ -98,6 +99,7 @@ if ($CMSCore->client->isLogged(2)) {
       if (isset($_PATCH['form_method_id'])) $formData['metadata']['methodID'] = $_PATCH['form_method_id'];
       if (isset($_PATCH['form_action'])) $formData['metadata']['action'] = $_PATCH['form_action'];
 
+      $formData['elements'] = $formElements;
       $isUpdated = $form->update($formData);
 
       if ($isUpdated) {
