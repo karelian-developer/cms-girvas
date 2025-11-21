@@ -324,15 +324,13 @@ export class PageForm {
 
   getLocalizedFormElementText(elementData, field, preferredLocale) {
     const texts = elementData?.texts;
-    console.log(elementData?.texts);
     if (!texts) return '';
     
     if (texts[preferredLocale]?.[field]) {
       return texts[preferredLocale][field];
     }
-    
-    const firstLocale = Object.keys(texts)[0];
-    return texts[firstLocale]?.[field] || '';
+
+    return '';
   }
 
   createCellFormElementElements(title, dataElement = null) {
