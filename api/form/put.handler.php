@@ -32,6 +32,8 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
+  $handlerOutputData = $_PUT;
+
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT)) {
     $formName = (isset($_PUT['form_name'])) ? urlencode(htmlentities($_PUT['form_name'])) : '';
     
@@ -67,7 +69,7 @@ if ($CMSCore->client->isLogged(2)) {
     $metadata['methodID'] = $formMethodID;
     $metadata['action'] = $formAction;
 
-    $form = Form::create($CMSCore, $formName, $texts, [], $metadata);
+    $form = Form::create($CMSCore, $formName, $texts, $elements, $metadata);
     if (!is_null($form)) {
       $handlerOutputData['form'] = [];
       $handlerOutputData['form']['id'] = $form->getID();

@@ -94,6 +94,15 @@ class PageForm implements InterfacePage
     $formsDataItemsAssembled = [];
     $formsElements = $this->form->getElements();
     $formsData = $this->form->getData();
+
+    usort($formsData, function ($a, $b) {
+      if ($a['createdUnixTimestamp'] !== $b['createdUnixTimestamp']) {
+        return $a['createdUnixTimestamp'] < $b['createdUnixTimestamp'] ? 1 : -1;
+      }
+
+      return 0;
+    });
+
     $formsDatas = array_slice($formsData, $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
     $pagination = new Pagination($this->CMSCore, count($formsData), $paginationItemsOnPage, $paginationItemCurrent);
     $pagination->assembly();
@@ -115,14 +124,18 @@ class PageForm implements InterfacePage
             ? $elementData['texts'][$localeName]['title']
             : $elementName;
           
-          $itemElement = $document->createElement('li', $elementTitle . ': ' . $dataArray[$elementName]);
-          $listElement->appendChild($itemElement);
+          $itemElement = $document->createElement('li');
 
           $titleElement =  $document->createElement('span', $elementTitle);
           $dataElement =  $document->createElement('span', $dataArray[$elementName]);
 
           $titleElement->setAttribute('class', 'list__title');
           $dataElement->setAttribute('class', 'list__data');
+
+          $itemElement->appendChild($titleElement);
+          $itemElement->appendChild($dataElement);
+
+          $listElement->appendChild($itemElement);
         }
       }
 
