@@ -189,9 +189,9 @@ export class PageForm {
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
         const formTitleInputElement = document.querySelector('[data-element="input-title"]');
         const formDescriptionTextareaElement = document.querySelector('[data-element="input-description"]');
-        const formElementTitleInputElements = document.querySelectorAll('[name=form_element_title[]]');
-        const formElementDescriptionInputElements = document.querySelectorAll('[name=form_element_description[]]');
-        const formElementPlaceholderInputElements = document.querySelectorAll('[name=form_element_placeholder[]]');
+        const formElementTitleInputElements = document.querySelectorAll('[name="form_element_title[]"]');
+        const formElementDescriptionInputElements = document.querySelectorAll('[name="form_element_description[]"]');
+        const formElementPlaceholderInputElements = document.querySelectorAll('[name="form_element_placeholder[]"]');
         
         locales.forEach((locale, localeIndex) => {
           if (locale.name === event.target.value) {
