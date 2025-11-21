@@ -185,18 +185,21 @@ export class PageForm {
 
       tableFormElementsButtonContainer.append(this.buttons.addElement.target.element);
       
-      let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
+      const interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
-        let formTitleInputElement = document.querySelector('[data-element="input-title"]');
-        let formDescriptionTextareaElement = document.querySelector('[data-element="input-description"]');
+        const formTitleInputElement = document.querySelector('[data-element="input-title"]');
+        const formDescriptionTextareaElement = document.querySelector('[data-element="input-description"]');
+        const formElementTitleInputElements = document.querySelectorAll('[name=form_element_title[]]');
+        const formElementDescriptionInputElements = document.querySelectorAll('[name=form_element_description[]]');
+        const formElementPlaceholderInputElements = document.querySelectorAll('[name=form_element_placeholder[]]');
         
         locales.forEach((locale, localeIndex) => {
-          if (locale.name == event.target.value) {
+          if (locale.name === event.target.value) {
             formTitleInputElement.setAttribute('name', 'form_title_' + locale.iso639_2);
             formDescriptionTextareaElement.setAttribute('name', 'form_description_' + locale.iso639_2);
 
             if (searchParams.getPathPart(3) != null) {
-              let request = new Interactive('request', {
+              const request = new Interactive('request', {
                 method: 'GET',
                 url: '/handler/form/' + searchParams.getPathPart(3) + '?locale=' + locale.name + '&localeMessage=' + window.CMSCore.locales.admin.name
               });
@@ -207,6 +210,18 @@ export class PageForm {
                 if (data.statusCode === 1 && data.outputData.hasOwnProperty('form')) {
                   formDescriptionTextareaElement.value = data.outputData.form.description;
                   formTitleInputElement.value = data.outputData.form.title;
+
+                  formElementTitleInputElements.forEach((element, elementIndex) => {
+                    element.value = data.outputData.form.elements[elementIndex]['texts'][locale.name]['title'];
+                  });
+
+                  formElementDescriptionInputElements.forEach((element, elementIndex) => {
+                    element.value = data.outputData.form.elements[elementIndex]['texts'][locale.name]['description'];
+                  });
+
+                  formElementPlaceholderInputElements.forEach((element, elementIndex) => {
+                    element.value = data.outputData.form.elements[elementIndex]['texts'][locale.name]['placeholder'];
+                  });
                 }
               });
             }
