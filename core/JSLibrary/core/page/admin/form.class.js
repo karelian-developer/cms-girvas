@@ -153,7 +153,7 @@ export class PageForm {
       let tableFormElementsButtonContainer = document.querySelector('[data-element="button-add-element"]');
 
       this.buttons.addElement = new Interactive('button');
-      this.buttons.addElement.target.setLabel(localeData.BUTTON_NEW_ELEMENT_LABEL);
+      this.buttons.addElement.target.setLabel(localeData.BUTTON_NEW_ELEMENT);
       this.buttons.addElement.target.setCallback((event) => {
         event.preventDefault();
 

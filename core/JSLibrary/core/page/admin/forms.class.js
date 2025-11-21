@@ -57,7 +57,7 @@ export class PageForms {
               
               interactiveModal.target.addButton(localeData.BUTTON_DELETE_LABEL, () => {
                 let formData = new FormData();
-                formData.append('web_channel_id', formID);
+                formData.append('form_id', formID);
 
                 let request = new Interactive('request', {
                   method: 'DELETE',
