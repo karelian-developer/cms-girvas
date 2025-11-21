@@ -30,7 +30,7 @@ final class Core implements ThemeInterfaceCore
 {
   private string $primaryColor = '#EAEAEA';
   public string $assembled = '';
-  public DOMDocument|null $source = null;
+  public ?DOMDocument $source = null;
   public array $navigationSections = [
     'index' => [
       'name' => 'index',
@@ -309,30 +309,31 @@ final class Core implements ThemeInterfaceCore
    */
   public function assembly() : void
   {
-    $this->theme->addStyle(['href' => 'styles/normalize.css', 'rel' => 'stylesheet']);
-    $this->theme->addStyle(['href' => 'styles/fonts.css', 'rel' => 'stylesheet']);
-    $this->theme->addStyle(['href' => 'styles/colors.css', 'rel' => 'stylesheet']);
-    $this->theme->addStyle(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
-    $this->theme->addStyle(['href' => 'styles/table.css', 'rel' => 'stylesheet']);
-    $this->theme->addStyle(['href' => 'styles/form.css', 'rel' => 'stylesheet']);
-    $this->theme->addStyle(['href' => 'styles/modal.css', 'rel' => 'stylesheet']);
-    $this->theme->addStyle(['href' => 'styles/interactive.css', 'rel' => 'stylesheet']);
-    $this->theme->addStyle(['href' => 'styles/notification.css', 'rel' => 'stylesheet']);
+    $CMSTheme = $this->theme;
+    $CMSConfigurator = $CMSTheme->CMSCore->configurator;
+    $CMSThemeProperties = $CMSTheme->getFilePropertiesData();
+    $CMSThemeColorScheme = isset($CMSThemeProperties['COLOR_SCHEME'])
+      ? $CMSThemeProperties['COLOR_SCHEME']['value']
+      : 'default';
+
+    if (!file_exists($CMSTheme->getPath() . '/styles/colors/' . $CMSThemeColorScheme . '.css')) {
+      $CMSThemeColorScheme = 'default';
+    }
+
+    $CMSTheme->addStyle(['href' => 'styles/colors/' . $CMSThemeColorScheme . '.css', 'rel' => 'stylesheet']);
+    $CMSTheme->addStyle(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
     
-    $this->theme->addScript(['src' => 'interactive.class.js', 'type' => 'module'], true);
-    $this->theme->addScript(['src' => 'common.js'], true);
-    $this->theme->addScript(['src' => 'core.class.js', 'type' => 'module'], true);
-    $this->theme->addScript(['src' => 'core.class.js', 'type' => 'module']);
+    $CMSTheme->addScript(['src' => 'interactive.class.js', 'type' => 'module'], true);
+    $CMSTheme->addScript(['src' => 'common.js'], true);
+    $CMSTheme->addScript(['src' => 'core.class.js', 'type' => 'module'], true);
+    $CMSTheme->addScript(['src' => 'core.class.js', 'type' => 'module']);
 
 
     /** @var string $userIP IP-адрес пользователя */
     $userIP = $_SERVER['REMOTE_ADDR'];
 
-    if ($this->theme->CMSCore->client->isLogged(2)) {
-      $this->theme->addStyle(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
-      $this->theme->addStyle(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
-      $this->theme->addStyle(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
-      $this->theme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+    if ($CMSTheme->CMSCore->client->isLogged(2)) {
+      $CMSTheme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
 
       /** @var string $this->assembled Итоговый шаблон в виде строки */
       $this->assembled = ThemeCollector::assembly($this->assemblyDocument(), [
@@ -342,7 +343,7 @@ final class Core implements ThemeInterfaceCore
         'ADMIN_PANEL_NAVIGATION' => $this->assemblyAdminPanelNavigation()
       ]);
     } else {
-      $this->theme->addStyle(['href' => 'styles/page/auth.css', 'rel' => 'stylesheet']);
+      $CMSTheme->addStyle(['href' => 'styles/page/auth.css', 'rel' => 'stylesheet']);
 
       $this->assembled = ThemeCollector::assembly($this->assemblyDocument(), [
         'ADMIN_PANEL_HEADER' => '',
@@ -361,8 +362,10 @@ final class Core implements ThemeInterfaceCore
    */
   public function assemblyDocument(array $themeVars = []) : string
   {
-    $themeURL = $this->theme->getURL();
-    $themeLocale = $this->theme->locale;
+    $CMSTheme = $this->theme;
+
+    $themeURL = $CMSTheme->getURL();
+    $themeLocale = $CMSTheme->locale;
     $themeLocaleName = $themeLocale->getName();
 
     $documentLang = mb_substr($themeLocaleName, 0, 2);
@@ -431,7 +434,7 @@ final class Core implements ThemeInterfaceCore
 
     $bodyElement = $document->createElement('body');
 
-    if (!$this->theme->CMSCore->client->isLogged(2)) {
+    if (!$CMSTheme->CMSCore->client->isLogged(2)) {
       $bodyElement->setAttribute('class', 'body body_auth');
       $bodyContentElement = $document->createTextNode('{ADMIN_PANEL_HEADER}{ADMIN_PANEL_MAIN}{ADMIN_PANEL_FOOTER}');
       

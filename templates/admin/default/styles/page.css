@@ -6,6 +6,10 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
+@import url('./header.css');
+@import url('./main.css');
+@import url('./footer.css');
+
 .main__page-wrapper {
   display: flex;
 }
