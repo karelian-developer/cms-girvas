@@ -32,8 +32,6 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
-  $handlerOutputData = $_PUT;
-
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT)) {
     $formName = (isset($_PUT['form_name'])) ? urlencode(htmlentities($_PUT['form_name'])) : '';
     
@@ -43,6 +41,26 @@ if ($CMSCore->client->isLogged(2)) {
     $formAction = $_PUT['form_action'] ?? '';
 
     $texts = [];
+    $elements = [];
+
+    if (array_key_exists('form_element_type', $_PUT)) {
+      foreach ($_PUT['form_element_type'] as $elementIndex => $elementTypeName) {
+        $elements[$elementIndex] = [];
+        $elements[$elementIndex]['type'] = $elementTypeName;
+        $elements[$elementIndex]['texts'] = [];
+
+        $elementName = $_PUT['form_element_name'][$elementIndex] ?? null;
+        $elementSequenceNumber = $_PUT['form_element_sequence_number'][$elementIndex] ?? null;
+
+        if ($elementName !== null) {
+          $elements[$elementIndex]['name'] = trim($elementName);
+        }
+
+        if ($elementSequenceNumber !== null) {
+          $elements[$elementIndex]['sequenceNumber'] = (is_numeric($elementSequenceNumber)) ? $elementSequenceNumber : 0;
+        }
+      }
+    }
 
     $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
     if (count($CMSLocalesNames) > 0) {
@@ -61,6 +79,26 @@ if ($CMSCore->client->isLogged(2)) {
 
           if (array_key_exists($inputTitleName, $_PUT)) $texts[$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', $_PUT[$inputTitleName]));
           if (array_key_exists($textareaDescriptionName, $_PUT)) $texts[$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', $_PUT[$textareaDescriptionName]));
+        }
+
+        if (array_key_exists('form_element_type', $_PUT)) {
+          foreach ($_PUT['form_element_type'] as $elementIndex => $elementTypeName) {
+            $elementTitle = $_PUT['form_element_title'][$elementIndex] ?? null;
+            $elementDescription = $_PUT['form_element_description'][$elementIndex] ?? null;
+            $elementPlaceholder = $_PUT['form_element_placeholder'][$elementIndex] ?? null;
+
+            if ($elementTitle !== null) {
+              $elements[$elementIndex]['texts'][$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', trim($_PUT['form_element_title'][$elementIndex])));
+            }
+
+            if ($elementDescription !== null) {
+              $elements[$elementIndex]['texts'][$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', trim($_PUT['form_element_description'][$elementIndex])));
+            }
+
+            if ($elementPlaceholder !== null) {
+              $elements[$elementIndex]['texts'][$CMSLocaleName]['placeholder'] = htmlspecialchars(str_replace('\'', '"', trim($_PUT['form_element_placeholder'][$elementIndex])));
+            }
+          }
         }
       }
     }
