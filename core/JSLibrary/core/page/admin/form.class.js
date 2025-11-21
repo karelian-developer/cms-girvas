@@ -211,6 +211,8 @@ export class PageForm {
                   formDescriptionTextareaElement.value = data.outputData.form.description;
                   formTitleInputElement.value = data.outputData.form.title;
 
+                  console.log(data.outputData.form.elements);
+
                   formElementTitleInputElements.forEach((element, elementIndex) => {
                     element.value = data.outputData.form.elements[elementIndex]['texts'][locale.name]['title'];
                   });
