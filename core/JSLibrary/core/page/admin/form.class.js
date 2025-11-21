@@ -324,6 +324,7 @@ export class PageForm {
 
   getLocalizedFormElementText(elementData, field, preferredLocale) {
     const texts = elementData?.texts;
+    console.log(elementData?.texts);
     if (!texts) return '';
     
     if (texts[preferredLocale]?.[field]) {
