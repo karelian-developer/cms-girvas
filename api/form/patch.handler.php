@@ -66,7 +66,7 @@ if ($CMSCore->client->isLogged(2)) {
           $formElementDescriptions = isset($_PATCH['form_element_description']) ? $_PATCH['form_element_description'] : [];
           $formElementPlaceholders = isset($_PATCH['form_element_placeholder']) ? $_PATCH['form_element_placeholder'] : [];
           $formElementTypes = isset($_PATCH['form_element_type']) ? $_PATCH['form_element_type'] : [];
-          $formElementNames = isset($_PATCH['form_element_name']) ? trim($_PATCH['form_element_name']) : [];
+          $formElementNames = isset($_PATCH['form_element_name']) ? $_PATCH['form_element_name'] : [];
           $formElementSequenceNumbers = isset($_PATCH['form_element_sequence_number']) ? $_PATCH['form_element_sequence_number'] : [];
 
           if (count($formElementTitles) > 0) {
@@ -80,8 +80,10 @@ if ($CMSCore->client->isLogged(2)) {
 
               $formData['elements'][$i]['number'] = $i + 1;
               $formData['elements'][$i]['type'] = $formElementTypes[$i];
-              $formData['elements'][$i]['name'] = $formElementNames[$i];
-              $formData['elements'][$i]['sequenceNumber'] = $formElementSequenceNumbers[$i];
+              $formData['elements'][$i]['name'] = trim($formElementNames[$i]);
+              $formData['elements'][$i]['sequenceNumber'] = is_numeric($formElementSequenceNumbers[$i])
+                ? $formElementSequenceNumbers[$i]
+                : 0;
               $formData['elements'][$i]['texts'][$CMSLocaleName] = [
                 'title' => htmlspecialchars(str_replace('\'', '"', (trim($formElementTitles[$i])))),
                 'description' => htmlspecialchars(str_replace('\'', '"', (trim($formElementDescriptions[$i])))),
