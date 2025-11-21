@@ -71,8 +71,6 @@ if ($CMSCore->client->isLogged(2)) {
           $formElementSequenceNumbers = isset($_PATCH['form_element_sequence_number']) ? $_PATCH['form_element_sequence_number'] : [];
 
           if (count($formElementTitles) > 0) {
-            $formElements = $form->getElements();
-            
             for ($i = 0; $i < count($formElementTitles); $i++) {
               $elements = $form;
 
