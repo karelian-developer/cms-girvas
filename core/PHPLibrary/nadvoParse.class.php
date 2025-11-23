@@ -42,8 +42,8 @@ class NadvoParse
     $markdown = $this->parseQuotes($markdown);
     $markdown = $this->parseLists($markdown);
     $markdown = $this->parseTables($markdown);
-    $markdown = $this->parseBlocks($markdown);
-    return $this->parseInlineElements($markdown);
+    $markdown = $this->parseInlineElements($markdown);
+    return $this->parseBlocks($markdown);
   }
 
   private function sanitizeInput(string $markdown) : string
@@ -330,11 +330,15 @@ class NadvoParse
         str_starts_with(trim($line), '<blockquote>') ||
         str_starts_with(trim($line), '</blockquote>') ||
         str_starts_with(trim($line), '<table>') ||
+        str_starts_with(trim($line), '</table>') ||
         str_starts_with(trim($line), '<ul>') ||
         str_starts_with(trim($line), '<ol>') ||
         str_starts_with(trim($line), '</ul>') ||
         str_starts_with(trim($line), '</ol>') ||
-        str_starts_with(trim($line), '<li>'))
+        str_starts_with(trim($line), '<li>') ||
+        str_starts_with(trim($line), '</li>') ||
+        str_starts_with(trim($line), '<div>') ||
+        str_starts_with(trim($line), '</div>'))
       {
 
         if (!empty($currentParagraph)) {
