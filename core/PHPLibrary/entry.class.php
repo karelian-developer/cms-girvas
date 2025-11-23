@@ -1004,7 +1004,7 @@ class Entry implements EntityTypeContent
 
         $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
           'mysql' => "JSON_MERGE_PATCH(COALESCE(`$columnName`, '{}'), CAST('{$fieldsJSONImplodedMySQL}' AS JSON))",
-          'postgresql' => "\"$columnName\"::jsonb || $fieldsJSONImplodedPostgreSQL"
+          'postgresql' => "$columnName::jsonb || $fieldsJSONImplodedPostgreSQL"
         ]);
       }
     }
