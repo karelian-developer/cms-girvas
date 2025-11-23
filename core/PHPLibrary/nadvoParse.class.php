@@ -38,12 +38,12 @@ class NadvoParse
   public function parse(string $markdown) : string
   {
     $markdown = $this->sanitizeInput($markdown);
-    $markdown = $this->parseInlineElements($markdown);
     $markdown = $this->parseCodeBlocks($markdown);
     $markdown = $this->parseQuotes($markdown);
     $markdown = $this->parseLists($markdown);
     $markdown = $this->parseTables($markdown);
-    return $this->parseBlocks($markdown);
+    $markdown = $this->parseBlocks($markdown);
+    return $this->parseInlineElements($markdown);
   }
 
   private function sanitizeInput(string $markdown) : string
@@ -384,6 +384,15 @@ class NadvoParse
 
   private function parseInlineElements(string $html) : string
   {
+    // Защищаем блоки кода от обработки
+    $html = preg_replace_callback(
+      '/(<pre><code[^>]*>.*?<\/code><\/pre>|<code>.*?<\/code>|<table>.*?<\/table>|<ul>.*?<\/ul>|<ol>.*?<\/ol>|<blockquote>.*?<\/blockquote>)/s',
+      function($matches) {
+        return htmlspecialchars($matches[0]);
+      },
+      $html
+    );
+
     $html = preg_replace_callback(
       self::PATTERNS['video'],
       function($matches) {
