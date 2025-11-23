@@ -295,7 +295,7 @@ class NadvoParse
       self::PATTERNS['code_block'],
       function($matches) {
         $language = trim($matches[1]);
-        $code = htmlspecialchars(trim($matches[2]), ENT_NOQUOTES);
+        $code = trim($matches[2]);
         
         if ($language) {
           return '<pre><code class="language-' . $language . '">' . $code . '</code></pre>';
@@ -309,7 +309,7 @@ class NadvoParse
     $markdown = preg_replace_callback(
       self::PATTERNS['inline_code'],
       function($matches) {
-        $code = htmlspecialchars(trim($matches[1]), ENT_NOQUOTES);
+        $code = trim($matches[1]);
         return '<code>' . $code . '</code>';
       },
       $markdown
