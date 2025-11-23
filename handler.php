@@ -28,13 +28,12 @@ if (defined('IS_NOT_HACKED')) {
 
   header('Access-Control-Allow-Origin: ' . $CMSConfigurator->get('domain'));
 
-  $handlerHeaders = getallheaders();
-  error_log(print_r($handlerHeaders, true));
+  $handlerHeaders = apache_response_headers();
   $PHPInputContent = file_get_contents('php://input');
 
   if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     $cookieToken = $_COOKIE['_grv_csrf'] ?? null;
-    $headerToken = $handlerHeaders['X-CSRF-Token'] ?? null;
+    $headerToken = $handlerHeaders['X-Csrf-Token'] ?? null;
 
     if ($cookieToken === null || $headerToken === null || !hash_equals($cookieToken, $headerToken)) {
       $handlerMessage = $handlerMessage ?? 'The request was rejected by the security system.';
