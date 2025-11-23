@@ -191,7 +191,6 @@ if ($CMSCore->client->isLogged(2)) {
                 
                 if (array_key_exists($textareaContentName, $_PATCH)) {
                   $textareaValue = $_PATCH[$textareaContentName];
-                  $textareaValue = strip_tags($textareaValue, '<table><tr><td><th><b><u><i><hr>');
                   $textareaValue = str_replace('\'', '"', $textareaValue);
       
                   $entryData['texts'][$CMSLocaleName]['content'] = $textareaValue;
