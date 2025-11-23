@@ -29,6 +29,7 @@ if (defined('IS_NOT_HACKED')) {
   header('Access-Control-Allow-Origin: ' . $CMSConfigurator->get('domain'));
 
   $handlerHeaders = apache_request_headers();
+  error_log(print_r($handlerHeaders, true));
   $PHPInputContent = file_get_contents('php://input');
 
   if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
