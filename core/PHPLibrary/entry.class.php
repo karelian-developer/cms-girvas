@@ -991,6 +991,7 @@ class Entry implements EntityTypeContent
 
       foreach ($data[$columnName] as $name => $value) {
         $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_TAG);
+        $valueJSON = addcslashes($valueJSON);
 
         $fieldsJSON[] = match ($queryBuilder->DMS) {
           CMSDMS::MySQL => sprintf("\"%s\": %s", $name, $valueJSON),
@@ -1003,7 +1004,7 @@ class Entry implements EntityTypeContent
         $fieldsJSONImplodedPostgreSQL = implode(' || ', $fieldsJSON);
 
         $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-          'mysql' => "JSON_MERGE_PATCH(COALESCE(`$columnName`, '{}'), CAST('{$fieldsJSONImplodedMySQL}' AS JSON))",
+          'mysql' => "JSON_MERGE_PATCH(COALESCE($columnName, '{}'), CAST('{$fieldsJSONImplodedMySQL}' AS JSON))",
           'postgresql' => "$columnName::jsonb || $fieldsJSONImplodedPostgreSQL"
         ]);
       }
@@ -1021,8 +1022,6 @@ class Entry implements EntityTypeContent
 
     /** @var int $updatedUnixTimestamp Текущее время в UNIX-формате */
     $updatedUnixTimestamp = time();
-
-    error_log($queryBuilder->statement->clauseWhere->assembled);
 
     try {
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
