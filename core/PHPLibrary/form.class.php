@@ -839,7 +839,7 @@ class Form implements EntityTypeContent
     try {
       $databaseConnection = $CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':id', $id, \PDO::PARAM_INT);
       $execute = $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
