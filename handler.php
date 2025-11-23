@@ -42,7 +42,7 @@ if (defined('IS_NOT_HACKED')) {
       echo json_encode([
         'message' => $handlerMessage,
         'statusCode' => $handlerStatusCode,
-        'outputData' => $handlerOutputData
+        'outputData' => []
       // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
