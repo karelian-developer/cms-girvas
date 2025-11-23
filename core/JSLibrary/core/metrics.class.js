@@ -30,7 +30,10 @@ export class Metrics {
 
     fetch('/handler/metrics', {
       method: 'POST',
-      headers: {'Metrics-Token': localStorage.getItem('_grv_mtoken')},
+      headers: {
+        'Metrics-Token': localStorage.getItem('_grv_mtoken'),
+        'X-CSRF-Token': window.CMSCore.client.CSRFToken
+      },
       body: formData
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
@@ -58,7 +61,9 @@ export class Metrics {
   async getDataByTimestamp(time) {
     return fetch(`/handler/metrics?time=${Math.round(time / 1000)}`, {
       method: 'GET',
-      headers: {'Metrics-Token': localStorage.getItem('_grv_mtoken')}
+      headers: {
+        'Metrics-Token': localStorage.getItem('_grv_mtoken')
+      }
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
@@ -77,7 +82,9 @@ export class Metrics {
 
     return fetch(`/handler/metrics?timeStart=${timeStart}&timeEnd=${timeEnd}`, {
       method: 'GET',
-      headers: {'Metrics-Token': localStorage.getItem('_grv_mtoken')}
+      headers: {
+        'Metrics-Token': localStorage.getItem('_grv_mtoken')
+      }
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
