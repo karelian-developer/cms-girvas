@@ -139,7 +139,7 @@ export class Request {
     return fetch(requestURL, {
       method: requestMethod,
       body: this.data,
-      headers: {}
+      headers: this.headers
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
