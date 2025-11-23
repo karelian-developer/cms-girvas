@@ -12,7 +12,7 @@
   </div>
   <div class="grid-table__cell grid-table__cell_panel" data-element="panel">
     <ul class="grid-table__panel-list">
-      <li class="grid-table__panel-item grid-table__panel-item_remove">
+      <li class="grid-table__panel-item grid-table__panel-item_remove" data-event="remove">
         <a href="#" class="grid-table__panel-link grid-table__panel-link_red">Удалить</a>
       </li>
     </ul>
