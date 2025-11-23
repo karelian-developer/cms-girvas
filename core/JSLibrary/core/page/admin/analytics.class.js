@@ -167,7 +167,7 @@ export class PageAnalytics {
 
                   const request = new Interactive('request', {
                     method: 'DELETE',
-                    url: '/handler/form/' + formID + '?localeMessage=' + window.CMSCore.locales.admin.name
+                    url: '/handler/form/data?localeMessage=' + window.CMSCore.locales.admin.name
                   });
         
                   request.target.data = formData;
