@@ -26,12 +26,10 @@ export class Client {
   initCSRFToken() {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; _grv_csrf=`);
-    
+
     if (parts.length === 2) {
-      return decodeURIComponent(parts.pop().split(';').shift());
+      this.CSRFToken = decodeURIComponent(parts.pop().split(';').shift());
     }
-    
-    return '';
   }
 
   getCSRFToken() {
