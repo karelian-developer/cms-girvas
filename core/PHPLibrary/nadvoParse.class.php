@@ -330,15 +330,11 @@ class NadvoParse
         str_starts_with(trim($line), '<blockquote>') ||
         str_starts_with(trim($line), '</blockquote>') ||
         str_starts_with(trim($line), '<table>') ||
-        str_starts_with(trim($line), '</table>') ||
         str_starts_with(trim($line), '<ul>') ||
         str_starts_with(trim($line), '<ol>') ||
         str_starts_with(trim($line), '</ul>') ||
         str_starts_with(trim($line), '</ol>') ||
-        str_starts_with(trim($line), '<li>') ||
-        str_starts_with(trim($line), '</li>') ||
-        str_starts_with(trim($line), '<div>') ||
-        str_starts_with(trim($line), '</div>'))
+        str_starts_with(trim($line), '<li>'))
       {
 
         if (!empty($currentParagraph)) {
