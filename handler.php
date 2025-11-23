@@ -31,6 +31,25 @@ if (defined('IS_NOT_HACKED')) {
   $handlerHeaders = apache_request_headers();
   $PHPInputContent = file_get_contents('php://input');
 
+  if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    $cookieToken = $_COOKIE['_grv_csrf'] ?? null;
+    $headerToken = $handlerHeaders['X-CSRF-Token'] ?? null;
+
+    if ($cookieToken === null || $headerToken === null || !hash_equals($cookieToken, $headerToken)) {
+      $handlerMessage = $handlerMessage ?? 'The request was rejected by the security system.';
+      $handlerStatusCode = $handlerStatusCode ?? 0;
+
+      echo json_encode([
+        'message' => $handlerMessage,
+        'statusCode' => $handlerStatusCode,
+        'outputData' => $handlerOutputData
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+      exit;
+    }
+  }
+
   if (isset($_SERVER['REQUEST_METHOD'])) {
     switch ($_SERVER['REQUEST_METHOD']) {
       case 'PATCH': $_PATCH = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;

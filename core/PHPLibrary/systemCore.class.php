@@ -366,6 +366,19 @@ final class SystemCore implements CoreInterface
     /** @var string Случайная хэш-строка для идентификации ранее встроенных стилей (CSS) */
     $this->CSPStylesHash = bin2hex($bytes);
 
+    if (!isset($_COOKIE['_grv_csrf'])) {
+      $CSRFToken = self::generateCSRFToken();
+
+      setcookie('_grv_csrf', $CSRFToken, [
+        'expires' => $expires,
+        'path' => '/',
+        'domain' => $domainForCookies,
+        'secure' => $userSessionIsSecure,
+        'httponly' => false,
+        'samesite' => 'Strict'
+      ]);
+    }
+
     /** @var CMSFileConnector Объект подключателя файлов */
     $CMSFileConnector = new CMSFileConnector($this);
     $CMSFileConnector = $this->autoloadComponents(
@@ -933,6 +946,16 @@ final class SystemCore implements CoreInterface
     }
 
     return false;
+  }
+
+  /**
+   * Генерация CSRF-токена
+   * 
+   * @return string
+   */
+  public static function generateCSRFToken() : string
+  {
+    return bin2hex(random_bytes(32));
   }
 
   /**

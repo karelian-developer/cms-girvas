@@ -570,7 +570,8 @@ final class Template implements ThemeInterface
         'CMS_DEVELOPER_SITE_LINK' => $this->CMSCore::CMS_DEVELOPER_SITE_LINK,
         'CMS_DEVELOPER_TITLE' => $this->CMSCore::CMS_DEVELOPER_TITLE,
         'CMS_REESTR_DIGITAL_GOV_LINK' => $this->CMSCore::CMS_REESTR_DIGITAL_GOV_LINK,
-        'CMS_COPYRIGHT' => $this->CMSCore::getCopyrightString()
+        'CMS_COPYRIGHT' => $this->CMSCore::getCopyrightString(),
+        'CMS_CSRF_TOKEN' => $this->CMSCore::generateCSRFToken()
       ];
 
       if (!$isInstallationMode && $this->CMSCore->urlp->getPath(0) !== 'install') {

@@ -18,7 +18,24 @@ import {URLParser} from '../urlParser.class.js';
 export class Client {
   constructor(core) {
     this.core = core;
+    this.CSRFToken = '';
     this.setRestHash();
+    this.initCSRFToken();
+  }
+
+  initCSRFToken() {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; _grv_csrf=`);
+    
+    if (parts.length === 2) {
+      return decodeURIComponent(parts.pop().split(';').shift());
+    }
+    
+    return '';
+  }
+
+  getCSRFToken() {
+    return this.CSRFToken;
   }
 
   setRestHash() {
