@@ -12,7 +12,7 @@ import {Interactive} from '../interactive.class.js';
 import {Client} from './client.class.js';
 
 export class Metrics {
-  constructor() {
+  constructor(core) {
     this.core = core;
 
     const clientMetricsToken = localStorage.getItem('_grv_mtoken');
