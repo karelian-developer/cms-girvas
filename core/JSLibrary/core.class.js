@@ -28,7 +28,7 @@ export class Core {
     this.pages = {default: {}, admin: {}, install: {}};
     this.locales = {base: {}, admin: {}, install: {}};
     this.client = new Client(this);
-    this.metrics = new Metrics();
+    this.metrics = new Metrics(this);
     this.debugLevel = 1;
     this.isReady = false;
 

@@ -13,9 +13,10 @@ import {Client} from './client.class.js';
 
 export class Metrics {
   constructor() {
-    let clientMetricsToken = localStorage.getItem('_grv_mtoken');
+    this.core = core;
 
-    let formData = new FormData();
+    const clientMetricsToken = localStorage.getItem('_grv_mtoken');
+    const formData = new FormData();
 
     formData.append('time', Math.round(new Date().getTime() / 1000));
     formData.append('current_url', document.location.href);
@@ -32,7 +33,7 @@ export class Metrics {
       method: 'POST',
       headers: {
         'Metrics-Token': localStorage.getItem('_grv_mtoken'),
-        'X-CSRF-Token': window.CMSCore.client.CSRFToken
+        'X-CSRF-Token': this.core.client.CSRFToken
       },
       body: formData
     }).then((response) => {
