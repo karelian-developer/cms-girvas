@@ -820,10 +820,10 @@ class Form implements EntityTypeContent
    */
   public static function deleteData(CoreInterface $CMSCore, int $id) : bool
   {
-    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementDelete();
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('forms_data');
@@ -837,7 +837,7 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->assembly();
 
     try {
-      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
       $execute = $databaseQuery->execute();
