@@ -992,8 +992,8 @@ class Entry implements EntityTypeContent
       foreach ($data[$columnName] as $name => $value) {
         $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $fieldsJSON[] = match ($queryBuilder->DMS) {
-          CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
-          CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
+          CMSDMS::MySQL => sprintf("\"%s\": %s", $name, $valueJSON),
+          CMSDMS::PostgreSQL => sprintf("'{\"%s\": %s}'::jsonb", $name, $valueJSON)
         };
       }
 
@@ -1002,7 +1002,7 @@ class Entry implements EntityTypeContent
         $fieldsJSONImplodedPGSQL = implode(' || ', $fieldsJSON);
 
         $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-          'mysql' => "JSON_MERGE_PATCH(COALESCE($columnName, {}), CAST({$fieldsJSONImplodedMySQL} AS JSON))",
+          'mysql' => "JSON_MERGE_PATCH(COALESCE($columnName, '{}'), CAST('{$fieldsJSONImplodedMySQL}' AS JSON))",
           'postgresql' => "$columnName::jsonb || $fieldsJSONImplodedPGSQL"
         ]);
       }
