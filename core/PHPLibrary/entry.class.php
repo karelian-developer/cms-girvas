@@ -1002,7 +1002,7 @@ class Entry implements EntityTypeContent
         $fieldsJSONImplodedPGSQL = implode(' || ', $fieldsJSON);
 
         $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-          'mysql' => "JSON_MERGE_PATCH(COALESCE($columnName, '{}'), CAST('{$fieldsJSONImplodedMySQL}' AS JSON))",
+          'mysql' => "JSON_MERGE_PATCH(COALESCE($columnName, {}), CAST({$fieldsJSONImplodedMySQL} AS JSON))",
           'postgresql' => "$columnName::jsonb || $fieldsJSONImplodedPGSQL"
         ]);
       }
