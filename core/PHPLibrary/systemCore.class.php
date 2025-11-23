@@ -366,19 +366,6 @@ final class SystemCore implements CoreInterface
     /** @var string Случайная хэш-строка для идентификации ранее встроенных стилей (CSS) */
     $this->CSPStylesHash = bin2hex($bytes);
 
-    if (!isset($_COOKIE['_grv_csrf'])) {
-      $CSRFToken = self::generateCSRFToken();
-
-      setcookie('_grv_csrf', $CSRFToken, [
-        'expires' => $expires,
-        'path' => '/',
-        'domain' => $domainForCookies,
-        'secure' => $userSessionIsSecure,
-        'httponly' => false,
-        'samesite' => 'Strict'
-      ]);
-    }
-
     /** @var CMSFileConnector Объект подключателя файлов */
     $CMSFileConnector = new CMSFileConnector($this);
     $CMSFileConnector = $this->autoloadComponents(
@@ -414,6 +401,19 @@ final class SystemCore implements CoreInterface
     /** @var CMSConfigurator Объект конфигуратора системного ядра */
     $this->configurator = new CMSConfigurator($this);
     $CMSConfigurator = $this->configurator;
+
+    if (!isset($_COOKIE['_grv_csrf'])) {
+      $CSRFToken = self::generateCSRFToken();
+
+      setcookie('_grv_csrf', $CSRFToken, [
+        'expires' => $expires,
+        'path' => '/',
+        'domain' => $CMSConfigurator->get('domainCookies'),
+        'secure' => $CMSConfigurator->get('SSLIsEnabled') ? true : false,
+        'httponly' => false,
+        'samesite' => 'Strict'
+      ]);
+    }
 
     // Подключение к базе данных
     if ($CMSURLP->getPath(0) !== 'install' && $CMSURLP->getPath(1) !== 'install' && $CMSURLP->getParam('installation-mode') !== 'true') {
