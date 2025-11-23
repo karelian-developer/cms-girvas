@@ -384,15 +384,6 @@ class NadvoParse
 
   private function parseInlineElements(string $html) : string
   {
-    // Защищаем блоки кода от обработки
-    $html = preg_replace_callback(
-      '/(<pre><code[^>]*>.*?<\/code><\/pre>|<code>.*?<\/code>|<table>.*?<\/table>|<ul>.*?<\/ul>|<ol>.*?<\/ol>|<blockquote>.*?<\/blockquote>)/s',
-      function($matches) {
-        return htmlspecialchars($matches[0]);
-      },
-      $html
-    );
-
     $html = preg_replace_callback(
       self::PATTERNS['video'],
       function($matches) {
