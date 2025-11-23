@@ -133,7 +133,6 @@ export class Request {
     if (window.CMSCore !== undefined) {
       if (window.CMSCore.client.CSRFToken !== '') {
         this.headers['X-CSRF-Token'] = window.CMSCore.client.CSRFToken;
-        console.log(this.headers);
       }
     }
 
