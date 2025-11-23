@@ -141,7 +141,7 @@ export class PageAnalytics {
         });
       }
 
-      if (searchParams.getPathPart(2) === 'form' && searchParams.getPathPart(3) !== null) {
+      if (searchParams.getPathPart(3) === 'form' && searchParams.getPathPart(4) !== null) {
         const formID = searchParams.getPathPart(3);
 
         const tableItems = document.querySelectorAll('[data-element="form-data"]');
