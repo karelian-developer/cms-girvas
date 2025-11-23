@@ -999,9 +999,12 @@ class Entry implements EntityTypeContent
       }
 
       if (!empty($data[$columnName])) {
+        $fieldsJSONImplodedMySQL = implode(', ', $fieldsJSON);
+        $fieldsJSONImplodedPostgreSQL = implode(' || ', $fieldsJSON);
+
         $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-          'mysql' => "JSON_MERGE_PATCH(COALESCE($columnName, '{}'), CAST('{$fieldsJSON}' AS JSON))",
-          'postgresql' => "'$columnName'::jsonb || $fieldsJSON"
+          'mysql' => "JSON_MERGE_PATCH(COALESCE(`$columnName`, '{}'), CAST('{$fieldsJSONImplodedMySQL}' AS JSON))",
+          'postgresql' => "\"$columnName\"::jsonb || $fieldsJSONImplodedPostgreSQL"
         ]);
       }
     }
