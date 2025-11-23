@@ -30,113 +30,116 @@ export class PageAnalytics {
       this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
       const analyticApp = document.querySelector('#analytic-app');
-      const attendanceScheduleContainerElement = analyticApp.querySelector('[role="attendance-schedule"]');
-      
-      const scheduleContainerElement = this.scheduleContainerElementCreate();
-      const scheduleParentElement = scheduleContainerElement.parentElement;
-      const scheduleParentElementWidth = scheduleParentElement.offsetWidth;
 
-      const firstDate = new Date(), lastDate = new Date();
+      if (analyticApp !== null) {
+        const attendanceScheduleContainerElement = analyticApp.querySelector('[role="attendance-schedule"]');
+        
+        const scheduleContainerElement = this.scheduleContainerElementCreate();
+        const scheduleParentElement = scheduleContainerElement.parentElement;
+        const scheduleParentElementWidth = scheduleParentElement.offsetWidth;
 
-      attendanceScheduleContainerElement.innerHTML = '';
-      attendanceScheduleContainerElement.append(scheduleContainerElement);
+        const firstDate = new Date(), lastDate = new Date();
 
-      scheduleContainerElement.setAttribute('width', `${scheduleParentElementWidth}px`);
-      scheduleContainerElement.setAttribute('height', '400px');
+        attendanceScheduleContainerElement.innerHTML = '';
+        attendanceScheduleContainerElement.append(scheduleContainerElement);
 
-      firstDate.setDate(1);
-      lastDate.setMonth(firstDate.getMonth() + 1);
-      lastDate.setDate(0);
-      
-      window.CMSCore.metrics.getDataByRangeTimestamp(firstDate.getTime(), lastDate.getTime()).then((metricsData) => {
-        let scheduleAttendance = new Interactive('schedule', {
-          canvasElement: scheduleContainerElement,
-          type: 'linear'
-        });
+        scheduleContainerElement.setAttribute('width', `${scheduleParentElementWidth}px`);
+        scheduleContainerElement.setAttribute('height', '400px');
 
-        scheduleAttendance.target.setFrameSize(scheduleContainerElement.width - 50, scheduleContainerElement.height - 50 - 40);
-        scheduleAttendance.target.addGroup('Просмотры');
+        firstDate.setDate(1);
+        lastDate.setMonth(firstDate.getMonth() + 1);
+        lastDate.setDate(0);
+        
+        window.CMSCore.metrics.getDataByRangeTimestamp(firstDate.getTime(), lastDate.getTime()).then((metricsData) => {
+          let scheduleAttendance = new Interactive('schedule', {
+            canvasElement: scheduleContainerElement,
+            type: 'linear'
+          });
 
-        if (searchParams.getPathPart(4) === null) {
-          scheduleAttendance.target.addGroup('Визиты');
-          scheduleAttendance.target.addGroup('Посещения');
-        }
+          scheduleAttendance.target.setFrameSize(scheduleContainerElement.width - 50, scheduleContainerElement.height - 50 - 40);
+          scheduleAttendance.target.addGroup('Просмотры');
 
-        metricsData.forEach((data) => {
-          let urlsTotalViews = 0, visits0 = [], visits1 = [];
-          let time = data.metrics.time * 1000;
-          let date = new Date();
+          if (searchParams.getPathPart(4) === null) {
+            scheduleAttendance.target.addGroup('Визиты');
+            scheduleAttendance.target.addGroup('Посещения');
+          }
 
-          date.setTime(time);
+          metricsData.forEach((data) => {
+            let urlsTotalViews = 0, visits0 = [], visits1 = [];
+            let time = data.metrics.time * 1000;
+            let date = new Date();
 
-          for (let token in data.metrics.views) {
-            let urls = data.metrics.views[token].urls;
-            let urlTransfers = data.metrics.views[token].url_transfers;
+            date.setTime(time);
 
-            for (let url in urls) {
-              if (searchParams.getPathPart(4) === null) {
-                urlsTotalViews += urls[url];
-              } else {
-                let urlObject = new URL(url);
-                let urlPathParts = urlObject.pathname.split('/');
+            for (let token in data.metrics.views) {
+              let urls = data.metrics.views[token].urls;
+              let urlTransfers = data.metrics.views[token].url_transfers;
 
-                let targetObjectName = document.querySelector('article.page[data-name]');
+              for (let url in urls) {
+                if (searchParams.getPathPart(4) === null) {
+                  urlsTotalViews += urls[url];
+                } else {
+                  let urlObject = new URL(url);
+                  let urlPathParts = urlObject.pathname.split('/');
 
-                if (targetObjectName !== null) {
-                  if (urlPathParts[2] === targetObjectName.getAttribute('data-name')) {
-                    urlsTotalViews += urls[url];
-                  }
-                }
-              }
-            }
+                  let targetObjectName = document.querySelector('article.page[data-name]');
 
-            if (searchParams.getPathPart(4) === null) {
-              for (let transferIndex in urlTransfers) {
-                for (let transfer in urlTransfers[transferIndex]) {
-                  let urlReferral = urlTransfers[transferIndex][transfer].referral;
-                  let visitedIsNew = urlTransfers[transferIndex][transfer].is_visited_new;
-                  
-                  if (transfer !== urlReferral) {
-                    if (visits0.indexOf(token) != -1) {
-                      if ((urlTransfers[transferIndex][transfer].time * 1000) + (30 * 60 * 1000) < new Date().getTime()) {
-                        visits0.push(token);
-                      }
-                    } else {
-                      visits0.push(token);
+                  if (targetObjectName !== null) {
+                    if (urlPathParts[2] === targetObjectName.getAttribute('data-name')) {
+                      urlsTotalViews += urls[url];
                     }
                   }
+                }
+              }
 
-                  if (transfer !== urlReferral) {
-                    if (visits1.indexOf(token) === -1) {
-                      if (visitedIsNew) {
-                        visits1.push(token);
+              if (searchParams.getPathPart(4) === null) {
+                for (let transferIndex in urlTransfers) {
+                  for (let transfer in urlTransfers[transferIndex]) {
+                    let urlReferral = urlTransfers[transferIndex][transfer].referral;
+                    let visitedIsNew = urlTransfers[transferIndex][transfer].is_visited_new;
+                    
+                    if (transfer !== urlReferral) {
+                      if (visits0.indexOf(token) != -1) {
+                        if ((urlTransfers[transferIndex][transfer].time * 1000) + (30 * 60 * 1000) < new Date().getTime()) {
+                          visits0.push(token);
+                        }
+                      } else {
+                        visits0.push(token);
                       }
-                    } 
+                    }
+
+                    if (transfer !== urlReferral) {
+                      if (visits1.indexOf(token) === -1) {
+                        if (visitedIsNew) {
+                          visits1.push(token);
+                        }
+                      } 
+                    }
                   }
                 }
               }
             }
-          }
 
-          scheduleAttendance.target.addData(0, date.getDate() - 1, urlsTotalViews);
+            scheduleAttendance.target.addData(0, date.getDate() - 1, urlsTotalViews);
 
-          if (searchParams.getPathPart(4) === null) {
-            scheduleAttendance.target.addData(1, date.getDate() - 1, visits0.length);
-            scheduleAttendance.target.addData(2, date.getDate() - 1, visits1.length);
-          }
+            if (searchParams.getPathPart(4) === null) {
+              scheduleAttendance.target.addData(1, date.getDate() - 1, visits0.length);
+              scheduleAttendance.target.addData(2, date.getDate() - 1, visits1.length);
+            }
 
-          scheduleAttendance.target.types[0].setColor('#EE82EE');
+            scheduleAttendance.target.types[0].setColor('#EE82EE');
 
-          if (searchParams.getPathPart(4) === null) {
-            scheduleAttendance.target.types[1].setColor('#5B92E5');
-            scheduleAttendance.target.types[2].setColor('#088567');
-          }
+            if (searchParams.getPathPart(4) === null) {
+              scheduleAttendance.target.types[1].setColor('#5B92E5');
+              scheduleAttendance.target.types[2].setColor('#088567');
+            }
+          });
+    
+          scheduleAttendance.target.buildData();
+          scheduleAttendance.target.init();
+          scheduleAttendance.assembly();
         });
-  
-        scheduleAttendance.target.buildData();
-        scheduleAttendance.target.init();
-        scheduleAttendance.assembly();
-      });
+      }
 
       if (searchParams.getPathPart(2) === 'form' && searchParams.getPathPart(3) !== null) {
         const formID = searchParams.getPathPart(3);
