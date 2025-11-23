@@ -176,7 +176,7 @@ class Client
     
     if ($domainForCookies !== null) {
       return setcookie($name, $session->getToken(), [
-        'expires' => $expires,
+        'expires' => 0,
         'path' => '/',
         'domain' => $domainForCookies,
         'secure' => $userSessionIsSecure,
