@@ -326,16 +326,34 @@ class NadvoParse
     $inTable = false;
 
     foreach ($lines as $line) {
+      if (str_starts_with(trim($line), '<pre>') || 
+        str_starts_with(trim($line), '<blockquote>') ||
+        str_starts_with(trim($line), '</blockquote>') ||
+        str_starts_with(trim($line), '<table>') ||
+        str_starts_with(trim($line), '<ul>') ||
+        str_starts_with(trim($line), '<ol>') ||
+        str_starts_with(trim($line), '</ul>') ||
+        str_starts_with(trim($line), '</ol>') ||
+        str_starts_with(trim($line), '<li>'))
+      {
+
+        if (!empty($currentParagraph)) {
+          $html .= '<p>' . $currentParagraph . '</p>';
+          $currentParagraph = '';
+        }
+
+        $html .= $line . "\n";
+        continue;
+      }
+
       if (str_starts_with(trim($line), '|')) {
         if (!$inTable) {
           if (!empty($currentParagraph)) {
             $html .= '<p>' . $currentParagraph . '</p>';
             $currentParagraph = '';
           }
-
           $inTable = true;
         }
-        
         continue;
       }
 
@@ -346,8 +364,7 @@ class NadvoParse
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
         }
-
-        $html .= '<h' . strlen($matches[1]) . '>' . $matches[2] . '</h' . strlen($matches[1]) . '>';
+        $html .= '<h' . strlen($matches[1]) . '>' . $matches[2] . '</h' . strlen($matches[1]) . '>' . "\n";
       } elseif (empty(trim($line))) {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
