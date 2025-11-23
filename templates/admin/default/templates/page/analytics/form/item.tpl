@@ -1,4 +1,4 @@
-<div class="grid-table__item grid-table__item_form" data-element="form" data-id="{FORM_DATA_ID}">
+<div class="grid-table__item grid-table__item_form" data-element="form-data" data-id="{FORM_DATA_ID}">
   <div class="grid-table__cell grid-table__cell_description">
     {FORM_DATA}
   </div>

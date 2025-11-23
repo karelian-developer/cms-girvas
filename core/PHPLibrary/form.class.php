@@ -491,6 +491,51 @@ class Form implements EntityTypeContent
 
     return ($databaseQuery->fetchColumn()) ? true : false;
   }
+
+  /**
+   * Проверка существования данных формы по ID
+   *
+   * @param  CoreInterface $CMSCore
+   * @param  int $id
+   * 
+   * @return bool
+   */
+  public static function existsDataByID(CoreInterface $CMSCore, int $id) : bool
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['1']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('forms_data');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+    
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $id, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    return $databaseQuery->fetchColumn() ? true : false;
+  }
   
   /**
    * Получить объект по имени
@@ -726,7 +771,7 @@ class Form implements EntityTypeContent
   }
   
   /**
-   * Удаление существующей
+   * Удаление существующей формы
    *
    * @return bool
    */
@@ -739,6 +784,49 @@ class Form implements EntityTypeContent
     $queryBuilder->setStatementDelete();
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('forms');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+      $execute = $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    return $execute ? true : false;
+  }
+  
+  /**
+   * Удаление существующих данных формы
+   * 
+   * @param CoreInterface $CMSCore
+   * @param int $id
+   * 
+   * @return bool
+   */
+  public static function deleteData(CoreInterface $CMSCore, int $id) : bool
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementDelete();
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('forms_data');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
     $queryBuilder->statement->clauseWhere->addConditionAdaptive([

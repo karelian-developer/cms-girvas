@@ -18,7 +18,7 @@ export class PageAnalytics {
   }
 
   init() {
-    let searchParams = new URLParser();
+    const searchParams = new URLParser();
     let locales;
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
@@ -27,28 +27,22 @@ export class PageAnalytics {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let analyticApp = document.querySelector('#analytic-app');
-      let attendanceScheduleContainerElement = analyticApp.querySelector('[role="attendance-schedule"]');
+      const analyticApp = document.querySelector('#analytic-app');
+      const attendanceScheduleContainerElement = analyticApp.querySelector('[role="attendance-schedule"]');
+      
+      const scheduleContainerElement = this.scheduleContainerElementCreate();
+      const scheduleParentElement = scheduleContainerElement.parentElement;
+      const scheduleParentElementWidth = scheduleParentElement.offsetWidth;
+
+      const firstDate = new Date(), lastDate = new Date();
+
       attendanceScheduleContainerElement.innerHTML = '';
-
-      let scheduleContainerElement = this.scheduleContainerElementCreate();
       attendanceScheduleContainerElement.append(scheduleContainerElement);
-
-      let scheduleParentElement = scheduleContainerElement.parentElement;
-      let scheduleParentElementWidth = scheduleParentElement.offsetWidth;
 
       scheduleContainerElement.setAttribute('width', `${scheduleParentElementWidth}px`);
       scheduleContainerElement.setAttribute('height', '400px');
-
-      let firstDate = new Date(), lastDate = new Date();
 
       firstDate.setDate(1);
       lastDate.setMonth(firstDate.getMonth() + 1);
@@ -61,7 +55,6 @@ export class PageAnalytics {
         });
 
         scheduleAttendance.target.setFrameSize(scheduleContainerElement.width - 50, scheduleContainerElement.height - 50 - 40);
-
         scheduleAttendance.target.addGroup('Просмотры');
 
         if (searchParams.getPathPart(4) === null) {
@@ -89,7 +82,7 @@ export class PageAnalytics {
 
                 let targetObjectName = document.querySelector('article.page[data-name]');
 
-                if (targetObjectName != null) {
+                if (targetObjectName !== null) {
                   if (urlPathParts[2] === targetObjectName.getAttribute('data-name')) {
                     urlsTotalViews += urls[url];
                   }
@@ -102,9 +95,8 @@ export class PageAnalytics {
                 for (let transfer in urlTransfers[transferIndex]) {
                   let urlReferral = urlTransfers[transferIndex][transfer].referral;
                   let visitedIsNew = urlTransfers[transferIndex][transfer].is_visited_new;
-                  console.log(visitedIsNew);
-
-                  if (transfer != urlReferral) {
+                  
+                  if (transfer !== urlReferral) {
                     if (visits0.indexOf(token) != -1) {
                       if ((urlTransfers[transferIndex][transfer].time * 1000) + (30 * 60 * 1000) < new Date().getTime()) {
                         visits0.push(token);
@@ -114,7 +106,7 @@ export class PageAnalytics {
                     }
                   }
 
-                  if (transfer != urlReferral) {
+                  if (transfer !== urlReferral) {
                     if (visits1.indexOf(token) === -1) {
                       if (visitedIsNew) {
                         visits1.push(token);
@@ -145,6 +137,58 @@ export class PageAnalytics {
         scheduleAttendance.target.init();
         scheduleAttendance.assembly();
       });
+
+      if (searchParams.getPathPart(2) === 'form' && searchParams.getPathPart(3) !== null) {
+        const formID = searchParams.getPathPart(3);
+
+        const tableItems = document.querySelectorAll('[data-element="form-data"]');
+        for (let tableItem of tableItems) {
+          const formDataID = tableItem.getAttribute('data-id');
+          const panelElement = tableItem.querySelector('[data-element="panel"]');
+          const panelEventElements = panelElement.querySelectorAll('[data-event]');
+
+          for (let eventElement of panelEventElements) {
+            eventElement.addEventListener('click', (event) => {
+              event.preventDefault();
+
+              if (eventElement.getAttribute('data-event') === 'remove') {
+                const interactiveModal = new Interactive('modal', {
+                  title: localeData.MODAL_FORM_DELETE_TITLE,
+                  content: localeData.MODAL_FORM_DELETE_DESCRIPTION
+                });
+                
+                interactiveModal.target.addButton(localeData.BUTTON_DELETE_LABEL, () => {
+                  const formData = new FormData();
+                  formData.append('form_id', formID);
+                  formData.append('form_data_id', formDataID);
+
+                  const request = new Interactive('request', {
+                    method: 'DELETE',
+                    url: '/handler/form/' + formID + '?localeMessage=' + window.CMSCore.locales.admin.name
+                  });
+        
+                  request.target.data = formData;
+                  request.target.send().then((data) => {
+                    if (data.statusCode === 1) {
+                      window.location.href = '/admin/analytics/form/' + formID;
+                    }
+                  });
+                });
+
+                interactiveModal.target.addButton(localeData.BUTTON_CANCEL_LABEL, () => {
+                  interactiveModal.target.close();
+                });
+
+                interactiveModal.assembly();
+                document.body.appendChild(interactiveModal.target.element);
+                interactiveModal.target.show();
+              }
+            });
+          }
+        }
+      }
+    }, (rejectionReason) => {
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 
