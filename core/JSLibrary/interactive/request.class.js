@@ -27,7 +27,7 @@ export class Request {
     this.setURL(url);
 
     this.data = (data == undefined || data == null) ? undefined : new FormData(data);
-    this.headers = {};
+    this.headers = new Headers({});
     this.showingNotification = true;
   }
 
@@ -132,7 +132,7 @@ export class Request {
 
     if (window.CMSCore !== undefined) {
       if (window.CMSCore.client.CSRFToken !== '') {
-        this.headers['X-CSRF-Token'] = window.CMSCore.client.CSRFToken;
+        this.headers.set('X-CSRF-Token', window.CMSCore.client.CSRFToken);
       }
     }
 
