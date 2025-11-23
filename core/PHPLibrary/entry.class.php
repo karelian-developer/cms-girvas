@@ -990,22 +990,17 @@ class Entry implements EntityTypeContent
       }
 
       foreach ($data[$columnName] as $name => $value) {
-        $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_QUOT | JSON_HEX_TAG);
-        $valueJSON = addcslashes($valueJSON, '"');
-
+        $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $fieldsJSON[] = match ($queryBuilder->DMS) {
-          CMSDMS::MySQL => sprintf("\"%s\": %s", $name, $valueJSON),
-          CMSDMS::PostgreSQL => sprintf("'{\"%s\": %s}'::jsonb", $name, $valueJSON)
+          CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
+          CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
         };
       }
 
       if (!empty($data[$columnName])) {
-        $fieldsJSONImplodedMySQL = implode(', ', $fieldsJSON);
-        $fieldsJSONImplodedPostgreSQL = implode(' || ', $fieldsJSON);
-
         $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-          'mysql' => "JSON_MERGE_PATCH(COALESCE($columnName, '{}'), CAST('{$fieldsJSONImplodedMySQL}' AS JSON))",
-          'postgresql' => "$columnName::jsonb || $fieldsJSONImplodedPostgreSQL"
+          'mysql' => 'JSON_MERGE_PATCH(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
+          'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
         ]);
       }
     }
