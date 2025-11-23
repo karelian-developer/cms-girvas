@@ -29,12 +29,6 @@ export class Request {
     this.data = (data == undefined || data == null) ? undefined : new FormData(data);
     this.headers = {};
     this.showingNotification = true;
-
-    if (window.CMSCore !== undefined) {
-      if (window.CMSCore.client.CSRFToken !== '') {
-        this.headers['X-CSRF-Token'] = window.CMSCore.client.CSRFToken;
-      }
-    }
   }
 
   /**
@@ -134,6 +128,12 @@ export class Request {
       interactiveNotificationLoading.target.assembly();
 
       interactiveNotificationLoading.target.show();
+    }
+
+    if (window.CMSCore !== undefined) {
+      if (window.CMSCore.client.CSRFToken !== '') {
+        this.headers['X-CSRF-Token'] = window.CMSCore.client.CSRFToken;
+      }
     }
 
     return fetch(requestURL, {
