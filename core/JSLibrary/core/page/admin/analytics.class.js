@@ -142,7 +142,7 @@ export class PageAnalytics {
       }
 
       if (searchParams.getPathPart(3) === 'form' && searchParams.getPathPart(4) !== null) {
-        const formID = searchParams.getPathPart(3);
+        const formID = searchParams.getPathPart(4);
 
         const tableItems = document.querySelectorAll('[data-element="form-data"]');
         for (let tableItem of tableItems) {
