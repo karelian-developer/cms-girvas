@@ -145,6 +145,7 @@ export class PageAnalytics {
         const formID = searchParams.getPathPart(3);
 
         const tableItems = document.querySelectorAll('[data-element="form-data"]');
+        console.log(tableItems);
         for (let tableItem of tableItems) {
           const formDataID = tableItem.getAttribute('data-id');
           const panelElement = tableItem.querySelector('[data-element="panel"]');
