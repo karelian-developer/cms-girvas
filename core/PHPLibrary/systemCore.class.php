@@ -406,7 +406,7 @@ final class SystemCore implements CoreInterface
       $CSRFToken = self::generateCSRFToken();
 
       setcookie('_grv_csrf', $CSRFToken, [
-        'expires' => $expires,
+        'expires' => 0,
         'path' => '/',
         'domain' => $CMSConfigurator->get('domainCookies'),
         'secure' => $CMSConfigurator->get('SSLIsEnabled') ? true : false,
