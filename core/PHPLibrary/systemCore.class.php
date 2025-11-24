@@ -684,6 +684,28 @@ final class SystemCore implements CoreInterface
       $document = new DOMDocument();
       @$document->loadHTML($theme->core->assembled);
 
+      if ($this->page !== null) {
+        if (property_exists($this->page, 'metaOpenGraphAllowed')) {
+          $headElement = $document->getElementsByTagName('head')->item(0);
+
+          foreach ($this->page->metaOpenGraphAllowed as $metadata) {
+            $metaElement = $document->createElement('meta');
+            $metaElementContent = match ($metadata) {
+              'title' => '{SITE_META_TITLE}',
+              'description' => '{SITE_DESCRIPTION}',
+              'type' => 'website',
+              'url' => '{CMS_DOMAIN_LINK}',
+              'site_name' => '{SITE_TITLE}'
+            };
+
+            $metaElement->setAttribute('property', 'og:' . $metadata);
+            $metaElement->setAttribute('content', 'og:' . $metaElementContent);
+
+            $headElement->appendChild($metaElement);
+          }
+        }
+      }
+
       $scriptElements = $document->getElementsByTagName('script');
       foreach ($scriptElements as $scriptElement) {
         $scriptElement->setAttribute('nonce', $this->CSPScriptsHash);

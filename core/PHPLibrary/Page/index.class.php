@@ -25,7 +25,7 @@ class PageIndex implements InterfacePage
   public SystemCore $CMSCore;
   public Page $page;
   public string $assembled = '';
-  private array $metaOpenGraphAllowed = [
+  public array $metaOpenGraphAllowed = [
     'title',
     'description',
     'type',
@@ -44,36 +44,6 @@ class PageIndex implements InterfacePage
   {
     $this->CMSCore = $CMSCore;
     $this->page = $page;
-
-    $this->initMetaOpenGraph();
-  }
-
-  private function initMetaOpenGraph() : void
-  {
-    $document = new DOMDocument();
-    libxml_use_internal_errors(true);
-    $document->loadHTML($this->CMSCore->theme->core->assembled);
-    libxml_use_internal_errors(false);
-
-    $documentElement = (new DOMXPath($document))->query('/')->item(0);
-    $headElement = $documentElement->getElementsByTagName('head')->item(0);
-    if ($headElement !== null) {
-      foreach ($this->metaOpenGraphAllowed as $metadata) {
-        $metaElement = $document->createElement('meta');
-        $metaElementContent = match ($metadata) {
-          'title' => '{SITE_META_TITLE}',
-          'description' => '{SITE_DESCRIPTION}',
-          'type' => 'website',
-          'url' => '{CMS_DOMAIN_LINK}',
-          'site_name' => '{SITE_TITLE}'
-        };
-
-        $metaElement->setAttribute('property', 'og:' . $metadata);
-        $metaElement->setAttribute('content', 'og:' . $metaElementContent);
-
-        $headElement->appendChild($document->importNode($metaElement, true));
-      }
-    }
   }
   
   /**
