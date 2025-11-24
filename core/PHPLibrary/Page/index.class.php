@@ -67,6 +67,11 @@ class PageIndex implements InterfacePage
           'url' => '{CMS_DOMAIN_LINK}'
           'site_name' => '{SITE_TITLE}'
         };
+
+        $metaElement->setAttribute('property', 'og:' . $metadata);
+        $metaElement->setAttribute('content', 'og:' . $metaElementContent);
+
+        $headElement->appendChild($document->importNode($metaElement, true));
       }
     }
   }
