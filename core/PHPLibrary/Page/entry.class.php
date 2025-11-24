@@ -94,8 +94,8 @@ class PageEntry implements InterfacePage
     $this->metaOpenGraphAllowed['title'] = $this->targetObject->getSEOTitle($CMSLocaleName);
     $this->metaOpenGraphAllowed['description'] = $this->targetObject->getSEODescription($CMSLocaleName);
     $this->metaOpenGraphAllowed['type'] = 'website';
-    $this->metaOpenGraphAllowed['url'] = $this->CMSCore->getCMSLink() . $imageURL;
-    $this->metaOpenGraphAllowed['image'] = $this->CMSCore->getCMSLink() . $this->targetObject->getPreviewURL();
+    $this->metaOpenGraphAllowed['url'] = rtrim($this->CMSCore->getCMSLink(), '/') . $this->targetObject->getURL();
+    $this->metaOpenGraphAllowed['image'] = rtrim($this->CMSCore->getCMSLink(), '/') . $imageURL;
     $this->metaOpenGraphAllowed['site_name'] = $CMSConfigurator->getSiteTitle();
   }
 
