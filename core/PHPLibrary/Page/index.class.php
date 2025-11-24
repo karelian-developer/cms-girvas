@@ -59,7 +59,7 @@ class PageIndex implements InterfacePage
     $this->metaOpenGraphAllowed['title'] = $CMSConfigurator->getSiteTitle();
     $this->metaOpenGraphAllowed['description'] = $CMSConfigurator->getSiteDescription();
     $this->metaOpenGraphAllowed['type'] = 'website';
-    $this->metaOpenGraphAllowed['url'] = $CMSConfigurator->getCMSLink();
+    $this->metaOpenGraphAllowed['url'] = $this->CMSCore->getCMSLink();
     $this->metaOpenGraphAllowed['site_name'] = $CMSConfigurator->getSiteTitle();
   }
   
