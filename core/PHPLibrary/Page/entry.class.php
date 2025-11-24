@@ -37,6 +37,14 @@ class PageEntry implements InterfacePage
 {
   public string $assembled = '';
   private ?EntityTypeContent $targetObject = null;
+  public array $metaOpenGraphAllowed = [
+    'title',
+    'description',
+    'type',
+    'url',
+    'image',
+    'site_name'
+  ];
 
   /**
    * __construct
@@ -64,6 +72,31 @@ class PageEntry implements InterfacePage
         ]
       );
     }
+
+    $this->initMetaOpenGraph();
+  }
+
+  /**
+   * Инициализация данных OpenGraph
+   * 
+   * @return void
+   */
+  private function initMetaOpenGraph() : void
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSLocale = $this->CMSCore->locale;
+    $CMSLocaleName = $CMSLocale->getName();
+
+    $imageURL = $this->targetObject->getPreviewURL() !== ''
+      ? $this->targetObject->getPreviewURL()
+      : $this->targetObject::getPreviewDefaultURL($this->CMSCore, 1024);
+
+    $this->metaOpenGraphAllowed['title'] = $this->targetObject->getSEOTitle($CMSLocaleName);
+    $this->metaOpenGraphAllowed['description'] = $CMSConfigurator->getSEODescription($CMSLocaleName);
+    $this->metaOpenGraphAllowed['type'] = 'website';
+    $this->metaOpenGraphAllowed['url'] = $CMSConfigurator->getCMSLink() . $imageURL;
+    $this->metaOpenGraphAllowed['image'] = $CMSConfigurator->getCMSLink() . $this->targetObject->getPreviewURL();
+    $this->metaOpenGraphAllowed['site_name'] = $CMSConfigurator->getSiteTitle();
   }
 
   /**

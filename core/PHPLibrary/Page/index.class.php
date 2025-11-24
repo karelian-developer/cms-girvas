@@ -44,6 +44,23 @@ class PageIndex implements InterfacePage
   {
     $this->CMSCore = $CMSCore;
     $this->page = $page;
+
+    $this->initMetaOpenGraph();
+  }
+
+  /**
+   * Инициализация данных OpenGraph
+   * 
+   * @return void
+   */
+  private function initMetaOpenGraph() : void
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $this->metaOpenGraphAllowed['title'] = $CMSConfigurator->getSiteTitle();
+    $this->metaOpenGraphAllowed['description'] = $CMSConfigurator->getSiteDescription();
+    $this->metaOpenGraphAllowed['type'] = 'website';
+    $this->metaOpenGraphAllowed['url'] = $CMSConfigurator->getCMSLink();
+    $this->metaOpenGraphAllowed['site_name'] = $CMSConfigurator->getSiteTitle();
   }
   
   /**
