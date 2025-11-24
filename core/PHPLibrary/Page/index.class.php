@@ -64,7 +64,7 @@ class PageIndex implements InterfacePage
           'title' => '{SITE_META_TITLE}',
           'description' => '{SITE_DESCRIPTION}',
           'type' => 'website',
-          'url' => '{CMS_DOMAIN_LINK}'
+          'url' => '{CMS_DOMAIN_LINK}',
           'site_name' => '{SITE_TITLE}'
         };
 
