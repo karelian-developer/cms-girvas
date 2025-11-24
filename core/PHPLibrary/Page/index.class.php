@@ -25,13 +25,7 @@ class PageIndex implements InterfacePage
   public SystemCore $CMSCore;
   public Page $page;
   public string $assembled = '';
-  public array $metaOpenGraphAllowed = [
-    'title',
-    'description',
-    'type',
-    'url',
-    'site_name'
-  ];
+  public array $metaOpenGraphAllowed = [];
 
   /**
    * __construct
