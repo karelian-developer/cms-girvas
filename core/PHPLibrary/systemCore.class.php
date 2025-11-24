@@ -687,7 +687,7 @@ final class SystemCore implements CoreInterface
       if ($this->page !== null) {
         if (property_exists($this->page, 'metaOpenGraphAllowed')) {
           $headElement = $document->getElementsByTagName('head')->item(0);
-
+          
           foreach ($this->page->metaOpenGraphAllowed as $metaname => $metadata) {
             $metaElement = $document->createElement('meta');
             $metaElement->setAttribute('property', 'og:' . $metaname);

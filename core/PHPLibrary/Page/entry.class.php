@@ -37,14 +37,7 @@ class PageEntry implements InterfacePage
 {
   public string $assembled = '';
   private ?EntityTypeContent $targetObject = null;
-  public array $metaOpenGraphAllowed = [
-    'title',
-    'description',
-    'type',
-    'url',
-    'image',
-    'site_name'
-  ];
+  public array $metaOpenGraphAllowed = [];
 
   /**
    * __construct

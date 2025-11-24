@@ -37,6 +37,7 @@ class PagePage implements InterfacePage
 {
   public string $assembled = '';
   private ?EntityTypeContent $targetObject = null;
+  public array $metaOpenGraphAllowed = [];
 
   /**
    * __construct
