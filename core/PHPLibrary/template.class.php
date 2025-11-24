@@ -566,6 +566,7 @@ final class Template implements ThemeInterface
         'CMS_STAGE_DEVELOPING' => $this->CMSCore->getCMSStageDeveloping(),
         'CMS_TITLE' => $this->CMSCore->getCMSTitle(),
         'CMS_DOMAIN' => $this->CMSCore->getCMSDomain(),
+        'CMS_DOMAIN_LINK' => $this->CMSCore->getCMSLink(),
         'CMS_PRODUCT_SITE_LINK' => $this->CMSCore::CMS_PRODUCT_SITE_LINK,
         'CMS_DEVELOPER_SITE_LINK' => $this->CMSCore::CMS_DEVELOPER_SITE_LINK,
         'CMS_DEVELOPER_TITLE' => $this->CMSCore::CMS_DEVELOPER_TITLE,

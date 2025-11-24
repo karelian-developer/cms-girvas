@@ -17,12 +17,21 @@ use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
+use \DOMDocument as DOMDocument;
+use \DOMXPath as DOMXPath;
 
 class PageIndex implements InterfacePage
 {
   public SystemCore $CMSCore;
   public Page $page;
   public string $assembled = '';
+  private array $metaOpenGraphAllowed = [
+    'title',
+    'description',
+    'type',
+    'url',
+    'site_name'
+  ];
 
   /**
    * __construct
@@ -35,6 +44,31 @@ class PageIndex implements InterfacePage
   {
     $this->CMSCore = $CMSCore;
     $this->page = $page;
+
+    $this->initMetaOpenGraph();
+  }
+
+  initMetaOpenGraph() : void
+  {
+    $document = new DOMDocument();
+    libxml_use_internal_errors(true);
+    $document->loadHTML($this->CMSCore->theme->core->assembled);
+    libxml_use_internal_errors(false);
+
+    $documentElement = (new DOMXPath($document))->query('/')->item(0);
+    $headElement = $documentElement->getElementsByTagName('head')->item(0);
+    if ($headElement !== null) {
+      foreach ($this->metaOpenGraphAllowed as $metadata) {
+        $metaElement = $document->createElement('meta');
+        $metaElementContent = match ($metadata) {
+          'title' => '{SITE_META_TITLE}',
+          'description' => '{SITE_DESCRIPTION}',
+          'type' => 'website',
+          'url' => '{CMS_DOMAIN_LINK}'
+          'site_name' => '{SITE_TITLE}'
+        };
+      }
+    }
   }
   
   /**
