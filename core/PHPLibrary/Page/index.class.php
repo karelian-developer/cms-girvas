@@ -48,7 +48,7 @@ class PageIndex implements InterfacePage
     $this->initMetaOpenGraph();
   }
 
-  initMetaOpenGraph() : void
+  private function initMetaOpenGraph() : void
   {
     $document = new DOMDocument();
     libxml_use_internal_errors(true);
