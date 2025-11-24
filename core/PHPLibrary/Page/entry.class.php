@@ -84,14 +84,14 @@ class PageEntry implements InterfacePage
       ? $this->targetObject->getPreviewURL()
       : $this->targetObject::getPreviewDefaultURL($this->CMSCore, 1024);
 
-    $title = strip_tags($this->targetObject->getTitle($localeName));
-    $SEOTitle = strip_tags($this->targetObject->getSEOTitle($localeName));
+    $title = strip_tags($this->targetObject->getTitle($CMSLocaleName));
+    $SEOTitle = strip_tags($this->targetObject->getSEOTitle($CMSLocaleName));
     $SEOTitle = $SEOTitle !== ''
       ? $SEOTitle
       : $title;
 
-    $description = strip_tags($this->targetObject->getDescription($localeName));
-    $SEODescription = strip_tags($this->targetObject->getSEODescription($localeName));
+    $description = strip_tags($this->targetObject->getDescription($CMSLocaleName));
+    $SEODescription = strip_tags($this->targetObject->getSEODescription($CMSLocaleName));
     $SEODescription = $SEODescription !== ''
       ? $SEODescription
       : $description;
