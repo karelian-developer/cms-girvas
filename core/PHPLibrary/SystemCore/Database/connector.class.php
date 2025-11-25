@@ -18,7 +18,7 @@
  * @support     support@karelian-developer.ru
  */
 
-namespace core\PHPLibrary\SystemCore;
+namespace core\PHPLibrary\SystemCore\Database;
 
 use \core\PHPLibrary\Database as CMSDatabase;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as DatabaseManagementSystem;
