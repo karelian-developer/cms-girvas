@@ -14,8 +14,8 @@
 }
 
 use \core\PHPLibrary\PageStatic as PageStatic;
-use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
-use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as FileConverterEnumFileFormat;
+use \core\PHPLibrary\SystemCore\File\Converter as FileConverter;
+use \core\PHPLibrary\SystemCore\File\EnumFormat as FileConverterEnumFileFormat;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
 if ($CMSCore->client->isLogged(2)) {

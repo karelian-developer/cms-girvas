@@ -29,8 +29,8 @@ use \core\PHPLibrary\SystemCore\Header\HTTPReferrerPolicy as CMSHeaderHTTPReferr
 use \core\PHPLibrary\SystemCore\Header\EnumHTTPReferrerPolicy as CMSHeaderEnumHTTPReferrerPolicy;
 use \core\PHPLibrary\SystemCore\EnumHeader as CMSEnumHeader;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
-use \core\PHPLibrary\SystemCore\DatabaseConnector as CMSDatabaseConnector;
-use \core\PHPLibrary\SystemCore\FileConnector as CMSFileConnector;
+use \core\PHPLibrary\SystemCore\Database\Connector as CMSDatabaseConnector;
+use \core\PHPLibrary\SystemCore\File\Connector as CMSFileConnector;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;

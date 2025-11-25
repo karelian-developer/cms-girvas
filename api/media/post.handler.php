@@ -13,8 +13,8 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
-use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as EnumFileFormat;
+use \core\PHPLibrary\SystemCore\File\Converter as FileConverter;
+use \core\PHPLibrary\SystemCore\File\EnumFormat as EnumFileFormat;
 use \GdImage as GdImage;
 
 if ($CMSCore->client->isLogged(2)) {

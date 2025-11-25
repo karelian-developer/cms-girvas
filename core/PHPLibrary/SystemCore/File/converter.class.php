@@ -1,21 +1,31 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary\SystemCore;
 
 use \core\PHPLibrary\SystemCore as CMSCore;
-use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as EnumFileFormat;
+use \core\PHPLibrary\SystemCore\File\EnumFormat as EnumFileFormat;
 
-final class FileConverter
+final class Converter
 {
-  private CMSCore|null $CMSCore = null;
+  private ?CMSCore $CMSCore = null;
   private array|string $file = '';
   private string $convertFrom = '';
   private string $convertTo = '';
@@ -51,10 +61,12 @@ final class FileConverter
    * @param string $fileOutputFolderPath
    * @param EnumFileFormat $convertTo
    * @param bool $deleteOldFile
+   * @param mixed $salt
+   * @param int $quality
    * 
    * @return bool
    */
-  public function convert(array|string $file, string $fileOutputFolderPath, EnumFileFormat $convertTo, bool $deleteOldFile = false, mixed $salt = 0) : bool|array
+  public function convert(array|string $file, string $fileOutputFolderPath, EnumFileFormat $convertTo, bool $deleteOldFile = false, mixed $salt = 0, int $quality = -1) : bool|array
   {
     $CMSSalt = $this->CMSCore->configurator->get('salt');
     $fileOutputName = md5(sprintf('{GIRVAS:CONVERTER:%s:%d+%s}', $CMSSalt, time(), $salt));
@@ -99,51 +111,51 @@ final class FileConverter
       $convertedResult = false;
       if ($fileSourcePath != '' && file_exists($fileSourcePath)) {
         if (($fileExtension === 'jpeg' || $fileExtension === 'jpg') && $convertToExtension === 'png') {
-          $convertedResult = $this->convertJPEGToPNG($fileSourcePath, $fileOutputPath, $deleteOldFile);
+          $convertedResult = $this->convertJPEGToPNG($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
 
         if (($fileExtension === 'jpeg' || $fileExtension === 'jpg') && $convertToExtension === 'webp') {
-          $convertedResult = $this->convertJPEGToWEBP($fileSourcePath, $fileOutputPath, $deleteOldFile);
+          $convertedResult = $this->convertJPEGToWEBP($fileSourcePath, $fileOutputPath, $deleteOldFile), $quality;
         }
 
         if (($fileExtension === 'jpeg' || $fileExtension === 'jpg') && $convertToExtension === 'avif') {
-          $convertedResult = $this->convertJPEGToAVIF($fileSourcePath, $fileOutputPath, $deleteOldFile);
+          $convertedResult = $this->convertJPEGToAVIF($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
         if ($fileExtension === 'png' && ($convertToExtension === 'jpeg' || $convertToExtension === 'jpg')) {
-          $convertedResult = $this->convertPNGToJPEG($fileSourcePath, $fileOutputPath, $deleteOldFile);
+          $convertedResult = $this->convertPNGToJPEG($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
         if ($fileExtension === 'png' && $convertToExtension === 'webp') {
-          $convertedResult = $this->convertPNGToWEBP($fileSourcePath, $fileOutputPath, $deleteOldFile);
+          $convertedResult = $this->convertPNGToWEBP($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
         if ($fileExtension === 'png' && $convertToExtension === 'avif') {
-          $convertedResult = $this->convertPNGToAVIF($fileSourcePath, $fileOutputPath, $deleteOldFile);
+          $convertedResult = $this->convertPNGToAVIF($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
         if ($fileExtension === 'webp' && ($convertToExtension === 'jpeg' || $convertToExtension === 'jpg')) {
-          $convertedResult = $this->convertWEBPToJPEG($fileSourcePath, $fileOutputPath, $deleteOldFile);
+          $convertedResult = $this->convertWEBPToJPEG($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
         if ($fileExtension === 'webp' && $convertToExtension === 'png') {
-          $convertedResult = $this->convertWEBPToPNG($fileSourcePath, $fileOutputPath, $deleteOldFile);
+          $convertedResult = $this->convertWEBPToPNG($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
         if ($fileExtension === 'webp' && $convertToExtension === 'avif') {
-          $convertedResult = $this->convertWEBPToAVIF($fileSourcePath, $fileOutputPath, $deleteOldFile);
+          $convertedResult = $this->convertWEBPToAVIF($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
         if ($fileExtension === 'avif' && ($convertToExtension === 'jpeg' || $convertToExtension === 'jpg')) {
-          $convertedResult = $this->convertAVIFToJPEG($fileSourcePath, $fileOutputPath, $deleteOldFile);
+          $convertedResult = $this->convertAVIFToJPEG($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
         if ($fileExtension === 'avif' && $convertToExtension === 'png') {
-          $convertedResult = $this->convertAVIFToPNG($fileSourcePath, $fileOutputPath, $deleteOldFile);
+          $convertedResult = $this->convertAVIFToPNG($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
         if ($fileExtension === 'avif' && $convertToExtension === 'webp') {
-          $convertedResult = $this->convertAVIFToWEBP($fileSourcePath, $fileOutputPath, $deleteOldFile);
+          $convertedResult = $this->convertAVIFToWEBP($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
 
         if (($fileExtension === $convertToExtension)) {
@@ -180,7 +192,7 @@ final class FileConverter
    * 
    * @return bool
    */
-  private function convertJPEGToPNG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
+  private function convertJPEGToPNG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromjpeg($fileSourcePath);
     $imageSourceWidth = imagesx($imageSource);
@@ -188,7 +200,7 @@ final class FileConverter
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imagepng($imageConverted, $fileOutputPath, -1);
+    imagepng($imageConverted, $fileOutputPath, $quality);
     
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
@@ -201,13 +213,14 @@ final class FileConverter
   /**
    * convertJPEGToWEBP
    *
-   * @param  string $fileSourcePath
-   * @param  string $fileOutputPath
-   * @param  bool $deleteOldFile
+   * @param string $fileSourcePath
+   * @param string $fileOutputPath
+   * @param bool $deleteOldFile
+   * @param int $quality
    * 
    * @return bool
    */
-  private function convertJPEGToWEBP(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
+  private function convertJPEGToWEBP(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromjpeg($fileSourcePath);
     $imageSourceWidth = imagesx($imageSource);
@@ -215,7 +228,7 @@ final class FileConverter
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imagewebp($imageConverted, $fileOutputPath, 100);
+    imagewebp($imageConverted, $fileOutputPath, $quality);
 
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
@@ -234,7 +247,7 @@ final class FileConverter
    * 
    * @return bool
    */
-  private function convertJPEGToAVIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
+  private function convertJPEGToAVIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromjpeg($fileSourcePath);
     $imageSourceWidth = imagesx($imageSource);
@@ -242,7 +255,7 @@ final class FileConverter
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imageavif($imageConverted, $fileOutputPath);
+    imageavif($imageConverted, $fileOutputPath, $quality);
 
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
@@ -261,7 +274,7 @@ final class FileConverter
    * 
    * @return bool
    */
-  private function convertPNGToJPEG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
+  private function convertPNGToJPEG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefrompng($fileSourcePath);
     $imageSourceWidth = imagesx($imageSource);
@@ -272,7 +285,7 @@ final class FileConverter
     imagealphablending($imageConverted, true);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imagejpeg($imageConverted, $fileOutputPath, 100);
+    imagejpeg($imageConverted, $fileOutputPath, $quality);
     
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
@@ -291,7 +304,7 @@ final class FileConverter
    * 
    * @return bool
    */
-  private function convertPNGToWEBP(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
+  private function convertPNGToWEBP(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefrompng($fileSourcePath);
     $imageSourceWidth = imagesx($imageSource);
@@ -305,7 +318,7 @@ final class FileConverter
     imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imagewebp($imageConverted, $fileOutputPath, 100);
+    imagewebp($imageConverted, $fileOutputPath, $quality);
 
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
@@ -324,7 +337,7 @@ final class FileConverter
    * 
    * @return bool
    */
-  private function convertPNGToAVIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
+  private function convertPNGToAVIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefrompng($fileSourcePath);
     $imageSourceWidth = imagesx($imageSource);
@@ -338,7 +351,7 @@ final class FileConverter
     imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imageavif($imageConverted, $fileOutputPath);
+    imageavif($imageConverted, $fileOutputPath, $quality);
 
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
@@ -357,7 +370,7 @@ final class FileConverter
    * 
    * @return bool
    */
-  private function convertWEBPToJPEG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
+  private function convertWEBPToJPEG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromwebp($fileSourcePath);
     $imageSourceWidth = imagesx($imageSource);
@@ -368,7 +381,7 @@ final class FileConverter
     imagealphablending($imageConverted, true);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imagejpeg($imageConverted, $fileOutputPath, 100);
+    imagejpeg($imageConverted, $fileOutputPath, $quality);
     
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
@@ -387,7 +400,7 @@ final class FileConverter
    * 
    * @return bool
    */
-  private function convertWEBPToPNG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
+  private function convertWEBPToPNG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromwebp($fileSourcePath);
     $imageSourceWidth = imagesx($imageSource);
@@ -400,7 +413,7 @@ final class FileConverter
     $image_transparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
     imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imagepng($imageConverted, $fileOutputPath, -1);
+    imagepng($imageConverted, $fileOutputPath, $quality);
     
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
@@ -419,7 +432,7 @@ final class FileConverter
    * 
    * @return bool
    */
-  private function convertWEBPToAVIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
+  private function convertWEBPToAVIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromwebp($fileSourcePath);
     $imageSourceWidth = imagesx($imageSource);
@@ -433,7 +446,7 @@ final class FileConverter
     imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imageavif($imageConverted, $fileOutputPath);
+    imageavif($imageConverted, $fileOutputPath, $quality);
 
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
@@ -452,7 +465,7 @@ final class FileConverter
    * 
    * @return bool
    */
-  private function convertAVIFToJPEG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
+  private function convertAVIFToJPEG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromavif($fileSourcePath);
     $imageSourceWidth = imagesx($imageSource);
@@ -463,7 +476,7 @@ final class FileConverter
     imagealphablending($imageConverted, true);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imagejpeg($imageConverted, $fileOutputPath, 100);
+    imagejpeg($imageConverted, $fileOutputPath, $quality);
     
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
@@ -482,7 +495,7 @@ final class FileConverter
    * 
    * @return bool
    */
-  private function convertAVIFToPNG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
+  private function convertAVIFToPNG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromavif($fileSourcePath);
     $imageSourceWidth = imagesx($imageSource);
@@ -495,7 +508,7 @@ final class FileConverter
     $image_transparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
     imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imagepng($imageConverted, $fileOutputPath, -1);
+    imagepng($imageConverted, $fileOutputPath, $quality);
     
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
@@ -514,7 +527,7 @@ final class FileConverter
    * 
    * @return bool
    */
-  private function convertAVIFToWEBP(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
+  private function convertAVIFToWEBP(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromavif($fileSourcePath);
     $imageSourceWidth = imagesx($imageSource);
@@ -528,7 +541,7 @@ final class FileConverter
     imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imagewebp($imageConverted, $fileOutputPath);
+    imagewebp($imageConverted, $fileOutputPath, $quality);
 
     imagedestroy($imageSource);
     imagedestroy($imageConverted);

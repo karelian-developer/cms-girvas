@@ -14,10 +14,10 @@ use \core\PHPLibrary\Database as CMSDatabase;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as DatabaseManagementSystem;
 use \core\PHPLibrary\SystemCore as CMSCore;
 
-final class DatabaseConnector
+final class Connector
 {
-  private CMSCore|null $CMSCore = null;
-  public CMSDatabase|null $database = null;
+  private ?CMSCore $CMSCore = null;
+  public ? CMSDatabase $database = null;
   
   /**
    * __construct

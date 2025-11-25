@@ -15,8 +15,8 @@
 
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
-use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as FileConverterEnumFileFormat;
-use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
+use \core\PHPLibrary\SystemCore\File\EnumFormat as FileConverterEnumFileFormat;
+use \core\PHPLibrary\SystemCore\File\Converter as FileConverter;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
@@ -213,7 +213,7 @@ if ($CMSCore->client->isLogged(2)) {
           if (isset($_PATCH['entry_preview'])) {
             $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
             $fileConverter = new FileConverter($CMSCore);
-            $fileConverted = $fileConverter->convert($_PATCH['entry_preview'], $fileDirectoryPath, FileConverterEnumFileFormat::WEBP, true);
+            $fileConverted = $fileConverter->convert($_PATCH['entry_preview'], $fileDirectoryPath, FileConverterEnumFileFormat::WEBP, true, 0, 60);
             
             if (is_array($fileConverted)) {
               if (!array_key_exists('metadata', $entryData)) $entryData['metadata'] = [];
