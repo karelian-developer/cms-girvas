@@ -23,6 +23,7 @@ namespace core\PHPLibrary\SystemCore\Database;
 use \core\PHPLibrary\Database as CMSDatabase;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as DatabaseManagementSystem;
 use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\SystemCore\Configurator as CMSConfigurator;
 
 final class Connector
 {
@@ -33,12 +34,12 @@ final class Connector
    * __construct
    *
    * @param CMSCore $CMSCore
-   * @param Configurator $configurator
+   * @param CMSConfigurator $configurator
    * @param bool $isTest
    * 
    * @return void
    */
-  public function __construct(CMSCore $CMSCore, Configurator $configurator, bool $isTest = false)
+  public function __construct(CMSCore $CMSCore, CMSConfigurator $configurator, bool $isTest = false)
   {
     $this->CMSCore = $CMSCore;
 
