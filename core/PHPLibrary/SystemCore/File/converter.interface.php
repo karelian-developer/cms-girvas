@@ -18,7 +18,7 @@
  * @support     support@karelian-developer.ru
  */
 
-namespace core\PHPLibrary\SystemCore;
+namespace core\PHPLibrary\SystemCore\File;
 
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\SystemCore\File\EnumFormat as EnumFileFormat;
