@@ -351,8 +351,8 @@ final class SystemCore implements CoreInterface
   private function init()
   {
     // Принудительное подключение класса файлового подключателя
-    require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/fileConnector.interface.php';
-    require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/fileConnector.class.php';
+    require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/File/connector.interface.php';
+    require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/File/connector.class.php';
 
     /** @var string Равномерно выбранные случайные байты */
     $bytes = random_bytes(16);
