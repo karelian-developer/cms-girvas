@@ -1,24 +1,33 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
-namespace core\PHPLibrary\SystemCore\Header {
-  enum EnumHTTPReferrerPolicy {
-    case NO_REFFERER;
-    case NO_REFFERER_WHEN_DOWNGRADE;
-    case ORIGIN;
-    case ORIGIN_WHEN_CROSS_ORIGIN;
-    case SAME_ORIGIN;
-    case STRICT_ORIGIN;
-    case STRICT_ORIGIN_WHEN_CROSS_ORIGIN;
-    case UNSAFE_URL;
-  }
-}
+namespace core\PHPLibrary\SystemCore\Header;
 
-?>
+enum EnumHTTPReferrerPolicy
+{
+  case NO_REFFERER;
+  case NO_REFFERER_WHEN_DOWNGRADE;
+  case ORIGIN;
+  case ORIGIN_WHEN_CROSS_ORIGIN;
+  case SAME_ORIGIN;
+  case STRICT_ORIGIN;
+  case STRICT_ORIGIN_WHEN_CROSS_ORIGIN;
+  case UNSAFE_URL;
+}
