@@ -20,11 +20,11 @@
 
 namespace core\PHPLibrary\SystemCore;
 
-enum EnumHeader
+use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\SystemCore\File\EnumFormat as EnumFileFormat;
+
+interface InterfaceConverter
 {
-  case HTTP_RESPONSE_CODE;
-  case HTTP_LOCATION;
-  case HTTP_CONTENT_SECURITY_POLICY;
-  case HTTP_REFERRER_POLICY;
-  case HTTP_X_CONTENT_TYPE_OPTIONS;
+  public function __construct(CMSCore $CMSCore);
+  public function convert(array|string $file, string $fileOutputFolderPath, EnumFileFormat $convertTo, bool $deleteOldFile = false, mixed $salt = 0, int $quality = -1) : bool|array;
 }

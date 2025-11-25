@@ -22,7 +22,7 @@ namespace core\PHPLibrary\SystemCore;
 
 use \core\PHPLibrary\SystemCore as CMSCore;
 
-interface InterfaceFileConnector
+interface InterfaceConnector
 {
   public function __construct(CMSCore $CMSCore);
   public function setCurrentDirectory(string $directory) : void;

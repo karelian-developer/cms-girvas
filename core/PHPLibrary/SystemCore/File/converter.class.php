@@ -23,7 +23,7 @@ namespace core\PHPLibrary\SystemCore;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\SystemCore\File\EnumFormat as EnumFileFormat;
 
-final class Converter
+final class Converter implements InterfaceConverter
 {
   private ?CMSCore $CMSCore = null;
   private array|string $file = '';
@@ -49,7 +49,7 @@ final class Converter
    * 
    * @return void
    */
-  public function set_file(array|string $file) : void
+  public function setFile(array|string $file) : void
   {
     $this->file = $file;
   }
