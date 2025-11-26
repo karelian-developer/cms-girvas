@@ -23,7 +23,7 @@ namespace core\PHPLibrary\SystemCore\File;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\SystemCore\File\EnumFormat as EnumFileFormat;
 
-interface InterfaceConverter
+interface InterfaceResizer
 {
   public function __construct(CMSCore $CMSCore);
 }
