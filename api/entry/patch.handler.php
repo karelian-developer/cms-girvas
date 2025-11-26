@@ -226,10 +226,6 @@ if ($CMSCore->client->isLogged(2)) {
               try {
                 $fileResizesDir = '/uploads/media/' . $fileConverted['fileBaseName'];
 
-                if (!file_exists($fileResizesDir)) {
-                  mkdir($fileResizesDir, 0755);
-                }
-
                 $fileResizer->multipleResize(
                   $fileConverted['filePath'],
                   $fileResizesDir

@@ -69,7 +69,7 @@ final class Resizer implements InterfaceResizer
     }
 
     if (!is_dir($outputDir)) {
-      mkdir($outputDir, 0755, true);
+      mkdir($outputDir, 0774, true);
     }
 
     $createdFiles = [];
