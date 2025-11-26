@@ -68,13 +68,13 @@ final class Resizer implements InterfaceResizer
       throw new RuntimeException("Failed to load image: {$sourcePath}");
     }
 
-    if (!is_dir($outputDir)) {
-      mkdir($outputDir, 0774, true);
-    }
-
     $createdFiles = [];
     $baseName = pathinfo($sourcePath, PATHINFO_FILENAME);
     $extension = pathinfo($sourcePath, PATHINFO_EXTENSION);
+
+    if (!is_dir($outputDir . '/' . $baseName)) {
+      mkdir($outputDir . '/' . $baseName, 0774, true);
+    }
 
     $width = 8;
     while ($width <= $originalWidth) {
