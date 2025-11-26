@@ -224,9 +224,15 @@ if ($CMSCore->client->isLogged(2)) {
               $fileResizer = new FileResizer($CMSCore);
 
               try {
+                $fileResizesDir = '/uploads/media/' . $fileConverted['fileBaseName'];
+
+                if (!file_exists($fileResizesDir)) {
+                  mkdir($fileResizesDir, 0755);
+                }
+
                 $fileResizer->multipleResize(
                   $fileConverted['filePath'],
-                  '/uploads/media/' . $fileConverted['fileBaseName']
+                  $fileResizesDir
                 );
               } catch (Exception $exception) {
                 $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $exception->getMessage();

@@ -95,10 +95,6 @@ final class Resizer implements InterfaceResizer
         $originalWidth, $originalHeight
       );
 
-      if (!file_exists($outputDir . '/' . $baseName)) {
-        mkdir($outputDir . '/' . $baseName, 0755);
-      }
-
       $outputPath = $outputDir . '/' . $baseName . '/' . $width . '.' . $extension;
 
       $success = match($type) {
