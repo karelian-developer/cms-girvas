@@ -95,7 +95,7 @@ final class Resizer implements InterfaceResizer
         $originalWidth, $originalHeight
       );
 
-      $outputPath = $outputDir . '/' . $baseName . '/' . $width . '.' . $extension;
+      $outputPath = $outputDir . '/' . $width . '.' . $extension;
 
       $success = match($type) {
         IMAGETYPE_JPEG => imagejpeg($resizedImage, $outputPath),
