@@ -69,7 +69,7 @@ final class Converter implements InterfaceConverter
   public function convert(array|string $file, string $fileOutputFolderPath, EnumFileFormat $convertTo, bool $deleteOldFile = false, mixed $salt = 0, int $quality = -1) : bool|array
   {
     $CMSSalt = $this->CMSCore->configurator->get('salt');
-    $fileOutputName = md5(sprintf('{GIRVAS:CONVERTER:%s:%d+%s}', $CMSSalt, time(), $salt));
+    $fileOutputBaseName = md5(sprintf('{GIRVAS:CONVERTER:%s:%d+%s}', $CMSSalt, time(), $salt));
     
     if (file_exists($fileOutputFolderPath)) {
       $convertToExtension = match ($convertTo) {
@@ -82,7 +82,7 @@ final class Converter implements InterfaceConverter
 
       if ($convertToExtension === '') return false;
 
-      $fileOutputName = $fileOutputName . '.' . $convertToExtension;
+      $fileOutputName = $fileOutputBaseName . '.' . $convertToExtension;
       $fileOutputPath = $fileOutputFolderPath . '/' . $fileOutputName;
       $fileSourcePath = ''; $fileExtension = '';
 
@@ -173,6 +173,7 @@ final class Converter implements InterfaceConverter
         return [
           'extensionOld' => $fileExtension,
           'extensionNew' => $convertToExtension,
+          'fileBaseName' => $fileOutputBaseName,
           'fileName' => $fileOutputName,
           'filePath' => $fileOutputPath,
           'fileURL' => str_replace(CMS_ROOT_DIRECTORY, '', $fileOutputPath)

@@ -17,8 +17,10 @@ use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\SystemCore\File\EnumFormat as FileConverterEnumFileFormat;
 use \core\PHPLibrary\SystemCore\File\Converter as FileConverter;
+use \core\PHPLibrary\SystemCore\File\Resizer as FileResizer;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
+use \Exception as Exception;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
@@ -218,6 +220,18 @@ if ($CMSCore->client->isLogged(2)) {
             if (is_array($fileConverted)) {
               if (!array_key_exists('metadata', $entryData)) $entryData['metadata'] = [];
               $entryData['metadata']['previewURL'] = '/uploads/media/' . $fileConverted['fileName'];
+
+              $fileResizer = new FileResizer($CMSCore);
+
+              try {
+                $fileResizer->multipleResize(
+                  $fileConverted['filePath'],
+                  '/uploads/media/' . $fileConverted['fileBaseName']
+                );
+              } catch (Exception $exception) {
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $exception->getMessage();
+                $handlerStatusCode = $handlerStatusCode ?? 0;
+              }
             }
           }
 
