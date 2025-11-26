@@ -224,7 +224,7 @@ if ($CMSCore->client->isLogged(2)) {
               $fileResizer = new FileResizer($CMSCore);
 
               try {
-                $fileResizesDir = CMS_ROOT_DIRECTORY . '/uploads/media/' . $fileConverted['fileBaseName'];
+                $fileResizesDir = CMS_ROOT_DIRECTORY . '/uploads/media';
 
                 $fileResizer->multipleResize(
                   $fileConverted['filePath'],
