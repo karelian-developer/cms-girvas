@@ -104,7 +104,7 @@ class SettingsFiles implements SettingsPageInterface
       'SETTING_UPLOAD_FILE_IMAGE_AVATAR_WEIGHT_MAX_VALUE' => $this->CMSCore->configurator->getUploadFileImageAvatarWeightMax(),
       'SETTING_UPLOAD_FILE_IMAGE_AVATAR_WIDTH_MAX_VALUE' => $this->CMSCore->configurator->getUploadFileImageAvatarWidthMax(),
       'SETTING_UPLOAD_FILE_IMAGE_AVATAR_HEIGHT_MAX_VALUE' => $this->CMSCore->configurator->getUploadFileImageAvatarHeightMax(),
-      'SETTING_AUTO_COMPRESSION_UPLOAD_IMAGE_VALUE' => $this->CMSCore->configurator->getAutoCompressionUploadImage(),
+      'SETTING_UPLOAD_IMAGE_COMPRESSION_VALUE' => $this->CMSCore->configurator->getUploadImageCompression(),
       'SETTING_AUTO_CONVERT_FILE_IMAGE_FORMAT_VALUE' => $this->CMSCore->configurator->getAutoConvertFileImageExtension(),
       'SETTING_AUTO_CONVERT_FILE_IMAGE_STATUS_VALUE' => $settingAutoConvertFileImageStatusValue,
       'SETTING_AUTO_CONVERT_FILE_IMAGE_CHECKED_VALUE' => $settingAutoConvertFileImageStatusValue === 'on' ? 'checked' : '',
