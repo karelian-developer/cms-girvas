@@ -219,6 +219,16 @@ class PageEntry implements InterfacePage
       'templates/page/entry.tpl'
     );
 
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_ID')) {
+      $value = $entry !== null ? $entry->getID() : 0;
+
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'ENTRY_ID',
+        $value
+      );
+    }
+
     if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_TITLE')) {
       $value = $entry !== null ? $entry->getTitle($localeName) : '';
 
