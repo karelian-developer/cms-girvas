@@ -393,7 +393,9 @@ class Entry implements EntityTypeContent
 
       if (isset($texts[$localeName]['keywords'])) {
         $value = $texts[$localeName]['keywords'];
-        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        return array_map(function($item) {
+          return htmlspecialchars($item, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        }, $value);
       }
     }
 
