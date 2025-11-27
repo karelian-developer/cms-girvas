@@ -607,6 +607,12 @@ final class Template implements ThemeInterface
             $parts = array_map('ucfirst', $parts);
             return lcfirst(implode('', $parts));
           };
+
+          $themeNameUpperCase = function($string): string {
+            $parts = explode('-', $string);
+            $parts = array_map('strtoupper', $parts);
+            return strtoupper(implode('_', $parts));
+          };
           
           $themeSamplePath = 'templates/samples/' . $themeNameCamelCase($entriesSample->getName());
 
@@ -857,10 +863,17 @@ final class Template implements ThemeInterface
             }
 
             if (ThemeCollector::existsTemplateVariable($entriesSampleTemplateContent, 'ENTRY_PREVIEW_URL')) {
+              $themePropertySamplePreviewWidth = 'ENTRIES_SAMPLE_' . $themeNameUpperCase($entriesSample->getName()) . 'PREVIEW_WIDTH';
+              $samplePreviewWidth = defined(get_class($this->core) . '::' . $themePropertySamplePreviewWidth)
+                ? $this->core::$themePropertySamplePreviewWidth
+                : -1;
+
               ThemeCollector::addTemplateVariable(
                 $templatesAssembled,
                 'ENTRY_PREVIEW_URL',
-                $entry->getPreviewURL() !== '' ? $entry->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 512)
+                $entry->getPreviewURL($samplePreviewWidth) !== ''
+                  ? $entry->getPreviewURL($samplePreviewWidth)
+                  : Entry::getPreviewDefaultURL($this->CMSCore, 512)
               );
             }
 
