@@ -93,6 +93,63 @@ final class Reports
   }
 
   /**
+   * Получить объекты отчетов за конкретный период конкретного типа
+   * 
+   * @param CMSCore $CMSCore
+   * @param int $typeID
+   * @param int $startPeriodUnix
+   * @param int $endPeriodUnix
+   * 
+   * @return array
+   */
+  public static function getByPeriod(CMSCore $CMSCore, int $typeID, int $startPeriodUnix, int $endPeriodUnix) : array
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('reports');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`createdUnixTimestamp` BETWEEN :startPeriodUnix AND :endPeriodUnix AND JSON_UNQUOTE(JSON_EXTRACT(metadata, \'$.typeID\')) IS NOT NULL AND CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, \'$.typeID\')) AS UNSIGNED) = :typeID',
+      'postgresql' => '"createdUnixTimestamp" BETWEEN :startPeriodUnix AND :endPeriodUnix AND (metadata::jsonb->>\'typeID\') IS NOT NULL AND (metadata::jsonb->>\'typeID\')::integer = :typeID'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':startPeriodUnix', $startPeriodUnix, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':endPeriodUnix', $endPeriodUnix, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':typeID', $typeID, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $reports = [];
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    if ($results) {
+      foreach ($results as $data) {
+        array_push($reports, new Report($this->CMSCore, $data['id']));
+      }
+    }
+
+    return $reports;
+  }
+
+  /**
    * Получить объекты отчетов определенного типа
    *
    * @param  int $typeID

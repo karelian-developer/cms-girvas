@@ -119,6 +119,7 @@
   "API_UTILS_USER_AUTHORIZATION_SUCCESS": "Авторизация прошла успешно.",
   "API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND": "Пользователь с такими данными не обнаружен.",
   "API_UTILS_USER_AUTHORIZATION_ERROR_AUTHORIZATION_ALREADY": "Авторизация недоступна, поскольку Вы уже авторизованы в системе.",
+  "API_UTILS_USER_AUTHORIZATION_ERROR_FAILED_LIMIT": "Авторизация невозможна. Вы заблокированы за большое количество неудачных попыток авторизации. Попробуйте позже.",
   "API_UTILS_USER_PASSWORD_RESETED_TOKEN_IS_NOT_ACTIVE": "Токен неактивен для сброса пароля неактивен.",
   "API_UTILS_USER_PASSWORD_RESETED_SUCCESS": "Пароль сброшен! На электронную почту направлен новый пароль.",
   "API_UTILS_USER_PASSWORD_RESETED_EMAIL_TITLE": "Новый пароль",

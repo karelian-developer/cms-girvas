@@ -22,7 +22,7 @@ namespace core\PHPLibrary\SystemCore;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
-use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore as CMSCore;
 use \PDOException as PDOException;
 
 #[\AllowDynamicProperties]
@@ -33,8 +33,10 @@ final class Report
   public const REPORT_TYPE_ID_AP_ENTRY_DELETED = 11000002;
   public const REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL = 10000001;
   public const REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS = 10000002;
+  public const REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL = 20000001;
+  public const REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS = 20000002;
 
-  private readonly SystemCore $CMSCore;
+  private readonly CMSCore $CMSCore;
   private int $id;
 
   /**
@@ -44,7 +46,7 @@ final class Report
    * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore, int $id)
+  public function __construct(CMSCore $CMSCore, int $id)
   {
     $this->CMSCore = $CMSCore;
     $this->id = $id;
@@ -213,7 +215,7 @@ final class Report
    * 
    * @return Report
    */
-  public static function create(SystemCore $CMSCore, int $typeID, array $variables = []) : Report|null
+  public static function create(CMSCore $CMSCore, int $typeID, array $variables = []) : Report|null
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');

@@ -21,6 +21,7 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Mail\SMTPClient as SMTPClient;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
+use \core\PHPLibrary\SystemCore\Reports as CMSReports;
 
 if ($CMSCore->urlp->getPath(2) === 'nadvoparse') {
   if ($CMSCore->client->isLogged(1)) {
@@ -391,112 +392,134 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
     $adminAccessCodes = $_POST['admin_access-code'] ?? [];
 
     if ($userLogin !== null && !$userPassword !== null && !empty($adminAccessCodes)) {
-      $user = User::getByLogin($CMSCore, $userLogin);
+      $currentUnixTime = time();
+      $targetCheckingUnixTime = $currentUnixTime - 300;
+      $lastReportsFailAuth = CMSReports::getByPeriod($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, $targetCheckingUnixTime, $currentUnixTime);
+      foreach($lastReportsFailAuth as $reportIndex => $report) {
+        $report->initData(['metadata']);
+        $reportMetadata = $report->getMetadata();
 
-      if ($user !== null) {
-        // Инициализация данных пользователя
-        $user->initData(['passwordHash', 'securityHash', 'metadata']);
-        $userGroup = $user->getGroup();
-        $userGroup->initData(['permissions']);
-        
-        if ($userGroup->permissionCheck($userGroup::PERMISSION_ADMIN_PANEL_AUTH)) {
-          $adminAccessCodesIsValid = true;
-          foreach ($adminAccessCodes as $index => $code) {
-            switch ($index) {
-              case 0: $codeChar = 'a'; break;
-              case 1: $codeChar = 'b'; break;
-              case 2: $codeChar = 'c'; break;
-              case 3: $codeChar = 'd'; break;
+        if ($clientIP !== $reportMetadata['clientIP']) {
+          unset($lastReportsFailAuth[$reportIndex]);
+        }
+      }
+
+      if (count($lastReportsFailAuth) < 3) {
+        $user = User::getByLogin($CMSCore, $userLogin);
+
+        if ($user !== null) {
+          // Инициализация данных пользователя
+          $user->initData(['passwordHash', 'securityHash', 'metadata']);
+          $userGroup = $user->getGroup();
+          $userGroup->initData(['permissions']);
+          
+          if ($userGroup->permissionCheck($userGroup::PERMISSION_ADMIN_PANEL_AUTH)) {
+            $adminAccessCodesIsValid = true;
+            foreach ($adminAccessCodes as $index => $code) {
+              switch ($index) {
+                case 0: $codeChar = 'a'; break;
+                case 1: $codeChar = 'b'; break;
+                case 2: $codeChar = 'c'; break;
+                case 3: $codeChar = 'd'; break;
+              }
+
+              if (!password_verify($code, $CMSCore->configurator->getDatabaseEntryValue('security_admin_code_' . $codeChar))) {
+                $adminAccessCodesIsValid = false; break;
+              }
             }
 
-            if (!password_verify($code, $CMSCore->configurator->getDatabaseEntryValue('security_admin_code_' . $codeChar))) {
-              $adminAccessCodesIsValid = false; break;
-            }
-          }
+            // Проверяем правильность пароля
+            if ($user->passwordVerify($userPassword) && $adminAccessCodesIsValid) {
+              /** @var string $userToken */
+              $userTokenBase = ClientSession::generateToken();
+              $userTokenAdmin = ClientSession::generateToken();
 
-          // Проверяем правильность пароля
-          if ($user->passwordVerify($userPassword) && $adminAccessCodesIsValid) {
-            /** @var string $userToken */
-            $userTokenBase = ClientSession::generateToken();
-            $userTokenAdmin = ClientSession::generateToken();
+              $userSessionBase = null;
+              $userSessionAdmin = null;
 
-            $userSessionBase = null;
-            $userSessionAdmin = null;
+              // Если сессия не была найдена, то создаем новую.
+              if (!ClientSession::existsByIPAndUserID($CMSCore, $clientIP, $user->getID(), 1)) {
+                /** @var ClientSession|null $userSession */
+                $userSessionBase = ClientSession::create($CMSCore, [
+                  'userID' => $user->getID(),
+                  'token' => $userTokenBase,
+                  'userIP' => $clientIP,
+                  'typeID' => 1
+                ]);
+              } else {
+                $userSessionBase = ClientSession::getByIPAndUserID($CMSCore, $userIP, $user->getID(), 1);
+                $userSessionBase->update([]);
+              }
 
-            // Если сессия не была найдена, то создаем новую.
-            if (!ClientSession::existsByIPAndUserID($CMSCore, $clientIP, $user->getID(), 1)) {
-              /** @var ClientSession|null $userSession */
-              $userSessionBase = ClientSession::create($CMSCore, [
-                'userID' => $user->getID(),
-                'token' => $userTokenBase,
-                'userIP' => $clientIP,
-                'typeID' => 1
-              ]);
+              // Если сессия не была найдена, то создаем новую.
+              if (!ClientSession::existsByIPAndUserID($CMSCore, $userIP, $user->getID(), 2)) {
+                /** @var ClientSession|null $userSession */
+                $userSessionAdmin = ClientSession::create($CMSCore, [
+                  'userID' => $user->getID(),
+                  'token' => $userTokenAdmin,
+                  'userIP' => $clientIP,
+                  'typeID' => 2
+                ]);
+              } else {
+                $userSessionAdmin = ClientSession::getByIPAndUserID($CMSCore, $clientIP, $user->getID(), 2);
+                $userSessionAdmin->update([]);
+              }
+
+              if (!is_null($userSessionBase)) {
+                $userSessionBase->initData(['updatedUnixTimestamp', 'token']);
+                $userSessionBaseExpires = $userSessionBase->getUpdatedUnixTimestamp() + $CMSCore->configurator->get('sessionExpires');
+
+                $CMSCore->client::createCookie($CMSCore, '_grv_utoken', $userSessionBase, $userRememberMe ? $userSessionBaseExpires : 0);
+              }
+
+              if (!is_null($userSessionAdmin)) {
+                $userSessionAdmin->initData(['updatedUnixTimestamp', 'token']);
+                $userSessionAdmin_expires = $userSessionAdmin->getUpdatedUnixTimestamp() + $CMSCore->configurator->get('sessionExpires');
+
+                $CMSCore->client::createCookie($CMSCore, '_grv_atoken', $userSessionAdmin, $userRememberMe ? $userSessionAdmin_expires : 0);
+
+                CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS, [
+                  'clientIP' => $clientIP,
+                  'userTargetID' => $user->getID()
+                ]);
+
+                $handlerOutputData['reload'] = true;
+
+                /** @var string $handlerMessage Сообщение обработчика */
+                $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_SUCCESS');
+                $handlerStatusCode = $handlerStatusCode ?? 1;
+              } else {
+                /** @var string $handlerMessage Сообщение обработчика */
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+                $handlerStatusCode = $handlerStatusCode ?? 0;
+              }
+
             } else {
-              $userSessionBase = ClientSession::getByIPAndUserID($CMSCore, $userIP, $user->getID(), 1);
-              $userSessionBase->update([]);
-            }
-
-            // Если сессия не была найдена, то создаем новую.
-            if (!ClientSession::existsByIPAndUserID($CMSCore, $userIP, $user->getID(), 2)) {
-              /** @var ClientSession|null $userSession */
-              $userSessionAdmin = ClientSession::create($CMSCore, [
-                'userID' => $user->getID(),
-                'token' => $userTokenAdmin,
-                'userIP' => $clientIP,
-                'typeID' => 2
-              ]);
-            } else {
-              $userSessionAdmin = ClientSession::getByIPAndUserID($CMSCore, $clientIP, $user->getID(), 2);
-              $userSessionAdmin->update([]);
-            }
-
-            if (!is_null($userSessionBase)) {
-              $userSessionBase->initData(['updatedUnixTimestamp', 'token']);
-              $userSessionBaseExpires = $userSessionBase->getUpdatedUnixTimestamp() + $CMSCore->configurator->get('sessionExpires');
-
-              $CMSCore->client::createCookie($CMSCore, '_grv_utoken', $userSessionBase, $userRememberMe ? $userSessionBaseExpires : 0);
-            }
-
-            if (!is_null($userSessionAdmin)) {
-              $userSessionAdmin->initData(['updatedUnixTimestamp', 'token']);
-              $userSessionAdmin_expires = $userSessionAdmin->getUpdatedUnixTimestamp() + $CMSCore->configurator->get('sessionExpires');
-
-              $CMSCore->client::createCookie($CMSCore, '_grv_atoken', $userSessionAdmin, $userRememberMe ? $userSessionAdmin_expires : 0);
-
-              CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS, [
+              $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
                 'clientIP' => $clientIP,
                 'userTargetID' => $user->getID()
               ]);
 
-              $handlerOutputData['reload'] = true;
-
               /** @var string $handlerMessage Сообщение обработчика */
-              $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_SUCCESS');
-              $handlerStatusCode = $handlerStatusCode ?? 1;
-            } else {
-              /** @var string $handlerMessage Сообщение обработчика */
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
               $handlerStatusCode = $handlerStatusCode ?? 0;
             }
-
           } else {
             $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
               'clientIP' => $clientIP,
               'userTargetID' => $user->getID()
             ]);
 
-            /** @var string $handlerMessage Сообщение обработчика */
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
           $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
-            'clientIP' => $clientIP,
-            'userTargetID' => $user->getID()
+            'clientIP' => $CMSCore->client->getIPAddress(),
+            'userTargetID' => 0
           ]);
-
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
+          
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
@@ -505,10 +528,9 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
           'userTargetID' => 0
         ]);
         
-        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_FAILED_LIMIT');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
-
     } else {
       $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
       $handlerStatusCode = $handlerStatusCode ?? 0;

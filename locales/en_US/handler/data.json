@@ -117,6 +117,7 @@
   "API_UTILS_USER_AUTHORIZATION_SUCCESS": "Authorization was successful.",
   "API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND": "A user with such data was not found.",
   "API_UTILS_USER_AUTHORIZATION_ERROR_AUTHORIZATION_ALREADY": "Authorization is not available because you are already authorized in the system.",
+  "API_UTILS_USER_AUTHORIZATION_ERROR_FAILED_LIMIT": "Authorization failed. You have been blocked due to too many unsuccessful authorization errors. Please try again later.",
   "API_UTILS_USER_PASSWORD_RESETED_TOKEN_IS_NOT_ACTIVE": "The token is not active for resetting the password is not active.",
   "API_UTILS_USER_PASSWORD_RESETED_SUCCESS": "The password has been reset! A new password has been sent to your email.",
   "API_UTILS_USER_PASSWORD_RESETED_EMAIL_TITLE": "New password",
