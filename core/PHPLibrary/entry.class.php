@@ -291,8 +291,7 @@ class Entry implements EntityTypeContent
       $texts = json_decode($this->texts, true);
 
       if (isset($texts[$localeName]['title'])) {
-        $value = $texts[$localeName]['title'];
-        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        return $texts[$localeName]['title'];
       }
     }
 
@@ -312,8 +311,7 @@ class Entry implements EntityTypeContent
       $texts = json_decode($this->texts, true);
 
       if (isset($texts[$localeName]['SEOTitle'])) {
-        $value = $texts[$localeName]['SEOTitle'];
-        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        return $texts[$localeName]['SEOTitle'];
       }
     }
 
@@ -332,8 +330,7 @@ class Entry implements EntityTypeContent
       $texts = json_decode($this->texts, true);
 
       if (isset($texts[$localeName]['description'])) {
-        $value = $texts[$localeName]['description'];
-        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        return $texts[$localeName]['description'];
       }
     }
 
@@ -352,8 +349,7 @@ class Entry implements EntityTypeContent
       $texts = json_decode($this->texts, true);
 
       if (isset($texts[$localeName]['SEODescription'])) {
-        $value = $texts[$localeName]['SEODescription'];
-        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        return $texts[$localeName]['SEODescription'];
       }
     }
 
@@ -372,8 +368,7 @@ class Entry implements EntityTypeContent
       $texts = json_decode($this->texts, true);
 
       if (isset($texts[$localeName]['content'])) {
-        $value = $texts[$localeName]['content'];
-        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        return $texts[$localeName]['content'];
       }
     }
 
@@ -392,10 +387,7 @@ class Entry implements EntityTypeContent
       $texts = json_decode($this->texts, true);
 
       if (isset($texts[$localeName]['keywords'])) {
-        $value = $texts[$localeName]['keywords'];
-        return array_map(function($item) {
-          return htmlspecialchars($item, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        }, $value);
+        return $texts[$localeName]['keywords'];
       }
     }
 
