@@ -312,8 +312,8 @@ final class Converter implements InterfaceConverter
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
-    imageAlphaBlending($imageConverted, false);
-    imageSaveAlpha($imageConverted, true);
+    imagealphablending($imageConverted, false);
+    imagesavealpha($imageConverted, true);
 
     $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
     imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
@@ -345,8 +345,8 @@ final class Converter implements InterfaceConverter
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
-    imageAlphaBlending($imageConverted, false);
-    imageSaveAlpha($imageConverted, true);
+    imagealphablending($imageConverted, false);
+    imagesavealpha($imageConverted, true);
 
     $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
     imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
@@ -408,8 +408,8 @@ final class Converter implements InterfaceConverter
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
-    imageAlphaBlending($imageConverted, false);
-    imageSaveAlpha($imageConverted, true);
+    imagealphablending($imageConverted, false);
+    imagesavealpha($imageConverted, true);
 
     $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
     imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
@@ -440,8 +440,8 @@ final class Converter implements InterfaceConverter
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
-    imageAlphaBlending($imageConverted, false);
-    imageSaveAlpha($imageConverted, true);
+    imagealphablending($imageConverted, false);
+    imagesavealpha($imageConverted, true);
 
     $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
     imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
@@ -503,8 +503,8 @@ final class Converter implements InterfaceConverter
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
-    imageAlphaBlending($imageConverted, false);
-    imageSaveAlpha($imageConverted, true);
+    imagealphablending($imageConverted, false);
+    imagesavealpha($imageConverted, true);
 
     $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
     imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
@@ -535,8 +535,8 @@ final class Converter implements InterfaceConverter
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
-    imageAlphaBlending($imageConverted, false);
-    imageSaveAlpha($imageConverted, true);
+    imagealphablending($imageConverted, false);
+    imagesavealpha($imageConverted, true);
 
     $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
     imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
