@@ -216,7 +216,7 @@ class PageEntry implements InterfacePage
     $templatesAssembled = [];
     $templateContent = ThemeCollector::getTemplateFileContent(
       $this->CMSCore->theme,
-      '/templates/page/entry.tpl'
+      'templates/page/entry.tpl'
     );
 
     if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_TITLE')) {
@@ -278,7 +278,7 @@ class PageEntry implements InterfacePage
       ThemeCollector::addTemplateVariable(
         $templatesAssembled,
         'ENTRY_KEYWORDS',
-        $entry !== null ? $value : ''
+        $entry !== null ? implode(', ', $value) : ''
       );
     }
 
