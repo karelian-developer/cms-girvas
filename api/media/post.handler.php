@@ -99,7 +99,7 @@ if ($CMSCore->client->isLogged(2)) {
                   if ($qualityPercent <= 0) {
                     $quality = -1;
                   } else {
-                    $quality = min(9, max(0, (int) round(($quality / 100) * 9)));
+                    $quality = min(9, max(0, (int) round(($qualityPercent / 100) * 9)));
                   }
                   
                   /** @var FileConverter Объект-конвектор файлов */

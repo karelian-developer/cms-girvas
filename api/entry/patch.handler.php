@@ -226,7 +226,7 @@ if ($CMSCore->client->isLogged(2)) {
             if ($qualityPercent <= 0) {
               $previewQuality = -1;
             } else {
-              $previewQuality = min(9, max(0, (int) round(($quality / 100) * 9)));
+              $previewQuality = min(9, max(0, (int) round(($qualityPercent / 100) * 9)));
             }
 
             $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
