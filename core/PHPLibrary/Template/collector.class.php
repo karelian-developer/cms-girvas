@@ -31,6 +31,9 @@ use \DOMDocument as DOMDocument;
 
 final class Collector
 {
+  private const DECODED_ENTITIES = ['&laquo;', '&raquo;', '&ldquo;', '&rdquo;'];
+  private const SAFE_SYMBOLS = ['«', '»', '“', '”'];
+
   private const TEMPLATE_TAG_PATTERN = '/\{([a-zA-Z0-9_]+)\}/';
   private const TEMPLATE_TAG_LANG_PATTERN = '/\{LANG\:([a-zA-Z0-9_]+)\}/';
   private const TEMPLATE_TAG_LANG_MARKDOWN_PATTERN = '/\{LANG\:MD\:([a-zA-Z0-9_]+)\}/';
