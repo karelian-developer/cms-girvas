@@ -35,13 +35,14 @@ export class PageAnalytics {
         const attendanceScheduleContainerElement = analyticApp.querySelector('[role="attendance-schedule"]');
         
         const scheduleContainerElement = this.scheduleContainerElementCreate();
+        attendanceScheduleContainerElement.append(scheduleContainerElement);
+        
         const scheduleParentElement = scheduleContainerElement.parentElement;
         const scheduleParentElementWidth = scheduleParentElement.offsetWidth;
 
         const firstDate = new Date(), lastDate = new Date();
 
         attendanceScheduleContainerElement.innerHTML = '';
-        attendanceScheduleContainerElement.append(scheduleContainerElement);
 
         scheduleContainerElement.setAttribute('width', `${scheduleParentElementWidth}px`);
         scheduleContainerElement.setAttribute('height', '400px');
