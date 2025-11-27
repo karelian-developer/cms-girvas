@@ -218,103 +218,36 @@ class PageEntry implements InterfacePage
       $this->CMSCore->theme,
       'templates/page/entry.tpl'
     );
+    
+    $variables = [
+      'ENTRY_ID' => fn() => $entry?->getID() ?? 0,
+      'ENTRY_TITLE' => fn() => $entry?->getTitle($localeName) ?? '',
+      'ENTRY_SEO_TITLE' => fn() => $entry?->getSEOTitle($localeName) ?? '',
+      'ENTRY_DESCRIPTION' => fn() => $entry?->getDescription($localeName) ?? '',
+      'ENTRY_SEO_DESCRIPTION' => fn() => $entry?->getSEODescription($localeName) ?? '',
+      'ENTRY_CONTENT' => fn() => $entry?->getContent($localeName) ?? '',
+      'ENTRY_NAME' => fn() => $entry?->getName() ?? '',
+      'ENTRY_ADDITIONAL_FIELDS' => fn() => implode($additionalFieldsElements),
+      'ENTRY_FORM_METHOD' => fn() => $entry !== null ? 'PATCH' : 'PUT'
+    ];
 
-    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_ID')) {
-      $value = $entry !== null ? $entry->getID() : 0;
-
-      ThemeCollector::addTemplateVariable(
-        $templatesAssembled,
-        'ENTRY_ID',
-        $value
-      );
-    }
-
-    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_TITLE')) {
-      $value = $entry !== null ? $entry->getTitle($localeName) : '';
-
-      ThemeCollector::addTemplateVariable(
-        $templatesAssembled,
-        'ENTRY_TITLE',
-        htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
-      );
-    }
-
-    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_SEO_TITLE')) {
-      $value = $entry !== null ? $entry->getSEOTitle($localeName) : '';
-
-      ThemeCollector::addTemplateVariable(
-        $templatesAssembled,
-        'ENTRY_SEO_TITLE',
-        htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
-      );
-    }
-
-    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_DESCRIPTION')) {
-      $value = $entry !== null ? $entry->getDescription($localeName) : '';
-      
-      ThemeCollector::addTemplateVariable(
-        $templatesAssembled,
-        'ENTRY_DESCRIPTION',
-        htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
-      );
-    }
-
-    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_SEO_DESCRIPTION')) {
-      $value = $entry !== null ? $entry->getSEODescription($localeName) : '';
-
-      ThemeCollector::addTemplateVariable(
-        $templatesAssembled,
-        'ENTRY_SEO_DESCRIPTION',
-        htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
-      );
-    }
-
-    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_CONTENT')) {
-      $value = $entry !== null ? $entry->getContent($localeName) : '';
-
-      ThemeCollector::addTemplateVariable(
-        $templatesAssembled,
-        'ENTRY_CONTENT',
-        htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
-      );
-    }
-
-    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_KEYWORDS')) {
-      $value = $entry !== null ? $entry->getKeywords($localeName) : [];
-      $valueArray = array_map(function($item) {
-        return htmlspecialchars($item, ENT_QUOTES, 'UTF-8');
-      }, $value);
-      
-      ThemeCollector::addTemplateVariable(
-        $templatesAssembled,
-        'ENTRY_KEYWORDS',
-        $entry !== null ? implode(', ', $valueArray) : ''
-      );
-    }
-
-    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_NAME')) {
-      ThemeCollector::addTemplateVariable(
-        $templatesAssembled,
-        'ENTRY_NAME',
-        $entry !== null ? $entry->getName() : ''
-      );
-    }
-
-    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_ADDITIONAL_FIELDS')) {
-      ThemeCollector::addTemplateVariable(
-        $templatesAssembled,
-        'ENTRY_ADDITIONAL_FIELDS',
-        implode($additionalFieldsElements)
-      );
-    }
-
-    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_FORM_METHOD')) {
-      ThemeCollector::addTemplateVariable(
-        $templatesAssembled,
-        'ENTRY_FORM_METHOD',
-        $entry !== null ? 'PATCH' : 'PUT'
-      );
-    }
+    foreach ($variables as $key => $getValue) {
+      if (ThemeCollector::existsTemplateVariable($templateContent, $key)) {
+        $value = $getValue();
+        
+        if ($key === 'ENTRY_KEYWORDS') {
+          $keywords = $entry?->getKeywords($localeName) ?? [];
+          $value = implode(', ', array_map(
+            fn($item) => htmlspecialchars($item, ENT_QUOTES, 'UTF-8'), 
+            $keywords
+          ));
+        } elseif (!in_array($key, ['ENTRY_ID', 'ENTRY_NAME', 'ENTRY_ADDITIONAL_FIELDS', 'ENTRY_FORM_METHOD']) && is_string($value)) {
+          $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+        }
+        
+        ThemeCollector::addTemplateVariable($templatesAssembled, $key, $value);
+      }
+   }
 
     $templatesAssembled['ADMIN_PANEL_PAGE_NAME'] = 'entry';
     $templatesAssembled['ENTRY_EDITOR'] = ThemeCollector::assemblyFileContent(
