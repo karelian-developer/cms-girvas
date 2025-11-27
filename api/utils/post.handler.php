@@ -292,84 +292,102 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
 }
 
 if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('method') === 'base') {
+  $clientIP = $CMSCore->client->getRealIPAddress();
+  
   if (!$CMSCore->client->isLogged(1)) {
     $userLogin = trim($_POST['user_login']) ?? null;
     $userPassword = trim($_POST['user_password']) ?? null;
     $userRememberMe = isset($_POST['user_remember_me']);
 
     if ($userLogin !== null && $userPassword !== null) {
-      $user = User::getByLogin($CMSCore, $userLogin);
+      $currentUnixTime = time();
+      $targetCheckingUnixTime = $currentUnixTime - 300;
+      $lastReportsFailAuth = CMSReports::getByPeriod($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL, $targetCheckingUnixTime, $currentUnixTime);
+      
+      foreach($lastReportsFailAuth as $reportIndex => $report) {
+        $report->initData(['variables']);
+        $reportVariables = $report->getVariables();
 
-      if ($user !== null) {
-        // Инициализация данных пользователя
-        $user->initData(['passwordHash', 'securityHash']);
-        
-        // Проверяем правильность пароля
-        if ($user->passwordVerify($userPassword)) {
-          /** @var string $userIP */
-          $userIP = $_SERVER['REMOTE_ADDR'];
-          /** @var string $userToken */
-          $userToken = ClientSession::generateToken();
+        if ($clientIP !== $reportVariables['clientIP']) {
+          unset($lastReportsFailAuth[$reportIndex]);
+        }
+      }
 
-          if (!ClientSession::existsByIPAndUserID($CMSCore, $userIP, $user->getID(), 1)) {
-            $userSession = ClientSession::create(
-              $CMSCore,
-              [
-                'userID' => $user->getID(),
-                'token' => $userToken,
-                'userIP' => $userIP,
-                'typeID' => 1
-              ]
-            );
+      if (count($lastReportsFailAuth) < 3) {
+        $user = User::getByLogin($CMSCore, $userLogin);
+
+        if ($user !== null) {
+          // Инициализация данных пользователя
+          $user->initData(['passwordHash', 'securityHash']);
+          
+          // Проверяем правильность пароля
+          if ($user->passwordVerify($userPassword)) {
+            /** @var string $userToken */
+            $userToken = ClientSession::generateToken();
+
+            if (!ClientSession::existsByIPAndUserID($CMSCore, $clientIP, $user->getID(), 1)) {
+              $userSession = ClientSession::create(
+                $CMSCore,
+                [
+                  'userID' => $user->getID(),
+                  'token' => $userToken,
+                  'userIP' => $clientIP,
+                  'typeID' => 1
+                ]
+              );
+            } else {
+              $userSession = ClientSession::getByIPAndUserID($CMSCore, $clientIP, $user->getID(), 1);
+              $userSession->update([]);
+            }
+
+            if ($userSession !== null) {
+              $userSession->initData(['updatedUnixTimestamp', 'token']);
+              $userSessionExpires = $userSession->getUpdatedUnixTimestamp() + $CMSCore->configurator->get('sessionExpires');
+
+              $userSessionIsSecure = (bool) $CMSCore->configurator->get('SSLIsEnabled');
+
+              setcookie('_grv_utoken', $userSession->getToken(), [
+                'expires' => ($userRememberMe) ? $userSessionExpires : 0,
+                'path' => '/',
+                'domain' => $CMSCore->configurator->get('domainCookies'),
+                'secure' => $userSessionIsSecure,
+                'httponly' => true
+              ]);
+
+              $handlerOutputData['reload'] = true;
+
+              CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS, [
+                'clientIP' => $CMSCore->client->getRealIPAddress(),
+                'userTargetID' => $user->getID()
+              ]);
+
+              $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_SUCCESS');
+              $handlerStatusCode = $handlerStatusCode ?? 1;
+            } else {
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+              $handlerStatusCode = $handlerStatusCode ?? 0;
+            }
+
           } else {
-            $userSession = ClientSession::getByIPAndUserID($CMSCore, $userIP, $user->getID(), 1);
-            $userSession->update([]);
-          }
-
-          if ($userSession !== null) {
-            $userSession->initData(['updatedUnixTimestamp', 'token']);
-            $userSessionExpires = $userSession->getUpdatedUnixTimestamp() + $CMSCore->configurator->get('sessionExpires');
-
-            $userSessionIsSecure = (bool) $CMSCore->configurator->get('SSLIsEnabled');
-
-            setcookie('_grv_utoken', $userSession->getToken(), [
-              'expires' => ($userRememberMe) ? $userSessionExpires : 0,
-              'path' => '/',
-              'domain' => $CMSCore->configurator->get('domainCookies'),
-              'secure' => $userSessionIsSecure,
-              'httponly' => true
-            ]);
-
-            $handlerOutputData['reload'] = true;
-
-            CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS, [
+            CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL, [
               'clientIP' => $CMSCore->client->getRealIPAddress(),
               'userTargetID' => $user->getID()
             ]);
 
-            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_SUCCESS');
-            $handlerStatusCode = $handlerStatusCode ?? 1;
-          } else {
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
-
         } else {
           CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL, [
             'clientIP' => $CMSCore->client->getRealIPAddress(),
-            'userTargetID' => $user->getID()
+            'userTargetID' => 0
           ]);
 
           $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL, [
-          'clientIP' => $CMSCore->client->getRealIPAddress(),
-          'userTargetID' => 0
-        ]);
-
-        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_FAILED_LIMIT');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
     } else {
@@ -395,7 +413,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
       $currentUnixTime = time();
       $targetCheckingUnixTime = $currentUnixTime - 300;
       $lastReportsFailAuth = CMSReports::getByPeriod($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, $targetCheckingUnixTime, $currentUnixTime);
-      error_log(count($lastReportsFailAuth));
+
       foreach($lastReportsFailAuth as $reportIndex => $report) {
         $report->initData(['variables']);
         $reportVariables = $report->getVariables();
@@ -448,12 +466,12 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                   'typeID' => 1
                 ]);
               } else {
-                $userSessionBase = ClientSession::getByIPAndUserID($CMSCore, $userIP, $user->getID(), 1);
+                $userSessionBase = ClientSession::getByIPAndUserID($CMSCore, $clientIP, $user->getID(), 1);
                 $userSessionBase->update([]);
               }
 
               // Если сессия не была найдена, то создаем новую.
-              if (!ClientSession::existsByIPAndUserID($CMSCore, $userIP, $user->getID(), 2)) {
+              if (!ClientSession::existsByIPAndUserID($CMSCore, $clientIP, $user->getID(), 2)) {
                 /** @var ClientSession|null $userSession */
                 $userSessionAdmin = ClientSession::create($CMSCore, [
                   'userID' => $user->getID(),
@@ -524,11 +542,6 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
-          'clientIP' => $CMSCore->client->getIPAddress(),
-          'userTargetID' => 0
-        ]);
-        
         $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_FAILED_LIMIT');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
