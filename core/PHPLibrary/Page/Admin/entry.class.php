@@ -186,33 +186,6 @@ class PageEntry implements InterfacePage
       }
     }
 
-    $mediaFilesPath = $this->CMSCore->getCMSPath() . '/uploads/media';
-    $mediaFiles = array_diff(scandir($mediaFilesPath), ['.', '..']);
-    $mediaFiles = array_slice($mediaFiles, 0, 6);
-
-    $mediaFilesTransformed = [];
-    foreach ($mediaFiles as $fileName) {
-      $mediaFileURL = '/uploads/media/' . $fileName;
-      $mediaFilesTransformed[] = ThemeCollector::assemblyFileContent(
-        $this->CMSCore->theme, 'templates/page/entry/mediaManager/listItem.tpl',
-        [
-          'MEDIA_FILE_URL' => $mediaFileURL,
-          'MEDIA_FILE_FULLNAME' => $fileName
-        ]
-      );
-    }
-
-    if (!empty($mediaFilesTransformed)) {
-      $mediaManagerList = ThemeCollector::assemblyFileContent(
-        $this->CMSCore->theme, 'templates/page/entry/mediaManager/list.tpl',
-        [
-          'MEDIA_LIST_ITEMS' => implode($mediaFilesTransformed)
-        ]
-      );
-    } else {
-      $mediaManagerList = $localeData['PAGE_ENTRY_MEDIA_FILES_NOT_FOUND_LABEL'];
-    }
-
     $templatesAssembled = [];
     $templateContent = ThemeCollector::getTemplateFileContent(
       $this->CMSCore->theme,
