@@ -306,16 +306,14 @@ class PageEntry implements InterfacePage
       );
     }
 
+    $templatesAssembled['ADMIN_PANEL_PAGE_NAME'] = 'entry';
+    $templatesAssembled['ENTRY_EDITOR'] = ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme, 'templates/page/entry/editor.tpl', []
+    );
+
     /** @var string $site_page Содержимое шаблона страницы */
     $this->assembled = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme, 'templates/page/entry.tpl',
-      [
-        'ADMIN_PANEL_PAGE_NAME' => 'entry',
-        'ENTRY_EDITOR' => ThemeCollector::assemblyFileContent(
-          $this->CMSCore->theme, 'templates/page/entry/editor.tpl',
-          []
-        )
-      ],
       $templatesAssembled
     );
   }
