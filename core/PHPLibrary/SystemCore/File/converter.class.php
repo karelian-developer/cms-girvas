@@ -315,8 +315,8 @@ final class Converter implements InterfaceConverter
     imageAlphaBlending($imageConverted, false);
     imageSaveAlpha($imageConverted, true);
 
-    $image_transparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
-    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
+    $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
+    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imagewebp($imageConverted, $fileOutputPath, $quality);
@@ -348,8 +348,8 @@ final class Converter implements InterfaceConverter
     imageAlphaBlending($imageConverted, false);
     imageSaveAlpha($imageConverted, true);
 
-    $image_transparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
-    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
+    $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
+    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imageavif($imageConverted, $fileOutputPath, $quality);
@@ -411,8 +411,8 @@ final class Converter implements InterfaceConverter
     imageAlphaBlending($imageConverted, false);
     imageSaveAlpha($imageConverted, true);
 
-    $image_transparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
-    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
+    $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
+    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imagepng($imageConverted, $fileOutputPath, $quality);
     
@@ -443,8 +443,8 @@ final class Converter implements InterfaceConverter
     imageAlphaBlending($imageConverted, false);
     imageSaveAlpha($imageConverted, true);
 
-    $image_transparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
-    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
+    $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
+    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imageavif($imageConverted, $fileOutputPath, $quality);
@@ -506,8 +506,8 @@ final class Converter implements InterfaceConverter
     imageAlphaBlending($imageConverted, false);
     imageSaveAlpha($imageConverted, true);
 
-    $image_transparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
-    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
+    $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
+    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imagepng($imageConverted, $fileOutputPath, $quality);
     
@@ -538,8 +538,8 @@ final class Converter implements InterfaceConverter
     imageAlphaBlending($imageConverted, false);
     imageSaveAlpha($imageConverted, true);
 
-    $image_transparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
-    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $image_transparent);
+    $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
+    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imagewebp($imageConverted, $fileOutputPath, $quality);
