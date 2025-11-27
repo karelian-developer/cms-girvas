@@ -273,7 +273,7 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getUploadImageCompression() : int
   {
-    return $this->existsDatabaseEntryValue('files_upload_image_compression_max') ? (int) $this->getDatabaseEntryValue('files_upload_image_compression_max') : 0;
+    return $this->existsDatabaseEntryValue('files_upload_image_compression') ? (int) $this->getDatabaseEntryValue('files_upload_image_compression') : 0;
   }
 
   /**
