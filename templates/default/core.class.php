@@ -25,6 +25,9 @@ final class Core implements ThemeInterfaceCore
   private string $primaryColor = '#EAEAEA';
   public string $assembled = '';
   public ?DOMDocument $source = null;
+
+  const ENTRIES_SAMPLE_LAST_NEWS_PREVIEW_WIDTH = 1024;
+  const ENTRIES_SAMPLE_INDEX_NEWS_PREVIEW_WIDTH = 1024;
   
   /**
    * __construct
