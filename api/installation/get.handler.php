@@ -874,10 +874,27 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       ]
     ];
 
+    $secondEntriesSampleTexts = [
+      'en_US' => [
+        'title' => 'Index entries',
+        'description' => 'Last entries for index page'
+      ],
+      'ru_RU' => [
+        'title' => 'Записи стартовой страницы',
+        'description' => 'Последние записи для стартовой страницы'
+      ]
+    ];
+
     $firstEntriesSample = EntriesSample::create($CMSCore, 'last-news', $firstEntriesSampleTexts, [
       'limitCount' => 6,
       'sortTypeID' => 2,
       'categoriesIDs' => [1]
+    ]);
+
+    $secondEntriesSample = EntriesSample::create($CMSCore, 'index-entries', $secondEntriesSampleTexts, [
+      'limitCount' => 8,
+      'sortTypeID' => 2,
+      'categoriesIDs' => [1, 2]
     ]);
 
     $firstUsersGroupTexts = [

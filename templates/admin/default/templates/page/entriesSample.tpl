@@ -44,7 +44,7 @@
           </div>
         </div>
         <div class="cell grid-table__cell grid-table__cell_data">
-          <textarea name="entries_sample_description_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRIES_SAMPLE_INPUT_DESCRIPTION_PLACEHOLDER}" data-element="input-description" required>{ENTRIES_CATEGORY_DESCRIPTION}</textarea>
+          <textarea name="entries_sample_description_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_ENTRIES_SAMPLE_INPUT_DESCRIPTION_PLACEHOLDER}" data-element="input-description" required>{ENTRIES_SAMPLE_DESCRIPTION}</textarea>
         </div>
         <!-- Поле: Количество записей -->
         <div class="cell grid-table__cell grid-table__cell_text">
