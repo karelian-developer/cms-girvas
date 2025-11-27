@@ -435,6 +435,37 @@ class Entry implements EntityTypeContent
   }
 
   /**
+   * Получить URL директории изображений предпросмотра
+   *
+   * @return string
+   */
+  public function getPreviewDirectoryURL() : string
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+
+      if (isset($metadata['previewURL'])) {
+        $previewURL = $metadata['previewURL'];
+        
+        if ($size === -1) {
+          return $previewURL;
+        }
+            
+        $parsedUrl = parse_url($previewURL);
+        $path = $parsedUrl['path'] ?? '';
+        
+        $pathinfo = pathinfo($path);
+        $dirname = $pathinfo['dirname'] ?? '';
+        $filename = $pathinfo['filename'] ?? '';
+
+        return $dirname . '/' . $filename;
+      }
+    }
+
+    return '';
+  }
+
+  /**
    * Получить статус публикации записи
    *
    * @return bool

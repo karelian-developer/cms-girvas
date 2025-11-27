@@ -864,6 +864,14 @@ final class Template implements ThemeInterface
               );
             }
 
+            if (ThemeCollector::existsTemplateVariable($entriesSampleTemplateContent, 'ENTRY_PREVIEW_DIRECTORY_URL')) {
+              ThemeCollector::addTemplateVariable(
+                $templatesAssembled,
+                'ENTRY_PREVIEW_DIRECTORY_URL',
+                $entry->getPreviewDirectoryURL()
+              );
+            }
+
             if (ThemeCollector::existsTemplateVariable($entriesSampleTemplateContent, 'ENTRY_CATEGORY_URL')) {
               ThemeCollector::addTemplateVariable(
                 $templatesAssembled,

@@ -25,6 +25,7 @@ use \core\PHPLibrary\SystemCore as CMSCore;
 final class Resizer implements InterfaceResizer
 {
   private ?CMSCore $CMSCore = null;
+  private array $allowWidths = [320, 480, 640, 800, 1024, 1280, 1600, 1920];
       
   /**
    * __construct
@@ -76,9 +77,16 @@ final class Resizer implements InterfaceResizer
       mkdir($outputDir . '/' . $baseName, 0774, true);
     }
 
-    $width = 8;
-    while ($width <= $originalWidth) {
+    foreach ($this->allowWidths as $width) {
+      if ($width > $originalWidth) {
+        continue;
+      }
+
       $newHeight = (int)($originalHeight * ($width / $originalWidth));
+      if ($newHeight < 10) {
+        continue;
+      }
+
       $resizedImage = imagecreatetruecolor($width, $newHeight);
 
       if ($type === IMAGETYPE_PNG || $type === IMAGETYPE_WEBP || $type === IMAGETYPE_AVIF) {
@@ -110,7 +118,6 @@ final class Resizer implements InterfaceResizer
       }
 
       imagedestroy($resizedImage);
-      $width *= 2;
     }
 
     imagedestroy($image);
