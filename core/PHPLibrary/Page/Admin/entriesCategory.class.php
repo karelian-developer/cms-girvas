@@ -71,8 +71,12 @@ class PageEntriesCategory implements InterfacePage
 
     $entriesCategory = null;
     if ($this->CMSCore->urlp->getPath(2) !== null) {
-      $entriesCategoryID = (is_numeric($this->CMSCore->urlp->getPath(2))) ? (int)$this->CMSCore->urlp->getPath(2) : 0;
-      $entriesCategory = EntryCategory::existsByID($this->CMSCore, $entriesCategoryID) ? new EntryCategory($this->CMSCore, $entriesCategoryID) : null;
+      $entriesCategoryID = is_numeric($this->CMSCore->urlp->getPath(2))
+        ? (int)$this->CMSCore->urlp->getPath(2)
+        : 0;
+      $entriesCategory = EntryCategory::existsByID($this->CMSCore, $entriesCategoryID)
+        ? new EntryCategory($this->CMSCore, $entriesCategoryID)
+        : null;
       
       if ($entriesCategory !== null) {
         $entriesCategory->initData(['id', 'texts', 'name', 'parentID', 'metadata']);
@@ -80,15 +84,21 @@ class PageEntriesCategory implements InterfacePage
     }
     
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesCategory.tpl', [
-      'ADMIN_PANEL_PAGE_NAME' => 'entries-category',
-      'ENTRIES_CATEGORY_ID' => $entriesCategory !== null ? $entriesCategory->getID() : 0,
-      'ENTRIES_CATEGORY_TITLE' => $entriesCategory !== null ? $entriesCategory->getTitle() : '',
-      'ENTRIES_CATEGORY_DESCRIPTION' => $entriesCategory !== null ? $entriesCategory->getDescription() : '',
-      'ENTRIES_CATEGORY_NAME' => $entriesCategory !== null ? $entriesCategory->getName() : '',
-      'ENTRIES_CATEGORY_FORM_METHOD' => $entriesCategory !== null ? 'PATCH' : 'PUT',
-      'ENTRIES_CATEGORY_SHOW_ON_INDEX_PAGE' => $entriesCategory === null ? '' : ($entriesCategory->isShowedOnIndexPage() ? 'checked' : ''),
-    ]);
+    $this->assembled = ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme, 'templates/page/entriesCategory.tpl',
+      [
+        'ADMIN_PANEL_PAGE_NAME' => 'entries-category',
+        'ENTRIES_CATEGORY_ID' => $entriesCategory !== null ? $entriesCategory->getID() : 0,
+        'ENTRIES_CATEGORY_TITLE' => $entriesCategory !== null ? $entriesCategory->getTitle($localeName) : '',
+        'ENTRIES_CATEGORY_SEO_TITLE' => $entriesCategory !== null ? $entriesCategory->getSEOTitle($localeName) : '',
+        'ENTRIES_CATEGORY_DESCRIPTION' => $entriesCategory !== null ? $entriesCategory->getDescription($localeName) : '',
+        'ENTRIES_CATEGORY_SEO_DESCRIPTION' => $entriesCategory !== null ? $entriesCategory->getSEODescription($localeName) : '',
+        'ENTRIES_CATEGORY_KEYWORDS' => $entriesCategory !== null ? implode(', ', $entriesCategory->getKeywords($localeName)) : '',
+        'ENTRIES_CATEGORY_NAME' => $entriesCategory !== null ? $entriesCategory->getName() : '',
+        'ENTRIES_CATEGORY_FORM_METHOD' => $entriesCategory !== null ? 'PATCH' : 'PUT',
+        'ENTRIES_CATEGORY_SHOW_ON_INDEX_PAGE' => $entriesCategory === null ? '' : ($entriesCategory->isShowedOnIndexPage() ? 'checked' : ''),
+      ]
+    );
   }
 
 }
