@@ -466,7 +466,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
               CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS, [
                 'clientIP' => $clientIP,
-                'userTargetID' => $user->getID();
+                'userTargetID' => $user->getID()
               ]);
 
               $handlerOutputData['reload'] = true;
@@ -483,7 +483,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
           } else {
             $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
               'clientIP' => $clientIP,
-              'userTargetID' => $user->getID();
+              'userTargetID' => $user->getID()
             ]);
 
             /** @var string $handlerMessage Сообщение обработчика */
@@ -493,7 +493,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
         } else {
           $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
             'clientIP' => $clientIP,
-            'userTargetID' => $user->getID();
+            'userTargetID' => $user->getID()
           ]);
 
           $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
@@ -502,7 +502,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
       } else {
         $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
           'clientIP' => $CMSCore->client->getIPAddress(),
-          'date' => date('Y/m/d H:i:s', time())
+          'userTargetID' => $user->getID()
         ]);
         
         $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
