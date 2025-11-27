@@ -314,9 +314,9 @@ class PageEntry implements InterfacePage
         'ENTRY_EDITOR' => ThemeCollector::assemblyFileContent(
           $this->CMSCore->theme, 'templates/page/entry/editor.tpl',
           []
-        ),
-        $templatesAssembled
-      ]
+        )
+      ],
+      $templatesAssembled
     );
   }
 }
