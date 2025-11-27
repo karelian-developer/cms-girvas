@@ -544,7 +544,7 @@ final class Template implements ThemeInterface
         $CMSLocale = $this->CMSCore->locale;
 
         $localeData = $CMSLocale->getData();
-        $systemLocaleName = $CMSLocale->getName();
+        $localeName = $CMSLocale->getName();
 
         $siteTitle = $CMSConfigurator->getMetaTitle() ?: $CMSConfigurator->getSiteTitle();
         $siteMetaTitle = $CMSConfigurator->getMetaTitle();
@@ -658,7 +658,7 @@ final class Template implements ThemeInterface
               ThemeCollector::addTemplateVariable(
                 $templatesAssembled,
                 'ENTRY_CATEGORY_TITLE',
-                $entryCategory->getTitle($systemLocaleName)
+                $entryCategory->getTitle($localeName)
               );
             }
 
@@ -917,8 +917,8 @@ final class Template implements ThemeInterface
           $themeSampleNameVariable = strtoupper(str_replace('-', '_', $entriesSample->getName()));
           $themeVariablesArray['ENTRIES_SAMPLE_' . $themeSampleNameVariable] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $themeSamplePath . '/wrapper.tpl', [
             'SAMPLE_ENTRIES_LIST' => implode('', $entriesAssembled),
-            'SAMPLE_TITLE' => $entriesSample->getTitle($systemLocaleName),
-            'SAMPLE_DESCRIPTION' => $entriesSample->getDescription($systemLocaleName)
+            'SAMPLE_TITLE' => $entriesSample->getTitle($localeName),
+            'SAMPLE_DESCRIPTION' => $entriesSample->getDescription($localeName)
           ]);
         }
       }
