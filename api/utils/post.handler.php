@@ -396,8 +396,8 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
       $targetCheckingUnixTime = $currentUnixTime - 300;
       $lastReportsFailAuth = CMSReports::getByPeriod($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, $targetCheckingUnixTime, $currentUnixTime);
       foreach($lastReportsFailAuth as $reportIndex => $report) {
-        $report->initData(['metadata']);
-        $reportMetadata = $report->getMetadata();
+        $report->initData(['variables']);
+        $reportMetadata = $report->getVariables();
 
         if ($clientIP !== $reportMetadata['clientIP']) {
           unset($lastReportsFailAuth[$reportIndex]);
