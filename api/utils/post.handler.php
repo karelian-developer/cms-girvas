@@ -395,7 +395,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
       $currentUnixTime = time();
       $targetCheckingUnixTime = $currentUnixTime - 300;
       $lastReportsFailAuth = CMSReports::getByPeriod($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, $targetCheckingUnixTime, $currentUnixTime);
-      error_log(print_r($lastReportsFailAuth, true));
+      error_log(count($lastReportsFailAuth));
       foreach($lastReportsFailAuth as $reportIndex => $report) {
         $report->initData(['variables']);
         $reportVariables = $report->getVariables();
