@@ -196,17 +196,27 @@ final class Converter implements InterfaceConverter
   private function convertJPEGToPNG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromjpeg($fileSourcePath);
+    if ($imageSource === false) {
+      return false;
+    }
+
     $imageSourceWidth = imagesx($imageSource);
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+    if ($imageConverted === false) {
+      return false;
+    }
+
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imagepng($imageConverted, $fileOutputPath, $quality);
     
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
 
-    if ($deleteOldFile) unlink($fileSourcePath);
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      unlink($fileSourcePath);
+    }
 
     return file_exists($fileOutputPath);
   }
@@ -224,17 +234,27 @@ final class Converter implements InterfaceConverter
   private function convertJPEGToWEBP(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromjpeg($fileSourcePath);
+    if ($imageSource === false) {
+      return false;
+    }
+
     $imageSourceWidth = imagesx($imageSource);
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+    if ($imageConverted === false) {
+      return false;
+    }
+    
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imagewebp($imageConverted, $fileOutputPath, $quality);
 
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
 
-    if ($deleteOldFile) unlink($fileSourcePath);
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      unlink($fileSourcePath);
+    }
 
     return file_exists($fileOutputPath);
   }
@@ -251,17 +271,27 @@ final class Converter implements InterfaceConverter
   private function convertJPEGToAVIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromjpeg($fileSourcePath);
+    if ($imageSource === false) {
+      return false;
+    }
+
     $imageSourceWidth = imagesx($imageSource);
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+    if ($imageConverted === false) {
+      return false;
+    }
+    
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imageavif($imageConverted, $fileOutputPath, $quality);
 
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
 
-    if ($deleteOldFile) unlink($fileSourcePath);
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      unlink($fileSourcePath);
+    }
 
     return file_exists($fileOutputPath);
   }
@@ -278,10 +308,18 @@ final class Converter implements InterfaceConverter
   private function convertPNGToJPEG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefrompng($fileSourcePath);
+    if ($imageSource === false) {
+      return false;
+    }
+
     $imageSourceWidth = imagesx($imageSource);
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+    if ($imageConverted === false) {
+      return false;
+    }
+    
     imagefill($imageConverted, 0, 0, imagecolorallocate($imageConverted, 255, 255, 255));
     imagealphablending($imageConverted, true);
 
@@ -291,7 +329,9 @@ final class Converter implements InterfaceConverter
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
 
-    if ($deleteOldFile) unlink($fileSourcePath);
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      unlink($fileSourcePath);
+    }
 
     return file_exists($fileOutputPath);
   }
@@ -308,15 +348,23 @@ final class Converter implements InterfaceConverter
   private function convertPNGToWEBP(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefrompng($fileSourcePath);
+    if ($imageSource === false) {
+      return false;
+    }
+
     $imageSourceWidth = imagesx($imageSource);
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+    if ($imageConverted === false) {
+      return false;
+    }
+
     imagealphablending($imageConverted, false);
     imagesavealpha($imageConverted, true);
 
     $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
-    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
+    imagefill($imageConverted, 0, 0, $imageTransparent);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imagewebp($imageConverted, $fileOutputPath, $quality);
@@ -324,7 +372,9 @@ final class Converter implements InterfaceConverter
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
 
-    if ($deleteOldFile) unlink($fileSourcePath);
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      unlink($fileSourcePath);
+    }
 
     return file_exists($fileOutputPath);
   }
@@ -341,15 +391,23 @@ final class Converter implements InterfaceConverter
   private function convertPNGToAVIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefrompng($fileSourcePath);
+    if ($imageSource === false) {
+      return false;
+    }
+
     $imageSourceWidth = imagesx($imageSource);
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+    if ($imageConverted === false) {
+      return false;
+    }
+    
     imagealphablending($imageConverted, false);
     imagesavealpha($imageConverted, true);
 
     $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
-    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
+    imagefill($imageConverted, 0, 0, $imageTransparent);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imageavif($imageConverted, $fileOutputPath, $quality);
@@ -357,7 +415,9 @@ final class Converter implements InterfaceConverter
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
 
-    if ($deleteOldFile) unlink($fileSourcePath);
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      unlink($fileSourcePath);
+    }
 
     return file_exists($fileOutputPath);
   }
@@ -374,10 +434,18 @@ final class Converter implements InterfaceConverter
   private function convertWEBPToJPEG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromwebp($fileSourcePath);
+    if ($imageSource === false) {
+      return false;
+    }
+
     $imageSourceWidth = imagesx($imageSource);
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+    if ($imageConverted === false) {
+      return false;
+    }
+    
     imagefill($imageConverted, 0, 0, imagecolorallocate($imageConverted, 255, 255, 255));
     imagealphablending($imageConverted, true);
 
@@ -387,7 +455,9 @@ final class Converter implements InterfaceConverter
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
 
-    if ($deleteOldFile) unlink($fileSourcePath);
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      unlink($fileSourcePath);
+    }
 
     return file_exists($fileOutputPath);
   }
@@ -404,22 +474,32 @@ final class Converter implements InterfaceConverter
   private function convertWEBPToPNG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromwebp($fileSourcePath);
+    if ($imageSource === false) {
+      return false;
+    }
+
     $imageSourceWidth = imagesx($imageSource);
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+    if ($imageConverted === false) {
+      return false;
+    }
+    
     imagealphablending($imageConverted, false);
     imagesavealpha($imageConverted, true);
 
     $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
-    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
+    imagefill($imageConverted, 0, 0, $imageTransparent);
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imagepng($imageConverted, $fileOutputPath, $quality);
     
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
 
-    if ($deleteOldFile) unlink($fileSourcePath);
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      unlink($fileSourcePath);
+    }
 
     return file_exists($fileOutputPath);
   }
@@ -436,15 +516,23 @@ final class Converter implements InterfaceConverter
   private function convertWEBPToAVIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromwebp($fileSourcePath);
+    if ($imageSource === false) {
+      return false;
+    }
+
     $imageSourceWidth = imagesx($imageSource);
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+    if ($imageConverted === false) {
+      return false;
+    }
+    
     imagealphablending($imageConverted, false);
     imagesavealpha($imageConverted, true);
 
     $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
-    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
+    imagefill($imageConverted, 0, 0, $imageTransparent);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imageavif($imageConverted, $fileOutputPath, $quality);
@@ -452,7 +540,9 @@ final class Converter implements InterfaceConverter
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
 
-    if ($deleteOldFile) unlink($fileSourcePath);
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      unlink($fileSourcePath);
+    }
 
     return file_exists($fileOutputPath);
   }
@@ -469,10 +559,18 @@ final class Converter implements InterfaceConverter
   private function convertAVIFToJPEG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromavif($fileSourcePath);
+    if ($imageSource === false) {
+      return false;
+    }
+
     $imageSourceWidth = imagesx($imageSource);
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+    if ($imageConverted === false) {
+      return false;
+    }
+    
     imagefill($imageConverted, 0, 0, imagecolorallocate($imageConverted, 255, 255, 255));
     imagealphablending($imageConverted, true);
 
@@ -482,7 +580,9 @@ final class Converter implements InterfaceConverter
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
 
-    if ($deleteOldFile) unlink($fileSourcePath);
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      unlink($fileSourcePath);
+    }
 
     return file_exists($fileOutputPath);
   }
@@ -499,22 +599,32 @@ final class Converter implements InterfaceConverter
   private function convertAVIFToPNG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromavif($fileSourcePath);
+    if ($imageSource === false) {
+      return false;
+    }
+
     $imageSourceWidth = imagesx($imageSource);
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+    if ($imageConverted === false) {
+      return false;
+    }
+    
     imagealphablending($imageConverted, false);
     imagesavealpha($imageConverted, true);
 
     $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
-    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
+    imagefill($imageConverted, 0, 0, $imageTransparent);
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imagepng($imageConverted, $fileOutputPath, $quality);
     
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
 
-    if ($deleteOldFile) unlink($fileSourcePath);
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      unlink($fileSourcePath);
+    }
 
     return file_exists($fileOutputPath);
   }
@@ -531,15 +641,23 @@ final class Converter implements InterfaceConverter
   private function convertAVIFToWEBP(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
     $imageSource = imagecreatefromavif($fileSourcePath);
+    if ($imageSource === false) {
+      return false;
+    }
+
     $imageSourceWidth = imagesx($imageSource);
     $imageSourceHeight = imagesy($imageSource);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+    if ($imageConverted === false) {
+      return false;
+    }
+    
     imagealphablending($imageConverted, false);
     imagesavealpha($imageConverted, true);
 
     $imageTransparent = imagecolorallocatealpha($imageConverted, 0, 0, 0, 127);
-    imagefilledrectangle($imageConverted, 0, 0, $imageSourceWidth - 1, $imageSourceHeight - 1, $imageTransparent);
+    imagefill($imageConverted, 0, 0, $imageTransparent);
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     imagewebp($imageConverted, $fileOutputPath, $quality);
@@ -547,7 +665,9 @@ final class Converter implements InterfaceConverter
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
 
-    if ($deleteOldFile) unlink($fileSourcePath);
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      unlink($fileSourcePath);
+    }
 
     return file_exists($fileOutputPath);
   }
