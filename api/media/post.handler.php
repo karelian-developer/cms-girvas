@@ -94,11 +94,14 @@ if ($CMSCore->client->isLogged(2)) {
                   } else {
                     $fileExtensionConvertedEnum = $fileExtensionEnum;
                   }
+
+                  $quality = 100 - $CMSCore->configurator->getUploadImageCompression();
+                  $quality = $quality > 0 ? $quality : -1;
                   
                   /** @var FileConverter Объект-конвектор файлов */
                   $fileConverter = new FileConverter($CMSCore);
                   /** @var array Конвертированный файл */
-                  $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true);
+                  $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true, 4658, $quality);
                   
                   /** @var array Данные конвертированного файла */
                   $fileData = [];

@@ -607,6 +607,8 @@
   "PAGE_SETTINGS_SETTING_FILES_UPLOAD_FILE_IMAGE_AVATAR_WIDTH_MAX_DESCRIPTION": "Максимальная ширина аватара, загружаемого через сайт. Размер указывается в пикселях. Если ограничения не требуются, то укажите 0.",
   "PAGE_SETTINGS_SETTING_FILES_UPLOAD_FILE_IMAGE_AVATAR_HEIGHT_MAX_TITLE": "Максимальная высота (в PX) загружаемого аватара",
   "PAGE_SETTINGS_SETTING_FILES_UPLOAD_FILE_IMAGE_AVATAR_HEIGHT_MAX_DESCRIPTION": "Максимальная высота аватара, загружаемого через сайт. Размер указывается в пикселях. Если ограничения не требуются, то укажите 0.",
+  "PAGE_SETTINGS_SETTING_FILES_UPLOAD_IMAGE_COMPRESSION_TITLE": "Процент сжатия загружаемого изображения",
+  "PAGE_SETTINGS_SETTING_FILES_UPLOAD_IMAGE_COMPRESSION_DESCRIPTION": "Все изображения, которые будут загружаться в систему (в том числе в качестве превью к записям) будут сжаты на процент, указанный в этом поле. Рекомендуется использоваться не более 40-ка процентов.",
   "PAGE_SETTINGS_SETTING_FILES_AUTO_CONVERT_FILE_IMAGE_TITLE": "Автоматическая конвертация загружаемого изображения",
   "PAGE_SETTINGS_SETTING_FILES_AUTO_CONVERT_FILE_IMAGE_DESCRIPTION": "Если автоматическая конвертация загружаемого изображения включена, то оно при загрузке будет автоматически преобразовано в выбранное расширение. К примеру, если в настройках было выбрано расширение WEBP, то загружаемое изображение формата JPEG или любого другого будет преобразовано в WEBP.",
   "PAGE_SETTINGS_SETTING_FILES_AUTO_CONVERT_FILE_IMAGE_EXTENSION_TITLE": "Расширение изображения при автоматической конвертации",

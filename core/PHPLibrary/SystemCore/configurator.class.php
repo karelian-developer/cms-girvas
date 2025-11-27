@@ -267,6 +267,16 @@ final class Configurator implements ConfiguratorInterface
   }
 
   /**
+   * Получить показатель автоматического сжатия загружаемых изображений
+   * 
+   * @return int
+   */
+  public function getUploadImageCompression() : int
+  {
+    return $this->existsDatabaseEntryValue('files_upload_image_compression_max') ? (int) $this->getDatabaseEntryValue('files_upload_image_compression_max') : 0;
+  }
+
+  /**
    * Получить статус состояния раздела "Записи"
    * 
    * @return string|bool

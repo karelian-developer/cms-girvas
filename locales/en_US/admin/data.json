@@ -607,6 +607,8 @@
   "PAGE_SETTINGS_SETTING_FILES_UPLOAD_FILE_IMAGE_AVATAR_WIDTH_MAX_DESCRIPTION": "The maximum width of the avatar uploaded via the site. The size is specified in pixels. If no restrictions are required, specify 0.",
   "PAGE_SETTINGS_SETTING_FILES_UPLOAD_FILE_IMAGE_AVATAR_HEIGHT_MAX_TITLE": "The maximum height (in PX) of the uploaded avatar",
   "PAGE_SETTINGS_SETTING_FILES_UPLOAD_FILE_IMAGE_AVATAR_HEIGHT_MAX_DESCRIPTION": "The maximum height of the avatar uploaded via the site. The size is specified in pixels. If no restrictions are required, specify 0.",
+  "PAGE_SETTINGS_SETTING_FILES_UPLOAD_IMAGE_COMPRESSION_TITLE": "Uploaded image compression percentage",
+  "PAGE_SETTINGS_SETTING_FILES_UPLOAD_IMAGE_COMPRESSION_DESCRIPTION": "All images uploaded to the system (including post previews) will be compressed by the percentage specified in this field. It is recommended to use no more than 40 percent.",
   "PAGE_SETTINGS_SETTING_FILES_AUTO_CONVERT_FILE_IMAGE_TITLE": "Automatic conversion of the uploaded image",
   "PAGE_SETTINGS_SETTING_FILES_AUTO_CONVERT_FILE_IMAGE_DESCRIPTION": "If automatic conversion of the uploaded image is enabled, it will be automatically converted to the selected extension upon upload. For example, if the WEBP extension was selected in the settings, then the uploaded image of JPEG or any other format will be converted to WEBP.",
   "PAGE_SETTINGS_SETTING_FILES_AUTO_CONVERT_FILE_IMAGE_EXTENSION_TITLE": "Image extension for automatic conversion",

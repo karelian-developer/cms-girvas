@@ -213,9 +213,12 @@ if ($CMSCore->client->isLogged(2)) {
           if (isset($_PATCH['entry_category_id'])) $entryData['categoryID'] = $_PATCH['entry_category_id'];
           
           if (isset($_PATCH['entry_preview'])) {
+            $previewQuality = 100 - $CMSCore->configurator->getUploadImageCompression();
+            $previewQuality = $previewQuality > 0 ? $previewQuality : -1;
+
             $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
             $fileConverter = new FileConverter($CMSCore);
-            $fileConverted = $fileConverter->convert($_PATCH['entry_preview'], $fileDirectoryPath, FileConverterEnumFileFormat::WEBP, true, 0, 60);
+            $fileConverted = $fileConverter->convert($_PATCH['entry_preview'], $fileDirectoryPath, FileConverterEnumFileFormat::WEBP, true, 0, 60, $previewQuality);
             
             if (is_array($fileConverted)) {
               if (!array_key_exists('metadata', $entryData)) $entryData['metadata'] = [];
