@@ -225,7 +225,7 @@ class PageEntry implements InterfacePage
       ThemeCollector::addTemplateVariable(
         $templatesAssembled,
         'ENTRY_TITLE',
-        htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8')
+        htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
       );
     }
 
@@ -235,7 +235,7 @@ class PageEntry implements InterfacePage
       ThemeCollector::addTemplateVariable(
         $templatesAssembled,
         'ENTRY_SEO_TITLE',
-        htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8')
+        htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
       );
     }
 
@@ -245,7 +245,7 @@ class PageEntry implements InterfacePage
       ThemeCollector::addTemplateVariable(
         $templatesAssembled,
         'ENTRY_DESCRIPTION',
-        htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8')
+        htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
       );
     }
 
@@ -255,7 +255,7 @@ class PageEntry implements InterfacePage
       ThemeCollector::addTemplateVariable(
         $templatesAssembled,
         'ENTRY_SEO_DESCRIPTION',
-        htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8')
+        htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
       );
     }
 
@@ -265,14 +265,14 @@ class PageEntry implements InterfacePage
       ThemeCollector::addTemplateVariable(
         $templatesAssembled,
         'ENTRY_CONTENT',
-        htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8')
+        htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
       );
     }
 
     if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_KEYWORDS')) {
       $value = $entry !== null ? $entry->getKeywords($localeName) : [];
       $valueArray = array_map(function($item) {
-        return htmlspecialchars($item, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        return htmlspecialchars($item, ENT_QUOTES, 'UTF-8');
       }, $value);
       
       ThemeCollector::addTemplateVariable(
