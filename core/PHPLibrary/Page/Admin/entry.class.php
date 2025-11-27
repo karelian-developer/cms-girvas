@@ -278,7 +278,7 @@ class PageEntry implements InterfacePage
       ThemeCollector::addTemplateVariable(
         $templatesAssembled,
         'ENTRY_KEYWORDS',
-        $entry !== null ? implode(', ', $value) : ''
+        $entry !== null ? implode(', ', $valueArray) : ''
       );
     }
 
