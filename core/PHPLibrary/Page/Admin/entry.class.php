@@ -306,7 +306,7 @@ class PageEntry implements InterfacePage
           ThemeCollector::DECODED_ENTITIES,
           ThemeCollector::SAFE_SYMBOLS,
           htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
-        )''
+        )
       }, $value);
       
       ThemeCollector::addTemplateVariable(
