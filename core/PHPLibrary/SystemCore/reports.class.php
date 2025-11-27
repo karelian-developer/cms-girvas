@@ -119,7 +119,6 @@ final class Reports
       'postgresql' => '"createdUnixTimestamp" BETWEEN :startPeriodUnix AND :endPeriodUnix AND (metadata::jsonb->>\'typeID\') IS NOT NULL AND (metadata::jsonb->>\'typeID\')::integer = :typeID'
     ]);
     $queryBuilder->statement->clauseWhere->assembly();
-    $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
 
     try {
