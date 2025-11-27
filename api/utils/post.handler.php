@@ -311,19 +311,21 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
           $userToken = ClientSession::generateToken();
 
           if (!ClientSession::existsByIPAndUserID($CMSCore, $userIP, $user->getID(), 1)) {
-            /** @var ClientSession|null $userSession */
-            $userSession = ClientSession::create($CMSCore, [
-              'userID' => $user->getID(),
-              'token' => $userToken,
-              'userIP' => $userIP,
-              'typeID' => 1
-            ]);
+            $userSession = ClientSession::create(
+              $CMSCore,
+              [
+                'userID' => $user->getID(),
+                'token' => $userToken,
+                'userIP' => $userIP,
+                'typeID' => 1
+              ]
+            );
           } else {
             $userSession = ClientSession::getByIPAndUserID($CMSCore, $userIP, $user->getID(), 1);
             $userSession->update([]);
           }
 
-          if (!is_null($userSession)) {
+          if ($userSession !== null) {
             $userSession->initData(['updatedUnixTimestamp', 'token']);
             $userSessionExpires = $userSession->getUpdatedUnixTimestamp() + $CMSCore->configurator->get('sessionExpires');
 
@@ -339,22 +341,33 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
             $handlerOutputData['reload'] = true;
 
-            /** @var string $handlerMessage Сообщение обработчика */
+            CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS, [
+              'clientIP' => $CMSCore->client->getRealIPAddress(),
+              'userTargetID' => $user->getID();
+            ]);
+
             $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_SUCCESS');
             $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {
-            /** @var string $handlerMessage Сообщение обработчика */
             $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
 
         } else {
-          /** @var string $handlerMessage Сообщение обработчика */
+          CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL, [
+            'clientIP' => $CMSCore->client->getRealIPAddress(),
+            'userTargetID' => $user->getID();
+          ]);
+
           $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        /** @var string $handlerMessage Сообщение обработчика */
+        CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL, [
+          'clientIP' => $CMSCore->client->getRealIPAddress(),
+          'userTargetID' => $user->getID();
+        ]);
+
         $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
@@ -369,6 +382,8 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 }
 
 if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('method') === 'admin') {
+  $clientIP = $CMSCore->client->getRealIPAddress();
+  
   if (!$CMSCore->client->isLogged(2)) {
     $userLogin = trim($_POST['user_login']) ?? null;
     $userPassword = trim($_POST['user_password']) ?? null;
@@ -401,8 +416,6 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
           // Проверяем правильность пароля
           if ($user->passwordVerify($userPassword) && $adminAccessCodesIsValid) {
-            /** @var string $userIP */
-            $userIP = $_SERVER['REMOTE_ADDR'];
             /** @var string $userToken */
             $userTokenBase = ClientSession::generateToken();
             $userTokenAdmin = ClientSession::generateToken();
@@ -411,12 +424,12 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             $userSessionAdmin = null;
 
             // Если сессия не была найдена, то создаем новую.
-            if (!ClientSession::existsByIPAndUserID($CMSCore, $userIP, $user->getID(), 1)) {
+            if (!ClientSession::existsByIPAndUserID($CMSCore, $clientIP, $user->getID(), 1)) {
               /** @var ClientSession|null $userSession */
               $userSessionBase = ClientSession::create($CMSCore, [
                 'userID' => $user->getID(),
                 'token' => $userTokenBase,
-                'userIP' => $userIP,
+                'userIP' => $clientIP,
                 'typeID' => 1
               ]);
             } else {
@@ -430,11 +443,11 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
               $userSessionAdmin = ClientSession::create($CMSCore, [
                 'userID' => $user->getID(),
                 'token' => $userTokenAdmin,
-                'userIP' => $userIP,
+                'userIP' => $clientIP,
                 'typeID' => 2
               ]);
             } else {
-              $userSessionAdmin = ClientSession::getByIPAndUserID($CMSCore, $userIP, $user->getID(), 2);
+              $userSessionAdmin = ClientSession::getByIPAndUserID($CMSCore, $clientIP, $user->getID(), 2);
               $userSessionAdmin->update([]);
             }
 
@@ -451,9 +464,9 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
               $CMSCore->client::createCookie($CMSCore, '_grv_atoken', $userSessionAdmin, $userRememberMe ? $userSessionAdmin_expires : 0);
 
-              $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS, [
-                'clientIP' => $CMSCore->client->getIPAddress(),
-                'date' => date('Y/m/d H:i:s', time())
+              CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS, [
+                'clientIP' => $clientIP,
+                'userTargetID' => $user->getID();
               ]);
 
               $handlerOutputData['reload'] = true;
@@ -469,8 +482,8 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
           } else {
             $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
-              'clientIP' => $CMSCore->client->getIPAddress(),
-              'date' => date('Y/m/d H:i:s', time())
+              'clientIP' => $clientIP,
+              'userTargetID' => $user->getID();
             ]);
 
             /** @var string $handlerMessage Сообщение обработчика */
@@ -478,6 +491,11 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
+          $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
+            'clientIP' => $clientIP,
+            'userTargetID' => $user->getID();
+          ]);
+
           $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
@@ -487,7 +505,6 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
           'date' => date('Y/m/d H:i:s', time())
         ]);
         
-        /** @var string $handlerMessage Сообщение обработчика */
         $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }

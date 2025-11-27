@@ -208,12 +208,12 @@ final class Report
    * Создание записи в базе данных
    *
    * @param  mixed $CMSCore
-   * @param  int $type_id
+   * @param  int $typeID
    * @param  array $variables
    * 
    * @return Report
    */
-  public static function create(SystemCore $CMSCore, int $type_id, array $variables = []) : Report|null
+  public static function create(SystemCore $CMSCore, int $typeID, array $variables = []) : Report|null
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -231,7 +231,7 @@ final class Report
     /** @var int Время создания записи в БД в UNIX-формате */
     $createdUnixTimestamp = time();
 
-    $metadata = ['typeID' => $type_id];
+    $metadata = ['typeID' => $typeID];
     $metadataJSON = json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     $variablesJSON = json_encode($variables, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
