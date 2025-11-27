@@ -379,18 +379,30 @@ class PageEntries implements InterfacePage
         }
 
         if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_TITLE')) {
+          $value = $entryObject !== null ? $entryObject->getTitle($localeName) : '';
+
           ThemeCollector::addTemplateVariable(
             $templatesAssembled,
             'ENTRY_TITLE',
-            $entryObject->getTitle($localeName)
+            str_replace(
+              ThemeCollector::DECODED_ENTITIES,
+              ThemeCollector::SAFE_SYMBOLS,
+              htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+            )
           );
         }
 
         if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_DESCRIPTION')) {
+          $value = $entryObject !== null ? $entryObject->getDescription($localeName) : '';
+
           ThemeCollector::addTemplateVariable(
             $templatesAssembled,
             'ENTRY_DESCRIPTION',
-            $entryObject->getDescription($localeName)
+            str_replace(
+              ThemeCollector::DECODED_ENTITIES,
+              ThemeCollector::SAFE_SYMBOLS,
+              htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+            )
           );
         }
 
