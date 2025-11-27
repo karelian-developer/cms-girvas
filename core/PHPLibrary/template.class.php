@@ -863,9 +863,9 @@ final class Template implements ThemeInterface
             }
 
             if (ThemeCollector::existsTemplateVariable($entriesSampleTemplateContent, 'ENTRY_PREVIEW_URL')) {
-              $themePropertySamplePreviewWidth = 'ENTRIES_SAMPLE_' . $themeNameUpperCase($entriesSample->getName()) . '_PREVIEW_WIDTH';
-              $samplePreviewWidth = defined(get_class($this->core) . '::' . $themePropertySamplePreviewWidth)
-                ? $this->core::$themePropertySamplePreviewWidth
+              $themePropertySamplePreviewWidthName = 'ENTRIES_SAMPLE_' . $themeNameUpperCase($entriesSample->getName()) . '_PREVIEW_WIDTH';
+              $samplePreviewWidth = defined(get_class($this->core) . '::' . $themePropertySamplePreviewWidthName)
+                ? $this->core::{$themePropertySamplePreviewWidthName}
                 : -1;
 
               ThemeCollector::addTemplateVariable(
