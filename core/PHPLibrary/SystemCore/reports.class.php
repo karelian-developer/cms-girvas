@@ -104,10 +104,10 @@ final class Reports
    */
   public static function getByPeriod(CMSCore $CMSCore, int $typeID, int $startPeriodUnix, int $endPeriodUnix) : array
   {
-    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
@@ -123,7 +123,7 @@ final class Reports
     $queryBuilder->statement->assembly();
 
     try {
-      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       $databaseQuery->bindParam(':startPeriodUnix', $startPeriodUnix, \PDO::PARAM_INT);
       $databaseQuery->bindParam(':endPeriodUnix', $endPeriodUnix, \PDO::PARAM_INT);
@@ -142,7 +142,7 @@ final class Reports
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        array_push($reports, new Report($this->CMSCore, $data['id']));
+        array_push($reports, new Report($CMSCore, $data['id']));
       }
     }
 
