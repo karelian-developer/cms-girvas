@@ -216,7 +216,7 @@ class PageEntry implements InterfacePage
     $templatesAssembled = [];
     $templateContent = ThemeCollector::getTemplateFileContent(
       $this->CMSCore->theme,
-      'templates/page/entry.tpl'
+      '/templates/page/entry.tpl'
     );
 
     if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_TITLE')) {
