@@ -53,7 +53,6 @@ if ($CMSCore->client->isLogged(2)) {
 
             if (array_key_exists($inputTitleName, $_PUT)) {
               $inputValue = $_PUT[$inputTitleName];
-              $inputValue = strip_tags($inputValue);
               $inputValue = str_replace('\'', '"', $inputValue);
   
               $texts[$CMSLocaleName]['title'] = $inputValue;
@@ -61,7 +60,6 @@ if ($CMSCore->client->isLogged(2)) {
 
             if (array_key_exists($inputSEOTitleName, $_PUT)) {
               $inputValue = $_PUT[$inputSEOTitleName];
-              $inputValue = strip_tags($inputValue);
               $inputValue = str_replace('\'', '"', $inputValue);
   
               $texts[$CMSLocaleName]['SEOTitle'] = $inputValue;
@@ -69,7 +67,6 @@ if ($CMSCore->client->isLogged(2)) {
 
             if (array_key_exists($textareaDescriptionName, $_PUT)) {
               $textareaValue = $_PUT[$textareaDescriptionName];
-              $textareaValue = strip_tags($textareaValue);
               $textareaValue = str_replace('\'', '"', $textareaValue);
   
               $texts[$CMSLocaleName]['description'] = $textareaValue;
@@ -77,7 +74,6 @@ if ($CMSCore->client->isLogged(2)) {
 
             if (array_key_exists($textareaSEODescriptionName, $_PUT)) {
               $textareaValue = $_PUT[$textareaSEODescriptionName];
-              $textareaValue = strip_tags($textareaValue);
               $textareaValue = str_replace('\'', '"', $textareaValue);
   
               $texts[$CMSLocaleName]['SEODescription'] = $textareaValue;
@@ -85,7 +81,6 @@ if ($CMSCore->client->isLogged(2)) {
 
             if (array_key_exists($textareaKeywordsName, $_PUT)) {
               $textareaValue = $_PUT[$textareaKeywordsName];
-              $textareaValue = strip_tags($textareaValue);
               $textareaValue = str_replace('\'', '"', $textareaValue);
 
               $texts[$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);

@@ -58,7 +58,6 @@ if ($CMSCore->client->isLogged(2)) {
 
               if (array_key_exists($inputTitleName, $_PATCH)) {
                 $inputValue = $_PATCH[$inputTitleName];
-                $inputValue = strip_tags($inputValue);
                 $inputValue = str_replace('\'', '"', $inputValue);
                 
                 $pageStaticData['texts'][$CMSLocaleName]['title'] = $inputValue;
@@ -66,7 +65,6 @@ if ($CMSCore->client->isLogged(2)) {
 
               if (array_key_exists($inputSEOTitleName, $_PATCH)) {
                 $inputValue = $_PATCH[$inputSEOTitleName];
-                $inputValue = strip_tags($inputValue);
                 $inputValue = str_replace('\'', '"', $inputValue);
     
                 $pageStaticData['texts'][$CMSLocaleName]['SEOTitle'] = $inputValue;
@@ -74,7 +72,6 @@ if ($CMSCore->client->isLogged(2)) {
 
               if (array_key_exists($textareaDescriptionName, $_PATCH)) {
                 $textareaValue = $_PATCH[$textareaDescriptionName];
-                $textareaValue = strip_tags($textareaValue);
                 $textareaValue = str_replace('\'', '"', $textareaValue);
 
                 $pageStaticData['texts'][$CMSLocaleName]['description'] = $textareaValue;
@@ -82,7 +79,6 @@ if ($CMSCore->client->isLogged(2)) {
     
               if (array_key_exists($textareaSEODescriptionName, $_PATCH)) {
                 $textareaValue = $_PATCH[$textareaSEODescriptionName];
-                $textareaValue = strip_tags($textareaValue);
                 $textareaValue = str_replace('\'', '"', $textareaValue);
     
                 $pageStaticData['texts'][$CMSLocaleName]['SEODescription'] = $textareaValue;
@@ -90,7 +86,6 @@ if ($CMSCore->client->isLogged(2)) {
 
               if (array_key_exists($textareaContentName, $_PATCH)) {
                 $textareaValue = $_PATCH[$textareaContentName];
-                $textareaValue = strip_tags($textareaValue, '<table><tr><td><th><b><u><i><hr>');
                 $textareaValue = str_replace('\'', '"', $textareaValue);
 
                 $pageStaticData['texts'][$CMSLocaleName]['content'] = $textareaValue;
@@ -98,7 +93,6 @@ if ($CMSCore->client->isLogged(2)) {
 
               if (array_key_exists($textareaKeywordsName, $_PATCH)) {
                 $textareaValue = $_PATCH[$textareaKeywordsName];
-                $textareaValue = strip_tags($textareaValue);
                 $textareaValue = str_replace('\'', '"', $textareaValue);
                 
                 $pageStaticData['texts'][$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
