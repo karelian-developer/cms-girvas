@@ -21,11 +21,11 @@
 namespace core\PHPLibrary\SystemCore;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore as CMSCore;
 
 final class Reports
 {
-  private readonly SystemCore $CMSCore;
+  private readonly CMSCore $CMSCore;
 
   /**
    * __construct
@@ -33,7 +33,7 @@ final class Reports
    * @param  mixed $CMSCore
    * @return void
    */
-  public function __construct(SystemCore $CMSCore)
+  public function __construct(CMSCore $CMSCore)
   {
     $this->CMSCore = $CMSCore;
   }
