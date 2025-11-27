@@ -96,7 +96,7 @@ class PagePage implements InterfacePage
     /** @var array Имена полей */
     $fieldsNames = $this->CMSCore->configurator->existsDatabaseEntryValue('static_pages_additional_field_name') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('static_pages_additional_field_name'), true) : [];
 
-    $additionaFieldsElements = [];
+    $additionalFieldsElements = [];
     foreach ($fieldsTypes as $index => $type) {
       $fieldNameExploded = explode('_', $fieldsNames[$index]);
 
@@ -124,7 +124,7 @@ class PagePage implements InterfacePage
 
         $documentString = $document->saveHTML($element);
 
-        array_push($additionaFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
+        array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
           'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
           'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
           'FIELD_INPUT' => $documentString
@@ -148,7 +148,7 @@ class PagePage implements InterfacePage
 
         $documentString = $document->saveHTML($element);
 
-        array_push($additionaFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
+        array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
           'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
           'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
           'FIELD_INPUT' => $documentString
