@@ -109,7 +109,7 @@ final class Converter implements InterfaceConverter
       }
 
       $convertedResult = false;
-      if ($fileSourcePath != '' && file_exists($fileSourcePath)) {
+      if ($fileSourcePath !== '' && file_exists($fileSourcePath)) {
         if (($fileExtension === 'jpeg' || $fileExtension === 'jpg') && $convertToExtension === 'png') {
           $convertedResult = $this->convertJPEGToPNG($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }

@@ -213,12 +213,25 @@ if ($CMSCore->client->isLogged(2)) {
           if (isset($_PATCH['entry_category_id'])) $entryData['categoryID'] = $_PATCH['entry_category_id'];
           
           if (isset($_PATCH['entry_preview'])) {
-            $previewQuality = 100 - $CMSCore->configurator->getUploadImageCompression();
-            $previewQuality = $previewQuality > 0 ? $previewQuality : -1;
+            if ($CMSCore->configurator->getAutoConvertFileImageStatus(true)) {
+              $fileExtensionConvertedEnum = match ($CMSCore->configurator->getAutoConvertFileImageExtension()) {
+                'webp' => FileConverterEnumFileFormat::WEBP,
+                'avif' => FileConverterEnumFileFormat::AVIF
+              };
+            } else {
+              $fileExtensionConvertedEnum = $fileExtensionEnum;
+            }
+
+            $qualityPercent = 100 - $CMSCore->configurator->getUploadImageCompression();
+            if ($qualityPercent <= 0) {
+              $previewQuality = -1;
+            } else {
+              $previewQuality = min(9, max(0, (int) round(($quality / 100) * 9)));
+            }
 
             $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
             $fileConverter = new FileConverter($CMSCore);
-            $fileConverted = $fileConverter->convert($_PATCH['entry_preview'], $fileDirectoryPath, FileConverterEnumFileFormat::WEBP, true, 0, 60, $previewQuality);
+            $fileConverted = $fileConverter->convert($_PATCH['entry_preview'], $fileDirectoryPath, $fileExtensionConvertedEnum, true, 0, 60, $previewQuality);
             
             if (is_array($fileConverted)) {
               if (!array_key_exists('metadata', $entryData)) $entryData['metadata'] = [];

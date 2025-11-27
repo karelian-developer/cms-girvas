@@ -95,8 +95,12 @@ if ($CMSCore->client->isLogged(2)) {
                     $fileExtensionConvertedEnum = $fileExtensionEnum;
                   }
 
-                  $quality = 100 - $CMSCore->configurator->getUploadImageCompression();
-                  $quality = $quality > 0 ? $quality : -1;
+                  $qualityPercent = 100 - $CMSCore->configurator->getUploadImageCompression();
+                  if ($qualityPercent <= 0) {
+                    $quality = -1;
+                  } else {
+                    $quality = min(9, max(0, (int) round(($quality / 100) * 9)));
+                  }
                   
                   /** @var FileConverter Объект-конвектор файлов */
                   $fileConverter = new FileConverter($CMSCore);
