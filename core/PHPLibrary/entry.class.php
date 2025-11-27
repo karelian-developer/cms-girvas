@@ -291,7 +291,8 @@ class Entry implements EntityTypeContent
       $texts = json_decode($this->texts, true);
 
       if (isset($texts[$localeName]['title'])) {
-        return $texts[$localeName]['title'];
+        $value = $texts[$localeName]['title'];
+        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
       }
     }
 
@@ -311,7 +312,8 @@ class Entry implements EntityTypeContent
       $texts = json_decode($this->texts, true);
 
       if (isset($texts[$localeName]['SEOTitle'])) {
-        return $texts[$localeName]['SEOTitle'];
+        $value = $texts[$localeName]['SEOTitle'];
+        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
       }
     }
 
@@ -330,7 +332,8 @@ class Entry implements EntityTypeContent
       $texts = json_decode($this->texts, true);
 
       if (isset($texts[$localeName]['description'])) {
-        return $texts[$localeName]['description'];
+        $value = $texts[$localeName]['description'];
+        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
       }
     }
 
@@ -349,7 +352,8 @@ class Entry implements EntityTypeContent
       $texts = json_decode($this->texts, true);
 
       if (isset($texts[$localeName]['SEODescription'])) {
-        return $texts[$localeName]['SEODescription'];
+        $value = $texts[$localeName]['SEODescription'];
+        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
       }
     }
 
@@ -368,7 +372,8 @@ class Entry implements EntityTypeContent
       $texts = json_decode($this->texts, true);
 
       if (isset($texts[$localeName]['content'])) {
-        return $texts[$localeName]['content'];
+        $value = $texts[$localeName]['content'];
+        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
       }
     }
 
@@ -387,7 +392,8 @@ class Entry implements EntityTypeContent
       $texts = json_decode($this->texts, true);
 
       if (isset($texts[$localeName]['keywords'])) {
-        return $texts[$localeName]['keywords'];
+        $value = $texts[$localeName]['keywords'];
+        return htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
       }
     }
 
