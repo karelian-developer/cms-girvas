@@ -839,18 +839,30 @@ final class Template implements ThemeInterface
             }
 
             if (ThemeCollector::existsTemplateVariable($entriesSampleTemplateContent, 'ENTRY_TITLE')) {
+              $value = $entry !== null ? $entry->getTitle($localeName) : '';
+
               ThemeCollector::addTemplateVariable(
                 $templatesAssembled,
                 'ENTRY_TITLE',
-                $entry->getTitle($systemLocaleName)
+                str_replace(
+                  ThemeCollector::DECODED_ENTITIES,
+                  ThemeCollector::SAFE_SYMBOLS,
+                  htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+                )
               );
             }
 
             if (ThemeCollector::existsTemplateVariable($entriesSampleTemplateContent, 'ENTRY_DESCRIPTION')) {
+              $value = $entry !== null ? $entry->getDescription($localeName) : '';
+
               ThemeCollector::addTemplateVariable(
                 $templatesAssembled,
                 'ENTRY_DESCRIPTION',
-                $entry->getDescription($systemLocaleName)
+                str_replace(
+                  ThemeCollector::DECODED_ENTITIES,
+                  ThemeCollector::SAFE_SYMBOLS,
+                  htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+                )
               );
             }
 
