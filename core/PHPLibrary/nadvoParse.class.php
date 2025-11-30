@@ -350,7 +350,7 @@ class NadvoParse
         str_starts_with(trim($line), '<li>'))
       {
         if (!empty($currentParagraph)) {
-          $html .= $currentParagraph;
+          $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
         }
 
