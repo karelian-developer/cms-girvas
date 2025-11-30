@@ -23,7 +23,16 @@
   margin-right: 6px;
 }
 
+.page__article .article__content,
+.page__article .article__content:has(img + img),
+.page__article .article__content:has(figure + figure) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
 .page__article .article__content > * {
+  grid-column: 1 / -1;
   word-break: break-word;
 }
 
@@ -70,14 +79,6 @@
 .page__article .article__content > ol,
 .page__article .article__content > figcaption {
   font-size: 14px;
-}
-
-.page__article .article__content,
-.page__article .article__content:has(img + img),
-.page__article .article__content:has(figure + figure) {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 10px;
 }
 
 .page__article .article__content .video-container:nth-of-type(n+5),
