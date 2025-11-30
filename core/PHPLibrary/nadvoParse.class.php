@@ -20,6 +20,8 @@
 
 namespace core\PHPLibrary;
 
+use \DOMDocument as DOMDocument;
+
 class NadvoParse
 {
   private const PATTERNS = [
@@ -409,7 +411,7 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['image'],
       function($matches) {
-        $alt = htmlspecialchars(trim($matches[1]), ENT_QUOTES);
+        $caption = htmlspecialchars(trim($matches[1]), ENT_QUOTES);
         $src = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
         $src = str_replace('_', '&#95;', $src);
         $attrs = [];
@@ -428,8 +430,24 @@ class NadvoParse
             // ...
           }
         }
-        
-        return '<img src="' . $src . '" alt="' . $alt . '"' . (count($attrs) ? ' ' . implode(' ', $attrs) : '') . '>';
+
+        $document = new DOMDocument();
+        $figureElement = $document->createElement('figure');
+        $imageElement = $document->createElement('img');
+        $figcaptionElement = $document->createElement('figcaption', $caption);
+
+        $imageElement->setAttribute('src', $src);
+        $imageElement->setAttribute('alt', $caption);
+
+        foreach($attrs as $attrName => $attrValue) {
+          $figureElement->setAttribute($attrName, $attrValue);
+        }
+
+        $figureElement->appendChild($imageElement);
+        $figureElement->appendChild($figcaptionElement);
+        $document->appendChild($figureElement);
+
+        return $document->saveHTML();
       },
       $html
     );
