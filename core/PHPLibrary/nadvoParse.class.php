@@ -55,8 +55,8 @@ class NadvoParse
     $markdown = $this->parseQuotes($markdown);
     $markdown = $this->parseLists($markdown);
     $markdown = $this->parseTables($markdown);
-    $markdown = $this->parseBlocks($markdown);
-    return $this->parseInlineElements($markdown);
+    $markdown = $this->parseInlineElements($markdown);
+    return $this->parseBlocks($markdown);
   }
 
   private function sanitizeInput(string $markdown) : string
@@ -73,8 +73,6 @@ class NadvoParse
     $result = [];
     $stack = [];
     $currentLevel = 0;
-    $inListItem = false;
-    $listItemContent = [];
     
     foreach ($lines as $line) {
       // Определяем тип элемента списка
@@ -83,13 +81,6 @@ class NadvoParse
         $isOrdered = is_numeric($matches[2][0]);
         $content = $matches[3];
         $level = floor($indent / 4) + 1; // 4 пробела = 1 уровень
-
-        if ($inListItem && !empty($listItemContent)) {
-          $fullContent = implode("\n", $listItemContent);
-          $parsedContent = $this->parseInlineElements($fullContent);
-          $result[] = "<li>{$parsedContent}</li>";
-          $listItemContent = [];
-        }
         
         // Закрываем предыдущие уровни
         while ($currentLevel > $level) {
@@ -120,22 +111,8 @@ class NadvoParse
           ];
         }
         
-        $inListItem = true;
-        $listItemContent[] = $content;
+        $result[] = "<li>{$content}</li>";
       } else {
-        if ($inListItem && !empty($listItemContent) && preg_match('/^\s+\S/', $line)) {
-          $listItemContent[] = ltrim($line);
-          continue;
-        }
-
-        if ($inListItem && !empty($listItemContent)) {
-          $fullContent = implode("\n", $listItemContent);
-          $parsedContent = $this->parseInlineElements($fullContent);
-          $result[] = "<li>{$parsedContent}</li>";
-          $listItemContent = [];
-          $inListItem = false;
-        }
-
         // Закрываем все списки для обычного текста
         while (!empty($stack)) {
           $result[] = array_pop($stack)['close'];
@@ -144,12 +121,6 @@ class NadvoParse
 
         $result[] = $line;
       }
-    }
-
-    if ($inListItem && !empty($listItemContent)) {
-      $fullContent = implode("\n", $listItemContent);
-      $parsedContent = $this->parseInlineElements($fullContent);
-      $result[] = "<li>{$parsedContent}</li>";
     }
     
     // Закрываем все оставшиеся списки
@@ -368,20 +339,17 @@ class NadvoParse
     $inTable = false;
 
     foreach ($lines as $line) {
-      $trimmedLine = trim($line);
-      
-      if (str_starts_with($trimmedLine, '<pre>') || 
-        str_starts_with($trimmedLine, '<blockquote>') ||
-        str_starts_with($trimmedLine, '</blockquote>') ||
-        str_starts_with($trimmedLine, '<table>') ||
-        str_starts_with($trimmedLine, '<ul>') ||
-        str_starts_with($trimmedLine, '<ol>') ||
-        str_starts_with($trimmedLine, '</ul>') ||
-        str_starts_with($trimmedLine, '</ol>') ||
-        str_starts_with($trimmedLine, '<li>') ||
-        str_starts_with($trimmedLine, '<div class="video-container">') ||
-        str_starts_with($trimmedLine, '<figure>'))
+      if (str_starts_with(trim($line), '<pre>') || 
+        str_starts_with(trim($line), '<blockquote>') ||
+        str_starts_with(trim($line), '</blockquote>') ||
+        str_starts_with(trim($line), '<table>') ||
+        str_starts_with(trim($line), '<ul>') ||
+        str_starts_with(trim($line), '<ol>') ||
+        str_starts_with(trim($line), '</ul>') ||
+        str_starts_with(trim($line), '</ol>') ||
+        str_starts_with(trim($line), '<li>'))
       {
+
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
@@ -391,7 +359,7 @@ class NadvoParse
         continue;
       }
 
-      if (str_starts_with($trimmedLine, '|')) {
+      if (str_starts_with(trim($line), '|')) {
         if (!$inTable) {
           if (!empty($currentParagraph)) {
             $html .= '<p>' . $currentParagraph . '</p>';
@@ -410,7 +378,7 @@ class NadvoParse
           $currentParagraph = '';
         }
         $html .= '<h' . strlen($matches[1]) . '>' . $matches[2] . '</h' . strlen($matches[1]) . '>' . "\n";
-      } elseif (empty($trimmedLine)) {
+      } elseif (empty(trim($line))) {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
