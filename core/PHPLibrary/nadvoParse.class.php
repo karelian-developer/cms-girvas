@@ -111,7 +111,8 @@ class NadvoParse
           ];
         }
         
-        $result[] = "<li>{$content}</li>";
+        $parsedContent = $this->parseInlineElements($content);
+        $result[] = "<li>{$parsedContent}</li>";
       } else {
         // Закрываем все списки для обычного текста
         while (!empty($stack)) {
@@ -352,9 +353,8 @@ class NadvoParse
         str_starts_with($trimmedLine, '<li>') ||
         str_starts_with($trimmedLine, '<div class="video-container">') ||
         str_starts_with($trimmedLine, '<figure>') ||
-        // Если строка содержит ТОЛЬКО изображение или видео - это блочный элемент
         (preg_match('/^<(img|div class="video-container")[^>]*>$/', $trimmedLine) && 
-          !preg_match('/[^<>\s]/', str_replace(['<img', '<div'], '', $trimmedLine))))
+        !preg_match('/[^<>\s]/', str_replace(['<img', '<div'], '', $trimmedLine))))
       {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
