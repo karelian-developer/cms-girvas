@@ -383,7 +383,7 @@ class PageEntry implements InterfacePage
         }
 
         if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_CONTENT')) {
-          $value = $entry !== null ? $nadvoParse->parse($entry->getContent($localeName)) : '';
+          $value = $entry !== null ? $entry->getContent($localeName) : '';
           
           ThemeCollector::addTemplateVariable(
             $templatesAssembled,
@@ -391,7 +391,7 @@ class PageEntry implements InterfacePage
             str_replace(
               ThemeCollector::DECODED_ENTITIES,
               ThemeCollector::SAFE_SYMBOLS,
-              htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+              $nadvoParse->parse(htmlspecialchars($value, ENT_QUOTES, 'UTF-8'))
             )
           );
         }
