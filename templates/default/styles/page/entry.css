@@ -77,8 +77,13 @@
 .page__article .article__content > p,
 .page__article .article__content > ul,
 .page__article .article__content > ol,
-.page__article .article__content > figcaption {
+.page__article .article__content > figure figcaption {
   font-size: 14px;
+}
+
+.page__article .article__content > figure figcaption {
+  font-style: italic;
+  color: var(--primary-color-5);
 }
 
 .page__article .article__content .video-container:nth-of-type(n+5),
