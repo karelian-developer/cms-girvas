@@ -40,6 +40,14 @@
   margin-top: 0;
 }
 
+.page__article .article__content *:has(+ h2),
+.page__article .article__content *:has(+ h3),
+.page__article .article__content *:has(+ h4),
+.page__article .article__content *:has(+ h5),
+.page__article .article__content *:has(+ h6) {
+  margin-bottom: 20px !important;
+}
+
 .page__article .article__content > h1,
 .page__article .article__content > h2 {
   font-size: 14px;
@@ -80,11 +88,13 @@
   margin-top: 0;
 }
 
-.page__article .article__content ol {
+.page__article .article__content ol,
+.page__article .article__content ol li {
   list-style-type: disc;
 }
 
-.page__article .article__content ul {
+.page__article .article__content ul,
+.page__article .article__content ul li {
   list-style-type: decimal;
 }
 
