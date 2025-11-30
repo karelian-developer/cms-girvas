@@ -339,15 +339,22 @@ class NadvoParse
     $inTable = false;
 
     foreach ($lines as $line) {
-      if (str_starts_with(trim($line), '<pre>') || 
-        str_starts_with(trim($line), '<blockquote>') ||
-        str_starts_with(trim($line), '</blockquote>') ||
-        str_starts_with(trim($line), '<table>') ||
-        str_starts_with(trim($line), '<ul>') ||
-        str_starts_with(trim($line), '<ol>') ||
-        str_starts_with(trim($line), '</ul>') ||
-        str_starts_with(trim($line), '</ol>') ||
-        str_starts_with(trim($line), '<li>'))
+      $trimmedLine = trim($line);
+      
+      if (str_starts_with($trimmedLine, '<pre>') || 
+        str_starts_with($trimmedLine, '<blockquote>') ||
+        str_starts_with($trimmedLine, '</blockquote>') ||
+        str_starts_with($trimmedLine, '<table>') ||
+        str_starts_with($trimmedLine, '<ul>') ||
+        str_starts_with($trimmedLine, '<ol>') ||
+        str_starts_with($trimmedLine, '</ul>') ||
+        str_starts_with($trimmedLine, '</ol>') ||
+        str_starts_with($trimmedLine, '<li>') ||
+        str_starts_with($trimmedLine, '<div class="video-container">') ||
+        str_starts_with($trimmedLine, '<figure>') ||
+        // Если строка содержит ТОЛЬКО изображение или видео - это блочный элемент
+        (preg_match('/^<(img|div class="video-container")[^>]*>$/', $trimmedLine) && 
+          !preg_match('/[^<>\s]/', str_replace(['<img', '<div'], '', $trimmedLine))))
       {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
@@ -358,7 +365,7 @@ class NadvoParse
         continue;
       }
 
-      if (str_starts_with(trim($line), '|')) {
+      if (str_starts_with($trimmedLine, '|')) {
         if (!$inTable) {
           if (!empty($currentParagraph)) {
             $html .= '<p>' . $currentParagraph . '</p>';
@@ -377,7 +384,7 @@ class NadvoParse
           $currentParagraph = '';
         }
         $html .= '<h' . strlen($matches[1]) . '>' . $matches[2] . '</h' . strlen($matches[1]) . '>' . "\n";
-      } elseif (empty(trim($line))) {
+      } elseif (empty($trimmedLine)) {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
