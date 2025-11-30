@@ -575,7 +575,7 @@ class PageEntry implements InterfacePage
         }
 
         if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_CREATED_DATE_TIMESTAMP')) {
-          $value = $createdDateTimestamp;
+          $value = date('d.m.Y H:i:s', $createdDateTimestamp);
           
           ThemeCollector::addTemplateVariable(
             $templatesAssembled,
@@ -595,7 +595,7 @@ class PageEntry implements InterfacePage
         }
 
         if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_UPDATED_DATE_TIMESTAMP')) {
-          $value = $updatedDateTimestamp;
+          $value = date('d.m.Y H:i:s', $updatedDateTimestamp);
           
           ThemeCollector::addTemplateVariable(
             $templatesAssembled,
