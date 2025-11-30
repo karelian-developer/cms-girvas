@@ -410,45 +410,6 @@ class NadvoParse
     );
 
     $html = preg_replace_callback(
-      self::PATTERNS['image'],
-      function($matches) {
-        $caption = htmlspecialchars(trim($matches[1]), ENT_QUOTES);
-        $src = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
-        $attrs = [];
-        
-        if (isset($matches[3])) {
-          try {
-            $json = json_decode('{' . $matches[3] . '}', true);
-            if ($json) {
-              foreach ($json as $key => $value) {
-                if (in_array($key, ['class', 'id'])) {
-                  $attrs[$key] = htmlspecialchars($value);
-                }
-              }
-            }
-          } catch (Exception $e) {
-            // ...
-          }
-        }
-
-        $document = new DOMDocument();
-        $imageElement = $document->createElement('img');
-
-        $imageElement->setAttribute('src', $src);
-        $imageElement->setAttribute('alt', $caption);
-
-        foreach($attrs as $attrName => $attrValue) {
-          $imageElement->setAttribute($attrName, $attrValue);
-        }
-
-        $document->appendChild($imageElement);
-
-        return $document->saveHTML();
-      },
-      $html
-    );
-
-    $html = preg_replace_callback(
       self::PATTERNS['figure'],
       function($matches) {
         $caption = htmlspecialchars(trim($matches[1]), ENT_QUOTES);
