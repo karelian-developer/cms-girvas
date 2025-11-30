@@ -346,10 +346,8 @@ class NadvoParse
         str_starts_with(trim($line), '<ul>') ||
         str_starts_with(trim($line), '<ol>') ||
         str_starts_with(trim($line), '</ul>') ||
-        str_starts_with(trim($line), '</ol>') ||
-        str_starts_with(trim($line), '<li>'))
+        str_starts_with(trim($line), '</ol>'))
       {
-
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
@@ -495,7 +493,6 @@ class NadvoParse
       self::PATTERNS['link'],
       function($matches) {
         $href = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
-        $href = str_replace('_', '&#95;', $href);
         
         $text = htmlspecialchars(trim($matches[1]));
         $text = empty($text) ? $href : $text;
@@ -507,7 +504,7 @@ class NadvoParse
             if ($json) {
               foreach ($json as $key => $value) {
                 if (in_array($key, ['class', 'id', 'target', 'rel'])) {
-                  $attrs[] = $key . '="' . htmlspecialchars($value) . '"';
+                  $attrs[$key] = htmlspecialchars($value);
                 }
               }
             }
