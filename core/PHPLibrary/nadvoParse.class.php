@@ -422,7 +422,7 @@ class NadvoParse
             if ($json) {
               foreach ($json as $key => $value) {
                 if (in_array($key, ['class', 'id'])) {
-                  $attrs[] = $key . '="' . htmlspecialchars($value) . '"';
+                  $attrs[$key] = htmlspecialchars($value);
                 }
               }
             }
@@ -440,7 +440,7 @@ class NadvoParse
         foreach($attrs as $attrName => $attrValue) {
           $imageElement->setAttribute($attrName, $attrValue);
         }
-        
+
         $document->appendChild($imageElement);
 
         return $document->saveHTML();
@@ -461,7 +461,7 @@ class NadvoParse
             if ($json) {
               foreach ($json as $key => $value) {
                 if (in_array($key, ['class', 'id'])) {
-                  $attrs[] = $key . '="' . htmlspecialchars($value) . '"';
+                  $attrs[$key] = htmlspecialchars($value);
                 }
               }
             }
