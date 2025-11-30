@@ -475,7 +475,7 @@ class NadvoParse
 
         $document->appendChild($imageElement);
 
-        return $document->saveHTML();
+        return $document->saveHTML($imageElement);
       },
       $html
     );
