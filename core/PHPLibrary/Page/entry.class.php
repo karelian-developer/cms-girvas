@@ -330,9 +330,9 @@ class PageEntry implements InterfacePage
 
         $templatesAssembled = [];
 
-        $createdUnixTimestamp = $entryObject->getCreatedUnixTimestamp();
-        $publishedUnixTimestamp = $entryObject->getPublishedUnixTimestamp();
-        $updatedUnixTimestamp = $entryObject->getUpdatedUnixTimestamp();
+        $createdUnixTimestamp = $entry->getCreatedUnixTimestamp();
+        $publishedUnixTimestamp = $entry->getPublishedUnixTimestamp();
+        $updatedUnixTimestamp = $entry->getUpdatedUnixTimestamp();
 
         if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_ID')) {
           $value = $entry !== null ? $entry->getID() : 0;
