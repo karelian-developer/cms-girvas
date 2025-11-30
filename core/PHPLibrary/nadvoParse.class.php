@@ -123,6 +123,11 @@ class NadvoParse
         $inListItem = true;
         $listItemContent[] = $content;
       } else {
+        if ($inListItem && !empty($listItemContent) && preg_match('/^\s+\S/', $line)) {
+          $listItemContent[] = ltrim($line);
+          continue;
+        }
+
         if ($inListItem && !empty($listItemContent)) {
           $fullContent = implode("\n", $listItemContent);
           $parsedContent = $this->parseInlineElements($fullContent);
