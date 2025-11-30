@@ -382,7 +382,7 @@ class NadvoParse
         str_starts_with($trimmedLine, '<div class="video-container">') ||
         str_starts_with($trimmedLine, '<figure>') ||
         (preg_match('/^<(img|div class="video-container")[^>]*>$/', $trimmedLine) && 
-        !preg_match('/[^<>\s]/', str_replace(['<img', '<div'], '', $trimmedLine))))
+        !preg_match('/[^<>\s]/', str_replace(['<div'], '', $trimmedLine))))
       {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
