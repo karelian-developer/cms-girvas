@@ -73,6 +73,8 @@ class NadvoParse
     $result = [];
     $stack = [];
     $currentLevel = 0;
+    $inListItem = false;
+    $listItemContent = [];
     
     foreach ($lines as $line) {
       // Определяем тип элемента списка
@@ -81,6 +83,13 @@ class NadvoParse
         $isOrdered = is_numeric($matches[2][0]);
         $content = $matches[3];
         $level = floor($indent / 4) + 1; // 4 пробела = 1 уровень
+
+        if ($inListItem && !empty($listItemContent)) {
+          $fullContent = implode("\n", $listItemContent);
+          $parsedContent = $this->parseInlineElements($fullContent);
+          $result[] = "<li>{$parsedContent}</li>";
+          $listItemContent = [];
+        }
         
         // Закрываем предыдущие уровни
         while ($currentLevel > $level) {
@@ -111,9 +120,17 @@ class NadvoParse
           ];
         }
         
-        $parsedContent = $this->parseInlineElements($content);
-        $result[] = "<li>{$parsedContent}</li>";
+        $inListItem = true;
+        $listItemContent[] = $content;
       } else {
+        if ($inListItem && !empty($listItemContent)) {
+          $fullContent = implode("\n", $listItemContent);
+          $parsedContent = $this->parseInlineElements($fullContent);
+          $result[] = "<li>{$parsedContent}</li>";
+          $listItemContent = [];
+          $inListItem = false;
+        }
+
         // Закрываем все списки для обычного текста
         while (!empty($stack)) {
           $result[] = array_pop($stack)['close'];
@@ -122,6 +139,12 @@ class NadvoParse
 
         $result[] = $line;
       }
+    }
+
+    if ($inListItem && !empty($listItemContent)) {
+      $fullContent = implode("\n", $listItemContent);
+      $parsedContent = $this->parseInlineElements($fullContent);
+      $result[] = "<li>{$parsedContent}</li>";
     }
     
     // Закрываем все оставшиеся списки
