@@ -437,6 +437,8 @@ class PageEntries implements InterfacePage
             $templatesAssembled
           );
         }
+
+        $templatesAssembled = [];
       }
 
       unset($entriesObjects);
