@@ -383,7 +383,7 @@ class PageEntry implements InterfacePage
         }
 
         if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_CONTENT')) {
-          $value = $entry !== null ? $entry->getContent($localeName) : '';
+          $value = $entry !== null ? $nadvoParse->parse($entry->getContent($localeName)) : '';
           
           ThemeCollector::addTemplateVariable(
             $templatesAssembled,
