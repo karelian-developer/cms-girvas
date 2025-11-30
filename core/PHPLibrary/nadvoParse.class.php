@@ -346,14 +346,15 @@ class NadvoParse
         str_starts_with(trim($line), '<ul>') ||
         str_starts_with(trim($line), '<ol>') ||
         str_starts_with(trim($line), '</ul>') ||
-        str_starts_with(trim($line), '</ol>'))
+        str_starts_with(trim($line), '</ol>') ||
+        str_starts_with(trim($line), '<li>'))
       {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
         }
 
-        $html .= $line . "\n";
+        
         continue;
       }
 
