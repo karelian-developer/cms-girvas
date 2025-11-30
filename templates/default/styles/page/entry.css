@@ -74,28 +74,28 @@
   padding-top: 10px;
 }
 
-.page__article .article__content > ul,
-.page__article .article__content > ol {
+.page__article .article__content ul,
+.page__article .article__content ol {
   padding-left: 10px;
   margin-top: 0;
 }
 
-.page__article .article__content > ol {
+.page__article .article__content ol {
   list-style-type: disc;
 }
 
-.page__article .article__content > ul {
+.page__article .article__content ul {
   list-style-type: decimal;
 }
 
 .page__article .article__content > p,
-.page__article .article__content > ul,
-.page__article .article__content > ol,
-.page__article .article__content > figure figcaption {
+.page__article .article__content ul,
+.page__article .article__content ol,
+.page__article .article__content figure figcaption {
   font-size: 14px;
 }
 
-.page__article .article__content > figure figcaption {
+.page__article .article__content figure figcaption {
   font-style: italic;
   color: var(--primary-color-5);
 }
