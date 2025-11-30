@@ -55,8 +55,8 @@ class NadvoParse
     $markdown = $this->parseQuotes($markdown);
     $markdown = $this->parseLists($markdown);
     $markdown = $this->parseTables($markdown);
-    $markdown = $this->parseInlineElements($markdown);
-    return $this->parseBlocks($markdown);
+    $markdown = $this->parseBlocks($markdown);
+    return $this->parseInlineElements($markdown);
   }
 
   private function sanitizeInput(string $markdown) : string
