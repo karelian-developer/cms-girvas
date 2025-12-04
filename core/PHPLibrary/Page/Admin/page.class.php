@@ -124,15 +124,20 @@ class PagePage implements InterfacePage
 
         $documentString = $document->saveHTML($element);
 
-        array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
-          'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
-          'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
-          'FIELD_INPUT' => $documentString
-        ]));
-
+        $additionalFieldsElements[] = ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme,
+          'templates/page/entry/form/field.tpl',
+          [
+            'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
+            'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
+            'FIELD_INPUT' => $documentString
+          ]
+        );
       } else {
         if ($pageStatic !== null) {
-          $fieldValue = $pageStatic->getAdditionalFieldData($fieldsNames[$index]) !== null ? $pageStatic->getAdditionalFieldData($fieldsNames[$index]) : '';
+          $fieldValue = $pageStatic->getAdditionalFieldData($fieldsNames[$index]) !== null
+            ? $pageStatic->getAdditionalFieldData($fieldsNames[$index])
+            : '';
         }
 
         /** @var DOMDocument */
@@ -148,11 +153,15 @@ class PagePage implements InterfacePage
 
         $documentString = $document->saveHTML($element);
 
-        array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/form/field.tpl', [
-          'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
-          'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
-          'FIELD_INPUT' => $documentString
-        ]));
+        $additionalFieldsElements[] = ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme,
+          'templates/page/entry/form/field.tpl',
+          [
+            'FIELD_DESCRIPTION' => $fieldsDescriptions[$localeName][$index],
+            'FIELD_TITLE' => $fieldsTitles[$localeName][$index],
+            'FIELD_INPUT' => $documentString
+          ]
+        );
       }
     }
 
@@ -285,12 +294,14 @@ class PagePage implements InterfacePage
 
     $templatesAssembled['ADMIN_PANEL_PAGE_NAME'] = 'page-static';
     $templatesAssembled['PAGE_STATIC_EDITOR'] = ThemeCollector::assemblyFileContent(
-      $this->CMSCore->theme, 'templates/page/pageStatic/editor.tpl', []
+      $this->CMSCore->theme,
+      'templates/page/pageStatic/editor.tpl', []
     );
 
     /** @var string $site_page Содержимое шаблона страницы */
     $this->assembled = ThemeCollector::assemblyFileContent(
-      $this->CMSCore->theme, 'templates/page/pageStatic.tpl',
+      $this->CMSCore->theme,
+      'templates/page/pageStatic.tpl',
       $templatesAssembled
     );
   }

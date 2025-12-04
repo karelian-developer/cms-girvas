@@ -20,23 +20,22 @@
 
 namespace core\PHPLibrary\SystemCore;
 
+use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 
 final class Reports
 {
-  private readonly CMSCore $CMSCore;
-
   /**
    * __construct
    *
    * @param  mixed $CMSCore
    * @return void
    */
-  public function __construct(CMSCore $CMSCore)
-  {
-    $this->CMSCore = $CMSCore;
-  }
+  public function __construct(
+    public CoreInterface $CMSCore
+  ) {}
 
   /**
    * Получить все объекты отчетов
@@ -57,15 +56,17 @@ final class Reports
     $queryBuilder->statement->clauseFrom->addTable('reports');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseOrderBy();
-    $queryBuilder->statement->clauseOrderBy->setColumn('created_unix_timestamp');
+    $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
     $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+
     if (array_key_exists('limit', $paramsArray)) {
       if (is_array($paramsArray['limit'])) {
         $limit = is_integer($paramsArray['limit'][0]) ? $paramsArray['limit'][0] : 0;
         $offset = is_integer($paramsArray['limit'][1]) ? $paramsArray['limit'][1] : 0;
-        $queryBuilder->statement->set_clause_limit($limit, $offset);
+        $queryBuilder->statement->setClauseLimit($limit, $offset);
       }
     }
+
     $queryBuilder->statement->assembly();
 
     try {
@@ -95,14 +96,14 @@ final class Reports
   /**
    * Получить объекты отчетов за конкретный период конкретного типа
    * 
-   * @param CMSCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param int $typeID
    * @param int $startPeriodUnix
    * @param int $endPeriodUnix
    * 
    * @return array
    */
-  public static function getByPeriod(CMSCore $CMSCore, int $typeID, int $startPeriodUnix, int $endPeriodUnix) : array
+  public static function getByPeriod(CoreInterface $CMSCore, int $typeID, int $startPeriodUnix, int $endPeriodUnix) : array
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -163,8 +164,13 @@ final class Reports
     
     $conditionTypeIDs = [];
     foreach ($typeIDs as $typeID) {
-      array_push($conditionTypeIDs, sprintf('(metadata::jsonb->>\'typeID\')::int = %d', $typeID));
+      $conditionTypeIDs[] = match ($CMSConfigDatabase['dms']) {
+        DMS::PostgreSQL => '(metadata::jsonb->>\'typeID\')::int = ' . $typeID,
+        DMS::MySQL => 'JSON_EXTRACT(`metadata`, \'$.typeID\') = ' . $typeID,
+      };
     }
+
+    $conditionTypeIDsImploded = implode(' OR ', $conditionTypeIDs);
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
@@ -173,18 +179,20 @@ final class Reports
     $queryBuilder->statement->clauseFrom->addTable('reports');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition(implode(' OR ', $conditionTypeIDs));
+    $queryBuilder->statement->clauseWhere->addCondition($conditionTypeIDsImploded);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseOrderBy();
-    $queryBuilder->statement->clauseOrderBy->setColumn('created_unix_timestamp');
+    $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
     $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+
     if (array_key_exists('limit', $paramsArray)) {
       if (is_array($paramsArray['limit'])) {
         $limit = is_integer($paramsArray['limit'][0]) ? $paramsArray['limit'][0] : 0;
         $offset = is_integer($paramsArray['limit'][1]) ? $paramsArray['limit'][1] : 0;
-        $queryBuilder->statement->set_clause_limit($limit, $offset);
+        $queryBuilder->statement->setClauseLimit($limit, $offset);
       }
     }
+
     $queryBuilder->statement->assembly();
 
     try {
@@ -204,7 +212,7 @@ final class Reports
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        array_push($resultArray, new Report($this->CMSCore, $data['id']));
+        $resultArray[] = new Report($this->CMSCore, $data['id']);
       }
     }
 

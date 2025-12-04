@@ -174,9 +174,9 @@ class PagePages implements InterfacePage
       $pageStaticTitle = strip_tags($pageStaticTitle);
       $pageStaticDescription = strip_tags($pageStaticDescription);
 
-      $pageStaticAuthor = $object->getAuthor();
-      if ($pageStaticAuthor !== null) {
-        $pageStaticAuthor->initData(['login']);
+      $authorObject = $object->getAuthor();
+      if ($authorObject !== null) {
+        $authorObject->initData(['login']);
       }
 
       $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
@@ -185,7 +185,7 @@ class PagePages implements InterfacePage
         ? '<span style="color: green;">Оптимизировано</span>'
         : '<span style="color: red;">Не оптимизировано</span>';
 
-      $pageStaticAuthorLogin = $pageStaticAuthor !== null ? $pageStaticAuthor->getLogin() : 'User deleted';
+      $authorLogin = $authorObject !== null ? $authorObject->getLogin() : 'User deleted';
 
       $templatesAssembled = [];
       $templateContent = ThemeCollector::getTemplateFileContent(
@@ -263,7 +263,7 @@ class PagePages implements InterfacePage
         ThemeCollector::addTemplateVariable(
           $templatesAssembled,
           'PAGE_STATIC_AUTHOR_LOGIN',
-          $pageStaticAuthorLogin
+          $authorLogin
         );
       }
 
