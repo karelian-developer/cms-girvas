@@ -21,18 +21,16 @@
 namespace core\PHPLibrary\SystemCore;
 
 use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\LocaleInterface as LocaleInterface;
 use \DOMDocument as DOMDocument;
 
 final class Locale implements LocaleInterface
 {
-  public CMSCore $CMSCore;
-
   public const DEFAULT_LOCALE_NAME = 'en_US';
   public const LOCALE_CORE_PATH_PATTERN = '%s/locales/%s';
   public const LOCALE_DATA_PATH_PATTERN = '%s/locales/%s/%s';
 
-  private string $name;
   private string $corePath;
   private string $dataPath;
   private string $typeName = 'base';
@@ -40,13 +38,13 @@ final class Locale implements LocaleInterface
   /**
    * __construct
    * 
-   * @param mixed $CMSCore
+   * @param CoreInterface $CMSCore
    * @param string $name
-   * @param string $dir
    */
-  public function __construct(mixed $CMSCore, string $name)
-  {
-    $this->CMSCore = $CMSCore;
+  public function __construct(
+    private CoreInterface $CMSCore,
+    private string $name
+  ) {
     $this->setName($name);
   }
 

@@ -21,9 +21,10 @@
 namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
-use \core\PHPLibrary\SystemCore as SystemCore;
-use \core\PHPLibrary\SystemCore\Report as SystemCoreReport;
-use \core\PHPLibrary\SystemCore\Reports as SystemCoreReports;
+use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
+use \core\PHPLibrary\SystemCore\Reports as CMSReports;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
@@ -35,8 +36,6 @@ final class PageReports implements InterfacePage
 
   const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_REPORTS_NAVIGATION_%s_LABEL';
 
-  public SystemCore $CMSCore;
-  public Page $page;
   public string $assembled = '';
   public array $navigationSubsections = [
     'index' => [
@@ -55,11 +54,10 @@ final class PageReports implements InterfacePage
     ],
   ];
 
-  public function __construct(SystemCore $CMSCore, Page $page)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->page = $page;
-  }
+  public function __construct(
+    public CoreInterface $CMSCore,
+    public Page $page
+  ) {}
 
   /**
    * Инициализация подразделов
@@ -81,16 +79,16 @@ final class PageReports implements InterfacePage
     $localeName = $this->CMSCore->locale->getName();
 
     $reportsSecurityAssembled = [];
-    $reportsSecurity = (new SystemCoreReports($this->CMSCore))->getByTypeIDs([
-      SystemCoreReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL,
-      SystemCoreReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS
+    $reportsSecurity = (new CMSReports($this->CMSCore))->getByTypeIDs([
+      CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL,
+      CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS
     ], ['limit' => 50]);
 
     $reportsCommonAssembled = [];
-    $reportsCommon = (new SystemCoreReports($this->CMSCore))->getByTypeIDs([
-      SystemCoreReport::REPORT_TYPE_ID_AP_ENTRY_CREATED,
-      SystemCoreReport::REPORT_TYPE_ID_AP_ENTRY_EDITED,
-      SystemCoreReport::REPORT_TYPE_ID_AP_ENTRY_DELETED
+    $reportsCommon = (new CMSReports($this->CMSCore))->getByTypeIDs([
+      CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED,
+      CMSReport::REPORT_TYPE_ID_AP_ENTRY_EDITED,
+      CMSReport::REPORT_TYPE_ID_AP_ENTRY_DELETED
     ], ['limit' => 50]);
 
     foreach ($reportsSecurity as $index => $report) {

@@ -23,6 +23,7 @@ namespace core\PHPLibrary\SystemCore;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \PDOException as PDOException;
 
 #[\AllowDynamicProperties]
@@ -36,9 +37,6 @@ final class Report
   public const REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL = 20000001;
   public const REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS = 20000002;
 
-  private readonly CMSCore $CMSCore;
-  private int $id;
-
   /**
    * __construct
    *
@@ -46,11 +44,10 @@ final class Report
    * 
    * @return void
    */
-  public function __construct(CMSCore $CMSCore, int $id)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->id = $id;
-  }
+  public function __construct(
+    public CoreInterface $CMSCore,
+    private int $id
+  ) {}
   
   /**
    * Инициализация данных из БД
@@ -209,13 +206,13 @@ final class Report
   /**
    * Создание записи в базе данных
    *
-   * @param  mixed $CMSCore
+   * @param  mixed $CoreInterface
    * @param  int $typeID
    * @param  array $variables
    * 
    * @return Report
    */
-  public static function create(CMSCore $CMSCore, int $typeID, array $variables = []) : Report|null
+  public static function create(CoreInterface $CMSCore, int $typeID, array $variables = []) : Report|null
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -264,8 +261,6 @@ final class Report
       $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
-
-      error_log('SQL: ' . $queryBuilder->statement->assembled);
 
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;
