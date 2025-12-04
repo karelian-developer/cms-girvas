@@ -20,8 +20,6 @@
 
 namespace core\PHPLibrary;
 
-use SystemCore as CMSCore;
-
 interface LocaleInterface
 {
   public function __construct(mixed $object, string $name);

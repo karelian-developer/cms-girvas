@@ -42,8 +42,8 @@ final class Locale implements LocaleInterface
    * @param string $name
    */
   public function __construct(
-    private CoreInterface $CMSCore,
-    private string $name
+    public mixed $CMSCore,
+    public string $name
   ) {
     $this->setName($name);
   }
