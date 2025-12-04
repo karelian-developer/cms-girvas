@@ -185,9 +185,9 @@ class PageEntries implements InterfacePage
       $entryCategory = new EntryCategory($this->CMSCore, $entryCategoryID);
       $entryCategory->initData(['texts']);
 
-      $entryCreatedDateTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
-      $entryPublishedDateTimestamp = date('d.m.Y H:i:s', $object->getPublishedUnixTimestamp());
-      $entryUpdatedDateTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
+      $createdDateTimestamp = $object->getCreatedUnixTimestamp();
+      $publishedDateTimestamp = $object->getPublishedUnixTimestamp();
+      $updatedDateTimestamp = $object->getUpdatedUnixTimestamp();
 
       $entryTitle = $object->getTitle($entriesLocaleName);
       $entryDescription = $object->getDescription($entriesLocaleName);
@@ -214,12 +214,30 @@ class PageEntries implements InterfacePage
         'templates/page/entries/tableItem.tpl'
       );
 
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_INDEX')) {
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_INDEX',
+          $index
+        );
+      }
+
       if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_ID')) {
         $value = $object !== null ? $object->getID() : 0;
 
         ThemeCollector::addTemplateVariable(
           $templatesAssembled,
           'ENTRY_ID',
+          $value
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_NAME')) {
+        $value = $object !== null ? $object->getName() : '';
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_NAME',
           $value
         );
       }
@@ -311,15 +329,17 @@ class PageEntries implements InterfacePage
       }
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_CREATED_DATE_TIMESTAMP')) {
+        $value = date('d.m.Y H:i:s', $createdDateTimestamp);
+        
         ThemeCollector::addTemplateVariable(
           $templatesAssembled,
           'ENTRY_CREATED_DATE_TIMESTAMP',
-          $entryCreatedDateTimestamp
+          $value
         );
       }
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_PUBLISHED_DATE_TIMESTAMP')) {
-        $value = $object->getPublishedUnixTimestamp() > 0 ? $entryPublishedDateTimestamp : '-';
+        $value = $publishedDateTimestamp > 0 ? date('d.m.Y H:i:s', $publishedDateTimestamp) : '-';
 
         ThemeCollector::addTemplateVariable(
           $templatesAssembled,
@@ -329,10 +349,12 @@ class PageEntries implements InterfacePage
       }
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_UPDATED_DATE_TIMESTAMP')) {
+        $value = date('d.m.Y H:i:s', $updatedDateTimestamp);
+        
         ThemeCollector::addTemplateVariable(
           $templatesAssembled,
           'ENTRY_UPDATED_DATE_TIMESTAMP',
-          $entryUpdatedDateTimestamp
+          $value
         );
       }
 
