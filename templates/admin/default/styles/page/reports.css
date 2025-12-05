@@ -22,6 +22,7 @@
 
 .main__page.page .report-section .report-section__list {
   display: flex;
+  flex-direction: column;
   list-style-type: none;
   padding: 0;
   margin: 0;
