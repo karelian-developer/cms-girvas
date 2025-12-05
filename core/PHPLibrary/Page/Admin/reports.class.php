@@ -78,90 +78,123 @@ final class PageReports implements InterfacePage
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
 
-    $reportsSecurityAssembled = [];
-    $reportsSecurity = (new CMSReports($this->CMSCore))->getByTypeIDs([
-      CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL,
-      CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS
-    ], ['limit' => 50]);
+    $reportsName = $this->CMSCore->urlp->getPath(2) ?? 'base';
+    $reportsCorePath = $this->CMSCore->getCMSPath() . '/core/PHPLibrary/Page/Admin/Reports/' . $reportsName . '.class.php';
 
-    $reportsCommonAssembled = [];
-    $reportsCommon = (new CMSReports($this->CMSCore))->getByTypeIDs([
-      CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED,
-      CMSReport::REPORT_TYPE_ID_AP_ENTRY_EDITED,
-      CMSReport::REPORT_TYPE_ID_AP_ENTRY_DELETED
-    ], ['limit' => 50]);
+    if (file_exists($reportsCorePath)) {
+      http_response_code(200);
 
-    foreach ($reportsSecurity as $index => $report) {
-      $report->initData(['metadata', 'variables', 'createdUnixTimestamp']);
-      
-      $reportCategoryName = 'security';
-      $reportVariables = $report->getVariables();
+      $classNamespace = $this->getReportsPageClassNamespace($reportsName);
+      $reportsPage = new $classNamespace($this->CMSCore, $reportsName);
+      $reportsNameConstant = $this->convertReportsNameToConstant($reportsName);
 
-      $reportsSecurityAssembled[] = ThemeCollector::assemblyFileContent(
-        $this->CMSCore->theme,
-        'templates/page/reports/listItem.tpl',
-        [
-          'REPORT_CATEGORY_NAME' => $reportCategoryName,
-          'REPORT_CONTENT' => ThemeCollector::assembly(
-            ThemeCollector::assemblyLocale(
-              $report->getContent(),
-              $this->CMSCore->locale
-            ),
-            [
-              'CLIENT_IP' => $reportVariables['clientIP'] ?? '0.0.0.0',
-              'DATE' => $reportVariables['date'] ?? date('d.m.Y H:i:s', time()),
-              'ENTRY_TITLE' => $reportVariables['entryTitle'] ?? '[ ??? ]',
-            ]
-          ),
-          'REPORT_CREATED_TIMESTAMP' => date('d.m.Y H:i:s', $report->getCreatedUnixTimestamp()),
-        ]
-      );
+      $reportsPage->setTitle('{LANG:PAGE_REPORTS_REPORTS_GROUP_' . $reportsNameConstant . '_TITLE}');
+      $reportsPage->setDescription('{LANG:PAGE_REPORTS_REPORTS_GROUP_' . $reportsNameConstant . '_DESCRIPTION}');
+
+      $reportsTitle = $reportsPage->getTitle();
+      $reportsDescription = $reportsPage->getDescription();
+      $reportsPage->assembly();
+    } else {
+      http_response_code(404);
     }
-
-    foreach ($reportsCommon as $index => $report) {
-      $report->initData(['metadata', 'variables', 'createdUnixTimestamp']);
-
-      $reportCategoryName = 'common';
-      $reportVariables = $report->getVariables();
-
-      $reportsCommonAssembled[] = ThemeCollector::assemblyFileContent(
-        $this->CMSCore->theme,
-        'templates/page/reports/listItem.tpl',
-        [
-          'REPORT_CATEGORY_NAME' => $reportCategoryName,
-          'REPORT_CONTENT' => ThemeCollector::assembly(
-            ThemeCollector::assemblyLocale(
-              $report->getContent(),
-              $this->CMSCore->locale
-            ),
-            [
-              'CLIENT_IP' => $reportVariables['clientIP'] ?? '0.0.0.0',
-              'DATE' => $reportVariables['date'] ?? date('d.m.Y H:i:s', time()),
-              'ENTRY_TITLE' => $reportVariables['entryTitle'] ?? '[ ??? ]',
-            ]
-          ),
-          'REPORT_CREATED_TIMESTAMP' => date('d.m.Y H:i:s', $report->getCreatedUnixTimestamp()),
-        ]
-      );
-    }
-
+    
     /** @var string $site_page Содержимое шаблона страницы */
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports.tpl', [
-      'ADMIN_PANEL_PAGE_NAME' => 'reports',
-      'REPORTS_SECURITY_LIST' => ThemeCollector::assemblyFileContent(
-        $this->CMSCore->theme,
-        'templates/page/reports/list.tpl',
-        [
-          'REPORTS_LIST_ITEMS' => implode($reportsSecurityAssembled)
-        ]
-      ),
-      'REPORTS_COMMON_LIST' => ThemeCollector::assemblyFileContent(
-        $this->CMSCore->theme,
-        'templates/page/reports/list.tpl',
-        [
-          'REPORTS_LIST_ITEMS' => implode($reportsCommonAssembled)
-        ]
-      )
+      'PAGE_NAME' => 'reports',
+      'REPORTS_TITLE' => $reportsTitle ?? $localeData['PAGE_REPORTS_GROUP_NOT_FOUND_TITLE'],
+      'REPORTS_DESCRIPTION' => $reportsDescription ?? $localeData['PAGE_REPORTS_GROUP_NOT_FOUND_DESCRIPTION']
     ]);
+
+    // $reportsSecurityAssembled = [];
+    // $reportsSecurity = (new CMSReports($this->CMSCore))->getByTypeIDs([
+    //   CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL,
+    //   CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS
+    // ], ['limit' => 50]);
+
+    // $reportsCommonAssembled = [];
+    // $reportsCommon = (new CMSReports($this->CMSCore))->getByTypeIDs([
+    //   CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED,
+    //   CMSReport::REPORT_TYPE_ID_AP_ENTRY_EDITED,
+    //   CMSReport::REPORT_TYPE_ID_AP_ENTRY_DELETED
+    // ], ['limit' => 50]);
+
+    // foreach ($reportsSecurity as $index => $report) {
+    //   $report->initData(['metadata', 'variables', 'createdUnixTimestamp']);
+      
+    //   $reportCategoryName = 'security';
+    //   $reportVariables = $report->getVariables();
+
+    //   $reportsSecurityAssembled[] = ThemeCollector::assemblyFileContent(
+    //     $this->CMSCore->theme,
+    //     'templates/page/reports/listItem.tpl',
+    //     [
+    //       'REPORT_CATEGORY_NAME' => $reportCategoryName,
+    //       'REPORT_CONTENT' => ThemeCollector::assembly(
+    //         ThemeCollector::assemblyLocale(
+    //           $report->getContent(),
+    //           $this->CMSCore->locale
+    //         ),
+    //         [
+    //           'CLIENT_IP' => $reportVariables['clientIP'] ?? '0.0.0.0',
+    //           'DATE' => $reportVariables['date'] ?? date('d.m.Y H:i:s', time()),
+    //           'ENTRY_TITLE' => $reportVariables['entryTitle'] ?? '[ ??? ]',
+    //         ]
+    //       ),
+    //       'REPORT_CREATED_TIMESTAMP' => date('d.m.Y H:i:s', $report->getCreatedUnixTimestamp()),
+    //     ]
+    //   );
+    // }
+
+    // foreach ($reportsCommon as $index => $report) {
+    //   $report->initData(['metadata', 'variables', 'createdUnixTimestamp']);
+
+    //   $reportCategoryName = 'common';
+    //   $reportVariables = $report->getVariables();
+
+    //   $reportsCommonAssembled[] = ThemeCollector::assemblyFileContent(
+    //     $this->CMSCore->theme,
+    //     'templates/page/reports/listItem.tpl',
+    //     [
+    //       'REPORT_CATEGORY_NAME' => $reportCategoryName,
+    //       'REPORT_CONTENT' => ThemeCollector::assembly(
+    //         ThemeCollector::assemblyLocale(
+    //           $report->getContent(),
+    //           $this->CMSCore->locale
+    //         ),
+    //         [
+    //           'CLIENT_IP' => $reportVariables['clientIP'] ?? '0.0.0.0',
+    //           'DATE' => $reportVariables['date'] ?? date('d.m.Y H:i:s', time()),
+    //           'ENTRY_TITLE' => $reportVariables['entryTitle'] ?? '[ ??? ]',
+    //         ]
+    //       ),
+    //       'REPORT_CREATED_TIMESTAMP' => date('d.m.Y H:i:s', $report->getCreatedUnixTimestamp()),
+    //     ]
+    //   );
+    // }
+
+    /** @var string $site_page Содержимое шаблона страницы */
+    // $this->assembled = ThemeCollector::assemblyFileContent(
+    //   $this->CMSCore->theme,
+    //   'templates/page/reports.tpl',
+    //   [
+    //     'ADMIN_PANEL_PAGE_NAME' => 'reports',
+    //     'REPORTS_SECURITY_LIST' => ThemeCollector::assemblyFileContent(
+    //       $this->CMSCore->theme,
+    //       'templates/page/reports/list.tpl',
+    //       [
+    //         'REPORTS_LIST_ITEMS' => implode($reportsSecurityAssembled)
+    //       ]
+    //     ),
+    //     'REPORTS_COMMON_LIST' => ThemeCollector::assemblyFileContent(
+    //       $this->CMSCore->theme,
+    //       'templates/page/reports/list.tpl',
+    //       [
+    //         'REPORTS_LIST_ITEMS' => implode($reportsCommonAssembled)
+    //       ]
+    //     )
+    //   ]
+    // );
+
+
   }
 }

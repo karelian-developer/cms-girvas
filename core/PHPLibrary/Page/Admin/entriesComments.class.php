@@ -23,6 +23,7 @@ namespace core\PHPLibrary\Page\Admin;
 use \DOMDocument as DOMDocument;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\EntryComments as EntryComments;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
@@ -37,7 +38,7 @@ class PageEntriesComments implements InterfacePage
 
   const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_CONTENT_NAVIGATION_%s_LABEL';
 
-  public SystemCore $CMSCore;
+  public CoreInterface $CMSCore;
   public Page $page;
   public string $assembled = '';
   public array $navigationSubsections = [
@@ -92,7 +93,7 @@ class PageEntriesComments implements InterfacePage
     ]
   ];
 
-  public function __construct(SystemCore $CMSCore, Page $page)
+  public function __construct(CoreInterface $CMSCore, Page $page)
   {
     $this->CMSCore = $CMSCore;
     $this->page = $page;

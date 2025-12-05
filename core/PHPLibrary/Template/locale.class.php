@@ -22,6 +22,7 @@ namespace core\PHPLibrary\Template;
 
 use \DOMDocument as DOMDocument;
 use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\LocaleInterface as LocaleInterface;
 
