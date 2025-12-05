@@ -108,7 +108,7 @@ class ReportsBase implements ReportsPageInterface
       $this->CMSCore->theme,
       $templatePath,
       [
-        'SETTINGS_NAME' => $this->name
+        'REPORT_NAME' => $this->name
       ]
     );
   }

@@ -11,7 +11,7 @@
 import {Interactive} from "../../../interactive.class.js";
 import {URLParser} from "../../../urlParser.class.js";
 
-export class PageAdminReports {
+export class PageReports {
   constructor(page, params = {}) {
     this.page = page;
   }
