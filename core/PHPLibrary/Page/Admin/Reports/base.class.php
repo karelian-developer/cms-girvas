@@ -21,6 +21,7 @@
 namespace core\PHPLibrary\Page\Admin\Reports;
 
 use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
@@ -38,13 +39,13 @@ class ReportsBase implements ReportsPageInterface
   /**
    * __construct
    * 
-   * @param CMSCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param string $name
    * 
    * @return void
    */
   public function __construct(
-    public CMSCore $CMSCore,
+    public CoreInterface $CMSCore,
     public string $name
   ) {}
 
