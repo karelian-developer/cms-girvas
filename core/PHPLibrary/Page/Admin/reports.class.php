@@ -135,7 +135,9 @@ final class PageReports implements InterfacePage
 
       $reportsTitle = $reportsPage->getTitle();
       $reportsDescription = $reportsPage->getDescription();
-      $reportsPageAssembled = $reportsPage->assembly();
+      $reportsPage->assembly();
+
+      $reportsPageAssembled = $reportsPage->assembled;
     } else {
       http_response_code(404);
     }
