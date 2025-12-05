@@ -21,6 +21,8 @@
 namespace core\PHPLibrary\Page\Admin\Reports;
 
 use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
+use \core\PHPLibrary\SystemCore\Reports as CMSReports;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
@@ -94,6 +96,33 @@ class ReportsBase implements ReportsPageInterface
   }
 
   /**
+   * Получить объекты отчетов
+   * 
+   * @return array
+   */
+  private function getAllReportsObjectsByPeriod() : array
+  { 
+    $startPeriodUnix = time() - 604800;
+    $endPeriodUnix = time();
+
+    return CMSReports::getAllByPeriod(
+      $this->CMSCore,
+      $startPeriodUnix,
+      $endPeriodUnix,
+      ['id', 'metadata']
+    );
+  }
+
+  private function filterReports(array &$reportsObjects, array $typeIDs) : void
+  {
+    foreach ($reportsObjects as $index => $report) {
+      if (!in_array($report->getTypeID(), $typeIDs)) {
+        unset($reportsObjects[$index]);
+      }
+    }
+  }
+
+  /**
    * Собрать шаблон
    * 
    * @param array $templateValues
@@ -103,12 +132,22 @@ class ReportsBase implements ReportsPageInterface
   public function assembly(array $templateValues = []) : void
   {
     $templatePath = 'templates/page/reports/' . $this->name . '.tpl';
+    $reports = $this->getAllReportsObjectsByPeriod();
+    $this->filterReports($reports, [
+      CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED,
+      CMSReport::REPORT_TYPE_ID_AP_PAGE_CREATED,
+      CMSReport::REPORT_TYPE_ID_AP_MEDIA_UPLOADED,
+      CMSReport::REPORT_TYPE_ID_USER_CREATED
+    ]);
+
+    $totalActions = count($reports);
     
     $this->assembled = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme,
       $templatePath,
       [
-        'REPORT_NAME' => $this->name
+        'REPORT_NAME' => $this->name,
+        'TOTAL_ACTIONS' => $totalActions
       ]
     );
   }

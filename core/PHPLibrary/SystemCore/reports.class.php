@@ -44,14 +44,14 @@ final class Reports
    * 
    * @return array
    */
-  public function getAll(array $paramsArray = []) : array
+  public function getAll(array $paramsArray = [], array $columnsScope = ['id']) : array
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->addSelections($columnsScope);
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('reports');
     $queryBuilder->statement->clauseFrom->assembly();
@@ -103,14 +103,14 @@ final class Reports
    * 
    * @return array
    */
-  public static function getByPeriod(CoreInterface $CMSCore, int $typeID, int $startPeriodUnix, int $endPeriodUnix) : array
+  public static function getByPeriod(CoreInterface $CMSCore, int $typeID, int $startPeriodUnix, int $endPeriodUnix, array $columnsScope = ['id']) : array
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
     $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->addSelections($columnsScope);
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('reports');
     $queryBuilder->statement->clauseFrom->assembly();
@@ -142,7 +142,62 @@ final class Reports
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        array_push($reports, new Report($CMSCore, $data['id']));
+        $reports[] = new Report($CMSCore, $data['id']);
+      }
+    }
+
+    return $reports;
+  }
+
+  /**
+   * Получить объекты отчетов за конкретный период конкретного типа
+   * 
+   * @param CoreInterface $CMSCore
+   * @param int $typeID
+   * @param int $startPeriodUnix
+   * @param int $endPeriodUnix
+   * 
+   * @return array
+   */
+  public static function getAllByPeriod(CoreInterface $CMSCore, int $startPeriodUnix, int $endPeriodUnix, array $columnsScope = ['id']) : array
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections($columnsScope);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('reports');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`createdUnixTimestamp` BETWEEN :startPeriodUnix AND :endPeriodUnix',
+      'postgresql' => '"createdUnixTimestamp" BETWEEN :startPeriodUnix AND :endPeriodUnix'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':startPeriodUnix', $startPeriodUnix, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':endPeriodUnix', $endPeriodUnix, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $reports = [];
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    if ($results) {
+      foreach ($results as $data) {
+        $reports[] = new Report($CMSCore, $data['id']);
       }
     }
 
