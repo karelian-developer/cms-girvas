@@ -70,6 +70,48 @@ final class PageReports implements InterfacePage
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
+  public function getAvailableReportsCategoriesArray() : array
+  {
+    $reports = [];
+
+    $reportsClassesFilesPath = $this->CMSCore->getCMSPath() . '/core/PHPLibrary/Page/Admin/Reports';
+    $reportsClassesFiles = array_diff(scandir($reportsClassesFilesPath), ['.', '..']);
+
+    foreach ($reportsClassesFiles as $file) {
+      if (preg_match('/^([a-zA-Z_]+)\.class\.php$/', $file, $matches)) {
+        array_push($reports, $matches[1]);
+      }
+    }
+
+    return $reports;
+  }
+
+  /**
+   * Конвертировать имя настройки в константу
+   * 
+   * @param string $reportsName
+   * 
+   * @return string
+   */
+  private function convertSettingNameToConstant(string $reportsName) : string
+  {
+    return match ($reportsName) {
+      default => strtoupper($reportsName)
+    };
+  }
+
+  /**
+   * Получить пространство имен страницы с настройками
+   * 
+   * @param string $reportsName
+   * 
+   * @return string
+   */
+  private function getReportsPageClassNamespace(string $reportsName) : string
+  {
+    return '\\core\\PHPLibrary\\Page\\Admin\\Reports\\Reports' . ucfirst($reportsName);
+  }
+
   public function assembly() : void
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/reports.css', 'rel' => 'stylesheet']);
@@ -97,7 +139,7 @@ final class PageReports implements InterfacePage
     } else {
       http_response_code(404);
     }
-    
+
     /** @var string $site_page Содержимое шаблона страницы */
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports.tpl', [
       'PAGE_NAME' => 'reports',
