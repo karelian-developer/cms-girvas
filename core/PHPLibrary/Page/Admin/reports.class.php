@@ -93,7 +93,7 @@ final class PageReports implements InterfacePage
    * 
    * @return string
    */
-  private function convertSettingNameToConstant(string $reportsName) : string
+  private function convertReportsNameToConstant(string $reportsName) : string
   {
     return match ($reportsName) {
       default => strtoupper($reportsName)
