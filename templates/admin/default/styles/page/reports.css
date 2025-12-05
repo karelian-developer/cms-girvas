@@ -6,50 +6,32 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-.page.page_reports .reports-blocks-list {
-  display: flex;
-  flex-wrap: wrap;
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+.main__page.page .page__content {
+  display: grid;
+  grid-template-columns: repeat(2, calc(50% - 10px));
+  gap: 20px;
 }
-.page.page_reports .reports-blocks-list__item {
-  display: flex;
-  box-sizing: border-box;
-  flex-direction: column;
-  border: 1px solid var(--common-main-color-2);
-  flex: 0 0 calc((100% / 2) - (10px / 2));
 
-  &:not(:nth-child(2n)) {
-    margin-right: 10px;
-  }
-}
-.page.page_reports .reports-blocks-list__item > .item__title {
-  background-color: var(--common-main-color-2);
+.main__page.page .report-section .report-section__title {
+  font-size: 14px;
+  font-weight: 500;
   text-transform: uppercase;
-  font-size: 16px;
-  font-weight: 700px;
-  color: var(--common-main-color-4);
-  padding: 10px 20px;
-  margin: 0;
+  margin-top: 0;
+  margin-bottom: 20px;
 }
-.page.page_reports .reports-blocks-list__item > .item__container {
-  box-sizing: border-box;
-  overflow-y: scroll;
-  height: 300px;
-}
-.page.page_reports .reports-list {
+
+.main__page.page .report-section .report-section__list {
   display: flex;
-  flex-direction: column;
   list-style-type: none;
   padding: 0;
   margin: 0;
 }
-.page.page_reports .reports-list__item > .item__content {
-  font-size: 14px;
-  padding: 5px 10px;
+
+.main__page.page .report-section .report-section__list > li:not(:last-child) {
+  margin-bottom: 10px;
 }
-.page.page_reports .reports-list__item:nth-child(2n) > .item__content {
-  background-color: var(--common-main-color-2);
-  color: var(--common-main-color-3);
+
+.main__page.page .report-section .report-section__data-label::after {
+  content: ':';
+  margin-right: 5px;
 }

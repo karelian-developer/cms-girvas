@@ -1,30 +1,22 @@
-<article class="main__page page page_{ADMIN_PANEL_PAGE_NAME}">
+<article class="page main__page main__page_reports">
   <nav id="SYSTEM_AP_SUBNAVIGATION" class="page__navigation navigation"></nav>
   <div class="page__title-container">
-    <h1 class="page__title">{LANG:PAGE_REPORTS_TITLE}</h1>
+    <h1 class="page__title">
+      {LANG:PAGE_REPORT_TITLE}&nbsp;&mdash;&nbsp;{PAGE_REPORT_TITLE}
+    </h1>
   </div>
   <div class="page__content">
-    <ul class="reports-blocks-list">
-      <li class="reports-blocks-list__item item item_common">
-        <h2 class="item__title">{LANG:PAGE_REPORTS_COMMON_TITLE}</h2>
-        <div class="item__container">
-          {REPORTS_COMMON_LIST}
-        </div>
-      </li>
-      <li class="reports-blocks-list__item item item_security">
-        <h2 class="item__title">{LANG:PAGE_REPORTS_SECURITY_TITLE}</h2>
-        <div class="item__container">
-          {REPORTS_SECURITY_LIST}
-        </div>
-      </li>
-    </ul>
+    {PAGE_REPORT}
   </div>
 </article>
 <aside class="main__page-aside page-aside">
-  <article class="page-aside__block">
-    <h2 class="page-aside__block-title">[ ??? ]</h2>
-    <div class="page-aside__block-content">
-      [ ??? ]
+  <div class="page-aside__block">
+    <h2 class="page-aside__block-title">{LANG:PAGE_REPORTS_SIDEBAR_BLOCK_ABOUT_TITLE}</h2>
+    <div class="page-aside__block-content block-content">
+      <div class="note-block note-block_blue">
+        <p class="block-content__phar">{LANG:PAGE_REPORTS_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_1}</p>
+        <p class="block-content__phar">{LANG:PAGE_REPORTS_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_2}</p>
+      </div>
     </div>
-  </article>
+  </div>
 </aside>

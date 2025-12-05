@@ -20,6 +20,7 @@ import {PageEntriesSample as PageAdminEntriesSample} from './page/admin/entriesS
 import {PageEntriesSamples as PageAdminEntriesSamples} from './page/admin/entriesSamples.class.js';
 import {PagePages as PageAdminPages} from './page/admin/pages.class.js';
 import {PagePageStatic as PageAdminPageStatic} from './page/admin/pageStatic.class.js';
+import {PageReports as PageAdminReports} from './page/admin/reports.class.js';
 import {PageMedia as PageAdminMedia} from './page/admin/media.class.js';
 import {PageModule as PageAdminModule} from './page/admin/module.class.js';
 import {PageModules as PageAdminModules} from './page/admin/modules.class.js';
@@ -66,6 +67,7 @@ export class Page {
         case 'entriesSamples': this.target = new PageAdminEntriesSamples(this, params); break;
         case 'pages': this.target = new PageAdminPages(this, params); break;
         case 'pageStatic': this.target = new PageAdminPageStatic(this, params); break;
+        case 'reports': this.target = new PageAdminReports(this, params); break;
         case 'media': this.target = new PageAdminMedia(this, params); break;
         case 'module': this.target = new PageAdminModule(this, params); break;
         case 'modules': this.target = new PageAdminModules(this, params); break;

@@ -135,16 +135,19 @@ final class PageReports implements InterfacePage
 
       $reportsTitle = $reportsPage->getTitle();
       $reportsDescription = $reportsPage->getDescription();
-      $reportsPage->assembly();
+      $reportsPageAssembled = $reportsPage->assembly();
     } else {
       http_response_code(404);
     }
 
+    $reportsPageAssembled = $reportsPageAssembled ?? '';
+
     /** @var string $site_page Содержимое шаблона страницы */
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports.tpl', [
       'PAGE_NAME' => 'reports',
-      'REPORTS_TITLE' => $reportsTitle ?? $localeData['PAGE_REPORTS_GROUP_NOT_FOUND_TITLE'],
-      'REPORTS_DESCRIPTION' => $reportsDescription ?? $localeData['PAGE_REPORTS_GROUP_NOT_FOUND_DESCRIPTION']
+      'PAGE_REPORT_TITLE' => $reportsTitle ?? $localeData['PAGE_REPORTS_GROUP_NOT_FOUND_TITLE'],
+      'PAGE_REPORT_DESCRIPTION' => $reportsDescription ?? $localeData['PAGE_REPORTS_GROUP_NOT_FOUND_DESCRIPTION'],
+      'PAGE_REPORT' => ThemeCollector::assembly($reportsPageAssembled, [])
     ]);
 
     // $reportsSecurityAssembled = [];
