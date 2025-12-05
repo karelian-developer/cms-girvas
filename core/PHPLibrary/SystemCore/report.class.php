@@ -110,8 +110,11 @@ final class Report
   {
     if (property_exists($this, 'metadata')) {
       $metadata = json_decode($this->metadata, true);
+
       if (isset($metadata['typeID'])) {
-        return $metadata['typeID'];
+        return is_numeric($metadata['typeID'])
+          ? (int)$metadata['typeID']
+          : 0;
       }
     }
 
