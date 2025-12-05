@@ -153,7 +153,6 @@ final class Reports
    * Получить объекты отчетов за конкретный период конкретного типа
    * 
    * @param CoreInterface $CMSCore
-   * @param int $typeID
    * @param int $startPeriodUnix
    * @param int $endPeriodUnix
    * 

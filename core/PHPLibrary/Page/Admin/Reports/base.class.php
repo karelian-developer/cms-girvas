@@ -136,12 +136,12 @@ class ReportsBase implements ReportsPageInterface
   {
     $templatePath = 'templates/page/reports/' . $this->name . '.tpl';
     $reports = $this->getAllReportsObjectsByPeriod();
-    $this->filterReports($reports, [
-      CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED,
-      CMSReport::REPORT_TYPE_ID_AP_PAGE_CREATED,
-      CMSReport::REPORT_TYPE_ID_AP_MEDIA_UPLOADED,
-      CMSReport::REPORT_TYPE_ID_USER_CREATED
-    ]);
+    // $this->filterReports($reports, [
+    //   CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED,
+    //   CMSReport::REPORT_TYPE_ID_AP_PAGE_CREATED,
+    //   CMSReport::REPORT_TYPE_ID_AP_MEDIA_UPLOADED,
+    //   CMSReport::REPORT_TYPE_ID_USER_CREATED
+    // ]);
 
     $totalActions = count($reports);
     $totalEntriesCreated = count($reports);
