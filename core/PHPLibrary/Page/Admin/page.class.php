@@ -282,6 +282,14 @@ class PagePage implements InterfacePage
       );
     }
 
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_PERSONAL_TEMPLATE_PATH')) {
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'PAGE_STATIC_PERSONAL_TEMPLATE_PATH',
+        $pageStatic->getPersonalTemplatePath()
+      );
+    }
+
     if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_ADDITIONAL_FIELDS')) {
       ThemeCollector::addTemplateVariable(
         $templatesAssembled,
