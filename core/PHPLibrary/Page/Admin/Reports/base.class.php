@@ -140,11 +140,12 @@ class ReportsBase implements ReportsPageInterface
   {
     $templatePath = 'templates/page/reports/' . $this->name . '.tpl';
     $reports = $this->getAllReportsObjectsByPeriod();
+
     $reportsAll = $this->filterReports($reports, [
       CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED,
       CMSReport::REPORT_TYPE_ID_AP_PAGE_CREATED,
       CMSReport::REPORT_TYPE_ID_AP_MEDIA_UPLOADED,
-      CMSReport::REPORT_TYPE_ID_USER_CREATED
+      CMSReport::REPORT_TYPE_ID_BASE_USER_CREATED
     ]);
 
     $reportsEntriesCreated = $this->filterReports($reports, [
@@ -160,14 +161,35 @@ class ReportsBase implements ReportsPageInterface
     ]);
 
     $reportsUsersRegistered = $this->filterReports($reports, [
-      CMSReport::REPORT_TYPE_ID_USER_CREATED
+      CMSReport::REPORT_TYPE_ID_BASE_USER_CREATED
     ]);
 
-    $totalActions = count($reports);
+    $reportsSecurityAdminAuthFail = $this->filterReports($reports, [
+      CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL
+    ]);
+
+    $reportsSecurityAdminAuthSuccess = $this->filterReports($reports, [
+      CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS
+    ]);
+
+    $reportsSecurityBaseAuthFail = $this->filterReports($reports, [
+      CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL
+    ]);
+
+    $reportsSecurityBaseAuthSuccess = $this->filterReports($reports, [
+      CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS
+    ]);
+
+    $totalActions = count($reportsAll);
     $totalEntriesCreatedActions = count($reportsEntriesCreated);
     $totalPagesCreatedActions = count($reportsPagesCreated);
     $totalMediaUploadedActions = count($reportsMediaUploaded);
     $totalUsersRegisteredActions = count($reportsUsersRegistered);
+
+    $totalSecurityAdminAuthFailActions = count($reportsSecurityAdminAuthFail);
+    $totalSecurityAdminAuthSuccessActions = count($reportsSecurityAdminAuthSuccess);
+    $totalSecurityBaseAuthFailActions = count($reportsSecurityBaseAuthFail);
+    $totalSecurityBaseAuthSuccessActions = count($reportsSecurityBaseAuthSuccess);
     
     $this->assembled = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme,
@@ -178,7 +200,11 @@ class ReportsBase implements ReportsPageInterface
         'TOTAL_ENTRIES_CREATED' => $totalEntriesCreatedActions,
         'TOTAL_PAGES_CREATED' => $totalPagesCreatedActions,
         'TOTAL_MEDIA_UPLOADS' => $totalMediaUploadedActions,
-        'TOTAL_USERS_CREATED' => $totalUsersRegisteredActions
+        'TOTAL_USERS_CREATED' => $totalUsersRegisteredActions,
+        'TOTAL_SUCCESSFUL_AUTH_ON_THE_SITE' => $totalSecurityAdminAuthFailActions,
+        'TOTAL_UNSUCCESSFUL_AUTH_ON_THE_SITE' => $totalSecurityAdminAuthSuccessActions,
+        'TOTAL_SUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $totalSecurityBaseAuthFailActions,
+        'TOTAL_UNSUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $totalSecurityBaseAuthSuccessActions
       ]
     );
   }
