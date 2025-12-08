@@ -1,9 +1,16 @@
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
- * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * Включена в Реестр российского программного обеспечения Минцифры РФ.
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ *             Все права защищены.
+ * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @see       https://cms-girvas.ru Сайт продукта
+ * @author    Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * @support   support@karelian-developer.ru
  */
 
 'use strict';
@@ -15,6 +22,7 @@ import {Utils} from "../../../utils.class.js";
 export class PageEntry {
   constructor(page, params = {}) {
     this.page = page;
+    this.statusCode = this.page.getPageStatusCode()
 
     this.buttons = {save: null, delete: null, publish: null, unpublish: null};
   }
@@ -182,7 +190,9 @@ export class PageEntry {
           }
 
           let request = new Interactive('request', {
-            method: searchParams.getPathPart(3) === null ? 'PUT' : 'PATCH',
+            method: searchParams.getPathPart(3) === null || this.statusCode === 404
+              ? 'PUT'
+              : 'PATCH',
             url: '/handler/entry?localeMessage=' + window.CMSCore.locales.admin.name
           });
   
@@ -487,11 +497,13 @@ export class PageEntry {
               interactiveCategoriesChoices.target.addItem(entriesCategory.title, entriesCategory.id);
             });
 
-            entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
-              if (entriesCategory.id === entryData.categoryID) {
-                interactiveCategoriesChoices.target.setItemSelectedIndex(entriesCategoryIndex);
-              }
-            });
+            if (this.statusCode !== 404) {
+              entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
+                if (entriesCategory.id === entryData.categoryID) {
+                  interactiveCategoriesChoices.target.setItemSelectedIndex(entriesCategoryIndex);
+                }
+              });
+            }
             
             interactiveCategoriesChoices.target.setName('entry_category_id');
             interactiveCategoriesChoices.assembly();

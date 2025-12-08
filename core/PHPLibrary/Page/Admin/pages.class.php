@@ -1,11 +1,21 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary\Page\Admin;
@@ -25,7 +35,7 @@ class PagePages implements InterfacePage
 {
   use TraitPage;
 
-  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_STATIC_PAGES_NAVIGATION_%s_LABEL';
+  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_CONTENT_NAVIGATION_%s_LABEL';
 
   public SystemCore $CMSCore;
   public Page $page;
@@ -38,6 +48,13 @@ class PagePages implements InterfacePage
       'permanent' => true,
       'isActive' => false
     ],
+    'entries' => [
+      'name' => 'entries',
+      'iconName' => 'entries',
+      'link' => '/entries',
+      'permanent' => false,
+      'isActive' => false
+    ],
     'pages' => [
       'name' => 'pages',
       'iconName' => 'pages',
@@ -45,6 +62,34 @@ class PagePages implements InterfacePage
       'permanent' => false,
       'isActive' => true
     ],
+    'categories' => [
+      'name' => 'categories',
+      'iconName' => 'entriesCategories',
+      'link' => '/entriesCategories',
+      'permanent' => false,
+      'isActive' => false
+    ],
+    'comments' => [
+      'name' => 'comments',
+      'iconName' => 'entriesComments',
+      'link' => '/entriesComments',
+      'permanent' => false,
+      'isActive' => false
+    ],
+    'samples' => [
+      'name' => 'samples',
+      'iconName' => 'entriesSamples',
+      'link' => '/entriesSamples',
+      'permanent' => false,
+      'isActive' => false
+    ],
+    'forms' => [
+      'name' => 'forms',
+      'iconName' => 'forms',
+      'link' => '/forms',
+      'permanent' => false,
+      'isActive' => false
+    ]
   ];
 
   public function __construct(SystemCore $CMSCore, Page $page)
@@ -116,13 +161,12 @@ class PagePages implements InterfacePage
 
     unset($entries);
 
-    $pageStaticNumber = 1;
-    foreach ($pagesStaticObjects as $object) {
+    foreach ($pagesStaticObjects as $index => $object) {
       $object->initData(['id', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata', 'authorID']);
 
-      $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
-      $publishedUnixTimestamp = date('d.m.Y H:i:s', $object->getPublishedUnixTimestamp());
-      $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
+      $createdDateTimestamp = $object->getCreatedUnixTimestamp();
+      $publishedDateTimestamp = $object->getPublishedUnixTimestamp();
+      $updatedDateTimestamp = $object->getUpdatedUnixTimestamp();
 
       $pageStaticTitle = $object->getTitle($pagesStaticLocaleName);
       $pageStaticDescription = $object->getDescription($pagesStaticLocaleName);
@@ -130,46 +174,175 @@ class PagePages implements InterfacePage
       $pageStaticTitle = strip_tags($pageStaticTitle);
       $pageStaticDescription = strip_tags($pageStaticDescription);
 
-      $pageStaticAuthor = $object->getAuthor();
-      if ($pageStaticAuthor !== null) {
-        $pageStaticAuthor->initData(['login']);
+      $authorObject = $object->getAuthor();
+      if ($authorObject !== null) {
+        $authorObject->initData(['login']);
       }
 
-      $pageStaticCompletedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
-      $pageStaticCompletedLocales = $this->assemblyLocalesItems($pageStaticCompletedLocalesData);
-      $pageStaticSEOStatus = !empty($object->getCompletedSEOTexts())
+      $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
+      $completedLocales = $this->assemblyLocalesItems($completedLocalesData);
+      $SEOStatus = !empty($object->getCompletedSEOTexts())
         ? '<span style="color: green;">Оптимизировано</span>'
         : '<span style="color: red;">Не оптимизировано</span>';
 
-      $pageStaticAuthorLogin = $pageStaticAuthor !== null ? $pageStaticAuthor->getLogin() : 'User deleted';
+      $authorLogin = $authorObject !== null ? $authorObject->getLogin() : 'User deleted';
 
-      array_push($pagesStaticTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/pages/tableItem.tpl', [
-        'PAGE_STATIC_ID' => $object->getID(),
-        'PAGE_STATIC_NAME' => $object->getName(),
-        'PAGE_STATIC_INDEX' => $pageStaticNumber,
-        'PAGE_STATIC_TITLE' => !empty($pageStaticTitle) ? $pageStaticTitle : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $pagesStaticLocale->getName()),
-        'PAGE_STATIC_DESCRIPTION' => !empty($pageStaticDescription) ? $pageStaticDescription : sprintf('[ DESCRIPTION NOT FOUND IN LOCALE %s ]', $pagesStaticLocale->getName()),
-        'PAGE_STATIC_PUBLISHED_STATUS' => $object->isPublished() ? 'published' : 'not-published',
-        'PAGE_STATIC_URL' => $object->getURL(),
-        'PAGE_STATIC_AUTHOR_LOGIN' => $pageStaticAuthorLogin,
-        'PAGE_STATIC_LOCALES_LIST' => $pageStaticCompletedLocales,
-        'PAGE_STATIC_SEO_STATUS' => $pageStaticSEOStatus,
-        'PAGE_STATIC_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
-        'PAGE_STATIC_PUBLISHED_DATE_TIMESTAMP' => $object->getPublishedUnixTimestamp() > 0 ? $publishedUnixTimestamp : '-',
-        'PAGE_STATIC_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
-      ]));
+      $templatesAssembled = [];
+      $templateContent = ThemeCollector::getTemplateFileContent(
+        $this->CMSCore->theme,
+        'templates/page/pages/tableItem.tpl'
+      );
 
-      $pageStaticNumber++;
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_INDEX')) {
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'PAGE_STATIC_INDEX',
+          $index
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_ID')) {
+        $value = $object !== null ? $object->getID() : 0;
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'PAGE_STATIC_ID',
+          $value
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_NAME')) {
+        $value = $object !== null ? $object->getName() : '';
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'PAGE_STATIC_NAME',
+          $value
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_TITLE')) {
+        $value = $object !== null ? $object->getTitle($localeName) : '';
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'PAGE_STATIC_TITLE',
+          str_replace(
+            ThemeCollector::DECODED_ENTITIES,
+            ThemeCollector::SAFE_SYMBOLS,
+            htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+          )
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_DESCRIPTION')) {
+        $value = $object !== null ? $object->getDescription($localeName) : '';
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'PAGE_STATIC_DESCRIPTION',
+          str_replace(
+            ThemeCollector::DECODED_ENTITIES,
+            ThemeCollector::SAFE_SYMBOLS,
+            htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+          )
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_URL')) {
+        $value = $object->getURL();
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'PAGE_STATIC_URL',
+          $value
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_AUTHOR_LOGIN')) {
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'PAGE_STATIC_AUTHOR_LOGIN',
+          $authorLogin
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_LOCALES_LIST')) {
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'PAGE_STATIC_LOCALES_LIST',
+          $completedLocales
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_SEO_STATUS')) {
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'PAGE_STATIC_SEO_STATUS',
+          $SEOStatus
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_CREATED_DATE_TIMESTAMP')) {
+        $value = date('d.m.Y H:i:s', $createdDateTimestamp);
+        
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'PAGE_STATIC_CREATED_DATE_TIMESTAMP',
+          $value
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_PUBLISHED_DATE_TIMESTAMP')) {
+        $value = $publishedDateTimestamp > 0 ? date('d.m.Y H:i:s', $publishedDateTimestamp) : '-';
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'PAGE_STATIC_PUBLISHED_DATE_TIMESTAMP',
+          $value
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_UPDATED_DATE_TIMESTAMP')) {
+        $value = date('d.m.Y H:i:s', $updatedDateTimestamp);
+        
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'PAGE_STATIC_UPDATED_DATE_TIMESTAMP',
+          $value
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_PUBLISHED_STATUS')) {
+        $value = $object->isPublished() ? 'published' : 'not-published';
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'PAGE_STATIC_PUBLISHED_STATUS',
+          $value
+        );
+      }
+
+      $tableItemsAssembled[] =  ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/pages/tableItem.tpl',
+        $templatesAssembled
+      );
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/pages.tpl', [
-      'PAGE_PAGES_STATIC_PAGINATION' => $pagination->assembled,
-      'ADMIN_PANEL_PAGE_NAME' => 'page_static',
-      'ADMIN_PANEL_PAGES_STATIC_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/pages/table.tpl', [
-        'ADMIN_PANEL_PAGES_STATIC_TABLE_ITEMS' => implode($pagesStaticTableItemsAssembled)
-      ])
-    ]);
+    $this->assembled = ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme, 'templates/page/pages.tpl',
+      [
+        'PAGE_PAGES_STATIC_PAGINATION' => $pagination->assembled,
+        'ADMIN_PANEL_PAGE_NAME' => 'page_static',
+        'ADMIN_PANEL_PAGES_STATIC_TABLE' => ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme, 'templates/page/pages/table.tpl',
+          [
+            'ADMIN_PANEL_PAGES_STATIC_TABLE_ITEMS' => implode($tableItemsAssembled)
+          ]
+        )
+      ]
+    );
   }
-
 }

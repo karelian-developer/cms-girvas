@@ -12,7 +12,7 @@ namespace templates\default;
 
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Template as Theme;
-use \core\PHPLibrary\InterfaceTemplate as InterfaceTheme;
+use \core\PHPLibrary\ThemeInterface as ThemeInterface;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \DOMDocument as DOMDocument;
@@ -25,16 +25,19 @@ final class Core implements ThemeInterfaceCore
   private string $primaryColor = '#EAEAEA';
   public string $assembled = '';
   public ?DOMDocument $source = null;
+
+  const ENTRIES_SAMPLE_LAST_NEWS_PREVIEW_WIDTH = 1024;
+  const ENTRIES_SAMPLE_INDEX_NEWS_PREVIEW_WIDTH = 1024;
   
   /**
    * __construct
    *
-   * @param  Theme $theme
+   * @param ThemeInterface $theme
    * 
    * @return void
    */
   public function __construct(
-    private Theme $theme
+    private ThemeInterface $theme
   ) {}
 
   /**
@@ -50,9 +53,9 @@ final class Core implements ThemeInterfaceCore
   /**
    * Получить основной объект темы
    * 
-   * @return InterfaceTheme
+   * @return ThemeInterface
    */
-  public function getThemeFrame() : InterfaceTheme
+  public function getThemeFrame() : ThemeInterface
   {
     return $this->theme;
   }

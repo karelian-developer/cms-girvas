@@ -72,6 +72,18 @@
     <div class="cell grid-table__cell grid-table__cell_data">
       <input name="setting_{SETTINGS_NAME}_upload_file_image_avatar_height_max" type="number" class="input form__input form__input_number" value="{SETTING_UPLOAD_FILE_IMAGE_AVATAR_HEIGHT_MAX_VALUE}" placeholder="128" min="0" data-element="input-avatar-height-max">
     </div>
+    <!-- Поле: Сжатие загружаемого изображения -->
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">
+        {LANG:PAGE_SETTINGS_SETTING_FILES_UPLOAD_IMAGE_COMPRESSION_TITLE}
+      </div>
+      <div class="cell__description">
+        {LANG:PAGE_SETTINGS_SETTING_FILES_UPLOAD_IMAGE_COMPRESSION_DESCRIPTION}
+      </div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <input name="setting_{SETTINGS_NAME}_upload_image_compression" type="number" class="input form__input form__input_number" value="{SETTING_UPLOAD_IMAGE_COMPRESSION_VALUE}" placeholder="40" min="0" max="100" data-element="input-image-compression">
+    </div>
     <!-- Поле: Автоматическая конвертация загружаемого изображения -->
     <div class="cell grid-table__cell grid-table__cell_text">
       <div class="cell__title">

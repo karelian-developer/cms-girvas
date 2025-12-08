@@ -18,8 +18,8 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Mail\SMTPClient as SMTPClient;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\UserGroup as UserGroup;
-use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
-use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as EnumFileFormat;
+use \core\PHPLibrary\SystemCore\File\Converter as FileConverter;
+use \core\PHPLibrary\SystemCore\File\EnumFormat as EnumFileFormat;
 
 /**
  * Загрузка аватара для пользователя

@@ -1,9 +1,16 @@
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
- * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * Включена в Реестр российского программного обеспечения Минцифры РФ.
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ *             Все права защищены.
+ * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @see       https://cms-girvas.ru Сайт продукта
+ * @author    Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * @support   support@karelian-developer.ru
  */
 
 'use strict';
@@ -12,10 +19,11 @@ import {Interactive} from '../interactive.class.js';
 import {Client} from './client.class.js';
 
 export class Metrics {
-  constructor() {
-    let clientMetricsToken = localStorage.getItem('_grv_mtoken');
+  constructor(core) {
+    this.core = core;
 
-    let formData = new FormData();
+    const clientMetricsToken = localStorage.getItem('_grv_mtoken');
+    const formData = new FormData();
 
     formData.append('time', Math.round(new Date().getTime() / 1000));
     formData.append('current_url', document.location.href);
@@ -30,7 +38,10 @@ export class Metrics {
 
     fetch('/handler/metrics', {
       method: 'POST',
-      headers: {'Metrics-Token': localStorage.getItem('_grv_mtoken')},
+      headers: {
+        'Metrics-Token': localStorage.getItem('_grv_mtoken'),
+        'X-CSRF-Token': this.core.client.CSRFToken
+      },
       body: formData
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
@@ -58,7 +69,9 @@ export class Metrics {
   async getDataByTimestamp(time) {
     return fetch(`/handler/metrics?time=${Math.round(time / 1000)}`, {
       method: 'GET',
-      headers: {'Metrics-Token': localStorage.getItem('_grv_mtoken')}
+      headers: {
+        'Metrics-Token': localStorage.getItem('_grv_mtoken')
+      }
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
@@ -77,7 +90,9 @@ export class Metrics {
 
     return fetch(`/handler/metrics?timeStart=${timeStart}&timeEnd=${timeEnd}`, {
       method: 'GET',
-      headers: {'Metrics-Token': localStorage.getItem('_grv_mtoken')}
+      headers: {
+        'Metrics-Token': localStorage.getItem('_grv_mtoken')
+      }
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {

@@ -1,0 +1,16 @@
+{
+  "COLOR_SCHEME": {
+    "value": "default",
+    "type": "colorScheme",
+    "locale": {
+      "title": {
+        "en_US": "Color scheme",
+        "ru_RU": "Цветовая схема"
+      },
+      "description": {
+        "en_US": "The color scheme allows you to customize the global designations for the site theme colors.",
+        "ru_RU": "Цветовая схема позволяет настроить глобальные обозначения для цветов темы сайта."
+      }
+    }
+  }
+}

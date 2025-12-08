@@ -1,13 +1,22 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
-
 
 namespace core\PHPLibrary\Page\Admin\Settings;
 
@@ -95,6 +104,7 @@ class SettingsFiles implements SettingsPageInterface
       'SETTING_UPLOAD_FILE_IMAGE_AVATAR_WEIGHT_MAX_VALUE' => $this->CMSCore->configurator->getUploadFileImageAvatarWeightMax(),
       'SETTING_UPLOAD_FILE_IMAGE_AVATAR_WIDTH_MAX_VALUE' => $this->CMSCore->configurator->getUploadFileImageAvatarWidthMax(),
       'SETTING_UPLOAD_FILE_IMAGE_AVATAR_HEIGHT_MAX_VALUE' => $this->CMSCore->configurator->getUploadFileImageAvatarHeightMax(),
+      'SETTING_UPLOAD_IMAGE_COMPRESSION_VALUE' => $this->CMSCore->configurator->getUploadImageCompression(),
       'SETTING_AUTO_CONVERT_FILE_IMAGE_FORMAT_VALUE' => $this->CMSCore->configurator->getAutoConvertFileImageExtension(),
       'SETTING_AUTO_CONVERT_FILE_IMAGE_STATUS_VALUE' => $settingAutoConvertFileImageStatusValue,
       'SETTING_AUTO_CONVERT_FILE_IMAGE_CHECKED_VALUE' => $settingAutoConvertFileImageStatusValue === 'on' ? 'checked' : '',

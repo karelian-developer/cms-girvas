@@ -1,18 +1,29 @@
 <?php
 
+
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\EntriesSample as EntriesSample;
-use \core\PHPLibrary\SystemCore\DatabaseConnector as CMSDatabaseConnector;
+use \core\PHPLibrary\SystemCore\Database\Connector as CMSDatabaseConnector;
 use \core\PHPLibrary\SystemCore\Configurator as CMSConfigurator;
 use \core\PHPLibrary\UserGroup as UserGroup;
 use \DOMDocument as DOMDocument;
@@ -419,11 +430,12 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       fwrite($file, '  \'sessionExpires\' => 86400,' . PHP_EOL);
       fwrite($file, '  \'sessionAdminExpires\' => 86400,' . PHP_EOL);
       fwrite($file, '  \'SSLCSP\' => [' . PHP_EOL);
-      fwrite($file, '    \'default-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com \',' . PHP_EOL);
-      fwrite($file, '    \'style-src \\\'unsafe-inline\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
-      fwrite($file, '    \'script-src \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
-      fwrite($file, '    \'script-src-elem \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\',' . PHP_EOL);
-      fwrite($file, '    \'manifest-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com\'' . PHP_EOL);
+      fwrite($file, '    \'default-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com *.карельский-разработчик.рф карельский-разработчик.рф *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
+      fwrite($file, '    \'style-src \\\'unsafe-inline\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com *.карельский-разработчик.рф карельский-разработчик.рф *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
+      fwrite($file, '    \'script-src \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com *.карельский-разработчик.рф карельский-разработчик.рф *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
+      fwrite($file, '    \'script-src-elem \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com *.карельский-разработчик.рф карельский-разработчик.рф *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
+      fwrite($file, '    \'manifest-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com *.карельский-разработчик.рф карельский-разработчик.рф *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\'' . PHP_EOL);
+      fwrite($file, '    \'img-src \\\'self\\\' data: *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com *.карельский-разработчик.рф карельский-разработчик.рф *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\'' . PHP_EOL);
       fwrite($file, '  ],' . PHP_EOL);
       fwrite($file, '  \'SSLPermRedirect\' => false,' . PHP_EOL);
       fwrite($file, '  \'SSLHSTSMaxAge\' => 63072000,' . PHP_EOL);
@@ -503,11 +515,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries');
       $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('categoryID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('authorID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
       $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -526,10 +538,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries_categories');
       $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('parentID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
       $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -570,9 +582,51 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries_samples');
       $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
       $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      $execute = $databaseQuery->execute();
+
+      // =======================
+      // ТАБЛИЦА ФОРМ
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('forms');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
       $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('elements', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      $execute = $databaseQuery->execute();
+
+      // =======================
+      // ТАБЛИЦА ДЛЯ ДАННЫХ С ФОРМ
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('forms_data');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('form_id', 'integer', 'NOT NULL');
+      $queryBuilder->statement->addColumn('data', $JSONDataTypeDMS);
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -806,14 +860,14 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       'en_US' => [
         'title' => 'Hello, World!',
         'description' => 'Welcome to the GIRVAS Content Management System!',
-        'content' => "Welcome to the GIRVAS Content Management System! This is a simple example of an entry on your website that does not contain anything important, but we would like to tell you a little about the system and the developer company. In the future, you can delete or change this entry, or just keep it as a keepsake!\r\n\r\n##Briefly about the system\r\nContent management system \"GIRVAS\" is a technically complex software, but easy to use, through which you can manage content on a website, as well as change its appearance using templates or expand functionality using a modular system. On our YouTube channel we have collected several examples demonstrating the functionality of the CMS \"GIRVAS\".\r\n\r\n##First release of the system\r\nThe control system is currently undergoing the first stage of its post-release review, so we need to collect feedback on its performance. If something does not work or does not work as it should, then feel free to report it via one of the contacts: https://www.garbalo.com/page/contacts.",
+        'content' => "Welcome to the GIRVAS Content Management System! This is a simple example of an entry on your website that does not contain anything important, but we would like to tell you a little about the system and the developer company. In the future, you can delete or change this entry, or just keep it as a keepsake!\r\n\r\n##Briefly about the system\r\nContent management system \"GIRVAS\" is a technically complex software, but easy to use, through which you can manage content on a website, as well as change its appearance using templates or expand functionality using a modular system. On our YouTube channel we have collected several examples demonstrating the functionality of the CMS \"GIRVAS\".\r\n\r\n##First release of the system\r\nThe control system is currently undergoing the first stage of its post-release review, so we need to collect feedback on its performance. If something does not work or does not work as it should, then feel free to report it via one of the contacts: https://карельский-разработчик.рф/page/contacts.",
         'keywords' => ['cms girvas', 'Content Management System GIRVAS']
       ],
       'ru_RU' => [
         'title' => 'Привет, Мир!',
-        'description' => 'Добро пожаловать в Систему управления содержимым &laquo;ГИРВАС&raquo;!',
-        'content' => "Добро пожаловать в Систему управления содержимым &laquo;ГИРВАС&raquo;! Это простой пример записи на Вашем сайте, которая не несет в себе ничего важного, однако хотели бы немного рассказать о системе и компании-разработчике. В дальнейшем Вы сможете удалить или изменить эту запись, или же просто оставить себе на память!\r\n\r\n##Кратко о системе\r\nСистема управления содержимым &laquo;ГИРВАС&raquo; представляет собой сложное в техническом плане программное обеспечение, но легкое в плане использования, через которое Вы можете управлять содержимым на веб-сайте, а также изменять его внешний вид при помощи шаблонов или расширять функционал при помощи модульной системы. На нашем YouTube-канале мы собрали несколько примеров с демонстрацией функционала СУС &laquo;ГИРВАС&raquo;\r\n\r\n##Первый выпуск системы\r\nСейчас система управления проходит первый этап своей проверки после выпуска, поэтому нам необходимо собирать обратную связь по ее работе. Если что-то будет не работать или работать не так как надо, то смело сообщайте по одному из контактов: https://www.garbalo.com/page/contacts.",
-        'keywords' => ['сус гирвас', 'Система управления содержимым ГИРВАС']
+        'description' => 'Добро пожаловать в Систему управления содержимым «ГИРВАС»!',
+        'content' => "Добро пожаловать в Систему управления содержимым «ГИРВАС»! Это простой пример записи на Вашем сайте, которая не несет в себе ничего важного, однако хотели бы немного рассказать о системе и компании-разработчике. В дальнейшем Вы сможете удалить или изменить эту запись, или же просто оставить себе на память!\r\n\r\n##Кратко о системе\r\nСистема управления содержимым «ГИРВАС» представляет собой сложное в техническом плане программное обеспечение, но легкое в плане использования, через которое Вы можете управлять содержимым на веб-сайте, а также изменять его внешний вид при помощи шаблонов или расширять функционал при помощи модульной системы. На нашем YouTube-канале мы собрали несколько примеров с демонстрацией функционала СУС «ГИРВАС»\r\n\r\n##Первый выпуск системы\r\nСейчас система управления проходит первый этап своей проверки после выпуска, поэтому нам необходимо собирать обратную связь по ее работе. Если что-то будет не работать или работать не так как надо, то смело сообщайте по одному из контактов: https://карельский-разработчик.рф/page/contacts.",
+        'keywords' => ['CMS «ГИРВАС»', 'Система управления содержимым «ГИРВАС»']
       ]
     ];
 
@@ -832,10 +886,27 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       ]
     ];
 
+    $secondEntriesSampleTexts = [
+      'en_US' => [
+        'title' => 'Index entries',
+        'description' => 'Last entries for index page'
+      ],
+      'ru_RU' => [
+        'title' => 'Записи стартовой страницы',
+        'description' => 'Последние записи для стартовой страницы'
+      ]
+    ];
+
     $firstEntriesSample = EntriesSample::create($CMSCore, 'last-news', $firstEntriesSampleTexts, [
       'limitCount' => 6,
       'sortTypeID' => 2,
       'categoriesIDs' => [1]
+    ]);
+
+    $secondEntriesSample = EntriesSample::create($CMSCore, 'index-entries', $secondEntriesSampleTexts, [
+      'limitCount' => 8,
+      'sortTypeID' => 2,
+      'categoriesIDs' => [1, 2]
     ]);
 
     $firstUsersGroupTexts = [
@@ -864,7 +935,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     $fourtyUsersGroup = UserGroup::create($CMSCore, 'user', $fourtyUsersGroupTexts, 114688);
     
     $CMSCore->configurator->insertDatabaseEntryValue('base_template', 'default');
-    $CMSCore->configurator->insertDatabaseEntryValue('base_site_title', 'CMS GIRVAS');
+    $CMSCore->configurator->insertDatabaseEntryValue('base_site_title', 'CMS «ГИРВАС»');
     $CMSCore->configurator->insertDatabaseEntryValue('base_engineering_works_status', 'off');
     $CMSCore->configurator->insertDatabaseEntryValue('base_engineering_works_text', '');
     $CMSCore->configurator->insertDatabaseEntryValue('seo_site_description', 'CMS GIRVAS - a multidisciplinary free contents control system from the Karelian Developer company.');

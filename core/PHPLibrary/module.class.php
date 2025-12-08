@@ -1,15 +1,27 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary;
 
+use \core\PHPLibrary\InterfaceModule as ModuleInterface;
+use \core\PHPLibrary\Module\Collector as ModuleCollector;
 use \core\PHPLibrary\Module\Locale as ModuleLocale;
 use \core\PHPLibrary\Module\EnumMetadata as ModuleEnumMetadata;
 use \core\PHPLibrary\Module\EnumWeight as ModuleEnumWeight;
@@ -21,19 +33,20 @@ use \core\PHPLibrary\Module\EnumWeight as ModuleEnumWeight;
  * @version 0.0.2
  */
 #[\AllowDynamicProperties]
-final class Module {
-  /** @var ModuleLocale|null Объект локализации */
-  public ModuleLocale|null $locale = null;
-  /** @var string|null Абсолютный путь до файлов модуля */
-  private string|null $path = null;
-  /** @var string|null URL до файлов модуля */
-  private string|null $url = null;
+final class Module implements ModuleInterface
+{
+  /** @var ?ModuleLocale Объект локализации */
+  public ?ModuleLocale $locale = null;
+  /** @var ?string Абсолютный путь до файлов модуля */
+  private ?string $path = null;
+  /** @var ?string URL до файлов модуля */
+  private ?string $url = null;
   
   /**
    * __construct
    *
-   * @param  CoreInterface $CMSCore
-   * @param  string $name
+   * @param CoreInterface $CMSCore
+   * @param string $name
    * 
    * @return void
    */
@@ -276,12 +289,12 @@ final class Module {
   /**
    * Подключние файла ядра модуля
    *
-   * @param  SystemCore $CMSCore
+   * @param  CoreInterface $CMSCore
    * @param  string $name
    * 
    * @return bool
    */
-  public static function connectCore(SystemCore $CMSCore, string $name) : bool
+  public static function connectCore(CoreInterface $CMSCore, string $name) : bool
   {
     $module = new Module($CMSCore, $name);
     
@@ -451,9 +464,9 @@ final class Module {
   /**
    * Получение массива метаданных модуля
    *
-   * @return array
+   * @return ?array
    */
-  public function getMetadata() : array|null
+  public function getMetadata() : ?array
   {
     $filePath = $this->getFileMetadataJSONPath();
     $fileContent = file_get_contents($filePath);

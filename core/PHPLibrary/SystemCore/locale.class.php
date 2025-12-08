@@ -1,28 +1,36 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary\SystemCore;
 
 use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\LocaleInterface as LocaleInterface;
 use \DOMDocument as DOMDocument;
 
 final class Locale implements LocaleInterface
 {
-  public CMSCore $CMSCore;
-
   public const DEFAULT_LOCALE_NAME = 'en_US';
   public const LOCALE_CORE_PATH_PATTERN = '%s/locales/%s';
   public const LOCALE_DATA_PATH_PATTERN = '%s/locales/%s/%s';
 
-  private string $name;
   private string $corePath;
   private string $dataPath;
   private string $typeName = 'base';
@@ -30,13 +38,13 @@ final class Locale implements LocaleInterface
   /**
    * __construct
    * 
-   * @param mixed $CMSCore
+   * @param CoreInterface $CMSCore
    * @param string $name
-   * @param string $dir
    */
-  public function __construct(mixed $CMSCore, string $name)
-  {
-    $this->CMSCore = $CMSCore;
+  public function __construct(
+    public mixed $CMSCore,
+    public string $name
+  ) {
     $this->setName($name);
   }
 

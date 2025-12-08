@@ -1,18 +1,29 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary\SystemCore;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
-use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \PDOException as PDOException;
 
 #[\AllowDynamicProperties]
@@ -21,11 +32,30 @@ final class Report
   public const REPORT_TYPE_ID_AP_ENTRY_CREATED = 11000000;
   public const REPORT_TYPE_ID_AP_ENTRY_EDITED = 11000001;
   public const REPORT_TYPE_ID_AP_ENTRY_DELETED = 11000002;
+
+  public const REPORT_TYPE_ID_AP_PAGE_CREATED = 11000003;
+  public const REPORT_TYPE_ID_AP_PAGE_EDITED = 11000004;
+  public const REPORT_TYPE_ID_AP_PAGE_DELETED = 11000005;
+
+  public const REPORT_TYPE_ID_AP_MEDIA_UPLOADED = 11000006;
+  public const REPORT_TYPE_ID_AP_MEDIA_DELETED = 11000007;
+
+  public const REPORT_TYPE_ID_AP_USER_CREATED = 11000008;
+  public const REPORT_TYPE_ID_AP_USER_EDITED = 11000009;
+  public const REPORT_TYPE_ID_AP_USER_DELETED = 11000010;
+
+  public const REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_CREATED = 11000011;
+  public const REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_EDITED = 11000012;
+  public const REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_DELETED = 11000013;
+
   public const REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL = 10000001;
   public const REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS = 10000002;
+  public const REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL = 20000001;
+  public const REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS = 20000002;
 
-  private readonly SystemCore $CMSCore;
-  private int $id;
+  public const REPORT_TYPE_ID_BASE_USER_CREATED = 11100001;
+  public const REPORT_TYPE_ID_BASE_USER_EDITED = 11100001;
+  public const REPORT_TYPE_ID_BASE_USER_DELETED = 11100002;
 
   /**
    * __construct
@@ -34,11 +64,10 @@ final class Report
    * 
    * @return void
    */
-  public function __construct(SystemCore $CMSCore, int $id)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->id = $id;
-  }
+  public function __construct(
+    public CoreInterface $CMSCore,
+    private int $id
+  ) {}
   
   /**
    * Инициализация данных из БД
@@ -85,8 +114,11 @@ final class Report
   {
     if (property_exists($this, 'metadata')) {
       $metadata = json_decode($this->metadata, true);
+
       if (isset($metadata['typeID'])) {
-        return $metadata['typeID'];
+        return is_numeric($metadata['typeID'])
+          ? (int)$metadata['typeID']
+          : 0;
       }
     }
 
@@ -197,13 +229,13 @@ final class Report
   /**
    * Создание записи в базе данных
    *
-   * @param  mixed $CMSCore
-   * @param  int $type_id
+   * @param  mixed $CoreInterface
+   * @param  int $typeID
    * @param  array $variables
    * 
    * @return Report
    */
-  public static function create(SystemCore $CMSCore, int $type_id, array $variables = []) : Report|null
+  public static function create(CoreInterface $CMSCore, int $typeID, array $variables = []) : Report|null
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -221,7 +253,7 @@ final class Report
     /** @var int Время создания записи в БД в UNIX-формате */
     $createdUnixTimestamp = time();
 
-    $metadata = ['typeID' => $type_id];
+    $metadata = ['typeID' => $typeID];
     $metadataJSON = json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     $variablesJSON = json_encode($variables, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
@@ -252,8 +284,6 @@ final class Report
       $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
-
-      error_log('SQL: ' . $queryBuilder->statement->assembled);
 
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;

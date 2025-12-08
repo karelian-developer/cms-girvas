@@ -1,9 +1,16 @@
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
- * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * Включена в Реестр российского программного обеспечения Минцифры РФ.
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ *             Все права защищены.
+ * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @see       https://cms-girvas.ru Сайт продукта
+ * @author    Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * @support   support@karelian-developer.ru
  */
 
 'use strict';
@@ -20,6 +27,7 @@ import {PageEntriesSample as PageAdminEntriesSample} from './page/admin/entriesS
 import {PageEntriesSamples as PageAdminEntriesSamples} from './page/admin/entriesSamples.class.js';
 import {PagePages as PageAdminPages} from './page/admin/pages.class.js';
 import {PagePageStatic as PageAdminPageStatic} from './page/admin/pageStatic.class.js';
+import {PageReports as PageAdminReports} from './page/admin/reports.class.js';
 import {PageMedia as PageAdminMedia} from './page/admin/media.class.js';
 import {PageModule as PageAdminModule} from './page/admin/module.class.js';
 import {PageModules as PageAdminModules} from './page/admin/modules.class.js';
@@ -32,6 +40,8 @@ import {PageUsersGroup as PageAdminUsersGroup} from './page/admin/usersGroup.cla
 import {PageUsersGroups as PageAdminUsersGroups} from './page/admin/usersGroups.class.js';
 import {PageFeed as PageAdminFeed} from './page/admin/feed.class.js';
 import {PageFeeds as PageAdminFeeds} from './page/admin/feeds.class.js';
+import {PageForm as PageAdminForm} from './page/admin/form.class.js';
+import {PageForms as PageAdminForms} from './page/admin/forms.class.js';
 import {PageGlobal as PageAdminGlobal} from './page/admin/global.class.js';
 import {PageGlobal as PageDefaultGlobal} from './page/global.class.js';
 import {Interactive} from '../interactive.class.js';
@@ -64,6 +74,7 @@ export class Page {
         case 'entriesSamples': this.target = new PageAdminEntriesSamples(this, params); break;
         case 'pages': this.target = new PageAdminPages(this, params); break;
         case 'pageStatic': this.target = new PageAdminPageStatic(this, params); break;
+        case 'reports': this.target = new PageAdminReports(this, params); break;
         case 'media': this.target = new PageAdminMedia(this, params); break;
         case 'module': this.target = new PageAdminModule(this, params); break;
         case 'modules': this.target = new PageAdminModules(this, params); break;
@@ -76,6 +87,8 @@ export class Page {
         case 'usersGroups': this.target = new PageAdminUsersGroups(this, params); break;
         case 'feed': this.target = new PageAdminFeed(this, params); break;
         case 'feeds': this.target = new PageAdminFeeds(this, params); break;
+        case 'form': this.target = new PageAdminForm(this, params); break;
+        case 'forms': this.target = new PageAdminForms(this, params); break;
         case 'global': this.target = new PageAdminGlobal(this, params); break;
       }
     }
@@ -85,6 +98,11 @@ export class Page {
     }
   }
 
+  /**
+   * Показать всплывающее уведомление
+   * @param {String} message 
+   * @param {Number} code 
+   */
   showPopupNotification(message, code = -1) {
     let interactiveNotification = new Interactive('notification');
     interactiveNotification.target.isPopup = true;
@@ -95,6 +113,18 @@ export class Page {
     interactiveNotification.target.show();
   }
 
+  /**
+   * Получить статус-код текущей страницы
+   * @returns {Number}
+   */
+  getPageStatusCode() {
+    const navigation = performance.getEntriesByType('navigation')[0];
+    return navigation ? navigation.responseStatus : null;
+  }
+
+  /**
+   * Инициализация страницы
+   */
   init() {
     this.target.init();
 

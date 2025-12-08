@@ -1,16 +1,21 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * Класс системного ядра является главным классом в CMS GIRVAS, поскольку он управляет
- * подключением всех необходимых файлов для работы системы, а также проводит иницилизацию
- * необходимых объектов, таких как: шаблон системы, локализация системы, парсер адресной строки,
- * сборщик шаблона, клиент и так далее.
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary;
@@ -24,8 +29,8 @@ use \core\PHPLibrary\SystemCore\Header\HTTPReferrerPolicy as CMSHeaderHTTPReferr
 use \core\PHPLibrary\SystemCore\Header\EnumHTTPReferrerPolicy as CMSHeaderEnumHTTPReferrerPolicy;
 use \core\PHPLibrary\SystemCore\EnumHeader as CMSEnumHeader;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
-use \core\PHPLibrary\SystemCore\DatabaseConnector as CMSDatabaseConnector;
-use \core\PHPLibrary\SystemCore\FileConnector as CMSFileConnector;
+use \core\PHPLibrary\SystemCore\Database\Connector as CMSDatabaseConnector;
+use \core\PHPLibrary\SystemCore\File\Connector as CMSFileConnector;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
@@ -34,6 +39,12 @@ use \DOMDocument as DOMDocument;
   
 /**
  * Class SystemCore
+ * 
+ * Класс системного ядра является главным классом в CMS «ГИРВАС», поскольку он управляет
+ * подключением всех необходимых файлов для работы системы, а также проводит иницилизацию
+ * необходимых объектов, таких как: шаблон системы, локализация системы, парсер адресной строки,
+ * сборщик шаблона, клиент и так далее.
+ * 
  * @package core\PHPLibrary
  * 
  * @property-read string CMS_CORE_PATH Полный путь до ядра CMS
@@ -51,7 +62,7 @@ final class SystemCore implements CoreInterface
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS «GIRVAS»';
-  public const CMS_VERSION = '0.2.7';
+  public const CMS_VERSION = '0.2.8';
   public const CMS_STAGE_DEVELOPING = 'voitsy';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai';
@@ -202,11 +213,11 @@ final class SystemCore implements CoreInterface
   /**
    * Установить шаблон для системы
    * 
-   * @param Theme $theme
+   * @param ThemeInterface $theme
    * 
    * @return void
    */
-  public function setTheme(Theme $theme) : void
+  public function setTheme(ThemeInterface $theme) : void
   {
     $this->theme = $theme;
   }
@@ -214,9 +225,9 @@ final class SystemCore implements CoreInterface
   /**
    * Получить текущий шаблон
    * 
-   * @return Theme
+   * @return ThemeInterface
    */
-  public function getTheme() : Theme
+  public function getTheme() : ThemeInterface
   {
     return $this->theme;
   }
@@ -304,7 +315,7 @@ final class SystemCore implements CoreInterface
         $currentDir = str_replace('/', '\\', $currentDir);
         
         $class = '\\core\\PHPLibrary\\Page\\' . $currentDir;
-        $this->page = new $class($this, new Page($this, $currentDirArray));
+        $this->page = $this->page ?? new $class($this, new Page($this));
 
         if ($currentDirArray[0] === $CMSTheme->getCategory()) unset($currentDirArray[0]);
         $currentDirArray[$currentDirLastKey] =& $this->page;
@@ -323,7 +334,7 @@ final class SystemCore implements CoreInterface
       $CMSTheme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
       
       $class = sprintf('\\core\\PHPLibrary\\Page\\PageError', $currentDir);
-      $this->page = new $class($this, new Page($this, $currentDirFinalArray), 404);
+      $this->page = $this->page ?? new $class($this, new Page($this), 404);
       $currentDirFinalArray[$currentDirFinalLastKey] =& $this->page;
     }
 
@@ -340,8 +351,8 @@ final class SystemCore implements CoreInterface
   private function init()
   {
     // Принудительное подключение класса файлового подключателя
-    require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/fileConnector.interface.php';
-    require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/fileConnector.class.php';
+    require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/File/connector.interface.php';
+    require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/File/connector.class.php';
 
     /** @var string Равномерно выбранные случайные байты */
     $bytes = random_bytes(16);
@@ -360,7 +371,8 @@ final class SystemCore implements CoreInterface
     $CMSFileConnector = $this->autoloadComponents(
       $CMSFileConnector,
       self::CMS_CORE_PHP_LIBRARY_PATH,
-      ['enum', 'interface', 'trait', 'class']
+      ['enum', 'interface', 'trait', 'class'],
+      'base'
     );
 
     /** @var null Переменная для будущего объекта шаблона */
@@ -389,6 +401,19 @@ final class SystemCore implements CoreInterface
     /** @var CMSConfigurator Объект конфигуратора системного ядра */
     $this->configurator = new CMSConfigurator($this);
     $CMSConfigurator = $this->configurator;
+
+    if (!isset($_COOKIE['_grv_csrf'])) {
+      $CSRFToken = self::generateCSRFToken();
+
+      setcookie('_grv_csrf', $CSRFToken, [
+        'expires' => 0,
+        'path' => '/',
+        'domain' => $CMSConfigurator->get('domainCookies'),
+        'secure' => $CMSConfigurator->get('SSLIsEnabled') ? true : false,
+        'httponly' => false,
+        'samesite' => 'Strict'
+      ]);
+    }
 
     // Подключение к базе данных
     if ($CMSURLP->getPath(0) !== 'install' && $CMSURLP->getPath(1) !== 'install' && $CMSURLP->getParam('installation-mode') !== 'true') {
@@ -458,7 +483,7 @@ final class SystemCore implements CoreInterface
           $CMSConfigSSLHSTSMaxAge = $CMSConfigurator->get('SSLHSTSMaxAge');
 
           if (is_integer($CMSConfigSSLHSTSMaxAge)) {
-            array_push($HSTSVars, 'max-age=' . $CMSConfigSSLHSTSMaxAge);
+            $HSTSVars[] = 'max-age=' . $CMSConfigSSLHSTSMaxAge;
           }
         }
 
@@ -467,7 +492,7 @@ final class SystemCore implements CoreInterface
 
           if (is_bool($CMSConfigSSLHSTSIncludeSubdomains)) {
             if ($CMSConfigSSLHSTSIncludeSubdomains === true) {
-              array_push($HSTSVars, 'includeSubDomains');
+              $HSTSVars[] = 'includeSubDomains';
             }
           }
         }
@@ -476,7 +501,7 @@ final class SystemCore implements CoreInterface
           $CMSConfigSSLHSTSPreload = $CMSConfigurator->get('SSLHSTSPreload');
 
           if (is_bool($CMSConfigSSLHSTSPreload) && $CMSConfigSSLHSTSPreload === true) {
-            array_push($HSTSVars, 'preload');
+            $HSTSVars[] = 'preload';
           }
         }
 
@@ -504,8 +529,9 @@ final class SystemCore implements CoreInterface
           $CMSFileConnector = new CMSFileConnector($this);
           $CMSFileConnector = $this->autoloadComponents(
             $CMSFileConnector,
-            $moduleDirectoryPath,
-            ['enum', 'interface', 'trait', 'class']
+            self::CMS_MODULES_PATH . '/' . $directoryName . '/core',
+            ['enum', 'interface', 'trait', 'class'],
+            'module_' . $directoryName
           );
           
           Module::connectCore($this, $directoryName);
@@ -610,7 +636,7 @@ final class SystemCore implements CoreInterface
         // Устанавливаем объект шаблона для системного ядра
         $this->setTheme(new Theme($this, $CMSCoreThemeName, $CMSCoreThemeCategoryName));
 
-        /** @var Theme Объект шаблона системного ядра */
+        /** @var ThemeInterface Объект шаблона системного ядра */
         $theme = $this->getTheme();
         // Инициализация шаблона системного ядра
         $theme->init();
@@ -657,6 +683,20 @@ final class SystemCore implements CoreInterface
     if ($theme !== null) {
       $document = new DOMDocument();
       @$document->loadHTML($theme->core->assembled);
+
+      if ($this->page !== null) {
+        if (property_exists($this->page, 'metaOpenGraphAllowed')) {
+          $headElement = $document->getElementsByTagName('head')->item(0);
+          
+          foreach ($this->page->metaOpenGraphAllowed as $metaname => $metadata) {
+            $metaElement = $document->createElement('meta');
+            $metaElement->setAttribute('property', 'og:' . $metaname);
+            $metaElement->setAttribute('content', $metadata);
+
+            $headElement->appendChild($metaElement);
+          }
+        }
+      }
 
       $scriptElements = $document->getElementsByTagName('script');
       foreach ($scriptElements as $scriptElement) {
@@ -923,6 +963,16 @@ final class SystemCore implements CoreInterface
   }
 
   /**
+   * Генерация CSRF-токена
+   * 
+   * @return string
+   */
+  public static function generateCSRFToken() : string
+  {
+    return bin2hex(random_bytes(32));
+  }
+
+  /**
    * Аварийное завершение работы ядра
    * 
    * ВНИМАНИЕ! Вызов данного метода оборвет выполнение
@@ -975,14 +1025,14 @@ final class SystemCore implements CoreInterface
    * 
    * @return void
    */
-  private function autoloadComponents(CMSFileConnector $CMSFileConnector, string $filesPath, array $filesTypes = []) : void
+  public function autoloadComponents(CMSFileConnector $CMSFileConnector, string $filesPath, array $filesTypes = [], string $salt = '') : void
   {
     $CMSFileConnector->setStartDirectory($filesPath);
     $CMSFileConnector->setCurrentDirectory($filesPath);
 
     foreach ($filesTypes as $type) {
       $fileNamePattern = '/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/';
-      $cacheKey = md5($fileNamePattern);
+      $cacheKey = md5($fileNamePattern . $salt);
       $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
 
       if (file_exists($cacheFile)) {
@@ -994,14 +1044,14 @@ final class SystemCore implements CoreInterface
       };
 
       if (!file_exists($cacheFile)) {
-        $CMSFileConnector->generateCachePathesFiles('/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/');
+        $CMSFileConnector->generateCachePathesFiles('/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/', $salt);
         $CMSFileConnector->resetCurrentDirectory();
       }
     }
 
     foreach ($filesTypes as $type) {
       $fileNamePattern = '/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/';
-      $cacheKey = md5($fileNamePattern);
+      $cacheKey = md5($fileNamePattern . $salt);
       $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
 
       if (file_exists($cacheFile)) {

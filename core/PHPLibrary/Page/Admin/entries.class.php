@@ -1,18 +1,29 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
-use \core\PHPLibrary\SystemCore as SystemCore;
-use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
@@ -29,9 +40,9 @@ class PageEntries implements InterfacePage
 {
   use TraitPage;
 
-  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_NAVIGATION_%s_LABEL';
+  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_CONTENT_NAVIGATION_%s_LABEL';
 
-  public SystemCore $CMSCore;
+  public CoreInterface $CMSCore;
   public Page $page;
   public string $assembled = '';
   public array $navigationSubsections = [
@@ -48,6 +59,13 @@ class PageEntries implements InterfacePage
       'link' => '/entries',
       'permanent' => false,
       'isActive' => true
+    ],
+    'pages' => [
+      'name' => 'pages',
+      'iconName' => 'pages',
+      'link' => '/pages',
+      'permanent' => false,
+      'isActive' => false
     ],
     'categories' => [
       'name' => 'categories',
@@ -69,16 +87,23 @@ class PageEntries implements InterfacePage
       'link' => '/entriesSamples',
       'permanent' => false,
       'isActive' => false
+    ],
+    'forms' => [
+      'name' => 'forms',
+      'iconName' => 'forms',
+      'link' => '/forms',
+      'permanent' => false,
+      'isActive' => false
     ]
   ];
 
   /**
    * __construct
    * 
-   * @param SystemCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param Page $page
    */
-  public function __construct(SystemCore $CMSCore, Page $page)
+  public function __construct(CoreInterface $CMSCore, Page $page)
   {
     $this->CMSCore = $CMSCore;
     $this->page = $page;
@@ -161,17 +186,15 @@ class PageEntries implements InterfacePage
       $entryCategory = new EntryCategory($this->CMSCore, $entryCategoryID);
       $entryCategory->initData(['texts']);
 
-      $entryCreatedDateTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
-      $entryPublishedDateTimestamp = date('d.m.Y H:i:s', $object->getPublishedUnixTimestamp());
-      $entryUpdatedDateTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
+      $createdDateTimestamp = $object->getCreatedUnixTimestamp();
+      $publishedDateTimestamp = $object->getPublishedUnixTimestamp();
+      $updatedDateTimestamp = $object->getUpdatedUnixTimestamp();
 
       $entryTitle = $object->getTitle($entriesLocaleName);
       $entryDescription = $object->getDescription($entriesLocaleName);
-      $entryCategoryTitle = $entryCategory->getTitle($localeName);
 
       $entryTitle = strip_tags($entryTitle);
       $entryDescription = strip_tags($entryDescription);
-      $entryCategoryTitle = strip_tags($entryCategoryTitle);
 
       $entryAuthor = $object->getAuthor();
       if ($entryAuthor !== null) {
@@ -186,24 +209,160 @@ class PageEntries implements InterfacePage
 
       $entryAuthorLogin = $entryAuthor !== null ? $entryAuthor->getLogin() : 'User deleted';
 
+      $templatesAssembled = [];
+      $templateContent = ThemeCollector::getTemplateFileContent(
+        $this->CMSCore->theme,
+        'templates/page/entries/tableItem.tpl'
+      );
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_INDEX')) {
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_INDEX',
+          $index
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_ID')) {
+        $value = $object !== null ? $object->getID() : 0;
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_ID',
+          $value
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_NAME')) {
+        $value = $object !== null ? $object->getName() : '';
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_NAME',
+          $value
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_TITLE')) {
+        $value = $object !== null ? $object->getTitle($localeName) : '';
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_TITLE',
+          str_replace(
+            ThemeCollector::DECODED_ENTITIES,
+            ThemeCollector::SAFE_SYMBOLS,
+            htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+          )
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_DESCRIPTION')) {
+        $value = $object !== null ? $object->getDescription($localeName) : '';
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_DESCRIPTION',
+          str_replace(
+            ThemeCollector::DECODED_ENTITIES,
+            ThemeCollector::SAFE_SYMBOLS,
+            htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+          )
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_CATEGORY_TITLE')) {
+        $value = $entryCategory !== null ? $entryCategory->getTitle($localeName) : '';
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_CATEGORY_TITLE',
+          str_replace(
+            ThemeCollector::DECODED_ENTITIES,
+            ThemeCollector::SAFE_SYMBOLS,
+            htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+          )
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_PUBLISHED_STATUS')) {
+        $value = $object->isPublished() ? 'published' : 'not-published';
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_PUBLISHED_STATUS',
+          $value
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_URL')) {
+        $value = $object->getURL();
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_URL',
+          $value
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_AUTHOR_LOGIN')) {
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_AUTHOR_LOGIN',
+          $entryAuthorLogin
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_LOCALES_LIST')) {
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_LOCALES_LIST',
+          $completedLocales
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_SEO_STATUS')) {
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_SEO_STATUS',
+          $entrySEOStatus
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_CREATED_DATE_TIMESTAMP')) {
+        $value = date('d.m.Y H:i:s', $createdDateTimestamp);
+        
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_CREATED_DATE_TIMESTAMP',
+          $value
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_PUBLISHED_DATE_TIMESTAMP')) {
+        $value = $publishedDateTimestamp > 0 ? date('d.m.Y H:i:s', $publishedDateTimestamp) : '-';
+
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_PUBLISHED_DATE_TIMESTAMP',
+          $value
+        );
+      }
+
+      if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_UPDATED_DATE_TIMESTAMP')) {
+        $value = date('d.m.Y H:i:s', $updatedDateTimestamp);
+        
+        ThemeCollector::addTemplateVariable(
+          $templatesAssembled,
+          'ENTRY_UPDATED_DATE_TIMESTAMP',
+          $value
+        );
+      }
+
       $entriesTableItemsAssembled[] =  ThemeCollector::assemblyFileContent(
-        $this->CMSCore->theme, 'templates/page/entries/tableItem.tpl',
-        [
-          'ENTRY_ID' => $object->getID(),
-          'ENTRY_NAME' => $object->getName(),
-          'ENTRY_INDEX' => $index + 1,
-          'ENTRY_TITLE' => !empty($entryTitle) ? $entryTitle : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $entriesLocale->getName()),
-          'ENTRY_DESCRIPTION' => !empty($entryDescription) ? $entryDescription : sprintf('[ DESCRIPTION NOT FOUND IN LOCALE %s ]', $entriesLocale->getName()),
-          'ENTRY_CATEGORY_TITLE' => !empty($entryCategoryTitle) ? $entryCategoryTitle : sprintf('[ CATEGORY TITLE NOT FOUND IN LOCALE %s ]', $localeName),
-          'ENTRY_PUBLISHED_STATUS' => $object->isPublished() ? 'published' : 'not-published',
-          'ENTRY_URL' => $object->getURL(),
-          'ENTRY_AUTHOR_LOGIN' => $entryAuthorLogin,
-          'ENTRY_LOCALES_LIST' => $completedLocales,
-          'ENTRY_SEO_STATUS' => $entrySEOStatus,
-          'ENTRY_CREATED_DATE_TIMESTAMP' => $entryCreatedDateTimestamp,
-          'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $object->getPublishedUnixTimestamp() > 0 ? $entryPublishedDateTimestamp : '-',
-          'ENTRY_UPDATED_DATE_TIMESTAMP' => $entryUpdatedDateTimestamp,
-        ]
+        $this->CMSCore->theme,
+        'templates/page/entries/tableItem.tpl',
+        $templatesAssembled
       );
     }
 
@@ -222,5 +381,4 @@ class PageEntries implements InterfacePage
       ]
     );
   }
-
 }

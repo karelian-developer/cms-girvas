@@ -1,0 +1,125 @@
+<?php
+
+/**
+ * CMS «ГИРВАС»
+ * 
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
+ */
+
+if (!defined('IS_NOT_HACKED')) {
+  http_response_code(503);
+  die('An attempted hacker attack has been detected.');
+}
+
+use \core\PHPLibrary\Form as Form;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
+
+if ($CMSCore->client->isLogged(2)) {
+  $clientUser = $CMSCore->client->getUser(2);
+  $clientUser->initData(['metadata']);
+  $clientUserGroup = $clientUser->getGroup();
+  $clientUserGroup->initData(['permissions']);
+
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT)) {
+    $formID = (isset($_PATCH['form_id'])) ? $_PATCH['form_id'] : 0;
+    $formID = (is_numeric($formID)) ? (int)$formID : 0;
+
+    if (Form::existsByID($CMSCore, $formID)) {
+      $form = new Form($CMSCore, $formID);
+      $form->initData(['elements']);
+
+      $formData = [];
+      $formElements = $form->getElements();
+
+      $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+      if (count($CMSLocalesNames) > 0) {
+        foreach ($CMSLocalesNames as $index => $name) {
+          $CMSLocale = new CMSLocale($CMSCore, $name);
+          $CMSLocale->setTypeName('handler');
+          $CMSLocale->initPathes();
+
+          $CMSLocaleName = $CMSLocale->getName();
+          $commonLocale = $_PATCH['common_locale'];
+
+          $inputTitleName = 'form_title_' . $CMSLocale->getISO639(2);
+          $textareaDescriptionName = 'form_description_' . $CMSLocale->getISO639(2);
+
+          if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH)) {
+            if (!array_key_exists('texts', $formData)) $formData['texts'] = [];
+            if (!array_key_exists($CMSLocaleName, $formData['texts'])) $formData['texts'][$CMSLocaleName] = [];
+
+            if (array_key_exists($inputTitleName, $_PATCH)) $formData['texts'][$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$inputTitleName]));
+            if (array_key_exists($textareaDescriptionName, $_PATCH)) $formData['texts'][$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$textareaDescriptionName]));
+          }
+
+          $formElementTitles = isset($_PATCH['form_element_title']) ? $_PATCH['form_element_title'] : [];
+          $formElementDescriptions = isset($_PATCH['form_element_description']) ? $_PATCH['form_element_description'] : [];
+          $formElementPlaceholders = isset($_PATCH['form_element_placeholder']) ? $_PATCH['form_element_placeholder'] : [];
+          $formElementTypes = isset($_PATCH['form_element_type']) ? $_PATCH['form_element_type'] : [];
+          $formElementNames = isset($_PATCH['form_element_name']) ? $_PATCH['form_element_name'] : [];
+          $formElementSequenceNumbers = isset($_PATCH['form_element_sequence_number']) ? $_PATCH['form_element_sequence_number'] : [];
+
+          if (count($formElementTitles) > 0) {
+            for ($i = 0; $i < count($formElementTitles); $i++) {
+              $elements = $form;
+
+              if (!isset($formElements[$i])) $formElements[$i] = [];
+              if (!isset($formElements[$i]['texts'][$CMSLocaleName])) $formElements[$i]['texts'][$CMSLocaleName] = [];
+
+              $formElements[$i]['number'] = $i + 1;
+              $formElements[$i]['type'] = $formElementTypes[$i];
+              $formElements[$i]['name'] = trim($formElementNames[$i]);
+              $formElements[$i]['sequenceNumber'] = is_numeric($formElementSequenceNumbers[$i])
+                ? $formElementSequenceNumbers[$i]
+                : 0;
+              
+              if ($CMSLocaleName === $commonLocale) {
+                $formElements[$i]['texts'][$CMSLocaleName] = [
+                  'title' => htmlspecialchars(str_replace('\'', '"', (trim($formElementTitles[$i])))),
+                  'description' => htmlspecialchars(str_replace('\'', '"', (trim($formElementDescriptions[$i])))),
+                  'placeholder' => htmlspecialchars(str_replace('\'', '"', (trim($formElementPlaceholders[$i]))))
+                ];
+              }
+            }
+          }
+        }
+      }
+
+      if (isset($_PATCH['form_name'])) $formData['name'] = urlencode(htmlentities($_PATCH['form_name']));
+      if (isset($_PATCH['form_method_id'])) $formData['metadata']['methodID'] = $_PATCH['form_method_id'];
+      if (isset($_PATCH['form_action'])) $formData['metadata']['action'] = $_PATCH['form_action'];
+
+      $formData['elements'] = $formElements;
+      $isUpdated = $form->update($formData);
+
+      if ($isUpdated) {
+        $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
+        $handlerStatusCode = $handlerStatusCode ?? 1;
+      } else {
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+        $handlerStatusCode = $handlerStatusCode ?? 0;
+      }
+    } else {
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_FORM_ERROR_NOT_FOUND');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
+    }
+  } else {
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
+  }
+} else {
+  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
+  $handlerStatusCode = $handlerStatusCode ?? 0;
+}

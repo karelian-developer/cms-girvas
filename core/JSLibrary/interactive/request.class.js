@@ -1,9 +1,16 @@
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
- * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * Включена в Реестр российского программного обеспечения Минцифры РФ.
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ *             Все права защищены.
+ * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @see       https://cms-girvas.ru Сайт продукта
+ * @author    Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * @support   support@karelian-developer.ru
  */
 
 'use strict';
@@ -130,10 +137,17 @@ export class Request {
       interactiveNotificationLoading.target.show();
     }
 
+    if (window.CMSCore !== undefined) {
+      if (window.CMSCore.client.CSRFToken !== '') {
+        this.headers['X-CSRF-Token'] = window.CMSCore.client.CSRFToken;
+      }
+    }
+
     return fetch(requestURL, {
       method: requestMethod,
       body: this.data,
-      headers: {}
+      headers: this.headers,
+      credentials: 'same-origin'
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {

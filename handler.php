@@ -31,10 +31,43 @@ if (defined('IS_NOT_HACKED')) {
   $handlerHeaders = apache_request_headers();
   $PHPInputContent = file_get_contents('php://input');
 
-  switch ($_SERVER['REQUEST_METHOD']) {
-    case 'PATCH': $_PATCH = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
-    case 'PUT': $_PUT = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
-    case 'DELETE': $_DELETE = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
+  if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    $cookieToken = $_COOKIE['_grv_csrf'] ?? null;
+    $headerToken = $handlerHeaders['X-Csrf-Token'] ?? null;
+
+    if ($cookieToken === null || $headerToken === null || !hash_equals($cookieToken, $headerToken)) {
+      $handlerMessage = $handlerMessage ?? 'The request was rejected by the security system.';
+      $handlerStatusCode = $handlerStatusCode ?? 0;
+
+      echo json_encode([
+        'message' => $handlerMessage,
+        'statusCode' => $handlerStatusCode,
+        'outputData' => []
+      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+      exit;
+    }
+  }
+
+  if (isset($_SERVER['REQUEST_METHOD'])) {
+    switch ($_SERVER['REQUEST_METHOD']) {
+      case 'PATCH': $_PATCH = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
+      case 'PUT': $_PUT = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
+      case 'DELETE': $_DELETE = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
+    }
+  } else {
+    http_response_code(405);
+
+    $handlerMessage = $handlerMessage ?? 'Request method is undefined.';
+    $handlerStatusCode = $handlerStatusCode ?? 0;
+
+    echo json_encode([
+      'message' => $handlerMessage,
+      'statusCode' => $handlerStatusCode,
+      'outputData' => []
+    // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   }
 
   $handlerOutputData = [];
@@ -170,6 +203,22 @@ if (defined('IS_NOT_HACKED')) {
 
     if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/feeds.api.php';
+      include_once $APIFilePath;
+    }
+  } else if ($CMSURLPathes[1] === 'form' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSClient->getIPAddress();
+
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/form.api.php';
+      include_once $APIFilePath;
+    }
+  } else if ($CMSURLPathes[1] === 'forms' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSClient->getIPAddress();
+
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/forms.api.php';
       include_once $APIFilePath;
     }
   } else if ($CMSURLPathes[1] === 'profile' && $CMSCore::coreRESTCookieExists()) {
@@ -309,20 +358,24 @@ if (defined('IS_NOT_HACKED')) {
 
         $files = array_diff(scandir($handlersDirectoryPath), ['.', '..']);
         foreach ($files as $index => $name) {
-          if (array_key_last($pathes) !== $index) {
-            if ($name === $pathes[$index]) {
-              $URLPathes = $CMSURLP->getPathes();
-              return $recursionHandlerConnect($CMSCore, $URLPathes, $index + 1);
-            }
-          } else {
-            $handlerFileName = $pathes[$index] . '.api.php';
-            $handlerFilePath = $handlersDirectoryPath . '/' . implode('/', array_slice($pathes, 1, count($pathes) - 2)) . '/' .  $handlerFileName;
-            
-            if (file_exists($handlerFilePath)) {
-              return $handlerFilePath;
-            }
+          $path = isset($pathes[$index]) ? $pathes[$index] : null;
 
-            break;
+          if ($path !== null) {
+            if (array_key_last($pathes) !== $index) {
+              if ($name === $pathes[$index]) {
+                $URLPathes = $CMSURLP->getPathes();
+                return $recursionHandlerConnect($CMSCore, $URLPathes, $index + 1);
+              }
+            } else {
+              $handlerFileName = $pathes[$index] . '.api.php';
+              $handlerFilePath = $handlersDirectoryPath . '/' . implode('/', array_slice($pathes, 1, count($pathes) - 2)) . '/' .  $handlerFileName;
+              
+              if (file_exists($handlerFilePath)) {
+                return $handlerFilePath;
+              }
+
+              break;
+            }
           }
         }
 
@@ -339,18 +392,20 @@ if (defined('IS_NOT_HACKED')) {
   }
 
   /** @var string $handlerMessage Сообщение обработчика */
-  $handlerMessage = $handlerMessage ?? 'Обработчик CMS GIRVAS не смог обработать запрос.';
+  $handlerMessage = $handlerMessage ?? 'The GIRVAS CMS handler was unable to process the request.';
+
   /** @var int $handlerStatusCode Статус обработчика */
   $handlerStatusCode = $handlerStatusCode ?? 0;
+
   /** @var array $handlerOutputData Выходные данные обработчика */
   $handlerOutputData = $handlerOutputData ?? [];
   $handlerOutputData['debug']['method'] = $_SERVER['REQUEST_METHOD'];
-  $handlerOutputData['debug']['client_ip'] = $_SERVER['REMOTE_ADDR'];
-  $handlerOutputData['debug']['post_data'] = $_POST ?? null;
-  $handlerOutputData['debug']['get_data'] = $_GET ?? null;
-  $handlerOutputData['debug']['patch_data'] = $_PATCH ?? null;
-  $handlerOutputData['debug']['put_data'] = $_PUT ?? null;
-  $handlerOutputData['debug']['delete_data'] = $_DELETE ?? null;
+  $handlerOutputData['debug']['clientIP'] = $_SERVER['REMOTE_ADDR'];
+  $handlerOutputData['debug']['postData'] = $_POST ?? null;
+  $handlerOutputData['debug']['getData'] = $_GET ?? null;
+  $handlerOutputData['debug']['patchData'] = $_PATCH ?? null;
+  $handlerOutputData['debug']['putData'] = $_PUT ?? null;
+  $handlerOutputData['debug']['deleteData'] = $_DELETE ?? null;
 
   $loadTime = microtime(true) - $startTime; // Конечное время
   header('X-Load-Time: ' . round($loadTime, 3) . 's');

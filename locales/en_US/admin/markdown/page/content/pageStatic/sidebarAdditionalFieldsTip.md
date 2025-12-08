@@ -1,0 +1,1 @@
+You can add additional field values ​​directly to the static page content using the **template variable**: *{ENTRY\_ADDITIONAL\_DATA\_<TECHNICAL\_NAME>}* (without <>).

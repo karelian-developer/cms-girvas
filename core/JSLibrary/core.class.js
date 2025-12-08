@@ -1,9 +1,16 @@
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
- * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * Включена в Реестр российского программного обеспечения Минцифры РФ.
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ *             Все права защищены.
+ * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @see       https://cms-girvas.ru Сайт продукта
+ * @author    Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * @support   support@karelian-developer.ru
  */
 
 'use strict';
@@ -28,7 +35,7 @@ export class Core {
     this.pages = {default: {}, admin: {}, install: {}};
     this.locales = {base: {}, admin: {}, install: {}};
     this.client = new Client(this);
-    this.metrics = new Metrics();
+    this.metrics = new Metrics(this);
     this.debugLevel = 1;
     this.isReady = false;
 
@@ -96,33 +103,35 @@ export class Core {
     let locale;
 
     return this.client.isLogged().then((clientIsLogged) => {
-      if (this.searchParams.getPathPart(1) == 'entry') this.pages.default.entry = new Page(this, 'default', 'entry');
-      if (this.searchParams.getPathPart(1) == 'profile') this.pages.default.profile = new Page(this, 'default', 'profile');
+      if (this.searchParams.getPathPart(1) === 'entry') this.pages.default.entry = new Page(this, 'default', 'entry');
+      if (this.searchParams.getPathPart(1) === 'profile') this.pages.default.profile = new Page(this, 'default', 'profile');
     
-      if (this.searchParams.getPathPart(1) == 'admin') {
+      if (this.searchParams.getPathPart(1) === 'admin') {
         if (clientIsLogged) {
-          if (this.searchParams.getPathPart(2) == 'analytics') this.pages.admin.entry = new Page(this, 'admin', 'analytics');
-          if (this.searchParams.getPathPart(2) == 'entry') this.pages.admin.entry = new Page(this, 'admin', 'entry');
-          if (this.searchParams.getPathPart(2) == 'entries') this.pages.admin.entries = new Page(this, 'admin', 'entries');
-          if (this.searchParams.getPathPart(2) == 'entriesCategory') this.pages.admin.entriesCategory = new Page(this, 'admin', 'entriesCategory');
-          if (this.searchParams.getPathPart(2) == 'entriesCategories') this.pages.admin.entriesCategories = new Page(this, 'admin', 'entriesCategories');
-          if (this.searchParams.getPathPart(2) == 'entriesComments') this.pages.admin.entriesComments = new Page(this, 'admin', 'entriesComments');
-          if (this.searchParams.getPathPart(2) == 'entriesSample') this.pages.admin.entriesSample = new Page(this, 'admin', 'entriesSample');
-          if (this.searchParams.getPathPart(2) == 'entriesSamples') this.pages.admin.entriesSamples = new Page(this, 'admin', 'entriesSamples');
-          if (this.searchParams.getPathPart(2) == 'pages') this.pages.admin.pages = new Page(this, 'admin', 'pages');
-          if (this.searchParams.getPathPart(2) == 'page') this.pages.admin.pageStatic = new Page(this, 'admin', 'pageStatic');
-          if (this.searchParams.getPathPart(2) == 'media') this.pages.admin.media = new Page(this, 'admin', 'media');
-          if (this.searchParams.getPathPart(2) == 'module') this.pages.admin.module = new Page(this, 'admin', 'module');
-          if (this.searchParams.getPathPart(2) == 'modules') this.pages.admin.modules = new Page(this, 'admin', 'modules');
-          if (this.searchParams.getPathPart(2) == 'settings') this.pages.admin.settings = new Page(this, 'admin', 'settings');
-          if (this.searchParams.getPathPart(2) == 'template') this.pages.admin.template = new Page(this, 'admin', 'template');
-          if (this.searchParams.getPathPart(2) == 'templates') this.pages.admin.templates = new Page(this, 'admin', 'templates');
-          if (this.searchParams.getPathPart(2) == 'user') this.pages.admin.user = new Page(this, 'admin', 'user');
-          if (this.searchParams.getPathPart(2) == 'users') this.pages.admin.users = new Page(this, 'admin', 'users');
-          if (this.searchParams.getPathPart(2) == 'userGroup') this.pages.admin.usersGroup = new Page(this, 'admin', 'usersGroup');
-          if (this.searchParams.getPathPart(2) == 'usersGroups') this.pages.admin.usersGroups = new Page(this, 'admin', 'usersGroups');
-          if (this.searchParams.getPathPart(2) == 'feed') this.pages.admin.feed = new Page(this, 'admin', 'feed');
-          if (this.searchParams.getPathPart(2) == 'feeds') this.pages.admin.feeds = new Page(this, 'admin', 'feeds');
+          if (this.searchParams.getPathPart(2) === 'analytics') this.pages.admin.entry = new Page(this, 'admin', 'analytics');
+          if (this.searchParams.getPathPart(2) === 'entry') this.pages.admin.entry = new Page(this, 'admin', 'entry');
+          if (this.searchParams.getPathPart(2) === 'entries') this.pages.admin.entries = new Page(this, 'admin', 'entries');
+          if (this.searchParams.getPathPart(2) === 'entriesCategory') this.pages.admin.entriesCategory = new Page(this, 'admin', 'entriesCategory');
+          if (this.searchParams.getPathPart(2) === 'entriesCategories') this.pages.admin.entriesCategories = new Page(this, 'admin', 'entriesCategories');
+          if (this.searchParams.getPathPart(2) === 'entriesComments') this.pages.admin.entriesComments = new Page(this, 'admin', 'entriesComments');
+          if (this.searchParams.getPathPart(2) === 'entriesSample') this.pages.admin.entriesSample = new Page(this, 'admin', 'entriesSample');
+          if (this.searchParams.getPathPart(2) === 'entriesSamples') this.pages.admin.entriesSamples = new Page(this, 'admin', 'entriesSamples');
+          if (this.searchParams.getPathPart(2) === 'pages') this.pages.admin.pages = new Page(this, 'admin', 'pages');
+          if (this.searchParams.getPathPart(2) === 'page') this.pages.admin.pageStatic = new Page(this, 'admin', 'pageStatic');
+          if (this.searchParams.getPathPart(2) === 'media') this.pages.admin.media = new Page(this, 'admin', 'media');
+          if (this.searchParams.getPathPart(2) === 'module') this.pages.admin.module = new Page(this, 'admin', 'module');
+          if (this.searchParams.getPathPart(2) === 'modules') this.pages.admin.modules = new Page(this, 'admin', 'modules');
+          if (this.searchParams.getPathPart(2) === 'settings') this.pages.admin.settings = new Page(this, 'admin', 'settings');
+          if (this.searchParams.getPathPart(2) === 'template') this.pages.admin.template = new Page(this, 'admin', 'template');
+          if (this.searchParams.getPathPart(2) === 'templates') this.pages.admin.templates = new Page(this, 'admin', 'templates');
+          if (this.searchParams.getPathPart(2) === 'user') this.pages.admin.user = new Page(this, 'admin', 'user');
+          if (this.searchParams.getPathPart(2) === 'users') this.pages.admin.users = new Page(this, 'admin', 'users');
+          if (this.searchParams.getPathPart(2) === 'userGroup') this.pages.admin.usersGroup = new Page(this, 'admin', 'usersGroup');
+          if (this.searchParams.getPathPart(2) === 'usersGroups') this.pages.admin.usersGroups = new Page(this, 'admin', 'usersGroups');
+          if (this.searchParams.getPathPart(2) === 'feed') this.pages.admin.feed = new Page(this, 'admin', 'feed');
+          if (this.searchParams.getPathPart(2) === 'feeds') this.pages.admin.feeds = new Page(this, 'admin', 'feeds');
+          if (this.searchParams.getPathPart(2) === 'form') this.pages.admin.form = new Page(this, 'admin', 'form');
+          if (this.searchParams.getPathPart(2) === 'forms') this.pages.admin.forms = new Page(this, 'admin', 'forms');
         }
 
         this.pages.admin.global = new Page(this, 'admin', 'global');

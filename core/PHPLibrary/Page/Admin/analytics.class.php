@@ -1,28 +1,44 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\Page\Admin\Analytics\PageEntry as PageAnalyticsEntry;
 use \core\PHPLibrary\Page\Admin\Analytics\PagePage as PageAnalyticsPageStatic;
+use \core\PHPLibrary\Page\Admin\Analytics\PageForms as PageAnalyticsForms;
+use \core\PHPLibrary\Page\Admin\Analytics\PageForm as PageAnalyticsForm;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
-use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\Metrics as Metrics;
+use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\Pages as PagesStatic;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\Form as Form;
+use \core\PHPLibrary\Forms as Forms;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
 use \core\PHPLibrary\Users as Users;
@@ -38,8 +54,6 @@ class PageAnalytics implements InterfacePage
 
   const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ANALYTICS_NAVIGATION_%s_LABEL';
 
-  public SystemCore $CMSCore;
-  public Page $page;
   public string $assembled = '';
   public array $navigationSubsections = [
     'back' => [
@@ -49,19 +63,25 @@ class PageAnalytics implements InterfacePage
       'permanent' => true,
       'isActive' => false
     ],
+    'forms' => [
+      'name' => 'forms',
+      'iconName' => 'forms',
+      'link' => '/analytics/forms',
+      'permanent' => false,
+      'isActive' => false
+    ]
   ];
 
   /**
    * __construct
    * 
-   * @param SystemCore $CMSCore
-   * @param Page $page
+   * @param CoreInterface $CMSCore
+   * @param InterfacePage $page
    */
-  public function __construct(SystemCore $CMSCore, Page $page)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->page = $page;
-  }
+  public function __construct(
+    public CoreInterface $CMSCore,
+    public InterfacePage $page
+  ) {}
 
   /**
    * Инициализация подразделов
@@ -74,6 +94,13 @@ class PageAnalytics implements InterfacePage
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
+  /**
+   * Сборка таблицы с записями
+   * 
+   * @param array $entries
+   * 
+   * @return string
+   */
   public function assemblyEntriesTable(array $entries = []) : string
   {
     $localeData = $this->CMSCore->locale->getData();
@@ -292,6 +319,7 @@ class PageAnalytics implements InterfacePage
     $CMSTheme->addStyle(['href' => 'styles/page/analytics.css', 'rel' => 'stylesheet']);
     
     $localeData = $CMSLocale->getData();
+    $localeName = $CMSLocale->getName();
 
     if ($CMSURLP->getPath(2) === 'entry' && $CMSURLP->getPath(3) !== null) {
       $entry = null;
@@ -303,8 +331,8 @@ class PageAnalytics implements InterfacePage
 
         $page = new PageAnalyticsEntry($this->CMSCore, $this->page, $entry);
         
-        if (method_exists($page, 'initSubnavigation')) {
-          $page->initSubnavigation();
+        if (property_exists($page, 'navigationSubsections')) {
+          $this->navigationSubsections = $page->navigationSubsections;
         }
 
         $page->assembly();
@@ -328,8 +356,46 @@ class PageAnalytics implements InterfacePage
 
         $page = new PageAnalyticsPageStatic($this->CMSCore, $this->page, $pageStatic);
         
-        if (method_exists($page, 'initSubnavigation')) {
-          $page->initSubnavigation();
+        if (property_exists($page, 'navigationSubsections')) {
+          $this->navigationSubsections = $page->navigationSubsections;
+        }
+
+        $page->assembly();
+
+        $this->assembled = $page->assembled;
+      } else {
+        http_response_code(404);
+
+        $pageError = new PageError($this->CMSCore, $this->page, 404);
+        $pageError->assembly();
+        
+        $this->assembled = $pageError->assembled;
+      }
+    } elseif ($CMSURLP->getPath(2) === 'forms') {
+      $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics/forms.css', 'rel' => 'stylesheet']);
+
+      $page = new PageAnalyticsForms($this->CMSCore, $this->page);
+        
+      if (property_exists($page, 'navigationSubsections')) {
+        $this->navigationSubsections = $page->navigationSubsections;
+      }
+
+      $page->assembly();
+
+      $this->assembled = $page->assembled;
+    } elseif ($CMSURLP->getPath(2) === 'form' && $CMSURLP->getPath(3) !== null) {
+      $form = null;
+      $formID = $this->getContentEntityIDFromURL($this->CMSCore, $CMSURLP);
+      $form = $this->getFormObjectByID($this->CMSCore, $formID);
+      
+      if ($form !== null) {
+        $form->initData(['texts', 'elements']);
+        $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics/form.css', 'rel' => 'stylesheet']);
+
+        $page = new PageAnalyticsForm($this->CMSCore, $this->page, $form);
+          
+        if (property_exists($page, 'navigationSubsections')) {
+          $this->navigationSubsections = $page->navigationSubsections;
         }
 
         $page->assembly();
@@ -394,39 +460,60 @@ class PageAnalytics implements InterfacePage
   /**
    * Получение объекта статической страницы по ID
    * 
-   * @param SystemCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param int $id
    * 
-   * @return ?PageStatic
+   * @return ?EntityTypeContent
    */
-  private function getPageStaticObjectByID(SystemCore $CMSCore, int $id) : ?PageStatic
+  private function getPageStaticObjectByID(CoreInterface $CMSCore, int $id) : ?EntityTypeContent
   {
-    return PageStatic::existsByID($CMSCore, $id) ? new PageStatic($CMSCore, $id) : null;
+    return Form::existsByID($CMSCore, $id)
+      ? new Form($CMSCore, $id)
+      : null;
+  }
+
+  /**
+   * Получение объекта формы по ID
+   * 
+   * @param CoreInterface $CMSCore
+   * @param int $id
+   * 
+   * @return ?EntityTypeContent
+   */
+  private function getFormObjectByID(CoreInterface $CMSCore, int $id) : ?EntityTypeContent
+  {
+    return Form::existsByID($CMSCore, $id)
+      ? new Form($CMSCore, $id)
+      : null;
   }
 
   /**
    * Получение объекта записи по ID
    * 
-   * @param SystemCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param int $id
    * 
-   * @return ?Entry
+   * @return ?EntityTypeContent
    */
-  private function getEntryObjectByID(SystemCore $CMSCore, int $id) : ?Entry
+  private function getEntryObjectByID(CoreInterface $CMSCore, int $id) : ?EntityTypeContent
   {
-    return Entry::existsByID($CMSCore, $id) ? new Entry($CMSCore, $id) : null;
+    return Entry::existsByID($CMSCore, $id)
+      ? new Entry($CMSCore, $id)
+      : null;
   }
 
   /**
    * Получение ID сущности контента через URL
    * 
-   * @param SystemCore $CMSCore
+   * @param CoreInterface $CMSCore
    * @param CMSURLP $CMSURLP
    * 
    * @return int
    */
-  private function getContentEntityIDFromURL(SystemCore $CMSCore, CMSURLP $CMSURLP) : int
+  private function getContentEntityIDFromURL(CoreInterface $CMSCore, CMSURLP $CMSURLP) : int
   {
-    return is_numeric($CMSURLP->getPath(3)) ? (int) $CMSURLP->getPath(3) : 0;
+    return is_numeric($CMSURLP->getPath(3))
+      ? (int) $CMSURLP->getPath(3)
+      : 0;
   }
 }

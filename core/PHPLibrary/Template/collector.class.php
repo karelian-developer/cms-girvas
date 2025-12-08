@@ -1,11 +1,21 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary\Template;
@@ -15,10 +25,15 @@ use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\LocaleInterface as LocaleInterface;
 use \core\PHPLibrary\Module\Locale as ModuleLocale;
 use \core\PHPLibrary\Template as Theme;
+use \core\PHPLibrary\ThemeInterface as ThemeInterface;
+use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \DOMDocument as DOMDocument;
 
 final class Collector
 {
+  public const DECODED_ENTITIES = ['&laquo;', '&raquo;', '&ldquo;', '&rdquo;'];
+  public const SAFE_SYMBOLS = ['«', '»', '“', '”'];
+
   private const TEMPLATE_TAG_PATTERN = '/\{([a-zA-Z0-9_]+)\}/';
   private const TEMPLATE_TAG_LANG_PATTERN = '/\{LANG\:([a-zA-Z0-9_]+)\}/';
   private const TEMPLATE_TAG_LANG_MARKDOWN_PATTERN = '/\{LANG\:MD\:([a-zA-Z0-9_]+)\}/';
@@ -300,5 +315,63 @@ final class Collector
     $containerElement->appendChild($spanElement);
     $document->appendChild($containerElement);
     return $document->saveHTML();
+  }
+
+  /**
+   * Получить содержимое файла шаблона
+   * 
+   * @param ThemeInterface $theme
+   * @param string $filePath
+   * 
+   * @return string
+   */
+  public static function getTemplateFileContent(ThemeInterface $theme, string $filePath) : string
+  {
+    $filePath = $theme->getPath() . '/' . $filePath;
+
+    return file_exists($filePath) ? file_get_contents($filePath) : '';
+  }
+
+  /**
+   * Проверить наличие шаблонной переменной
+   * 
+   * @param string $template
+   * @param string $name
+   * 
+   * @return bool
+   */
+  public static function existsTemplateVariable(string $template, string $name) : bool
+  {
+    return preg_match("/\{" . $name . "\}/", $template);
+  }
+
+  /**
+   * Проверить наличие языковой шаблонной переменной
+   * 
+   * @param string $template
+   * @param string $name
+   * @param bool $isMD
+   * 
+   * @return bool
+   */
+  public static function existsTemplateLocaleVariable(string $template, string $name, bool $isMD = false) : bool
+  {
+    return !$isMD
+      ? preg_match("/\{LANG\:" . $name . "\}/", $template)
+      : preg_match("/\{LANG\:MD\:" . $name . "\}/", $template);
+  }
+
+  /**
+   * Добавить значение для шаблонной переменной
+   * 
+   * @param array $templateVariables
+   * @param string $name
+   * @param string $value
+   * 
+   * @return void
+   */
+  public static function addTemplateVariable(array &$templateVariables, string $name, mixed $value) : void
+  {
+    $templateVariables[$name] = $value;
   }
 }

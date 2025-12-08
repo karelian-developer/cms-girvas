@@ -12,7 +12,11 @@ namespace templates\admin\default;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Template as Theme;
+<<<<<<< HEAD
 use \core\PHPLibrary\InterfaceTemplate as InterfaceTheme;
+=======
+use \core\PHPLibrary\ThemeInterface as ThemeInterface;
+>>>>>>> develop
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \core\PHPLibrary\Entry as Entry;
@@ -30,7 +34,11 @@ final class Core implements ThemeInterfaceCore
 {
   private string $primaryColor = '#EAEAEA';
   public string $assembled = '';
+<<<<<<< HEAD
   public DOMDocument|null $source = null;
+=======
+  public ?DOMDocument $source = null;
+>>>>>>> develop
   public array $navigationSections = [
     'index' => [
       'name' => 'index',
@@ -39,13 +47,20 @@ final class Core implements ThemeInterfaceCore
       'permanent' => true,
       'role' => ''
     ],
+<<<<<<< HEAD
     'entries' => [
       'name' => 'entries',
       'iconName' => 'entries',
+=======
+    'content' => [
+      'name' => 'content',
+      'iconName' => 'content',
+>>>>>>> develop
       'link' => '/entries',
       'permanent' => false,
       'role' => ''
     ],
+<<<<<<< HEAD
     'static_pages' => [
       'name' => 'pages',
       'iconName' => 'pages',
@@ -53,6 +68,8 @@ final class Core implements ThemeInterfaceCore
       'permanent' => false,
       'role' => ''
     ],
+=======
+>>>>>>> develop
     'media' => [
       'name' => 'media',
       'iconName' => 'media',
@@ -121,20 +138,34 @@ final class Core implements ThemeInterfaceCore
   /**
    * __construct
    *
+<<<<<<< HEAD
    * @param  Theme $theme
+=======
+   * @param ThemeInterface $theme
+>>>>>>> develop
    * 
    * @return void
    */
   public function __construct(
+<<<<<<< HEAD
     private Theme $theme
+=======
+    private ThemeInterface $theme
+>>>>>>> develop
   ) {}
 
   /**
    * Получить основной объект темы
    * 
+<<<<<<< HEAD
    * @return InterfaceTheme
    */
   public function getThemeFrame() : InterfaceTheme
+=======
+   * @return ThemeInterface
+   */
+  public function getThemeFrame() : ThemeInterface
+>>>>>>> develop
   {
     return $this->theme;
   }
@@ -274,12 +305,24 @@ final class Core implements ThemeInterfaceCore
   public function assemblyMain(array $themeReplaces = []) : string
   {
     $this->theme->CMSCore->initPage(ltrim($_SERVER['REQUEST_URI'], '/'));
+<<<<<<< HEAD
     $sitePage = $this->theme->CMSCore->getInitedPage();
     $sitePage->assembly();
     
     $themeReplaces['ADMIN_PANEL_PAGE_WRAPPER'] = ThemeCollector::assemblyFileContent($this->theme, 'templates/page.tpl', [
       'ADMIN_PANEL_PAGE' => $sitePage->assembled,
     ]);
+=======
+    $sitePage = $this->theme->CMSCore->page;
+    $sitePage->assembly();
+    
+    $themeReplaces['ADMIN_PANEL_PAGE_WRAPPER'] = ThemeCollector::assemblyFileContent(
+      $this->theme, 'templates/page.tpl',
+      [
+        'ADMIN_PANEL_PAGE' => $sitePage->assembled,
+      ]
+    );
+>>>>>>> develop
 
     return ThemeCollector::assemblyFileContent($this->theme, 'templates/main.tpl', $themeReplaces);
   }
@@ -313,6 +356,7 @@ final class Core implements ThemeInterfaceCore
    */
   public function assembly() : void
   {
+<<<<<<< HEAD
     $this->theme->addStyle(['href' => 'styles/normalize.css', 'rel' => 'stylesheet']);
     $this->theme->addStyle(['href' => 'styles/fonts.css', 'rel' => 'stylesheet']);
     $this->theme->addStyle(['href' => 'styles/colors.css', 'rel' => 'stylesheet']);
@@ -327,16 +371,41 @@ final class Core implements ThemeInterfaceCore
     $this->theme->addScript(['src' => 'common.js'], true);
     $this->theme->addScript(['src' => 'core.class.js', 'type' => 'module'], true);
     $this->theme->addScript(['src' => 'core.class.js', 'type' => 'module']);
+=======
+    $CMSTheme = $this->theme;
+    $CMSConfigurator = $CMSTheme->CMSCore->configurator;
+    $CMSThemeProperties = $CMSTheme->getFilePropertiesData();
+    $CMSThemeColorScheme = isset($CMSThemeProperties['COLOR_SCHEME'])
+      ? $CMSThemeProperties['COLOR_SCHEME']['value']
+      : 'default';
+
+    if (!file_exists($CMSTheme->getPath() . '/styles/colors/' . $CMSThemeColorScheme . '.css')) {
+      $CMSThemeColorScheme = 'default';
+    }
+
+    $CMSTheme->addStyle(['href' => 'styles/colors/' . $CMSThemeColorScheme . '.css', 'rel' => 'stylesheet']);
+    $CMSTheme->addStyle(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
+    
+    $CMSTheme->addScript(['src' => 'interactive.class.js', 'type' => 'module'], true);
+    $CMSTheme->addScript(['src' => 'common.js'], true);
+    $CMSTheme->addScript(['src' => 'core.class.js', 'type' => 'module'], true);
+    $CMSTheme->addScript(['src' => 'core.class.js', 'type' => 'module']);
+>>>>>>> develop
 
 
     /** @var string $userIP IP-адрес пользователя */
     $userIP = $_SERVER['REMOTE_ADDR'];
 
+<<<<<<< HEAD
     if ($this->theme->CMSCore->client->isLogged(2)) {
       $this->theme->addStyle(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
       $this->theme->addStyle(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
       $this->theme->addStyle(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
       $this->theme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+=======
+    if ($CMSTheme->CMSCore->client->isLogged(2)) {
+      $CMSTheme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
+>>>>>>> develop
 
       /** @var string $this->assembled Итоговый шаблон в виде строки */
       $this->assembled = ThemeCollector::assembly($this->assemblyDocument(), [
@@ -346,7 +415,11 @@ final class Core implements ThemeInterfaceCore
         'ADMIN_PANEL_NAVIGATION' => $this->assemblyAdminPanelNavigation()
       ]);
     } else {
+<<<<<<< HEAD
       $this->theme->addStyle(['href' => 'styles/page/auth.css', 'rel' => 'stylesheet']);
+=======
+      $CMSTheme->addStyle(['href' => 'styles/page/auth.css', 'rel' => 'stylesheet']);
+>>>>>>> develop
 
       $this->assembled = ThemeCollector::assembly($this->assemblyDocument(), [
         'ADMIN_PANEL_HEADER' => '',
@@ -365,8 +438,15 @@ final class Core implements ThemeInterfaceCore
    */
   public function assemblyDocument(array $themeVars = []) : string
   {
+<<<<<<< HEAD
     $themeURL = $this->theme->getURL();
     $themeLocale = $this->theme->locale;
+=======
+    $CMSTheme = $this->theme;
+
+    $themeURL = $CMSTheme->getURL();
+    $themeLocale = $CMSTheme->locale;
+>>>>>>> develop
     $themeLocaleName = $themeLocale->getName();
 
     $documentLang = mb_substr($themeLocaleName, 0, 2);
@@ -435,7 +515,11 @@ final class Core implements ThemeInterfaceCore
 
     $bodyElement = $document->createElement('body');
 
+<<<<<<< HEAD
     if (!$this->theme->CMSCore->client->isLogged(2)) {
+=======
+    if (!$CMSTheme->CMSCore->client->isLogged(2)) {
+>>>>>>> develop
       $bodyElement->setAttribute('class', 'body body_auth');
       $bodyContentElement = $document->createTextNode('{ADMIN_PANEL_HEADER}{ADMIN_PANEL_MAIN}{ADMIN_PANEL_FOOTER}');
       

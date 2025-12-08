@@ -8,7 +8,7 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-use \core\PHPLibrary\SystemCore\DatabaseConnector as CMSDatabaseConnector;
+use \core\PHPLibrary\SystemCore\Database\Connector as CMSDatabaseConnector;
 use \core\PHPLibrary\Client as Client;
 use \core\PHPLibrary\User as User;
 use \DOMDocument as DOMDocument;

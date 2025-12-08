@@ -13,8 +13,8 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
-use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as EnumFileFormat;
+use \core\PHPLibrary\SystemCore\File\Converter as FileConverter;
+use \core\PHPLibrary\SystemCore\File\EnumFormat as EnumFileFormat;
 use \GdImage as GdImage;
 
 if ($CMSCore->client->isLogged(2)) {
@@ -94,11 +94,18 @@ if ($CMSCore->client->isLogged(2)) {
                   } else {
                     $fileExtensionConvertedEnum = $fileExtensionEnum;
                   }
+
+                  $qualityPercent = 100 - $CMSCore->configurator->getUploadImageCompression();
+                  if ($qualityPercent <= 0) {
+                    $quality = -1;
+                  } else {
+                    $quality = min(9, max(0, (int) round(($qualityPercent / 100) * 9)));
+                  }
                   
                   /** @var FileConverter Объект-конвектор файлов */
                   $fileConverter = new FileConverter($CMSCore);
                   /** @var array Конвертированный файл */
-                  $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true);
+                  $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true, 4658, $quality);
                   
                   /** @var array Данные конвертированного файла */
                   $fileData = [];

@@ -1,17 +1,27 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
-use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\Entry as Entry;
@@ -19,7 +29,7 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 
 class PageError implements InterfacePage
 {
-  public SystemCore $CMSCore;
+  public CMSCore $CMSCore;
   public Page $page;
   public string $assembled = '';
   public int $errorCode;
@@ -29,12 +39,12 @@ class PageError implements InterfacePage
   /**
    * __construct
    *
-   * @param  SystemCore $CMSCore
+   * @param  CMSCore $CMSCore
    * @param  Page $page
    * @param  int $errorCode
    * @return void
    */
-  public function __construct(SystemCore $CMSCore, Page $page, int $errorCode)
+  public function __construct(CMSCore $CMSCore, Page $page, int $errorCode)
   {
     $this->CMSCore = $CMSCore;
     $this->page = $page;

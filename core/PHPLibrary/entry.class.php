@@ -1,11 +1,21 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary;
@@ -387,15 +397,68 @@ class Entry implements EntityTypeContent
   /**
    * Получить URL изображения предпросмотра
    *
+   * @param int $size
+   * 
    * @return string
    */
-  public function getPreviewURL() : string
+  public function getPreviewURL(int $size = -1) : string
   {
     if (property_exists($this, 'metadata')) {
       $metadata = json_decode($this->metadata, true);
 
       if (isset($metadata['previewURL'])) {
-        return $metadata['previewURL'];
+        $previewURL = $metadata['previewURL'];
+        
+        if ($size === -1) {
+          return $previewURL;
+        }
+            
+        $parsedUrl = parse_url($previewURL);
+        $path = $parsedUrl['path'] ?? '';
+        
+        $pathinfo = pathinfo($path);
+        $dirname = $pathinfo['dirname'] ?? '';
+        $filename = $pathinfo['filename'] ?? '';
+        $extension = $pathinfo['extension'] ?? '';
+
+        $resizedPath = $dirname . '/' . $filename . '/' . $size . '.' . $extension;
+        
+        if (file_exists(CMS_ROOT_DIRECTORY . $resizedPath)) {
+          return $resizedPath;
+        } else {
+          return $previewURL;
+        }
+      }
+    }
+
+    return '';
+  }
+
+  /**
+   * Получить URL директории изображений предпросмотра
+   *
+   * @return string
+   */
+  public function getPreviewDirectoryURL() : string
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+
+      if (isset($metadata['previewURL'])) {
+        $previewURL = $metadata['previewURL'];
+        
+        if ($size === -1) {
+          return $previewURL;
+        }
+            
+        $parsedUrl = parse_url($previewURL);
+        $path = $parsedUrl['path'] ?? '';
+        
+        $pathinfo = pathinfo($path);
+        $dirname = $pathinfo['dirname'] ?? '';
+        $filename = $pathinfo['filename'] ?? '';
+
+        return $dirname . '/' . $filename;
       }
     }
 

@@ -14,6 +14,7 @@
 }
 
 use \core\PHPLibrary\PageStatic as PageStatic;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
 if ($CMSCore->client->isLogged(2)) {
@@ -56,7 +57,6 @@ if ($CMSCore->client->isLogged(2)) {
 
           if (array_key_exists($inputSEOTitleName, $_PUT)) {
             $inputValue = $_PUT[$inputSEOTitleName];
-            $inputValue = strip_tags($inputValue);
             $inputValue = str_replace('\'', '"', $inputValue);
 
             $texts[$CMSLocaleName]['SEOTitle'] = $inputValue;
@@ -64,7 +64,6 @@ if ($CMSCore->client->isLogged(2)) {
 
           if (array_key_exists($textareaDescriptionName, $_PUT)) {
             $textareaValue = $_PUT[$textareaDescriptionName];
-            $textareaValue = strip_tags($textareaValue);
             $textareaValue = str_replace('\'', '"', $textareaValue);
 
             $texts[$CMSLocaleName]['description'] = $textareaValue;
@@ -72,7 +71,6 @@ if ($CMSCore->client->isLogged(2)) {
 
           if (array_key_exists($textareaSEODescriptionName, $_PUT)) {
             $textareaValue = $_PUT[$textareaSEODescriptionName];
-            $textareaValue = strip_tags($textareaValue);
             $textareaValue = str_replace('\'', '"', $textareaValue);
 
             $texts[$CMSLocaleName]['SEODescription'] = $textareaValue;
@@ -80,7 +78,6 @@ if ($CMSCore->client->isLogged(2)) {
 
           if (array_key_exists($textareaContentName, $_PUT)) {
             $textareaValue = $_PUT[$textareaContentName];
-            $textareaValue = strip_tags($textareaValue, '<table><tr><td><th><b><u><i><hr>');
             $textareaValue = str_replace('\'', '"', $textareaValue);
 
             $texts[$CMSLocaleName]['content'] = $textareaValue;
@@ -88,7 +85,6 @@ if ($CMSCore->client->isLogged(2)) {
 
           if (array_key_exists($textareaKeywordsName, $_PUT)) {
             $textareaValue = $_PUT[$textareaKeywordsName];
-            $textareaValue = strip_tags($textareaValue);
             $textareaValue = str_replace('\'', '"', $textareaValue);
             
             $texts[$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
@@ -136,6 +132,12 @@ if ($CMSCore->client->isLogged(2)) {
         if (isset($pageStaticData)) {
           $pageStatic->update($pageStaticData);
         }
+
+        /** @var CMSReport Новый отчет */
+        $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_PAGE_CREATED, [
+          'clientIP' => $CMSCore->client->getIPAddress(),
+          'pageID' => $pageStatic->getID()
+        ]);
 
         $handlerOutputData['pageStatic'] = [];
         $handlerOutputData['pageStatic']['id'] = $pageStatic->getID();

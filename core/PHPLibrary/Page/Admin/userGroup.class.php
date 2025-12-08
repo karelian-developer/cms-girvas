@@ -1,11 +1,21 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary\Page\Admin;
@@ -83,6 +93,7 @@ class PageUserGroup implements InterfacePage
       'USERS_GROUP_PERMISSION_ADMIN_MODULES_MANAGEMENT_VALUE' => $usersGroup === null ? '' : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT)) ? 'checked' : ''),
       'USERS_GROUP_PERMISSION_ADMIN_TEMPLATES_MANAGEMENT_VALUE' => $usersGroup === null ? '' : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT)) ? 'checked' : ''),
       'USERS_GROUP_PERMISSION_ADMIN_FEEDS_MANAGEMENT_VALUE' => $usersGroup === null ? '' : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_FEEDS_MANAGEMENT)) ? 'checked' : ''),
+      'USERS_GROUP_PERMISSION_ADMIN_FORMS_MANAGEMENT_VALUE' => $usersGroup === null ? '' : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT)) ? 'checked' : ''),
       'USERS_GROUP_PERMISSION_ADMIN_SETTINGS_MANAGEMENT_VALUE' => $usersGroup === null ? '' : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT)) ? 'checked' : ''),
       'USERS_GROUP_PERMISSION_ADMIN_VIEWING_LOGS_VALUE' => $usersGroup === null ? '' : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_VIEWING_LOGS)) ? 'checked' : ''),
       'USERS_GROUP_PERMISSION_MODER_USERS_BAN_VALUE' => $usersGroup === null ? '' : (($usersGroup->permissionCheck(UserGroup::PERMISSION_MODER_USERS_BAN)) ? 'checked' : ''),

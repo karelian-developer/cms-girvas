@@ -17,7 +17,6 @@
   "DEFAULT_TEXT_USER_DELETED": "User deleted",
   "DEFAULT_TEXT_USER_REGISTRATION_AGREEMENT": "I give my consent to the processing of my personal data in accordance with the <a href=\"/page/document--privacy-policy\" target=\"_blank\">Privacy Policy</a> and accept <a href=\"/page/document--user-agreement\" target=\"_blank\">User Agreement</a>.",
   "DEFAULT_TEXT_USER_AUTHORIZATION_REMEMBER_ME": "Remember me on this device.",
-  "DEFAULT_PAGE": "Page",
   "BUTTON_SEND_LABEL": "Send",
   "BUTTON_LOAD_MORE_COMMENTS_LABEL": "Load more comments",
   "BUTTON_LOAD_ANSWERS_COMMENTS_LABEL": "Load answers",

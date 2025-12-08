@@ -15,10 +15,12 @@
 
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
-use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as FileConverterEnumFileFormat;
-use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
+use \core\PHPLibrary\SystemCore\File\EnumFormat as FileConverterEnumFileFormat;
+use \core\PHPLibrary\SystemCore\File\Converter as FileConverter;
+use \core\PHPLibrary\SystemCore\File\Resizer as FileResizer;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
+use \Exception as Exception;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
@@ -109,6 +111,12 @@ if ($CMSCore->client->isLogged(2)) {
           $entriesCategoryIsUpdated = $entriesCategory->update($entriesCategoryData);
 
           if ($entriesCategoryIsUpdated) {
+            /** @var CMSReport Новый отчет */
+            $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_EDITED, [
+              'clientIP' => $CMSCore->client->getIPAddress(),
+              'entriesCategoryID' => $entriesCategory->getID()
+            ]);
+
             $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
             $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {
@@ -159,7 +167,6 @@ if ($CMSCore->client->isLogged(2)) {
 
                 if (array_key_exists($inputTitleName, $_PATCH)) {
                   $inputValue = $_PATCH[$inputTitleName];
-                  $inputValue = strip_tags($inputValue);
                   $inputValue = str_replace('\'', '"', $inputValue);
       
                   $entryData['texts'][$CMSLocaleName]['title'] = $inputValue;
@@ -167,7 +174,6 @@ if ($CMSCore->client->isLogged(2)) {
 
                 if (array_key_exists($inputSEOTitleName, $_PATCH)) {
                   $inputValue = $_PATCH[$inputSEOTitleName];
-                  $inputValue = strip_tags($inputValue);
                   $inputValue = str_replace('\'', '"', $inputValue);
       
                   $entryData['texts'][$CMSLocaleName]['SEOTitle'] = $inputValue;
@@ -175,7 +181,6 @@ if ($CMSCore->client->isLogged(2)) {
     
                 if (array_key_exists($textareaDescriptionName, $_PATCH)) {
                   $textareaValue = $_PATCH[$textareaDescriptionName];
-                  $textareaValue = strip_tags($textareaValue);
                   $textareaValue = str_replace('\'', '"', $textareaValue);
       
                   $entryData['texts'][$CMSLocaleName]['description'] = $textareaValue;
@@ -183,7 +188,6 @@ if ($CMSCore->client->isLogged(2)) {
     
                 if (array_key_exists($textareaSEODescriptionName, $_PATCH)) {
                   $textareaValue = $_PATCH[$textareaSEODescriptionName];
-                  $textareaValue = strip_tags($textareaValue);
                   $textareaValue = str_replace('\'', '"', $textareaValue);
       
                   $entryData['texts'][$CMSLocaleName]['SEODescription'] = $textareaValue;
@@ -191,7 +195,6 @@ if ($CMSCore->client->isLogged(2)) {
                 
                 if (array_key_exists($textareaContentName, $_PATCH)) {
                   $textareaValue = $_PATCH[$textareaContentName];
-                  $textareaValue = strip_tags($textareaValue, '<table><tr><td><th><b><u><i><hr>');
                   $textareaValue = str_replace('\'', '"', $textareaValue);
       
                   $entryData['texts'][$CMSLocaleName]['content'] = $textareaValue;
@@ -199,7 +202,6 @@ if ($CMSCore->client->isLogged(2)) {
     
                 if (array_key_exists($textareaKeywordsName, $_PATCH)) {
                   $textareaValue = $_PATCH[$textareaKeywordsName];
-                  $textareaValue = strip_tags($textareaValue);
                   $textareaValue = str_replace('\'', '"', $textareaValue);
     
                   $entryData['texts'][$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
@@ -212,13 +214,43 @@ if ($CMSCore->client->isLogged(2)) {
           if (isset($_PATCH['entry_category_id'])) $entryData['categoryID'] = $_PATCH['entry_category_id'];
           
           if (isset($_PATCH['entry_preview'])) {
+            if ($CMSCore->configurator->getAutoConvertFileImageStatus(true)) {
+              $fileExtensionConvertedEnum = match ($CMSCore->configurator->getAutoConvertFileImageExtension()) {
+                'webp' => FileConverterEnumFileFormat::WEBP,
+                'avif' => FileConverterEnumFileFormat::AVIF
+              };
+            } else {
+              $fileExtensionConvertedEnum = $fileExtensionEnum;
+            }
+
+            $qualityPercent = 100 - $CMSCore->configurator->getUploadImageCompression();
+            if ($qualityPercent <= 0) {
+              $previewQuality = -1;
+            } else {
+              $previewQuality = min(9, max(0, (int) round(($qualityPercent / 100) * 9)));
+            }
+
             $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
             $fileConverter = new FileConverter($CMSCore);
-            $fileConverted = $fileConverter->convert($_PATCH['entry_preview'], $fileDirectoryPath, FileConverterEnumFileFormat::WEBP, true);
+            $fileConverted = $fileConverter->convert($_PATCH['entry_preview'], $fileDirectoryPath, $fileExtensionConvertedEnum, true, 0, $previewQuality);
             
             if (is_array($fileConverted)) {
               if (!array_key_exists('metadata', $entryData)) $entryData['metadata'] = [];
               $entryData['metadata']['previewURL'] = '/uploads/media/' . $fileConverted['fileName'];
+
+              $fileResizer = new FileResizer($CMSCore);
+
+              try {
+                $fileResizesDir = CMS_ROOT_DIRECTORY . '/uploads/media';
+
+                $fileResizer->multipleResize(
+                  $fileConverted['filePath'],
+                  $fileResizesDir
+                );
+              } catch (Exception $exception) {
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $exception->getMessage();
+                $handlerStatusCode = $handlerStatusCode ?? 0;
+              }
             }
           }
 
@@ -282,8 +314,7 @@ if ($CMSCore->client->isLogged(2)) {
             /** @var CMSReport Новый отчет */
             $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_ENTRY_EDITED, [
               'clientIP' => $CMSCore->client->getIPAddress(),
-              'entryTitle' => $entry->getTitle(),
-              'date' => date('Y/m/d H:i:s', time())
+              'entryID' => $entry->getID()
             ]);
 
             $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');

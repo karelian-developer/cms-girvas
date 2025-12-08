@@ -337,3 +337,49 @@
 .page__article .article__content > *:last-child {
   margin-bottom: 0;
 }
+
+.form {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+}
+
+.form > *:not(:last-child) {
+  margin-bottom: 24px;
+}
+
+.form .form__input_submit {
+  width: fit-content;
+}
+
+.form .form__input-container {
+  position: relative;
+}
+
+.form .form__input-container.form__input_checkbox {
+  margin-bottom: 10px;
+}
+
+.form .form__label {
+  margin-bottom: 10px;
+}
+
+.form .form__input-container > input,
+.form .form__input-container > textarea {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.form .form__input-container > .form__input-tip {
+  position: absolute;
+  font-size: 12px;
+  height: 15px;
+  top: -15px;
+  right: 0;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+.form .form__input-container:hover > .form__input-tip {
+  opacity: 1;
+}

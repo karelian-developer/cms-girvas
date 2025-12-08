@@ -1,14 +1,26 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link  https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
- * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary;
+
+use \DOMDocument as DOMDocument;
 
 class NadvoParse
 {
@@ -19,6 +31,7 @@ class NadvoParse
     'underline' => '/\~\~(.+?)\~\~/s',
     'link' => '/\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'image' => '/!\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
+    'figure' => '/!\#\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'video' => '/!\[video\]\((.+?)\)/',
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
@@ -42,8 +55,8 @@ class NadvoParse
     $markdown = $this->parseQuotes($markdown);
     $markdown = $this->parseLists($markdown);
     $markdown = $this->parseTables($markdown);
-    $markdown = $this->parseBlocks($markdown);
-    return $this->parseInlineElements($markdown);
+    $markdown = $this->parseInlineElements($markdown);
+    return $this->parseBlocks($markdown);
   }
 
   private function sanitizeInput(string $markdown) : string
@@ -294,7 +307,7 @@ class NadvoParse
       self::PATTERNS['code_block'],
       function($matches) {
         $language = trim($matches[1]);
-        $code = htmlspecialchars(trim($matches[2]), ENT_NOQUOTES);
+        $code = trim($matches[2]);
         
         if ($language) {
           return '<pre><code class="language-' . $language . '">' . $code . '</code></pre>';
@@ -308,7 +321,7 @@ class NadvoParse
     $markdown = preg_replace_callback(
       self::PATTERNS['inline_code'],
       function($matches) {
-        $code = htmlspecialchars(trim($matches[1]), ENT_NOQUOTES);
+        $code = trim($matches[1]);
         return '<code>' . $code . '</code>';
       },
       $markdown
@@ -325,16 +338,34 @@ class NadvoParse
     $inTable = false;
 
     foreach ($lines as $line) {
+      if (str_starts_with(trim($line), '<pre>') || 
+        str_starts_with(trim($line), '<blockquote>') ||
+        str_starts_with(trim($line), '</blockquote>') ||
+        str_starts_with(trim($line), '<table>') ||
+        str_starts_with(trim($line), '<ul>') ||
+        str_starts_with(trim($line), '<ol>') ||
+        str_starts_with(trim($line), '</ul>') ||
+        str_starts_with(trim($line), '</ol>') ||
+        str_starts_with(trim($line), '<li>'))
+      {
+
+        if (!empty($currentParagraph)) {
+          $html .= '<p>' . $currentParagraph . '</p>';
+          $currentParagraph = '';
+        }
+
+        $html .= $line . "\n";
+        continue;
+      }
+
       if (str_starts_with(trim($line), '|')) {
         if (!$inTable) {
           if (!empty($currentParagraph)) {
             $html .= '<p>' . $currentParagraph . '</p>';
             $currentParagraph = '';
           }
-
           $inTable = true;
         }
-        
         continue;
       }
 
@@ -345,8 +376,7 @@ class NadvoParse
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
         }
-
-        $html .= '<h' . strlen($matches[1]) . '>' . $matches[2] . '</h' . strlen($matches[1]) . '>';
+        $html .= '<h' . strlen($matches[1]) . '>' . $matches[2] . '</h' . strlen($matches[1]) . '>' . "\n";
       } elseif (empty(trim($line))) {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
@@ -381,9 +411,8 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['image'],
       function($matches) {
-        $alt = htmlspecialchars(trim($matches[1]), ENT_QUOTES);
+        $caption = htmlspecialchars(trim($matches[1]), ENT_QUOTES);
         $src = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
-        $src = str_replace('_', '&#95;', $src);
         $attrs = [];
         
         if (isset($matches[3])) {
@@ -392,7 +421,7 @@ class NadvoParse
             if ($json) {
               foreach ($json as $key => $value) {
                 if (in_array($key, ['class', 'id'])) {
-                  $attrs[] = $key . '="' . htmlspecialchars($value) . '"';
+                  $attrs[$key] = htmlspecialchars($value);
                 }
               }
             }
@@ -400,8 +429,63 @@ class NadvoParse
             // ...
           }
         }
+
+        $document = new DOMDocument();
+        $imageElement = $document->createElement('img');
+
+        $imageElement->setAttribute('src', $src);
+        $imageElement->setAttribute('alt', $caption);
+
+        foreach($attrs as $attrName => $attrValue) {
+          $imageElement->setAttribute($attrName, $attrValue);
+        }
+
+        $document->appendChild($imageElement);
+
+        return $document->saveHTML($imageElement);
+      },
+      $html
+    );
+
+    $html = preg_replace_callback(
+      self::PATTERNS['figure'],
+      function($matches) {
+        $caption = htmlspecialchars(trim($matches[1]), ENT_QUOTES);
+        $src = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
+        $attrs = [];
         
-        return '<img src="' . $src . '" alt="' . $alt . '"' . (count($attrs) ? ' ' . implode(' ', $attrs) : '') . '>';
+        if (isset($matches[3])) {
+          try {
+            $json = json_decode('{' . $matches[3] . '}', true);
+            if ($json) {
+              foreach ($json as $key => $value) {
+                if (in_array($key, ['class', 'id'])) {
+                  $attrs[$key] = htmlspecialchars($value);
+                }
+              }
+            }
+          } catch (Exception $e) {
+            // ...
+          }
+        }
+
+        $document = new DOMDocument();
+        $figureElement = $document->createElement('figure');
+        $imageElement = $document->createElement('img');
+        $figcaptionElement = $document->createElement('figcaption', $caption);
+
+        $imageElement->setAttribute('src', $src);
+        $imageElement->setAttribute('alt', $caption);
+
+        foreach($attrs as $attrName => $attrValue) {
+          $figureElement->setAttribute($attrName, $attrValue);
+        }
+
+        $figureElement->appendChild($imageElement);
+        $figureElement->appendChild($figcaptionElement);
+        $document->appendChild($figureElement);
+
+        return $document->saveHTML();
       },
       $html
     );
@@ -410,7 +494,6 @@ class NadvoParse
       self::PATTERNS['link'],
       function($matches) {
         $href = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
-        $href = str_replace('_', '&#95;', $href);
         
         $text = htmlspecialchars(trim($matches[1]));
         $text = empty($text) ? $href : $text;
@@ -422,7 +505,7 @@ class NadvoParse
             if ($json) {
               foreach ($json as $key => $value) {
                 if (in_array($key, ['class', 'id', 'target', 'rel'])) {
-                  $attrs[] = $key . '="' . htmlspecialchars($value) . '"';
+                  $attrs[$key] = htmlspecialchars($value);
                 }
               }
             }

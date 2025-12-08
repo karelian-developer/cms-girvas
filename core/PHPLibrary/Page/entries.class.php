@@ -1,11 +1,21 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary\Page;
@@ -139,7 +149,6 @@ class PageEntries implements InterfacePage
           ? $categorySEODescription
           : $categoryDescription;
         $categorySEODescription = str_replace('"', '&quot;', $categorySEODescription);
-
         $categoryKeywords = $category->getKeywords($localeName);
         $categoryKeywords = str_replace('"', '&quot;', $categoryKeywords);
 
@@ -173,82 +182,263 @@ class PageEntries implements InterfacePage
 
       unset($entries);
 
-      $entriesArrayRemplates = [];
+      $entriesArrayTemplates = [];
+      $entriesTemplateContent = ThemeCollector::getTemplateFileContent(
+        $this->CMSCore->theme,
+        'templates/page/entries/entriesList/item.tpl'
+      );
+
+      $templatesAssembled = [];
       foreach ($entriesObjects as $entryObject) {
         $entryObject->initData(['id', 'categoryID', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
-
-        /** @var string Заголовок записи */
-        $entryTitle = $entryObject->getTitle($localeName);
-        $entryTitle = strip_tags($entryTitle); 
-        /** @var string Описание записи */
-        $entryDescription = $entryObject->getDescription($localeName);
-        $entryDescription = strip_tags($entryDescription);
-        /** @var string Содержание записи */
-        $entryContent = $entryObject->getContent($localeName);
-        $entryContent = strip_tags($entryContent);
-
-        $createdDateTimestamp = date('d.m.Y H:i:s', $entryObject->getCreatedUnixTimestamp());
-        $publishedDateTimestamp = date('d.m.Y H:i:s', $entryObject->getPublishedUnixTimestamp());
-        $updatedDateTimestamp = date('d.m.Y H:i:s', $entryObject->getUpdatedUnixTimestamp());
-
-        $createdDateTimestampWithoutTime = date('d.m.Y', $entryObject->getCreatedUnixTimestamp());
-        $publishedDateTimestampWithoutTime = date('d.m.Y', $entryObject->getPublishedUnixTimestamp());
-        $updatedDateTimestampWithoutTime = date('d.m.Y', $entryObject->getUpdatedUnixTimestamp());
-
-        $createdDateTimestampWithoutDate = date('H:i:s', $entryObject->getCreatedUnixTimestamp());
-        $publishedDateTimestampWithoutDate = date('H:i:s', $entryObject->getPublishedUnixTimestamp());
-        $updatedDateTimestampWithoutDate = date('H:i:s', $entryObject->getUpdatedUnixTimestamp());
-
-        $createdDateTimestampISO8601 = date('Y-m-dH:i:s', $entryObject->getCreatedUnixTimestamp());
-        $publishedDateTimestampISO8601 = date('Y-m-dH:i:s', $entryObject->getPublishedUnixTimestamp());
-        $updatedDateTimestampISO8601 = date('Y-m-dH:i:s', $entryObject->getUpdatedUnixTimestamp());
-
-        $createdDateTimestampISO8601WithoutTime = date('Y-m-d', $entryObject->getCreatedUnixTimestamp());
-        $publishedDateTimestampISO8601WithoutTime = date('Y-m-d', $entryObject->getPublishedUnixTimestamp());
-        $updatedDateTimestampISO8601WithoutTime = date('Y-m-d', $entryObject->getUpdatedUnixTimestamp());
-
-        $createdDateTimestampISO8601WithoutDate = date('H:i:s', $entryObject->getCreatedUnixTimestamp());
-        $publishedDateTimestampISO8601WithoutDate = date('H:i:s', $entryObject->getPublishedUnixTimestamp());
-        $updatedDateTimestampISO8601WithoutDate = date('H:i:s', $entryObject->getUpdatedUnixTimestamp());
-
-        $category = $entryObject->getCategory();
-        $categoryTitle = $category->getTitle($localeName);
-        $categoryTitle = strip_tags($categoryTitle);
-        $categoryDescription = $category->getDescription($localeName);
-        $categoryDescription = strip_tags($categoryDescription);
-
-        if (!empty($entryTitle) && !empty($entryDescription) && !empty($entryContent)) {
-          array_push($entriesArrayRemplates, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/entriesList/item.tpl', [
-            'ENTRY_ID' => $entryObject->getID(),
-            'ENTRY_TITLE' => $entryTitle,
-            'ENTRY_DESCRIPTION' => $entryDescription,
-            'ENTRY_URL' => $entryObject->getURL(),
-            'ENTRY_PREVIEW_URL' => $entryObject->getPreviewURL() !== '' ? $entryObject->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 512),
-            'ENTRY_CATEGORY_TITLE' => $categoryTitle,
-            'ENTRY_DESCRIPTION_TITLE' => $categoryDescription,
-            'ENTRY_CATEGORY_URL' => $category->getURL(),
-            'ENTRY_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
-            'ENTRY_PUBLISHED_DATE_TIMESTAMP' => $entryObject->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestamp : date('d.m.Y H:i:s', 0),
-            'ENTRY_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp,
-            'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_TIME' => $createdDateTimestampWithoutTime,
-            'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_TIME' => $entryObject->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestampWithoutTime : date('d.m.Y', 0),
-            'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_TIME' => $updatedDateTimestampWithoutTime,
-            'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_DATE' => $createdDateTimestampWithoutDate,
-            'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_DATE' => $entryObject->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestampWithoutDate : date('H:i:s', 0),
-            'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_DATE' => $updatedDateTimestampWithoutDate,
-            'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601' => $createdDateTimestampISO8601,
-            'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601' => $publishedDateTimestampISO8601,
-            'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601' => $updatedDateTimestampISO8601,
-            'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $createdDateTimestampISO8601WithoutTime,
-            'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $publishedDateTimestampISO8601WithoutTime,
-            'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME' => $updatedDateTimestampISO8601WithoutTime,
-            'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $createdDateTimestampISO8601WithoutDate,
-            'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $publishedDateTimestampISO8601WithoutDate,
-            'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE' => $updatedDateTimestampISO8601WithoutDate
-          ]));
+        
+        $entryCategory = $entryObject->getCategory();
+            
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CATEGORY_TITLE')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_CATEGORY_TITLE',
+            $entryCategory->getTitle($localeName)
+          );
         }
 
-        unset($entry_data);
+        $entryCreatedUnixTimestamp = $entryObject->getCreatedUnixTimestamp();
+        $entryPublishedUnixTimestamp = $entryObject->getPublishedUnixTimestamp();
+        $entryUpdatedUnixTimestamp = $entryObject->getUpdatedUnixTimestamp();
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CREATED_DATE_TIMESTAMP')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_CREATED_DATE_TIMESTAMP',
+            date('d.m.Y H:i:s', $entryCreatedUnixTimestamp)
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CREATED_DATE_TIMESTAMP')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_PUBLISHED_DATE_TIMESTAMP',
+            $entryPublishedUnixTimestamp > 0
+              ? date('d.m.Y H:i:s', $entryPublishedUnixTimestamp)
+              : '-'
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CREATED_DATE_TIMESTAMP')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_UPDATED_DATE_TIMESTAMP',
+            date('d.m.Y H:i:s', $entryUpdatedUnixTimestamp)
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_TIME')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_TIME',
+            date('d.m.Y', $entryCreatedUnixTimestamp)
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_TIME')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_TIME',
+            $entryPublishedUnixTimestamp > 0
+              ? date('d.m.Y', $entryPublishedUnixTimestamp)
+              : '-'
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_TIME')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_TIME',
+            date('d.m.Y', $entryUpdatedUnixTimestamp)
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_DATE')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_CREATED_DATE_TIMESTAMP_WITHOUT_DATE',
+            date('H:i:s', $entryCreatedUnixTimestamp)
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_DATE')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_PUBLISHED_DATE_TIMESTAMP_WITHOUT_DATE',
+            $entryPublishedUnixTimestamp > 0
+              ? date('H:i:s', $entryPublishedUnixTimestamp)
+              : '-'
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_DATE')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_UPDATED_DATE_TIMESTAMP_WITHOUT_DATE',
+            date('H:i:s', $entryUpdatedUnixTimestamp)
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601',
+            date('Y-m-dH:i:s', $entryCreatedUnixTimestamp)
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601',
+            $entryPublishedUnixTimestamp > 0
+              ? date('Y-m-dH:i:s', $entryPublishedUnixTimestamp)
+              : '-'
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601',
+            date('Y-m-dH:i:s', $entryUpdatedUnixTimestamp)
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME',
+            date('Y-m-d', $entryCreatedUnixTimestamp)
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME',
+            $entryPublishedUnixTimestamp > 0
+              ? date('Y-m-d', $entryPublishedUnixTimestamp)
+              : '-'
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME',
+            date('Y-m-d', $entryUpdatedUnixTimestamp)
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE',
+            date('H:i:s', $entryCreatedUnixTimestamp)
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE',
+            $entryPublishedUnixTimestamp > 0
+              ? date('H:i:s', $entryPublishedUnixTimestamp)
+              : '-'
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_UPDATED_DATE_TIMESTAMP_ISO_8601_WITHOUT_DATE',
+            date('H:i:s', $entryUpdatedUnixTimestamp)
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_ID')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_ID',
+            $entryObject->getID()
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_NAME')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_NAME',
+            $entryObject->getName()
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_TITLE')) {
+          $value = $entryObject !== null ? $entryObject->getTitle($localeName) : '';
+
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_TITLE',
+            str_replace(
+              ThemeCollector::DECODED_ENTITIES,
+              ThemeCollector::SAFE_SYMBOLS,
+              htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+            )
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_DESCRIPTION')) {
+          $value = $entryObject !== null ? $entryObject->getDescription($localeName) : '';
+
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_DESCRIPTION',
+            str_replace(
+              ThemeCollector::DECODED_ENTITIES,
+              ThemeCollector::SAFE_SYMBOLS,
+              htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+            )
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_URL')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_URL',
+            $entryObject->getURL()
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_PREVIEW_URL')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_PREVIEW_URL',
+            $entryObject->getPreviewURL() !== '' ? $entryObject->getPreviewURL() : Entry::getPreviewDefaultURL($this->CMSCore, 512)
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CATEGORY_URL')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_CATEGORY_URL',
+            $entryCategory->getURL()
+          );
+        }
+
+        if (isset($templatesAssembled['ENTRY_TITLE']) && isset($templatesAssembled['ENTRY_DESCRIPTION'])) {
+          $entriesArrayTemplates[] = ThemeCollector::assemblyFileContent(
+            $this->CMSCore->theme,
+            'templates/page/entries/entriesList/item.tpl',
+            $templatesAssembled
+          );
+        }
+
+        $templatesAssembled = [];
       }
 
       unset($entriesObjects);
@@ -262,14 +452,14 @@ class PageEntries implements InterfacePage
           'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
           'ENTRIES_CATEGORY_TITLE' => ($categoryName == 'all') ? $localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_LABEL'] : $category->getTitle($localeName),
           'ENTRIES_CATEGORY_DESCRIPTION' => ($categoryName == 'all') ? $localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_DESCRIPTION'] : $category->getDescription($localeName),
-          'ENTRIES_LIST' => (!empty($entriesArrayRemplates)) ? ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/entriesList/list.tpl', [
-            'ENTRIES_LIST_ITEMS' => implode($entriesArrayRemplates)
+          'ENTRIES_LIST' => (!empty($entriesArrayTemplates)) ? ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entries/entriesList/list.tpl', [
+            'ENTRIES_LIST_ITEMS' => implode($entriesArrayTemplates)
           ]) : sprintf('<div class="page__simple-note">%s</div>', $localeData['PAGE_ENTRIES_NOT_FOUND_LABEL']),
-          'ENTRIES_PAGINATION' => (!empty($entriesArrayRemplates)) ? $pagination->assembled : ''
+          'ENTRIES_PAGINATION' => (!empty($entriesArrayTemplates)) ? $pagination->assembled : ''
         ])
       ]);
 
-      unset($entriesArrayRemplates);
+      unset($entriesArrayTemplates);
     } else {
       http_response_code(404);
 

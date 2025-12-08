@@ -1,11 +1,21 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary\Page\Admin;
@@ -74,6 +84,8 @@ class PageEntry implements InterfacePage
       
       if ($entry !== null) {
         $entry->initData(['id', 'texts', 'name', 'metadata']);
+      } else {
+        http_response_code(404);
       }
     }
 
@@ -174,53 +186,150 @@ class PageEntry implements InterfacePage
       }
     }
 
-    $mediaFilesPath = $this->CMSCore->getCMSPath() . '/uploads/media';
-    $mediaFiles = array_diff(scandir($mediaFilesPath), ['.', '..']);
-    $mediaFiles = array_slice($mediaFiles, 0, 6);
+    $templatesAssembled = [];
+    $templatesEditorAssembled = [];
+    $templateContent = ThemeCollector::getTemplateFileContent(
+      $this->CMSCore->theme,
+      'templates/page/entry.tpl'
+    );
+    $templateEditorContent = ThemeCollector::getTemplateFileContent(
+      $this->CMSCore->theme,
+      'templates/page/entry/editor.tpl'
+    );
 
-    $mediaFilesTransformed = [];
-    foreach ($mediaFiles as $fileName) {
-      $mediaFileURL = '/uploads/media/' . $fileName;
-      $mediaFilesTransformed[] = ThemeCollector::assemblyFileContent(
-        $this->CMSCore->theme, 'templates/page/entry/mediaManager/listItem.tpl',
-        [
-          'MEDIA_FILE_URL' => $mediaFileURL,
-          'MEDIA_FILE_FULLNAME' => $fileName
-        ]
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_ID')) {
+      $value = $entry !== null ? $entry->getID() : 0;
+
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'ENTRY_ID',
+        $value
       );
     }
 
-    if (!empty($mediaFilesTransformed)) {
-      $mediaManagerList = ThemeCollector::assemblyFileContent(
-        $this->CMSCore->theme, 'templates/page/entry/mediaManager/list.tpl',
-        [
-          'MEDIA_LIST_ITEMS' => implode($mediaFilesTransformed)
-        ]
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_TITLE')) {
+      $value = $entry !== null ? $entry->getTitle($localeName) : '';
+
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'ENTRY_TITLE',
+        str_replace(
+          ThemeCollector::DECODED_ENTITIES,
+          ThemeCollector::SAFE_SYMBOLS,
+          htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+        )
       );
-    } else {
-      $mediaManagerList = $localeData['PAGE_ENTRY_MEDIA_FILES_NOT_FOUND_LABEL'];
     }
+
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_SEO_TITLE')) {
+      $value = $entry !== null ? $entry->getSEOTitle($localeName) : '';
+
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'ENTRY_SEO_TITLE',
+        str_replace(
+          ThemeCollector::DECODED_ENTITIES,
+          ThemeCollector::SAFE_SYMBOLS,
+          htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+        )
+      );
+    }
+
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_DESCRIPTION')) {
+      $value = $entry !== null ? $entry->getDescription($localeName) : '';
+      
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'ENTRY_DESCRIPTION',
+        str_replace(
+          ThemeCollector::DECODED_ENTITIES,
+          ThemeCollector::SAFE_SYMBOLS,
+          htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+        )
+      );
+    }
+
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_SEO_DESCRIPTION')) {
+      $value = $entry !== null ? $entry->getSEODescription($localeName) : '';
+
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'ENTRY_SEO_DESCRIPTION',
+        str_replace(
+          ThemeCollector::DECODED_ENTITIES,
+          ThemeCollector::SAFE_SYMBOLS,
+          htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+        )
+      );
+    }
+
+    if (ThemeCollector::existsTemplateVariable($templateEditorContent, 'ENTRY_CONTENT')) {
+      $value = $entry !== null ? $entry->getContent($localeName) : '';
+
+      ThemeCollector::addTemplateVariable(
+        $templatesEditorAssembled,
+        'ENTRY_CONTENT',
+        str_replace(
+          ThemeCollector::DECODED_ENTITIES,
+          ThemeCollector::SAFE_SYMBOLS,
+          htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+        )
+      );
+    }
+
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_KEYWORDS')) {
+      $value = $entry !== null ? $entry->getKeywords($localeName) : [];
+      $valueArray = array_map(function($item) {
+        return str_replace(
+          ThemeCollector::DECODED_ENTITIES,
+          ThemeCollector::SAFE_SYMBOLS,
+          htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+        );
+      }, $value);
+      
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'ENTRY_KEYWORDS',
+        $entry !== null ? implode(', ', $valueArray) : ''
+      );
+    }
+
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_NAME')) {
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'ENTRY_NAME',
+        $entry !== null ? $entry->getName() : ''
+      );
+    }
+
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_ADDITIONAL_FIELDS')) {
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'ENTRY_ADDITIONAL_FIELDS',
+        implode($additionalFieldsElements)
+      );
+    }
+
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_FORM_METHOD')) {
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'ENTRY_FORM_METHOD',
+        $entry !== null ? 'PATCH' : 'PUT'
+      );
+    }
+
+    $templatesAssembled['ADMIN_PANEL_PAGE_NAME'] = 'entry';
+    $templatesAssembled['ENTRY_EDITOR'] = ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme,
+      'templates/page/entry/editor.tpl',
+      $templatesEditorAssembled
+    );
 
     /** @var string $site_page Содержимое шаблона страницы */
     $this->assembled = ThemeCollector::assemblyFileContent(
-      $this->CMSCore->theme, 'templates/page/entry.tpl',
-      [
-        'ADMIN_PANEL_PAGE_NAME' => 'entry',
-        'ENTRY_EDITOR' => ThemeCollector::assemblyFileContent(
-          $this->CMSCore->theme, 'templates/page/entry/editor.tpl',
-          []
-        ),
-        'ENTRY_ID' => $entry !== null ? $entry->getID() : 0,
-        'ENTRY_TITLE' => $entry !== null ? $entry->getTitle($localeName) : '',
-        'ENTRY_SEO_TITLE' => $entry !== null ? $entry->getSEOTitle($localeName) : '',
-        'ENTRY_DESCRIPTION' => $entry !== null ? $entry->getDescription($localeName) : '',
-        'ENTRY_SEO_DESCRIPTION' => $entry !== null ? $entry->getSEODescription($localeName) : '',
-        'ENTRY_CONTENT' => $entry !== null ? $entry->getContent($localeName) : '',
-        'ENTRY_KEYWORDS' => $entry !== null ? implode(', ', $entry->getKeywords($localeName)) : '',
-        'ENTRY_NAME' => $entry !== null ? $entry->getName() : '',
-        'ENTRY_ADDITIONAL_FIELDS' => implode($additionalFieldsElements),
-        'ENTRY_FORM_METHOD' => $entry !== null ? 'PATCH' : 'PUT'
-      ]
+      $this->CMSCore->theme,
+      'templates/page/entry.tpl',
+      $templatesAssembled
     );
   }
 }

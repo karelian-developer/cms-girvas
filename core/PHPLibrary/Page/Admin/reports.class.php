@@ -1,19 +1,30 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
-use \core\PHPLibrary\SystemCore as SystemCore;
-use \core\PHPLibrary\SystemCore\Report as SystemCoreReport;
-use \core\PHPLibrary\SystemCore\Reports as SystemCoreReports;
+use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
+use \core\PHPLibrary\SystemCore\Reports as CMSReports;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
@@ -25,8 +36,6 @@ final class PageReports implements InterfacePage
 
   const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_REPORTS_NAVIGATION_%s_LABEL';
 
-  public SystemCore $CMSCore;
-  public Page $page;
   public string $assembled = '';
   public array $navigationSubsections = [
     'index' => [
@@ -37,19 +46,18 @@ final class PageReports implements InterfacePage
       'isActive' => false
     ],
     'all' => [
-      'name' => 'all',
-      'iconName' => 'all',
+      'name' => 'base',
+      'iconName' => 'base',
       'link' => '/reports',
       'permanent' => false,
       'isActive' => true
     ],
   ];
 
-  public function __construct(SystemCore $CMSCore, Page $page)
-  {
-    $this->CMSCore = $CMSCore;
-    $this->page = $page;
-  }
+  public function __construct(
+    public CoreInterface $CMSCore,
+    public Page $page
+  ) {}
 
   /**
    * Инициализация подразделов
@@ -62,6 +70,48 @@ final class PageReports implements InterfacePage
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
+  public function getAvailableReportsCategoriesArray() : array
+  {
+    $reports = [];
+
+    $reportsClassesFilesPath = $this->CMSCore->getCMSPath() . '/core/PHPLibrary/Page/Admin/Reports';
+    $reportsClassesFiles = array_diff(scandir($reportsClassesFilesPath), ['.', '..']);
+
+    foreach ($reportsClassesFiles as $file) {
+      if (preg_match('/^([a-zA-Z_]+)\.class\.php$/', $file, $matches)) {
+        array_push($reports, $matches[1]);
+      }
+    }
+
+    return $reports;
+  }
+
+  /**
+   * Конвертировать имя настройки в константу
+   * 
+   * @param string $reportsName
+   * 
+   * @return string
+   */
+  private function convertReportsNameToConstant(string $reportsName) : string
+  {
+    return match ($reportsName) {
+      default => strtoupper($reportsName)
+    };
+  }
+
+  /**
+   * Получить пространство имен страницы с настройками
+   * 
+   * @param string $reportsName
+   * 
+   * @return string
+   */
+  private function getReportsPageClassNamespace(string $reportsName) : string
+  {
+    return '\\core\\PHPLibrary\\Page\\Admin\\Reports\\Reports' . ucfirst($reportsName);
+  }
+
   public function assembly() : void
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/reports.css', 'rel' => 'stylesheet']);
@@ -70,62 +120,36 @@ final class PageReports implements InterfacePage
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
 
-    $reportsSecurityAssembled = [];
-    $reportsSecurity = (new SystemCoreReports($this->CMSCore))->getByTypeIDs([
-      SystemCoreReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL,
-      SystemCoreReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS
-    ], ['limit' => 50]);
+    $reportsName = $this->CMSCore->urlp->getPath(2) ?? 'base';
+    $reportsCorePath = $this->CMSCore->getCMSPath() . '/core/PHPLibrary/Page/Admin/Reports/' . $reportsName . '.class.php';
 
-    $reportsCommonAssembled = [];
-    $reportsCommon = (new SystemCoreReports($this->CMSCore))->getByTypeIDs([
-      SystemCoreReport::REPORT_TYPE_ID_AP_ENTRY_CREATED,
-      SystemCoreReport::REPORT_TYPE_ID_AP_ENTRY_EDITED,
-      SystemCoreReport::REPORT_TYPE_ID_AP_ENTRY_DELETED
-    ], ['limit' => 50]);
+    if (file_exists($reportsCorePath)) {
+      http_response_code(200);
 
-    foreach ($reportsSecurity as $report) {
-      $report->initData(['metadata', 'variables', 'createdUnixTimestamp']);
-      
-      $reportCategoryName = 'security';
-      $reportVariables = $report->getVariables();
+      $classNamespace = $this->getReportsPageClassNamespace($reportsName);
+      $reportsPage = new $classNamespace($this->CMSCore, $reportsName);
+      $reportsNameConstant = $this->convertReportsNameToConstant($reportsName);
 
-      array_push($reportsSecurityAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports/listItem.tpl', [
-        'REPORT_CATEGORY_NAME' => $reportCategoryName,
-        'REPORT_CONTENT' =>ThemeCollector::assembly(ThemeCollector::assemblyLocale($report->getContent(), $this->CMSCore->locale), [
-          'CLIENT_IP' => $reportVariables['clientIP'] ?? '0.0.0.0',
-          'DATE' => $reportVariables['date'] ?? date('d.m.Y H:i:s', time()),
-          'ENTRY_TITLE' => $reportVariables['entryTitle'] ?? '[ ??? ]',
-        ]),
-        'REPORT_CREATED_TIMESTAMP' => date('d.m.Y H:i:s', $report->getCreatedUnixTimestamp()),
-      ]));
+      $reportsPage->setTitle('{LANG:PAGE_REPORTS_REPORTS_GROUP_' . $reportsNameConstant . '_TITLE}');
+      $reportsPage->setDescription('{LANG:PAGE_REPORTS_REPORTS_GROUP_' . $reportsNameConstant . '_DESCRIPTION}');
+
+      $reportsTitle = $reportsPage->getTitle();
+      $reportsDescription = $reportsPage->getDescription();
+      $reportsPage->assembly();
+
+      $reportsPageAssembled = $reportsPage->assembled;
+    } else {
+      http_response_code(404);
     }
 
-    foreach ($reportsCommon as $report) {
-      $report->initData(['metadata', 'variables', 'createdUnixTimestamp']);
-
-      $reportCategoryName = 'common';
-      $reportVariables = $report->getVariables();
-
-      array_push($reportsCommonAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports/listItem.tpl', [
-        'REPORT_CATEGORY_NAME' => $reportCategoryName,
-        'REPORT_CONTENT' =>ThemeCollector::assembly(ThemeCollector::assemblyLocale($report->getContent(), $this->CMSCore->locale), [
-          'CLIENT_IP' => $reportVariables['clientIP'] ?? '0.0.0.0',
-          'DATE' => $reportVariables['date'] ?? date('d.m.Y H:i:s', time()),
-          'ENTRY_TITLE' => $reportVariables['entryTitle'] ?? '[ ??? ]',
-        ]),
-        'REPORT_CREATED_TIMESTAMP' => date('d.m.Y H:i:s', $report->getCreatedUnixTimestamp()),
-      ]));
-    }
+    $reportsPageAssembled = $reportsPageAssembled ?? '';
 
     /** @var string $site_page Содержимое шаблона страницы */
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports.tpl', [
-      'ADMIN_PANEL_PAGE_NAME' => 'reports',
-      'REPORTS_SECURITY_LIST' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports/list.tpl', [
-        'REPORTS_LIST_ITEMS' => implode($reportsSecurityAssembled)
-      ]),
-      'REPORTS_COMMON_LIST' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports/list.tpl', [
-        'REPORTS_LIST_ITEMS' => implode($reportsCommonAssembled)
-      ])
+      'PAGE_NAME' => 'reports',
+      'PAGE_REPORT_TITLE' => $reportsTitle ?? $localeData['PAGE_REPORTS_GROUP_NOT_FOUND_TITLE'],
+      'PAGE_REPORT_DESCRIPTION' => $reportsDescription ?? $localeData['PAGE_REPORTS_GROUP_NOT_FOUND_DESCRIPTION'],
+      'PAGE_REPORT' => ThemeCollector::assembly($reportsPageAssembled, [])
     ]);
   }
 }

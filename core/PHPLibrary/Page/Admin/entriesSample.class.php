@@ -1,18 +1,28 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
-
 
 namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\EntriesSample as EntriesSample;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
@@ -24,7 +34,7 @@ class PageEntriesSample implements InterfacePage
 
   const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_ENTRIES_SAMPLE_NAVIGATION_%s_LABEL';
 
-  public SystemCore $CMSCore;
+  public CoreInterface $CMSCore;
   public Page $page;
   public string $assembled = '';
   public array $navigationSubsections = [
@@ -37,7 +47,7 @@ class PageEntriesSample implements InterfacePage
     ],
   ];
 
-  public function __construct(SystemCore $CMSCore, Page $page) {
+  public function __construct(CoreInterface $CMSCore, Page $page) {
     $this->CMSCore = $CMSCore;
     $this->page = $page;
   }

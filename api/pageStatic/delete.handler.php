@@ -14,6 +14,7 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 use \core\PHPLibrary\PageStatic as PageStatic;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
@@ -31,6 +32,12 @@ if ($CMSCore->client->isLogged(2)) {
         $pageStaticIsDeleted = $pageStatic->delete();
 
         if ($pageStaticIsDeleted) {
+          /** @var CMSReport Новый отчет */
+          $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_PAGE_DELETED, [
+            'clientIP' => $CMSCore->client->getIPAddress(),
+            'pageID' => $pageStaticID
+          ]);
+
           $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_DELETE_DATA_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {
