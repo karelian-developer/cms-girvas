@@ -35,6 +35,12 @@ if ($CMSCore->client->isLogged(2)) {
           $entriesСategoryIsDeleted = $entriesСategory->delete();
 
           if ($entriesСategoryIsDeleted) {
+            /** @var CMSReport Новый отчет */
+            $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_DELETED, [
+              'clientIP' => $CMSCore->client->getIPAddress(),
+              'entriesCategoryID' => $entriesCategoryID
+            ]);
+
             $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_DELETE_DATA_SUCCESS');
             $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {
@@ -64,10 +70,10 @@ if ($CMSCore->client->isLogged(2)) {
           $entryIsDeleted = $entry->delete();
 
           if ($entryIsDeleted) {
+            /** @var CMSReport Новый отчет */
             $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_ENTRY_DELETED, [
               'clientIP' => $CMSCore->client->getIPAddress(),
-              'entryTitle' => $entryTitle,
-              'date' => date('Y/m/d H:i:s', time())
+              'entryID' => $entryID
             ]);
 
             $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_DELETE_DATA_SUCCESS');

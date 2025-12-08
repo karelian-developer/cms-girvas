@@ -1,17 +1,23 @@
 /* ==========================================================================================
-=> CMS GIRVAS (https://www.cms-girvas.ru/)
+=> CMS CMS «ГИРВАС»
 =>
-=> Типовая стилизация таблиц
-=>
-=> @link      https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
-=> @copyright Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+=> Включена в Реестр российского программного обеспечения Минцифры РФ.
+=> Реестровый номер: №25012 от 27.11.2024
+=> 
+=> @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+=>             Все права защищены.
 => @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+=> @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+=> @see       https://cms-girvas.ru Сайт продукта
+=> @author    Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+=> @support   support@karelian-developer.ru
 ============================================================================================= */
 
 .table, .table__row, .table__cell {
   border-width: 1px;
   border-style: solid;
 }
+
 .table {
   background-color: var(--primary-color-4);
   font-size: 14px;
@@ -19,16 +25,20 @@
   border-collapse: collapse;
   width: 100%;
 }
+
 .table__row {
   border-color: var(--primary-color-3);
 }
+
 .table__cell {
   border-color: var(--primary-color-3);
   padding: 10px;
 }
+
 .table__cell .cell__block-phar {
   margin-bottom: 10px;
 }
+
 .table__cell .cell__block-phar:last-child {
   margin-bottom: 0;
 }

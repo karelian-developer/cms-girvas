@@ -14,6 +14,7 @@
 }
 
 use \core\PHPLibrary\PageStatic as PageStatic;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
 if ($CMSCore->client->isLogged(2)) {
@@ -131,6 +132,12 @@ if ($CMSCore->client->isLogged(2)) {
         if (isset($pageStaticData)) {
           $pageStatic->update($pageStaticData);
         }
+
+        /** @var CMSReport Новый отчет */
+        $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_PAGE_CREATED, [
+          'clientIP' => $CMSCore->client->getIPAddress(),
+          'pageID' => $pageStatic->getID()
+        ]);
 
         $handlerOutputData['pageStatic'] = [];
         $handlerOutputData['pageStatic']['id'] = $pageStatic->getID();

@@ -16,6 +16,7 @@
 use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\SystemCore\File\Converter as FileConverter;
 use \core\PHPLibrary\SystemCore\File\EnumFormat as FileConverterEnumFileFormat;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
 if ($CMSCore->client->isLogged(2)) {
@@ -171,6 +172,12 @@ if ($CMSCore->client->isLogged(2)) {
         $pageStaticIsUpdated = $pageStaticIsUpdated ?? false;
 
         if ($pageStaticIsUpdated) {
+          /** @var CMSReport Новый отчет */
+          $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_PAGE_EDITED, [
+            'clientIP' => $CMSCore->client->getIPAddress(),
+            'pageID' => $pageStaticID
+          ]);
+
           $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {

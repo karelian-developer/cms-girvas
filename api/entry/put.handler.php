@@ -96,6 +96,11 @@ if ($CMSCore->client->isLogged(2)) {
         $handlerOutputData['entriesCategory'] = [];
         $handlerOutputData['entriesCategory']['id'] = $entriesCategory->getID();
 
+        $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_CREATED, [
+          'clientIP' => $CMSCore->client->getIPAddress(),
+          'entriesCategoryID' => $entriesCategory->getID()
+        ]);
+
         $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PUT_DATA_SUCCESS');
         $handlerStatusCode = $handlerStatusCode ?? 1;
       } else {
@@ -218,8 +223,7 @@ if ($CMSCore->client->isLogged(2)) {
 
         $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED, [
           'clientIP' => $CMSCore->client->getIPAddress(),
-          'entryTitle' => $entry->getTitle(),
-          'date' => date('Y/m/d H:i:s', time())
+          'entryID' => $entry->getID()
         ]);
         
         $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_PUT_DATA_SUCCESS');

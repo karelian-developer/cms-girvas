@@ -111,6 +111,12 @@ if ($CMSCore->client->isLogged(2)) {
           $entriesCategoryIsUpdated = $entriesCategory->update($entriesCategoryData);
 
           if ($entriesCategoryIsUpdated) {
+            /** @var CMSReport Новый отчет */
+            $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_EDITED, [
+              'clientIP' => $CMSCore->client->getIPAddress(),
+              'entriesCategoryID' => $entriesCategory->getID()
+            ]);
+
             $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
             $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {
@@ -308,8 +314,7 @@ if ($CMSCore->client->isLogged(2)) {
             /** @var CMSReport Новый отчет */
             $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_ENTRY_EDITED, [
               'clientIP' => $CMSCore->client->getIPAddress(),
-              'entryTitle' => $entry->getTitle(),
-              'date' => date('Y/m/d H:i:s', time())
+              'entryID' => $entry->getID()
             ]);
 
             $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
