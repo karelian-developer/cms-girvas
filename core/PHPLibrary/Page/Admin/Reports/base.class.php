@@ -208,7 +208,7 @@ class ReportsBase implements ReportsPageInterface
     $IPsWithSuccessfulAuth = $this->extractClientIPs($reportsSecurityAdminAuthSuccess);
     $IPsWithFailAuth = $this->extractClientIPs($reportsSecurityAdminAuthFail);
 
-    $IPsWithSuccessfulAuthImploded = !empty($IPsWithFailAuth)
+    $IPsWithSuccessfulAuthImploded = !empty($IPsWithSuccessfulAuth)
       ? implode(', ', $IPsWithSuccessfulAuth)
       : '-';
     $IPsWithFailAuthImploded = !empty($IPsWithFailAuth)
