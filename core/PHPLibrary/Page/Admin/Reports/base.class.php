@@ -138,7 +138,7 @@ class ReportsBase implements ReportsPageInterface
       }
     }
     
-    return array_values(array_unique($IPs));
+    return $IPs;
   }
 
   /**

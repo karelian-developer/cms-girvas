@@ -28,8 +28,11 @@
   margin: 0;
 }
 
-.main__page.page .report-section .report-section__list > li:not(:last-child) {
+.main__page.page .report-section .report-section__list > li {
   font-size: 14px;
+}
+
+.main__page.page .report-section .report-section__list > li:not(:last-child) {
   margin-bottom: 10px;
 }
 
