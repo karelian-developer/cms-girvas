@@ -133,9 +133,10 @@ class ReportsBase implements ReportsPageInterface
     $IPs = [];
     
     foreach ($reports as $report) {
-      echo $report->variables['clientIP'];
-      if (isset($report->variables['clientIP'])) {
-        $IPs[] = $report->variables['clientIP'];
+      $variables = $report->getVariables();
+      
+      if (isset($variables['clientIP'])) {
+        $IPs[] = $variables['clientIP'];
       }
     }
     
