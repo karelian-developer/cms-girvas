@@ -165,7 +165,7 @@ final class Reports
 
     $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections($columnsScope);
+    $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('reports');
     $queryBuilder->statement->clauseFrom->assembly();
@@ -198,7 +198,7 @@ final class Reports
       foreach ($results as $data) {
         $report = new Report($CMSCore, $data['id']);
         $report->initData($columnsScope);
-        
+
         $reports[] = $report;
       }
     }
