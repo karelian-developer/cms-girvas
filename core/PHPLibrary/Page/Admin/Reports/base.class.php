@@ -116,12 +116,13 @@ class ReportsBase implements ReportsPageInterface
   private function filterReports(array &$reportsObjects, array $typeIDs) : void
   {
     foreach ($reportsObjects as $index => $report) {
+      print_r($report->getTypeID());
       $typeID = $report->getTypeID();
       $typeID = is_numeric($report->getTypeID())
         ? (int)$report->getTypeID()
         : 0;
 
-      if (!in_array($typeID, $typeIDs)) {
+      if (!in_array($typeID, $typeIDs, true)) {
         unset($reportsObjects[$index]);
       }
     }
