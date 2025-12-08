@@ -109,7 +109,7 @@ class ReportsBase implements ReportsPageInterface
       $this->CMSCore,
       $startPeriodUnix,
       $endPeriodUnix,
-      ['id', 'metadata']
+      ['id', 'metadata', 'variables']
     );
   }
 
@@ -133,8 +133,8 @@ class ReportsBase implements ReportsPageInterface
     $IPs = [];
     
     foreach ($reports as $report) {
-      if (isset($report->metadata['clientIP'])) {
-        $IPs[] = $report->metadata['clientIP'];
+      if (isset($report->variables['clientIP'])) {
+        $IPs[] = $report->variables['clientIP'];
       }
     }
     
