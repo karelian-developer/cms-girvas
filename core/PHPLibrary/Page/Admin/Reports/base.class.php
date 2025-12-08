@@ -134,13 +134,13 @@ class ReportsBase implements ReportsPageInterface
     
     foreach ($reports as $report) {
       $variables = $report->getVariables();
-      
+
       if (isset($variables['clientIP'])) {
         $IPs[] = $variables['clientIP'];
       }
     }
     
-    return $IPs;
+    return array_unique($IPs);
   }
 
   /**
