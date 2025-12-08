@@ -51,34 +51,6 @@ class PageIndex implements InterfacePage
 
     $this->initMetaOpenGraph();
   }
-  
-  /**
-   * Добавление обязательных CSS-файлов
-   * 
-   * @return void
-   */
-  private function addRequiredStyles() : void
-  {
-    foreach (['page.css', 'page/index.css'] as $stylePath) {
-      $this->CMSCore->theme->addStyle(
-        [
-          'href' => 'styles/' . $stylePath,
-          'rel' => 'stylesheet'
-        ]
-      );
-    }
-  }
-  
-  /**
-   * Сборка шаблона страницы
-   *
-   * @return void
-   */
-  public function assembly() : void
-  {
-    $CMSCore = $this->CMSCore;
-    $CMSTheme = $CMSCore->theme;
-    $CMSLocale = $CMSCore->locale;
 
   /**
    * Инициализация данных OpenGraph
