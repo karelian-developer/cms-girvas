@@ -133,6 +133,7 @@ class ReportsBase implements ReportsPageInterface
     $IPs = [];
     
     foreach ($reports as $report) {
+      print_r($report->variables['clientIP']);
       if (isset($report->variables['clientIP'])) {
         $IPs[] = $report->variables['clientIP'];
       }
@@ -204,7 +205,6 @@ class ReportsBase implements ReportsPageInterface
     $totalSecurityBaseAuthSuccessActions = count($reportsSecurityBaseAuthSuccess);
 
     $IPsWithSuccessfulAuth = $this->extractClientIPs($reportsSecurityAdminAuthSuccess);
-    print_r($IPsWithSuccessfulAuth);
     $IPsWithFailAuth = $this->extractClientIPs($reportsSecurityAdminAuthFail);
 
     $IPsWithSuccessfulAuthImploded = implode(', ', $IPsWithSuccessfulAuth);
