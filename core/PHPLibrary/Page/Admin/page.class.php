@@ -166,10 +166,16 @@ class PagePage implements InterfacePage
     }
 
     $templatesAssembled = [];
+    $templatesEditorAssembled = [];
     $templateContent = ThemeCollector::getTemplateFileContent(
       $this->CMSCore->theme,
       'templates/page/pageStatic.tpl'
     );
+    $templateEditorContent = ThemeCollector::getTemplateFileContent(
+      $this->CMSCore->theme,
+      'templates/page/pageStatic/editor.tpl'
+    );
+
 
     if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_ID')) {
       $value = $pageStatic !== null ? $pageStatic->getID() : 0;
@@ -237,11 +243,11 @@ class PagePage implements InterfacePage
       );
     }
 
-    if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_CONTENT')) {
+    if (ThemeCollector::existsTemplateVariable($templateEditorContent, 'PAGE_STATIC_CONTENT')) {
       $value = $pageStatic !== null ? $pageStatic->getContent($localeName) : '';
 
       ThemeCollector::addTemplateVariable(
-        $templatesAssembled,
+        $templatesEditorAssembled,
         'PAGE_STATIC_CONTENT',
         str_replace(
           ThemeCollector::DECODED_ENTITIES,
@@ -295,7 +301,8 @@ class PagePage implements InterfacePage
     $templatesAssembled['ADMIN_PANEL_PAGE_NAME'] = 'page-static';
     $templatesAssembled['PAGE_STATIC_EDITOR'] = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme,
-      'templates/page/pageStatic/editor.tpl', []
+      'templates/page/pageStatic/editor.tpl',
+      $templatesEditorAssembled
     );
 
     /** @var string $site_page Содержимое шаблона страницы */
