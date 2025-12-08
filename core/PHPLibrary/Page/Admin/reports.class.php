@@ -34,7 +34,7 @@ final class PageReports implements InterfacePage
 {
   use TraitPage;
 
-  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_REPORTS_REPORTS_GROUP_%s_TITLE';
+  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_REPORTS_NAVIGATION_%s_LABEL';
 
   public string $assembled = '';
   public array $navigationSubsections = [
