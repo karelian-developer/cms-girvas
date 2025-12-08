@@ -36,7 +36,16 @@
   margin-bottom: 10px;
 }
 
+.main__page.page .report-section .report-section__data-label {
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
 .main__page.page .report-section .report-section__data-label::after {
   content: ':';
   margin-right: 5px;
+}
+
+.main__page.page .report-section .report-section__data-value {
+  opacity: .8;
 }
