@@ -113,7 +113,7 @@ class ReportsBase implements ReportsPageInterface
     );
   }
 
-  private function filterReports(array &$reportsObjects, array $typeIDs) : void
+  private function filterReports(array $reportsObjects, array $typeIDs) : array
   {
     foreach ($reportsObjects as $index => $report) {
       $typeID = $report->getTypeID();
@@ -125,6 +125,8 @@ class ReportsBase implements ReportsPageInterface
         unset($reportsObjects[$index]);
       }
     }
+
+    return $reportsObjects;
   }
 
   /**
@@ -138,22 +140,45 @@ class ReportsBase implements ReportsPageInterface
   {
     $templatePath = 'templates/page/reports/' . $this->name . '.tpl';
     $reports = $this->getAllReportsObjectsByPeriod();
-    $this->filterReports($reports, [
+    $reportsAll = $this->filterReports($reports, [
       CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED,
       CMSReport::REPORT_TYPE_ID_AP_PAGE_CREATED,
       CMSReport::REPORT_TYPE_ID_AP_MEDIA_UPLOADED,
       CMSReport::REPORT_TYPE_ID_USER_CREATED
     ]);
 
+    $reportsEntriesCreated = $this->filterReports($reports, [
+      CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED
+    ]);
+
+    $reportsPagesCreated = $this->filterReports($reports, [
+      CMSReport::REPORT_TYPE_ID_AP_PAGE_CREATED
+    ]);
+
+    $reportsMediaUploaded = $this->filterReports($reports, [
+      CMSReport::REPORT_TYPE_ID_AP_MEDIA_UPLOADED
+    ]);
+
+    $reportsUsersRegistered = $this->filterReports($reports, [
+      CMSReport::REPORT_TYPE_ID_USER_CREATED
+    ]);
+
     $totalActions = count($reports);
-    $totalEntriesCreated = count($reports);
+    $totalEntriesCreatedActions = count($reportsEntriesCreated);
+    $totalPagesCreatedActions = count($reportsPagesCreated);
+    $totalMediaUploadedActions = count($reportsMediaUploaded);
+    $totalUsersRegisteredActions = count($reportsUsersRegistered);
     
     $this->assembled = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme,
       $templatePath,
       [
         'REPORT_NAME' => $this->name,
-        'TOTAL_ACTIONS' => $totalActions
+        'TOTAL_ACTIONS' => $totalActions,
+        'TOTAL_ENTRIES_CREATED' => $totalEntriesCreatedActions,
+        'TOTAL_PAGES_CREATED' => $totalPagesCreatedActions,
+        'TOTAL_MEDIA_UPLOADS' => $totalMediaUploadedActions,
+        'TOTAL_USERS_CREATED' => $totalUsersRegisteredActions
       ]
     );
   }
