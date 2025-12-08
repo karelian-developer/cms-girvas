@@ -48,7 +48,7 @@
     </li>
     <li class="report-section__data">
       <div class="report-section__data-label">IP-адреса с неуспешными авторизациями в административной панели</div>
-      <div class="report-section__data-value">{TOTAL_IP_ADDRESS_WITH_SUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL}</div>
+      <div class="report-section__data-value">{TOTAL_IP_ADDRESS_WITH_UNSUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL}</div>
     </li>
   </ul>
 </section>

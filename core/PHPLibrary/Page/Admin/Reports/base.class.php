@@ -129,6 +129,18 @@ class ReportsBase implements ReportsPageInterface
     return $reportsObjects;
   }
 
+  private function extractClientIPs(array $reports) : array {
+    $IPs = [];
+    
+    foreach ($reports as $report) {
+      if (isset($report->metadata['clientIP'])) {
+        $IPs[] = $report->metadata['clientIP'];
+      }
+    }
+    
+    return array_values(array_unique($IPs));
+  }
+
   /**
    * Собрать шаблон
    * 
@@ -190,6 +202,12 @@ class ReportsBase implements ReportsPageInterface
     $totalSecurityAdminAuthSuccessActions = count($reportsSecurityAdminAuthSuccess);
     $totalSecurityBaseAuthFailActions = count($reportsSecurityBaseAuthFail);
     $totalSecurityBaseAuthSuccessActions = count($reportsSecurityBaseAuthSuccess);
+
+    $IPsWithSuccessfulAuth = $this->extractClientIPs($reportsSecurityAdminAuthSuccess);
+    $IPsWithFailAuth = $this->extractClientIPs($reportsSecurityAdminAuthFail);
+
+    $IPsWithSuccessfulAuthImploded = implode(', ', $IPsWithSuccessfulAuth);
+    $IPsWithFailAuthImploded = implode(', ', $IPsWithFailAuth);
     
     $this->assembled = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme,
@@ -201,10 +219,12 @@ class ReportsBase implements ReportsPageInterface
         'TOTAL_PAGES_CREATED' => $totalPagesCreatedActions,
         'TOTAL_MEDIA_UPLOADS' => $totalMediaUploadedActions,
         'TOTAL_USERS_CREATED' => $totalUsersRegisteredActions,
-        'TOTAL_SUCCESSFUL_AUTH_ON_THE_SITE' => $totalSecurityAdminAuthFailActions,
-        'TOTAL_UNSUCCESSFUL_AUTH_ON_THE_SITE' => $totalSecurityAdminAuthSuccessActions,
-        'TOTAL_SUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $totalSecurityBaseAuthFailActions,
-        'TOTAL_UNSUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $totalSecurityBaseAuthSuccessActions
+        'TOTAL_SUCCESSFUL_AUTH_ON_THE_SITE' => $totalSecurityAdminAuthSuccessActions,
+        'TOTAL_UNSUCCESSFUL_AUTH_ON_THE_SITE' => $totalSecurityAdminAuthFailActions,
+        'TOTAL_SUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $totalSecurityBaseAuthSuccessActions,
+        'TOTAL_UNSUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $totalSecurityBaseAuthFailActions,
+        'TOTAL_IP_ADDRESS_WITH_SUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $IPsWithSuccessfulAuthImploded,
+        'TOTAL_IP_ADDRESS_WITH_UNSUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $IPsWithFailAuthImploded
       ]
     );
   }
