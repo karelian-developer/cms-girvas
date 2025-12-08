@@ -187,9 +187,14 @@ class PageEntry implements InterfacePage
     }
 
     $templatesAssembled = [];
+    $templatesEditorAssembled = [];
     $templateContent = ThemeCollector::getTemplateFileContent(
       $this->CMSCore->theme,
       'templates/page/entry.tpl'
+    );
+    $templateEditorContent = ThemeCollector::getTemplateFileContent(
+      $this->CMSCore->theme,
+      'templates/page/entry/editor.tpl'
     );
 
     if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_ID')) {
@@ -258,11 +263,11 @@ class PageEntry implements InterfacePage
       );
     }
 
-    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_CONTENT')) {
+    if (ThemeCollector::existsTemplateVariable($templateEditorContent, 'ENTRY_CONTENT')) {
       $value = $entry !== null ? $entry->getContent($localeName) : '';
 
       ThemeCollector::addTemplateVariable(
-        $templatesAssembled,
+        $templatesEditorAssembled,
         'ENTRY_CONTENT',
         str_replace(
           ThemeCollector::DECODED_ENTITIES,
@@ -315,7 +320,8 @@ class PageEntry implements InterfacePage
 
     $templatesAssembled['ADMIN_PANEL_PAGE_NAME'] = 'entry';
     $templatesAssembled['ENTRY_EDITOR'] = ThemeCollector::assemblyFileContent(
-      $this->CMSCore->theme, 'templates/page/entry/editor.tpl', []
+      $this->CMSCore->theme, 'templates/page/entry/editor.tpl',
+      $templatesEditorAssembled
     );
 
     /** @var string $site_page Содержимое шаблона страницы */
