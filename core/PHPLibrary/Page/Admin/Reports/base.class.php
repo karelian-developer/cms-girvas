@@ -208,8 +208,12 @@ class ReportsBase implements ReportsPageInterface
     $IPsWithSuccessfulAuth = $this->extractClientIPs($reportsSecurityAdminAuthSuccess);
     $IPsWithFailAuth = $this->extractClientIPs($reportsSecurityAdminAuthFail);
 
-    $IPsWithSuccessfulAuthImploded = implode(', ', $IPsWithSuccessfulAuth);
-    $IPsWithFailAuthImploded = implode(', ', $IPsWithFailAuth);
+    $IPsWithSuccessfulAuthImploded = !empty($IPsWithFailAuth)
+      ? implode(', ', $IPsWithSuccessfulAuth)
+      : '-';
+    $IPsWithFailAuthImploded = !empty($IPsWithFailAuth)
+      ? implode(', ', $IPsWithFailAuth)
+      : '-';
     
     $this->assembled = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme,

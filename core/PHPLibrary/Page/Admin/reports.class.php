@@ -34,7 +34,7 @@ final class PageReports implements InterfacePage
 {
   use TraitPage;
 
-  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_REPORTS_NAVIGATION_%s_LABEL';
+  const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_REPORTS_REPORTS_GROUP_%s_TITLE';
 
   public string $assembled = '';
   public array $navigationSubsections = [
@@ -46,8 +46,8 @@ final class PageReports implements InterfacePage
       'isActive' => false
     ],
     'all' => [
-      'name' => 'all',
-      'iconName' => 'all',
+      'name' => 'base',
+      'iconName' => 'base',
       'link' => '/reports',
       'permanent' => false,
       'isActive' => true
@@ -151,97 +151,5 @@ final class PageReports implements InterfacePage
       'PAGE_REPORT_DESCRIPTION' => $reportsDescription ?? $localeData['PAGE_REPORTS_GROUP_NOT_FOUND_DESCRIPTION'],
       'PAGE_REPORT' => ThemeCollector::assembly($reportsPageAssembled, [])
     ]);
-
-    // $reportsSecurityAssembled = [];
-    // $reportsSecurity = (new CMSReports($this->CMSCore))->getByTypeIDs([
-    //   CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL,
-    //   CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS
-    // ], ['limit' => 50]);
-
-    // $reportsCommonAssembled = [];
-    // $reportsCommon = (new CMSReports($this->CMSCore))->getByTypeIDs([
-    //   CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED,
-    //   CMSReport::REPORT_TYPE_ID_AP_ENTRY_EDITED,
-    //   CMSReport::REPORT_TYPE_ID_AP_ENTRY_DELETED
-    // ], ['limit' => 50]);
-
-    // foreach ($reportsSecurity as $index => $report) {
-    //   $report->initData(['metadata', 'variables', 'createdUnixTimestamp']);
-      
-    //   $reportCategoryName = 'security';
-    //   $reportVariables = $report->getVariables();
-
-    //   $reportsSecurityAssembled[] = ThemeCollector::assemblyFileContent(
-    //     $this->CMSCore->theme,
-    //     'templates/page/reports/listItem.tpl',
-    //     [
-    //       'REPORT_CATEGORY_NAME' => $reportCategoryName,
-    //       'REPORT_CONTENT' => ThemeCollector::assembly(
-    //         ThemeCollector::assemblyLocale(
-    //           $report->getContent(),
-    //           $this->CMSCore->locale
-    //         ),
-    //         [
-    //           'CLIENT_IP' => $reportVariables['clientIP'] ?? '0.0.0.0',
-    //           'DATE' => $reportVariables['date'] ?? date('d.m.Y H:i:s', time()),
-    //           'ENTRY_TITLE' => $reportVariables['entryTitle'] ?? '[ ??? ]',
-    //         ]
-    //       ),
-    //       'REPORT_CREATED_TIMESTAMP' => date('d.m.Y H:i:s', $report->getCreatedUnixTimestamp()),
-    //     ]
-    //   );
-    // }
-
-    // foreach ($reportsCommon as $index => $report) {
-    //   $report->initData(['metadata', 'variables', 'createdUnixTimestamp']);
-
-    //   $reportCategoryName = 'common';
-    //   $reportVariables = $report->getVariables();
-
-    //   $reportsCommonAssembled[] = ThemeCollector::assemblyFileContent(
-    //     $this->CMSCore->theme,
-    //     'templates/page/reports/listItem.tpl',
-    //     [
-    //       'REPORT_CATEGORY_NAME' => $reportCategoryName,
-    //       'REPORT_CONTENT' => ThemeCollector::assembly(
-    //         ThemeCollector::assemblyLocale(
-    //           $report->getContent(),
-    //           $this->CMSCore->locale
-    //         ),
-    //         [
-    //           'CLIENT_IP' => $reportVariables['clientIP'] ?? '0.0.0.0',
-    //           'DATE' => $reportVariables['date'] ?? date('d.m.Y H:i:s', time()),
-    //           'ENTRY_TITLE' => $reportVariables['entryTitle'] ?? '[ ??? ]',
-    //         ]
-    //       ),
-    //       'REPORT_CREATED_TIMESTAMP' => date('d.m.Y H:i:s', $report->getCreatedUnixTimestamp()),
-    //     ]
-    //   );
-    // }
-
-    /** @var string $site_page Содержимое шаблона страницы */
-    // $this->assembled = ThemeCollector::assemblyFileContent(
-    //   $this->CMSCore->theme,
-    //   'templates/page/reports.tpl',
-    //   [
-    //     'ADMIN_PANEL_PAGE_NAME' => 'reports',
-    //     'REPORTS_SECURITY_LIST' => ThemeCollector::assemblyFileContent(
-    //       $this->CMSCore->theme,
-    //       'templates/page/reports/list.tpl',
-    //       [
-    //         'REPORTS_LIST_ITEMS' => implode($reportsSecurityAssembled)
-    //       ]
-    //     ),
-    //     'REPORTS_COMMON_LIST' => ThemeCollector::assemblyFileContent(
-    //       $this->CMSCore->theme,
-    //       'templates/page/reports/list.tpl',
-    //       [
-    //         'REPORTS_LIST_ITEMS' => implode($reportsCommonAssembled)
-    //       ]
-    //     )
-    //   ]
-    // );
-
-
   }
 }
