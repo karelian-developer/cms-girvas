@@ -196,7 +196,10 @@ final class Reports
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        $reports[] = new Report($CMSCore, $data['id']);
+        $report = new Report($CMSCore, $data['id']);
+        $report->initData($columnsScope);
+        
+        $reports[] = $report;
       }
     }
 
