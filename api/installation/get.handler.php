@@ -625,7 +625,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('forms_data');
       $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->addColumn('form_id', 'integer', 'NOT NULL');
+      $queryBuilder->statement->addColumn('formID', 'integer', 'NOT NULL');
       $queryBuilder->statement->addColumn('data', $JSONDataTypeDMS);
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
