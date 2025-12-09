@@ -31,7 +31,7 @@ if (defined('IS_NOT_HACKED')) {
   $handlerHeaders = apache_request_headers();
   $PHPInputContent = file_get_contents('php://input');
 
-  if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+  if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $CMSURLP->getPath(1) !== 'install') {
     $cookieToken = $_COOKIE['_grv_csrf'] ?? null;
     $headerToken = $handlerHeaders['X-Csrf-Token'] ?? null;
 
