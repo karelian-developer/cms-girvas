@@ -3,5 +3,3 @@ Allow: /
 
 Disallow: /admin
 Disallow: /registration
-Disallow: /entries?*
-Disallow: /entries/*?*
