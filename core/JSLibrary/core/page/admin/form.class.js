@@ -152,7 +152,7 @@ export class PageForm {
         let uString = utils.createString(inputValue);
         uString.source = uString.translitToEN(true);
         uString.source = uString.source.toLowerCase();
-        uString.source = uString.source.replace(/[^a-zA-Z0-9\-]/, '');
+        uString.source = uString.source.replace(/[^a-z0-9\-]/, '');
 
         event.target.value = uString.source;
       });
@@ -399,7 +399,7 @@ export class PageForm {
     formElementInputPlaceholder.setAttribute('type', 'text');
     formElementInputPlaceholder.setAttribute('name', 'form_element_placeholder[]');
     formElementInputPlaceholder.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_PLACEHOLDER_PLACEHOLDER);
-    formElementInputName.setAttribute('pattern', '[a-z0-9_]+');
+    formElementInputName.setAttribute('pattern', '[a-zA-Z0-9_]+');
     formElementInputName.setAttribute('type', 'text');
     formElementInputName.setAttribute('name', 'form_element_name[]');
     formElementInputName.setAttribute('placeholder', 'my_field');
