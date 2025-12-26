@@ -23,7 +23,7 @@ namespace core\PHPLibrary\SystemCore\Notifier;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\SystemCore\Notifier as Notifier;
 
-abstract class Telegram extends Notifier
+class Telegram extends Notifier
 {
   private string $token = '';
   private int $chatID = 0;

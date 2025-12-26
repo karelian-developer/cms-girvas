@@ -23,7 +23,7 @@ namespace core\PHPLibrary\SystemCore\Notifier;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\SystemCore\Notifier as Notifier;
 
-abstract class OK extends Notifier
+class OK extends Notifier
 {
   private string $token = '';
   private string $message = '';
