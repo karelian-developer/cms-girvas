@@ -42,8 +42,6 @@ abstract class Notifier
     public CoreInterface $CMSCore
   ) {}
 
-  abstract public function getPlatform() : Notifier;
-
   private function setType(string $typeLabel) : void
   {
     $this->type = match ($typeLabel) {
