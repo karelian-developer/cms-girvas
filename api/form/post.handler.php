@@ -42,6 +42,20 @@ if (Form::existsByName($CMSCore, $formName)) {
     }
   };
 
+  //////////////
+  $botToken = '5278817432:AAF6N_kfULH3v1N-pC4_zrt28s9JrWlpwWc';
+  $chatID = '867321986';
+  $message = "✅ Тестовое сообщение работает!";
+  $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
+
+  $params = [
+    'chat_id' => $chatID,
+    'text' => $message,
+    'parse_mode' => 'HTML'
+  ];
+
+  $result = file_get_contents($url . '?' . http_build_query($params));
+
   $form->saveData($formData);
 
   $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_POST_DATA_SUCCESS');
