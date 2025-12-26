@@ -399,7 +399,7 @@ export class PageForm {
     formElementInputPlaceholder.setAttribute('type', 'text');
     formElementInputPlaceholder.setAttribute('name', 'form_element_placeholder[]');
     formElementInputPlaceholder.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_PLACEHOLDER_PLACEHOLDER);
-    formElementInputName.setAttribute('pattern', '[a-z0-9_]+');
+    formElementInputName.setAttribute('pattern', '[a-zA-Z0-9_]+');
     formElementInputName.setAttribute('type', 'text');
     formElementInputName.setAttribute('name', 'form_element_name[]');
     formElementInputName.setAttribute('placeholder', 'my_field');

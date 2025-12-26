@@ -485,27 +485,29 @@ export class InstallationMaster {
           /** @type {FormData} */
           let formData = new FormData(formTarget);
           
-          fetch(`/handler/install/set-locales-and-timezone?locale=${localeName}&installation-mode=true`, {method: 'POST', body: formData}).then((response) => {
-            return response.ok ? response.json() : Promise.reject(response);
-          }).then((data) => {
-            let resultHTML = data.outputData.html;
+          let request = new Interactive('request', {
+            method: 'POST',
+            url: `/handler/install/set-locales-and-timezone?locale=${localeName}&installation-mode=true`
+          });
 
-            let tableSystemsElement = document.querySelector('[role="cms-locale-and-timezone"]');
-
-            if (tableSystemsElement) {
-              tableSystemsElement.remove();
+          request.target.data = formData;
+          request.target.send().then((data) => {
+            if (data.statusCode === 1) {
+              let resultHTML = data.outputData.html;
+              let tableSystemsElement = document.querySelector('[role="cms-locale-and-timezone"]');
+              if (tableSystemsElement) {
+                tableSystemsElement.remove();
+              }
+              
+              let dynamicDiv = document.createElement('div');
+              dynamicDiv.setAttribute('role', 'cms-locale-and-timezone');
+              dynamicDiv.innerHTML = resultHTML;
+              let installationPages = document.querySelectorAll('[data-page-index]');
+              installationPages[this.getStepIndex()].appendChild(dynamicDiv);
+              this.buttons.nextStepIndex.target.enable();
+            } else {
+              this.showPopupNotification(rejectionReason, 0);
             }
-            
-            let dynamicDiv = document.createElement('div');
-            dynamicDiv.setAttribute('role', 'cms-locale-and-timezone');
-            dynamicDiv.innerHTML = resultHTML;
-
-            let installationPages = document.querySelectorAll('[data-page-index]');
-            installationPages[this.getStepIndex()].appendChild(dynamicDiv);
-
-            this.buttons.nextStepIndex.target.enable();
-          }, (rejectionReason) => {
-            this.showPopupNotification(rejectionReason, 0);
           });
         });
 

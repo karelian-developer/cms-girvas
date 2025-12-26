@@ -214,6 +214,21 @@ if ($CMSCore->client->isLogged(2)) {
           if (isset($_PATCH['entry_category_id'])) $entryData['categoryID'] = $_PATCH['entry_category_id'];
           
           if (isset($_PATCH['entry_preview'])) {
+            $fileExtension = pathinfo($_PATCH['entry_preview'], PATHINFO_EXTENSION);
+            $fileExtension = strtolower($fileExtension);
+            
+            $extensionMap = [
+              'jpg' => FileConverterEnumFileFormat::JPG,
+              'jpeg' => FileConverterEnumFileFormat::JPG,
+              'png' => FileConverterEnumFileFormat::PNG,
+              'gif' => FileConverterEnumFileFormat::GIF,
+              'bmp' => FileConverterEnumFileFormat::BMP,
+              'webp' => FileConverterEnumFileFormat::WEBP,
+              'avif' => FileConverterEnumFileFormat::AVIF,
+            ];
+
+            $fileExtensionEnum = $extensionMap[$fileExtension] ?? FileConverterEnumFileFormat::JPG;
+
             if ($CMSCore->configurator->getAutoConvertFileImageStatus(true)) {
               $fileExtensionConvertedEnum = match ($CMSCore->configurator->getAutoConvertFileImageExtension()) {
                 'webp' => FileConverterEnumFileFormat::WEBP,

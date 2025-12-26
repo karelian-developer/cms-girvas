@@ -239,7 +239,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
         if ($userUpdateIsAllowed) {
           if (isset($userEmail)) {
             if ($userEmail !== $user->getEmail()) {
-              if (User::emailIIsValid($CMSCore, $userEmail)) {
+              if (User::emailIsValid($CMSCore, $userEmail)) {
                 if (!User::existsByEmail($CMSCore, $userEmail)) {
                   $userData['email'] = $userEmail;
                 } else {
