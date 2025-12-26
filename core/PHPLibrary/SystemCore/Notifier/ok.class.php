@@ -37,7 +37,7 @@ abstract class OK extends Notifier
    */
   public function __construct(
     public CoreInterface $CMSCore,
-    private Notifier $platform;
+    private Notifier $platform
   ) {}
 
   public function getPlatform() : Notifier
