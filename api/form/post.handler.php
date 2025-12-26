@@ -44,14 +44,14 @@ if (Form::existsByName($CMSCore, $formName)) {
 
   //////////////
   $botToken = '5278817432:AAF6N_kfULH3v1N-pC4_zrt28s9JrWlpwWc';
-  $chatID = '867321986';
-  $message = "✅ Тестовое сообщение работает!";
+  $chatID = '856123605';
+  $message = "[CMS \"ГИРВАС\"]: Идентификация прошла успешно для последующей отправки уведомлений!";
   $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
 
   $params = [
     'chat_id' => $chatID,
     'text' => $message,
-    'parse_mode' => 'HTML'
+    'parse_mode' => 'Markdown'
   ];
 
   $result = file_get_contents($url . '?' . http_build_query($params));
