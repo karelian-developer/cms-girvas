@@ -195,6 +195,78 @@ class Form implements EntityTypeContent
 
     return '';
   }
+  
+  /**
+   * Получить ID чата в Telegram
+   *
+   * @return int
+   */
+  public function getTelegramChatIDs() : int
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+      
+      if (isset($metadata['telegramChatIDs'])) {
+        return $metadata['telegramChatIDs'];
+      }
+    }
+
+    return 0;
+  }
+  
+  /**
+   * Получить ID топика в Telegram
+   *
+   * @return int
+   */
+  public function getTelegramThreatIDs() : int
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+      
+      if (isset($metadata['telegramThreatIDs'])) {
+        return $metadata['telegramChatIDs'];
+      }
+    }
+
+    return 0;
+  }
+  
+  /**
+   * Получить ID канала в Telegram
+   *
+   * @return int
+   */
+  public function getTelegramChannelsIDs() : int
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+      
+      if (isset($metadata['telegramBusinessConnectionIDs'])) {
+        return $metadata['telegramBusinessConnectionIDs'];
+      }
+    }
+
+    return 0;
+  }
+  
+  /**
+   * Получить ключ для Telegram
+   *
+   * @return string
+   */
+  public function getTelegramKey() : string
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+      
+      if (isset($metadata['telegramKey'])) {
+        return $metadata['telegramKey'];
+      }
+    }
+
+    return '';
+  }
 
   /**
    * Получить тексты

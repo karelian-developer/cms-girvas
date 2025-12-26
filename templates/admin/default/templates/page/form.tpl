@@ -70,6 +70,57 @@
         <div class="cell grid-table__cell grid-table__cell_data">
           <div data-element="choice" data-choice="method"></div>
         </div>
+        <div class="cell grid-table__cell grid-table__cell_header">
+          {LANG:PAGE_FORM_NOTIFICATIONS_TITLE}
+        </div>
+        <!-- Поле: Уведомления (ключ для Telegram) -->
+        <div class="cell grid-table__cell grid-table__cell_text">
+          <div class="cell__title">
+            {LANG:PAGE_FORM_NOTIFICATIONS_TELEGRAM_KEY_TITLE}
+          </div>
+          <div class="cell__description">
+            {LANG:PAGE_FORM_NOTIFICATIONS_TELEGRAM_KEY_DESCRIPTION}
+          </div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <input name="form_notification_telegram_key_ids" type="text" class="input form__input form__input_text" value="{FORM_NOTIFICATION_TELEGRAM_KEY}" placeholder="" data-element="input-notifications-telegram-key">
+        </div>
+        <!-- Поле: Уведомления (чаты Telegram) -->
+        <div class="cell grid-table__cell grid-table__cell_text">
+          <div class="cell__title">
+            {LANG:PAGE_FORM_NOTIFICATIONS_TELEGRAM_CHATS_TITLE}
+          </div>
+          <div class="cell__description">
+            {LANG:PAGE_FORM_NOTIFICATIONS_TELEGRAM_CHATS_DESCRIPTION}
+          </div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <input name="form_notification_telegram_chats_ids" type="text" class="input form__input form__input_text" value="{FORM_NOTIFICATION_TELEGRAM_CHATS_IDS}" placeholder="123456789, 123456790..." data-element="input-notifications-telegram-chats-ids">
+        </div>
+        <!-- Поле: Уведомления (топики Telegram) -->
+        <!-- <div class="cell grid-table__cell grid-table__cell_text">
+          <div class="cell__title">
+            {LANG:PAGE_FORM_NOTIFICATIONS_TELEGRAM_THREATS_TITLE}
+          </div>
+          <div class="cell__description">
+            {LANG:PAGE_FORM_NOTIFICATIONS_TELEGRAM_THREATS_DESCRIPTION}
+          </div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <input name="form_notification_telegram_threats_ids" type="text" class="input form__input form__input_text" value="{FORM_NOTIFICATION_TELEGRAM_THREATS_IDS}" placeholder="123456789, 123456790..." data-element="input-notifications-telegram-threats-ids">
+        </div> -->
+        <!-- Поле: Уведомления (каналы Telegram) -->
+        <!-- <div class="cell grid-table__cell grid-table__cell_text">
+          <div class="cell__title">
+            {LANG:PAGE_FORM_NOTIFICATIONS_TELEGRAM_CHANNELS_TITLE}
+          </div>
+          <div class="cell__description">
+            {LANG:PAGE_FORM_NOTIFICATIONS_TELEGRAM_CHANNELS_DESCRIPTION}
+          </div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <input name="form_notification_telegram_channels_ids" type="text" class="input form__input form__input_text" value="{FORM_NOTIFICATION_TELEGRAM_CHANNELS_IDS}" placeholder="123456789, 123456790..." data-element="input-notifications-telegram-channels-ids">
+        </div> -->
         <!-- Раздел: Элементы формы -->
         <div class="cell grid-table__cell grid-table__cell_header">
           {LANG:PAGE_FORM_ELEMENTS_TITLE}

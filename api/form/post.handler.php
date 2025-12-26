@@ -24,6 +24,7 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 use \core\PHPLibrary\Form as Form;
+use \core\PHPLibrary\SystemCore\Notifier as CMSNotifier;
 
 $formName = $CMSCore->urlp->getPath(2);
 
@@ -42,24 +43,56 @@ if (Form::existsByName($CMSCore, $formName)) {
     }
   };
 
-  //////////////
-  $botToken = '5278817432:AAF6N_kfULH3v1N-pC4_zrt28s9JrWlpwWc';
-  $chatID = '867321986';
-  $message = "[CMS \"ГИРВАС\"]: Идентификация прошла успешно для последующей отправки уведомлений!";
-  $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
+  $result = $form->saveData($formData);
 
-  $params = [
-    'chat_id' => $chatID,
-    'text' => $message,
-    'parse_mode' => 'Markdown'
-  ];
+  if ($result) {
+    $notifierTelegramChatsIDs = $_POST['form_notification_telegram_chats_ids'] ?? [];
+    $notifierTelegramThreatsIDs = $_POST['form_notification_telegram_threats_ids'] ?? [];
+    $notifierTelegramChannelsIDs = $_POST['form_notification_telegram_channels_ids'] ?? [];
 
-  $result = file_get_contents($url . '?' . http_build_query($params));
+    $notifierTelegramChatsIDs = is_array($notifierTelegramChatsIDs)
+      ? explode(', ', $notifierTelegramChatsIDs)
+      : [];
 
-  $form->saveData($formData);
+    $notifierTelegramThreatsIDs = is_array($notifierTelegramThreatsIDs)
+      ? explode(', ', $notifierTelegramThreatsIDs)
+      : [];
 
-  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_POST_DATA_SUCCESS');
-  $handlerStatusCode = $handlerStatusCode ?? 1;
+    $notifierTelegramChannelsIDs = is_array($notifierTelegramChannelsIDs)
+      ? explode(', ', $notifierTelegramChannelsIDs)
+      : [];
+
+    $notifierTelegramChatsCount = count($notifierTelegramChatsIDs);
+    $notifierTelegramThreatsCount = count($notifierTelegramThreatsIDs);
+    $notifierTelegramChannelsCount = count($notifierTelegramChannelsIDs);
+
+    if (
+      $notifierTelegramChatsCount > 0 ||
+      $notifierTelegramThreatsCount > 0 ||
+      $notifierTelegramChannelsCount > 0
+    ) {
+      $CMSNotifier = new CMSNotifier($CMSCore);
+      $CMSNotifier->setType('telegram');
+      $CMSNotifier->initAdapter();
+      
+      $CMSNotifierAdapter = $CMSNotifier->getAdapter();
+      $notificationMessage = $_POST[]
+
+      if ($notifierTelegramChatsCount > 0) {
+        foreach ($notifierTelegramChatsIDs as $index => $id) {
+          $CMSNotifierAdapter->setChatID(867321986);
+          $CMSNotifierAdapter->setMessage('Поступление новых данных');
+          $CMSNotifierAdapter->send('NJB2RYMi4mSwDsxrWdHU');
+        }
+      }
+    }
+
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_POST_DATA_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
+  } else {
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
+  }
 } else {
   $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_FORM_ERROR_NOT_FOUND');
   $handlerStatusCode = $handlerStatusCode ?? 0;
