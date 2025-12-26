@@ -21,9 +21,9 @@
 namespace core\PHPLibrary\SystemCore\Notifier;
 
 use \core\PHPLibrary\CoreInterface as CoreInterface;
-use \core\PHPLibrary\SystemCore\Notifier as Notifier;
+use \core\PHPLibrary\SystemCore\Notifier as CMSNotifier;
 
-class OK extends Notifier
+class OK extends CMSNotifier
 {
   private string $token = '';
   private string $message = '';
@@ -37,10 +37,10 @@ class OK extends Notifier
    */
   public function __construct(
     public CoreInterface $CMSCore,
-    private Notifier $platform
+    private CMSNotifier $platform
   ) {}
 
-  public function getPlatform() : Notifier
+  public function getPlatform() : CMSNotifier
   {
     return $platform;
   }

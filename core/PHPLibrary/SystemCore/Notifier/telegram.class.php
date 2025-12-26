@@ -21,9 +21,9 @@
 namespace core\PHPLibrary\SystemCore\Notifier;
 
 use \core\PHPLibrary\CoreInterface as CoreInterface;
-use \core\PHPLibrary\SystemCore\Notifier as Notifier;
+use \core\PHPLibrary\SystemCore\Notifier as CMSNotifier;
 
-class Telegram extends Notifier
+class Telegram extends CMSNotifier
 {
   private string $token = '';
   private int $chatID = 0;
@@ -41,10 +41,10 @@ class Telegram extends Notifier
    */
   public function __construct(
     public CoreInterface $CMSCore,
-    private Notifier $platform
+    private CMSNotifier $platform
   ) {}
 
-  public function getPlatform() : Notifier
+  public function getPlatform() : CMSNotifier
   {
     return $platform;
   }
