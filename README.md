@@ -21,7 +21,7 @@ __ОГРНИП/ИНН:__ 323100000029062/100605017919
 * __Презентация продукта:__ [https://документы.карельский-разработчик.рф/projects/cms-girvas/presentation.pdf](https://xn--d1acoigc6ae0f.xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai/projects/cms-girvas/presentation.pdf)
 
 ## Другие ресурсы
-* __Официальный сайт производителя:__ [https://документы.карельский-разработчик.рф/](https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai)
+* __Официальный сайт производителя:__ [https://карельский-разработчик.рф/](https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai)
 * __Официальный Telegram-канал производителя:__ [https://t.me/karelian_developer](https://t.me/karelian_developer)
 * __Официальный Max-канал производителя:__ [https://max.ru/id100605017919_biz](https://max.ru/id100605017919_biz)
 * __Официальный сообщество ВКонтакте производителя:__ [https://vk.ru/karelian_developer](https://vk.ru/karelian_developer)
