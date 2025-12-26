@@ -40,13 +40,9 @@ class Telegram extends CMSNotifier
    * @return void
    */
   public function __construct(
-    public CoreInterface $CMSCore,
-    private CMSNotifier $platform
-  ) {}
-
-  public function getPlatform() : CMSNotifier
-  {
-    return $platform;
+    public CoreInterface $CMSCore
+  ) {
+    parent::__construct($CMSCore);
   }
 
   public function setToken(string $token) : void
