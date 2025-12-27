@@ -1058,6 +1058,17 @@ final class SystemCore implements CoreInterface
         $cachedData = json_decode(file_get_contents($cacheFile), true);
 
         if (time() < $cachedData['expires']) {
+          usort($cachedData['files'], function($a, $b) {
+            $depthA = substr_count($a, '/');
+            $depthB = substr_count($b, '/');
+
+            if ($depthA !== $depthB) {
+              return $depthA <=> $depthB;
+            }
+
+            return strcmp($a, $b);
+          });
+
           foreach ($cachedData['files'] as $file) {
             $CMSFileConnector->connectFile(strtr(CMS_ROOT_DIRECTORY . '/' . $file, ['\\' => '']));
           }
