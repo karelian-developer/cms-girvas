@@ -50,15 +50,15 @@ if (Form::existsByName($CMSCore, $formName)) {
     $notifierTelegramThreatsIDs = $_POST['form_notification_telegram_threats_ids'] ?? [];
     $notifierTelegramChannelsIDs = $_POST['form_notification_telegram_channels_ids'] ?? [];
 
-    $notifierTelegramChatsIDs = is_array($notifierTelegramChatsIDs)
+    $notifierTelegramChatsIDs = !is_array($notifierTelegramChatsIDs)
       ? explode(', ', $notifierTelegramChatsIDs)
       : [];
 
-    $notifierTelegramThreatsIDs = is_array($notifierTelegramThreatsIDs)
+    $notifierTelegramThreatsIDs = !is_array($notifierTelegramThreatsIDs)
       ? explode(', ', $notifierTelegramThreatsIDs)
       : [];
 
-    $notifierTelegramChannelsIDs = is_array($notifierTelegramChannelsIDs)
+    $notifierTelegramChannelsIDs = !is_array($notifierTelegramChannelsIDs)
       ? explode(', ', $notifierTelegramChannelsIDs)
       : [];
 
