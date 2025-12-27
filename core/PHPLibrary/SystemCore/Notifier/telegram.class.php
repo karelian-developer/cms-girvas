@@ -41,9 +41,7 @@ class Telegram extends CMSNotifier
    */
   public function __construct(
     public CoreInterface $CMSCore
-  ) {
-    parent::__construct($CMSCore);
-  }
+  ) {}
 
   public function setToken(string $token) : void
   {

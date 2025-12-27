@@ -29,18 +29,7 @@ use \core\PHPLibrary\SystemCore\Notifier\Max as NotifierMax;
 abstract class Notifier
 {
   private NotifierEnum $type;
-  private Notifier $adapter;
-
-  /**
-   * __construct
-   *
-   * @param CoreInterface $CMSCore
-   * 
-   * @return void
-   */
-  public function __construct(
-    public CoreInterface $CMSCore
-  ) {}
+  private Notifier $adapter
 
   private function setType(string $typeLabel) : void
   {
