@@ -31,7 +31,7 @@ abstract class Notifier
   private NotifierEnum $type;
   private Notifier $adapter
 
-  private function setType(string $typeLabel) : void
+  public function setType(string $typeLabel) : void
   {
     $this->type = match ($typeLabel) {
       case 'vk' => NotifierEnum::VK,
@@ -52,7 +52,7 @@ abstract class Notifier
     return $this->adapter;
   }
 
-  private function initAdapter() : void
+  public function initAdapter() : void
   {
     $this->adapter = match ($this->type) {
       NotifierEnum::VK => new NotifierVK($this->CMSCore),
