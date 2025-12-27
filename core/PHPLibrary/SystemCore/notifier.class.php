@@ -20,7 +20,7 @@
 
 namespace core\PHPLibrary\SystemCore;
 
-use \core\PHPLibrary as CoreInterface;
+use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\SystemCore\Notifier\VK as NotifierVK;
 use \core\PHPLibrary\SystemCore\Notifier\OK as NotifierOK;
 use \core\PHPLibrary\SystemCore\Notifier\Telegram as NotifierTelegram;
