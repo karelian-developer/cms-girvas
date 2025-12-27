@@ -76,7 +76,7 @@ if (Form::existsByName($CMSCore, $formName)) {
       $CMSNotifier->initAdapter();
       
       $CMSNotifierAdapter = $CMSNotifier->getAdapter();
-      $notificationMessage = $_POST[]
+      //$notificationMessage = $_POST[];
 
       if ($notifierTelegramChatsCount > 0) {
         foreach ($notifierTelegramChatsIDs as $index => $id) {
