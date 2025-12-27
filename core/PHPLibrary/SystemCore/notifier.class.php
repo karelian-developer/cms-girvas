@@ -34,10 +34,10 @@ abstract class Notifier
   public function setType(string $typeLabel) : void
   {
     $this->type = match ($typeLabel) {
-      case 'vk' => NotifierEnum::VK,
-      case 'ok' => NotifierEnum::OK,
-      case 'telegram' => NotifierEnum::TELEGRAM,
-      case 'max' => NotifierEnum::MAX
+      'vk' => NotifierEnum::VK,
+      'ok' => NotifierEnum::OK,
+      'telegram' => NotifierEnum::TELEGRAM,
+      'max' => NotifierEnum::MAX
     };
   }
 
