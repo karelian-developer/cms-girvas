@@ -29,7 +29,7 @@ use \core\PHPLibrary\SystemCore\Notifier\Max as NotifierMax;
 abstract class Notifier
 {
   private NotifierEnum $type;
-  private Notifier $adapter
+  private Notifier $adapter;
 
   public function setType(string $typeLabel) : void
   {
