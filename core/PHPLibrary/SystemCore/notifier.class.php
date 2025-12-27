@@ -44,7 +44,7 @@ abstract class Notifier
   public function init(string $typeLabel) : void
   {
     $this->setType($typeLabel);
-    $this->initAdapter():
+    $this->initAdapter();
   }
 
   public function getAdapter() : Notifier
