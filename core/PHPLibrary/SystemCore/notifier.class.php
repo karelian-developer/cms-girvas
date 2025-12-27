@@ -20,11 +20,11 @@
 
 namespace core\PHPLibrary\SystemCore;
 
-use \core\PHPLibrary\CoreInterface as CoreInterface;
-use \core\PHPLibrary\CoreInterface\Notifier\VK as NotifierVK;
-use \core\PHPLibrary\CoreInterface\Notifier\OK as NotifierOK;
-use \core\PHPLibrary\CoreInterface\Notifier\Telegram as NotifierTelegram;
-use \core\PHPLibrary\CoreInterface\Notifier\Max as NotifierMax;
+use \core\PHPLibrary as CoreInterface;
+use \core\PHPLibrary\SystemCore\Notifier\VK as NotifierVK;
+use \core\PHPLibrary\SystemCore\Notifier\OK as NotifierOK;
+use \core\PHPLibrary\SystemCore\Notifier\Telegram as NotifierTelegram;
+use \core\PHPLibrary\SystemCore\Notifier\Max as NotifierMax;
 
 abstract class Notifier
 {
