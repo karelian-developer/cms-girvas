@@ -521,6 +521,10 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                   $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CLIENT_IP_LABEL') . ":* " . $userIP . "\n\n";
                   $CMSTelegramNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
 
+                  $start = max(0, 175);
+                  $end = min(strlen($CMSTelegramNotifierMessage), 195);
+                  error_log("Символы с 176 по 195: '" . substr($CMSTelegramNotifierMessage, $start, $end-$start) . "'");
+
                   $CMSTelegramNotifier->setMessage($CMSTelegramNotifierMessage);
 
                   foreach ($CMSTelegramNotifierChatsIDs as $index => $id) {
