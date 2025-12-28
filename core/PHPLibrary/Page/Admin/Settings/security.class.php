@@ -78,6 +78,7 @@ class SettingsSecurity implements SettingsPageInterface
 
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
       'SETTINGS_NAME' => $this->name,
+      'SETTING_NOTIFICATION_TELEGRAM_CHATS_IDS' => $this->CMSCore->configurator->existsDatabaseEntryValue('security_notification_telegram_chats_ids') ? implode(', ', json_decode($this->CMSCore->configurator->getDatabaseEntryValue('security_notification_telegram_chats_ids'), true)) : '',
       'SETTING_ALLOWED_USERS_REGISTRATION_STATUS_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_users_registration_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_users_registration_status') : 'off',
       'SETTING_ALLOWED_USERS_REGISTRATION_CHECKED_VALUE' => $settingAllowedUsersRegistrationStatusValue === 'on' ? 'checked' : '',
       'SETTING_ALLOWED_EMAILS_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_emails') ? implode(', ', json_decode($this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_emails'), true)) : '',

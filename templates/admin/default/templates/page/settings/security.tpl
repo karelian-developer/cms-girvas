@@ -1,5 +1,17 @@
 <form class="form page__form" data-element="main-form">
   <div class="grid-table page__grid-table">
+    <!-- Поле: Уведомления (чаты Telegram) -->
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_NOTIFICATIONS_TELEGRAM_CHATS_TITLE}
+      </div>
+      <div class="cell__description">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_NOTIFICATIONS_TELEGRAM_CHATS_DESCRIPTION}
+      </div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <input name="setting_{SETTINGS_NAME}_notification_telegram_chats_ids" type="text" class="input form__input form__input_text" value="{SETTING_NOTIFICATION_TELEGRAM_CHATS_IDS}" placeholder="123456789, 123456790..." data-element="input-notifications-telegram-chats-ids">
+    </div>
     <!-- Поле: Регистрация пользователей -->
     <div class="cell grid-table__cell grid-table__cell_text">
       <div class="cell__title">

@@ -535,6 +535,8 @@
   "PAGE_SETTINGS_SETTING_BASE_SECTION_FEEDS_DESCRIPTION": "Раздел &laquo;Фиды&raquo;необходим для улучшения индексации со стороны поисковых систем, а также возможности импорта контента с Вашего сайта на другие платформы. В случае, если Ваш сайт относится к сайтам-лендингам (продающим страницам), то этот раздел Вам не требуется.",
   "PAGE_SETTINGS_SETTING_BASE_SECTION_ANALYTICS_TITLE": "Раздел &laquo;Аналитика&raquo;",
   "PAGE_SETTINGS_SETTING_BASE_SECTION_ANALYTICS_DESCRIPTION": "Раздел &laquo;Аналитика&raquo; является статистическим разделом, где можно проанализировать ситуацию вокруг контента на Вашем сайте. Например, можно посмотреть сколько просмотров у записей или статических страниц, а также сколько раз в течение дня заходили на Ваш сайт пользователи.",
+  "PAGE_SETTINGS_SETTING_SECURITY_NOTIFICATIONS_TELEGRAM_CHATS_TITLE": "ID чатов для уведомителя (Telegram)",
+  "PAGE_SETTINGS_SETTING_SECURITY_NOTIFICATIONS_TELEGRAM_CHATS_DESCRIPTION": "Список чатов в Telegram, куда уведомитель будет отправлять системные оповещения. Необходимо перечислить их ID через запятую.",
   "PAGE_SETTINGS_SETTING_SECURITY_REGISTRATION_USERS_TITLE": "Регистрация пользователей",
   "PAGE_SETTINGS_SETTING_SECURITY_REGISTRATION_USERS_DESCRIPTION": "Данная опция разрешает или запрещает регистрироваться пользователям в системе.",
   "PAGE_SETTINGS_SETTING_SECURITY_RESTRICTING_ACCESS_TO_AP_BY_IP_TITLE": "Ограничение доступа к административной панели по IP-адресу",

@@ -717,7 +717,9 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getSMTPPassword() : string
   {
-    return $this->existsDatabaseEntryValue('email_smtp_password') ? $this->getDatabaseEntryValue('email_smtp_password') : '';
+    return $this->existsDatabaseEntryValue('email_smtp_password')
+      ? $this->getDatabaseEntryValue('email_smtp_password')
+      : '';
   }
 
   /**
@@ -727,7 +729,21 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getSMTPDomain() : string
   {
-    return $this->existsDatabaseEntryValue('email_smtp_domain') ? $this->getDatabaseEntryValue('email_smtp_domain') : '';
+    return $this->existsDatabaseEntryValue('email_smtp_domain')
+      ? $this->getDatabaseEntryValue('email_smtp_domain')
+      : '';
+  }
+
+  /**
+   * Получить ID чатов для уведомителя в Telegram
+   * 
+   * @return int
+   */
+  public function getSecurityNotificationTelegramChatsIDs() : int
+  {
+    return $this->existsDatabaseEntryValue('security_notification_telegram_chats_ids')
+      ? $this->getDatabaseEntryValue('security_notification_telegram_chats_ids')
+      : [];
   }
 
   /**
