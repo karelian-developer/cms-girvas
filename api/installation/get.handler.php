@@ -441,6 +441,12 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       fwrite($file, '  \'SSLHSTSMaxAge\' => 63072000,' . PHP_EOL);
       fwrite($file, '  \'SSLHSTSIncludeSubdomains\' => false,' . PHP_EOL);
       fwrite($file, '  \'SSLHSTSPreload\' => false,' . PHP_EOL);
+      fwrite($file, '  \'notifierKeys\' => [' . PHP_EOL);
+      fwrite($file, '    \'telegram\' => \'\',' . PHP_EOL);
+      fwrite($file, '    \'max\' => \'\',' . PHP_EOL);
+      fwrite($file, '    \'vk\' => \'\',' . PHP_EOL);
+      fwrite($file, '    \'ok\' => \'\'' . PHP_EOL);
+      fwrite($file, '  ],' . PHP_EOL);
       fwrite($file, '];' . PHP_EOL);
       fwrite($file, PHP_EOL);
       fclose($file);

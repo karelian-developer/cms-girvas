@@ -104,6 +104,7 @@ if ($CMSCore->client->isLogged(2)) {
             : [];
 
           if (count($formElementTitles) > 0) {
+
             for ($i = 0; $i < count($formElementTitles); $i++) {
               $elements = $form;
 
@@ -118,14 +119,15 @@ if ($CMSCore->client->isLogged(2)) {
                 : 0;
               
               if ($CMSLocaleName === $commonLocale) {
+                
                 $formElementTitlesTrimmed = trim($formElementTitles[$i]);
                 $formElementDescriptionsTrimmed = trim($formElementDescriptions[$i]);
                 $formElementPlaceholdersTrimmed = trim($formElementPlaceholders[$i]);
 
                 $formElements[$i]['texts'][$CMSLocaleName] = [
                   'title' => htmlspecialchars(str_replace('\'', '"', $formElementTitlesTrimmed)),
-                  'description' => htmlspecialchars(str_replace('\'', '"', $formElementDescriptionsTrimmed)),
-                  'placeholder' => htmlspecialchars(str_replace('\'', '"', $formElementPlaceholdersTrimmed))
+                  'description' => str_replace('\'', '"', $formElementDescriptionsTrimmed),
+                  'placeholder' => str_replace('\'', '"', $formElementPlaceholdersTrimmed)
                 ];
               }
             }

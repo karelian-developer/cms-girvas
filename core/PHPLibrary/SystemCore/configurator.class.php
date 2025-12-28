@@ -731,6 +731,21 @@ final class Configurator implements ConfiguratorInterface
   }
 
   /**
+   * Получить ключ уведомителя
+   * 
+   * @param string $name
+   * 
+   * @return string
+   */
+  public function getNotifierKey(string $name) : string
+  {
+    $keys = $this->exists('notifierKeys') ? $this->get('notifierKeys') : [];
+    $keys = is_array($keys) ? $keys : [];
+
+    return isset($keys[$name]) ? $keys[$name] : '';
+  }
+
+  /**
    * Получить данные конфигурации CMS из базы данных
    *
    * @return mixed

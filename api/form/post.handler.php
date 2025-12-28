@@ -94,19 +94,20 @@ if (Form::existsByName($CMSCore, $formName)) {
           }
         }
 
-        $CMSTelegramNotifierMessage = "📊 *Поступление новых данных*\n\n";
-        $CMSTelegramNotifierMessage .= "*Форма:* " . $formTitle . "\n";
-        $CMSTelegramNotifierMessage .= "*Сайт:* " . $CMSCore->getSiteURL() . "\n\n";
+        $CMSTelegramNotifierMessage = "📊 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_SENDED_TITLE') . "*\n\n";
+        $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_LABEL') . ":* " . $formTitle . "\n";
+        $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_FROM_SITE_LABEL') . ":* " . $CMSCore->getSiteURL() . "\n\n";
         $CMSTelegramNotifierMessage .= implode("\n", $formDataFormated) . "\n\n";
-        $CMSTelegramNotifierMessage .= "*Дата отправления:* " . $formSendedDatetime . "\n";
-        $CMSTelegramNotifierMessage .= "*IP-адрес отправителя:* " . $formSendedAuthorIP . "\n\n";
-        $CMSTelegramNotifierMessage .= "_Отчет автоматически сгенерирован системой отчетности " . $CMSCore::CMS_TITLE . " " . $CMSCore::CMS_VERSION . ". Если возникли проблемы с формированием данных, то необходимо обратиться в техническую поддержку компании-производителя «Карельский разработчик»: support@karelian-developer.ru._";
+        $CMSTelegramNotifierMessage .= "*". $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_DATE_LABEL') .":* " . $formSendedDatetime . "\n";
+        $CMSTelegramNotifierMessage .= "*". $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_IP_LABEL') .":* " . $formSendedAuthorIP . "\n\n";
+        $CMSTelegramNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
 
         $CMSTelegramNotifier->setMessage($CMSTelegramNotifierMessage);
+        $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
 
         foreach ($notifierTelegramChatsIDs as $index => $id) {
           $CMSTelegramNotifier->setChatID($id);
-          $CMSTelegramNotifier->send('NJB2RYMi4mSwDsxrWdHU');
+          $CMSTelegramNotifier->send($CMSTelegramNotifierKey);
           usleep(1000);
         }
       }
