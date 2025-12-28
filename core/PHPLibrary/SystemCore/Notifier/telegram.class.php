@@ -85,13 +85,11 @@ class Telegram extends CMSNotifier
 
   public function setMessage(string $text) : void
   {
-    $chars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
+    $chars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '!'];
     
     foreach ($chars as $char) {
       $text = preg_replace('/(?<!\\\\)' . preg_quote($char, '/') . '/', '\\\\' . $char, $text);
     }
-    
-    $text = str_replace('\\', '\\\\', $text);
     
     $this->message = $text;
   }
