@@ -127,8 +127,6 @@ class Telegram extends CMSNotifier
       CURLOPT_CONNECTTIMEOUT => 5,
       CURLOPT_FOLLOWLOCATION => true,
       CURLOPT_MAXREDIRS => 3,
-      CURLOPT_SSL_VERIFYPEER => true,
-      CURLOPT_SSL_VERIFYHOST => 2,
       CURLOPT_FAILONERROR => false,
       CURLOPT_USERAGENT => 'CMS-GIRVAS-Notifier/1.0',
       CURLOPT_ENCODING => '',
