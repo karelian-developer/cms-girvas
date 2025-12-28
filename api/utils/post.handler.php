@@ -513,10 +513,10 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                   $eventDatetime = date('Y-m-d H:i', time());
                   $userIP = $CMSCore->client->getRealIPAddress();
                   
-                  $CMSTelegramNotifierMessage = "🔓 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
+                  $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
                   $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ":* " . $CMSCore->getSiteURL() . "\n\n";
                   $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_USER_LOGIN_LABEL') . ":* " . $userLogin . "\n";
-                  $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ":* " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SUCCESS_LABEL') . "\n\n";
+                  $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ":* \xF0\x9F\x9F\xA2 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SUCCESS_LABEL') . "\n\n";
                   $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_DATE_LABEL') . ":* " . $eventDatetime . "\n";
                   $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CLIENT_IP_LABEL') . ":* " . $userIP . "\n\n";
                   $CMSTelegramNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
@@ -557,10 +557,10 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                 $eventDatetime = date('Y-m-d H:i', time());
                 $userIP = $CMSCore->client->getRealIPAddress();
                 
-                $CMSTelegramNotifierMessage = "🔒 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
+                $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
                 $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ":* " . $CMSCore->getSiteURL() . "\n\n";
                 $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_USER_LOGIN_LABEL') . ":* " . $userLogin . "\n";
-                $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ":* 🔴 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_UNSUCCESS_LABEL') . "\n\n";
+                $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ":* \xF0\x9F\x94\xB4 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_UNSUCCESS_LABEL') . "\n\n";
                 $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_DATE_LABEL') . ":* " . $eventDatetime . "\n";
                 $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CLIENT_IP_LABEL') . ":* " . $userIP . "\n\n";
                 $CMSTelegramNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
@@ -594,10 +594,10 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
               $eventDatetime = date('Y-m-d H:i', time());
               $userIP = $CMSCore->client->getRealIPAddress();
               
-              $CMSTelegramNotifierMessage = "🔒 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
+              $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
               $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ":* " . $CMSCore->getSiteURL() . "\n\n";
               $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_USER_LOGIN_LABEL') . ":* " . $userLogin . "\n";
-              $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ":* 🔴 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_UNSUCCESS_LABEL') . "\n\n";
+              $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ":* \xF0\x9F\x94\xB4 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_UNSUCCESS_LABEL') . "\n\n";
               $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_DATE_LABEL') . ":* " . $eventDatetime . "\n";
               $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CLIENT_IP_LABEL') . ":* " . $userIP . "\n\n";
               $CMSTelegramNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
@@ -630,10 +630,10 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             $eventDatetime = date('Y-m-d H:i', time());
             $userIP = $CMSCore->client->getRealIPAddress();
             
-            $CMSTelegramNotifierMessage = "🔒 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
+            $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
             $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ":* " . $CMSCore->getSiteURL() . "\n\n";
             $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_USER_LOGIN_LABEL') . ":* " . $userLogin . "\n";
-            $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ":* 🔴 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_UNSUCCESS_LABEL') . "\n\n";
+            $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ":* \xF0\x9F\x94\xB4 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_UNSUCCESS_LABEL') . "\n\n";
             $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_DATE_LABEL') . ":* " . $eventDatetime . "\n";
             $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CLIENT_IP_LABEL') . ":* " . $userIP . "\n\n";
             $CMSTelegramNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
@@ -663,7 +663,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
           $CMSTelegramNotifierMessage = "🔔 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_LIMIT_TITLE') . "*\n\n";
           $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ":* " . $CMSCore->getSiteURL() . "\n\n";
           $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_USER_LOGIN_LABEL') . ":* " . $userLogin . "\n";
-          $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ":* 🔴 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_BANNED_LABEL') . "\n\n";
+          $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ":* \xF0\x9F\x94\xB4 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_BANNED_LABEL') . "\n\n";
           $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_DATE_LABEL') . ":* " . $eventDatetime . "\n";
           $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CLIENT_IP_LABEL') . ":* " . $userIP . "\n\n";
           $CMSTelegramNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
