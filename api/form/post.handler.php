@@ -29,6 +29,7 @@ use \core\PHPLibrary\SystemCore\Notifier as CMSNotifier;
 $formName = $CMSCore->urlp->getPath(2);
 
 if (Form::existsByName($CMSCore, $formName)) {
+
   $form = Form::getByName($CMSCore, $formName);
   $form->initData(['name', 'metadata', 'elements']);
   $formLocale = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
@@ -51,6 +52,7 @@ if (Form::existsByName($CMSCore, $formName)) {
   $result = $form->saveData($formData);
 
   if ($result) {
+
     $notifierTelegramChatsIDs = $form->getTelegramChatsIDs();
     $notifierTelegramThreatsIDs = $form->getTelegramThreatsIDs();
     $notifierTelegramChannelsIDs = $form->getTelegramChannelsIDs();
@@ -64,14 +66,13 @@ if (Form::existsByName($CMSCore, $formName)) {
       $notifierTelegramThreatsCount > 0 ||
       $notifierTelegramChannelsCount > 0
     ) {
-      $CMSNotifier = new CMSNotifier($CMSCore);
-      $CMSNotifier->setType('telegram');
-      $CMSNotifier->initAdapter();
-      
-      $CMSNotifierAdapter = $CMSNotifier->getAdapter();
+
+      $CMSTelegramNotifier = CMSNotifier::create('telegram');
 
       if ($notifierTelegramChatsCount > 0) {
+
         foreach ($notifierTelegramChatsIDs as $index => $id) {
+          
           $CMSNotifierAdapter->setChatID($id);
           $CMSNotifierAdapter->setMessage('Поступление новых данных');
           $CMSNotifierAdapter->send('NJB2RYMi4mSwDsxrWdHU');
