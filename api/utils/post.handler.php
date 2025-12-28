@@ -506,8 +506,9 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
                 $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
                 $CMSTelegramNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationTelegramChatsIDs();
-                
-                if ($CMSTelegramNotifierChatsIDs > 0 && $CMSTelegramNotifierKey !== '') {
+                $CMSTelegramNotifierChatsIDsCount = count($CMSTelegramNotifierChatsIDs);
+
+                if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
                   $eventDatetime = date('Y-m-d H:i', time());
                   $userIP = $CMSCore->client->getRealIPAddress();
@@ -548,8 +549,9 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
               $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
               $CMSTelegramNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationTelegramChatsIDs();
-              
-              if ($CMSTelegramNotifierChatsIDs > 0 && $CMSTelegramNotifierKey !== '') {
+              $CMSTelegramNotifierChatsIDsCount = count($CMSTelegramNotifierChatsIDs);
+
+              if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
                 $eventDatetime = date('Y-m-d H:i', time());
                 $userIP = $CMSCore->client->getRealIPAddress();
@@ -583,8 +585,9 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
             $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
             $CMSTelegramNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationTelegramChatsIDs();
-            
-            if ($CMSTelegramNotifierChatsIDs > 0 && $CMSTelegramNotifierKey !== '') {
+            $CMSTelegramNotifierChatsIDsCount = count($CMSTelegramNotifierChatsIDs);
+
+            if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
               $eventDatetime = date('Y-m-d H:i', time());
               $userIP = $CMSCore->client->getRealIPAddress();
@@ -617,8 +620,9 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
           $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
           $CMSTelegramNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationTelegramChatsIDs();
-          
-          if ($CMSTelegramNotifierChatsIDs > 0 && $CMSTelegramNotifierKey !== '') {
+          $CMSTelegramNotifierChatsIDsCount = count($CMSTelegramNotifierChatsIDs);
+
+          if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
             $eventDatetime = date('Y-m-d H:i', time());
             $userIP = $CMSCore->client->getRealIPAddress();
@@ -646,8 +650,9 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
       } else {
         $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
         $CMSTelegramNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationTelegramChatsIDs();
-        
-        if ($CMSTelegramNotifierChatsIDs > 0 && $CMSTelegramNotifierKey !== '') {
+        $CMSTelegramNotifierChatsIDsCount = count($CMSTelegramNotifierChatsIDs);
+
+        if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
           $eventDatetime = date('Y-m-d H:i', time());
           $userIP = $CMSCore->client->getRealIPAddress();
