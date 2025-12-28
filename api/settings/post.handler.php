@@ -290,6 +290,7 @@ if ($CMSCore->client->isLogged(2)) {
                 }
 
                 $formTelegramChatsIDs[$index] = trim($id);
+                $formTelegramChatsIDs[$index] = (int)$formTelegramChatsIDs[$index];
               }
 
               $settingValue = $formTelegramChatsIDs;

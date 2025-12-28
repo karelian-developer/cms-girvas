@@ -522,7 +522,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
                   $CMSTelegramNotifier->setMessage($CMSTelegramNotifierMessage);
 
-                  foreach ($notifierTelegramChatsIDs as $index => $id) {
+                  foreach ($CMSTelegramNotifierChatsIDs as $index => $id) {
                     
                     $CMSTelegramNotifier->setChatID($id);
                     $CMSTelegramNotifier->send($CMSTelegramNotifierKey);
@@ -565,7 +565,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
                 $CMSTelegramNotifier->setMessage($CMSTelegramNotifierMessage);
 
-                foreach ($notifierTelegramChatsIDs as $index => $id) {
+                foreach ($CMSTelegramNotifierChatsIDs as $index => $id) {
                   
                   $CMSTelegramNotifier->setChatID($id);
                   $CMSTelegramNotifier->send($CMSTelegramNotifierKey);
@@ -601,7 +601,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
               $CMSTelegramNotifier->setMessage($CMSTelegramNotifierMessage);
 
-              foreach ($notifierTelegramChatsIDs as $index => $id) {
+              foreach ($CMSTelegramNotifierChatsIDs as $index => $id) {
                 
                 $CMSTelegramNotifier->setChatID($id);
                 $CMSTelegramNotifier->send($CMSTelegramNotifierKey);
@@ -636,7 +636,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
             $CMSTelegramNotifier->setMessage($CMSTelegramNotifierMessage);
 
-            foreach ($notifierTelegramChatsIDs as $index => $id) {
+            foreach ($CMSTelegramNotifierChatsIDs as $index => $id) {
               
               $CMSTelegramNotifier->setChatID($id);
               $CMSTelegramNotifier->send($CMSTelegramNotifierKey);
@@ -666,7 +666,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
           $CMSTelegramNotifier->setMessage($CMSTelegramNotifierMessage);
 
-          foreach ($notifierTelegramChatsIDs as $index => $id) {
+          foreach ($CMSTelegramNotifierChatsIDs as $index => $id) {
             
             $CMSTelegramNotifier->setChatID($id);
             $CMSTelegramNotifier->send($CMSTelegramNotifierKey);
