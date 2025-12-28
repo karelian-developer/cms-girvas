@@ -660,7 +660,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
           $eventDatetime = date('Y-m-d H:i', time());
           $userIP = $CMSCore->client->getRealIPAddress();
           
-          $CMSTelegramNotifierMessage = "🔔 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_LIMIT_TITLE') . "*\n\n";
+          $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x94 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_LIMIT_TITLE') . "*\n\n";
           $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ":* " . $CMSCore->getSiteURL() . "\n\n";
           $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_USER_LOGIN_LABEL') . ":* " . $userLogin . "\n";
           $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ":* \xF0\x9F\x94\xB4 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_BANNED_LABEL') . "\n\n";
