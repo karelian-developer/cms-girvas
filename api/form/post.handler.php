@@ -91,9 +91,15 @@ if (Form::existsByName($CMSCore, $formName)) {
           }
         }
 
+        $CMSTelegramNotifierMessage = "*Поступление новых данных*\n\n";
+        $CMSTelegramNotifierMessage .= "*Форма:* " . $formTitle . "\n";
+        $CMSTelegramNotifierMessage .= "*Сайт:* " . $CMSCore->getSiteURL() . "\n\n";
+        $CMSTelegramNotifierMessage .= implode("\n", $formDataFormated);
+
+        $CMSTelegramNotifier->setMessage("*Поступление новых данных*\n\n*Форма:* " . $formTitle . "\n" . implode("\n", $formDataFormated));
+
         foreach ($notifierTelegramChatsIDs as $index => $id) {
           $CMSTelegramNotifier->setChatID($id);
-          $CMSTelegramNotifier->setMessage("*Поступление новых данных*\n\n*Форма:* " . $formTitle . "\n" . implode("\n", $formDataFormated));
           $CMSTelegramNotifier->send('NJB2RYMi4mSwDsxrWdHU');
           usleep(1000);
         }
