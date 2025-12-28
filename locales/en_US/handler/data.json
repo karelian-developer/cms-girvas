@@ -151,7 +151,7 @@
   "API_INSTALLATION_SITE_TITLE_OR_DESCRIPTION_IS_EMPTY": "The site title or description is empty.",
   "API_NOTIFIER_CUSTOM_FORM_SENDED_TITLE": "New data received via a website form",
   "API_NOTIFIER_CUSTOM_FORM_LABEL": "Customized form",
-  "API_NOTIFIER_CUSTOM_FORM_FROM_SITE_LABEL": "Source website",
+  "API_NOTIFIER_FROM_SITE_LABEL": "Source website",
   "API_NOTIFIER_DATE_LABEL": "Generated date",
   "API_NOTIFIER_CUSTOM_FORM_IP_LABEL": "Sender's IP address",
   "API_NOTIFIER_USER_LOGIN_LABEL": "User Login",

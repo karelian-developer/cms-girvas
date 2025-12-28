@@ -155,7 +155,7 @@
   "API_INSTALLATION_SITE_TITLE_OR_DESCRIPTION_IS_EMPTY": "Название сайта или его описание пусты.",
   "API_NOTIFIER_CUSTOM_FORM_SENDED_TITLE": "Поступление новых данных через форму на сайте",
   "API_NOTIFIER_CUSTOM_FORM_LABEL": "Персонализированная форма",
-  "API_NOTIFIER_CUSTOM_FORM_FROM_SITE_LABEL": "Сайт-источник",
+  "API_NOTIFIER_FROM_SITE_LABEL": "Сайт-источник",
   "API_NOTIFIER_DATE_LABEL": "Дата формирования",
   "API_NOTIFIER_CUSTOM_FORM_IP_LABEL": "IP-адрес отправителя",
   "API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE": "Авторизация в административной панели",
