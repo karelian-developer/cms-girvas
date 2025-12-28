@@ -40,7 +40,7 @@ abstract class Notifier
     };
   }
 
-  public function create(string $typeLabel) : Notifier
+  public static function create(string $typeLabel) : Notifier
   {
     $adapter = match ($typeLabel) {
       NotifierEnum::VK => new NotifierVK($this->CMSCore),
