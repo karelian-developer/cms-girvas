@@ -45,7 +45,7 @@ abstract class Notifier
     $adapter = match ($typeLabel) {
       'vk' => new NotifierVK($CMSCore),
       'ok' => new NotifierOK($CMSCore),
-      'telegram' => new NotifierTelegram($MSCore),
+      'telegram' => new NotifierTelegram($CMSCore),
       'max' => new NotifierMax($CMSCore)
     };
 
