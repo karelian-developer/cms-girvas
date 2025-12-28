@@ -76,19 +76,17 @@ if (Form::existsByName($CMSCore, $formName)) {
         $formData = $form->getData();
         $formTitle = $form->getTitle($formLocale);
 
-        foreach ($formData as $dataIndex => $data) {
-
-          $dataArray = json_decode($data['data'], true);
+        foreach($_POST as $POSTDataKey => $POSTData) {
 
           foreach ($formElements as $elementIndex => $elementData) {
             $elementName = $elementData['name'];
             
-            if (isset($dataArray[$elementName])) {
+            if ($POSTDataKey === $elementName) {
               $elementTitle = isset($elementData['texts'][$formLocale]['title'])
                 ? $elementData['texts'][$formLocale]['title']
                 : $elementName;
 
-              $formDataFormated[] = '**' . $elementTitle . '**: ' . $dataArray[$elementName];
+              $formDataFormated[] = '**' . $elementTitle . '**: ' . $POSTData;
             }
           }
         }
