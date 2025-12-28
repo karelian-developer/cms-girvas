@@ -49,9 +49,19 @@ if ($CMSCore->client->isLogged(2)) {
       ? urlencode(htmlentities($_PUT['form_notification_telegram_key']))
       : '';
 
-    $formTelegramChatsIDs = isset($_PUT['form_notification_telegram_chats_ids'])
-      ? urlencode(htmlentities($_PUT['form_notification_telegram_chats_ids']))
-      : '';
+    if (isset($_PATCH['form_notification_telegram_chats_ids'])) {
+
+      $formTelegramChatsIDs = explode(', ', $_PUT['form_notification_telegram_chats_ids']);
+      
+      foreach ($formTelegramChatsIDs as $index => $id) {
+
+        if (!is_numeric($formTelegramChatsIDs)) {
+          unset($formTelegramChatsIDs[$index]);
+        }
+      }
+    }
+
+    $formTelegramChatsIDs = $formTelegramChatsIDs ?? [];
     
     $formAction = $_PUT['form_action'] ?? '';
 
@@ -137,6 +147,8 @@ if ($CMSCore->client->isLogged(2)) {
     $metadata = [];
     $metadata['methodID'] = $formMethodID;
     $metadata['action'] = $formAction;
+    $metadata['telegramKey'] = $formTelegramKey;
+    $metadata['telegramChatsIDs'] = $formTelegramChatsIDs;
 
     $form = Form::create($CMSCore, $formName, $texts, $elements, $metadata);
 

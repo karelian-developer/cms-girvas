@@ -150,7 +150,8 @@ if ($CMSCore->client->isLogged(2)) {
       }
 
       if (isset($_PATCH['form_notification_telegram_chats_ids'])) {
-        $formData['metadata']['telegramChatsIDs'] = $_PATCH['form_notification_telegram_chats_ids'];
+        $formTelegramChatsIDs = explode(', ', $_PATCH['form_notification_telegram_chats_ids']);
+        $formData['metadata']['telegramChatsIDs'] = $formTelegramChatsIDs;
       }
 
       $formData['elements'] = $formElements;
