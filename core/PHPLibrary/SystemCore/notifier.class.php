@@ -29,7 +29,6 @@ use \core\PHPLibrary\SystemCore\Notifier\Max as NotifierMax;
 abstract class Notifier
 {
   private NotifierEnum $type;
-  private Notifier $adapter;
 
   public function setType(string $typeLabel) : void
   {
@@ -41,24 +40,16 @@ abstract class Notifier
     };
   }
 
-  public function init(string $typeLabel) : void
+  public function create(string $typeLabel) : Notifier
   {
-    $this->setType($typeLabel);
-    $this->initAdapter();
-  }
-
-  public function getAdapter() : Notifier
-  {
-    return $this->adapter;
-  }
-
-  public function initAdapter() : void
-  {
-    $this->adapter = match ($this->type) {
+    $adapter = match ($typeLabel) {
       NotifierEnum::VK => new NotifierVK($this->CMSCore),
       NotifierEnum::OK => new NotifierOK($this->CMSCore),
       NotifierEnum::TELEGRAM => new NotifierTelegram($this->CMSCore),
       NotifierEnum::MAX => new NotifierMax($this->CMSCore)
     };
+
+    $adapter->setType($typeLabel);
+    return $adapter;
   }
 }
