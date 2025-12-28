@@ -51,21 +51,9 @@ if (Form::existsByName($CMSCore, $formName)) {
   $result = $form->saveData($formData);
 
   if ($result) {
-    $notifierTelegramChatsIDs = $_POST['form_notification_telegram_chats_ids'] ?? [];
-    $notifierTelegramThreatsIDs = $_POST['form_notification_telegram_threats_ids'] ?? [];
-    $notifierTelegramChannelsIDs = $_POST['form_notification_telegram_channels_ids'] ?? [];
-
-    $notifierTelegramChatsIDs = !is_array($notifierTelegramChatsIDs)
-      ? explode(', ', $notifierTelegramChatsIDs)
-      : [];
-
-    $notifierTelegramThreatsIDs = !is_array($notifierTelegramThreatsIDs)
-      ? explode(', ', $notifierTelegramThreatsIDs)
-      : [];
-
-    $notifierTelegramChannelsIDs = !is_array($notifierTelegramChannelsIDs)
-      ? explode(', ', $notifierTelegramChannelsIDs)
-      : [];
+    $notifierTelegramChatsIDs = $form->getTelegramChatsIDs();
+    $notifierTelegramThreatsIDs = $form->getTelegramThreatsIDs();
+    $notifierTelegramChannelsIDs = $form->getTelegramChannelsIDs();
 
     $notifierTelegramChatsCount = count($notifierTelegramChatsIDs);
     $notifierTelegramThreatsCount = count($notifierTelegramThreatsIDs);
@@ -84,9 +72,10 @@ if (Form::existsByName($CMSCore, $formName)) {
 
       if ($notifierTelegramChatsCount > 0) {
         foreach ($notifierTelegramChatsIDs as $index => $id) {
-          $CMSNotifierAdapter->setChatID(867321986);
+          $CMSNotifierAdapter->setChatID($id);
           $CMSNotifierAdapter->setMessage('Поступление новых данных');
           $CMSNotifierAdapter->send('NJB2RYMi4mSwDsxrWdHU');
+          usleep(1000);
         }
       }
     }
