@@ -155,7 +155,7 @@ if ($CMSCore->client->isLogged(2)) {
         
         foreach ($formTelegramChatsIDs as $index => $id) {
 
-          if (!is_numeric($formTelegramChatsIDs)) {
+          if (!is_numeric($formTelegramChatsIDs[$index])) {
             unset($formTelegramChatsIDs[$index]);
           }
         }
