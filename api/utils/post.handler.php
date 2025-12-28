@@ -637,7 +637,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             $CMSTelegramNotifier->setMessage($CMSTelegramNotifierMessage);
 
             foreach ($CMSTelegramNotifierChatsIDs as $index => $id) {
-              error_log($id);
+              error_log($CMSTelegramNotifierKey);
               $CMSTelegramNotifier->setChatID($id);
               $CMSTelegramNotifier->send($CMSTelegramNotifierKey);
               usleep(1000);
