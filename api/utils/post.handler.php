@@ -495,9 +495,9 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
               if (!is_null($userSessionAdmin)) {
                 $userSessionAdmin->initData(['updatedUnixTimestamp', 'token']);
-                $userSessionAdmin_expires = $userSessionAdmin->getUpdatedUnixTimestamp() + $CMSCore->configurator->get('sessionExpires');
+                $userSessionAdminExpires = $userSessionAdmin->getUpdatedUnixTimestamp() + $CMSCore->configurator->get('sessionExpires');
 
-                $CMSCore->client::createCookie($CMSCore, '_grv_atoken', $userSessionAdmin, $userRememberMe ? $userSessionAdmin_expires : 0);
+                $CMSCore->client::createCookie($CMSCore, '_grv_atoken', $userSessionAdmin, $userRememberMe ? $userSessionAdminExpires : 0);
 
                 CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS, [
                   'clientIP' => $clientIP,
@@ -507,7 +507,8 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                 $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
                 $CMSTelegramNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationTelegramChatsIDs();
                 $CMSTelegramNotifierChatsIDsCount = count($CMSTelegramNotifierChatsIDs);
-
+                error_log($CMSTelegramNotifierChatsIDsCount);
+                error_log($CMSTelegramNotifierKey);
                 if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
                   $eventDatetime = date('Y-m-d H:i', time());
