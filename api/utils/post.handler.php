@@ -20,6 +20,7 @@ use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Mail\SMTPClient as SMTPClient;
 use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\SystemCore\Notifier as CMSNotifier;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \core\PHPLibrary\SystemCore\Reports as CMSReports;
 
