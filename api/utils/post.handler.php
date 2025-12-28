@@ -401,6 +401,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 }
 
 if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('method') === 'admin') {
+  $CMSTelegramNotifier = CMSNotifier::create($CMSCore, 'telegram');
   $clientIP = $CMSCore->client->getRealIPAddress();
   
   if (!$CMSCore->client->isLogged(2)) {
