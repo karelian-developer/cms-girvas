@@ -151,13 +151,16 @@ if ($CMSCore->client->isLogged(2)) {
 
       if (isset($_PATCH['form_notification_telegram_chats_ids'])) {
 
-        $formTelegramChatsIDs = explode(', ', $_PATCH['form_notification_telegram_chats_ids']);
+        $formTelegramChatsIDs = explode(',', $_PATCH['form_notification_telegram_chats_ids']);
         
         foreach ($formTelegramChatsIDs as $index => $id) {
 
           if (!is_numeric($id)) {
             unset($formTelegramChatsIDs[$index]);
+            continue;
           }
+
+          $formTelegramChatsIDs[$index] = trim($id);
         }
       }
 
