@@ -95,7 +95,7 @@ if (Form::existsByName($CMSCore, $formName)) {
 
         foreach ($notifierTelegramChatsIDs as $index => $id) {
           $CMSTelegramNotifier->setChatID($id);
-          $CMSTelegramNotifier->setMessage("**Поступление новых данных**\n\n\Форма: " .  . "n\n" . implode("\n", $formDataFormated));
+          $CMSTelegramNotifier->setMessage("**Поступление новых данных**\n\n\Форма: " . $formTitle . "n\n" . implode("\n", $formDataFormated));
           $CMSTelegramNotifier->send('NJB2RYMi4mSwDsxrWdHU');
           usleep(1000);
         }
