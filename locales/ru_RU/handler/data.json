@@ -156,7 +156,15 @@
   "API_NOTIFIER_CUSTOM_FORM_SENDED_TITLE": "Поступление новых данных через форму на сайте",
   "API_NOTIFIER_CUSTOM_FORM_LABEL": "Персонализированная форма",
   "API_NOTIFIER_CUSTOM_FORM_FROM_SITE_LABEL": "Сайт-источник",
-  "API_NOTIFIER_CUSTOM_FORM_DATE_LABEL": "Дата формирования",
+  "API_NOTIFIER_DATE_LABEL": "Дата формирования",
   "API_NOTIFIER_CUSTOM_FORM_IP_LABEL": "IP-адрес отправителя",
-  "API_NOTIFIER_CUSTOM_COPYRIGHT_LABEL": "Отчет автоматически сгенерирован системой отчетности %s. Если возникли проблемы с формированием данных, то необходимо обратиться в техническую поддержку компании-производителя «Карельский разработчик»: support@karelian-developer.ru."
+  "API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE": "Авторизация в административной панели",
+  "API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_LIMIT_TITLE": "Зафиксирована попытка подбора паролей",
+  "API_NOTIFIER_USER_LOGIN_LABEL": "Логин пользователя",
+  "API_NOTIFIER_CLIENT_IP_LABEL": "IP-адрес клиента",
+  "API_NOTIFIER_SUCCESS_LABEL": "Успешно",
+  "API_NOTIFIER_UNSUCCESS_LABEL": "Неуспешно",
+  "API_NOTIFIER_STATUS_LABEL": "Статус",
+  "API_NOTIFIER_BANNED_LABEL": "Заблокирован",
+  "API_NOTIFIER_COPYRIGHT_LABEL": "Отчет автоматически сгенерирован системой отчетности %s. Если возникли проблемы с формированием данных, то необходимо обратиться в техническую поддержку компании-производителя «Карельский разработчик»: support@karelian-developer.ru."
 }

@@ -98,9 +98,9 @@ if (Form::existsByName($CMSCore, $formName)) {
         $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_LABEL') . ":* " . $formTitle . "\n";
         $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_FROM_SITE_LABEL') . ":* " . $CMSCore->getSiteURL() . "\n\n";
         $CMSTelegramNotifierMessage .= implode("\n", $formDataFormated) . "\n\n";
-        $CMSTelegramNotifierMessage .= "*". $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_DATE_LABEL') .":* " . $formSendedDatetime . "\n";
+        $CMSTelegramNotifierMessage .= "*". $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_DATE_LABEL') .":* " . $formSendedDatetime . "\n";
         $CMSTelegramNotifierMessage .= "*". $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_IP_LABEL') .":* " . $formSendedAuthorIP . "\n\n";
-        $CMSTelegramNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
+        $CMSTelegramNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
 
         $CMSTelegramNotifier->setMessage($CMSTelegramNotifierMessage);
         $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
