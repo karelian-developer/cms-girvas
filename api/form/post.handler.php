@@ -37,7 +37,12 @@ if (Form::existsByName($CMSCore, $formName)) {
   $formData = [];
 
   foreach($_POST as $POSTDataKey => $POSTData) {
-    if (preg_match('/^' . $formName . '_([a-z0-9_]+)$/', $POSTDataKey, $matches, PREG_OFFSET_CAPTURE)) {
+    if (preg_match(
+      '/^' . $formName . '_([a-z0-9_]+)$/',
+      $POSTDataKey,
+      $matches,
+      PREG_OFFSET_CAPTURE
+    )) {
       $formFieldName = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $matches[1][0]))));
       $formData[$formFieldName] = $POSTData;
     }
@@ -76,7 +81,6 @@ if (Form::existsByName($CMSCore, $formName)) {
       $CMSNotifier->initAdapter();
       
       $CMSNotifierAdapter = $CMSNotifier->getAdapter();
-      //$notificationMessage = $_POST[];
 
       if ($notifierTelegramChatsCount > 0) {
         foreach ($notifierTelegramChatsIDs as $index => $id) {

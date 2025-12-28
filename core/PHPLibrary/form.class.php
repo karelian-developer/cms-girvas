@@ -199,15 +199,15 @@ class Form implements EntityTypeContent
   /**
    * Получить ID чата в Telegram
    *
-   * @return int
+   * @return array
    */
-  public function getTelegramChatIDs() : int
+  public function getTelegramChatsIDs() : array
   {
     if (property_exists($this, 'metadata')) {
       $metadata = json_decode($this->metadata, true);
       
-      if (isset($metadata['telegramChatIDs'])) {
-        return $metadata['telegramChatIDs'];
+      if (isset($metadata['telegramChatsIDs'])) {
+        return $metadata['telegramChatsIDs'];
       }
     }
 
@@ -217,15 +217,15 @@ class Form implements EntityTypeContent
   /**
    * Получить ID топика в Telegram
    *
-   * @return int
+   * @return array
    */
-  public function getTelegramThreatIDs() : int
+  public function getTelegramThreatsIDs() : array
   {
     if (property_exists($this, 'metadata')) {
       $metadata = json_decode($this->metadata, true);
       
-      if (isset($metadata['telegramThreatIDs'])) {
-        return $metadata['telegramChatIDs'];
+      if (isset($metadata['telegramThreatsIDs'])) {
+        return $metadata['telegramThreatsIDs'];
       }
     }
 
@@ -235,15 +235,15 @@ class Form implements EntityTypeContent
   /**
    * Получить ID канала в Telegram
    *
-   * @return int
+   * @return array
    */
-  public function getTelegramChannelsIDs() : int
+  public function getTelegramChannelsIDs() : array
   {
     if (property_exists($this, 'metadata')) {
       $metadata = json_decode($this->metadata, true);
       
-      if (isset($metadata['telegramBusinessConnectionIDs'])) {
-        return $metadata['telegramBusinessConnectionIDs'];
+      if (isset($metadata['telegramChannelsIDs'])) {
+        return $metadata['telegramChannelsIDs'];
       }
     }
 

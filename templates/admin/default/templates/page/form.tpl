@@ -83,7 +83,7 @@
           </div>
         </div>
         <div class="cell grid-table__cell grid-table__cell_data">
-          <input name="form_notification_telegram_key_ids" type="text" class="input form__input form__input_text" value="{FORM_NOTIFICATION_TELEGRAM_KEY}" placeholder="" data-element="input-notifications-telegram-key">
+          <input name="form_notification_telegram_key" type="text" class="input form__input form__input_text" value="{FORM_NOTIFICATION_TELEGRAM_KEY}" placeholder="" data-element="input-notifications-telegram-key">
         </div>
         <!-- Поле: Уведомления (чаты Telegram) -->
         <div class="cell grid-table__cell grid-table__cell_text">

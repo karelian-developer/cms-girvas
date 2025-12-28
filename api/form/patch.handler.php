@@ -32,9 +32,11 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT)) {
-    $formID = (isset($_PATCH['form_id'])) ? $_PATCH['form_id'] : 0;
-    $formID = (is_numeric($formID)) ? (int)$formID : 0;
+  if ($clientUserGroup->permissionCheck(
+    $clientUserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT
+  )) {
+    $formID = isset($_PATCH['form_id']) ? $_PATCH['form_id'] : 0;
+    $formID = is_numeric($formID) ? (int)$formID : 0;
 
     if (Form::existsByID($CMSCore, $formID)) {
       $form = new Form($CMSCore, $formID);
@@ -56,20 +58,50 @@ if ($CMSCore->client->isLogged(2)) {
           $inputTitleName = 'form_title_' . $CMSLocale->getISO639(2);
           $textareaDescriptionName = 'form_description_' . $CMSLocale->getISO639(2);
 
-          if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH)) {
-            if (!array_key_exists('texts', $formData)) $formData['texts'] = [];
-            if (!array_key_exists($CMSLocaleName, $formData['texts'])) $formData['texts'][$CMSLocaleName] = [];
+          if (
+            array_key_exists($inputTitleName, $_PATCH) ||
+            array_key_exists($textareaDescriptionName, $_PATCH)
+          ) {
+            if (!array_key_exists('texts', $formData)) {
+              $formData['texts'] = [];
+            }
 
-            if (array_key_exists($inputTitleName, $_PATCH)) $formData['texts'][$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$inputTitleName]));
-            if (array_key_exists($textareaDescriptionName, $_PATCH)) $formData['texts'][$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$textareaDescriptionName]));
+            if (!array_key_exists($CMSLocaleName, $formData['texts'])) {
+              $formData['texts'][$CMSLocaleName] = [];
+            }
+
+            if (array_key_exists($inputTitleName, $_PATCH)) {
+              $formData['texts'][$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$inputTitleName]));
+            }
+
+            if (array_key_exists($textareaDescriptionName, $_PATCH)) {
+              $formData['texts'][$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$textareaDescriptionName]));
+            }
           }
 
-          $formElementTitles = isset($_PATCH['form_element_title']) ? $_PATCH['form_element_title'] : [];
-          $formElementDescriptions = isset($_PATCH['form_element_description']) ? $_PATCH['form_element_description'] : [];
-          $formElementPlaceholders = isset($_PATCH['form_element_placeholder']) ? $_PATCH['form_element_placeholder'] : [];
-          $formElementTypes = isset($_PATCH['form_element_type']) ? $_PATCH['form_element_type'] : [];
-          $formElementNames = isset($_PATCH['form_element_name']) ? $_PATCH['form_element_name'] : [];
-          $formElementSequenceNumbers = isset($_PATCH['form_element_sequence_number']) ? $_PATCH['form_element_sequence_number'] : [];
+          $formElementTitles = isset($_PATCH['form_element_title'])
+            ? $_PATCH['form_element_title']
+            : [];
+
+          $formElementDescriptions = isset($_PATCH['form_element_description'])
+            ? $_PATCH['form_element_description']
+            : [];
+
+          $formElementPlaceholders = isset($_PATCH['form_element_placeholder'])
+            ? $_PATCH['form_element_placeholder']
+            : [];
+
+          $formElementTypes = isset($_PATCH['form_element_type'])
+            ? $_PATCH['form_element_type']
+            : [];
+
+          $formElementNames = isset($_PATCH['form_element_name'])
+            ? $_PATCH['form_element_name']
+            : [];
+            
+          $formElementSequenceNumbers = isset($_PATCH['form_element_sequence_number'])
+            ? $_PATCH['form_element_sequence_number']
+            : [];
 
           if (count($formElementTitles) > 0) {
             for ($i = 0; $i < count($formElementTitles); $i++) {
@@ -86,10 +118,14 @@ if ($CMSCore->client->isLogged(2)) {
                 : 0;
               
               if ($CMSLocaleName === $commonLocale) {
+                $formElementTitlesTrimmed = trim($formElementTitles[$i]);
+                $formElementDescriptionsTrimmed = trim($formElementDescriptions[$i]);
+                $formElementPlaceholdersTrimmed = trim($formElementPlaceholders[$i]);
+
                 $formElements[$i]['texts'][$CMSLocaleName] = [
-                  'title' => htmlspecialchars(str_replace('\'', '"', (trim($formElementTitles[$i])))),
-                  'description' => htmlspecialchars(str_replace('\'', '"', (trim($formElementDescriptions[$i])))),
-                  'placeholder' => htmlspecialchars(str_replace('\'', '"', (trim($formElementPlaceholders[$i]))))
+                  'title' => htmlspecialchars(str_replace('\'', '"', $formElementTitlesTrimmed)),
+                  'description' => htmlspecialchars(str_replace('\'', '"', $formElementDescriptionsTrimmed)),
+                  'placeholder' => htmlspecialchars(str_replace('\'', '"', $formElementPlaceholdersTrimmed))
                 ];
               }
             }
@@ -97,9 +133,25 @@ if ($CMSCore->client->isLogged(2)) {
         }
       }
 
-      if (isset($_PATCH['form_name'])) $formData['name'] = urlencode(htmlentities($_PATCH['form_name']));
-      if (isset($_PATCH['form_method_id'])) $formData['metadata']['methodID'] = $_PATCH['form_method_id'];
-      if (isset($_PATCH['form_action'])) $formData['metadata']['action'] = $_PATCH['form_action'];
+      if (isset($_PATCH['form_name'])) {
+        $formData['name'] = urlencode(htmlentities($_PATCH['form_name']));
+      }
+
+      if (isset($_PATCH['form_method_id'])) {
+        $formData['metadata']['methodID'] = $_PATCH['form_method_id'];
+      }
+
+      if (isset($_PATCH['form_action'])) {
+        $formData['metadata']['action'] = $_PATCH['form_action'];
+      }
+
+      if (isset($_PATCH['form_notification_telegram_key'])) {
+        $formData['metadata']['telegramKey'] = $_PATCH['form_notification_telegram_key_ids'];
+      }
+
+      if (isset($_PATCH['form_notification_telegram_chats_ids'])) {
+        $formData['metadata']['telegramChatsIDs'] = $_PATCH['form_notification_telegram_chats_ids'];
+      }
 
       $formData['elements'] = $formElements;
       $isUpdated = $form->update($formData);
