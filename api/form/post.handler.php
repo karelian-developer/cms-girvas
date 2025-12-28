@@ -49,6 +49,9 @@ if (Form::existsByName($CMSCore, $formName)) {
     }
   };
 
+  $formSendedDatetime = date('Y-m-d H:i', time());
+  $formSendedAuthorIP = $CMSCore->client->getRealIPAddress();
+
   $result = $form->saveData($formData);
 
   if ($result) {
@@ -94,9 +97,12 @@ if (Form::existsByName($CMSCore, $formName)) {
         $CMSTelegramNotifierMessage = "*Поступление новых данных*\n\n";
         $CMSTelegramNotifierMessage .= "*Форма:* " . $formTitle . "\n";
         $CMSTelegramNotifierMessage .= "*Сайт:* " . $CMSCore->getSiteURL() . "\n\n";
-        $CMSTelegramNotifierMessage .= implode("\n", $formDataFormated);
+        $CMSTelegramNotifierMessage .= implode("\n", $formDataFormated) . "\n\n";
+        $CMSTelegramNotifierMessage .= "*Дата отправления:* " . $formSendedDatetime . "\n";
+        $CMSTelegramNotifierMessage .= "*IP-адрес отправителя:* " . $formSendedAuthorIP . "\n";
+        $CMSTelegramNotifierMessage .= '_Отчет __автоматически__ сгенерирован системой отчетности' . $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION . '_.';
 
-        $CMSTelegramNotifier->setMessage("*Поступление новых данных*\n\n*Форма:* " . $formTitle . "\n" . implode("\n", $formDataFormated));
+        $CMSTelegramNotifier->setMessage($CMSTelegramNotifierMessage);
 
         foreach ($notifierTelegramChatsIDs as $index => $id) {
           $CMSTelegramNotifier->setChatID($id);
