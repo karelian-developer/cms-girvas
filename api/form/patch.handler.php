@@ -146,7 +146,7 @@ if ($CMSCore->client->isLogged(2)) {
       }
 
       if (isset($_PATCH['form_notification_telegram_key'])) {
-        $formData['metadata']['telegramKey'] = $_PATCH['form_notification_telegram_key_ids'];
+        $formData['metadata']['telegramKey'] = $_PATCH['form_notification_telegram_key'];
       }
 
       if (isset($_PATCH['form_notification_telegram_chats_ids'])) {
@@ -155,7 +155,7 @@ if ($CMSCore->client->isLogged(2)) {
         
         foreach ($formTelegramChatsIDs as $index => $id) {
 
-          if (!is_numeric($formTelegramChatsIDs[$index])) {
+          if (!is_numeric($id)) {
             unset($formTelegramChatsIDs[$index]);
           }
         }
