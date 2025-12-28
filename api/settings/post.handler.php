@@ -278,7 +278,7 @@ if ($CMSCore->client->isLogged(2)) {
               }
             }
 
-            if ($settingName === 'setting_security_notification_telegram_chats_ids') {
+            if ($settingName === 'security_notification_telegram_chats_ids') {
 
               $formTelegramChatsIDs = explode(',', $settingValue);
               
