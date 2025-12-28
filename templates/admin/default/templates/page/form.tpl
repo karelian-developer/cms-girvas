@@ -73,15 +73,6 @@
         <div class="cell grid-table__cell grid-table__cell_header">
           {LANG:PAGE_FORM_NOTIFICATIONS_TITLE}
         </div>
-        <!-- Поле: Уведомления (ключ для Telegram) -->
-        <div class="cell grid-table__cell grid-table__cell_text">
-          <div class="cell__title">
-            {LANG:PAGE_FORM_NOTIFICATIONS_TELEGRAM_KEY_TITLE}
-          </div>
-          <div class="cell__description">
-            {LANG:PAGE_FORM_NOTIFICATIONS_TELEGRAM_KEY_DESCRIPTION}
-          </div>
-        </div>
         <div class="cell grid-table__cell grid-table__cell_data">
           <input name="form_notification_telegram_key" type="text" class="input form__input form__input_text" value="{FORM_NOTIFICATION_TELEGRAM_KEY}" placeholder="" data-element="input-notifications-telegram-key">
         </div>

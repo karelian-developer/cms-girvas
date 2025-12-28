@@ -45,10 +45,6 @@ if ($CMSCore->client->isLogged(2)) {
       ? (int)$_PUT['form_method_id']
       : 0;
 
-    $formTelegramKey = isset($_PUT['form_notification_telegram_key'])
-      ? urlencode(htmlentities($_PUT['form_notification_telegram_key']))
-      : '';
-
     if (isset($_PATCH['form_notification_telegram_chats_ids'])) {
 
       $formTelegramChatsIDs = explode(',', $_PUT['form_notification_telegram_chats_ids']);
@@ -150,7 +146,6 @@ if ($CMSCore->client->isLogged(2)) {
     $metadata = [];
     $metadata['methodID'] = $formMethodID;
     $metadata['action'] = $formAction;
-    $metadata['telegramKey'] = $formTelegramKey;
     $metadata['telegramChatsIDs'] = $formTelegramChatsIDs;
 
     $form = Form::create($CMSCore, $formName, $texts, $elements, $metadata);
