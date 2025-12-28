@@ -81,19 +81,19 @@ if (Form::existsByName($CMSCore, $formName)) {
           foreach ($formElements as $elementIndex => $elementData) {
             $elementName = $elementData['name'];
             
-            if ($POSTDataKey === $elementName) {
+            if ($POSTDataKey === $formName . '_' . $elementName) {
               $elementTitle = isset($elementData['texts'][$formLocale]['title'])
                 ? $elementData['texts'][$formLocale]['title']
                 : $elementName;
 
-              $formDataFormated[] = '**' . $elementTitle . '**: ' . $POSTData;
+              $formDataFormated[] = '__' . $elementTitle . '__: `' . $POSTData . '`';
             }
           }
         }
 
         foreach ($notifierTelegramChatsIDs as $index => $id) {
           $CMSTelegramNotifier->setChatID($id);
-          $CMSTelegramNotifier->setMessage("**Поступление новых данных**\n\n\Форма: " . $formTitle . "n\n" . implode("\n", $formDataFormated));
+          $CMSTelegramNotifier->setMessage("__Поступление новых данных__\n\n\Форма: " . $formTitle . "\n" . implode("\n", $formDataFormated));
           $CMSTelegramNotifier->send('NJB2RYMi4mSwDsxrWdHU');
           usleep(1000);
         }
