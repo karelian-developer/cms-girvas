@@ -269,17 +269,36 @@ if ($CMSCore->client->isLogged(2)) {
             }
 
             if ($settingName === 'setting_static_pages_additional_field_category_id') {
+
               foreach ($settingValue as $key => $value) {
+
                 if (is_numeric($value)) {
                   $settingValue[$key] = ($value > 0) ? (int)$value : 1;
                 }
               }
             }
 
+            if ($settingName === 'setting_security_notification_telegram_chats_ids') {
+
+              $formTelegramChatsIDs = explode(',', $settingValue);
+              
+              foreach ($formTelegramChatsIDs as $index => $id) {
+
+                if (!is_numeric($id)) {
+                  unset($formTelegramChatsIDs[$index]);
+                  continue;
+                }
+
+                $formTelegramChatsIDs[$index] = trim($id);
+              }
+
+              $settingValue = $formTelegramChatsIDs;
+            }
+
             if (is_array($settingValue)) $settingValue = json_encode($settingValue);
 
             $settingValue = match ($settingName) {
-              'security_notification_telegram_chats_ids' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
+              'security_notification_telegram_chats_ids' => !empty($settingValue) ? json_encode($settingValue) : json_encode([]),
               'security_allowed_admin_ip' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
               'security_allowed_emails' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
               'seo_site_keywords' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
