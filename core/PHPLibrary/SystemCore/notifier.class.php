@@ -43,10 +43,10 @@ abstract class Notifier
   public static function create(string $typeLabel) : Notifier
   {
     $adapter = match ($typeLabel) {
-      NotifierEnum::VK => new NotifierVK($this->CMSCore),
-      NotifierEnum::OK => new NotifierOK($this->CMSCore),
-      NotifierEnum::TELEGRAM => new NotifierTelegram($this->CMSCore),
-      NotifierEnum::MAX => new NotifierMax($this->CMSCore)
+      'vk' => new NotifierVK($this->CMSCore),
+      'ok' => new NotifierOK($this->CMSCore),
+      'telegram' => new NotifierTelegram($this->CMSCore),
+      'max' => new NotifierMax($this->CMSCore)
     };
 
     $adapter->setType($typeLabel);

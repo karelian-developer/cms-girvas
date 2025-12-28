@@ -72,7 +72,7 @@ if (Form::existsByName($CMSCore, $formName)) {
       if ($notifierTelegramChatsCount > 0) {
 
         foreach ($notifierTelegramChatsIDs as $index => $id) {
-          
+
           $CMSNotifierAdapter->setChatID($id);
           $CMSNotifierAdapter->setMessage('Поступление новых данных');
           $CMSNotifierAdapter->send('NJB2RYMi4mSwDsxrWdHU');
