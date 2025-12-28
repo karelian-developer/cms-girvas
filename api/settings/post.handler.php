@@ -298,7 +298,7 @@ if ($CMSCore->client->isLogged(2)) {
             if (is_array($settingValue)) $settingValue = json_encode($settingValue);
 
             $settingValue = match ($settingName) {
-              'security_notification_telegram_chats_ids' => !empty($settingValue) ? json_encode($settingValue) : json_encode([]),
+              'security_notification_telegram_chats_ids' => !empty($settingValue) ? $settingValue : json_encode([]),
               'security_allowed_admin_ip' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
               'security_allowed_emails' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
               'seo_site_keywords' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
