@@ -507,8 +507,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                 $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
                 $CMSTelegramNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationTelegramChatsIDs();
                 $CMSTelegramNotifierChatsIDsCount = count($CMSTelegramNotifierChatsIDs);
-                error_log($CMSTelegramNotifierChatsIDsCount);
-                error_log($CMSTelegramNotifierKey);
+                
                 if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
                   $eventDatetime = date('Y-m-d H:i', time());
@@ -525,7 +524,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                   $CMSTelegramNotifier->setMessage($CMSTelegramNotifierMessage);
 
                   foreach ($CMSTelegramNotifierChatsIDs as $index => $id) {
-                    
+                    error_log($id);
                     $CMSTelegramNotifier->setChatID($id);
                     $CMSTelegramNotifier->send($CMSTelegramNotifierKey);
                     usleep(1000);
