@@ -91,8 +91,6 @@ class Telegram extends CMSNotifier
       $text = str_replace($char, '\\' . $char, $text);
     }
 
-    return $text;
-    
     $this->message = $text;
   }
 
