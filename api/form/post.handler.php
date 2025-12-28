@@ -94,12 +94,12 @@ if (Form::existsByName($CMSCore, $formName)) {
           }
         }
 
-        $CMSTelegramNotifierMessage = "*Поступление новых данных*\n\n";
+        $CMSTelegramNotifierMessage = "📊 *Поступление новых данных*\n\n";
         $CMSTelegramNotifierMessage .= "*Форма:* " . $formTitle . "\n";
         $CMSTelegramNotifierMessage .= "*Сайт:* " . $CMSCore->getSiteURL() . "\n\n";
         $CMSTelegramNotifierMessage .= implode("\n", $formDataFormated) . "\n\n";
         $CMSTelegramNotifierMessage .= "*Дата отправления:* " . $formSendedDatetime . "\n";
-        $CMSTelegramNotifierMessage .= "*IP-адрес отправителя:* " . $formSendedAuthorIP . "\n";
+        $CMSTelegramNotifierMessage .= "*IP-адрес отправителя:* " . $formSendedAuthorIP . "\n\n";
         $CMSTelegramNotifierMessage .= '_Отчет __автоматически__ сгенерирован системой отчетности' . $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION . '_.';
 
         $CMSTelegramNotifier->setMessage($CMSTelegramNotifierMessage);
