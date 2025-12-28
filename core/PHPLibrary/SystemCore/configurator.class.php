@@ -737,12 +737,12 @@ final class Configurator implements ConfiguratorInterface
   /**
    * Получить ID чатов для уведомителя в Telegram
    * 
-   * @return int
+   * @return array
    */
-  public function getSecurityNotificationTelegramChatsIDs() : int
+  public function getSecurityNotificationTelegramChatsIDs() : array
   {
     return $this->existsDatabaseEntryValue('security_notification_telegram_chats_ids')
-      ? $this->getDatabaseEntryValue('security_notification_telegram_chats_ids')
+      ? json_decode($this->getDatabaseEntryValue('security_notification_telegram_chats_ids'), true)
       : [];
   }
 
