@@ -87,7 +87,7 @@ if (Form::existsByName($CMSCore, $formName)) {
                 ? $elementData['texts'][$formLocale]['title']
                 : $elementName;
 
-              $formDataFormated = '**' . $elementTitle . '**: ' . $dataArray[$elementName];
+              $formDataFormated[] = '**' . $elementTitle . '**: ' . $dataArray[$elementName];
             }
           }
         }
