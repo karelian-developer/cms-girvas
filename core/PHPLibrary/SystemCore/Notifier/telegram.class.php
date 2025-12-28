@@ -113,16 +113,16 @@ class Telegram extends CMSNotifier
     
     $params = [
       'chatID' => $this->chatID,
-      'message' => urlencode($this->message),
+      'message' => $this->message,
       'key' => 'NJB2RYMi4mSwDsxrWdHU'
     ];
     
     $ch = curl_init();
-    $paramsImploded = 'chatID=' . $params['chatID'] . '&message=' . $params['message'] . '&key=' . $params['key'];
-    $fullUrl = '?' . $paramsImploded;
 
     curl_setopt_array($ch, [
-      CURLOPT_URL => $fullUrl,
+      CURLOPT_URL => $URL,
+      CURLOPT_POST => true,
+      CURLOPT_POSTFIELDS => http_build_query($params),
       CURLOPT_RETURNTRANSFER => true,
       CURLOPT_TIMEOUT => 10,
       CURLOPT_CONNECTTIMEOUT => 5,
