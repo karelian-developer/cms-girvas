@@ -70,11 +70,31 @@ if (Form::existsByName($CMSCore, $formName)) {
       $CMSTelegramNotifier = CMSNotifier::create($CMSCore, 'telegram');
 
       if ($notifierTelegramChatsCount > 0) {
+        
+        $formDataFormated = [];
+        $formElements = $form->getElements();
+        $formData = $form->getData();
+
+        foreach ($formData as $dataIndex => $data) {
+
+          $dataArray = json_decode($data['data'], true);
+
+          foreach ($formElements as $elementIndex => $elementData) {
+            $elementName = $elementData['name'];
+            
+            if (isset($dataArray[$elementName])) {
+              $elementTitle = isset($elementData['texts'][$localeName]['title'])
+                ? $elementData['texts'][$localeName]['title']
+                : $elementName;
+
+              $formDataFormated = '**' . $elementTitle . '**: ' . $dataArray[$elementName];
+            }
+          }
+        }
 
         foreach ($notifierTelegramChatsIDs as $index => $id) {
-
           $CMSTelegramNotifier->setChatID($id);
-          $CMSTelegramNotifier->setMessage('Поступление новых данных');
+          $CMSTelegramNotifier->setMessage('Поступление новых данных\n\n' . implode('\n', $formDataFormated));
           $CMSTelegramNotifier->send('NJB2RYMi4mSwDsxrWdHU');
           usleep(1000);
         }
