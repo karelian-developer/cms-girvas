@@ -106,13 +106,53 @@ class Telegram extends CMSNotifier
   public function send(string $key) : string|bool
   {
     $URL = "https://sdk.karelian-developer.ru/notifier/tg/lagerta";
-
+    
+    if (empty($this->chatID) || empty($this->message)) {
+      return false;
+    }
+    
     $params = [
       'chatID' => $this->chatID,
       'message' => $this->message,
       'key' => 'NJB2RYMi4mSwDsxrWdHU'
     ];
-
-    return file_get_contents($URL . '?' . http_build_query($params));
+    
+    $ch = curl_init();
+    $fullUrl = $URL . '?' . http_build_query($params);
+    
+    curl_setopt_array($ch, [
+      CURLOPT_URL => $fullUrl,
+      CURLOPT_RETURNTRANSFER => true,
+      CURLOPT_TIMEOUT => 10,
+      CURLOPT_CONNECTTIMEOUT => 5,
+      CURLOPT_FOLLOWLOCATION => true,
+      CURLOPT_MAXREDIRS => 3,
+      CURLOPT_SSL_VERIFYPEER => true,
+      CURLOPT_SSL_VERIFYHOST => 2,
+      CURLOPT_FAILONERROR => false,
+      CURLOPT_USERAGENT => 'CMS-GIRVAS-Notifier/1.0',
+      CURLOPT_ENCODING => '',
+      CURLOPT_HEADER => false,
+    ]);
+    
+    $response = curl_exec($ch);
+    
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    $errorNo = curl_errno($ch);
+    
+    curl_close($ch);
+    
+    if ($errorNo !== CURLE_OK) {
+      error_log("cURL Error #{$errorNo}: {$error} - URL: {$fullUrl}");
+      return false;
+    }
+    
+    if ($httpCode !== 200) {
+      error_log("HTTP Error #{$httpCode} - URL: {$fullUrl}");
+      return false;
+    }
+    
+    return $response;
   }
 }
