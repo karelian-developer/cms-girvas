@@ -114,7 +114,7 @@ class Telegram extends CMSNotifier
     $params = [
       'chatID' => $this->chatID,
       'message' => $this->message,
-      'key' => 'NJB2RYMi4mSwDsxrWdHU'
+      'key' => $key
     ];
     
     $ch = curl_init();
