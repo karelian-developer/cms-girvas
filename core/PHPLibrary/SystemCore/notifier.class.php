@@ -40,13 +40,13 @@ abstract class Notifier
     };
   }
 
-  public static function create(string $typeLabel) : Notifier
+  public static function create(CoreInterface $CMSCore, string $typeLabel) : Notifier
   {
     $adapter = match ($typeLabel) {
-      'vk' => new NotifierVK($this->CMSCore),
-      'ok' => new NotifierOK($this->CMSCore),
-      'telegram' => new NotifierTelegram($this->CMSCore),
-      'max' => new NotifierMax($this->CMSCore)
+      'vk' => new NotifierVK($CMSCore),
+      'ok' => new NotifierOK($CMSCore),
+      'telegram' => new NotifierTelegram($MSCore),
+      'max' => new NotifierMax($CMSCore)
     };
 
     $adapter->setType($typeLabel);

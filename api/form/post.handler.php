@@ -67,7 +67,7 @@ if (Form::existsByName($CMSCore, $formName)) {
       $notifierTelegramChannelsCount > 0
     ) {
 
-      $CMSTelegramNotifier = CMSNotifier::create('telegram');
+      $CMSTelegramNotifier = CMSNotifier::create($CMSCore, 'telegram');
 
       if ($notifierTelegramChatsCount > 0) {
 
