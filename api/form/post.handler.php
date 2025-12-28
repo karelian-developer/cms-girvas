@@ -31,7 +31,7 @@ $formName = $CMSCore->urlp->getPath(2);
 if (Form::existsByName($CMSCore, $formName)) {
 
   $form = Form::getByName($CMSCore, $formName);
-  $form->initData(['name', 'metadata', 'elements']);
+  $form->initData(['name', 'metadata', 'elements', 'texts']);
   $formLocale = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
 
   $formName = $form->getName();
@@ -74,6 +74,7 @@ if (Form::existsByName($CMSCore, $formName)) {
         $formDataFormated = [];
         $formElements = $form->getElements();
         $formData = $form->getData();
+        $formTitle = $form->getTitle($formLocale);
 
         foreach ($formData as $dataIndex => $data) {
 
@@ -94,7 +95,7 @@ if (Form::existsByName($CMSCore, $formName)) {
 
         foreach ($notifierTelegramChatsIDs as $index => $id) {
           $CMSTelegramNotifier->setChatID($id);
-          $CMSTelegramNotifier->setMessage('Поступление новых данных\n\n' . implode('\n', $formDataFormated));
+          $CMSTelegramNotifier->setMessage("**Поступление новых данных**\n\n\Форма: " .  . "n\n" . implode("\n", $formDataFormated));
           $CMSTelegramNotifier->send('NJB2RYMi4mSwDsxrWdHU');
           usleep(1000);
         }
