@@ -207,7 +207,11 @@ class Form implements EntityTypeContent
       $metadata = json_decode($this->metadata, true);
       
       if (isset($metadata['telegramChatsIDs'])) {
-        return $metadata['telegramChatsIDs'];
+        $value = is_string($metadata['telegramChatsIDs'])
+          ? explode(', ', $metadata['telegramChatsIDs'])
+          : $metadata['telegramChatsIDs'];
+
+        return $value;
       }
     }
 
@@ -225,7 +229,11 @@ class Form implements EntityTypeContent
       $metadata = json_decode($this->metadata, true);
       
       if (isset($metadata['telegramThreatsIDs'])) {
-        return $metadata['telegramThreatsIDs'];
+        $value = is_string($metadata['telegramThreatsIDs'])
+          ? explode(', ', $metadata['telegramThreatsIDs'])
+          : $metadata['telegramThreatsIDs'];
+
+        return $value;
       }
     }
 
@@ -243,7 +251,11 @@ class Form implements EntityTypeContent
       $metadata = json_decode($this->metadata, true);
       
       if (isset($metadata['telegramChannelsIDs'])) {
-        return $metadata['telegramChannelsIDs'];
+        $value = is_string($metadata['telegramChannelsIDs'])
+          ? explode(', ', $metadata['telegramChannelsIDs'])
+          : $metadata['telegramChannelsIDs'];
+
+        return $value;
       }
     }
 
