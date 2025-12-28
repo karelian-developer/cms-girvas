@@ -105,7 +105,7 @@ class Telegram extends CMSNotifier
 
   public function send(string $key) : string|bool
   {
-    $URL = "http://sdk.karelian-developer.ru/notifier/tg/lagerta";
+    $URL = "https://sdk.karelian-developer.ru/notifier/tg/lagerta";
 
     $params = [
       'chatID' => $this->chatID,
