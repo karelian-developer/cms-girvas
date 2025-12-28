@@ -211,7 +211,7 @@ class Form implements EntityTypeContent
       }
     }
 
-    return 0;
+    return [];
   }
   
   /**
@@ -229,7 +229,7 @@ class Form implements EntityTypeContent
       }
     }
 
-    return 0;
+    return [];
   }
   
   /**
@@ -247,7 +247,7 @@ class Form implements EntityTypeContent
       }
     }
 
-    return 0;
+    return [];
   }
   
   /**
