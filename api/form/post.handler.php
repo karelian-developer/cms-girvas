@@ -100,7 +100,7 @@ if (Form::existsByName($CMSCore, $formName)) {
         $CMSTelegramNotifierMessage .= implode("\n", $formDataFormated) . "\n\n";
         $CMSTelegramNotifierMessage .= "*Дата отправления:* " . $formSendedDatetime . "\n";
         $CMSTelegramNotifierMessage .= "*IP-адрес отправителя:* " . $formSendedAuthorIP . "\n\n";
-        $CMSTelegramNotifierMessage .= '_Отчет __автоматически__ сгенерирован системой отчетности __' . $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION . '___.';
+        $CMSTelegramNotifierMessage .= '_Отчет *автоматически* сгенерирован системой отчетности *' . $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION . '*_. Если возникли проблемы с формированием данных, то необходимо обратиться в техническую поддержку компании-производителя «Карельский разработчик»: support@karelian-developer.ru.';
 
         $CMSTelegramNotifier->setMessage($CMSTelegramNotifierMessage);
 
