@@ -74,7 +74,7 @@ if (Form::existsByName($CMSCore, $formName)) {
         foreach ($notifierTelegramChatsIDs as $index => $id) {
 
           $CMSTelegramNotifier->setChatID($id);
-          $CMSTelegramNotifier->setMessage('Поступление новых данных');
+          $CMSTelegramNotifier->setMessage('123');
           $CMSTelegramNotifier->send('NJB2RYMi4mSwDsxrWdHU');
           usleep(1000);
         }
