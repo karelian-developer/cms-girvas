@@ -557,6 +557,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
                 $eventDatetime = date('Y-m-d H:i', time());
                 $userIP = $CMSCore->client->getRealIPAddress();
+                $userLogin = str_replace(['_'], ['\_'], $userLogin);
                 
                 $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
                 $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ":* " . $CMSCore->getSiteURL() . "\xC2\xA0\n\n";
@@ -594,6 +595,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
               $eventDatetime = date('Y-m-d H:i', time());
               $userIP = $CMSCore->client->getRealIPAddress();
+              $userLogin = str_replace(['_'], ['\_'], $userLogin);
               
               $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
               $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ":* " . $CMSCore->getSiteURL() . "\xC2\xA0\n\n";
@@ -630,6 +632,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
             $eventDatetime = date('Y-m-d H:i', time());
             $userIP = $CMSCore->client->getRealIPAddress();
+            $userLogin = str_replace(['_'], ['\_'], $userLogin);
             
             $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
             $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ":* " . $CMSCore->getSiteURL() . "\xC2\xA0\n\n";
@@ -660,6 +663,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
           $eventDatetime = date('Y-m-d H:i', time());
           $userIP = $CMSCore->client->getRealIPAddress();
+          $userLogin = str_replace(['_'], ['\_'], $userLogin);
           
           $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x94 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_LIMIT_TITLE') . "*\n\n";
           $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ":* " . $CMSCore->getSiteURL() . "\xC2\xA0\n\n";
