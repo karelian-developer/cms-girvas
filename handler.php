@@ -34,6 +34,7 @@ if (defined('IS_NOT_HACKED')) {
   if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $CMSURLP->getPath(1) !== 'install') {
     $cookieToken = $_COOKIE['_grv_csrf'] ?? null;
     $headerToken = $handlerHeaders['X-Csrf-Token'] ?? null;
+    error_log($headerToken);
 
     if ($cookieToken === null || $headerToken === null || !hash_equals($cookieToken, $headerToken)) {
       $handlerMessage = $handlerMessage ?? 'The request was rejected by the security system.';
