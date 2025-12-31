@@ -1,11 +1,21 @@
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 10M
+    php_value max_input_time 300
+    php_value max_execution_time 300
+</IfModule>
+
+Options -Indexes
+
 <IfModule mod_rewrite.c>
 	RewriteEngine On
-	
-	Options -Indexes
-	
 	RewriteBase /
 	
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteRule ^(.*)$ ?$1 [QSA,L]
 </IfModule>
+
+<FilesMatch "\.(json|md|gitignore|log)$">
+	Require all denied
+</FilesMatch>
