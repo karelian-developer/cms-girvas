@@ -39,7 +39,7 @@ if ($CMSCore->client->isLogged(2)) {
       /** @var string Путь до загружаемых файлов */
       $filesDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
 
-      $handlerUploaderErrorCode = $file['error'];
+      $handlerUploaderErrorCode = $_FILES['mediaFile']['error'];
       $handlerUploaderErrorMessage = match($handlerUploaderErrorCode) {
         UPLOAD_ERR_INI_SIZE => $CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_UPLOAD_INI_SIZE'),
         UPLOAD_ERR_FORM_SIZE => $CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_UPLOAD_FORM_SIZE'),
