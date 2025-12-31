@@ -108,7 +108,13 @@ export class PageMedia {
     request.target.data = formData;
 
     request.target.send().then((data) => {
-      if (data.statusCode === 1 && data.outputData.hasOwnProperty('file')) {
+      const APIStatusCode = data?.statusCode;
+      const APIOutputData = data?.outputData;
+      const APIOutputDataFile = APIOutputData !== undefined
+        ? APIOutputData
+        : {};
+
+      if (APIStatusCode === 1 && APIOutputData.hasOwnProperty('file')) {
         let fileName, fileURL;
 
         fileName = data.outputData.file.fullname;

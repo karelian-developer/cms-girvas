@@ -1,7 +1,11 @@
+INSTALLED
 sqlExecute.php
 /cron/database.config.php
 /repository/
 /install/
+/cache/*
+/logs/*
+/uploads/*
 /modules/*
 !/modules/README.md
 /OLD/

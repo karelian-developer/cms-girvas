@@ -935,7 +935,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       'ru_RU' => ['title' => 'Пользователь']
     ];
 
-    $firstUsersGroup = UserGroup::create($CMSCore, 'admin', $firstUsersGroupTexts, 262143);
+    $firstUsersGroup = UserGroup::create($CMSCore, 'admin', $firstUsersGroupTexts, 786431);
     $secondUsersGroup = UserGroup::create($CMSCore, 'moder', $secondUsersGroupTexts, 115585);
     $thirtyUsersGroup = UserGroup::create($CMSCore, 'editor', $thirtyUsersGroupTexts, 130049);
     $fourtyUsersGroup = UserGroup::create($CMSCore, 'user', $fourtyUsersGroupTexts, 114688);

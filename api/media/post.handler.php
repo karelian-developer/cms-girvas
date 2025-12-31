@@ -26,9 +26,11 @@ if ($CMSCore->client->isLogged(2)) {
   // Проверка прав пользователя на доступ к данному действию
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_MEDIA_FILES_MANAGEMENT)) {
     // Проверка передачи файлов (действительно ли они были переданы в массиве)
-    if (!empty($_FILES)) {
+    if (!empty($_FILES) && isset($_FILES['mediaFile'])) {
       /** @var array Массив передаваемых файлов для отладки */
       $handlerOutputData['debug_files'] = $_FILES;
+
+      error_log(print_r($_FILES, true));
 
       /** @var string Расширение передаваемого файла */
       $fileUploadedExtension = pathinfo($_FILES['mediaFile']['name'], PATHINFO_EXTENSION);
