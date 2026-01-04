@@ -89,18 +89,20 @@ class Pagination
     }
 
     for ($itemIndex = 0; $itemIndex < $this->getPagesCount(); $itemIndex++) {
-      $itemClass = $this->itemCurrent === $itemIndex ? 'pagination-list__item pagination-list__item_active' : 'pagination-list__item';
-      $pageNumber = $itemIndex + 1;
+      if ($itemIndex >= $this->itemCurrent - 2 && $itemIndex <= $this->itemCurrent + 3) {
+        $itemClass = $this->itemCurrent === $itemIndex ? 'pagination-list__item pagination-list__item_active' : 'pagination-list__item';
+        $pageNumber = $itemIndex + 1;
 
-      $aElement = $DOMDocument->createElement('a', $pageNumber);
-      $aElement->setAttribute('class', 'pagination-list__item-link item-link');
-      $aElement->setAttribute('href', '?pageNumber=' . $itemIndex . '#window-target');
+        $aElement = $DOMDocument->createElement('a', $pageNumber);
+        $aElement->setAttribute('class', 'pagination-list__item-link item-link');
+        $aElement->setAttribute('href', '?pageNumber=' . $itemIndex . '#window-target');
 
-      $liElement = $DOMDocument->createElement('li');
-      $liElement->setAttribute('class', $itemClass);
-      
-      $liElement->appendChild($aElement);
-      $ulElement->appendChild($liElement);
+        $liElement = $DOMDocument->createElement('li');
+        $liElement->setAttribute('class', $itemClass);
+        
+        $liElement->appendChild($aElement);
+        $ulElement->appendChild($liElement);
+      }
     }
 
     if ($this->itemCurrent < ($this->getPagesCount() - 1)) {
