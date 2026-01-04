@@ -286,7 +286,7 @@ class PagePage implements InterfacePage
       ThemeCollector::addTemplateVariable(
         $templatesAssembled,
         'PAGE_STATIC_PERSONAL_TEMPLATE_PATH',
-        $pageStatic->getPersonalTemplatePath()
+        $pageStatic !== null ? $pageStatic->getPersonalTemplatePath() : 'templates/page/static.tpl'
       );
     }
 
