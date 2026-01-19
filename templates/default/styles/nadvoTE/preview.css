@@ -1,6 +1,29 @@
 body {
+  display: grid;
   background-color: var(--primary-color-4);
   font-family: 'Roboto';
+}
+
+body:has(img + img),
+body:has(figure + figure) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+body .video-container:nth-of-type(n+5),
+body img:nth-child(n+5),
+body figure:nth-child(n+5) {
+  grid-column: 1 / -1;
+  max-width: 100%;
+}
+
+body img,
+body figure,
+body .video-container {
+  grid-column: auto;
+  max-width: 100%;
+  height: auto;
 }
 
 body > * {
