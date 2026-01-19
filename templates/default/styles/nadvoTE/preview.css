@@ -28,6 +28,7 @@ body .video-container {
 
 body > * {
   box-sizing: border-box;
+  grid-column: 1 / -1;
   word-break: break-word;
   margin-bottom: 10px;
 }
