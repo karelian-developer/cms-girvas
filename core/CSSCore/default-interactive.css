@@ -510,11 +510,21 @@
 }
 
 .file-manager__controller_left {
-  left: 8px;
+  left: 24px;
 }
 
 .file-manager__controller_right {
-  right: 8px;
+  right: 24px;
+}
+
+@media (max-width: 880px) {
+  .file-manager__controller_left {
+    left: 8px;
+  }
+
+  .file-manager__controller_right {
+    right: 8px;
+  }
 }
 
 .file-manager__controller > .interactive__button {
