@@ -181,7 +181,8 @@ export class ToolImage extends Tool {
       this.modal = new Interactive('modal',
         {
           title: "Вставить изображение",
-          content: modalBodyContent
+          content: modalBodyContent,
+          width: window.innerWidth - 100
         }
       );
       
