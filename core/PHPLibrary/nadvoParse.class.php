@@ -486,7 +486,7 @@ class NadvoParse
         $figureElement->appendChild($figcaptionElement);
         $document->appendChild($figureElement);
 
-        return $document->saveHTML();
+        return $document->saveHTML($figureElement);
       },
       $html
     );
