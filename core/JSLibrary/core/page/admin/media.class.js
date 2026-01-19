@@ -33,7 +33,7 @@ export class PageMedia {
 
   initMediaElement(element) {
     let buttons = {};
-    let fileName, fileURL;
+    let fileName, fileURL, isDirectory;
 
     fileName = element.getAttribute('data-file-name');
     fileURL = element.getAttribute('data-file-url');
@@ -115,42 +115,39 @@ export class PageMedia {
         : {};
 
       if (APIStatusCode === 1 && APIOutputData.hasOwnProperty('file')) {
-        let fileName, fileURL, isDirectory;
+        let fileName, fileURL;
 
         fileName = data.outputData.file.fullname;
         fileURL = data.outputData.file.url;
-        isDirectory = data.outputData.file.isDirectory;
 
-        if (!isDirectory) {
-          let listItemElement = document.createElement('li');
-          listItemElement.classList.add('media-list__item');
-          listItemElement.classList.add('item');
-          listItemElement.style.backgroundImage = `url('${fileURL}')`;
-          listItemElement.setAttribute('data-file-name', fileName);
-          listItemElement.setAttribute('data-file-url', fileURL);
+        let listItemElement = document.createElement('li');
+        listItemElement.classList.add('media-list__item');
+        listItemElement.classList.add('item');
+        listItemElement.style.backgroundImage = `url('${fileURL}')`;
+        listItemElement.setAttribute('data-file-name', fileName);
+        listItemElement.setAttribute('data-file-url', fileURL);
 
-          let listItemControllerContainerElement = document.createElement('div');
-          listItemControllerContainerElement.classList.add('item__controller-panel');
-          listItemControllerContainerElement.classList.add('controller-panel');
-          listItemControllerContainerElement.setAttribute('role', 'controller-panel');
+        let listItemControllerContainerElement = document.createElement('div');
+        listItemControllerContainerElement.classList.add('item__controller-panel');
+        listItemControllerContainerElement.classList.add('controller-panel');
+        listItemControllerContainerElement.setAttribute('role', 'controller-panel');
 
-          let listItemTitleContainerElement = document.createElement('div');
-          listItemTitleContainerElement.classList.add('item__title-container');
+        let listItemTitleContainerElement = document.createElement('div');
+        listItemTitleContainerElement.classList.add('item__title-container');
 
-          let listItemTitleElement = document.createElement('div');
-          listItemTitleElement.classList.add('item__title');
-          listItemTitleElement.innerText = fileName;
+        let listItemTitleElement = document.createElement('div');
+        listItemTitleElement.classList.add('item__title');
+        listItemTitleElement.innerText = fileName;
 
-          listItemElement.appendChild(listItemControllerContainerElement);
-          listItemTitleContainerElement.appendChild(listItemTitleElement);
-          listItemElement.appendChild(listItemTitleContainerElement);
+        listItemElement.appendChild(listItemControllerContainerElement);
+        listItemTitleContainerElement.appendChild(listItemTitleElement);
+        listItemElement.appendChild(listItemTitleContainerElement);
 
-          let mediaListElement = document.querySelector('#E9453667589');
-          let mediaListItems = mediaListElement.querySelectorAll('li');
-          mediaListItems[0].before(listItemElement);
+        let mediaListElement = document.querySelector('#E9453667589');
+        let mediaListItems = mediaListElement.querySelectorAll('li');
+        mediaListItems[0].before(listItemElement);
 
-          this.initMediaElement(listItemElement);
-        }
+        this.initMediaElement(listItemElement);
       }
 
       if (data.statusCode === 1 && fileIndex < (inputElement.files.length - 1)) {

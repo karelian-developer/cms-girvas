@@ -25,14 +25,15 @@ if ($CMSCore->client->isLogged(2)) {
 
   foreach ($files as $file) {
     /** @var string */
-    $path = $filesDirectoryPath . '/' . $file;
+    $filePath = $filesDirectoryPath . '/' . $file;
     /** @var string */
     $URL = $file;
     
-    array_push($filesData, [
+    $filesData[] = [
       'fileURL' => $URL,
-      'createdUnixTimestamp' => filemtime($path)
-    ]);
+      'isDirectory' => is_dir($filePath),
+      'createdUnixTimestamp' => filemtime($filePath)
+    ];
   }
 
   usort($filesData, function($a, $b) {
@@ -45,12 +46,20 @@ if ($CMSCore->client->isLogged(2)) {
 
   $filesSorted = [];
   foreach ($filesData as $data) {
-    array_push($filesSorted, $data['fileURL']);
+    $filesSorted[] = [
+      'URL' => $data['fileURL'],
+      'isDirectory' => $data['isDirectory'],
+      'createdUnixTimestamp' => $data['createdUnixTimestamp']
+    ];
   }
 
   $filesTransformed = [];
-  foreach ($filesSorted as $file) {
-    $filesTransformed[] = '/uploads/media/' . $file;
+  foreach ($filesSorted as $fileData) {
+    $filesTransformed[] = [
+      'URL' => '/uploads/media/' . $fileData['URL'],
+      'isDirectory' => (bool) $fileData['isDirectory'],
+      'createdUnixTimestamp' => (int) $fileData['createdUnixTimestamp']
+    ];
   }
 
   $handlerOutputData['items'] = $filesTransformed;

@@ -42,21 +42,43 @@ export class ToolImage extends Tool {
     });
   }
 
-  addImageItem(fileURL, end = true) {
-    let targetElement = document.querySelector('#SYSTEM_MODAL_6438654856');
-    let imagesListElement = targetElement.querySelector('ul');
-    let imagesListItemsElements = targetElement.querySelectorAll('li');
+  addImageItem(data, end = true) {
+    const fileURL = data.URL === undefined
+      ? ''
+      : data.URL;
 
-    let mediaListItemElement = document.createElement('li');
+    const fileIsDirectory = data.isDirectory === undefined
+      ? true :
+      data.isDirectory;
+
+    const fileCreatedUnixTimestamp = data.createdUnixTimestamp === undefined
+      ? 0
+      : data.createdUnixTimestamp;
+
+    const targetElement = document.querySelector('#SYSTEM_MODAL_6438654856');
+    const imagesListElement = targetElement.querySelector('ul');
+    const imagesListItemsElements = targetElement.querySelectorAll('li');
+
+    const mediaListItemElement = document.createElement('li');
     mediaListItemElement.classList.add('media-list__item');
-    mediaListItemElement.style.backgroundImage = `url("${fileURL}")`;
+
+    if (!fileIsDirectory) {
+      mediaListItemElement.style.backgroundImage = `url("${fileURL}")`;
+    } else {
+      mediaListItemElement.classList.add('media-list__item_is-directory');
+    }
+    
     mediaListItemElement.setAttribute('data-media-url', fileURL);
 
     mediaListItemElement.addEventListener('click', (event) => {
       event.preventDefault();
 
-      let inputImageLabelElement = this.modal.target.element.querySelector('[name="image_label"]');
-      let imageLabel = inputImageLabelElement.value;
+      if (fileIsDirectory) {
+        return false;
+      }
+
+      const inputImageLabelElement = this.modal.target.element.querySelector('[name="image_label"]');
+      const imageLabel = inputImageLabelElement.value;
 
       this.editor.textarea.replaceStringSelection(
         `![${imageLabel}](${fileURL})`
@@ -65,10 +87,12 @@ export class ToolImage extends Tool {
       this.modal.target.close();
     });
 
-    if (end) {
-      imagesListElement.appendChild(mediaListItemElement);
-    } else {
-      imagesListItemsElements[0].after(mediaListItemElement);
+    if (!fileIsDirectory) {
+      if (end) {
+        imagesListElement.appendChild(mediaListItemElement);
+      } else {
+        imagesListItemsElements[0].after(mediaListItemElement);
+      }
     }
   }
 
@@ -98,12 +122,10 @@ export class ToolImage extends Tool {
           this.imageUpload(input, fileIndex + 1);
         }
 
-        if (!data.outputData.file.isDirectory) {
-          this.addImageItem(data.outputData.file.url, false);
-        }
+        this.addImageItem(data.outputData.file.url, false);
 
-        let targetElement = document.querySelector('#SYSTEM_MODAL_6438654856');
-        let imagesListItemsElements = targetElement.querySelectorAll('li');
+        const targetElement = document.querySelector('#SYSTEM_MODAL_6438654856');
+        const imagesListItemsElements = targetElement.querySelectorAll('li');
         imagesListItemsElements[imagesListItemsElements.length - 2].remove();
       }
     });
