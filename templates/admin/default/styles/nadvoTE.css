@@ -18,7 +18,7 @@
 
 .nadvo-te__toolbar-list {
   display: grid;
-  grid-template-columns: minmax(32px, 48px);
+  grid-template-columns: repeat(12, 32px);
   list-style-type: none;
   padding-left: 0;
   padding-right: 32px;
@@ -27,6 +27,7 @@
 
 @media (max-width: 600px) {
   .nadvo-te__toolbar-list {
+    grid-template-columns: repeat(8, 48px);
     padding-right: 48px;
   }
 }
