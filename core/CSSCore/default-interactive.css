@@ -501,6 +501,8 @@
 .file-manager__controller {
   position: fixed;
   border-radius: 100%;
+  width: 40px;
+  height: 40px;
   z-index: 101;
   top: 50%;
   transform: translateY(-50%);
