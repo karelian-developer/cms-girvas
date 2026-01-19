@@ -157,18 +157,16 @@ export class ToolImage extends Tool {
       inputImageLabelElement.setAttribute('placeholder', 'Подпись изображения');
       inputImageLabelElement.setAttribute('name', 'image_label');
       inputImageLabelElement.classList.add('form__input');
-      inputImageLabelElement.style.width = '100%';
-      inputImageLabelElement.style.marginBottom = '10px';
       inputImageLabelElement.value = stringSelection;
 
       const inputImageLinkElement = document.createElement('input');
       inputImageLinkElement.classList.add('form__input');
       inputImageLinkElement.setAttribute('placeholder', '../image.webp');
       inputImageLinkElement.setAttribute('name', 'image_link');
-      inputImageLinkElement.style.width = '100%';
 
       const formElement = document.createElement('form');
       formElement.classList.add('form');
+      formElement.classList.add('file-manager__form');
       formElement.append(inputFilesElement);
       formElement.append(inputImageLabelElement);
       formElement.append(inputImageLinkElement);
