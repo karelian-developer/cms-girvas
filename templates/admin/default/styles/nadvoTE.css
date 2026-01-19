@@ -55,14 +55,14 @@
 @media (max-width: 600px) {
   .nadvo-te__toolbar-item_preview {
     position: absolute;
-    right: 48px;
+    right: 0;
     top: 0;
   }
   
   .nadvo-te__toolbar-item_source {
     position: absolute;
     right: 0;
-    top: 0;
+    top: 48px;
   }
 }
 
