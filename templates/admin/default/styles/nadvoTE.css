@@ -17,11 +17,18 @@
 }
 
 .nadvo-te__toolbar-list {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(32px, 48px);
   list-style-type: none;
-  padding: 0;
+  padding-left: 0;
+  padding-right: 32px;
   margin: 0;
+}
+
+@media (max-width: 600px) {
+  .nadvo-te__toolbar-list {
+    padding-right: 48px;
+  }
 }
 
 @media (min-width: 601px) {
