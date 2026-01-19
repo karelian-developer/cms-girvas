@@ -287,11 +287,11 @@ export class ToolImage extends Tool {
           }
         });
 
-        interactiveButtonNavPrev.target.element.classList.add('form-manager__controller');
-        interactiveButtonNavPrev.target.element.classList.add('form-manager__controller_left');
+        interactiveButtonNavPrev.target.element.classList.add('file-manager__controller');
+        interactiveButtonNavPrev.target.element.classList.add('file-manager__controller_left');
 
-        interactiveButtonNavNext.target.element.classList.add('form-manager__controller');
-        interactiveButtonNavNext.target.element.classList.add('form-manager__controller_right');
+        interactiveButtonNavNext.target.element.classList.add('file-manager__controller');
+        interactiveButtonNavNext.target.element.classList.add('file-manager__controller_right');
 
         targetElement.appendChild(interactiveButtonNavPrev.target.element);
         targetElement.appendChild(interactiveButtonNavNext.target.element);
