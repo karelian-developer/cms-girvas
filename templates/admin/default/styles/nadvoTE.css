@@ -146,7 +146,8 @@
 }
 
 .nadvo-te__copyright {
+  text-align: right;
   font-style: italic;
-  font-size: 12px;
+  font-size: 8px;
   opacity: .6;
 }
