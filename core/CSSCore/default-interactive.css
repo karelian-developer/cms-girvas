@@ -484,10 +484,12 @@
 .file-manager__fixed-panel {
   position: sticky;
   background-color: var(--primary-color-4);
+  padding-top: 10px;
   padding-bottom: 10px;
   top: 0;
   left: 0;
   z-index: 101;
+  transform: translateY(-10px);
 }
 
 .file-manager__form {
