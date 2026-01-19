@@ -15,6 +15,7 @@
 
 'use strict';
 
+import {Interactive} from "../../interactive.class.js";
 import {Tool} from './tool.class.js';
 
 export class ToolPreview extends Tool {
