@@ -2,10 +2,11 @@ body {
   display: grid;
   background-color: var(--primary-color-4);
   font-family: 'Roboto';
+  grid-column: 1 / -1;
 }
 
 body p:has(img + img),
-body p:has(figure + figure) {
+body:has(figure + figure) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 10px;
@@ -13,7 +14,7 @@ body p:has(figure + figure) {
 
 body .video-container:nth-of-type(n+5),
 body p > img:nth-child(n+5),
-body p > figure:nth-child(n+5) {
+body p figure:nth-child(n+5) {
   grid-column: 1 / -1;
   max-width: 100%;
 }
