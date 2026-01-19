@@ -41,6 +41,7 @@ body figure img {
 body figure figcaption {
   font-style: italic;
   font-size: 11px;
+  opacity: .8;
 }
 
 body > * {
