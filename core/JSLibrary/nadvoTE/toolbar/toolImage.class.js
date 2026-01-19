@@ -288,21 +288,10 @@ export class ToolImage extends Tool {
         });
 
         interactiveButtonNavPrev.target.element.classList.add('form-manager__controller');
+        interactiveButtonNavPrev.target.element.classList.add('form-manager__controller_left');
+
         interactiveButtonNavNext.target.element.classList.add('form-manager__controller');
-
-        interactiveButtonNavPrev.target.element.style.position = 'fixed';
-        interactiveButtonNavPrev.target.element.style.left = '8px';
-        interactiveButtonNavPrev.target.element.style.top = '50%';
-        interactiveButtonNavPrev.target.element.style.zIndex = '101';
-        interactiveButtonNavPrev.target.element.style.borderRadius = '100%';
-        interactiveButtonNavPrev.target.element.style.transform = 'translateY(-50%)';
-
-        interactiveButtonNavNext.target.element.style.position = 'fixed';
-        interactiveButtonNavNext.target.element.style.right = '8px';
-        interactiveButtonNavNext.target.element.style.top = '50%';
-        interactiveButtonNavNext.target.element.style.zIndex = '101';
-        interactiveButtonNavNext.target.element.style.borderRadius = '100%';
-        interactiveButtonNavNext.target.element.style.transform = 'translateY(-50%)';
+        interactiveButtonNavNext.target.element.classList.add('form-manager__controller_right');
 
         targetElement.appendChild(interactiveButtonNavPrev.target.element);
         targetElement.appendChild(interactiveButtonNavNext.target.element);

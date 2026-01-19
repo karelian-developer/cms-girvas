@@ -497,3 +497,23 @@
 .file-manager__form .form__input {
   width: 100%;
 }
+
+.file-manager__controller {
+  position: fixed;
+  border-radius: 100%;
+  z-index: 101;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.file-manager__controller_left {
+  left: 8px;
+}
+
+.file-manager__controller_right {
+  right: 8px;
+}
+
+.file-manager__controller > .interactive__button {
+  border-radius: 100%;
+}
