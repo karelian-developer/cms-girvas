@@ -287,17 +287,19 @@ export class ToolImage extends Tool {
           }
         });
 
-        const listItemsElementStyle = targetElement.currentStyle || window.getComputedStyle(targetElement);
-        const listItemsElementCurrentHeight = parseInt(listItemsElementStyle.height);
-
-        interactiveButtonNavPrev.target.element.style.position = 'absolute';
-        interactiveButtonNavPrev.target.element.style.left = '0px';
-        interactiveButtonNavPrev.target.element.style.top = (listItemsElementCurrentHeight / 2) + 'px';
+        interactiveButtonNavPrev.target.element.style.position = 'fixed';
+        interactiveButtonNavPrev.target.element.style.left = '8px';
+        interactiveButtonNavPrev.target.element.style.top = '50%';
         interactiveButtonNavPrev.target.element.style.zIndex = '101';
-        interactiveButtonNavNext.target.element.style.position = 'absolute';
-        interactiveButtonNavNext.target.element.style.right = '0px';
-        interactiveButtonNavNext.target.element.style.top = (listItemsElementCurrentHeight / 2) + 'px';
+        interactiveButtonNavPrev.target.element.style.borderRadius = '100%';
+        interactiveButtonNavPrev.target.element.style.transform = 'translateY(-50%)';
+
+        interactiveButtonNavNext.target.element.style.position = 'fixed';
+        interactiveButtonNavNext.target.element.style.right = '8px';
+        interactiveButtonNavNext.target.element.style.top = '50%';
         interactiveButtonNavNext.target.element.style.zIndex = '101';
+        interactiveButtonNavNext.target.element.style.borderRadius = '100%';
+        interactiveButtonNavNext.target.element.style.transform = 'translateY(-50%)';
 
         targetElement.appendChild(interactiveButtonNavPrev.target.element);
         targetElement.appendChild(interactiveButtonNavNext.target.element);
