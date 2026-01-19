@@ -107,6 +107,7 @@
   box-sizing: border-box;
   font-size: 16px;
   padding: 10px;
+  margin-bottom: 8px;
   height: 400px;
   overflow-y: scroll;
 }
@@ -124,6 +125,7 @@
 
 .nadvo-te__textarea {
   display: block;
+  margin-bottom: 8px;
   height: 400px;
   resize: none;
 }
@@ -141,4 +143,10 @@
 .nadvo-te__textarea-visual h6 {
   margin-top: 0;
   margin-bottom: 10px;
+}
+
+.nadvo-te__copyright {
+  font-style: italic;
+  font-size: 12px;
+  opacity: .6;
 }
