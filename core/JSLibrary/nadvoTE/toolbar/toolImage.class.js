@@ -177,8 +177,8 @@ export class ToolImage extends Tool {
       inputsGroupContainer.classList.add('file-manager__fixed-panel');
       inputsGroupContainer.append(formElement);
 
-      modalBodyContent.append(mediaContainerElement);
       modalBodyContent.append(inputsGroupContainer);
+      modalBodyContent.append(mediaContainerElement);
 
       this.modal = new Interactive('modal',
         {
@@ -189,9 +189,11 @@ export class ToolImage extends Tool {
       );
       
       let self = this;
+
       this.modal.target.onClose(() => {
         self.imagesListGroup = 0;
       });
+
       this.modal.target.addButton('Вставить', () => {
         let inputImageLabelElement = this.modal.target.element.querySelector('[name="image_label"]');
         let inputImageLinkElement = this.modal.target.element.querySelector('[name="image_link"]');
@@ -205,9 +207,11 @@ export class ToolImage extends Tool {
 
         this.modal.target.close();
       });
+
       this.modal.target.addButton('Отмена', () => {
         this.modal.target.close();
       });
+
       this.modal.assembly();
       document.body.appendChild(this.modal.target.element);
       this.modal.target.show();
@@ -218,7 +222,7 @@ export class ToolImage extends Tool {
 
         let mediaListElement = document.createElement('ul');
         mediaListElement.classList.add('media-list');
-        mediaListElement.classList.add('list-reset');
+        mediaListElement.classList.add('file-manager__media-list');
         
         let mediaListItemUploadElement = document.createElement('li');
         mediaListItemUploadElement.classList.add('media-list__item');
@@ -261,7 +265,10 @@ export class ToolImage extends Tool {
               this.imagesListGroup++;
 
               items.forEach((item, itemIndex) => {
-                if (itemIndex >= (itemsinGroupCount * this.imagesListGroup) && itemIndex < (itemsinGroupCount * this.imagesListGroup) + itemsinGroupCount) {
+                if (
+                  itemIndex >= (itemsinGroupCount * this.imagesListGroup) &&
+                  itemIndex < (itemsinGroupCount * this.imagesListGroup) + itemsinGroupCount
+                ) {
                   this.addImageItem(item);
                 }
               });
@@ -282,8 +289,8 @@ export class ToolImage extends Tool {
           }
         });
 
-        let listItemsElementStyle = targetElement.currentStyle || window.getComputedStyle(targetElement);
-        let listItemsElementCurrentHeight = parseInt(listItemsElementStyle.height);
+        const listItemsElementStyle = targetElement.currentStyle || window.getComputedStyle(targetElement);
+        const listItemsElementCurrentHeight = parseInt(listItemsElementStyle.height);
 
         interactiveButtonNavPrev.target.element.style.position = 'absolute';
         interactiveButtonNavPrev.target.element.style.left = '0px';
@@ -293,6 +300,7 @@ export class ToolImage extends Tool {
         interactiveButtonNavNext.target.element.style.right = '0px';
         interactiveButtonNavNext.target.element.style.top = (listItemsElementCurrentHeight / 2) + 'px';
         interactiveButtonNavNext.target.element.style.zIndex = '101';
+
         targetElement.appendChild(interactiveButtonNavPrev.target.element);
         targetElement.appendChild(interactiveButtonNavNext.target.element);
       });
