@@ -33,9 +33,16 @@
   }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 530px) {
   .nadvo-te__toolbar-list {
     grid-template-columns: repeat(6, 48px);
+    padding-right: 48px;
+  }
+}
+
+@media (max-width: 420px) {
+  .nadvo-te__toolbar-list {
+    grid-template-columns: repeat(4, 48px);
     padding-right: 48px;
   }
 }
