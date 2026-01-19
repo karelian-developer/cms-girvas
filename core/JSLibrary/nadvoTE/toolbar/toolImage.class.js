@@ -98,7 +98,9 @@ export class ToolImage extends Tool {
           this.imageUpload(input, fileIndex + 1);
         }
 
-        this.addImageItem(data.outputData.file.url, false);
+        if (!data.outputData.file.isDirectory) {
+          this.addImageItem(data.outputData.file.url, false);
+        }
 
         let targetElement = document.querySelector('#SYSTEM_MODAL_6438654856');
         let imagesListItemsElements = targetElement.querySelectorAll('li');

@@ -119,12 +119,11 @@ if ($CMSCore->client->isLogged(2)) {
                     
                     /** @var array Данные конвертированного файла */
                     $fileData = [];
-                    // URL до конвертированного файла
-                    $fileData['url'] = '/uploads/media/' . $fileConverted['fileName'];
-                    // Полное наименование конвертированного файла
-                    $fileData['fullname'] = $fileConverted['fileName'];
 
-                    // Передача данных о загруженном файле в глобальную переменную обработчика
+                    $fileData['url'] = '/uploads/media/' . $fileConverted['fileName'];
+                    $fileData['isDirectory'] = is_dir(CMS_ROOT_DIRECTORY . $fileData['url']);
+                    $fileData['fullname'] = $fileConverted['fileName'];
+                    
                     $handlerOutputData['file'] = $fileData;
 
                     if (is_array($fileConverted)) {
