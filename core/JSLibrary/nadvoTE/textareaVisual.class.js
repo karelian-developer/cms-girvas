@@ -53,7 +53,7 @@ export class TextareaVisual {
       iFrameTargetStylesURLs.forEach(url => {
         let linkElement = document.createElement('link');
         linkElement.rel = 'stylesheet';
-        linkElement.href = url + '?_t=' + new Date().getTime();
+        linkElement.href = url;
 
         iFrameElementDocument.head.appendChild(linkElement);
       });
