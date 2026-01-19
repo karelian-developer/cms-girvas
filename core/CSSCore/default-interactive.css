@@ -432,7 +432,7 @@
 #SYSTEM_MODAL_6438654856 .media-list {
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: repeat(8, calc((100% / 8) - (10px * 7)));
+  grid-template-columns: repeat(6, calc((100% / 6) - (10px * 6) / 7));
   width: 100%;
   gap: 10px;
 }

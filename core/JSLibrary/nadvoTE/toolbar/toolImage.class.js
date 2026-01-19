@@ -86,7 +86,7 @@ export class ToolImage extends Tool {
 
       this.modal.target.close();
     });
-    
+
     if (end) {
       imagesListElement.appendChild(mediaListItemElement);
     } else {
@@ -132,13 +132,16 @@ export class ToolImage extends Tool {
   initClickEvent() {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
-      let stringSelection = this.editor.getSelectionString();
+      const stringSelection = this.editor.getSelectionString();
 
-      let modalBodyContent = document.createElement('div');
-      let mediaContainerElement = document.createElement('div');
+      const modalBodyContent = document.createElement('div');
+      modalBodyContent.classList.add('file-manager');
+
+      const mediaContainerElement = document.createElement('div');
+      mediaContainerElement.classList.add('file-manager__files-container');
       mediaContainerElement.setAttribute('id', 'SYSTEM_MODAL_6438654856');
 
-      let inputFilesElement = document.createElement('input');
+      const inputFilesElement = document.createElement('input');
       inputFilesElement.setAttribute('type', 'file');
       inputFilesElement.setAttribute('accept', 'image/png, image/jpeg, image/gif, image/webp, image/avif');
       inputFilesElement.setAttribute('multiple', 'multiple');
@@ -150,7 +153,7 @@ export class ToolImage extends Tool {
         }
       });
 
-      let inputImageLabelElement = document.createElement('input');
+      const inputImageLabelElement = document.createElement('input');
       inputImageLabelElement.setAttribute('placeholder', 'Подпись изображения');
       inputImageLabelElement.setAttribute('name', 'image_label');
       inputImageLabelElement.classList.add('form__input');
@@ -158,25 +161,32 @@ export class ToolImage extends Tool {
       inputImageLabelElement.style.marginBottom = '10px';
       inputImageLabelElement.value = stringSelection;
 
-      let inputImageLinkElement = document.createElement('input');
+      const inputImageLinkElement = document.createElement('input');
       inputImageLinkElement.classList.add('form__input');
       inputImageLinkElement.setAttribute('placeholder', '../image.webp');
       inputImageLinkElement.setAttribute('name', 'image_link');
       inputImageLinkElement.style.width = '100%';
 
-      let formElement = document.createElement('form');
+      const formElement = document.createElement('form');
       formElement.classList.add('form');
       formElement.append(inputFilesElement);
       formElement.append(inputImageLabelElement);
       formElement.append(inputImageLinkElement);
       
-      let inputsGroupContainer = document.createElement('div');
+      const inputsGroupContainer = document.createElement('div');
+      inputsGroupContainer.classList.add('file-manager__fixed-panel');
       inputsGroupContainer.append(formElement);
 
       modalBodyContent.append(mediaContainerElement);
       modalBodyContent.append(inputsGroupContainer);
 
-      this.modal = new Interactive('modal', {title: "Вставить изображение", content: modalBodyContent, width: window.innerWidth - 400});
+      this.modal = new Interactive('modal',
+        {
+          title: "Вставить изображение",
+          content: modalBodyContent,
+          width: window.innerWidth - 400
+        }
+      );
       
       let self = this;
       this.modal.target.onClose(() => {
