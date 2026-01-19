@@ -437,6 +437,18 @@
   gap: 10px;
 }
 
+@media (max-width: 880px) {
+  #SYSTEM_MODAL_6438654856 .media-list {
+    grid-template-columns: repeat(4, calc((100% / 4) - (10px * 4) / 5));
+  }
+}
+
+@media (max-width: 640px) {
+  #SYSTEM_MODAL_6438654856 .media-list {
+    grid-template-columns: repeat(2, calc((100% / 2) - (10px * 2) / 3));
+  }
+}
+
 #SYSTEM_MODAL_6438654856 .media-list__item {
   position: relative;
   background-size: cover;
