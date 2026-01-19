@@ -34,6 +34,14 @@ body figure {
   height: 100%;
 }
 
+body figure img {
+  margin-bottom: 8px;
+}
+
+body figure figcaption {
+  font-style: italic;
+  font-size: 11px;
+}
 
 body > * {
   box-sizing: border-box;
