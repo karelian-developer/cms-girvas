@@ -431,10 +431,10 @@
 
 #SYSTEM_MODAL_6438654856 .media-list {
   box-sizing: border-box;
-  display: flex;
-  flex-wrap: wrap;
-  padding: 0 40px;
+  display: grid;
+  grid-template-columns: repeat(8, calc((100% / 8) - (10px * 7)));
   width: 100%;
+  gap: 10px;
 }
 
 #SYSTEM_MODAL_6438654856 .media-list__item {
@@ -442,22 +442,15 @@
   background-size: cover;
   background-position: center center;
   box-sizing: border-box;
-  border: 1px solid var(--primary-color-3);
-  outline: 1px solid var(--primary-color-3);
-  margin-right: 10px;
-  margin-bottom: 10px;
-  flex: 0 0 calc(((100% / 8) - 10px) + (10px / 8));
+  border: 1px solid var(--common-main-color-2);
+  outline: 1px solid var(--common-main-color-2);
   height: 100px;
   transition: filter .2s, outline .2s;
   cursor: pointer;
 
   &:not(:first-child) {
-    &:nth-child(8n) {
-      margin-right: 0;
-    }
-
     &:hover, &:focus {
-      outline: 1px solid var(--secondary-color-2);
+      outline: 1px solid var(--common-secondary-color-2);
       filter: brightness(120%);
     }
   }
