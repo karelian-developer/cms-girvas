@@ -86,13 +86,11 @@ export class ToolImage extends Tool {
 
       this.modal.target.close();
     });
-
-    if (!fileIsDirectory) {
-      if (end) {
-        imagesListElement.appendChild(mediaListItemElement);
-      } else {
-        imagesListItemsElements[0].after(mediaListItemElement);
-      }
+    
+    if (end) {
+      imagesListElement.appendChild(mediaListItemElement);
+    } else {
+      imagesListItemsElements[0].after(mediaListItemElement);
     }
   }
 
