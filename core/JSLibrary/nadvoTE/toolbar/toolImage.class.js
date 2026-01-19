@@ -287,6 +287,9 @@ export class ToolImage extends Tool {
           }
         });
 
+        interactiveButtonNavPrev.target.element.classList.add('form-manager__controller');
+        interactiveButtonNavNext.target.element.classList.add('form-manager__controller');
+
         interactiveButtonNavPrev.target.element.style.position = 'fixed';
         interactiveButtonNavPrev.target.element.style.left = '8px';
         interactiveButtonNavPrev.target.element.style.top = '50%';
