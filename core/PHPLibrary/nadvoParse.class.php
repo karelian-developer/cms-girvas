@@ -491,10 +491,7 @@ class NadvoParse
         $figureElement->appendChild($figcaptionElement);
         $document->appendChild($figureElement);
 
-        $figureHtml = $document->saveHTML($figureElement);
-        $figureHtml = str_replace(["\n", "\r"], '', $figureHtml);
-
-        return $figureHtml;
+        return $document->saveHTML($figureElement);
       },
       $html
     );
