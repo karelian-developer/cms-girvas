@@ -490,6 +490,10 @@
   z-index: 101;
 }
 
+.file-manager__form {
+  margin-bottom: 0;
+}
+
 .file-manager__form .form__input {
   width: 100%;
 }
