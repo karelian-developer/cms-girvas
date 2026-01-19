@@ -505,6 +505,7 @@
   height: 40px;
   z-index: 101;
   top: 50%;
+  box-shadow: 0 0 10px var(--common-main-color-4--opacity-0-2);
   transform: translateY(-50%);
 }
 
@@ -518,4 +519,6 @@
 
 .file-manager__controller > .interactive__button {
   border-radius: 100%;
+  width: 100%;
+  height: 100%;
 }
