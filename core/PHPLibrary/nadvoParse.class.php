@@ -31,7 +31,7 @@ class NadvoParse
     'underline' => '/\~\~(.+?)\~\~/s',
     'link' => '/\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'image' => '/!\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
-    'figure' => '/![f]\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
+    'figure' => '/!\#\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'video' => '/!\[video\]\((.+?)\)/',
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
@@ -373,21 +373,16 @@ class NadvoParse
       $inTable = false;
 
       if (preg_match('/^(#{1,6})\s+(.+)/', $line, $matches)) {
-
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
         }
-
         $html .= '<h' . strlen($matches[1]) . '>' . $matches[2] . '</h' . strlen($matches[1]) . '>' . "\n";
-      
       } elseif (empty(trim($line))) {
-
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
         }
-
       } else {
         $currentParagraph .= $line . ' ';
       }
@@ -491,7 +486,7 @@ class NadvoParse
         $figureElement->appendChild($figcaptionElement);
         $document->appendChild($figureElement);
 
-        return $document->saveHTML($figureElement);
+        return $document->saveHTML();
       },
       $html
     );
