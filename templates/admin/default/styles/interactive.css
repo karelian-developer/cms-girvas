@@ -163,7 +163,6 @@
   flex-direction: column;
   background-color: var(--common-main-color-1);
   box-shadow: 0 0 10px var(--common-main-color-4--opacity-0-2);
-  max-width: calc(100% - 200px);
 }
 
 .interactive .interactive__modal .modal__header-container {
