@@ -372,7 +372,7 @@ class NadvoParse
 
       $inTable = false;
 
-      if (preg_match('/^(#{1,6})\s+(.+)/', $line, $matches)) {
+      if (preg_match('/^(?!!)(#{1,6})\s+(.+)/', $line, $matches)) {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
