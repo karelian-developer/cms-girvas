@@ -340,14 +340,19 @@ class NadvoParse
 
     foreach ($lines as $line) {
       if (str_starts_with(trim($line), '<pre>') || 
+        str_starts_with(trim($line), '</pre>') ||
         str_starts_with(trim($line), '<blockquote>') ||
         str_starts_with(trim($line), '</blockquote>') ||
         str_starts_with(trim($line), '<table>') ||
+        str_starts_with(trim($line), '</table>') ||
         str_starts_with(trim($line), '<ul>') ||
         str_starts_with(trim($line), '<ol>') ||
         str_starts_with(trim($line), '</ul>') ||
         str_starts_with(trim($line), '</ol>') ||
-        str_starts_with(trim($line), '<li>'))
+        str_starts_with(trim($line), '<li>') ||
+        str_starts_with(trim($line), '</li>') ||
+        str_starts_with(trim($line), '<figure>') ||
+        str_starts_with(trim($line), '</figure>'))
       {
 
         if (!empty($currentParagraph)) {
