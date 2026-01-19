@@ -17,6 +17,7 @@
 }
 
 .nadvo-te__toolbar-list {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(12, 32px);
   list-style-type: none;
