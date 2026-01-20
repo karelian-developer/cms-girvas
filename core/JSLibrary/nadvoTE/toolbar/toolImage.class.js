@@ -29,11 +29,12 @@ export class ToolImage extends Tool {
 
     this.modal = null;
     this.imagesListGroup = 0;
+    this.filesPath = '/';
     this.initClickEvent();
   }
 
-  async getMediaFilesArray() {
-    return await fetch('/handler/media', {
+  async getMediaFilesArray(directory = '/') {
+    return await fetch('/handler/media?directory=' + directory, {
       method: 'GET'
     }).then((response) => {
       return response.json();
@@ -74,6 +75,17 @@ export class ToolImage extends Tool {
       event.preventDefault();
 
       if (fileIsDirectory) {
+        this.filesPath = fileURL;
+        this.imagesListGroup = 0;
+
+        this.clearImagesList();
+        this.getMediaFilesArray(fileURL).then((items) => {
+          items.forEach((item, itemIndex) => {
+            if (itemIndex >= (itemsinGroupCount * this.imagesListGroup) && itemIndex < (itemsinGroupCount * this.imagesListGroup) + itemsinGroupCount) {
+              this.addImageItem(item);
+            }
+          });
+        });
         return false;
       }
 
@@ -241,7 +253,7 @@ export class ToolImage extends Tool {
             this.imagesListGroup--;
 
             this.clearImagesList();
-            this.getMediaFilesArray().then((items) => {
+            this.getMediaFilesArray(this.filesPath).then((items) => {
               items.forEach((item, itemIndex) => {
                 if (itemIndex >= (itemsinGroupCount * this.imagesListGroup) && itemIndex < (itemsinGroupCount * this.imagesListGroup) + itemsinGroupCount) {
                   this.addImageItem(item);
@@ -255,7 +267,7 @@ export class ToolImage extends Tool {
         let interactiveButtonNavNext = new Interactive('button');
         interactiveButtonNavNext.target.setLabel('>');
         interactiveButtonNavNext.target.setCallback(() => {
-          this.getMediaFilesArray().then((items) => {
+          this.getMediaFilesArray(this.filesPath).then((items) => {
             let itemsinGroupCount = 23;
             let groupsCount = Math.ceil(items.length / itemsinGroupCount);
             if (this.imagesListGroup < groupsCount - 1) {

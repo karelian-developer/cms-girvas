@@ -16,11 +16,12 @@ if (!defined('IS_NOT_HACKED')) {
 if ($CMSCore->client->isLogged(2)) {
   $handlerOutputData['dom'] = [];
 
-  /** @var string */
-  $filesDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
-  /** @var array */
+  $filesDirectoryPathParam = $CMSCore->urlp->getParam('directory');
+  $filesDirectoryPath = $filesDirectoryPathParam === '/'
+    ? CMS_ROOT_DIRECTORY . '/uploads/media'
+    : CMS_ROOT_DIRECTORY . $filesDirectoryPathParam;
+  
   $files = array_diff(scandir($filesDirectoryPath), ['.', '..']);
-  /** @var array */
   $filesData = [];
 
   foreach ($files as $file) {
