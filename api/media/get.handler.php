@@ -60,7 +60,7 @@ if ($CMSCore->client->isLogged(2)) {
   $filesTransformed = [];
   foreach ($filesSorted as $fileData) {
     $filesTransformed[] = [
-      'URL' => '/uploads/media/' . $fileData['URL'],
+      'URL' => $fileData['URL'],
       'isDirectory' => (bool) $fileData['isDirectory'],
       'createdUnixTimestamp' => (int) $fileData['createdUnixTimestamp']
     ];
