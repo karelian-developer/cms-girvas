@@ -81,9 +81,7 @@ export class ToolImage extends Tool {
         this.clearImagesList();
         this.getMediaFilesArray(fileURL).then((items) => {
           items.forEach((item, itemIndex) => {
-            if (itemIndex >= (itemsinGroupCount * this.imagesListGroup) && itemIndex < (itemsinGroupCount * this.imagesListGroup) + itemsinGroupCount) {
-              this.addImageItem(item);
-            }
+            this.addImageItem(item);
           });
         });
         return false;
