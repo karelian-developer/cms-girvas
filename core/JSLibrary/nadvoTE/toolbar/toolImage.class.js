@@ -29,12 +29,13 @@ export class ToolImage extends Tool {
 
     this.modal = null;
     this.imagesListGroup = 0;
-    this.filesPath = '/';
+    this.filesPath = '';
     this.initClickEvent();
   }
 
-  async getMediaFilesArray(directory = '0') {
-    return await fetch('/handler/media?directory=' + directory, {
+  async getMediaFilesArray(directory = '') {
+    const fetchURL = directory === '' ? '/handler/media' : '/handler/media?directory=' + encodeURI(directory);
+    return await fetch(fetchURL, {
       method: 'GET'
     }).then((response) => {
       return response.json();
