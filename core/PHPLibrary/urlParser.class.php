@@ -108,6 +108,7 @@ final class URLParser
     $parsedURL = parse_url($_SERVER['REQUEST_URI']);
     if (array_key_exists('path', $parsedURL)) {
       $pathArray = explode('/', $parsedURL['path']);
+      print_r($pathArray);
 
       foreach ($pathArray as $pathElement) {
         if (!empty($pathElement)) {
