@@ -44,20 +44,31 @@ class PageMedia implements InterfacePage
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/media.css', 'rel' => 'stylesheet']);
     
-    $filesPath =  CMS_ROOT_DIRECTORY . '/uploads/media';
-    $files = array_diff(scandir($filesPath), ['.', '..']);
+    $filesDirectoryPathParam = $CMSURLP->getParam('directory') !== null
+      ? urldecode($CMSURLP->getParam('directory'))
+      : null;
+
+    $filesDirectoryPath = $filesDirectoryPathParam === null
+    ? '/uploads/media'
+    : $filesDirectoryPathParam;
+
+    $filesDirectoryPathWithRoot = CMS_ROOT_DIRECTORY . $filesDirectoryPath;
+
+    $files = array_diff(scandir($filesDirectoryPathWithRoot), ['.', '..']);
     $filesCount = count($files);
 
     $filesData = [];
     foreach ($files as $file) {
       /** @var string */
-      $path = $filesPath . '/' . $file;
+      $filePath = $filesDirectoryPathWithRoot . '/' . $file;
       $URL = $file;
       
-      array_push($filesData, [
+      $filesData[] = [
         'fileURL' => $URL,
-        'createdUnixTimestamp' => filemtime($path)
-      ]);
+        'filePath' => $filesDirectoryPath,
+        'isDirectory' => is_dir($filePath),
+        'createdUnixTimestamp' => filemtime($filePath)
+      ];
     }
 
     usort($filesData, function($a, $b)
