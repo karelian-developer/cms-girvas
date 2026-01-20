@@ -107,12 +107,13 @@ final class URLParser
 
     $parsedURL = parse_url($_SERVER['REQUEST_URI']);
     if (array_key_exists('path', $parsedURL)) {
+      error_log($parsedURL['path']);
       $pathArray = explode('/', $parsedURL['path']);
 
       foreach ($pathArray as $pathElement) {
         if (!empty($pathElement)) {
           $pathElement = is_numeric($pathElement) ? (int) $pathElement : $pathElement;
-          array_push($result, $pathElement);
+          $result[] = $pathElement;
         }
       }
     }

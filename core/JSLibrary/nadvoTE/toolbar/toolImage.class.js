@@ -80,7 +80,7 @@ export class ToolImage extends Tool {
         this.imagesListGroup = 0;
 
         this.clearImagesList();
-        this.getMediaFilesArray(fileURL).then((items) => {
+        this.getMediaFilesArray(this.filesPath).then((items) => {
           items.forEach((item, itemIndex) => {
             this.addImageItem(item);
           });
