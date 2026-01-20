@@ -135,7 +135,7 @@ final class URLParser
       $paramsArray = explode('&', $parsedURL['query']);
 
       foreach ($paramsArray as $param) {
-        preg_match('/([a-z0-9_-]+)=([a-z0-9_\-+.,%]*)/i', $param, $regexMatches);
+        preg_match('/([a-z0-9_-]+)=([a-z0-9_\-+.,%\/]*)/i', $param, $regexMatches);
 
         if (array_key_exists(1, $regexMatches) && array_key_exists(2, $regexMatches)) {
           $value = is_numeric($regexMatches[2]) ? (int) $regexMatches[2] : $regexMatches[2];
