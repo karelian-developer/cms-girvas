@@ -16,7 +16,7 @@ if (!defined('IS_NOT_HACKED')) {
 if ($CMSCore->client->isLogged(2)) {
   $handlerOutputData['dom'] = [];
 
-  $filesDirectoryPathParam = $CMSCore->urlp->getParam('directory');
+  $filesDirectoryPathParam = $CMSURLP->getParam('directory');
   $filesDirectoryPath = $filesDirectoryPathParam === null
     ? CMS_ROOT_DIRECTORY . '/uploads/media'
     : CMS_ROOT_DIRECTORY . urldecode($filesDirectoryPathParam);
