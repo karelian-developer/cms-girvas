@@ -21,6 +21,8 @@ if ($CMSCore->client->isLogged(2)) {
     ? CMS_ROOT_DIRECTORY . '/uploads/media'
     : CMS_ROOT_DIRECTORY . urldecode($filesDirectoryPathParam);
   
+  error_log($filesDirectoryPath);
+
   $files = array_diff(scandir($filesDirectoryPath), ['.', '..']);
   $filesData = [];
 
