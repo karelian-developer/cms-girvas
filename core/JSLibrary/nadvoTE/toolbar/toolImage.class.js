@@ -33,7 +33,7 @@ export class ToolImage extends Tool {
     this.initClickEvent();
   }
 
-  async getMediaFilesArray(directory = '/') {
+  async getMediaFilesArray(directory = '0') {
     return await fetch('/handler/media?directory=' + directory, {
       method: 'GET'
     }).then((response) => {

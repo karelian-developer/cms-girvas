@@ -17,7 +17,7 @@ if ($CMSCore->client->isLogged(2)) {
   $handlerOutputData['dom'] = [];
 
   $filesDirectoryPathParam = $CMSCore->urlp->getParam('directory');
-  $filesDirectoryPath = $filesDirectoryPathParam === '/'
+  $filesDirectoryPath = $filesDirectoryPathParam === '0'
     ? CMS_ROOT_DIRECTORY . '/uploads/media'
     : CMS_ROOT_DIRECTORY . $filesDirectoryPathParam;
   
