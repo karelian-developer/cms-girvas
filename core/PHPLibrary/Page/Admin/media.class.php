@@ -61,11 +61,12 @@ class PageMedia implements InterfacePage
     foreach ($files as $file) {
       /** @var string */
       $filePath = $filesDirectoryPathWithRoot . '/' . $file;
-      $URL = $file;
+      $URL = $filesDirectoryPath . '/' . $file;
       
       $filesData[] = [
         'fileURL' => $URL,
         'filePath' => $filesDirectoryPath,
+        'fileExtension' => pathinfo($filePath, PATHINFO_EXTENSION),
         'isDirectory' => is_dir($filePath),
         'createdUnixTimestamp' => filemtime($filePath)
       ];
@@ -85,19 +86,15 @@ class PageMedia implements InterfacePage
 
     $filesData = array_slice($filesData, $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
 
-    $filesSorted = [];
-    foreach ($filesData as $data) {
-      $filesSorted[] = $data['fileURL'];
-    }
-
     $filesTransformed = [];
-    foreach ($filesSorted as $file) {
+    foreach ($filesData as $file) {
       $URL = '/uploads/media/' . $file;
       $filesTransformed[] = ThemeCollector::assemblyFileContent(
         $this->CMSCore->theme,
         'templates/page/media/listItem.tpl',
         [
           'MEDIA_FILE_URL' => $URL,
+          'MEDIA_FILE_EXTENSION' => $URL,
           'MEDIA_FILE_FULLNAME' => $file
         ]
       );
