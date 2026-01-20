@@ -44,7 +44,7 @@ class PageMedia implements InterfacePage
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/media.css', 'rel' => 'stylesheet']);
     
-    $filesDirectoryPathParam = $CMSURLP->getParam('directory') !== null
+    $filesDirectoryPathParam = $CMSCore->urlp->getParam('directory') !== null
       ? urldecode($CMSURLP->getParam('directory'))
       : null;
 
