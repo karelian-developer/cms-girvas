@@ -107,7 +107,6 @@ final class URLParser
 
     $parsedURL = parse_url($_SERVER['REQUEST_URI']);
     if (array_key_exists('path', $parsedURL)) {
-      error_log(print_r($parsedURL, true));
       $pathArray = explode('/', $parsedURL['path']);
 
       foreach ($pathArray as $pathElement) {
@@ -136,7 +135,7 @@ final class URLParser
       $paramsArray = explode('&', $parsedURL['query']);
 
       foreach ($paramsArray as $param) {
-        preg_match('/([a-z0-9\-\_\.]*)\=([a-z0-9\-\_\\.\,]*)/i', $param, $regexMatches);
+        preg_match('/([a-z0-9_-]+)=([a-z0-9_\-+.,%]*)/i', $param, $regexMatches);
 
         if (array_key_exists(1, $regexMatches) && array_key_exists(2, $regexMatches)) {
           $value = is_numeric($regexMatches[2]) ? (int) $regexMatches[2] : $regexMatches[2];
