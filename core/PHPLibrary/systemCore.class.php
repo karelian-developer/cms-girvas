@@ -295,7 +295,7 @@ final class SystemCore implements CoreInterface
     
     if ($pageDirFirstElement === $CMSTheme->getCategory()) {
       $this->pageDirArray[0] = ucfirst($pageDirFirstElement);
-      array_push($this->pageDirArray, 'index');
+      $this->pageDirArray[] = 'index';
     }
     
     $currentDirFinalArray = [];

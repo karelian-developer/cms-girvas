@@ -276,7 +276,9 @@ final class Core implements ThemeInterfaceCore
    */
   public function assemblyMain(array $themeReplaces = []) : string
   {
-    $this->theme->CMSCore->initPage(ltrim($_SERVER['REQUEST_URI'], '/'));
+    $parsedURL = parse_url($_SERVER['REQUEST_URI']);
+    $this->theme->CMSCore->initPage($parsedURL['path']);
+    
     $sitePage = $this->theme->CMSCore->page;
     $sitePage->assembly();
     
