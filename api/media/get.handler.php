@@ -16,24 +16,25 @@ if (!defined('IS_NOT_HACKED')) {
 if ($CMSCore->client->isLogged(2)) {
   $handlerOutputData['dom'] = [];
 
-  $filesDirectoryPathParam = $CMSURLP->getParam('directory');
+  $filesDirectoryPathParam = urldecode($CMSURLP->getParam('directory'));
   $filesDirectoryPath = $filesDirectoryPathParam === null
-    ? CMS_ROOT_DIRECTORY . '/uploads/media'
-    : CMS_ROOT_DIRECTORY . urldecode($filesDirectoryPathParam);
-  
-  error_log($filesDirectoryPathParam);
+    ? '/uploads/media'
+    : $filesDirectoryPathParam;
 
-  $files = array_diff(scandir($filesDirectoryPath), ['.', '..']);
+  $filesDirectoryPathWithRoot = CMS_ROOT_DIRECTORY . $filesDirectoryPath;
+
+  $files = array_diff(scandir($filesDirectoryPathWithRoot), ['.', '..']);
   $filesData = [];
 
   foreach ($files as $file) {
     /** @var string */
-    $filePath = $filesDirectoryPath . '/' . $file;
+    $filePath = $filesDirectoryPathWithRoot . '/' . $file;
     /** @var string */
-    $URL = $file;
+    $URL = $filesDirectoryPath . '/' . $file;
     
     $filesData[] = [
       'fileURL' => $URL,
+      'filePath' => $filesDirectoryPath,
       'isDirectory' => is_dir($filePath),
       'createdUnixTimestamp' => filemtime($filePath)
     ];
