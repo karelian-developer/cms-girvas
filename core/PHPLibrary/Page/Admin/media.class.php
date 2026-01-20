@@ -67,6 +67,7 @@ class PageMedia implements InterfacePage
         'fileURL' => $URL,
         'filePath' => $filesDirectoryPath,
         'fileExtension' => pathinfo($filePath, PATHINFO_EXTENSION),
+        'fileName' => pathinfo($filePath, PATHINFO_FILENAME),
         'isDirectory' => is_dir($filePath),
         'createdUnixTimestamp' => filemtime($filePath)
       ];
@@ -93,9 +94,9 @@ class PageMedia implements InterfacePage
         $this->CMSCore->theme,
         'templates/page/media/listItem.tpl',
         [
-          'MEDIA_FILE_URL' => $URL,
-          'MEDIA_FILE_EXTENSION' => $URL,
-          'MEDIA_FILE_FULLNAME' => $file
+          'MEDIA_FILE_URL' => $file['fileURL'],
+          'MEDIA_FILE_EXTENSION' => $file['fileExtension'],
+          'MEDIA_FILE_FULLNAME' => $file['fileName']
         ]
       );
     }
