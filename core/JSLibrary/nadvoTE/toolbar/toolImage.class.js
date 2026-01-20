@@ -34,7 +34,7 @@ export class ToolImage extends Tool {
   }
 
   async getMediaFilesArray(directory = '') {
-    const fetchURL = directory === '' ? '/handler/media' : '/handler/media?directory=' + encodeURI(directory);
+    const fetchURL = directory === '' ? '/handler/media' : '/handler/media?directory=' + encodeURIComponent(directory);
     return await fetch(fetchURL, {
       method: 'GET'
     }).then((response) => {
