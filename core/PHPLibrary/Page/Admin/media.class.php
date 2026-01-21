@@ -90,13 +90,16 @@ class PageMedia implements InterfacePage
     $filesTransformed = [];
     foreach ($filesData as $file) {
       $URL = '/uploads/media/' . $file;
+      $fileTemplatePath = $file['isDirectory']
+        ? 'templates/page/media/directory.tpl'
+        : 'templates/page/media/file.tpl';
       $filesTransformed[] = ThemeCollector::assemblyFileContent(
         $this->CMSCore->theme,
-        'templates/page/media/listItem.tpl',
+        $fileTemplatePath,
         [
-          'MEDIA_FILE_URL' => $file['fileURL'],
-          'MEDIA_FILE_EXTENSION' => $file['fileExtension'],
-          'MEDIA_FILE_FULLNAME' => $file['fileName']
+          'FILE_URL' => $file['fileURL'],
+          'FILE_EXTENSION' => $file['fileExtension'],
+          'FILE_NAME' => $file['fileName']
         ]
       );
     }
