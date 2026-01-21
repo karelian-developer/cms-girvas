@@ -7,13 +7,13 @@
  */
 
  .media-list {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(8, calc(100% / 8 - (8px * 8) / 7));
+  gap: 8px;
 }
 
 .media-list__item {
   display: flex;
-  flex-direction: column;
   justify-content: space-between;
   box-sizing: border-box;
   background-size: cover;
@@ -26,7 +26,7 @@
   height: 128px;
 }
 
-.media-list__item > .controller-panel {
+.media-list__item > .media-list__item-controllers {
   box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
@@ -37,30 +37,30 @@
   height: fit-content;
 }
 
-.media-list__item > .controller-panel > *:not(:last-child) {
+.media-list__item > .media-list__item-controllers > *:not(:last-child) {
   margin-right: 10px;
 }
 
-.media-list__item > .controller-panel .interactive__button {
+.media-list__item > .media-list__item-controllers .interactive__button {
   background-color: var(--common-main-color-1);
   padding: 5px 10px;
 }
 
-.media-list__item > .controller-panel .interactive__button:hover,
-.media-list__item > .controller-panel .interactive__button:focus {
+.media-list__item > .media-list__item-controllers .interactive__button:hover,
+.media-list__item > .media-list__item-controllers .interactive__button:focus {
   background-color: var(--common-main-color-2);
 }
 
-.media-list__item > .controller-panel .interactive__button:active {
+.media-list__item > .media-list__item-controllers .interactive__button:active {
   background-color: var(--common-main-color-4);
 }
 
-.media-list__item > .controller-panel .interactive__button .button__icon {
+.media-list__item > .media-list__item-controllers .interactive__button .button__icon {
   width: 14px;
   height: 14px;
 }
 
-.media-list__item > .controller-panel .interactive__button:active .button__icon {
+.media-list__item > .media-list__item-controllers .interactive__button:active .button__icon {
   fill: var(--common-main-color-2);
 }
 
