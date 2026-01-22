@@ -1,12 +1,4 @@
 <li class="media-list__item item" style="background-image: url('{FILE_URL}');" data-file-name="{FILE_NAME}" data-file-url="{FILE_URL}">
-  <div class="item__controller-panel controller-panel" role="controller-panel"></div>
-  <div class="item__title-container">
-    <div class="item__title">{FILE_NAME}</div>
-  </div>
-</li>
-
-
-<li class="media-list__item item" style="background-image: url('{FILE_URL}');" data-file-name="{FILE_NAME}" data-file-url="{FILE_URL}">
   <div class="media-list__item-body">
     <span class="media-list__item-extension">{FILE_EXTENSION}</span>
     <img class="media-list__item-preview" src="{FILE_URL}" alt="{FILE_NAME}">

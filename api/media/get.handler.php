@@ -39,6 +39,8 @@ if ($CMSCore->client->isLogged(2)) {
       'fileURL' => $URL,
       'filePath' => $filesDirectoryPath,
       'isDirectory' => is_dir($filePath),
+      'fileExtension' => pathinfo($filePath, PATHINFO_EXTENSION),
+      'fileName' => pathinfo($filePath, PATHINFO_FILENAME),
       'createdUnixTimestamp' => filemtime($filePath)
     ];
   }
