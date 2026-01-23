@@ -133,7 +133,7 @@ export class ToolImage extends Tool {
           this.imageUpload(input, fileIndex + 1);
         }
 
-        this.addImageItem(data.outputData.file.url, false);
+        this.addImageItem(data.outputData.file, false);
 
         const targetElement = document.querySelector('#SYSTEM_MODAL_6438654856');
         const imagesListItemsElements = targetElement.querySelectorAll('li');
