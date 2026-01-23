@@ -33,7 +33,6 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
-  backdrop-filter: blur(14px);
   min-height: 100%;
 }
 
