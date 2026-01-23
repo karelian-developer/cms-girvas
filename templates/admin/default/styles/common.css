@@ -31,8 +31,9 @@ body {
   background-image: url('../images/background.webp');
   background-attachment: fixed;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain;
   background-position: center center;
+  backdrop-filter: blur(14px);
   min-height: 100%;
 }
 

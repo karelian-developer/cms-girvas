@@ -8,6 +8,7 @@
 
 .main {
   background-image: url('../images/background.webp');
+  background-attachment: scroll;
   backdrop-filter: blur(14px);
   flex-grow: 1;
   z-index: 0;
