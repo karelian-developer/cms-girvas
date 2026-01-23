@@ -68,6 +68,7 @@
 }
 
 .media-list__item-title {
+  flex-grow: 1;
   background-color: var(--common-main-color-4);
   color: var(--common-main-color-2);
   font-size: 11px;
@@ -79,6 +80,8 @@
 
 .media-list__item-body {
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .media-list__item-extension {
