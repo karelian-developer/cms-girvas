@@ -99,7 +99,7 @@ export class PageMedia {
       location.href = locationURL.toString();
     });
 
-    buttons.link.assembly();
+    buttons.open.assembly();
 
     const elementControllerElement = element.querySelector('[data-role="controller-panel"]');
     if (elementControllerElement !== null) {
