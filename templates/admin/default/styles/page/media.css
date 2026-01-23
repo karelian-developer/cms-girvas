@@ -8,7 +8,7 @@
 
  .media-list {
   display: grid;
-  grid-template-columns: repeat(8, calc(100% / 8 - (8px * 8) / 7));
+  grid-template-columns: repeat(6, calc(100% / 6 - (8px * 6) / 5));
   gap: 8px;
 }
 
@@ -21,6 +21,7 @@
   background-repeat: no-repeat;
   background-position: center center;
   border: 1px solid var(--common-main-color-6);
+  border-radius: 8px;
   margin-right: 10px;
   margin-bottom: 10px;
 }
@@ -67,8 +68,6 @@
   color: var(--common-main-color-2);
   font-size: 12px;
   padding: 8px;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
   word-break: break-all;
 }
 
