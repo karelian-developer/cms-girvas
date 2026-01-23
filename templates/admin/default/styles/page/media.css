@@ -31,6 +31,8 @@
   display: flex;
   flex-direction: column;
   padding: 8px;
+  right: 8px;
+  top: 8px;
 }
 
 .media-list__item > .media-list__item-controllers > *:not(:last-child) {
