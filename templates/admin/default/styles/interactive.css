@@ -94,56 +94,6 @@
   margin-right: 10px;
 }
 
-.interactive .interactive__button {
-  display: flex;
-  background-color: var(--common-main-color-2);
-  justify-content: center;
-  align-items: center;
-  box-sizing: border-box;
-  padding: 10px;
-  transition: background-color .2s, color .2s;
-  cursor: pointer;
-}
-
-.interactive .interactive__button:hover {
-  background-color: var(--common-secondary-color-2);
-}
-
-.interactive .interactive__button:focus {
-  background-color: var(--common-secondary-color-2);
-}
-
-.interactive .interactive__button:active {
-  background-color: var(--interactive-button-background-color--active);
-}
-
-.interactive .interactive__button:disabled {
-  background-color: var(--common-main-color-2);
-}
-
-.interactive .interactive__button-icon {
-  margin-right: 10px;
-  width: 16px;
-}
-
-.interactive .interactive__button-label {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--common-main-color-3);
-}
-
-.interactive .interactive__button:hover .interactive__button-label {
-  color: var(--common-secondary-color-3);
-}
-
-.interactive .interactive__button:focus .interactive__button-label {
-  color: var(--common-secondary-color-3);
-}
-
-.interactive .interactive__button:active .interactive__button-label {
-  color: var(--common-secondary-color-2);
-}
-
 .interactive .interactive__modal-wrapper {
   position: fixed;
   display: flex;
