@@ -189,7 +189,7 @@
   border-left: 0;
   border-right: 0;
   border-top: 0;
-  border-bottom: 3px solid var(--common-main-color-3);
+  border-bottom: 0;
   border-radius: 8px;
   padding: 10px;
   transition: background-color .2s, color .2s;
@@ -202,7 +202,6 @@
 
 .interactive .interactive__button:not([disabled]):hover {
   background-color: var(--secondary-color-2);
-  border-bottom: 3px solid var(--common-main-color-3);
 }
 
 .interactive .interactive__button:not([disabled]):focus {
@@ -219,7 +218,6 @@
 
 .interactive .interactive__button_red:not([disabled]):hover {
   background-color: var(--secondary-color-6);
-  border-bottom: 3px solid var(--secondary-color-13);
 }
 
 .interactive .interactive__button_red:not([disabled]):focus {
@@ -236,7 +234,6 @@
 
 .interactive .interactive__button_green:not([disabled]):hover {
   background-color: var(--secondary-color-9);
-  border-bottom: 3px solid var(--common-main-color-3);
 }
 
 .interactive .interactive__button_green:not([disabled]):focus {
