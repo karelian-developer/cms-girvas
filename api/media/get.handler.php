@@ -27,6 +27,28 @@ if ($CMSCore->client->isLogged(2)) {
   $filesDirectoryPathWithRoot = CMS_ROOT_DIRECTORY . $filesDirectoryPath;
 
   $files = array_diff(scandir($filesDirectoryPathWithRoot), ['.', '..']);
+
+  usort($files, function($a, $b) use ($filesDirectoryPathWithRoot) {
+    $pathA = $filesDirectoryPathWithRoot . DIRECTORY_SEPARATOR . $a;
+    $pathB = $filesDirectoryPathWithRoot . DIRECTORY_SEPARATOR . $b;
+    
+    $isDirA = is_dir($pathA);
+    $isDirB = is_dir($pathB);
+    
+    if ($isDirA === $isDirB) {
+      $timeA = filemtime($pathA);
+      $timeB = filemtime($pathB);
+      
+      if ($timeA === $timeB) {
+        return 0;
+      }
+
+      return ($timeA > $timeB) ? -1 : 1;
+    }
+    
+    return $isDirA ? 1 : -1;
+  });
+
   $filesData = [];
 
   foreach ($files as $file) {
@@ -44,14 +66,6 @@ if ($CMSCore->client->isLogged(2)) {
       'createdUnixTimestamp' => filemtime($filePath)
     ];
   }
-
-  usort($filesData, function($a, $b) {
-    if ($a['createdUnixTimestamp'] === $b['createdUnixTimestamp']) {
-      return 0;
-    }
-
-    return ($a['createdUnixTimestamp'] > $b['createdUnixTimestamp']) ? -1 : 1;
-  });
 
   $filesSorted = [];
   foreach ($filesData as $data) {
