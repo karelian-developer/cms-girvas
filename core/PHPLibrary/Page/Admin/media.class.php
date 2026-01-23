@@ -55,6 +55,21 @@ class PageMedia implements InterfacePage
     $filesDirectoryPathWithRoot = CMS_ROOT_DIRECTORY . $filesDirectoryPath;
 
     $files = array_diff(scandir($filesDirectoryPathWithRoot), ['.', '..']);
+
+    usort($files, function($a, $b) use ($filesDirectoryPathWithRoot) {
+      $pathA = $filesDirectoryPathWithRoot . DIRECTORY_SEPARATOR . $a;
+      $pathB = $filesDirectoryPathWithRoot . DIRECTORY_SEPARATOR . $b;
+      
+      $isDirA = is_dir($pathA);
+      $isDirB = is_dir($pathB);
+      
+      if ($isDirA === $isDirB) {
+        return strcasecmp($a, $b);
+      }
+      
+      return $isDirA ? -1 : 1;
+    });
+
     $filesCount = count($files);
 
     $filesData = [];
@@ -83,7 +98,7 @@ class PageMedia implements InterfacePage
     });
 
     $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
-    $paginationItemsOnPage = 34;
+    $paginationItemsOnPage = 36;
 
     $filesData = array_slice($filesData, $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
 
