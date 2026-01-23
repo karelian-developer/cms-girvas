@@ -275,7 +275,6 @@
 .page .page__content > ul,
 .page .page__content > ol  {
   list-style-position: inside;
-  font-weight: 300;
   font-size: 14px;
   padding-left: 0;
   margin-top: 0;
@@ -386,6 +385,7 @@
 }
 
 .page__content-block {
+  font-weight: 300;
   font-size: 14px;
 }
 
