@@ -43,7 +43,7 @@ export class PageMedia {
     buttons.delete = new Interactive('button');
     buttons.link = new Interactive('button');
     buttons.open = new Interactive('button');
-    
+
     buttons.delete.target.setLabel(PageMedia.buttonIcons.trash);
     buttons.delete.target.setCallback((event) => {
       event.preventDefault();
@@ -108,7 +108,7 @@ export class PageMedia {
       elementControllerElement.appendChild(buttons.delete.target.element);
       elementControllerElement.appendChild(buttons.link.target.element);
 
-      if (isDirectory !== undefined) {
+      if (isDirectory !== null) {
         elementControllerElement.appendChild(buttons.open.target.element);
       }
     }
