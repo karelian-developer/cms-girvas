@@ -16,6 +16,7 @@
 .form__input, .form__textarea, .form__select {
   box-sizing: border-box;
   font-size: 14px;
+  border-radius: 8px;
   border-width: 1px;
   border-style: solid;
   outline: 0;
