@@ -265,7 +265,7 @@
 .main__auth-footer {
   background-color: var(--primary-color-4);
   font-size: 12px;
-  color: var(--main-admin-auth-footer-font-color);
+  color: var(--primary-color-2);
   text-align: center;
   border: 1px solid var(--primary-color-3);
   border-radius: 8px;
