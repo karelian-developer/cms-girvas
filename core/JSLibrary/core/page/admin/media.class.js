@@ -136,7 +136,7 @@ export class PageMedia {
         let fileName, fileURL;
 
         fileName = data.outputData.file.fullname;
-        fileURL = data.outputData.file.url;
+        fileURL = data.outputData.file.URL;
 
         let listItemElement = document.createElement('li');
         listItemElement.classList.add('media-list__item');

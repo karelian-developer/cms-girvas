@@ -120,7 +120,7 @@ if ($CMSCore->client->isLogged(2)) {
                     /** @var array Данные конвертированного файла */
                     $fileData = [];
 
-                    $fileData['url'] = '/uploads/media/' . $fileConverted['fileName'];
+                    $fileData['URL'] = '/uploads/media/' . $fileConverted['fileName'];
                     $fileData['isDirectory'] = is_dir(CMS_ROOT_DIRECTORY . $fileData['url']);
                     $fileData['fullname'] = $fileConverted['fileName'];
                     
