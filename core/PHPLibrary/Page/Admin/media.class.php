@@ -64,10 +64,17 @@ class PageMedia implements InterfacePage
       $isDirB = is_dir($pathB);
       
       if ($isDirA === $isDirB) {
-        return strcasecmp($a, $b);
+        $timeA = filemtime($pathA);
+        $timeB = filemtime($pathB);
+        
+        if ($timeA === $timeB) {
+          return 0;
+        }
+
+        return ($timeA > $timeB) ? -1 : 1;
       }
       
-      return $isDirA ? -1 : 1;
+      return $isDirA ? 1 : -1;
     });
 
     $filesCount = count($files);
