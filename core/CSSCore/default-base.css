@@ -19,6 +19,7 @@
 @import url('./default-tables.css');
 
 pre, p {
+  font-weight: 300;
   margin-top: 0;
 }
 
