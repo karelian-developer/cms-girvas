@@ -31,9 +31,12 @@
   box-sizing: border-box;
   display: grid;
   flex-direction: column;
+  background-color: var(--common-main-color-4--opacity-0-4);
+  border-top-right-radius: 8px;
+  border-bottom-left-radius: 8px;
   padding: 8px;
-  right: 8px;
-  top: 8px;
+  right: 0;
+  top: 0;
   gap: 8px;
 }
 
