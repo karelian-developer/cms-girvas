@@ -117,16 +117,18 @@ export class ToolImage extends Tool {
   }
 
   imageUpload(input, fileIndex) {
-    let formData = new FormData();
+    const formData = new FormData();
     formData.append('mediaFile', input.files[fileIndex]);
 
-    fetch('/handler/media', {
+    const request = new Interactive('request', {
       method: 'POST',
-      body: formData
-    }).then((response) => {
-      return response.json();
-    }).then((data) => {
-      if (data.statusCode == 1) {
+      url: '/handler/media?localeMessage=' + window.CMSCore.locales.admin.name
+    });
+
+    request.target.data = formData;
+
+    request.target.send().then((data) => {
+      if (data.statusCode === 1) {
         if (fileIndex < input.files.length) {
           this.imageUpload(input, fileIndex + 1);
         }
