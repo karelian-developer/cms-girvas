@@ -49,9 +49,7 @@ export class ToolImage extends Tool {
       ? ''
       : data.URL;
 
-    const fileIsDirectory = data.isDirectory !== undefined
-      ? true :
-      data.isDirectory;
+    const fileIsDirectory = data.isDirectory;
 
     const fileCreatedUnixTimestamp = data.createdUnixTimestamp === undefined
       ? 0
