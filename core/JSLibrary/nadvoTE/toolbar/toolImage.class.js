@@ -45,9 +45,9 @@ export class ToolImage extends Tool {
   }
 
   addImageItem(data, end = true) {
-    const fileURL = data.URL === undefined
+    const fileURL = data.url === undefined
       ? ''
-      : data.URL;
+      : data.url;
 
     const fileIsDirectory = data.isDirectory === undefined
       ? true :
