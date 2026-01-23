@@ -62,10 +62,10 @@ export class ToolImage extends Tool {
     const mediaListItemElement = document.createElement('li');
     mediaListItemElement.classList.add('media-list__item');
 
-    if (!fileIsDirectory) {
-      mediaListItemElement.style.backgroundImage = `url("${fileURL}")`;
-    } else {
+    if (fileIsDirectory === true) {
       mediaListItemElement.classList.add('media-list__item_is-directory');
+    } else {
+      mediaListItemElement.style.backgroundImage = `url("${fileURL}")`;
     }
     
     mediaListItemElement.setAttribute('data-media-url', fileURL);
