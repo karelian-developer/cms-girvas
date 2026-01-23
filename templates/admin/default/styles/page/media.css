@@ -22,8 +22,6 @@
   background-position: center center;
   border: 1px solid var(--common-main-color-6);
   border-radius: 8px;
-  margin-right: 10px;
-  margin-bottom: 10px;
 }
 
 .media-list__item > .media-list__item-controllers {
