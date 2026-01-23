@@ -257,10 +257,10 @@
   text-transform: uppercase;
 }
 
-.page .page__content > * + h3,
-.page .page__content > * + h4,
-.page .page__content > * + h5,
-.page .page__content > * + h6  {
+.page .page__content * + h3,
+.page .page__content * + h4,
+.page .page__content * + h5,
+.page .page__content * + h6  {
   padding-top: 20px;
 }
 
