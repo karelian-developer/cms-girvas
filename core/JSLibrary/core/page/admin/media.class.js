@@ -89,7 +89,7 @@ export class PageMedia {
 
     buttons.link.assembly();
 
-    let elementControllerElement = element.querySelector('[role="controller-panel"]');
+    let elementControllerElement = element.querySelector('[data-role="controller-panel"]');
     if (elementControllerElement != null) {
       elementControllerElement.appendChild(buttons.delete.target.element);
       elementControllerElement.appendChild(buttons.link.target.element);

@@ -83,7 +83,7 @@ class PageMedia implements InterfacePage
     });
 
     $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
-    $paginationItemsOnPage = 12;
+    $paginationItemsOnPage = 34;
 
     $filesData = array_slice($filesData, $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
 
