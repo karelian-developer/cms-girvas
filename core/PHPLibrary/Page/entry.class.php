@@ -432,6 +432,16 @@ class PageEntry implements InterfacePage
           );
         }
 
+        if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_URL')) {
+          $value = $entry !== null ? $entry->getURL() : '#';
+          
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_URL',
+            $value
+          );
+        }
+
         if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_COMMENTS_LIST')) {
           $value = count($commentsArray) > 0 ? $entryCommentsTransformed : $localeData['PAGE_ENTRY_COMMENTS_NOT_FOUND_LABEL'];
           
