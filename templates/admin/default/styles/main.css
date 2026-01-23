@@ -9,6 +9,9 @@
 .main {
   background-image: url('../images/background.webp');
   background-attachment: scroll;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
   backdrop-filter: blur(14px);
   flex-grow: 1;
   z-index: 0;
