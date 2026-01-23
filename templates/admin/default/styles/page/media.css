@@ -100,6 +100,17 @@
   top: 8px;
 }
 
+.media-list__item-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.media-list__item-icon {
+  width: 64px;
+  height: 64px;
+}
+
 .media-list__item .item__title {
   position: absolute;
   display: flex;
