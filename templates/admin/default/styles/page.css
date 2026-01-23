@@ -272,8 +272,8 @@
   margin-bottom: 10px;
 }
 
-.page .page__content > ul,
-.page .page__content > ol  {
+.page .page__content ul,
+.page .page__content ol  {
   list-style-position: inside;
   font-size: 14px;
   padding-left: 0;
