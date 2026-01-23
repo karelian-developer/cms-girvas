@@ -88,15 +88,6 @@ class PageMedia implements InterfacePage
       ];
     }
 
-    usort($filesData, function($a, $b)
-    {
-      if ($a['createdUnixTimestamp'] === $b['createdUnixTimestamp']) {
-        return 0;
-      }
-  
-      return $a['createdUnixTimestamp'] > $b['createdUnixTimestamp'] ? -1 : 1;
-    });
-
     $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
     $paginationItemsOnPage = 36;
 
