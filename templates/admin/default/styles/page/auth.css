@@ -29,6 +29,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease forwards;
 }
 
 @media (max-width: 399px) {
@@ -41,9 +44,6 @@
   .main__auth-section {
     flex-direction: column;
     width: fit-content;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.6s ease forwards;
   }
 }
 
