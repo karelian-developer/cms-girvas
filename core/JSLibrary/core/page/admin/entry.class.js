@@ -300,6 +300,12 @@ export class PageEntry {
       });
       this.buttons.unpublish.assembly();
 
+      this.buttons.viewOnSite.target.setStyle('default');
+      this.buttons.unpublish.target.setStyle('red');
+      this.buttons.publish.target.setStyle('green');
+      this.buttons.delete.target.setStyle('red');
+      this.buttons.save.target.setStyle('green');
+
       if (searchParams.getPathPart(3) === null) {
         let request = new Interactive('request', {
           method: 'GET',
@@ -483,12 +489,6 @@ export class PageEntry {
             this.buttons.delete.target.element.style.display = 'none';
             this.buttons.save.target.element.style.display = 'flex';
           }
-
-          this.buttons.viewOnSite.target.setStyle('default');
-          this.buttons.unpublish.target.setStyle('red');
-          this.buttons.publish.target.setStyle('green');
-          this.buttons.delete.target.setStyle('red');
-          this.buttons.save.target.setStyle('green');
           
           return fetch('/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
         }, (rejectionReason) => {
