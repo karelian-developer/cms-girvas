@@ -20,6 +20,7 @@ export class Button {
     this.interactiveObject = interactiveObject;
     
     this.element = null;
+    this.style = 'default';
     this.label = null;
     this.iconUrl = null;
     this.callback = (event) => {
@@ -61,6 +62,14 @@ export class Button {
     }
   }
 
+  setStyle(name) {
+    this.style = name;
+  }
+
+  getStyle() {
+    return this.style;
+  }
+
   isDisabled() {
     return this.disabled;
   }
@@ -78,24 +87,28 @@ export class Button {
   }
 
   assembly() {
-    let element = document.createElement('div');
+    const element = document.createElement('div');
+    const buttonElement = document.createElement('button');
+    const buttonIconElement = document.createElement('img');
+    const buttonLabelElement = document.createElement('span');
 
-    let buttonElement = document.createElement('button');
     buttonElement.classList.add('interactive__button');
     buttonElement.addEventListener('click', this.callback);
+
+    if (this.style !== null || this.style !== '') {
+      buttonElement.classList.add('interactive__button_' + this.style);
+    }
 
     if (this.isDisabled()) {
       buttonElement.setAttribute('disabled', 'disabled');
     }
 
     if (this.iconUrl != null) {
-      let buttonIconElement = document.createElement('img');
       buttonIconElement.classList.add('interactive__button-icon');
       buttonIconElement.setAttribute('scr', this.iconUrl);
       buttonElement.append(buttonIconElement);
     }
 
-    let buttonLabelElement = document.createElement('span');
     buttonLabelElement.classList.add('interactive__button-label');
     buttonLabelElement.innerHTML = (this.label != null) ? this.label : 'Button';
     buttonElement.append(buttonLabelElement);
