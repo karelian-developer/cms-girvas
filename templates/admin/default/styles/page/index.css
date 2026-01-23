@@ -172,5 +172,6 @@
 }
 
 .main__page-aside .web-channel-items-list .web-channel-item__description-container {
+  font-weight: 300;
   font-size: 14px;
 }

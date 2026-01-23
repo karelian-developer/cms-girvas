@@ -354,6 +354,7 @@ a:active {
   color: var(--common-main-color-3);
   font-size: 14px;
   border-left: 3px solid var(--common-main-color-3);
+  border-radius: 8px;
   padding: 20px;
 }
 
