@@ -114,6 +114,10 @@
   margin-bottom: 10px;
 }
 
+.main__page-aside .form-page-static-preview__container-image img {
+  border-radius: 8px;
+}
+
 .main__page-aside .form-page-static-preview {
   display: flex;
   justify-content: center;
