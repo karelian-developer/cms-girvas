@@ -41,6 +41,9 @@ export class PageMedia {
     isDirectory = element.getAttribute('data-is-directory');
 
     buttons.delete = new Interactive('button');
+    buttons.link = new Interactive('button');
+    buttons.open = new Interactive('button');
+    
     buttons.delete.target.setLabel(PageMedia.buttonIcons.trash);
     buttons.delete.target.setCallback((event) => {
       event.preventDefault();
@@ -77,10 +80,7 @@ export class PageMedia {
       document.body.appendChild(interactiveModal.target.element);
       interactiveModal.target.show();
     });
-    
-    buttons.delete.assembly();
 
-    buttons.link = new Interactive('button');
     buttons.link.target.setLabel(PageMedia.buttonIcons.link);
     buttons.link.target.setCallback((event) => {
       event.preventDefault();
@@ -99,6 +99,8 @@ export class PageMedia {
       location.href = locationURL.toString();
     });
 
+    buttons.delete.assembly();
+    buttons.link.assembly();
     buttons.open.assembly();
 
     const elementControllerElement = element.querySelector('[data-role="controller-panel"]');
