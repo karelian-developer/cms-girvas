@@ -2,7 +2,7 @@
   <div class="media-list__item-body">
     <div class="media-list__item-title">
       <div class="media-list__item-icon-container">
-        <img src="{THEME_URL}/images/icons/folder.svg" alt="{FILE_NAME}">
+        <img src="{SITE_TEMPLATE_URL}/images/icons/folder.svg" alt="{FILE_NAME}">
       </div>
       <span class="media-list__item-label">{FILE_NAME}</span>
     </div>
