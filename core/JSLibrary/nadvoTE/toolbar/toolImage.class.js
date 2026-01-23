@@ -49,7 +49,7 @@ export class ToolImage extends Tool {
       ? ''
       : data.URL;
 
-    const fileIsDirectory = data.isDirectory === undefined
+    const fileIsDirectory = data.isDirectory !== undefined
       ? true :
       data.isDirectory;
 
