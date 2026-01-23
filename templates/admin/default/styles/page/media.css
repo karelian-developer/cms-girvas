@@ -79,6 +79,8 @@
 
 .media-list__item-extension {
   position: absolute;
+  display: flex;
+  align-items: center;
   background-color: var(--common-main-color-4);
   text-transform: uppercase;
   font-weight: 300;
