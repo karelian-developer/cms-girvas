@@ -207,6 +207,9 @@ export class PageEntriesCategory {
 
       this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
       this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+      
+      this.buttons.save.target.setStyle('green');
+      this.buttons.delete.target.setStyle('red');
 
       this.buttons.save.target.setCallback((event) => {
         event.preventDefault();
@@ -269,7 +272,7 @@ export class PageEntriesCategory {
         document.body.appendChild(interactiveModal.target.element);
         interactiveModal.target.show();
       });
-      
+
       this.buttons.save.assembly();
       this.buttons.delete.assembly();
 
