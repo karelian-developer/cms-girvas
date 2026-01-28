@@ -363,7 +363,10 @@
   color: var(--primary-color-3);
   font-size: 14px;
   font-weight: 700;
-  border-radius: 0 !important;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 8px;
   padding: 0 10px;
   height: 100%;
 }
