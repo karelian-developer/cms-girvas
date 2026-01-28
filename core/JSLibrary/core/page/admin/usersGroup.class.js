@@ -138,7 +138,7 @@ export class PageUsersGroup {
       this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
       
       this.buttons.save.target.setStyle('green');
-      this.buttons.delete.target.setStyle('red')
+      this.buttons.delete.target.setStyle('red');
 
       this.buttons.save.target.setCallback((event) => {
         event.preventDefault();

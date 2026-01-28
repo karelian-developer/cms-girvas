@@ -64,14 +64,14 @@ export class PageModule {
   }
 
   init() {
-    let searchParams = new URLParser(), locales;
-    let buttons = {enable: null, disable: null, install: null, delete: null};
+    const searchParams = new URLParser(), locales;
+    const buttons = {enable: null, disable: null, install: null, delete: null};
 
-    let moduleBlock = document.querySelector('.module');
-    let moduleName = moduleBlock.getAttribute('data-module-name');
-    let moduleEnabledStatus = moduleBlock.getAttribute('data-module-enabled-status');
-    let moduleInstalledStatus = moduleBlock.getAttribute('data-module-installed-status');
-    let interactiveContainerElement = document.querySelector('#E8548530785');
+    const moduleBlock = document.querySelector('.module');
+    const moduleName = moduleBlock.getAttribute('data-module-name');
+    const moduleEnabledStatus = moduleBlock.getAttribute('data-module-enabled-status');
+    const moduleInstalledStatus = moduleBlock.getAttribute('data-module-installed-status');
+    const interactiveContainerElement = document.querySelector('#E8548530785');
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
@@ -79,23 +79,30 @@ export class PageModule {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
 
       if (searchParams.getPathPart(2) != null) {
+        buttons.enable = new Interactive('button');
+        buttons.disable = new Interactive('button');
+        buttons.install = new Interactive('button');
+        buttons.delete = new Interactive('button');
+
+        buttons.enable.target.setLabel(localeData.BUTTON_ENABLE_LABEL);
+        buttons.disable.target.setLabel(localeData.BUTTON_DISABLE_LABEL);
+        buttons.install.target.setLabel(localeData.BUTTON_INSTALL_LABEL);
+        buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+        
+        buttons.enable.target.setStyle('green');
+        buttons.disable.target.setStyle('red');
+        buttons.install.target.setStyle('default');
+        buttons.delete.target.setStyle('red');
+
         let pageGalleryElement = moduleBlock.querySelector('[role="gallery"]');
         if (pageGalleryElement != null) {
           this.initGallery(pageGalleryElement); 
         }
 
-        buttons.enable = new Interactive('button');
-        buttons.enable.target.setLabel(localeData.BUTTON_ENABLE_LABEL);
         buttons.enable.target.setCallback(() => {
           let formData = new FormData();
           formData.append('module_name', moduleName);
@@ -117,10 +124,7 @@ export class PageModule {
             }
           });
         });
-        buttons.enable.assembly();
-    
-        buttons.disable = new Interactive('button');
-        buttons.disable.target.setLabel(localeData.BUTTON_DISABLE_LABEL);
+
         buttons.disable.target.setCallback(() => {
           let formData = new FormData();
           formData.append('module_name', moduleName);
@@ -142,10 +146,7 @@ export class PageModule {
             }
           });
         });
-        buttons.disable.assembly();
-    
-        buttons.install = new Interactive('button');
-        buttons.install.target.setLabel(localeData.BUTTON_INSTALL_LABEL);
+
         buttons.install.target.setCallback(() => {
           let formData = new FormData();
           formData.append('module_name', moduleName);
@@ -170,10 +171,7 @@ export class PageModule {
             }
           });
         });
-        buttons.install.assembly();
-    
-        buttons.delete = new Interactive('button');
-        buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+
         buttons.delete.target.setCallback(() => {
           let formData = new FormData();
           formData.append('module_name', moduleName);
@@ -197,6 +195,10 @@ export class PageModule {
             }
           });
         });
+
+        buttons.enable.assembly();
+        buttons.disable.assembly();
+        buttons.install.assembly();
         buttons.delete.assembly();
     
         if (moduleEnabledStatus === 'enabled') {
@@ -218,13 +220,7 @@ export class PageModule {
         interactiveContainerElement.append(buttons.delete.target.element);
       }
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }
