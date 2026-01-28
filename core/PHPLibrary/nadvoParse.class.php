@@ -33,6 +33,7 @@ class NadvoParse
     'image' => '/!\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'figure' => '/![f]\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'video' => '/!\[video\]\((.+?)\)/',
+    'video_vk' => '/!\[video\-vk\]\((.+?)\)/',
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(\>+)\s?(.*)$/m',
@@ -410,6 +411,17 @@ class NadvoParse
         
         return '<div class="video-container"><video controls><source src="' . $url . '" type="video/' . $extension . '">' .
                'Ваш браузер не поддерживает работу с видео.</video></div>';
+      },
+      $html
+    );
+
+    $html = preg_replace_callback(
+      self::PATTERNS['video_vk'],
+      function($matches) {
+        $url = htmlspecialchars(trim($matches[1]));
+        $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+        
+        return '<iframe src="' . $url . '" width="640" height="360" frameborder="0" allowfullscreen="1" allow="autoplay; encrypted-media; fullscreen; picture-in-picture"></iframe>';
       },
       $html
     );
