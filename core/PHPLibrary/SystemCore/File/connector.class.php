@@ -127,6 +127,7 @@ final class Connector implements InterfaceConnector
     $cacheKey = md5($fileNamePattern . $salt);
     $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
 
+    error_log($filesPath);
     /** @var array $filesList Массив файлов */
     $filesList = array_diff(scandir($filesPath), ['..', '.']);
     $foundFiles = [];
