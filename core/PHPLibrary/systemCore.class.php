@@ -525,14 +525,17 @@ final class SystemCore implements CoreInterface
         $module = new Module($this, $directoryName);
 
         if ($module->isEnabled()) {
-          /** @var CMSFileConnector Объект подключателя файлов */
-          $CMSFileConnector = new CMSFileConnector($this);
-          $CMSFileConnector = $this->autoloadComponents(
-            $CMSFileConnector,
-            self::CMS_MODULES_PATH . '/' . $directoryName . '/core',
-            ['enum', 'interface', 'trait', 'class'],
-            'module_' . $directoryName
-          );
+          $modulesCoreDirectoryPath = self::CMS_MODULES_PATH . '/' . $directoryName . '/core';
+          
+          if (file_exists($modulesCoreDirectoryPath)) {
+            $CMSFileConnector = new CMSFileConnector($this);
+            $CMSFileConnector = $this->autoloadComponents(
+              $CMSFileConnector,
+              $modulesCoreDirectoryPath,
+              ['enum', 'interface', 'trait', 'class'],
+              'module_' . $directoryName
+            );
+          }
           
           Module::connectCore($this, $directoryName);
         }
