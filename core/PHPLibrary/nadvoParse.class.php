@@ -406,7 +406,7 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['video'],
       function($matches) {
-        $url = urlencode(trim($matches[1]));
+        $url = trim($matches[1]);
         $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
         
         return '<div class="video-container"><video controls><source src="' . $url . '" type="video/' . $extension . '">' .
@@ -418,7 +418,7 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['video_vk'],
       function($matches) {
-        $url = urlencode(trim($matches[1]));
+        $url = trim($matches[1]);
         
         return '<iframe src="' . $url . '" width="640" height="360" frameborder="0" allowfullscreen="1" allow="autoplay; encrypted-media; fullscreen; picture-in-picture"></iframe>';
       },
