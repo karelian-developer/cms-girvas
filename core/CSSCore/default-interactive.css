@@ -327,6 +327,7 @@
   flex-direction: column;
   background-color: var(--primary-color-4);
   box-shadow: 0 0 10px var(--primary-color-2--opacity-0-2);
+  border-radius: 8px;
   max-width: calc(100% - 200px);
 }
 
@@ -362,6 +363,7 @@
   color: var(--primary-color-3);
   font-size: 14px;
   font-weight: 700;
+  border-radius: 0 !important;
   padding: 0 10px;
   height: 100%;
 }
