@@ -493,6 +493,8 @@ export class PageForm {
 
     const buttonRemoveField = new Interactive('button');
     buttonRemoveField.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+    buttonRemoveField.target.setStyle('red');
+
     buttonRemoveField.target.setCallback((event) => {
       event.preventDefault();
       
