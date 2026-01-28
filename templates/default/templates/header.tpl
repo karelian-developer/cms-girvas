@@ -34,7 +34,7 @@
           {NAVIGATION_REGISTRATION_LINK}
         </li>
         <li class="header__nav-item">
-          {F4E267_HELLO_WORLD}
+          {NAVIGATION_EXIT_LINK}
         </li>
       </ul>
     </nav>
