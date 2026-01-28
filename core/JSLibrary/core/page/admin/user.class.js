@@ -104,7 +104,20 @@ export class PageUser {
       }
 
       this.buttons.save = new Interactive('button');
+      this.buttons.delete = new Interactive('button');
+      this.buttons.block = new Interactive('button');
+      this.buttons.unblock = new Interactive('button');
+
       this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
+      this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+      this.buttons.block.target.setLabel(localeData.BUTTON_BAN_LABEL);
+      this.buttons.unblock.target.setLabel(localeData.BUTTON_UNBAN_LABEL);
+      
+      this.buttons.save.target.setStyle('green');
+      this.buttons.delete.target.setStyle('red');
+      this.buttons.block.target.setStyle('red');
+      this.buttons.unblock.target.setStyle('green');
+
       this.buttons.save.target.setCallback((event) => {
         event.preventDefault();
         
@@ -130,10 +143,7 @@ export class PageUser {
           this.page.showPopupNotification(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY, 0);
         }
       });
-      this.buttons.save.assembly();
-  
-      this.buttons.block = new Interactive('button');
-      this.buttons.block.target.setLabel(localeData.BUTTON_BAN_LABEL);
+
       this.buttons.block.target.setCallback((event) => {
         event.preventDefault();
         
@@ -155,10 +165,7 @@ export class PageUser {
           }
         });
       });
-      this.buttons.block.assembly();
-  
-      this.buttons.unblock = new Interactive('button');
-      this.buttons.unblock.target.setLabel(localeData.BUTTON_UNBAN_LABEL);
+
       this.buttons.unblock.target.setCallback((event) => {
         event.preventDefault();
         
@@ -180,10 +187,7 @@ export class PageUser {
           }
         });
       });
-      this.buttons.unblock.assembly();
-  
-      this.buttons.delete = new Interactive('button');
-      this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+
       this.buttons.delete.target.setCallback((event) => {
         event.preventDefault();
   
@@ -219,7 +223,10 @@ export class PageUser {
         interactiveModal.target.show();
       });
 
+      this.buttons.save.assembly();
       this.buttons.delete.assembly();
+      this.buttons.block.assembly();
+      this.buttons.unblock.assembly();
   
       if (searchParams.getPathPart(3) === null) {
         this.buttons.unblock.target.element.style.display = 'none';
