@@ -64,7 +64,8 @@ export class PageModule {
   }
 
   init() {
-    const searchParams = new URLParser(), locales;
+    let locales;
+    const searchParams = new URLParser();
     const buttons = {enable: null, disable: null, install: null, delete: null};
 
     const moduleBlock = document.querySelector('.module');
