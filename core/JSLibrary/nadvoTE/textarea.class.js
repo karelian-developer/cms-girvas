@@ -40,7 +40,7 @@ export class Textarea {
     
     this.element.addEventListener('keydown', (event) => {
       const key = event.key;
-      
+
       if (this.bracketMap[key] && !event.ctrlKey && !event.altKey && !event.metaKey) {
         const start = this.element.selectionStart;
         const end = this.element.selectionEnd;
@@ -50,7 +50,7 @@ export class Textarea {
           
           const value = this.element.value;
           const selectedText = value.substring(start, end);
-          const closingBracket = this.element[key];
+          const closingBracket = this.bracketMap[key];
             
           this.element.value = value.substring(0, start) + key + selectedText + closingBracket + value.substring(end);
             
