@@ -1,4 +1,4 @@
-<li class="media-list__item item" data-file-name="{FILE_NAME}" data-file-url="{FILE_URL}">
+<li class="media-list__item item" data-file-name="{FILE_NAME}" data-file-url="{FILE_URL}" data-file-extension="{FILE_EXTENSION}">
   <div class="media-list__item-body">
     <span class="media-list__item-extension">{FILE_EXTENSION}</span>
     <img class="media-list__item-preview" src="{FILE_URL}" alt="{FILE_NAME}">

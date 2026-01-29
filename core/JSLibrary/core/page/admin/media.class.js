@@ -33,6 +33,7 @@ export class PageMedia {
 
     fileName = element.getAttribute('data-file-name');
     fileURL = element.getAttribute('data-file-url');
+    fileExtension = element.getAttribute('data-file-extension');
     isDirectory = element.getAttribute('data-is-directory');
 
     buttons.delete = new Interactive('button');
@@ -136,6 +137,7 @@ export class PageMedia {
 
         const formData = new FormData();
         formData.append('file_fullname', fileName);
+        formData.append('file_extension', fileExtension);
         formData.append('file_description', fileDescription);
         formData.append('file_additional_description', fileAdditionalDescription);
 

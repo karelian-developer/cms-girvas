@@ -24,7 +24,7 @@ if ($CMSCore->client->isLogged(2)) {
 
     if (isset($_PATCH['file_fullname'])) {
       $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
-      $filePath =  $fileDirectoryPath . '/' . $fileFullname;
+      $filePath =  $fileDirectoryPath . '/' . $fileFullname . '.' . $fileExtension;
 
       if (file_exists($filePath)) {
         $jsonFilePath = $fileDirectoryPath . '/metadata.json';
@@ -38,10 +38,12 @@ if ($CMSCore->client->isLogged(2)) {
         // Получаем данные из запроса
         $description = $_PATCH['file_description'] ?? '';
         $additionalDescription = $_PATCH['file_additional_description'] ?? '';
+        $fileExtension = $_PATCH['file_extension'] ?? '';
 
         // Обновляем или добавляем данные для текущего файла
         $imagesData[$fileFullname] = [
           'filename' => $fileFullname,
+          'extension' => $fileExtension,
           'description' => $description,
           'additionalDescription' => $additionalDescription,
           'updatedAt' => date('Y-m-d H:i:s')
@@ -53,16 +55,17 @@ if ($CMSCore->client->isLogged(2)) {
             continue;
           }
           
-          $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-          $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+          $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+          $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'avif', 'webp', 'bmp'];
           
-          if (in_array($ext, $imageExtensions)) {
+          if (in_array($extension, $imageExtensions)) {
             if (!isset($imagesData[$file])) {
               $imagesData[$file] = [
                 'filename' => $file,
+                'extension' => $extension,
                 'description' => '',
                 'additionalDescription' => '',
-                'createdAt' => date('Y-m-d H:i:s', filemtime($fileDirectoryPath . '/' . $file))
+                'createdAt' => date('Y-m-d H:i:s', filemtime($fileDirectoryPath . '/' . $file . '.' . $extension))
               ];
             }
           }
