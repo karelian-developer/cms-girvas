@@ -85,7 +85,6 @@ export class PageMedia {
       this.page.showPopupNotification(this.localeData.POPUP_SLIDE_RELATIVE_LINK_COPIED, 1);
     });
 
-    buttons.open = new Interactive('button');
     buttons.open.target.setLabel(this.icons.target);
     buttons.open.target.setCallback((event) => {
       event.preventDefault();
@@ -95,7 +94,6 @@ export class PageMedia {
       location.href = locationURL.toString();
     });
 
-    buttons.edit = new Interactive('button');
     buttons.edit.target.setLabel(this.icons.edit);
     buttons.edit.target.setCallback((event) => {
       event.preventDefault();
