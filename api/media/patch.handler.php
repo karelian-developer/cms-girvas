@@ -21,6 +21,9 @@ if ($CMSCore->client->isLogged(2)) {
 
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_MEDIA_FILES_MANAGEMENT)) {
     $fileFullname = $_PATCH['file_fullname'];
+    $description = $_PATCH['file_description'] ?? '';
+    $additionalDescription = $_PATCH['file_additional_description'] ?? '';
+    $fileExtension = $_PATCH['file_extension'] ?? '';
 
     if (isset($_PATCH['file_fullname'])) {
       $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
@@ -35,12 +38,6 @@ if ($CMSCore->client->isLogged(2)) {
           $imagesData = json_decode($jsonContent, true) ?? [];
         }
 
-        // Получаем данные из запроса
-        $description = $_PATCH['file_description'] ?? '';
-        $additionalDescription = $_PATCH['file_additional_description'] ?? '';
-        $fileExtension = $_PATCH['file_extension'] ?? '';
-
-        // Обновляем или добавляем данные для текущего файла
         $imagesData[$fileFullname] = [
           'filename' => $fileFullname,
           'extension' => $fileExtension,
