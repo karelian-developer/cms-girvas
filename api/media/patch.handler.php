@@ -71,7 +71,7 @@ if ($CMSCore->client->isLogged(2)) {
         $jsonResult = json_encode($imagesData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         file_put_contents($jsonFilePath, $jsonResult);
 
-        if (!file_exists($filePath)) {
+        if (!file_exists($jsonFilePath)) {
           $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {
