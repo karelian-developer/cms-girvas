@@ -29,7 +29,7 @@ export class PageMedia {
 
   initMediaElement(element) {
     let buttons = {};
-    let fileName, fileURL, isDirectory;
+    let fileName, fileURL, fileExtension, isDirectory;
 
     fileName = element.getAttribute('data-file-name');
     fileURL = element.getAttribute('data-file-url');
