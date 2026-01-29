@@ -62,7 +62,7 @@ if ($CMSCore->client->isLogged(2)) {
                 'extension' => $extension,
                 'description' => '',
                 'additionalDescription' => '',
-                'createdAt' => date('Y-m-d H:i:s', filemtime($fileDirectoryPath . '/' . $file . '.' . $extension))
+                'createdAt' => date('Y-m-d H:i:s', filemtime($fileDirectoryPath . '/' . $file))
               ];
             }
           }
