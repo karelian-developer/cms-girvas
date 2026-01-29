@@ -146,7 +146,7 @@ export class PageMedia {
 
         requestFileEditor.target.data = formData;
 
-        request.target.send().then((data) => {
+        requestFileEditor.target.send().then((data) => {
           if (data.statusCode === 1) {
             // ...
           }
