@@ -100,10 +100,6 @@ final class SitemapImagesBuilder
     $jsonContent = file_get_contents($jsonFilePath);
     $metadata = json_decode($jsonContent, true);
 
-    if (!$metadata) {
-      throw new \Exception("Неверный формат JSON файла: " . $jsonFilePath);
-    }
-
     $count = 0;
     
     foreach ($metadata as $filename => $imageData) {
