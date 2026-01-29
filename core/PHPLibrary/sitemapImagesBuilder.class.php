@@ -50,7 +50,6 @@ final class SitemapImagesBuilder
   private function setDocument() : void
   {
     $this->document = new DOMDocument('1.0', 'UTF-8');
-    $this->document->formatOutput = true;
   }
 
   /**
