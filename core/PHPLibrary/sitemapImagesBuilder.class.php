@@ -91,7 +91,10 @@ final class SitemapImagesBuilder
   public function loadFromMetadata(string $jsonFilePath, string $baseUrl) : int
   {
     if (!file_exists($jsonFilePath)) {
-      file_put_contents($jsonFilePath, json_encode([]));
+      $emptyData = json_encode([], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+      if (file_put_contents($jsonFilePath, $emptyData) === false) {
+        throw new \Exception("Не удалось создать файл: " . $jsonFilePath);
+      }
     }
 
     $jsonContent = file_get_contents($jsonFilePath);
