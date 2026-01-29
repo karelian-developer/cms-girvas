@@ -38,7 +38,7 @@ if ($CMSCore->client->isLogged(2)) {
           $imagesData = json_decode($jsonContent, true) ?? [];
         }
 
-        $imagesData[$fileFullname] = [
+        $imagesData[$fileFullname . '.' . $fileExtension] = [
           'filename' => $fileFullname . '.' . $fileExtension,
           'extension' => $fileExtension,
           'description' => $description,
