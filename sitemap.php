@@ -37,7 +37,7 @@ if (defined('IS_NOT_HACKED')) {
     $imageSitemapXML = $sitemapImagesBuilder->assembled;
 
     echo $imageSitemapXML;
-  }{
+  } else {
     $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
     if (count($CMSLocalesNames) > 0) {
       // Перебор всех существующих записей
