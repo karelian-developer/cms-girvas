@@ -11,6 +11,7 @@
 use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\Pages as StaticPages;
 use \core\PHPLibrary\SitemapBuilder as SitemapBuilder;
+use \core\PHPLibrary\SitemapImagesBuilder as SitemapImagesBuilder;
 
 if (!defined('IS_NOT_HACKED')) {
   http_response_code(503);
@@ -24,45 +25,58 @@ if (defined('IS_NOT_HACKED')) {
   $entries = new Entries($CMSCore);
   $pagesStatic = new StaticPages($CMSCore);
 
-  $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
-  if (count($CMSLocalesNames) > 0) {
-    // Перебор всех существующих записей
-    foreach ($entries->getAll() as $entry) {
-      $entry->initData(['name', 'updatedUnixTimestamp', 'metadata', 'texts']);
+  if ($CMSURLP->getPath(1) === 'images') {
+    $count = $imageSitemapBuilder->loadFromMetadata(
+      CMS_ROOT_DIRECTORY . '/uploads/media/metadata.json',
+      $CMSCore->getSiteURL()
+    );
 
-      if ($entry->isPublished()) {
-        foreach ($CMSLocalesNames as $index => $localeName) {
-          if (!empty($entry->getTitle($localeName)) && !empty($entry->getDescription($localeName)) && !empty($entry->getContent($localeName))) {
-            $CMSConfigDomain = trim($CMSConfigurator->get('domain'));
-            $entryURL = sprintf('https://%s/entry/%s?locale=%s', $CMSConfigDomain, $entry->getName(), $localeName);
+    $imageSitemapBuilder->assembly();
+    $imageSitemapXML = $imageSitemapBuilder->assembled;
 
-            $sitemapBuilder->addURL($entryURL, $entry->getUpdatedUnixTimestamp(), 'weekly', 0.8);
+    header('Content-Type: application/xml; charset=utf-8');
+    echo $imageSitemapXML;
+  }{
+    $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+    if (count($CMSLocalesNames) > 0) {
+      // Перебор всех существующих записей
+      foreach ($entries->getAll() as $entry) {
+        $entry->initData(['name', 'updatedUnixTimestamp', 'metadata', 'texts']);
+
+        if ($entry->isPublished()) {
+          foreach ($CMSLocalesNames as $index => $localeName) {
+            if (!empty($entry->getTitle($localeName)) && !empty($entry->getDescription($localeName)) && !empty($entry->getContent($localeName))) {
+              $CMSConfigDomain = trim($CMSConfigurator->get('domain'));
+              $entryURL = sprintf('https://%s/entry/%s?locale=%s', $CMSConfigDomain, $entry->getName(), $localeName);
+
+              $sitemapBuilder->addURL($entryURL, $entry->getUpdatedUnixTimestamp(), 'weekly', 0.8);
+            }
+          }
+        }
+      }
+
+      // Перебор всех существующих статических страниц
+      foreach ($pagesStatic->getAll() as $pageStatic) {
+        $pageStatic->initData(['name', 'updatedUnixTimestamp', 'metadata', 'texts']);
+
+        if ($pageStatic->isPublished()) {
+          foreach ($CMSLocalesNames as $index => $localeName) {
+            if (!empty($pageStatic->getTitle($localeName)) && !empty($pageStatic->getDescription($localeName)) && !empty($pageStatic->getContent($localeName))) {
+              $CMSConfigDomain = trim($CMSConfigurator->get('domain'));
+              $pageStaticURL = sprintf('https://%s/page/%s?locale=%s', $CMSConfigDomain, $pageStatic->getName(), $localeName);
+
+              $sitemapBuilder->addURL($pageStaticURL, $pageStatic->getUpdatedUnixTimestamp(), 'weekly', 0.8);
+            }
           }
         }
       }
     }
 
-    // Перебор всех существующих статических страниц
-    foreach ($pagesStatic->getAll() as $pageStatic) {
-      $pageStatic->initData(['name', 'updatedUnixTimestamp', 'metadata', 'texts']);
+    header('Content-type: text/xml');
 
-      if ($pageStatic->isPublished()) {
-        foreach ($CMSLocalesNames as $index => $localeName) {
-          if (!empty($pageStatic->getTitle($localeName)) && !empty($pageStatic->getDescription($localeName)) && !empty($pageStatic->getContent($localeName))) {
-            $CMSConfigDomain = trim($CMSConfigurator->get('domain'));
-            $pageStaticURL = sprintf('https://%s/page/%s?locale=%s', $CMSConfigDomain, $pageStatic->getName(), $localeName);
+    $sitemapBuilder->assembly();
 
-            $sitemapBuilder->addURL($pageStaticURL, $pageStatic->getUpdatedUnixTimestamp(), 'weekly', 0.8);
-          }
-        }
-      }
-    }
+    http_response_code(200);
+    echo $sitemapBuilder->assembled;
   }
-
-  header('Content-type: text/xml');
-
-  $sitemapBuilder->assembly();
-
-  http_response_code(200);
-  echo $sitemapBuilder->assembled;
 }
