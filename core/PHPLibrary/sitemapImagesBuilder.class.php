@@ -25,7 +25,7 @@ use \DOMDocument as DOMDocument;
 /**
  * Сборщик карты сайта в XML-формате
  */
-final class ImageSitemapBuilder
+final class SitemapImagesBuilder
 {
   private DOMDocument $document;
   private array $images = [];
