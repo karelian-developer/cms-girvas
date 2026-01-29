@@ -73,7 +73,7 @@ if (defined('IS_NOT_HACKED')) {
       }
     }
 
-    header('Content-Type: application/xml; charset=utf-8');
+    header('Content-type: text/xml');
 
     $sitemapBuilder->assembly();
 
