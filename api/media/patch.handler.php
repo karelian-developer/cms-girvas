@@ -20,17 +20,59 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUserGroup->initData(['permissions']);
 
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_MEDIA_FILES_MANAGEMENT)) {
-    $fileFullname = $_DELETE['file_fullname'];
+    $fileFullname = $_PATCH['file_fullname'];
 
-    if (isset($_DELETE['file_fullname'])) {
+    if (isset($_PATCH['file_fullname'])) {
       $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
       $filePath =  $fileDirectoryPath . '/' . $fileFullname;
 
       if (file_exists($filePath)) {
-        unlink($filePath);
+        $jsonFilePath = $fileDirectoryPath . '/metadata.json';
+        $imagesData = [];
+
+        if (file_exists($jsonFilePath)) {
+          $jsonContent = file_get_contents($jsonFilePath);
+          $imagesData = json_decode($jsonContent, true) ?? [];
+        }
+
+        // Получаем данные из запроса
+        $description = $_PATCH['file_description'] ?? '';
+        $additionalDescription = $_PATCH['file_additional_description'] ?? '';
+
+        // Обновляем или добавляем данные для текущего файла
+        $imagesData[$fileFullname] = [
+          'filename' => $fileFullname,
+          'description' => $description,
+          'additionalDescription' => $additionalDescription,
+          'updatedAt' => date('Y-m-d H:i:s')
+        ];
+
+        $allFiles = scandir($fileDirectoryPath);
+        foreach ($allFiles as $file) {
+          if ($file === '.' || $file === '..' || $file === 'metadata.json') {
+            continue;
+          }
+          
+          $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+          $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+          
+          if (in_array($ext, $imageExtensions)) {
+            if (!isset($imagesData[$file])) {
+              $imagesData[$file] = [
+                'filename' => $file,
+                'description' => '',
+                'additionalDescription' => '',
+                'createdAt' => date('Y-m-d H:i:s', filemtime($fileDirectoryPath . '/' . $file))
+              ];
+            }
+          }
+        }
+
+        $jsonResult = json_encode($imagesData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        file_put_contents($jsonFilePath, $jsonResult);
 
         if (!file_exists($filePath)) {
-          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_DELETE_FILE_SUCCESS');
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {
           $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');

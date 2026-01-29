@@ -320,7 +320,7 @@ export class Core {
 
   async loadIcons(iconsURL) {
     const icons = {};
-    const iconNames = ['trash', 'link', 'target'];
+    const iconNames = ['trash', 'link', 'target', 'delete', 'edit', 'folder', 'search'];
     
     const promises = iconNames.map(async (name) => {
       try {

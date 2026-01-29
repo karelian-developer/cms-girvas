@@ -38,6 +38,7 @@ export class PageMedia {
     buttons.delete = new Interactive('button');
     buttons.link = new Interactive('button');
     buttons.open = new Interactive('button');
+    buttons.edit = new Interactive('button');
 
     buttons.delete.target.setLabel(this.icons.trash);
     buttons.delete.target.setCallback((event) => {
@@ -50,7 +51,7 @@ export class PageMedia {
       
       interactiveModal.target.addButton(this.localeData.BUTTON_DELETE_LABEL, () => {
         let formData = new FormData();
-        formData.append('media_file_fullname', fileName);
+        formData.append('file_fullname', fileName);
 
         let request = new Interactive('request', {
           method: 'DELETE',
@@ -94,17 +95,87 @@ export class PageMedia {
       location.href = locationURL.toString();
     });
 
+    buttons.edit = new Interactive('button');
+    buttons.edit.target.setLabel(this.icons.edit);
+    buttons.edit.target.setCallback((event) => {
+      event.preventDefault();
+
+      const modalFileEditorBodyContent = document.createElement('div');
+      modalFileEditorBodyContent.classList.add('file-editor');
+
+      const inputDescriptionElement = document.createElement('textarea');
+      inputDescriptionElement.setAttribute('placeholder', 'Описание файла');
+      inputDescriptionElement.setAttribute('name', 'file_description');
+      inputDescriptionElement.classList.add('form__textarea');
+
+      const inputAdditionalDescriptionElement = document.createElement('textarea');
+      inputAdditionalDescriptionElement.setAttribute('placeholder', 'Дополнительное описание файла');
+      inputAdditionalDescriptionElement.setAttribute('name', 'file_additional_description');
+      inputAdditionalDescriptionElement.classList.add('form__textarea');
+
+      const formElement = document.createElement('form');
+      formElement.classList.add('form');
+      formElement.classList.add('file-editor__form');
+      formElement.append(inputDescriptionElement);
+      formElement.append(inputAdditionalDescriptionElement);
+
+      modalFileEditorBodyContent.append(formElement);
+
+      const modalFileEditor = new Interactive('modal',
+        {
+          title: "Изменить файл",
+          content: modalFileEditorBodyContent,
+          width: window.innerWidth - 100
+        }
+      );
+
+      modalFileEditor.target.addButton('Сохранить', () => {
+        const inputDescriptionElementQS = modalFileEditor.target.element.querySelector('[name="file_description"]');
+        const inputAdditionalDescriptionElementQS = modalFileEditor.target.element.querySelector('[name="file_additional_description"]');
+        
+        const fileDescription = inputDescriptionElementQS.value;
+        const fileAdditionalDescription = inputAdditionalDescriptionElementQS.value;
+
+        const formData = new FormData();
+        formData.append('file_fullname', fileName);
+        formData.append('file_description', fileDescription);
+        formData.append('file_additional_description', fileAdditionalDescription);
+
+        const requestFileEditor = new Interactive('request', {
+          method: 'PATCH',
+          url: '/handler/media?localeMessage=' + window.CMSCore.locales.admin.name
+        });
+
+        requestFileEditor.target.data = formData;
+
+        request.target.send().then((data) => {
+          if (data.statusCode === 1) {
+            // ...
+          }
+        });
+
+        modalFileEditor.target.close();
+      });
+
+      modalFileEditor.target.addButton('Отмена', () => {
+        modalFileEditor.target.close();
+      });
+    });
+
     buttons.delete.assembly();
     buttons.link.assembly();
     buttons.open.assembly();
+    buttons.edit.assembly();
 
     const elementControllerElement = element.querySelector('[data-role="controller-panel"]');
     if (elementControllerElement !== null) {
-      elementControllerElement.appendChild(buttons.delete.target.element);
-      elementControllerElement.appendChild(buttons.link.target.element);
-
       if (isDirectory !== null) {
+        elementControllerElement.appendChild(buttons.link.target.element);
         elementControllerElement.appendChild(buttons.open.target.element);
+      } else {
+        elementControllerElement.appendChild(buttons.delete.target.element);
+        elementControllerElement.appendChild(buttons.link.target.element);
+        elementControllerElement.appendChild(buttons.edit.target.element);
       }
     }
   }
