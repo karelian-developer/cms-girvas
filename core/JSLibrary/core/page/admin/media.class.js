@@ -112,18 +112,13 @@ export class PageMedia {
       inputAdditionalDescriptionElement.setAttribute('name', 'file_additional_description');
       inputAdditionalDescriptionElement.classList.add('form__textarea');
 
-      const inputAdditionalDescriptionElement = document.createElement('textarea');
-      inputAdditionalDescriptionElement.setAttribute('placeholder', 'Дополнительное описание файла');
-      inputAdditionalDescriptionElement.setAttribute('name', 'file_additional_description');
-      inputAdditionalDescriptionElement.classList.add('form__textarea');
-
       const inputLicenseElement = document.createElement('textarea');
       inputLicenseElement.setAttribute('placeholder', 'Лицензия файла');
       inputLicenseElement.setAttribute('name', 'file_license');
       inputLicenseElement.classList.add('form__textarea');
 
       const inputGEOLocationElement = document.createElement('input');
-      inputGEOLocationElement.setAttribute('placeholder', 'Лицензия файла');
+      inputGEOLocationElement.setAttribute('placeholder', 'Геолокация');
       inputGEOLocationElement.setAttribute('name', 'file_geo_location');
       inputGEOLocationElement.classList.add('form__input');
 
