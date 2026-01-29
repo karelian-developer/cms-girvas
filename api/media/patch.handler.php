@@ -39,7 +39,7 @@ if ($CMSCore->client->isLogged(2)) {
         }
 
         $imagesData[$fileFullname] = [
-          'filename' => $fileFullname,
+          'filename' => $fileFullname . '.' . $fileExtension,
           'extension' => $fileExtension,
           'description' => $description,
           'additionalDescription' => $additionalDescription,
