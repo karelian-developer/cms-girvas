@@ -204,11 +204,11 @@ export class ToolImage extends Tool {
       });
 
       this.modal.target.addButton('Вставить', () => {
-        let inputImageLabelElement = this.modal.target.element.querySelector('[name="image_label"]');
-        let inputImageLinkElement = this.modal.target.element.querySelector('[name="image_link"]');
+        const inputImageLabelElement = this.modal.target.element.querySelector('[name="image_label"]');
+        const inputImageLinkElement = this.modal.target.element.querySelector('[name="image_link"]');
         
-        let imageLabel = inputImageLabelElement.value;
-        let imageLink = inputImageLinkElement.value;
+        const imageLabel = inputImageLabelElement.value;
+        const imageLink = inputImageLinkElement.value;
         
         this.editor.textarea.replaceStringSelection(
           `![${imageLabel}](${imageLink})`

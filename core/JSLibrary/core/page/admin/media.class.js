@@ -158,6 +158,8 @@ export class PageMedia {
       modalFileEditor.target.addButton('Отмена', () => {
         modalFileEditor.target.close();
       });
+
+      modalFileEditor.assembly();
     });
 
     buttons.delete.assembly();
