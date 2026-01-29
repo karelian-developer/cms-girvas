@@ -25,6 +25,8 @@ if (defined('IS_NOT_HACKED')) {
   $entries = new Entries($CMSCore);
   $pagesStatic = new StaticPages($CMSCore);
 
+  header('Content-type: text/xml');
+
   if ($CMSURLP->getPath(1) === 'images') {
     $sitemapImagesBuilder = new SitemapImagesBuilder($CMSCore);
 
@@ -34,9 +36,9 @@ if (defined('IS_NOT_HACKED')) {
     );
 
     $sitemapImagesBuilder->assembly();
-    $imageSitemapXML = $sitemapImagesBuilder->assembled;
 
-    echo $imageSitemapXML;
+    http_response_code(200);
+    echo $sitemapImagesBuilder->assembled;
   } else {
     $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
     if (count($CMSLocalesNames) > 0) {
@@ -71,13 +73,11 @@ if (defined('IS_NOT_HACKED')) {
           }
         }
       }
+
+      $sitemapBuilder->assembly();
+
+      http_response_code(200);
+      echo $sitemapBuilder->assembled;
     }
-
-    header('Content-type: text/xml');
-
-    $sitemapBuilder->assembly();
-
-    http_response_code(200);
-    echo $sitemapBuilder->assembled;
   }
 }
