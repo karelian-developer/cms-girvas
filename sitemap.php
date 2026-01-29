@@ -36,7 +36,6 @@ if (defined('IS_NOT_HACKED')) {
     $sitemapImagesBuilder->assembly();
     $imageSitemapXML = $sitemapImagesBuilder->assembled;
 
-    header('Content-Type: application/xml; charset=utf-8');
     echo $imageSitemapXML;
   }{
     $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
@@ -74,7 +73,7 @@ if (defined('IS_NOT_HACKED')) {
       }
     }
 
-    header('Content-type: text/xml');
+    header('Content-Type: application/xml; charset=utf-8');
 
     $sitemapBuilder->assembly();
 
