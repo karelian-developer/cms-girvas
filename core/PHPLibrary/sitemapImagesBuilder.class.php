@@ -73,11 +73,11 @@ final class SitemapImagesBuilder
   ) : void
   {
     array_push($this->images, [
-      'image_url' => $imageUrl,
+      'imageURL' => $imageUrl,
       'caption' => $caption,
       'title' => $title,
       'license' => $license,
-      'geo_location' => $geoLocation
+      'GEOLocation' => $geoLocation
     ]);
   }
 
@@ -108,7 +108,7 @@ final class SitemapImagesBuilder
       $imageUrl = rtrim($baseUrl, '/') . '/uploads/media/' . urlencode($filename);
       
       $caption = $imageData['description'] ?? null;
-      $additionalCaption = $imageData['additional_description'] ?? null;
+      $additionalCaption = $imageData['additionalDescription'] ?? null;
       
       if ($caption && $additionalCaption) {
         $fullCaption = $caption . '. ' . $additionalCaption;
@@ -122,7 +122,7 @@ final class SitemapImagesBuilder
       
       $title = $imageData['description'] ?? pathinfo($filename, PATHINFO_FILENAME);
       $license = $imageData['license'] ?? null;
-      $geoLocation = $imageData['geo_location'] ?? null;
+      $geoLocation = $imageData['GEOLocation'] ?? null;
       
       $this->addImage($imageUrl, $fullCaption, $title, $license, $geoLocation);
       $count++;
@@ -151,7 +151,7 @@ final class SitemapImagesBuilder
     foreach ($this->images as $image) {
       $elementURL = $this->document->createElement('url');
       
-      $elementLoc = $this->document->createElement('loc', $image['image_url']);
+      $elementLoc = $this->document->createElement('loc', $image['imageURL']);
       $elementLastmod = $this->document->createElement('lastmod', date('Y-m-d'));
       $elementChangefreq = $this->document->createElement('changefreq', 'monthly');
       $elementPriority = $this->document->createElement('priority', '0.5');
@@ -162,7 +162,7 @@ final class SitemapImagesBuilder
       $elementURL->appendChild($elementPriority);
 
       $elementImage = $this->document->createElement('image:image');
-      $elementImageLoc = $this->document->createElement('image:loc', $image['image_url']);
+      $elementImageLoc = $this->document->createElement('image:loc', $image['imageURL']);
       $elementImage->appendChild($elementImageLoc);
 
       if (!empty($image['caption'])) {
@@ -181,7 +181,7 @@ final class SitemapImagesBuilder
       }
 
       if (!empty($image['geo_location'])) {
-        $elementImageGeoLocation = $this->document->createElement('image:geo_location', $image['geo_location']);
+        $elementImageGeoLocation = $this->document->createElement('image:geo_location', $image['GEOLocation']);
         $elementImage->appendChild($elementImageGeoLocation);
       }
 

@@ -112,11 +112,28 @@ export class PageMedia {
       inputAdditionalDescriptionElement.setAttribute('name', 'file_additional_description');
       inputAdditionalDescriptionElement.classList.add('form__textarea');
 
+      const inputAdditionalDescriptionElement = document.createElement('textarea');
+      inputAdditionalDescriptionElement.setAttribute('placeholder', 'Дополнительное описание файла');
+      inputAdditionalDescriptionElement.setAttribute('name', 'file_additional_description');
+      inputAdditionalDescriptionElement.classList.add('form__textarea');
+
+      const inputLicenseElement = document.createElement('textarea');
+      inputLicenseElement.setAttribute('placeholder', 'Лицензия файла');
+      inputLicenseElement.setAttribute('name', 'file_license');
+      inputLicenseElement.classList.add('form__textarea');
+
+      const inputGEOLocationElement = document.createElement('input');
+      inputGEOLocationElement.setAttribute('placeholder', 'Лицензия файла');
+      inputGEOLocationElement.setAttribute('name', 'file_geo_location');
+      inputGEOLocationElement.classList.add('form__input');
+
       const formElement = document.createElement('form');
       formElement.classList.add('form');
       formElement.classList.add('file-editor__form');
       formElement.append(inputDescriptionElement);
       formElement.append(inputAdditionalDescriptionElement);
+      formElement.append(inputLicenseElement);
+      formElement.append(inputGEOLocationElement);
 
       modalFileEditorBodyContent.append(formElement);
 
@@ -131,15 +148,21 @@ export class PageMedia {
       modalFileEditor.target.addButton('Сохранить', () => {
         const inputDescriptionElementQS = modalFileEditor.target.element.querySelector('[name="file_description"]');
         const inputAdditionalDescriptionElementQS = modalFileEditor.target.element.querySelector('[name="file_additional_description"]');
+        const inputLicenseElementQS = modalFileEditor.target.element.querySelector('[name="file_license"]');
+        const inputGEOLocationElementQS = modalFileEditor.target.element.querySelector('[name="file_geo_location"]');
         
         const fileDescription = inputDescriptionElementQS.value;
         const fileAdditionalDescription = inputAdditionalDescriptionElementQS.value;
+        const fileLicense = inputLicenseElementQS.value;
+        const fileGEOLocation = inputGEOLocationElementQS.value;
 
         const formData = new FormData();
         formData.append('file_fullname', fileName);
         formData.append('file_extension', fileExtension);
         formData.append('file_description', fileDescription);
         formData.append('file_additional_description', fileAdditionalDescription);
+        formData.append('file_license', fileLicense);
+        formData.append('file_geo_location', fileGEOLocation);
 
         const requestFileEditor = new Interactive('request', {
           method: 'PATCH',

@@ -24,6 +24,8 @@ if ($CMSCore->client->isLogged(2)) {
     $description = $_PATCH['file_description'] ?? '';
     $additionalDescription = $_PATCH['file_additional_description'] ?? '';
     $fileExtension = $_PATCH['file_extension'] ?? '';
+    $fileLicense = $_PATCH['file_license'] ?? '';
+    $fileGEOLocation = $_PATCH['file_geo_location'] ?? '';
 
     if (isset($_PATCH['file_fullname'])) {
       $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
@@ -43,6 +45,8 @@ if ($CMSCore->client->isLogged(2)) {
           'extension' => $fileExtension,
           'description' => $description,
           'additionalDescription' => $additionalDescription,
+          'license' => $fileLicense,
+          'GEOLocation' => $fileGEOLocation,
           'updatedAt' => date('Y-m-d H:i:s')
         ];
 
@@ -62,6 +66,8 @@ if ($CMSCore->client->isLogged(2)) {
                 'extension' => $extension,
                 'description' => '',
                 'additionalDescription' => '',
+                'license' => '',
+                'GEOLocation' => '',
                 'createdAt' => date('Y-m-d H:i:s', filemtime($fileDirectoryPath . '/' . $file))
               ];
             }
