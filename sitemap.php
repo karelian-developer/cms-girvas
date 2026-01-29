@@ -26,13 +26,15 @@ if (defined('IS_NOT_HACKED')) {
   $pagesStatic = new StaticPages($CMSCore);
 
   if ($CMSURLP->getPath(1) === 'images') {
-    $count = $imageSitemapBuilder->loadFromMetadata(
+    $sitemapImagesBuilder = new SitemapImagesBuilder($CMSCore);
+
+    $count = $sitemapImagesBuilder->loadFromMetadata(
       CMS_ROOT_DIRECTORY . '/uploads/media/metadata.json',
       $CMSCore->getSiteURL()
     );
 
-    $imageSitemapBuilder->assembly();
-    $imageSitemapXML = $imageSitemapBuilder->assembled;
+    $sitemapImagesBuilder->assembly();
+    $imageSitemapXML = $sitemapImagesBuilder->assembled;
 
     header('Content-Type: application/xml; charset=utf-8');
     echo $imageSitemapXML;
