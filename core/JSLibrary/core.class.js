@@ -318,7 +318,7 @@ export class Core {
     window.CMSCore.debugLog(1, 'CMSCore', `Core CMS is ready!`, true);
   }
 
-  static async loadIcons(iconsURL) {
+  async loadIcons(iconsURL) {
     const icons = {};
     const iconNames = ['trash', 'link', 'open'];
     
