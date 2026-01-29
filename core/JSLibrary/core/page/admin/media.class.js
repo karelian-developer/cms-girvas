@@ -160,6 +160,8 @@ export class PageMedia {
       });
 
       modalFileEditor.assembly();
+      document.body.appendChild(modalFileEditor.target.element);
+      modalFileEditor.target.show();
     });
 
     buttons.delete.assembly();
