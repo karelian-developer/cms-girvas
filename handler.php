@@ -371,6 +371,7 @@ if (defined('IS_NOT_HACKED')) {
               }
             } else {
               $handlerFileName = $pathes[$index] . '.api.php';
+              error_log($handlerFileName);
               $handlerFilePath = $handlersDirectoryPath . '/' . implode('/', array_slice($pathes, 1, count($pathes) - 2)) . '/' .  $handlerFileName;
               
               if (file_exists($handlerFilePath)) {
