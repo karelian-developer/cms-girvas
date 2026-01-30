@@ -351,6 +351,7 @@ if (defined('IS_NOT_HACKED')) {
     }
   
   } else {
+    error_log($CMSURLPathes[1]);
     if ($CMSURLPathes[1] !== null) {
       /**
        * Рекурсивный поиск файла обработчика в директории API
@@ -362,7 +363,7 @@ if (defined('IS_NOT_HACKED')) {
         $files = array_diff(scandir($handlersDirectoryPath), ['.', '..']);
         foreach ($files as $index => $name) {
           $path = isset($pathes[$index]) ? $pathes[$index] : null;
-          error_log($path);
+          
           if ($path !== null) {
             if (array_key_last($pathes) !== $index) {
               if ($name === $pathes[$index]) {
