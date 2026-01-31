@@ -1,0 +1,29 @@
+image: alpine/git:latest
+
+variables:
+  GITHUB_REPO_URL: "git@github.com:karelian-developer/cms-girvas.git"
+
+mirror_to_github:
+  stage: deploy
+  script:
+    # Настройка SSH
+    - mkdir -p ~/.ssh
+    - printf "%s" "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+    
+    # Конфигурация git (важно для корректной работы)
+    - git config --global user.email "gitlab-ci@example.com"
+    - git config --global user.name "GitLab CI"
+    
+    # Отзеркаливание
+    - git remote remove github 2>/dev/null || true
+    - git remote add github "$GITHUB_REPO_URL"
+    - git push --mirror github
+    
+    # Очистка SSH ключа (опционально, но рекомендуется)
+    - rm -f ~/.ssh/id_rsa
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  only:
+    - main  # или ваша основная ветка
