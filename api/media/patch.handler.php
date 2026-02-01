@@ -74,7 +74,7 @@ if ($CMSCore->client->isLogged(2)) {
           }
         }
 
-        $jsonResult = json_encode($imagesData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $jsonResult = json_encode($imagesData, JSON_UNESCAPED_UNICODE);
         file_put_contents($jsonFilePath, $jsonResult);
 
         if (file_exists($jsonFilePath)) {
