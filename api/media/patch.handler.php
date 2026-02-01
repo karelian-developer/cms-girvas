@@ -20,12 +20,12 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUserGroup->initData(['permissions']);
 
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_MEDIA_FILES_MANAGEMENT)) {
-    $fileFullname = $_PATCH['file_fullname'];
-    $description = $_PATCH['file_description'] ?? '';
-    $additionalDescription = $_PATCH['file_additional_description'] ?? '';
-    $fileExtension = $_PATCH['file_extension'] ?? '';
-    $fileLicense = $_PATCH['file_license'] ?? '';
-    $fileGEOLocation = $_PATCH['file_geo_location'] ?? '';
+    $fileFullname = trim($_PATCH['file_fullname']);
+    $description = trim($_PATCH['file_description']) ?? '';
+    $additionalDescription = trim($_PATCH['file_additional_description']) ?? '';
+    $fileExtension = trim($_PATCH['file_extension']) ?? '';
+    $fileLicense = trim($_PATCH['file_license']) ?? '';
+    $fileGEOLocation = trim($_PATCH['file_geo_location']) ?? '';
 
     if (isset($_PATCH['file_fullname'])) {
       $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';

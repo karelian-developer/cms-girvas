@@ -113,6 +113,7 @@ export class PageMedia {
         const inputDescriptionElement = document.createElement('textarea');
         inputDescriptionElement.setAttribute('placeholder', 'Название файла');
         inputDescriptionElement.setAttribute('name', 'file_description');
+        inputDescriptionElement.setAttribute('required', '');
         inputDescriptionElement.classList.add('form__textarea');
 
         const inputAdditionalDescriptionElement = document.createElement('textarea');
@@ -121,13 +122,15 @@ export class PageMedia {
         inputAdditionalDescriptionElement.classList.add('form__textarea');
 
         const inputLicenseElement = document.createElement('textarea');
-        inputLicenseElement.setAttribute('placeholder', 'Лицензия файла');
+        inputLicenseElement.setAttribute('placeholder', 'Лицензия (URL)');
         inputLicenseElement.setAttribute('name', 'file_license');
+        inputLicenseElement.setAttribute('type', 'url');
         inputLicenseElement.classList.add('form__textarea');
 
         const inputGEOLocationElement = document.createElement('input');
-        inputGEOLocationElement.setAttribute('placeholder', 'Геолокация');
+        inputGEOLocationElement.setAttribute('placeholder', 'RU');
         inputGEOLocationElement.setAttribute('name', 'file_geo_location');
+        inputGEOLocationElement.setAttribute('pattern', '^(A[^ABCHJKNPVY]|B[^CKPUX]|C[^BEJPQST]|D[EJKMOZ]|E[CEGHRST]|F[IJKMOR]|G[^CJKOVXZ]|H[KMNRTU]|I[DEL-OQ-T]|J[EMOP]|K[EGHIMNPRWYZ]|L[ABCIKR-VY]|M[^BIJ]|N[ACEFGILOPRUZ]|O[M]|P[^BEIJLOXY]|QA|R[EOSUW]|S[^FPQUW]|T[^BEIPQSUXY]|U[AGMSYZ]|V[ACEGINU]|W[FS]|XK|Y[ET]|Z[AMW])$');
         inputGEOLocationElement.classList.add('form__input');
 
         const formElement = document.createElement('form');
