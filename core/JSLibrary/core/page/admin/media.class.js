@@ -195,10 +195,10 @@ export class PageMedia {
           const metadata = data?.outputData?.metadata;
 
           if (metadata !== undefined) {
-            inputDescriptionElement.value = data?.description;
-            inputAdditionalDescriptionElement.value = data?.additionalDescription;
-            inputLicenseElement.value = data?.license;
-            inputGEOLocationElement.value = data?.GEOLocation;
+            inputDescriptionElement.value = metadata.description;
+            inputAdditionalDescriptionElement.value = metadata.additionalDescription;
+            inputLicenseElement.value = metadata.license;
+            inputGEOLocationElement.value = metadata.GEOLocation;
           }
         }
       });
