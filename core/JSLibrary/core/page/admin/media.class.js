@@ -192,11 +192,14 @@ export class PageMedia {
         modalFileEditor.target.show();
 
         if (data.statusCode === 1) {
-          console.log(data);
-          inputDescriptionElement.value = data?.description;
-          inputAdditionalDescriptionElement.value = data?.additionalDescription;
-          inputLicenseElement.value = data?.license;
-          inputGEOLocationElement.value = data?.GEOLocation;
+          const metadata = data?.outputData?.metadata;
+
+          if (metadata !== undefined) {
+            inputDescriptionElement.value = data?.description;
+            inputAdditionalDescriptionElement.value = data?.additionalDescription;
+            inputLicenseElement.value = data?.license;
+            inputGEOLocationElement.value = data?.GEOLocation;
+          }
         }
       });
     });
