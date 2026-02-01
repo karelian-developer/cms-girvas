@@ -30,8 +30,8 @@ if ($CMSCore->client->isLogged(2)) {
 
     if (file_exists($fileMetadataPath)) {
       $filename = $CMSURLP->getParam('fileName');
-      error_log($filename);
-      $metadata = json_decode($fileMetadataPath, true);
+      $metadata = file_get_contents($fileMetadataPath);
+      $metadataJSON = json_decode($metadata, true);
       $handlerOutputData['metadata'] = $filename === null
         ? $metadata
         : $metadata[$filename];
