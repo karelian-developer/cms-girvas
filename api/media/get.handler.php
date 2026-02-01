@@ -15,7 +15,7 @@ if (!defined('IS_NOT_HACKED')) {
 
 if ($CMSCore->client->isLogged(2)) {
 
-  if ($CMSURLP->getPath(3) === 'metadata') {
+  if ($CMSURLP->getPath(2) === 'metadata') {
 
     $filesDirectoryPathParam = $CMSURLP->getParam('directory') !== null
       ? urldecode($CMSURLP->getParam('directory'))
