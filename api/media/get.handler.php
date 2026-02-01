@@ -33,8 +33,8 @@ if ($CMSCore->client->isLogged(2)) {
       $metadata = file_get_contents($fileMetadataPath);
       $metadataJSON = json_decode($metadata, true);
       $handlerOutputData['metadata'] = $filename === null
-        ? $metadata
-        : $metadata[$filename];
+        ? $metadataJSON
+        : $metadataJSON[$filename];
       
       $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
       $handlerStatusCode = $handlerStatusCode ?? 1;
