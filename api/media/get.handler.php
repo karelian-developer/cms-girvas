@@ -30,9 +30,10 @@ if ($CMSCore->client->isLogged(2)) {
 
     if (file_exists($fileMetadataPath)) {
       $filename = $CMSURLP->getParam('fileName');
+      error_log($filename);
       $metadata = json_decode($fileMetadataPath, true);
       $handlerOutputData['metadata'] = $filename === null
-        ? json_decode($fileMetadataPath, true)
+        ? $metadata
         : $metadata[$filename];
       
       $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
