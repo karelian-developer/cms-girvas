@@ -351,27 +351,26 @@ if (defined('IS_NOT_HACKED')) {
     }
   
   } else {
-    error_log($CMSURLPathes[1]);
     if ($CMSURLPathes[1] !== null) {
       /**
        * Рекурсивный поиск файла обработчика в директории API
        */
-      $recursionHandlerConnect = function(CMSCore $CMSCore, array $pathes, int $index) use (&$recursionHandlerConnect) : string|null
+      $recursionHandlerConnect = function(CMSCore $CMSCore, array $pathes, int $level) use (&$recursionHandlerConnect) : string|null
       {
         $handlersDirectoryPath = CMS_ROOT_DIRECTORY . '/api';
 
         $files = array_diff(scandir($handlersDirectoryPath), ['.', '..']);
         foreach ($files as $index => $name) {
-          $path = isset($pathes[$index]) ? $pathes[$index] : null;
-          
+          $path = isset($pathes[$level]) ? $pathes[$level] : null;
+          error_log($path);
           if ($path !== null) {
-            if (array_key_last($pathes) !== $index) {
-              if ($name === $pathes[$index]) {
+            if (array_key_last($pathes) !== $level) {
+              if ($name === $pathes[$level]) {
                 $URLPathes = $CMSURLP->getPathes();
-                return $recursionHandlerConnect($CMSCore, $URLPathes, $index + 1);
+                return $recursionHandlerConnect($CMSCore, $URLPathes, $level + 1);
               }
             } else {
-              $handlerFileName = $pathes[$index] . '.api.php';
+              $handlerFileName = $pathes[$level] . '.api.php';
               $handlerFilePath = $handlersDirectoryPath . '/' . implode('/', array_slice($pathes, 1, count($pathes) - 2)) . '/' .  $handlerFileName;
               
               if (file_exists($handlerFilePath)) {
