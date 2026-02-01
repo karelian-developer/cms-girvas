@@ -14,85 +14,116 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 if ($CMSCore->client->isLogged(2)) {
-  $handlerOutputData['dom'] = [];
 
-  $filesDirectoryPathParam = $CMSURLP->getParam('directory') !== null
-    ? urldecode($CMSURLP->getParam('directory'))
-    : null;
+  if ($CMSURLP->getPath(3) === 'metadata') {
 
-  $filesDirectoryPath = $filesDirectoryPathParam === null
-    ? '/uploads/media'
-    : $filesDirectoryPathParam;
+    $filesDirectoryPathParam = $CMSURLP->getParam('directory') !== null
+      ? urldecode($CMSURLP->getParam('directory'))
+      : null;
 
-  $filesDirectoryPathWithRoot = CMS_ROOT_DIRECTORY . $filesDirectoryPath;
+    $filesDirectoryPath = $filesDirectoryPathParam === null
+      ? '/uploads/media'
+      : $filesDirectoryPathParam;
 
-  $files = array_diff(scandir($filesDirectoryPathWithRoot), ['.', '..']);
+    $filesDirectoryPathWithRoot = CMS_ROOT_DIRECTORY . $filesDirectoryPath;
+    $fileMetadataPath = $filesDirectoryPathWithRoot . '/metadata.json';
 
-  usort($files, function($a, $b) use ($filesDirectoryPathWithRoot) {
-    $pathA = $filesDirectoryPathWithRoot . DIRECTORY_SEPARATOR . $a;
-    $pathB = $filesDirectoryPathWithRoot . DIRECTORY_SEPARATOR . $b;
-    
-    $isDirA = is_dir($pathA);
-    $isDirB = is_dir($pathB);
-    
-    if ($isDirA === $isDirB) {
-      $timeA = filemtime($pathA);
-      $timeB = filemtime($pathB);
+    if (file_exists($fileMetadataPath)) {
+      $filename = $CMSURLP->getParam('fileName');
+      $metadata = json_decode($fileMetadataPath, true);
+      $handlerOutputData['metadata'] = $filename === null
+        ? json_decode($fileMetadataPath, true)
+        : $metadata[$filename];
       
-      if ($timeA === $timeB) {
-        return 0;
-      }
-
-      return ($timeA > $timeB) ? -1 : 1;
+      $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+      $handlerStatusCode = $handlerStatusCode ?? 1;
+    } else {
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
-    
-    return $isDirA ? 1 : -1;
-  });
 
-  $filesData = [];
-
-  foreach ($files as $file) {
-    /** @var string */
-    $filePath = $filesDirectoryPathWithRoot . '/' . $file;
-    /** @var string */
-    $URL = $filesDirectoryPath . '/' . $file;
-    
-    $filesData[] = [
-      'fileURL' => $URL,
-      'filePath' => $filesDirectoryPath,
-      'isDirectory' => is_dir($filePath),
-      'fileExtension' => pathinfo($filePath, PATHINFO_EXTENSION),
-      'fileName' => pathinfo($filePath, PATHINFO_FILENAME),
-      'createdUnixTimestamp' => filemtime($filePath)
-    ];
-  }
-
-  $filesSorted = [];
-  foreach ($filesData as $data) {
-    $filesSorted[] = [
-      'URL' => $data['fileURL'],
-      'isDirectory' => $data['isDirectory'],
-      'createdUnixTimestamp' => $data['createdUnixTimestamp']
-    ];
-  }
-
-  $filesTransformed = [];
-  foreach ($filesSorted as $fileData) {
-    $filesTransformed[] = [
-      'URL' => $fileData['URL'],
-      'isDirectory' => (bool) $fileData['isDirectory'],
-      'createdUnixTimestamp' => (int) $fileData['createdUnixTimestamp']
-    ];
-  }
-
-  $handlerOutputData['items'] = $filesTransformed;
-
-  if (!empty($filesTransformed)) {
-    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
-    $handlerStatusCode = $handlerStatusCode ?? 1;
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_FILES_ERROR_NOT_FOUND');
-    $handlerStatusCode = $handlerStatusCode ?? 0;
+
+    $handlerOutputData['dom'] = [];
+
+    $filesDirectoryPathParam = $CMSURLP->getParam('directory') !== null
+      ? urldecode($CMSURLP->getParam('directory'))
+      : null;
+
+    $filesDirectoryPath = $filesDirectoryPathParam === null
+      ? '/uploads/media'
+      : $filesDirectoryPathParam;
+
+    $filesDirectoryPathWithRoot = CMS_ROOT_DIRECTORY . $filesDirectoryPath;
+
+    $files = array_diff(scandir($filesDirectoryPathWithRoot), ['.', '..']);
+
+    usort($files, function($a, $b) use ($filesDirectoryPathWithRoot) {
+      $pathA = $filesDirectoryPathWithRoot . DIRECTORY_SEPARATOR . $a;
+      $pathB = $filesDirectoryPathWithRoot . DIRECTORY_SEPARATOR . $b;
+      
+      $isDirA = is_dir($pathA);
+      $isDirB = is_dir($pathB);
+      
+      if ($isDirA === $isDirB) {
+        $timeA = filemtime($pathA);
+        $timeB = filemtime($pathB);
+        
+        if ($timeA === $timeB) {
+          return 0;
+        }
+
+        return ($timeA > $timeB) ? -1 : 1;
+      }
+      
+      return $isDirA ? 1 : -1;
+    });
+
+    $filesData = [];
+
+    foreach ($files as $file) {
+      /** @var string */
+      $filePath = $filesDirectoryPathWithRoot . '/' . $file;
+      /** @var string */
+      $URL = $filesDirectoryPath . '/' . $file;
+      
+      $filesData[] = [
+        'fileURL' => $URL,
+        'filePath' => $filesDirectoryPath,
+        'isDirectory' => is_dir($filePath),
+        'fileExtension' => pathinfo($filePath, PATHINFO_EXTENSION),
+        'fileName' => pathinfo($filePath, PATHINFO_FILENAME),
+        'createdUnixTimestamp' => filemtime($filePath)
+      ];
+    }
+
+    $filesSorted = [];
+    foreach ($filesData as $data) {
+      $filesSorted[] = [
+        'URL' => $data['fileURL'],
+        'isDirectory' => $data['isDirectory'],
+        'createdUnixTimestamp' => $data['createdUnixTimestamp']
+      ];
+    }
+
+    $filesTransformed = [];
+    foreach ($filesSorted as $fileData) {
+      $filesTransformed[] = [
+        'URL' => $fileData['URL'],
+        'isDirectory' => (bool) $fileData['isDirectory'],
+        'createdUnixTimestamp' => (int) $fileData['createdUnixTimestamp']
+      ];
+    }
+
+    $handlerOutputData['items'] = $filesTransformed;
+
+    if (!empty($filesTransformed)) {
+      $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+      $handlerStatusCode = $handlerStatusCode ?? 1;
+    } else {
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_FILES_ERROR_NOT_FOUND');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
+    }
   }
 } else {
   http_response_code(401);

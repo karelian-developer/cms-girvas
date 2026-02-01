@@ -99,89 +99,105 @@ export class PageMedia {
     buttons.edit.target.setCallback((event) => {
       event.preventDefault();
 
-      const modalFileEditorBodyContent = document.createElement('div');
-      modalFileEditorBodyContent.classList.add('file-editor');
+      const filePath = fileURL.split('/').slice(0, -1).join('/');
 
-      const inputDescriptionElement = document.createElement('textarea');
-      inputDescriptionElement.setAttribute('placeholder', 'Описание файла');
-      inputDescriptionElement.setAttribute('name', 'file_description');
-      inputDescriptionElement.classList.add('form__textarea');
+      const requestMetadata = new Interactive('request', {
+        method: 'GET',
+        url: '/handler/media/metadata?directory=' + filePath + '&fileName=' + fileName + '.' + fileExtension + '&localeMessage=' + window.CMSCore.locales.admin.name
+      });
 
-      const inputAdditionalDescriptionElement = document.createElement('textarea');
-      inputAdditionalDescriptionElement.setAttribute('placeholder', 'Дополнительное описание файла');
-      inputAdditionalDescriptionElement.setAttribute('name', 'file_additional_description');
-      inputAdditionalDescriptionElement.classList.add('form__textarea');
+      requestMetadata.target.send().then((data) => {
+        const modalFileEditorBodyContent = document.createElement('div');
+        modalFileEditorBodyContent.classList.add('file-editor');
 
-      const inputLicenseElement = document.createElement('textarea');
-      inputLicenseElement.setAttribute('placeholder', 'Лицензия файла');
-      inputLicenseElement.setAttribute('name', 'file_license');
-      inputLicenseElement.classList.add('form__textarea');
+        const inputDescriptionElement = document.createElement('textarea');
+        inputDescriptionElement.setAttribute('placeholder', 'Название файла');
+        inputDescriptionElement.setAttribute('name', 'file_description');
+        inputDescriptionElement.classList.add('form__textarea');
 
-      const inputGEOLocationElement = document.createElement('input');
-      inputGEOLocationElement.setAttribute('placeholder', 'Геолокация');
-      inputGEOLocationElement.setAttribute('name', 'file_geo_location');
-      inputGEOLocationElement.classList.add('form__input');
+        const inputAdditionalDescriptionElement = document.createElement('textarea');
+        inputAdditionalDescriptionElement.setAttribute('placeholder', 'Описание файла');
+        inputAdditionalDescriptionElement.setAttribute('name', 'file_additional_description');
+        inputAdditionalDescriptionElement.classList.add('form__textarea');
 
-      const formElement = document.createElement('form');
-      formElement.classList.add('form');
-      formElement.classList.add('file-editor__form');
-      formElement.append(inputDescriptionElement);
-      formElement.append(inputAdditionalDescriptionElement);
-      formElement.append(inputLicenseElement);
-      formElement.append(inputGEOLocationElement);
+        const inputLicenseElement = document.createElement('textarea');
+        inputLicenseElement.setAttribute('placeholder', 'Лицензия файла');
+        inputLicenseElement.setAttribute('name', 'file_license');
+        inputLicenseElement.classList.add('form__textarea');
 
-      modalFileEditorBodyContent.append(formElement);
+        const inputGEOLocationElement = document.createElement('input');
+        inputGEOLocationElement.setAttribute('placeholder', 'Геолокация');
+        inputGEOLocationElement.setAttribute('name', 'file_geo_location');
+        inputGEOLocationElement.classList.add('form__input');
 
-      const modalFileEditor = new Interactive('modal',
-        {
-          title: "Изменить файл",
-          content: modalFileEditorBodyContent,
-          width: window.innerWidth - 100
-        }
-      );
+        const formElement = document.createElement('form');
+        formElement.classList.add('form');
+        formElement.classList.add('file-editor__form');
+        formElement.append(inputDescriptionElement);
+        formElement.append(inputAdditionalDescriptionElement);
+        formElement.append(inputLicenseElement);
+        formElement.append(inputGEOLocationElement);
 
-      modalFileEditor.target.addButton('Сохранить', () => {
-        const inputDescriptionElementQS = modalFileEditor.target.element.querySelector('[name="file_description"]');
-        const inputAdditionalDescriptionElementQS = modalFileEditor.target.element.querySelector('[name="file_additional_description"]');
-        const inputLicenseElementQS = modalFileEditor.target.element.querySelector('[name="file_license"]');
-        const inputGEOLocationElementQS = modalFileEditor.target.element.querySelector('[name="file_geo_location"]');
-        
-        const fileDescription = inputDescriptionElementQS.value;
-        const fileAdditionalDescription = inputAdditionalDescriptionElementQS.value;
-        const fileLicense = inputLicenseElementQS.value;
-        const fileGEOLocation = inputGEOLocationElementQS.value;
+        modalFileEditorBodyContent.append(formElement);
 
-        const formData = new FormData();
-        formData.append('file_fullname', fileName);
-        formData.append('file_extension', fileExtension);
-        formData.append('file_description', fileDescription);
-        formData.append('file_additional_description', fileAdditionalDescription);
-        formData.append('file_license', fileLicense);
-        formData.append('file_geo_location', fileGEOLocation);
-
-        const requestFileEditor = new Interactive('request', {
-          method: 'PATCH',
-          url: '/handler/media?localeMessage=' + window.CMSCore.locales.admin.name
-        });
-
-        requestFileEditor.target.data = formData;
-
-        requestFileEditor.target.send().then((data) => {
-          if (data.statusCode === 1) {
-            // ...
+        const modalFileEditor = new Interactive('modal',
+          {
+            title: "Изменить файл",
+            content: modalFileEditorBodyContent,
+            width: window.innerWidth - 100
           }
+        );
+
+        modalFileEditor.target.addButton('Сохранить', () => {
+          const inputDescriptionElementQS = modalFileEditor.target.element.querySelector('[name="file_description"]');
+          const inputAdditionalDescriptionElementQS = modalFileEditor.target.element.querySelector('[name="file_additional_description"]');
+          const inputLicenseElementQS = modalFileEditor.target.element.querySelector('[name="file_license"]');
+          const inputGEOLocationElementQS = modalFileEditor.target.element.querySelector('[name="file_geo_location"]');
+          
+          const fileDescription = inputDescriptionElementQS.value;
+          const fileAdditionalDescription = inputAdditionalDescriptionElementQS.value;
+          const fileLicense = inputLicenseElementQS.value;
+          const fileGEOLocation = inputGEOLocationElementQS.value;
+
+          const formData = new FormData();
+          formData.append('file_fullname', fileName);
+          formData.append('file_extension', fileExtension);
+          formData.append('file_description', fileDescription);
+          formData.append('file_additional_description', fileAdditionalDescription);
+          formData.append('file_license', fileLicense);
+          formData.append('file_geo_location', fileGEOLocation);
+
+          const requestFileEditor = new Interactive('request', {
+            method: 'PATCH',
+            url: '/handler/media?localeMessage=' + window.CMSCore.locales.admin.name
+          });
+
+          requestFileEditor.target.data = formData;
+
+          requestFileEditor.target.send().then((data1) => {
+            if (data1.statusCode === 1) {
+              // ...
+            }
+          });
+
+          modalFileEditor.target.close();
         });
 
-        modalFileEditor.target.close();
-      });
+        modalFileEditor.target.addButton('Отмена', () => {
+          modalFileEditor.target.close();
+        });
 
-      modalFileEditor.target.addButton('Отмена', () => {
-        modalFileEditor.target.close();
-      });
+        modalFileEditor.assembly();
+        document.body.appendChild(modalFileEditor.target.element);
+        modalFileEditor.target.show();
 
-      modalFileEditor.assembly();
-      document.body.appendChild(modalFileEditor.target.element);
-      modalFileEditor.target.show();
+        if (data.statusCode === 1) {
+          inputDescriptionElement.value = data?.description;
+          inputAdditionalDescriptionElement.value = data?.additionalDescription;
+          inputLicenseElement.value = data?.license;
+          inputGEOLocationElement.value = data?.GEOLocation;
+        }
+      });
     });
 
     buttons.delete.assembly();
