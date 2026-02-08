@@ -363,7 +363,7 @@ if (defined('IS_NOT_HACKED')) {
         $files = array_diff(scandir($handlersDirectoryPath), ['.', '..']);
         foreach ($files as $index => $name) {
           $path = isset($pathes[$level]) ? $pathes[$level] : null;
-          error_log($path);
+          
           if ($path !== null) {
             if (array_key_last($pathes) !== $level) {
               if ($name === $pathes[$level]) {
