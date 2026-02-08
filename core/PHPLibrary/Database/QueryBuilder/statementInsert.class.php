@@ -83,19 +83,17 @@ final class StatementInsert implements InterfaceStatement
    */
   public function getTable() : string
   {
-    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+    $databaseConfigurations = $this->queryBuilder->CMSCore->configurator->get('database');
     
     $tableFullname = '';
-    if ($CMSConfigDatabase !== null) {
-      if (
-        $CMSConfigDatabase['scheme'] !== ''
-        && $CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL
-      ) {
-        $tableFullname .= $CMSConfigDatabase['scheme'] . '.';
+    if ($databaseConfigurations !== null) {
+      if ($databaseConfigurations['scheme'] !== '') {
+        $tableFullname .= $databaseConfigurations['scheme'] . '.';
       }
 
-      if ($CMSConfigDatabase['prefix'] !== '') {
-        $tableFullname .= $CMSConfigDatabase['prefix'] . '_';
+      if ($databaseConfigurations['prefix'] !== '' || $this->tablePrefix !== '') {
+        $tablePrefix = $this->tablePrefix === '' ? $databaseConfigurations['prefix'] : $this->tablePrefix;
+        $tableFullname .= $tablePrefix . '_';
       }
     }
 
