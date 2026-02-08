@@ -357,6 +357,7 @@ if (defined('IS_NOT_HACKED')) {
        */
       $recursionHandlerConnect = function(CMSCore $CMSCore, array $pathes, int $level) use (&$recursionHandlerConnect) : string|null
       {
+        $CMSURLP = $CMSCore->urlp;
         $handlersDirectoryPath = CMS_ROOT_DIRECTORY . '/api';
 
         $files = array_diff(scandir($handlersDirectoryPath), ['.', '..']);
