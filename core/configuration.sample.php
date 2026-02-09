@@ -59,5 +59,6 @@ $configuration = [
     'max' => '',
     'vk' => '',
     'ok' => ''
-  ]
+  ],
+  'APISecret' => ''
 ];

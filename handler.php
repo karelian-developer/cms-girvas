@@ -26,32 +26,13 @@ if (defined('IS_NOT_HACKED')) {
   $CMSClient = $CMSCore->client;
   $CMSConfigurator = $CMSCore->configurator;
 
+  define('API_SECRET', $CMSConfigurator->get('APISecret'));
   header('Access-Control-Allow-Origin: ' . $CMSConfigurator->get('domain'));
 
   $handlerHeaders = apache_request_headers();
   $normalizedHeaders = array_change_key_case($handlerHeaders, CASE_LOWER);
 
   $PHPInputContent = file_get_contents('php://input');
-
-  if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $CMSURLP->getPath(1) !== 'install') {
-    $cookieToken = $_COOKIE['_grv_csrf'] ?? null;
-
-    $headerToken = $normalizedHeaders['x-csrf-token'] ?? null;
-
-    if ($cookieToken === null || $headerToken === null || !hash_equals($cookieToken, $headerToken)) {
-      $handlerMessage = $handlerMessage ?? 'The request was rejected by the security system.';
-      $handlerStatusCode = $handlerStatusCode ?? 0;
-
-      echo json_encode([
-        'message' => $handlerMessage,
-        'statusCode' => $handlerStatusCode,
-        'outputData' => []
-      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
-      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-
-      exit;
-    }
-  }
 
   if (isset($_SERVER['REQUEST_METHOD'])) {
     switch ($_SERVER['REQUEST_METHOD']) {
@@ -73,6 +54,34 @@ if (defined('IS_NOT_HACKED')) {
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   }
 
+  $APISecretInput = match ($_SERVER['REQUEST_METHOD']) {
+    'PATCH' => $_PATCH['APISecret'] ?? null,
+    'PUT' => $_PUT['APISecret'] ?? null,
+    'DELETE' => $_DELETE['APISecret'] ?? null,
+    'POST' => $_POST['APISecret'] ?? null,
+    'GET' => $_GET['APISecret'] ?? null
+  };
+
+  if ($APISecretInput !== API_SECRET || empty(API_SECRET)) {
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $CMSURLP->getPath(1) !== 'install') {
+      $cookieToken = $_COOKIE['_grv_csrf'] ?? null;
+      $headerToken = $normalizedHeaders['x-csrf-token'] ?? null;
+
+      if ($cookieToken === null || $headerToken === null || !hash_equals($cookieToken, $headerToken)) {
+        $handlerMessage = $handlerMessage ?? 'The request was rejected by the security system.';
+        $handlerStatusCode = $handlerStatusCode ?? 0;
+
+        echo json_encode([
+          'message' => $handlerMessage,
+          'statusCode' => $handlerStatusCode,
+          'outputData' => []
+        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+        exit;
+      }
+    }
+  }
   $handlerOutputData = [];
 
   /** ===================================================

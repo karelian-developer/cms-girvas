@@ -447,6 +447,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       fwrite($file, '    \'vk\' => \'\',' . PHP_EOL);
       fwrite($file, '    \'ok\' => \'\'' . PHP_EOL);
       fwrite($file, '  ],' . PHP_EOL);
+      fwrite($file, '  \'APISecret\' => \'' . md5($domain . $CMSSalt) . '\'' . PHP_EOL);
       fwrite($file, '];' . PHP_EOL);
       fwrite($file, PHP_EOL);
       fclose($file);
