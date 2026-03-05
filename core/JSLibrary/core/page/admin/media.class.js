@@ -329,7 +329,7 @@ export class PageMedia {
         }
 
         interactiveSortChoices.target.addItem(this.localeData.SORT_BY_CREATEDTIMESTAMP_INCREASE, 'by_createdtimestamp_increase');
-        interactiveSortChoices.target.addItem(this.localeData.SORT_BY_CREATEDTIMESTAMP_DECREASE, 'sby_createdtimestamp_decrease');
+        interactiveSortChoices.target.addItem(this.localeData.SORT_BY_CREATEDTIMESTAMP_DECREASE, 'by_createdtimestamp_decrease');
         interactiveSortChoices.target.addItem(this.localeData.SORT_BY_ALPHABET_INCREASE, 'by_alphabet_increase');
         interactiveSortChoices.target.addItem(this.localeData.SORT_BY_ALPHABET_DECREASE, 'by_alphabet_decrease');
 
