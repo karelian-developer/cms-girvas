@@ -110,7 +110,7 @@ class PageMedia implements InterfacePage
 
     $filesTransformed = [];
     foreach ($filesData as $file) {
-      $URL = '/uploads/media/' . $file;
+      $URL = '/uploads/media/' . $file['fileName'];
       $fileTemplatePath = $file['isDirectory']
         ? 'templates/page/media/directory.tpl'
         : 'templates/page/media/file.tpl';
