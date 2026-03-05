@@ -328,23 +328,23 @@ export class PageMedia {
           this.initMediaElement(listElement);
         }
 
-        interactiveContainerPagePanelElement.target.addItem(this.localeData.SORT_BY_CREATEDTIMESTAMP_INCREASE, 'by_createdtimestamp_increase');
-        interactiveContainerPagePanelElement.target.addItem(this.localeData.SORT_BY_CREATEDTIMESTAMP_DECREASE, 'sby_createdtimestamp_decrease');
-        interactiveContainerPagePanelElement.target.addItem(this.localeData.SORT_BY_ALPHABET_INCREASE, 'by_alphabet_increase');
-        interactiveContainerPagePanelElement.target.addItem(this.localeData.SORT_BY_ALPHABET_DECREASE, 'by_alphabet_decrease');
+        interactiveSortChoices.target.addItem(this.localeData.SORT_BY_CREATEDTIMESTAMP_INCREASE, 'by_createdtimestamp_increase');
+        interactiveSortChoices.target.addItem(this.localeData.SORT_BY_CREATEDTIMESTAMP_DECREASE, 'sby_createdtimestamp_decrease');
+        interactiveSortChoices.target.addItem(this.localeData.SORT_BY_ALPHABET_INCREASE, 'by_alphabet_increase');
+        interactiveSortChoices.target.addItem(this.localeData.SORT_BY_ALPHABET_DECREASE, 'by_alphabet_decrease');
 
         const currentSort = this.page.core.searchParams.getParam('sort');
         if (currentSort !== null) {
           switch (currentSort) {
-            case 'by_createdtimestamp_increase': interactiveContainerPagePanelElement.target.setItemSelectedIndex(0); break;
-            case 'sby_createdtimestamp_decrease': interactiveContainerPagePanelElement.target.setItemSelectedIndex(1); break;
-            case 'by_alphabet_increase': interactiveContainerPagePanelElement.target.setItemSelectedIndex(2); break;
-            case 'by_alphabet_decrease': interactiveContainerPagePanelElement.target.setItemSelectedIndex(3); break;
-            default: interactiveContainerPagePanelElement.target.setItemSelectedIndex(0); break;
+            case 'by_createdtimestamp_increase': interactiveSortChoices.target.setItemSelectedIndex(0); break;
+            case 'sby_createdtimestamp_decrease': interactiveSortChoices.target.setItemSelectedIndex(1); break;
+            case 'by_alphabet_increase': interactiveSortChoices.target.setItemSelectedIndex(2); break;
+            case 'by_alphabet_decrease': interactiveSortChoices.target.setItemSelectedIndex(3); break;
+            default: interactiveSortChoices.target.setItemSelectedIndex(0); break;
           }
         }
 
-        interactiveContainerPagePanelElement.assembly();
+        interactiveSortChoices.assembly();
 
         this.buttons.upload = new Interactive('button');
         this.buttons.upload.target.setLabel(this.localeData.BUTTON_UPLOAD_LABEL);
@@ -356,13 +356,13 @@ export class PageMedia {
 
         this.buttons.upload.assembly();
 
-        interactiveContainerPagePanelElement.target.element.addEventListener('change', () => {
+        interactiveSortChoices.target.element.addEventListener('change', () => {
           const currentURL = new URL(window.location.href);
-          currentURL.searchParams.set('sort', interactiveContainerPagePanelElement.target.getValue());
+          currentURL.searchParams.set('sort', interactiveSortChoices.target.getValue());
           window.location.href = currentURL.toString();
         });
 
-        interactiveContainerPagePanelElement.append(interactiveContainerPagePanelElement.target.element);
+        interactiveContainerPagePanelElement.append(interactiveSortChoices.target.element);
         interactiveContainerPagePanelElement.append(this.buttons.upload.target.element);
       });
     }
