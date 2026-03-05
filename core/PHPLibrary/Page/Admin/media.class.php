@@ -71,11 +71,9 @@ class PageMedia implements InterfacePage
       
       switch ($filesSortRule) {
         case 'by_createdtimestamp_increase':
-          $timeA = filectime($pathA) ?: 0;
-          $timeB = filectime($pathB) ?: 0;
+          $timeA = filemtime($pathA) ?: 0;
+          $timeB = filemtime($pathB) ?: 0;
 
-          error_log($timeA . ' ' . $timeB . ' ' . $pathA . ' ' . $pathB);
-          
           if ($timeA === $timeB) {
             return strcasecmp($a, $b);
           }
@@ -83,8 +81,8 @@ class PageMedia implements InterfacePage
           return $timeA - $timeB;
             
         case 'by_createdtimestamp_decrease':
-          $timeA = filectime($pathA) ?: 0;
-          $timeB = filectime($pathB) ?: 0;
+          $timeA = filemtime($pathA) ?: 0;
+          $timeB = filemtime($pathB) ?: 0;
           
           if ($timeA === $timeB) {
             return strcasecmp($a, $b);
