@@ -58,7 +58,7 @@ class PageMedia implements InterfacePage
 
     $files = array_diff(scandir($filesDirectoryPathWithRoot), ['.', '..']);
 
-    usort($files, function($a, $b) use ($filesDirectoryPathWithRoot) {
+    usort($files, function($a, $b) use ($filesDirectoryPathWithRoot, $filesSortRule) {
       $pathA = $filesDirectoryPathWithRoot . DIRECTORY_SEPARATOR . $a;
       $pathB = $filesDirectoryPathWithRoot . DIRECTORY_SEPARATOR . $b;
       
