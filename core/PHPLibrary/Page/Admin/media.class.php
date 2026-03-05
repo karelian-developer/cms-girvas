@@ -57,7 +57,7 @@ class PageMedia implements InterfacePage
     $filesDirectoryPathWithRoot = CMS_ROOT_DIRECTORY . $filesDirectoryPath;
 
     $files = array_diff(scandir($filesDirectoryPathWithRoot), ['.', '..']);
-  error_log($filesDirectoryPathWithRoot);
+  
     usort($files, function($a, $b) use ($filesDirectoryPathWithRoot, $filesSortRule) {
       $pathA = $filesDirectoryPathWithRoot . DIRECTORY_SEPARATOR . $a;
       $pathB = $filesDirectoryPathWithRoot . DIRECTORY_SEPARATOR . $b;
@@ -73,6 +73,8 @@ class PageMedia implements InterfacePage
         case 'by_createdtimestamp_increase':
           $timeA = filectime($pathA) ?: 0;
           $timeB = filectime($pathB) ?: 0;
+
+          error_log($timeA . ' ' . $timeB . ' ' . $filesDirectoryPathWithRoot);
           
           if ($timeA === $timeB) {
             return strcasecmp($a, $b);
