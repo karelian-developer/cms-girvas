@@ -356,7 +356,7 @@ export class PageMedia {
 
         this.buttons.upload.assembly();
 
-        interactiveSortChoices.target.element.addEventListener('change', () => {
+        interactiveSortChoices.target.elementSelect.addEventListener('change', () => {
           const currentURL = new URL(window.location.href);
           currentURL.searchParams.set('sort', interactiveSortChoices.target.getValue());
           window.location.href = currentURL.toString();
