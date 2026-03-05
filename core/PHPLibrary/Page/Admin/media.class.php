@@ -48,6 +48,8 @@ class PageMedia implements InterfacePage
       ? urldecode($this->CMSCore->urlp->getParam('directory'))
       : null;
 
+    $filesSortRule = $this->CMSCore->urlp->getParam('sort') ?? 'by_alphabet_increase';
+
     $filesDirectoryPath = $filesDirectoryPathParam === null
     ? '/uploads/media'
     : $filesDirectoryPathParam;
@@ -63,11 +65,24 @@ class PageMedia implements InterfacePage
       $isDirA = is_dir($pathA);
       $isDirB = is_dir($pathB);
       
-      if ($isDirA === $isDirB) {
-        return strcasecmp($a, $b);
+      if ($isDirA !== $isDirB) {
+        return $isDirA ? -1 : 1;
       }
       
-      return $isDirA ? -1 : 1;
+      switch ($filesSortRule) {
+        case 'by_createdtimestamp_increase':
+          return filectime($pathA) - filectime($pathB);
+            
+        case 'by_createdtimestamp_decrease':
+          return filectime($pathB) - filectime($pathA);
+            
+        case 'by_alphabet_decrease':
+          return strcasecmp($b, $a);
+            
+        case 'by_alphabet_increase':
+        default:
+          return strcasecmp($a, $b);
+      }
     });
 
     $filesCount = count($files);

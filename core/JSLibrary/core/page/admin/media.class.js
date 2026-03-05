@@ -333,15 +333,13 @@ export class PageMedia {
         interactiveSortChoices.target.addItem(this.localeData.SORT_BY_ALPHABET_INCREASE, 'by_alphabet_increase');
         interactiveSortChoices.target.addItem(this.localeData.SORT_BY_ALPHABET_DECREASE, 'by_alphabet_decrease');
 
-        const currentSort = this.page.core.searchParams.getParam('sort');
-        if (currentSort !== null) {
-          switch (currentSort) {
-            case 'by_createdtimestamp_increase': interactiveSortChoices.target.setItemSelectedIndex(0); break;
-            case 'sby_createdtimestamp_decrease': interactiveSortChoices.target.setItemSelectedIndex(1); break;
-            case 'by_alphabet_increase': interactiveSortChoices.target.setItemSelectedIndex(2); break;
-            case 'by_alphabet_decrease': interactiveSortChoices.target.setItemSelectedIndex(3); break;
-            default: interactiveSortChoices.target.setItemSelectedIndex(0); break;
-          }
+        const currentSort = this.page.core.searchParams.getParam('sort') ?? 'by_alphabet_increase';
+        switch (currentSort) {
+          case 'by_createdtimestamp_increase': interactiveSortChoices.target.setItemSelectedIndex(0); break;
+          case 'by_createdtimestamp_decrease': interactiveSortChoices.target.setItemSelectedIndex(1); break;
+          case 'by_alphabet_increase': interactiveSortChoices.target.setItemSelectedIndex(2); break;
+          case 'by_alphabet_decrease': interactiveSortChoices.target.setItemSelectedIndex(3); break;
+          default: interactiveSortChoices.target.setItemSelectedIndex(2); break;
         }
 
         interactiveSortChoices.assembly();
