@@ -74,7 +74,7 @@ class PageMedia implements InterfacePage
           $timeA = filectime($pathA) ?: 0;
           $timeB = filectime($pathB) ?: 0;
 
-          error_log($timeA . ' ' . $timeB . ' ' . $filesDirectoryPathWithRoot);
+          error_log($timeA . ' ' . $timeB . ' ' . $pathA . ' ' . $pathB);
           
           if ($timeA === $timeB) {
             return strcasecmp($a, $b);
