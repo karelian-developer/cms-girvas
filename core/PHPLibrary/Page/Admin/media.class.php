@@ -78,7 +78,7 @@ class PageMedia implements InterfacePage
             return strcasecmp($a, $b);
           }
 
-          return $timeA - $timeB;
+          return $timeB - $timeA;
             
         case 'by_createdtimestamp_decrease':
           $timeA = filectime($pathA) ?: 0;
@@ -87,8 +87,8 @@ class PageMedia implements InterfacePage
           if ($timeA === $timeB) {
             return strcasecmp($a, $b);
           }
-          
-          return $timeB - $timeA;
+
+          return $timeA - $timeB;
             
         case 'by_alphabet_decrease':
           return strcasecmp($b, $a);
