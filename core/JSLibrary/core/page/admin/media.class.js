@@ -328,6 +328,8 @@ export class PageMedia {
           this.initMediaElement(listElement);
         }
 
+        interactiveSortChoices.target.setWidth(280);
+
         interactiveSortChoices.target.addItem(this.localeData.SORT_BY_CREATEDTIMESTAMP_INCREASE, 'by_createdtimestamp_increase');
         interactiveSortChoices.target.addItem(this.localeData.SORT_BY_CREATEDTIMESTAMP_DECREASE, 'by_createdtimestamp_decrease');
         interactiveSortChoices.target.addItem(this.localeData.SORT_BY_ALPHABET_INCREASE, 'by_alphabet_increase');
