@@ -45,32 +45,56 @@ export class ToolImage extends Tool {
   }
 
   addImageItem(data, end = true) {
-    const fileURL = data.URL === undefined
-      ? ''
-      : data.URL;
+    let fileName, fileURL, fileExtension, fileIsDirectory;
 
-    const fileIsDirectory = data.isDirectory;
-
-    const fileCreatedUnixTimestamp = data.createdUnixTimestamp === undefined
-      ? 0
-      : data.createdUnixTimestamp;
+    fileName = data.fullname;
+    fileURL = data.URL === undefined ? '' : data.URL;;
+    fileExtension = data.extension;
+    fileIsDirectory = data.isDirectory;
 
     const targetElement = document.querySelector('#SYSTEM_MODAL_6438654856');
     const imagesListElement = targetElement.querySelector('ul');
     const imagesListItemsElements = targetElement.querySelectorAll('li');
 
-    const mediaListItemElement = document.createElement('li');
-    mediaListItemElement.classList.add('media-list__item');
+    const listItemElement = document.createElement('li');
+    listItemElement.classList.add('media-list__item');
+    listItemElement.classList.add('item');
+    listItemElement.setAttribute('data-file-name', fileName);
+    listItemElement.setAttribute('data-file-url', fileURL);
 
     if (fileIsDirectory === true) {
-      mediaListItemElement.classList.add('media-list__item_is-directory');
-    } else {
-      mediaListItemElement.style.backgroundImage = `url("${fileURL}")`;
+      listItemElement.classList.add('media-list__item_is-directory');
     }
-    
-    mediaListItemElement.setAttribute('data-media-url', fileURL);
 
-    mediaListItemElement.addEventListener('click', (event) => {
+    const listItemBodyContainerElement = document.createElement('div');
+    listItemBodyContainerElement.classList.add('media-list__item-body');
+
+    const listItemExtensionElement = document.createElement('span');
+    listItemExtensionElement.classList.add('media-list__item-extension');
+    listItemExtensionElement.innerText = fileExtension;
+
+    const listItemImageElement = document.createElement('img');
+    listItemImageElement.classList.add('media-list__item-preview');
+    listItemImageElement.setAttribute('src', fileURL);
+    listItemImageElement.setAttribute('alt', fileName);
+
+    const listItemTitleContainerElement = document.createElement('div');
+    listItemTitleContainerElement.classList.add('media-list__item-title');
+
+    const listItemTitleElement = document.createElement('span');
+    listItemTitleElement.classList.add('media-list__item-label');
+    listItemTitleElement.innerText = fileName;
+
+    listItemTitleContainerElement.appendChild(listItemTitleElement);
+    listItemElement.appendChild(listItemTitleContainerElement);
+
+    listItemBodyContainerElement.appendChild(listItemExtensionElement);
+    listItemBodyContainerElement.appendChild(listItemImageElement);
+    listItemBodyContainerElement.appendChild(listItemTitleContainerElement);
+
+    listItemElement.appendChild(listItemBodyContainerElement);
+
+    listItemElement.addEventListener('click', (event) => {
       event.preventDefault();
 
       if (fileIsDirectory) {
@@ -97,9 +121,9 @@ export class ToolImage extends Tool {
     });
 
     if (end) {
-      imagesListElement.appendChild(mediaListItemElement);
+      imagesListElement.appendChild(listItemElement);
     } else {
-      imagesListItemsElements[0].after(mediaListItemElement);
+      imagesListItemsElements[0].after(listItemElement);
     }
   }
 
