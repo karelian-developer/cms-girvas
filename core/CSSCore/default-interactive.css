@@ -463,25 +463,6 @@
   }
 }
 
-.file-manager .media-list__item {
-  position: relative;
-  background-size: cover;
-  background-position: center center;
-  box-sizing: border-box;
-  border: 1px solid var(--common-main-color-2);
-  outline: 1px solid var(--common-main-color-2);
-  height: 100px;
-  transition: filter .2s, outline .2s;
-  cursor: pointer;
-
-  &:not(:first-child) {
-    &:hover, &:focus {
-      outline: 1px solid var(--common-secondary-color-2);
-      filter: brightness(120%);
-    }
-  }
-}
-
 .file-manager .media-list__item:first-child .interactive {
   display: flex;
 }
@@ -556,6 +537,15 @@
   background-position: center center;
   border: 1px solid var(--common-main-color-6);
   border-radius: 8px;
+  transition: filter .2s, outline .2s;
+  cursor: pointer;
+
+  &:not(:first-child) {
+    &:hover, &:focus {
+      outline: 1px solid var(--common-secondary-color-2);
+      filter: brightness(120%);
+    }
+  }
 }
 
 .file-manager .media-list__item > .media-list__item-controllers {
