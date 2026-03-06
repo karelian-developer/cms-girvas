@@ -129,6 +129,11 @@ if ($CMSCore->client->isLogged(2)) {
       if (!is_null($pageStatic)) {
         $pageStatic->initData(['*']);
 
+        if (isset($_PUT['page_static_published_timestamp'])) {
+          $pageStatic['metadata']['publishedUnixTimestamp'] = strtotime($_PUT['page_static_published_timestamp']);
+          $pageStatic['metadata']['isPublished'] = 1;
+        }
+
         if (isset($pageStaticData)) {
           $pageStatic->update($pageStaticData);
         }

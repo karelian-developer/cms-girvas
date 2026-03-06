@@ -159,7 +159,10 @@ if ($CMSCore->client->isLogged(2)) {
               $textareaKeywordsName = 'entry_keywords_' . $CMSLocale->getISO639(2);
 
               if (!array_key_exists('metadata', $entryData)) $entryData['metadata'] = [];
-              if (isset($_PATCH['entry_is_published'])) $entryData['metadata']['isPublished'] = $_PATCH['entry_is_published'];
+              if (isset($_PATCH['entry_is_published'])) {
+                $entryData['metadata']['publishedUnixTimestamp'] = time();
+                $entryData['metadata']['isPublished'] = 1;
+              }
 
               if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH) || array_key_exists($textareaContentName, $_PATCH)) {
                 if (!array_key_exists('texts', $entryData)) $entryData['texts'] = [];
@@ -303,7 +306,11 @@ if ($CMSCore->client->isLogged(2)) {
             /** @var string содержимое записи */
             $entryContent = $entry->getContent($CMSBaseLocaleName);
             /** @var int дата обновления страницы в формате UNIX */
-            $entryData['metadata']['publishedUnixTimestamp'] = time();
+
+            if (isset($_PATCH['entry_published_timestamp'])) {
+              $entryData['metadata']['publishedUnixTimestamp'] = strtotime($_PATCH['entry_published_timestamp']);
+              $entryData['metadata']['isPublished'] = 1;
+            }
 
             // Если заголовок, описание или содержимое стандартной локализации не задано, то
             // запись не будет обновлена.

@@ -110,6 +110,17 @@
     </h2>
     <div class="page-aside__block-content block-content"></div>
   </div>
+  <div class="page-aside__block block">
+    <h2 class="page-aside__block-title">
+      {LANG:PAGE_ENTRY_SIDEBAR_BLOCK_SCHEDULER_TITLE}
+    </h2>
+    <div class="page-aside__block-content block-content">
+      <div class="block__input-container input-container">
+        {LANG:MD:PAGE_ENTRY_SIDEBAR_BLOCK_SCHEDULER_TIP}
+        <input class="block__input input input_text" type="datetime" name="entry_published_timestamp" value="{ENTRY_PUBLISHED_TIMESTAMP}">
+      </div>
+    </div>
+  </div>
   <div class="page-aside__block" data-element="aside-block-additional-fields">
     <h2 class="page-aside__block-title">
       {LANG:PAGE_ENTRY_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TITLE}

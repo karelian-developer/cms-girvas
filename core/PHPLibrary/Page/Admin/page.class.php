@@ -306,6 +306,16 @@ class PagePage implements InterfacePage
       );
     }
 
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_PUBLISHED_TIMESTAMP')) {
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'PAGE_STATIC_PUBLISHED_TIMESTAMP',
+        $pageStatic !== null
+          ? date('Y-m-dTH:i:s', $pageStatic->getPublishedUnixTimestamp())
+          : date('Y-m-dTH:i:s', time())
+      );
+    }
+
     $templatesAssembled['ADMIN_PANEL_PAGE_NAME'] = 'page-static';
     $templatesAssembled['PAGE_STATIC_EDITOR'] = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme,

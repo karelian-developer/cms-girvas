@@ -319,6 +319,16 @@ class PageEntry implements InterfacePage
       );
     }
 
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_PUBLISHED_TIMESTAMP')) {
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'ENTRY_PUBLISHED_TIMESTAMP',
+        $entry !== null
+          ? date('Y-m-dTH:i:s', $entry->getPublishedUnixTimestamp())
+          : date('Y-m-dTH:i:s', time())
+      );
+    }
+
     $templatesAssembled['ADMIN_PANEL_PAGE_NAME'] = 'entry';
     $templatesAssembled['ENTRY_EDITOR'] = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme,
