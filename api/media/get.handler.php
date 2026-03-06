@@ -20,10 +20,6 @@ if ($CMSCore->client->isLogged(2)) {
     $filesDirectoryPathParam = $CMSURLP->getParam('directory') !== null
       ? urldecode($CMSURLP->getParam('directory'))
       : null;
-    
-    $filesExtensionsScopeParam = $CMSURLP->getParam('extensions') !== null
-      ? explode(',', urldecode($CMSURLP->getParam('extensions')))
-      : [];
 
     $filesDirectoryPath = $filesDirectoryPathParam === null
       ? '/uploads/media'
@@ -54,6 +50,10 @@ if ($CMSCore->client->isLogged(2)) {
     $filesDirectoryPathParam = $CMSURLP->getParam('directory') !== null
       ? urldecode($CMSURLP->getParam('directory'))
       : null;
+
+    $filesExtensionsScopeParam = $CMSURLP->getParam('extensions') !== null
+      ? explode(',', urldecode($CMSURLP->getParam('extensions')))
+      : [];
 
     $filesDirectoryPath = $filesDirectoryPathParam === null
       ? '/uploads/media'
