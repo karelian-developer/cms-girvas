@@ -193,7 +193,7 @@ class PageEntries implements InterfacePage
         $entryObject->initData(['id', 'categoryID', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
         
         if ($entryObject->getPublishedUnixTimestamp() > time()) {
-          break;
+          continue;
         }
 
         $entryCategory = $entryObject->getCategory();
