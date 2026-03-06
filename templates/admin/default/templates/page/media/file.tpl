@@ -1,7 +1,9 @@
-<li class="media-list__item item" data-file-name="{FILE_NAME}" data-file-url="{FILE_URL}" data-file-extension="{FILE_EXTENSION}">
+<li class="media-list__item item_directory" data-file-name="{FILE_NAME}" data-file-url="{FILE_URL}" data-is-directory="true">
   <div class="media-list__item-body">
-    <span class="media-list__item-extension">{FILE_EXTENSION}</span>
-    <img class="media-list__item-preview" src="{FILE_URL}" alt="{FILE_NAME}">
+    <div class="media-list__item-icon-container">
+      <img class="media-list__item-icon" src="/images/admin/icons/file.svg" alt="{FILE_NAME}">
+      <div class="media-list__item-icon-label">{FILE_EXTENSION}</div>
+    </div>
     <div class="media-list__item-title">
       <span class="media-list__item-label">{FILE_NAME}</span>
     </div>
