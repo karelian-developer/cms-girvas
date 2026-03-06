@@ -311,11 +311,19 @@ class EntriesSample implements EntityTypeContent
           $limit = $this->getLimitCount();
 
           foreach ($categoryArray as $entryIndex => $entry) {
+            $entry->initData(['metadata']);
+
             if ($limit <= $entryIndex) {
               break;
             }
 
-            array_push($entries, $entry);
+            if ($isPublished) {
+              if ($entry->getPublishedUnixTimestamp() <= time()) {
+                $entries[] = $entry;
+              }
+            } else {
+              $entries[] = $entry;
+            }
           }
         }
       }
