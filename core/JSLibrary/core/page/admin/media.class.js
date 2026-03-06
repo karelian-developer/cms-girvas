@@ -285,6 +285,7 @@ export class PageMedia {
         listItemBodyContainerElement.appendChild(listItemImageElement);
         listItemBodyContainerElement.appendChild(listItemTitleContainerElement);
 
+        listItemElement.appendChild(listItemBodyContainerElement);
         listItemElement.appendChild(listItemControllerContainerElement);
 
         const mediaListElement = document.querySelector('#E9453667589');
