@@ -143,7 +143,8 @@ class PageMedia implements InterfacePage
         [
           'FILE_URL' => $file['fileURL'],
           'FILE_EXTENSION' => $file['fileExtension'],
-          'FILE_NAME' => $file['fileName']
+          'FILE_NAME' => $file['fileName'],
+          'FILE_FULLNAME' => $file['fileName'] . '.' . $file['fileExtension']
         ]
       );
     }
