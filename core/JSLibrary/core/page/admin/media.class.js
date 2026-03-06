@@ -268,8 +268,8 @@ export class PageMedia {
 
         const listItemImageElement = document.createElement('img');
         listItemImageElement.classList.add('media-list__item-preview');
-        listItemElement.setAttribute('src', fileURL);
-        listItemElement.setAttribute('alt', fileName);
+        listItemImageElement.setAttribute('src', fileURL);
+        listItemImageElement.setAttribute('alt', fileName);
 
         const listItemTitleContainerElement = document.createElement('div');
         listItemTitleContainerElement.classList.add('media-list__item-title');
