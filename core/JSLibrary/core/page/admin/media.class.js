@@ -266,7 +266,7 @@ export class PageMedia {
 
         const listItemExtensionElement = document.createElement('span');
         listItemExtensionElement.classList.add('media-list__item-extension');
-        listItemExtensionElement.innerText = 
+        listItemExtensionElement.innerText = fileExtension;
 
         const listItemImageElement = document.createElement('img');
         listItemImageElement.classList.add('media-list__item-preview');
