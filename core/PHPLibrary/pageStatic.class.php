@@ -392,7 +392,7 @@ class PageStatic implements EntityTypeContent
     if (property_exists($this, 'metadata')) {
       $metadata = json_decode($this->metadata, true);
 
-      if (isset($metadata['isPublished'])) {
+      if (isset($metadata['isPublished']) && $this->getPublishedUnixTimestamp() >= time()) {
         return (bool) $metadata['isPublished'];
       }
     }
