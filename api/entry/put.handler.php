@@ -218,7 +218,7 @@ if ($CMSCore->client->isLogged(2)) {
         $entry->initData(['texts']);
 
         if (isset($_PUT['entry_published_timestamp'])) {
-          $entryData['metadata']['publishedUnixTimestamp'] = strtotime($_PUT['entry_published_timestamp']);
+          $entryData['metadata']['publishedUnixTimestamp'] = strtotime(str_replace('T', ' ', $_PUT['entry_published_timestamp']));
           $entryData['metadata']['isPublished'] = 1;
         }
 

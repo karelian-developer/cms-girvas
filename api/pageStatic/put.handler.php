@@ -130,7 +130,7 @@ if ($CMSCore->client->isLogged(2)) {
         $pageStatic->initData(['*']);
 
         if (isset($_PUT['page_static_published_timestamp'])) {
-          $pageStatic['metadata']['publishedUnixTimestamp'] = strtotime($_PUT['page_static_published_timestamp']);
+          $pageStatic['metadata']['publishedUnixTimestamp'] = strtotime(str_replace('T', ' ', $_PUT['page_static_published_timestamp']));
           $pageStatic['metadata']['isPublished'] = 1;
         }
 

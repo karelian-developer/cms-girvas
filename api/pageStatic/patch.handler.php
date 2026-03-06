@@ -157,7 +157,7 @@ if ($CMSCore->client->isLogged(2)) {
           /** @var int дата обновления страницы в формате UNIX */
 
           if (isset($_PATCH['page_static_published_timestamp'])) {
-            $pageStaticData['metadata']['publishedUnixTimestamp'] = strtotime($_PATCH['page_static_published_timestamp']);
+            $pageStaticData['metadata']['publishedUnixTimestamp'] = strtotime(str_replace('T', ' ', $_PATCH['page_static_published_timestamp']));
             $pageStaticData['metadata']['isPublished'] = 1;
           }
 
