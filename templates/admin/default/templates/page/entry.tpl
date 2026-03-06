@@ -117,7 +117,7 @@
     <div class="page-aside__block-content block-content">
       <div class="block__input-container input-container">
         {LANG:MD:PAGE_ENTRY_SIDEBAR_BLOCK_SCHEDULER_TIP}
-        <input class="block__input input input_date" type="date" name="entry_published_timestamp" value="{ENTRY_PUBLISHED_TIMESTAMP}" data-element="published-date-input">
+        <input class="block__input input input_date" type="datetime-local" name="entry_published_timestamp" value="{ENTRY_PUBLISHED_TIMESTAMP}" data-element="published-date-input">
       </div>
     </div>
   </div>
