@@ -30,6 +30,12 @@
   }
 }
 
+@media (max-width: 400px) {
+  .media-list {
+    grid-template-columns: 1fr;
+  }
+}
+
 .media-list__item {
   position: relative;
   display: flex;
