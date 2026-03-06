@@ -122,7 +122,7 @@ if ($CMSCore->client->isLogged(2)) {
                     $fileData['URL'] = '/uploads/media/' . $fileConverted['fileName'];
                     $fileData['isDirectory'] = is_dir(CMS_ROOT_DIRECTORY . $fileData['URL']);
                     $fileData['fullname'] = $fileConverted['fileName'];
-                    $fileData['extension'] = $fileExtension;
+                    $fileData['extension'] = $fileConverted['extensionNew'];
                     
                     $handlerOutputData['file'] = $fileData;
 
