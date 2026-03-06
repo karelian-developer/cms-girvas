@@ -346,7 +346,7 @@ export class PageMedia {
 
         interactiveSortChoices.assembly();
 
-        const paginationListPage = document.querySelectorAll('.page__pagination > ul');
+        const paginationListPage = document.querySelectorAll('.main__page .page__pagination > ul');
         
         paginationListPage.forEach(paginationElement => {
           const paginationListItemsPage = paginationElement.querySelectorAll('li');

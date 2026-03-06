@@ -6,10 +6,28 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
- .media-list {
+.media-list {
   display: grid;
   grid-template-columns: repeat(6, calc(100% / 6 - (8px * 6) / 7));
   gap: 8px;
+}
+
+@media (max-width: 1300px) {
+  .media-list {
+    grid-template-columns: repeat(4, calc(100% / 4 - (8px * 4) / 5));
+  }
+}
+
+@media (max-width: 700px) {
+  .media-list {
+    grid-template-columns: repeat(3, calc(100% / 3 - (8px * 3) / 4));
+  }
+}
+
+@media (max-width: 520px) {
+  .media-list {
+    grid-template-columns: repeat(2, calc(100% / 2 - (8px * 2) / 3));
+  }
 }
 
 .media-list__item {
