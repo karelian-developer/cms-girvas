@@ -244,10 +244,11 @@ export class PageMedia {
         : {};
 
       if (APIStatusCode === 1 && APIOutputData.hasOwnProperty('file')) {
-        let fileName, fileURL;
+        let fileName, fileURL, fileExtension;
 
         fileName = data.outputData.file.fullname;
         fileURL = data.outputData.file.URL;
+        fileExtension = data.outputData.file.extension;
 
         const listItemElement = document.createElement('li');
         listItemElement.classList.add('media-list__item');
@@ -265,6 +266,7 @@ export class PageMedia {
 
         const listItemExtensionElement = document.createElement('span');
         listItemExtensionElement.classList.add('media-list__item-extension');
+        listItemExtensionElement.innerText = 
 
         const listItemImageElement = document.createElement('img');
         listItemImageElement.classList.add('media-list__item-preview');

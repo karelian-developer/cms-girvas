@@ -66,8 +66,9 @@ if ($CMSCore->client->isLogged(2)) {
 
               if (preg_match('/^image\//', $fileMIMEType)) {
                 preg_match('/^image\/([a-z]+)/', $fileMIMEType, $matches);
+                $fileExtension = mime_content_type($matches[1]);
                 
-                $fileExtensionEnum = match ($matches[1]) {
+                $fileExtensionEnum = match ($fileExtension) {
                   'jpeg' => EnumFileFormat::JPG,
                   'png' => EnumFileFormat::PNG,
                   'webp' => EnumFileFormat::WEBP,
@@ -121,6 +122,7 @@ if ($CMSCore->client->isLogged(2)) {
                     $fileData['URL'] = '/uploads/media/' . $fileConverted['fileName'];
                     $fileData['isDirectory'] = is_dir(CMS_ROOT_DIRECTORY . $fileData['URL']);
                     $fileData['fullname'] = $fileConverted['fileName'];
+                    $fileData['extension'] = $fileExtension;
                     
                     $handlerOutputData['file'] = $fileData;
 
