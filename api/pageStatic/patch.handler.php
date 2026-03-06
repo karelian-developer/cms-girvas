@@ -141,7 +141,6 @@ if ($CMSCore->client->isLogged(2)) {
 
         if (isset($_PATCH['page_static_published_timestamp'])) {
           $pageStaticData['metadata']['publishedUnixTimestamp'] = strtotime(str_replace('T', ' ', $_PATCH['page_static_published_timestamp']));
-          $pageStaticData['metadata']['isPublished'] = 1;
         }
 
         // Если происходит публикация страницы, то необходимо удостовериться, что

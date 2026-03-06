@@ -292,7 +292,6 @@ if ($CMSCore->client->isLogged(2)) {
 
           if (isset($_PATCH['entry_published_timestamp'])) {
             $entryData['metadata']['publishedUnixTimestamp'] = strtotime(str_replace('T', ' ', $_PATCH['entry_published_timestamp']));
-            $entryData['metadata']['isPublished'] = 1;
           }
 
           // Если происходит публикация записи, то необходимо удостовериться, что
