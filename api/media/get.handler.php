@@ -20,6 +20,10 @@ if ($CMSCore->client->isLogged(2)) {
     $filesDirectoryPathParam = $CMSURLP->getParam('directory') !== null
       ? urldecode($CMSURLP->getParam('directory'))
       : null;
+    
+    $filesExtensionsScopeParam = $CMSURLP->getParam('extensions') !== null
+      ? explode(',', urldecode($CMSURLP->getParam('extensions')))
+      : [];
 
     $filesDirectoryPath = $filesDirectoryPathParam === null
       ? '/uploads/media'
@@ -83,19 +87,22 @@ if ($CMSCore->client->isLogged(2)) {
     $filesData = [];
 
     foreach ($files as $file) {
-      /** @var string */
-      $filePath = $filesDirectoryPathWithRoot . '/' . $file;
-      /** @var string */
-      $URL = $filesDirectoryPath . '/' . $file;
+      $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
       
-      $filesData[] = [
-        'fileURL' => $URL,
-        'filePath' => $filesDirectoryPath,
-        'isDirectory' => is_dir($filePath),
-        'fileExtension' => pathinfo($filePath, PATHINFO_EXTENSION),
-        'fileName' => pathinfo($filePath, PATHINFO_FILENAME),
-        'createdUnixTimestamp' => filemtime($filePath)
-      ];
+      if (in_array($fileExtension, $filesExtensionsScopeParam) || empty($filesExtensionsScopeParam)) {
+        $filePath = $filesDirectoryPathWithRoot . '/' . $file;
+        $URL = $filesDirectoryPath . '/' . $file;
+        $fileName = pathinfo($filePath, PATHINFO_FILENAME);
+        
+        $filesData[] = [
+          'fileURL' => $URL,
+          'filePath' => $filesDirectoryPath,
+          'isDirectory' => is_dir($filePath),
+          'fileExtension' => $fileExtension,
+          'fileName' => $fileName,
+          'createdUnixTimestamp' => filemtime($filePath)
+        ];
+      }
     }
 
     $filesSorted = [];
