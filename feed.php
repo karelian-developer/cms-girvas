@@ -55,6 +55,10 @@ if (defined('IS_NOT_HACKED')) {
       foreach ($entriesArray as $entry) {
         $entry->initData(['name', 'metadata', 'texts', 'updatedUnixTimestamp']);
 
+        if ($entry->getPublishedUnixTimestamp() > time()) {
+          continue;
+        }
+
         $entryAuthor = $entry->getAuthor();
         $entryLink = 'https://' . $CMSCore->configurator->get('domain') . '/entry/' . $entry->getName();
 
