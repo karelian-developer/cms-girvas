@@ -324,8 +324,8 @@ class PageEntry implements InterfacePage
         $templatesAssembled,
         'ENTRY_PUBLISHED_TIMESTAMP',
         $entry !== null
-          ? date('Y-m-dTH:i', $entry->getPublishedUnixTimestamp())
-          : date('Y-m-dTH:i', time())
+          ? date('Y-m-d\TH:i', $entry->getPublishedUnixTimestamp())
+          : date('Y-m-d\TH:i', time())
       );
     }
 
