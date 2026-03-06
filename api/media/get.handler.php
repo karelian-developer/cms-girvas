@@ -103,7 +103,9 @@ if ($CMSCore->client->isLogged(2)) {
       $filesSorted[] = [
         'URL' => $data['fileURL'],
         'isDirectory' => $data['isDirectory'],
-        'createdUnixTimestamp' => $data['createdUnixTimestamp']
+        'createdUnixTimestamp' => $data['createdUnixTimestamp'],
+        'fullname' => $data['fileName'] . '.' . $data['fileExtension'],
+        'extension' => $data['fileExtension']
       ];
     }
 
@@ -112,7 +114,9 @@ if ($CMSCore->client->isLogged(2)) {
       $filesTransformed[] = [
         'URL' => $fileData['URL'],
         'isDirectory' => (bool) $fileData['isDirectory'],
-        'createdUnixTimestamp' => (int) $fileData['createdUnixTimestamp']
+        'createdUnixTimestamp' => (int) $fileData['createdUnixTimestamp'],
+        'fullname' => $fileData['fullname'],
+        'extension' => $fileData['extension']
       ];
     }
 
