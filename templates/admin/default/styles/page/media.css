@@ -143,9 +143,11 @@
   position: absolute;
   background-color: var(--primary-color-4);
   text-transform: uppercase;
+  text-align: center;
   font-weight: 900;
+  font-size: 16px;
   color: var(--primary-color-2);
-  padding: 8px 16px;
+  padding: 4px 8px;
   width: 128px;
   max-width: 100%;
 }
