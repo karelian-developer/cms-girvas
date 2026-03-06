@@ -185,6 +185,7 @@ export class ToolImage extends Tool {
         if (inputFilesElement.files.length > 0) {
           console.log(`[NADVO TE] New images upload...`);
           this.imageUpload(inputFilesElement, 0);
+          inputFilesElement.value = '';
         }
       });
 
