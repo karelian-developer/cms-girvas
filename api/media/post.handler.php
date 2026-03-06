@@ -66,7 +66,7 @@ if ($CMSCore->client->isLogged(2)) {
 
               if (preg_match('/^image\//', $fileMIMEType)) {
                 preg_match('/^image\/([a-z]+)/', $fileMIMEType, $matches);
-                $fileExtension = mime_content_type($matches[1]);
+                $fileExtension = $matches[1];
                 
                 $fileExtensionEnum = match ($fileExtension) {
                   'jpeg' => EnumFileFormat::JPG,
