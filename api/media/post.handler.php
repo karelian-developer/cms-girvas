@@ -34,7 +34,7 @@ if ($CMSCore->client->isLogged(2)) {
       $fileUploadedExtension = pathinfo($_FILES['mediaFile']['name'], PATHINFO_EXTENSION);
       
       /** @var array Массив разрешенных расширений передаваемых файлов */
-      $fileExtensionsAllowed = ['png', 'gif', 'jpg', 'jpeg', 'webp'];
+      $fileExtensionsAllowed = ['png', 'gif', 'jpg', 'jpeg', 'webp', 'gif'];
 
       /** @var string Путь до загружаемых файлов */
       $filesDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
@@ -61,21 +61,19 @@ if ($CMSCore->client->isLogged(2)) {
           if (in_array($fileUploadedExtension, $fileExtensionsAllowed)) {
             // Проверка величины файла на соответствие ограничениям
             if ($CMSCore->configurator->getUploadFileWeightMax() >= filesize($_FILES['mediaFile']['tmp_name']) / 1024 || $CMSCore->configurator->getUploadFileWeightMax() == 0) {
-              /** @var string Путь до загружаемых файлов */
               $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
-              /** @var string MIME-тип загружаемого файла */
               $fileMIMEType = mime_content_type($_FILES['mediaFile']['tmp_name']);
 
               if (preg_match('/^image\//', $fileMIMEType)) {
                 preg_match('/^image\/([a-z]+)/', $fileMIMEType, $matches);
-                /** @var EnumFileFormat Расширение файла */
+                
                 $fileExtensionEnum = match ($matches[1]) {
                   'jpeg' => EnumFileFormat::JPG,
                   'png' => EnumFileFormat::PNG,
                   'webp' => EnumFileFormat::WEBP,
                   'avif' => EnumFileFormat::AVIF
                 };
-                /** @var GdImage Изображение, созданное из загружаемого файла */
+
                 $image = match ($fileExtensionEnum) {
                   EnumFileFormat::JPG => imagecreatefromjpeg($_FILES['mediaFile']['tmp_name']),
                   EnumFileFormat::PNG => imagecreatefrompng($_FILES['mediaFile']['tmp_name']),

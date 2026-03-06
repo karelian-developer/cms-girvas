@@ -249,31 +249,46 @@ export class PageMedia {
         fileName = data.outputData.file.fullname;
         fileURL = data.outputData.file.URL;
 
-        let listItemElement = document.createElement('li');
+        const listItemElement = document.createElement('li');
         listItemElement.classList.add('media-list__item');
         listItemElement.classList.add('item');
-        listItemElement.style.backgroundImage = `url('${fileURL}')`;
         listItemElement.setAttribute('data-file-name', fileName);
         listItemElement.setAttribute('data-file-url', fileURL);
 
-        let listItemControllerContainerElement = document.createElement('div');
-        listItemControllerContainerElement.classList.add('item__controller-panel');
-        listItemControllerContainerElement.classList.add('controller-panel');
-        listItemControllerContainerElement.setAttribute('role', 'controller-panel');
+        const listItemBodyContainerElement = document.createElement('div');
+        listItemBodyContainerElement.classList.add('media-list__item-body');
 
-        let listItemTitleContainerElement = document.createElement('div');
-        listItemTitleContainerElement.classList.add('item__title-container');
+        const listItemControllerContainerElement = document.createElement('div');
+        listItemControllerContainerElement.classList.add('media-list__item-controllers');
+        listItemControllerContainerElement.classList.add('item-controllers');
+        listItemControllerContainerElement.setAttribute('data-role', 'controller-panel');
 
-        let listItemTitleElement = document.createElement('div');
-        listItemTitleElement.classList.add('item__title');
+        const listItemExtensionElement = document.createElement('span');
+        listItemExtensionElement.classList.add('media-list__item-extension');
+
+        const listItemImageElement = document.createElement('img');
+        listItemImageElement.classList.add('media-list__item-preview');
+        listItemElement.setAttribute('src', fileURL);
+        listItemElement.setAttribute('alt', fileName);
+
+        const listItemTitleContainerElement = document.createElement('div');
+        listItemTitleContainerElement.classList.add('media-list__item-title');
+
+        const listItemTitleElement = document.createElement('span');
+        listItemTitleElement.classList.add('media-list__item-label');
         listItemTitleElement.innerText = fileName;
 
-        listItemElement.appendChild(listItemControllerContainerElement);
         listItemTitleContainerElement.appendChild(listItemTitleElement);
         listItemElement.appendChild(listItemTitleContainerElement);
 
-        let mediaListElement = document.querySelector('#E9453667589');
-        let mediaListItems = mediaListElement.querySelectorAll('li');
+        listItemBodyContainerElement.appendChild(listItemExtensionElement);
+        listItemBodyContainerElement.appendChild(listItemImageElement);
+        listItemBodyContainerElement.appendChild(listItemTitleContainerElement);
+
+        listItemElement.appendChild(listItemControllerContainerElement);
+
+        const mediaListElement = document.querySelector('#E9453667589');
+        const mediaListItems = mediaListElement.querySelectorAll('li');
         mediaListItems[0].before(listItemElement);
 
         this.initMediaElement(listItemElement);
