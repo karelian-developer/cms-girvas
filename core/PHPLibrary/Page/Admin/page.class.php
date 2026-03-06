@@ -311,8 +311,8 @@ class PagePage implements InterfacePage
         $templatesAssembled,
         'PAGE_STATIC_PUBLISHED_TIMESTAMP',
         $pageStatic !== null
-          ? date('Y-m-dTH:i:s', $pageStatic->getPublishedUnixTimestamp())
-          : date('Y-m-dTH:i:s', time())
+          ? date('Y-m-dTH:i', $pageStatic->getPublishedUnixTimestamp())
+          : date('Y-m-dTH:i', time())
       );
     }
 
