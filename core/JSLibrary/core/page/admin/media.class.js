@@ -346,6 +346,15 @@ export class PageMedia {
 
         interactiveSortChoices.assembly();
 
+        const paginationListPage = document.querySelector('.page__pagination > ul');
+        const paginationListItemsPage = paginationListPage.querySelectorAll('li');
+        paginationListItemsPage.forEach(element => {
+          const linkElement = element.querySelector('a');
+          const linkElementHref = linkElement.getAttribute('href');
+          
+          linkElement.setAttribute('href', linkElementHref + '&sort=' + currentSort);
+        });
+
         this.buttons.upload = new Interactive('button');
         this.buttons.upload.target.setLabel(this.localeData.BUTTON_UPLOAD_LABEL);
 
