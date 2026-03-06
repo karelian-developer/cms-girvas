@@ -346,13 +346,17 @@ export class PageMedia {
 
         interactiveSortChoices.assembly();
 
-        const paginationListPage = document.querySelector('.page__pagination > ul');
-        const paginationListItemsPage = paginationListPage.querySelectorAll('li');
-        paginationListItemsPage.forEach(element => {
-          const linkElement = element.querySelector('a');
-          const linkElementHref = linkElement.getAttribute('href');
+        const paginationListPage = document.querySelectorAll('.page__pagination > ul');
+        
+        paginationListPage.forEach(paginationElement => {
+          const paginationListItemsPage = paginationElement.querySelectorAll('li');
           
-          linkElement.setAttribute('href', linkElementHref + '&sort=' + currentSort);
+          paginationListItemsPage.forEach(listElement => {
+            const linkElement = listElement.querySelector('a');
+            const linkElementHref = linkElement.getAttribute('href');
+
+            linkElement.setAttribute('href', linkElementHref + '&sort=' + currentSort);
+          });
         });
 
         this.buttons.upload = new Interactive('button');
