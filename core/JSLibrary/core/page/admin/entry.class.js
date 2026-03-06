@@ -192,7 +192,12 @@ export class PageEntry {
         form.target.replaceElement(elementForm);
         
         if (form.target.checkRequiredFields()) {
-          let formData = new FormData(elementForm);
+          const formData = new FormData(elementForm);
+
+          const publishedDateInputElement = document.querySelector('[data-element="published-date-input"]');
+          if (publishedDateInputElement !== null) {
+            formData.append(publishedDateInputElement.name, publishedDateInputElement.value);
+          }
 
           const additionalDataContainerElement = document.querySelector('[data-element="additional-data"]');
           if (additionalDataContainerElement !== null) {

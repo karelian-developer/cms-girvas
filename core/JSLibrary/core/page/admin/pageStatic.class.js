@@ -191,7 +191,12 @@ export class PagePageStatic {
         form.target.replaceElement(elementForm);
 
         if (form.target.checkRequiredFields()) {
-          let formData = new FormData(elementForm);
+          const formData = new FormData(elementForm);
+
+          const publishedDateInputElement = document.querySelector('[data-element="published-date-input"]');
+          if (publishedDateInputElement !== null) {
+            formData.append(publishedDateInputElement.name, publishedDateInputElement.value);
+          }
           
           let inputPersonalTemplatePath = document.querySelector('[name="page_static_template_path"]');
           if (inputPersonalTemplatePath !== null) {
