@@ -87,10 +87,10 @@ if ($CMSCore->client->isLogged(2)) {
     $filesData = [];
 
     foreach ($files as $file) {
+      $filePath = $filesDirectoryPathWithRoot . '/' . $file;
       $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
       
       if (in_array($fileExtension, $filesExtensionsScopeParam) || empty($filesExtensionsScopeParam)) {
-        $filePath = $filesDirectoryPathWithRoot . '/' . $file;
         $URL = $filesDirectoryPath . '/' . $file;
         $fileName = pathinfo($filePath, PATHINFO_FILENAME);
         
