@@ -139,6 +139,11 @@ if ($CMSCore->client->isLogged(2)) {
 
         $pageStaticIsPublished = $pageStaticData['metadata']['isPublished'] ?? 0;
 
+        if (isset($_PATCH['page_static_published_timestamp'])) {
+          $pageStaticData['metadata']['publishedUnixTimestamp'] = strtotime(str_replace('T', ' ', $_PATCH['page_static_published_timestamp']));
+          $pageStaticData['metadata']['isPublished'] = 1;
+        }
+
         // Если происходит публикация страницы, то необходимо удостовериться, что
         // в странице присутствует стандартная локализация, в противном случае
         // система не даст сохранить ее.
@@ -155,11 +160,7 @@ if ($CMSCore->client->isLogged(2)) {
           /** @var string содержимое записи */
           $pageStaticContent = $pageStatic->getContent($CMSBaseLocaleName);
           /** @var int дата обновления страницы в формате UNIX */
-
-          if (isset($_PATCH['page_static_published_timestamp'])) {
-            $pageStaticData['metadata']['publishedUnixTimestamp'] = strtotime(str_replace('T', ' ', $_PATCH['page_static_published_timestamp']));
-            $pageStaticData['metadata']['isPublished'] = 1;
-          }
+          $pageStaticData['metadata']['publishedUnixTimestamp'] = time();
 
           // Если заголовок, описание или содержимое стандартной локализации не задано, то
           // запись не будет обновлена.

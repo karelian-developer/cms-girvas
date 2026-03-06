@@ -290,6 +290,11 @@ if ($CMSCore->client->isLogged(2)) {
 
           $entryIsPublished = $entryData['metadata']['isPublished'] ?? 0;
 
+          if (isset($_PATCH['entry_published_timestamp'])) {
+            $entryData['metadata']['publishedUnixTimestamp'] = strtotime(str_replace('T', ' ', $_PATCH['entry_published_timestamp']));
+            $entryData['metadata']['isPublished'] = 1;
+          }
+
           // Если происходит публикация записи, то необходимо удостовериться, что
           // в записи присутствует стандартная локализация, в противном случае
           // система не даст сохранить ее.
@@ -306,11 +311,7 @@ if ($CMSCore->client->isLogged(2)) {
             /** @var string содержимое записи */
             $entryContent = $entry->getContent($CMSBaseLocaleName);
             /** @var int дата обновления страницы в формате UNIX */
-
-            if (isset($_PATCH['entry_published_timestamp'])) {
-              $entryData['metadata']['publishedUnixTimestamp'] = strtotime(str_replace('T', ' ', $_PATCH['entry_published_timestamp']));
-              $entryData['metadata']['isPublished'] = 1;
-            }
+            $entryData['metadata']['publishedUnixTimestamp'] = time();
 
             // Если заголовок, описание или содержимое стандартной локализации не задано, то
             // запись не будет обновлена.
