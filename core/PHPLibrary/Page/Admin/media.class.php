@@ -131,9 +131,9 @@ class PageMedia implements InterfacePage
       $URL = '/uploads/media/' . $file['fileName'];
       $fileTemplatePath = $file['isDirectory']
         ? 'templates/page/media/directory.tpl'
-        : $fileIsImage
+        : ($fileIsImage
           ? 'templates/page/media/image.tpl'
-          : 'templates/page/media/file.tpl';
+          : 'templates/page/media/file.tpl');
       
       $filesTransformed[] = ThemeCollector::assemblyFileContent(
         $this->CMSCore->theme,
