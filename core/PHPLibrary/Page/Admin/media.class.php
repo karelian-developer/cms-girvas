@@ -124,8 +124,8 @@ class PageMedia implements InterfacePage
     $filesTransformed = [];
     foreach ($filesData as $file) {
       $fileIsImage = in_array(
-        ['apng', 'png', 'gif', 'jpeg', 'jpg', 'ico', 'svg', 'bmp', 'avif', 'webp'],
-        $file['fileExtension']
+        $file['fileExtension'],
+        ['apng', 'png', 'gif', 'jpeg', 'jpg', 'ico', 'svg', 'bmp', 'avif', 'webp']
       );
 
       $fileItemTemplate = $fileIsImage
