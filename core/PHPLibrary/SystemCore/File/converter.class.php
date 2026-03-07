@@ -680,12 +680,12 @@ final class Converter implements InterfaceConverter
   {
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $mimeType = finfo_file($finfo, $fileSourcePath);
-    finfo_close($finfo);
+    finfo_close($finfo);error_log('kek');
     
     if ($mimeType !== 'image/gif') {
       error_log("Invalid MIME type: " . $mimeType);
       return false;
-    }error_log('kek');
+    }
     
     $content = file_get_contents($fileSourcePath);
     if (preg_match('/<\?php|<\?=|<\?/i', $content)) {
