@@ -165,6 +165,7 @@ final class Converter implements InterfaceConverter
               $convertedResult = $this->sanitizeGIF($fileSourcePath, $fileOutputPath, $deleteOldFile);
             } else {
               $fileRenamed = rename($fileSourcePath, $fileOutputPath);
+              error_log($fileRenamed);
 
               if ($fileRenamed) {
                 $convertedResult = true;
