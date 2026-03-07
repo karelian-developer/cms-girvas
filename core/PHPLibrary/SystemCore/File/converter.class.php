@@ -691,7 +691,8 @@ final class Converter implements InterfaceConverter
     if (preg_match('/<\?php|<\?=|<\?/i', $content)) {
       error_log("Potential PHP code detected in GIF");
       return false;
-    }
+    }error_log('kek');
+
     
     $imageSource = imagecreatefromgif($fileSourcePath);
     if ($imageSource === false) {
@@ -700,8 +701,8 @@ final class Converter implements InterfaceConverter
 
     $result = imagegif($imageSource, $fileOutputPath);
     
-    imagedestroy($imageSource);error_log('kek');
-
+    imagedestroy($imageSource);
+    
     if (!$result) {
       return false;
     }
@@ -709,8 +710,6 @@ final class Converter implements InterfaceConverter
     if ($deleteOldFile && file_exists($fileSourcePath)) {
       unlink($fileSourcePath);
     }
-
-    
 
     return file_exists($fileOutputPath);
   }
