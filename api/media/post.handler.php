@@ -160,7 +160,7 @@ if ($CMSCore->client->isLogged(2)) {
                 /** @var FileConverter Объект-конвектор файлов */
                 $fileConverter = new FileConverter($CMSCore);
                 /** @var array Конвертированный файл */
-                $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true, 4658, $quality);
+                $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true);
 
                 /** @var array Данные конвертированного файла */
                 $fileData = [];
