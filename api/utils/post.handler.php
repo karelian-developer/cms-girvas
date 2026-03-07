@@ -403,6 +403,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
 if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('method') === 'admin') {
   $CMSTelegramNotifier = CMSNotifier::create($CMSCore, 'telegram');
+  $CMSMaxNotifier = CMSNotifier::create($CMSCore, 'max');
   $clientIP = $CMSCore->client->getRealIPAddress();
   
   if (!$CMSCore->client->isLogged(2)) {
@@ -505,8 +506,13 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                 ]);
 
                 $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
+                $CMSMaxNotifierKey = $CMSCore->configurator->getNotifierKey('max');
+                
                 $CMSTelegramNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationTelegramChatsIDs();
+                $CMSMaxNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationMaxChatsIDs();
+                
                 $CMSTelegramNotifierChatsIDsCount = count($CMSTelegramNotifierChatsIDs);
+                $CMSMaxNotifierChatsIDsCount = count($CMSMaxNotifierChatsIDs);
                 
                 if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
@@ -532,6 +538,30 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                   }
                 }
 
+                if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
+
+                  $eventDatetime = date('Y-m-d H:i', time());
+                  $userIP = $CMSCore->client->getRealIPAddress();
+                  $userLogin = str_replace(['_'], ['\_'], $userLogin);
+
+                  $CMSMaxNotifierMessage = "\xF0\x9F\x94\x93 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "\n\n";
+                  $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ": " . $CMSCore->getSiteURL() . "\xC2\xA0\n\n";
+                  $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_USER_LOGIN_LABEL') . ": " . $userLogin . "\xC2\xA0\n";
+                  $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ": \xE2\x9C\x85 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SUCCESS_LABEL') . "\xC2\xA0\n\n";
+                  $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_DATE_LABEL') . ": " . $eventDatetime . "\xC2\xA0\n";
+                  $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CLIENT_IP_LABEL') . ": " . $userIP . "\xC2\xA0\n\n";
+                  $CMSMaxNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
+                  
+                  $CMSMaxNotifier->setMessage($CMSMaxNotifierMessage);
+
+                  foreach ($CMSMaxNotifierChatsIDsCount as $index => $id) {
+                    
+                    $CMSMaxNotifier->setChatID($id);
+                    $CMSMaxNotifier->send($CMSMaxNotifierKey);
+                    usleep(1000);
+                  }
+                }
+
                 $handlerOutputData['reload'] = true;
 
                 /** @var string $handlerMessage Сообщение обработчика */
@@ -550,8 +580,13 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
               ]);
 
               $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
+              $CMSMaxNotifierKey = $CMSCore->configurator->getNotifierKey('max');
+
               $CMSTelegramNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationTelegramChatsIDs();
+              $CMSMaxNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationMaxChatsIDs();
+
               $CMSTelegramNotifierChatsIDsCount = count($CMSTelegramNotifierChatsIDs);
+              $CMSMaxNotifierChatsIDsCount = count($CMSMaxNotifierChatsIDs);
 
               if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
@@ -577,6 +612,30 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                 }
               }
 
+              if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
+
+                $eventDatetime = date('Y-m-d H:i', time());
+                $userIP = $CMSCore->client->getRealIPAddress();
+                $userLogin = str_replace(['_'], ['\_'], $userLogin);
+                
+                $CMSMaxNotifierMessage = "\xF0\x9F\x94\x93 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "\n\n";
+                $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ": " . $CMSCore->getSiteURL() . "\xC2\xA0\n\n";
+                $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_USER_LOGIN_LABEL') . ": " . $userLogin . "\xC2\xA0\n";
+                $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ": \xF0\x9F\x94\xB4 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_UNSUCCESS_LABEL') . "\xC2\xA0\n\n";
+                $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_DATE_LABEL') . ": " . $eventDatetime . "\xC2\xA0\n";
+                $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CLIENT_IP_LABEL') . ": " . $userIP . "\xC2\xA0\n\n";
+                $CMSMaxNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
+
+                $CMSMaxNotifier->setMessage($CMSMaxNotifierMessage);
+
+                foreach ($CMSMaxNotifierChatsIDs as $index => $id) {
+                  
+                  $CMSMaxNotifier->setChatID($id);
+                  $CMSMaxNotifier->send($CMSMaxNotifierKey);
+                  usleep(1000);
+                }
+              }
+
               /** @var string $handlerMessage Сообщение обработчика */
               $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
               $handlerStatusCode = $handlerStatusCode ?? 0;
@@ -588,8 +647,13 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             ]);
 
             $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
+            $CMSMaxNotifierKey = $CMSCore->configurator->getNotifierKey('max');
+            
             $CMSTelegramNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationTelegramChatsIDs();
+            $CMSMaxNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationMaxChatsIDs();
+            
             $CMSTelegramNotifierChatsIDsCount = count($CMSTelegramNotifierChatsIDs);
+            $CMSMaxNotifierChatsIDsCount = count($CMSMaxNotifierChatsIDs);
 
             if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
@@ -615,6 +679,30 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
               }
             }
 
+            if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
+
+              $eventDatetime = date('Y-m-d H:i', time());
+              $userIP = $CMSCore->client->getRealIPAddress();
+              $userLogin = str_replace(['_'], ['\_'], $userLogin);
+              
+              $CMSMaxNotifierMessage = "\xF0\x9F\x94\x93 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "\n\n";
+              $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ": " . $CMSCore->getSiteURL() . "\xC2\xA0\n\n";
+              $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_USER_LOGIN_LABEL') . ": " . $userLogin . "\xC2\xA0\n";
+              $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ": \xF0\x9F\x94\xB4 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_UNSUCCESS_LABEL') . "\xC2\xA0\n\n";
+              $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_DATE_LABEL') . ": " . $eventDatetime . "\xC2\xA0\n";
+              $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CLIENT_IP_LABEL') . ": " . $userIP . "\xC2\xA0\n\n";
+              $CMSMaxNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
+
+              $CMSMaxNotifier->setMessage($CMSMaxNotifierMessage);
+
+              foreach ($CMSMaxNotifierChatsIDsCount as $index => $id) {
+                
+                $CMSMaxNotifier->setChatID($id);
+                $CMSMaxNotifier->send($CMSMaxNotifierKey);
+                usleep(1000);
+              }
+            }
+
             $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
@@ -625,8 +713,13 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
           ]);
 
           $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
+          $CMSMaxNotifierKey = $CMSCore->configurator->getNotifierKey('max');
+          
           $CMSTelegramNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationTelegramChatsIDs();
+          $CMSMaxNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationMaxChatsIDs();
+          
           $CMSTelegramNotifierChatsIDsCount = count($CMSTelegramNotifierChatsIDs);
+          $CMSMaxNotifierChatsIDsCount = count($CMSMaxNotifierChatsIDs);
 
           if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
@@ -650,14 +743,42 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
               usleep(1000);
             }
           }
+
+          if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
+
+            $eventDatetime = date('Y-m-d H:i', time());
+            $userIP = $CMSCore->client->getRealIPAddress();
+            $userLogin = str_replace(['_'], ['\_'], $userLogin);
+            
+            $CMSMaxNotifierMessage = "\xF0\x9F\x94\x93 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "\n\n";
+            $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ": " . $CMSCore->getSiteURL() . "\xC2\xA0\n\n";
+            $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_USER_LOGIN_LABEL') . ": " . $userLogin . "\xC2\xA0\n";
+            $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ": \xF0\x9F\x94\xB4 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_UNSUCCESS_LABEL') . "\xC2\xA0\n\n";
+            $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_DATE_LABEL') . ": " . $eventDatetime . "\xC2\xA0\n";
+            $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CLIENT_IP_LABEL') . ": " . $userIP . "\xC2\xA0\n\n";
+            $CMSMaxNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
+
+            $CMSMaxNotifier->setMessage($CMSMaxNotifierMessage);
+
+            foreach ($CMSMaxNotifierChatsIDs as $index => $id) {
+              $CMSMaxNotifier->setChatID($id);
+              $CMSMaxNotifier->send($CMSMaxNotifierKey);
+              usleep(1000);
+            }
+          }
           
           $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
         $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
+        $CMSMaxNotifierKey = $CMSCore->configurator->getNotifierKey('max');
+
         $CMSTelegramNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationTelegramChatsIDs();
+        $CMSMaxNotifierChatsIDs = $CMSCore->configurator->getSecurityNotificationMaxChatsIDs();
+
         $CMSTelegramNotifierChatsIDsCount = count($CMSTelegramNotifierChatsIDs);
+        $CMSMaxNotifierChatsIDsCount = count($CMSMaxNotifierChatsIDs);
 
         if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
@@ -679,6 +800,30 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             
             $CMSTelegramNotifier->setChatID($id);
             $CMSTelegramNotifier->send($CMSTelegramNotifierKey);
+            usleep(1000);
+          }
+        }
+
+        if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
+
+          $eventDatetime = date('Y-m-d H:i', time());
+          $userIP = $CMSCore->client->getRealIPAddress();
+          $userLogin = str_replace(['_'], ['\_'], $userLogin);
+          
+          $CMSMaxNotifierMessage = "\xF0\x9F\x94\x94 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_LIMIT_TITLE') . "\n\n";
+          $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ": " . $CMSCore->getSiteURL() . "\xC2\xA0\n\n";
+          $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_USER_LOGIN_LABEL') . ": " . $userLogin . "\xC2\xA0\n";
+          $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_STATUS_LABEL') . ": \xF0\x9F\x94\xB4 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_BANNED_LABEL') . "\xC2\xA0\n\n";
+          $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_DATE_LABEL') . ": " . $eventDatetime . "\xC2\xA0\n";
+          $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CLIENT_IP_LABEL') . ": " . $userIP . "\xC2\xA0\n\n";
+          $CMSMaxNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
+
+          $CMSMaxNotifier->setMessage($CMSMaxNotifierMessage);
+
+          foreach ($CMSMaxNotifierChatsIDs as $index => $id) {
+            
+            $CMSMaxNotifier->setChatID($id);
+            $CMSMaxNotifier->send($CMSMaxNotifierKey);
             usleep(1000);
           }
         }

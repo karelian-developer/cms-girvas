@@ -747,6 +747,18 @@ final class Configurator implements ConfiguratorInterface
   }
 
   /**
+   * Получить ID чатов для уведомителя в MAX
+   * 
+   * @return array
+   */
+  public function getSecurityNotificationMaxChatsIDs() : array
+  {
+    return $this->existsDatabaseEntryValue('security_notification_max_chats_ids')
+      ? json_decode($this->getDatabaseEntryValue('security_notification_max_chats_ids'), true)
+      : [];
+  }
+
+  /**
    * Получить ключ уведомителя
    * 
    * @param string $name
