@@ -147,7 +147,7 @@ if ($CMSCore->client->isLogged(2)) {
                   $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_TOO_WIDTH_IMAGE'), $CMSCore->configurator->getUploadFileImageWidthMax());
                   $handlerStatusCode = $handlerStatusCode ?? 0;
                 }
-              } if else ($fileMIMEType === 'application/pdf') {
+              } else if ($fileMIMEType === 'application/pdf') {
                 /** @var FileConverter Объект-конвектор файлов */
                 $fileConverter = new FileConverter($CMSCore);
                 /** @var array Конвертированный файл */
