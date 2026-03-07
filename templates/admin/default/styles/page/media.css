@@ -68,8 +68,8 @@
   align-items: center;
   background-color: var(--common-main-color-1);
   border-radius: 8px;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 
 .media-list__item > .media-list__item-controllers .interactive__button:hover,

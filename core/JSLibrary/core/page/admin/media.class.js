@@ -40,6 +40,7 @@ export class PageMedia {
     buttons.link = new Interactive('button');
     buttons.open = new Interactive('button');
     buttons.edit = new Interactive('button');
+    buttons.view = new Interactive('button');
 
     buttons.delete.target.setLabel(this.icons.trash);
     buttons.delete.target.setCallback((event) => {
@@ -207,10 +208,17 @@ export class PageMedia {
       });
     });
 
+    buttons.view.target.setLabel(this.icons.search);
+    buttons.view.target.setCallback((event) => {
+      event.preventDefault();
+      window.location.href = window.location.origin + fileURL;
+    });
+
     buttons.delete.assembly();
     buttons.link.assembly();
     buttons.open.assembly();
     buttons.edit.assembly();
+    buttons.view.assembly();
 
     const elementControllerElement = element.querySelector('[data-role="controller-panel"]');
     if (elementControllerElement !== null) {
@@ -221,6 +229,7 @@ export class PageMedia {
         elementControllerElement.appendChild(buttons.delete.target.element);
         elementControllerElement.appendChild(buttons.link.target.element);
         elementControllerElement.appendChild(buttons.edit.target.element);
+        elementControllerElement.appendChild(buttons.view.target.element);
       }
     }
   }
