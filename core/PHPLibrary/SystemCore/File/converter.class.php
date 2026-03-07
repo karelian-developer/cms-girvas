@@ -160,10 +160,14 @@ final class Converter implements InterfaceConverter
 
         if (($fileExtension === $convertToExtension)) {
           if (file_exists($fileSourcePath)) {
-            $fileRenamed = rename($fileSourcePath, $fileOutputPath);
+            if ($fileExtension === 'gif') {
+              $convertedResult = $this->sanitizeGIF($fileSourcePath, $fileOutputPath, $deleteOldFile);
+            } else {
+              $fileRenamed = rename($fileSourcePath, $fileOutputPath);
 
-            if ($fileRenamed) {
-              $convertedResult = true;
+              if ($fileRenamed) {
+                $convertedResult = true;
+              }
             }
           };
         }
@@ -664,6 +668,43 @@ final class Converter implements InterfaceConverter
 
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
+
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      unlink($fileSourcePath);
+    }
+
+    return file_exists($fileOutputPath);
+  }
+
+  private function sanitizeGIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
+  {
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $fileSourcePath);
+    finfo_close($finfo);
+    
+    if ($mimeType !== 'image/gif') {
+      error_log("Invalid MIME type: " . $mimeType);
+      return false;
+    }
+    
+    $content = file_get_contents($fileSourcePath);
+    if (preg_match('/<\?php|<\?=|<\?/i', $content)) {
+      error_log("Potential PHP code detected in GIF");
+      return false;
+    }
+    
+    $imageSource = imagecreatefromgif($fileSourcePath);
+    if ($imageSource === false) {
+      return false;
+    }
+
+    $result = imagegif($imageSource, $fileOutputPath);
+    
+    imagedestroy($imageSource);
+
+    if (!$result) {
+      return false;
+    }
 
     if ($deleteOldFile && file_exists($fileSourcePath)) {
       unlink($fileSourcePath);

@@ -34,7 +34,7 @@ if ($CMSCore->client->isLogged(2)) {
       $fileUploadedExtension = pathinfo($_FILES['mediaFile']['name'], PATHINFO_EXTENSION);
       
       /** @var array Массив разрешенных расширений передаваемых файлов */
-      $fileExtensionsAllowed = ['png', 'gif', 'jpg', 'jpeg', 'webp', 'gif'];
+      $fileExtensionsAllowed = ['png', 'gif', 'jpg', 'jpeg', 'webp', 'gif', 'pdf'];
 
       /** @var string Путь до загружаемых файлов */
       $filesDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
@@ -72,14 +72,16 @@ if ($CMSCore->client->isLogged(2)) {
                   'jpeg' => EnumFileFormat::JPG,
                   'png' => EnumFileFormat::PNG,
                   'webp' => EnumFileFormat::WEBP,
-                  'avif' => EnumFileFormat::AVIF
+                  'avif' => EnumFileFormat::AVIF,
+                  'gif' => EnumFileFormat::GIF
                 };
 
                 $image = match ($fileExtensionEnum) {
                   EnumFileFormat::JPG => imagecreatefromjpeg($_FILES['mediaFile']['tmp_name']),
                   EnumFileFormat::PNG => imagecreatefrompng($_FILES['mediaFile']['tmp_name']),
                   EnumFileFormat::WEBP => imagecreatefromwebp($_FILES['mediaFile']['tmp_name']),
-                  EnumFileFormat::AVIF => imagecreatefromavif($_FILES['mediaFile']['tmp_name'])
+                  EnumFileFormat::AVIF => imagecreatefromavif($_FILES['mediaFile']['tmp_name']),
+                  EnumFileFormat::GIF => imagecreatefromavif($_FILES['mediaFile']['tmp_name'])
                 };
 
                 /** @var int Ширина изображения */
@@ -94,12 +96,16 @@ if ($CMSCore->client->isLogged(2)) {
                 if ($imageWidth <= $CMSCore->configurator->getUploadFileImageWidthMax() || $CMSCore->configurator->getUploadFileImageWidthMax() === 0) {
                   // Проверка высоты изображения на соответствие ограничениям
                   if ($imageHeight <= $CMSCore->configurator->getUploadFileImageHeightMax() || $CMSCore->configurator->getUploadFileImageHeightMax() === 0) {
-                    
+                    // Проверка включения автоматической конвертации изображений
                     if ($CMSCore->configurator->getAutoConvertFileImageStatus(true)) {
-                      $fileExtensionConvertedEnum = match ($CMSCore->configurator->getAutoConvertFileImageExtension()) {
-                        'webp' => EnumFileFormat::WEBP,
-                        'avif' => EnumFileFormat::AVIF
-                      };
+                      if ($fileExtensionEnum === $fileExtensionEnum) {
+                        $fileExtensionConvertedEnum = EnumFileFormat::AVIF;
+                      } else {
+                        $fileExtensionConvertedEnum = match ($CMSCore->configurator->getAutoConvertFileImageExtension()) {
+                          'webp' => EnumFileFormat::WEBP,
+                          'avif' => EnumFileFormat::AVIF
+                        };
+                      }
                     } else {
                       $fileExtensionConvertedEnum = $fileExtensionEnum;
                     }

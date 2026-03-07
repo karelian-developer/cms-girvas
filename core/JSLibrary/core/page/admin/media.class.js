@@ -320,7 +320,7 @@ export class PageMedia {
 
     let mediaUploaderInput = document.querySelector('.form__input_file');
     if (mediaUploaderInput !== null) {
-      mediaUploaderInput.setAttribute('accept', 'image/png, image/jpeg, image/gif, image/webp, image/avif');
+      mediaUploaderInput.setAttribute('accept', 'image/png, image/jpeg, image/gif, image/webp, image/avif, application/pdf, .pdf');
 
       fetch('/handler/locales', {method: 'GET'}).then((response) => {
         return response.ok ? response.json() : Promise.reject(response);
