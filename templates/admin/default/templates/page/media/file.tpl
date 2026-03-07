@@ -1,4 +1,4 @@
-<li class="media-list__item item_directory" data-file-name="{FILE_FULLNAME}" data-file-url="{FILE_URL}">
+<li class="media-list__item item_file" data-file-name="{FILE_FULLNAME}" data-file-url="{FILE_URL}" data-file-extension="{FILE_EXTENSION}">
   <div class="media-list__item-body">
     <div class="media-list__item-icon-container">
       <img class="media-list__item-icon" src="/images/admin/icons/file.svg" alt="{FILE_NAME}">

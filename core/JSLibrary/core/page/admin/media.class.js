@@ -235,8 +235,13 @@ export class PageMedia {
   }
 
   uploadFile(inputElement, fileIndex) {
-    let formData = new FormData();
-    formData.append('mediaFile', inputElement.files[fileIndex]);
+    const imageRegex = /^image/i;
+
+    const file = inputElement.files[fileIndex];
+    const mimeType = file.type;
+
+    const formData = new FormData();
+    formData.append('mediaFile', file);
 
     let request = new Interactive('request', {
       method: 'POST',
@@ -264,40 +269,82 @@ export class PageMedia {
         listItemElement.classList.add('item');
         listItemElement.setAttribute('data-file-name', fileName);
         listItemElement.setAttribute('data-file-url', fileURL);
+        listItemElement.setAttribute('data-file-extension', fileExtension);
 
-        const listItemBodyContainerElement = document.createElement('div');
-        listItemBodyContainerElement.classList.add('media-list__item-body');
+        if (imageRegex.test(mimeType)) {
+          const listItemBodyContainerElement = document.createElement('div');
+          listItemBodyContainerElement.classList.add('media-list__item-body');
 
-        const listItemControllerContainerElement = document.createElement('div');
-        listItemControllerContainerElement.classList.add('media-list__item-controllers');
-        listItemControllerContainerElement.classList.add('item-controllers');
-        listItemControllerContainerElement.setAttribute('data-role', 'controller-panel');
+          const listItemControllerContainerElement = document.createElement('div');
+          listItemControllerContainerElement.classList.add('media-list__item-controllers');
+          listItemControllerContainerElement.classList.add('item-controllers');
+          listItemControllerContainerElement.setAttribute('data-role', 'controller-panel');
 
-        const listItemExtensionElement = document.createElement('span');
-        listItemExtensionElement.classList.add('media-list__item-extension');
-        listItemExtensionElement.innerText = fileExtension;
+          const listItemExtensionElement = document.createElement('span');
+          listItemExtensionElement.classList.add('media-list__item-extension');
+          listItemExtensionElement.innerText = fileExtension;
 
-        const listItemImageElement = document.createElement('img');
-        listItemImageElement.classList.add('media-list__item-preview');
-        listItemImageElement.setAttribute('src', fileURL);
-        listItemImageElement.setAttribute('alt', fileName);
+          const listItemImageElement = document.createElement('img');
+          listItemImageElement.classList.add('media-list__item-preview');
+          listItemImageElement.setAttribute('src', fileURL);
+          listItemImageElement.setAttribute('alt', fileName);
 
-        const listItemTitleContainerElement = document.createElement('div');
-        listItemTitleContainerElement.classList.add('media-list__item-title');
+          const listItemTitleContainerElement = document.createElement('div');
+          listItemTitleContainerElement.classList.add('media-list__item-title');
 
-        const listItemTitleElement = document.createElement('span');
-        listItemTitleElement.classList.add('media-list__item-label');
-        listItemTitleElement.innerText = fileName;
+          const listItemTitleElement = document.createElement('span');
+          listItemTitleElement.classList.add('media-list__item-label');
+          listItemTitleElement.innerText = fileName;
 
-        listItemTitleContainerElement.appendChild(listItemTitleElement);
-        listItemElement.appendChild(listItemTitleContainerElement);
+          listItemTitleContainerElement.appendChild(listItemTitleElement);
+          listItemElement.appendChild(listItemTitleContainerElement);
 
-        listItemBodyContainerElement.appendChild(listItemExtensionElement);
-        listItemBodyContainerElement.appendChild(listItemImageElement);
-        listItemBodyContainerElement.appendChild(listItemTitleContainerElement);
+          listItemBodyContainerElement.appendChild(listItemExtensionElement);
+          listItemBodyContainerElement.appendChild(listItemImageElement);
+          listItemBodyContainerElement.appendChild(listItemTitleContainerElement);
 
-        listItemElement.appendChild(listItemBodyContainerElement);
-        listItemElement.appendChild(listItemControllerContainerElement);
+          listItemElement.appendChild(listItemBodyContainerElement);
+          listItemElement.appendChild(listItemControllerContainerElement);
+        } else {
+          const listItemBodyContainerElement = document.createElement('div');
+          listItemBodyContainerElement.classList.add('media-list__item-body');
+
+          const listItemControllerContainerElement = document.createElement('div');
+          listItemControllerContainerElement.classList.add('media-list__item-controllers');
+          listItemControllerContainerElement.classList.add('item-controllers');
+          listItemControllerContainerElement.setAttribute('data-role', 'controller-panel');
+
+          const listItemIconContainer = document.createElement('div');
+          listItemIconContainer.classList.add('media-list__item-icon-container');
+
+          const listItemIcon = document.createElement('img');
+          listItemIcon.classList.add('media-list__item-icon');
+          listItemIcon.setAttribute('src', '/images/admin/icons/file.svg');
+          listItemIcon.setAttribute('alt', fileName);
+          
+          const listItemIconLabel = document.createElement('div');
+          listItemIconLabel.classList.add('media-list__item-icon-label');
+          listItemIconLabel.innerText = fileExtension;
+
+          const listItemTitleContainerElement = document.createElement('div');
+          listItemTitleContainerElement.classList.add('media-list__item-title');
+
+          const listItemTitleElement = document.createElement('span');
+          listItemTitleElement.classList.add('media-list__item-label');
+          listItemTitleElement.innerText = fileName;
+
+          listItemIconContainer.appendChild(listItemIcon);
+          listItemIconContainer.appendChild(listItemIconLabel);
+
+          listItemTitleContainerElement.appendChild(listItemTitleElement);
+          listItemElement.appendChild(listItemTitleContainerElement);
+
+          listItemBodyContainerElement.appendChild(listItemIconContainer);
+          listItemBodyContainerElement.appendChild(listItemTitleContainerElement);
+
+          listItemElement.appendChild(listItemBodyContainerElement);
+          listItemElement.appendChild(listItemControllerContainerElement);
+        }
 
         const mediaListElement = document.querySelector('#E9453667589');
         const mediaListItems = mediaListElement.querySelectorAll('li');
