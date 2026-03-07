@@ -700,7 +700,7 @@ final class Converter implements InterfaceConverter
 
     $result = imagegif($imageSource, $fileOutputPath);
     
-    imagedestroy($imageSource);
+    imagedestroy($imageSource);error_log('kek');
 
     if (!$result) {
       return false;
@@ -710,7 +710,7 @@ final class Converter implements InterfaceConverter
       unlink($fileSourcePath);
     }
 
-    error_log('kek');
+    
 
     return file_exists($fileOutputPath);
   }
