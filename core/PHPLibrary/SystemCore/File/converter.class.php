@@ -698,7 +698,6 @@ final class Converter implements InterfaceConverter
       return false;
     }
     
-    // 4. Проверяем первые 6 байт на сигнатуру GIF
     $handle = fopen($fileSourcePath, 'rb');
     if (!$handle) {
       error_log("Cannot open file for reading: " . $fileSourcePath);
@@ -728,32 +727,29 @@ final class Converter implements InterfaceConverter
       }
     }
     
-    $imageSource = imagecreatefromgif($fileSourcePath);
+    $imageSource = @imagecreatefromgif($fileSourcePath);
     if ($imageSource === false) {
-      error_log("GD failed to create image from: " . $fileSourcePath);
+      error_log("GD failed to validate image: " . $fileSourcePath);
       return false;
     }
     
     $width = imagesx($imageSource);
     $height = imagesy($imageSource);
     
+    imagedestroy($imageSource);
+    
     if ($width <= 0 || $height <= 0 || $width > 5000 || $height > 5000) {
-      imagedestroy($imageSource);
       error_log("Suspicious GIF dimensions: {$width}x{$height}");
       return false;
     }
     
-    $result = imagegif($imageSource, $fileOutputPath);
-    
-    imagedestroy($imageSource);
-    
-    if (!$result) {
-      error_log("Failed to save sanitized GIF to: " . $fileOutputPath);
+    if (!copy($fileSourcePath, $fileOutputPath)) {
+      error_log("Failed to copy file to: " . $fileOutputPath);
       return false;
     }
     
     if (!file_exists($fileOutputPath) || filesize($fileOutputPath) === 0) {
-      error_log("Sanitized GIF file is missing or empty");
+      error_log("Copied file is missing or empty");
       return false;
     }
     
