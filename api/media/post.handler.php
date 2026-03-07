@@ -147,6 +147,29 @@ if ($CMSCore->client->isLogged(2)) {
                   $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_TOO_WIDTH_IMAGE'), $CMSCore->configurator->getUploadFileImageWidthMax());
                   $handlerStatusCode = $handlerStatusCode ?? 0;
                 }
+              } if else ($fileMIMEType === 'application/pdf') {
+                /** @var FileConverter Объект-конвектор файлов */
+                $fileConverter = new FileConverter($CMSCore);
+                /** @var array Конвертированный файл */
+                $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true, 4658, $quality);
+
+                /** @var array Данные конвертированного файла */
+                $fileData = [];
+
+                $fileData['URL'] = '/uploads/media/' . $fileConverted['fileName'];
+                $fileData['isDirectory'] = is_dir(CMS_ROOT_DIRECTORY . $fileData['URL']);
+                $fileData['fullname'] = $fileConverted['fileName'];
+                $fileData['extension'] = $fileConverted['extensionNew'];
+                
+                $handlerOutputData['file'] = $fileData;
+
+                if (is_array($fileConverted)) {
+                  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_POST_FILES_SUCCESS');
+                  $handlerStatusCode = $handlerStatusCode ?? 1;
+                } else {
+                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+                  $handlerStatusCode = $handlerStatusCode ?? 0;
+                }
               }
             } else {
               $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_HEAVY_FILE'), $CMSCore->configurator->getUploadFileWeightMax());
