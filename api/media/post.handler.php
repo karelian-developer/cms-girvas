@@ -100,6 +100,7 @@ if ($CMSCore->client->isLogged(2)) {
                     if ($CMSCore->configurator->getAutoConvertFileImageStatus(true)) {
                       if ($fileExtensionEnum === EnumFileFormat::GIF) {
                         $fileExtensionConvertedEnum = $fileExtensionEnum;
+                        error_log('adfsdfasd');
                       } else {
                         $fileExtensionConvertedEnum = match ($CMSCore->configurator->getAutoConvertFileImageExtension()) {
                           'webp' => EnumFileFormat::WEBP,
