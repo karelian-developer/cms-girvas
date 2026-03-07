@@ -341,7 +341,7 @@ export class PageMedia {
       }).then((localeData) => {
         this.localeData = localeData;
 
-        return this.page.core.loadIcons('/images/admin/icons').then((icons) => {
+        return this.page.core.loadIcons('/images/admin/icons/buttons').then((icons) => {
           return icons;
         });
       }, (rejectionReason) => {
