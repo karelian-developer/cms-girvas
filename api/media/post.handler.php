@@ -81,7 +81,7 @@ if ($CMSCore->client->isLogged(2)) {
                   EnumFileFormat::PNG => imagecreatefrompng($_FILES['mediaFile']['tmp_name']),
                   EnumFileFormat::WEBP => imagecreatefromwebp($_FILES['mediaFile']['tmp_name']),
                   EnumFileFormat::AVIF => imagecreatefromavif($_FILES['mediaFile']['tmp_name']),
-                  EnumFileFormat::GIF => imagecreatefromavif($_FILES['mediaFile']['tmp_name'])
+                  EnumFileFormat::GIF => imagecreatefromgif($_FILES['mediaFile']['tmp_name'])
                 };
 
                 /** @var int Ширина изображения */
