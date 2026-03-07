@@ -710,6 +710,8 @@ final class Converter implements InterfaceConverter
       unlink($fileSourcePath);
     }
 
+    error_log('kek');
+
     return file_exists($fileOutputPath);
   }
 }
