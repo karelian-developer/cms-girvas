@@ -78,6 +78,7 @@ final class Converter implements InterfaceConverter
         EnumFileFormat::WEBP => $convertToExtension = 'webp',
         EnumFileFormat::AVIF => $convertToExtension = 'avif',
         EnumFileFormat::GIF => $convertToExtension = 'gif',
+        EnumFileFormat::PDF => $convertToExtension = 'pdf',
         default => ''
       };
 
@@ -165,7 +166,6 @@ final class Converter implements InterfaceConverter
               $convertedResult = $this->sanitizeGIF($fileSourcePath, $fileOutputPath, $deleteOldFile);
             } else {
               $fileRenamed = rename($fileSourcePath, $fileOutputPath);
-              error_log($fileRenamed);
 
               if ($fileRenamed) {
                 $convertedResult = true;
