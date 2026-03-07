@@ -162,6 +162,7 @@ final class Converter implements InterfaceConverter
           if (file_exists($fileSourcePath)) {
             if ($fileExtension === 'gif') {
               $convertedResult = $this->sanitizeGIF($fileSourcePath, $fileOutputPath, $deleteOldFile);
+              error_log(var_dump(print_r($convertedResult, true)));
             } else {
               $fileRenamed = rename($fileSourcePath, $fileOutputPath);
 
@@ -680,7 +681,7 @@ final class Converter implements InterfaceConverter
   {
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $mimeType = finfo_file($finfo, $fileSourcePath);
-    finfo_close($finfo);error_log('kek');
+    finfo_close($finfo);
     
     if ($mimeType !== 'image/gif') {
       error_log("Invalid MIME type: " . $mimeType);
