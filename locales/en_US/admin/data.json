@@ -543,6 +543,8 @@
   "PAGE_SETTINGS_SETTING_BASE_SECTION_ANALYTICS_DESCRIPTION": "Section \"Analytics\" is a statistical section where you can analyze the situation around the content on your site. For example, you can see how many views your posts or static pages have, as well as how many times users visited your site during the day.",
   "PAGE_SETTINGS_SETTING_SECURITY_NOTIFICATIONS_TELEGRAM_CHATS_TITLE": "Chat IDs for the notifier (Telegram)",
   "PAGE_SETTINGS_SETTING_SECURITY_NOTIFICATIONS_TELEGRAM_CHATS_DESCRIPTION": "List of Telegram chats to which the notifier will send system notifications. Their IDs must be separated by commas.",
+  "PAGE_SETTINGS_SETTING_SECURITY_NOTIFICATIONS_MAX_CHATS_TITLE": "Chat IDs for the notifier (Max)",
+  "PAGE_SETTINGS_SETTING_SECURITY_NOTIFICATIONS_MAX_CHATS_DESCRIPTION": "List of Max chats to which the notifier will send system notifications. Their IDs must be separated by commas.",
   "PAGE_SETTINGS_SETTING_SECURITY_REGISTRATION_USERS_TITLE": "User registration",
   "PAGE_SETTINGS_SETTING_SECURITY_REGISTRATION_USERS_DESCRIPTION": "This option allows or denies users registration in the system.",
   "PAGE_SETTINGS_SETTING_SECURITY_RESTRICTING_ACCESS_TO_AP_BY_IP_TITLE": "Restricting access to the administrative panel by IP address.",
