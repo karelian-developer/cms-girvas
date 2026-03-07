@@ -685,14 +685,13 @@ final class Converter implements InterfaceConverter
     if ($mimeType !== 'image/gif') {
       error_log("Invalid MIME type: " . $mimeType);
       return false;
-    }
+    }error_log('kek');
     
     $content = file_get_contents($fileSourcePath);
     if (preg_match('/<\?php|<\?=|<\?/i', $content)) {
       error_log("Potential PHP code detected in GIF");
       return false;
-    }error_log('kek');
-
+    }
     
     $imageSource = imagecreatefromgif($fileSourcePath);
     if ($imageSource === false) {
