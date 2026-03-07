@@ -122,6 +122,8 @@ if ($CMSCore->client->isLogged(2)) {
                     /** @var array Конвертированный файл */
                     $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true, 4658, $quality);
                     
+                    error_log(print_r($fileConverted, true));
+
                     /** @var array Данные конвертированного файла */
                     $fileData = [];
 
