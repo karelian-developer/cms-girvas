@@ -13,5 +13,6 @@
 ### Другие ресурсы
 * **Официальный сайт производителя:** [https://карельский-разработчик.рф](https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai/)
 * **Официальный Telegram-канал производителя:** [https://t.me/karelian_developer](https://t.me/karelian_developer)
+* **Официальный канал производителя в MAX:** [https://max.ru/id100605017919_biz](https://max.ru/id100605017919_biz)
 * **Официальное сообщество ВКонтакте производителя:** [https://vk.ru/karelian_developer](https://vk.ru/karelian_developer)
 * **Официальное сообщество Одноклассники производителя:** [https://ok.ru/kareliandeveloper](https://ok.ru/kareliandeveloper)

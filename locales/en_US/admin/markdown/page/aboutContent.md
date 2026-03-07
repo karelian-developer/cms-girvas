@@ -13,5 +13,6 @@ All files that were supplied with this software have their owners. The current b
 ### Other resources
 * **Official manufacturer website:** [https://карельский-производитель.рф](https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai/)
 * **Official manufacturer Telegram channel:** [https://t.me/karelian_developer](https://t.me/karelian_developer)
+* **Official manufacturer MAX channel:** [https://max.ru/id100605017919_biz](https://max.ru/id100605017919_biz)
 * **Official manufacturer VKontakte community:** [https://vk.ru/karelian_developer](https://vk.ru/karelian_developer)
 * **Official manufacturer Odnoklassniki community:** [https://ok.ru/kareliandeveloper](https://ok.ru/kareliandeveloper)

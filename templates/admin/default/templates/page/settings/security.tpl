@@ -121,7 +121,7 @@
         <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308804" type="checkbox" {SETTING_PREMODERATION_WORDS_FILTER_CHECKED_VALUE} data-logic-block="I1474308815" data-status-block="I1474308114">
         <label class="checkbox-container__label form__label" for="I1474308804"></label>
       </div>
-      <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_premoderation_words_filter_list" id="I1474308815" cols="30" rows="10" placeholder="PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_PLACEHOLDER">{SETTING_PREMODERATION_WORDS_FILTER_LIST_VALUE}</textarea>
+      <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_premoderation_words_filter_list" id="I1474308815" cols="30" rows="10" placeholder="{LANG:PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_PLACEHOLDER}">{SETTING_PREMODERATION_WORDS_FILTER_LIST_VALUE}</textarea>
     </div>
     <!-- Панель формы -->
     <div class="cell grid-table__cell grid-table__cell_panel" data-element="panel"></div>
