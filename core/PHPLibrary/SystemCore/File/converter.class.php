@@ -77,6 +77,7 @@ final class Converter implements InterfaceConverter
         EnumFileFormat::PNG => $convertToExtension = 'png',
         EnumFileFormat::WEBP => $convertToExtension = 'webp',
         EnumFileFormat::AVIF => $convertToExtension = 'avif',
+        EnumFileFormat::GIF => $convertToExtension = 'gif',
         default => ''
       };
 
