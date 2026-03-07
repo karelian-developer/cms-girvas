@@ -98,14 +98,10 @@ if ($CMSCore->client->isLogged(2)) {
                   if ($imageHeight <= $CMSCore->configurator->getUploadFileImageHeightMax() || $CMSCore->configurator->getUploadFileImageHeightMax() === 0) {
                     // Проверка включения автоматической конвертации изображений
                     if ($CMSCore->configurator->getAutoConvertFileImageStatus(true)) {
-                      if ($fileExtensionEnum === $fileExtensionEnum) {
-                        $fileExtensionConvertedEnum = EnumFileFormat::AVIF;
-                      } else {
-                        $fileExtensionConvertedEnum = match ($CMSCore->configurator->getAutoConvertFileImageExtension()) {
-                          'webp' => EnumFileFormat::WEBP,
-                          'avif' => EnumFileFormat::AVIF
-                        };
-                      }
+                      $fileExtensionConvertedEnum = match ($CMSCore->configurator->getAutoConvertFileImageExtension()) {
+                        'webp' => EnumFileFormat::WEBP,
+                        'avif' => EnumFileFormat::AVIF
+                      };
                     } else {
                       $fileExtensionConvertedEnum = $fileExtensionEnum;
                     }
