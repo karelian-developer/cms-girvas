@@ -211,7 +211,7 @@ export class PageMedia {
     buttons.view.target.setLabel(this.icons.search);
     buttons.view.target.setCallback((event) => {
       event.preventDefault();
-      window.location.href = window.location.origin + fileURL;
+      window.open(window.location.origin + fileURL);
     });
 
     buttons.delete.assembly();
