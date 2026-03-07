@@ -147,7 +147,16 @@ if ($CMSCore->client->isLogged(2)) {
                   $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_TOO_WIDTH_IMAGE'), $CMSCore->configurator->getUploadFileImageWidthMax());
                   $handlerStatusCode = $handlerStatusCode ?? 0;
                 }
-              } else if ($fileMIMEType === 'application/pdf') {
+              } else if (preg_match('/^application\//', $fileMIMEType)) {
+                preg_match('/^application\/([a-z]+)/', $fileMIMEType, $matches);
+                $fileExtension = $matches[1];
+
+                $fileExtensionEnum = match ($fileExtension) {
+                  'pdf' => EnumFileFormat::PDF
+                };
+
+                $fileExtensionConvertedEnum = $fileExtensionEnum;
+
                 /** @var FileConverter Объект-конвектор файлов */
                 $fileConverter = new FileConverter($CMSCore);
                 /** @var array Конвертированный файл */
