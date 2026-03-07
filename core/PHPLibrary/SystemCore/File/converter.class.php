@@ -679,38 +679,90 @@ final class Converter implements InterfaceConverter
 
   private function sanitizeGIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
   {
+    if (!file_exists($fileSourcePath)) {
+      error_log("File does not exist: " . $fileSourcePath);
+      return false;
+    }
+
+    if (filesize($fileSourcePath) === 0) {
+      error_log("File is empty: " . $fileSourcePath);
+      return false;
+    }
+    
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $mimeType = finfo_file($finfo, $fileSourcePath);
     finfo_close($finfo);
     
     if ($mimeType !== 'image/gif') {
-      error_log("Invalid MIME type: " . $mimeType);
+      error_log("Invalid MIME type: " . $mimeType . " for file: " . $fileSourcePath);
       return false;
     }
     
-    $content = file_get_contents($fileSourcePath);
-    if (preg_match('/<\?php|<\?=|<\?/i', $content)) {
-      error_log("Potential PHP code detected in GIF");
+    // 4. Проверяем первые 6 байт на сигнатуру GIF
+    $handle = fopen($fileSourcePath, 'rb');
+    if (!$handle) {
+      error_log("Cannot open file for reading: " . $fileSourcePath);
       return false;
+    }
+    
+    $header = fread($handle, 6);
+    fclose($handle);
+    
+    if (!in_array($header, ['GIF87a', 'GIF89a'])) {
+      error_log("Invalid GIF header: " . bin2hex($header));
+      return false;
+    }
+    
+    $handle = fopen($fileSourcePath, 'rb');
+    if ($handle) {
+      $start = fread($handle, 2048);
+      fseek($handle, -2048, SEEK_END);
+      $end = fread($handle, 2048);
+      fclose($handle);
+      
+      $contentToCheck = $start . $end;
+      
+      if (preg_match('/<\?php|<\?=|<\?|<\s*\%|<\s*script\s*language\s*=\s*["\']?\s*php/i', $contentToCheck)) {
+        error_log("Potential PHP code detected in GIF: " . $fileSourcePath);
+        return false;
+      }
     }
     
     $imageSource = imagecreatefromgif($fileSourcePath);
     if ($imageSource === false) {
+      error_log("GD failed to create image from: " . $fileSourcePath);
       return false;
     }
-
+    
+    $width = imagesx($imageSource);
+    $height = imagesy($imageSource);
+    
+    if ($width <= 0 || $height <= 0 || $width > 5000 || $height > 5000) {
+      imagedestroy($imageSource);
+      error_log("Suspicious GIF dimensions: {$width}x{$height}");
+      return false;
+    }
+    
     $result = imagegif($imageSource, $fileOutputPath);
     
     imagedestroy($imageSource);
     
     if (!$result) {
+      error_log("Failed to save sanitized GIF to: " . $fileOutputPath);
       return false;
     }
-
+    
+    if (!file_exists($fileOutputPath) || filesize($fileOutputPath) === 0) {
+      error_log("Sanitized GIF file is missing or empty");
+      return false;
+    }
+    
     if ($deleteOldFile && file_exists($fileSourcePath)) {
-      unlink($fileSourcePath);
+      if (!unlink($fileSourcePath)) {
+        error_log("Failed to delete source file: " . $fileSourcePath);
+      }
     }
 
-    return file_exists($fileOutputPath);
+    return true;
   }
 }
