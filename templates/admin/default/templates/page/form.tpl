@@ -73,9 +73,6 @@
         <div class="cell grid-table__cell grid-table__cell_header">
           {LANG:PAGE_FORM_NOTIFICATIONS_TITLE}
         </div>
-        <div class="cell grid-table__cell grid-table__cell_data">
-          <input name="form_notification_telegram_key" type="text" class="input form__input form__input_text" value="{FORM_NOTIFICATION_TELEGRAM_KEY}" placeholder="" data-element="input-notifications-telegram-key">
-        </div>
         <!-- Поле: Уведомления (чаты Telegram) -->
         <div class="cell grid-table__cell grid-table__cell_text">
           <div class="cell__title">
@@ -112,6 +109,18 @@
         <div class="cell grid-table__cell grid-table__cell_data">
           <input name="form_notification_telegram_channels_ids" type="text" class="input form__input form__input_text" value="{FORM_NOTIFICATION_TELEGRAM_CHANNELS_IDS}" placeholder="123456789, 123456790..." data-element="input-notifications-telegram-channels-ids">
         </div> -->
+        <!-- Поле: Уведомления (чаты Max) -->
+        <div class="cell grid-table__cell grid-table__cell_text">
+          <div class="cell__title">
+            {LANG:PAGE_FORM_NOTIFICATIONS_MAX_CHATS_TITLE}
+          </div>
+          <div class="cell__description">
+            {LANG:PAGE_FORM_NOTIFICATIONS_MAX_CHATS_DESCRIPTION}
+          </div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <input name="form_notification_max_chats_ids" type="text" class="input form__input form__input_text" value="{FORM_NOTIFICATION_MAX_CHATS_IDS}" placeholder="123456789, 123456790..." data-element="input-notifications-max-chats-ids">
+        </div>
         <!-- Раздел: Элементы формы -->
         <div class="cell grid-table__cell grid-table__cell_header">
           {LANG:PAGE_FORM_ELEMENTS_TITLE}
