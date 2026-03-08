@@ -471,7 +471,7 @@ export class PageForm {
 
     cellElementsForType[1].append(interactiveChoicesTypeField.target.element);
 
-    const checkboxID = Array(10).fill(0).map(() => Math.floor(Math.random() * 100));
+    const checkboxID = Array(10).fill(0).map(() => Math.floor(Math.random() * 10)).join('');
 
     const checkboxContainerElement = document.createElement('div');
     checkboxContainerElement.classList.add('form__checkbox-container');
