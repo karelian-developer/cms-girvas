@@ -162,7 +162,23 @@ if ($CMSCore->client->isLogged(2)) {
         }
       }
 
+      if (isset($_PATCH['form_notification_max_chats_ids'])) {
+
+        $formMaxChatsIDs = explode(',', $_PATCH['form_notification_max_chats_ids']);
+        
+        foreach ($formMaxChatsIDs as $index => $id) {
+
+          if (!is_numeric($id)) {
+            unset($formMaxChatsIDs[$index]);
+            continue;
+          }
+
+          $formMaxChatsIDs[$index] = trim($id);
+        }
+      }
+
       $formData['metadata']['telegramChatsIDs'] = $formTelegramChatsIDs ?? [];
+      $formData['metadata']['maxChatsIDs'] = $formMaxChatsIDs ?? [];
 
       $formData['elements'] = $formElements;
       $isUpdated = $form->update($formData);

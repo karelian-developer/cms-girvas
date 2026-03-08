@@ -219,6 +219,28 @@ class Form implements EntityTypeContent
   }
   
   /**
+   * Получить ID чата в Max
+   *
+   * @return array
+   */
+  public function getMaxChatsIDs() : array
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+      
+      if (isset($metadata['maxChatsIDs'])) {
+        $value = is_string($metadata['maxChatsIDs'])
+          ? explode(', ', $metadata['maxChatsIDs'])
+          : $metadata['maxChatsIDs'];
+
+        return $value;
+      }
+    }
+
+    return [];
+  }
+  
+  /**
    * Получить ID топика в Telegram
    *
    * @return array

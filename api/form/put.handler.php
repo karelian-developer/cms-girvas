@@ -45,7 +45,7 @@ if ($CMSCore->client->isLogged(2)) {
       ? (int)$_PUT['form_method_id']
       : 0;
 
-    if (isset($_PATCH['form_notification_telegram_chats_ids'])) {
+    if (isset($_PUT['form_notification_telegram_chats_ids'])) {
 
       $formTelegramChatsIDs = explode(',', $_PUT['form_notification_telegram_chats_ids']);
       
@@ -60,7 +60,23 @@ if ($CMSCore->client->isLogged(2)) {
       }
     }
 
+    if (isset($_PUT['form_notification_max_chats_ids'])) {
+
+      $formMaxChatsIDs = explode(',', $_PUT['form_notification_max_chats_ids']);
+      
+      foreach ($formMaxChatsIDs as $index => $id) {
+
+        if (!is_numeric($id)) {
+          unset($formMaxChatsIDs[$index]);
+          continue;
+        }
+
+        $formMaxChatsIDs[$index] = trim($id);
+      }
+    }
+
     $formTelegramChatsIDs = $formTelegramChatsIDs ?? [];
+    $formMaxChatsIDs = $formMaxChatsIDs ?? [];
     
     $formAction = $_PUT['form_action'] ?? '';
 
@@ -147,6 +163,7 @@ if ($CMSCore->client->isLogged(2)) {
     $metadata['methodID'] = $formMethodID;
     $metadata['action'] = $formAction;
     $metadata['telegramChatsIDs'] = $formTelegramChatsIDs;
+    $metadata['maxChatsIDs'] = $formMaxChatsIDs;
 
     $form = Form::create($CMSCore, $formName, $texts, $elements, $metadata);
 
