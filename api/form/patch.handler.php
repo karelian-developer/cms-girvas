@@ -49,7 +49,7 @@ if ($CMSCore->client->isLogged(2)) {
         return isset($_PATCH['form_element_name']) && in_array($element['name'], $_PATCH['form_element_name']);
       });
 
-      error_log(print_r($_PATCH, true))
+      error_log(print_r($_PATCH, true));
 
       $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
       if (count($CMSLocalesNames) > 0) {
