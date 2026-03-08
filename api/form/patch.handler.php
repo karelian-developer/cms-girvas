@@ -45,6 +45,10 @@ if ($CMSCore->client->isLogged(2)) {
       $formData = [];
       $formElements = $form->getElements();
 
+      $formElements = array_filter($formElements, function($element) use ($_PATCH) {
+        return isset($_PATCH['form_element_name']) && in_array($element['name'], $_PATCH['form_element_name']);
+      });
+
       $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
       if (count($CMSLocalesNames) > 0) {
         foreach ($CMSLocalesNames as $index => $name) {
