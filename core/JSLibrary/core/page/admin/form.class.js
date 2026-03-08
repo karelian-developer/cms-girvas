@@ -194,6 +194,7 @@ export class PageForm {
           this.addElement(localeData, tableFormElementsButtonContainer, {
             index: elementIndex,
             type: element.type,
+            required: element.required,
             title: elementTitle,
             description: elementDescription,
             placeholder: elementPlaceholder,
@@ -484,7 +485,11 @@ export class PageForm {
     checkboxInputElement.setAttribute('id', 'I' + checkboxID);
     checkboxInputElement.setAttribute('name', 'form_element_required[' + this.elementsCount + ']');
     checkboxInputElement.setAttribute('type', 'checkbox');
-    checkboxInputElement.setAttribute('value', 'field_is_required');
+    checkboxInputElement.setAttribute('value', 'required');
+
+    if (data.required) {
+      checkboxInputElement.setAttribute('checked', 'checked');
+    }
     
     const checkboxLabelElement = document.createElement('label');
     checkboxLabelElement.classList.add('checkbox-container__label');
