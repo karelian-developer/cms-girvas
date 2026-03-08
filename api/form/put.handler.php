@@ -93,14 +93,17 @@ if ($CMSCore->client->isLogged(2)) {
 
         $elementName = $_PUT['form_element_name'][$elementIndex] ?? null;
         $elementSequenceNumber = $_PUT['form_element_sequence_number'][$elementIndex] ?? null;
+        $elementRequired = $_PUT['form_element_required'][$elementIndex] ?? null;
 
         if ($elementName !== null) {
           $elements[$elementIndex]['name'] = trim($elementName);
         }
 
         if ($elementSequenceNumber !== null) {
-          $elements[$elementIndex]['sequenceNumber'] = (is_numeric($elementSequenceNumber)) ? $elementSequenceNumber : 0;
+          $elements[$elementIndex]['sequenceNumber'] = is_numeric($elementSequenceNumber) ? $elementSequenceNumber : 0;
         }
+
+        $elements[$elementIndex]['required'] = $elementRequired !== null;
       }
     }
 

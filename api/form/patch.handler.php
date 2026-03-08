@@ -95,6 +95,10 @@ if ($CMSCore->client->isLogged(2)) {
             ? $_PATCH['form_element_type']
             : [];
 
+          $formElementRequired = isset($_PATCH['form_element_required'])
+            ? $_PATCH['form_element_required']
+            : [];
+
           $formElementNames = isset($_PATCH['form_element_name'])
             ? $_PATCH['form_element_name']
             : [];
@@ -113,6 +117,7 @@ if ($CMSCore->client->isLogged(2)) {
 
               $formElements[$i]['number'] = $i + 1;
               $formElements[$i]['type'] = $formElementTypes[$i];
+              $formElements[$i]['required'] = $formElementRequired[$i];
               $formElements[$i]['name'] = trim($formElementNames[$i]);
               $formElements[$i]['sequenceNumber'] = is_numeric($formElementSequenceNumbers[$i])
                 ? $formElementSequenceNumbers[$i]
