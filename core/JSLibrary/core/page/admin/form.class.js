@@ -202,8 +202,6 @@ export class PageForm {
         });
       });
 
-      tableFormElementsButtonContainer.append(this.buttons.addElement.target.element);
-      
       const interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
         const formTitleInputElement = document.querySelector('[data-element="input-title"]');
@@ -333,6 +331,8 @@ export class PageForm {
         this.buttons.save.target.element.style.display = 'flex';
       }
 
+      tableFormElementsButtonContainer.append(this.buttons.addElement.target.element);
+
       let interactiveContainer = document.querySelector('[data-element="panel"]');
       interactiveContainer.append(this.buttons.delete.target.element);
       interactiveContainer.append(this.buttons.save.target.element);
@@ -433,6 +433,10 @@ export class PageForm {
       localeData.PAGE_FORM_ELEMENT_TYPE_TITLE
     );
 
+    const cellElementsForRequired = this.createCellFormElementElements(
+      localeData.PAGE_FORM_ELEMENT_REQUIRED_TITLE
+    );
+
     /* Выпадающий список с типами полей */
 
     const interactiveChoicesTypeField = new Interactive('choices');
@@ -465,6 +469,30 @@ export class PageForm {
     interactiveChoicesTypeField.assembly();
 
     cellElementsForType[1].append(interactiveChoicesTypeField.target.element);
+
+    const checkboxID = Array(10).fill(0).map(() => Math.floor(Math.random() * 100));
+
+    const checkboxContainerElement = document.createElement('div');
+    checkboxContainerElement.classList.add('form__checkbox-container');
+    checkboxContainerElement.classList.add('checkbox-container');
+
+    const checkboxInputElement = document.createElement('input');
+    checkboxInputElement.classList.add('checkbox-container__input');
+    checkboxInputElement.classList.add('form__input');
+    checkboxInputElement.classList.add('form__input_checkbox');
+    checkboxInputElement.setAttribute('id', 'I' + checkboxID);
+    checkboxInputElement.setAttribute('name', 'form_element_required[]');
+    checkboxInputElement.setAttribute('type', 'checkbox');
+    checkboxInputElement.setAttribute('value', 'field_is_required');
+    
+    const checkboxLabelElement = document.createElement('label');
+    checkboxLabelElement.classList.add('checkbox-container__label');
+    checkboxLabelElement.classList.add('form__label');
+    checkboxLabelElement.setAttribute('for', 'I' + checkboxID);
+
+    checkboxContainerElement.appendChild(checkboxInputElement);
+    checkboxContainerElement.appendChild(checkboxLabelElement);
+    cellElementsForRequired[1].append(checkboxContainerElement);
 
     const cellElementsForTitle = this.createCellFormElementElements(
       localeData.PAGE_FORM_ELEMENT_TITLE_TITLE,
@@ -499,6 +527,10 @@ export class PageForm {
       event.preventDefault();
       
       cellElementsForType.forEach(element => {
+        element.remove();
+      });
+      
+      cellElementsForRequired.forEach(element => {
         element.remove();
       });
 

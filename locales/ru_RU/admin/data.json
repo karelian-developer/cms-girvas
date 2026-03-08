@@ -352,6 +352,7 @@
   "PAGE_FORM_NEW_ELEMENT": "Новый элемент",
   "PAGE_FORM_ELEMENT": "Элемент",
   "PAGE_FORM_ELEMENT_TYPE_TITLE": "Тип поля",
+  "PAGE_FORM_ELEMENT_REQUIRED_TITLE": "Обязательное поле",
   "PAGE_FORM_ELEMENT_TITLE_TITLE": "Наименование",
   "PAGE_FORM_ELEMENT_TECHNICAL_NAME_TITLE": "Техническое наименование",
   "PAGE_FORM_ELEMENT_DESCRIPTION_TITLE": "Описание",
