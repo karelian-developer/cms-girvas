@@ -92,9 +92,11 @@ class PageForm implements InterfacePage
         $formAction = $form->getAction();
         $formAction = strip_tags($formAction);
 
-        $formTelegramKey = $form->getTelegramKey();
         $formTelegramChatsIDs = $form->getTelegramChatsIDs();
         $formTelegramChatsIDs = implode(', ', $formTelegramChatsIDs);
+        
+        $formMaxChatsIDs = $form->getMaxChatsIDs();
+        $formMaxChatsIDs = implode(', ', $formMaxChatsIDs);
       }
     }
     
@@ -106,8 +108,8 @@ class PageForm implements InterfacePage
         'FORM_DESCRIPTION' => $form !== null ? $formDescription : '',
         'FORM_NAME' => $form !== null ? $formName : '',
         'FORM_ACTION' => $form !== null ? $formAction : '',
-        'FORM_NOTIFICATION_TELEGRAM_KEY' => $form !== null ? $formTelegramKey : '',
-        'FORM_NOTIFICATION_TELEGRAM_CHATS_IDS' => $form !== null ? $formTelegramChatsIDs : ''
+        'FORM_NOTIFICATION_TELEGRAM_CHATS_IDS' => $form !== null ? $formTelegramChatsIDs : '',
+        'FORM_NOTIFICATION_MAX_CHATS_IDS' => $form !== null ? $formMaxChatsIDs : ''
       ]
     );
   }
