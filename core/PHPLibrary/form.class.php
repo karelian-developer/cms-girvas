@@ -829,7 +829,7 @@ class Form implements EntityTypeContent
         if ($columnName === 'elements') {
           $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
             'mysql' => 'CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON)',
-            'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
+            'postgresql' => $columnName . '::jsonb = ' . implode(' || ', $fieldsJSON)
           ]);
         } else {
           $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
