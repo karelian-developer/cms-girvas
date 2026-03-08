@@ -414,6 +414,7 @@ class Form implements EntityTypeContent
       $DOMElementDescription = $element['texts'][$CMSLocaleName]['description'];
       $DOMElementPlaceholder = $element['texts'][$CMSLocaleName]['placeholder'];
       $DOMElementType = $element['type'];
+      $DOMElementRequired = $element['required'] ?? false;
       $DOMElementID = 'FORM_' . strtoupper(str_replace('-', '_', $formName)) . '_' . strtoupper($DOMElementName);
 
       $DOMElement = $DOMElementType === 'textarea' 
@@ -431,6 +432,10 @@ class Form implements EntityTypeContent
       $DOMElement->setAttribute('id', $DOMElementID);
       $DOMElement->setAttribute('placeholder', $DOMElementPlaceholder);
       $DOMElement->setAttribute('name', $DOMElementName);
+
+      if ($DOMElementRequired === true) {
+        $DOMElement->setAttribute('required', 'required');
+      }
 
       if (in_array($DOMElementType, ['submit', 'reset'])) {
         $DOMElement->setAttribute('value', $DOMElementTitle);
