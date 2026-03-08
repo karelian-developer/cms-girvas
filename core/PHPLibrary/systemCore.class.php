@@ -888,16 +888,14 @@ final class SystemCore implements CoreInterface
    */
   public static function parseRawHTTPRequest(string $inputString, string $contentType) : array
   {
-    // grab multipart boundary from content type header
     preg_match('/boundary=(.*)$/', $contentType, $matches);
     $boundary = $matches[1];
     
-    // split content by boundary and get rid of last -- element
     $arrayBlocks = preg_split("/-+$boundary/", $inputString);
     array_pop($arrayBlocks);
     
     $dataArray = [];
-    // loop data blocks
+    
     foreach ($arrayBlocks as $index => $block) {
       if (empty($block)) continue;
 
@@ -911,10 +909,15 @@ final class SystemCore implements CoreInterface
       }
 
       if (isset($matches[2])) {
-        if (preg_match('/(.*)\[\]$/', $matches[1], $matchesName)) {
-          $dataArray[$matchesName[1]][] = $matches[2];
+        $fieldName = $matches[1];
+        $fieldValue = $matches[2];
+
+        if (preg_match('/^(.*)\[\]$/', $fieldName, $nameMatches)) {
+          $dataArray[$nameMatches[1]][] = $fieldValue;
+        } elseif (preg_match('/^(.*)\[([0-9]+)\]$/', $fieldName, $nameMatches)) {
+          $dataArray[$nameMatches[1]][$nameMatches[2]] = $fieldValue;
         } else {
-          $dataArray[$matches[1]] = $matches[2];
+          $dataArray[$fieldName] = $fieldValue;
         }
       }
     }   
