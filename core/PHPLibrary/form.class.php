@@ -819,17 +819,25 @@ class Form implements EntityTypeContent
 
       foreach ($data[$columnName] as $name => $value) {
         $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $fieldsJSON[] = match ($queryBuilder->DMS) {
-          CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
-          CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
-        };
+        
+        if ($columnName === 'elements') {
+          $fieldsJSON[] = match ($queryBuilder->DMS) {
+            CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
+            CMSDMS::PostgreSQL => sprintf('(\'{"%s": %s}\'::jsonb)', $name, $valueJSON)
+          };
+        } else {
+          $fieldsJSON[] = match ($queryBuilder->DMS) {
+            CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
+            CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
+          };
+        }
       }
 
       if (!empty($data[$columnName])) {
         if ($columnName === 'elements') {
           $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
             'mysql' => 'CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON)',
-            'postgresql' => implode(' || ', '(' . $fieldsJSON . ')')
+            'postgresql' => implode(' || ', $fieldsJSON)
           ]);
         } else {
           $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
