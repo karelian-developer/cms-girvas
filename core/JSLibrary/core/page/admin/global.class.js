@@ -115,6 +115,7 @@ export class PageGlobal {
             request.target.showingNotification = false;
 
             request.target.send().then((data1) => {
+              console.log(data1);
               if (data1.outputData.hasOwnProperty('needToUpdate')) {
                 let needToUpdate = data1.outputData.needToUpdate;
                 let lastVersionTitle = data1.outputData.title;
@@ -132,7 +133,6 @@ export class PageGlobal {
                 }
 
                 interactiveNotificationLoading.target.assembly();
-
                 interactiveNotificationLoading.target.show();
               }
             });
