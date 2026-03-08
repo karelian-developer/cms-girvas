@@ -615,6 +615,13 @@ export class PageForm {
       );
     });
 
+    cellElementsForRequired.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
     cellElementsForEvents.forEach(element => {
       container.parentElement.parentElement.insertBefore(
         element,
