@@ -24,6 +24,7 @@ export class PageForm {
     this.page = page;
     
     this.buttons = {save: null, delete: null, addElement: null};
+    this.elementsCount = 0;
   }
 
   init() {
@@ -158,7 +159,6 @@ export class PageForm {
       });
 
       let tableFormElementsButtonContainer = document.querySelector('[data-element="button-add-element"]');
-
       
       this.buttons.addElement = new Interactive('button');
       this.buttons.save = new Interactive('button');
@@ -192,6 +192,7 @@ export class PageForm {
           const elementPlaceholder = elementTexts.placeholder;
           
           this.addElement(localeData, tableFormElementsButtonContainer, {
+            index: elementIndex,
             type: element.type,
             title: elementTitle,
             description: elementDescription,
@@ -481,7 +482,7 @@ export class PageForm {
     checkboxInputElement.classList.add('form__input');
     checkboxInputElement.classList.add('form__input_checkbox');
     checkboxInputElement.setAttribute('id', 'I' + checkboxID);
-    checkboxInputElement.setAttribute('name', 'form_element_required[]');
+    checkboxInputElement.setAttribute('name', 'form_element_required[' + this.elementsCount + ']');
     checkboxInputElement.setAttribute('type', 'checkbox');
     checkboxInputElement.setAttribute('value', 'field_is_required');
     
@@ -525,6 +526,7 @@ export class PageForm {
 
     buttonRemoveField.target.setCallback((event) => {
       event.preventDefault();
+      this.elementsCount--;
       
       cellElementsForType.forEach(element => {
         element.remove();
@@ -639,5 +641,7 @@ export class PageForm {
     formElementInputSequenceNumber.value = data.sequenceNumber !== undefined
       ? data.sequenceNumber
       : 0;
+    
+    this.elementsCount++;
   }
 }

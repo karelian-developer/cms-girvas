@@ -117,7 +117,7 @@ if ($CMSCore->client->isLogged(2)) {
 
               $formElements[$i]['number'] = $i + 1;
               $formElements[$i]['type'] = $formElementTypes[$i];
-              $formElements[$i]['required'] = $formElementRequired[$i];
+              $formElements[$i]['required'] = isset($formElementRequired[$i]) ? true : false;
               $formElements[$i]['name'] = trim($formElementNames[$i]);
               $formElements[$i]['sequenceNumber'] = is_numeric($formElementSequenceNumbers[$i])
                 ? $formElementSequenceNumbers[$i]
