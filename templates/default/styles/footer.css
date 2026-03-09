@@ -32,13 +32,12 @@
 
 .footer__main-block {
   display: flex;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
   height: 142px;
 }
 
 .footer__content {
   display: none;
+  border-bottom-left-radius: 8px;
   width: calc(100% - 300px);
   height: 100%;
   background-color: var(--dark-gray-color);
@@ -128,6 +127,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  border-bottom-right-radius: 8px;
   width: 300px;
   height: 100%;
   background-color: var(--primary-color-1);
