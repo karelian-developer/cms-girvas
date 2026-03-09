@@ -70,13 +70,14 @@ if ($CMSCore->client->isLogged(2)) {
           }
         }
 
-        $directoryPath = dirname($theme->getFilePropertiesPath());
+        $themeFilePropertiesPath = $theme->getFilePropertiesPath();
+        $directoryPath = dirname($themeFilePropertiesPath);
 
-        if (!is_writable($directoryPath)) {
+        if (!is_writable($directoryPath) || !is_writable($themeFilePropertiesPath)) {
           $handlerMessage = $handlerMessage ?? sprintf($CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS_WRITABLE'), $theme->getFilePropertiesPath());
           $handlerStatusCode = $handlerStatusCode ?? 0;
         } else {
-          file_put_contents($theme->getFilePropertiesPath(), json_encode($propertiesData));
+          file_put_contents($themeFilePropertiesPath, json_encode($propertiesData));
 
           $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
