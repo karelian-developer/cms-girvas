@@ -8,27 +8,20 @@
 
 .footer__nav-span,
 .information-list__link {
-    position: relative;
+  position: relative;
 }
 
 .footer__nav-span::after,
 .information-list__link::after {
-    position: absolute;
-    content: "";
-    left: 0;
-    bottom: 0;
-    height: 1px;
-    width: 100%;
-    background-color: var(--container-and-text-white-color);
-    transform: scaleX(0);
-    transition: var(--transistion);
-}
-
-/* footer */
-.footer {
-  background-color: var(--bcg-body-color);
-  display: flex;
-  flex-direction: column;
+  position: absolute;
+  content: "";
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  background-color: var(--container-and-text-white-color);
+  transform: scaleX(0);
+  transition: var(--transistion);
 }
 
 @media (min-width: 670px) {
