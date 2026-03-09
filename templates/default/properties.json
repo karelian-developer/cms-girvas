@@ -43,7 +43,7 @@
     }
   },
   "IMAGE_FOOTER_LOGOTYPE_URL": {
-    "value": "images/footer-logo.png",
+    "value": "{SITE_TEMPLATE_URL}images/footer-logo.png",
     "type": "file",
     "file": "png/jpg/svg/webp/avif",
     "locale": {
