@@ -25,8 +25,14 @@ a {
 }
 
 body {
-  background-color: var(--bcg-body-color);
-  font-family: 'Roboto';
+  display: flex;
+  background-attachment: fixed;
+  background-color: var(--primary-color-3);
+  background-image: url('../images/background.webp');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  min-height: 100%;
 }
 
 @media (min-width: 670px) and (max-width: 1139px) {
