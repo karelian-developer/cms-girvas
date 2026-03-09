@@ -13,8 +13,8 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as FileConverterEnumFileFormat;
-use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
+use \core\PHPLibrary\SystemCore\File\EnumFormat as FileFormat;
+use \core\PHPLibrary\SystemCore\File\Converter as FileConverter;
 use \core\PHPLibrary\Template as Theme;
 
 if ($CMSCore->client->isLogged(2)) {
@@ -44,10 +44,10 @@ if ($CMSCore->client->isLogged(2)) {
                 $fileExtension = $matches[2];
 
                 $enumFileFormat = match ($fileExtension) {
-                  'jpeg' => FileConverterEnumFileFormat::JPG,
-                  'png' => FileConverterEnumFileFormat::PNG,
-                  'webp' => FileConverterEnumFileFormat::WEBP,
-                  'avif' => FileConverterEnumFileFormat::AVIF
+                  'jpeg' => FileFormat::JPG,
+                  'png' => FileFormat::PNG,
+                  'webp' => FileFormat::WEBP,
+                  'avif' => FileFormat::AVIF
                 };
 
                 $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
