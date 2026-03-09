@@ -1,7 +1,7 @@
 <footer class="footer">
   <div class="footer__container container">
-    <div class="footer-top flex">
-      <div class="footer-top__left">
+    <div class="footer__main-block flex">
+      <div class="footer__content">
         <nav class="footer__nav">
           <ul class="footer__nav-list">
             <li class="footer__nav-item">
@@ -30,16 +30,14 @@
             <p class="footer__text">{LANG:DEFAULT_FOOTER_CMS_DESCRIPTION}</p>
         </div>
       </div>
-      <div class="footer-top__right">
-        <a class="footer-top__logo-link display-block" href="/" title="CMS GIRVAS">
-          <picture>
-            <img src="{PROP:IMAGE_FOOTER_LOGOTYPE_URL}" alt="{PROP:IMAGE_FOOTER_LOGOTYPE_ALT}">
-          </picture>
+      <div class="footer__brand-container">
+        <a class="footer__brand-link display-block" href="/" title="CMS GIRVAS">
+          <img class="footer__brand" src="{PROP:IMAGE_FOOTER_LOGOTYPE_URL}" alt="{PROP:IMAGE_FOOTER_LOGOTYPE_ALT}">
         </a>
       </div>
     </div>
-    <div class="footer__bottom flex">
-      <div class="footer__bottom-left-block">{CMS_COPYRIGHT}</div>
+    <div class="footer__copyright-container flex">
+      <div class="footer__copyright">{CMS_COPYRIGHT}</div>
       <ul class="information-list footer__bottom-information-list flex">
         <li class="information-list__item">
           <a class="information-list__link" href="{PROP:LINK_DOCUMENT_LICENSE_AGREEMENT}">{LANG:DEFAULT_FOOTER_META_LINK_LICENSE_AGREEMENT}</a>

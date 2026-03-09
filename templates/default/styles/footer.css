@@ -30,11 +30,11 @@
   }
 }
 
-.footer-top {
+.footer__main-block {
   height: 142px;
 }
 
-.footer-top__left {
+.footer__content {
   display: none;
   width: calc(100% - 300px);
   height: 100%;
@@ -42,7 +42,7 @@
 }
 
 @media (min-width: 670px) {
-  .footer-top__left {
+  .footer__content {
     display: block;
     border-radius: 0px 0px 0px 40px;
   }
@@ -122,44 +122,44 @@
   color: var(--container-and-text-white-color);
 }
 
-.footer-top__right {
+.footer__brand-container {
   display: flex;
   justify-content: center;
+  align-items: center;
   width: 300px;
   height: 100%;
-  padding: 29px 83px;
-  background-color: var(--footer-black-color);
+  background-color: var(--primary-color-1);
 }
 
 @media (min-width: 670px) {
-  .footer-top__right {
+  .footer__brand-container {
     width: 300px;
     border-radius: 0px 0px 40px 0px;
   }
 }
 
 @media (max-width: 669px) {
-  .footer-top__right {
+  .footer__brand-container {
     width: 100%;
   }
 }
 
-.footer-top__logo-link {
-  width: fit-content;
-}
-
-.footer-top__logo-link picture {
+.footer__brand-link {
   display: flex;
-  flex: 0 0 fit-content;
 }
 
-.footer__bottom {
+.footer__brand {
+  width: 100%;
+  max-width: 144px;
+}
+
+.footer__copyright-container {
   justify-content: space-between;
   padding: 25px;
 }
 
 @media (max-width: 929px) {
-  .footer__bottom {
+  .footer__copyright-container {
     flex-direction: column-reverse;
     align-items: center;
   }
@@ -172,7 +172,7 @@
 }
 
 @media (max-width: 669px) {
-  .footer__bottom {
+  .footer__copyright-container {
     background-color: var(--footer-black-color);
     padding-top: 0;
   }
@@ -182,7 +182,7 @@
   }
 }
 
-.footer__bottom-left-block {
+.footer__copyright {
   display: flex;
   align-items: center;
   font-size: 12px;
@@ -190,13 +190,13 @@
 }
 
 @media (max-width: 669px) {
-  .footer__bottom-left-block {
+  .footer__copyright {
     color: var(--primary-color-3);
   }
 }
 
 @media (min-width: 670px) {
-  .footer__bottom-left-block {
+  .footer__copyright {
     color: var(--dark-gray-color);
   }
 }
@@ -210,7 +210,7 @@
 }
 
 @media (max-width: 929px) {
-  .footer__bottom-left-block {
+  .footer__copyright {
     width: fit-content;
   }
 
