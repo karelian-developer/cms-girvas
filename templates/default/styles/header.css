@@ -114,9 +114,9 @@
 
 .header__nav-link {
   position: relative;
-  height: 60px;
-  padding: 20px 25px;
-  font-size: 18px;
+  height: 56px;
+  padding: 16px 24px;
+  font-size: 16px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--container-and-text-white-color);
