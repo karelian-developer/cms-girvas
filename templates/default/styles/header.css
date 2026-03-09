@@ -119,12 +119,14 @@
 .header__nav-link {
   box-sizing: border-box;
   position: relative;
-  padding-left: 24px;
-  padding-right: 24px;
+  display: flex;
+  align-items: center;
   font-size: 16px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--container-and-text-white-color);
+  padding-left: 24px;
+  padding-right: 24px;
   height: 100%;
 }
 
