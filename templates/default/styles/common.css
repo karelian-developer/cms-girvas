@@ -25,7 +25,6 @@ a {
 }
 
 body {
-  display: flex;
   background-attachment: fixed;
   background-color: var(--primary-color-3);
   background-image: url('../images/background.webp');
