@@ -12,6 +12,10 @@
   }
 }
 
+.header__container {
+  background-color: unset;
+}
+
 .header__logo-block {
   background: linear-gradient(270deg, #FFF 64.61%, #E0E0E0 100%);
   display: flex;
