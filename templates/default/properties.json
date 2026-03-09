@@ -14,7 +14,7 @@
     }
   },
   "IMAGE_HEADER_LOGOTYPE_URL": {
-    "value": "images/header-logo.png",
+    "value": "{SITE_TEMPLATE_URL}/images/header-logo.png",
     "type": "file",
     "file": "png/jpg/svg/webp/avif",
     "locale": {
@@ -43,7 +43,7 @@
     }
   },
   "IMAGE_FOOTER_LOGOTYPE_URL": {
-    "value": "{SITE_TEMPLATE_URL}images/footer-logo.png",
+    "value": "{SITE_TEMPLATE_URL}/images/footer-logo.png",
     "type": "file",
     "file": "png/jpg/svg/webp/avif",
     "locale": {
