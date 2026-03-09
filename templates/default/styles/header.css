@@ -16,22 +16,17 @@
   background: linear-gradient(270deg, #FFF 64.61%, #E0E0E0 100%);
 }
 
-@media (min-width: 670px) {
-  .header__container {
-    border-radius: 40px 40px 0px 0px;
-  }
-}
-
 .header__logo-block {
   display: flex;
-  justify-content: center;
-  padding: 68px 25px;
-  border-radius: inherit;
+  justify-content: left;
+  align-items: center;
+  padding: 16px;
 }
 
 @media (max-width: 669px) {
   .header__logo-link img {
-    width: 80%;
+    width: 100%;
+    max-width: 248px;
   }  
 }
 
