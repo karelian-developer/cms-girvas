@@ -73,6 +73,10 @@ if ($CMSCore->client->isLogged(2)) {
         $themeFilePropertiesPath = $theme->getFilePropertiesPath();
         $directoryPath = dirname($themeFilePropertiesPath);
 
+        if (!is_writable($themeFilePropertiesPath)) {
+          chmod($themeFilePropertiesPath, 0664);
+        }
+
         if (!is_writable($directoryPath)) {
           $handlerMessage = $handlerMessage ?? sprintf($CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS_WRITABLE'), $directoryPath);
           $handlerStatusCode = $handlerStatusCode ?? 0;
