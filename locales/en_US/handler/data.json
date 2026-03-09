@@ -1,5 +1,6 @@
 {
   "API_ERROR_DONT_HAVE_PERMISSIONS": "There are insufficient rights to perform the current action.",
+  "API_ERROR_DONT_HAVE_PERMISSIONS_WRITABLE": "Insufficient permissions to write: %s.",
   "API_ERROR_HANDLER_NOT_FOUND": "No handler was found for the current request.",
   "API_ERROR_UNKNOWN": "An unknown error has occurred.",
   "API_ERROR_EXCEPTION": "Exception thrown: ",

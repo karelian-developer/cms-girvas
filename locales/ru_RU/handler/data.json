@@ -1,5 +1,6 @@
 {
   "API_ERROR_DONT_HAVE_PERMISSIONS": "Для выполнения текущего действия недостаточно прав.",
+  "API_ERROR_DONT_HAVE_PERMISSIONS_WRITABLE": "Недостаточно прав для записи: %s.",
   "API_ERROR_HANDLER_NOT_FOUND": "Обработчик для текущего запроса не обнаружен.",
   "API_ERROR_UNKNOWN": "Произошла незвестная ошибка.",
   "API_ERROR_EXCEPTION": "Выбрашено исключение: ",

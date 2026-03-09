@@ -70,11 +70,17 @@ if ($CMSCore->client->isLogged(2)) {
           }
         }
 
-        file_put_contents($theme->getFilePropertiesPath(), json_encode($propertiesData));
+        $directoryPath = dirname($theme->getFilePropertiesPath());
 
-        http_response_code(200);
-        $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
-        $handlerStatusCode = $handlerStatusCode ?? 1;
+        if (!is_writable($directoryPath)) {
+          $handlerMessage = $handlerMessage ?? sprintf($CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS_WRITABLE'), $theme->getFilePropertiesPath());
+          $handlerStatusCode = $handlerStatusCode ?? 0;
+        } else {
+          file_put_contents($theme->getFilePropertiesPath(), json_encode($propertiesData));
+
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
+          $handlerStatusCode = $handlerStatusCode ?? 1;
+        }
       }
     }
   } else {
