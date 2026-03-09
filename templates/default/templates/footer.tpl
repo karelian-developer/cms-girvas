@@ -1,6 +1,6 @@
 <footer class="footer">
   <div class="footer__container container">
-    <div class="footer__main-block flex">
+    <div class="footer__main-block">
       <div class="footer__content">
         <nav class="footer__nav">
           <ul class="footer__nav-list">
