@@ -254,10 +254,10 @@ final class SystemCore implements CoreInterface
     $copyrightContainerElement = $document->createElement('div');
     $copyrightContainerElement->setAttribute('class', 'footer__copyright copyright');
 
-    $copyrightLabelSymbolNodeElement = $document->createTextNode('copy');
-    $copyrightLabelSpaceNodeElement1 = $document->createTextNode('nbsp');
-    $copyrightLabelSpaceNodeElement2 = $document->createTextNode('nbsp');
-    $copyrightLabelSpaceNodeElement3 = $document->createTextNode('nbsp');
+    $copyrightLabelSymbolNodeElement = $document->createTextNode('&copy;');
+    $copyrightLabelSpaceNodeElement1 = $document->createTextNode('&nbsp;');
+    $copyrightLabelSpaceNodeElement2 = $document->createTextNode('&nbsp;');
+    $copyrightLabelSpaceNodeElement3 = $document->createTextNode('&nbsp;');
 
     $copyrightLabelSiteLinkElement = $document->createElement('a', $this->getCMSDomain());
     $copyrightLabelSiteLinkElement->setAttribute('href', $this->getCMSLink());
