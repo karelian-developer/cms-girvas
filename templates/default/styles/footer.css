@@ -231,14 +231,6 @@
 
 .information-list__link {
   position: relative;
-  font-size: 12px;
-  font-weight: 400;
-}
-
-@media (min-width: 670px) {
-  .information-list__link {
-    color: var(--dark-gray-color);
-  }
 }
 
 /* стиль на нижнюю черту прописан в header */
