@@ -268,7 +268,10 @@ final class SystemCore implements CoreInterface
 
     $copyrightDateElement = $document->createElement('span', date('Y', time()) . '.');
     $copyrightAllRightsElement = $document->createElement('span', 'All rights reserved.');
-    $copyrightCMSLinkElement = $document->createElement('span', sprintf('Powered by <a href="%s" target="_blank">CMS «GIRVAS»</a>.', self::CMS_PRODUCT_SITE_LINK));
+    $copyrightCMSLinkElement = $document->createElement('a', 'CMS «GIRVAS»');
+    $copyrightCMSLinkElement->setAttribute('href', self::CMS_PRODUCT_SITE_LINK);
+    $copyrightCMSLinkElement->setAttribute('target', '_blank');
+    $copyrightLabelPoweredByElement = $document->createTextNode('Powered by ');
 
     $copyrightContainerElement->appendChild($copyrightLabelSymbolNodeElement);
     $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement1);
