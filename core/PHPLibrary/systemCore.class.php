@@ -249,26 +249,36 @@ final class SystemCore implements CoreInterface
    */
   public static function getCopyrightString() : string
   {
-    // $document = new DOMDocument();
+    $document = new DOMDocument();
 
-    // $copyrightContainerElement = $document->createElement('div');
-    // $copyrightContainerElement->setAttribute('class', 'footer__copyright copyright');
+    $copyrightContainerElement = $document->createElement('div');
+    $copyrightContainerElement->setAttribute('class', 'footer__copyright copyright');
 
-    // $copyrightLabelSymbolNodeElement = $document->createTextNode('copy');
-    // $copyrightLabelSpaceNodeElement = $document->createTextNode('nbsp');
+    $copyrightLabelSymbolNodeElement = $document->createTextNode('copy');
+    $copyrightLabelSpaceNodeElement1 = $document->createTextNode('nbsp');
+    $copyrightLabelSpaceNodeElement2 = $document->createTextNode('nbsp');
+    $copyrightLabelSpaceNodeElement3 = $document->createTextNode('nbsp');
 
-    // $copyrightLabelSiteLinkElement = $document->createElement('a', '&laquo;Карельский разработчик&raquo;');
-    // $copyrightLabelSiteLinkElement->setAttribute('href', 'https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai/');
-    // $copyrightLabelSiteLinkElement->setAttribute('title', 'Компания &laquo;Карельский разработчик&raquo;');
-    // $copyrightLabelSiteLinkElement->setAttribute('target', '_blank');
+    $copyrightLabelSiteLinkElement = $document->createElement('a', $this->getCMSDomain());
+    $copyrightLabelSiteLinkElement->setAttribute('href', $this->getCMSLink());
+    $copyrightLabelSiteLinkElement->setAttribute('title', $this->configurator->getSiteTitle() . '.');
 
-    // $copyrightLabelDatesElement = $document->createElement('span', '&laquo;Карельский разработчик&raquo;');
+    $copyrightLabelDatesElement = $document->createElement('span', '&laquo;Карельский разработчик&raquo;');
 
-    // $copyrightContainerElement->appendChild($copyrightLabelSymbolNodeElement);
-    // $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement);
-    // $document->appendChild($copyrightContainerElement);
+    $copyrightDateElement = $document->createElement('span', date('Y', time()) . '.');
+    $copyrightAllRightsElement = $document->createElement('span', 'All rights reserved.');
+    $copyrightCMSLinkElement = $document->createElement('span', sprintf('Powered by <a href="%s" target="_blank">CMS «GIRVAS»</a>.', self::CMS_PRODUCT_SITE_LINK));
 
-    return sprintf('<div class="footer__copyright"><span>&copy;&nbsp;<a href="%s" title="Developer Site Official" target="_blank">%s</a>.</span> <span>2021&nbsp;&mdash;&nbsp;2026. <span>All&nbsp;rights&nbsp;reserved.</span> <span>Powered&nbsp;by&nbsp;<a href="%s" title="CMS Site Official" target="_blank">CMS&nbsp;&laquo;GIRVAS&raquo;</a>.</span></div>', self::CMS_DEVELOPER_SITE_LINK, self::CMS_DEVELOPER_TITLE, self::CMS_PRODUCT_SITE_LINK);
+    $copyrightContainerElement->appendChild($copyrightLabelSymbolNodeElement);
+    $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement1);
+    $copyrightContainerElement->appendChild($copyrightLabelSiteLinkElement);
+    $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement2);
+    $copyrightContainerElement->appendChild($copyrightDateElement);
+    $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement3);
+    $copyrightContainerElement->appendChild($copyrightAllRightsElement);
+    $document->appendChild($copyrightContainerElement);
+
+    return $document->saveHTML();
   }
 
   /**
