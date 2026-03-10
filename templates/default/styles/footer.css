@@ -101,27 +101,14 @@
 
 .footer__text-block {
   width: 100%;
-  max-width: 455px;
-  height: 102px;
-  padding: 25px;
-}
-
-@media (max-width: 779px) {
-  .footer__text-block {
-    height: 100%;
-  }
-}
-
-@media (min-width: 780px) {
-  .footer__text-block {
-    height: 102px;
-  }
+  max-width: 456px;
+  padding: 24px;
 }
 
 .footer__text {
   font-size: 12px;
-  font-weight: 400;
-  color: var(--container-and-text-white-color);
+  font-weight: 300;
+  color: var(--primary-color-3);
 }
 
 .footer__brand-container {
