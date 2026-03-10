@@ -43,7 +43,7 @@
 }
 
 .header__brand-slogan {
-  font-weight: 600;
+  font-weight: 300;
   font-size: 18px;
   color: var(--primary-color-5);
 }
