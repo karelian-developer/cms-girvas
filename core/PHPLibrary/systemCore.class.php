@@ -247,7 +247,7 @@ final class SystemCore implements CoreInterface
    * 
    * @return string
    */
-  public static function getCopyrightString() : string
+  public function getCopyrightString() : string
   {
     $document = new DOMDocument();
 
