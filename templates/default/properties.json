@@ -14,7 +14,7 @@
     }
   },
   "SITE_SLOGAN": {
-    "value": "Бесплатно, быстро и легко...",
+    "value": "{LANG:DEFAULT_SLOGAN}",
     "type": "text",
     "locale": {
       "title": {
@@ -28,7 +28,7 @@
     }
   },
   "IMAGE_HEADER_LOGOTYPE_URL": {
-    "value": "{SITE_TEMPLATE_URL}/images/header-logo.png",
+    "value": "{SITE_TEMPLATE_URL}/images/brand-icon.svg",
     "type": "file",
     "file": "png/jpg/svg/webp/avif",
     "locale": {
@@ -57,7 +57,7 @@
     }
   },
   "IMAGE_FOOTER_LOGOTYPE_URL": {
-    "value": "{SITE_TEMPLATE_URL}/images/footer-logo.png",
+    "value": "{SITE_TEMPLATE_URL}/images/brand-footer.webp",
     "type": "file",
     "file": "png/jpg/svg/webp/avif",
     "locale": {
