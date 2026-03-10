@@ -31,7 +31,7 @@
         </div>
       </div>
       <div class="footer__brand-container">
-        <a class="footer__brand-link display-block" href="/" title="CMS GIRVAS">
+        <a class="footer__brand-link display-block" href="/" title="CMS &laquo;ГИРВАС&raquo;">
           <img class="footer__brand" src="{PROP:IMAGE_FOOTER_LOGOTYPE_URL}" alt="{PROP:IMAGE_FOOTER_LOGOTYPE_ALT}">
         </a>
       </div>
