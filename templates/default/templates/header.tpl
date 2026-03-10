@@ -1,9 +1,13 @@
 <header class="header">
-  <div class="header__container container" >
-    <div class="header__brand-block">
-      <a class="header__brand-link display-block" href="/" title="{CMS_TITLE}">
-        <img src="{PROP:IMAGE_HEADER_LOGOTYPE_URL}" alt="{PROP:IMAGE_HEADER_LOGOTYPE_ALT}">
-      </a>
+  <div class="header__container container">
+    <div class="header__brand-container">
+      <div class="header__brand-image-container">
+        <img class="header__brand-image" src="{PROP:IMAGE_HEADER_LOGOTYPE_URL}" alt="{PROP:IMAGE_HEADER_LOGOTYPE_ALT}">
+      </div>
+      <div class="header__brand-labels-container">
+        <span class="header__brand-title">{SITE_TITLE}</span>
+        <span class="header__brand-slogan">{PROP:SITE_SLOGAN}</span>
+      </div>
     </div>
     <nav class="header__nav"> 
       <svg class="header__nav-burger" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 51.49" role="navagation-burger">
