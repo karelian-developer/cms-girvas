@@ -23,7 +23,7 @@
   display: grid;
   grid-template-columns: 96px 356px;
   align-items: center;
-  padding: 32px 64px;
+  padding: 32px;
   column-gap: 24px;
 }
 
@@ -43,7 +43,6 @@
 }
 
 .header__brand-slogan {
-  font-weight: 300;
   font-size: 18px;
   color: var(--primary-color-5);
 }
