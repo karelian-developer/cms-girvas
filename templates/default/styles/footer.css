@@ -192,25 +192,6 @@
   }
 }
 
-.footer__copyright {
-  display: flex;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 400;
-}
-
-@media (max-width: 669px) {
-  .footer__copyright {
-    color: var(--primary-color-3);
-  }
-}
-
-@media (min-width: 670px) {
-  .footer__copyright {
-    color: var(--dark-gray-color);
-  }
-}
-
 .information-list__item:not(:first-child) {
   padding-left: 5px;
 }
