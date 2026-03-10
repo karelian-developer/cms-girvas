@@ -230,7 +230,7 @@
 
 /* стиль на нижнюю черту прописан в header */
 .footer__document-link:focus-visible::after {
-  background-color: var(--footer-black-color);
+  background-color: var(--primary-color-4--opacity-0-4);
   transform: scaleX(1);
 }
 
