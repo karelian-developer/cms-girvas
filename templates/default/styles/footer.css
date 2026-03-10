@@ -31,14 +31,14 @@
 }
 
 .footer__main-block {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 300px;
   margin-bottom: 16px;
 }
 
 .footer__content {
   display: none;
   border-bottom-left-radius: 8px;
-  width: calc(100% - 300px);
   height: 100%;
   background-color: var(--dark-gray-color);
 }
@@ -115,21 +115,8 @@
   justify-content: center;
   align-items: center;
   border-bottom-right-radius: 8px;
-  width: 300px;
   height: 100%;
   background-color: var(--primary-color-1);
-}
-
-@media (min-width: 670px) {
-  .footer__brand-container {
-    width: 300px;
-  }
-}
-
-@media (max-width: 669px) {
-  .footer__brand-container {
-    width: 100%;
-  }
 }
 
 .footer__brand-link {
