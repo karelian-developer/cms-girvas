@@ -263,8 +263,7 @@ final class SystemCore implements CoreInterface
     $copyrightLabelSiteLinkElement = $document->createElement('a', $this->getCMSDomain());
     $copyrightLabelSiteLinkElement->setAttribute('href', $this->getCMSLink());
     $copyrightLabelSiteLinkElement->setAttribute('title', $this->configurator->getSiteTitle() . '.');
-
-    $copyrightLabelDatesElement = $document->createElement('span', '&laquo;Карельский разработчик&raquo;');
+    $copyrightLabelSiteLinkDotElement = $document->createTextNode('.');
 
     $copyrightDateElement = $document->createElement('span', date('Y', time()) . '.');
     $copyrightAllRightsElement = $document->createElement('span', 'All rights reserved.');
@@ -276,6 +275,7 @@ final class SystemCore implements CoreInterface
     $copyrightContainerElement->appendChild($copyrightLabelSymbolNodeElement);
     $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement1);
     $copyrightContainerElement->appendChild($copyrightLabelSiteLinkElement);
+    $copyrightContainerElement->appendChild($copyrightLabelSiteLinkDotElement);
     $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement2);
     $copyrightContainerElement->appendChild($copyrightDateElement);
     $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement3);
