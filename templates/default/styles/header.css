@@ -16,13 +16,14 @@
   background: linear-gradient(270deg, #FFF 64.61%, #E0E0E0 100%);
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  padding: 32px 64px;
 }
 
 .header__brand-container {
+  box-sizing: border-box;
   display: grid;
   grid-template-columns: 188px 356px;
   align-items: center;
+  padding: 32px 64px;
 }
 
 .header__brand-image-container {
