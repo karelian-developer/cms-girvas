@@ -194,12 +194,6 @@
   }
 }
 
-@media (max-width: 669px) {
-  .footer__document-link {
-    color: inherit;
-  }
-}
-
 .footer__document:not(:first-child) {
   padding-left: 5px;
 }
@@ -231,6 +225,7 @@
 
 .footer__document-link {
   position: relative;
+  color: var(--primary-color-4--opacity-0-4);
 }
 
 /* стиль на нижнюю черту прописан в header */
