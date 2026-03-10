@@ -281,6 +281,7 @@ final class SystemCore implements CoreInterface
     $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement3);
     $copyrightContainerElement->appendChild($copyrightAllRightsElement);
     $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement4);
+    $copyrightContainerElement->appendChild($copyrightLabelPoweredByElement);
     $copyrightContainerElement->appendChild($copyrightCMSLinkElement);
     $document->appendChild($copyrightContainerElement);
 
