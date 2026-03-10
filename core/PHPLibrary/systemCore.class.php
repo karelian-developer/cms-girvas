@@ -258,6 +258,7 @@ final class SystemCore implements CoreInterface
     $copyrightLabelSpaceNodeElement1 = $document->createTextNode(' ');
     $copyrightLabelSpaceNodeElement2 = $document->createTextNode(' ');
     $copyrightLabelSpaceNodeElement3 = $document->createTextNode(' ');
+    $copyrightLabelSpaceNodeElement4 = $document->createTextNode(' ');
 
     $copyrightLabelSiteLinkElement = $document->createElement('a', $this->getCMSDomain());
     $copyrightLabelSiteLinkElement->setAttribute('href', $this->getCMSLink());
@@ -276,6 +277,8 @@ final class SystemCore implements CoreInterface
     $copyrightContainerElement->appendChild($copyrightDateElement);
     $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement3);
     $copyrightContainerElement->appendChild($copyrightAllRightsElement);
+    $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement4);
+    $copyrightContainerElement->appendChild($copyrightCMSLinkElement);
     $document->appendChild($copyrightContainerElement);
 
     return $document->saveHTML();
