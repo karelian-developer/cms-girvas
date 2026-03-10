@@ -38,7 +38,7 @@
 .header__brand-title {
   text-transform: uppercase;
   font-weight: 600;
-  font-size: 24px;
+  font-size: 32px;
   color: var(--primary-color-2);
 }
 
