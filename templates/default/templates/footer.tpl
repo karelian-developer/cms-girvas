@@ -36,9 +36,9 @@
         </a>
       </div>
     </div>
-    <div class="footer__copyright-container flex">
+    <div class="footer__copyright-container">
       <div class="footer__copyright">{CMS_COPYRIGHT}</div>
-      <ul class="information-list footer__bottom-information-list flex">
+      <ul class="information-list footer__bottom-information-list">
         <li class="information-list__item">
           <a class="information-list__link" href="{PROP:LINK_DOCUMENT_LICENSE_AGREEMENT}">{LANG:DEFAULT_FOOTER_META_LINK_LICENSE_AGREEMENT}</a>
         </li>

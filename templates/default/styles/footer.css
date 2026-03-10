@@ -155,8 +155,15 @@
 }
 
 .footer__copyright-container {
+  display: flex;
   justify-content: space-between;
-  padding: 25px;
+  background-color: var(--primary-color-1);
+  border-radius: 8px;
+  padding: 16px 24px;
+}
+
+.footer__bottom-information-list {
+  display: flex;
 }
 
 @media (max-width: 929px) {
@@ -166,7 +173,6 @@
   }
 
   .footer__bottom-information-list {
-    display: flex;
     flex-direction: column;
     margin-bottom: 10px;
   }

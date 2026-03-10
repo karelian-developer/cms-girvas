@@ -12,7 +12,7 @@
   }
 }
 
-.header__logo-block {
+.header__brand-block {
   background: linear-gradient(270deg, #FFF 64.61%, #E0E0E0 100%);
   display: flex;
   justify-content: left;
@@ -23,18 +23,18 @@
 }
 
 @media (max-width: 669px) {
-  .header__logo-link img {
+  .header__brand-link img {
     width: 100%;
     max-width: 192px;
   }  
 }
 
-.header__logo-link {
+.header__brand-link {
   display: flex;
 }
 
 @media (max-width: 669px) {
-  .header__logo-link {
+  .header__brand-link {
     justify-content: center;
   }
 }
