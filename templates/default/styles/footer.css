@@ -181,6 +181,12 @@
 
 .footer__copyright a {
   color: inherit;
+  transition: color .2s;
+}
+
+.footer__copyright a:hover,
+.footer__copyright a:focus {
+  color: var(--primary-color-3);
 }
 
 .footer__documents-list {
@@ -228,7 +234,6 @@
   color: var(--primary-color-4--opacity-0-4);
 }
 
-/* стиль на нижнюю черту прописан в header */
 .footer__document-link:focus-visible::after {
   background-color: var(--primary-color-4--opacity-0-4);
   transform: scaleX(1);
