@@ -37,12 +37,13 @@
 
 .header__brand-title {
   text-transform: uppercase;
-  font-weight: 600;
-  font-size: 32px;
+  font-weight: 900;
+  font-size: 24px;
   color: var(--primary-color-2);
 }
 
 .header__brand-slogan {
+  font-weight: 600;
   font-size: 18px;
   color: var(--primary-color-5);
 }
