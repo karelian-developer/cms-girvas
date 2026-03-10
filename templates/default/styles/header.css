@@ -21,13 +21,14 @@
 .header__brand-container {
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: 188px 356px;
+  grid-template-columns: 64px 356px;
   align-items: center;
   padding: 32px 64px;
+  column-gap: 24px;
 }
 
 .header__brand-image-container {
-  height: 188px;
+  height: 64px;
 }
 
 .header__brand-image {

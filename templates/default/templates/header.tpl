@@ -5,8 +5,8 @@
         <img class="header__brand-image" src="{PROP:IMAGE_HEADER_LOGOTYPE_URL}" alt="{PROP:IMAGE_HEADER_LOGOTYPE_ALT}">
       </div>
       <div class="header__brand-labels-container">
-        <span class="header__brand-title">{SITE_TITLE}</span>
-        <span class="header__brand-slogan">{PROP:SITE_SLOGAN}</span>
+        <div class="header__brand-title">{SITE_TITLE}</div>
+        <div class="header__brand-slogan">{PROP:SITE_SLOGAN}</div>
       </div>
     </div>
     <nav class="header__nav"> 
