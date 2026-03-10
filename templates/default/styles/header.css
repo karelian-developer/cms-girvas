@@ -42,7 +42,7 @@
   color: var(--primary-color-2);
 }
 
-.header__brand-title {
+.header__brand-slogan {
   font-size: 18px;
   color: var(--primary-color-5);
 }
