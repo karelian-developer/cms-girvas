@@ -239,6 +239,6 @@
 }
 
 .footer__document:hover .footer__document-link::after {
-  background-color: var(--footer-black-color);
+  background-color: var(--primary-color-4--opacity-0-4);
   transform: scaleX(1);
 }
