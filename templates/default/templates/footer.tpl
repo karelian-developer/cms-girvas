@@ -38,15 +38,21 @@
     </div>
     <div class="footer__copyright-container">
       <div class="footer__copyright">{CMS_COPYRIGHT}</div>
-      <ul class="information-list footer__bottom-information-list">
-        <li class="information-list__item">
-          <a class="information-list__link" href="{PROP:LINK_DOCUMENT_LICENSE_AGREEMENT}">{LANG:DEFAULT_FOOTER_META_LINK_LICENSE_AGREEMENT}</a>
+      <ul class="footer__documents-list">
+        <li class="footer__document">
+          <a class="footer__document-link" href="{PROP:LINK_DOCUMENT_LICENSE_AGREEMENT}">
+            <span class="footer__document-label">{LANG:DEFAULT_FOOTER_META_LINK_LICENSE_AGREEMENT}</span>
+          </a>
         </li>
-        <li class="information-list__item">
-          <a class="information-list__link" href="{PROP:LINK_DOCUMENT_TERMS_OF_USE}">{LANG:DEFAULT_FOOTER_META_LINK_TERMS_OF_USE}</a>
+        <li class="footer__document">
+          <a class="footer__document-link" href="{PROP:LINK_DOCUMENT_TERMS_OF_USE}">
+            <span class="footer__document-label">{LANG:DEFAULT_FOOTER_META_LINK_TERMS_OF_USE}</span>
+          </a>
         </li>
-        <li class="information-list__item">
-          <a class="information-list__link" href="{PROP:LINK_DOCUMENT_COOKIE_ABOUT}">{LANG:DEFAULT_FOOTER_META_LINK_COOKIE_ABOUT}</a>
+        <li class="footer__document">
+          <a class="footer__document-link" href="{PROP:LINK_DOCUMENT_COOKIE_ABOUT}">
+            <span class="footer__document-label">{LANG:DEFAULT_FOOTER_META_LINK_COOKIE_ABOUT}</span>
+          </a>
         </li>
       </ul>
     </div>

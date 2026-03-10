@@ -7,12 +7,12 @@
  */
 
 .footer__nav-span,
-.information-list__link {
+.footer__document-link {
   position: relative;
 }
 
 .footer__nav-span::after,
-.information-list__link::after {
+.footer__document-link::after {
   position: absolute;
   content: "";
   left: 0;
@@ -183,28 +183,28 @@
   color: inherit;
 }
 
-.footer__bottom-information-list {
+.footer__documents-list {
   display: flex;
 }
 
 @media (max-width: 929px) {
-  .footer__bottom-information-list {
+  .footer__documents-list {
     flex-direction: column;
     margin-bottom: 10px;
   }
 }
 
 @media (max-width: 669px) {
-  .information-list__link {
+  .footer__document-link {
     color: inherit;
   }
 }
 
-.information-list__item:not(:first-child) {
+.footer__document:not(:first-child) {
   padding-left: 5px;
 }
 
-.information-list__item:not(:last-child) {
+.footer__document:not(:last-child) {
   padding-right: 5px;
 }
 
@@ -213,37 +213,37 @@
     width: fit-content;
   }
 
-  .footer__bottom-information-list {
+  .footer__documents-list {
     width: fit-content;
   }
 
-  .information-list__item {
+  .footer__document {
     text-align: center;
   }
 }
 
 @media (min-width: 930px) {
-  .information-list__item:nth-child(2) {
+  .footer__document:nth-child(2) {
     border-left: 1px solid var(--dark-gray-color);
     border-right: 1px solid var(--dark-gray-color);
   }
 }
 
-.information-list__link {
+.footer__document-link {
   position: relative;
 }
 
 /* стиль на нижнюю черту прописан в header */
-.information-list__link:focus-visible::after {
+.footer__document-link:focus-visible::after {
   background-color: var(--footer-black-color);
   transform: scaleX(1);
 }
 
-.information-list__link:focus-visible {
+.footer__document-link:focus-visible {
   outline: none;
 }
 
-.information-list__item:hover .information-list__link::after {
+.footer__document:hover .footer__document-link::after {
   background-color: var(--footer-black-color);
   transform: scaleX(1);
 }
