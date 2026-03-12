@@ -110,7 +110,9 @@
 }
 
 @keyframes entries-group-animation-block {
-  from {}
+  from {
+    height: 40px;
+  }
 
   to {
     height: calc(100% - 0);
