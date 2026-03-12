@@ -153,6 +153,7 @@
   z-index: 1;
   left: 0;
   top: 0;
+  cursor: pointer;
 }
 
 .article__preview-link {
@@ -165,52 +166,46 @@
   transition: var(--transistion);
   cursor: pointer;
   bottom: 0;
+  pointer-events: none;
+}
+
+.article__preview-link-wrapper:hover .article__preview-link {
+  pointer-events: auto;
+  animation: entries-group-animation-block .2s linear 1 forwards;
+  background-color: var(--dark-gray-color);
+  color: var(--container-and-text-white-color);
+}
+
+.article__preview-link:hover .article__description {
+  animation: entries-group-hidden-text .7s ease-in-out 1 forwards;
+}
+
+.article__preview-link-wrapper:focus-within {
+  outline: none;
+}
+
+.article__preview-link-wrapper:focus-within .article__preview-link {
+  pointer-events: auto;
+  animation: entries-group-animation-block .2s linear 1 forwards;
+  background-color: var(--dark-gray-color);
+  color: var(--container-and-text-white-color);
+}
+
+.article__preview-link-wrapper:focus-within .article__description {
+  visibility: visible;
+  opacity: 1;
+  animation: entries-group-hidden-text .7s ease-in-out 1 forwards;
+}
+
+.article__preview-link:active {
+  color: var(--dark-gray-color);
+  background-color: var(--container-and-text-white-color);
 }
 
 .entries-list-container__list-item:focus-within {
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
 }
 
-.article__preview-link-wrapper .article__preview-link {
-  pointer-events: none;
-}
-
-.article__preview-link-wrapper:hover .article__preview-link {
-  animation: entries-group-animation-block .2s linear 1 forwards;
-  pointer-events: auto;
-}
-
-.article__preview-link-wrapper:focus-within {
-  transform: var(--transistion);
-  outline: none;
-  pointer-events: auto;
-}
-
-.article__preview-link-wrapper:focus-within .article__description {
-  animation: entries-group-hidden-text .7s ease-in-out 1 forwards
-}
-
-.article__preview-link-wrapper:focus .article__preview-link {
-  animation: entries-group-animation-block .2s linear 1 forwards;
-  opacity: 1;
-  background-color: var(--dark-gray-color);
-  color: var(--container-and-text-white-color);
-}
-
-.article__preview-link-wrapper:focus .article__description {
-  visibility: visible;
-  opacity: 1;
-}
-
 .entries-list-container__list-item:hover {
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
-}
-
-.article__preview-link:hover .article__description {
-  animation: entries-group-hidden-text .7s ease-in-out 1 forwards
-}
-
-.article__preview-link:active {
-  color: var(--dark-gray-color);
-  background-color: var(--container-and-text-white-color);
 }
