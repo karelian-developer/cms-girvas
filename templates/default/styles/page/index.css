@@ -125,7 +125,7 @@
 
 @keyframes entries-group-animation-block {
   from {
-    height: fit-content;
+    height: 72px;
   }
 
   to {
