@@ -35,12 +35,12 @@
 .entries-list-container__list-item .item__article {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   height: 100%;
 }
 
 .entries-list-container__list-item .article__preview-container {
   position: relative;
+  flex-grow: 1;
 }
 
 .entries-list-container__list-item .article__preview-image {
