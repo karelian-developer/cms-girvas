@@ -2,10 +2,12 @@
   <article class="item__article article">
     <div class="article__preview-container">
       <img src="{ENTRY_PREVIEW_URL}" alt="{ENTRY_TITLE}" class="article__preview-image">
-      <a href="{ENTRY_URL}" title="{ENTRY_TITLE}" class="article__preview-link" tabindex="0">
-        <h2 class="article__title">{ENTRY_TITLE}</h2>
-        <p class="article__description">{ENTRY_DESCRIPTION}</p>
-      </a>
+      <div class="article__preview-link-wrapper">
+        <a href="{ENTRY_URL}" title="{ENTRY_TITLE}" class="article__preview-link" tabindex="0">
+          <h2 class="article__title">{ENTRY_TITLE}</h2>
+          <p class="article__description">{ENTRY_DESCRIPTION}</p>
+        </a>
+      </div>
     </div>
     <div class="article__metadata metadata">
       <div class="metadata__datetime datetime flex">
