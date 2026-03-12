@@ -126,9 +126,10 @@
 /* ===== АНИМАЦИИ ===== */
 @keyframes entries-group-animation-block {
   from {
-    height: auto;
+    height: 70px;
     background-color: rgba(0, 0, 0, 0.6);
   }
+  
   to {
     height: 100%;
     background-color: var(--dark-gray-color);
@@ -142,6 +143,7 @@
     opacity: 0;
     visibility: hidden;
   }
+  
   to {
     visibility: visible;
     font-size: 12px;
