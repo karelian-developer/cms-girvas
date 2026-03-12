@@ -123,30 +123,42 @@
   background-color: var(--grey-color);
 }
 
+/* ===== АНИМАЦИИ ===== */
 @keyframes entries-group-animation-block {
-  0% {
-    max-height: 60px; /* Начальная высота под контент */
+  from {
+    height: auto;
     background-color: rgba(0, 0, 0, 0.6);
   }
-  100% {
-    max-height: 400px; /* Достаточно для всего контента */
+  to {
+    height: 100%;
     background-color: var(--dark-gray-color);
   }
 }
 
 @keyframes entries-group-hidden-text {
-  0% {
+  from {
     font-size: 0;
     padding-top: 0;
     opacity: 0;
     visibility: hidden;
   }
-  100% {
+  to {
     visibility: visible;
     font-size: 12px;
     padding-top: 10px;
     opacity: 1;
   }
+}
+
+/* ===== ОСНОВНЫЕ СТИЛИ ===== */
+.article__preview-link-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  cursor: pointer;
 }
 
 .article__preview-link {
@@ -156,33 +168,42 @@
   color: var(--primary-color-3);
   padding: 20px;
   width: 100%;
+  transition: var(--transistion);
   cursor: pointer;
   bottom: 0;
-  pointer-events: none;
-  height: auto;
-  max-height: 60px;
-  overflow: hidden;
+  z-index: 1;
   text-decoration: none;
+  height: auto;
+  overflow: hidden;
 }
 
+/* ===== СОСТОЯНИЯ ===== */
+
+/* HOVER - наведение */
 .article__preview-link-wrapper:hover .article__preview-link {
-  animation: entries-group-animation-block 0.3s ease-in-out forwards;
-  pointer-events: auto;
+  animation: entries-group-animation-block 0.2s linear 1 forwards;
 }
 
-/* Анимация текста при наведении */
 .article__preview-link-wrapper:hover .article__description {
   animation: entries-group-hidden-text 0.5s ease-in-out 0.1s forwards;
 }
 
-/* Состояния фокуса */
+/* Дополнительная поддержка hover при наведении прямо на ссылку */
+.article__preview-link:hover {
+  animation: entries-group-animation-block 0.2s linear 1 forwards;
+}
+
+.article__preview-link:hover .article__description {
+  animation: entries-group-hidden-text 0.5s ease-in-out 0.1s forwards;
+}
+
+/* FOCUS - фокус с клавиатуры */
 .article__preview-link-wrapper:focus-within {
   outline: none;
 }
 
 .article__preview-link-wrapper:focus-within .article__preview-link {
-  animation: entries-group-animation-block 0.3s ease-in-out forwards;
-  pointer-events: auto;
+  animation: entries-group-animation-block 0.2s linear 1 forwards;
   background-color: var(--dark-gray-color);
   color: var(--container-and-text-white-color);
 }
@@ -191,35 +212,39 @@
   animation: entries-group-hidden-text 0.5s ease-in-out 0.1s forwards;
 }
 
-/* Активное состояние */
-.article__preview-link-wrapper:active .article__preview-link {
-  background-color: var(--container-and-text-white-color);
-  color: var(--dark-gray-color);
+.article__preview-link:focus-visible {
+  transform: var(--transistion);
+  outline: none;
 }
 
+/* ACTIVE - активное состояние (при клике) */
+.article__preview-link-wrapper:active .article__preview-link,
 .article__preview-link:active {
   color: var(--dark-gray-color);
   background-color: var(--container-and-text-white-color);
 }
 
-/* Остальные стили */
+/* ===== ЭФФЕКТЫ ДЛЯ КОНТЕЙНЕРА СПИСКА ===== */
 .entries-list-container__list-item:hover,
 .entries-list-container__list-item:focus-within {
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
 }
 
-/* Стили для псевдоэлемента (если нужен) */
-.article__preview-link-wrapper::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
-  pointer-events: none;
+/* ===== СТИЛИ ДЛЯ ТЕКСТА (базовые) ===== */
+.article__description {
+  visibility: hidden;
+  font-size: 0;
+  padding-top: 0;
+  opacity: 0;
+  margin: 0;
 }
 
-.article__preview-link-wrapper {
-  cursor: pointer;
+.article__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: inherit;
+  text-transform: uppercase;
+  max-width: 75ch;
+  overflow: hidden;
+  margin: 0;
 }
