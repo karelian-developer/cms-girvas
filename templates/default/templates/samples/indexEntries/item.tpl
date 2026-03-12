@@ -1,9 +1,12 @@
-<div id="SYSTEM_ENTRY_{ENTRY_ID}" class="entries-list-container__list-item item" data-item-id="{ENTRY_ID}" style="background-image: url('{ENTRY_PREVIEW_URL}');">
+<li id="SYSTEM_ENTRY_{ENTRY_ID}" class="entries-list-container__list-item item" data-item-id="{ENTRY_ID}">
   <article class="item__article article">
-    <a href="{ENTRY_URL}" title="{ENTRY_TITLE}" class="article__interactive-block display-block" tabindex="0">
-      <h2 class="article__title">{ENTRY_TITLE}</h2>
-      <p class="article__description">{ENTRY_DESCRIPTION}</p>
-    </a>
+    <div class="article__preview-container">
+      <img src="{ENTRY_PREVIEW_URL}" alt="{ENTRY_TITLE}" class="article__preview-image">
+      <a href="{ENTRY_URL}" title="{ENTRY_TITLE}" class="article__preview-link" tabindex="0">
+        <h2 class="article__title">{ENTRY_TITLE}</h2>
+        <p class="article__description">{ENTRY_DESCRIPTION}</p>
+      </a>
+    </div>
     <div class="article__metadata metadata">
       <div class="metadata__datetime datetime flex">
         <svg class="metadata__icon" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -17,9 +20,9 @@
             </clipPath>
           </defs>
         </svg>
-        <time class="metadata__value" datetime="{ENTRY_CREATED_DATE_TIMESTAMP}">{ENTRY_CREATED_DATE_TIMESTAMP}</time>
+        <time class="metadata__value" datetime="{ENTRY_CREATED_DATE_TIMESTAMP_ISO_8601}">{ENTRY_CREATED_DATE_TIMESTAMP}</time>
       </div>
       <a class="article__group-link" href="{ENTRY_CATEGORY_URL}">{ENTRY_CATEGORY_TITLE}</a>
     </div>
   </article>
-</div>
+</li>
