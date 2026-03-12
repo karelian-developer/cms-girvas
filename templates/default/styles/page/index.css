@@ -168,23 +168,23 @@
   outline: none;
 }
 
-.item__article:focus-visible .article__description {
+.article__preview-container:focus-visible .article__description {
   animation: entries-group-hidden-text .7s ease-in-out 1 forwards
 }
 
-.item__article:focus .article__preview-link {
+.article__preview-container:focus .article__preview-link {
   animation: entries-group-animation-block .2s linear 1 forwards;
   opacity: 1;
   background-color: var(--dark-gray-color);
   color: var(--container-and-text-white-color);
 }
 
-.item__article:focus .article__description {
+.article__preview-container:focus .article__description {
   visibility: visible;
   opacity: 1;
 }
 
-.item__article:hover .article__preview-link {
+.article__preview-container:hover .article__preview-link {
   animation: entries-group-animation-block .2s linear 1 forwards;
 }
 
