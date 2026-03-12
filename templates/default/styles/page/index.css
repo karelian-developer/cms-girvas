@@ -168,6 +168,7 @@
 }
 
 .article__preview-container:hover .article__preview-link {
+  animation: entries-group-animation-block .2s linear 1 forwards;
   pointer-events: auto;
 }
 
@@ -191,10 +192,6 @@
 .article__preview-container:focus .article__description {
   visibility: visible;
   opacity: 1;
-}
-
-.article__preview-container:hover .article__preview-link {
-  animation: entries-group-animation-block .2s linear 1 forwards;
 }
 
 .entries-list-container__list-item:hover {
