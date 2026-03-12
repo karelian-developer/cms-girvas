@@ -180,13 +180,13 @@
   pointer-events: auto;
 }
 
-.article__preview-link-wrapper:focus-visible {
+.article__preview-link-wrapper:focus-within {
   transform: var(--transistion);
   outline: none;
   pointer-events: auto;
 }
 
-.article__preview-link-wrapper:focus-visible .article__description {
+.article__preview-link-wrapper:focus-within .article__description {
   animation: entries-group-hidden-text .7s ease-in-out 1 forwards
 }
 
