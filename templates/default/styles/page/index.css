@@ -124,13 +124,10 @@
 }
 
 @keyframes entries-group-animation-block {
-  from {
-    height: 72px;
-  }
+  from {}
 
   to {
     height: calc(100% - 0);
-    top: 0;
   }
 }
 
