@@ -124,7 +124,9 @@
 }
 
 @keyframes entries-group-animation-block {
-  from {}
+  from {
+    height: fit-content;
+  }
 
   to {
     height: calc(100% - 0);
