@@ -113,7 +113,7 @@
   from {}
 
   to {
-    height: calc(100% - 40px);
+    height: calc(100% - 0);
     top: 0;
   }
 }
