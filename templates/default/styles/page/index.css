@@ -124,10 +124,15 @@
 }
 
 @keyframes entries-group-animation-block {
-  from {}
-
-  to {
-    height: calc(100% - 0);
+  0% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+  100% {
+    transform: scaleY(10); /* Увеличиваем в 10 раз по вертикали */
+    transform-origin: bottom;
+    background-color: var(--dark-gray-color);
   }
 }
 
