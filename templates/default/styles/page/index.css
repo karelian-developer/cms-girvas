@@ -50,6 +50,7 @@
   height: 100%;
   left: 0;
   top: 0;
+  z-index: 0;
 }
 
 .entries-list-container__list-item .article__title {
@@ -147,6 +148,7 @@
 }
 
 .article__preview-link {
+  position: absolute;
   display: block;
   background-color: rgba(0, 0, 0, .6);
   color: var(--primary-color-3);
@@ -154,6 +156,8 @@
   width: 100%;
   transition: var(--transistion);
   cursor: pointer;
+  bottom: 0;
+  z-index: 1;
 }
 
 .entries-list-container__list-item:focus-within {
