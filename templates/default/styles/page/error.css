@@ -17,10 +17,17 @@
 }
 
 .page__article .article__title {
-  background: rgba(255, 255, 255, .85);
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
+  background-color: rgba(0, 0, 0, .6);
+  font-weight: 300;
+  font-size: 18px;
+  color: var(--primary-color-3);
   padding: 16px 24px;
+}
+
+@media (max-width: 800px) {
+  .page__article .article__title {
+    font-size: 18px;
+  }
 }
 
 .page__article .article__content {
