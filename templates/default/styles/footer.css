@@ -161,7 +161,7 @@
   padding: 16px 24px;
 }
 
-@media (max-width: 929px) {
+@media (max-width: 1060px) {
   .footer__copyright-container {
     flex-direction: column-reverse;
     align-items: center;
@@ -206,7 +206,7 @@
   padding-right: 5px;
 }
 
-@media (max-width: 929px) {
+@media (max-width: 1060px) {
   .footer__copyright {
     width: fit-content;
   }
