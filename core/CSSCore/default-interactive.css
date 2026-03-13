@@ -347,14 +347,14 @@
   display: flex;
   background-color: var(--primary-color-2);
   color: var(--primary-color-3);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .interactive .interactive__modal .modal__header-label {
   flex-grow: 1;
   font-size: 14px;
   font-weight: 500;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
   padding: 10px;
 }
 
