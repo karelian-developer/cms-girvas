@@ -179,8 +179,7 @@
 }
 
 .page__article .article__comments .comments-list__item {
-  min-height: 148px;
-  padding: 15px;
+  padding: 16px;
 }
 
 .page__article .article__comments .comments-list__item:nth-child(odd) {

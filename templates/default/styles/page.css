@@ -109,10 +109,14 @@
 }
 
 .sidebar {
+  position: sticky;
   display: grid;
   grid-template-rows: minmax(200px, min-content);
   grid-auto-rows: min-content;
   row-gap: 16px;
+  height: min-content;
+  left: 0;
+  top: 0;
 }
 
 .sidebar__block {
