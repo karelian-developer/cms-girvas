@@ -85,3 +85,7 @@
 .page__article .article__content > *:last-child {
   margin-bottom: 0;
 }
+
+.page__simple-note {
+  font-size: 14px;
+}
