@@ -9,8 +9,8 @@
         </a>
       </div>
     </div>
-    <div class="article__metadata metadata">
-      <div class="metadata__datetime datetime flex">
+    <div class="article__metadata">
+      <div class="metadata__datetime">
         <svg class="metadata__icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g clip-path="url(#clip0_105_35)">
             <path class="metadata__icon-path" d="M9 1.6875C13.0219 1.6875 16.3125 4.97813 16.3125 9C16.3125 13.0219 13.0219 16.3125 9 16.3125C4.97813 16.3125 1.6875 13.0219 1.6875 9C1.6875 4.97813 4.97813 1.6875 9 1.6875ZM9 0C4.02187 0 0 4.02187 0 9C0 13.9781 4.02187 18 9 18C13.9781 18 18 13.9781 18 9C18 4.02187 13.9781 0 9 0Z"/>

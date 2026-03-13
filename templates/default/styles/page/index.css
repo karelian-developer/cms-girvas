@@ -95,6 +95,7 @@
 }
 
 .entries-list-container__list-item .article .metadata__datetime {
+  display: flex;
   flex-grow: 1;
   align-items: center;
   font-size: 12px;
