@@ -26,8 +26,8 @@
     <div class="comments__header">
       <h3 class="comments__title">{LANG:DEFAULT_TEXT_COMMENTS}</h3>
     </div>
-    <div role="entryCommentFormContainer"></div>
-    <div role="entryCommentsContainer">
+    <div class="article__comment-form-container" data-role="entry-comment-form-container"></div>
+    <div class="article__comments-container" data-role="entry-comments-container">
       {ENTRY_COMMENTS_LIST}
     </div>
   </div>

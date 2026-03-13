@@ -6,21 +6,25 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-.page__article {
-  background-color: var(--primary-color-4);
-  padding: 24px;
-  min-height: 520px;
-}
-
 .page__article-header {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
+  border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
   padding-top: 130px;
+  margin-bottom: 16px;
 }
 
 .page__article .metadata__icon {
   margin-right: 6px;
+}
+
+.page__article .article__content {
+  background-color: var(--primary-color-4);
+  border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
+  padding: 24px;
 }
 
 .page__article .article__content,
@@ -144,10 +148,18 @@
   margin-bottom: 0;
 }
 
-.page__article .article__comments .comments__header{
+.page__article .article__comments {
+  background-color: var(--primary-color-4);
+  border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
+}
+
+.page__article .article__comments .comments__header {
   display: flex;
-  background-color: var(--dark-gray-color);
   align-items: center;
+  background-color: var(--dark-gray-color);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   margin-bottom: 10px;
   width: 100%;
   height: 40px;
