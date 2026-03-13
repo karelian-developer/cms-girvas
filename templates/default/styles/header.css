@@ -32,14 +32,19 @@
 }
 
 @media (max-width: 480px) {
-  .header__brand-image-container {
-    display: none;
+  .header__brand-container {
     grid-template-columns: 1fr;
   }
 }
 
 .header__brand-image-container {
   height: 96px;
+}
+
+@media (max-width: 480px) {
+  .header__brand-image-container {
+    display: none;
+  }
 }
 
 .header__brand-image {
