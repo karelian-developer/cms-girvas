@@ -120,7 +120,8 @@
 .sidebar__block {
   display: flex;
   flex-direction: column;
-  border-left: 1px solid var(--common-secondary-color-10);
+  border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
 }
 
 .sidebar__block-title {
