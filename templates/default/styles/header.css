@@ -115,6 +115,7 @@
     position: absolute;
     display: flex;
     flex-direction: column;
+    z-index: 2;
   }
 
   .header__nav-burger.is-active + .header__nav-list .header__nav-item {
