@@ -27,7 +27,7 @@
           </ul>
         </nav>
         <div class="footer__text-block">
-            <p class="footer__text">{LANG:DEFAULT_FOOTER_CMS_DESCRIPTION}</p>
+          <p class="footer__text">{LANG:DEFAULT_FOOTER_CMS_DESCRIPTION}</p>
         </div>
       </div>
       <div class="footer__brand-container">

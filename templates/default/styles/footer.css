@@ -112,9 +112,16 @@
 }
 
 .footer__text-block {
+  box-sizing: border-box;
   width: 100%;
   max-width: 456px;
   padding: 24px;
+}
+
+@media (max-width: 670px) {
+  .footer__text-block {
+    max-width: 100%;
+  }
 }
 
 .footer__text {
@@ -171,7 +178,6 @@
 @media (max-width: 670px) {
   .footer__copyright-container {
     background-color: var(--footer-black-color);
-    padding-top: 0;
   }
 }
 
