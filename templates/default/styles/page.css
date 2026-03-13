@@ -116,7 +116,7 @@
   row-gap: 16px;
   height: min-content;
   left: 0;
-  top: 0;
+  top: 16px;
 }
 
 .sidebar__block {
