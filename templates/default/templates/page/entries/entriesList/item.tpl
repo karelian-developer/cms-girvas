@@ -1,4 +1,4 @@
-<li id="SYSTEM_ENTRY_{ENTRY_ID}" class="entries-list__item item" data-item-id="{ENTRY_ID}">
+<li id="SYSTEM_ENTRY_{ENTRY_ID}" class="page__entry item" data-item-id="{ENTRY_ID}">
   <article class="item__article article">
     <div class="article__preview-container">
       <img src="{ENTRY_PREVIEW_URL}" alt="{ENTRY_TITLE}" class="article__preview-image">
