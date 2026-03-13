@@ -198,6 +198,7 @@ export class EntryComment {
         if (clientUserPermissions.moder_entries_comments_management) {
           let interactiveButtonHide = new Interactive('button');
           interactiveButtonHide.target.setLabel(this.entry.localeBaseData.BUTTON_HIDE_LABEL);
+          interactiveButtonHide.target.setStyle('red');
           interactiveButtonHide.target.setCallback((event) => {
             let elementForm = document.createElement('form');
             elementForm.classList.add('form');
@@ -252,6 +253,7 @@ export class EntryComment {
         if (clientUserPermissions.moder_entries_comments_management) {
           let interactiveButtonPublish = new Interactive('button');
           interactiveButtonPublish.target.setLabel(this.entry.localeBaseData.BUTTON_SHOW_LABEL);
+          interactiveButtonPublish.target.setStyle('green');
           interactiveButtonPublish.target.setCallback((event) => {
             event.preventDefault();
 
@@ -298,6 +300,7 @@ export class EntryComment {
         if (clientUserPermissions.base_entry_comment_change && clientUserData.id == this.authorID || clientUserPermissions.moder_entries_comments_management) {
           let interactiveButtonDelete = new Interactive('button');
           interactiveButtonDelete.target.setLabel(this.entry.localeBaseData.BUTTON_DELETE_LABEL);
+          interactiveButtonDelete.target.setStyle('red');
           interactiveButtonDelete.target.setCallback((event) => {
             let formData = new FormData();
             formData.append('comment_id', this.id);
