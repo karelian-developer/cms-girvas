@@ -189,10 +189,12 @@
   display: flex;
 }
 
-@media (max-width: 929px) {
+@media (max-width: 1060px) {
   .footer__documents-list {
-    flex-direction: column;
-    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-bottom: 16px;
+    row-gap: 8px;
   }
 }
 
