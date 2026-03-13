@@ -2,26 +2,26 @@
   <div class="footer__container container">
     <div class="footer__main-block">
       <div class="footer__content">
-        <nav class="footer__nav">
-          <ul class="footer__nav-list">
-            <li class="footer__nav-item">
-              <a class="footer__nav-link" href="/entries/news">
-                <span class="footer__nav-span">{LANG:DEFAULT_TEXT_NEWS}</span>
+        <nav class="footer__navigation">
+          <ul class="footer__navigation-list">
+            <li class="footer__navigation-item">
+              <a class="footer__navigation-link" href="/entries/news">
+                <span class="footer__navigation-span">{LANG:DEFAULT_TEXT_NEWS}</span>
               </a>
             </li>
-            <li class="footer__nav-item">
-              <a class="footer__nav-link" href="/entries/articles">
-                <span class="footer__nav-span">{LANG:DEFAULT_TEXT_ARTICLES}</span>
+            <li class="footer__navigation-item">
+              <a class="footer__navigation-link" href="/entries/articles">
+                <span class="footer__navigation-span">{LANG:DEFAULT_TEXT_ARTICLES}</span>
               </a>
             </li>
-            <li class="footer__nav-item">
-              <a class="footer__nav-link" href="/page/reviews">
-                <span class="footer__nav-span">{LANG:DEFAULT_TEXT_REVIEWS}</span>
+            <li class="footer__navigation-item">
+              <a class="footer__navigation-link" href="/page/reviews">
+                <span class="footer__navigation-span">{LANG:DEFAULT_TEXT_REVIEWS}</span>
               </a>
             </li>
-            <li class="footer__nav-item">
-              <a class="footer__nav-link" href="/page/about">
-                <span class="footer__nav-span">{LANG:DEFAULT_TEXT_ABOUT}</span>
+            <li class="footer__navigation-item">
+              <a class="footer__navigation-link" href="/page/about">
+                <span class="footer__navigation-span">{LANG:DEFAULT_TEXT_ABOUT}</span>
               </a>
             </li>
           </ul>

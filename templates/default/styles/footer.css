@@ -6,12 +6,12 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-.footer__nav-span,
+.footer__navigation-span,
 .footer__document-link {
   position: relative;
 }
 
-.footer__nav-span::after,
+.footer__navigation-span::after,
 .footer__document-link::after {
   position: absolute;
   content: "";
@@ -50,28 +50,32 @@
   }
 }
 
+.footer__navigation {
+  background-color: var(--grey-color);
+  border-top-left-radius: 8px;
+}
+
 @media (max-width: 779px) {
-  .footer__nav {
+  .footer__navigation {
     display: none;
   }
 }
 
-.footer__nav-list {
+.footer__navigation-list {
   display: flex;
   align-items: center;
   width: 100%;
-  background-color: var(--grey-color);
 }
 
-.footer__nav-item {
+.footer__navigation-item {
   display: flex;
 }
 
-.footer__nav-item:nth-last-child(2) {
+.footer__navigation-item:nth-last-child(2) {
   margin-left: auto;
 }
 
-.footer__nav-link {
+.footer__navigation-link {
   height: 100%;
   padding: 12px 24px;
   font-size: 12px;
@@ -80,21 +84,21 @@
   color: var(--container-and-text-white-color);
 }
 
-.footer__nav-link:focus-visible {
+.footer__navigation-link:focus-visible {
   outline: none;
 }
 
-.footer__nav-link:focus {
+.footer__navigation-link:focus {
   transition: var(--transistion);
   background-color: var(--footer-black-color);
 }
 
 /* стиль на нижнюю черту прописан в header */
-.footer__nav-link:hover .footer__nav-span::after {
+.footer__navigation-link:hover .footer__navigation-span::after {
   transform: scaleX(1);
 }
 
-.footer__nav-link:active {
+.footer__navigation-link:active {
   transition: var(--transistion);
   background-color: var(--dark-gray-color);
 }
