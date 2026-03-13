@@ -19,6 +19,7 @@
 .header__container {
   background: var(--primary-linear-gradient-270deg);
   border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
 }
 
 .header__brand-container {

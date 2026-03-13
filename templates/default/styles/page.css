@@ -125,8 +125,8 @@
 .sidebar__block-title {
   background: var(--primary-linear-gradient-180deg);
   text-transform: uppercase;
-  font-size: 16px;
-  font-weight: 300;
+  font-size: 14px;
+  font-weight: 400;
   color: var(--primary-color-2);
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
