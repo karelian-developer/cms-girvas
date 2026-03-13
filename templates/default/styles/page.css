@@ -11,12 +11,14 @@
 }
 
 .main__page {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 304px;
+  gap: 16px;
 }
 
 @media (max-width: 669px) {
   .main__page {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 }
 
@@ -109,12 +111,6 @@
 .sidebar {
   display: flex;
   flex-direction: column;
-}
-
-@media (min-width: 670px) {
-  .sidebar {
-    flex: 0 0 300px;
-  }
 }
 
 .sidebar__block {
@@ -214,6 +210,7 @@
 
 .page__article {
   flex-grow: 1;
+  background-color: var(--primary-color-4);
   padding: 24px;
   min-height: 520px;
 }

@@ -7,7 +7,7 @@
  */
 
 .page__entries-list-container {
-  flex-grow: 1;
+  background-color: var(--primary-color-4);
   padding: 24px;
 }
 

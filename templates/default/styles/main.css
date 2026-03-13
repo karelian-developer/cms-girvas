@@ -6,10 +6,6 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-.main__content {
-  background-color: var(--primary-color-4);
-}
-
 .main-content {
   min-height: 509px;
 }
