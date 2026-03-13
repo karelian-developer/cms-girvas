@@ -290,7 +290,7 @@ class PageEntry implements InterfacePage
             'COMMENT_INDEX' => $entryCommentIndex,
             'COMMENT_CREATED_DATE_TIMESTAMP' => date('d.m.Y H:i:s', $entryComment->getCreatedUnixTimestamp()),
             'COMMENT_AUTHOR_LOGIN' => $entryCommentAuthor !== null ? $entryCommentAuthor->getLogin() : '{LANG:DEFAULT_TEXT_USER_DELETED}',
-            'COMMENT_AUTHOR_AVATAR_URL' => $entryCommentAuthor !== null ? $entryCommentAuthor->getAvatarURL(64) : User::getAvatarDefaultURL($this->CMSCore, 64),
+            'COMMENT_AUTHOR_AVATAR_URL' => $entryCommentAuthor !== null ? $entryCommentAuthor->getAvatarURL(128) : User::getAvatarDefaultURL($this->CMSCore, 64),
             'COMMENT_AUTHOR_GROUP_TITLE' => $entryCommentAuthor !== null ? $entryCommentAuthorGroup->getTitle($localeName) : '',
             'COMMENT_CONTENT' => $entryComment->isHidden() ? $localeData['PAGE_ENTRY_COMMENT_HIDE_LABEL'] . ' ' . strip_tags($entryComment->getHiddenReason()) : $entryCommentContent
           ]));
