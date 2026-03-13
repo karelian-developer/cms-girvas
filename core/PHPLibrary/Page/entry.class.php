@@ -64,9 +64,9 @@ class PageEntry implements InterfacePage
           'metadata'
         ]
       );
-    }
 
-    $this->initMetaOpenGraph();
+      $this->initMetaOpenGraph();
+    }
   }
 
   /**
@@ -79,7 +79,7 @@ class PageEntry implements InterfacePage
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSLocale = $this->CMSCore->locale;
     $CMSLocaleName = $CMSLocale->getName();
-
+    
     $imageURL = $this->targetObject->getPreviewURL() !== ''
       ? $this->targetObject->getPreviewURL()
       : $this->targetObject::getPreviewDefaultURL($this->CMSCore, 1024);
