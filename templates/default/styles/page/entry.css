@@ -35,7 +35,7 @@
 }
 
 .page__article .article__content,
-.page__article .article__content:has(img + img),
+.page__article .article__content p:has(img + img),
 .page__article .article__content:has(figure + figure) {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
