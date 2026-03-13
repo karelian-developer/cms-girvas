@@ -84,15 +84,18 @@
 }
 
 .entries-list-container__list-item .article .metadata__icon {
-  margin-right: 6px;
+  fill: var(--primary-color-3);
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
 }
 
 .entries-list-container__list-item .article .metadata__datetime {
-  align-items: center;
   flex-grow: 1;
-  font-size: 14px;
-  font-weight: 400;
-  color: var(--container-and-text-white-color);
+  align-items: center;
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--primary-color-3);
 }
 
 .entries-list-container__list-item .article .article__group-link {
