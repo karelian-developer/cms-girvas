@@ -25,7 +25,7 @@
     --common-secondary-color-8: #C6FFC4;
     --common-secondary-color-9: #2B9432;
     --primary-linear-gradient-270deg: linear-gradient(270deg, #FFFFFF 64%, #E0E0E0 100%);
-    --primary-linear-gradient-0deg: linear-gradient(0deg, #FFFFFF 64%, #E0E0E0 100%);
+    --primary-linear-gradient-180deg: linear-gradient(180deg, #FFFFFF, #E0E0E0);
     --bcg-body-color: #CACACA;
     --container-and-text-white-color:#FFF;
     --dark-gray-color: #232323;

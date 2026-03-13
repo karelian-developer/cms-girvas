@@ -122,26 +122,26 @@
   flex-direction: column;
 }
 
-.sidebar .block__title {
+.sidebar__block-title {
   font-size: 16px;
   font-weight: 300;
   color: var(--primary-color-2);
-  background: var(--primary-linear-gradient-0deg);
+  background: var(--primary-linear-gradient-180deg);
   border-left: 1px solid var(--primary-color-5);
   padding: 16px;
   width: 100%;
 }
 
-.sidebar .block__content {
+.sidebar__block-content {
+  box-sizing: border-box;
   width: 100%;
   padding: 11px 13px 13px 15px;
   font-size: 14px;
   background-color: var(--primary-color-4);
-  border-left: 6px solid var(--primary-color-5);
 }
 
 @media (min-width: 670px) {
-  .sidebar .block__content {
+  .sidebar__block-content {
     min-height: 151px;
   }
 }
