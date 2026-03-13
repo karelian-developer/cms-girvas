@@ -219,6 +219,8 @@
 
 .page__article .article__comments .comment__avatar-container {
   margin-right: 16px;
+  width: 64px;
+  height: 64px;
 }
 
 .page__article .article__comments .comment__avatar {
