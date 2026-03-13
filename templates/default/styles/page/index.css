@@ -104,8 +104,8 @@
 
 .entries-list-container__list-item .article .article__group-link {
   background-color: var(--grey-color);
-  font-size: 14px;
-  font-weight: 400;
+  font-size: 12px;
+  font-weight: 300;
   text-transform: uppercase;
   color: var(--container-and-text-white-color);
   border-bottom-right-radius: 8px;
