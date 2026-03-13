@@ -18,8 +18,7 @@
 
 .header__container {
   background: var(--primary-linear-gradient-270deg);
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  border-radius: 8px;
 }
 
 .header__brand-container {
@@ -56,6 +55,8 @@
   position: sticky;
   width: 100%;
   background-color: var(--dark-gray-color);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
   z-index: 1;
 }
 
