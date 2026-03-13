@@ -6,6 +6,10 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
+.header {
+  margin-bottom: 16px;
+}
+
 @media (min-width: 670px) {
   .header {
     padding-top: 60px;
