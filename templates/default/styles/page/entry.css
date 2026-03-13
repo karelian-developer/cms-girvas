@@ -260,6 +260,7 @@
 
 .page__article .article__comments .form__panel-container {
   display: flex;
+  justify-content: flex-end;
 }
 
 .page__article .article__comments .form__panel-container > *:not(:last-child) {
@@ -269,7 +270,7 @@
 .page__article .article__comments .form[role="entryCommentForm"] {
   display: flex;
   flex-direction: column;
-  margin-bottom: 10px;
+  width: 100%;
 }
 
 .page__article .article__comments .form[role="entryCommentForm"] textarea {
