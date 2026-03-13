@@ -17,17 +17,17 @@
       </svg>
       <ul class="header__nav-list">
         <li class="header__nav-item">
-          <a class="header__nav-link display-block" href="/">
+          <a class="header__nav-link" href="/">
             <span class="header__nav-span">{LANG:DEFAULT_TEXT_MAIN}</span>
           </a>
         </li>
         <li class="header__nav-item">
-          <a class="header__nav-link display-block" href="/entries">
+          <a class="header__nav-link" href="/entries">
             <span class="header__nav-span">{LANG:DEFAULT_TEXT_ENTRIES}</span>
           </a>
         </li>
         <li class="header__nav-item">
-          <a class="header__nav-link display-block" href="/page/about">
+          <a class="header__nav-link" href="/page/about">
             <span class="header__nav-span">{LANG:DEFAULT_TEXT_ABOUT}</span>
           </a>
         </li>
