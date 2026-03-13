@@ -353,6 +353,8 @@
   flex-grow: 1;
   font-size: 14px;
   font-weight: 500;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   padding: 10px;
 }
 
