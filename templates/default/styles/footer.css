@@ -51,9 +51,9 @@
 
 @media (max-width: 670px) {
   .footer__content {
-    border-bottom-left-radius: 0;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
+    border-bottom-right-radius: 0;
   }
 }
 
@@ -133,10 +133,9 @@
 }
 
 @media (max-width: 670px) {
-  .footer__content {
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 0;
+  .footer__brand-container {
+    padding-top: 16px;
+    padding-bottom: 16px;
   }
 }
 
