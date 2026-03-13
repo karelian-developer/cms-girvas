@@ -20,11 +20,13 @@
 }
 
 .entries-list-container__list-item {
+  box-sizing: border-box;
   position: relative;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
   border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
   height: 240px;
 }
 
