@@ -120,14 +120,16 @@
 .sidebar__block {
   display: flex;
   flex-direction: column;
+  border-left: 1px solid var(--common-secondary-color-10);
 }
 
 .sidebar__block-title {
+  background: var(--primary-linear-gradient-180deg);
+  text-transform: uppercase;
   font-size: 16px;
   font-weight: 300;
   color: var(--primary-color-2);
-  background: var(--primary-linear-gradient-180deg);
-  border-left: 1px solid var(--primary-color-5);
+  border-bottom: 1px solid var(--common-secondary-color-10);
   padding: 16px;
   width: 100%;
 }
