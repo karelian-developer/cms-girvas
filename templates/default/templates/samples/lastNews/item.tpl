@@ -1,12 +1,24 @@
-<article class="sample__item item">
-  <a href="/entry/{ENTRY_NAME}" class="item__link link link_title">
-    <h3 class="item__title title">{ENTRY_TITLE}</h3>
+<article class="sample__item">
+  <a href="/entry/{ENTRY_NAME}" class="sample__item-title-link">
+    <h3 class="sample__item-title">
+      <span class="sample__item-title-label">
+        {ENTRY_TITLE}
+      </span>
+    </h3>
   </a>
-  <div class="item__description description">
+  <div class="sample__item-description">
     {ENTRY_DESCRIPTION}
   </div>
-  <div class="item__bottom-bar bottom-bar">
-    <time class="item__datetime" datetime="Y-m-d">{ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME}</time>
-    <a href="/entry/{ENTRY_NAME}" class="item__link link link_read" title="{ENTRY_TITLE}">{LANG:DEFAULT_TEXT_READ}</a>
+  <div class="sample__item-bottom-bar">
+    <time class="sample__item-datetime" datetime="Y-m-d">
+      <span class="sample__item-datetime-label">
+        {ENTRY_PUBLISHED_DATE_TIMESTAMP_ISO_8601_WITHOUT_TIME}
+      </span>
+    </time>
+    <a href="/entry/{ENTRY_NAME}" class="sample__item-read-link" title="{ENTRY_TITLE}">
+      <span class="sample__item-read-label">
+        {LANG:DEFAULT_TEXT_READ}
+      </span>
+    </a>
   </div>
 </article>
