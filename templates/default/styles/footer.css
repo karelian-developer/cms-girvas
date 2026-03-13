@@ -39,6 +39,7 @@
 .footer__content {
   display: none;
   border-bottom-left-radius: 8px;
+  border-top-left-radius: 8px;
   height: 100%;
   background-color: var(--dark-gray-color);
 }
@@ -115,6 +116,7 @@
   justify-content: center;
   align-items: center;
   border-bottom-right-radius: 8px;
+  border-top-right-radius: 8px;
   height: 100%;
   background-color: var(--primary-color-1);
 }
