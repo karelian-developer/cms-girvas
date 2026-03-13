@@ -123,13 +123,12 @@
   background-color: var(--grey-color);
 }
 
-/* ===== АНИМАЦИИ ===== */
 @keyframes entries-group-animation-block {
   from {
     height: 70px;
     background-color: rgba(0, 0, 0, 0.6);
   }
-  
+
   to {
     height: 100%;
     background-color: var(--dark-gray-color);
@@ -152,7 +151,6 @@
   }
 }
 
-/* ===== ОСНОВНЫЕ СТИЛИ ===== */
 .article__preview-link-wrapper {
   position: absolute;
   width: 100%;
@@ -179,24 +177,20 @@
   overflow: hidden;
 }
 
-/* ===== СОСТОЯНИЯ ===== */
-
-/* HOVER - наведение */
 .article__preview-link-wrapper:hover .article__preview-link {
-  animation: entries-group-animation-block 0.2s linear 1 forwards;
+  animation: entries-group-animation-block .2s linear 1 forwards;
 }
 
 .article__preview-link-wrapper:hover .article__description {
-  animation: entries-group-hidden-text 0.5s ease-in-out 0.1s forwards;
+  animation: entries-group-hidden-text .2s ease-in-out .1s forwards;
 }
 
-/* Дополнительная поддержка hover при наведении прямо на ссылку */
 .article__preview-link:hover {
-  animation: entries-group-animation-block 0.2s linear 1 forwards;
+  animation: entries-group-animation-block .2s linear 1 forwards;
 }
 
 .article__preview-link:hover .article__description {
-  animation: entries-group-hidden-text 0.5s ease-in-out 0.1s forwards;
+  animation: entries-group-hidden-text .2s ease-in-out .1s forwards;
 }
 
 /* FOCUS - фокус с клавиатуры */
@@ -205,13 +199,13 @@
 }
 
 .article__preview-link-wrapper:focus-within .article__preview-link {
-  animation: entries-group-animation-block 0.2s linear 1 forwards;
+  animation: entries-group-animation-block .2s linear 1 forwards;
   background-color: var(--dark-gray-color);
   color: var(--container-and-text-white-color);
 }
 
 .article__preview-link-wrapper:focus-within .article__description {
-  animation: entries-group-hidden-text 0.5s ease-in-out 0.1s forwards;
+  animation: entries-group-hidden-text .2s ease-in-out .1s forwards;
 }
 
 .article__preview-link:focus-visible {
@@ -219,20 +213,17 @@
   outline: none;
 }
 
-/* ACTIVE - активное состояние (при клике) */
 .article__preview-link-wrapper:active .article__preview-link,
 .article__preview-link:active {
   color: var(--dark-gray-color);
   background-color: var(--container-and-text-white-color);
 }
 
-/* ===== ЭФФЕКТЫ ДЛЯ КОНТЕЙНЕРА СПИСКА ===== */
 .entries-list-container__list-item:hover,
 .entries-list-container__list-item:focus-within {
-  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, .25));
 }
 
-/* ===== СТИЛИ ДЛЯ ТЕКСТА (базовые) ===== */
 .article__description {
   visibility: hidden;
   font-size: 0;
