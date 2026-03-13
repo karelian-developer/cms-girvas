@@ -41,6 +41,8 @@
 
 .entries-list-container__list-item .article__preview-image {
   position: absolute;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   object-fit: cover;
   width: 100%;
   height: 100%;
@@ -92,15 +94,16 @@
 }
 
 .entries-list-container__list-item .article .article__group-link {
-  width: fit-content;
-  height: 100%;
-  padding: 12px 25px;
+  background-color: var(--grey-color);
   font-size: 14px;
   font-weight: 400;
-  transition: var(--transistion);
   text-transform: uppercase;
   color: var(--container-and-text-white-color);
-  background-color: var(--grey-color);
+  border-bottom-right-radius: 8px;
+  padding: 12px 25px;
+  width: fit-content;
+  height: 100%;
+  transition: var(--transistion);
 }
 
 .entries-list-container__list-item .article .article__group-link:focus-visible {
