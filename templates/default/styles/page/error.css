@@ -21,6 +21,8 @@
   font-weight: 300;
   font-size: 18px;
   color: var(--primary-color-3);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
   padding: 16px 24px;
 }
 
