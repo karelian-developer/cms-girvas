@@ -312,6 +312,7 @@
 .page__article .article__content {
   font-weight: 300;
   padding: 24px;
+  margin-bottom: 16px;
 }
 
 .page__article .article__content > p {
@@ -370,6 +371,19 @@
 .page__article .article__content a:hover,
 .page__article .article__content a:focus {
   color: var(--primary-color-2);
+}
+
+.page__article .article__comment-form-container {
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 16px;
+  margin-bottom: 16px;
+}
+
+.page__article .article__comments-container {
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-bottom: 16px;
 }
 
 .form {
