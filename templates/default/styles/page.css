@@ -110,7 +110,7 @@
 
 .sidebar {
   display: grid;
-  grid-template-columns: min-content;
+  grid-template-rows: min-content;
   row-gap: 16px;
 }
 
