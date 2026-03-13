@@ -358,7 +358,7 @@ final class Core implements ThemeInterfaceCore
 
     $linkElement = $document->createElement('a');
     $linkElement->setAttribute('id', 'SYSTEM_GE_IMC_00000001');
-    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link');
     $linkElement->setAttribute('href', '#');
 
     $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_LOGIN']);
@@ -385,7 +385,7 @@ final class Core implements ThemeInterfaceCore
     $documentFragment = $document->createDocumentFragment();
 
     $linkElement = $document->createElement('a');
-    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link');
     $linkElement->setAttribute('href', '/registration');
 
     $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_REGISTRATION']);
@@ -413,7 +413,7 @@ final class Core implements ThemeInterfaceCore
 
     $linkElement = $document->createElement('a');
     $linkElement->setAttribute('role', 'profileNavigationExit');
-    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link');
     $linkElement->setAttribute('href', '#');
 
     $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_EXIT']);
