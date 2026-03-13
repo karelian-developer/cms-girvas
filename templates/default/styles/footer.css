@@ -37,7 +37,7 @@
 }
 
 @media (max-width: 670px) {
-  .footer {
+  .footer__main-block {
     grid-template-columns: 1fr;
   }
 }
