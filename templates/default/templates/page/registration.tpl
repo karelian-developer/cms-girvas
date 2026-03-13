@@ -1,6 +1,6 @@
 <article class="page__article article" data-entry-id="{ENTRY_ID}" role="entry">
   <div class="page__article-header">
-    <h2 class="article__title">{LANG:PAGE_REGISTRATION_TITLE}</h2>
+    <h1 class="article__title">{LANG:PAGE_REGISTRATION_TITLE}</h1>
     <div class="article__metadata metadata"></div>
   </div>
   <div class="article__content">

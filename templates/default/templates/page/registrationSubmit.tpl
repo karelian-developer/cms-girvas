@@ -1,6 +1,6 @@
 <article class="page__article article">
   <div class="page__article-header">
-    <h2 class="article__title">{REGISTRATION_SUBMIT_TITLE}</h2>
+    <h1 class="article__title">{REGISTRATION_SUBMIT_TITLE}</h1>
     <div class="article__metadata metadata"></div>
   </div>
   <div class="article__content">

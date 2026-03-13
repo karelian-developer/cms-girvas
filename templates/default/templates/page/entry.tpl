@@ -1,6 +1,6 @@
 <article class="page__article article" data-entry-id="{ENTRY_ID}" role="entry">
   <div class="page__article-header" style="background-image: url('{ENTRY_PREVIEW_URL}');">
-    <h2 class="article__title">{ENTRY_TITLE}</h2>
+    <h1 class="article__title">{ENTRY_TITLE}</h1>
     <div class="article__metadata">
       <div class="metadata__datetime">
         <svg class="metadata__icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -19,7 +19,7 @@
   </div>
   <div class="article__comments comments">
     <div class="comments__header">
-      <h3 class="comments__title">{LANG:DEFAULT_TEXT_COMMENTS}</h3>
+      <h2 class="comments__title">{LANG:DEFAULT_TEXT_COMMENTS}</h2>
     </div>
     <div class="article__comment-form-container" data-role="entry-comment-form-container"></div>
     <div class="article__comments-container" data-role="entry-comments-container">

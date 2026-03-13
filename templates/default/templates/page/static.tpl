@@ -1,6 +1,6 @@
 <article class="page__article article" role="page">
   <div class="page__article-header" style="background-image: url('{PAGE_PREVIEW_URL}');">
-    <h2 class="article__title">{PAGE_TITLE}</h2>
+    <h1 class="article__title">{PAGE_TITLE}</h1>
     <div class="article__metadata metadata">
       <div class="metadata__datetime">
         <svg class="metadata__icon" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">

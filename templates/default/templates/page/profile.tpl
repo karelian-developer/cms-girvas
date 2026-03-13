@@ -1,7 +1,7 @@
 <article class="page__article article">
   <div class="page__article-header" style="background-image: url('{SITE_TEMPLATE_URL}/images/entry/default_1024.png');">
     <div class="page__buttons-panel" role="profilePanelButtons"></div>
-    <h2 class="article__title">{USER_LOGIN}</h2>
+    <h1 class="article__title">{USER_LOGIN}</h1>
   </div>
   <div class="article__content">
     <div class="profile">
