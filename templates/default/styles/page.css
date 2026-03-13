@@ -359,6 +359,68 @@
   padding-top: 10px;
 }
 
+.page__article .article__content ul,
+.page__article .article__content ol {
+  padding-left: 10px;
+  margin-top: 0;
+}
+
+.page__article .article__content ol,
+.page__article .article__content ol li {
+  list-style-type: disc;
+}
+
+.page__article .article__content ul,
+.page__article .article__content ul li {
+  list-style-type: decimal;
+}
+
+.page__article .article__content > p,
+.page__article .article__content ul,
+.page__article .article__content ol,
+.page__article .article__content figure figcaption {
+  font-size: 14px;
+}
+
+.page__article .article__content figure figcaption {
+  font-style: italic;
+  color: var(--primary-color-5);
+}
+
+.page__article .article__content .video-container:nth-of-type(n+5),
+.page__article .article__content img:nth-child(n+5),
+.page__article .article__content figure:nth-child(n+5) {
+  grid-column: 1 / -1;
+  max-width: 100%;
+}
+
+.page__article .article__content img,
+.page__article .article__content figure,
+.page__article .article__content .video-container {
+  grid-column: auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.page__article .article__content video {
+  width: 100%;
+}
+
+.page__article .article__content > figure {
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.page__article .article__content > figure img {
+  margin-bottom: 10px;
+}
+
+.page__article .article__content > *:not(:last-child) {
+  margin-bottom: 10px;
+}
+
 .page__article .article__content > * {
   margin-bottom: 10px;
 }
