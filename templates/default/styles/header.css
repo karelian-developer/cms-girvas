@@ -13,7 +13,7 @@
 }
 
 .header__container {
-  background: linear-gradient(270deg, #FFF 64.61%, #E0E0E0 100%);
+  background: var(--primary-linear-gradient-270deg);
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 }

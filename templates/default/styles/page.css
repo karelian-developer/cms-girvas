@@ -123,12 +123,13 @@
 }
 
 .sidebar .block__title {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--primary-color-2);
+  background: var(--primary-linear-gradient-0deg);
+  border-left: 1px solid var(--primary-color-5);
+  padding: 16px;
   width: 100%;
-  height: 40px;
-  padding: 13px 15px;
-  color: var(--primary-color-3);
-  background-color: var(--primary-color-2);
-  border-left: 6px solid var(--primary-color-1);
 }
 
 .sidebar .block__content {

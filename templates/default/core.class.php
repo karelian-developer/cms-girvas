@@ -268,11 +268,6 @@ final class Core implements ThemeInterfaceCore
     $CMSConfigEngineeringWorksStatus = $CMSConfigurator->getDatabaseEntryValue('base_engineering_works_status');
 
     if ($CMSConfigEngineeringWorksStatus === 'off' || $userGroupID === 1) {
-      $CMSTheme->addStyle(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
-      $CMSTheme->addStyle(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
-      $CMSTheme->addStyle(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
-      $CMSTheme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-      
       $CMSTheme->addScript(['src' => 'common.js'], true);
       $CMSTheme->addScript(['src' => 'core.class.js', 'type' => 'module'], true);
       $CMSTheme->addScript(['src' => 'core.class.js', 'type' => 'module']);
