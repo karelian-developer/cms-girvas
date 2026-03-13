@@ -136,6 +136,10 @@
   height: auto;
 }
 
+.page__article .article__content video {
+  width: 100%;
+}
+
 .page__article .article__content > figure {
   margin-left: 0;
   margin-right: 0;
