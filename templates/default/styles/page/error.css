@@ -6,17 +6,14 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-.page__article {
-  background-color: var(--primary-color-4);
-  padding: 24px;
-  min-height: 520px;
-}
-
 .page__article-header {
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
+  border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
   padding-top: 130px;
+  margin-bottom: 16px;
 }
 
 .page__article .article__title {
