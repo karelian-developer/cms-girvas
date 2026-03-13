@@ -330,7 +330,7 @@ final class Core implements ThemeInterfaceCore
     $documentFragment = $document->createDocumentFragment();
 
     $linkElement = $document->createElement('a');
-    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link');
     $linkElement->setAttribute('href', '/profile');
 
     $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_PROFILE']);
