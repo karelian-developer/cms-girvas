@@ -89,7 +89,8 @@
   height: 16px;
 }
 
-.entries-list-container__list-item .article .metadata__icon-path {
+.entries-list-container__list-item .article .metadata__icon-path,
+.entries-list-container__list-item .article .metadata__icon-rect {
   fill: var(--primary-color-3);
 }
 
