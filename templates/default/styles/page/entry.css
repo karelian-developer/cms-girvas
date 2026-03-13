@@ -17,7 +17,9 @@
 }
 
 .page__article .metadata__icon {
-  margin-right: 6px;
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
 }
 
 .page__article .article__content {
