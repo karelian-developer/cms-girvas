@@ -151,7 +151,7 @@
   }
 }
 
-@media (max-width: 669px) {
+@media (max-width: 670px) {
   .footer__copyright-container {
     background-color: var(--footer-black-color);
     padding-top: 0;
