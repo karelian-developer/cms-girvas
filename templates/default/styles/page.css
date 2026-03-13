@@ -188,6 +188,13 @@
 
 .block__sample .sample__item-read-link {
   text-decoration: underline;
+  color: var(--common-secondary-color-3);
+  transition: color .2s;
+}
+
+.block__sample .sample__item-read-link:hover,
+.block__sample .sample__item-read-link:focus {
+  color: var(--primary-color-2);
 }
 
 .block__sample .sample__item-read-link::after {
