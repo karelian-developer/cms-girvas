@@ -31,6 +31,13 @@
   column-gap: 24px;
 }
 
+@media (max-width: 480px) {
+  .header__brand-image-container {
+    display: none;
+    grid-template-columns: 1fr;
+  }
+}
+
 .header__brand-image-container {
   height: 96px;
 }
@@ -46,9 +53,21 @@
   color: var(--primary-color-2);
 }
 
+@media (max-width: 480px) {
+  .header__brand-title {
+    text-align: center;
+  }
+}
+
 .header__brand-slogan {
   font-size: 18px;
   color: var(--primary-color-5);
+}
+
+@media (max-width: 480px) {
+  .header__brand-slogan {
+    text-align: center;
+  }
 }
 
 .header__nav {
