@@ -42,6 +42,7 @@
 @media (max-width: 670px) {
   .header__brand-container {
     grid-template-columns: 64px 1fr;
+    padding: 16px 0;
   }
 }
 
