@@ -165,12 +165,17 @@
 }
 
 .page__article .article__comments .comments__title {
-  padding: 12px 25px;
+  background-color: var(--grey-color);
+  text-transform: uppercase;
   font-size: 14px;
   font-weight: 400;
-  text-transform: uppercase;
   color: var(--container-and-text-white-color);
-  background-color: var(--grey-color);
+  border-top-left-radius: 8px;
+  padding: 12px 25px;
+}
+
+.page__article .article__comments .article__comments-list {
+  margin-bottom: 16px;
 }
 
 .page__article .article__comments .comments-list__item {
