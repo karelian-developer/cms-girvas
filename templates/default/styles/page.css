@@ -111,6 +111,7 @@
 .sidebar {
   display: grid;
   grid-template-rows: minmax(200px, min-content);
+  grid-auto-rows: min-content;
   row-gap: 16px;
 }
 
