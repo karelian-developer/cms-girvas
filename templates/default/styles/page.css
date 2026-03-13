@@ -187,7 +187,7 @@
 }
 
 .block__sample .sample__item-read-link {
-  text-decoration: underline;
+  text-decoration: none;
   color: var(--common-secondary-color-3);
   transition: color .2s;
 }
@@ -199,7 +199,7 @@
 
 .block__sample .sample__item-read-link::after {
   font-size: 12px;
-  text-decoration: underline;
+  text-decoration: none;
   content: '>>';
   margin-left: 5px;
 }
