@@ -22,6 +22,11 @@
   height: 16px;
 }
 
+.page__article .metadata__icon-path,
+.page__article .metadata__icon-rect {
+  fill: var(--primary-color-3);
+}
+
 .page__article .article__content {
   background-color: var(--primary-color-4);
   border-radius: 8px;
