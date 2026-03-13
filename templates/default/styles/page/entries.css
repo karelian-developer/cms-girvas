@@ -6,12 +6,6 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-.page__entries-wrapper {
-  background-color: var(--primary-color-4);
-  padding: 24px;
-  min-height: 520px;
-}
-
 .page__entries-container {
   margin-bottom: 20px;
 }
