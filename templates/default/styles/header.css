@@ -10,10 +10,15 @@
   margin-bottom: 16px;
 }
 
-@media (min-width: 670px) {
+@media (min-width: 671px) {
+  .header {
+    padding-top: 60px;
+  }
+}
+
+@media (max-width: 670px) {
   .header {
     position: sticky;
-    padding-top: 60px;
     top: 0;
     z-index: 5;
   }
