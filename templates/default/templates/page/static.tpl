@@ -1,4 +1,5 @@
 <article class="page__article article" role="page">
+  <div class="page__breadcrumbs breadcrumbs">{PAGE_BREADCRUMPS}</div>
   <div class="page__article-header" style="background-image: url('{PAGE_PREVIEW_URL}');">
     <h1 class="article__title">{PAGE_TITLE}</h1>
     <div class="article__metadata metadata">

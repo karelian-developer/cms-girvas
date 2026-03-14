@@ -1,4 +1,5 @@
 <article class="page__article article" data-entry-id="{ENTRY_ID}" role="entry">
+  <div class="page__breadcrumbs breadcrumbs">{PAGE_BREADCRUMPS}</div>
   <div class="page__article-header" style="background-image: url('{ENTRY_PREVIEW_URL}');">
     <h1 class="article__title">{ENTRY_TITLE}</h1>
     <div class="article__metadata">
