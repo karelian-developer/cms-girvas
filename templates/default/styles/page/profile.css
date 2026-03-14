@@ -147,13 +147,16 @@
   top: 96px;
 }
 
-.article__profile.profile_edit input[cmsg-password-checker] + [cmsg-password-checker-bar-container] {
+.article__profile.profile_edit [cmsg-password-checker-bar-container] {
   box-sizing: border-box;
   border-radius: 100%;
   padding-left: 8px;
   padding-right: 8px;
-  height: 8px !important;
   transform: translateY(4px);
+}
+
+.article__profile.profile_edit [cmsg-password-checker-bar] {
+  height: 8px !important;
 }
 
 .article__profile.profile_edit .profile__information-table {
