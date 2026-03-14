@@ -194,11 +194,9 @@
 
 .profile__avatar {
   filter: brightness(100%);
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-image: center center;
   width: 128px;
   height: 128px;
+  object-fit: cover;
 }
 
 .form__input-container {

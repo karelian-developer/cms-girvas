@@ -6,7 +6,7 @@
   <div class="article__content">
     <div class="profile article__profile profile_edit">
       <div class="profile__avatar-container">
-        <div class="profile__avatar" style="background-image: url('{USER_AVATAR_URL}');" role="profile-avatar"></div>
+        <img class="profile__avatar" src="{USER_AVATAR_URL}" alt="{USER_LOGIN}">
       </div>
       <div class="profile__information-container">
         <form id="SYSTEM_F0648538312" class="profile__form form form_profile" method="PATCH" action="/handler/user">
