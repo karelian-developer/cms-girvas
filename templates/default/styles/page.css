@@ -60,9 +60,12 @@
 }
 
 .page .pagination-list__item-link {
+  background-color: var(--primary-color-4);
   text-decoration: none;
-  color: inherit;
+  color: var(--common-secondary-color-3);
+  border-radius: 8px;
   padding: 8px;
+  transition: background-color .2s, color .2s;
 }
 
 .page .pagination-list__item-link:hover,
