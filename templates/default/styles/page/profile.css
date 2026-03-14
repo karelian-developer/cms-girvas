@@ -42,15 +42,14 @@
 }
 
 .page__article .article__title {
-  background-color: var(--primary-color-4);
-  text-transform: uppercase;
-  font-weight: 400;
+  background-color: rgba(0, 0, 0, .6);
+  font-weight: 300;
   font-size: 18px;
-  color: var(--primary-color-2);
-  border-radius: 8px;
-  border: 1px solid var(--common-secondary-color-10);
-  padding: 8px 24px;
-  margin-bottom: 16px;
+  color: var(--primary-color-3);
+  padding-left: 144px;
+  padding-right: 24px;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 .page__article .article__content {
