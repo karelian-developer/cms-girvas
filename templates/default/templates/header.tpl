@@ -31,15 +31,9 @@
             <span class="header__nav-span">{LANG:DEFAULT_TEXT_ABOUT}</span>
           </a>
         </li>
-        <li class="header__nav-item">
-          {NAVIGATION_PROFILE_LINK}
-        </li>
-        <li class="header__nav-item">
-          {NAVIGATION_REGISTRATION_LINK}
-        </li>
-        <li class="header__nav-item">
-          {NAVIGATION_EXIT_LINK}
-        </li>
+        {NAVIGATION_PROFILE_LINK}
+        {NAVIGATION_REGISTRATION_LINK}
+        {NAVIGATION_EXIT_LINK}
       </ul>
     </nav>
   </div>
