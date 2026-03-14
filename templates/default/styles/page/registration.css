@@ -16,6 +16,20 @@
   margin-bottom: 16px;
 }
 
+.page__article .article__title {
+  background-color: rgba(0, 0, 0, .6);
+  font-weight: 300;
+  font-size: 18px;
+  color: var(--primary-color-3);
+  padding: 16px 24px;
+}
+
+@media (max-width: 800px) {
+  .page__article .article__title {
+    font-size: 18px;
+  }
+}
+
 .page__article .metadata__icon {
   margin-right: 8px;
   width: 16px;
