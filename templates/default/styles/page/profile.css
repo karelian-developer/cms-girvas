@@ -223,3 +223,32 @@
 .form__input-container:hover > .form__input-tip {
   opacity: 1;
 }
+
+.profile_edit .form__button {
+  display: flex;
+  background-color: var(--primary-color-3);
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  color: var(--common-main-color-3);
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  border-bottom: 0;
+  border-radius: 8px;
+  padding: 10px;
+  transition: background-color .2s, color .2s;
+  cursor: pointer;
+}
+
+.profile_edit .form__button:not([disabled]):hover {
+  background-color: var(--secondary-color-2);
+}
+
+.profile_edit .form__button:not([disabled]):focus {
+  background-color: var(--secondary-color-2);
+}
+
+.profile_edit .form__button:not([disabled]):active {
+  background-color: var(--secondary-color-3);
+}
