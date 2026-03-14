@@ -155,7 +155,11 @@
   border-bottom: 1px solid var(--primary-color-3);
 }
 
-.article__profile.profile_edit .cell_header[colspan] {
+.article__profile.profile_edit .table__cell_header {
+  font-weight: 400;
+}
+
+.article__profile.profile_edit .table__cell_header[colspan] {
   background-color: var(--primary-color-3);
   text-align: center;
   font-weight: 600;
@@ -163,10 +167,6 @@
 
 .article__profile.profile_edit .table__cell {
   border-color: transparent;
-}
-
-.article__profile.profile_edit .table__cell_header {
-  font-weight: 400;
 }
 
 .profile_edit .profile__avatar {
