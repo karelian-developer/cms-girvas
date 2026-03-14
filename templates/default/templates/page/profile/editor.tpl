@@ -4,7 +4,7 @@
     <h2 class="article__title">{USER_LOGIN}</h2>
   </div>
   <div class="article__content">
-    <div class="profile profile_edit">
+    <div class="profile article__profile profile_edit">
       <div class="profile__avatar-container">
         <div class="profile__avatar" style="background-image: url('{USER_AVATAR_URL}');" role="profile-avatar"></div>
       </div>
