@@ -147,6 +147,12 @@
   top: 96px;
 }
 
+.article__profile.profile_edit input[cmsg-password-checker] + div {
+  box-sizing: border-box;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
 .article__profile.profile_edit .profile__information-table {
   background-color: transparent;
 }
