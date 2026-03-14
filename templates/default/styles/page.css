@@ -70,7 +70,7 @@
 
 .page .pagination-list__item-link:hover,
 .page .pagination-list__item-link:focus,
-.page .pagination-list__item.pagination-list__item_active {
+.page .pagination-list__item.pagination-list__item_active .pagination-list__item-link {
   background-color: var(--common-secondary-color-3);
   color: var(--common-secondary-color-2);
 }
