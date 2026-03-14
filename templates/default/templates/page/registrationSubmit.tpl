@@ -1,7 +1,6 @@
 <article class="page__article article">
-  <div class="page__article-header">
+  <div class="page__article-header" style="background-image: url('{SITE_TEMPLATE_URL}/images/entry/default_1024.png');">
     <h1 class="article__title">{REGISTRATION_SUBMIT_TITLE}</h1>
-    <div class="article__metadata metadata"></div>
   </div>
   <div class="article__content">
     {REGISTRATION_SUBMIT_TEXT}
