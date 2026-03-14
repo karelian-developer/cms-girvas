@@ -152,6 +152,10 @@
   border-radius: 8px;
 }
 
+.article__profile.profile_edit .profile__information-table {
+  background-color: transparent;
+}
+
 .article__profile.profile_edit .table__cell {
   border-color: transparent;
 }
