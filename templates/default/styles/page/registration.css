@@ -22,6 +22,8 @@
   font-size: 18px;
   color: var(--primary-color-3);
   padding: 16px 24px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 
 @media (max-width: 800px) {
