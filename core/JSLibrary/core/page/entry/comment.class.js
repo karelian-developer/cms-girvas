@@ -101,7 +101,8 @@ export class EntryComment {
               commentData.indexLabel = `${commentParentElement.id}_${commentData.index}`;
               commentData.parentElement = commentParentElement;
               commentData.parent = this;
-              commentData.level = this.level >= 3 ? this.level + 1 : this.level;
+              
+              this.level = this.level >= 3 ? this.level + 1 : this.level;
               
               let entryComment = new EntryComment(this.entry, commentData);
               entryComment.assembly({login: authorData.login, avatarURL: authorData.avatarURL, group: authorData.group}, (commentElement) => {
