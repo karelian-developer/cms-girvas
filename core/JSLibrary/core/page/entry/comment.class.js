@@ -125,6 +125,11 @@ export class EntryComment {
                 targetContainer = commentParentElement.querySelector('[data-role="entry-comments-container"] .comments-list');
               }
 
+              const existingComment = targetContainer?.querySelector(`[data-comment-id="${commentData.id}"]`);
+              if (existingComment) {
+                return;
+              }
+
               entryComment.assembly({login: authorData.login, avatarURL: authorData.avatarURL, group: authorData.group}, (commentElement) => {
                 commentLoadedIndex++;
                 
