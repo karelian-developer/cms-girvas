@@ -102,7 +102,7 @@ export class EntryComment {
               commentData.parentElement = commentParentElement;
               commentData.parent = this;
               
-              this.level = this.level >= 3 ? this.level + 1 : this.level;
+              this.level = this.level <= 2 ? this.level + 1 : this.level;
               
               let entryComment = new EntryComment(this.entry, commentData);
               entryComment.assembly({login: authorData.login, avatarURL: authorData.avatarURL, group: authorData.group}, (commentElement) => {
