@@ -6,7 +6,7 @@
   <div class="article__content">
     <div class="profile article__profile">
       <div class="profile__avatar-container">
-        <img class="profile__avatar" src="{USER_AVATAR_URL}" alt="{USER_LOGIN}">
+        <img class="profile__avatar" src="{USER_AVATAR_URL}" alt="{USER_LOGIN}" data-role="profile-avatar">
       </div>
       <div class="profile__information-container">
         <table class="table profile__information-table">

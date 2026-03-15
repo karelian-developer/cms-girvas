@@ -80,16 +80,16 @@ export class PageProfile {
         this.clientUserPermissions = data.outputData.user.permissions;
 
         if (this.clientUserPermissions.admin_users_management || this.clientUserData.login === this.page.core.searchParams.getPathPart(2) || this.page.core.searchParams.getPathPart(2) === null) {
-          let profileAvatarElement = document.querySelector('[role="profile-avatar"]');
-          let profileFormElement = document.querySelector('#SYSTEM_F0648538312');
+          const profileAvatarElement = document.querySelector('[role="profile-avatar"]');
+          const profileFormElement = document.querySelector('#SYSTEM_F0648538312');
           
           if (profileAvatarElement !== null && profileFormElement !== null) {
-            let formInputUserID = profileFormElement.querySelector('input[name="user_id"]');
-
-            let profileAvatarInput = document.createElement('input');
+            const formInputUserID = profileFormElement.querySelector('input[name="user_id"]');
+            
+            const profileAvatarInput = document.createElement('input');
             profileAvatarInput.setAttribute('type', 'file');
             profileAvatarInput.setAttribute('name', 'user_avatar');
-            profileAvatarInput.setAttribute('role', 'profileFormInputUserAvatar');
+            profileAvatarInput.setAttribute('data-role', 'input-user-avatar');
 
             profileAvatarInput.style.display = 'none';
 
