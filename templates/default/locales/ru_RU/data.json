@@ -11,5 +11,7 @@
   "DEFAULT_INDEX_SIDEBAR_BLOCK_LAST_NEWS_TITLE": "Последние новости",
   "DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_TITLE": "Пример блока",
   "DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_DESCRIPTION": "Это содержимое простого блока",
-  "DEFAULT_SLOGAN": "Бесплатно, быстро и легко..."
+  "DEFAULT_SLOGAN": "Бесплатно, быстро и легко...",
+  "THEME_IDEBAR_BLOCK_DEMO_TITLE": "Демонстрационный блок",
+  "THEME_SIDEBAR_BLOCK_DEMO_CONTENT": "Это демонстрационный блок боковой колонки."
 }
