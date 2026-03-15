@@ -49,6 +49,7 @@
 
 .page__article .article__content > p {
   margin-top: 0;
+  margin-bottom: 0;
 }
 
 .page__article .article__content *:has(+ h2),
