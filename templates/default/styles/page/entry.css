@@ -261,8 +261,13 @@
 
 .page__article .article__comments .comment__panel-interactive {
   display: flex;
+  flex-wrap: wrap;
   padding-top: 10px;
   flex: 0 0 100%;
+}
+
+.page__article .article__comments .comment__panel-interactive .interactive__button-label {
+  font-size: 14px;
 }
 
 .page__article .article__comments .comment__panel-interactive > *:not(:last-child) {

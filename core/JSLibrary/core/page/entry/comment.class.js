@@ -47,9 +47,6 @@ export class EntryComment {
   }
 
   initAnswersPanel(clientUserData = {}, clientUserPermissions = {}) {
-    let elementEntry = document.querySelector('[role="entry"]');
-    let entryCommentsListElement = elementEntry.querySelector('[role="entryCommentsList"]');
-
     let interactivePanelButtonContainerElement = document.createElement('div');
     interactivePanelButtonContainerElement.classList.add('comment__answers-container');
     interactivePanelButtonContainerElement.setAttribute('data-parent-id', this.id);
@@ -115,7 +112,7 @@ export class EntryComment {
                   entryComment.initAnswersPanel(clientUserData, clientUserPermissions);
                 }
   
-                entryComment.elementAssembled.setAttribute('role', 'entryCommentsAnswer');
+                entryComment.elementAssembled.setAttribute('data-role', 'entry-comments-answer');
                 entryComment.elementAssembled.classList.add('comment_answer');
               });
             });
