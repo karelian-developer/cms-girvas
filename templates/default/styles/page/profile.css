@@ -192,6 +192,21 @@
   border-color: transparent;
 }
 
+@media (max-width: 970px) {
+  .article__profile.profile_edit .table__row .table__cell_header {
+    width: 200px;
+  }
+  
+  .article__profile.profile_edit .table__row .table__cell:nth-child(2) {
+    width: calc(100% - 200px);
+  }
+
+  .article__profile.profile_edit .table__row .table__cell:nth-child(2) input,
+  .article__profile.profile_edit .table__row .table__cell:nth-child(2) textarea {
+    width: 100%;
+  }
+}
+
 .form__input-container {
   position: relative;
   width: fit-content;
