@@ -99,11 +99,12 @@ export class EntryComment {
               commentData.answersLoadingLimit = this.answersLoadingLimit;
               commentData.index = (answersContainerParentElement != null) ? answersContainerParentElement.children.length + 1 : 1;
               commentData.indexLabel = `${commentParentElement.id}_${commentData.index}`;
-              commentData.parentElement = commentParentElement;
-              commentData.parent = this;
               
               const entryComment = new EntryComment(this.entry, commentData);
               entryComment.level = this.level <= 2 ? this.level + 1 : this.level;
+              entryComment.parent = this;
+              
+              this.parentElement = commentParentElement;
 
               entryComment.assembly({login: authorData.login, avatarURL: authorData.avatarURL, group: authorData.group}, (commentElement) => {
                 commentLoadedIndex++;
@@ -111,7 +112,7 @@ export class EntryComment {
                 answersListElement.append(commentElement);
                 entryComment.initPanel(clientUserData, clientUserPermissions);
                 if (commentLoadedIndex < comments.length) {
-                  if (this.level === 3) {
+                  if (this.level >= 3) {
                     appendComment(comments[commentLoadedIndex], commentData.parent.parentElement);
                   } else {
                     appendComment(comments[commentLoadedIndex], commentParentElement);
