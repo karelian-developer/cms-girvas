@@ -458,6 +458,6 @@ final class Core implements ThemeInterfaceCore
    * @return string
    */
   public function assemblySidebarBlock(string $name, array $themeVars = []) : string {
-    return ThemeCollector::assemblyFileContent($this->theme, 'templates/sidebar/block/' . $name . '.tpl', $themeVars);
+    return ThemeCollector::assemblyFileContent($this->theme, 'templates/page/sidebar/block/' . $name . '.tpl', $themeVars);
   }
 }
