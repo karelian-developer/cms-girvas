@@ -186,15 +186,7 @@ final class Core implements ThemeInterfaceCore
    */
   public function assembly() : void
   {
-    $this->theme->addStyle(['href' => 'styles/colors.css', 'rel' => 'stylesheet']);
-    $this->theme->addStyle(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
-    
     $this->theme->addScript(['src' => 'interactive.class.js', 'type' => 'module'], true);
-
-    $this->theme->addStyle(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
-    $this->theme->addStyle(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
-    $this->theme->addStyle(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
-
     $this->theme->addScript(['src' => 'core.class.js', 'type' => 'module']);
 
     /** @var string $this->assembled Итоговый шаблон в виде строки */

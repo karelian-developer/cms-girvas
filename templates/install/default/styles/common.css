@@ -1,26 +1,47 @@
+/**
+ * CMS «ГИРВАС» (https://cms-girvas.ru/)
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
+ * @copyright   Copyright (c) 2021 - 2026, «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ */
+
+@import url('./colors.css');
+@import url('./fonts.css');
+@import url('./header.css');
+@import url('./main.css');
+@import url('./footer.css');
+
 html {
   font-family: 'Roboto', 'Helvetica', 'sans-serif';
   height: 100%;
 }
+
 body {
   box-sizing: border-box;
   background-attachment: fixed;
   background-color: var(--common-main-color-2);
+  background-image: url('../images/background.webp');
+  background-position: center center;
+  background-repeat: no-repeat;
   padding-top: 40px;
   padding-bottom: 40px;
   min-height: 100%;
 }
+
 .container {
   box-sizing: border-box;
   background-color: var(--common-main-color-1);
   margin: 0 auto;
   max-width: 620px;
 }
+
 .list-reset {
   list-style-type: none;
   padding: 0;
   margin: 0;
 }
+
 .tip {
   background-color: var(--common-main-color-2);
   font-size: 14px;
@@ -32,6 +53,7 @@ body {
     margin-bottom: 10px;
   }
 }
+
 .tip.tip_green {
   background-color: var(--common-secondary-color-8);
   color: var(--common-secondary-color-9);
