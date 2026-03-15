@@ -51,7 +51,7 @@
   background-color: transparent !important;
   padding-left: 8px;
   padding-right: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 16px !important;
 }
 
 .header__installer-progress {
