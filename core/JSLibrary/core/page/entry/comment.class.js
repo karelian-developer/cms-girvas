@@ -104,7 +104,7 @@ export class EntryComment {
               entryComment.level = this.level <= 2 ? this.level + 1 : this.level;
               entryComment.parent = this;
 
-              console.log(this.parent.id);
+              console.log(this.id);
 
               if (this.level > 0) {
                 this.parentElement = this.level <= 2
