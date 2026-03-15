@@ -92,55 +92,65 @@ export class EntryComment {
             requestAppend.target.showingNotification = false;
 
             requestAppend.target.send().then((authorLoadedData) => {
-                let authorData = authorLoadedData.outputData.user;
-                let answersContainerParentElement = this.getAnswersListElement();
-                
-                commentData.entryID = this.entryID;
-                commentData.answersLoadingLimit = this.answersLoadingLimit;
-                commentData.index = (answersContainerParentElement != null) ? answersContainerParentElement.children.length + 1 : 1;
-                commentData.indexLabel = `${commentParentElement.id}_${commentData.index}`;
-                
-                const entryComment = new EntryComment(this.entry, commentData);
-                entryComment.level = this.level <= 2 ? this.level + 1 : this.level;
-                entryComment.parent = this;
+              let authorData = authorLoadedData.outputData.user;
+              let answersContainerParentElement = this.getAnswersListElement();
+              
+              commentData.entryID = this.entryID;
+              commentData.answersLoadingLimit = this.answersLoadingLimit;
+              commentData.index = (answersContainerParentElement != null) ? answersContainerParentElement.children.length + 1 : 1;
+              commentData.indexLabel = `${commentParentElement.id}_${commentData.index}`;
+              
+              const entryComment = new EntryComment(this.entry, commentData);
+              entryComment.level = this.level <= 2 ? this.level + 1 : this.level;
+              entryComment.parent = this;
 
-                let targetParentElement;
+              console.log(this.id);
+
+              let targetContainer;
+              
+              if (this.level >= 3) {
+                let level2Comment = this;
+                while (level2Comment.level > 2 && level2Comment.parent) {
+                  level2Comment = level2Comment.parent;
+                }
                 
-                if (this.level >= 3) {
-                  targetParentElement = document.querySelector(`[data-comment-id="${this.parent.id}"]`);
-                  
-                  if (!targetParentElement) {
-                    targetParentElement = document.querySelector(`[data-comment-id="${this.id}"]`);
-                  }
-                } else if (this.level > 0) {
-                  targetParentElement = document.querySelector(`[data-comment-id="${this.id}"]`);
+                if (level2Comment.level === 2) {
+                  targetContainer = level2Comment.getAnswersListElement();
                 } else {
-                  targetParentElement = commentParentElement;
+                  targetContainer = answersContainerParentElement;
+                }
+              } else if (this.level === 2) {
+                targetContainer = this.getAnswersListElement();
+              } else {
+                targetContainer = commentParentElement.querySelector('[data-role="entry-comments-container"] .comments-list');
+              }
+
+              entryComment.assembly({login: authorData.login, avatarURL: authorData.avatarURL, group: authorData.group}, (commentElement) => {
+                commentLoadedIndex++;
+                
+                if (targetContainer) {
+                  targetContainer.append(commentElement);
+                } else {
+                  answersListElement.append(commentElement);
+                }
+                
+                entryComment.initPanel(clientUserData, clientUserPermissions);
+                
+                if (commentLoadedIndex < comments.length) {
+                  if (this.level >= 3) {
+                    appendComment(comments[commentLoadedIndex], targetContainer?.closest('.comment') || commentParentElement);
+                  } else {
+                    appendComment(comments[commentLoadedIndex], commentParentElement);
+                  }
                 }
 
-                entryComment.parentElement = targetParentElement;
+                if (entryComment.answersCount > 0) {
+                  entryComment.initAnswersPanel(clientUserData, clientUserPermissions);
+                }
 
-                entryComment.assembly({login: authorData.login, avatarURL: authorData.avatarURL, group: authorData.group}, (commentElement) => {
-                    commentLoadedIndex++;
-                    
-                    answersListElement.append(commentElement);
-                    entryComment.initPanel(clientUserData, clientUserPermissions);
-                    
-                    if (commentLoadedIndex < comments.length) {
-                      if (this.level >= 3) {
-                        appendComment(comments[commentLoadedIndex], targetParentElement);
-                      } else {
-                        appendComment(comments[commentLoadedIndex], commentParentElement);
-                      }
-                    }
-
-                    if (entryComment.answersCount > 0) {
-                      entryComment.initAnswersPanel(clientUserData, clientUserPermissions);
-                    }
-
-                    entryComment.elementAssembled.setAttribute('data-role', 'entry-comments-answer');
-                    entryComment.elementAssembled.classList.add('comment_answer');
-                });
+                entryComment.elementAssembled.setAttribute('data-role', 'entry-comments-answer');
+                entryComment.elementAssembled.classList.add('comment_answer');
+              });
             });
           };
   
