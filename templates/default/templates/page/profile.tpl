@@ -41,8 +41,5 @@
   </div>
 </article>
 <aside class="sidebar" role="siteSidebarRight">
-  <div class="sidebar__block">
-    <h2 class="sidebar__block-title">{LANG:DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_TITLE}</h2>
-    <div class="sidebar__block-content">{LANG:DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_DESCRIPTION}</div>
-  </div>
+  {SIDEBAR_BLOCK_DEMO}
 </aside>

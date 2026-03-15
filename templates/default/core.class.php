@@ -121,8 +121,15 @@ final class Core implements ThemeInterfaceCore
     $this->theme->CMSCore->initPage($this->theme->CMSCore->urlp->getPathString());
     $sitePage = $this->theme->CMSCore->getInitedPage();
     $sitePage->assembly();
+
+    $localeData = $this->theme->locale->getData();
     
-    $themeVars['SITE_PAGE'] = ThemeCollector::assembly($sitePage->assembled, []);
+    $themeVars['SITE_PAGE'] = ThemeCollector::assembly($sitePage->assembled, [
+      'SIDEBAR_BLOCK_DEMO' => $this->assemblySidebarBlock('default', [
+        'BLOCK_TITLE' => $localeData['STHEME_IDEBAR_BLOCK_DEMO_TITLE'],
+        'BLOCK_CONTENT' => $localeData['THEME_SIDEBAR_BLOCK_DEMO_CONTENT']
+      ]),
+    ]);
 
     return ThemeCollector::assemblyFileContent($this->theme, 'templates/main.tpl', $themeVars);
   }
@@ -440,5 +447,17 @@ final class Core implements ThemeInterfaceCore
     $document->appendChild($documentFragment);
 
     return $document->saveHTML();
+  }
+
+  /**
+   * Сборка блока боковой колонки
+   *
+   * @param string $name
+   * @param array $themeVars
+   * 
+   * @return string
+   */
+  public function assemblySidebarBlock(string $name, array $themeVars = []) : string {
+    return ThemeCollector::assemblyFileContent($this->theme, 'templates/sidebar/' . $name . '.tpl', $themeVars);
   }
 }
