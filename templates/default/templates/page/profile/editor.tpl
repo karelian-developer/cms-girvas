@@ -9,7 +9,7 @@
         <img class="profile__avatar" src="{USER_AVATAR_URL}" alt="{USER_LOGIN}" data-role="profile-avatar">
       </div>
       <div class="profile__information-container">
-        <form class="profile__form form form_profile" method="PATCH" action="/handler/user" data-role="profile-form">
+        <form class="profile__form form form_profile" method="PATCH" data-role="profile-form">
           <input type="hidden" name="user_id" value="{USER_ID}">
           <table class="table profile__information-table">
             <tr class="table__row">

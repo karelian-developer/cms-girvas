@@ -144,6 +144,7 @@ export class PageProfile {
             }
 
             if (this.page.core.searchParams.getParam('event') === 'edit') {
+              const profileFormElement = document.querySelector('[data-role="profile-form"]');
               const profileFormPanelElement = document.querySelector('[data-role="profile-form-panel"]');
               const profilePasswordInput = document.querySelector('[data-role="input-user-password"]');
               const profilePasswordRepeatInput = document.querySelector('[data-role="input-user-password-repeat"]');
@@ -159,6 +160,23 @@ export class PageProfile {
 
               interactiveButtonBack.target.setCallback((event) => {
                 window.location.href = '/profile';
+              });
+
+              interactiveButtonSave.target.setCallback((event) => {
+                const formData = new FormData(profileFormElement);
+
+                const request = new Interactive('request', {
+                  method: 'PATCH',
+                  url: `/handler/user?localeMessage=${window.CMSCore.locales.base.name}`
+                });
+
+                request.target.data = formData;
+
+                request.target.send().then((data) => {
+                  if (data.statusCode === 1) {
+                    // ...
+                  }
+                });
               });
 
               interactiveButtonEditAvatar.target.setCallback((event) => {
