@@ -35,6 +35,8 @@ export class EntryComment {
     this.answersCount = (typeof data.answersCount != 'undefined') ? data.answersCount : 0;
     this.answersLoadingOffset = (typeof data.answersLoadingOffset != 'undefined') ? data.answersLoadingOffset : 0;
     this.answersLoadingLimit = (typeof data.answersLoadingLimit != 'undefined') ? data.answersLoadingLimit : 0;
+    this.parent = (typeof data.parent != 'undefined') ? data.parent : null;
+    this.level = (typeof data.level != 'undefined') ? data.level : 0;
     this.elementAssembled = null;
   }
 
@@ -96,7 +98,10 @@ export class EntryComment {
               commentData.entryID = this.entryID;
               commentData.answersLoadingLimit = this.answersLoadingLimit;
               commentData.index = (answersContainerParentElement != null) ? answersContainerParentElement.children.length + 1 : 1;
-              commentData.indexLabel = `${commentParentElement.id}_${commentData.index}`
+              commentData.indexLabel = `${commentParentElement.id}_${commentData.index}`;
+              commentData.parentElement = commentParentElement;
+              commentData.parent = this;
+              commentData.level = this.level >= 3 ? this.level + 1 : this.level;
               
               let entryComment = new EntryComment(this.entry, commentData);
               entryComment.assembly({login: authorData.login, avatarURL: authorData.avatarURL, group: authorData.group}, (commentElement) => {
@@ -105,7 +110,11 @@ export class EntryComment {
                 answersListElement.append(commentElement);
                 entryComment.initPanel(clientUserData, clientUserPermissions);
                 if (commentLoadedIndex < comments.length) {
-                  appendComment(comments[commentLoadedIndex], commentParentElement);
+                  if (this.level >= 3) {
+                    appendComment(comments[commentLoadedIndex], commentData.parent.parentElement);
+                  } else {
+                    appendComment(comments[commentLoadedIndex], commentParentElement);
+                  }
                 }
   
                 if (entryComment.answersCount > 0) {
