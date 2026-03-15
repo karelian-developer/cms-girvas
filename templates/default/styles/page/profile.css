@@ -207,6 +207,16 @@
   }
 }
 
+@media (max-width: 470px) {
+  .article__profile.profile_edit .table__row .table__cell_header {
+    width: 30%;
+  }
+  
+  .article__profile.profile_edit .table__row .table__cell:nth-child(2) {
+    width: 70%;
+  }
+}
+
 .form__input-container {
   position: relative;
   width: fit-content;
