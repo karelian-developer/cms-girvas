@@ -5,14 +5,14 @@
   <div class="article__content">
     <form action="/handler/utils/registration" class="form form_registration">
       <div class="form__input-container input-container">
-        <input class="form__input form__input_text" type="text" name="user_login" placeholder="UserName" required>
+        <input class="form__input form__input_text" type="text" name="user_login" placeholder="UserName" required min="{USERS_LOGIM_LENGTH_MIN}" max="{USERS_LOGIM_LENGTH_MAX}">
       </div>
       <div class="form__input-container input-container">
         <input class="form__input form__input_email" type="email" name="user_email" placeholder="username@example.ru" required>
       </div>
       <div class="form__input-container input-container">
         <div class="form__input-tip input-tip" role="passwords-show">{LANG:BUTTON_SHOW_HIDE_LABEL}</div>
-        <input class="form__input form__input_password" type="password" name="user_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" cmsg-password-checker required>
+        <input class="form__input form__input_password" type="password" name="user_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" cmsg-password-checker required min="{USERS_PASSWORD_LENGTH_MIN}" max="{USERS_PASSWORD_LENGTH_MAX}">
       </div>
       <div class="form__input-container input-container">
         <div class="form__input-tip input-tip" role="passwords-show">{LANG:BUTTON_SHOW_HIDE_LABEL}</div>

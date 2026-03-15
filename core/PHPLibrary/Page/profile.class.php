@@ -92,18 +92,30 @@ class PageProfile implements InterfacePage
       }
       
       if ($profileUser !== null) {
+        $CMSConfigurator = $this->CMSCore->configurator;
+
         $userGroup = $user->getGroup();
         $userGroup->initData(['permissions']);
 
-        $fieldsTypes = $this->CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_type') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_type'), true) : [];
-        $fieldsTitles = $this->CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_title') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_title'), true) : [];
-        $fieldsDescriptions = $this->CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_description') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_description'), true) : [];
-        $fieldsNames = $this->CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_name') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_name'), true) : [];
+        $fieldsTypes = $CMSConfigurator->existsDatabaseEntryValue('users_additional_field_type')
+          ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_type'), true)
+          : [];
+        $fieldsTitles = $CMSConfigurator->existsDatabaseEntryValue('users_additional_field_title')
+          ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_title'), true)
+          : [];
+        $fieldsDescriptions = $CMSConfigurator->existsDatabaseEntryValue('users_additional_field_description')
+          ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_description'), true)
+          : [];
+        $fieldsNames = $CMSConfigurator->existsDatabaseEntryValue('users_additional_field_name')
+          ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_name'), true)
+          : [];
 
         $additionalFieldsElements = [];
 
         if ($this->CMSCore->urlp->getParam('event') === 'edit') {
-          if ($userGroup->permissionCheck($userGroup::PERMISSION_ADMIN_USERS_MANAGEMENT) || $user->getID() == $profileUser->getID()) {
+          
+          if ($userGroup->permissionCheck($userGroup::PERMISSION_ADMIN_USERS_MANAGEMENT) || $user->getID() === $profileUser->getID()) {
+            
             foreach ($fieldsTypes as $fieldIndex => $fieldType) {
               $fieldNameExploded = isset($fieldsNames[$fieldIndex]) ? explode('_', $fieldsNames[$fieldIndex]) : [];
               $fieldNameTransformed = implode($fieldNameExploded);
@@ -121,13 +133,13 @@ class PageProfile implements InterfacePage
                   }
                 }
 
-                array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/editor/fieldInput.tpl', [
+                $additionalFieldsElements[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/editor/fieldInput.tpl', [
                   'FIELD_NAME' => $fieldName,
                   'FIELD_TYPE' => $fieldType === 'textarea' ? '' : $fieldType,
                   'FIELD_TITLE' => $fieldTitle,
                   'FIELD_DESCRIPTION' => $fieldDescription,
                   'FIELD_VALUE' => $fieldValue
-                ]));
+                ]);
               }
             }
 
@@ -142,7 +154,11 @@ class PageProfile implements InterfacePage
                 'USER_SURNAME' => $profileUser->getSurname(),
                 'USER_PATRONYMIC' => $profileUser->getPatronymic(),
                 'USER_BIRTHDATE' => date('Y-m-d', $profileUser->getBirthdateUnixTimestamp()),
-                'PROFILE_ADDITIONAL_FIELDS' => implode($additionalFieldsElements)
+                'PROFILE_ADDITIONAL_FIELDS' => implode($additionalFieldsElements),
+                'USERS_PASSWORD_LENGTH_MAX' => $CMSConfigurator->getUsersPasswordLengthMax(),
+                'USERS_PASSWORD_LENGTH_MIN' => $CMSConfigurator->getUsersPasswordLengthMin(),
+                'USERS_LOGIM_LENGTH_MAX' => $CMSConfigurator->getUsersPasswordLengthMax(),
+                'USERS_LOGIM_LENGTH_MIN' => $CMSConfigurator->getUsersPasswordLengthMIN()
               ])
             ]);
           } else {
@@ -163,10 +179,12 @@ class PageProfile implements InterfacePage
             }
             $fieldNameTransformed = implode($fieldNameExploded);
 
-            array_push($additionalFieldsElements, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/additionalField.tpl', [
+            $additionalFieldsElements[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/additionalField.tpl', [
               'FIELD_TITLE' => $fieldsTitles[$localeName][$fieldIndex],
-              'FIELD_VALUE' => $profileUser->getAdditionalFieldData($fieldNameTransformed) !== null ? strip_tags($profileUser->getAdditionalFieldData($fieldNameTransformed)) : ''
-            ]));
+              'FIELD_VALUE' => $profileUser->getAdditionalFieldData($fieldNameTransformed) !== null
+                ? strip_tags($profileUser->getAdditionalFieldData($fieldNameTransformed))
+                : ''
+            ]);
           }
 
           $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
