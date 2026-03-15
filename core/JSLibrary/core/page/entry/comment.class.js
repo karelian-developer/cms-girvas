@@ -104,7 +104,13 @@ export class EntryComment {
               entryComment.level = this.level <= 2 ? this.level + 1 : this.level;
               entryComment.parent = this;
 
-              this.parentElement = document.querySelector(`[data-comment-id="${this.parent.id}"]`);
+              if (this.level > 0) {
+                this.parentElement = this.level <= 2
+                  ? document.querySelector(`[data-comment-id="${this.parent.id}"]`)
+                  : document.querySelector(`[data-comment-id="${this.id}"]`);
+              } else {
+                this.parentElement = commentParentElement;
+              }
 
               entryComment.assembly({login: authorData.login, avatarURL: authorData.avatarURL, group: authorData.group}, (commentElement) => {
                 commentLoadedIndex++;
