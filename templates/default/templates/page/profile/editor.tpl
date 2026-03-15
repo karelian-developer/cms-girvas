@@ -83,9 +83,7 @@
             </tr>
             {PROFILE_ADDITIONAL_FIELDS}
           </table>
-          <div class="profile__form-panel" data-role="profile-form-panel">
-            <button class="form__button form__input_submit">{LANG:DEFAULT_TEXT_SAVE}</button>
-          </div>
+          <div class="profile__form-panel" data-role="profile-form-panel"></div>
         </form>
       </div>
     </div>

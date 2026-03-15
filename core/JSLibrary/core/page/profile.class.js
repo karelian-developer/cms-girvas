@@ -155,12 +155,12 @@ export class PageProfile {
 
               interactiveButtonBack.target.setLabel(this.localeBaseData.DEFAULT_TEXT_BACK);
               interactiveButtonEditAvatar.target.setLabel(this.localeBaseData.BUTTON_EDIT_AVATAR_LABEL);
-              interactiveButtonSave.target.setLabel(this.localeBaseData.BUTTON_SAVE_LABEL);
+              interactiveButtonSave.target.setLabel(this.localeBaseData.DEFAULT_TEXT_SAVE);
 
               interactiveButtonBack.target.setCallback((event) => {
                 window.location.href = '/profile';
               });
-              
+
               interactiveButtonEditAvatar.target.setCallback((event) => {
                 if (profileAvatarInput !== null) {
                   profileAvatarInput.click();
