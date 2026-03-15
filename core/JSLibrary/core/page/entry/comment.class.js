@@ -103,8 +103,8 @@ export class EntryComment {
               const entryComment = new EntryComment(this.entry, commentData);
               entryComment.level = this.level <= 2 ? this.level + 1 : this.level;
               entryComment.parent = this;
-              
-              this.parentElement = commentParentElement;
+
+              this.parentElement = document.querySelector(`[data-comment-id="${commentParentElement.id}"]`);
 
               entryComment.assembly({login: authorData.login, avatarURL: authorData.avatarURL, group: authorData.group}, (commentElement) => {
                 commentLoadedIndex++;
@@ -113,7 +113,7 @@ export class EntryComment {
                 entryComment.initPanel(clientUserData, clientUserPermissions);
                 if (commentLoadedIndex < comments.length) {
                   if (this.level >= 3) {
-                    appendComment(comments[commentLoadedIndex], commentData.parent.parentElement);
+                    appendComment(comments[commentLoadedIndex], this.parentElement);
                   } else {
                     appendComment(comments[commentLoadedIndex], commentParentElement);
                   }
