@@ -554,7 +554,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                   
                   $CMSMaxNotifier->setMessage($CMSMaxNotifierMessage);
 
-                  foreach ($CMSMaxNotifierChatsIDsCount as $index => $id) {
+                  foreach ($CMSMaxNotifierChatsIDs as $index => $id) {
                     
                     $CMSMaxNotifier->setChatID($id);
                     $CMSMaxNotifier->send($CMSMaxNotifierKey);

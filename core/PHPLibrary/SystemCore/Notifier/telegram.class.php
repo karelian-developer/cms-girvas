@@ -145,12 +145,12 @@ class Telegram extends CMSNotifier
     curl_close($ch);
     
     if ($errorNo !== CURLE_OK) {
-      error_log("cURL Error #{$errorNo}: {$error} - URL: {$fullUrl}");
+      error_log("cURL Error #{$errorNo}: {$error} - URL: {$URL}");
       return false;
     }
     
     if ($httpCode !== 200) {
-      error_log("HTTP Error #{$httpCode} - URL: {$fullUrl}");
+      error_log("HTTP Error #{$httpCode} - URL: {$URL}");
       return false;
     }
     
