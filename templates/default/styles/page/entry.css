@@ -151,10 +151,6 @@
   margin-bottom: 10px;
 }
 
-.page__article .article__content > *:not(:last-child) {
-  margin-bottom: 10px;
-}
-
 .page__article .article__content > *:last-child {
   margin-bottom: 0;
 }

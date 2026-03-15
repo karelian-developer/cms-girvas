@@ -435,18 +435,6 @@
   margin-bottom: 10px;
 }
 
-.page__article .article__content > *:not(:last-child) {
-  margin-bottom: 10px;
-}
-
-.page__article .article__content > * {
-  margin-bottom: 10px;
-}
-
-.page__article .article__content > *:last-child {
-  margin-bottom: 0;
-}
-
 .page__article .article__content a {
   text-decoration: none;
   color: var(--common-secondary-color-3);
