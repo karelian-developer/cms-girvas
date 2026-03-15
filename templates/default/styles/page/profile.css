@@ -150,7 +150,7 @@
   top: 96px;
 }
 
-.profile_edit .profile__avatar {
+.profile__avatar {
   border-radius: 8px;
   width: 100% !important;
   height: 100% !important;
