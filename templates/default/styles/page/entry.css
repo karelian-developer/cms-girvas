@@ -288,12 +288,16 @@
 @media (max-width: 1150px) {
   .page__article .article__comments .comment__panel-interactive {
     display: grid;
-    justify-content: flex-end;
+    justify-content: flex-start;
     flex-wrap: unset;
-    grid-template-columns: repeat(4, min-content);
+    grid-template-columns: repeat(4, max-content);
     flex: unset;
     width: 100%;
     gap: 16px;
+  }
+
+  .page__article .article__comments .comment__panel-interactive .interactive__button {
+    width: 100%;
   }
 }
 
