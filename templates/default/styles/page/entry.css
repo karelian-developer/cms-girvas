@@ -137,6 +137,7 @@
   height: auto;
 }
 
+.page__article .article__content .video-container,
 .page__article .article__content video {
   width: 100%;
 }
