@@ -186,6 +186,8 @@ final class Core implements ThemeInterfaceCore
    */
   public function assembly() : void
   {
+    $this->theme->addStyle(['href' => 'styles/common.css', 'rel' => 'stylesheet']);
+    
     $this->theme->addScript(['src' => 'interactive.class.js', 'type' => 'module'], true);
     $this->theme->addScript(['src' => 'core.class.js', 'type' => 'module']);
 
