@@ -80,46 +80,49 @@ export class PageProfile {
         this.clientUserPermissions = data.outputData.user.permissions;
 
         if (this.clientUserPermissions.admin_users_management || this.clientUserData.login === this.page.core.searchParams.getPathPart(2) || this.page.core.searchParams.getPathPart(2) === null) {
-          const profileAvatarElement = document.querySelector('[role="profile-avatar"]');
-          const profileFormElement = document.querySelector('#SYSTEM_F0648538312');
+          const profileAvatarElement = document.querySelector('[data-role="profile-avatar"]');
+          const profileFormElement = document.querySelector('[data-role="profile-form"]');
           
+          const profileAvatarInput = document.createElement('input');
+          profileAvatarInput.setAttribute('type', 'file');
+          profileAvatarInput.setAttribute('name', 'user_avatar');
+          profileAvatarInput.setAttribute('data-role', 'input-user-avatar');
+
+          profileAvatarInput.style.display = 'none';
+
           if (profileAvatarElement !== null && profileFormElement !== null) {
             const formInputUserID = profileFormElement.querySelector('input[name="user_id"]');
             
-            const profileAvatarInput = document.createElement('input');
-            profileAvatarInput.setAttribute('type', 'file');
-            profileAvatarInput.setAttribute('name', 'user_avatar');
-            profileAvatarInput.setAttribute('data-role', 'input-user-avatar');
-
-            profileAvatarInput.style.display = 'none';
-
             profileFormElement.append(profileAvatarInput);
-            profileAvatarInput.addEventListener('change', (event) => {
-              if (profileAvatarInput.files.length > 0 && formInputUserID !== null) {
-                let formData = new FormData();
-                formData.append('user_id', formInputUserID.getAttribute('value'));
-                formData.append('avatarFile', profileAvatarInput.files[0]);
+            
+            if (profileAvatarInput !== null) {
+              profileAvatarInput.addEventListener('change', (event) => {
+                if (profileAvatarInput.files.length > 0 && formInputUserID !== null) {
+                  let formData = new FormData();
+                  formData.append('user_id', formInputUserID.getAttribute('value'));
+                  formData.append('avatarFile', profileAvatarInput.files[0]);
 
-                let request = new Interactive('request', {
-                  method: 'POST',
-                  url: '/handler/user/avatar?localeMessage=' + window.CMSCore.locales.base.name
-                });
-      
-                request.target.data = formData;
-      
-                request.target.send().then((data) => {
-                  if (data.statusCode === 1 && data.outputData.hasOwnProperty('file')) {
-                    let fileName, fileURL;
+                  let request = new Interactive('request', {
+                    method: 'POST',
+                    url: '/handler/user/avatar?localeMessage=' + window.CMSCore.locales.base.name
+                  });
+        
+                  request.target.data = formData;
+        
+                  request.target.send().then((data) => {
+                    if (data.statusCode === 1 && data.outputData.hasOwnProperty('file')) {
+                      let fileName, fileURL;
 
-                    fileName = data.outputData.file.fullname;
-                    fileURL = data.outputData.file.url;
+                      fileName = data.outputData.file.fullname;
+                      fileURL = data.outputData.file.url;
 
-                    profileAvatarElement.style.backgroundImage = `url('${fileURL}')`;
-                    profileAvatarInput.remove();
-                  }
-                });
-              }
-            });
+                      profileAvatarElement.style.backgroundImage = `url('${fileURL}')`;
+                      profileAvatarInput.remove();
+                    }
+                  });
+                }
+              });
+            }
 
             profileAvatarElement.addEventListener('click', (event) => {
               profileAvatarInput.click();
@@ -157,7 +160,7 @@ export class PageProfile {
               interactiveButtonBack.target.setCallback((event) => {
                 window.location.href = '/profile';
               });
-
+              
               interactiveButtonEditAvatar.target.setCallback((event) => {
                 if (profileAvatarInput !== null) {
                   profileAvatarInput.click();
