@@ -1,5 +1,5 @@
 <article class="page__article article">
-  <div class="page__article-header" style="background-image: url('{SITE_TEMPLATE_URL}/images/entry/default_1024.png');">
+  <div class="page__article-header" style="background-image: url('{SITE_TEMPLATE_URL}/images/entry/default-1024.webp');">
     <h1 class="article__title">{ERROR_TITLE}</h1>
   </div>
   <div class="article__content">

@@ -147,7 +147,7 @@ class User
    */
   public static function getAvatarDefaultURL(CMSCore $CMSCore, int $size) : string
   {
-    return '/' . $CMSCore->theme->getURL() . '/images/avatar_default_' . $size . '.webp';
+    return '/' . $CMSCore->theme->getURL() . '/images/user/avatar/default-' . $size . '.webp';
   }
   
   /**
