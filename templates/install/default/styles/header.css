@@ -49,6 +49,7 @@
 
 .header__installer-progress-container {
   background-color: transparent !important;
+  border: 1px solid var(--common-secondary-color-10);
   padding-left: 8px;
   padding-right: 8px;
 }
