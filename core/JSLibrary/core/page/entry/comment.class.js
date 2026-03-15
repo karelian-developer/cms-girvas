@@ -92,48 +92,55 @@ export class EntryComment {
             requestAppend.target.showingNotification = false;
 
             requestAppend.target.send().then((authorLoadedData) => {
-              let authorData = authorLoadedData.outputData.user;
-              let answersContainerParentElement = this.getAnswersListElement();
-              
-              commentData.entryID = this.entryID;
-              commentData.answersLoadingLimit = this.answersLoadingLimit;
-              commentData.index = (answersContainerParentElement != null) ? answersContainerParentElement.children.length + 1 : 1;
-              commentData.indexLabel = `${commentParentElement.id}_${commentData.index}`;
-              
-              const entryComment = new EntryComment(this.entry, commentData);
-              entryComment.level = this.level <= 2 ? this.level + 1 : this.level;
-              entryComment.parent = this;
-
-              console.log(this.id);
-
-              if (this.level > 0) {
-                this.parentElement = this.level >= 3
-                  ? document.querySelector(`[data-comment-id="${this.parent.id}"]`)
-                  : document.querySelector(`[data-comment-id="${this.id}"]`);
-              } else {
-                this.parentElement = commentParentElement;
-              }
-
-              entryComment.assembly({login: authorData.login, avatarURL: authorData.avatarURL, group: authorData.group}, (commentElement) => {
-                commentLoadedIndex++;
+                let authorData = authorLoadedData.outputData.user;
+                let answersContainerParentElement = this.getAnswersListElement();
                 
-                answersListElement.append(commentElement);
-                entryComment.initPanel(clientUserData, clientUserPermissions);
-                if (commentLoadedIndex < comments.length) {
-                  if (this.level >= 3) {
-                    appendComment(comments[commentLoadedIndex], this.parentElement);
-                  } else {
-                    appendComment(comments[commentLoadedIndex], commentParentElement);
+                commentData.entryID = this.entryID;
+                commentData.answersLoadingLimit = this.answersLoadingLimit;
+                commentData.index = (answersContainerParentElement != null) ? answersContainerParentElement.children.length + 1 : 1;
+                commentData.indexLabel = `${commentParentElement.id}_${commentData.index}`;
+                
+                const entryComment = new EntryComment(this.entry, commentData);
+                entryComment.level = this.level <= 2 ? this.level + 1 : this.level;
+                entryComment.parent = this;
+
+                let targetParentElement;
+                
+                if (this.level >= 3) {
+                  targetParentElement = document.querySelector(`[data-comment-id="${this.parent.id}"]`);
+                  
+                  if (!targetParentElement) {
+                    targetParentElement = document.querySelector(`[data-comment-id="${this.id}"]`);
                   }
+                } else if (this.level > 0) {
+                  targetParentElement = document.querySelector(`[data-comment-id="${this.id}"]`);
+                } else {
+                  targetParentElement = commentParentElement;
                 }
-  
-                if (entryComment.answersCount > 0) {
-                  entryComment.initAnswersPanel(clientUserData, clientUserPermissions);
-                }
-  
-                entryComment.elementAssembled.setAttribute('data-role', 'entry-comments-answer');
-                entryComment.elementAssembled.classList.add('comment_answer');
-              });
+
+                entryComment.parentElement = targetParentElement;
+
+                entryComment.assembly({login: authorData.login, avatarURL: authorData.avatarURL, group: authorData.group}, (commentElement) => {
+                    commentLoadedIndex++;
+                    
+                    answersListElement.append(commentElement);
+                    entryComment.initPanel(clientUserData, clientUserPermissions);
+                    
+                    if (commentLoadedIndex < comments.length) {
+                      if (this.level >= 3) {
+                        appendComment(comments[commentLoadedIndex], targetParentElement);
+                      } else {
+                        appendComment(comments[commentLoadedIndex], commentParentElement);
+                      }
+                    }
+
+                    if (entryComment.answersCount > 0) {
+                      entryComment.initAnswersPanel(clientUserData, clientUserPermissions);
+                    }
+
+                    entryComment.elementAssembled.setAttribute('data-role', 'entry-comments-answer');
+                    entryComment.elementAssembled.classList.add('comment_answer');
+                });
             });
           };
   
