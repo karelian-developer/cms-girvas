@@ -51,16 +51,15 @@
   background-position: left center;
   background-repeat: no-repeat;
   background-size: contain;
-  padding-left: 120px;
 }
 
 .main__page {
   box-sizing: border-box;
   background-color: var(--common-main-color-1);
-  padding-left: 20px;
-  padding-right: 40px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 24px;
+  padding-bottom: 24px;
   min-height: 290px;
 }
 

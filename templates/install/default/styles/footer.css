@@ -1,4 +1,5 @@
 .footer__container {
+  background-color: var(--common-main-color-4);
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
   border-left: 1px solid var(--common-secondary-color-10);
@@ -6,23 +7,20 @@
   border-bottom: 1px solid var(--common-secondary-color-10);
 }
 
-.footer__links-list-container {
-  background-color: var(--common-main-color-4);
-  padding-left: 120px;
-}
-
 .footer__links-list {
-  display: flex;
   box-sizing: border-box;
+  display: flex;
+  justify-content: center;
   background-color: var(--common-main-color-5);
   font-size: 12px;
-  padding-left: 20px;
-  padding-right: 40px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 .footer__links-list .links-list__item {
+  font-size: 14px;
   color: var(--common-main-color-2);
   transition: color .2s;
 
