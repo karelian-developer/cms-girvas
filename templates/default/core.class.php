@@ -126,7 +126,7 @@ final class Core implements ThemeInterfaceCore
     
     $themeVars['SITE_PAGE'] = ThemeCollector::assembly($sitePage->assembled, [
       'SIDEBAR_BLOCK_DEMO' => $this->assemblySidebarBlock('default', [
-        'BLOCK_TITLE' => $localeData['STHEME_IDEBAR_BLOCK_DEMO_TITLE'],
+        'BLOCK_TITLE' => $localeData['THEME_IDEBAR_BLOCK_DEMO_TITLE'],
         'BLOCK_CONTENT' => $localeData['THEME_SIDEBAR_BLOCK_DEMO_CONTENT']
       ]),
     ]);
