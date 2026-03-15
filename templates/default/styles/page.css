@@ -94,16 +94,24 @@
   display: flex;
 }
 
-.page__breadcrumbs .breadcrumbs-list__item {
-  &::after {
-    content: '/';
-    margin-left: 4px;
-    margin-right: 4px;
+@media (max-width: 540px) {
+  .page__breadcrumbs .breadcrumbs-list {
+    flex-direction: column;
   }
+}
 
-  &:last-child::after {
-    content: '';
-    margin: 0;
+@media (min-width: 541px) {
+  .page__breadcrumbs .breadcrumbs-list__item {
+    &::after {
+      content: '/';
+      margin-left: 4px;
+      margin-right: 4px;
+    }
+
+    &:last-child::after {
+      content: '';
+      margin: 0;
+    }
   }
 }
 
