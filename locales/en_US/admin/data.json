@@ -395,6 +395,7 @@
   "PAGE_THEME_SIDEBAR_BLOCK_ABOUT_TITLE": "About themes",
   "PAGE_THEME_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_1": "<b>Themes</b> are pre-created structures that define the appearance and design of a site's web pages. They include design elements, block placement, fonts, colors and other stylistic parameters.",
   "PAGE_THEME_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_2": "Themes are important for a website because they provide a consistent and professional appearance to the pages. Themes make it easy to create new pages without wasting time creating a design from scratch. They also make it easy to update and redesign your site, since changes to a template are automatically applied to all pages using that template. As a result, templates help improve the user experience by making the site more attractive and convenient for visitors.",
+  "PAGE_THEME_CHANGING_PROPERTIES_FOR_INSTALLED_THEMES": "Changing properties is only available for installed themes.",
   "PAGE_THEMES_TITLE": "Themes",
   "PAGE_THEMES_SIDEBAR_POPULAR_TEMPLATES_BLOCK_TITLE": "Popular themes",
   "PAGE_THEMES_SIDEBAR_BLOCK_ABOUT_TITLE": "About themes",

@@ -148,7 +148,7 @@ class PageTemplate implements InterfacePage
         $isExistsFileMetadata = true;
       }
 
-      $themeVariables['TEMPLATE_PROPERTIES'] = 'Changing properties is only available for installed themes.';
+      $themeVariables['TEMPLATE_PROPERTIES'] = $localeData['PAGE_THEME_CHANGING_PROPERTIES_FOR_INSTALLED_THEMES'];
     } else {
       $isExistsFileMetadata = $theme->existsFileMetadataJSON();
       $isExistsFileProperties = $theme->existsFileProperties();
