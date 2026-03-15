@@ -20,23 +20,23 @@ import {Interactive} from "../../../interactive.class.js";
 export class EntryComment {
   constructor(entry, data) {
     this.entry = entry;
-    this.id = (typeof data.id != 'undefined') ? data.id : 0;
-    this.entryID = (typeof data.entryID != 'undefined') ? data.entryID : 0;
-    this.index = (typeof data.index != 'undefined') ? data.index : 0;
-    this.indexLabel = (typeof data.indexLabel != 'undefined') ? data.indexLabel : 0;
-    this.content = (typeof data.content != 'undefined') ? data.content : '';
-    this.authorID = (typeof data.authorID != 'undefined') ? data.authorID : 0;
-    this.isHidden = (typeof data.isHidden != 'undefined') ? data.isHidden : false;
-    this.hiddenReason = (typeof data.hiddenReason != 'undefined') ? data.hiddenReason : '';
-    this.rating = (typeof data.rating != 'undefined') ? data.rating : 0;
-    this.ratingVoters = (typeof data.ratingVoters != 'undefined') ? data.ratingVoters : {};
-    this.createdUnixTimestamp = (typeof data.createdUnixTimestamp != 'undefined') ? data.createdUnixTimestamp : 0;
-    this.updatedUnixTimestamp = (typeof data.updatedUnixTimestamp != 'undefined') ? data.updatedUnixTimestamp : 0;
-    this.answersCount = (typeof data.answersCount != 'undefined') ? data.answersCount : 0;
-    this.answersLoadingOffset = (typeof data.answersLoadingOffset != 'undefined') ? data.answersLoadingOffset : 0;
-    this.answersLoadingLimit = (typeof data.answersLoadingLimit != 'undefined') ? data.answersLoadingLimit : 0;
-    this.parent = (typeof data.parent != 'undefined') ? data.parent : null;
-    this.level = (typeof data.level != 'undefined') ? data.level : 0;
+    this.id = data.id ?? 0;
+    this.entryID = data.entryID ?? 0;
+    this.index = data.index ?? 0;
+    this.indexLabel = data.indexLabel ?? 0;
+    this.content = data.content ?? '';
+    this.authorID = data.authorID ?? 0;
+    this.isHidden = data.isHidden ?? false;
+    this.hiddenReason = data.hiddenReason ?? '';
+    this.rating = data.rating ?? 0;
+    this.ratingVoters = data.ratingVoters ?? {};
+    this.createdUnixTimestamp = data.createdUnixTimestamp ?? 0;
+    this.updatedUnixTimestamp = data.updatedUnixTimestamp ?? 0;
+    this.answersCount = data.answersCount ?? 0;
+    this.answersLoadingOffset = data.answersLoadingOffset ?? 0;
+    this.answersLoadingLimit = data.answersLoadingLimit ?? 0;
+    this.parent = data.parent ?? null;
+    this.level = data.level ?? 0;
     this.elementAssembled = null;
   }
 
@@ -497,9 +497,9 @@ export class EntryComment {
 
   assembly(params = {}, callback = (htmlElement) => {}) {
     let content = (!this.isHidden) ? this.content : `${CMSCore.localeData.PAGE_ENTRY_COMMENT_HIDE_LABEL}: ${this.hiddenReason}`;
-    let authorLogin = (typeof params.login != 'undefined') ? params.login : '';
-    let authorAvatarURL = (typeof params.avatarURL != 'undefined') ? params.avatarURL : '';
-    let authorGroupTitle = (typeof params.group != 'undefined') ? params.group.title : '';
+    let authorLogin = params.login ?? '';
+    let authorAvatarURL = params.avatarURL ?? '';
+    let authorGroupTitle = params.group !== undefined ? params.group.title : '';
     
     let createdDate = new Date(this.createdUnixTimestamp * 1000);
     let createdDay = (createdDate.getDay() + 1).toString().padStart(2, '0');
