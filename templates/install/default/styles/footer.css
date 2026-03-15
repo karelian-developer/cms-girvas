@@ -7,16 +7,22 @@
   border-bottom: 1px solid var(--common-secondary-color-10);
 }
 
+.footer__links-list-container {
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
 .footer__links-list {
   box-sizing: border-box;
   display: flex;
   justify-content: center;
   background-color: var(--common-main-color-5);
   font-size: 12px;
-  padding-left: 24px;
-  padding-right: 24px;
-  padding-top: 16px;
-  padding-bottom: 16px;
+  list-style-type: none;
+  margin-bottom: 0;
+  margin-top: 0;
 }
 
 .footer__links-list .links-list__item {

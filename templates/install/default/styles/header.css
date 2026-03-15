@@ -13,8 +13,8 @@
   flex: 0 0 128px;
 }
 
-.header__brand {
-  fill: var(--common-main-color-4);
+.header__brand-image {
+  width: 100%;
 }
 
 .header__container {
