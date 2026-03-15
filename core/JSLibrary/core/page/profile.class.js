@@ -141,90 +141,88 @@ export class PageProfile {
             }
 
             if (this.page.core.searchParams.getParam('event') === 'edit') {
-              if (profileAvatarElement !== null && profileFormElement !== null) {
-                const profileFormPanelElement = document.querySelector('[data-role="profile-form-panel"]');
-                const profilePasswordInput = document.querySelector('[data-role="input-user-password"]');
-                const profilePasswordRepeatInput = document.querySelector('[data-role="input-user-password-repeat"]');
-                const profilePasswordOldInput = document.querySelector('[data-role="input-user-password-old"]');
-                
-                const interactiveButtonBack = new Interactive('button');
-                const interactiveButtonEditAvatar = new Interactive('button');
-                const interactiveButtonSave = new Interactive('button');
+              const profileFormPanelElement = document.querySelector('[data-role="profile-form-panel"]');
+              const profilePasswordInput = document.querySelector('[data-role="input-user-password"]');
+              const profilePasswordRepeatInput = document.querySelector('[data-role="input-user-password-repeat"]');
+              const profilePasswordOldInput = document.querySelector('[data-role="input-user-password-old"]');
+              
+              const interactiveButtonBack = new Interactive('button');
+              const interactiveButtonEditAvatar = new Interactive('button');
+              const interactiveButtonSave = new Interactive('button');
 
-                interactiveButtonBack.target.setLabel(this.localeBaseData.DEFAULT_TEXT_BACK);
-                interactiveButtonEditAvatar.target.setLabel(this.localeBaseData.BUTTON_EDIT_AVATAR_LABEL);
-                interactiveButtonSave.target.setLabel(this.localeBaseData.BUTTON_SAVE_LABEL);
+              interactiveButtonBack.target.setLabel(this.localeBaseData.DEFAULT_TEXT_BACK);
+              interactiveButtonEditAvatar.target.setLabel(this.localeBaseData.BUTTON_EDIT_AVATAR_LABEL);
+              interactiveButtonSave.target.setLabel(this.localeBaseData.BUTTON_SAVE_LABEL);
 
-                interactiveButtonBack.target.setCallback((event) => {
-                  window.location.href = '/profile';
-                });
+              interactiveButtonBack.target.setCallback((event) => {
+                window.location.href = '/profile';
+              });
 
-                interactiveButtonEditAvatar.target.setCallback((event) => {
-                  if (profileAvatarInput !== null) {
-                    profileAvatarInput.click();
-                  }
-                });
-
-                profilePasswordInput.addEventListener('change', (event) => {
-                  event.preventDefault();
-
-                  if (event.target.value !== '') {
-                    profilePasswordInput.setAttribute('required', '');
-                    profilePasswordRepeatInput.setAttribute('required', '');
-                    profilePasswordOldInput.setAttribute('required', '');
-                  } else {
-                    if (profilePasswordRepeatInput.value === '') {
-                      profilePasswordInput.removeAttribute('required');
-                      profilePasswordRepeatInput.removeAttribute('required');
-                      profilePasswordOldInput.removeAttribute('required');
-                    }
-                  }
-                });
-
-                profilePasswordRepeatInput.addEventListener('change', (event) => {
-                  event.preventDefault();
-
-                  if (event.target.value !== '') {
-                    profilePasswordInput.setAttribute('required', '');
-                    profilePasswordRepeatInput.setAttribute('required', '');
-                    profilePasswordOldInput.setAttribute('required', '');
-                  } else {
-                    if (profilePasswordRepeatInput.value === '') {
-                      profilePasswordInput.removeAttribute('required');
-                      profilePasswordRepeatInput.removeAttribute('required');
-                      profilePasswordOldInput.removeAttribute('required');
-                    }
-                  }
-                });
-
-                profilePasswordOldInput.addEventListener('change', (event) => {
-                  event.preventDefault();
-
-                  if (event.target.value !== '') {
-                    profilePasswordInput.setAttribute('required', '');
-                    profilePasswordRepeatInput.setAttribute('required', '');
-                    profilePasswordOldInput.setAttribute('required', '');
-                  } else {
-                    if (profilePasswordRepeatInput.value === '') {
-                      profilePasswordInput.removeAttribute('required');
-                      profilePasswordRepeatInput.removeAttribute('required');
-                      profilePasswordOldInput.removeAttribute('required');
-                    }
-                  }
-                });
-
-                interactiveButtonBack.assembly();
-                interactiveButtonEditAvatar.assembly();
-                interactiveButtonSave.assembly();
-
-                if (profilePanelButtonsElement !== null) {
-                  profilePanelButtonsElement.append(interactiveButtonBack.target.element);
-                  profilePanelButtonsElement.append(interactiveButtonEditAvatar.target.element);
+              interactiveButtonEditAvatar.target.setCallback((event) => {
+                if (profileAvatarInput !== null) {
+                  profileAvatarInput.click();
                 }
+              });
 
-                if (profileFormPanelElement !== null) {
-                  profileFormPanelElement.append(interactiveButtonSave.target.element);
+              profilePasswordInput.addEventListener('change', (event) => {
+                event.preventDefault();
+
+                if (event.target.value !== '') {
+                  profilePasswordInput.setAttribute('required', '');
+                  profilePasswordRepeatInput.setAttribute('required', '');
+                  profilePasswordOldInput.setAttribute('required', '');
+                } else {
+                  if (profilePasswordRepeatInput.value === '') {
+                    profilePasswordInput.removeAttribute('required');
+                    profilePasswordRepeatInput.removeAttribute('required');
+                    profilePasswordOldInput.removeAttribute('required');
+                  }
                 }
+              });
+
+              profilePasswordRepeatInput.addEventListener('change', (event) => {
+                event.preventDefault();
+
+                if (event.target.value !== '') {
+                  profilePasswordInput.setAttribute('required', '');
+                  profilePasswordRepeatInput.setAttribute('required', '');
+                  profilePasswordOldInput.setAttribute('required', '');
+                } else {
+                  if (profilePasswordRepeatInput.value === '') {
+                    profilePasswordInput.removeAttribute('required');
+                    profilePasswordRepeatInput.removeAttribute('required');
+                    profilePasswordOldInput.removeAttribute('required');
+                  }
+                }
+              });
+
+              profilePasswordOldInput.addEventListener('change', (event) => {
+                event.preventDefault();
+
+                if (event.target.value !== '') {
+                  profilePasswordInput.setAttribute('required', '');
+                  profilePasswordRepeatInput.setAttribute('required', '');
+                  profilePasswordOldInput.setAttribute('required', '');
+                } else {
+                  if (profilePasswordRepeatInput.value === '') {
+                    profilePasswordInput.removeAttribute('required');
+                    profilePasswordRepeatInput.removeAttribute('required');
+                    profilePasswordOldInput.removeAttribute('required');
+                  }
+                }
+              });
+
+              interactiveButtonBack.assembly();
+              interactiveButtonEditAvatar.assembly();
+              interactiveButtonSave.assembly();
+
+              if (profilePanelButtonsElement !== null) {
+                profilePanelButtonsElement.append(interactiveButtonBack.target.element);
+                profilePanelButtonsElement.append(interactiveButtonEditAvatar.target.element);
+              }
+
+              if (profileFormPanelElement !== null) {
+                profileFormPanelElement.append(interactiveButtonSave.target.element);
               }
             }
           }
