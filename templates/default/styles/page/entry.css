@@ -180,7 +180,7 @@
 }
 
 .page__article .article__comments .comments-list__item {
-  padding: 16px;
+  padding: 8px;
 }
 
 .page__article .article__comments .comments-list__item:nth-child(odd) {
