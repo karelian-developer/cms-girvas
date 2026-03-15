@@ -354,6 +354,7 @@
 
 .page__article .article__comments .comment__panel-interactive .comment__rate-block {
   display: flex;
+  justify-content: space-between;
 }
 
 .page__article .article__comments .comment__panel-interactive .comment__rate-block > *:not(:last-child) {
