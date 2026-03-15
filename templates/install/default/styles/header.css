@@ -47,6 +47,11 @@
   margin-bottom: 5px;
 }
 
+.header__installer-progress-container {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
 .header__installer-progress {
   display: flex;
   list-style-type: none;
@@ -55,10 +60,21 @@
 }
 
 .header__installer-progress > .installer-progress__item {
+  flex-grow: 1;
   background-color: var(--common-main-color-6);
   padding: 0;
-  flex-grow: 1;
-  height: 6px;
+  margin-bottom: 16px;
+  height: 16px;
+}
+
+.header__installer-progress > .installer-progress__item:first-child {
+  border-bottom-left-radius: 8px;
+  border-top-left-radius: 8px;
+}
+
+.header__installer-progress > .installer-progress__item:last-child {
+  border-bottom-right-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .header__installer-progress > .installer-progress__item:not(:last-child) {
