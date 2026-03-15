@@ -107,7 +107,7 @@ export class EntryComment {
               console.log(this.id);
 
               if (this.level > 0) {
-                this.parentElement = this.level <= 2
+                this.parentElement = this.level >= 3
                   ? document.querySelector(`[data-comment-id="${this.parent.id}"]`)
                   : document.querySelector(`[data-comment-id="${this.id}"]`);
               } else {
