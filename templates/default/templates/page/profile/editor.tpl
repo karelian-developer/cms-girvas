@@ -1,5 +1,5 @@
 <article class="page__article article">
-  <div class="page__article-header" style="background-image: url('{SITE_TEMPLATE_URL}/images/entry/default-1024.webp');">
+  <div class="page__article-header" style="background-image: url('{SITE_TEMPLATE_URL}/images/entry/preview/default-1024.webp');">
     <div class="page__buttons-panel" data-role="profile-panel-buttons"></div>
     <h2 class="article__title">{USER_LOGIN}</h2>
   </div>
