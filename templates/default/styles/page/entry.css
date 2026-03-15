@@ -237,9 +237,7 @@
 
 @media (max-width: 470px) {
   .page__article .article__comments .comment__avatar-container {
-    margin-right: 8px;
-    width: 32px;
-    height: 32px;
+    display: none;
   }
 }
 
@@ -298,6 +296,48 @@
 
   .page__article .article__comments .comment__panel-interactive .interactive__button {
     width: 100%;
+  }
+}
+
+@media (max-width: 920px) {
+  .page__article .article__comments .comment__panel-interactive {
+    grid-template-columns: repeat(3, max-content);
+  }
+}
+
+@media (max-width: 860px) {
+  .page__article .article__comments .comment__panel-interactive {
+    grid-template-columns: repeat(2, max-content);
+  }
+}
+
+@media (max-width: 710px) {
+  .page__article .article__comments .comment__panel-interactive {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 690px) {
+  .page__article .article__comments .comment__panel-interactive {
+    grid-template-columns: repeat(4, max-content);
+  }
+}
+
+@media (max-width: 520px) {
+  .page__article .article__comments .comment__panel-interactive {
+    grid-template-columns: repeat(3, max-content);
+  }
+}
+
+@media (max-width: 480px) {
+  .page__article .article__comments .comment__panel-interactive {
+    grid-template-columns: repeat(2, max-content);
+  }
+}
+
+@media (max-width: 340px) {
+  .page__article .article__comments .comment__panel-interactive {
+    grid-template-columns: 1fr;
   }
 }
 
