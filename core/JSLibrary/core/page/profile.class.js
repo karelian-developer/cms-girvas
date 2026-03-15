@@ -167,7 +167,7 @@ export class PageProfile {
 
                 const request = new Interactive('request', {
                   method: 'PATCH',
-                  url: `/handler/user?localeMessage=${window.CMSCore.locales.base.name}`
+                  url: '/handler/user?localeMessage=' + window.CMSCore.locales.base.name
                 });
 
                 request.target.data = formData;
