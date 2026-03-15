@@ -152,20 +152,10 @@
 
 .profile_edit .profile__avatar {
   border-radius: 8px;
-  transition: filter .2s;
-}
-
-.profile_edit .profile__avatar:hover,
-.profile_edit .profile__avatar:focus {
-  filter: brightness(50%);
-  cursor: pointer;
-}
-
-.profile__avatar {
-  filter: brightness(100%);
   width: 100% !important;
   height: 100% !important;
   object-fit: cover;
+  transition: filter .2s;
 }
 
 .article__profile.profile_edit [cmsg-password-checker-bar-container] {

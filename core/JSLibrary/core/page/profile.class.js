@@ -31,53 +31,59 @@ export class PageProfile {
     this.clientUserData = {};
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
+
       return (response.ok) ? response.json() : Promise.reject(response);
+    
     }).then((data) => {
+
       locales = data.outputData.locales;
+
       return window.CMSCore.locales.base.getData();
-    }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
 
-      interactiveNotification.target.show();
+    }, (rejectionReason) => {
+
+      this.page.showPopupNotification(rejectionReason, 0);
+
     }).then((localeData) => {
+
       this.localeBaseData = localeData;
+      
       return fetch(`/handler/user/@me?localeMessage=${window.CMSCore.locales.base.name}`, {method: 'GET'});
+    
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
 
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
+
     }).then((response) => {
+
       return (response.ok) ? response.json() : Promise.reject(response);
+    
     }).then((data) => {
-      this.clientUserData = (data.outputData.hasOwnProperty('user')) ? Object.assign(data.outputData.user) : this.clientUserData;
+      
+      this.clientUserData = data.outputData.hasOwnProperty('user')
+        ? Object.assign(data.outputData.user)
+        : this.clientUserData;
+      
       return fetch(`/handler/user/@me/permissions?localeMessage=${window.CMSCore.locales.base.name}`, {method: 'GET'});
+    
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
 
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
+
     }).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
+
+      return response.ok ? response.json() : Promise.reject(response);
+
     }).then((data) => {
-      if (typeof data.outputData.user != 'undefined') {
+
+      if (data.outputData.user !== undefined) {
         this.clientUserPermissions = data.outputData.user.permissions;
 
-        if (this.clientUserPermissions.admin_users_management || this.clientUserData.login == this.page.core.searchParams.getPathPart(2) || this.page.core.searchParams.getPathPart(2) == null) {
+        if (this.clientUserPermissions.admin_users_management || this.clientUserData.login === this.page.core.searchParams.getPathPart(2) || this.page.core.searchParams.getPathPart(2) === null) {
           let profileAvatarElement = document.querySelector('[role="profile-avatar"]');
           let profileFormElement = document.querySelector('#SYSTEM_F0648538312');
           
-          if (profileAvatarElement != null && profileFormElement != null) {
+          if (profileAvatarElement !== null && profileFormElement !== null) {
             let formInputUserID = profileFormElement.querySelector('input[name="user_id"]');
 
             let profileAvatarInput = document.createElement('input');
@@ -89,7 +95,7 @@ export class PageProfile {
 
             profileFormElement.append(profileAvatarInput);
             profileAvatarInput.addEventListener('change', (event) => {
-              if (profileAvatarInput.files.length > 0 && formInputUserID != null) {
+              if (profileAvatarInput.files.length > 0 && formInputUserID !== null) {
                 let formData = new FormData();
                 formData.append('user_id', formInputUserID.getAttribute('value'));
                 formData.append('avatarFile', profileAvatarInput.files[0]);
@@ -102,7 +108,7 @@ export class PageProfile {
                 request.target.data = formData;
       
                 request.target.send().then((data) => {
-                  if (data.statusCode == 1 && data.outputData.hasOwnProperty('file')) {
+                  if (data.statusCode === 1 && data.outputData.hasOwnProperty('file')) {
                     let fileName, fileURL;
 
                     fileName = data.outputData.file.fullname;
@@ -120,9 +126,9 @@ export class PageProfile {
             });
           }
 
-          let profilePanelButtonsElement = document.querySelector('[role="profilePanelButtons"]');
-          if (profilePanelButtonsElement != null) {
-            if (this.page.core.searchParams.getParam('event') != 'edit') {
+          const profilePanelButtonsElement = document.querySelector('[data-role="profile-panel-buttons"]');
+          if (profilePanelButtonsElement !== null) {
+            if (this.page.core.searchParams.getParam('event') !== 'edit') {
 
               let interactiveButtonEdit = new Interactive('button');
               interactiveButtonEdit.target.setLabel(this.localeBaseData.BUTTON_EDIT_LABEL);
@@ -134,23 +140,27 @@ export class PageProfile {
               profilePanelButtonsElement.append(interactiveButtonEdit.target.element);
             }
 
-            if (this.page.core.searchParams.getParam('event') == 'edit') {
-              if (profileAvatarElement != null && profileFormElement != null) {
-                let profileAvatarInput = document.querySelector('[role="profileFormInputUserAvatar"]');
-                let profilePasswordInput = document.querySelector('[role="profileFormInputUserPassword"]');
-                let profilePasswordRepeatInput = document.querySelector('[role="profileFormInputUserPasswordRepeat"]');
-                let profilePasswordOldInput = document.querySelector('[role="profileFormInputUserPasswordOld"]');
+            if (this.page.core.searchParams.getParam('event') === 'edit') {
+              if (profileAvatarElement !== null && profileFormElement !== null) {
+                const profileFormPanelElement = document.querySelector('[data-role="profile-form-panel"]');
+                const profilePasswordInput = document.querySelector('[data-role="input-user-password"]');
+                const profilePasswordRepeatInput = document.querySelector('[data-role="input-user-password-repeat"]');
+                const profilePasswordOldInput = document.querySelector('[data-role="input-user-password-old"]');
                 
-                let interactiveButtonBack = new Interactive('button');
+                const interactiveButtonBack = new Interactive('button');
+                const interactiveButtonEditAvatar = new Interactive('button');
+                const interactiveButtonSave = new Interactive('button');
+
                 interactiveButtonBack.target.setLabel(this.localeBaseData.DEFAULT_TEXT_BACK);
+                interactiveButtonEditAvatar.target.setLabel(this.localeBaseData.BUTTON_EDIT_AVATAR_LABEL);
+                interactiveButtonSave.target.setLabel(this.localeBaseData.BUTTON_SAVE_LABEL);
+
                 interactiveButtonBack.target.setCallback((event) => {
                   window.location.href = '/profile';
                 });
 
-                let interactiveButtonEditAvatar = new Interactive('button');
-                interactiveButtonEditAvatar.target.setLabel(this.localeBaseData.BUTTON_EDIT_AVATAR_LABEL);
                 interactiveButtonEditAvatar.target.setCallback((event) => {
-                  if (profileAvatarInput != null) {
+                  if (profileAvatarInput !== null) {
                     profileAvatarInput.click();
                   }
                 });
@@ -158,12 +168,12 @@ export class PageProfile {
                 profilePasswordInput.addEventListener('change', (event) => {
                   event.preventDefault();
 
-                  if (event.target.value != '') {
+                  if (event.target.value !== '') {
                     profilePasswordInput.setAttribute('required', '');
                     profilePasswordRepeatInput.setAttribute('required', '');
                     profilePasswordOldInput.setAttribute('required', '');
                   } else {
-                    if (profilePasswordRepeatInput.value == '') {
+                    if (profilePasswordRepeatInput.value === '') {
                       profilePasswordInput.removeAttribute('required');
                       profilePasswordRepeatInput.removeAttribute('required');
                       profilePasswordOldInput.removeAttribute('required');
@@ -174,12 +184,12 @@ export class PageProfile {
                 profilePasswordRepeatInput.addEventListener('change', (event) => {
                   event.preventDefault();
 
-                  if (event.target.value != '') {
+                  if (event.target.value !== '') {
                     profilePasswordInput.setAttribute('required', '');
                     profilePasswordRepeatInput.setAttribute('required', '');
                     profilePasswordOldInput.setAttribute('required', '');
                   } else {
-                    if (profilePasswordRepeatInput.value == '') {
+                    if (profilePasswordRepeatInput.value === '') {
                       profilePasswordInput.removeAttribute('required');
                       profilePasswordRepeatInput.removeAttribute('required');
                       profilePasswordOldInput.removeAttribute('required');
@@ -190,12 +200,12 @@ export class PageProfile {
                 profilePasswordOldInput.addEventListener('change', (event) => {
                   event.preventDefault();
 
-                  if (event.target.value != '') {
+                  if (event.target.value !== '') {
                     profilePasswordInput.setAttribute('required', '');
                     profilePasswordRepeatInput.setAttribute('required', '');
                     profilePasswordOldInput.setAttribute('required', '');
                   } else {
-                    if (profilePasswordRepeatInput.value == '') {
+                    if (profilePasswordRepeatInput.value === '') {
                       profilePasswordInput.removeAttribute('required');
                       profilePasswordRepeatInput.removeAttribute('required');
                       profilePasswordOldInput.removeAttribute('required');
@@ -205,23 +215,25 @@ export class PageProfile {
 
                 interactiveButtonBack.assembly();
                 interactiveButtonEditAvatar.assembly();
+                interactiveButtonSave.assembly();
 
-                profilePanelButtonsElement.append(interactiveButtonBack.target.element);
-                profilePanelButtonsElement.append(interactiveButtonEditAvatar.target.element);
-                
+                if (profilePanelButtonsElement !== null) {
+                  profilePanelButtonsElement.append(interactiveButtonBack.target.element);
+                  profilePanelButtonsElement.append(interactiveButtonEditAvatar.target.element);
+                }
+
+                if (profileFormPanelElement !== null) {
+                  profileFormPanelElement.append(interactiveButtonSave.target.element);
+                }
               }
             }
           }
         }
       }
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
 
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
+
     });
   }
 }
