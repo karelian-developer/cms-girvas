@@ -4,7 +4,7 @@
     <h1 class="article__title">{USER_LOGIN}</h1>
   </div>
   <div class="article__content">
-    <div class="profile">
+    <div class="profile article__profile">
       <div class="profile__avatar-container">
         <img class="profile__avatar" src="{USER_AVATAR_URL}" alt="{USER_LOGIN}">
       </div>
