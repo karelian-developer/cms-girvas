@@ -8,6 +8,7 @@
         </div>
         <h2 class="main__title" role="installer-step-title">{LANG:INSTALLER_STAGE_ACQUAINTANCE_TITLE}</h2>
       </div>
+      <img src="{CMS_TEMPLATE_URL}/images/background-left-side.webp" alt="{LANG:INSTALLER_TITLE}" class="main__side-image">
       <div class="main__page-container">
         <div class="main__page page" style="display: none;" role="language-page">
           {LANG:MD:STAGE_LANGUAGE_SELECT}
