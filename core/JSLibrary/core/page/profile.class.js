@@ -163,6 +163,8 @@ export class PageProfile {
               });
 
               interactiveButtonSave.target.setCallback((event) => {
+                event.preventDefault();
+                
                 const formData = new FormData(profileFormElement);
 
                 const request = new Interactive('request', {
