@@ -1,4 +1,5 @@
 .header__container {
+  background: var(--primary-linear-gradient-270deg);
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   border-left: 1px solid var(--common-secondary-color-10);

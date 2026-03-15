@@ -14,6 +14,8 @@
   --common-main-color-5: #000000;
   --common-main-color-6: #C1C1C1;
   --common-main-color-7: #F7F7F7;
+  --primary-linear-gradient-270deg: linear-gradient(270deg, #FFFFFF 64%, #E0E0E0 100%);
+  --primary-linear-gradient-180deg: linear-gradient(180deg, #FFFFFF, #E0E0E0);
   --common-secondary-color-1: #EEF7FF;
   --common-secondary-color-2: #C4E4FF;
   --common-secondary-color-3: #285E8E;
