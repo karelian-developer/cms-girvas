@@ -301,6 +301,7 @@
 
 @media (max-width: 920px) {
   .page__article .article__comments .comment__panel-interactive {
+    justify-content: center;
     grid-template-columns: repeat(3, max-content);
   }
 }
