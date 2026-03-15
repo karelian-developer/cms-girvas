@@ -5,7 +5,7 @@
     </div>
     <div class="header__container container">
       <div class="header__brand-container">
-        <img src="{SITE_TEMPLATE_URL}/brand-header.webp" alt="CMS «GIRVAS»" class="header__brand-image">
+        <img src="{SITE_TEMPLATE_URL}/images/brand-header.webp" alt="CMS «GIRVAS»" class="header__brand-image">
       </div>
       <div class="header__title-container">
         <h1 class="header__title">{LANG:INSTALLER_TITLE}</h1>
