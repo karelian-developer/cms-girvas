@@ -278,6 +278,7 @@
 }
 
 .page__article .article__comments .comment__panel-interactive {
+    box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
   padding-top: 10px;
@@ -291,6 +292,7 @@
     flex-wrap: unset;
     grid-template-columns: repeat(4, min-content);
     flex: unset;
+    width: 100%;
     gap: 16px;
   }
 }
