@@ -68,6 +68,10 @@
   }
 }
 
+.header__brand-link {
+  display: flex;
+}
+
 .header__brand-image {
   width: 100%;
 }

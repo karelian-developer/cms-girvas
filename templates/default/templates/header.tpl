@@ -2,7 +2,9 @@
   <div class="header__container container">
     <div class="header__brand-container">
       <div class="header__brand-image-container">
-        <img class="header__brand-image" src="{PROP:IMAGE_HEADER_LOGOTYPE_URL}" alt="{PROP:IMAGE_HEADER_LOGOTYPE_ALT}">
+        <a href="/" class="header__brand-link" title="{SITE_CONFIG_TITLE}">
+          <img class="header__brand-image" src="{PROP:IMAGE_HEADER_LOGOTYPE_URL}" alt="{PROP:IMAGE_HEADER_LOGOTYPE_ALT}">
+        </a>
       </div>
       <div class="header__brand-labels-container">
         <div class="header__brand-title">{SITE_CONFIG_TITLE}</div>
