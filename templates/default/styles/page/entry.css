@@ -267,7 +267,7 @@
 }
 
 .page__article .article__comments .comment__panel-interactive .interactive__button-label {
-  font-size: 14px !important;
+  font-size: 12px !important;
 }
 
 .page__article .article__comments .comment__panel-interactive > *:not(:last-child) {
