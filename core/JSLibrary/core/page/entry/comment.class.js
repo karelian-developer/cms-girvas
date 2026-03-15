@@ -72,7 +72,7 @@ export class EntryComment {
         if (data.statusCode == 1 && data.outputData.hasOwnProperty('comments')) {
           let comments = data.outputData.comments, commentLoadedIndex = 0;
           let answersListElementQuery = this.getAnswersListElement();
-          
+          console.log(this.level);
           let answersListElement;
           if (answersListElementQuery == null) {
             answersListElement = document.createElement('ul');
@@ -110,7 +110,7 @@ export class EntryComment {
                 answersListElement.append(commentElement);
                 entryComment.initPanel(clientUserData, clientUserPermissions);
                 if (commentLoadedIndex < comments.length) {
-                  if (this.level >= 3) {
+                  if (this.level === 3) {
                     appendComment(comments[commentLoadedIndex], commentData.parent.parentElement);
                   } else {
                     appendComment(comments[commentLoadedIndex], commentParentElement);
