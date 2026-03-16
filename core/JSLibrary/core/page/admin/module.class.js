@@ -69,9 +69,9 @@ export class PageModule {
     const buttons = {enable: null, disable: null, install: null, delete: null};
 
     const moduleBlock = document.querySelector('.module');
-    const moduleName = moduleBlock.getAttribute('data-module-name');
-    const moduleEnabledStatus = moduleBlock.getAttribute('data-module-enabled-status');
-    const moduleInstalledStatus = moduleBlock.getAttribute('data-module-installed-status');
+    const moduleName = moduleBlock.getAttribute('data-name');
+    const moduleEnabledStatus = moduleBlock.getAttribute('data-enabled-status');
+    const moduleInstalledStatus = moduleBlock.getAttribute('data-installed-status');
     const interactiveContainerElement = document.querySelector('#E8548530785');
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
@@ -83,7 +83,7 @@ export class PageModule {
       this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
 
-      if (searchParams.getPathPart(2) != null) {
+      if (searchParams.getPathPart(2) !== null) {
         buttons.enable = new Interactive('button');
         buttons.disable = new Interactive('button');
         buttons.install = new Interactive('button');
@@ -100,7 +100,7 @@ export class PageModule {
         buttons.delete.target.setStyle('red');
 
         let pageGalleryElement = moduleBlock.querySelector('[role="gallery"]');
-        if (pageGalleryElement != null) {
+        if (pageGalleryElement !== null) {
           this.initGallery(pageGalleryElement); 
         }
 
@@ -121,7 +121,7 @@ export class PageModule {
               buttons.enable.target.element.style.display = 'none';
               buttons.disable.target.element.style.display = 'flex';
     
-              moduleBlock.setAttribute('data-module-enabled-status', 'enabled');
+              moduleBlock.setAttribute('data-enabled-status', 'enabled');
             }
           });
         });
@@ -143,7 +143,7 @@ export class PageModule {
               buttons.enable.target.element.style.display = 'flex';
               buttons.disable.target.element.style.display = 'none';
     
-              moduleBlock.setAttribute('data-module-enabled-status', 'disabled');
+              moduleBlock.setAttribute('data-enabled-status', 'disabled');
             }
           });
         });
@@ -167,8 +167,8 @@ export class PageModule {
               buttons.enable.target.element.style.display = 'flex';
               buttons.disable.target.element.style.display = 'none';
     
-              moduleBlock.setAttribute('data-module-enabled-status', 'disabled');
-              moduleBlock.setAttribute('data-module-installed-status', 'installed');
+              moduleBlock.setAttribute('data-enabled-status', 'disabled');
+              moduleBlock.setAttribute('data-installed-status', 'installed');
             }
           });
         });
@@ -191,8 +191,8 @@ export class PageModule {
               buttons.enable.target.element.style.display = 'none';
               buttons.disable.target.element.style.display = 'none';
     
-              moduleBlock.setAttribute('data-module-enabled-status', 'disabled');
-              moduleBlock.setAttribute('data-module-installed-status', 'not-installed');
+              moduleBlock.setAttribute('data-enabled-status', 'disabled');
+              moduleBlock.setAttribute('data-installed-status', 'not-installed');
 
               if (searchParams.getPathPart(2) !== 'repository') {
                 window.location.href = '/admin/modules';
