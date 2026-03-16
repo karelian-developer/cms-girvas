@@ -222,19 +222,19 @@ export class InstallationMaster {
           fetch(`/handler/install?stepIndex=1&locale=${localeName}&installation-mode=true`, {method: 'GET'}).then((response) => {
             return response.ok ? response.json() : Promise.reject(response);
           }).then((data) => {
-            let resultHTML = data.outputData.html;
+            const resultHTML = data.outputData.html;
 
-            let tableSystemsElement = document.querySelector('[data-role="cms-table-systems"]');
+            const tableSystemsElement = document.querySelector('[data-role="cms-table-systems"]');
 
             if (tableSystemsElement) {
               tableSystemsElement.remove();
             }
             
-            let dynamicDiv = document.createElement('div');
-            dynamicDiv.setAttribute('role', 'cms-table-systems');
+            const dynamicDiv = document.createElement('div');
+            dynamicDiv.setAttribute('data-role', 'cms-table-systems');
             dynamicDiv.innerHTML = resultHTML;
 
-            let installationPages = document.querySelectorAll('[data-page-index]');
+            const installationPages = document.querySelectorAll('[data-page-index]');
             installationPages[this.getStepIndex()].appendChild(dynamicDiv);
           }, (rejectionReason) => {
             this.showPopupNotification(rejectionReason, 0);
