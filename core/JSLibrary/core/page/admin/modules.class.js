@@ -41,10 +41,10 @@ export class PageModules {
 
         let moduleName = listItem.getAttribute('data-name');
         let moduleInstalledStatus = listItem.hasAttribute('data-installed-status')
-          ? listItem.getAttribute('data-module-installed-status')
+          ? listItem.getAttribute('data-installed-status')
           : 'not-installed';
         let moduleEnabledStatus = listItem.hasAttribute('data-enabled-status')
-          ? listItem.getAttribute('data-module-enabled-status')
+          ? listItem.getAttribute('data-enabled-status')
           : 'disabled';
         let itemFooterContainer = listItem.querySelector('[data-element="item-footer-panel"]');
 
