@@ -54,7 +54,7 @@ export class PageModules {
         buttons.more.target.setLabel(localeData.BUTTON_MORE_DETAILS_LABEL);
         buttons.more.target.setCallback(() => {
           switch (searchParams.getPathPart(3)) {
-            case 'repository': window.location.href = `/admin/modules/repository/${moduleName}`; break;
+            case 'repository': window.location.href = `/admin/module/repository/${moduleName}`; break;
             default: window.location.href = `/admin/module/${moduleName}`;
           }
         });
@@ -85,7 +85,7 @@ export class PageModules {
               interactiveModal.target.close();
 
               if (data.statusCode === 1) {
-                if (searchParams.getPathPart(3) != 'repository') {
+                if (searchParams.getPathPart(3) !== 'repository') {
                   listItem.remove();
                 } else {
                   buttons.install.target.element.style.display = 'flex';
@@ -199,8 +199,12 @@ export class PageModules {
             || searchParams.getPathPart(3) === null
           )
         ) {
-          buttons.enable.target.element.style.display = (moduleEnabledStatus === 'enabled') ? 'none' : 'flex';
-          buttons.disable.target.element.style.display = (moduleEnabledStatus === 'enabled') ? 'flex' : 'none';
+          buttons.enable.target.element.style.display = moduleEnabledStatus === 'enabled'
+            ? 'none'
+            : 'flex';
+          buttons.disable.target.element.style.display = moduleEnabledStatus === 'enabled'
+            ? 'flex'
+            : 'none';
         } else {
           buttons.enable.target.element.style.display = 'none';
           buttons.disable.target.element.style.display = 'none';
