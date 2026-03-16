@@ -1,4 +1,6 @@
 .header__container {
+  display: grid;
+  grid-template-columns: 128px 1fr;
   background: var(--primary-linear-gradient-270deg);
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
@@ -7,10 +9,19 @@
   border-top: 1px solid var(--common-secondary-color-10);
   padding-left: 40px;
   padding-right: 40px;
+  gap: 16px;
 }
 
-.header__brand-container {
-  flex: 0 0 128px;
+@media (max-width: 620px) {
+  .header__container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .header__brand-container {
+    display: none;
+  }
 }
 
 .header__brand-image {
