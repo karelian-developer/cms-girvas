@@ -9,7 +9,7 @@
   border-top: 1px solid var(--common-secondary-color-10);
   padding-left: 40px;
   padding-right: 40px;
-  gap: 16px;
+  gap: 32px;
 }
 
 @media (max-width: 620px) {
@@ -39,7 +39,6 @@
   flex-direction: column;
   justify-content: space-between;
   flex-grow: 1;
-  padding-left: 40px;
 }
 
 .header__title {
