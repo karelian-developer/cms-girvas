@@ -212,7 +212,9 @@ export class PageModule {
         }
   
         if (moduleEnabledStatus === 'disabled') {
-          buttons.enable.target.element.style.display = 'flex';
+          buttons.enable.target.element.style.display = moduleInstalledStatus === 'installed'
+            ? 'flex'
+            : 'none';
           buttons.disable.target.element.style.display = 'none';
         }
         
