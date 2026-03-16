@@ -262,7 +262,7 @@ export class InstallationMaster {
             }
             
             let dynamicDiv = document.createElement('div');
-            dynamicDiv.setAttribute('role', 'cms-table-directories-exists');
+            dynamicDiv.setAttribute('data-role', 'cms-table-directories-exists');
             dynamicDiv.innerHTML = resultHTML;
 
             let installationPages = document.querySelectorAll('[data-page-index]');
@@ -293,7 +293,7 @@ export class InstallationMaster {
             }
             
             let dynamicDiv = document.createElement('div');
-            dynamicDiv.setAttribute('role', 'cms-table-directories-perms');
+            dynamicDiv.setAttribute('data-role', 'cms-table-directories-perms');
             dynamicDiv.innerHTML = resultHTML;
 
             let installationPages = document.querySelectorAll('[data-page-index]');
@@ -324,7 +324,7 @@ export class InstallationMaster {
             }
             
             let dynamicDiv = document.createElement('div');
-            dynamicDiv.setAttribute('role', 'cms-table-dms-exists');
+            dynamicDiv.setAttribute('data-role', 'cms-table-dms-exists');
             dynamicDiv.innerHTML = resultHTML;
 
             let installationPages = document.querySelectorAll('[data-page-index]');
@@ -358,7 +358,7 @@ export class InstallationMaster {
             }
             
             let dynamicDiv = document.createElement('div');
-            dynamicDiv.setAttribute('role', 'cms-dms-connect-test');
+            dynamicDiv.setAttribute('data-role', 'cms-dms-connect-test');
             dynamicDiv.innerHTML = resultHTML;
 
             let installationPages = document.querySelectorAll('[data-page-index]');
@@ -391,7 +391,7 @@ export class InstallationMaster {
             }
             
             let dynamicDiv = document.createElement('div');
-            dynamicDiv.setAttribute('role', 'cms-dms-tables-generate');
+            dynamicDiv.setAttribute('data-role', 'cms-dms-tables-generate');
             dynamicDiv.innerHTML = resultHTML;
 
             let installationPages = document.querySelectorAll('[data-page-index]');
@@ -503,7 +503,7 @@ export class InstallationMaster {
               }
               
               let dynamicDiv = document.createElement('div');
-              dynamicDiv.setAttribute('role', 'cms-locale-and-timezone');
+              dynamicDiv.setAttribute('data-role', 'cms-locale-and-timezone');
               dynamicDiv.innerHTML = resultHTML;
               let installationPages = document.querySelectorAll('[data-page-index]');
               installationPages[this.getStepIndex()].appendChild(dynamicDiv);
@@ -551,7 +551,7 @@ export class InstallationMaster {
               }
               
               let dynamicDiv = document.createElement('div');
-              dynamicDiv.setAttribute('role', 'cms-metadata');
+              dynamicDiv.setAttribute('data-role', 'cms-metadata');
               dynamicDiv.innerHTML = resultHTML;
 
               /** @type {NodeList} */
@@ -592,7 +592,7 @@ export class InstallationMaster {
             }
             
             let dynamicDiv = document.createElement('div');
-            dynamicDiv.setAttribute('role', 'cms-admin-create');
+            dynamicDiv.setAttribute('data-role', 'cms-admin-create');
             dynamicDiv.innerHTML = resultHTML;
 
             let installationPages = document.querySelectorAll('[data-page-index]');
@@ -627,7 +627,7 @@ export class InstallationMaster {
             }
             
             let dynamicDiv = document.createElement('div');
-            dynamicDiv.setAttribute('role', 'cms-secret-key');
+            dynamicDiv.setAttribute('data-role', 'cms-secret-key');
             dynamicDiv.innerHTML = resultHTML;
 
             let installationPages = document.querySelectorAll('[data-page-index]');
@@ -664,7 +664,7 @@ export class InstallationMaster {
                 }
                 
                 let dynamicDiv = document.createElement('div');
-                dynamicDiv.setAttribute('role', 'cms-table-directories-exists');
+                dynamicDiv.setAttribute('data-role', 'cms-table-directories-exists');
                 dynamicDiv.innerHTML = resultHTML;
       
                 let installationPages = document.querySelectorAll('[data-page-index]');
@@ -687,7 +687,7 @@ export class InstallationMaster {
                 }
                 
                 let dynamicDiv = document.createElement('div');
-                dynamicDiv.setAttribute('role', 'cms-table-directories-perms');
+                dynamicDiv.setAttribute('data-role', 'cms-table-directories-perms');
                 dynamicDiv.innerHTML = resultHTML;
       
                 let installationPages = document.querySelectorAll('[data-page-index]');
@@ -710,7 +710,7 @@ export class InstallationMaster {
                 }
                 
                 let dynamicDiv = document.createElement('div');
-                dynamicDiv.setAttribute('role', 'cms-table-dms-exists');
+                dynamicDiv.setAttribute('data-role', 'cms-table-dms-exists');
                 dynamicDiv.innerHTML = resultHTML;
       
                 let installationPages = document.querySelectorAll('[data-page-index]');
