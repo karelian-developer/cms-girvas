@@ -34,7 +34,7 @@ export class InstallationMaster {
     this.stepsData = [];
     this.progressItems = [];
     
-    let installationProgress = document.querySelector('[role="installer-progress"]');
+    let installationProgress = document.querySelector('[data-role="installer-progress"]');
     let installationPages = document.querySelectorAll('[data-page-index]');
 
     if (this.searchParams.getParam('locale') !== null) {
@@ -66,12 +66,12 @@ export class InstallationMaster {
         element.style.display = 'none';
       });
 
-      let languagePageElement = document.querySelector('[role="language-page"]');
+      let languagePageElement = document.querySelector('[data-role="language-page"]');
       if (languagePageElement !== null) {
         languagePageElement.style.display = 'block';
 
         let interactiveLocaleChoices = new Interactive('choices', {isDisclosed: true});
-        let languageSelectContainerElement = document.querySelector('[role="language-select"]');
+        let languageSelectContainerElement = document.querySelector('[data-role="language-select"]');
 
         fetch('/handler/locales?installation-mode=true', {method: 'GET'}).then((response) => {
           return response.ok ? response.json() : Promise.reject(response);
@@ -106,12 +106,12 @@ export class InstallationMaster {
         });
       }
 
-      let installerStepDataElement = document.querySelector('[role="installer-step-data"]');
+      let installerStepDataElement = document.querySelector('[data-role="installer-step-data"]');
       if (installerStepDataElement != null) {
         installerStepDataElement.innerHTML = '';
       }
 
-      let installerStepTitleElement = document.querySelector('[role="installer-step-title"]');
+      let installerStepTitleElement = document.querySelector('[data-role="installer-step-title"]');
       if (installerStepTitleElement != null) {
         installerStepTitleElement.innerHTML = 'Language installer';
       }
@@ -133,8 +133,10 @@ export class InstallationMaster {
   }
 
   buildPanel() {
-    let localeName = (this.searchParams.getParam('locale') != null) ? this.searchParams.getParam('locale') : 'en_US';
-    let locale = new Locale(localeName, 'install');
+    const localeName = this.searchParams.getParam('locale') !== null
+      ? this.searchParams.getParam('locale')
+      : 'en_US';
+    const locale = new Locale(localeName, 'install');
     let localeData = null;
 
     locale.getData().then((data) => {
@@ -142,7 +144,7 @@ export class InstallationMaster {
     }, (rejectionReason) => {
       this.showPopupNotification(rejectionReason, 0);
     }).then(() => {
-      let buttonsPanel = document.querySelector('[role="installation-buttons-panel"]');
+      const buttonsPanel = document.querySelector('[data-role="installation-buttons-panel"]');
       buttonsPanel.innerHTML = '';
 
       for (let buttonName in this.buttons) {
@@ -155,10 +157,11 @@ export class InstallationMaster {
         this.buttons.prevStepIndex.target.setCallback((event) => {
           event.preventDefault();
 
-          let languageSelectContainerElement = document.querySelector('[role="language-select"]');
+          const languageSelectContainerElement = document.querySelector('[data-role="language-select"]');
           if (languageSelectContainerElement != null) {
-            let listItemSelectedElement = languageSelectContainerElement.querySelector('.item_is-selected');
-            let listItemSelectedValue = listItemSelectedElement.getAttribute('data-option-value');
+            const listItemSelectedElement = languageSelectContainerElement.querySelector('.item_is-selected');
+            const listItemSelectedValue = listItemSelectedElement.getAttribute('data-option-value');
+            
             window.location = window.location + '?locale=' + listItemSelectedValue;
           }
         });
@@ -191,11 +194,11 @@ export class InstallationMaster {
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
-            let tableSystemsElement = document.querySelector('[role="cms-table-systems"]');
+            const tableSystemsElement = document.querySelector('[data-role="cms-table-systems"]');
 
             if (!tableSystemsElement) {
               let dynamicDiv = document.createElement('div');
-              dynamicDiv.setAttribute('role', 'cms-table-systems');
+              dynamicDiv.setAttribute('data-role', 'cms-table-systems');
               dynamicDiv.innerHTML = resultHTML;
 
               let installationPages = document.querySelectorAll('[data-page-index]');
@@ -221,7 +224,7 @@ export class InstallationMaster {
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
-            let tableSystemsElement = document.querySelector('[role="cms-table-systems"]');
+            let tableSystemsElement = document.querySelector('[data-role="cms-table-systems"]');
 
             if (tableSystemsElement) {
               tableSystemsElement.remove();
@@ -252,7 +255,7 @@ export class InstallationMaster {
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
-            let tableSystemsElement = document.querySelector('[role="cms-table-directories-exists"]');
+            let tableSystemsElement = document.querySelector('[data-role="cms-table-directories-exists"]');
 
             if (tableSystemsElement) {
               tableSystemsElement.remove();
@@ -283,7 +286,7 @@ export class InstallationMaster {
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
-            let tableSystemsElement = document.querySelector('[role="cms-table-directories-perms"]');
+            let tableSystemsElement = document.querySelector('[data-role="cms-table-directories-perms"]');
 
             if (tableSystemsElement) {
               tableSystemsElement.remove();
@@ -314,7 +317,7 @@ export class InstallationMaster {
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
-            let tableSystemsElement = document.querySelector('[role="cms-table-dms-exists"]');
+            let tableSystemsElement = document.querySelector('[data-role="cms-table-dms-exists"]');
 
             if (tableSystemsElement) {
               tableSystemsElement.remove();
@@ -340,7 +343,7 @@ export class InstallationMaster {
         this.buttons.updateData.target.setCallback((event) => {
           event.preventDefault();
 
-          let formTarget = document.querySelector('[role="form-database"]');
+          let formTarget = document.querySelector('[data-role="form-database"]');
           let formData = new FormData(formTarget);
 
           fetch(`/handler/install?stepIndex=5&locale=${localeName}&installation-mode=true&` + new URLSearchParams(formData).toString(), {method: 'GET'}).then((response) => {
@@ -348,7 +351,7 @@ export class InstallationMaster {
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
-            let tableSystemsElement = document.querySelector('[role="cms-dms-connect-test"]');
+            let tableSystemsElement = document.querySelector('[data-role="cms-dms-connect-test"]');
 
             if (tableSystemsElement) {
               tableSystemsElement.remove();
@@ -381,7 +384,7 @@ export class InstallationMaster {
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
-            let tableSystemsElement = document.querySelector('[role="cms-dms-tables-generate"]');
+            let tableSystemsElement = document.querySelector('[data-role="cms-dms-tables-generate"]');
 
             if (tableSystemsElement) {
               tableSystemsElement.remove();
@@ -481,7 +484,7 @@ export class InstallationMaster {
         this.buttons.updateData.target.setCallback((event) => {
           event.preventDefault();
 
-          let formTarget = document.querySelector('[role="form-locale"]');
+          let formTarget = document.querySelector('[data-role="form-locale"]');
           /** @type {FormData} */
           let formData = new FormData(formTarget);
           
@@ -494,7 +497,7 @@ export class InstallationMaster {
           request.target.send().then((data) => {
             if (data.statusCode === 1) {
               let resultHTML = data.outputData.html;
-              let tableSystemsElement = document.querySelector('[role="cms-locale-and-timezone"]');
+              let tableSystemsElement = document.querySelector('[data-role="cms-locale-and-timezone"]');
               if (tableSystemsElement) {
                 tableSystemsElement.remove();
               }
@@ -529,7 +532,7 @@ export class InstallationMaster {
           event.preventDefault();
 
           /** @type {HTMLFormElement} */
-          let formTarget = document.querySelector('[role="form-metadata"]');
+          let formTarget = document.querySelector('[data-role="form-metadata"]');
           if (formTarget !== null) {
             /** @type {FormData} */
             let formData = new FormData(formTarget);
@@ -541,7 +544,7 @@ export class InstallationMaster {
               let resultHTML = data.outputData.html;
               let statusCode = data.statusCode;
 
-              let tableSystemsElement = document.querySelector('[role="cms-metadata"]');
+              let tableSystemsElement = document.querySelector('[data-role="cms-metadata"]');
 
               if (tableSystemsElement) {
                 tableSystemsElement.remove();
@@ -573,7 +576,7 @@ export class InstallationMaster {
         this.buttons.updateData.target.setCallback((event) => {
           event.preventDefault();
 
-          let formTarget = document.querySelector('[role="form-admin-create"]');
+          let formTarget = document.querySelector('[data-role="form-admin-create"]');
           /** @type {FormData} */
           let formData = new FormData(formTarget);
           
@@ -582,7 +585,7 @@ export class InstallationMaster {
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
-            let tableSystemsElement = document.querySelector('[role="cms-admin-create"]');
+            let tableSystemsElement = document.querySelector('[data-role="cms-admin-create"]');
 
             if (tableSystemsElement) {
               tableSystemsElement.remove();
@@ -617,7 +620,7 @@ export class InstallationMaster {
           }).then((data) => {
             let resultHTML = data.outputData.html;
 
-            let tableSystemsElement = document.querySelector('[role="cms-secret-key"]');
+            let tableSystemsElement = document.querySelector('[data-role="cms-secret-key"]');
 
             if (tableSystemsElement) {
               tableSystemsElement.remove();
@@ -654,7 +657,7 @@ export class InstallationMaster {
               }).then((data) => {
                 let resultHTML = data.outputData.html;
       
-                let tableSystemsElement = document.querySelector('[role="cms-table-directories-exists"]');
+                let tableSystemsElement = document.querySelector('[data-role="cms-table-directories-exists"]');
       
                 if (tableSystemsElement) {
                   tableSystemsElement.remove();
@@ -677,7 +680,7 @@ export class InstallationMaster {
               }).then((data) => {
                 let resultHTML = data.outputData.html;
       
-                let tableSystemsElement = document.querySelector('[role="cms-table-directories-perms"]');
+                let tableSystemsElement = document.querySelector('[data-role="cms-table-directories-perms"]');
       
                 if (tableSystemsElement) {
                   tableSystemsElement.remove();
@@ -700,7 +703,7 @@ export class InstallationMaster {
               }).then((data) => {
                 let resultHTML = data.outputData.html;
       
-                let tableSystemsElement = document.querySelector('[role="cms-table-dms-exists"]');
+                let tableSystemsElement = document.querySelector('[data-role="cms-table-dms-exists"]');
       
                 if (tableSystemsElement) {
                   tableSystemsElement.remove();

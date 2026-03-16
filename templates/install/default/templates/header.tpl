@@ -1,7 +1,7 @@
 <header class="header">
   <section class="header__section section">
     <div class="header__installer-progress-container container">
-      <ul class="header__installer-progress installer-progress" role="installer-progress"></ul>
+      <ul class="header__installer-progress installer-progress" data-role="installer-progress"></ul>
     </div>
     <div class="header__container container">
       <div class="header__brand-container">
