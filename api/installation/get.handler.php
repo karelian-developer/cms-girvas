@@ -358,7 +358,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         $element->setAttribute('class', 'table__cell');
 
         if ($index === 1 && !empty($tableCellsFontColor[$dataIndex])) {
-          $element->setAttribute('style', sprintf('color: %s; border-color: inherit;', $tableCellsFontColor[$dataIndex]));
+          $element->setAttribute('style', sprintf('color: %s;', $tableCellsFontColor[$dataIndex]));
         }
       }
 
