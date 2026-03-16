@@ -741,7 +741,9 @@ export class InstallationMaster {
         buttonsPanel.appendChild(this.buttons[buttonName].target.element);
       }
 
-      this.stepsData[this.getStepIndex()].isBuilded = true;
+      if (this.getStepIndex() !== -1) {
+        this.stepsData[this.getStepIndex()].isBuilded = true;
+      }
 
       console.log(this.stepsData[this.getStepIndex()]);
       console.log(`Index install step: ${this.getStepIndex()}`);
