@@ -28,7 +28,7 @@ export class PageEntry {
   }
 
   init() {
-    let searchParams = new URLParser();
+    const searchParams = new URLParser();
     const elementForm = document.querySelector('[data-element="main-form"]');
 
     let locales;
