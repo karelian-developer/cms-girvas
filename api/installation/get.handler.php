@@ -307,8 +307,8 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       ['MySQL', (in_array('pdo_mysql', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
       ['Oracle Call Interface', (in_array('pdo_ocl', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
       ['ODBC v3 (IBM DB2, unixODBC, win32 ODBC)', (in_array('pdo_odbc', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
-      ['PostgreSQL', (in_array('pdo_pgsql', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
-      ['SQLite 3 и SQLite 2', (in_array('pdo_sqlite', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      ['PostgreSQL, Postgres Pro', (in_array('pdo_pgsql', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      ['SQLite 3, SQLite 2', (in_array('pdo_sqlite', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
       ['Microsoft SQL Server / SQL Azure', (in_array('pdo_sqlsrv', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))]
     ];
 
