@@ -66,9 +66,8 @@ final class EntriesSamples
 
     $queryBuilder->statement->assembly();
 
-    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
-
-    if ($databaseConnection !== null) {
+    if ($this->CMSCore->databaseConnector !== null) {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       $databaseQuery->execute();
 
@@ -77,7 +76,7 @@ final class EntriesSamples
 
       if ($results) {
         foreach ($results as $data) {
-          array_push($array, new EntriesSample($this->CMSCore, $data['id']));
+          $array[] = new EntriesSample($this->CMSCore, $data['id']));
         }
       }
 

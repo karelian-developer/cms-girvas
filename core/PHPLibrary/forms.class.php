@@ -66,9 +66,8 @@ final class Forms
 
     $queryBuilder->statement->assembly();
 
-    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
-
-    if ($databaseConnection !== null) {
+    if ($this->CMSCore->databaseConnector !== null) {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       $databaseQuery->execute();
 
@@ -83,7 +82,7 @@ final class Forms
 
       return $array;
     }
-
+    
     return [];
   }
       
