@@ -8,9 +8,9 @@
 
 .page__article {
   position: relative;
-  flex-grow: 1;
-  padding: 24px;
-  min-height: 520px;
+  background-color: var(--primary-color-4);
+  border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
 }
 
 .page__article-header {
@@ -18,6 +18,8 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   padding-top: 130px;
 }
 
@@ -28,6 +30,8 @@
   box-sizing: border-box;
   justify-content: flex-end;
   padding: 24px;
+  border-bottom-left-radius: 8px;
+  border-top-right-radius: 8px;
   width: fit-content;
   top: 0;
   right: 0;
@@ -38,18 +42,21 @@
 }
 
 .page__article .article__title {
+  background-color: rgba(0, 0, 0, .6);
+  font-weight: 300;
+  font-size: 18px;
+  color: var(--primary-color-3);
+  padding-left: 216px;
+  padding-right: 24px;
   padding-top: 16px;
   padding-bottom: 16px;
-  padding-right: 24px;
-  padding-left: 200px;
-  background: rgba(255, 255, 255, 0.85);
 }
 
 .page__article .article__content {
   padding-left: 24px;
   padding-right: 24px;
   padding-bottom: 24px;
-  padding-top: 56px;
+  padding-top: 64px;
 }
 
 .page__article .article__content > p {
@@ -131,30 +138,83 @@
 }
 
 .profile__avatar-container {
+  box-sizing: border-box;
   background-color: var(--primary-color-4);
   position: absolute;
-  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
+  padding: 8px;
+  width: 136px;
+  height: 136px;
   left: 48px;
   top: 96px;
 }
 
-.profile_edit .profile__avatar {
+.profile__avatar {
+  border-radius: 8px;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
   transition: filter .2s;
 }
 
-.profile_edit .profile__avatar:hover,
-.profile_edit .profile__avatar:focus {
-  filter: brightness(50%);
-  cursor: pointer;
+.article__profile.profile_edit [cmsg-password-checker-bar-container] {
+  box-sizing: border-box;
+  padding-left: 8px;
+  padding-right: 8px;
+  transform: translateY(4px);
 }
 
-.profile__avatar {
-  filter: brightness(100%);
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-image: center center;
-  width: 128px;
-  height: 128px;
+.article__profile.profile_edit [cmsg-password-checker-bar] {
+  border-radius: 8px;
+  height: 8px !important;
+}
+
+.article__profile.profile_edit .profile__information-table {
+  background-color: transparent;
+}
+
+.article__profile.profile_edit .table__row:not(:last-child) {
+  border-bottom: 1px solid var(--primary-color-3);
+}
+
+.article__profile.profile_edit .table__cell_header {
+  font-weight: 400;
+}
+
+.article__profile.profile_edit .table__cell_header[colspan] {
+  background-color: var(--primary-color-3);
+  text-align: center;
+  font-weight: 600;
+}
+
+.article__profile.profile_edit .table__cell {
+  border-color: transparent;
+}
+
+@media (max-width: 970px) {
+  .article__profile.profile_edit .table__row .table__cell_header {
+    width: 200px;
+  }
+  
+  .article__profile.profile_edit .table__row .table__cell:nth-child(2) {
+    width: calc(100% - 200px);
+  }
+
+  .article__profile.profile_edit .table__row .table__cell:nth-child(2) input,
+  .article__profile.profile_edit .table__row .table__cell:nth-child(2) textarea {
+    width: 100%;
+  }
+}
+
+@media (max-width: 470px) {
+  .article__profile.profile_edit .table__row .table__cell_header {
+    width: 30%;
+  }
+  
+  .article__profile.profile_edit .table__row .table__cell:nth-child(2) {
+    width: 70%;
+  }
 }
 
 .form__input-container {
@@ -178,4 +238,33 @@
 
 .form__input-container:hover > .form__input-tip {
   opacity: 1;
+}
+
+.profile_edit .form__button {
+  display: flex;
+  background-color: var(--primary-color-3);
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  color: var(--common-main-color-3);
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  border-bottom: 0;
+  border-radius: 8px;
+  padding: 10px;
+  transition: background-color .2s, color .2s;
+  cursor: pointer;
+}
+
+.profile_edit .form__button:not([disabled]):hover {
+  background-color: var(--secondary-color-2);
+}
+
+.profile_edit .form__button:not([disabled]):focus {
+  background-color: var(--secondary-color-2);
+}
+
+.profile_edit .form__button:not([disabled]):active {
+  background-color: var(--secondary-color-3);
 }

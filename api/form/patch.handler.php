@@ -32,9 +32,11 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT)) {
-    $formID = (isset($_PATCH['form_id'])) ? $_PATCH['form_id'] : 0;
-    $formID = (is_numeric($formID)) ? (int)$formID : 0;
+  if ($clientUserGroup->permissionCheck(
+    $clientUserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT
+  )) {
+    $formID = isset($_PATCH['form_id']) ? $_PATCH['form_id'] : 0;
+    $formID = is_numeric($formID) ? (int)$formID : 0;
 
     if (Form::existsByID($CMSCore, $formID)) {
       $form = new Form($CMSCore, $formID);
@@ -42,6 +44,12 @@ if ($CMSCore->client->isLogged(2)) {
 
       $formData = [];
       $formElements = $form->getElements();
+
+      $formElements = array_filter($formElements, function($element) use ($_PATCH) {
+        return isset($_PATCH['form_element_name']) && in_array($element['name'], $_PATCH['form_element_name']);
+      });
+
+      error_log(print_r($_PATCH, true));
 
       $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
       if (count($CMSLocalesNames) > 0) {
@@ -56,22 +64,57 @@ if ($CMSCore->client->isLogged(2)) {
           $inputTitleName = 'form_title_' . $CMSLocale->getISO639(2);
           $textareaDescriptionName = 'form_description_' . $CMSLocale->getISO639(2);
 
-          if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH)) {
-            if (!array_key_exists('texts', $formData)) $formData['texts'] = [];
-            if (!array_key_exists($CMSLocaleName, $formData['texts'])) $formData['texts'][$CMSLocaleName] = [];
+          if (
+            array_key_exists($inputTitleName, $_PATCH) ||
+            array_key_exists($textareaDescriptionName, $_PATCH)
+          ) {
+            if (!array_key_exists('texts', $formData)) {
+              $formData['texts'] = [];
+            }
 
-            if (array_key_exists($inputTitleName, $_PATCH)) $formData['texts'][$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$inputTitleName]));
-            if (array_key_exists($textareaDescriptionName, $_PATCH)) $formData['texts'][$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$textareaDescriptionName]));
+            if (!array_key_exists($CMSLocaleName, $formData['texts'])) {
+              $formData['texts'][$CMSLocaleName] = [];
+            }
+
+            if (array_key_exists($inputTitleName, $_PATCH)) {
+              $formData['texts'][$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$inputTitleName]));
+            }
+
+            if (array_key_exists($textareaDescriptionName, $_PATCH)) {
+              $formData['texts'][$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$textareaDescriptionName]));
+            }
           }
 
-          $formElementTitles = isset($_PATCH['form_element_title']) ? $_PATCH['form_element_title'] : [];
-          $formElementDescriptions = isset($_PATCH['form_element_description']) ? $_PATCH['form_element_description'] : [];
-          $formElementPlaceholders = isset($_PATCH['form_element_placeholder']) ? $_PATCH['form_element_placeholder'] : [];
-          $formElementTypes = isset($_PATCH['form_element_type']) ? $_PATCH['form_element_type'] : [];
-          $formElementNames = isset($_PATCH['form_element_name']) ? $_PATCH['form_element_name'] : [];
-          $formElementSequenceNumbers = isset($_PATCH['form_element_sequence_number']) ? $_PATCH['form_element_sequence_number'] : [];
+          $formElementTitles = isset($_PATCH['form_element_title'])
+            ? $_PATCH['form_element_title']
+            : [];
+
+          $formElementDescriptions = isset($_PATCH['form_element_description'])
+            ? $_PATCH['form_element_description']
+            : [];
+
+          $formElementPlaceholders = isset($_PATCH['form_element_placeholder'])
+            ? $_PATCH['form_element_placeholder']
+            : [];
+
+          $formElementTypes = isset($_PATCH['form_element_type'])
+            ? $_PATCH['form_element_type']
+            : [];
+
+          $formElementRequired = isset($_PATCH['form_element_required'])
+            ? $_PATCH['form_element_required']
+            : [];
+
+          $formElementNames = isset($_PATCH['form_element_name'])
+            ? $_PATCH['form_element_name']
+            : [];
+            
+          $formElementSequenceNumbers = isset($_PATCH['form_element_sequence_number'])
+            ? $_PATCH['form_element_sequence_number']
+            : [];
 
           if (count($formElementTitles) > 0) {
+
             for ($i = 0; $i < count($formElementTitles); $i++) {
               $elements = $form;
 
@@ -80,16 +123,22 @@ if ($CMSCore->client->isLogged(2)) {
 
               $formElements[$i]['number'] = $i + 1;
               $formElements[$i]['type'] = $formElementTypes[$i];
+              $formElements[$i]['required'] = isset($formElementRequired[$i]) ? true : false;
               $formElements[$i]['name'] = trim($formElementNames[$i]);
               $formElements[$i]['sequenceNumber'] = is_numeric($formElementSequenceNumbers[$i])
                 ? $formElementSequenceNumbers[$i]
                 : 0;
               
               if ($CMSLocaleName === $commonLocale) {
+                
+                $formElementTitlesTrimmed = trim($formElementTitles[$i]);
+                $formElementDescriptionsTrimmed = trim($formElementDescriptions[$i]);
+                $formElementPlaceholdersTrimmed = trim($formElementPlaceholders[$i]);
+
                 $formElements[$i]['texts'][$CMSLocaleName] = [
-                  'title' => htmlspecialchars(str_replace('\'', '"', (trim($formElementTitles[$i])))),
-                  'description' => htmlspecialchars(str_replace('\'', '"', (trim($formElementDescriptions[$i])))),
-                  'placeholder' => htmlspecialchars(str_replace('\'', '"', (trim($formElementPlaceholders[$i]))))
+                  'title' => htmlspecialchars(str_replace('\'', '"', $formElementTitlesTrimmed)),
+                  'description' => str_replace('\'', '"', $formElementDescriptionsTrimmed),
+                  'placeholder' => str_replace('\'', '"', $formElementPlaceholdersTrimmed)
                 ];
               }
             }
@@ -97,9 +146,50 @@ if ($CMSCore->client->isLogged(2)) {
         }
       }
 
-      if (isset($_PATCH['form_name'])) $formData['name'] = urlencode(htmlentities($_PATCH['form_name']));
-      if (isset($_PATCH['form_method_id'])) $formData['metadata']['methodID'] = $_PATCH['form_method_id'];
-      if (isset($_PATCH['form_action'])) $formData['metadata']['action'] = $_PATCH['form_action'];
+      if (isset($_PATCH['form_name'])) {
+        $formData['name'] = urlencode(htmlentities($_PATCH['form_name']));
+      }
+
+      if (isset($_PATCH['form_method_id'])) {
+        $formData['metadata']['methodID'] = $_PATCH['form_method_id'];
+      }
+
+      if (isset($_PATCH['form_action'])) {
+        $formData['metadata']['action'] = $_PATCH['form_action'];
+      }
+
+      if (isset($_PATCH['form_notification_telegram_chats_ids'])) {
+
+        $formTelegramChatsIDs = explode(',', $_PATCH['form_notification_telegram_chats_ids']);
+        
+        foreach ($formTelegramChatsIDs as $index => $id) {
+
+          if (!is_numeric($id)) {
+            unset($formTelegramChatsIDs[$index]);
+            continue;
+          }
+
+          $formTelegramChatsIDs[$index] = trim($id);
+        }
+      }
+
+      if (isset($_PATCH['form_notification_max_chats_ids'])) {
+
+        $formMaxChatsIDs = explode(',', $_PATCH['form_notification_max_chats_ids']);
+        
+        foreach ($formMaxChatsIDs as $index => $id) {
+
+          if (!is_numeric($id)) {
+            unset($formMaxChatsIDs[$index]);
+            continue;
+          }
+
+          $formMaxChatsIDs[$index] = trim($id);
+        }
+      }
+
+      $formData['metadata']['telegramChatsIDs'] = $formTelegramChatsIDs ?? [];
+      $formData['metadata']['maxChatsIDs'] = $formMaxChatsIDs ?? [];
 
       $formData['elements'] = $formElements;
       $isUpdated = $form->update($formData);

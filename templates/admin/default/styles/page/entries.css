@@ -83,6 +83,7 @@
 
 .grid-table__cell_description {
   grid-area: description;
+  font-weight: 300;
 }
 
 .grid-table__cell_locales {

@@ -29,11 +29,13 @@ export class ToolImage extends Tool {
 
     this.modal = null;
     this.imagesListGroup = 0;
+    this.filesPath = '';
     this.initClickEvent();
   }
 
-  async getMediaFilesArray() {
-    return await fetch('/handler/media', {
+  async getMediaFilesArray(directory = '') {
+    const fetchURL = directory === '' ? '/handler/media?extensions=png,jpeg,webp,jpg,gif,avif' : '/handler/media?directory=' + encodeURIComponent(directory) + '&extensions=png,jpeg,webp,jpg,gif,avif';
+    return await fetch(fetchURL, {
       method: 'GET'
     }).then((response) => {
       return response.json();
@@ -42,21 +44,74 @@ export class ToolImage extends Tool {
     });
   }
 
-  addImageItem(fileURL, end = true) {
-    let targetElement = document.querySelector('#SYSTEM_MODAL_6438654856');
-    let imagesListElement = targetElement.querySelector('ul');
-    let imagesListItemsElements = targetElement.querySelectorAll('li');
+  addImageItem(data, end = true) {
+    let fileName, fileURL, fileExtension, fileIsDirectory;
 
-    let mediaListItemElement = document.createElement('li');
-    mediaListItemElement.classList.add('media-list__item');
-    mediaListItemElement.style.backgroundImage = `url("${fileURL}")`;
-    mediaListItemElement.setAttribute('data-media-url', fileURL);
+    fileName = data.fullname;
+    fileURL = data.URL === undefined ? '' : data.URL;;
+    fileExtension = data.extension;
+    fileIsDirectory = data.isDirectory;
 
-    mediaListItemElement.addEventListener('click', (event) => {
+    const targetElement = document.querySelector('#SYSTEM_MODAL_6438654856');
+    const imagesListElement = targetElement.querySelector('ul');
+    const imagesListItemsElements = targetElement.querySelectorAll('li');
+
+    const listItemElement = document.createElement('li');
+    listItemElement.classList.add('media-list__item');
+    listItemElement.classList.add('item');
+    listItemElement.setAttribute('data-file-name', fileName);
+    listItemElement.setAttribute('data-file-url', fileURL);
+
+    if (fileIsDirectory === true) {
+      listItemElement.classList.add('media-list__item_is-directory');
+    }
+
+    const listItemBodyContainerElement = document.createElement('div');
+    listItemBodyContainerElement.classList.add('media-list__item-body');
+
+    const listItemExtensionElement = document.createElement('span');
+    listItemExtensionElement.classList.add('media-list__item-extension');
+    listItemExtensionElement.innerText = fileExtension;
+
+    const listItemImageElement = document.createElement('img');
+    listItemImageElement.classList.add('media-list__item-preview');
+    listItemImageElement.setAttribute('src', fileURL);
+    listItemImageElement.setAttribute('alt', fileName);
+
+    const listItemTitleContainerElement = document.createElement('div');
+    listItemTitleContainerElement.classList.add('media-list__item-title');
+
+    const listItemTitleElement = document.createElement('span');
+    listItemTitleElement.classList.add('media-list__item-label');
+    listItemTitleElement.innerText = fileName;
+
+    listItemTitleContainerElement.appendChild(listItemTitleElement);
+    listItemElement.appendChild(listItemTitleContainerElement);
+
+    listItemBodyContainerElement.appendChild(listItemExtensionElement);
+    listItemBodyContainerElement.appendChild(listItemImageElement);
+    listItemBodyContainerElement.appendChild(listItemTitleContainerElement);
+
+    listItemElement.appendChild(listItemBodyContainerElement);
+
+    listItemElement.addEventListener('click', (event) => {
       event.preventDefault();
 
-      let inputImageLabelElement = this.modal.target.element.querySelector('[name="image_label"]');
-      let imageLabel = inputImageLabelElement.value;
+      if (fileIsDirectory) {
+        this.filesPath = fileURL;
+        this.imagesListGroup = 0;
+
+        this.clearImagesList();
+        this.getMediaFilesArray(this.filesPath).then((items) => {
+          items.forEach((item, itemIndex) => {
+            this.addImageItem(item);
+          });
+        });
+        return false;
+      }
+
+      const inputImageLabelElement = this.modal.target.element.querySelector('[name="image_label"]');
+      const imageLabel = inputImageLabelElement.value;
 
       this.editor.textarea.replaceStringSelection(
         `![${imageLabel}](${fileURL})`
@@ -66,9 +121,9 @@ export class ToolImage extends Tool {
     });
 
     if (end) {
-      imagesListElement.appendChild(mediaListItemElement);
+      imagesListElement.appendChild(listItemElement);
     } else {
-      imagesListItemsElements[0].after(mediaListItemElement);
+      imagesListItemsElements[0].after(listItemElement);
     }
   }
 
@@ -84,24 +139,26 @@ export class ToolImage extends Tool {
   }
 
   imageUpload(input, fileIndex) {
-    let formData = new FormData();
+    const formData = new FormData();
     formData.append('mediaFile', input.files[fileIndex]);
 
-    fetch('/handler/media', {
+    const request = new Interactive('request', {
       method: 'POST',
-      body: formData
-    }).then((response) => {
-      return response.json();
-    }).then((data) => {
-      if (data.statusCode == 1) {
+      url: '/handler/media?localeMessage=' + window.CMSCore.locales.admin.name
+    });
+
+    request.target.data = formData;
+
+    request.target.send().then((data) => {
+      if (data.statusCode === 1) {
         if (fileIndex < input.files.length) {
           this.imageUpload(input, fileIndex + 1);
         }
 
-        this.addImageItem(data.outputData.file.url, false);
+        this.addImageItem(data.outputData.file, false);
 
-        let targetElement = document.querySelector('#SYSTEM_MODAL_6438654856');
-        let imagesListItemsElements = targetElement.querySelectorAll('li');
+        const targetElement = document.querySelector('#SYSTEM_MODAL_6438654856');
+        const imagesListItemsElements = targetElement.querySelectorAll('li');
         imagesListItemsElements[imagesListItemsElements.length - 2].remove();
       }
     });
@@ -110,13 +167,16 @@ export class ToolImage extends Tool {
   initClickEvent() {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
-      let stringSelection = this.editor.getSelectionString();
+      const stringSelection = this.editor.getSelectionString();
 
-      let modalBodyContent = document.createElement('div');
-      let mediaContainerElement = document.createElement('div');
+      const modalBodyContent = document.createElement('div');
+      modalBodyContent.classList.add('file-manager');
+
+      const mediaContainerElement = document.createElement('div');
+      mediaContainerElement.classList.add('file-manager__files-container');
       mediaContainerElement.setAttribute('id', 'SYSTEM_MODAL_6438654856');
 
-      let inputFilesElement = document.createElement('input');
+      const inputFilesElement = document.createElement('input');
       inputFilesElement.setAttribute('type', 'file');
       inputFilesElement.setAttribute('accept', 'image/png, image/jpeg, image/gif, image/webp, image/avif');
       inputFilesElement.setAttribute('multiple', 'multiple');
@@ -125,47 +185,55 @@ export class ToolImage extends Tool {
         if (inputFilesElement.files.length > 0) {
           console.log(`[NADVO TE] New images upload...`);
           this.imageUpload(inputFilesElement, 0);
+          inputFilesElement.value = '';
         }
       });
 
-      let inputImageLabelElement = document.createElement('input');
+      const inputImageLabelElement = document.createElement('input');
       inputImageLabelElement.setAttribute('placeholder', 'Подпись изображения');
       inputImageLabelElement.setAttribute('name', 'image_label');
       inputImageLabelElement.classList.add('form__input');
-      inputImageLabelElement.style.width = '100%';
-      inputImageLabelElement.style.marginBottom = '10px';
       inputImageLabelElement.value = stringSelection;
 
-      let inputImageLinkElement = document.createElement('input');
+      const inputImageLinkElement = document.createElement('input');
       inputImageLinkElement.classList.add('form__input');
       inputImageLinkElement.setAttribute('placeholder', '../image.webp');
       inputImageLinkElement.setAttribute('name', 'image_link');
-      inputImageLinkElement.style.width = '100%';
 
-      let formElement = document.createElement('form');
+      const formElement = document.createElement('form');
       formElement.classList.add('form');
+      formElement.classList.add('file-manager__form');
       formElement.append(inputFilesElement);
       formElement.append(inputImageLabelElement);
       formElement.append(inputImageLinkElement);
       
-      let inputsGroupContainer = document.createElement('div');
+      const inputsGroupContainer = document.createElement('div');
+      inputsGroupContainer.classList.add('file-manager__fixed-panel');
       inputsGroupContainer.append(formElement);
 
-      modalBodyContent.append(mediaContainerElement);
       modalBodyContent.append(inputsGroupContainer);
+      modalBodyContent.append(mediaContainerElement);
 
-      this.modal = new Interactive('modal', {title: "Вставить изображение", content: modalBodyContent, width: window.innerWidth - 400});
+      this.modal = new Interactive('modal',
+        {
+          title: "Вставить изображение",
+          content: modalBodyContent,
+          width: window.innerWidth - 100
+        }
+      );
       
       let self = this;
+
       this.modal.target.onClose(() => {
         self.imagesListGroup = 0;
       });
+
       this.modal.target.addButton('Вставить', () => {
-        let inputImageLabelElement = this.modal.target.element.querySelector('[name="image_label"]');
-        let inputImageLinkElement = this.modal.target.element.querySelector('[name="image_link"]');
+        const inputImageLabelElement = this.modal.target.element.querySelector('[name="image_label"]');
+        const inputImageLinkElement = this.modal.target.element.querySelector('[name="image_link"]');
         
-        let imageLabel = inputImageLabelElement.value;
-        let imageLink = inputImageLinkElement.value;
+        const imageLabel = inputImageLabelElement.value;
+        const imageLink = inputImageLinkElement.value;
         
         this.editor.textarea.replaceStringSelection(
           `![${imageLabel}](${imageLink})`
@@ -173,9 +241,11 @@ export class ToolImage extends Tool {
 
         this.modal.target.close();
       });
+
       this.modal.target.addButton('Отмена', () => {
         this.modal.target.close();
       });
+
       this.modal.assembly();
       document.body.appendChild(this.modal.target.element);
       this.modal.target.show();
@@ -186,7 +256,7 @@ export class ToolImage extends Tool {
 
         let mediaListElement = document.createElement('ul');
         mediaListElement.classList.add('media-list');
-        mediaListElement.classList.add('list-reset');
+        mediaListElement.classList.add('file-manager__media-list');
         
         let mediaListItemUploadElement = document.createElement('li');
         mediaListItemUploadElement.classList.add('media-list__item');
@@ -207,7 +277,7 @@ export class ToolImage extends Tool {
             this.imagesListGroup--;
 
             this.clearImagesList();
-            this.getMediaFilesArray().then((items) => {
+            this.getMediaFilesArray(this.filesPath).then((items) => {
               items.forEach((item, itemIndex) => {
                 if (itemIndex >= (itemsinGroupCount * this.imagesListGroup) && itemIndex < (itemsinGroupCount * this.imagesListGroup) + itemsinGroupCount) {
                   this.addImageItem(item);
@@ -221,7 +291,7 @@ export class ToolImage extends Tool {
         let interactiveButtonNavNext = new Interactive('button');
         interactiveButtonNavNext.target.setLabel('>');
         interactiveButtonNavNext.target.setCallback(() => {
-          this.getMediaFilesArray().then((items) => {
+          this.getMediaFilesArray(this.filesPath).then((items) => {
             let itemsinGroupCount = 23;
             let groupsCount = Math.ceil(items.length / itemsinGroupCount);
             if (this.imagesListGroup < groupsCount - 1) {
@@ -229,7 +299,10 @@ export class ToolImage extends Tool {
               this.imagesListGroup++;
 
               items.forEach((item, itemIndex) => {
-                if (itemIndex >= (itemsinGroupCount * this.imagesListGroup) && itemIndex < (itemsinGroupCount * this.imagesListGroup) + itemsinGroupCount) {
+                if (
+                  itemIndex >= (itemsinGroupCount * this.imagesListGroup) &&
+                  itemIndex < (itemsinGroupCount * this.imagesListGroup) + itemsinGroupCount
+                ) {
                   this.addImageItem(item);
                 }
               });
@@ -250,17 +323,12 @@ export class ToolImage extends Tool {
           }
         });
 
-        let listItemsElementStyle = targetElement.currentStyle || window.getComputedStyle(targetElement);
-        let listItemsElementCurrentHeight = parseInt(listItemsElementStyle.height);
+        interactiveButtonNavPrev.target.element.classList.add('file-manager__controller');
+        interactiveButtonNavPrev.target.element.classList.add('file-manager__controller_left');
 
-        interactiveButtonNavPrev.target.element.style.position = 'absolute';
-        interactiveButtonNavPrev.target.element.style.left = '0px';
-        interactiveButtonNavPrev.target.element.style.top = (listItemsElementCurrentHeight / 2) + 'px';
-        interactiveButtonNavPrev.target.element.style.zIndex = '101';
-        interactiveButtonNavNext.target.element.style.position = 'absolute';
-        interactiveButtonNavNext.target.element.style.right = '0px';
-        interactiveButtonNavNext.target.element.style.top = (listItemsElementCurrentHeight / 2) + 'px';
-        interactiveButtonNavNext.target.element.style.zIndex = '101';
+        interactiveButtonNavNext.target.element.classList.add('file-manager__controller');
+        interactiveButtonNavNext.target.element.classList.add('file-manager__controller_right');
+
         targetElement.appendChild(interactiveButtonNavPrev.target.element);
         targetElement.appendChild(interactiveButtonNavNext.target.element);
       });

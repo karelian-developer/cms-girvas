@@ -31,10 +31,10 @@
 	--primary-color-4--opacity-0-4: rgba(255, 255, 255, .4);
 	--primary-color-4--opacity-0-2: rgba(255, 255, 255, .2);
 	--secondary-color-1: #EEF7FF;
-	--secondary-color-2: #C4E4FF;
+	--secondary-color-2: #E0F1FF;
 	--secondary-color-3: #285E8E;
 	--secondary-color-4: #FFEEEE;
-	--secondary-color-5: #FFC4C4;
+	--secondary-color-5: #FBDFDF;
 	--secondary-color-6: #932929;
 	--secondary-color-7: #F0FFEE;
 	--secondary-color-8: #C6FFC4;
@@ -42,7 +42,8 @@
 	--secondary-color-10: #6D2222;
 	--secondary-color-11: #1B6920;
 	--secondary-color-12: #1D4160;
-	--secondary-color-13: #9E5757;
-	--secondary-color-14: #579E59;
+	--secondary-color-13: #B57575;
+	--secondary-color-14: #8ABD8C;
 	--secondary-color-15: #57619E;
+	--secondary-color-16: #000000;
 }

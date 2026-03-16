@@ -31,12 +31,12 @@ export class PageEntry {
 
   init() {
     let elementEntry = document.querySelector('[role="entry"]');
-    let entryCommentsListElement = (elementEntry != null) ? elementEntry.querySelector('[role="entryCommentsList"]') : null;
-    let entryID = (elementEntry != null) ? elementEntry.getAttribute('data-entry-id') : 0;
+    let entryCommentsListElement = (elementEntry !== null) ? elementEntry.querySelector('[role="entryCommentsList"]') : null;
+    let entryID = (elementEntry !== null) ? elementEntry.getAttribute('data-entry-id') : 0;
     this.clientUserPermissions = {};
     this.clientUserData = {};
 
-    this.commentsLimit = (entryCommentsListElement != null) ? entryCommentsListElement.querySelectorAll('[role="entryComment"]').length : 0;
+    this.commentsLimit = (entryCommentsListElement !== null) ? entryCommentsListElement.querySelectorAll('[role="entryComment"]').length : 0;
     this.commentsOffset = 0;
     this.postLoadComments = [];
     this.comments = [];
@@ -48,41 +48,23 @@ export class PageEntry {
     }).then((data) => {
       return fetch('/handler/locales', {method: 'GET'});
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
       locales = data.outputData.locales;
       return window.CMSCore.locales.base.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
       this.localeBaseData = localeData;
       return fetch(`/handler/user/@me/permissions?localeMessage=${window.CMSCore.locales.base.name}`, {method: 'GET'});
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
-      if (typeof data.outputData.user != 'undefined') {
+      if (typeof data.outputData.user !== 'undefined') {
         this.clientUserPermissions = data.outputData.user.permissions;
 
         if (this.clientUserPermissions.base_entry_comment_create || this.clientUserPermissions.base_entry_comment_change) {
@@ -101,7 +83,7 @@ export class PageEntry {
 
           commentForm.target.successCallback = (data) => {
             if (data.outputData.hasOwnProperty('comment')) {
-              if (commentForm.target.element.firstChild.getAttribute('method') == 'PUT') {
+              if (commentForm.target.element.firstChild.getAttribute('method') === 'PUT') {
                 let commentID = data.outputData.comment.id;
                 let commentData = {}, authorData = {};
                 
@@ -123,11 +105,11 @@ export class PageEntry {
                 });
               }
 
-              if (commentForm.target.element.firstChild.getAttribute('method') == 'PATCH') {
+              if (commentForm.target.element.firstChild.getAttribute('method') === 'PATCH') {
                 let commentID = data.outputData.comment.id;
                 let commentContent = data.outputData.comment.content;
                 let commentElement = elementEntry.querySelector(`[data-comment-id="${commentID}"]`);
-                if (commentElement != null) {
+                if (commentElement !== null) {
                   let commentContentElement = commentElement.querySelector('[role="entryCommentContent"]');
                   commentContentElement.innerHTML = commentContent;
                 }
@@ -168,40 +150,39 @@ export class PageEntry {
           formButton.setClickEvent((event) => {
             event.preventDefault();
 
-            if (formTextarea.element.value != '') {
+            if (formTextarea.element.value !== '') {
               commentForm.target.send();
             }
 
             formTextarea.element.value = '';
 
             let formInputCommentID = commentForm.target.element.querySelector('[name="comment_id"]');
-            if (formInputCommentID != null) {
+            if (formInputCommentID !== null) {
               let commentTargetElement = elementEntry.querySelector(`[data-comment-id="${formInputCommentID.value}"]`);
               commentTargetElement.scrollIntoView({block: "center", behavior: "smooth"});
               formInputCommentID.remove();
 
               if (commentForm.target.element.firstChild.hasAttribute('method')) {
-                if (commentForm.target.element.firstChild.getAttribute('method') == 'PATCH') {
+                if (commentForm.target.element.firstChild.getAttribute('method') === 'PATCH') {
                   commentForm.target.element.firstChild.setAttribute('method', 'PUT');
                 }
               }
             }
 
             let formButtonRest = commentForm.target.element.querySelector('[role="comment-form-button-reset"]');
-            if (formButtonRest != null) formButtonRest.remove();
+            if (formButtonRest !== null) formButtonRest.remove();
           });
           formButton.init({
             role: 'comment-form-button-send'
           });
 
-          let commentFormContainerElement = document.querySelector('[role="entryCommentFormContainer"]');
+          const commentFormContainerElement = document.querySelector('[data-role="entry-comment-form-container"]');
 
-          if (commentFormContainerElement != null) {
-            let commentFormPanelElement = document.createElement('div');
+          if (commentFormContainerElement !== null) {
+            const commentFormPanelElement = document.createElement('div');
             commentFormPanelElement.classList.add('form__panel-container');
             commentFormPanelElement.append(formButton.element);
 
-            // Assembly form
             commentForm.target.element.setAttribute('id', 'E7443753064');
             commentForm.target.element.firstChild.append(formInputParentID.element);
             commentForm.target.element.firstChild.append(formInputEntryID.element);
@@ -211,7 +192,6 @@ export class PageEntry {
 
             this.commentForm = commentForm;
 
-            // Append form to container
             commentFormContainerElement.append(this.commentForm.target.element);
           }
         }
@@ -219,19 +199,13 @@ export class PageEntry {
 
       return fetch(`/handler/entry/${entryID}/comments?localeMessage=${window.CMSCore.locales.base.name}&limit=${this.commentsLimit}&offset=${this.commentsOffset}&sortColumn=createdUnixTimestamp&sortType=desc&parentID=0`, {method: 'GET'});
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
       this.postLoadComments = data.outputData.comments;
       
-      let entryCommentsContainerElement = (elementEntry != null) ? elementEntry.querySelector('[role="entryCommentsContainer"]') : null;
+      let entryCommentsContainerElement = (elementEntry !== null) ? elementEntry.querySelector('[data-role="entry-comments-container"]') : null;
       let interactiveButtonCommentsLoad = new Interactive('button');
       interactiveButtonCommentsLoad.target.setLabel(this.localeBaseData.BUTTON_LOAD_MORE_COMMENTS_LABEL);
       interactiveButtonCommentsLoad.target.setCallback((event) => {
@@ -243,7 +217,7 @@ export class PageEntry {
         request.target.showingNotification = false;
 
         request.target.send().then((data1) => {
-          if (data1.statusCode == 1 && data1.outputData.hasOwnProperty('comments')) {
+          if (data1.statusCode === 1 && data1.outputData.hasOwnProperty('comments')) {
             let comments = data1.outputData.comments, commentLoadedIndex = 0;
             
             let appendComment = (commentData, clientUserPermissions) => {
@@ -289,27 +263,21 @@ export class PageEntry {
 
       interactiveButtonCommentsLoad.assembly();
 
-      if (entryCommentsContainerElement != null) {
+      if (entryCommentsContainerElement !== null) {
         entryCommentsContainerElement.append(interactiveButtonCommentsLoad.target.element);
       }
       
       return fetch(`/handler/user/@me?localeMessage=${window.CMSCore.locales.base.name}`, {method: 'GET'});
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
       this.clientUserData = (data.outputData.hasOwnProperty('user')) ? Object.assign(data.outputData.user) : this.clientUserData;
 
-      let commentsElements = (entryCommentsListElement != null) ? entryCommentsListElement.querySelectorAll('[role="entryComment"]') : [];
+      let commentsElements = (entryCommentsListElement !== null) ? entryCommentsListElement.querySelectorAll('[role="entryComment"]') : [];
       commentsElements.forEach((comment, commentIndex) => {
-        if (typeof(this.postLoadComments) != 'undefined') {
+        if (typeof(this.postLoadComments) !== 'undefined') {
           this.postLoadComments[commentIndex].entryID = entryID;
           let entryComment = new EntryComment(this, this.postLoadComments[commentIndex]);
           entryComment.elementAssembled = comment;
@@ -328,17 +296,11 @@ export class PageEntry {
         }
       });
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
 
     let commentFormElement = document.querySelector('[role="entryCommentForm"]');
-    if (commentFormElement != null) {
+    if (commentFormElement !== null) {
       if (commentFormElement.hasAttribute('readonly')) {
         commentFormElement.removeAttribute('readonly');
       }

@@ -13,6 +13,7 @@
     --primary-color-2--opacity-0-4: rgba(35, 35, 35, .4);
     --primary-color-3: #EAEAEA;
     --primary-color-4: #FFFFFF;
+    --primary-color-4--opacity-0-4: rgba(255, 255, 255, .4);
     --primary-color-5: #717171;
     --common-secondary-color-1: #EEF7FF;
     --common-secondary-color-2: #C4E4FF;
@@ -23,6 +24,9 @@
     --common-secondary-color-7: #F0FFEE;
     --common-secondary-color-8: #C6FFC4;
     --common-secondary-color-9: #2B9432;
+    --common-secondary-color-10: #858585;
+    --primary-linear-gradient-270deg: linear-gradient(270deg, #FFFFFF 64%, #E0E0E0 100%);
+    --primary-linear-gradient-180deg: linear-gradient(180deg, #FFFFFF, #E0E0E0);
     --bcg-body-color: #CACACA;
     --container-and-text-white-color:#FFF;
     --dark-gray-color: #232323;

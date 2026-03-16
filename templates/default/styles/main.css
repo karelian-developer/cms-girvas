@@ -6,6 +6,10 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
+.main {
+  margin-bottom: 16px;
+}
+
 .main-content {
   min-height: 509px;
 }

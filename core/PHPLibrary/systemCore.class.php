@@ -62,7 +62,7 @@ final class SystemCore implements CoreInterface
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS «GIRVAS»';
-  public const CMS_VERSION = '0.2.8';
+  public const CMS_VERSION = '0.2.9';
   public const CMS_STAGE_DEVELOPING = 'voitsy';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai';
@@ -247,28 +247,45 @@ final class SystemCore implements CoreInterface
    * 
    * @return string
    */
-  public static function getCopyrightString() : string
+  public function getCopyrightString() : string
   {
-    // $document = new DOMDocument();
+    $document = new DOMDocument();
 
-    // $copyrightContainerElement = $document->createElement('div');
-    // $copyrightContainerElement->setAttribute('class', 'footer__copyright copyright');
+    $copyrightContainerElement = $document->createElement('div');
+    $copyrightContainerElement->setAttribute('class', 'footer__copyright copyright');
 
-    // $copyrightLabelSymbolNodeElement = $document->createTextNode('copy');
-    // $copyrightLabelSpaceNodeElement = $document->createTextNode('nbsp');
+    $copyrightLabelSymbolNodeElement = $document->createTextNode('©');
+    $copyrightLabelSpaceNodeElement1 = $document->createTextNode(' ');
+    $copyrightLabelSpaceNodeElement2 = $document->createTextNode(' ');
+    $copyrightLabelSpaceNodeElement3 = $document->createTextNode(' ');
+    $copyrightLabelSpaceNodeElement4 = $document->createTextNode(' ');
 
-    // $copyrightLabelSiteLinkElement = $document->createElement('a', '&laquo;Карельский разработчик&raquo;');
-    // $copyrightLabelSiteLinkElement->setAttribute('href', 'https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai/');
-    // $copyrightLabelSiteLinkElement->setAttribute('title', 'Компания &laquo;Карельский разработчик&raquo;');
-    // $copyrightLabelSiteLinkElement->setAttribute('target', '_blank');
+    $copyrightLabelSiteLinkElement = $document->createElement('a', $this->getCMSDomain());
+    $copyrightLabelSiteLinkElement->setAttribute('href', $this->getCMSLink());
+    $copyrightLabelSiteLinkElement->setAttribute('title', $this->configurator->getSiteTitle() . '.');
+    $copyrightLabelSiteLinkDotElement = $document->createTextNode('.');
 
-    // $copyrightLabelDatesElement = $document->createElement('span', '&laquo;Карельский разработчик&raquo;');
+    $copyrightDateElement = $document->createElement('span', date('Y', time()) . '.');
+    $copyrightAllRightsElement = $document->createElement('span', 'All rights reserved.');
+    $copyrightCMSLinkElement = $document->createElement('a', 'CMS «GIRVAS»');
+    $copyrightCMSLinkElement->setAttribute('href', self::CMS_PRODUCT_SITE_LINK);
+    $copyrightCMSLinkElement->setAttribute('target', '_blank');
+    $copyrightLabelPoweredByElement = $document->createTextNode('Powered by ');
 
-    // $copyrightContainerElement->appendChild($copyrightLabelSymbolNodeElement);
-    // $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement);
-    // $document->appendChild($copyrightContainerElement);
+    $copyrightContainerElement->appendChild($copyrightLabelSymbolNodeElement);
+    $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement1);
+    $copyrightContainerElement->appendChild($copyrightLabelSiteLinkElement);
+    $copyrightContainerElement->appendChild($copyrightLabelSiteLinkDotElement);
+    $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement2);
+    $copyrightContainerElement->appendChild($copyrightDateElement);
+    $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement3);
+    $copyrightContainerElement->appendChild($copyrightAllRightsElement);
+    $copyrightContainerElement->appendChild($copyrightLabelSpaceNodeElement4);
+    $copyrightContainerElement->appendChild($copyrightLabelPoweredByElement);
+    $copyrightContainerElement->appendChild($copyrightCMSLinkElement);
+    $document->appendChild($copyrightContainerElement);
 
-    return sprintf('<div class="footer__copyright"><span>&copy;&nbsp;<a href="%s" title="Garbalo Site Official" target="_blank">%s</a>.</span> <span>2021&nbsp;&mdash;&nbsp;%d. <span>All&nbsp;rights&nbsp;reserved.</span> <span>Powered&nbsp;by&nbsp;<a href="%s" title="CMS Site Official" target="_blank">CMS&nbsp;&laquo;GIRVAS&raquo;</a>.</span></div>', self::CMS_DEVELOPER_SITE_LINK, self::CMS_DEVELOPER_TITLE, date('Y'), self::CMS_PRODUCT_SITE_LINK);
+    return $document->saveHTML();
   }
 
   /**
@@ -295,7 +312,7 @@ final class SystemCore implements CoreInterface
     
     if ($pageDirFirstElement === $CMSTheme->getCategory()) {
       $this->pageDirArray[0] = ucfirst($pageDirFirstElement);
-      array_push($this->pageDirArray, 'index');
+      $this->pageDirArray[] = 'index';
     }
     
     $currentDirFinalArray = [];
@@ -525,14 +542,17 @@ final class SystemCore implements CoreInterface
         $module = new Module($this, $directoryName);
 
         if ($module->isEnabled()) {
-          /** @var CMSFileConnector Объект подключателя файлов */
-          $CMSFileConnector = new CMSFileConnector($this);
-          $CMSFileConnector = $this->autoloadComponents(
-            $CMSFileConnector,
-            self::CMS_MODULES_PATH . '/' . $directoryName . '/core',
-            ['enum', 'interface', 'trait', 'class'],
-            'module_' . $directoryName
-          );
+          $modulesCoreDirectoryPath = self::CMS_MODULES_PATH . '/' . $directoryName . '/core';
+          
+          if (file_exists($modulesCoreDirectoryPath)) {
+            $CMSFileConnector = new CMSFileConnector($this);
+            $CMSFileConnector = $this->autoloadComponents(
+              $CMSFileConnector,
+              $modulesCoreDirectoryPath,
+              ['enum', 'interface', 'trait', 'class'],
+              'module_' . $directoryName
+            );
+          }
           
           Module::connectCore($this, $directoryName);
         }
@@ -885,16 +905,14 @@ final class SystemCore implements CoreInterface
    */
   public static function parseRawHTTPRequest(string $inputString, string $contentType) : array
   {
-    // grab multipart boundary from content type header
     preg_match('/boundary=(.*)$/', $contentType, $matches);
     $boundary = $matches[1];
     
-    // split content by boundary and get rid of last -- element
     $arrayBlocks = preg_split("/-+$boundary/", $inputString);
     array_pop($arrayBlocks);
     
     $dataArray = [];
-    // loop data blocks
+    
     foreach ($arrayBlocks as $index => $block) {
       if (empty($block)) continue;
 
@@ -908,10 +926,15 @@ final class SystemCore implements CoreInterface
       }
 
       if (isset($matches[2])) {
-        if (preg_match('/(.*)\[\]$/', $matches[1], $matchesName)) {
-          $dataArray[$matchesName[1]][] = $matches[2];
+        $fieldName = $matches[1];
+        $fieldValue = $matches[2];
+
+        if (preg_match('/^(.*)\[\]$/', $fieldName, $nameMatches)) {
+          $dataArray[$nameMatches[1]][] = $fieldValue;
+        } elseif (preg_match('/^(.*)\[([0-9]+)\]$/', $fieldName, $nameMatches)) {
+          $dataArray[$nameMatches[1]][$nameMatches[2]] = $fieldValue;
         } else {
-          $dataArray[$matches[1]] = $matches[2];
+          $dataArray[$fieldName] = $fieldValue;
         }
       }
     }   
@@ -1058,6 +1081,17 @@ final class SystemCore implements CoreInterface
         $cachedData = json_decode(file_get_contents($cacheFile), true);
 
         if (time() < $cachedData['expires']) {
+          usort($cachedData['files'], function($a, $b) {
+            $depthA = substr_count($a, '/');
+            $depthB = substr_count($b, '/');
+
+            if ($depthA !== $depthB) {
+              return $depthA <=> $depthB;
+            }
+
+            return strcmp($a, $b);
+          });
+
           foreach ($cachedData['files'] as $file) {
             $CMSFileConnector->connectFile(strtr(CMS_ROOT_DIRECTORY . '/' . $file, ['\\' => '']));
           }

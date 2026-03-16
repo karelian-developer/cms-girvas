@@ -717,7 +717,9 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getSMTPPassword() : string
   {
-    return $this->existsDatabaseEntryValue('email_smtp_password') ? $this->getDatabaseEntryValue('email_smtp_password') : '';
+    return $this->existsDatabaseEntryValue('email_smtp_password')
+      ? $this->getDatabaseEntryValue('email_smtp_password')
+      : '';
   }
 
   /**
@@ -727,7 +729,48 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getSMTPDomain() : string
   {
-    return $this->existsDatabaseEntryValue('email_smtp_domain') ? $this->getDatabaseEntryValue('email_smtp_domain') : '';
+    return $this->existsDatabaseEntryValue('email_smtp_domain')
+      ? $this->getDatabaseEntryValue('email_smtp_domain')
+      : '';
+  }
+
+  /**
+   * Получить ID чатов для уведомителя в Telegram
+   * 
+   * @return array
+   */
+  public function getSecurityNotificationTelegramChatsIDs() : array
+  {
+    return $this->existsDatabaseEntryValue('security_notification_telegram_chats_ids')
+      ? json_decode($this->getDatabaseEntryValue('security_notification_telegram_chats_ids'), true)
+      : [];
+  }
+
+  /**
+   * Получить ID чатов для уведомителя в MAX
+   * 
+   * @return array
+   */
+  public function getSecurityNotificationMaxChatsIDs() : array
+  {
+    return $this->existsDatabaseEntryValue('security_notification_max_chats_ids')
+      ? json_decode($this->getDatabaseEntryValue('security_notification_max_chats_ids'), true)
+      : [];
+  }
+
+  /**
+   * Получить ключ уведомителя
+   * 
+   * @param string $name
+   * 
+   * @return string
+   */
+  public function getNotifierKey(string $name) : string
+  {
+    $keys = $this->exists('notifierKeys') ? $this->get('notifierKeys') : [];
+    $keys = is_array($keys) ? $keys : [];
+
+    return isset($keys[$name]) ? $keys[$name] : '';
   }
 
   /**

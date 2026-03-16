@@ -24,6 +24,7 @@ export class PageForm {
     this.page = page;
     
     this.buttons = {save: null, delete: null, addElement: null};
+    this.elementsCount = 0;
   }
 
   init() {
@@ -158,15 +159,24 @@ export class PageForm {
       });
 
       let tableFormElementsButtonContainer = document.querySelector('[data-element="button-add-element"]');
-
+      
       this.buttons.addElement = new Interactive('button');
+      this.buttons.save = new Interactive('button');
+      this.buttons.delete = new Interactive('button');
+
       this.buttons.addElement.target.setLabel(localeData.BUTTON_NEW_ELEMENT);
+      this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
+      this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+      
+      this.buttons.addElement.target.setStyle('default');
+      this.buttons.save.target.setStyle('green');
+      this.buttons.delete.target.setStyle('red');
+
       this.buttons.addElement.target.setCallback((event) => {
         event.preventDefault();
 
         this.addElement(localeData, tableFormElementsButtonContainer);
       });
-      this.buttons.addElement.assembly();
 
       // Получаем все установленные языковые пакеты
       fetch('/handler/form/' + searchParams.getPathPart(3) + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
@@ -182,7 +192,9 @@ export class PageForm {
           const elementPlaceholder = elementTexts.placeholder;
           
           this.addElement(localeData, tableFormElementsButtonContainer, {
+            index: elementIndex,
             type: element.type,
+            required: element.required,
             title: elementTitle,
             description: elementDescription,
             placeholder: elementPlaceholder,
@@ -192,8 +204,6 @@ export class PageForm {
         });
       });
 
-      tableFormElementsButtonContainer.append(this.buttons.addElement.target.element);
-      
       const interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
         const formTitleInputElement = document.querySelector('[data-element="input-title"]');
@@ -241,8 +251,6 @@ export class PageForm {
         });
       });
 
-      this.buttons.save = new Interactive('button');
-      this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
       this.buttons.save.target.setCallback((event) => {
         event.preventDefault();
 
@@ -277,10 +285,6 @@ export class PageForm {
           this.page.showPopupNotification(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY, 0);
         }
       });
-      this.buttons.save.assembly();
-
-      this.buttons.delete = new Interactive('button');
-      this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
       this.buttons.delete.target.setCallback((event) => {
         event.preventDefault();
 
@@ -315,6 +319,9 @@ export class PageForm {
         document.body.appendChild(interactiveModal.target.element);
         interactiveModal.target.show();
       });
+
+      this.buttons.addElement.assembly();
+      this.buttons.save.assembly();
       this.buttons.delete.assembly();
 
       if (searchParams.getPathPart(3) === null) {
@@ -324,6 +331,8 @@ export class PageForm {
         this.buttons.delete.target.element.style.display = 'flex';
         this.buttons.save.target.element.style.display = 'flex';
       }
+
+      tableFormElementsButtonContainer.append(this.buttons.addElement.target.element);
 
       let interactiveContainer = document.querySelector('[data-element="panel"]');
       interactiveContainer.append(this.buttons.delete.target.element);
@@ -425,6 +434,10 @@ export class PageForm {
       localeData.PAGE_FORM_ELEMENT_TYPE_TITLE
     );
 
+    const cellElementsForRequired = this.createCellFormElementElements(
+      localeData.PAGE_FORM_ELEMENT_REQUIRED_TITLE
+    );
+
     /* Выпадающий список с типами полей */
 
     const interactiveChoicesTypeField = new Interactive('choices');
@@ -458,6 +471,34 @@ export class PageForm {
 
     cellElementsForType[1].append(interactiveChoicesTypeField.target.element);
 
+    const checkboxID = Array(10).fill(0).map(() => Math.floor(Math.random() * 10)).join('');
+
+    const checkboxContainerElement = document.createElement('div');
+    checkboxContainerElement.classList.add('form__checkbox-container');
+    checkboxContainerElement.classList.add('checkbox-container');
+
+    const checkboxInputElement = document.createElement('input');
+    checkboxInputElement.classList.add('checkbox-container__input');
+    checkboxInputElement.classList.add('form__input');
+    checkboxInputElement.classList.add('form__input_checkbox');
+    checkboxInputElement.setAttribute('id', 'I' + checkboxID);
+    checkboxInputElement.setAttribute('name', 'form_element_required[' + this.elementsCount + ']');
+    checkboxInputElement.setAttribute('type', 'checkbox');
+    checkboxInputElement.setAttribute('value', 'required');
+
+    if (data.required) {
+      checkboxInputElement.setAttribute('checked', 'checked');
+    }
+    
+    const checkboxLabelElement = document.createElement('label');
+    checkboxLabelElement.classList.add('checkbox-container__label');
+    checkboxLabelElement.classList.add('form__label');
+    checkboxLabelElement.setAttribute('for', 'I' + checkboxID);
+
+    checkboxContainerElement.appendChild(checkboxInputElement);
+    checkboxContainerElement.appendChild(checkboxLabelElement);
+    cellElementsForRequired[1].append(checkboxContainerElement);
+
     const cellElementsForTitle = this.createCellFormElementElements(
       localeData.PAGE_FORM_ELEMENT_TITLE_TITLE,
       formElementInputTitle
@@ -485,10 +526,17 @@ export class PageForm {
 
     const buttonRemoveField = new Interactive('button');
     buttonRemoveField.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+    buttonRemoveField.target.setStyle('red');
+
     buttonRemoveField.target.setCallback((event) => {
       event.preventDefault();
+      this.elementsCount--;
       
       cellElementsForType.forEach(element => {
+        element.remove();
+      });
+      
+      cellElementsForRequired.forEach(element => {
         element.remove();
       });
 
@@ -571,6 +619,13 @@ export class PageForm {
       );
     });
 
+    cellElementsForRequired.forEach(element => {
+      container.parentElement.parentElement.insertBefore(
+        element,
+        container.parentElement.previousElementSibling
+      );
+    });
+
     cellElementsForEvents.forEach(element => {
       container.parentElement.parentElement.insertBefore(
         element,
@@ -597,5 +652,7 @@ export class PageForm {
     formElementInputSequenceNumber.value = data.sequenceNumber !== undefined
       ? data.sequenceNumber
       : 0;
+    
+    this.elementsCount++;
   }
 }

@@ -1,12 +1,12 @@
 <article class="page__article article">
-  <div class="page__article-header" style="background-image: url('{SITE_TEMPLATE_URL}/images/entry/default_1024.png');">
-    <div class="page__buttons-panel" role="profilePanelButtons"></div>
-    <h2 class="article__title">{USER_LOGIN}</h2>
+  <div class="page__article-header" style="background-image: url('{SITE_TEMPLATE_URL}/images/entry/preview/default-1024.webp');">
+    <div class="page__buttons-panel" data-role="profile-panel-buttons"></div>
+    <h1 class="article__title">{USER_LOGIN}</h1>
   </div>
   <div class="article__content">
-    <div class="profile">
+    <div class="profile article__profile">
       <div class="profile__avatar-container">
-        <div class="profile__avatar" style="background-image: url('{USER_AVATAR_URL}');"></div>
+        <img class="profile__avatar" src="{USER_AVATAR_URL}" alt="{USER_LOGIN}" data-role="profile-avatar">
       </div>
       <div class="profile__information-container">
         <table class="table profile__information-table">
@@ -41,8 +41,5 @@
   </div>
 </article>
 <aside class="sidebar" role="siteSidebarRight">
-  <div class="sidebar__block block">
-    <h2 class="block__title title">{LANG:DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_TITLE}</h2>
-    <div class="block__content content">{LANG:DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_DESCRIPTION}</div>
-  </div>
+  {SIDEBAR_BLOCK_DEMO}
 </aside>

@@ -286,7 +286,7 @@ class PagePage implements InterfacePage
       ThemeCollector::addTemplateVariable(
         $templatesAssembled,
         'PAGE_STATIC_PERSONAL_TEMPLATE_PATH',
-        $pageStatic->getPersonalTemplatePath()
+        $pageStatic !== null ? $pageStatic->getPersonalTemplatePath() : 'templates/page/static.tpl'
       );
     }
 
@@ -303,6 +303,16 @@ class PagePage implements InterfacePage
         $templatesAssembled,
         'PAGE_STATIC_FORM_METHOD',
         $pageStatic !== null ? 'PATCH' : 'PUT'
+      );
+    }
+
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_PUBLISHED_TIMESTAMP')) {
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'PAGE_STATIC_PUBLISHED_TIMESTAMP',
+        $pageStatic !== null
+          ? date('Y-m-d\TH:i', $pageStatic->getPublishedUnixTimestamp())
+          : date('Y-m-d\TH:i', time())
       );
     }
 

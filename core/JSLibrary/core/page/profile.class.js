@@ -31,98 +31,107 @@ export class PageProfile {
     this.clientUserData = {};
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
+
       return (response.ok) ? response.json() : Promise.reject(response);
+    
     }).then((data) => {
+
       locales = data.outputData.locales;
+
       return window.CMSCore.locales.base.getData();
-    }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
 
-      interactiveNotification.target.show();
+    }, (rejectionReason) => {
+
+      this.page.showPopupNotification(rejectionReason, 0);
+
     }).then((localeData) => {
+
       this.localeBaseData = localeData;
+      
       return fetch(`/handler/user/@me?localeMessage=${window.CMSCore.locales.base.name}`, {method: 'GET'});
+    
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
 
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
+
     }).then((response) => {
+
       return (response.ok) ? response.json() : Promise.reject(response);
+    
     }).then((data) => {
-      this.clientUserData = (data.outputData.hasOwnProperty('user')) ? Object.assign(data.outputData.user) : this.clientUserData;
+      
+      this.clientUserData = data.outputData.hasOwnProperty('user')
+        ? Object.assign(data.outputData.user)
+        : this.clientUserData;
+      
       return fetch(`/handler/user/@me/permissions?localeMessage=${window.CMSCore.locales.base.name}`, {method: 'GET'});
+    
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
 
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
+
     }).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
+
+      return response.ok ? response.json() : Promise.reject(response);
+
     }).then((data) => {
-      if (typeof data.outputData.user != 'undefined') {
+
+      if (data.outputData.user !== undefined) {
         this.clientUserPermissions = data.outputData.user.permissions;
 
-        if (this.clientUserPermissions.admin_users_management || this.clientUserData.login == this.page.core.searchParams.getPathPart(2) || this.page.core.searchParams.getPathPart(2) == null) {
-          let profileAvatarElement = document.querySelector('[role="profile-avatar"]');
-          let profileFormElement = document.querySelector('#SYSTEM_F0648538312');
+        if (this.clientUserPermissions.admin_users_management || this.clientUserData.login === this.page.core.searchParams.getPathPart(2) || this.page.core.searchParams.getPathPart(2) === null) {
+          const profileAvatarElement = document.querySelector('[data-role="profile-avatar"]');
+          const profileFormElement = document.querySelector('[data-role="profile-form"]');
           
-          if (profileAvatarElement != null && profileFormElement != null) {
-            let formInputUserID = profileFormElement.querySelector('input[name="user_id"]');
+          const profileAvatarInput = document.createElement('input');
+          profileAvatarInput.setAttribute('type', 'file');
+          profileAvatarInput.setAttribute('name', 'user_avatar');
+          profileAvatarInput.setAttribute('data-role', 'input-user-avatar');
 
-            let profileAvatarInput = document.createElement('input');
-            profileAvatarInput.setAttribute('type', 'file');
-            profileAvatarInput.setAttribute('name', 'user_avatar');
-            profileAvatarInput.setAttribute('role', 'profileFormInputUserAvatar');
+          profileAvatarInput.style.display = 'none';
 
-            profileAvatarInput.style.display = 'none';
-
+          if (profileAvatarElement !== null && profileFormElement !== null) {
+            const formInputUserID = profileFormElement.querySelector('input[name="user_id"]');
+            
             profileFormElement.append(profileAvatarInput);
-            profileAvatarInput.addEventListener('change', (event) => {
-              if (profileAvatarInput.files.length > 0 && formInputUserID != null) {
-                let formData = new FormData();
-                formData.append('user_id', formInputUserID.getAttribute('value'));
-                formData.append('avatarFile', profileAvatarInput.files[0]);
+            
+            if (profileAvatarInput !== null) {
+              profileAvatarInput.addEventListener('change', (event) => {
+                if (profileAvatarInput.files.length > 0 && formInputUserID !== null) {
+                  let formData = new FormData();
+                  formData.append('user_id', formInputUserID.getAttribute('value'));
+                  formData.append('avatarFile', profileAvatarInput.files[0]);
 
-                let request = new Interactive('request', {
-                  method: 'POST',
-                  url: '/handler/user/avatar?localeMessage=' + window.CMSCore.locales.base.name
-                });
-      
-                request.target.data = formData;
-      
-                request.target.send().then((data) => {
-                  if (data.statusCode == 1 && data.outputData.hasOwnProperty('file')) {
-                    let fileName, fileURL;
+                  let request = new Interactive('request', {
+                    method: 'POST',
+                    url: '/handler/user/avatar?localeMessage=' + window.CMSCore.locales.base.name
+                  });
+        
+                  request.target.data = formData;
+        
+                  request.target.send().then((data) => {
+                    if (data.statusCode === 1 && data.outputData.hasOwnProperty('file')) {
+                      let fileName, fileURL;
 
-                    fileName = data.outputData.file.fullname;
-                    fileURL = data.outputData.file.url;
+                      fileName = data.outputData.file.fullname;
+                      fileURL = data.outputData.file.url;
 
-                    profileAvatarElement.style.backgroundImage = `url('${fileURL}')`;
-                    profileAvatarInput.remove();
-                  }
-                });
-              }
-            });
+                      profileAvatarElement.style.backgroundImage = `url('${fileURL}')`;
+                      profileAvatarInput.remove();
+                    }
+                  });
+                }
+              });
+            }
 
             profileAvatarElement.addEventListener('click', (event) => {
               profileAvatarInput.click();
             });
           }
 
-          let profilePanelButtonsElement = document.querySelector('[role="profilePanelButtons"]');
-          if (profilePanelButtonsElement != null) {
-            if (this.page.core.searchParams.getParam('event') != 'edit') {
+          const profilePanelButtonsElement = document.querySelector('[data-role="profile-panel-buttons"]');
+          if (profilePanelButtonsElement !== null) {
+            if (this.page.core.searchParams.getParam('event') !== 'edit') {
 
               let interactiveButtonEdit = new Interactive('button');
               interactiveButtonEdit.target.setLabel(this.localeBaseData.BUTTON_EDIT_LABEL);
@@ -134,94 +143,118 @@ export class PageProfile {
               profilePanelButtonsElement.append(interactiveButtonEdit.target.element);
             }
 
-            if (this.page.core.searchParams.getParam('event') == 'edit') {
-              if (profileAvatarElement != null && profileFormElement != null) {
-                let profileAvatarInput = document.querySelector('[role="profileFormInputUserAvatar"]');
-                let profilePasswordInput = document.querySelector('[role="profileFormInputUserPassword"]');
-                let profilePasswordRepeatInput = document.querySelector('[role="profileFormInputUserPasswordRepeat"]');
-                let profilePasswordOldInput = document.querySelector('[role="profileFormInputUserPasswordOld"]');
+            if (this.page.core.searchParams.getParam('event') === 'edit') {
+              const profileFormElement = document.querySelector('[data-role="profile-form"]');
+              const profileFormPanelElement = document.querySelector('[data-role="profile-form-panel"]');
+              const profilePasswordInput = document.querySelector('[data-role="input-user-password"]');
+              const profilePasswordRepeatInput = document.querySelector('[data-role="input-user-password-repeat"]');
+              const profilePasswordOldInput = document.querySelector('[data-role="input-user-password-old"]');
+              
+              const interactiveButtonBack = new Interactive('button');
+              const interactiveButtonEditAvatar = new Interactive('button');
+              const interactiveButtonSave = new Interactive('button');
+
+              interactiveButtonBack.target.setLabel(this.localeBaseData.DEFAULT_TEXT_BACK);
+              interactiveButtonEditAvatar.target.setLabel(this.localeBaseData.BUTTON_EDIT_AVATAR_LABEL);
+              interactiveButtonSave.target.setLabel(this.localeBaseData.DEFAULT_TEXT_SAVE);
+
+              interactiveButtonBack.target.setCallback((event) => {
+                window.location.href = '/profile';
+              });
+
+              interactiveButtonSave.target.setCallback((event) => {
+                event.preventDefault();
                 
-                let interactiveButtonBack = new Interactive('button');
-                interactiveButtonBack.target.setLabel(this.localeBaseData.DEFAULT_TEXT_BACK);
-                interactiveButtonBack.target.setCallback((event) => {
-                  window.location.href = '/profile';
+                const formData = new FormData(profileFormElement);
+
+                const request = new Interactive('request', {
+                  method: 'PATCH',
+                  url: '/handler/user?localeMessage=' + window.CMSCore.locales.base.name
                 });
 
-                let interactiveButtonEditAvatar = new Interactive('button');
-                interactiveButtonEditAvatar.target.setLabel(this.localeBaseData.BUTTON_EDIT_AVATAR_LABEL);
-                interactiveButtonEditAvatar.target.setCallback((event) => {
-                  if (profileAvatarInput != null) {
-                    profileAvatarInput.click();
+                request.target.data = formData;
+
+                request.target.send().then((data) => {
+                  if (data.statusCode === 1) {
+                    // ...
                   }
                 });
+              });
 
-                profilePasswordInput.addEventListener('change', (event) => {
-                  event.preventDefault();
+              interactiveButtonEditAvatar.target.setCallback((event) => {
+                if (profileAvatarInput !== null) {
+                  profileAvatarInput.click();
+                }
+              });
 
-                  if (event.target.value != '') {
-                    profilePasswordInput.setAttribute('required', '');
-                    profilePasswordRepeatInput.setAttribute('required', '');
-                    profilePasswordOldInput.setAttribute('required', '');
-                  } else {
-                    if (profilePasswordRepeatInput.value == '') {
-                      profilePasswordInput.removeAttribute('required');
-                      profilePasswordRepeatInput.removeAttribute('required');
-                      profilePasswordOldInput.removeAttribute('required');
-                    }
+              profilePasswordInput.addEventListener('change', (event) => {
+                event.preventDefault();
+
+                if (event.target.value !== '') {
+                  profilePasswordInput.setAttribute('required', '');
+                  profilePasswordRepeatInput.setAttribute('required', '');
+                  profilePasswordOldInput.setAttribute('required', '');
+                } else {
+                  if (profilePasswordRepeatInput.value === '') {
+                    profilePasswordInput.removeAttribute('required');
+                    profilePasswordRepeatInput.removeAttribute('required');
+                    profilePasswordOldInput.removeAttribute('required');
                   }
-                });
+                }
+              });
 
-                profilePasswordRepeatInput.addEventListener('change', (event) => {
-                  event.preventDefault();
+              profilePasswordRepeatInput.addEventListener('change', (event) => {
+                event.preventDefault();
 
-                  if (event.target.value != '') {
-                    profilePasswordInput.setAttribute('required', '');
-                    profilePasswordRepeatInput.setAttribute('required', '');
-                    profilePasswordOldInput.setAttribute('required', '');
-                  } else {
-                    if (profilePasswordRepeatInput.value == '') {
-                      profilePasswordInput.removeAttribute('required');
-                      profilePasswordRepeatInput.removeAttribute('required');
-                      profilePasswordOldInput.removeAttribute('required');
-                    }
+                if (event.target.value !== '') {
+                  profilePasswordInput.setAttribute('required', '');
+                  profilePasswordRepeatInput.setAttribute('required', '');
+                  profilePasswordOldInput.setAttribute('required', '');
+                } else {
+                  if (profilePasswordRepeatInput.value === '') {
+                    profilePasswordInput.removeAttribute('required');
+                    profilePasswordRepeatInput.removeAttribute('required');
+                    profilePasswordOldInput.removeAttribute('required');
                   }
-                });
+                }
+              });
 
-                profilePasswordOldInput.addEventListener('change', (event) => {
-                  event.preventDefault();
+              profilePasswordOldInput.addEventListener('change', (event) => {
+                event.preventDefault();
 
-                  if (event.target.value != '') {
-                    profilePasswordInput.setAttribute('required', '');
-                    profilePasswordRepeatInput.setAttribute('required', '');
-                    profilePasswordOldInput.setAttribute('required', '');
-                  } else {
-                    if (profilePasswordRepeatInput.value == '') {
-                      profilePasswordInput.removeAttribute('required');
-                      profilePasswordRepeatInput.removeAttribute('required');
-                      profilePasswordOldInput.removeAttribute('required');
-                    }
+                if (event.target.value !== '') {
+                  profilePasswordInput.setAttribute('required', '');
+                  profilePasswordRepeatInput.setAttribute('required', '');
+                  profilePasswordOldInput.setAttribute('required', '');
+                } else {
+                  if (profilePasswordRepeatInput.value === '') {
+                    profilePasswordInput.removeAttribute('required');
+                    profilePasswordRepeatInput.removeAttribute('required');
+                    profilePasswordOldInput.removeAttribute('required');
                   }
-                });
+                }
+              });
 
-                interactiveButtonBack.assembly();
-                interactiveButtonEditAvatar.assembly();
+              interactiveButtonBack.assembly();
+              interactiveButtonEditAvatar.assembly();
+              interactiveButtonSave.assembly();
 
+              if (profilePanelButtonsElement !== null) {
                 profilePanelButtonsElement.append(interactiveButtonBack.target.element);
                 profilePanelButtonsElement.append(interactiveButtonEditAvatar.target.element);
-                
+              }
+
+              if (profileFormPanelElement !== null) {
+                profileFormPanelElement.append(interactiveButtonSave.target.element);
               }
             }
           }
         }
       }
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
 
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
+
     });
   }
 }

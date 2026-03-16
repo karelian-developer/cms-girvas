@@ -28,9 +28,9 @@ body {
   display: flex;
   background-attachment: fixed;
   background-color: var(--common-main-color-2);
-  background-image: url('../images/background_auth.svg');
+  background-image: url('../images/background.webp');
   background-repeat: no-repeat;
-  background-size: 120%;
+  background-size: cover;
   background-position: center center;
   min-height: 100%;
 }
@@ -354,6 +354,7 @@ a:active {
   color: var(--common-main-color-3);
   font-size: 14px;
   border-left: 3px solid var(--common-main-color-3);
+  border-radius: 8px;
   padding: 20px;
 }
 

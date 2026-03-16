@@ -64,14 +64,15 @@ export class PageModule {
   }
 
   init() {
-    let searchParams = new URLParser(), locales;
-    let buttons = {enable: null, disable: null, install: null, delete: null};
+    let locales;
+    const searchParams = new URLParser();
+    const buttons = {enable: null, disable: null, install: null, delete: null};
 
-    let moduleBlock = document.querySelector('.module');
-    let moduleName = moduleBlock.getAttribute('data-module-name');
-    let moduleEnabledStatus = moduleBlock.getAttribute('data-module-enabled-status');
-    let moduleInstalledStatus = moduleBlock.getAttribute('data-module-installed-status');
-    let interactiveContainerElement = document.querySelector('#E8548530785');
+    const moduleBlock = document.querySelector('.module');
+    const moduleName = moduleBlock.getAttribute('data-name');
+    const moduleEnabledStatus = moduleBlock.getAttribute('data-enabled-status');
+    const moduleInstalledStatus = moduleBlock.getAttribute('data-installed-status');
+    const interactiveContainerElement = document.querySelector('#E8548530785');
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
@@ -79,23 +80,30 @@ export class PageModule {
       locales = data.outputData.locales;
       return window.CMSCore.locales.admin.getData();
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
 
-      if (searchParams.getPathPart(2) != null) {
+      if (searchParams.getPathPart(2) !== null) {
+        buttons.enable = new Interactive('button');
+        buttons.disable = new Interactive('button');
+        buttons.install = new Interactive('button');
+        buttons.delete = new Interactive('button');
+
+        buttons.enable.target.setLabel(localeData.BUTTON_ENABLE_LABEL);
+        buttons.disable.target.setLabel(localeData.BUTTON_DISABLE_LABEL);
+        buttons.install.target.setLabel(localeData.BUTTON_INSTALL_LABEL);
+        buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+        
+        buttons.enable.target.setStyle('green');
+        buttons.disable.target.setStyle('red');
+        buttons.install.target.setStyle('default');
+        buttons.delete.target.setStyle('red');
+
         let pageGalleryElement = moduleBlock.querySelector('[role="gallery"]');
-        if (pageGalleryElement != null) {
+        if (pageGalleryElement !== null) {
           this.initGallery(pageGalleryElement); 
         }
 
-        buttons.enable = new Interactive('button');
-        buttons.enable.target.setLabel(localeData.BUTTON_ENABLE_LABEL);
         buttons.enable.target.setCallback(() => {
           let formData = new FormData();
           formData.append('module_name', moduleName);
@@ -113,14 +121,11 @@ export class PageModule {
               buttons.enable.target.element.style.display = 'none';
               buttons.disable.target.element.style.display = 'flex';
     
-              moduleBlock.setAttribute('data-module-enabled-status', 'enabled');
+              moduleBlock.setAttribute('data-enabled-status', 'enabled');
             }
           });
         });
-        buttons.enable.assembly();
-    
-        buttons.disable = new Interactive('button');
-        buttons.disable.target.setLabel(localeData.BUTTON_DISABLE_LABEL);
+
         buttons.disable.target.setCallback(() => {
           let formData = new FormData();
           formData.append('module_name', moduleName);
@@ -138,14 +143,11 @@ export class PageModule {
               buttons.enable.target.element.style.display = 'flex';
               buttons.disable.target.element.style.display = 'none';
     
-              moduleBlock.setAttribute('data-module-enabled-status', 'disabled');
+              moduleBlock.setAttribute('data-enabled-status', 'disabled');
             }
           });
         });
-        buttons.disable.assembly();
-    
-        buttons.install = new Interactive('button');
-        buttons.install.target.setLabel(localeData.BUTTON_INSTALL_LABEL);
+
         buttons.install.target.setCallback(() => {
           let formData = new FormData();
           formData.append('module_name', moduleName);
@@ -153,7 +155,7 @@ export class PageModule {
 
           let request = new Interactive('request', {
             method: 'POST',
-            url: '/handler/module?localeMessage=' + window.CMSCore.locales.admin.name
+            url: '/handler/module/install?localeMessage=' + window.CMSCore.locales.admin.name
           });
 
           request.target.data = formData;
@@ -165,15 +167,21 @@ export class PageModule {
               buttons.enable.target.element.style.display = 'flex';
               buttons.disable.target.element.style.display = 'none';
     
-              moduleBlock.setAttribute('data-module-enabled-status', 'disabled');
-              moduleBlock.setAttribute('data-module-installed-status', 'installed');
+              moduleBlock.setAttribute('data-enabled-status', 'disabled');
+              moduleBlock.setAttribute('data-installed-status', 'installed');
+
+              if (searchParams.getPathPart(2) !== 'repository') {
+                const currentUrl = window.location.href;
+                const newUrl = currentUrl.replace('/repository/', '/');
+
+                if (newUrl !== currentUrl) {
+                  window.location.href = newUrl;
+                }
+              }
             }
           });
         });
-        buttons.install.assembly();
-    
-        buttons.delete = new Interactive('button');
-        buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+
         buttons.delete.target.setCallback(() => {
           let formData = new FormData();
           formData.append('module_name', moduleName);
@@ -192,11 +200,19 @@ export class PageModule {
               buttons.enable.target.element.style.display = 'none';
               buttons.disable.target.element.style.display = 'none';
     
-              moduleBlock.setAttribute('data-module-enabled-status', 'disabled');
-              moduleBlock.setAttribute('data-module-installed-status', 'not-installed');
+              moduleBlock.setAttribute('data-enabled-status', 'disabled');
+              moduleBlock.setAttribute('data-installed-status', 'not-installed');
+
+              if (searchParams.getPathPart(2) !== 'repository') {
+                window.location.href = '/admin/modules';
+              }
             }
           });
         });
+
+        buttons.enable.assembly();
+        buttons.disable.assembly();
+        buttons.install.assembly();
         buttons.delete.assembly();
     
         if (moduleEnabledStatus === 'enabled') {
@@ -205,12 +221,21 @@ export class PageModule {
         }
   
         if (moduleEnabledStatus === 'disabled') {
-          buttons.enable.target.element.style.display = 'flex';
+          buttons.enable.target.element.style.display = moduleInstalledStatus === 'installed'
+            ? 'flex'
+            : 'none';
           buttons.disable.target.element.style.display = 'none';
         }
-  
-        buttons.install.target.element.style.display = 'none';
-        buttons.delete.target.element.style.display = 'flex';
+        
+        if (moduleInstalledStatus === 'installed') {
+          buttons.install.target.element.style.display = 'none';
+          buttons.delete.target.element.style.display = 'flex';
+        }
+        
+        if (moduleInstalledStatus === 'not-installed') {
+          buttons.install.target.element.style.display = 'flex';
+          buttons.delete.target.element.style.display = 'none';
+        }
     
         interactiveContainerElement.append(buttons.enable.target.element);
         interactiveContainerElement.append(buttons.disable.target.element);
@@ -218,13 +243,7 @@ export class PageModule {
         interactiveContainerElement.append(buttons.delete.target.element);
       }
     }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 }

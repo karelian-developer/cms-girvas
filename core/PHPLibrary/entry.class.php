@@ -475,7 +475,7 @@ class Entry implements EntityTypeContent
     if (property_exists($this, 'metadata')) {
       $metadata = json_decode($this->metadata, true);
 
-      if (isset($metadata['isPublished'])) {
+      if (isset($metadata['isPublished']) && $this->getPublishedUnixTimestamp() <= time()) {
         return (bool) $metadata['isPublished'];
       }
     }
@@ -549,7 +549,7 @@ class Entry implements EntityTypeContent
    */
   public static function getPreviewDefaultURL(CMSCore $CMSCore, int $size) : string
   {
-    return '/' . $CMSCore->theme->getURL() . '/images/entry/default_' . (string) $size . '.png';
+    return '/' . $CMSCore->theme->getURL() . '/images/entry/preview/default-' . (string) $size . '.webp';
   }
   
   /**

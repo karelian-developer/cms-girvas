@@ -128,6 +128,11 @@
   margin-bottom: 20px;
 }
 
+.page.page_template .template__properties {
+  font-size: 14px;
+  color: var(--common-main-color-3);
+}
+
 .page.page_template .template__metadata-label,
 .page.page_template .template__description-label,
 .page.page_template .template__properties-label {

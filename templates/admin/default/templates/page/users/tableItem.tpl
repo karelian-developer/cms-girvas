@@ -1,6 +1,6 @@
 <div class="grid-table__item grid-table__item_user" data-element="user" data-id="{USER_ID}">
   <div class="grid-table__cell grid-table__cell_avatar">
-    <a class="grid-table__link" href="/admin/user/{USER_ID}" target="_blank">
+    <a class="grid-table__link grid-table__link_avatar" href="/admin/user/{USER_ID}" target="_blank">
       <img class="grid-table__avatar" src="{USER_AVATAR_URL}" alt="{USER_LOGIN}">
     </a>
   </div>

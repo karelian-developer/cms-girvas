@@ -1,5 +1,29 @@
 <form class="form page__form" data-element="main-form">
   <div class="grid-table page__grid-table">
+    <!-- Поле: Уведомления (чаты Telegram) -->
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_NOTIFICATIONS_TELEGRAM_CHATS_TITLE}
+      </div>
+      <div class="cell__description">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_NOTIFICATIONS_TELEGRAM_CHATS_DESCRIPTION}
+      </div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <input name="setting_{SETTINGS_NAME}_notification_telegram_chats_ids" type="text" class="input form__input form__input_text" value="{SETTING_NOTIFICATION_TELEGRAM_CHATS_IDS}" placeholder="123456789, 123456790..." data-element="input-notifications-telegram-chats-ids">
+    </div>
+    <!-- Поле: Уведомления (чаты MAX) -->
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_NOTIFICATIONS_MAX_CHATS_TITLE}
+      </div>
+      <div class="cell__description">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_NOTIFICATIONS_MAX_CHATS_DESCRIPTION}
+      </div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <input name="setting_{SETTINGS_NAME}_notification_max_chats_ids" type="text" class="input form__input form__input_text" value="{SETTING_NOTIFICATION_MAX_CHATS_IDS}" placeholder="123456789, 123456790..." data-element="input-notifications-max-chats-ids">
+    </div>
     <!-- Поле: Регистрация пользователей -->
     <div class="cell grid-table__cell grid-table__cell_text">
       <div class="cell__title">
@@ -109,7 +133,7 @@
         <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308804" type="checkbox" {SETTING_PREMODERATION_WORDS_FILTER_CHECKED_VALUE} data-logic-block="I1474308815" data-status-block="I1474308114">
         <label class="checkbox-container__label form__label" for="I1474308804"></label>
       </div>
-      <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_premoderation_words_filter_list" id="I1474308815" cols="30" rows="10" placeholder="PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_PLACEHOLDER">{SETTING_PREMODERATION_WORDS_FILTER_LIST_VALUE}</textarea>
+      <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_premoderation_words_filter_list" id="I1474308815" cols="30" rows="10" placeholder="{LANG:PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_PLACEHOLDER}">{SETTING_PREMODERATION_WORDS_FILTER_LIST_VALUE}</textarea>
     </div>
     <!-- Панель формы -->
     <div class="cell grid-table__cell grid-table__cell_panel" data-element="panel"></div>

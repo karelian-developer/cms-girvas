@@ -101,6 +101,7 @@ export class Modal {
     interactiveButtonClose.assembly();
 
     let elementButtonClose = interactiveButtonClose.target.element.querySelector('.interactive__button');
+    elementButtonClose.classList.add('interactive__button_red');
     elementButtonClose.classList.add('modal__header-button');
 
     elementHeader.append(elementHeaderLabel);

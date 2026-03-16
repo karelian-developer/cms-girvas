@@ -1,11 +1,21 @@
 <?php
 
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2025, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * Включена в Реестр российского программного обеспечения Минцифры РФ
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @link        https://cms-girvas.ru Сайт продукта
+ * 
+ * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * Все права защищены.
+ * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * 
+ * @support     support@karelian-developer.ru
  */
 
 namespace templates\default;
@@ -111,8 +121,16 @@ final class Core implements ThemeInterfaceCore
     $this->theme->CMSCore->initPage($this->theme->CMSCore->urlp->getPathString());
     $sitePage = $this->theme->CMSCore->getInitedPage();
     $sitePage->assembly();
+
+    $localeData = $this->theme->locale->getData();
     
-    $themeVars['SITE_PAGE'] = ThemeCollector::assembly($sitePage->assembled, []);
+    $themeVars['SITE_PAGE'] = ThemeCollector::assembly($sitePage->assembled, [
+      'SIDEBAR_BLOCK_DEMO' => $this->assemblySidebarBlock('default', [
+        'BLOCK_TITLE' => $localeData['THEME_IDEBAR_BLOCK_DEMO_TITLE'],
+        'BLOCK_CONTENT' => $localeData['THEME_SIDEBAR_BLOCK_DEMO_CONTENT']
+      ]),
+      'SIDEBAR_BLOCK_LAST_NEWS' => $this->assemblySidebarBlock('lastNews', []),
+    ]);
 
     return ThemeCollector::assemblyFileContent($this->theme, 'templates/main.tpl', $themeVars);
   }
@@ -247,7 +265,9 @@ final class Core implements ThemeInterfaceCore
 
     $localeData = $CMSTheme->locale->getData();
 
-    $clientIsLogged = $CMSTheme->CMSCore->client->isLogged(1);
+    $clientIsLogged = $CMSTheme->CMSCore->client !== null
+      ? $CMSTheme->CMSCore->client->isLogged(1)
+      : false;
     $user = $clientIsLogged ? $CMSTheme->CMSCore->client->getUser(1) : null;
     
     if ($user !== null) {
@@ -258,11 +278,6 @@ final class Core implements ThemeInterfaceCore
     $CMSConfigEngineeringWorksStatus = $CMSConfigurator->getDatabaseEntryValue('base_engineering_works_status');
 
     if ($CMSConfigEngineeringWorksStatus === 'off' || $userGroupID === 1) {
-      $CMSTheme->addStyle(['href' => 'styles/header.css', 'rel' => 'stylesheet']);
-      $CMSTheme->addStyle(['href' => 'styles/main.css', 'rel' => 'stylesheet']);
-      $CMSTheme->addStyle(['href' => 'styles/footer.css', 'rel' => 'stylesheet']);
-      $CMSTheme->addStyle(['href' => 'styles/page.css', 'rel' => 'stylesheet']);
-      
       $CMSTheme->addScript(['src' => 'common.js'], true);
       $CMSTheme->addScript(['src' => 'core.class.js', 'type' => 'module'], true);
       $CMSTheme->addScript(['src' => 'core.class.js', 'type' => 'module']);
@@ -324,15 +339,19 @@ final class Core implements ThemeInterfaceCore
 
     $documentFragment = $document->createDocumentFragment();
 
+    $liElement = $document->createElement('li');
+    $liElement->setAttribute('class', 'header__nav-item');
+
     $linkElement = $document->createElement('a');
-    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link');
     $linkElement->setAttribute('href', '/profile');
 
     $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_PROFILE']);
     $linkLabelElement->setAttribute('class', 'header__nav-span nav-span');
 
     $linkElement->appendChild($linkLabelElement);
-    $documentFragment->appendChild($linkElement);
+    $liElement->appendChild($linkElement);
+    $documentFragment->appendChild($liElement);
     $document->appendChild($documentFragment);
 
     return $document->saveHTML();
@@ -351,16 +370,20 @@ final class Core implements ThemeInterfaceCore
 
     $documentFragment = $document->createDocumentFragment();
 
+    $liElement = $document->createElement('li');
+    $liElement->setAttribute('class', 'header__nav-item');
+
     $linkElement = $document->createElement('a');
     $linkElement->setAttribute('id', 'SYSTEM_GE_IMC_00000001');
-    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link');
     $linkElement->setAttribute('href', '#');
 
     $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_LOGIN']);
     $linkLabelElement->setAttribute('class', 'header__nav-span nav-span');
 
     $linkElement->appendChild($linkLabelElement);
-    $documentFragment->appendChild($linkElement);
+    $liElement->appendChild($linkElement);
+    $documentFragment->appendChild($liElement);
     $document->appendChild($documentFragment);
 
     return $document->saveHTML();
@@ -379,15 +402,19 @@ final class Core implements ThemeInterfaceCore
 
     $documentFragment = $document->createDocumentFragment();
 
+    $liElement = $document->createElement('li');
+    $liElement->setAttribute('class', 'header__nav-item');
+
     $linkElement = $document->createElement('a');
-    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link');
     $linkElement->setAttribute('href', '/registration');
 
     $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_REGISTRATION']);
     $linkLabelElement->setAttribute('class', 'header__nav-span nav-span');
 
     $linkElement->appendChild($linkLabelElement);
-    $documentFragment->appendChild($linkElement);
+    $liElement->appendChild($linkElement);
+    $documentFragment->appendChild($liElement);
     $document->appendChild($documentFragment);
 
     return $document->saveHTML();
@@ -406,18 +433,34 @@ final class Core implements ThemeInterfaceCore
 
     $documentFragment = $document->createDocumentFragment();
 
+    $liElement = $document->createElement('li');
+    $liElement->setAttribute('class', 'header__nav-item');
+
     $linkElement = $document->createElement('a');
     $linkElement->setAttribute('role', 'profileNavigationExit');
-    $linkElement->setAttribute('class', 'header__nav-link nav-link display-block');
+    $linkElement->setAttribute('class', 'header__nav-link nav-link');
     $linkElement->setAttribute('href', '#');
 
     $linkLabelElement = $document->createElement('span', $localeData['DEFAULT_TEXT_EXIT']);
     $linkLabelElement->setAttribute('class', 'header__nav-span nav-span');
 
     $linkElement->appendChild($linkLabelElement);
-    $documentFragment->appendChild($linkElement);
+    $liElement->appendChild($linkElement);
+    $documentFragment->appendChild($liElement);
     $document->appendChild($documentFragment);
 
     return $document->saveHTML();
+  }
+
+  /**
+   * Сборка блока боковой колонки
+   *
+   * @param string $name
+   * @param array $themeVars
+   * 
+   * @return string
+   */
+  public function assemblySidebarBlock(string $name, array $themeVars = []) : string {
+    return ThemeCollector::assemblyFileContent($this->theme, 'templates/page/sidebar/block/' . $name . '.tpl', $themeVars);
   }
 }

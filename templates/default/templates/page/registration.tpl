@@ -1,19 +1,18 @@
 <article class="page__article article" data-entry-id="{ENTRY_ID}" role="entry">
-  <div class="page__article-header">
-    <h2 class="article__title">{LANG:PAGE_REGISTRATION_TITLE}</h2>
-    <div class="article__metadata metadata"></div>
+  <div class="page__article-header" style="background-image: url('{SITE_TEMPLATE_URL}/images/entry/preview/default-1024.webp');">
+    <h1 class="article__title">{LANG:PAGE_REGISTRATION_TITLE}</h1>
   </div>
   <div class="article__content">
     <form action="/handler/utils/registration" class="form form_registration">
       <div class="form__input-container input-container">
-        <input class="form__input form__input_text" type="text" name="user_login" placeholder="UserName" required>
+        <input class="form__input form__input_text" type="text" name="user_login" placeholder="UserName" required min="{USERS_LOGIM_LENGTH_MIN}" max="{USERS_LOGIM_LENGTH_MAX}">
       </div>
       <div class="form__input-container input-container">
         <input class="form__input form__input_email" type="email" name="user_email" placeholder="username@example.ru" required>
       </div>
       <div class="form__input-container input-container">
         <div class="form__input-tip input-tip" role="passwords-show">{LANG:BUTTON_SHOW_HIDE_LABEL}</div>
-        <input class="form__input form__input_password" type="password" name="user_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" cmsg-password-checker required>
+        <input class="form__input form__input_password" type="password" name="user_password" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" cmsg-password-checker required min="{USERS_PASSWORD_LENGTH_MIN}" max="{USERS_PASSWORD_LENGTH_MAX}">
       </div>
       <div class="form__input-container input-container">
         <div class="form__input-tip input-tip" role="passwords-show">{LANG:BUTTON_SHOW_HIDE_LABEL}</div>
@@ -30,8 +29,5 @@
   </div>
 </article>
 <aside class="sidebar" role="siteSidebarRight">
-  <div class="sidebar__block block">
-    <h2 class="block__title title">{LANG:DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_TITLE}</h2>
-    <div class="block__content content">{LANG:DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_DESCRIPTION}</div>
-  </div>
+  {SIDEBAR_BLOCK_DEMO}
 </aside>

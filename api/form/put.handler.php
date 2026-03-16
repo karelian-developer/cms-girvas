@@ -32,11 +32,51 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT)) {
-    $formName = (isset($_PUT['form_name'])) ? urlencode(htmlentities($_PUT['form_name'])) : '';
+  if ($clientUserGroup->permissionCheck(
+    $clientUserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT
+  )) {
+    
+    $formName = isset($_PUT['form_name'])
+      ? urlencode(htmlentities($_PUT['form_name']))
+      : '';
     
     $formMethodID = $_PUT['form_method_id'] ?? 0;
-    $formMethodID = (is_numeric($_PUT['form_method_id'])) ? (int)$_PUT['form_method_id'] : 0;
+    $formMethodID = is_numeric($_PUT['form_method_id'])
+      ? (int)$_PUT['form_method_id']
+      : 0;
+
+    if (isset($_PUT['form_notification_telegram_chats_ids'])) {
+
+      $formTelegramChatsIDs = explode(',', $_PUT['form_notification_telegram_chats_ids']);
+      
+      foreach ($formTelegramChatsIDs as $index => $id) {
+
+        if (!is_numeric($id)) {
+          unset($formTelegramChatsIDs[$index]);
+          continue;
+        }
+
+        $formTelegramChatsIDs[$index] = trim($id);
+      }
+    }
+
+    if (isset($_PUT['form_notification_max_chats_ids'])) {
+
+      $formMaxChatsIDs = explode(',', $_PUT['form_notification_max_chats_ids']);
+      
+      foreach ($formMaxChatsIDs as $index => $id) {
+
+        if (!is_numeric($id)) {
+          unset($formMaxChatsIDs[$index]);
+          continue;
+        }
+
+        $formMaxChatsIDs[$index] = trim($id);
+      }
+    }
+
+    $formTelegramChatsIDs = $formTelegramChatsIDs ?? [];
+    $formMaxChatsIDs = $formMaxChatsIDs ?? [];
     
     $formAction = $_PUT['form_action'] ?? '';
 
@@ -44,26 +84,33 @@ if ($CMSCore->client->isLogged(2)) {
     $elements = [];
 
     if (array_key_exists('form_element_type', $_PUT)) {
+
       foreach ($_PUT['form_element_type'] as $elementIndex => $elementTypeName) {
+
         $elements[$elementIndex] = [];
         $elements[$elementIndex]['type'] = $elementTypeName;
         $elements[$elementIndex]['texts'] = [];
 
         $elementName = $_PUT['form_element_name'][$elementIndex] ?? null;
         $elementSequenceNumber = $_PUT['form_element_sequence_number'][$elementIndex] ?? null;
+        $elementRequired = $_PUT['form_element_required'][$elementIndex] ?? null;
 
         if ($elementName !== null) {
           $elements[$elementIndex]['name'] = trim($elementName);
         }
 
         if ($elementSequenceNumber !== null) {
-          $elements[$elementIndex]['sequenceNumber'] = (is_numeric($elementSequenceNumber)) ? $elementSequenceNumber : 0;
+          $elements[$elementIndex]['sequenceNumber'] = is_numeric($elementSequenceNumber) ? $elementSequenceNumber : 0;
         }
+
+        $elements[$elementIndex]['required'] = $elementRequired !== null;
       }
     }
 
     $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+
     if (count($CMSLocalesNames) > 0) {
+
       foreach ($CMSLocalesNames as $index => $name) {
         $CMSLocale = new  CMSLocale($CMSCore, $name);
         $CMSLocale->setTypeName('handler');
@@ -74,15 +121,27 @@ if ($CMSCore->client->isLogged(2)) {
         $inputTitleName = 'form_title_' . $CMSLocale->getISO639(2);
         $textareaDescriptionName = 'form_description_' . $CMSLocale->getISO639(2);
 
-        if (array_key_exists($inputTitleName, $_PUT) || array_key_exists($textareaDescriptionName, $_PUT)) {
-          if (!array_key_exists($CMSLocaleName, $texts)) $texts[$CMSLocaleName] = [];
+        if (
+          array_key_exists($inputTitleName, $_PUT) ||
+          array_key_exists($textareaDescriptionName, $_PUT)
+        ) {
+          if (!array_key_exists($CMSLocaleName, $texts)) {
+            $texts[$CMSLocaleName] = [];
+          }
 
-          if (array_key_exists($inputTitleName, $_PUT)) $texts[$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', $_PUT[$inputTitleName]));
-          if (array_key_exists($textareaDescriptionName, $_PUT)) $texts[$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', $_PUT[$textareaDescriptionName]));
+          if (array_key_exists($inputTitleName, $_PUT)) {
+            $texts[$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', $_PUT[$inputTitleName]));
+          }
+
+          if (array_key_exists($textareaDescriptionName, $_PUT)) {
+            $texts[$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', $_PUT[$textareaDescriptionName]));
+          }
         }
 
         if (array_key_exists('form_element_type', $_PUT)) {
+
           foreach ($_PUT['form_element_type'] as $elementIndex => $elementTypeName) {
+
             $elementTitle = $_PUT['form_element_title'][$elementIndex] ?? null;
             $elementDescription = $_PUT['form_element_description'][$elementIndex] ?? null;
             $elementPlaceholder = $_PUT['form_element_placeholder'][$elementIndex] ?? null;
@@ -106,8 +165,11 @@ if ($CMSCore->client->isLogged(2)) {
     $metadata = [];
     $metadata['methodID'] = $formMethodID;
     $metadata['action'] = $formAction;
+    $metadata['telegramChatsIDs'] = $formTelegramChatsIDs;
+    $metadata['maxChatsIDs'] = $formMaxChatsIDs;
 
     $form = Form::create($CMSCore, $formName, $texts, $elements, $metadata);
+
     if (!is_null($form)) {
       $handlerOutputData['form'] = [];
       $handlerOutputData['form']['id'] = $form->getID();

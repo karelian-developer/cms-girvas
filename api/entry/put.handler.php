@@ -198,7 +198,6 @@ if ($CMSCore->client->isLogged(2)) {
           if (!isset($entryData)) $entryData = [];
           if (!isset($entryData['metadata'])) $entryData['metadata'] = [];
           if (!isset($entryData['metadata']['additionalFields'])) $entryData['metadata']['additionalFields'] = [];
-          
           $valueNameParts = explode('_', $key_matches[1][0]);
           foreach ($valueNameParts as $index => $part) {
             if ($index > 0) {
@@ -216,6 +215,11 @@ if ($CMSCore->client->isLogged(2)) {
       $entry = Entry::create($CMSCore, $entryName, $clientSession->getUserID(), 1, $texts);
       if ($entry !== null) {
         $entry->initData(['texts']);
+
+        if (isset($_PUT['entry_published_timestamp'])) {
+          $entryData['metadata']['publishedUnixTimestamp'] = strtotime(str_replace('T', ' ', $_PUT['entry_published_timestamp']));
+          $entryData['metadata']['isPublished'] = 1;
+        }
 
         // Обновление дополнительной информации
         $entryData['categoryID'] = $entryCategoryID;

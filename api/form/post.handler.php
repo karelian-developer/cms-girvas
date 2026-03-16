@@ -24,28 +24,150 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 use \core\PHPLibrary\Form as Form;
+use \core\PHPLibrary\SystemCore\Notifier as CMSNotifier;
 
 $formName = $CMSCore->urlp->getPath(2);
 
 if (Form::existsByName($CMSCore, $formName)) {
+
   $form = Form::getByName($CMSCore, $formName);
-  $form->initData(['name', 'metadata', 'elements']);
+  $form->initData(['name', 'metadata', 'elements', 'texts']);
   $formLocale = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
 
   $formName = $form->getName();
   $formData = [];
 
   foreach($_POST as $POSTDataKey => $POSTData) {
-    if (preg_match('/^' . $formName . '_([a-z0-9_]+)$/', $POSTDataKey, $matches, PREG_OFFSET_CAPTURE)) {
+    if (preg_match(
+      '/^' . $formName . '_([a-z0-9_]+)$/',
+      $POSTDataKey,
+      $matches,
+      PREG_OFFSET_CAPTURE
+    )) {
       $formFieldName = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $matches[1][0]))));
       $formData[$formFieldName] = $POSTData;
     }
   };
 
-  $form->saveData($formData);
+  $formSendedDatetime = date('Y-m-d H:i', time());
+  $formSendedAuthorIP = $CMSCore->client->getRealIPAddress();
 
-  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_POST_DATA_SUCCESS');
-  $handlerStatusCode = $handlerStatusCode ?? 1;
+  $result = $form->saveData($formData);
+
+  if ($result) {
+
+    $notifierTelegramChatsIDs = $form->getTelegramChatsIDs();
+    $notifierTelegramThreatsIDs = $form->getTelegramThreatsIDs();
+    $notifierTelegramChannelsIDs = $form->getTelegramChannelsIDs();
+
+    $notifierMaxChatsIDs = $form->getMaxChatsIDs();
+
+    $notifierTelegramChatsCount = count($notifierTelegramChatsIDs);
+    $notifierTelegramThreatsCount = count($notifierTelegramThreatsIDs);
+    $notifierTelegramChannelsCount = count($notifierTelegramChannelsIDs);
+
+    $notifierMaxChatsCount = count($notifierMaxChatsIDs);
+
+    if (
+      $notifierTelegramChatsCount > 0 ||
+      $notifierTelegramThreatsCount > 0 ||
+      $notifierTelegramChannelsCount > 0
+    ) {
+
+      $CMSTelegramNotifier = CMSNotifier::create($CMSCore, 'telegram');
+
+      if ($notifierTelegramChatsCount > 0) {
+        
+        $formDataFormated = [];
+        $formElements = $form->getElements();
+        $formData = $form->getData();
+        $formTitle = $form->getTitle($formLocale);
+
+        foreach($_POST as $POSTDataKey => $POSTData) {
+
+          foreach ($formElements as $elementIndex => $elementData) {
+            $elementName = $elementData['name'];
+            
+            if ($POSTDataKey === $formName . '_' . $elementName) {
+              $elementTitle = isset($elementData['texts'][$formLocale]['title'])
+                ? $elementData['texts'][$formLocale]['title']
+                : $elementName;
+
+              $formDataFormated[] = '*' . $elementTitle . ':* `' . $POSTData . '`';
+            }
+          }
+        }
+
+        $CMSTelegramNotifierMessage = "📊 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_SENDED_TITLE') . "*\n\n";
+        $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_LABEL') . ":* " . $formTitle . "\n";
+        $CMSTelegramNotifierMessage .= "*" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ":* " . $CMSCore->getSiteURL() . "\n\n";
+        $CMSTelegramNotifierMessage .= implode("\n", $formDataFormated) . "\n\n";
+        $CMSTelegramNotifierMessage .= "*". $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_DATE_LABEL') .":* " . $formSendedDatetime . "\n";
+        $CMSTelegramNotifierMessage .= "*". $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_IP_LABEL') .":* " . $formSendedAuthorIP . "\n\n";
+        $CMSTelegramNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
+
+        $CMSTelegramNotifier->setMessage($CMSTelegramNotifierMessage);
+        $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
+
+        foreach ($notifierTelegramChatsIDs as $index => $id) {
+          $CMSTelegramNotifier->setChatID($id);
+          $CMSTelegramNotifier->send($CMSTelegramNotifierKey);
+          usleep(1000);
+        }
+      }
+    }
+
+    if ($notifierMaxChatsCount > 0) {
+
+      $CMSMaxNotifier = CMSNotifier::create($CMSCore, 'max');
+
+      if ($notifierMaxChatsCount > 0) {
+        
+        $formDataFormated = [];
+        $formElements = $form->getElements();
+        $formData = $form->getData();
+        $formTitle = $form->getTitle($formLocale);
+
+        foreach($_POST as $POSTDataKey => $POSTData) {
+
+          foreach ($formElements as $elementIndex => $elementData) {
+            $elementName = $elementData['name'];
+            
+            if ($POSTDataKey === $formName . '_' . $elementName) {
+              $elementTitle = isset($elementData['texts'][$formLocale]['title'])
+                ? $elementData['texts'][$formLocale]['title']
+                : $elementName;
+
+              $formDataFormated[] = $elementTitle . ': ' . $POSTData;
+            }
+          }
+        }
+
+        $CMSMaxNotifierMessage = "📊 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_SENDED_TITLE') . "\n\n";
+        $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_LABEL') . ": " . $formTitle . "\n";
+        $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_FROM_SITE_LABEL') . ": " . $CMSCore->getSiteURL() . "\n\n";
+        $CMSMaxNotifierMessage .= implode("\n", $formDataFormated) . "\n\n";
+        $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_DATE_LABEL') .": " . $formSendedDatetime . "\n";
+        $CMSMaxNotifierMessage .= $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_CUSTOM_FORM_IP_LABEL') .": " . $formSendedAuthorIP . "\n\n";
+        $CMSMaxNotifierMessage .= sprintf($CMSCore->locale->getSingleValueByKey('API_NOTIFIER_COPYRIGHT_LABEL'), $CMSCore::CMS_TITLE . ' ' . $CMSCore::CMS_VERSION);
+
+        $CMSMaxNotifier->setMessage($CMSMaxNotifierMessage);
+        $CMSMaxNotifierKey = $CMSCore->configurator->getNotifierKey('max');
+
+        foreach ($notifierMaxChatsIDs as $index => $id) {
+          $CMSMaxNotifier->setChatID($id);
+          $CMSMaxNotifier->send($CMSMaxNotifierKey);
+          usleep(1000);
+        }
+      }
+    }
+
+    $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_POST_DATA_SUCCESS');
+    $handlerStatusCode = $handlerStatusCode ?? 1;
+  } else {
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
+  }
 } else {
   $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_FORM_ERROR_NOT_FOUND');
   $handlerStatusCode = $handlerStatusCode ?? 0;

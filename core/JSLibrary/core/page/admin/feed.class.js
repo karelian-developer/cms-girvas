@@ -44,8 +44,15 @@ export class PageFeed {
     }).then((localeData) => {
       let urlInputElement = document.querySelector('[data-element="input-url"]');
 
+      this.buttons.save = new Interactive('button');
       this.buttons.delete = new Interactive('button');
+
+      this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
       this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+      
+      this.buttons.save.target.setStyle('green');
+      this.buttons.delete.target.setStyle('red');
+
       this.buttons.delete.target.setCallback((event) => {
         event.preventDefault();
         
@@ -80,10 +87,7 @@ export class PageFeed {
         document.body.appendChild(interactiveModal.target.element);
         interactiveModal.target.show();
       });
-      this.buttons.delete.assembly();
 
-      this.buttons.save = new Interactive('button');
-      this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
       this.buttons.save.target.setCallback((event) => {
         event.preventDefault();
         
@@ -112,7 +116,9 @@ export class PageFeed {
           this.page.showPopupNotification(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY, 0);
         }
       });
+
       this.buttons.save.assembly();
+      this.buttons.delete.assembly();
 
       if (searchParams.getPathPart(3) !== null) {
         let feedsTypes;

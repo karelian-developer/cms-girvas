@@ -35,6 +35,11 @@ export class NadvoTE {
     this.element.appendChild(this.toolbar.element);
     this.element.appendChild(this.textarea.element);
     this.element.appendChild(this.textareaVisual.element);
+
+    const copyright = this.createElementDiv();
+    copyright.classList.add('nadvo-te__copyright');
+    copyright.innerHTML = 'Визуальный редактор &laquo;NadvoTE&raquo; разработан компанией &laquo;Карельский разработчик&raquo; специально для CMS &laquo;ГИРВАС&raquo;.';
+    this.element.appendChild(copyright);
   }
 
   initEditorToolbar() {

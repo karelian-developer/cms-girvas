@@ -64,9 +64,9 @@ class PageEntry implements InterfacePage
           'metadata'
         ]
       );
-    }
 
-    $this->initMetaOpenGraph();
+      $this->initMetaOpenGraph();
+    }
   }
 
   /**
@@ -79,7 +79,7 @@ class PageEntry implements InterfacePage
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSLocale = $this->CMSCore->locale;
     $CMSLocaleName = $CMSLocale->getName();
-
+    
     $imageURL = $this->targetObject->getPreviewURL() !== ''
       ? $this->targetObject->getPreviewURL()
       : $this->targetObject::getPreviewDefaultURL($this->CMSCore, 1024);
@@ -290,7 +290,7 @@ class PageEntry implements InterfacePage
             'COMMENT_INDEX' => $entryCommentIndex,
             'COMMENT_CREATED_DATE_TIMESTAMP' => date('d.m.Y H:i:s', $entryComment->getCreatedUnixTimestamp()),
             'COMMENT_AUTHOR_LOGIN' => $entryCommentAuthor !== null ? $entryCommentAuthor->getLogin() : '{LANG:DEFAULT_TEXT_USER_DELETED}',
-            'COMMENT_AUTHOR_AVATAR_URL' => $entryCommentAuthor !== null ? $entryCommentAuthor->getAvatarURL(64) : User::getAvatarDefaultURL($this->CMSCore, 64),
+            'COMMENT_AUTHOR_AVATAR_URL' => $entryCommentAuthor !== null ? $entryCommentAuthor->getAvatarURL(128) : User::getAvatarDefaultURL($this->CMSCore, 64),
             'COMMENT_AUTHOR_GROUP_TITLE' => $entryCommentAuthor !== null ? $entryCommentAuthorGroup->getTitle($localeName) : '',
             'COMMENT_CONTENT' => $entryComment->isHidden() ? $localeData['PAGE_ENTRY_COMMENT_HIDE_LABEL'] . ' ' . strip_tags($entryComment->getHiddenReason()) : $entryCommentContent
           ]));
@@ -428,6 +428,16 @@ class PageEntry implements InterfacePage
           ThemeCollector::addTemplateVariable(
             $templatesAssembled,
             'ENTRY_CATEGORY_URL',
+            $value
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_URL')) {
+          $value = $entry !== null ? $entry->getURL() : '#';
+          
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_URL',
             $value
           );
         }

@@ -19,6 +19,16 @@ export class Textarea {
   constructor(editor, options = []) {
     this.editor = editor;
     this.options = options;
+    this.bracketMap = {
+      '(': ')',
+      '[': ']',
+      '{': '}',
+      '"': '"',
+      "'": "'",
+      '`': '`',
+      '«': '»',
+      '„': '“'
+    };
 
     this.editor.textarea = this;
     console.log(`[NADVO TE] Object textarea created.`);
@@ -27,6 +37,30 @@ export class Textarea {
   init() {
     this.element = this.editor.createElementTextarea();
     this.element.classList.add('nadvo-te__textarea');
+    
+    this.element.addEventListener('keydown', (event) => {
+      const key = event.key;
+
+      if (this.bracketMap[key] && !event.ctrlKey && !event.altKey && !event.metaKey) {
+        const start = this.element.selectionStart;
+        const end = this.element.selectionEnd;
+
+        if (start !== end) {
+          event.preventDefault();
+          
+          const value = this.element.value;
+          const selectedText = value.substring(start, end);
+          const closingBracket = this.bracketMap[key];
+            
+          this.element.value = value.substring(0, start) + key + selectedText + closingBracket + value.substring(end);
+            
+          const newCursorPos = end + (key === closingBracket ? 1 : 2);
+          this.element.setSelectionRange(newCursorPos, newCursorPos);
+          
+          this.element.focus();
+        }
+      };
+    });
   }
 
   replaceStringSelection(string) {

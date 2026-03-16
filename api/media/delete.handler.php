@@ -20,9 +20,9 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUserGroup->initData(['permissions']);
 
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_MEDIA_FILES_MANAGEMENT)) {
-    $fileFullname = $_DELETE['media_file_fullname'];
+    $fileFullname = $_DELETE['file_fullname'];
 
-    if (isset($_DELETE['media_file_fullname'])) {
+    if (isset($_DELETE['file_fullname'])) {
       $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
       $filePath =  $fileDirectoryPath . '/' . $fileFullname;
 

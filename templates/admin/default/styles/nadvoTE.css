@@ -17,11 +17,65 @@
 }
 
 .nadvo-te__toolbar-list {
-  display: flex;
-  flex-wrap: wrap;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, 32px);
   list-style-type: none;
-  padding: 0;
-  margin: 0;
+  padding-left: 0;
+  padding-right: 32px;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 600px) {
+  .nadvo-te__toolbar-list {
+    grid-template-columns: repeat(8, 48px);
+    padding-right: 48px;
+  }
+}
+
+@media (max-width: 530px) {
+  .nadvo-te__toolbar-list {
+    grid-template-columns: repeat(6, 48px);
+  }
+}
+
+@media (max-width: 440px) {
+  .nadvo-te__toolbar-list {
+    grid-template-columns: repeat(4, 48px);
+  }
+}
+
+@media (max-width: 340px) {
+  .nadvo-te__toolbar-list {
+    grid-template-columns: repeat(3, 48px);
+  }
+}
+
+.nadvo-te__toolbar-item_preview {
+  position: absolute;
+  right: 32px;
+  top: 0;
+}
+
+.nadvo-te__toolbar-item_source {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+@media (max-width: 600px) {
+  .nadvo-te__toolbar-item_preview {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  
+  .nadvo-te__toolbar-item_source {
+    position: absolute;
+    right: 0;
+    top: 48px;
+  }
 }
 
 @media (min-width: 601px) {
@@ -37,6 +91,7 @@
   box-sizing: border-box;
   background-color: var(--nadvo-te-button-background-color);
   border: 0;
+  border-radius: 0 !important;
   padding: 8px;
   width: 32px;
   height: 32px;
@@ -58,7 +113,8 @@
   display: none;
   box-sizing: border-box;
   font-size: 16px;
-  padding: 10px;
+  padding-right: 10px;
+  margin-bottom: 8px;
   height: 400px;
   overflow-y: scroll;
 }
@@ -69,13 +125,15 @@
 
 .nadvo-te__textarea-visual > .iframe {
   box-sizing: border-box;
-  border: 0;
+  border: 1px solid var(--primary-color-3);
+  padding: 8px;
   width: 100%;
   min-height: 100%;
 }
 
 .nadvo-te__textarea {
   display: block;
+  margin-bottom: 8px;
   height: 400px;
   resize: none;
 }
@@ -93,4 +151,11 @@
 .nadvo-te__textarea-visual h6 {
   margin-top: 0;
   margin-bottom: 10px;
+}
+
+.nadvo-te__copyright {
+  text-align: right;
+  font-style: italic;
+  font-size: 11px;
+  opacity: .6;
 }

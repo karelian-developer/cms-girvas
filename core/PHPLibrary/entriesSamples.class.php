@@ -66,20 +66,24 @@ final class EntriesSamples
 
     $queryBuilder->statement->assembly();
 
-    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
-    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-    $databaseQuery->execute();
+    if ($this->CMSCore->databaseConnector !== null) {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
 
-    $array = [];
-    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+      $array = [];
+      $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
 
-    if ($results) {
-      foreach ($results as $data) {
-        array_push($array, new EntriesSample($this->CMSCore, $data['id']));
+      if ($results) {
+        foreach ($results as $data) {
+          $array[] = new EntriesSample($this->CMSCore, $data['id']);
+        }
       }
+
+      return $array;
     }
 
-    return $array;
+    return [];
   }
       
   /**

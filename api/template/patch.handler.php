@@ -13,8 +13,8 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-use \core\PHPLibrary\SystemCore\FileConverter\EnumFileFormat as FileConverterEnumFileFormat;
-use \core\PHPLibrary\SystemCore\FileConverter as FileConverter;
+use \core\PHPLibrary\SystemCore\File\EnumFormat as FileFormat;
+use \core\PHPLibrary\SystemCore\File\Converter as FileConverter;
 use \core\PHPLibrary\Template as Theme;
 
 if ($CMSCore->client->isLogged(2)) {
@@ -44,10 +44,10 @@ if ($CMSCore->client->isLogged(2)) {
                 $fileExtension = $matches[2];
 
                 $enumFileFormat = match ($fileExtension) {
-                  'jpeg' => FileConverterEnumFileFormat::JPG,
-                  'png' => FileConverterEnumFileFormat::PNG,
-                  'webp' => FileConverterEnumFileFormat::WEBP,
-                  'avif' => FileConverterEnumFileFormat::AVIF
+                  'jpeg' => FileFormat::JPG,
+                  'png' => FileFormat::PNG,
+                  'webp' => FileFormat::WEBP,
+                  'avif' => FileFormat::AVIF
                 };
 
                 $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
@@ -70,11 +70,21 @@ if ($CMSCore->client->isLogged(2)) {
           }
         }
 
-        file_put_contents($theme->getFilePropertiesPath(), json_encode($propertiesData));
+        $themeFilePropertiesPath = $theme->getFilePropertiesPath();
+        $directoryPath = dirname($themeFilePropertiesPath);
 
-        http_response_code(200);
-        $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
-        $handlerStatusCode = $handlerStatusCode ?? 1;
+        if (!is_writable($directoryPath)) {
+          $handlerMessage = $handlerMessage ?? sprintf($CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS_WRITABLE'), $directoryPath);
+          $handlerStatusCode = $handlerStatusCode ?? 0;
+        } else if (!is_writable($themeFilePropertiesPath)) {
+          $handlerMessage = $handlerMessage ?? sprintf($CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS_WRITABLE'), $themeFilePropertiesPath);
+          $handlerStatusCode = $handlerStatusCode ?? 0;
+        } else {
+          file_put_contents($themeFilePropertiesPath, json_encode($propertiesData));
+
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
+          $handlerStatusCode = $handlerStatusCode ?? 1;
+        }
       }
     }
   } else {

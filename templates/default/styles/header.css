@@ -6,42 +6,99 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-@media (min-width: 670px) {
+.header {
+  margin-bottom: 16px;
+}
+
+@media (min-width: 671px) {
   .header {
     padding-top: 60px;
   }
 }
 
-.header__container {
-  background: linear-gradient(270deg, #FFF 64.61%, #E0E0E0 100%);
-}
-
-@media (min-width: 670px) {
-  .header__container {
-    border-radius: 40px 40px 0px 0px;
+@media (max-width: 670px) {
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
   }
 }
 
-.header__logo-block {
+.header__container {
+  background: var(--primary-linear-gradient-270deg);
+  border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
+}
+
+.header__brand-container {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 96px 356px;
+  align-items: center;
+  padding: 32px;
+  column-gap: 24px;
+}
+
+@media (max-width: 670px) {
+  .header__brand-container {
+    grid-template-columns: 64px 1fr;
+    padding: 16px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .header__brand-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.header__brand-image-container {
+  height: 96px;
+}
+
+@media (max-width: 670px) {
+  .header__brand-image-container {
+    height: 64px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header__brand-image-container {
+    display: none;
+  }
+}
+
+.header__brand-link {
   display: flex;
-  justify-content: center;
-  padding: 68px 25px;
-  border-radius: inherit;
 }
 
-@media (max-width: 669px) {
-  .header__logo-link img {
-    width: 80%;
-  }  
+.header__brand-image {
+  width: 100%;
 }
 
-.header__logo-link {
-  display: flex;
+.header__brand-title {
+  text-transform: uppercase;
+  font-weight: 900;
+  font-size: 24px;
+  color: var(--primary-color-2);
 }
 
-@media (max-width: 669px) {
-  .header__logo-link {
-    justify-content: center;
+@media (max-width: 480px) {
+  .header__brand-title {
+    text-align: center;
+    font-size: 20px;
+  }
+}
+
+.header__brand-slogan {
+  font-size: 18px;
+  color: var(--primary-color-5);
+}
+
+@media (max-width: 480px) {
+  .header__brand-slogan {
+    text-align: center;
+    font-size: 16px;
   }
 }
 
@@ -50,10 +107,11 @@
   position: sticky;
   width: 100%;
   background-color: var(--dark-gray-color);
-  z-index: 1;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 
-@media (max-width: 669px) {
+@media (max-width: 670px) {
   .header__nav {
     padding: 10px;
   }
@@ -63,7 +121,7 @@
   display: none;
 }
 
-@media (max-width: 669px) {
+@media (max-width: 670px) {
   .header__nav-burger {
     display: flex;
     width: 32px;
@@ -81,6 +139,7 @@
     position: absolute;
     display: flex;
     flex-direction: column;
+    z-index: 2;
   }
 
   .header__nav-burger.is-active + .header__nav-list .header__nav-item {
@@ -95,19 +154,23 @@
 }
 
 .header__nav-span {
-    position: relative;
+  position: relative;
 }
 
 .header__nav-span::after {
-    position: absolute;
-    content: "";
-    left: 0;
-    bottom: 0;
-    height: 1px;
-    width: 100%;
-    background-color: var(--container-and-text-white-color);
-    transform: scaleX(0);
-    transition: var(--transistion);
+  position: absolute;
+  content: "";
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  background-color: var(--container-and-text-white-color);
+  transform: scaleX(0);
+  transition: var(--transistion);
+}
+
+.header__nav-item {
+  height: 56px;
 }
 
 .header__nav-item:nth-child(3) {
@@ -115,29 +178,33 @@
 }
 
 .header__nav-link {
+  box-sizing: border-box;
   position: relative;
-  height: 60px;
-  padding: 20px 25px;
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--container-and-text-white-color);
+  padding-left: 24px;
+  padding-right: 24px;
+  height: 100%;
 }
 
 .header__nav-link:focus-visible {
-    outline: none;
+  outline: none;
 }
 
 .header__nav-link:focus {
-    transition: var(--transistion);
-    background-color: var(--grey-color);
+  transition: var(--transistion);
+  background-color: var(--grey-color);
 }
 
 .header__nav-link:hover .header__nav-span::after {
-    transform: scaleX(1);
+  transform: scaleX(1);
 }
 
 .header__nav-link:active {
-    transition: var(--transistion);
-    background-color: var(--dark-gray-color);
+  transition: var(--transistion);
+  background-color: var(--dark-gray-color);
 }

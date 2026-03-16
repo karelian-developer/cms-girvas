@@ -33,7 +33,7 @@ export class Request {
     this.setMethod(method);
     this.setURL(url);
 
-    this.data = (data == undefined || data == null) ? undefined : new FormData(data);
+    this.data = (data === undefined || data === null) ? undefined : new FormData(data);
     this.headers = {};
     this.showingNotification = true;
   }
@@ -118,12 +118,16 @@ export class Request {
    * 
    * @returns {Response}
    */
-  async send() {
+  async send(isRefreshed = false) {
     let interactiveNotificationLoading;
     let requestMethod = this.getMethod();
     let requestURL = this.getURL();
 
-    if (this.data != undefined && this.data != null) {
+    if (isRefreshed) {
+      requestURL = requestURL + '&isRefreshed=1';
+    }
+
+    if (this.data !== undefined && this.data !== null) {
       this.addData('_grv_' + this.getRandomString(), this.getRandomString());
     }
 
@@ -155,13 +159,13 @@ export class Request {
         interactiveNotificationLoading.target.hide();
       }
 
-      if (typeof(data.outputData.reload) != 'undefined') {
+      if (typeof(data.outputData.reload) !== 'undefined') {
         setTimeout(() => {
           window.location.reload();
         }, 10);
       }
 
-      if (typeof(data.outputData.href) != 'undefined') {
+      if (typeof(data.outputData.href) !== 'undefined') {
         setTimeout(() => {
           window.location.href = data.outputData.href;
         }, 10);

@@ -6,6 +6,175 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
+.page__article-header {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
+  padding-top: 130px;
+  margin-bottom: 16px;
+}
+
+.page__article .article__title {
+  background-color: rgba(0, 0, 0, .6);
+  font-weight: 300;
+  font-size: 18px;
+  color: var(--primary-color-3);
+  padding: 16px 24px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+@media (max-width: 800px) {
+  .page__article .article__title {
+    font-size: 18px;
+  }
+}
+
+.page__article .metadata__icon {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+}
+
+.page__article .metadata__icon-path,
+.page__article .metadata__icon-rect {
+  fill: var(--primary-color-3);
+}
+
+.page__article .article__content {
+  background-color: var(--primary-color-4);
+  border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
+  padding: 24px;
+}
+
+.page__article .article__content,
+.page__article .article__content p:has(img + img),
+.page__article .article__content:has(figure + figure) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.page__article .article__content > * {
+  grid-column: 1 / -1;
+  word-break: break-word;
+}
+
+.page__article .article__content > p {
+  margin-top: 0;
+}
+
+.page__article .article__content *:has(+ h2),
+.page__article .article__content *:has(+ h3),
+.page__article .article__content *:has(+ h4),
+.page__article .article__content *:has(+ h5),
+.page__article .article__content *:has(+ h6) {
+  margin-bottom: 20px !important;
+}
+
+.page__article .article__content > h1,
+.page__article .article__content > h2 {
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.page__article .article__content > h3 {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.page__article .article__content > h4 {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.page__article .article__content > h5,
+.page__article .article__content > h6 {
+  font-size: 12px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.page__article .article__content > h1,
+.page__article .article__content > h2,
+.page__article .article__content > h3,
+.page__article .article__content > h4,
+.page__article .article__content > h5,
+.page__article .article__content > h6  {
+  padding-top: 10px;
+}
+
+.page__article .article__content ul,
+.page__article .article__content ol {
+  padding-left: 10px;
+  margin-top: 0;
+}
+
+.page__article .article__content ol,
+.page__article .article__content ol li {
+  list-style-type: disc;
+}
+
+.page__article .article__content ul,
+.page__article .article__content ul li {
+  list-style-type: decimal;
+}
+
+.page__article .article__content > p,
+.page__article .article__content ul,
+.page__article .article__content ol,
+.page__article .article__content figure figcaption {
+  font-size: 14px;
+}
+
+.page__article .article__content figure figcaption {
+  font-style: italic;
+  color: var(--primary-color-5);
+}
+
+.page__article .article__content .video-container:nth-of-type(n+5),
+.page__article .article__content img:nth-child(n+5),
+.page__article .article__content figure:nth-child(n+5) {
+  grid-column: 1 / -1;
+  max-width: 100%;
+}
+
+.page__article .article__content img,
+.page__article .article__content figure,
+.page__article .article__content .video-container {
+  grid-column: auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.page__article .article__content video {
+  width: 100%;
+}
+
+.page__article .article__content > figure {
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.page__article .article__content > figure img {
+  margin-bottom: 10px;
+}
+
+.page__article .article__content > *:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.page__article .article__content > *:last-child {
+  margin-bottom: 0;
+}
+
 .form.form_registration {
   display: flex;
   flex-direction: column;

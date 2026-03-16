@@ -39,10 +39,14 @@ export class PageModules {
       for (let listItem of listItems) {
         let buttons = {delete: null, install: null, enable: null, disable: null, more: null};
 
-        const moduleName = listItem.getAttribute('data-name');
-        const moduleInstalledStatus = (listItem.hasAttribute('data-installed-status')) ? listItem.getAttribute('data-module-installed-status') : 'not-installed';
-        const moduleEnabledStatus = (listItem.hasAttribute('data-enabled-status')) ? listItem.getAttribute('data-module-enabled-status') : 'disabled';
-        const itemFooterContainer = listItem.querySelector('[data-element="item-footer-panel"]');
+        let moduleName = listItem.getAttribute('data-name');
+        let moduleInstalledStatus = listItem.hasAttribute('data-installed-status')
+          ? listItem.getAttribute('data-installed-status')
+          : 'not-installed';
+        let moduleEnabledStatus = listItem.hasAttribute('data-enabled-status')
+          ? listItem.getAttribute('data-enabled-status')
+          : 'disabled';
+        let itemFooterContainer = listItem.querySelector('[data-element="item-footer-panel"]');
 
         // Добавление интерактивных элементов
         // Кнопка "Подробнее"
@@ -50,7 +54,7 @@ export class PageModules {
         buttons.more.target.setLabel(localeData.BUTTON_MORE_DETAILS_LABEL);
         buttons.more.target.setCallback(() => {
           switch (searchParams.getPathPart(3)) {
-            case 'repository': window.location.href = `/admin/modules/repository/${moduleName}`; break;
+            case 'repository': window.location.href = `/admin/module/repository/${moduleName}`; break;
             default: window.location.href = `/admin/module/${moduleName}`;
           }
         });
@@ -81,7 +85,7 @@ export class PageModules {
               interactiveModal.target.close();
 
               if (data.statusCode === 1) {
-                if (searchParams.getPathPart(3) != 'repository') {
+                if (searchParams.getPathPart(3) !== 'repository') {
                   listItem.remove();
                 } else {
                   buttons.install.target.element.style.display = 'flex';
@@ -195,8 +199,12 @@ export class PageModules {
             || searchParams.getPathPart(3) === null
           )
         ) {
-          buttons.enable.target.element.style.display = (moduleEnabledStatus === 'enabled') ? 'none' : 'flex';
-          buttons.disable.target.element.style.display = (moduleEnabledStatus === 'enabled') ? 'flex' : 'none';
+          buttons.enable.target.element.style.display = moduleEnabledStatus === 'enabled'
+            ? 'none'
+            : 'flex';
+          buttons.disable.target.element.style.display = moduleEnabledStatus === 'enabled'
+            ? 'flex'
+            : 'none';
         } else {
           buttons.enable.target.element.style.display = 'none';
           buttons.disable.target.element.style.display = 'none';

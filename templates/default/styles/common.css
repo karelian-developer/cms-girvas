@@ -6,6 +6,11 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
+@import url('./fonts.css');
+@import url('./header.css');
+@import url('./main.css');
+@import url('./footer.css');
+
 * {
   box-sizing: border-box;
 }
@@ -25,8 +30,13 @@ a {
 }
 
 body {
-  background-color: var(--bcg-body-color);
+  background-attachment: fixed;
+  background-image: url('../images/background.webp');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
   font-family: 'Roboto';
+  min-height: 100%;
 }
 
 @media (min-width: 670px) and (max-width: 1139px) {
@@ -37,9 +47,9 @@ body {
 }
 
 .container {
-  max-width: 1140px;
+  box-sizing: border-box;
   margin: 0 auto;
-  background-color: var(--container-and-text-white-color);
+  max-width: 1140px;
 }
 
 .flex {
@@ -128,7 +138,7 @@ body {
   }
 }
 
-@media (max-width: 669px) {
+@media (max-width: 670px) {
   .plug__body .section__title {
     font-size: 16px;
   }

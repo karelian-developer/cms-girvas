@@ -77,6 +77,8 @@ final class Converter implements InterfaceConverter
         EnumFileFormat::PNG => $convertToExtension = 'png',
         EnumFileFormat::WEBP => $convertToExtension = 'webp',
         EnumFileFormat::AVIF => $convertToExtension = 'avif',
+        EnumFileFormat::GIF => $convertToExtension = 'gif',
+        EnumFileFormat::PDF => $convertToExtension = 'pdf',
         default => ''
       };
 
@@ -160,10 +162,14 @@ final class Converter implements InterfaceConverter
 
         if (($fileExtension === $convertToExtension)) {
           if (file_exists($fileSourcePath)) {
-            $fileRenamed = rename($fileSourcePath, $fileOutputPath);
+            if ($fileExtension === 'gif') {
+              $convertedResult = $this->sanitizeGIF($fileSourcePath, $fileOutputPath, $deleteOldFile);
+            } else {
+              $fileRenamed = rename($fileSourcePath, $fileOutputPath);
 
-            if ($fileRenamed) {
-              $convertedResult = true;
+              if ($fileRenamed) {
+                $convertedResult = true;
+              }
             }
           };
         }
@@ -670,5 +676,90 @@ final class Converter implements InterfaceConverter
     }
 
     return file_exists($fileOutputPath);
+  }
+
+  private function sanitizeGIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
+  {
+    if (!file_exists($fileSourcePath)) {
+      error_log("File does not exist: " . $fileSourcePath);
+      return false;
+    }
+
+    if (filesize($fileSourcePath) === 0) {
+      error_log("File is empty: " . $fileSourcePath);
+      return false;
+    }
+    
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = finfo_file($finfo, $fileSourcePath);
+    finfo_close($finfo);
+    
+    if ($mimeType !== 'image/gif') {
+      error_log("Invalid MIME type: " . $mimeType . " for file: " . $fileSourcePath);
+      return false;
+    }
+    
+    $handle = fopen($fileSourcePath, 'rb');
+    if (!$handle) {
+      error_log("Cannot open file for reading: " . $fileSourcePath);
+      return false;
+    }
+    
+    $header = fread($handle, 6);
+    fclose($handle);
+    
+    if (!in_array($header, ['GIF87a', 'GIF89a'])) {
+      error_log("Invalid GIF header: " . bin2hex($header));
+      return false;
+    }
+    
+    $handle = fopen($fileSourcePath, 'rb');
+    if ($handle) {
+      $start = fread($handle, 2048);
+      fseek($handle, -2048, SEEK_END);
+      $end = fread($handle, 2048);
+      fclose($handle);
+      
+      $contentToCheck = $start . $end;
+      
+      if (preg_match('/<\?php|<\?=|<\?|<\s*\%|<\s*script\s*language\s*=\s*["\']?\s*php/i', $contentToCheck)) {
+        error_log("Potential PHP code detected in GIF: " . $fileSourcePath);
+        return false;
+      }
+    }
+    
+    $imageSource = @imagecreatefromgif($fileSourcePath);
+    if ($imageSource === false) {
+      error_log("GD failed to validate image: " . $fileSourcePath);
+      return false;
+    }
+    
+    $width = imagesx($imageSource);
+    $height = imagesy($imageSource);
+    
+    imagedestroy($imageSource);
+    
+    if ($width <= 0 || $height <= 0 || $width > 5000 || $height > 5000) {
+      error_log("Suspicious GIF dimensions: {$width}x{$height}");
+      return false;
+    }
+    
+    if (!copy($fileSourcePath, $fileOutputPath)) {
+      error_log("Failed to copy file to: " . $fileOutputPath);
+      return false;
+    }
+    
+    if (!file_exists($fileOutputPath) || filesize($fileOutputPath) === 0) {
+      error_log("Copied file is missing or empty");
+      return false;
+    }
+    
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      if (!unlink($fileSourcePath)) {
+        error_log("Failed to delete source file: " . $fileSourcePath);
+      }
+    }
+
+    return true;
   }
 }

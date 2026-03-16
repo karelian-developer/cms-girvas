@@ -37,6 +37,8 @@ export class Choices {
     this.items = [];
     this.itemSelectedIndex = 0;
     this.assembled = null;
+
+    this.width = 150;
   }
 
   /**
@@ -76,6 +78,15 @@ export class Choices {
   }
 
   /**
+   * Установить ширину поля
+   * 
+   * @param {String} value 
+   */
+  setWidth(value) {
+    this.width = value;
+  }
+
+  /**
    * Добавить элемент выборки
    * 
    * @param {string} label 
@@ -103,6 +114,8 @@ export class Choices {
     if (this.isDisclosed) {
       selectContainerElement.classList.add('select-imitation_is-disclosed');
     }
+
+    selectContainerElement.style.width = this.width + 'px';
 
     let selectedItemContainerElement = document.createElement('div');
     let selectContainerButton, selectContainerButtonIcon;

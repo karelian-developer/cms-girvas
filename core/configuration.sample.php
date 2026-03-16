@@ -53,5 +53,12 @@ $configuration = [
   'SSLPermRedirect' => false,
   'SSLHSTSMaxAge' => 63072000,
   'SSLHSTSIncludeSubdomains' => false,
-  'SSLHSTSPreload' => false
+  'SSLHSTSPreload' => false,
+  'notifierKeys' => [
+    'telegram' => '',
+    'max' => '',
+    'vk' => '',
+    'ok' => ''
+  ],
+  'APISecret' => ''
 ];

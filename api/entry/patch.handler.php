@@ -159,7 +159,10 @@ if ($CMSCore->client->isLogged(2)) {
               $textareaKeywordsName = 'entry_keywords_' . $CMSLocale->getISO639(2);
 
               if (!array_key_exists('metadata', $entryData)) $entryData['metadata'] = [];
-              if (isset($_PATCH['entry_is_published'])) $entryData['metadata']['isPublished'] = $_PATCH['entry_is_published'];
+              if (isset($_PATCH['entry_is_published'])) {
+                $entryData['metadata']['publishedUnixTimestamp'] = time();
+                $entryData['metadata']['isPublished'] = 1;
+              }
 
               if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH) || array_key_exists($textareaContentName, $_PATCH)) {
                 if (!array_key_exists('texts', $entryData)) $entryData['texts'] = [];
@@ -216,7 +219,7 @@ if ($CMSCore->client->isLogged(2)) {
           if (isset($_PATCH['entry_preview'])) {
             $fileExtension = pathinfo($_PATCH['entry_preview'], PATHINFO_EXTENSION);
             $fileExtension = strtolower($fileExtension);
-
+            
             $extensionMap = [
               'jpg' => FileConverterEnumFileFormat::JPG,
               'jpeg' => FileConverterEnumFileFormat::JPG,
@@ -286,6 +289,10 @@ if ($CMSCore->client->isLogged(2)) {
           }
 
           $entryIsPublished = $entryData['metadata']['isPublished'] ?? 0;
+
+          if (isset($_PATCH['entry_published_timestamp'])) {
+            $entryData['metadata']['publishedUnixTimestamp'] = strtotime(str_replace('T', ' ', $_PATCH['entry_published_timestamp']));
+          }
 
           // Если происходит публикация записи, то необходимо удостовериться, что
           // в записи присутствует стандартная локализация, в противном случае

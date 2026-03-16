@@ -31,8 +31,9 @@ class NadvoParse
     'underline' => '/\~\~(.+?)\~\~/s',
     'link' => '/\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'image' => '/!\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
-    'figure' => '/!\#\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
+    'figure' => '/![f]\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'video' => '/!\[video\]\((.+?)\)/',
+    'video_vk' => '/!\[video\-vk\]\((.+?)\)/',
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(\>+)\s?(.*)$/m',
@@ -339,14 +340,19 @@ class NadvoParse
 
     foreach ($lines as $line) {
       if (str_starts_with(trim($line), '<pre>') || 
+        str_starts_with(trim($line), '</pre>') ||
         str_starts_with(trim($line), '<blockquote>') ||
         str_starts_with(trim($line), '</blockquote>') ||
         str_starts_with(trim($line), '<table>') ||
+        str_starts_with(trim($line), '</table>') ||
         str_starts_with(trim($line), '<ul>') ||
         str_starts_with(trim($line), '<ol>') ||
         str_starts_with(trim($line), '</ul>') ||
         str_starts_with(trim($line), '</ol>') ||
-        str_starts_with(trim($line), '<li>'))
+        str_starts_with(trim($line), '<li>') ||
+        str_starts_with(trim($line), '</li>') ||
+        str_starts_with(trim($line), '<figure>') ||
+        str_starts_with(trim($line), '</figure>'))
       {
 
         if (!empty($currentParagraph)) {
@@ -399,11 +405,21 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['video'],
       function($matches) {
-        $url = htmlspecialchars(trim($matches[1]));
+        $url = trim($matches[1]);
         $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
         
         return '<div class="video-container"><video controls><source src="' . $url . '" type="video/' . $extension . '">' .
                'Ваш браузер не поддерживает работу с видео.</video></div>';
+      },
+      $html
+    );
+
+    $html = preg_replace_callback(
+      self::PATTERNS['video_vk'],
+      function($matches) {
+        $url = trim($matches[1]);
+        
+        return '<iframe src="' . $url . '" width="640" height="360" frameborder="0" allowfullscreen="1" allow="autoplay; encrypted-media; fullscreen; picture-in-picture"></iframe>';
       },
       $html
     );
@@ -505,7 +521,7 @@ class NadvoParse
             if ($json) {
               foreach ($json as $key => $value) {
                 if (in_array($key, ['class', 'id', 'target', 'rel'])) {
-                  $attrs[$key] = htmlspecialchars($value);
+                  $attrs[] = $key . ' = ' . "\"" . htmlspecialchars($value) . "\"";
                 }
               }
             }

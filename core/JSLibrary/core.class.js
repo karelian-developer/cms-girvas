@@ -317,6 +317,29 @@ export class Core {
 
     window.CMSCore.debugLog(1, 'CMSCore', `Core CMS is ready!`, true);
   }
+
+  async loadIcons(iconsURL) {
+    const icons = {};
+    const iconNames = ['trash', 'link', 'target', 'delete', 'edit', 'search'];
+    
+    const promises = iconNames.map(async (name) => {
+      try {
+        const response = await fetch(`${iconsURL}/${name}.svg`);
+
+        if (!response.ok) {
+          throw new Error(`Failed to load ${name}.svg`);
+        }
+
+        icons[name] = await response.text();
+      } catch (error) {
+        console.error(`Error loading icon ${name}:`, error);
+        icons[name] = '';
+      }
+    });
+    
+    await Promise.all(promises);
+    return icons;
+  }
 }
 
 window.CMSCore = new Core();

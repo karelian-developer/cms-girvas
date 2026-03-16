@@ -20,21 +20,23 @@ import {Interactive} from "../../../interactive.class.js";
 export class EntryComment {
   constructor(entry, data) {
     this.entry = entry;
-    this.id = (typeof data.id != 'undefined') ? data.id : 0;
-    this.entryID = (typeof data.entryID != 'undefined') ? data.entryID : 0;
-    this.index = (typeof data.index != 'undefined') ? data.index : 0;
-    this.indexLabel = (typeof data.indexLabel != 'undefined') ? data.indexLabel : 0;
-    this.content = (typeof data.content != 'undefined') ? data.content : '';
-    this.authorID = (typeof data.authorID != 'undefined') ? data.authorID : 0;
-    this.isHidden = (typeof data.isHidden != 'undefined') ? data.isHidden : false;
-    this.hiddenReason = (typeof data.hiddenReason != 'undefined') ? data.hiddenReason : '';
-    this.rating = (typeof data.rating != 'undefined') ? data.rating : 0;
-    this.ratingVoters = (typeof data.ratingVoters != 'undefined') ? data.ratingVoters : {};
-    this.createdUnixTimestamp = (typeof data.createdUnixTimestamp != 'undefined') ? data.createdUnixTimestamp : 0;
-    this.updatedUnixTimestamp = (typeof data.updatedUnixTimestamp != 'undefined') ? data.updatedUnixTimestamp : 0;
-    this.answersCount = (typeof data.answersCount != 'undefined') ? data.answersCount : 0;
-    this.answersLoadingOffset = (typeof data.answersLoadingOffset != 'undefined') ? data.answersLoadingOffset : 0;
-    this.answersLoadingLimit = (typeof data.answersLoadingLimit != 'undefined') ? data.answersLoadingLimit : 0;
+    this.id = data.id ?? 0;
+    this.entryID = data.entryID ?? 0;
+    this.index = data.index ?? 0;
+    this.indexLabel = data.indexLabel ?? 0;
+    this.content = data.content ?? '';
+    this.authorID = data.authorID ?? 0;
+    this.isHidden = data.isHidden ?? false;
+    this.hiddenReason = data.hiddenReason ?? '';
+    this.rating = data.rating ?? 0;
+    this.ratingVoters = data.ratingVoters ?? {};
+    this.createdUnixTimestamp = data.createdUnixTimestamp ?? 0;
+    this.updatedUnixTimestamp = data.updatedUnixTimestamp ?? 0;
+    this.answersCount = data.answersCount ?? 0;
+    this.answersLoadingOffset = data.answersLoadingOffset ?? 0;
+    this.answersLoadingLimit = data.answersLoadingLimit ?? 0;
+    this.parent = data.parent ?? null;
+    this.level = data.level ?? 0;
     this.elementAssembled = null;
   }
 
@@ -47,9 +49,6 @@ export class EntryComment {
   }
 
   initAnswersPanel(clientUserData = {}, clientUserPermissions = {}) {
-    let elementEntry = document.querySelector('[role="entry"]');
-    let entryCommentsListElement = elementEntry.querySelector('[role="entryCommentsList"]');
-
     let interactivePanelButtonContainerElement = document.createElement('div');
     interactivePanelButtonContainerElement.classList.add('comment__answers-container');
     interactivePanelButtonContainerElement.setAttribute('data-parent-id', this.id);
@@ -73,7 +72,7 @@ export class EntryComment {
         if (data.statusCode == 1 && data.outputData.hasOwnProperty('comments')) {
           let comments = data.outputData.comments, commentLoadedIndex = 0;
           let answersListElementQuery = this.getAnswersListElement();
-          
+          console.log(this.level);
           let answersListElement;
           if (answersListElementQuery == null) {
             answersListElement = document.createElement('ul');
@@ -99,23 +98,62 @@ export class EntryComment {
               commentData.entryID = this.entryID;
               commentData.answersLoadingLimit = this.answersLoadingLimit;
               commentData.index = (answersContainerParentElement != null) ? answersContainerParentElement.children.length + 1 : 1;
-              commentData.indexLabel = `${commentParentElement.id}_${commentData.index}`
+              commentData.indexLabel = `${commentParentElement.id}_${commentData.index}`;
               
-              let entryComment = new EntryComment(this.entry, commentData);
+              const entryComment = new EntryComment(this.entry, commentData);
+              entryComment.level = this.level <= 2 ? this.level + 1 : this.level;
+              entryComment.parent = this;
+
+              console.log(this.id);
+
+              let targetContainer;
+              
+              if (this.level >= 3) {
+                let level2Comment = this;
+                while (level2Comment.level > 2 && level2Comment.parent) {
+                  level2Comment = level2Comment.parent;
+                }
+                
+                if (level2Comment.level === 2) {
+                  targetContainer = level2Comment.getAnswersListElement();
+                } else {
+                  targetContainer = answersContainerParentElement;
+                }
+              } else if (this.level === 2) {
+                targetContainer = this.getAnswersListElement();
+              } else {
+                targetContainer = commentParentElement.querySelector('[data-role="entry-comments-container"] .comments-list');
+              }
+
+              const existingComment = targetContainer?.querySelector(`[data-comment-id="${commentData.id}"]`);
+              if (existingComment) {
+                return;
+              }
+
               entryComment.assembly({login: authorData.login, avatarURL: authorData.avatarURL, group: authorData.group}, (commentElement) => {
                 commentLoadedIndex++;
                 
-                answersListElement.append(commentElement);
-                entryComment.initPanel(clientUserData, clientUserPermissions);
-                if (commentLoadedIndex < comments.length) {
-                  appendComment(comments[commentLoadedIndex], commentParentElement);
+                if (targetContainer) {
+                  targetContainer.append(commentElement);
+                } else {
+                  answersListElement.append(commentElement);
                 }
-  
+                
+                entryComment.initPanel(clientUserData, clientUserPermissions);
+                
+                if (commentLoadedIndex < comments.length) {
+                  if (this.level >= 3) {
+                    appendComment(comments[commentLoadedIndex], targetContainer?.closest('.comment') || commentParentElement);
+                  } else {
+                    appendComment(comments[commentLoadedIndex], commentParentElement);
+                  }
+                }
+
                 if (entryComment.answersCount > 0) {
                   entryComment.initAnswersPanel(clientUserData, clientUserPermissions);
                 }
-  
-                entryComment.elementAssembled.setAttribute('role', 'entryCommentsAnswer');
+
+                entryComment.elementAssembled.setAttribute('data-role', 'entry-comments-answer');
                 entryComment.elementAssembled.classList.add('comment_answer');
               });
             });
@@ -198,6 +236,7 @@ export class EntryComment {
         if (clientUserPermissions.moder_entries_comments_management) {
           let interactiveButtonHide = new Interactive('button');
           interactiveButtonHide.target.setLabel(this.entry.localeBaseData.BUTTON_HIDE_LABEL);
+          interactiveButtonHide.target.setStyle('red');
           interactiveButtonHide.target.setCallback((event) => {
             let elementForm = document.createElement('form');
             elementForm.classList.add('form');
@@ -252,6 +291,7 @@ export class EntryComment {
         if (clientUserPermissions.moder_entries_comments_management) {
           let interactiveButtonPublish = new Interactive('button');
           interactiveButtonPublish.target.setLabel(this.entry.localeBaseData.BUTTON_SHOW_LABEL);
+          interactiveButtonPublish.target.setStyle('green');
           interactiveButtonPublish.target.setCallback((event) => {
             event.preventDefault();
 
@@ -298,6 +338,7 @@ export class EntryComment {
         if (clientUserPermissions.base_entry_comment_change && clientUserData.id == this.authorID || clientUserPermissions.moder_entries_comments_management) {
           let interactiveButtonDelete = new Interactive('button');
           interactiveButtonDelete.target.setLabel(this.entry.localeBaseData.BUTTON_DELETE_LABEL);
+          interactiveButtonDelete.target.setStyle('red');
           interactiveButtonDelete.target.setCallback((event) => {
             let formData = new FormData();
             formData.append('comment_id', this.id);
@@ -456,9 +497,9 @@ export class EntryComment {
 
   assembly(params = {}, callback = (htmlElement) => {}) {
     let content = (!this.isHidden) ? this.content : `${CMSCore.localeData.PAGE_ENTRY_COMMENT_HIDE_LABEL}: ${this.hiddenReason}`;
-    let authorLogin = (typeof params.login != 'undefined') ? params.login : '';
-    let authorAvatarURL = (typeof params.avatarURL != 'undefined') ? params.avatarURL : '';
-    let authorGroupTitle = (typeof params.group != 'undefined') ? params.group.title : '';
+    let authorLogin = params.login ?? '';
+    let authorAvatarURL = params.avatarURL ?? '';
+    let authorGroupTitle = params.group !== undefined ? params.group.title : '';
     
     let createdDate = new Date(this.createdUnixTimestamp * 1000);
     let createdDay = (createdDate.getDay() + 1).toString().padStart(2, '0');

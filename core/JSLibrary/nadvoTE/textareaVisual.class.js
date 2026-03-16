@@ -45,7 +45,7 @@ export class TextareaVisual {
         `/core/CSSCore/default-tables.css`,
         `${templateURL}/styles/fonts.css`,
         `${templateURL}/styles/colors.css`,
-        `${templateURL}/styles/nadvoTE/preview.css`
+        `${templateURL}/styles/nadvoTE/preview.css?_t=` + new Date().getTime()
       ];
 
       let iFrameElementDocument = iFrameElement.contentDocument || iFrameElement.contentWindow.document;

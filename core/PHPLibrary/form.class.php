@@ -195,6 +195,112 @@ class Form implements EntityTypeContent
 
     return '';
   }
+  
+  /**
+   * Получить ID чата в Telegram
+   *
+   * @return array
+   */
+  public function getTelegramChatsIDs() : array
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+      
+      if (isset($metadata['telegramChatsIDs'])) {
+        $value = is_string($metadata['telegramChatsIDs'])
+          ? explode(', ', $metadata['telegramChatsIDs'])
+          : $metadata['telegramChatsIDs'];
+
+        return $value;
+      }
+    }
+
+    return [];
+  }
+  
+  /**
+   * Получить ID чата в Max
+   *
+   * @return array
+   */
+  public function getMaxChatsIDs() : array
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+      
+      if (isset($metadata['maxChatsIDs'])) {
+        $value = is_string($metadata['maxChatsIDs'])
+          ? explode(', ', $metadata['maxChatsIDs'])
+          : $metadata['maxChatsIDs'];
+
+        return $value;
+      }
+    }
+
+    return [];
+  }
+  
+  /**
+   * Получить ID топика в Telegram
+   *
+   * @return array
+   */
+  public function getTelegramThreatsIDs() : array
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+      
+      if (isset($metadata['telegramThreatsIDs'])) {
+        $value = is_string($metadata['telegramThreatsIDs'])
+          ? explode(', ', $metadata['telegramThreatsIDs'])
+          : $metadata['telegramThreatsIDs'];
+
+        return $value;
+      }
+    }
+
+    return [];
+  }
+  
+  /**
+   * Получить ID канала в Telegram
+   *
+   * @return array
+   */
+  public function getTelegramChannelsIDs() : array
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+      
+      if (isset($metadata['telegramChannelsIDs'])) {
+        $value = is_string($metadata['telegramChannelsIDs'])
+          ? explode(', ', $metadata['telegramChannelsIDs'])
+          : $metadata['telegramChannelsIDs'];
+
+        return $value;
+      }
+    }
+
+    return [];
+  }
+  
+  /**
+   * Получить ключ для Telegram
+   *
+   * @return string
+   */
+  public function getTelegramKey() : string
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+      
+      if (isset($metadata['telegramKey'])) {
+        return $metadata['telegramKey'];
+      }
+    }
+
+    return '';
+  }
 
   /**
    * Получить тексты
@@ -308,6 +414,7 @@ class Form implements EntityTypeContent
       $DOMElementDescription = $element['texts'][$CMSLocaleName]['description'];
       $DOMElementPlaceholder = $element['texts'][$CMSLocaleName]['placeholder'];
       $DOMElementType = $element['type'];
+      $DOMElementRequired = $element['required'] ?? false;
       $DOMElementID = 'FORM_' . strtoupper(str_replace('-', '_', $formName)) . '_' . strtoupper($DOMElementName);
 
       $DOMElement = $DOMElementType === 'textarea' 
@@ -325,6 +432,10 @@ class Form implements EntityTypeContent
       $DOMElement->setAttribute('id', $DOMElementID);
       $DOMElement->setAttribute('placeholder', $DOMElementPlaceholder);
       $DOMElement->setAttribute('name', $DOMElementName);
+
+      if ($DOMElementRequired === true) {
+        $DOMElement->setAttribute('required', 'required');
+      }
 
       if (in_array($DOMElementType, ['submit', 'reset'])) {
         $DOMElement->setAttribute('value', $DOMElementTitle);
@@ -713,10 +824,18 @@ class Form implements EntityTypeContent
 
       foreach ($data[$columnName] as $name => $value) {
         $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $fieldsJSON[] = match ($queryBuilder->DMS) {
-          CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
-          CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
-        };
+        
+        if ($columnName === 'elements') {
+          $fieldsJSON[] = match ($queryBuilder->DMS) {
+            CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
+            CMSDMS::PostgreSQL => sprintf('(\'{"%s": %s}\'::jsonb)', $name, $valueJSON)
+          };
+        } else {
+          $fieldsJSON[] = match ($queryBuilder->DMS) {
+            CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
+            CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
+          };
+        }
       }
 
       if (!empty($data[$columnName])) {

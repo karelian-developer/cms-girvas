@@ -10,5 +10,8 @@
   "DEFAULT_TEXT_READ": "Read",
   "DEFAULT_INDEX_SIDEBAR_BLOCK_LAST_NEWS_TITLE": "Latest News",
   "DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_TITLE": "Example Block",
-  "DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_DESCRIPTION": "This is the content of a simple block"
+  "DEFAULT_INDEX_SIDEBAR_BLOCK_EXAMPLE_DESCRIPTION": "This is the content of a simple block",
+  "DEFAULT_SLOGAN": "Free, fast and easy...",
+  "THEME_IDEBAR_BLOCK_DEMO_TITLE": "Demo Block",
+  "THEME_SIDEBAR_BLOCK_DEMO_CONTENT": "This is the sidebar demo block."
 }

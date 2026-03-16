@@ -192,6 +192,10 @@ class PageEntries implements InterfacePage
       foreach ($entriesObjects as $entryObject) {
         $entryObject->initData(['id', 'categoryID', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
         
+        if ($entryObject->getPublishedUnixTimestamp() > time()) {
+          continue;
+        }
+
         $entryCategory = $entryObject->getCategory();
             
         if (ThemeCollector::existsTemplateVariable($entriesTemplateContent, 'ENTRY_CATEGORY_TITLE')) {

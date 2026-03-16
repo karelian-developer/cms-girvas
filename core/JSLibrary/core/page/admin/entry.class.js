@@ -28,7 +28,7 @@ export class PageEntry {
   }
 
   init() {
-    let searchParams = new URLParser();
+    const searchParams = new URLParser();
     const elementForm = document.querySelector('[data-element="main-form"]');
 
     let locales;
@@ -159,7 +159,23 @@ export class PageEntry {
       });
 
       this.buttons.viewOnSite = new Interactive('button');
+      this.buttons.save = new Interactive('button');
+      this.buttons.delete = new Interactive('button');
+      this.buttons.publish = new Interactive('button');
+      this.buttons.unpublish = new Interactive('button');
+
       this.buttons.viewOnSite.target.setLabel(localeData.BUTTON_VIEW_ON_SITE_LABEL);
+      this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+      this.buttons.publish.target.setLabel(localeData.BUTTON_PUBLISH_LABEL);
+      this.buttons.unpublish.target.setLabel(localeData.BUTTON_UNPUBLISH_LABEL);
+      this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
+
+      this.buttons.viewOnSite.target.setStyle('default');
+      this.buttons.unpublish.target.setStyle('red');
+      this.buttons.publish.target.setStyle('green');
+      this.buttons.delete.target.setStyle('red');
+      this.buttons.save.target.setStyle('green');
+
       this.buttons.viewOnSite.target.setCallback((event) => {
         event.preventDefault();
 
@@ -168,10 +184,7 @@ export class PageEntry {
 
         window.open(`/entry/${entryURL}?locale=${entryLocaleName}`, '_blank');
       });
-      this.buttons.viewOnSite.assembly();
 
-      this.buttons.save = new Interactive('button');
-      this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
       this.buttons.save.target.setCallback((event) => {
         event.preventDefault();
 
@@ -179,7 +192,12 @@ export class PageEntry {
         form.target.replaceElement(elementForm);
         
         if (form.target.checkRequiredFields()) {
-          let formData = new FormData(elementForm);
+          const formData = new FormData(elementForm);
+
+          const publishedDateInputElement = document.querySelector('[data-element="published-date-input"]');
+          if (publishedDateInputElement !== null) {
+            formData.append(publishedDateInputElement.name, publishedDateInputElement.value);
+          }
 
           const additionalDataContainerElement = document.querySelector('[data-element="additional-data"]');
           if (additionalDataContainerElement !== null) {
@@ -210,10 +228,7 @@ export class PageEntry {
           this.page.showPopupNotification(rejectionReason, 0);
         }
       });
-      this.buttons.save.assembly();
 
-      this.buttons.delete = new Interactive('button');
-      this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
       this.buttons.delete.target.setCallback((event) => {
         event.preventDefault();
 
@@ -248,10 +263,7 @@ export class PageEntry {
         document.body.appendChild(interactiveModal.target.element);
         interactiveModal.target.show();
       });
-      this.buttons.delete.assembly();
 
-      this.buttons.publish = new Interactive('button');
-      this.buttons.publish.target.setLabel(localeData.BUTTON_PUBLISH_LABEL);
       this.buttons.publish.target.setCallback((event) => {
         event.preventDefault();
 
@@ -273,10 +285,7 @@ export class PageEntry {
           }
         });
       });
-      this.buttons.publish.assembly();
 
-      this.buttons.unpublish = new Interactive('button');
-      this.buttons.unpublish.target.setLabel(localeData.BUTTON_UNPUBLISH_LABEL);
       this.buttons.unpublish.target.setCallback((event) => {
         event.preventDefault();
 
@@ -298,6 +307,11 @@ export class PageEntry {
           }
         });
       });
+      
+      this.buttons.viewOnSite.assembly();
+      this.buttons.save.assembly();
+      this.buttons.delete.assembly();
+      this.buttons.publish.assembly();
       this.buttons.unpublish.assembly();
 
       if (searchParams.getPathPart(3) === null) {

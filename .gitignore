@@ -1,10 +1,17 @@
+INSTALLED
 sqlExecute.php
 /cron/database.config.php
 /repository/
 /install/
+/cache/*
+/logs/*
+/uploads/*
 /modules/*
+**/.git/
 !/modules/README.md
 /OLD/
+/api/logoped.api.php
+/api/logoped/*
 /api/rowney
 /api/concert.api.php
 /api/concerts.api.php

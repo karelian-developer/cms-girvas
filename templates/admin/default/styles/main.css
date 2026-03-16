@@ -7,8 +7,6 @@
  */
 
 .main {
-  background-color: var(--admin-panel-main-background-color);
-  backdrop-filter: blur(14px);
   flex-grow: 1;
   z-index: 0;
 }

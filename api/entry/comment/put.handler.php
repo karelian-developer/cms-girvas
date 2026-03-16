@@ -118,6 +118,13 @@ if ($CMSCore->client->isLogged(1)) {
 
               $handlerOutputData['comment'] = [];
               $handlerOutputData['comment']['id'] = $comment->getID();
+              
+              $isRefreshed = $CMSCore->urlp->getParam('isRefreshed') ?? 0;
+              $isRefreshed = is_numeric($isRefreshed) ? (int) $isRefreshed : 0;
+
+              if ($isRefreshed === 1) {
+                $handlerOutputData['reload'] = true;
+              }
             } else {
               $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
               $handlerStatusCode = $handlerStatusCode ?? 0;

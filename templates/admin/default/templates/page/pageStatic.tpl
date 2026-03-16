@@ -112,6 +112,17 @@
   </div>
   <div class="page-aside__block block">
     <h2 class="page-aside__block-title">
+      {LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_SCHEDULER_TITLE}
+    </h2>
+    <div class="page-aside__block-content block-content">
+      <div class="block__input-container input-container">
+        {LANG:MD:PAGE_PAGE_STATIC_SIDEBAR_BLOCK_SCHEDULER_TIP}
+        <input class="block__input input input_date" type="datetime-local" name="page_static_published_timestamp" value="{PAGE_STATIC_PUBLISHED_TIMESTAMP}" data-element="published-date-input">
+      </div>
+    </div>
+  </div>
+  <div class="page-aside__block block">
+    <h2 class="page-aside__block-title">
       {LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TITLE}
     </h2>
     <div class="page-aside__block-content block-content">

@@ -330,6 +330,8 @@ class PagePages implements InterfacePage
       );
     }
 
+    $tableItemsAssembled = $tableItemsAssembled ?? [];
+
     /** @var string $site_page Содержимое шаблона страницы */
     $this->assembled = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme, 'templates/page/pages.tpl',

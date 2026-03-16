@@ -204,7 +204,7 @@ export class Form {
       data: formElement.firstChild
     });
 
-    request.target.send();
+    request.target.send(true);
   }
 
   assembly() {

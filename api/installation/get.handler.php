@@ -142,6 +142,9 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     
     $tableData = [
       ['./backups/', (file_exists(CMS_ROOT_DIRECTORY . '/backups')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./cache/', (file_exists(CMS_ROOT_DIRECTORY . '/cache')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./locales/', (file_exists(CMS_ROOT_DIRECTORY . '/locales')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./logs/', (file_exists(CMS_ROOT_DIRECTORY . '/logs')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./modules/', (file_exists(CMS_ROOT_DIRECTORY . '/modules')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./templates/', (file_exists(CMS_ROOT_DIRECTORY . '/templates')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./uploads/', (file_exists(CMS_ROOT_DIRECTORY . '/uploads')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
@@ -149,6 +152,9 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
 
     $tableCellsFontColor = [
       (file_exists(CMS_ROOT_DIRECTORY . '/backups') ? '#209A20' : '#9A2020'),
+      (file_exists(CMS_ROOT_DIRECTORY . '/cache') ? '#209A20' : '#9A2020'),
+      (file_exists(CMS_ROOT_DIRECTORY . '/locales') ? '#209A20' : '#9A2020'),
+      (file_exists(CMS_ROOT_DIRECTORY . '/logs') ? '#209A20' : '#9A2020'),
       (file_exists(CMS_ROOT_DIRECTORY . '/modules') ? '#209A20' : '#9A2020'),
       (file_exists(CMS_ROOT_DIRECTORY . '/templates') ? '#209A20' : '#9A2020'),
       (file_exists(CMS_ROOT_DIRECTORY . '/uploads') ? '#209A20' : '#9A2020'),
@@ -210,16 +216,22 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     $document = new DOMDocument();
 
     $tableData = [
-      ['./core/', '755', file_exists(CMS_ROOT_DIRECTORY . '/core') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/core')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./backups/', '755', file_exists(CMS_ROOT_DIRECTORY . '/backups') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/backups')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./cache/', '755', file_exists(CMS_ROOT_DIRECTORY . '/cache') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/cache')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./core/', '755', file_exists(CMS_ROOT_DIRECTORY . '/core') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/core')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./locales/', '755', file_exists(CMS_ROOT_DIRECTORY . '/locales') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/locales')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./logs/', '750', file_exists(CMS_ROOT_DIRECTORY . '/logs') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/logs')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./modules/', '755', file_exists(CMS_ROOT_DIRECTORY . '/modules') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/modules')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./templates/', '755', file_exists(CMS_ROOT_DIRECTORY . '/templates') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/templates')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./uploads/', '755', file_exists(CMS_ROOT_DIRECTORY . '/uploads') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/uploads')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
     ];
 
     $tableCellsFontColor = [
-      !file_exists(CMS_ROOT_DIRECTORY . '/core') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/core') & 0777) >= 755 ? '#209A20' : '#9A2020'),
       !file_exists(CMS_ROOT_DIRECTORY . '/backups') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/backups') & 0777) >= 755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/cache') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/cache') & 0777) >= 755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/core') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/core') & 0777) >= 755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/locales') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/locales') & 0777) >= 755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/logs') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/logs') & 0777) >= 750 ? '#209A20' : '#9A2020'),
       !file_exists(CMS_ROOT_DIRECTORY . '/modules') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/modules') & 0777) >= 755 ? '#209A20' : '#9A2020'),
       !file_exists(CMS_ROOT_DIRECTORY . '/templates') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/templates') & 0777) >= 755 ? '#209A20' : '#9A2020'),
       !file_exists(CMS_ROOT_DIRECTORY . '/uploads') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/uploads') & 0777) >= 755 ? '#209A20' : '#9A2020'),
@@ -295,8 +307,8 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       ['MySQL', (in_array('pdo_mysql', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
       ['Oracle Call Interface', (in_array('pdo_ocl', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
       ['ODBC v3 (IBM DB2, unixODBC, win32 ODBC)', (in_array('pdo_odbc', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
-      ['PostgreSQL', (in_array('pdo_pgsql', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
-      ['SQLite 3 и SQLite 2', (in_array('pdo_sqlite', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      ['PostgreSQL, Postgres Pro', (in_array('pdo_pgsql', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
+      ['SQLite 3, SQLite 2', (in_array('pdo_sqlite', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))],
       ['Microsoft SQL Server / SQL Azure', (in_array('pdo_sqlsrv', $phpExtensionsLoaded) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_ENABLED') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DISABLED'))]
     ];
 
@@ -346,7 +358,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         $element->setAttribute('class', 'table__cell');
 
         if ($index === 1 && !empty($tableCellsFontColor[$dataIndex])) {
-          $element->setAttribute('style', sprintf('color: %s; border-color: inherit;', $tableCellsFontColor[$dataIndex]));
+          $element->setAttribute('style', sprintf('color: %s;', $tableCellsFontColor[$dataIndex]));
         }
       }
 
@@ -430,17 +442,24 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       fwrite($file, '  \'sessionExpires\' => 86400,' . PHP_EOL);
       fwrite($file, '  \'sessionAdminExpires\' => 86400,' . PHP_EOL);
       fwrite($file, '  \'SSLCSP\' => [' . PHP_EOL);
-      fwrite($file, '    \'default-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com *.карельский-разработчик.рф карельский-разработчик.рф *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
-      fwrite($file, '    \'style-src \\\'unsafe-inline\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com *.карельский-разработчик.рф карельский-разработчик.рф *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
-      fwrite($file, '    \'script-src \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com *.карельский-разработчик.рф карельский-разработчик.рф *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
-      fwrite($file, '    \'script-src-elem \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com *.карельский-разработчик.рф карельский-разработчик.рф *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
-      fwrite($file, '    \'manifest-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com *.карельский-разработчик.рф карельский-разработчик.рф *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
-      fwrite($file, '    \'img-src \\\'self\\\' data: *.cms-girvas.ru cms-girvas.ru *.garbalo.com garbalo.com *.карельский-разработчик.рф карельский-разработчик.рф *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\'' . PHP_EOL);
+      fwrite($file, '    \'default-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
+      fwrite($file, '    \'style-src \\\'unsafe-inline\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
+      fwrite($file, '    \'script-src \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
+      fwrite($file, '    \'script-src-elem \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
+      fwrite($file, '    \'manifest-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
+      fwrite($file, '    \'img-src \\\'self\\\' data: *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\'' . PHP_EOL);
       fwrite($file, '  ],' . PHP_EOL);
       fwrite($file, '  \'SSLPermRedirect\' => false,' . PHP_EOL);
       fwrite($file, '  \'SSLHSTSMaxAge\' => 63072000,' . PHP_EOL);
       fwrite($file, '  \'SSLHSTSIncludeSubdomains\' => false,' . PHP_EOL);
       fwrite($file, '  \'SSLHSTSPreload\' => false,' . PHP_EOL);
+      fwrite($file, '  \'notifierKeys\' => [' . PHP_EOL);
+      fwrite($file, '    \'telegram\' => \'\',' . PHP_EOL);
+      fwrite($file, '    \'max\' => \'\',' . PHP_EOL);
+      fwrite($file, '    \'vk\' => \'\',' . PHP_EOL);
+      fwrite($file, '    \'ok\' => \'\'' . PHP_EOL);
+      fwrite($file, '  ],' . PHP_EOL);
+      fwrite($file, '  \'APISecret\' => \'' . md5($domain . $CMSSalt) . '\'' . PHP_EOL);
       fwrite($file, '];' . PHP_EOL);
       fwrite($file, PHP_EOL);
       fclose($file);
@@ -929,7 +948,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       'ru_RU' => ['title' => 'Пользователь']
     ];
 
-    $firstUsersGroup = UserGroup::create($CMSCore, 'admin', $firstUsersGroupTexts, 262143);
+    $firstUsersGroup = UserGroup::create($CMSCore, 'admin', $firstUsersGroupTexts, 786431);
     $secondUsersGroup = UserGroup::create($CMSCore, 'moder', $secondUsersGroupTexts, 115585);
     $thirtyUsersGroup = UserGroup::create($CMSCore, 'editor', $thirtyUsersGroupTexts, 130049);
     $fourtyUsersGroup = UserGroup::create($CMSCore, 'user', $fourtyUsersGroupTexts, 114688);

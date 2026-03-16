@@ -1,14 +1,31 @@
 .header__container {
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  background: var(--primary-linear-gradient-270deg);
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-left: 1px solid var(--common-secondary-color-10);
+  border-right: 1px solid var(--common-secondary-color-10);
+  border-top: 1px solid var(--common-secondary-color-10);
   padding-left: 40px;
   padding-right: 40px;
+  gap: 32px;
 }
 
-.header__brand-container {
-  flex: 0 0 128px;
+@media (max-width: 620px) {
+  .header__container {
+    grid-template-columns: 1fr;
+  }
 }
 
-.header__brand {
-  fill: var(--common-main-color-4);
+@media (max-width: 620px) {
+  .header__brand-container {
+    display: none;
+  }
+}
+
+.header__brand-image {
+  width: 100%;
 }
 
 .header__container {
@@ -22,7 +39,6 @@
   flex-direction: column;
   justify-content: space-between;
   flex-grow: 1;
-  padding-left: 40px;
 }
 
 .header__title {
@@ -41,18 +57,40 @@
   margin-bottom: 5px;
 }
 
+.header__installer-progress-container {
+  background-color: transparent !important;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-bottom: 16px !important;
+}
+
 .header__installer-progress {
   display: flex;
   list-style-type: none;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
   padding: 0;
   margin: 0;
 }
 
 .header__installer-progress > .installer-progress__item {
+  flex-grow: 1;
   background-color: var(--common-main-color-6);
   padding: 0;
-  flex-grow: 1;
-  height: 6px;
+  height: 16px;
+}
+
+.header__installer-progress > .installer-progress__item:first-child {
+  border-bottom-left-radius: 8px;
+  border-top-left-radius: 8px;
+}
+
+.header__installer-progress > .installer-progress__item:last-child {
+  border-bottom-right-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .header__installer-progress > .installer-progress__item:not(:last-child) {

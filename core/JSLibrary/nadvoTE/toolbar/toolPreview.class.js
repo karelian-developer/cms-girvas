@@ -15,6 +15,7 @@
 
 'use strict';
 
+import {Interactive} from "../../interactive.class.js";
 import {Tool} from './tool.class.js';
 
 export class ToolPreview extends Tool {
@@ -42,23 +43,26 @@ export class ToolPreview extends Tool {
         let formData = new FormData();
         formData.append('markdown_text', this.editor.textarea.element.value);
 
-        fetch(this.editor.options.handler, {
+        let request = new Interactive('request', {
           method: 'POST',
-          dataType: 'json',
-          body: formData
-        }).then((response) => {
-          return response.json();
-        }).then((data) => {
-          let iFrameWrapperElement = this.editor.textareaVisual.element;
-          let iFrameElement = iFrameWrapperElement.querySelector('iframe');
-          iFrameElement.setAttribute('scrolling', 'no');
+          url: this.editor.options.handler
+        });
 
-          let iFrameElementDocument = iFrameElement.contentDocument || iFrameElement.contentWindow.document;
+        request.target.data = formData;
 
-          iFrameElementDocument.body.innerHTML = data.outputData.nadvoparse;
-          this.resizePreviewIFrame(iFrameElement);
-        }).catch((error) => {
-          console.error(error);
+        request.target.send().then((data) => {
+          if (data.statusCode === 1) {
+            const iFrameWrapperElement = this.editor.textareaVisual.element;
+            const iFrameElement = iFrameWrapperElement.querySelector('iframe');
+            iFrameElement.setAttribute('scrolling', 'no');
+
+            const iFrameElementDocument = iFrameElement.contentDocument || iFrameElement.contentWindow.document;
+
+            iFrameElementDocument.body.innerHTML = data.outputData.nadvoparse;
+            this.resizePreviewIFrame(iFrameElement);
+          } else {
+            console.error(data.message);
+          }
         });
       }
 

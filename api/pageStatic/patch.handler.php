@@ -51,7 +51,10 @@ if ($CMSCore->client->isLogged(2)) {
             $textareaKeywordsName = 'page_static_keywords_' . $CMSLocale->getISO639(2);
 
             if (!array_key_exists('metadata', $pageStaticData)) $pageStaticData['metadata'] = [];
-            if (isset($_PATCH['page_static_is_published'])) $pageStaticData['metadata']['isPublished'] = $_PATCH['page_static_is_published'];
+            if (isset($_PATCH['page_static_is_published'])) {
+              $pageStaticData['metadata']['publishedUnixTimestamp'] = time();
+              $pageStaticData['metadata']['isPublished'] = 1;
+            }
 
             if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH) || array_key_exists($textareaContentName, $_PATCH)) {
               if (!array_key_exists('texts', $pageStaticData)) $pageStaticData['texts'] = [];
@@ -135,6 +138,10 @@ if ($CMSCore->client->isLogged(2)) {
         }
 
         $pageStaticIsPublished = $pageStaticData['metadata']['isPublished'] ?? 0;
+
+        if (isset($_PATCH['page_static_published_timestamp'])) {
+          $pageStaticData['metadata']['publishedUnixTimestamp'] = strtotime(str_replace('T', ' ', $_PATCH['page_static_published_timestamp']));
+        }
 
         // Если происходит публикация страницы, то необходимо удостовериться, что
         // в странице присутствует стандартная локализация, в противном случае

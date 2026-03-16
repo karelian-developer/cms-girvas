@@ -2,16 +2,17 @@
   <section class="main__section section">
     <div class="main__container container">
       <div class="main__title-container title-container">
-        <div class="title-container__step-container" role="installer-step-data">
-          <span class="title-container__step-label" role="installer-step-label">{LANG:INSTALLER_STAGE}</span>
-          <span class="title-container__step-number" role="installer-step-number">1</span>
+        <div class="title-container__step-container" data-role="installer-step-data">
+          <span class="title-container__step-label" data-role="installer-step-label">{LANG:INSTALLER_STAGE}</span>
+          <span class="title-container__step-number" data-role="installer-step-number">1</span>
         </div>
-        <h2 class="main__title" role="installer-step-title">{LANG:INSTALLER_STAGE_ACQUAINTANCE_TITLE}</h2>
+        <h2 class="main__title" data-role="installer-step-title">{LANG:INSTALLER_STAGE_ACQUAINTANCE_TITLE}</h2>
       </div>
+      <img src="{SITE_TEMPLATE_URL}/images/background-left-side.webp" alt="{LANG:INSTALLER_TITLE}" class="main__side-image">
       <div class="main__page-container">
-        <div class="main__page page" style="display: none;" role="language-page">
+        <div class="main__page page" style="display: none;" data-role="language-page">
           {LANG:MD:STAGE_LANGUAGE_SELECT}
-          <div role="language-select"></div>
+          <div data-role="language-select"></div>
         </div>
         <div class="main__page page" data-page-index="0">
           {LANG:MD:STAGE_ABOUT_ACQUAINTANCE}
@@ -31,7 +32,7 @@
         <div class="main__page page" data-page-index="5">
           {LANG:MD:STAGE_GENERATING_LOCAL_CONFIGURATIONS}
           <div class="page__phar">
-            <form class="form" role="form-database">
+            <form class="form" data-role="form-database">
               <table class="table">
                 <tr class="table__row">
                   <td class="table__cell cell">
@@ -168,12 +169,12 @@
         </div>
         <div class="main__page page" data-page-index="6">
           {LANG:MD:STAGE_GENERATING_DATABASE_TABLES}
-          <p class="page__phar" role="cms-dms-tables-generate"></p>
+          <p class="page__phar" data-role="cms-dms-tables-generate"></p>
         </div>
         <div class="main__page page" data-page-index="7">
           {LANG:MD:STAGE_CONFIGURING_LOCALIZATION_AND_TIME}
           <div class="page__phar">
-            <form class="form" role="form-locale">
+            <form class="form" data-role="form-locale">
               <table class="table">
                 <tr class="table__row">
                   <td class="table__cell cell">
@@ -211,12 +212,12 @@
               </table>
             </form>
           </div>
-          <p class="page__phar" role="cms-locale-and-timezone"></p>
+          <p class="page__phar" data-role="cms-locale-and-timezone"></p>
         </div>
         <div class="main__page page" data-page-index="8">
           {LANG:MD:STAGE_WEBSITE_METADATA}
           <div class="page__phar">
-            <form class="form" role="form-metadata">
+            <form class="form" data-role="form-metadata">
               <table class="table">
                 <tr class="table__row">
                   <td class="table__cell cell">
@@ -260,12 +261,12 @@
               </table>
             </form>
           </div>
-          <p class="page__phar" role="cms-metadata"></p>
+          <p class="page__phar" data-role="cms-metadata"></p>
         </div>
         <div class="main__page page" data-page-index="9">
           {LANG:MD:STAGE_CREATING_AN_ADMINISTRATOR_ACCOUNT}
           <div class="page__phar">
-            <form class="form" role="form-admin-create">
+            <form class="form" data-role="form-admin-create">
               <table class="table">
                 <tr class="table__row">
                   <td class="table__cell cell">
@@ -319,16 +320,16 @@
               </table>
             </form>
           </div>
-          <p class="page__phar" role="cms-admin-create"></p>
+          <p class="page__phar" data-role="cms-admin-create"></p>
         </div>
         <div class="main__page page" data-page-index="10">
           {LANG:MD:STAGE_GENERATING_A_SECRET_KEY}
-          <p class="page__phar" role="cms-secret-key"></p>
+          <p class="page__phar" data-role="cms-secret-key"></p>
         </div>
         <div class="main__page page" data-page-index="11">
           {LANG:MD:STAGE_FINISHING}
         </div>
-        <div class="main__page-panel-container panel-container" role="installation-buttons-panel"></div>
+        <div class="main__page-panel-container panel-container" data-role="installation-buttons-panel"></div>
       </div>
     </div>
   </section>

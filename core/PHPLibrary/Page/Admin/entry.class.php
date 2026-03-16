@@ -279,11 +279,12 @@ class PageEntry implements InterfacePage
 
     if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_KEYWORDS')) {
       $value = $entry !== null ? $entry->getKeywords($localeName) : [];
+      
       $valueArray = array_map(function($item) {
         return str_replace(
           ThemeCollector::DECODED_ENTITIES,
           ThemeCollector::SAFE_SYMBOLS,
-          htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+          htmlspecialchars($item, ENT_QUOTES, 'UTF-8')
         );
       }, $value);
       
@@ -315,6 +316,16 @@ class PageEntry implements InterfacePage
         $templatesAssembled,
         'ENTRY_FORM_METHOD',
         $entry !== null ? 'PATCH' : 'PUT'
+      );
+    }
+
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_PUBLISHED_TIMESTAMP')) {
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'ENTRY_PUBLISHED_TIMESTAMP',
+        $entry !== null
+          ? date('Y-m-d\TH:i', $entry->getPublishedUnixTimestamp())
+          : date('Y-m-d\TH:i', time())
       );
     }
 

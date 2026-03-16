@@ -39,5 +39,3 @@ if (isset($CMSCore)) {
     include_once $handlerPath;
   }
 }
-
-?>

@@ -34,6 +34,15 @@
   margin-bottom: 5px;
 }
 
+.grid-table__link_avatar {
+  display: flex;
+}
+
+.grid-table__avatar {
+  border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-14);
+}
+
 .grid-table__item .grid-table__draft {
   display: none;
 }

@@ -28,4 +28,6 @@ enum EnumFormat
   case BMP;
   case WEBP;
   case AVIF;
+  case TGA;
+  case PDF;
 }

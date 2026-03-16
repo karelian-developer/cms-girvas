@@ -91,6 +91,12 @@ class PageForm implements InterfacePage
         /** @var string Ссылка обработки */
         $formAction = $form->getAction();
         $formAction = strip_tags($formAction);
+
+        $formTelegramChatsIDs = $form->getTelegramChatsIDs();
+        $formTelegramChatsIDs = implode(', ', $formTelegramChatsIDs);
+        
+        $formMaxChatsIDs = $form->getMaxChatsIDs();
+        $formMaxChatsIDs = implode(', ', $formMaxChatsIDs);
       }
     }
     
@@ -101,7 +107,9 @@ class PageForm implements InterfacePage
         'FORM_TITLE' => $form !== null ? $formTitle : '',
         'FORM_DESCRIPTION' => $form !== null ? $formDescription : '',
         'FORM_NAME' => $form !== null ? $formName : '',
-        'FORM_ACTION' => $form !== null ? $formAction : ''
+        'FORM_ACTION' => $form !== null ? $formAction : '',
+        'FORM_NOTIFICATION_TELEGRAM_CHATS_IDS' => $form !== null ? $formTelegramChatsIDs : '',
+        'FORM_NOTIFICATION_MAX_CHATS_IDS' => $form !== null ? $formMaxChatsIDs : ''
       ]
     );
   }

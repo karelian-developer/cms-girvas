@@ -13,8 +13,22 @@
       }
     }
   },
+  "SITE_SLOGAN": {
+    "value": "{LANG:DEFAULT_SLOGAN}",
+    "type": "text",
+    "locale": {
+      "title": {
+        "en_US": "Site slogan",
+        "ru_RU": "Слоган сайта"
+      },
+      "description": {
+        "en_US": "A slogan for your site",
+        "ru_RU": "Слоган для Вашего сайта"
+      }
+    }
+  },
   "IMAGE_HEADER_LOGOTYPE_URL": {
-    "value": "images/header-logo.png",
+    "value": "{SITE_TEMPLATE_URL}/images/brand-icon.svg",
     "type": "file",
     "file": "png/jpg/svg/webp/avif",
     "locale": {
@@ -43,7 +57,7 @@
     }
   },
   "IMAGE_FOOTER_LOGOTYPE_URL": {
-    "value": "images/footer-logo.png",
+    "value": "{SITE_TEMPLATE_URL}/images/brand-footer.webp",
     "type": "file",
     "file": "png/jpg/svg/webp/avif",
     "locale": {

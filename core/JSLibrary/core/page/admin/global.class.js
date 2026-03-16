@@ -107,20 +107,21 @@ export class PageGlobal {
           event.preventDefault();
 
           window.CMSCore.getCMSVersion().then((data) => {
-            let request = new Interactive('request', {
+            const request = new Interactive('request', {
               method: 'GET',
               url: `https://repository.cms-girvas.ru/system-checker?currentVersion=${data}`
             });
 
             request.target.showingNotification = false;
 
-            request.target.send().then((data1) => {
-              if (data1.outputData.hasOwnProperty('needToUpdate')) {
-                let needToUpdate = data1.outputData.needToUpdate;
-                let lastVersionTitle = data1.outputData.title;
-                let lastVersionPostURL = data1.outputData.postURL;
+            request.target.send().then((checkerData) => {
+              console.log(checkerData);
+              if (checkerData.outputData.hasOwnProperty('needToUpdate')) {
+                const needToUpdate = checkerData.outputData.needToUpdate;
+                const lastVersionTitle = checkerData.outputData.title;
+                const lastVersionPostURL = checkerData.outputData.postURL;
   
-                let interactiveNotificationLoading = new Interactive('notification');
+                const interactiveNotificationLoading = new Interactive('notification');
                 interactiveNotificationLoading.target.isPopup = true;
 
                 if (needToUpdate) {
@@ -132,7 +133,6 @@ export class PageGlobal {
                 }
 
                 interactiveNotificationLoading.target.assembly();
-
                 interactiveNotificationLoading.target.show();
               }
             });

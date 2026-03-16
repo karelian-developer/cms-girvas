@@ -44,50 +44,107 @@ class PageMedia implements InterfacePage
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/media.css', 'rel' => 'stylesheet']);
     
-    $filesPath =  CMS_ROOT_DIRECTORY . '/uploads/media';
-    $files = array_diff(scandir($filesPath), ['.', '..']);
+    $filesDirectoryPathParam = $this->CMSCore->urlp->getParam('directory') !== null
+      ? urldecode($this->CMSCore->urlp->getParam('directory'))
+      : null;
+
+    $filesSortRule = $this->CMSCore->urlp->getParam('sort') ?? 'by_alphabet_increase';
+
+    $filesDirectoryPath = $filesDirectoryPathParam === null
+    ? '/uploads/media'
+    : $filesDirectoryPathParam;
+
+    $filesDirectoryPathWithRoot = CMS_ROOT_DIRECTORY . $filesDirectoryPath;
+
+    $files = array_diff(scandir($filesDirectoryPathWithRoot), ['.', '..']);
+  
+    usort($files, function($a, $b) use ($filesDirectoryPathWithRoot, $filesSortRule) {
+      $pathA = $filesDirectoryPathWithRoot . DIRECTORY_SEPARATOR . $a;
+      $pathB = $filesDirectoryPathWithRoot . DIRECTORY_SEPARATOR . $b;
+      
+      $isDirA = is_dir($pathA);
+      $isDirB = is_dir($pathB);
+      
+      if ($isDirA !== $isDirB) {
+        return $isDirA ? -1 : 1;
+      }
+      
+      switch ($filesSortRule) {
+        case 'by_createdtimestamp_increase':
+          $timeA = filemtime($pathA) ?: 0;
+          $timeB = filemtime($pathB) ?: 0;
+
+          if ($timeA === $timeB) {
+            return strcasecmp($a, $b);
+          }
+
+          return $timeA - $timeB;
+            
+        case 'by_createdtimestamp_decrease':
+          $timeA = filemtime($pathA) ?: 0;
+          $timeB = filemtime($pathB) ?: 0;
+          
+          if ($timeA === $timeB) {
+            return strcasecmp($a, $b);
+          }
+          return $timeB - $timeA;
+            
+        case 'by_alphabet_decrease':
+          return strcasecmp($b, $a);
+            
+        case 'by_alphabet_increase':
+        default:
+          return strcasecmp($a, $b);
+      }
+    });
+
     $filesCount = count($files);
 
     $filesData = [];
     foreach ($files as $file) {
       /** @var string */
-      $path = $filesPath . '/' . $file;
-      $URL = $file;
+      $filePath = $filesDirectoryPathWithRoot . '/' . $file;
+      $URL = $filesDirectoryPath . '/' . $file;
       
-      array_push($filesData, [
+      $filesData[] = [
         'fileURL' => $URL,
-        'createdUnixTimestamp' => filemtime($path)
-      ]);
+        'filePath' => $filesDirectoryPath,
+        'fileExtension' => pathinfo($filePath, PATHINFO_EXTENSION),
+        'fileName' => pathinfo($filePath, PATHINFO_FILENAME),
+        'isDirectory' => is_dir($filePath),
+        'createdUnixTimestamp' => filemtime($filePath)
+      ];
     }
 
-    usort($filesData, function($a, $b)
-    {
-      if ($a['createdUnixTimestamp'] === $b['createdUnixTimestamp']) {
-        return 0;
-      }
-  
-      return $a['createdUnixTimestamp'] > $b['createdUnixTimestamp'] ? -1 : 1;
-    });
-
     $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
-    $paginationItemsOnPage = 12;
+    $paginationItemsOnPage = 36;
 
     $filesData = array_slice($filesData, $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
 
-    $filesSorted = [];
-    foreach ($filesData as $data) {
-      $filesSorted[] = $data['fileURL'];
-    }
-
     $filesTransformed = [];
-    foreach ($filesSorted as $file) {
-      $URL = '/uploads/media/' . $file;
+    foreach ($filesData as $file) {
+      $fileIsImage = in_array(
+        $file['fileExtension'],
+        ['apng', 'png', 'gif', 'jpeg', 'jpg', 'ico', 'svg', 'bmp', 'avif', 'webp']
+      );
+
+      $fileItemTemplate = $fileIsImage
+        ? 'templates/page/media/image.tpl'
+        : 'templates/page/media/file.tpl';
+
+      $URL = '/uploads/media/' . $file['fileName'];
+      $fileTemplatePath = $file['isDirectory']
+        ? 'templates/page/media/directory.tpl'
+        : $fileItemTemplate;
+      
       $filesTransformed[] = ThemeCollector::assemblyFileContent(
         $this->CMSCore->theme,
-        'templates/page/media/listItem.tpl',
+        $fileTemplatePath,
         [
-          'MEDIA_FILE_URL' => $URL,
-          'MEDIA_FILE_FULLNAME' => $file
+          'FILE_URL' => $file['fileURL'],
+          'FILE_EXTENSION' => $file['fileExtension'],
+          'FILE_NAME' => $file['fileName'],
+          'FILE_FULLNAME' => $file['fileName'] . '.' . $file['fileExtension']
         ]
       );
     }
