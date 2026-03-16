@@ -60,8 +60,11 @@
 }
 
 @media (max-width: 480px) {
-  .footer__links-list .links-list__item:not(:last-child) {
+  .footer__links-list .links-list__item {
     text-align: center;
+  }
+
+  .footer__links-list .links-list__item:not(:last-child) {
     margin-bottom: 8px;
   }
 }
