@@ -194,7 +194,7 @@ export class PageModule {
               moduleBlock.setAttribute('data-module-enabled-status', 'disabled');
               moduleBlock.setAttribute('data-module-installed-status', 'not-installed');
 
-              if (searchParams.getPathPart(2) === 'repository') {
+              if (searchParams.getPathPart(2) !== 'repository') {
                 window.location.href = '/admin/modules';
               }
             }
