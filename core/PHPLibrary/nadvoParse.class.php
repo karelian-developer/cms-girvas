@@ -522,7 +522,7 @@ class NadvoParse
             if ($json) {
               foreach ($json as $key => $value) {
                 if (in_array($key, ['class', 'id', 'target', 'rel'])) {
-                  $attrs[$key] = htmlspecialchars($value);
+                  $attrs[] = $key . ' = ' . "\"" . htmlspecialchars($value) . "\"";
                 }
               }
             }
