@@ -265,7 +265,9 @@ final class Core implements ThemeInterfaceCore
 
     $localeData = $CMSTheme->locale->getData();
 
-    $clientIsLogged = $CMSTheme->CMSCore->client->isLogged(1);
+    $clientIsLogged = $CMSTheme->CMSCore->client !== null
+      ? $CMSTheme->CMSCore->client->isLogged(1)
+      : false;
     $user = $clientIsLogged ? $CMSTheme->CMSCore->client->getUser(1) : null;
     
     if ($user !== null) {
