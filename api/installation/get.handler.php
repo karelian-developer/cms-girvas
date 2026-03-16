@@ -142,6 +142,9 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     
     $tableData = [
       ['./backups/', (file_exists(CMS_ROOT_DIRECTORY . '/backups')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./cache/', (file_exists(CMS_ROOT_DIRECTORY . '/cache')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./locales/', (file_exists(CMS_ROOT_DIRECTORY . '/locales')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./logs/', (file_exists(CMS_ROOT_DIRECTORY . '/logs')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./modules/', (file_exists(CMS_ROOT_DIRECTORY . '/modules')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./templates/', (file_exists(CMS_ROOT_DIRECTORY . '/templates')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./uploads/', (file_exists(CMS_ROOT_DIRECTORY . '/uploads')) ? $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_FOUND_LABEL') : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
@@ -149,6 +152,9 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
 
     $tableCellsFontColor = [
       (file_exists(CMS_ROOT_DIRECTORY . '/backups') ? '#209A20' : '#9A2020'),
+      (file_exists(CMS_ROOT_DIRECTORY . '/cache') ? '#209A20' : '#9A2020'),
+      (file_exists(CMS_ROOT_DIRECTORY . '/locales') ? '#209A20' : '#9A2020'),
+      (file_exists(CMS_ROOT_DIRECTORY . '/logs') ? '#209A20' : '#9A2020'),
       (file_exists(CMS_ROOT_DIRECTORY . '/modules') ? '#209A20' : '#9A2020'),
       (file_exists(CMS_ROOT_DIRECTORY . '/templates') ? '#209A20' : '#9A2020'),
       (file_exists(CMS_ROOT_DIRECTORY . '/uploads') ? '#209A20' : '#9A2020'),
@@ -210,16 +216,22 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     $document = new DOMDocument();
 
     $tableData = [
-      ['./core/', '755', file_exists(CMS_ROOT_DIRECTORY . '/core') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/core')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./backups/', '755', file_exists(CMS_ROOT_DIRECTORY . '/backups') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/backups')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./cache/', '755', file_exists(CMS_ROOT_DIRECTORY . '/cache') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/cache')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./core/', '755', file_exists(CMS_ROOT_DIRECTORY . '/core') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/core')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./locales/', '755', file_exists(CMS_ROOT_DIRECTORY . '/locales') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/locales')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./logs/', '750', file_exists(CMS_ROOT_DIRECTORY . '/logs') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/logs')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./modules/', '755', file_exists(CMS_ROOT_DIRECTORY . '/modules') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/modules')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./templates/', '755', file_exists(CMS_ROOT_DIRECTORY . '/templates') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/templates')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./uploads/', '755', file_exists(CMS_ROOT_DIRECTORY . '/uploads') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/uploads')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
     ];
 
     $tableCellsFontColor = [
-      !file_exists(CMS_ROOT_DIRECTORY . '/core') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/core') & 0777) >= 755 ? '#209A20' : '#9A2020'),
       !file_exists(CMS_ROOT_DIRECTORY . '/backups') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/backups') & 0777) >= 755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/cache') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/cache') & 0777) >= 755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/core') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/core') & 0777) >= 755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/locales') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/locales') & 0777) >= 755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/logs') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/logs') & 0777) >= 750 ? '#209A20' : '#9A2020'),
       !file_exists(CMS_ROOT_DIRECTORY . '/modules') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/modules') & 0777) >= 755 ? '#209A20' : '#9A2020'),
       !file_exists(CMS_ROOT_DIRECTORY . '/templates') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/templates') & 0777) >= 755 ? '#209A20' : '#9A2020'),
       !file_exists(CMS_ROOT_DIRECTORY . '/uploads') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/uploads') & 0777) >= 755 ? '#209A20' : '#9A2020'),
