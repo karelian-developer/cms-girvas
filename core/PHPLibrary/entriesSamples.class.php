@@ -76,7 +76,7 @@ final class EntriesSamples
 
       if ($results) {
         foreach ($results as $data) {
-          $array[] = new EntriesSample($this->CMSCore, $data['id']));
+          $array[] = new EntriesSample($this->CMSCore, $data['id']);
         }
       }
 
