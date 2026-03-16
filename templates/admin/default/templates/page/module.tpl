@@ -5,7 +5,7 @@
     <div id="E8548530785" class="page__interactive-container"></div>
   </div>
   <div class="page__content">
-    <div class="module" data-module-name="{MODULE_NAME}" data-module-enabled-status="{MODULE_ENABLED_STATUS}" data-module-installed-status="{MODULE_INSTALLED_STATUS}">
+    <div class="module" data-name="{MODULE_NAME}" data-enabled-status="{MODULE_ENABLED_STATUS}" data-installed-status="{MODULE_INSTALLED_STATUS}">
       <div class="module__left-block">
         <div class="module__gallary-container">
           <div class="gallery__controllers-list">
