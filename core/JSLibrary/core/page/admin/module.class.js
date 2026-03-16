@@ -169,6 +169,15 @@ export class PageModule {
     
               moduleBlock.setAttribute('data-enabled-status', 'disabled');
               moduleBlock.setAttribute('data-installed-status', 'installed');
+
+              if (searchParams.getPathPart(2) !== 'repository') {
+                const currentUrl = window.location.href;
+                const newUrl = currentUrl.replace('/repository/', '/');
+
+                if (newUrl !== currentUrl) {
+                  window.location.href = newUrl;
+                }
+              }
             }
           });
         });
