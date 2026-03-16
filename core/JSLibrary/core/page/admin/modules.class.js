@@ -39,10 +39,14 @@ export class PageModules {
       for (let listItem of listItems) {
         let buttons = {delete: null, install: null, enable: null, disable: null, more: null};
 
-        const moduleName = listItem.getAttribute('data-name');
-        const moduleInstalledStatus = (listItem.hasAttribute('data-installed-status')) ? listItem.getAttribute('data-module-installed-status') : 'not-installed';
-        const moduleEnabledStatus = (listItem.hasAttribute('data-enabled-status')) ? listItem.getAttribute('data-module-enabled-status') : 'disabled';
-        const itemFooterContainer = listItem.querySelector('[data-element="item-footer-panel"]');
+        let moduleName = listItem.getAttribute('data-name');
+        let moduleInstalledStatus = listItem.hasAttribute('data-installed-status')
+          ? listItem.getAttribute('data-module-installed-status')
+          : 'not-installed';
+        let moduleEnabledStatus = listItem.hasAttribute('data-enabled-status')
+          ? listItem.getAttribute('data-module-enabled-status')
+          : 'disabled';
+        let itemFooterContainer = listItem.querySelector('[data-element="item-footer-panel"]');
 
         // Добавление интерактивных элементов
         // Кнопка "Подробнее"
