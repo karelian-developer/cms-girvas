@@ -67,19 +67,24 @@ final class Forms
     $queryBuilder->statement->assembly();
 
     $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
-    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-    $databaseQuery->execute();
 
-    $array = [];
-    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    if ($databaseConnection !== null) {
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
 
-    if ($results) {
-      foreach ($results as $data) {
-        $array[] = new Form($this->CMSCore, $data['id']);
+      $array = [];
+      $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+
+      if ($results) {
+        foreach ($results as $data) {
+          $array[] = new Form($this->CMSCore, $data['id']);
+        }
       }
+
+      return $array;
     }
 
-    return $array;
+    return [];
   }
       
   /**
