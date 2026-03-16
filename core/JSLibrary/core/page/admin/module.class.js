@@ -215,9 +215,16 @@ export class PageModule {
           buttons.enable.target.element.style.display = 'flex';
           buttons.disable.target.element.style.display = 'none';
         }
-  
-        buttons.install.target.element.style.display = 'none';
-        buttons.delete.target.element.style.display = 'flex';
+        
+        if (moduleInstalledStatus === 'installed') {
+          buttons.install.target.element.style.display = 'none';
+          buttons.delete.target.element.style.display = 'flex';
+        }
+        
+        if (moduleInstalledStatus === 'not-installed') {
+          buttons.install.target.element.style.display = 'flex';
+          buttons.delete.target.element.style.display = 'none';
+        }
     
         interactiveContainerElement.append(buttons.enable.target.element);
         interactiveContainerElement.append(buttons.disable.target.element);
