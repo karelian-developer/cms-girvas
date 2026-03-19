@@ -65,7 +65,7 @@ final class Builder
    */
   public function setLanguage(string $localeName) : void
   {
-    $this->feed->setLanguage($localeName);
+    $this->language = str_replace('_', '-', strtolower($localeName));
   }
   
   /**
@@ -75,7 +75,7 @@ final class Builder
    */
   public function getLanguage() : string
   {
-    return $this->feed->language;
+    return $this->language;
   }
 
   public static function getTypeEnum(int $typeID) : ?EnumSpecification
