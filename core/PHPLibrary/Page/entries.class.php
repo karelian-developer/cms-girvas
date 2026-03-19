@@ -156,7 +156,7 @@ class PageEntries implements InterfacePage
         $this->CMSCore->configurator->setMetaDescription($categorySEODescription);
         $this->CMSCore->configurator->setMetaKeywords($categoryKeywords);
 
-        $this->page->breadcrumbs->add($category->getTitle($this->CMSCore->configurator->getDatabaseEntryValue('base_locale')), '/entries/' . $category->getName());
+        $this->page->breadcrumbs->add($category->getTitle($localeName), '/entries/' . $category->getName());
         $this->page->breadcrumbs->assembly();
 
         /** @var Entries $entries Объект класса Entries */
