@@ -671,7 +671,7 @@ final class SystemCore implements CoreInterface
         if ($CMSURLP->getParam('localeMessage') === null) {
           $localeName = $CMSURLP->getParam('locale') ?? null;
 
-          if ($localeName !== null) {
+          if ($localeName === null) {
             $localeName = $CMSConfigurator->existsDatabaseEntryValue('base_locale')
               ? $CMSConfigurator->getDatabaseEntryValue('base_locale')
               : 'en_US';
