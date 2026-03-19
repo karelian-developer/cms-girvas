@@ -514,13 +514,13 @@ class NadvoParse
           ThemeCollector::DECODED_ENTITIES,
           ThemeCollector::SAFE_SYMBOLS,
           htmlspecialchars(trim($matches[2]), ENT_QUOTES, 'UTF-8')
-        )
+        );
 
         $text = str_replace(
           ThemeCollector::DECODED_ENTITIES,
           ThemeCollector::SAFE_SYMBOLS,
           htmlspecialchars(trim($matches[1]), ENT_QUOTES, 'UTF-8')
-        )
+        );
         
         $text = empty($text) ? $href : $text;
         $attrs = [];
