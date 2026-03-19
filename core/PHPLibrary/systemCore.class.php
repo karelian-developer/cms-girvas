@@ -669,7 +669,13 @@ final class SystemCore implements CoreInterface
         $this->locale->initPathes();
       } else {
         if ($CMSURLP->getParam('localeMessage') === null) {
-          $localeName = $CMSConfigurator->existsDatabaseEntryValue('base_locale') ? $CMSConfigurator->getDatabaseEntryValue('base_locale') : 'en_US';
+          $localeName = $CMSURLP->getParam('locale') ?? null;
+
+          if ($localeName !== null) {
+            $localeName = $CMSConfigurator->existsDatabaseEntryValue('base_locale')
+              ? $CMSConfigurator->getDatabaseEntryValue('base_locale')
+              : 'en_US';
+          }
         } else {
           $localeName = $CMSURLP->getParam('localeMessage');
         }
