@@ -33,6 +33,8 @@ if (defined('IS_NOT_HACKED')) {
 
       $feedBuilder->setLanguage($localeName);
 
+      error_log($localeName);
+
       $feedBuilder->feed->setTitle($feed->getTitle($localeName));
       $feedBuilder->feed->setDescription($feed->getDescription($localeName));
 
