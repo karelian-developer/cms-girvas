@@ -428,7 +428,7 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['image'],
       function($matches) {
-        $caption = htmlspecialchars(trim($matches[1]), ENT_QUOTES);
+        $caption = htmlspecialchars(trim($matches[1]), ENT_NOQUOTES);
         $src = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
         $attrs = [];
         
@@ -467,7 +467,7 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['figure'],
       function($matches) {
-        $caption = htmlspecialchars(trim($matches[1]), ENT_QUOTES);
+        $caption = htmlspecialchars(trim($matches[1]), ENT_NOQUOTES);
         $src = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
         $attrs = [];
         
