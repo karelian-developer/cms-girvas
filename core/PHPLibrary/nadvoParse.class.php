@@ -20,6 +20,8 @@
 
 namespace core\PHPLibrary;
 
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
+
 use \DOMDocument as DOMDocument;
 
 class NadvoParse
