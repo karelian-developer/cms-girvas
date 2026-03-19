@@ -428,8 +428,8 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['image'],
       function($matches) {
-        $caption = htmlspecialchars(trim($matches[1]), ENT_QUOTES);
-        $src = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
+        $caption = trim($matches[1]);
+        $src = trim($matches[2]);
         $attrs = [];
         
         if (isset($matches[3])) {
@@ -438,7 +438,7 @@ class NadvoParse
             if ($json) {
               foreach ($json as $key => $value) {
                 if (in_array($key, ['class', 'id'])) {
-                  $attrs[$key] = htmlspecialchars($value);
+                  $attrs[$key] = $value;
                 }
               }
             }
@@ -467,8 +467,8 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['figure'],
       function($matches) {
-        $caption = htmlspecialchars(trim($matches[1]), ENT_QUOTES);
-        $src = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
+        $caption = trim($matches[1]);
+        $src = trim($matches[2]);
         $attrs = [];
         
         if (isset($matches[3])) {
@@ -477,7 +477,7 @@ class NadvoParse
             if ($json) {
               foreach ($json as $key => $value) {
                 if (in_array($key, ['class', 'id'])) {
-                  $attrs[$key] = htmlspecialchars($value);
+                  $attrs[$key] = $value;
                 }
               }
             }
