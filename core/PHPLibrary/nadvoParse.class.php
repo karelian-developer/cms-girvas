@@ -428,7 +428,7 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['image'],
       function($matches) {
-        $caption = htmlspecialchars(trim($matches[1]), ENT_NOQUOTES);
+        $caption = htmlspecialchars(trim($matches[1]), ENT_QUOTES);
         $src = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
         $attrs = [];
         
@@ -467,7 +467,7 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['figure'],
       function($matches) {
-        $caption = htmlspecialchars(trim($matches[1]), ENT_NOQUOTES);
+        $caption = htmlspecialchars(trim($matches[1]), ENT_QUOTES);
         $src = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
         $attrs = [];
         
@@ -510,9 +510,9 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['link'],
       function($matches) {
-        $href = htmlspecialchars(trim($matches[2]), ENT_NOQUOTES);
+        $href = trim($matches[2]);
         
-        $text = htmlspecialchars(trim($matches[1]));
+        $text = trim($matches[1]);
         $text = empty($text) ? $href : $text;
         $attrs = [];
         
@@ -522,7 +522,7 @@ class NadvoParse
             if ($json) {
               foreach ($json as $key => $value) {
                 if (in_array($key, ['class', 'id', 'target', 'rel'])) {
-                  $attrs[] = $key . ' = ' . "\"" . htmlspecialchars($value) . "\"";
+                  $attrs[] = $key . ' = ' . "\"" . $value . "\"";
                 }
               }
             }
