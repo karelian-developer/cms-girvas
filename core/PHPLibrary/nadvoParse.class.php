@@ -510,9 +510,18 @@ class NadvoParse
     $html = preg_replace_callback(
       self::PATTERNS['link'],
       function($matches) {
-        $href = htmlspecialchars(trim($matches[2]), ENT_QUOTES);
+        $href = str_replace(
+          ThemeCollector::DECODED_ENTITIES,
+          ThemeCollector::SAFE_SYMBOLS,
+          htmlspecialchars(trim($matches[2]), ENT_QUOTES, 'UTF-8')
+        )
+
+        $text = str_replace(
+          ThemeCollector::DECODED_ENTITIES,
+          ThemeCollector::SAFE_SYMBOLS,
+          htmlspecialchars(trim($matches[1]), ENT_QUOTES, 'UTF-8')
+        )
         
-        $text = htmlspecialchars(trim($matches[1]));
         $text = empty($text) ? $href : $text;
         $attrs = [];
         
