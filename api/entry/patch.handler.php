@@ -135,7 +135,7 @@ if ($CMSCore->client->isLogged(2)) {
 
     if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_ENTRIES_EDIT)) {
       if (isset($_PATCH['entry_id'])) {
-        $entryName = isset($_PUT['entry_name']) ? urlencode(htmlentities($_PUT['entry_name'])) : '';
+        $entryName = isset($_PATCH['entry_name']) ? urlencode(htmlentities($_PATCH['entry_name'])) : '';
         $entryID = $_PATCH['entry_id'] ?? 0;
         $entryID = is_numeric($entryID) ? (int) $entryID : 0;
 
