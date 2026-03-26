@@ -26,7 +26,7 @@ if ($CMSCore->client->isLogged(2)) {
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_PAGES_STATIC_EDIT)) {
     $pageStaticName = isset($_PUT['page_static_name']) ? urlencode(htmlentities($_PUT['page_static_name'])) : '';
 
-    if (!PageStatic::existsByName($CMSCore, $clientUserGroup)) {
+    if (!PageStatic::existsByName($CMSCore, $pageStaticName)) {
       $pageStaticCreationAllowed = true;
       $texts = [];
 
