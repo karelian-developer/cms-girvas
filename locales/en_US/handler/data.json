@@ -62,6 +62,7 @@
   "API_MODULE_ALREADY_DISABLED": "The module is already disabled.",
   "API_STATIC_PAGE_ERROR_NOT_FOUND": "Page not found.",
   "API_PAGE_STATIC_EMPTY_LOCALE_DEFAULT_PUBLISHED_ERROR": "The static page cannot be published because it does not have the default localization [%s].",
+  "API_PAGE_STATIC_NAME_ALREADY_EXISTS": "A static page with this technical name already exists.",
   "API_TEMPLATE_ERROR_NOT_FOUND": "Шаблон не найден.",
   "API_TEMPLATE_ENABLED": "Template included.",
   "API_TEMPLATE_ALREADY_ENABLED": "The template is already included.",

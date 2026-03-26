@@ -64,6 +64,7 @@
   "API_MODULE_ALREADY_DISABLED": "Модуль уже отключен.",
   "API_STATIC_PAGE_ERROR_NOT_FOUND": "Страница не найдена.",
   "API_PAGE_STATIC_EMPTY_LOCALE_DEFAULT_PUBLISHED_ERROR": "Невозможно опубликовать статическую страницу, так как в ней отсутствует стандартная локализация [%s].",
+  "API_PAGE_STATIC_NAME_ALREADY_EXISTS": "Статическая страница с таким техническим наименованием уже существует.",
   "API_TEMPLATE_ERROR_NOT_FOUND": "Шаблон не найден.",
   "API_TEMPLATE_ENABLED": "Шаблон включен.",
   "API_TEMPLATE_ALREADY_ENABLED": "Шаблон уже включен.",
