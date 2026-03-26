@@ -77,8 +77,13 @@ if (defined('IS_NOT_HACKED')) {
         $siteMapCustomPages = $siteMapConfiguration['customPages'];
         
         foreach ($siteMapCustomPages as $pageData) {
-          $pageURL = sprintf('https://%s/%s?locale=%s', $CMSConfigDomain, $pageData['URL'], $CMSCore->locale->getName());
-          $sitemapBuilder->addURL($pageURL, time(), $pageData['changefreq'], $pageData['priority']);
+          if (isset($pageData['URL'])) {
+            $pageDataChangefreq = $pageData['changefreq'] ?? 'weekly';
+            $pageDataPriority = $pageData['priority'] ?? 0.5;
+
+            $pageURL = sprintf('https://%s/%s?locale=%s', $CMSConfigDomain, $pageData['URL'], $CMSCore->locale->getName());
+            $sitemapBuilder->addURL($pageURL, time(), $pageData['changefreq'], $pageData['priority']);
+          }
         }
       }
 
