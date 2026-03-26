@@ -27,5 +27,5 @@
  */
 
 $configuration = [
-  'customPages' = []
+  'customPages' => []
 ];
