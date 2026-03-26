@@ -40,8 +40,11 @@ if (defined('IS_NOT_HACKED')) {
     http_response_code(200);
     echo $sitemapImagesBuilder->assembled;
   } else {
+    $siteMapConfiguration = $CMSCore->configurator->getOtherCollection('sitemap');
     $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
     if (count($CMSLocalesNames) > 0) {
+      $CMSConfigDomain = trim($CMSConfigurator->get('domain'));
+
       // Перебор всех существующих записей
       foreach ($entries->getAll() as $entry) {
         $entry->initData(['name', 'updatedUnixTimestamp', 'metadata', 'texts']);
@@ -49,10 +52,8 @@ if (defined('IS_NOT_HACKED')) {
         if ($entry->isPublished()) {
           foreach ($CMSLocalesNames as $index => $localeName) {
             if (!empty($entry->getTitle($localeName)) && !empty($entry->getDescription($localeName)) && !empty($entry->getContent($localeName))) {
-              $CMSConfigDomain = trim($CMSConfigurator->get('domain'));
-              $entryURL = sprintf('https://%s/entry/%s?locale=%s', $CMSConfigDomain, $entry->getName(), $localeName);
-
-              $sitemapBuilder->addURL($entryURL, $entry->getUpdatedUnixTimestamp(), 'weekly', 0.8);
+              $pageURL = sprintf('https://%s/entry/%s?locale=%s', $CMSConfigDomain, $entry->getName(), $localeName);
+              $sitemapBuilder->addURL($pageURL, $entry->getUpdatedUnixTimestamp(), 'weekly', 0.8);
             }
           }
         }
@@ -65,12 +66,19 @@ if (defined('IS_NOT_HACKED')) {
         if ($pageStatic->isPublished()) {
           foreach ($CMSLocalesNames as $index => $localeName) {
             if (!empty($pageStatic->getTitle($localeName)) && !empty($pageStatic->getDescription($localeName)) && !empty($pageStatic->getContent($localeName))) {
-              $CMSConfigDomain = trim($CMSConfigurator->get('domain'));
-              $pageStaticURL = sprintf('https://%s/page/%s?locale=%s', $CMSConfigDomain, $pageStatic->getName(), $localeName);
-
-              $sitemapBuilder->addURL($pageStaticURL, $pageStatic->getUpdatedUnixTimestamp(), 'weekly', 0.8);
+              $pageURL = sprintf('https://%s/page/%s?locale=%s', $CMSConfigDomain, $pageStatic->getName(), $localeName);
+              $sitemapBuilder->addURL($pageURL, $pageStatic->getUpdatedUnixTimestamp(), 'weekly', 0.8);
             }
           }
+        }
+      }
+
+      if (isset($siteMapConfiguration['customPages'])) {
+        $siteMapCustomPages = $siteMapConfiguration['customPages'];
+        
+        foreach ($siteMapCustomPages as $pageData) {
+          $pageURL = sprintf('https://%s/%s?locale=%s', $CMSConfigDomain, $pageData['URL'], $CMSCore->locale->getName());
+          $sitemapBuilder->addURL($pageURL, time(), $pageData['changefreq'], $pageData['priority']);
         }
       }
 
