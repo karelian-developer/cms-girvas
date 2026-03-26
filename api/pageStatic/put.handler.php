@@ -8,7 +8,7 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
- if (!defined('IS_NOT_HACKED')) {
+if (!defined('IS_NOT_HACKED')) {
   http_response_code(503);
   die('An attempted hacker attack has been detected.');
 }
