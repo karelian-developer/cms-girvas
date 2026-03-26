@@ -44,6 +44,7 @@
   "API_ENTRY_COMMENT_ERROR_EMPTY": "Comment is empty.",
   "API_ENTRY_COMMENT_ERROR_REPEAT_VOTE": "It is also impossible to vote again.",
   "API_ENTRY_EMPTY_LOCALE_DEFAULT_PUBLISHED_ERROR": "The entry cannot be published because it does not have the default localization [%s].",
+  "API_ENTRY_NAME_ALREADY_EXISTS": "An entry with this technical name already exists.",
   "API_ENTRIES_CATEGORY_ERROR_NOT_FOUND": "Entries category not found.",
   "API_ENTRIES_CATEGORY_ERROR_DELETION_EXISTS_ENTRIES": "The post category cannot be deleted because it is not empty - it contains posts.",
   "API_ENTRIES_SAMPLE_ERROR_NAME_EMPTY": "The sample technical name cannot be empty.",
