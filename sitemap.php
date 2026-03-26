@@ -82,7 +82,7 @@ if (defined('IS_NOT_HACKED')) {
             $pageDataPriority = $pageData['priority'] ?? 0.5;
 
             $pageURL = sprintf('https://%s/%s?locale=%s', $CMSConfigDomain, $pageData['URL'], $CMSCore->locale->getName());
-            $sitemapBuilder->addURL($pageURL, time(), $pageData['changefreq'], $pageData['priority']);
+            $sitemapBuilder->addURL($pageURL, time(), $pageDataChangefreq, $pageDataPriority);
           }
         }
       }
