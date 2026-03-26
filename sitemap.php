@@ -81,8 +81,10 @@ if (defined('IS_NOT_HACKED')) {
             $pageDataChangefreq = $pageData['changefreq'] ?? 'weekly';
             $pageDataPriority = $pageData['priority'] ?? 0.5;
 
-            $pageURL = sprintf('https://%s/%s?locale=%s', $CMSConfigDomain, $pageData['URL'], $CMSCore->locale->getName());
-            $sitemapBuilder->addURL($pageURL, time(), $pageDataChangefreq, $pageDataPriority);
+            foreach ($CMSLocalesNames as $index => $localeName) {
+              $pageURL = sprintf('https://%s/%s?locale=%s', $CMSConfigDomain, $pageData['URL'], $localeName);
+              $sitemapBuilder->addURL($pageURL, time(), $pageDataChangefreq, $pageDataPriority);
+            }
           }
         }
       }
