@@ -333,9 +333,8 @@ export class PageForm {
         this.buttons.save.target.element.style.display = 'flex';
       }
 
-      tableFormElementsButtonContainer.append(this.buttons.addElement.target.element);
-
-      let interactiveContainer = document.querySelector('[data-element="panel"]');
+      const interactiveContainer = document.querySelector('[data-element="panel"]');
+      interactiveContainer.append(this.buttons.addElement.target.element);
       interactiveContainer.append(this.buttons.delete.target.element);
       interactiveContainer.append(this.buttons.save.target.element);
     }, (rejectionReason) => {
