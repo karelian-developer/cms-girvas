@@ -168,8 +168,8 @@ if ($CMSCore->client->isLogged(2)) {
           $elementName = $elements[$elementIndex]['name'];
           foreach ($_PUT['form_element_select_' . $elementName . '_option_label'] as $optionIndex => $optionLabel) {
             $elements[$elementIndex]['options'][$optionIndex]['texts'] = [];
-            $elements[$elementIndex]['options'][$optionIndex]['texts'][$CMSLocaleName] = [];
-            $elements[$elementIndex]['options'][$optionIndex]['texts'][$CMSLocaleName]['label'] = $optionLabel;
+            $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale] = [];
+            $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale]['label'] = $optionLabel;
           }
 
           foreach ($_PUT['form_element_select_' . $elementName . '_option_value'] as $optionIndex => $optionValue) {
