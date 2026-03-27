@@ -12,23 +12,9 @@
   row-gap: 16px;
 }
  
-.main__page_form .grid-table__cell:not(:last-child) {
+.main__page_form .grid-table__row:not(:last-child) {
   border-bottom: 1px solid var(--color-neutral-lightgray);
-  padding-bottom: 20px;
-}
-
-@media (min-width: 801px) {
-  .main__page_form .grid-table__cell_text {
-    padding-right: 20px;
-  }
-
-  .main__page_form .grid-table__cell_data {
-    padding-left: 20px;
-  }
-}
-
-.main__page_form .grid-table__cell_text {
-  grid-column: 1;
+  padding-bottom: 16px;
 }
 
 @media (max-width: 800px) {
