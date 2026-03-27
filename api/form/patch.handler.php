@@ -158,7 +158,10 @@ if ($CMSCore->client->isLogged(2)) {
                       $formElements[$i]['options'][$optionIndex]['texts'] = [];
                     }
 
-                    $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale] = [];
+                    if (!isset($formElements[$i]['options'][$optionIndex]['texts'][$commonLocale])) {
+                      $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale] = [];
+                    }
+
                     $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale]['label'] = $optionLabel;
                     $formElements[$i]['options'][$optionIndex]['value'] = $optionValue;
                   }
