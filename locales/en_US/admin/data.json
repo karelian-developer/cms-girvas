@@ -362,6 +362,8 @@
   "PAGE_FORM_ELEMENT_TITLE_PLACEHOLDER": "New Field",
   "PAGE_FORM_ELEMENT_DESCRIPTION_PLACEHOLDER": "Description for Field",
   "PAGE_FORM_ELEMENT_OPTION_TITLE": "Option",
+  "PAGE_FORM_ELEMENT_OPTION_LABEL_PLACEHOLDER": "Option label",
+  "PAGE_FORM_ELEMENT_OPTION_VALUE_PLACEHOLDER": "Option value",
   "PAGE_FORM_NOTIFICATIONS_TITLE": "Form Notifiers",
   "PAGE_FORM_NOTIFICATIONS_TELEGRAM_CHATS_TITLE": "Chat IDs for the notifier (Telegram)",
   "PAGE_FORM_NOTIFICATIONS_TELEGRAM_CHATS_DESCRIPTION": "A list of Telegram chats to which the notifier will send the results of this form. Their IDs must be separated by commas.",

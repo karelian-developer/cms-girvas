@@ -362,6 +362,8 @@
   "PAGE_FORM_ELEMENT_TITLE_PLACEHOLDER": "Новое поле",
   "PAGE_FORM_ELEMENT_DESCRIPTION_PLACEHOLDER": "Описание для поля",
   "PAGE_FORM_ELEMENT_OPTION_TITLE": "Параметр",
+  "PAGE_FORM_ELEMENT_OPTION_LABEL_PLACEHOLDER": "Подпись параметра",
+  "PAGE_FORM_ELEMENT_OPTION_VALUE_PLACEHOLDER": "Значение параметра",
   "PAGE_FORM_NOTIFICATIONS_TITLE": "Уведомители для формы",
   "PAGE_FORM_NOTIFICATIONS_TELEGRAM_CHATS_TITLE": "ID чатов для уведомителя (Telegram)",
   "PAGE_FORM_NOTIFICATIONS_TELEGRAM_CHATS_DESCRIPTION": "Список чатов в Telegram, куда уведомитель будет отправлять результаты данной формы. Необходимо перечислить их ID через запятую.",
