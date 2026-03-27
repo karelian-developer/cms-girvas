@@ -170,9 +170,9 @@ if ($CMSCore->client->isLogged(2)) {
 
               $elements[$elementIndex]['options'][$optionIndex] = [];
               $elements[$elementIndex]['options'][$optionIndex]['texts'] = [];
-              $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale] = [];
+              $elements[$elementIndex]['options'][$optionIndex]['texts'][$CMSLocaleName] = [];
               
-              $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale]['label'] = $optionLabel;
+              $elements[$elementIndex]['options'][$optionIndex]['texts'][$CMSLocaleName]['label'] = $optionLabel;
               $elements[$elementIndex]['options'][$optionIndex]['value'] = $optionValue;
             }
           }

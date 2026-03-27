@@ -44,7 +44,6 @@ if ($CMSCore->client->isLogged(2)) {
 
       $formData = [];
       $formElements = $form->getElements();
-      error_log(print_r($formElements, true));
 
       $formElements = array_filter($formElements, function($element) use ($_PATCH) {
         return isset($_PATCH['form_element_name']) && in_array($element['name'], $_PATCH['form_element_name']);
