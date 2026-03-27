@@ -164,17 +164,18 @@ if ($CMSCore->client->isLogged(2)) {
           }
         }
 
-        if (isset($elements[$elementIndex]['options'])) {
-          $elementName = $elements[$elementIndex]['name'];
-          foreach ($_PUT['form_element_select_' . $elementName . '_option_label'] as $optionIndex => $optionLabel) {
-            if (!isset($elements[$elementIndex]['options'][$optionIndex]['texts'])) $elements[$i]['options'][$optionIndex]['texts'] = [];
-            $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale] = [];
-            $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale]['label'] = $optionLabel;
-          }
+        $elements[$elementIndex]['options'] = [];
+        $elementName = $elements[$elementIndex]['name'];
 
-          foreach ($_PUT['form_element_select_' . $elementName . '_option_value'] as $optionIndex => $optionValue) {
-            $elements[$elementIndex]['options'][$optionIndex]['value'] = $optionValue;
-          }
+        foreach ($_PUT['form_element_select_' . $elementName . '_option_label'] as $optionIndex => $optionLabel) {
+          $optionValue = $_PUT['form_element_select_' . $elementName . '_option_value'][$optionIndex];
+
+          $elements[$elementIndex]['options'][$optionIndex] = [];
+          $elements[$elementIndex]['options'][$optionIndex]['texts'] = [];
+          $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale] = [];
+          
+          $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale]['label'] = $optionLabel;
+          $elements[$elementIndex]['options'][$optionIndex]['value'] = $optionValue;
         }
       }
     }
