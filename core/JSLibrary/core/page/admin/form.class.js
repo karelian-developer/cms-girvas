@@ -555,6 +555,7 @@ export class PageForm {
     });
 
     rowsElement.append(cellHeaderElement);
+    rowsElement.append(cellElementsForType);
     rowsElement.append(cellElementsForTitle);
     rowsElement.append(cellElementsForName);
     rowsElement.append(cellElementsForDescription);
