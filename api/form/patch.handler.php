@@ -137,6 +137,10 @@ if ($CMSCore->client->isLogged(2)) {
                 foreach ($_PATCH['form_element_select_' . $elementName . '_option_label'] as $optionIndex => $optionLabel) {
                   $optionValue = $_PATCH['form_element_select_' . $elementName . '_option_value'][$optionIndex];
                   
+                  if (!isset($formElements[$i]['options'][$optionIndex])) {
+                    $formElements[$i]['options'][$optionIndex] = [];
+                  }
+
                   if (!isset($formElements[$i]['options'][$optionIndex]['texts'])) {
                     $formElements[$i]['options'][$optionIndex]['texts'] = [];
                   }
