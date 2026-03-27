@@ -161,21 +161,21 @@ if ($CMSCore->client->isLogged(2)) {
             if ($elementPlaceholder !== null) {
               $elements[$elementIndex]['texts'][$CMSLocaleName]['placeholder'] = htmlspecialchars(str_replace('\'', '"', trim($_PUT['form_element_placeholder'][$elementIndex])));
             }
+
+            $elements[$elementIndex]['options'] = [];
+            $elementName = $elements[$elementIndex]['name'];
+
+            foreach ($_PUT['form_element_select_' . $elementName . '_option_label'] as $optionIndex => $optionLabel) {
+              $optionValue = $_PUT['form_element_select_' . $elementName . '_option_value'][$optionIndex];
+
+              $elements[$elementIndex]['options'][$optionIndex] = [];
+              $elements[$elementIndex]['options'][$optionIndex]['texts'] = [];
+              $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale] = [];
+              
+              $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale]['label'] = $optionLabel;
+              $elements[$elementIndex]['options'][$optionIndex]['value'] = $optionValue;
+            }
           }
-        }
-
-        $elements[$elementIndex]['options'] = [];
-        $elementName = $elements[$elementIndex]['name'];
-
-        foreach ($_PUT['form_element_select_' . $elementName . '_option_label'] as $optionIndex => $optionLabel) {
-          $optionValue = $_PUT['form_element_select_' . $elementName . '_option_value'][$optionIndex];
-
-          $elements[$elementIndex]['options'][$optionIndex] = [];
-          $elements[$elementIndex]['options'][$optionIndex]['texts'] = [];
-          $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale] = [];
-          
-          $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale]['label'] = $optionLabel;
-          $elements[$elementIndex]['options'][$optionIndex]['value'] = $optionValue;
         }
       }
     }
