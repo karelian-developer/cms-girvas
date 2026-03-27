@@ -138,7 +138,7 @@ if ($CMSCore->client->isLogged(2)) {
                 $formElementDescriptionsTrimmed = trim($formElementDescriptions[$i]);
                 $formElementPlaceholdersTrimmed = trim($formElementPlaceholders[$i]);
 
-                $formElements[$i]['texts'][$CMSLocaleName] = [
+                $formElements[$i]['texts'][$commonLocale] = [
                   'title' => htmlspecialchars(str_replace('\'', '"', $formElementTitlesTrimmed)),
                   'description' => str_replace('\'', '"', $formElementDescriptionsTrimmed),
                   'placeholder' => str_replace('\'', '"', $formElementPlaceholdersTrimmed)
