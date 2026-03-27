@@ -26,6 +26,10 @@
   padding-bottom: 16px;
 }
 
+.grid-table__input-group {
+  gap: 8px;
+}
+
 @media (max-width: 800px) {
   .main__page_form .grid-table__cell_text {
     border-bottom: 0 !important;

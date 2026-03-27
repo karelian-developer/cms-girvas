@@ -635,7 +635,10 @@ export class PageForm {
 
   createRowSelectOption(localeData, inputName, index) {
     const inputGroupElement = document.createElement('div');
+    inputGroupElement.classList.add('grid-table__input-group');
     const inputOptionLabelElement = document.createElement('input');
+    inputOptionLabelElement.classList.add('form__input');
+    inputOptionLabelElement.classList.add('form__input_text');
     inputOptionLabelElement.setAttribute('type', 'text');
     inputOptionLabelElement.setAttribute('name', 'form_element_select_' + inputName.value + '_option_label[' + index + ']');
     inputOptionLabelElement.setAttribute('data-element', 'select-option-label');
@@ -643,6 +646,8 @@ export class PageForm {
     inputOptionLabelElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_LABEL_PLACEHOLDER);
     
     const inputOptionValueElement = document.createElement('input');
+    inputOptionValueElement.classList.add('form__input');
+    inputOptionValueElement.classList.add('form__input_text');
     inputOptionValueElement.setAttribute('type', 'text');
     inputOptionValueElement.setAttribute('name', 'form_element_select_' + inputName.value + '_option_value[' + index + ']');
     inputOptionValueElement.setAttribute('data-element', 'select-option-value');
