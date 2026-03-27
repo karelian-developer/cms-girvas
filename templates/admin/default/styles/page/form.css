@@ -11,6 +11,10 @@
   grid-template-columns: 1fr 1fr;
   row-gap: 16px;
 }
+
+.main__page_form .grid-table__row_header {
+  grid-template-columns: 1fr;
+}
  
 .main__page_form .grid-table__row:not(:last-child) {
   border-bottom: 1px solid var(--color-neutral-lightgray);
