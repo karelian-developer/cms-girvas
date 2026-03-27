@@ -577,7 +577,7 @@ export class PageForm {
 
     interactiveChoicesTypeField.target.element.addEventListener('change', (event) => {
       if (interactiveChoicesTypeField.target.itemSelectedIndex === 7) {
-        cellElementsForPlaceholder.remove();
+        formElementInputPlaceholder.remove();
       }
     });
 
