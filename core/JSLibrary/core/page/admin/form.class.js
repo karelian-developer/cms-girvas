@@ -573,8 +573,7 @@ export class PageForm {
         buttonAddOptionField.target.setCallback((event) => {
           event.preventDefault();
 
-          let rowOptions = document.querySelectorAll('[data-element="select-option-label"][data-select="' + formElementInputName + '"]');
-          console.log('[data-element="select-option-label"][data-select="' + formElementInputName + '"]');
+          let rowOptions = document.querySelectorAll('[data-element="select-option-label"][data-select="' + formElementInputName.value + '"]');
           let rowOption = this.createRowSelectOption(localeData, formElementInputName, rowOptions.length);
           rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
         });
@@ -583,7 +582,7 @@ export class PageForm {
 
         buttonRemoveField.target.element.before(buttonAddOptionField.target.element);
       } else {
-        let rowOptions = document.querySelectorAll('[data-element="select-option-label"][data-select="' + formElementInputName + '"]');
+        let rowOptions = document.querySelectorAll('[data-element="select-option-label"][data-select="' + formElementInputName.value + '"]');
         if (rowOptions.length > 0) {
           rowOptions.forEach(rowOption => {
             rowOption.remove();
