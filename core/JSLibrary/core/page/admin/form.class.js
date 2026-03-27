@@ -475,7 +475,7 @@ export class PageForm {
 
     interactiveChoicesTypeField.assembly();
 
-    const cellElementsForTypeData = cellElementsForType.querySelector('.grid-table__cell_data');
+    const cellElementsForTypeData = cellElementsForType.querySelector('.grid-table__cell_text');
     cellElementsForTypeData.append(interactiveChoicesTypeField.target.element);
 
     const checkboxID = Array(10).fill(0).map(() => Math.floor(Math.random() * 10)).join('');
