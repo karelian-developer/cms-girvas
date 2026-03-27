@@ -355,9 +355,13 @@ export class PageForm {
   }
 
   createCellFormElementElements(title, dataElement = null) {
+    const cellContainerElement = document.createElement('div');
     const cellTextElement = document.createElement('div');
     const cellTextTitleElement = document.createElement('div');
     const cellDataElement = document.createElement('div');
+
+    cellContainerElement.classList.add('cell-container');
+    cellContainerElement.classList.add('grid-table__cell-container');
 
     cellTextElement.classList.add('cell');
     cellTextElement.classList.add('grid-table__cell');
@@ -374,15 +378,14 @@ export class PageForm {
     cellTextTitleElement.innerText = title;
     
     cellTextElement.appendChild(cellTextTitleElement);
+    cellContainerElement.appendChild(cellTextElement);
 
     if (dataElement !== null) {
       cellDataElement.appendChild(dataElement);
+      cellContainerElement.appendChild(cellDataElement);
     }
 
-    return [
-      cellTextElement,
-      cellDataElement
-    ];
+    return cellContainerElement;
   }
 
   addElement(localeData, container, data = {}) {
@@ -535,33 +538,12 @@ export class PageForm {
       event.preventDefault();
       this.elementsCount--;
       
-      cellElementsForType.forEach(element => {
-        element.remove();
-      });
-      
-      cellElementsForRequired.forEach(element => {
-        element.remove();
-      });
-
-      cellElementsForTitle.forEach(element => {
-        element.remove();
-      });
-
-      cellElementsForPlaceholder.forEach(element => {
-        element.remove();
-      });
-
-      cellElementsForName.forEach(element => {
-        element.remove();
-      });
-
-      cellElementsForDescription.forEach(element => {
-        element.remove();
-      });
-
-      cellElementsForSequenceNumber.forEach(element => {
-        element.remove();
-      });
+      cellElementsForType.remove()
+      cellElementsForRequired.remove();
+      cellElementsForPlaceholder.remove();
+      cellElementsForName.remove();
+      cellElementsForDescription.remove();
+      cellElementsForSequenceNumber.remove();
 
       buttonRemoveField.target.element.parentElement.previousElementSibling.remove();
       buttonRemoveField.target.element.parentElement.remove();
@@ -577,8 +559,7 @@ export class PageForm {
 
     interactiveChoicesTypeField.target.elementSelect.addEventListener('change', (event) => {
       if (interactiveChoicesTypeField.target.itemSelectedIndex === 7) {
-        cellElementsForPlaceholder[0].remove();
-        cellElementsForPlaceholder[1].remove();
+        
       }
     });
 
