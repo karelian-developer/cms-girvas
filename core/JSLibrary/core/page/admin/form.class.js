@@ -371,9 +371,12 @@ export class PageForm {
     cellDataElement.classList.add('grid-table__cell');
     cellDataElement.classList.add('grid-table__cell_data');
     cellTitleElement.classList.add('grid-table__cell-title');
-    cellTitleElement.innerText = title;
 
-    cellInfoElement.append(cellTitleElement);
+    if (title !== null) {
+      cellTitleElement.innerText = title;
+      cellInfoElement.append(cellTitleElement);
+    }
+
     rowElement.append(cellInfoElement);
     
     if (dataElement !== null) {
@@ -543,7 +546,7 @@ export class PageForm {
     buttonRemoveField.assembly();
 
     const cellElementsForEvents = this.createRowElement(
-      '', buttonRemoveField.target.element
+      null, buttonRemoveField.target.element
     );
 
     interactiveChoicesTypeField.target.elementSelect.addEventListener('change', (event) => {
