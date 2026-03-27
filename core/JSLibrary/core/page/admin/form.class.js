@@ -158,8 +158,6 @@ export class PageForm {
         event.target.value = uString.source;
       });
 
-      const formElementsU = document.querySelectorAll('[data-element="form-element"]');
-      
       this.buttons.addElement = new Interactive('button');
       this.buttons.save = new Interactive('button');
       this.buttons.delete = new Interactive('button');
@@ -175,7 +173,7 @@ export class PageForm {
       this.buttons.addElement.target.setCallback((event) => {
         event.preventDefault();
 
-        
+        const formElementsU = document.querySelectorAll('[data-element="form-element"]');
         const anchorElement = formElementsU[formElementsU.length - 1] ?? null;
         this.addElement(localeData, anchorElement);
       });
@@ -193,6 +191,7 @@ export class PageForm {
           const elementDescription = elementTexts.description;
           const elementPlaceholder = elementTexts.placeholder;
           
+          const formElementsU = document.querySelectorAll('[data-element="form-element"]');
           const anchorElement = formElementsU[formElementsU.length - 1] ?? null;
           this.addElement(localeData, anchorElement, {
             index: elementIndex,
