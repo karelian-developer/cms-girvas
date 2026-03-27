@@ -438,7 +438,9 @@ export class PageForm {
       selectOptionsElements.forEach(element => {
         if (element.getAttribute('data-element') === 'select-option-label') {
           element.setAttribute('name', 'form_element_select_' + formElementInputName.value + '_option_label');
-        } else {
+        }
+
+        if (element.getAttribute('data-element') === 'select-option-value') {
           element.setAttribute('name', 'form_element_select_' + formElementInputName.value + '_option_value');
         }
       });
