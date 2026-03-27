@@ -563,17 +563,18 @@ export class PageForm {
 
     interactiveChoicesTypeField.target.elementSelect.addEventListener('change', (event) => {
       if (interactiveChoicesTypeField.target.itemSelectedIndex === 7) {
-        const rowOption = this.createRowSelectOption(localeData, formElementInputName, 1);
+        const rowOption = this.createRowSelectOption(localeData, formElementInputName, 0);
         rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
 
         const buttonAddOptionField = new Interactive('button');
         buttonAddOptionField.target.setLabel(localeData.BUTTON_NEW_OPTION_LABEL);
-        buttonAddOptionField.target.setStyle('red');
+        buttonAddOptionField.target.setStyle('default');
 
         buttonAddOptionField.target.setCallback((event) => {
           event.preventDefault();
 
-          const rowOption = this.createRowSelectOption(localeData, formElementInputName, 1);
+          const rowOptions = document.querySelectorAll('[data-select="' + formElementInputName + '"]');
+          const rowOption = this.createRowSelectOption(localeData, formElementInputName, rowOptions.length);
           rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
         });
 
