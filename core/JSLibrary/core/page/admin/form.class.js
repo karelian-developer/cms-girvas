@@ -528,15 +528,6 @@ export class PageForm {
     const rowsElement = document.createElement('div');
     rowsElement.classList.add('grid-table__rows');
 
-    rowsElement.append(cellHeaderElement);
-    rowsElement.append(cellElementsForTitle);
-    rowsElement.append(cellElementsForName);
-    rowsElement.append(cellElementsForDescription);
-    rowsElement.append(cellElementsForPlaceholder);
-    rowsElement.append(cellElementsForSequenceNumber);
-    rowsElement.append(cellElementsForRequired);
-    rowsElement.append(cellElementsForEvents);
-
     const buttonRemoveField = new Interactive('button');
     buttonRemoveField.target.setLabel(localeData.BUTTON_DELETE_LABEL);
     buttonRemoveField.target.setStyle('red');
@@ -549,8 +540,6 @@ export class PageForm {
 
       buttonRemoveField.target.element.parentElement.previousElementSibling.remove();
       buttonRemoveField.target.element.parentElement.remove();
-
-      cellHeaderElement.remove();
     });
 
     buttonRemoveField.assembly();
@@ -564,6 +553,15 @@ export class PageForm {
         
       }
     });
+
+    rowsElement.append(cellHeaderElement);
+    rowsElement.append(cellElementsForTitle);
+    rowsElement.append(cellElementsForName);
+    rowsElement.append(cellElementsForDescription);
+    rowsElement.append(cellElementsForPlaceholder);
+    rowsElement.append(cellElementsForSequenceNumber);
+    rowsElement.append(cellElementsForRequired);
+    rowsElement.append(cellElementsForEvents);
 
     const formElementsSectionHeader = document.querySelector('[data-element="form-elements-section-header"]');
     if (formElementsSectionHeader !== null) {
