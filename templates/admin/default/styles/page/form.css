@@ -38,17 +38,17 @@
   }
 }
 
-.main__page_form .grid-table__cell_text .cell__title {
+.main__page_form .grid-table__cell_text .grid-table__cell-title {
   text-transform: uppercase;
   font-weight: 500;
   font-size: 16px;
 }
 
-.main__page_form .grid-table__cell_text .cell__title:not(:last-child) {
+.main__page_form .grid-table__cell_text .grid-table__cell-title:not(:last-child) {
   margin-bottom: 10px;
 }
 
-.main__page_form .grid-table__cell_text .cell__description {
+.main__page_form .grid-table__cell_text .grid-table__cell-description {
   font-size: 14px;
   opacity: .6;
 }

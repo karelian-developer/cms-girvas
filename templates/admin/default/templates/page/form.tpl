@@ -12,10 +12,10 @@
       <div class="grid-table page__grid-table">
         <!-- Поле: Техническое наименование -->
         <div class="cell grid-table__cell grid-table__cell_text">
-          <div class="cell__title">
+          <div class="grid-table__cell-title">
             {LANG:PAGE_FORM_TECHNICAL_NAME_TITLE}
           </div>
-          <div class="cell__description">
+          <div class="grid-table__cell-description">
             {LANG:PAGE_FORM_TECHNICAL_NAME_DESCRIPTION}
           </div>
         </div>
@@ -24,10 +24,10 @@
         </div>
         <!-- Поле: Заголовок -->
         <div class="cell grid-table__cell grid-table__cell_text">
-          <div class="cell__title">
+          <div class="grid-table__cell-title">
             {LANG:PAGE_FORM_TITLE_TITLE}
           </div>
-          <div class="cell__description">
+          <div class="grid-table__cell-description">
             {LANG:PAGE_FORM_TITLE_DESCRIPTION}
           </div>
         </div>
@@ -36,10 +36,10 @@
         </div>
         <!-- Поле: Описание -->
         <div class="cell grid-table__cell grid-table__cell_text">
-          <div class="cell__title">
+          <div class="grid-table__cell-title">
             {LANG:PAGE_FORM_DESCRIPTION_TITLE}
           </div>
-          <div class="cell__description">
+          <div class="grid-table__cell-description">
             {LANG:PAGE_FORM_DESCRIPTION_DESCRIPTION}
           </div>
         </div>
@@ -48,10 +48,10 @@
         </div>
         <!-- Поле: Ссылка обработки -->
         <div class="cell grid-table__cell grid-table__cell_text">
-          <div class="cell__title">
+          <div class="grid-table__cell-title">
             {LANG:PAGE_FORM_ACTION_TITLE}
           </div>
-          <div class="cell__description">
+          <div class="grid-table__cell-description">
             {LANG:PAGE_FORM_ACTION_DESCRIPTION}
           </div>
         </div>
@@ -60,10 +60,10 @@
         </div>
         <!-- Поле: Спецификация -->
         <div class="cell grid-table__cell grid-table__cell_text">
-          <div class="cell__title">
+          <div class="grid-table__cell-title">
             {LANG:PAGE_FORM_METHOD_TITLE}
           </div>
-          <div class="cell__description">
+          <div class="grid-table__cell-description">
             {LANG:PAGE_FORM_METHOD_DESCRIPTION}
           </div>
         </div>
@@ -75,10 +75,10 @@
         </div>
         <!-- Поле: Уведомления (чаты Telegram) -->
         <div class="cell grid-table__cell grid-table__cell_text">
-          <div class="cell__title">
+          <div class="grid-table__cell-title">
             {LANG:PAGE_FORM_NOTIFICATIONS_TELEGRAM_CHATS_TITLE}
           </div>
-          <div class="cell__description">
+          <div class="grid-table__cell-description">
             {LANG:PAGE_FORM_NOTIFICATIONS_TELEGRAM_CHATS_DESCRIPTION}
           </div>
         </div>
@@ -86,10 +86,10 @@
           <input name="form_notification_telegram_chats_ids" type="text" class="input form__input form__input_text" value="{FORM_NOTIFICATION_TELEGRAM_CHATS_IDS}" placeholder="123456789, 123456790..." data-element="input-notifications-telegram-chats-ids">
         </div>
         <div class="cell grid-table__cell grid-table__cell_text">
-          <div class="cell__title">
+          <div class="grid-table__cell-title">
             {LANG:PAGE_FORM_NOTIFICATIONS_MAX_CHATS_TITLE}
           </div>
-          <div class="cell__description">
+          <div class="grid-table__cell-description">
             {LANG:PAGE_FORM_NOTIFICATIONS_MAX_CHATS_DESCRIPTION}
           </div>
         </div>
