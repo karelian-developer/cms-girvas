@@ -563,33 +563,38 @@ export class PageForm {
     
     cellElementsForEvents.classList.add('grid-table__cell_panel');
 
+    const buttonAddOptionField = new Interactive('button');
+    buttonAddOptionField.target.setLabel(localeData.BUTTON_NEW_OPTION_LABEL);
+    buttonAddOptionField.target.setStyle('default');
+
+    buttonAddOptionField.target.setCallback((event) => {
+      event.preventDefault();
+
+      let rowOptions = document.querySelectorAll('[data-element="select-option-label"][data-select="' + formElementInputName.value + '"]');
+      let rowOption = this.createRowSelectOption(localeData, formElementInputName, rowOptions.length);
+      rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
+    });
+
+    buttonAddOptionField.assembly();
+
+    buttonRemoveField.target.element.before(buttonAddOptionField.target.element);
+
     interactiveChoicesTypeField.target.elementSelect.addEventListener('change', (event) => {
       if (interactiveChoicesTypeField.target.itemSelectedIndex === 7) {
         let rowOption = this.createRowSelectOption(localeData, formElementInputName, 0);
+        
         rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
-
-        const buttonAddOptionField = new Interactive('button');
-        buttonAddOptionField.target.setLabel(localeData.BUTTON_NEW_OPTION_LABEL);
-        buttonAddOptionField.target.setStyle('default');
-
-        buttonAddOptionField.target.setCallback((event) => {
-          event.preventDefault();
-
-          let rowOptions = document.querySelectorAll('[data-element="select-option-label"][data-select="' + formElementInputName.value + '"]');
-          let rowOption = this.createRowSelectOption(localeData, formElementInputName, rowOptions.length);
-          rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
-        });
-
-        buttonAddOptionField.assembly();
-
-        buttonRemoveField.target.element.before(buttonAddOptionField.target.element);
+        buttonAddOptionField.target.element.style.display = 'flex';
       } else {
         let rowOptions = document.querySelectorAll('[data-element="select-option-label"][data-select="' + formElementInputName.value + '"]');
+        
         if (rowOptions.length > 0) {
           rowOptions.forEach(rowOption => {
             rowOption.parentElement.parentElement.parentElement.remove();
           });
         }
+
+        buttonAddOptionField.target.element.style.display = 'none';
       }
     });
 
