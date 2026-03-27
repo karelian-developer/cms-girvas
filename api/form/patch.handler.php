@@ -49,8 +49,6 @@ if ($CMSCore->client->isLogged(2)) {
         return isset($_PATCH['form_element_name']) && in_array($element['name'], $_PATCH['form_element_name']);
       });
 
-      error_log(print_r($_PATCH, true));
-
       $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
       if (count($CMSLocalesNames) > 0) {
         foreach ($CMSLocalesNames as $index => $name) {
@@ -128,6 +126,24 @@ if ($CMSCore->client->isLogged(2)) {
               $formElements[$i]['sequenceNumber'] = is_numeric($formElementSequenceNumbers[$i])
                 ? $formElementSequenceNumbers[$i]
                 : 0;
+
+              if ($formElements[$i]['type'] === 'select') {
+                $formElements[$i]['options'] = [];
+              }
+              
+              if (isset($formElements[$i]['options'])) {
+                $elementName = $formElements[$i]['name'];
+                
+                foreach ($_PATCH['form_element_select_' . $elementName . '_option_label'] as $optionIndex => $optionLabel) {
+                  $formElements[$i]['options']['texts'] = [];
+                  $formElements[$i]['options']['texts'][$CMSLocaleName] = [];
+                  $formElements[$i]['options']['texts'][$CMSLocaleName]['label'] = $optionLabel;
+                }
+
+                foreach ($_PATCH['form_element_select_' . $elementName . '_option_value'] as $optionIndex => $optionValue) {
+                  $formElements[$i]['options']['value'] = $optionValue;
+                }
+              }
               
               if ($CMSLocaleName === $commonLocale) {
                 
