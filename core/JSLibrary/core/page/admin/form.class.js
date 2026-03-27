@@ -563,8 +563,8 @@ export class PageForm {
 
     interactiveChoicesTypeField.target.elementSelect.addEventListener('change', (event) => {
       if (interactiveChoicesTypeField.target.itemSelectedIndex === 7) {
-        const rowOptions = this.createRowSelectOption(localeData, 1);
-        rowsElement.children.item(rowsElement.children.length - 1).before(rowOptions);
+        const rowOption = this.createRowSelectOption(localeData, formElementInputName, 1);
+        rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
 
         const buttonAddOptionField = new Interactive('button');
         buttonAddOptionField.target.setLabel(localeData.BUTTON_NEW_OPTION_LABEL);
@@ -572,11 +572,21 @@ export class PageForm {
 
         buttonAddOptionField.target.setCallback((event) => {
           event.preventDefault();
+
+          const rowOption = this.createRowSelectOption(localeData, formElementInputName, 1);
+          rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
         });
 
         buttonAddOptionField.assembly();
 
         buttonRemoveField.target.element.before(buttonAddOptionField.target.element);
+      } else {
+        const rowOptions = document.querySelectorAll('[data-select="' + formElementInputName + '"]');
+        if (rowOptions.length > 0) {
+          rowOptions.forEach(rowOption => {
+            rowOption.remove();
+          });
+        }
       }
     });
 
@@ -622,28 +632,28 @@ export class PageForm {
     this.elementsCount++;
   }
 
-  createRowSelectOption(localeData, index) {
+  createRowSelectOption(localeData, inputName, index) {
     const inputGroupElement = document.createElement('div');
-      const inputOptionLabelElement = document.createElement('input');
-      inputOptionLabelElement.setAttribute('type', 'text');
-      inputOptionLabelElement.setAttribute('name', 'form_element_select_' + formElementInputName.value + '_option_label[' + index + ']');
-      inputOptionLabelElement.setAttribute('data-element', 'select-option-label');
-      inputOptionLabelElement.setAttribute('data-select', formElementInputName.value);
-      inputOptionLabelElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_LABEL_PLACEHOLDER);
-      
-      const inputOptionValueElement = document.createElement('input');
-      inputOptionValueElement.setAttribute('type', 'text');
-      inputOptionValueElement.setAttribute('name', 'form_element_select_' + formElementInputName.value + '_option_value[' + index + ']');
-      inputOptionValueElement.setAttribute('data-element', 'select-option-value');
-      inputOptionValueElement.setAttribute('data-select', formElementInputName.value);
-      inputOptionValueElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_VALUE_PLACEHOLDER);
+    const inputOptionLabelElement = document.createElement('input');
+    inputOptionLabelElement.setAttribute('type', 'text');
+    inputOptionLabelElement.setAttribute('name', 'form_element_select_' + inputName.value + '_option_label[' + index + ']');
+    inputOptionLabelElement.setAttribute('data-element', 'select-option-label');
+    inputOptionLabelElement.setAttribute('data-select', inputName.value);
+    inputOptionLabelElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_LABEL_PLACEHOLDER);
+    
+    const inputOptionValueElement = document.createElement('input');
+    inputOptionValueElement.setAttribute('type', 'text');
+    inputOptionValueElement.setAttribute('name', 'form_element_select_' + inputName.value + '_option_value[' + index + ']');
+    inputOptionValueElement.setAttribute('data-element', 'select-option-value');
+    inputOptionValueElement.setAttribute('data-select', inputName.value);
+    inputOptionValueElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_VALUE_PLACEHOLDER);
 
-      inputGroupElement.append(inputOptionLabelElement);
-      inputGroupElement.append(inputOptionValueElement);
+    inputGroupElement.append(inputOptionLabelElement);
+    inputGroupElement.append(inputOptionValueElement);
 
-      return this.createRowElement(
-        localeData.PAGE_FORM_ELEMENT_OPTION_TITLE + ' #' + (index + 1),
-        inputGroupElement
-      );
+    return this.createRowElement(
+      localeData.PAGE_FORM_ELEMENT_OPTION_TITLE + ' #' + (index + 1),
+      inputGroupElement
+    );
   }
 }
