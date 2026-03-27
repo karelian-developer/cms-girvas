@@ -129,7 +129,9 @@ if ($CMSCore->client->isLogged(2)) {
                 : 0;
 
               if ($formElements[$i]['type'] === 'select') {
-                $formElements[$i]['options'] = [];
+                if (!isset($formElements[$i]['options'])) {
+                  $formElements[$i]['options'] = [];
+                }
               }
               
               if ($CMSLocaleName === $commonLocale) {
@@ -159,11 +161,11 @@ if ($CMSCore->client->isLogged(2)) {
                     $formElements[$i]['options'][$optionIndex]['texts'] = [];
                   }
 
-                  if (!isset($formElements[$i]['options'][$optionIndex]['texts'][$CMSLocaleName])) {
-                    $formElements[$i]['options'][$optionIndex]['texts'][$CMSLocaleName] = [];
+                  if (!isset($formElements[$i]['options'][$optionIndex]['texts'][$commonLocale])) {
+                    $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale] = [];
                   }
 
-                  $formElements[$i]['options'][$optionIndex]['texts'][$CMSLocaleName]['label'] = $optionLabel;
+                  $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale]['label'] = $optionLabel;
                   $formElements[$i]['options'][$optionIndex]['value'] = $optionValue;
                 }
               }
