@@ -525,6 +525,18 @@ export class PageForm {
       formElementInputSequenceNumber
     );
 
+    const rowsElement = document.createElement('div');
+    rowsElement.classList.add('grid-table__rows');
+
+    rowsElement.append(cellHeaderElement);
+    rowsElement.append(cellElementsForTitle);
+    rowsElement.append(cellElementsForName);
+    rowsElement.append(cellElementsForDescription);
+    rowsElement.append(cellElementsForPlaceholder);
+    rowsElement.append(cellElementsForSequenceNumber);
+    rowsElement.append(cellElementsForRequired);
+    rowsElement.append(cellElementsForEvents);
+
     const buttonRemoveField = new Interactive('button');
     buttonRemoveField.target.setLabel(localeData.BUTTON_DELETE_LABEL);
     buttonRemoveField.target.setStyle('red');
@@ -533,12 +545,7 @@ export class PageForm {
       event.preventDefault();
       this.elementsCount--;
       
-      cellElementsForType.remove()
-      cellElementsForRequired.remove();
-      cellElementsForPlaceholder.remove();
-      cellElementsForName.remove();
-      cellElementsForDescription.remove();
-      cellElementsForSequenceNumber.remove();
+      rowsElement.remove();
 
       buttonRemoveField.target.element.parentElement.previousElementSibling.remove();
       buttonRemoveField.target.element.parentElement.remove();
@@ -557,18 +564,6 @@ export class PageForm {
         
       }
     });
-
-    const rowsElement = document.createElement('div');
-    rowsElement.classList.add('grid-table__rows');
-
-    rowsElement.append(cellHeaderElement);
-    rowsElement.append(cellElementsForTitle);
-    rowsElement.append(cellElementsForName);
-    rowsElement.append(cellElementsForDescription);
-    rowsElement.append(cellElementsForPlaceholder);
-    rowsElement.append(cellElementsForSequenceNumber);
-    rowsElement.append(cellElementsForRequired);
-    rowsElement.append(cellElementsForEvents);
 
     const formElementsSectionHeader = document.querySelector('[data-element="form-elements-section-header"]');
     if (formElementsSectionHeader !== null) {
