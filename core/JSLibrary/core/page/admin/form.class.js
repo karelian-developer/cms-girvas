@@ -375,6 +375,7 @@ export class PageForm {
     rowElement.append(cellInfoElement);
     
     if (dataElement !== null) {
+      cellDataElement.appendChild(dataElement);
       rowElement.appendChild(cellDataElement);
     }
 
