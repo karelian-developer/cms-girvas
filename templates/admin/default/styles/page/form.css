@@ -6,6 +6,10 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
+.grid-table__rows {
+  margin-bottom: 16px;
+}
+
 .main__page_form .grid-table__row {
   display: grid;
   grid-template-columns: 1fr 1fr;
