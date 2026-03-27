@@ -143,25 +143,25 @@ if ($CMSCore->client->isLogged(2)) {
                   'description' => str_replace('\'', '"', $formElementDescriptionsTrimmed),
                   'placeholder' => str_replace('\'', '"', $formElementPlaceholdersTrimmed)
                 ];
-              }
-              
-              if (isset($formElements[$i]['options'])) {
-                $elementName = $formElements[$i]['name'];
-                
-                foreach ($_PATCH['form_element_select_' . $elementName . '_option_label'] as $optionIndex => $optionLabel) {
-                  $optionValue = $_PATCH['form_element_select_' . $elementName . '_option_value'][$optionIndex];
+
+                if (isset($formElements[$i]['options'])) {
+                  $elementName = $formElements[$i]['name'];
                   
-                  if (!isset($formElements[$i]['options'][$optionIndex])) {
-                    $formElements[$i]['options'][$optionIndex] = [];
-                  }
+                  foreach ($_PATCH['form_element_select_' . $elementName . '_option_label'] as $optionIndex => $optionLabel) {
+                    $optionValue = $_PATCH['form_element_select_' . $elementName . '_option_value'][$optionIndex];
+                    
+                    if (!isset($formElements[$i]['options'][$optionIndex])) {
+                      $formElements[$i]['options'][$optionIndex] = [];
+                    }
 
-                  if (!isset($formElements[$i]['options'][$optionIndex]['texts'])) {
-                    $formElements[$i]['options'][$optionIndex]['texts'] = [];
-                  }
+                    if (!isset($formElements[$i]['options'][$optionIndex]['texts'])) {
+                      $formElements[$i]['options'][$optionIndex]['texts'] = [];
+                    }
 
-                  $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale] = [];
-                  $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale]['label'] = $optionLabel;
-                  $formElements[$i]['options'][$optionIndex]['value'] = $optionValue;
+                    $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale] = [];
+                    $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale]['label'] = $optionLabel;
+                    $formElements[$i]['options'][$optionIndex]['value'] = $optionValue;
+                  }
                 }
               }
             }
