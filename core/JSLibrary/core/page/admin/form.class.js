@@ -578,6 +578,7 @@ export class PageForm {
     buttonAddOptionField.assembly();
 
     buttonRemoveField.target.element.before(buttonAddOptionField.target.element);
+    buttonAddOptionField.target.element.style.display = 'none';
 
     interactiveChoicesTypeField.target.elementSelect.addEventListener('change', (event) => {
       if (interactiveChoicesTypeField.target.itemSelectedIndex === 7) {
