@@ -97,7 +97,7 @@
           <input name="form_notification_max_chats_ids" type="text" class="input form__input form__input_text" value="{FORM_NOTIFICATION_MAX_CHATS_IDS}" placeholder="123456789, 123456790..." data-element="input-notifications-max-chats-ids">
         </div>
         <!-- Раздел: Элементы формы -->
-        <div class="cell grid-table__cell grid-table__cell_header">
+        <div class="cell grid-table__cell grid-table__cell_header" data-element="form-elements-section-header">
           {LANG:PAGE_FORM_ELEMENTS_TITLE}
         </div>
         <!-- Панель формы -->

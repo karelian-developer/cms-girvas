@@ -568,30 +568,30 @@ export class PageForm {
     rowsElement.append(cellElementsForRequired);
     rowsElement.append(cellElementsForEvents);
 
-    container.parentElement.parentElement.insertBefore(
-      rowsElement,
-      container.parentElement.previousElementSibling
-    );
+    const formElementsSectionHeader = document.querySelector('[data-element="form-elements-section-header"]');
+    if (formElementsSectionHeader !== null) {
+      formElementsSectionHeader.before(rowsElement);
 
-    formElementInputTitle.value = data.title !== undefined
-      ? data.title
-      : '';
+      formElementInputTitle.value = data.title !== undefined
+        ? data.title
+        : '';
 
-    formElementInputName.value = data.name !== undefined
-      ? data.name
-      : '';
+      formElementInputName.value = data.name !== undefined
+        ? data.name
+        : '';
 
-    formElementInputPlaceholder.value = data.placeholder !== undefined
-      ? data.placeholder
-      : '';
+      formElementInputPlaceholder.value = data.placeholder !== undefined
+        ? data.placeholder
+        : '';
 
-    formElementInputDescription.value = data.description !== undefined
-      ? data.description
-      : '';
+      formElementInputDescription.value = data.description !== undefined
+        ? data.description
+        : '';
 
-    formElementInputSequenceNumber.value = data.sequenceNumber !== undefined
-      ? data.sequenceNumber
-      : 0;
+      formElementInputSequenceNumber.value = data.sequenceNumber !== undefined
+        ? data.sequenceNumber
+        : 0;
+    }
     
     this.elementsCount++;
   }
