@@ -369,6 +369,7 @@ export class PageForm {
     cellDataElement.classList.add('grid-table__cell');
     cellDataElement.classList.add('grid-table__cell_data');
     cellTitleElement.classList.add('grid-table__cell-title');
+    cellTitleElement.innerText = title;
 
     cellInfoElement.append(cellTitleElement);
     
