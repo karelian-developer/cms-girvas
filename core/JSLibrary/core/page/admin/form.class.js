@@ -375,9 +375,8 @@ export class PageForm {
     if (title !== null) {
       cellTitleElement.innerText = title;
       cellInfoElement.append(cellTitleElement);
+      rowElement.append(cellInfoElement);
     }
-
-    rowElement.append(cellInfoElement);
     
     if (dataElement !== null) {
       cellDataElement.appendChild(dataElement);
