@@ -135,13 +135,13 @@ if ($CMSCore->client->isLogged(2)) {
                 $elementName = $formElements[$i]['name'];
                 
                 foreach ($_PATCH['form_element_select_' . $elementName . '_option_label'] as $optionIndex => $optionLabel) {
-                  $formElements[$i]['options']['texts'] = [];
-                  $formElements[$i]['options']['texts'][$CMSLocaleName] = [];
-                  $formElements[$i]['options']['texts'][$CMSLocaleName]['label'] = $optionLabel;
+                  $formElements[$i]['options'][$optionIndex]['texts'] = [];
+                  $formElements[$i]['options'][$optionIndex]['texts'][$CMSLocaleName] = [];
+                  $formElements[$i]['options'][$optionIndex]['texts'][$CMSLocaleName]['label'] = $optionLabel;
                 }
 
                 foreach ($_PATCH['form_element_select_' . $elementName . '_option_value'] as $optionIndex => $optionValue) {
-                  $formElements[$i]['options']['value'] = $optionValue;
+                  $formElements[$i]['options'][$optionIndex]['value'] = $optionValue;
                 }
               }
               
