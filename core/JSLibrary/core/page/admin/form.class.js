@@ -567,61 +567,45 @@ export class PageForm {
       container.parentElement.previousElementSibling
     );
 
-    cellElementsForType.forEach(element => {
-      container.parentElement.parentElement.insertBefore(
-        element,
-        container.parentElement.previousElementSibling
-      );
-    });
+    container.parentElement.parentElement.insertBefore(
+      checkboxContainerElement,
+      container.parentElement.previousElementSibling
+    );
 
-    cellElementsForTitle.forEach(element => {
-      container.parentElement.parentElement.insertBefore(
-        element,
-        container.parentElement.previousElementSibling
-      );
-    });
+    container.parentElement.parentElement.insertBefore(
+      cellElementsForTitle,
+      container.parentElement.previousElementSibling
+    );
 
-    cellElementsForName.forEach(element => {
-      container.parentElement.parentElement.insertBefore(
-        element,
-        container.parentElement.previousElementSibling
-      );
-    });
+    container.parentElement.parentElement.insertBefore(
+      cellElementsForName,
+      container.parentElement.previousElementSibling
+    );
 
-    cellElementsForDescription.forEach(element => {
-      container.parentElement.parentElement.insertBefore(
-        element,
-        container.parentElement.previousElementSibling
-      );
-    });
+    container.parentElement.parentElement.insertBefore(
+      cellElementsForDescription,
+      container.parentElement.previousElementSibling
+    );
 
-    cellElementsForPlaceholder.forEach(element => {
-      container.parentElement.parentElement.insertBefore(
-        element,
-        container.parentElement.previousElementSibling
-      );
-    });
+    container.parentElement.parentElement.insertBefore(
+      cellElementsForPlaceholder,
+      container.parentElement.previousElementSibling
+    );
 
-    cellElementsForSequenceNumber.forEach(element => {
-      container.parentElement.parentElement.insertBefore(
-        element,
-        container.parentElement.previousElementSibling
-      );
-    });
+    container.parentElement.parentElement.insertBefore(
+      cellElementsForSequenceNumber,
+      container.parentElement.previousElementSibling
+    );
 
-    cellElementsForRequired.forEach(element => {
-      container.parentElement.parentElement.insertBefore(
-        element,
-        container.parentElement.previousElementSibling
-      );
-    });
+    container.parentElement.parentElement.insertBefore(
+      cellElementsForRequired,
+      container.parentElement.previousElementSibling
+    );
 
-    cellElementsForEvents.forEach(element => {
-      container.parentElement.parentElement.insertBefore(
-        element,
-        container.parentElement.previousElementSibling
-      );
-    });
+    container.parentElement.parentElement.insertBefore(
+      cellElementsForEvents,
+      container.parentElement.previousElementSibling
+    );
 
     formElementInputTitle.value = data.title !== undefined
       ? data.title
