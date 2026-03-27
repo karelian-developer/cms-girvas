@@ -132,6 +132,19 @@ if ($CMSCore->client->isLogged(2)) {
                 $formElements[$i]['options'] = [];
               }
               
+              if ($CMSLocaleName === $commonLocale) {
+                
+                $formElementTitlesTrimmed = trim($formElementTitles[$i]);
+                $formElementDescriptionsTrimmed = trim($formElementDescriptions[$i]);
+                $formElementPlaceholdersTrimmed = trim($formElementPlaceholders[$i]);
+
+                $formElements[$i]['texts'][$CMSLocaleName] = [
+                  'title' => htmlspecialchars(str_replace('\'', '"', $formElementTitlesTrimmed)),
+                  'description' => str_replace('\'', '"', $formElementDescriptionsTrimmed),
+                  'placeholder' => str_replace('\'', '"', $formElementPlaceholdersTrimmed)
+                ];
+              }
+              
               if (isset($formElements[$i]['options'])) {
                 $elementName = $formElements[$i]['name'];
                 
@@ -150,19 +163,6 @@ if ($CMSCore->client->isLogged(2)) {
                   $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale]['label'] = $optionLabel;
                   $formElements[$i]['options'][$optionIndex]['value'] = $optionValue;
                 }
-              }
-              
-              if ($CMSLocaleName === $commonLocale) {
-                
-                $formElementTitlesTrimmed = trim($formElementTitles[$i]);
-                $formElementDescriptionsTrimmed = trim($formElementDescriptions[$i]);
-                $formElementPlaceholdersTrimmed = trim($formElementPlaceholders[$i]);
-
-                $formElements[$i]['texts'][$CMSLocaleName] = [
-                  'title' => htmlspecialchars(str_replace('\'', '"', $formElementTitlesTrimmed)),
-                  'description' => str_replace('\'', '"', $formElementDescriptionsTrimmed),
-                  'placeholder' => str_replace('\'', '"', $formElementPlaceholdersTrimmed)
-                ];
               }
             }
           }
