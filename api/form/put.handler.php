@@ -121,6 +121,7 @@ if ($CMSCore->client->isLogged(2)) {
         $CMSLocale->initPathes();
 
         $CMSLocaleName = $CMSLocale->getName();
+        $commonLocale = $_PUT['common_locale'];
 
         $inputTitleName = 'form_title_' . $CMSLocale->getISO639(2);
         $textareaDescriptionName = 'form_description_' . $CMSLocale->getISO639(2);
@@ -129,16 +130,16 @@ if ($CMSCore->client->isLogged(2)) {
           array_key_exists($inputTitleName, $_PUT) ||
           array_key_exists($textareaDescriptionName, $_PUT)
         ) {
-          if (!array_key_exists($CMSLocaleName, $texts)) {
-            $texts[$CMSLocaleName] = [];
+          if (!array_key_exists($commonLocale, $texts)) {
+            $texts[$commonLocale] = [];
           }
 
           if (array_key_exists($inputTitleName, $_PUT)) {
-            $texts[$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', $_PUT[$inputTitleName]));
+            $texts[$commonLocale]['title'] = htmlspecialchars(str_replace('\'', '"', $_PUT[$inputTitleName]));
           }
 
           if (array_key_exists($textareaDescriptionName, $_PUT)) {
-            $texts[$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', $_PUT[$textareaDescriptionName]));
+            $texts[$commonLocale]['description'] = htmlspecialchars(str_replace('\'', '"', $_PUT[$textareaDescriptionName]));
           }
         }
 
@@ -151,15 +152,15 @@ if ($CMSCore->client->isLogged(2)) {
             $elementPlaceholder = $_PUT['form_element_placeholder'][$elementIndex] ?? null;
 
             if ($elementTitle !== null) {
-              $elements[$elementIndex]['texts'][$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', trim($_PUT['form_element_title'][$elementIndex])));
+              $elements[$elementIndex]['texts'][$commonLocale]['title'] = htmlspecialchars(str_replace('\'', '"', trim($_PUT['form_element_title'][$elementIndex])));
             }
 
             if ($elementDescription !== null) {
-              $elements[$elementIndex]['texts'][$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', trim($_PUT['form_element_description'][$elementIndex])));
+              $elements[$elementIndex]['texts'][$commonLocale]['description'] = htmlspecialchars(str_replace('\'', '"', trim($_PUT['form_element_description'][$elementIndex])));
             }
 
             if ($elementPlaceholder !== null) {
-              $elements[$elementIndex]['texts'][$CMSLocaleName]['placeholder'] = htmlspecialchars(str_replace('\'', '"', trim($_PUT['form_element_placeholder'][$elementIndex])));
+              $elements[$elementIndex]['texts'][$commonLocale]['placeholder'] = htmlspecialchars(str_replace('\'', '"', trim($_PUT['form_element_placeholder'][$elementIndex])));
             }
 
             $elements[$elementIndex]['options'] = [];
@@ -170,9 +171,9 @@ if ($CMSCore->client->isLogged(2)) {
 
               $elements[$elementIndex]['options'][$optionIndex] = [];
               $elements[$elementIndex]['options'][$optionIndex]['texts'] = [];
-              $elements[$elementIndex]['options'][$optionIndex]['texts'][$CMSLocaleName] = [];
+              $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale] = [];
               
-              $elements[$elementIndex]['options'][$optionIndex]['texts'][$CMSLocaleName]['label'] = $optionLabel;
+              $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale]['label'] = $optionLabel;
               $elements[$elementIndex]['options'][$optionIndex]['value'] = $optionValue;
             }
           }
