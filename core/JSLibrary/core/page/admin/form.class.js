@@ -587,7 +587,7 @@ export class PageForm {
         let rowOptions = document.querySelectorAll('[data-element="select-option-label"][data-select="' + formElementInputName.value + '"]');
         if (rowOptions.length > 0) {
           rowOptions.forEach(rowOption => {
-            rowOption.parentElement.remove();
+            rowOption.parentElement.parentElement.remove();
           });
         }
       }
