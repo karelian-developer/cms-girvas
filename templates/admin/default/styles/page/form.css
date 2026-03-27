@@ -9,6 +9,7 @@
 .main__page_form .grid-table__row {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  padding-top: 16px;
   row-gap: 16px;
 }
 
