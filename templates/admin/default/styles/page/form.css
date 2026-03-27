@@ -32,7 +32,7 @@
   gap: 8px;
 }
 
-.grid-table__cell_panel {
+.grid-table__cell_panel > .grid-table__cell_data {
   display: flex;
   gap: 8px;
 }
