@@ -69,16 +69,16 @@
 }
 
 .main__page_form .grid-table__cell_editor,
-.main__page_form .grid-table__cell_panel {
+.main__page_form .grid-table__row_panel {
   grid-column: 1 / -1;
 }
 
-.main__page_form .grid-table__cell_panel {
+.main__page_form .grid-table__row_panel {
   display: flex;
   justify-content: flex-end;
 }
 
-.main__page_form .grid-table__cell_panel > * {
+.main__page_form .grid-table__row_panel > * {
   &:not(:last-child) {
     margin-right: 10px;
   }

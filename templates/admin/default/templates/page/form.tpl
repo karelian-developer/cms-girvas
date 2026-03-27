@@ -79,9 +79,9 @@
           <div class="cell grid-table__cell grid-table__cell_data">
             <div data-element="choice" data-choice="method"></div>
           </div>
-          <div class="cell grid-table__cell grid-table__cell_header">
-            {LANG:PAGE_FORM_NOTIFICATIONS_TITLE}
-          </div>
+        </div>
+        <div class="row grid-table__row grid-table__row_header">
+          {LANG:PAGE_FORM_NOTIFICATIONS_TITLE}
         </div>
         <!-- Поле: Уведомления (чаты Telegram) -->
         <div class="row grid-table__row">
@@ -111,11 +111,11 @@
           </div>
         </div>
         <!-- Раздел: Элементы формы -->
-        <div class="cell grid-table__cell grid-table__cell_header" data-element="form-elements-section-header">
+        <div class="row grid-table__row grid-table__row_header" data-element="form-elements-section-header">
           {LANG:PAGE_FORM_ELEMENTS_TITLE}
         </div>
         <!-- Панель формы -->
-        <div class="cell grid-table__cell grid-table__cell_panel" data-element="panel"></div>
+        <div class="row grid-table__row grid-table__row_panel" data-element="panel"></div>
       </div>
     </form>
   </div>
