@@ -158,7 +158,7 @@ export class PageForm {
         event.target.value = uString.source;
       });
 
-      let tableFormElementsButtonContainer = document.querySelector('[data-element="button-add-element"]');
+      const formElementsU = document.querySelectorAll('[data-element="form-element"]');
       
       this.buttons.addElement = new Interactive('button');
       this.buttons.save = new Interactive('button');
@@ -175,7 +175,9 @@ export class PageForm {
       this.buttons.addElement.target.setCallback((event) => {
         event.preventDefault();
 
-        this.addElement(localeData, tableFormElementsButtonContainer);
+        
+        const anchorElement = formElementsU[formElementsU.length - 1] ?? null;
+        this.addElement(localeData, anchorElement);
       });
 
       // Получаем все установленные языковые пакеты
@@ -191,7 +193,8 @@ export class PageForm {
           const elementDescription = elementTexts.description;
           const elementPlaceholder = elementTexts.placeholder;
           
-          this.addElement(localeData, tableFormElementsButtonContainer, {
+          const anchorElement = formElementsU[formElementsU.length - 1] ?? null;
+          this.addElement(localeData, anchorElement, {
             index: elementIndex,
             type: element.type,
             required: element.required,
@@ -361,6 +364,7 @@ export class PageForm {
 
     rowElement.classList.add('row');
     rowElement.classList.add('grid-table__row');
+    rowElement.setAttribute('data-element', 'form-element');
     cellInfoElement.classList.add('cell');
     cellInfoElement.classList.add('grid-table__cell');
     cellInfoElement.classList.add('grid-table__cell_text');
@@ -381,7 +385,7 @@ export class PageForm {
     return rowElement;
   }
 
-  addElement(localeData, container, data = {}) {
+  addElement(localeData, anchorElement, data = {}) {
     const cellHeaderElement = document.createElement('div');
     const formElementInputTitle = document.createElement('input');
     const formElementInputName = document.createElement('input');
@@ -569,7 +573,11 @@ export class PageForm {
 
     const formElementsSectionHeader = document.querySelector('[data-element="form-elements-section-header"]');
     if (formElementsSectionHeader !== null) {
-      formElementsSectionHeader.after(rowsElement);
+      if (anchorElement === null) {
+        formElementsSectionHeader.after(rowsElement);
+      } else {
+        anchorElement.after(rowsElement);
+      }
 
       formElementInputTitle.value = data.title !== undefined
         ? data.title
