@@ -562,11 +562,6 @@ export class PageForm {
     );
 
     container.parentElement.parentElement.insertBefore(
-      checkboxContainerElement,
-      container.parentElement.previousElementSibling
-    );
-
-    container.parentElement.parentElement.insertBefore(
       cellElementsForTitle,
       container.parentElement.previousElementSibling
     );
