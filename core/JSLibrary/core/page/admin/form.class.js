@@ -436,7 +436,7 @@ export class PageForm {
     formElementInputName.addEventListener('change', (event) => {
       const selectOptionsElements = document.querySelectorAll('[data-select]');
       selectOptionsElements.forEach(element => {
-        const match = str.match(/\[(\d+)\]/);
+        const match = element.getAttribute('name').match(/\[(\d+)\]/);
         const number = match ? parseInt(match[1], 10) : 0;
 
         if (element.getAttribute('data-element') === 'select-option-label') {
