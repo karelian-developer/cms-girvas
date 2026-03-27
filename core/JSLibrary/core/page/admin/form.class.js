@@ -568,6 +568,11 @@ export class PageForm {
     rowsElement.append(cellElementsForRequired);
     rowsElement.append(cellElementsForEvents);
 
+    container.parentElement.parentElement.insertBefore(
+      rowsElement,
+      container.parentElement.previousElementSibling
+    );
+
     formElementInputTitle.value = data.title !== undefined
       ? data.title
       : '';
