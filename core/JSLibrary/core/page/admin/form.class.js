@@ -162,7 +162,7 @@ export class PageForm {
       this.buttons.save = new Interactive('button');
       this.buttons.delete = new Interactive('button');
 
-      this.buttons.addElement.target.setLabel(localeData.BUTTON_NEW_ELEMENT);
+      this.buttons.addElement.target.setLabel(localeData.BUTTON_NEW_ELEMENT_LABEL);
       this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
       this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
       
