@@ -570,7 +570,7 @@ export class PageForm {
 
     const formElementsSectionHeader = document.querySelector('[data-element="form-elements-section-header"]');
     if (formElementsSectionHeader !== null) {
-      formElementsSectionHeader.before(rowsElement);
+      formElementsSectionHeader.after(rowsElement);
 
       formElementInputTitle.value = data.title !== undefined
         ? data.title
