@@ -182,7 +182,11 @@ export class PageForm {
       fetch('/handler/form/' + searchParams.getPathPart(3) + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
         return response.ok ? response.json() : Promise.reject(response);
       }).then((data) => {
-        const elements = data.outputData.form.elements;
+        let elements = [];
+        if (data.outputData.form !== undefined) {
+          elements = data.outputData.form.elements ?? [];
+        }
+
         elements.forEach((element, elementIndex) => {
           let elementTexts = element['texts'][window.CMSCore.locales.admin.name];
           elementTexts = elementTexts !== undefined ? elementTexts : [];
