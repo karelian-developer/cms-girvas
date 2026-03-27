@@ -434,14 +434,6 @@ export class PageForm {
     formElementInputSequenceNumber.classList.add('form__input');
     formElementInputSequenceNumber.classList.add('form__input_number');
 
-    const cellElementsForType = this.createCellFormElementElements(
-      localeData.PAGE_FORM_ELEMENT_TYPE_TITLE
-    );
-
-    const cellElementsForRequired = this.createCellFormElementElements(
-      localeData.PAGE_FORM_ELEMENT_REQUIRED_TITLE
-    );
-
     /* Выпадающий список с типами полей */
 
     const interactiveChoicesTypeField = new Interactive('choices');
@@ -475,8 +467,14 @@ export class PageForm {
 
     interactiveChoicesTypeField.assembly();
 
-    const cellElementsForTypeData = cellElementsForType.querySelector('.grid-table__cell_text');
-    cellElementsForTypeData.append(interactiveChoicesTypeField.target.element);
+    const cellElementsForType = this.createCellFormElementElements(
+      localeData.PAGE_FORM_ELEMENT_TYPE_TITLE,
+      interactiveChoicesTypeField.target.element
+    );
+
+    const cellElementsForRequired = this.createCellFormElementElements(
+      localeData.PAGE_FORM_ELEMENT_REQUIRED_TITLE
+    );
 
     const checkboxID = Array(10).fill(0).map(() => Math.floor(Math.random() * 10)).join('');
 
