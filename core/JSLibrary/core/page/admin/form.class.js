@@ -472,10 +472,6 @@ export class PageForm {
       interactiveChoicesTypeField.target.element
     );
 
-    const cellElementsForRequired = this.createCellFormElementElements(
-      localeData.PAGE_FORM_ELEMENT_REQUIRED_TITLE
-    );
-
     const checkboxID = Array(10).fill(0).map(() => Math.floor(Math.random() * 10)).join('');
 
     const checkboxContainerElement = document.createElement('div');
@@ -502,7 +498,11 @@ export class PageForm {
 
     checkboxContainerElement.appendChild(checkboxInputElement);
     checkboxContainerElement.appendChild(checkboxLabelElement);
-    cellElementsForRequired[1].append(checkboxContainerElement);
+
+    const cellElementsForRequired = this.createCellFormElementElements(
+      localeData.PAGE_FORM_ELEMENT_REQUIRED_TITLE,
+      checkboxContainerElement
+    );
 
     const cellElementsForTitle = this.createCellFormElementElements(
       localeData.PAGE_FORM_ELEMENT_TITLE_TITLE,
