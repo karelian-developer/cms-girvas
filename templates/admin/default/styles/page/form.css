@@ -57,8 +57,7 @@
 }
 
 @media (max-width: 800px) {
-  .main__page_form .grid-table__cell_text,
-  .main__page_form .grid-table__cell_data {
+  .main__page_form .grid-table__row {
     grid-column: 1 / -1;
   }
 }
