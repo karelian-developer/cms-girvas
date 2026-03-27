@@ -354,38 +354,29 @@ export class PageForm {
     return '';
   }
 
-  createCellFormElementElements(title, dataElement = null) {
-    const cellContainerElement = document.createElement('div');
-    const cellTextElement = document.createElement('div');
-    const cellTextTitleElement = document.createElement('div');
+  createRowElement(title, dataElement = null) {
+    const rowElement = document.createElement('div');
+    const cellInfoElement = document.createElement('div');
     const cellDataElement = document.createElement('div');
+    const cellTitleElement = document.createElement('div');
 
-    cellContainerElement.classList.add('cell-container');
-    cellContainerElement.classList.add('grid-table__cell-container');
-
-    cellTextElement.classList.add('cell');
-    cellTextElement.classList.add('grid-table__cell');
-    cellTextElement.classList.add('grid-table__cell_text');
-
+    rowElement.classList.add('row');
+    rowElement.classList.add('grid-table__row');
+    cellInfoElement.classList.add('cell');
+    cellInfoElement.classList.add('grid-table__cell');
+    cellInfoElement.classList.add('grid-table__cell_text');
     cellDataElement.classList.add('cell');
     cellDataElement.classList.add('grid-table__cell');
     cellDataElement.classList.add('grid-table__cell_data');
+    cellTitleElement.classList.add('grid-table__cell-title');
 
-    cellTextElement.setAttribute('data-element', 'form-element-part-element');
-    cellDataElement.setAttribute('data-element', 'form-element-part-element');
+    cellInfoElement.append(cellTitleElement);
     
-    cellTextTitleElement.classList.add('cell__title');
-    cellTextTitleElement.innerText = title;
-    
-    cellTextElement.appendChild(cellTextTitleElement);
-    cellContainerElement.appendChild(cellTextElement);
-
     if (dataElement !== null) {
-      cellDataElement.appendChild(dataElement);
-      cellContainerElement.appendChild(cellDataElement);
+      rowElement.appendChild(cellDataElement);
     }
 
-    return cellContainerElement;
+    return rowElement;
   }
 
   addElement(localeData, container, data = {}) {
@@ -467,7 +458,7 @@ export class PageForm {
 
     interactiveChoicesTypeField.assembly();
 
-    const cellElementsForType = this.createCellFormElementElements(
+    const cellElementsForType = this.createRowElement(
       localeData.PAGE_FORM_ELEMENT_TYPE_TITLE,
       interactiveChoicesTypeField.target.element
     );
@@ -499,32 +490,32 @@ export class PageForm {
     checkboxContainerElement.appendChild(checkboxInputElement);
     checkboxContainerElement.appendChild(checkboxLabelElement);
 
-    const cellElementsForRequired = this.createCellFormElementElements(
+    const cellElementsForRequired = this.createRowElement(
       localeData.PAGE_FORM_ELEMENT_REQUIRED_TITLE,
       checkboxContainerElement
     );
 
-    const cellElementsForTitle = this.createCellFormElementElements(
+    const cellElementsForTitle = this.createRowElement(
       localeData.PAGE_FORM_ELEMENT_TITLE_TITLE,
       formElementInputTitle
     );
 
-    const cellElementsForPlaceholder = this.createCellFormElementElements(
+    const cellElementsForPlaceholder = this.createRowElement(
       localeData.PAGE_FORM_ELEMENT_PLACEHOLDER_TITLE,
       formElementInputPlaceholder
     );
 
-    const cellElementsForName = this.createCellFormElementElements(
+    const cellElementsForName = this.createRowElement(
       localeData.PAGE_FORM_ELEMENT_TECHNICAL_NAME_TITLE,
       formElementInputName
     );
 
-    const cellElementsForDescription = this.createCellFormElementElements(
+    const cellElementsForDescription = this.createRowElement(
       localeData.PAGE_FORM_ELEMENT_DESCRIPTION_TITLE,
       formElementInputDescription
     );
 
-    const cellElementsForSequenceNumber = this.createCellFormElementElements(
+    const cellElementsForSequenceNumber = this.createRowElement(
       localeData.PAGE_FORM_ELEMENT_SEQUENCE_NUMBER_TITLE,
       formElementInputSequenceNumber
     );
@@ -552,7 +543,7 @@ export class PageForm {
 
     buttonRemoveField.assembly();
 
-    const cellElementsForEvents = this.createCellFormElementElements(
+    const cellElementsForEvents = this.createRowElement(
       '', buttonRemoveField.target.element
     );
 
