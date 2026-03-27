@@ -392,14 +392,12 @@ export class PageForm {
     const formElementInputPlaceholder = document.createElement('input');
     const formElementInputSequenceNumber = document.createElement('input');
     
-    cellHeaderElement.classList.add('cell');
-    cellHeaderElement.classList.add('grid-table__cell');
-    cellHeaderElement.classList.add('grid-table__cell_header');
+    cellHeaderElement.classList.add('row');
+    cellHeaderElement.classList.add('grid-table__row');
+    cellHeaderElement.classList.add('grid-table__row_header');
     cellHeaderElement.innerText = data.title !== undefined
       ? `${localeData.PAGE_FORM_ELEMENT}: ${data.title}`
       : localeData.PAGE_FORM_NEW_ELEMENT;
-
-    cellHeaderElement.setAttribute('data-element', 'form-element-part-element');
 
     formElementInputTitle.setAttribute('type', 'text');
     formElementInputTitle.setAttribute('name', 'form_element_title[]');

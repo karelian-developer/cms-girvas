@@ -43,6 +43,7 @@
   grid-column: 2;
 }
 
+.main__page_form .grid-table__row_header,
 .main__page_form .grid-table__cell_header {
   text-transform: uppercase;
   text-align: center;
