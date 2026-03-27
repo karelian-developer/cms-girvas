@@ -556,45 +556,17 @@ export class PageForm {
       }
     });
 
-    container.parentElement.parentElement.insertBefore(
-      cellHeaderElement,
-      container.parentElement.previousElementSibling
-    );
+    const rowsElement = document.createElement('div');
+    rowsElement.classList.add('grid-table__rows');
 
-    container.parentElement.parentElement.insertBefore(
-      cellElementsForTitle,
-      container.parentElement.previousElementSibling
-    );
-
-    container.parentElement.parentElement.insertBefore(
-      cellElementsForName,
-      container.parentElement.previousElementSibling
-    );
-
-    container.parentElement.parentElement.insertBefore(
-      cellElementsForDescription,
-      container.parentElement.previousElementSibling
-    );
-
-    container.parentElement.parentElement.insertBefore(
-      cellElementsForPlaceholder,
-      container.parentElement.previousElementSibling
-    );
-
-    container.parentElement.parentElement.insertBefore(
-      cellElementsForSequenceNumber,
-      container.parentElement.previousElementSibling
-    );
-
-    container.parentElement.parentElement.insertBefore(
-      cellElementsForRequired,
-      container.parentElement.previousElementSibling
-    );
-
-    container.parentElement.parentElement.insertBefore(
-      cellElementsForEvents,
-      container.parentElement.previousElementSibling
-    );
+    rowsElement.append(cellHeaderElement);
+    rowsElement.append(cellElementsForTitle);
+    rowsElement.append(cellElementsForName);
+    rowsElement.append(cellElementsForDescription);
+    rowsElement.append(cellElementsForPlaceholder);
+    rowsElement.append(cellElementsForSequenceNumber);
+    rowsElement.append(cellElementsForRequired);
+    rowsElement.append(cellElementsForEvents);
 
     formElementInputTitle.value = data.title !== undefined
       ? data.title
