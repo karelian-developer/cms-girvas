@@ -582,6 +582,8 @@ export class PageForm {
           localeData.PAGE_FORM_ELEMENT_OPTION_TITLE + '#1',
           inputGroupElement
         );
+
+        rowsElement.children.item(rowsElement.children.length - 1).before(rowOptions);
       }
     });
 
