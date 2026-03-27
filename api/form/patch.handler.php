@@ -136,8 +136,8 @@ if ($CMSCore->client->isLogged(2)) {
                 
                 foreach ($_PATCH['form_element_select_' . $elementName . '_option_label'] as $optionIndex => $optionLabel) {
                   $formElements[$i]['options'][$optionIndex]['texts'] = [];
-                  $formElements[$i]['options'][$optionIndex]['texts'][$CMSLocaleName] = [];
-                  $formElements[$i]['options'][$optionIndex]['texts'][$CMSLocaleName]['label'] = $optionLabel;
+                  $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale] = [];
+                  $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale]['label'] = $optionLabel;
                 }
 
                 foreach ($_PATCH['form_element_select_' . $elementName . '_option_value'] as $optionIndex => $optionValue) {
