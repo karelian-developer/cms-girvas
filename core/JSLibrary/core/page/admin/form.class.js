@@ -563,7 +563,7 @@ export class PageForm {
 
     interactiveChoicesTypeField.target.elementSelect.addEventListener('change', (event) => {
       if (interactiveChoicesTypeField.target.itemSelectedIndex === 7) {
-        const rowOption = this.createRowSelectOption(localeData, formElementInputName, 0);
+        let rowOption = this.createRowSelectOption(localeData, formElementInputName, 0);
         rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
 
         const buttonAddOptionField = new Interactive('button');
@@ -574,7 +574,7 @@ export class PageForm {
           event.preventDefault();
 
           let rowOptions = document.querySelectorAll('[data-element="select-option-label"][data-select="' + formElementInputName + '"]');
-          const rowOption = this.createRowSelectOption(localeData, formElementInputName, rowOptions.length);
+          let rowOption = this.createRowSelectOption(localeData, formElementInputName, rowOptions.length);
           rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
         });
 
