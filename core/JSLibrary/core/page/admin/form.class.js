@@ -387,6 +387,9 @@ export class PageForm {
   }
 
   addElement(localeData, anchorElement, data = {}) {
+    const rowsElement = document.createElement('div');
+    rowsElement.classList.add('grid-table__rows');
+
     const cellHeaderElement = document.createElement('div');
     const formElementInputTitle = document.createElement('input');
     const formElementInputName = document.createElement('input');
@@ -429,6 +432,17 @@ export class PageForm {
     formElementInputDescription.classList.add('form__textarea');
     formElementInputSequenceNumber.classList.add('form__input');
     formElementInputSequenceNumber.classList.add('form__input_number');
+
+    formElementInputName.addEventListener('change', (event) => {
+      const selectOptionsElements = document.querySelectorAll('[data-select]');
+      selectOptionsElements.forEach(element => {
+        if (element.getAttribute('data-element') === 'select-option-label') {
+          element.setAttribute('name', 'form_element_select_' + formElementInputName.value + '_option_label');
+        } else {
+          element.setAttribute('name', 'form_element_select_' + formElementInputName.value + '_option_value');
+        }
+      });
+    });
 
     /* Выпадающий список с типами полей */
 
@@ -525,9 +539,6 @@ export class PageForm {
       formElementInputSequenceNumber
     );
 
-    const rowsElement = document.createElement('div');
-    rowsElement.classList.add('grid-table__rows');
-
     const buttonRemoveField = new Interactive('button');
     buttonRemoveField.target.setLabel(localeData.BUTTON_DELETE_LABEL);
     buttonRemoveField.target.setStyle('red');
@@ -550,7 +561,25 @@ export class PageForm {
 
     interactiveChoicesTypeField.target.elementSelect.addEventListener('change', (event) => {
       if (interactiveChoicesTypeField.target.itemSelectedIndex === 7) {
-        
+        const inputGroupElement = document.createElement('div');
+        const inputOptionLabelElement = document.createElement('input');
+        inputOptionLabelElement.setAttribute('type', 'text');
+        inputOptionLabelElement.setAttribute('name', 'form_element_select_' + formElementInputName.value + '_option_label');
+        inputOptionLabelElement.setAttribute('data-element', 'select-option-label');
+        inputOptionLabelElement.setAttribute('data-select', formElementInputName.value);
+        const inputOptionValueElement = document.createElement('input');
+        inputOptionValueElement.setAttribute('type', 'text');
+        inputOptionValueElement.setAttribute('name', 'form_element_select_' + formElementInputName.value + '_option_value');
+        inputOptionValueElement.setAttribute('data-element', 'select-option-value');
+        inputOptionValueElement.setAttribute('data-select', formElementInputName.value);
+
+        inputGroupElement.append(inputOptionLabelElement);
+        inputGroupElement.append(inputOptionValueElement);
+
+        const rowOptions = this.createRowElement(
+          localeData.PAGE_FORM_ELEMENT_OPTION_TITLE + '#1',
+          inputGroupElement
+        );
       }
     });
 
