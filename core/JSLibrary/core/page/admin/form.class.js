@@ -560,6 +560,8 @@ export class PageForm {
     const cellElementsForEvents = this.createRowElement(
       null, buttonRemoveField.target.element
     );
+    
+    cellElementsForEvents.classList.add('grid-table__cell_panel');
 
     interactiveChoicesTypeField.target.elementSelect.addEventListener('change', (event) => {
       if (interactiveChoicesTypeField.target.itemSelectedIndex === 7) {

@@ -32,6 +32,11 @@
   gap: 8px;
 }
 
+.grid-table__cell_panel {
+  display: flex;
+  gap: 8px;
+}
+
 @media (max-width: 800px) {
   .main__page_form .grid-table__cell_text {
     border-bottom: 0 !important;
