@@ -436,12 +436,15 @@ export class PageForm {
     formElementInputName.addEventListener('change', (event) => {
       const selectOptionsElements = document.querySelectorAll('[data-select]');
       selectOptionsElements.forEach(element => {
+        const match = str.match(/\[(\d+)\]/);
+        const number = match ? parseInt(match[1], 10) : 0;
+
         if (element.getAttribute('data-element') === 'select-option-label') {
-          element.setAttribute('name', 'form_element_select_' + formElementInputName.value + '_option_label');
+          element.setAttribute('name', 'form_element_select_' + formElementInputName.value + '_option_label[' + number + ']');
         }
 
         if (element.getAttribute('data-element') === 'select-option-value') {
-          element.setAttribute('name', 'form_element_select_' + formElementInputName.value + '_option_value');
+          element.setAttribute('name', 'form_element_select_' + formElementInputName.value + '_option_value[' + number + ']');
         }
       });
     });
