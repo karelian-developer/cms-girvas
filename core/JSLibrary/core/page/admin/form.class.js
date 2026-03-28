@@ -306,6 +306,8 @@ export class PageForm {
         label: option.texts?.[window.CMSCore.locales.admin.name]?.label || ''
       })) || [];
 
+      console.log('Options for element:', element.name, optionsWithTexts);
+
       this.addElement(this.localeData, anchorElement, {
         index: index,
         type: element.type,
@@ -763,6 +765,7 @@ export class PageForm {
     inputOptionLabelElement.setAttribute('data-element', 'select-option-label');
     inputOptionLabelElement.setAttribute('data-select', inputName.value);
     inputOptionLabelElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_LABEL_PLACEHOLDER);
+    
     if (label) {
       inputOptionLabelElement.value = label;
     }
@@ -775,6 +778,7 @@ export class PageForm {
     inputOptionValueElement.setAttribute('data-element', 'select-option-value');
     inputOptionValueElement.setAttribute('data-select', inputName.value);
     inputOptionValueElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_VALUE_PLACEHOLDER);
+    
     if (value) {
       inputOptionValueElement.value = value;
     }
