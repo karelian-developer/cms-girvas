@@ -412,7 +412,7 @@ export class PageForm {
     
     this.setupTypeChangeListener(typeSelect, rowsElement, formElements.inputName, actionButtons.addOptionButton, localeData);
     
-    this.appendRows(rowsElement, localeData, formElements, typeSelect, requiredCheckbox, actionButtons.removeButton);
+    this.appendRows(rowsElement, localeData, data, formElements, typeSelect, requiredCheckbox, actionButtons.removeButton);
     this.insertIntoDOM(rowsElement, anchorElement, formElements, data);
     
     this.elementsCount++;
@@ -660,7 +660,7 @@ export class PageForm {
   }
 
   // Добавление всех строк в контейнер
-  appendRows(rowsElement, localeData, formElements, typeSelect, requiredCheckbox, removeButton) {
+  appendRows(rowsElement, localeData, data, formElements, typeSelect, requiredCheckbox, removeButton) {
     const header = this.createSectionHeader(localeData, data);
     const typeRow = this.createRowElement(localeData.PAGE_FORM_ELEMENT_TYPE_TITLE, typeSelect.target.element);
     const titleRow = this.createRowElement(localeData.PAGE_FORM_ELEMENT_TITLE_TITLE, formElements.inputTitle);
