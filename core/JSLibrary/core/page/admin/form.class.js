@@ -240,9 +240,10 @@ export class PageForm {
     
     const request = new Interactive('request', {
       method: fetchMethod,
-      url: fetchLink,
-      data: formData
+      url: fetchLink
     });
+
+    request.target.data = formData;
     
     request.target.send().then((data) => {
       if (data.statusCode === 1 && formId === null) {
