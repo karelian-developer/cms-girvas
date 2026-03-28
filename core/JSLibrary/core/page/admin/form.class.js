@@ -28,332 +28,373 @@ export class PageForm {
   }
 
   init() {
-    let searchParams = new URLParser();
-    let elementForm = document.querySelector('[data-element="main-form"]');
-
-    let locales;
-    const interactiveLocaleChoices = new Interactive('choices');
-    interactiveLocaleChoices.target.setName('common_locale');
-
-    const interactiveMethodChoices = new Interactive('choices');
-
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
-      let urlInputElement = document.querySelector('[data-element="input-name"]');
-      let titleInputElement = document.querySelector('[data-element="input-title"]');
-      let descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
-
-      locales.forEach((locale, localeIndex) => {
-        let localeTitle = locale.title;
-        let localeIconURL = locale.iconURL;
-        let localeName = locale.name;
-        let localeISO639_2 = locale.iso639_2;
-
-        let localeIconImageElement = document.createElement('img');
-        localeIconImageElement.setAttribute('src', localeIconURL);
-        localeIconImageElement.setAttribute('alt', localeTitle);
-
-        let localeLabelElement = document.createElement('span');
-        localeLabelElement.innerText = localeTitle;
-
-        let localeTemplate = document.createElement('template');
-        localeTemplate.innerHTML += localeIconImageElement.outerHTML;
-        localeTemplate.innerHTML += localeLabelElement.outerHTML;
-
-        interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, localeName);
-      });
-
-      locales.forEach((locale, localeIndex) => {
-        if (locale.name === window.CMSCore.locales.admin.name) {
-          interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
-        }
-
-        if (locale.name === window.CMSCore.locales.admin.name) {
-          descriptionTextareaElement.setAttribute('name', 'form_description_' + locale.iso639_2);
-          titleInputElement.setAttribute('name', 'form_title_' + locale.iso639_2);
-
-          if (searchParams.getPathPart(3) != null) {
-            let request = new Interactive('request', {
-              method: 'GET',
-              url: `/handler/form/${searchParams.getPathPart(3)}?locale=${window.CMSCore.locales.admin.name}`
-            });
+    this.searchParams = new URLParser();
+    this.elementForm = document.querySelector('[data-element="main-form"]');
     
-            request.target.showingNotification = false;
-            
-            request.target.send().then((data) => {
-              if (data.statusCode == 1 && data.outputData.hasOwnProperty('form')) {
-                let formConstrData = data.outputData.form;
+    this.loadLocalesAndInitialize();
+  }
 
-                descriptionTextareaElement.value = formConstrData.description;
-                titleInputElement.value = formConstrData.title;
-              }
+  // Основные методы загрузки и инициализации
+  loadLocalesAndInitialize() {
+    fetch('/handler/locales', {method: 'GET'})
+      .then((response) => this.handleResponse(response))
+      .then((data) => {
+        this.locales = data.outputData.locales;
+        return window.CMSCore.locales.admin.getData();
+      })
+      .then((localeData) => this.initializeWithLocaleData(localeData))
+      .catch((rejectionReason) => this.page.showPopupNotification(rejectionReason, 0));
+  }
 
-            }, (rejectionReason) => {
-              this.page.showPopupNotification(rejectionReason, 0);
-            });
-          }
-        }
-      });
+  handleResponse(response) {
+    return response.ok ? response.json() : Promise.reject(response);
+  }
 
-      interactiveLocaleChoices.assembly();
+  initializeWithLocaleData(localeData) {
+    this.localeData = localeData;
+    this.formElements = this.getFormInputElements();
+    
+    this.initializeLocaleChoices();
+    this.initializeMethodChoices();
+    this.setupUrlInputListener();
+    this.initializeButtons();
+    this.loadExistingFormData();
+    this.setupLocaleChangeListener();
+    this.setupButtonsUI();
+  }
 
-      let interactiveContainerElement = document.querySelector('[data-element="header-interactive"]');
-      interactiveContainerElement.append(interactiveLocaleChoices.target.element);
+  // Получение DOM элементов формы
+  getFormInputElements() {
+    return {
+      urlInput: document.querySelector('[data-element="input-name"]'),
+      titleInput: document.querySelector('[data-element="input-title"]'),
+      descriptionTextarea: document.querySelector('[data-element="input-description"]')
+    };
+  }
 
-      let interactiveMethodContainerElement = document.querySelector('[data-element="choice"][data-choice="method"]');
-      if (interactiveMethodContainerElement != null) {
-        let formConstrData;
+  // Инициализация выбора языка
+  initializeLocaleChoices() {
+    this.interactiveLocaleChoices = new Interactive('choices');
+    this.interactiveLocaleChoices.target.setName('common_locale');
+    
+    this.populateLocaleChoices();
+    this.setDefaultLocale();
+    this.interactiveLocaleChoices.assembly();
+    
+    const interactiveContainer = document.querySelector('[data-element="header-interactive"]');
+    interactiveContainer.append(this.interactiveLocaleChoices.target.element);
+  }
 
-        fetch(`/handler/form/${searchParams.getPathPart(3)}?locale=${window.CMSCore.locales.admin.name}`, {method: 'GET'}).then((response) => {
-          return (response.ok) ? response.json() : Promise.reject(response);
-        }).then((data) => {
-          formConstrData = data.outputData.form;
-
-          return fetch(`/handler/forms/methods?locale=${window.CMSCore.locales.admin.name}`, {method: 'GET'});
-        }, (rejectionReason) => {
-          this.page.showPopupNotification(rejectionReason, 0);
-        }).then((response) => {
-          return response.ok ? response.json() : Promise.reject(response);
-        }).then((data) => {
-          if (data.outputData.hasOwnProperty('methods')) {
-            if (data.outputData.methods.length > 0) {
-              data.outputData.methods.forEach((method, methodIndex) => {
-                let methodTitle = method.name.toUpperCase();
-                interactiveMethodChoices.target.addItem(methodTitle, method.id);
-                
-                if (formConstrData !== undefined) {
-                  if (formConstrData.methodID == method.id) {
-                    interactiveMethodChoices.target.setItemSelectedIndex(methodIndex);
-                  }
-                }
-              });
-
-              interactiveMethodChoices.target.setName('form_method_id');
-              interactiveMethodChoices.assembly();
-            }
-          }
-          
-          interactiveMethodContainerElement.append(interactiveMethodChoices.target.element);
-        });
-      }
-
-      urlInputElement.addEventListener('input', (event) => {
-        /** @var {String} */
-        let inputValue = event.target.value;
-
-        /** @var {Utils} */
-        let utils = new Utils();
-        /** @var {UString} */
-        let uString = utils.createString(inputValue);
-        uString.source = uString.translitToEN(true);
-        uString.source = uString.source.toLowerCase();
-        uString.source = uString.source.replace(/[^a-z0-9\-]/, '');
-
-        event.target.value = uString.source;
-      });
-
-      this.buttons.addElement = new Interactive('button');
-      this.buttons.save = new Interactive('button');
-      this.buttons.delete = new Interactive('button');
-
-      this.buttons.addElement.target.setLabel(localeData.BUTTON_NEW_ELEMENT_LABEL);
-      this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
-      this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
-      
-      this.buttons.addElement.target.setStyle('default');
-      this.buttons.save.target.setStyle('green');
-      this.buttons.delete.target.setStyle('red');
-
-      this.buttons.addElement.target.setCallback((event) => {
-        event.preventDefault();
-
-        const formElementsU = document.querySelectorAll('[data-element="form-element"]');
-        const anchorElement = formElementsU[formElementsU.length - 1] ?? null;
-        this.addElement(localeData, anchorElement);
-      });
-
-      // Получаем все установленные языковые пакеты
-      fetch('/handler/form/' + searchParams.getPathPart(3) + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
-        return response.ok ? response.json() : Promise.reject(response);
-      }).then((data) => {
-        let elements = [];
-        if (data.outputData.form !== undefined) {
-          elements = data.outputData.form.elements ?? [];
-        }
-
-        elements.forEach((element, elementIndex) => {
-          let elementTexts = element['texts'][window.CMSCore.locales.admin.name];
-          elementTexts = elementTexts !== undefined ? elementTexts : [];
-
-          const elementTitle = elementTexts.title;
-          const elementDescription = elementTexts.description;
-          const elementPlaceholder = elementTexts.placeholder;
-          
-          const formElementsU = document.querySelectorAll('[data-element="form-element"]');
-          const anchorElement = formElementsU[formElementsU.length - 1] ?? null;
-          this.addElement(localeData, anchorElement, {
-            index: elementIndex,
-            type: element.type,
-            required: element.required,
-            title: elementTitle,
-            description: elementDescription,
-            placeholder: elementPlaceholder,
-            name: element.name,
-            sequenceNumber: element.sequenceNumber
-          });
-
-          if (element['options'].length > 0) {
-           
-          }
-
-          element['options'].forEach(optionElement => {
-            
-          });
-        });
-      });
-
-      const interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
-      interactiveChoicesSelectElement.addEventListener('change', (event) => {
-        const formTitleInputElement = document.querySelector('[data-element="input-title"]');
-        const formDescriptionTextareaElement = document.querySelector('[data-element="input-description"]');
-        const formElementTitleInputElements = document.querySelectorAll('[name="form_element_title[]"]');
-        const formElementDescriptionInputElements = document.querySelectorAll('[name="form_element_description[]"]');
-        const formElementPlaceholderInputElements = document.querySelectorAll('[name="form_element_placeholder[]"]');
-        
-        locales.forEach((locale, localeIndex) => {
-          if (locale.name === event.target.value) {
-            formTitleInputElement.setAttribute('name', 'form_title_' + locale.iso639_2);
-            formDescriptionTextareaElement.setAttribute('name', 'form_description_' + locale.iso639_2);
-
-            if (searchParams.getPathPart(3) != null) {
-              const request = new Interactive('request', {
-                method: 'GET',
-                url: '/handler/form/' + searchParams.getPathPart(3) + '?locale=' + locale.name + '&localeMessage=' + window.CMSCore.locales.admin.name
-              });
-      
-              request.target.showingNotification = false;
-      
-              request.target.send().then((data) => {
-                if (data.statusCode === 1 && data.outputData.hasOwnProperty('form')) {
-                  formDescriptionTextareaElement.value = data.outputData.form.description;
-                  formTitleInputElement.value = data.outputData.form.title;
-
-                  formElementTitleInputElements.forEach((element, elementIndex) => {
-                    const elementData = data.outputData.form.elements[elementIndex];
-                    element.value = this.getLocalizedFormElementText(elementData, 'title', locale.name);
-                  });
-
-                  formElementDescriptionInputElements.forEach((element, elementIndex) => {
-                    const elementData = data.outputData.form.elements[elementIndex];
-                    element.value = this.getLocalizedFormElementText(elementData, 'description', locale.name);
-                  });
-
-                  formElementPlaceholderInputElements.forEach((element, elementIndex) => {
-                    const elementData = data.outputData.form.elements[elementIndex];
-                    element.value = this.getLocalizedFormElementText(elementData, 'placeholder', locale.name);
-                  });
-                }
-              });
-            }
-          }
-        });
-      });
-
-      this.buttons.save.target.setCallback((event) => {
-        event.preventDefault();
-
-        elementForm = document.querySelector('[data-element="main-form"]');
-
-        let form = new Interactive('form');
-        form.target.replaceElement(elementForm);
-        
-        if (form.target.checkRequiredFields()) {
-          let formData = new FormData(elementForm);
-          formData.append('common_locale', interactiveLocaleChoices.target.getValue());
-
-          let fetchLink = searchParams.getPathPart(3) === null
-            ? '/handler/form?localeMessage=' + window.CMSCore.locales.admin.name
-            : '/handler/form/' + searchParams.getPathPart(3) + '?localeMessage=' + window.CMSCore.locales.admin.name;
-          let fetchMethod = searchParams.getPathPart(3) === null ? 'PUT' : 'PATCH';
-
-          let request = new Interactive('request', {
-            method: fetchMethod,
-            url: fetchLink
-          });
-  
-          request.target.data = formData;
-  
-          request.target.send().then((data) => {
-            if (data.statusCode == 1 && searchParams.getPathPart(3) == null) {
-              let formConstrData = data.outputData.form;
-              window.location.href = '/admin/form/' + formConstrData.id;
-            }
-          });
-        } else {
-          this.page.showPopupNotification(localeData.FORM_REQUIRED_FIELDS_IS_EMPTY, 0);
-        }
-      });
-
-      this.buttons.delete.target.setCallback((event) => {
-        event.preventDefault();
-
-        let interactiveModal = new Interactive('modal', {
-          title: localeData.MODAL_ENTRIES_CATEGORY_DELETE_TITLE,
-          content: localeData.MODAL_ENTRIES_CATEGORY_DELETE_DESCRIPTION
-        });
-        
-        interactiveModal.target.addButton(localeData.BUTTON_DELETE_LABEL, () => {
-          let formData = new FormData();
-          formData.append('form_id', searchParams.getPathPart(3));
-
-          let request = new Interactive('request', {
-            method: 'DELETE',
-            url: '/handler/form/' + searchParams.getPathPart(3) + '?localeMessage=' + window.CMSCore.locales.admin.name
-          });
-
-          request.target.data = formData;
-
-          request.target.send().then((data) => {
-            if (data.statusCode == 1) {
-              window.location.href = '/admin/forms';
-            }
-          });
-        });
-
-        interactiveModal.target.addButton(localeData.BUTTON_CANCEL_LABEL, () => {
-          interactiveModal.target.close();
-        });
-
-        interactiveModal.assembly();
-        document.body.appendChild(interactiveModal.target.element);
-        interactiveModal.target.show();
-      });
-
-      this.buttons.addElement.assembly();
-      this.buttons.save.assembly();
-      this.buttons.delete.assembly();
-
-      if (searchParams.getPathPart(3) === null) {
-        this.buttons.delete.target.element.style.display = 'none';
-        this.buttons.save.target.element.style.display = 'flex';
-      } else {
-        this.buttons.delete.target.element.style.display = 'flex';
-        this.buttons.save.target.element.style.display = 'flex';
-      }
-
-      const interactiveContainer = document.querySelector('[data-element="panel"]');
-      interactiveContainer.append(this.buttons.addElement.target.element);
-      interactiveContainer.append(this.buttons.delete.target.element);
-      interactiveContainer.append(this.buttons.save.target.element);
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
+  populateLocaleChoices() {
+    this.locales.forEach((locale) => {
+      const localeTemplate = this.createLocaleTemplate(locale);
+      this.interactiveLocaleChoices.target.addItem(localeTemplate, locale.name);
     });
+  }
+
+  createLocaleTemplate(locale) {
+    const iconElement = this.createLocaleIcon(locale.iconURL, locale.title);
+    const labelElement = this.createLocaleLabel(locale.title);
+    return iconElement.outerHTML + labelElement.outerHTML;
+  }
+
+  createLocaleIcon(iconURL, alt) {
+    const img = document.createElement('img');
+    img.setAttribute('src', iconURL);
+    img.setAttribute('alt', alt);
+    return img;
+  }
+
+  createLocaleLabel(title) {
+    const span = document.createElement('span');
+    span.innerText = title;
+    return span;
+  }
+
+  setDefaultLocale() {
+    this.locales.forEach((locale, index) => {
+      if (locale.name === window.CMSCore.locales.admin.name) {
+        this.interactiveLocaleChoices.target.setItemSelectedIndex(index);
+        this.setupFormFieldNames(locale);
+      }
+    });
+  }
+
+  setupFormFieldNames(locale) {
+    this.formElements.descriptionTextarea.setAttribute('name', `form_description_${locale.iso639_2}`);
+    this.formElements.titleInput.setAttribute('name', `form_title_${locale.iso639_2}`);
+  }
+
+  // Инициализация выбора метода
+  initializeMethodChoices() {
+    const methodContainer = document.querySelector('[data-element="choice"][data-choice="method"]');
+    if (!methodContainer) return;
+    
+    this.interactiveMethodChoices = new Interactive('choices');
+    this.loadMethodsData();
+  }
+
+  loadMethodsData() {
+    let formConstrData;
+    const formId = this.searchParams.getPathPart(3);
+    
+    fetch(`/handler/form/${formId}?locale=${window.CMSCore.locales.admin.name}`, {method: 'GET'})
+      .then((response) => this.handleResponse(response))
+      .then((data) => {
+        formConstrData = data.outputData.form;
+        return fetch(`/handler/forms/methods?locale=${window.CMSCore.locales.admin.name}`, {method: 'GET'});
+      })
+      .then((response) => this.handleResponse(response))
+      .then((data) => this.populateMethodChoices(data, formConstrData))
+      .catch((rejectionReason) => this.page.showPopupNotification(rejectionReason, 0));
+  }
+
+  populateMethodChoices(data, formConstrData) {
+    if (!data.outputData?.methods?.length) return;
+    
+    data.outputData.methods.forEach((method, index) => {
+      this.interactiveMethodChoices.target.addItem(method.name.toUpperCase(), method.id);
+      
+      if (formConstrData?.methodID === method.id) {
+        this.interactiveMethodChoices.target.setItemSelectedIndex(index);
+      }
+    });
+    
+    this.interactiveMethodChoices.target.setName('form_method_id');
+    this.interactiveMethodChoices.assembly();
+    
+    const methodContainer = document.querySelector('[data-element="choice"][data-choice="method"]');
+    methodContainer.append(this.interactiveMethodChoices.target.element);
+  }
+
+  // Настройка слушателя для поля URL
+  setupUrlInputListener() {
+    this.formElements.urlInput.addEventListener('input', (event) => {
+      const utils = new Utils();
+      const uString = utils.createString(event.target.value);
+      uString.source = uString.translitToEN(true);
+      uString.source = uString.source.toLowerCase();
+      uString.source = uString.source.replace(/[^a-z0-9\-]/, '');
+      event.target.value = uString.source;
+    });
+  }
+
+  // Инициализация кнопок
+  initializeButtons() {
+    this.buttons = {
+      addElement: new Interactive('button'),
+      save: new Interactive('button'),
+      delete: new Interactive('button')
+    };
+    
+    this.setupButtonLabels();
+    this.setupButtonStyles();
+    this.setupButtonCallbacks();
+  }
+
+  setupButtonLabels() {
+    this.buttons.addElement.target.setLabel(this.localeData.BUTTON_NEW_ELEMENT_LABEL);
+    this.buttons.save.target.setLabel(this.localeData.BUTTON_SAVE_LABEL);
+    this.buttons.delete.target.setLabel(this.localeData.BUTTON_DELETE_LABEL);
+  }
+
+  setupButtonStyles() {
+    this.buttons.addElement.target.setStyle('default');
+    this.buttons.save.target.setStyle('green');
+    this.buttons.delete.target.setStyle('red');
+  }
+
+  setupButtonCallbacks() {
+    this.buttons.addElement.target.setCallback((event) => {
+      event.preventDefault();
+      const formElements = document.querySelectorAll('[data-element="form-element"]');
+      const anchorElement = formElements[formElements.length - 1] ?? null;
+      this.addElement(this.localeData, anchorElement);
+    });
+    
+    this.buttons.save.target.setCallback((event) => this.handleSave());
+    this.buttons.delete.target.setCallback((event) => this.handleDelete());
+  }
+
+  // Обработка сохранения формы
+  handleSave() {
+    event.preventDefault();
+    this.elementForm = document.querySelector('[data-element="main-form"]');
+    
+    const form = new Interactive('form');
+    form.target.replaceElement(this.elementForm);
+    
+    if (!form.target.checkRequiredFields()) {
+      this.page.showPopupNotification(this.localeData.FORM_REQUIRED_FIELDS_IS_EMPTY, 0);
+      return;
+    }
+    
+    const formData = new FormData(this.elementForm);
+    formData.append('common_locale', this.interactiveLocaleChoices.target.getValue());
+    
+    const formId = this.searchParams.getPathPart(3);
+    const fetchLink = formId === null 
+      ? `/handler/form?localeMessage=${window.CMSCore.locales.admin.name}`
+      : `/handler/form/${formId}?localeMessage=${window.CMSCore.locales.admin.name}`;
+    const fetchMethod = formId === null ? 'PUT' : 'PATCH';
+    
+    const request = new Interactive('request', {
+      method: fetchMethod,
+      url: fetchLink,
+      data: formData
+    });
+    
+    request.target.send().then((data) => {
+      if (data.statusCode === 1 && formId === null) {
+        window.location.href = `/admin/form/${data.outputData.form.id}`;
+      }
+    });
+  }
+
+  // Обработка удаления формы
+  handleDelete() {
+    const modal = new Interactive('modal', {
+      title: this.localeData.MODAL_ENTRIES_CATEGORY_DELETE_TITLE,
+      content: this.localeData.MODAL_ENTRIES_CATEGORY_DELETE_DESCRIPTION
+    });
+    
+    modal.target.addButton(this.localeData.BUTTON_DELETE_LABEL, () => {
+      const formData = new FormData();
+      formData.append('form_id', this.searchParams.getPathPart(3));
+      
+      const request = new Interactive('request', {
+        method: 'DELETE',
+        url: `/handler/form/${this.searchParams.getPathPart(3)}?localeMessage=${window.CMSCore.locales.admin.name}`,
+        data: formData
+      });
+      
+      request.target.send().then((data) => {
+        if (data.statusCode === 1) {
+          window.location.href = '/admin/forms';
+        }
+      });
+    });
+    
+    modal.target.addButton(this.localeData.BUTTON_CANCEL_LABEL, () => modal.target.close());
+    modal.assembly();
+    document.body.appendChild(modal.target.element);
+    modal.target.show();
+  }
+
+  // Загрузка существующих данных формы
+  loadExistingFormData() {
+    const formId = this.searchParams.getPathPart(3);
+    if (!formId) return;
+    
+    fetch(`/handler/form/${formId}?locale=${window.CMSCore.locales.admin.name}&localeMessage=${window.CMSCore.locales.admin.name}`, {method: 'GET'})
+      .then((response) => this.handleResponse(response))
+      .then((data) => this.renderExistingFormElements(data))
+      .catch((rejectionReason) => this.page.showPopupNotification(rejectionReason, 0));
+  }
+
+  renderExistingFormElements(data) {
+    const elements = data.outputData.form?.elements ?? [];
+    
+    elements.forEach((element, index) => {
+      const elementTexts = element.texts[window.CMSCore.locales.admin.name] ?? {};
+      const formElements = document.querySelectorAll('[data-element="form-element"]');
+      const anchorElement = formElements[formElements.length - 1] ?? null;
+      
+      this.addElement(this.localeData, anchorElement, {
+        index: index,
+        type: element.type,
+        required: element.required,
+        title: elementTexts.title,
+        description: elementTexts.description,
+        placeholder: elementTexts.placeholder,
+        name: element.name,
+        sequenceNumber: element.sequenceNumber
+      });
+      
+      if (element.options?.length > 0) {
+        // Обработка опций select
+      }
+    });
+  }
+
+  // Настройка слушателя смены локали
+  setupLocaleChangeListener() {
+    const selectElement = document.querySelector('[data-element="header-interactive"] select');
+    selectElement.addEventListener('change', (event) => this.handleLocaleChange(event));
+  }
+
+  handleLocaleChange(event) {
+    const selectedLocale = this.locales.find(locale => locale.name === event.target.value);
+    if (!selectedLocale) return;
+    
+    this.updateFormFieldNames(selectedLocale);
+    
+    const formId = this.searchParams.getPathPart(3);
+    if (formId) {
+      this.loadFormDataForLocale(selectedLocale);
+    }
+  }
+
+  updateFormFieldNames(locale) {
+    const titleInput = document.querySelector('[data-element="input-title"]');
+    const descriptionTextarea = document.querySelector('[data-element="input-description"]');
+    
+    titleInput.setAttribute('name', `form_title_${locale.iso639_2}`);
+    descriptionTextarea.setAttribute('name', `form_description_${locale.iso639_2}`);
+  }
+
+  loadFormDataForLocale(locale) {
+    const request = new Interactive('request', {
+      method: 'GET',
+      url: `/handler/form/${this.searchParams.getPathPart(3)}?locale=${locale.name}&localeMessage=${window.CMSCore.locales.admin.name}`,
+      showingNotification: false
+    });
+    
+    request.target.send().then((data) => {
+      if (data.statusCode === 1 && data.outputData.form) {
+        this.updateFormWithLocaleData(data.outputData.form, locale);
+      }
+    });
+  }
+
+  updateFormWithLocaleData(formData, locale) {
+    const titleInput = document.querySelector('[data-element="input-title"]');
+    const descriptionTextarea = document.querySelector('[data-element="input-description"]');
+    
+    titleInput.value = formData.title;
+    descriptionTextarea.value = formData.description;
+    
+    this.updateFormElementsTexts(formData.elements, locale);
+  }
+
+  updateFormElementsTexts(elements, locale) {
+    const titleInputs = document.querySelectorAll('[name="form_element_title[]"]');
+    const descriptionInputs = document.querySelectorAll('[name="form_element_description[]"]');
+    const placeholderInputs = document.querySelectorAll('[name="form_element_placeholder[]"]');
+    
+    elements.forEach((element, index) => {
+      titleInputs[index].value = this.getLocalizedFormElementText(element, 'title', locale.name);
+      descriptionInputs[index].value = this.getLocalizedFormElementText(element, 'description', locale.name);
+      placeholderInputs[index].value = this.getLocalizedFormElementText(element, 'placeholder', locale.name);
+    });
+  }
+
+  // Настройка UI кнопок
+  setupButtonsUI() {
+    this.buttons.addElement.assembly();
+    this.buttons.save.assembly();
+    this.buttons.delete.assembly();
+    
+    const isNewForm = this.searchParams.getPathPart(3) === null;
+    this.buttons.delete.target.element.style.display = isNewForm ? 'none' : 'flex';
+    this.buttons.save.target.element.style.display = 'flex';
+    
+    const panelContainer = document.querySelector('[data-element="panel"]');
+    panelContainer.append(
+      this.buttons.addElement.target.element,
+      this.buttons.delete.target.element,
+      this.buttons.save.target.element
+    );
   }
 
   getLocalizedFormElementText(elementData, field, preferredLocale) {
