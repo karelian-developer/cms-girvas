@@ -208,6 +208,10 @@ export class PageForm {
             sequenceNumber: element.sequenceNumber
           });
 
+          if (element['options'].length > 0) {
+           
+          }
+
           element['options'].forEach(optionElement => {
             
           });
@@ -394,262 +398,300 @@ export class PageForm {
     return rowElement;
   }
 
+  // Основной метод, который теперь работает как оркестратор
   addElement(localeData, anchorElement, data = {}) {
+    const rowsElement = this.createRowsContainer();
+    const formElements = this.createFormElements(localeData, data);
+    
+    this.setupElementValues(formElements, data);
+    this.setupNameChangeListener(formElements.inputName);
+    
+    const typeSelect = this.createTypeSelect(localeData, data.type);
+    const requiredCheckbox = this.createRequiredCheckbox(data.required, this.elementsCount);
+    const actionButtons = this.createActionButtons(localeData, rowsElement, formElements.inputName);
+    
+    this.setupTypeChangeListener(typeSelect, rowsElement, formElements.inputName, actionButtons.addOptionButton, localeData);
+    
+    this.appendRows(rowsElement, localeData, data, formElements, typeSelect, requiredCheckbox, actionButtons.removeButton);
+    this.insertIntoDOM(rowsElement, anchorElement, formElements, data);
+    
+    this.elementsCount++;
+  }
+
+  // Создание контейнера для строк
+  createRowsContainer() {
     const rowsElement = document.createElement('div');
     rowsElement.classList.add('grid-table__rows');
+    return rowsElement;
+  }
 
-    const cellHeaderElement = document.createElement('div');
-    const formElementInputTitle = document.createElement('input');
-    const formElementInputName = document.createElement('input');
-    const formElementInputDescription = document.createElement('textarea');
-    const formElementInputPlaceholder = document.createElement('input');
-    const formElementInputSequenceNumber = document.createElement('input');
+  // Создание всех полей формы
+  createFormElements(localeData, data) {
+    return {
+      inputTitle: this.createInputField('text', 'form_element_title[]', localeData.PAGE_FORM_ELEMENT_TITLE_PLACEHOLDER, true, ['form__input', 'form__input_text']),
+      inputName: this.createInputField('text', 'form_element_name[]', 'my_field', true, ['form__input', 'form__input_text'], '[a-zA-Z0-9_]+'),
+      inputDescription: this.createTextareaField('form_element_description[]', localeData.PAGE_FORM_ELEMENT_DESCRIPTION_PLACEHOLDER, ['form__textarea']),
+      inputPlaceholder: this.createInputField('text', 'form_element_placeholder[]', localeData.PAGE_FORM_ELEMENT_PLACEHOLDER_PLACEHOLDER, false, ['form__input', 'form__input_text']),
+      inputSequenceNumber: this.createInputField('number', 'form_element_sequence_number[]', 4, true, ['form__input', 'form__input_number'])
+    };
+  }
+
+  // Общий метод создания input полей
+  createInputField(type, name, placeholder, required, classes, pattern = null) {
+    const input = document.createElement('input');
+    input.setAttribute('type', type);
+    input.setAttribute('name', name);
+    input.setAttribute('placeholder', placeholder);
     
-    cellHeaderElement.classList.add('row');
-    cellHeaderElement.classList.add('grid-table__row');
-    cellHeaderElement.classList.add('grid-table__row_header');
-    cellHeaderElement.innerText = data.title !== undefined
+    if (required) {
+      input.setAttribute('required', 'required');
+    }
+    
+    if (pattern) {
+      input.setAttribute('pattern', pattern);
+    }
+    
+    classes.forEach(className => input.classList.add(className));
+    
+    return input;
+  }
+
+  // Создание textarea поля
+  createTextareaField(name, placeholder, classes) {
+    const textarea = document.createElement('textarea');
+    textarea.setAttribute('name', name);
+    textarea.setAttribute('placeholder', placeholder);
+    classes.forEach(className => textarea.classList.add(className));
+    return textarea;
+  }
+
+  // Создание заголовка секции
+  createSectionHeader(localeData, data) {
+    const header = document.createElement('div');
+    header.classList.add('row', 'grid-table__row', 'grid-table__row_header');
+    header.innerText = data.title !== undefined
       ? `${localeData.PAGE_FORM_ELEMENT}: ${data.title}`
       : localeData.PAGE_FORM_NEW_ELEMENT;
+    return header;
+  }
 
-    formElementInputTitle.setAttribute('type', 'text');
-    formElementInputTitle.setAttribute('name', 'form_element_title[]');
-    formElementInputTitle.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_TITLE_PLACEHOLDER);
-    formElementInputTitle.setAttribute('required', 'required');
-    formElementInputPlaceholder.setAttribute('type', 'text');
-    formElementInputPlaceholder.setAttribute('name', 'form_element_placeholder[]');
-    formElementInputPlaceholder.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_PLACEHOLDER_PLACEHOLDER);
-    formElementInputName.setAttribute('pattern', '[a-zA-Z0-9_]+');
-    formElementInputName.setAttribute('type', 'text');
-    formElementInputName.setAttribute('name', 'form_element_name[]');
-    formElementInputName.setAttribute('placeholder', 'my_field');
-    formElementInputName.setAttribute('required', 'required');
-    formElementInputDescription.setAttribute('name', 'form_element_description[]');
-    formElementInputDescription.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_DESCRIPTION_PLACEHOLDER);
-    formElementInputSequenceNumber.setAttribute('type', 'number');
-    formElementInputSequenceNumber.setAttribute('name', 'form_element_sequence_number[]');
-    formElementInputSequenceNumber.setAttribute('placeholder', 4);
-    formElementInputSequenceNumber.setAttribute('required', 'required');
+  // Создание выпадающего списка типов полей
+  createTypeSelect(localeData, selectedType) {
+    const typeField = new Interactive('choices');
+    const typeMapping = this.getTypeMapping();
+    
+    // Добавление всех типов полей
+    Object.entries(typeMapping).forEach(([label, value]) => {
+      typeField.target.addItem(label, value);
+    });
+    
+    typeField.target.setName('form_element_type[]');
+    
+    // Установка выбранного значения
+    if (selectedType !== undefined) {
+      const selectedIndex = Object.values(typeMapping).indexOf(selectedType);
+      typeField.target.setItemSelectedIndex(selectedIndex !== -1 ? selectedIndex : 0);
+    }
+    
+    typeField.assembly();
+    return typeField;
+  }
 
-    formElementInputTitle.classList.add('form__input');
-    formElementInputTitle.classList.add('form__input_text');
-    formElementInputPlaceholder.classList.add('form__input');
-    formElementInputPlaceholder.classList.add('form__input_text');
-    formElementInputName.classList.add('form__input');
-    formElementInputName.classList.add('form__input_text');
-    formElementInputDescription.classList.add('form__textarea');
-    formElementInputSequenceNumber.classList.add('form__input');
-    formElementInputSequenceNumber.classList.add('form__input_number');
+  // Получение маппинга типов полей
+  getTypeMapping() {
+    return {
+      'Text': 'text',
+      'Number': 'number',
+      'Date': 'date',
+      'Textarea': 'textarea',
+      'EMail': 'email',
+      'Phone': 'tel',
+      'Checkbox': 'checkbox',
+      'Select': 'select',
+      'Button Submit': 'submit',
+      'Button Reset': 'reset'
+    };
+  }
 
-    formElementInputName.addEventListener('change', (event) => {
+  // Создание чекбокса "обязательное поле"
+  createRequiredCheckbox(isRequired, elementsCount) {
+    const checkboxID = this.generateRandomId();
+    const container = document.createElement('div');
+    container.classList.add('form__checkbox-container', 'checkbox-container');
+    
+    const checkbox = document.createElement('input');
+    checkbox.classList.add('checkbox-container__input', 'form__input', 'form__input_checkbox');
+    checkbox.setAttribute('id', `I${checkboxID}`);
+    checkbox.setAttribute('name', `form_element_required[${elementsCount}]`);
+    checkbox.setAttribute('type', 'checkbox');
+    checkbox.setAttribute('value', 'required');
+    
+    if (isRequired) {
+      checkbox.setAttribute('checked', 'checked');
+    }
+    
+    const label = document.createElement('label');
+    label.classList.add('checkbox-container__label', 'form__label');
+    label.setAttribute('for', `I${checkboxID}`);
+    
+    container.appendChild(checkbox);
+    container.appendChild(label);
+    
+    return container;
+  }
+
+  // Генерация случайного ID
+  generateRandomId() {
+    return Array(10).fill(0).map(() => Math.floor(Math.random() * 10)).join('');
+  }
+
+  // Создание строки (ячейки) с заголовком и содержимым
+  createRowElement(title, content) {
+    const row = document.createElement('div');
+    row.classList.add('row', 'grid-table__row');
+    
+    const titleCell = document.createElement('div');
+    titleCell.classList.add('grid-table__cell', 'grid-table__cell_title');
+    titleCell.innerText = title || '';
+    
+    const contentCell = document.createElement('div');
+    contentCell.classList.add('grid-table__cell');
+    contentCell.appendChild(content);
+    
+    row.appendChild(titleCell);
+    row.appendChild(contentCell);
+    
+    return row;
+  }
+
+  // Создание кнопок управления
+  createActionButtons(localeData, rowsElement, inputName) {
+    const removeButton = this.createRemoveButton(localeData, rowsElement);
+    const addOptionButton = this.createAddOptionButton(localeData, inputName, rowsElement);
+    
+    // Размещаем кнопку добавления опции перед кнопкой удаления
+    removeButton.target.element.before(addOptionButton.target.element);
+    addOptionButton.target.element.style.display = 'none';
+    
+    return {
+      removeButton,
+      addOptionButton
+    };
+  }
+
+  // Создание кнопки удаления поля
+  createRemoveButton(localeData, rowsElement) {
+    const button = new Interactive('button');
+    button.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+    button.target.setStyle('red');
+    button.target.setCallback((event) => {
+      event.preventDefault();
+      this.elementsCount--;
+      rowsElement.remove();
+      button.target.element.parentElement.previousElementSibling.remove();
+      button.target.element.parentElement.remove();
+    });
+    button.assembly();
+    return button;
+  }
+
+  // Создание кнопки добавления опции для select
+  createAddOptionButton(localeData, inputName, rowsElement) {
+    const button = new Interactive('button');
+    button.target.setLabel(localeData.BUTTON_NEW_OPTION_LABEL);
+    button.target.setStyle('default');
+    button.target.setCallback((event) => {
+      event.preventDefault();
+      const rowOptions = document.querySelectorAll(`[data-element="select-option-label"][data-select="${inputName.value}"]`);
+      const rowOption = this.createRowSelectOption(localeData, inputName, rowOptions.length);
+      rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
+    });
+    button.assembly();
+    return button;
+  }
+
+  // Настройка слушателя изменения имени поля
+  setupNameChangeListener(inputName) {
+    inputName.addEventListener('change', (event) => {
       const selectOptionsElements = document.querySelectorAll('[data-select]');
       selectOptionsElements.forEach(element => {
         const match = element.getAttribute('name').match(/\[(\d+)\]/);
         const number = match ? parseInt(match[1], 10) : 0;
-
+        
         if (element.getAttribute('data-element') === 'select-option-label') {
-          element.setAttribute('name', 'form_element_select_' + formElementInputName.value + '_option_label[' + number + ']');
+          element.setAttribute('name', `form_element_select_${inputName.value}_option_label[${number}]`);
         }
-
+        
         if (element.getAttribute('data-element') === 'select-option-value') {
-          element.setAttribute('name', 'form_element_select_' + formElementInputName.value + '_option_value[' + number + ']');
+          element.setAttribute('name', `form_element_select_${inputName.value}_option_value[${number}]`);
         }
       });
     });
+  }
 
-    /* Выпадающий список с типами полей */
-
-    const interactiveChoicesTypeField = new Interactive('choices');
-    interactiveChoicesTypeField.target.addItem('Text', 'text');
-    interactiveChoicesTypeField.target.addItem('Number', 'number');
-    interactiveChoicesTypeField.target.addItem('Date', 'date');
-    interactiveChoicesTypeField.target.addItem('Textarea', 'textarea');
-    interactiveChoicesTypeField.target.addItem('EMail', 'email');
-    interactiveChoicesTypeField.target.addItem('Phone', 'tel');
-    interactiveChoicesTypeField.target.addItem('Checkbox', 'checkbox');
-    interactiveChoicesTypeField.target.addItem('Select', 'select');
-    interactiveChoicesTypeField.target.addItem('Button Submit', 'submit');
-    interactiveChoicesTypeField.target.addItem('Button Reset', 'reset');
-    interactiveChoicesTypeField.target.setName('form_element_type[]');
-    
-    if (data.type !== undefined) {
-      switch (data.type) {
-        case 'text': interactiveChoicesTypeField.target.setItemSelectedIndex(0); break;
-        case 'number': interactiveChoicesTypeField.target.setItemSelectedIndex(1); break;
-        case 'date': interactiveChoicesTypeField.target.setItemSelectedIndex(2); break;
-        case 'textarea': interactiveChoicesTypeField.target.setItemSelectedIndex(3); break;
-        case 'email': interactiveChoicesTypeField.target.setItemSelectedIndex(4); break;
-        case 'tel': interactiveChoicesTypeField.target.setItemSelectedIndex(5); break;
-        case 'checkbox': interactiveChoicesTypeField.target.setItemSelectedIndex(6); break;
-        case 'select': interactiveChoicesTypeField.target.setItemSelectedIndex(7); break;
-        case 'submit': interactiveChoicesTypeField.target.setItemSelectedIndex(8); break;
-        case 'reset': interactiveChoicesTypeField.target.setItemSelectedIndex(9); break;
-        default: interactiveChoicesTypeField.target.setItemSelectedIndex(0);
-      }
-    }
-
-    interactiveChoicesTypeField.assembly();
-
-    const cellElementsForType = this.createRowElement(
-      localeData.PAGE_FORM_ELEMENT_TYPE_TITLE,
-      interactiveChoicesTypeField.target.element
-    );
-
-    const checkboxID = Array(10).fill(0).map(() => Math.floor(Math.random() * 10)).join('');
-
-    const checkboxContainerElement = document.createElement('div');
-    checkboxContainerElement.classList.add('form__checkbox-container');
-    checkboxContainerElement.classList.add('checkbox-container');
-
-    const checkboxInputElement = document.createElement('input');
-    checkboxInputElement.classList.add('checkbox-container__input');
-    checkboxInputElement.classList.add('form__input');
-    checkboxInputElement.classList.add('form__input_checkbox');
-    checkboxInputElement.setAttribute('id', 'I' + checkboxID);
-    checkboxInputElement.setAttribute('name', 'form_element_required[' + this.elementsCount + ']');
-    checkboxInputElement.setAttribute('type', 'checkbox');
-    checkboxInputElement.setAttribute('value', 'required');
-
-    if (data.required) {
-      checkboxInputElement.setAttribute('checked', 'checked');
-    }
-    
-    const checkboxLabelElement = document.createElement('label');
-    checkboxLabelElement.classList.add('checkbox-container__label');
-    checkboxLabelElement.classList.add('form__label');
-    checkboxLabelElement.setAttribute('for', 'I' + checkboxID);
-
-    checkboxContainerElement.appendChild(checkboxInputElement);
-    checkboxContainerElement.appendChild(checkboxLabelElement);
-
-    const cellElementsForRequired = this.createRowElement(
-      localeData.PAGE_FORM_ELEMENT_REQUIRED_TITLE,
-      checkboxContainerElement
-    );
-
-    const cellElementsForTitle = this.createRowElement(
-      localeData.PAGE_FORM_ELEMENT_TITLE_TITLE,
-      formElementInputTitle
-    );
-
-    const cellElementsForPlaceholder = this.createRowElement(
-      localeData.PAGE_FORM_ELEMENT_PLACEHOLDER_TITLE,
-      formElementInputPlaceholder
-    );
-
-    const cellElementsForName = this.createRowElement(
-      localeData.PAGE_FORM_ELEMENT_TECHNICAL_NAME_TITLE,
-      formElementInputName
-    );
-
-    const cellElementsForDescription = this.createRowElement(
-      localeData.PAGE_FORM_ELEMENT_DESCRIPTION_TITLE,
-      formElementInputDescription
-    );
-
-    const cellElementsForSequenceNumber = this.createRowElement(
-      localeData.PAGE_FORM_ELEMENT_SEQUENCE_NUMBER_TITLE,
-      formElementInputSequenceNumber
-    );
-
-    const buttonRemoveField = new Interactive('button');
-    buttonRemoveField.target.setLabel(localeData.BUTTON_DELETE_LABEL);
-    buttonRemoveField.target.setStyle('red');
-
-    buttonRemoveField.target.setCallback((event) => {
-      event.preventDefault();
-      this.elementsCount--;
+  // Настройка слушателя изменения типа поля
+  setupTypeChangeListener(typeSelect, rowsElement, inputName, addOptionButton, localeData) {
+    typeSelect.target.elementSelect.addEventListener('change', (event) => {
+      const isSelectType = typeSelect.target.itemSelectedIndex === 7; // Индекс типа "Select"
       
-      rowsElement.remove();
-
-      buttonRemoveField.target.element.parentElement.previousElementSibling.remove();
-      buttonRemoveField.target.element.parentElement.remove();
-    });
-
-    buttonRemoveField.assembly();
-
-    const cellElementsForEvents = this.createRowElement(
-      null, buttonRemoveField.target.element
-    );
-    
-    cellElementsForEvents.classList.add('grid-table__cell_panel');
-
-    const buttonAddOptionField = new Interactive('button');
-    buttonAddOptionField.target.setLabel(localeData.BUTTON_NEW_OPTION_LABEL);
-    buttonAddOptionField.target.setStyle('default');
-
-    buttonAddOptionField.target.setCallback((event) => {
-      event.preventDefault();
-
-      let rowOptions = document.querySelectorAll('[data-element="select-option-label"][data-select="' + formElementInputName.value + '"]');
-      let rowOption = this.createRowSelectOption(localeData, formElementInputName, rowOptions.length);
-      rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
-    });
-
-    buttonAddOptionField.assembly();
-
-    buttonRemoveField.target.element.before(buttonAddOptionField.target.element);
-    buttonAddOptionField.target.element.style.display = 'none';
-
-    interactiveChoicesTypeField.target.elementSelect.addEventListener('change', (event) => {
-      if (interactiveChoicesTypeField.target.itemSelectedIndex === 7) {
-        let rowOption = this.createRowSelectOption(localeData, formElementInputName, 0);
-        
+      if (isSelectType) {
+        const rowOption = this.createRowSelectOption(localeData, inputName, 0);
         rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
-        buttonAddOptionField.target.element.style.display = 'flex';
+        addOptionButton.style.display = 'flex';
       } else {
-        let rowOptions = document.querySelectorAll('[data-element="select-option-label"][data-select="' + formElementInputName.value + '"]');
-        
+        const rowOptions = document.querySelectorAll(`[data-element="select-option-label"][data-select="${inputName.value}"]`);
         if (rowOptions.length > 0) {
           rowOptions.forEach(rowOption => {
             rowOption.parentElement.parentElement.parentElement.remove();
           });
         }
-
-        buttonAddOptionField.target.element.style.display = 'none';
+        addOptionButton.style.display = 'none';
       }
     });
+  }
 
-    rowsElement.append(cellHeaderElement);
-    rowsElement.append(cellElementsForType);
-    rowsElement.append(cellElementsForTitle);
-    rowsElement.append(cellElementsForName);
-    rowsElement.append(cellElementsForDescription);
-    rowsElement.append(cellElementsForPlaceholder);
-    rowsElement.append(cellElementsForSequenceNumber);
-    rowsElement.append(cellElementsForRequired);
-    rowsElement.append(cellElementsForEvents);
+  // Установка значений полей из переданных данных
+  setupElementValues(formElements, data) {
+    formElements.inputTitle.value = data.title !== undefined ? data.title : '';
+    formElements.inputName.value = data.name !== undefined ? data.name : '';
+    formElements.inputPlaceholder.value = data.placeholder !== undefined ? data.placeholder : '';
+    formElements.inputDescription.value = data.description !== undefined ? data.description : '';
+    formElements.inputSequenceNumber.value = data.sequenceNumber !== undefined ? data.sequenceNumber : 0;
+  }
 
+  // Добавление всех строк в контейнер
+  appendRows(rowsElement, localeData, data, formElements, typeSelect, requiredCheckbox, removeButton) {
+    const header = this.createSectionHeader(localeData, data);
+    const typeRow = this.createRowElement(localeData.PAGE_FORM_ELEMENT_TYPE_TITLE, typeSelect.target.element);
+    const titleRow = this.createRowElement(localeData.PAGE_FORM_ELEMENT_TITLE_TITLE, formElements.inputTitle);
+    const nameRow = this.createRowElement(localeData.PAGE_FORM_ELEMENT_TECHNICAL_NAME_TITLE, formElements.inputName);
+    const descriptionRow = this.createRowElement(localeData.PAGE_FORM_ELEMENT_DESCRIPTION_TITLE, formElements.inputDescription);
+    const placeholderRow = this.createRowElement(localeData.PAGE_FORM_ELEMENT_PLACEHOLDER_TITLE, formElements.inputPlaceholder);
+    const sequenceRow = this.createRowElement(localeData.PAGE_FORM_ELEMENT_SEQUENCE_NUMBER_TITLE, formElements.inputSequenceNumber);
+    const requiredRow = this.createRowElement(localeData.PAGE_FORM_ELEMENT_REQUIRED_TITLE, requiredCheckbox);
+    
+    const buttonsRow = this.createRowElement(null, removeButton.target.element);
+    buttonsRow.classList.add('grid-table__cell_panel');
+    
+    rowsElement.append(
+      header, typeRow, titleRow, nameRow, descriptionRow, 
+      placeholderRow, sequenceRow, requiredRow, buttonsRow
+    );
+  }
+
+  // Вставка в DOM
+  insertIntoDOM(rowsElement, anchorElement, formElements, data) {
     const formElementsSectionHeader = document.querySelector('[data-element="form-elements-section-header"]');
+    
     if (formElementsSectionHeader !== null) {
       if (anchorElement === null) {
         formElementsSectionHeader.after(rowsElement);
       } else {
         anchorElement.after(rowsElement);
       }
-
-      formElementInputTitle.value = data.title !== undefined
-        ? data.title
-        : '';
-
-      formElementInputName.value = data.name !== undefined
-        ? data.name
-        : '';
-
-      formElementInputPlaceholder.value = data.placeholder !== undefined
-        ? data.placeholder
-        : '';
-
-      formElementInputDescription.value = data.description !== undefined
-        ? data.description
-        : '';
-
-      formElementInputSequenceNumber.value = data.sequenceNumber !== undefined
-        ? data.sequenceNumber
-        : 0;
+      
+      this.setupElementValues(formElements, data);
     }
-    
-    this.elementsCount++;
   }
 
   createRowSelectOption(localeData, inputName, index) {
