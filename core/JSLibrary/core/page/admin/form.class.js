@@ -306,7 +306,7 @@ export class PageForm {
         label: option.texts?.[window.CMSCore.locales.admin.name]?.label || ''
       })) || [];
 
-      console.log('Options for element:', element.name, optionsWithTexts);
+      console.log(element.options);
 
       this.addElement(this.localeData, anchorElement, {
         index: index,
