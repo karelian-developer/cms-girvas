@@ -753,63 +753,38 @@ export class PageForm {
   }
 
   createRowSelectOption(localeData, inputName, index, label = '', value = '') {
-    const rowElement = document.createElement('div');
-    rowElement.classList.add('row', 'grid-table__row');
-    
-    // Создаем ячейку для label
-    const labelCell = document.createElement('div');
-    labelCell.classList.add('grid-table__cell');
-
-    const labelInput = document.createElement('input');
-    labelInput.setAttribute('type', 'text');
-    labelInput.setAttribute('name', `form_element_select_${inputName.value}_option_label[${index}]`);
-    labelInput.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_LABEL_PLACEHOLDER);
-    labelInput.setAttribute('data-element', 'select-option-label');
-    labelInput.setAttribute('data-select', inputName.value);
-    labelInput.classList.add('form__input', 'form__input_text');
-    
+    const inputGroupElement = document.createElement('div');
+    inputGroupElement.classList.add('grid-table__input-group');
+    const inputOptionLabelElement = document.createElement('input');
+    inputOptionLabelElement.classList.add('form__input');
+    inputOptionLabelElement.classList.add('form__input_text');
+    inputOptionLabelElement.setAttribute('type', 'text');
+    inputOptionLabelElement.setAttribute('name', 'form_element_select_' + inputName.value + '_option_label[' + index + ']');
+    inputOptionLabelElement.setAttribute('data-element', 'select-option-label');
+    inputOptionLabelElement.setAttribute('data-select', inputName.value);
+    inputOptionLabelElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_LABEL_PLACEHOLDER);
     if (label) {
-      labelInput.value = label;
+      inputOptionLabelElement.value = label;
     }
-
-    labelCell.appendChild(labelInput);
     
-    // Создаем ячейку для value
-    const valueCell = document.createElement('div');
-    valueCell.classList.add('grid-table__cell');
-    const valueInput = document.createElement('input');
-    valueInput.setAttribute('type', 'text');
-    valueInput.setAttribute('name', `form_element_select_${inputName.value}_option_value[${index}]`);
-    valueInput.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_VALUE_PLACEHOLDER);
-    valueInput.setAttribute('data-element', 'select-option-value');
-    valueInput.setAttribute('data-select', inputName.value);
-    valueInput.classList.add('form__input', 'form__input_text');
-
+    const inputOptionValueElement = document.createElement('input');
+    inputOptionValueElement.classList.add('form__input');
+    inputOptionValueElement.classList.add('form__input_text');
+    inputOptionValueElement.setAttribute('type', 'text');
+    inputOptionValueElement.setAttribute('name', 'form_element_select_' + inputName.value + '_option_value[' + index + ']');
+    inputOptionValueElement.setAttribute('data-element', 'select-option-value');
+    inputOptionValueElement.setAttribute('data-select', inputName.value);
+    inputOptionValueElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_VALUE_PLACEHOLDER);
     if (value) {
-      valueInput.value = value;
+      inputOptionValueElement.value = value;
     }
 
-    valueCell.appendChild(valueInput);
-    
-    // Создаем ячейку с кнопкой удаления опции
-    const buttonCell = document.createElement('div');
-    buttonCell.classList.add('grid-table__cell', 'grid-table__cell_panel');
+    inputGroupElement.append(inputOptionLabelElement);
+    inputGroupElement.append(inputOptionValueElement);
 
-    const removeButton = new Interactive('button');
-    removeButton.target.setLabel(localeData.BUTTON_DELETE_LABEL);
-    removeButton.target.setStyle('red');
-    removeButton.target.setCallback((event) => {
-      event.preventDefault();
-      rowElement.remove();
-    });
-    
-    removeButton.assembly();
-    buttonCell.appendChild(removeButton.target.element);
-    
-    rowElement.appendChild(labelCell);
-    rowElement.appendChild(valueCell);
-    rowElement.appendChild(buttonCell);
-    
-    return rowElement;
+    return this.createRowElement(
+      localeData.PAGE_FORM_ELEMENT_OPTION_TITLE + ' #' + (index + 1),
+      inputGroupElement
+    );
   }
 }
