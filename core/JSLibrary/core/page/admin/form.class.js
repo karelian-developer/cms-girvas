@@ -333,11 +333,63 @@ export class PageForm {
     if (!selectedLocale) return;
     
     this.updateFormFieldNames(selectedLocale);
+    this.updateFormElementsTextsForLocale(selectedLocale);
     
     const formId = this.searchParams.getPathPart(3);
     if (formId) {
       this.loadFormDataForLocale(selectedLocale);
     }
+  }
+
+  updateFormElementsTextsForLocale(locale) {
+    // Получаем все select поля (их строки)
+    const selectRows = document.querySelectorAll('.grid-table__rows');
+    
+    selectRows.forEach((row, elementIndex) => {
+      // Находим поле name для текущего элемента
+      const nameInput = row.querySelector('[name="form_element_name[]"]');
+      if (!nameInput) return;
+      
+      const elementName = nameInput.value;
+      
+      // Находим все опции для этого select
+      const optionLabels = row.querySelectorAll('[data-element="select-option-label"]');
+      
+      if (optionLabels.length > 0) {
+        // Загружаем данные для текущего элемента с новой локалью
+        const formId = this.searchParams.getPathPart(3);
+        if (formId) {
+          this.loadSelectOptionsForLocale(formId, elementIndex, elementName, locale, optionLabels);
+        }
+      }
+    });
+  }
+
+  loadSelectOptionsForLocale(formId, elementIndex, elementName, locale, optionLabels) {
+    const request = new Interactive('request', {
+      method: 'GET',
+      url: `/handler/form/${formId}?locale=${locale.name}&localeMessage=${window.CMSCore.locales.admin.name}`,
+    });
+
+    request.target.showingNotification = false;
+    
+    request.target.send().then((data) => {
+      if (data.statusCode === 1 && data.outputData.form?.elements) {
+        const element = data.outputData.form.elements[elementIndex];
+        
+        if (element && element.options) {
+          // Обновляем значения label для каждой опции
+          optionLabels.forEach((labelInput, optionIndex) => {
+            const option = element.options[optionIndex];
+            if (option && option.texts?.[locale.iso639_2]?.label) {
+              labelInput.value = option.texts[locale.iso639_2].label;
+            } else {
+              labelInput.value = '';
+            }
+          });
+        }
+      }
+    });
   }
 
   updateFormFieldNames(locale) {
