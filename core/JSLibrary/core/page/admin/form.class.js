@@ -205,10 +205,23 @@ export class PageForm {
   }
 
   setupButtonCallbacks() {
+    // В методе setupButtonCallbacks или в addElement
     this.buttons.addElement.target.setCallback((event) => {
       event.preventDefault();
+      
+      // Получаем все элементы формы
       const formElements = document.querySelectorAll('[data-element="form-element"]');
-      const anchorElement = formElements[formElements.length - 1] ?? null;
+      
+      let anchorElement = null;
+      
+      if (formElements.length > 0) {
+        // Если есть существующие элементы, берем последний
+        anchorElement = formElements[formElements.length - 1];
+      } else {
+        // Если нет элементов, берем заголовок секции
+        anchorElement = document.querySelector('[data-element="form-elements-section-header"]');
+      }
+      
       this.addElement(this.localeData, anchorElement);
     });
     
@@ -508,6 +521,16 @@ export class PageForm {
     
     this.appendRows(rowsElement, localeData, data, formElements, typeSelect, requiredCheckbox, actionButtons.removeButton);
     this.insertIntoDOM(rowsElement, anchorElement, formElements, data);
+
+    const formElementsSectionHeader = document.querySelector('[data-element="form-elements-section-header"]');
+
+    if (formElementsSectionHeader !== null) {
+      if (anchorElement === null) {
+        formElementsSectionHeader.after(rowsElement);
+      } else {
+        anchorElement.after(rowsElement);
+      }
+    }
     
     if (data.type === 'select' && data.options && data.options.length > 0) {
       data.options.forEach((option, optionIndex) => {
