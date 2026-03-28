@@ -209,7 +209,7 @@ export class PageForm {
           });
 
           element['options'].forEach(optionElement => {
-            console.log(optionElement);
+            
           });
         });
       });
@@ -591,6 +591,13 @@ export class PageForm {
     buttonRemoveField.target.element.before(buttonAddOptionField.target.element);
     buttonAddOptionField.target.element.style.display = 'none';
 
+    if (interactiveChoicesTypeField.target.itemSelectedIndex === 7) {
+      let rowOption = this.createRowSelectOption(localeData, formElementInputName, 0);
+      
+      rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
+      buttonAddOptionField.target.element.style.display = 'flex';
+    }
+    
     interactiveChoicesTypeField.target.elementSelect.addEventListener('change', (event) => {
       if (interactiveChoicesTypeField.target.itemSelectedIndex === 7) {
         let rowOption = this.createRowSelectOption(localeData, formElementInputName, 0);
