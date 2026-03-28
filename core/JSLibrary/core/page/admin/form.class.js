@@ -308,12 +308,9 @@ export class PageForm {
         description: elementTexts.description,
         placeholder: elementTexts.placeholder,
         name: element.name,
-        sequenceNumber: element.sequenceNumber
+        sequenceNumber: element.sequenceNumber,
+        options: element.options || []
       });
-      
-      if (element.options?.length > 0) {
-        // Обработка опций select
-      }
     });
   }
 
@@ -456,6 +453,22 @@ export class PageForm {
     this.appendRows(rowsElement, localeData, data, formElements, typeSelect, requiredCheckbox, actionButtons.removeButton);
     this.insertIntoDOM(rowsElement, anchorElement, formElements, data);
     
+    if (data.type === 'select' && data.options && data.options.length > 0) {
+      setTimeout(() => {
+        data.options.forEach((option, optionIndex) => {
+          const rowOption = this.createRowSelectOption(
+            localeData, 
+            formElements.inputName, 
+            optionIndex,
+            option.label,
+            option.value
+          );
+          rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
+        });
+        actionButtons.addOptionButton.target.element.style.display = 'flex';
+      }, 0);
+    }
+
     this.elementsCount++;
   }
 
