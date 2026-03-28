@@ -207,6 +207,10 @@ export class PageForm {
             name: element.name,
             sequenceNumber: element.sequenceNumber
           });
+
+          element['options'].forEach(optionElement => {
+            console.log(optionElement);
+          });
         });
       });
 

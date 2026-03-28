@@ -135,7 +135,7 @@ export class Form {
     if (inputTipsAll.length > 0) {
       inputTipsAll.forEach((element) => {
         let elementRole = element.getAttribute('role');
-        if (elementRole == 'passwords-show') {
+        if (elementRole === 'passwords-show') {
           let elementParentElement = element.parentElement;
           elementParentElement.style.position = 'relative';
 
@@ -146,7 +146,7 @@ export class Form {
               element.addEventListener('click', (event) => {
                 let inputElementType = inputElement.getAttribute('type');
 
-                if (inputElementType == 'password') {
+                if (inputElementType === 'password') {
                   inputElement.setAttribute('type', 'text');
                 } else {
                   inputElement.setAttribute('type', 'password');
@@ -173,29 +173,29 @@ export class Form {
       }
     }
 
-    return (this.element.hasAttribute('method')) ? this.element.getAttribute('method') : 'POST';
+    return this.element.hasAttribute('method') ? this.element.getAttribute('method') : 'POST';
   }
 
   getFormAction() {
-    return (this.element.hasAttribute('action')) ? this.element.getAttribute('action') : '/handler';
+    return this.element.hasAttribute('action') ? this.element.getAttribute('action') : '/handler';
   }
 
   send(event) {
     let submitter, submitterName, submitterMethod;
 
     submitter = event.submitter;
-    submitterName = (submitter.hasAttribute('name')) ? submitter.getAttribute('name') : 'submitter_anomymous';
-    submitterMethod = (submitter.hasAttribute('formmethod')) ? submitter.getAttribute('formmethod') : 'POST';
+    submitterName = submitter.hasAttribute('name') ? submitter.getAttribute('name') : 'submitter_anomymous';
+    submitterMethod = submitter.hasAttribute('formmethod') ? submitter.getAttribute('formmethod') : 'POST';
 
     let form, formMethod, formAction;
 
     form = event.target;
-    formMethod = (event.target.hasAttribute('method')) ? event.target.getAttribute('method') : 'POST';
-    formAction = (event.target.hasAttribute('action')) ? event.target.getAttribute('action') : '/';
+    formMethod = event.target.hasAttribute('method') ? event.target.getAttribute('method') : 'POST';
+    formAction = event.target.hasAttribute('action') ? event.target.getAttribute('action') : '/';
 
     let request, requestMethod, requestURL;
 
-    requestMethod = (submitter.hasAttribute('formmethod')) ? submitterMethod : formMethod;
+    requestMethod = submitter.hasAttribute('formmethod') ? submitterMethod : formMethod;
     requestURL = formAction;
 
     request = new Interactive('request', {
