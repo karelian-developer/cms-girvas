@@ -508,6 +508,8 @@ export class PageForm {
   // Основной метод, который теперь работает как оркестратор
   addElement(localeData, anchorElement, data = {}) {
     const rowsElement = this.createRowsContainer();
+    rowsElement.setAttribute('data-element', 'form-element');
+    
     const formElements = this.createFormElements(localeData, data);
     
     this.setupElementValues(formElements, data);
