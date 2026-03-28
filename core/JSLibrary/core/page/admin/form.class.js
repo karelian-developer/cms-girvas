@@ -342,25 +342,20 @@ export class PageForm {
   }
 
   updateFormElementsTextsForLocale(locale) {
-    // Получаем все select поля (их строки)
-    const selectRows = document.querySelectorAll('.grid-table__rows');
+    const formRows = document.querySelectorAll('.grid-table__rows');
+    const formId = this.searchParams.getPathPart(3);
     
-    selectRows.forEach((row, elementIndex) => {
-      // Находим поле name для текущего элемента
+    if (!formId) return;
+    
+    formRows.forEach((row) => {
       const nameInput = row.querySelector('[name="form_element_name[]"]');
       if (!nameInput) return;
       
       const elementName = nameInput.value;
-      
-      // Находим все опции для этого select
       const optionLabels = row.querySelectorAll('[data-element="select-option-label"]');
       
       if (optionLabels.length > 0) {
-        // Загружаем данные для текущего элемента с новой локалью
-        const formId = this.searchParams.getPathPart(3);
-        if (formId) {
-          this.loadSelectOptionsForLocale(formId, elementIndex, elementName, locale, optionLabels);
-        }
+        this.loadSelectOptionsForLocale(formId, elementName, locale, optionLabels);
       }
     });
   }
@@ -375,7 +370,7 @@ export class PageForm {
     
     request.target.send().then((data) => {
       if (data.statusCode === 1 && data.outputData.form?.elements) {
-        const element = data.outputData.form.elements[elementIndex];
+        const element = data.outputData.form.elements.find(el => el.name === elementName);
         
         if (element && element.options) {
           // Обновляем значения label для каждой опции
