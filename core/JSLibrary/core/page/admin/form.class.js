@@ -212,12 +212,12 @@ export class PageForm {
       this.addElement(this.localeData, anchorElement);
     });
     
-    this.buttons.save.target.setCallback((event) => this.handleSave());
-    this.buttons.delete.target.setCallback((event) => this.handleDelete());
+    this.buttons.save.target.setCallback((event) => this.handleSave(event));
+    this.buttons.delete.target.setCallback((event) => this.handleDelete(event));
   }
 
   // Обработка сохранения формы
-  handleSave() {
+  handleSave(event) {
     event.preventDefault();
     this.elementForm = document.querySelector('[data-element="main-form"]');
     
@@ -252,7 +252,7 @@ export class PageForm {
   }
 
   // Обработка удаления формы
-  handleDelete() {
+  handleDelete(event) {
     const modal = new Interactive('modal', {
       title: this.localeData.MODAL_ENTRIES_CATEGORY_DELETE_TITLE,
       content: this.localeData.MODAL_ENTRIES_CATEGORY_DELETE_DESCRIPTION
