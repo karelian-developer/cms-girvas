@@ -637,7 +637,7 @@ export class PageForm {
       if (isSelectType) {
         const rowOption = this.createRowSelectOption(localeData, inputName, 0);
         rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
-        addOptionButton.style.display = 'flex';
+        addOptionButton.target.element.style.display = 'flex';
       } else {
         const rowOptions = document.querySelectorAll(`[data-element="select-option-label"][data-select="${inputName.value}"]`);
         if (rowOptions.length > 0) {
@@ -645,7 +645,7 @@ export class PageForm {
             rowOption.parentElement.parentElement.parentElement.remove();
           });
         }
-        addOptionButton.style.display = 'none';
+        addOptionButton.target.element.style.display = 'none';
       }
     });
   }
