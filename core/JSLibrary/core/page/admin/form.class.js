@@ -301,6 +301,11 @@ export class PageForm {
       const formElements = document.querySelectorAll('[data-element="form-element"]');
       const anchorElement = formElements[formElements.length - 1] ?? null;
       
+      const optionsWithTexts = element.options?.map(option => ({
+        value: option.value,
+        label: option.texts?.[window.CMSCore.locales.admin.name]?.label || ''
+      })) || [];
+
       this.addElement(this.localeData, anchorElement, {
         index: index,
         type: element.type,
@@ -310,7 +315,7 @@ export class PageForm {
         placeholder: elementTexts.placeholder,
         name: element.name,
         sequenceNumber: element.sequenceNumber,
-        options: element.options || []
+        options: optionsWithTexts
       });
     });
   }
@@ -455,19 +460,17 @@ export class PageForm {
     this.insertIntoDOM(rowsElement, anchorElement, formElements, data);
     
     if (data.type === 'select' && data.options && data.options.length > 0) {
-      setTimeout(() => {
-        data.options.forEach((option, optionIndex) => {
-          const rowOption = this.createRowSelectOption(
-            localeData, 
-            formElements.inputName, 
-            optionIndex,
-            option.label,
-            option.value
-          );
-          rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
-        });
-        actionButtons.addOptionButton.target.element.style.display = 'flex';
-      }, 0);
+      data.options.forEach((option, optionIndex) => {
+        const rowOption = this.createRowSelectOption(
+          localeData,
+          formElements.inputName,
+          optionIndex,
+          option.label,
+          option.value
+        );
+        rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
+      });
+      actionButtons.addOptionButton.target.element.style.display = 'flex';
     }
 
     this.elementsCount++;
@@ -772,6 +775,17 @@ export class PageForm {
 
     inputGroupElement.append(inputOptionLabelElement);
     inputGroupElement.append(inputOptionValueElement);
+
+    const labelInput = rowElement.querySelector('[data-element="select-option-label"]');
+    const valueInput = rowElement.querySelector('[data-element="select-option-value"]');
+    
+    if (labelInput && label) {
+      labelInput.value = label;
+    }
+    
+    if (valueInput && value) {
+      valueInput.value = value;
+    }
 
     return this.createRowElement(
       localeData.PAGE_FORM_ELEMENT_OPTION_TITLE + ' #' + (index + 1),
