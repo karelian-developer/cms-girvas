@@ -345,21 +345,14 @@ export class PageForm {
     const formRows = document.querySelectorAll('.grid-table__rows');
     const formId = this.searchParams.getPathPart(3);
     
-    console.log('Updating for locale:', locale.name);
-    console.log('Form rows count:', formRows.length);
-    
     if (!formId) return;
     
-    formRows.forEach((row, rowIndex) => {
+    formRows.forEach((row) => {
       const nameInput = row.querySelector('[name="form_element_name[]"]');
-      console.log(`Row ${rowIndex} nameInput:`, nameInput?.value);
-      
       if (!nameInput) return;
       
       const elementName = nameInput.value;
       const optionLabels = row.querySelectorAll('[data-element="select-option-label"]');
-      
-      console.log(`Element: ${elementName}, options count:`, optionLabels.length);
       
       if (optionLabels.length > 0) {
         this.loadSelectOptionsForLocale(formId, elementName, locale, optionLabels);
@@ -367,9 +360,7 @@ export class PageForm {
     });
   }
 
-  loadSelectOptionsForLocale(formId, elementName, locale, optionLabels) {
-    console.log('Loading options for element:', elementName, 'locale:', locale.name);
-    
+  loadSelectOptionsForLocale(formId, elementIndex, elementName, locale, optionLabels) {
     const request = new Interactive('request', {
       method: 'GET',
       url: `/handler/form/${formId}?locale=${locale.name}&localeMessage=${window.CMSCore.locales.admin.name}`,
@@ -378,35 +369,23 @@ export class PageForm {
     request.target.showingNotification = false;
     
     request.target.send().then((data) => {
-      console.log('Response data:', data);
-      
       if (data.statusCode === 1 && data.outputData.form?.elements) {
-        console.log('Form elements:', data.outputData.form.elements);
-        
         const element = data.outputData.form.elements.find(el => el.name === elementName);
-        console.log('Found element:', element);
         
         if (element && element.options) {
-          console.log('Element options:', element.options);
-          
+          // Обновляем значения label для каждой опции
           optionLabels.forEach((labelInput, optionIndex) => {
             const option = element.options[optionIndex];
-            console.log(`Option ${optionIndex}:`, option);
+            const labelKey = locale.name;
             
-            if (option && option.texts?.[locale.iso639_2]?.label) {
-              console.log('Setting value:', option.texts[locale.iso639_2].label);
-              labelInput.value = option.texts[locale.iso639_2].label;
+            if (option && option.texts?.[labelKey]?.label) {
+              labelInput.value = option.texts[labelKey].label;
             } else {
-              console.log('No label found for locale:', locale.iso639_2);
               labelInput.value = '';
             }
           });
-        } else {
-          console.log('Element not found or no options');
         }
       }
-    }).catch((error) => {
-      console.error('Request failed:', error);
     });
   }
 
