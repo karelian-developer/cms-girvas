@@ -360,7 +360,7 @@ export class PageForm {
     });
   }
 
-  loadSelectOptionsForLocale(formId, elementIndex, elementName, locale, optionLabels) {
+  loadSelectOptionsForLocale(formId, elementName, locale, optionLabels) {
     const request = new Interactive('request', {
       method: 'GET',
       url: `/handler/form/${formId}?locale=${locale.name}&localeMessage=${window.CMSCore.locales.admin.name}`,
@@ -373,7 +373,6 @@ export class PageForm {
         const element = data.outputData.form.elements.find(el => el.name === elementName);
         
         if (element && element.options) {
-          // Обновляем значения label для каждой опции
           optionLabels.forEach((labelInput, optionIndex) => {
             const option = element.options[optionIndex];
             const labelKey = locale.name;
