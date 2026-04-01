@@ -402,7 +402,7 @@ export class PageMedia {
           this.initMediaElement(listElement);
         }
 
-        interactiveSortChoices.target.setWidth(280);
+        interactiveSortChoices.target.setWidth('280px');
 
         interactiveSortChoices.target.addItem(this.localeData.SORT_BY_CREATEDTIMESTAMP_INCREASE, 'by_createdtimestamp_increase');
         interactiveSortChoices.target.addItem(this.localeData.SORT_BY_CREATEDTIMESTAMP_DECREASE, 'by_createdtimestamp_decrease');

@@ -120,6 +120,7 @@ export class PageGlobal {
             intractiveChoice.target.addItem(optionElement.innerText, optionElement.value);
           });
 
+          intractiveChoice.target.setWidth('100%');
           intractiveChoice.target.setName(selectElement.getAttribute('name'));
           intractiveChoice.assembly();
 
