@@ -109,10 +109,11 @@ export class PageGlobal {
         });
       }
 
+      // Подмена интерактивной базы «Select» на интерактивный элемент «Choice»
       const intractiveChoiceBases = document.querySelectorAll('[data-interactive-base]');
       intractiveChoiceBases.forEach(selectElement => {
         if (selectElement.tagName === 'SELECT') {
-          const selectElementOptionsElements = intractiveChoiceBases.querySelectorAll('option');
+          const selectElementOptionsElements = selectElement.querySelectorAll('option');
           const intractiveChoice = new Interactive('choices');
           
           selectElementOptionsElements.forEach(optionElement => {
