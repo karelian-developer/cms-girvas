@@ -417,20 +417,25 @@ class Form implements EntityTypeContent
       $DOMElementRequired = $element['required'] ?? false;
       $DOMElementID = 'FORM_' . strtoupper(str_replace('-', '_', $formName)) . '_' . strtoupper($DOMElementName);
 
-      $DOMElement = $DOMElementType === 'textarea' 
-        ? $document->createElement('textarea')
-        : $document->createElement('input');
-      
-      if ($DOMElementType !== 'textarea') {
+      $DOMElement = match ($DOMElementType) {
+        'textarea' => $document->createElement('textarea'),
+        'select' => $document->createElement('select'),
+        default => $document->createElement('input')
+      };
+
+      if ($DOMElementType === 'textarea') {
+        $DOMElement->setAttribute('class', 'form__textarea');
+        $DOMElement->setAttribute('placeholder', $DOMElementPlaceholder);
+      } else if ($DOMElementType === 'select') {
+        $DOMElement->setAttribute('class', 'form__select');
+      } else {
         $DOMElement->setAttribute('type', $DOMElementType);
         $DOMElement->setAttribute('class', 'form__input form__input_' . $DOMElementType);
         $DOMElement->setAttribute('autocomplete', 'off');
-      } else {
-        $DOMElement->setAttribute('class', 'form__textarea');
+        $DOMElement->setAttribute('placeholder', $DOMElementPlaceholder);
       }
       
       $DOMElement->setAttribute('id', $DOMElementID);
-      $DOMElement->setAttribute('placeholder', $DOMElementPlaceholder);
       $DOMElement->setAttribute('name', $DOMElementName);
 
       if ($DOMElementRequired === true) {
@@ -439,6 +444,19 @@ class Form implements EntityTypeContent
 
       if (in_array($DOMElementType, ['submit', 'reset'])) {
         $DOMElement->setAttribute('value', $DOMElementTitle);
+      }
+
+      if ($DOMElementType === 'select') {
+        $DOMElement->setAttribute('data-interactive-base', 'choice');
+
+        foreach ($element['options'] as $optionIndex => $optionData) {
+          $optionLabel = $optionData['texts'][$CMSLocaleName]['label'];
+          $optionValue = $optionData['value'];
+
+          $optionElement = $document->createElement('option', $optionLabel);
+          $optionElement->setAttribute('value', $optionValue);
+          $DOMElement->appendChild($optionElement);
+        }
       }
 
       $DOMElementContainerElement = $document->createElement('div');
