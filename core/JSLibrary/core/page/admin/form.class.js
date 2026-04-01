@@ -509,7 +509,7 @@ export class PageForm {
   addElement(localeData, anchorElement, data = {}) {
     const rowsElement = this.createRowsContainer();
     rowsElement.setAttribute('data-element', 'form-element');
-    
+
     const formElements = this.createFormElements(localeData, data);
     
     this.setupElementValues(formElements, data);
@@ -704,7 +704,6 @@ export class PageForm {
     
     // Размещаем кнопку добавления опции перед кнопкой удаления
     removeButton.target.element.before(addOptionButton.target.element);
-    addOptionButton.target.element.style.display = 'none';
     
     return {
       removeButton,
@@ -724,6 +723,7 @@ export class PageForm {
       button.target.element.parentElement.previousElementSibling.remove();
       button.target.element.parentElement.remove();
     });
+
     button.assembly();
     return button;
   }
@@ -739,6 +739,7 @@ export class PageForm {
       const rowOption = this.createRowSelectOption(localeData, inputName, rowOptions.length);
       rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
     });
+
     button.assembly();
     return button;
   }
