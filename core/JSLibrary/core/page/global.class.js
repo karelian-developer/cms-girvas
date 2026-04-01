@@ -121,7 +121,7 @@ export class PageGlobal {
           });
 
           intractiveChoice.target.setName(selectElement.getAttribute('name'));
-          intractiveChoice.target.assembly();
+          intractiveChoice.assembly();
 
           selectElement.replaceWith(intractiveChoice.target.element);
         }
