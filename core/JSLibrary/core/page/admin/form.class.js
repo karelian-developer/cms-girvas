@@ -522,6 +522,8 @@ export class PageForm {
     this.setupTypeChangeListener(typeSelect, rowsElement, formElements.inputName, actionButtons.addOptionButton, localeData);
     
     this.appendRows(rowsElement, localeData, data, formElements, typeSelect, requiredCheckbox, actionButtons.removeButton);
+    actionButtons.removeButton.target.element.before(actionButtons.addOptionButton.target.element);
+
     this.insertIntoDOM(rowsElement, anchorElement, formElements, data);
 
     const formElementsSectionHeader = document.querySelector('[data-element="form-elements-section-header"]');
@@ -701,9 +703,6 @@ export class PageForm {
   createActionButtons(localeData, rowsElement, inputName) {
     const removeButton = this.createRemoveButton(localeData, rowsElement);
     const addOptionButton = this.createAddOptionButton(localeData, inputName, rowsElement);
-    
-    // Размещаем кнопку добавления опции перед кнопкой удаления
-    removeButton.target.element.before(addOptionButton.target.element);
     
     return {
       removeButton,
