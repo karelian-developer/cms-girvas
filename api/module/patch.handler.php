@@ -33,6 +33,8 @@ if ($CMSCore->client->isLogged(2)) {
         $moduleEvent = $_PATCH['module_event'];
 
         if (file_exists($moduleCorePath)) {
+          require_once($moduleCorePath);
+          
           $moduleCore = new $moduleCoreNamespace($CMSCore, $module);
 
           if ($moduleEvent === 'enable') {
