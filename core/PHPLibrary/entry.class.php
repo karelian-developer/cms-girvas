@@ -656,7 +656,8 @@ class Entry implements EntityTypeContent
    * 
    * @return ?EntityTypeContent
    */
-  public function getPreviousEntry() : ?EntityTypeContent {
+  public function getPreviousEntry() : ?EntityTypeContent
+  {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
@@ -701,7 +702,8 @@ class Entry implements EntityTypeContent
    * 
    * @return ?EntityTypeContent
    */
-  public function getNextEntry() : ?EntityTypeContent {
+  public function getNextEntry() : ?EntityTypeContent
+  {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
@@ -985,8 +987,6 @@ class Entry implements EntityTypeContent
       $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
-
-      error_log('SQL: ' . $queryBuilder->statement->assembled);
 
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;

@@ -590,8 +590,6 @@ class EntriesSample implements EntityTypeContent
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
-      error_log('SQL: ' . $queryBuilder->statement->assembled);
-
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;
         $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
