@@ -751,6 +751,8 @@ final class SystemCore implements CoreInterface
       }
     }
 
+    echo 'Test';
+
     if (!empty($this->modules)) {
       foreach ($this->modules as $name => $moduleCore) {
         $module = new Module($this, $name);
