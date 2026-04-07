@@ -99,7 +99,7 @@ final class Template implements ThemeInterface
     $this->addStyle(['href' => 'default-notifications.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
 
     foreach ($this->CMSCore->deferredStyles as $data) {
-      $this->addStyle($data);
+      $this->addExternalStyle($data);
     }
 
     /** @var string $corePath Путь до файла ядра шаблона */
@@ -361,6 +361,19 @@ final class Template implements ThemeInterface
    */
   public function addStyle(array $data) : void
   {
+    $this->styles[] = $data;
+  }
+  
+  /**
+   * Добавить внешний скрипт в массив стилей
+   *
+   * @param array $data
+   * 
+   * @return void
+   */
+  public function addExternalStyle(array $data) : void
+  {
+    $data['isExternal'] = true;
     $this->styles[] = $data;
   }
   
