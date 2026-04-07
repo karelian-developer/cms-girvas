@@ -750,8 +750,6 @@ final class SystemCore implements CoreInterface
         }
       }
     }
-    
-    print_r(var_dump($theme, true));
 
     if (!empty($this->modules)) {
       foreach ($this->modules as $name => $moduleCore) {
@@ -760,8 +758,6 @@ final class SystemCore implements CoreInterface
         if ($module->isInstalled() && $module->isEnabled()) {
           $moduleCore->init();
         }
-
-        print_r(var_dump($theme, true));
 
         unset($module);
       }
