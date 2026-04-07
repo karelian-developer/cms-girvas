@@ -84,7 +84,6 @@ final class Collector
               : '/templates/' . $theme->getName() . '/' . $style['href'];
           }
         } else {
-          echo 'asdasd';
           $styleHref = $style['href'];
         }
 

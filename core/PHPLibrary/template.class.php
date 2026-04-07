@@ -983,20 +983,25 @@ final class Template implements ThemeInterface
 
           if (isset($elementData['rel']) && isset($elementData['href'])) {
             $styleIsCore = false;
-            if (array_key_exists('isCore', $elementData)) {
-              if ($elementData['isCore'] === true) {
-                $styleIsCore = true;
-                $styleHref = '/core/CSSCore/' . $elementData['href'];
+
+            if (!array_key_exists('isExternal', $style)) {
+              if (array_key_exists('isCore', $elementData)) {
+                if ($elementData['isCore'] === true) {
+                  $styleIsCore = true;
+                  $styleHref = '/core/CSSCore/' . $elementData['href'];
+                }
               }
-            }
 
-            if (!$styleIsCore) {
-              $themeName = $this->getName();
-              $themeCategoryName = $this->getCategory();
+              if (!$styleIsCore) {
+                $themeName = $this->getName();
+                $themeCategoryName = $this->getCategory();
 
-              $styleHrefIsNotBase = '/templates/' . $themeCategoryName . '/' . $themeName . '/' . $elementData['href'];
-              $styleHrefIsBase = '/templates/' . $themeName . '/' . $elementData['href'];
-              $styleHref = $themeCategoryName !== 'base' ? $styleHrefIsNotBase : $styleHrefIsBase;
+                $styleHrefIsNotBase = '/templates/' . $themeCategoryName . '/' . $themeName . '/' . $elementData['href'];
+                $styleHrefIsBase = '/templates/' . $themeName . '/' . $elementData['href'];
+                $styleHref = $themeCategoryName !== 'base' ? $styleHrefIsNotBase : $styleHrefIsBase;
+              }
+            } else {
+              $styleHref = $elementData['href'];
             }
 
             $elementLink->setAttribute('href', $styleHref);
