@@ -98,6 +98,10 @@ final class Template implements ThemeInterface
     $this->addStyle(['href' => 'default-interactive.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
     $this->addStyle(['href' => 'default-notifications.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
 
+    foreach ($this->CMSCore->deferredStyles as $data) {
+      $this->addStyle($data);
+    }
+
     /** @var string $corePath Путь до файла ядра шаблона */
     $corePath = $this->getCorePath();
     /** @var string $coreClass Класс ядра шаблона */

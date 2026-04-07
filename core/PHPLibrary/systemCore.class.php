@@ -94,6 +94,14 @@ final class SystemCore implements CoreInterface
    * @var Theme Класс шаблона системы 
    */
   public ?Theme $theme = null;
+  /**
+   * @var array Массив с отложенными стилями
+   */
+  public array $deferredStyles = [];
+  /**
+   * @var array Массив с отложенными стилями
+   */
+  public array $deferredScripts = [];
 
   private CMSLocaleFactory $CMSLocaleFactory;
 
@@ -1126,5 +1134,29 @@ final class SystemCore implements CoreInterface
     }
 
     return ($_SERVER['SERVER_PORT'] ?? null) === 443;
+  }
+
+  /**
+   * Добавить стиль в массив отложенных стилей
+   *
+   * @param  array $data
+   * 
+   * @return void
+   */
+  public function addDeferredStyle(array $data) : void
+  {
+    $this->deferredStyles[] = $data;
+  }
+
+  /**
+   * Добавить скрипт в массив отложенных скриптов
+   *
+   * @param  array $data
+   * 
+   * @return void
+   */
+  public function addDeferredScript(array $data) : void
+  {
+    $this->deferredScripts[] = $data;
   }
 }
