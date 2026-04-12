@@ -62,8 +62,21 @@ class NadvoParse
 
   private function sanitizeInput(string $markdown) : string
   {
-    //$markdown = preg_replace(self::PATTERNS['dangerous_tags'], '', $markdown);
+    // Сохраняем JSON-блоки с атрибутами
+    $jsonBlocks = [];
+    $markdown = preg_replace_callback('/\{[^{}]+\}/', function($matches) use (&$jsonBlocks) {
+      $placeholder = '%%JSON_' . count($jsonBlocks) . '%%';
+      $jsonBlocks[$placeholder] = $matches[0];
+      return $placeholder;
+    }, $markdown);
+    
+    // Экранируем остальной текст
     $markdown = htmlspecialchars($markdown, ENT_NOQUOTES, 'UTF-8', false);
+    
+    // Возвращаем JSON-блоки на место
+    foreach ($jsonBlocks as $placeholder => $json) {
+      $markdown = str_replace($placeholder, $json, $markdown);
+    }
     
     return $markdown;
   }
