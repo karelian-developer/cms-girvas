@@ -451,26 +451,24 @@ class NadvoParse
         $src = trim($matches[2]);
         $attrs = [];
         
-        if (isset($matches[3]) && !empty($matches[3])) {
+        if (isset($matches[3])) {
           try {
-            $jsonString = trim($matches[3]);
-            if (str_starts_with($jsonString, '{') && str_ends_with($jsonString, '}')) {
-              $json = json_decode($jsonString, true);
-              if ($json && is_array($json)) {
-                foreach ($json as $key => $value) {
-                  if (in_array($key, ['class', 'id', 'width', 'height'])) {
-                    $attrs[$key] = htmlspecialchars($value, ENT_QUOTES);
-                  }
+            $json = json_decode('{' . $matches[3] . '}', true);
+            if ($json) {
+              foreach ($json as $key => $value) {
+                if (in_array($key, ['class', 'id'])) {
+                  $attrs[$key] = $value;
                 }
               }
             }
           } catch (Exception $e) {
-              // ...
+            // ...
           }
         }
 
         $document = new DOMDocument();
         $imageElement = $document->createElement('img');
+
         $imageElement->setAttribute('src', $src);
         $imageElement->setAttribute('alt', $caption);
 
@@ -479,6 +477,7 @@ class NadvoParse
         }
 
         $document->appendChild($imageElement);
+
         return $document->saveHTML($imageElement);
       },
       $html
@@ -491,16 +490,13 @@ class NadvoParse
         $src = trim($matches[2]);
         $attrs = [];
         
-        if (isset($matches[3]) && !empty($matches[3])) {
+        if (isset($matches[3])) {
           try {
-            $jsonString = trim($matches[3]);
-            if (str_starts_with($jsonString, '{') && str_ends_with($jsonString, '}')) {
-              $json = json_decode($jsonString, true);
-              if ($json && is_array($json)) {
-                foreach ($json as $key => $value) {
-                  if (in_array($key, ['class', 'id'])) {
-                    $attrs[$key] = htmlspecialchars($value, ENT_QUOTES);
-                  }
+            $json = json_decode('{' . $matches[3] . '}', true);
+            if ($json) {
+              foreach ($json as $key => $value) {
+                if (in_array($key, ['class', 'id'])) {
+                  $attrs[$key] = $value;
                 }
               }
             }
@@ -534,27 +530,27 @@ class NadvoParse
       self::PATTERNS['link'],
       function($matches) {
         $href = trim($matches[2]);
+        
         $text = trim($matches[1]);
         $text = empty($text) ? $href : $text;
         $attrs = [];
         
-        // Парсим JSON атрибуты, если они есть
-        if (isset($matches[3]) && !empty($matches[3])) {
-          $jsonString = trim($matches[3]);
-          $json = json_decode($jsonString, true);
-          
-          if ($json && is_array($json)) {
-            foreach ($json as $key => $value) {
-              if (in_array($key, ['class', 'id', 'target', 'rel', 'title'])) {
-                $attrs[] = $key . '="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '"';
+        if (isset($matches[3])) {
+          try {
+            $json = json_decode('{' . $matches[3] . '}', true);
+            if ($json) {
+              foreach ($json as $key => $value) {
+                if (in_array($key, ['class', 'id', 'target', 'rel'])) {
+                  $attrs[] = $key . ' = ' . "\"" . $value . "\"";
+                }
               }
             }
+          } catch (Exception $e) {
+            // ...
           }
         }
         
-        $attrString = !empty($attrs) ? ' ' . implode(' ', $attrs) : '';
-        
-        return '<a href="' . htmlspecialchars($href, ENT_QUOTES, 'UTF-8') . '"' . $attrString . '>' . $text . '</a>';
+        return '<a href="' . $href . '"' . (count($attrs) ? ' ' . implode(' ', $attrs) : '') . '>' . $text . '</a>';
       },
       $html
     );
