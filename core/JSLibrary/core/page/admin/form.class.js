@@ -830,6 +830,7 @@ export class PageForm {
   createRowSelectOption(localeData, inputName, index, label = '', value = '') {
     const inputGroupElement = document.createElement('div');
     inputGroupElement.classList.add('grid-table__input-group');
+    
     const inputOptionLabelElement = document.createElement('input');
     inputOptionLabelElement.classList.add('form__input');
     inputOptionLabelElement.classList.add('form__input_text');
@@ -858,6 +859,21 @@ export class PageForm {
 
     inputGroupElement.append(inputOptionLabelElement);
     inputGroupElement.append(inputOptionValueElement);
+    
+    const removeOptionButton = new Interactive('button');
+    removeOptionButton.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+    removeOptionButton.target.setStyle('red');
+    removeOptionButton.target.setCallback((event) => {
+      event.preventDefault();
+      const row = removeOptionButton.target.element.closest('.row');
+      if (row) {
+        row.remove();
+      }
+    });
+
+    removeOptionButton.assembly();
+    
+    inputGroupElement.appendChild(removeOptionButton.target.element);
 
     return this.createRowElement(
       localeData.PAGE_FORM_ELEMENT_OPTION_TITLE + ' #' + (index + 1),
