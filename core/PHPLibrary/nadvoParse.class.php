@@ -538,28 +538,23 @@ class NadvoParse
         $text = empty($text) ? $href : $text;
         $attrs = [];
         
-        // Исправленный парсинг JSON-атрибутов
+        // Парсим JSON атрибуты, если они есть
         if (isset($matches[3]) && !empty($matches[3])) {
-          try {
-            $jsonString = trim($matches[3]);
-
-            if (str_starts_with($jsonString, '{') && str_ends_with($jsonString, '}')) {
-              $json = json_decode($jsonString, true);
-              if ($json && is_array($json)) {
-                foreach ($json as $key => $value) {
-                  if (in_array($key, ['class', 'id', 'target', 'rel', 'title'])) {
-                    $attrs[] = $key . '="' . htmlspecialchars($value, ENT_QUOTES) . '"';
-                  }
-                }
+          $jsonString = trim($matches[3]);
+          $json = json_decode($jsonString, true);
+          
+          if ($json && is_array($json)) {
+            foreach ($json as $key => $value) {
+              if (in_array($key, ['class', 'id', 'target', 'rel', 'title'])) {
+                $attrs[] = $key . '="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '"';
               }
             }
-          } catch (Exception $e) {
-            // ...
           }
         }
         
-        $attrString = count($attrs) ? ' ' . implode(' ', $attrs) : '';
-        return '<a href="' . $href . '"' . $attrString . '>' . $text . '</a>';
+        $attrString = !empty($attrs) ? ' ' . implode(' ', $attrs) : '';
+        
+        return '<a href="' . htmlspecialchars($href, ENT_QUOTES, 'UTF-8') . '"' . $attrString . '>' . $text . '</a>';
       },
       $html
     );
