@@ -152,7 +152,7 @@ class PageEntries implements InterfacePage
         $categoryKeywords = $category->getKeywords($localeName);
         $categoryKeywords = str_replace('"', '&quot;', $categoryKeywords);
 
-        $this->CMSCore->configurator->setMetaTitle($categorySEOTitle . ' | ' . $localeData['DEFAULT_PAGE'] . ' ' . $pageIndex + 1);
+        $this->CMSCore->configurator->setMetaTitle($categorySEOTitle . ' | ' . $localeData['DEFAULT_TEXT_PAGE'] . ' ' . $pageIndex + 1);
         $this->CMSCore->configurator->setMetaDescription($categorySEODescription);
         $this->CMSCore->configurator->setMetaKeywords($categoryKeywords);
 
