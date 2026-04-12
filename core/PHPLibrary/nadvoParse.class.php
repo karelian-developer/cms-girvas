@@ -418,7 +418,7 @@ class NadvoParse
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
         }
-        
+
         continue;
       }
       
@@ -549,6 +549,8 @@ class NadvoParse
       self::PATTERNS['link'],
       function($matches) {
         $href = trim($matches[2]);
+
+        error_log(print_r($matches, true));
         
         $text = trim($matches[1]);
         $text = empty($text) ? $href : $text;
