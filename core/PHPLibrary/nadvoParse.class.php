@@ -562,29 +562,31 @@ class NadvoParse
       self::PATTERNS['link'],
       function($matches) {
         $href = trim($matches[2]);
-
-        error_log(print_r($matches, true));
-        
         $text = trim($matches[1]);
         $text = empty($text) ? $href : $text;
         $attrs = [];
         
-        if (isset($matches[3])) {
+        if (isset($matches[3]) && !empty($matches[3])) {
+          // Восстанавливаем кавычки из &quot; в "
+          $jsonString = html_entity_decode($matches[3], ENT_QUOTES, 'UTF-8');
+          
           try {
-            $json = json_decode('{' . $matches[3] . '}', true);
-            if ($json) {
+            $json = json_decode($jsonString, true);
+
+            if ($json && is_array($json)) {
               foreach ($json as $key => $value) {
-                if (in_array($key, ['class', 'id', 'target', 'rel'])) {
-                  $attrs[] = $key . ' = ' . "\"" . $value . "\"";
+                if (in_array($key, ['class', 'id', 'target', 'rel', 'title'])) {
+                  $attrs[] = $key . '="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '"';
                 }
               }
             }
           } catch (Exception $e) {
-            // ...
+            // Ошибка парсинга JSON
           }
         }
         
-        return '<a href="' . $href . '"' . (count($attrs) ? ' ' . implode(' ', $attrs) : '') . '>' . $text . '</a>';
+        $attrString = !empty($attrs) ? ' ' . implode(' ', $attrs) : '';
+        return '<a href="' . htmlspecialchars($href, ENT_QUOTES, 'UTF-8') . '"' . $attrString . '>' . $text . '</a>';
       },
       $html
     );
