@@ -338,14 +338,41 @@ class NadvoParse
     $html = '';
     $currentParagraph = '';
     $inTable = false;
+    $tableBuffer = [];
 
     foreach ($lines as $line) {
+      if ($inTable && empty(trim($line))) {
+        continue;
+      }
+
+      if (str_starts_with(trim($line), '|') && !$inTable) {
+        if (!empty($currentParagraph)) {
+          $html .= '<p>' . $currentParagraph . '</p>';
+          $currentParagraph = '';
+        }
+
+        $inTable = true;
+        $tableBuffer = [$line];
+        continue;
+      }
+
+      
+      if ($inTable && str_starts_with(trim($line), '|')) {
+        $tableBuffer[] = $line;
+        continue;
+      }
+
+      if ($inTable && !str_starts_with(trim($line), '|')) {
+        $html .= implode("\n", $tableBuffer) . "\n";
+        $tableBuffer = [];
+        $inTable = false;
+      }
+
+      // Обработка HTML-тегов
       if (str_starts_with(trim($line), '<pre>') || 
         str_starts_with(trim($line), '</pre>') ||
         str_starts_with(trim($line), '<blockquote>') ||
         str_starts_with(trim($line), '</blockquote>') ||
-        str_starts_with(trim($line), '<table>') ||
-        str_starts_with(trim($line), '</table>') ||
         str_starts_with(trim($line), '<ul>') ||
         str_starts_with(trim($line), '<ol>') ||
         str_starts_with(trim($line), '</ul>') ||
@@ -355,7 +382,6 @@ class NadvoParse
         str_starts_with(trim($line), '<figure>') ||
         str_starts_with(trim($line), '</figure>'))
       {
-
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
@@ -365,24 +391,13 @@ class NadvoParse
         continue;
       }
 
-      if (str_starts_with(trim($line), '|')) {
-        if (!$inTable) {
-          if (!empty($currentParagraph)) {
-            $html .= '<p>' . $currentParagraph . '</p>';
-            $currentParagraph = '';
-          }
-          $inTable = true;
-        }
-        continue;
-      }
-
-      $inTable = false;
-
+      // Обработка заголовков
       if (preg_match('/^(#{1,6})\s+(.+)/', $line, $matches)) {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
         }
+
         $html .= '<h' . strlen($matches[1]) . '>' . $matches[2] . '</h' . strlen($matches[1]) . '>' . "\n";
       } elseif (empty(trim($line))) {
         if (!empty($currentParagraph)) {
@@ -396,6 +411,10 @@ class NadvoParse
 
     if (!empty($currentParagraph)) {
       $html .= '<p>' . $currentParagraph . '</p>';
+    }
+
+    if ($inTable && !empty($tableBuffer)) {
+      $html .= implode("\n", $tableBuffer) . "\n";
     }
 
     return $html;
