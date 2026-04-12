@@ -340,48 +340,35 @@ class NadvoParse
     $inTable = false;
     $tableBuffer = [];
 
+    // Список тегов, которые не должны оборачиваться в параграфы
+    $blockTags = [
+        'pre', '/pre', 'blockquote', '/blockquote',
+        'ul', '/ul', 'ol', '/ol', 'li', '/li',
+        'figure', '/figure', 'figcaption', '/figcaption',
+        'table', '/table', 'thead', '/thead', 'tbody', '/tbody',
+        'tr', '/tr', 'th', '/th', 'td', '/td',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        '/h1', '/h2', '/h3', '/h4', '/h5', '/h6'
+    ];
+    
+    // Инлайн-теги, которые могут быть внутри строки
+    $inlineTags = ['a', 'strong', 'em', 'u', 'code', 'img', 'video', 'iframe'];
+
     foreach ($lines as $line) {
-      if ($inTable && empty(trim($line))) {
-        continue;
-      }
-
-      if (str_starts_with(trim($line), '|') && !$inTable) {
-        if (!empty($currentParagraph)) {
-          $html .= '<p>' . $currentParagraph . '</p>';
-          $currentParagraph = '';
-        }
-
-        $inTable = true;
-        $tableBuffer = [$line];
-        continue;
-      }
-
+      $trimmedLine = trim($line);
       
-      if ($inTable && str_starts_with(trim($line), '|')) {
-        $tableBuffer[] = $line;
-        continue;
+      // Проверяем, начинается ли строка с блочного тега
+      $isBlockTag = false;
+      foreach ($blockTags as $tag) {
+        if (str_starts_with($trimmedLine, '<' . $tag . '>') || 
+          str_starts_with($trimmedLine, '<' . $tag . ' ')) {
+          $isBlockTag = true;
+          break;
+        }
       }
-
-      if ($inTable && !str_starts_with(trim($line), '|')) {
-        $html .= implode("\n", $tableBuffer) . "\n";
-        $tableBuffer = [];
-        $inTable = false;
-      }
-
-      // Обработка HTML-тегов
-      if (str_starts_with(trim($line), '<pre>') || 
-        str_starts_with(trim($line), '</pre>') ||
-        str_starts_with(trim($line), '<blockquote>') ||
-        str_starts_with(trim($line), '</blockquote>') ||
-        str_starts_with(trim($line), '<ul>') ||
-        str_starts_with(trim($line), '<ol>') ||
-        str_starts_with(trim($line), '</ul>') ||
-        str_starts_with(trim($line), '</ol>') ||
-        str_starts_with(trim($line), '<li>') ||
-        str_starts_with(trim($line), '</li>') ||
-        str_starts_with(trim($line), '<figure>') ||
-        str_starts_with(trim($line), '</figure>'))
-      {
+      
+      // Если это блочный тег - закрываем параграф и выводим строку как есть
+      if ($isBlockTag) {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
@@ -390,7 +377,30 @@ class NadvoParse
         $html .= $line . "\n";
         continue;
       }
+      
+      // Обработка таблиц
+      if (str_starts_with($trimmedLine, '|')) {
+        if (!$inTable) {
+          if (!empty($currentParagraph)) {
+            $html .= '<p>' . $currentParagraph . '</p>';
+            $currentParagraph = '';
+          }
 
+          $inTable = true;
+          $tableBuffer = [$line];
+        } else {
+          $tableBuffer[] = $line;
+        }
+        continue;
+      }
+      
+      // Завершение таблицы
+      if ($inTable && !str_starts_with($trimmedLine, '|')) {
+        $html .= implode("\n", $tableBuffer) . "\n";
+        $tableBuffer = [];
+        $inTable = false;
+      }
+      
       // Обработка заголовков
       if (preg_match('/^(#{1,6})\s+(.+)/', $line, $matches)) {
         if (!empty($currentParagraph)) {
@@ -399,24 +409,33 @@ class NadvoParse
         }
 
         $html .= '<h' . strlen($matches[1]) . '>' . $matches[2] . '</h' . strlen($matches[1]) . '>' . "\n";
-      } elseif (empty(trim($line))) {
+        continue;
+      }
+      
+      // Обработка пустых строк
+      if (empty($trimmedLine)) {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
         }
-      } else {
-        $currentParagraph .= $line . ' ';
+        
+        continue;
       }
+      
+      // Обычный текст - добавляем в текущий параграф
+      $currentParagraph .= $line . ' ';
     }
-
+    
+    // Закрываем последний параграф
     if (!empty($currentParagraph)) {
-      $html .= '<p>' . $currentParagraph . '</p>';
+      $html .= '<p>' . trim($currentParagraph) . '</p>';
     }
-
+    
+    // Закрываем таблицу, если осталась
     if ($inTable && !empty($tableBuffer)) {
       $html .= implode("\n", $tableBuffer) . "\n";
     }
-
+    
     return $html;
   }
 
