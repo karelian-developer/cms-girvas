@@ -410,10 +410,10 @@ class Form implements EntityTypeContent
 
     foreach ($elements as $index => $element) {
       $DOMElementName = $formName . '_' . $element['name'];
-      $DOMElementTitle = $element['texts'][$CMSLocaleName]['title'];
-      $DOMElementDescription = $element['texts'][$CMSLocaleName]['description'];
-      $DOMElementPlaceholder = $element['texts'][$CMSLocaleName]['placeholder'];
-      $DOMElementType = $element['type'];
+      $DOMElementTitle = $element['texts'][$CMSLocaleName]['title'] ?? '';
+      $DOMElementDescription = $element['texts'][$CMSLocaleName]['description'] ?? '';
+      $DOMElementPlaceholder = $element['texts'][$CMSLocaleName]['placeholder'] ?? '';
+      $DOMElementType = $element['type']  ?? 'text';
       $DOMElementRequired = $element['required'] ?? false;
       $DOMElementID = 'FORM_' . strtoupper(str_replace('-', '_', $formName)) . '_' . strtoupper($DOMElementName);
 
