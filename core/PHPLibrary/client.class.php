@@ -167,6 +167,93 @@ class Client
     return false;
   }
 
+  public function checkVPN() : array
+  {
+    $score = 0;
+    $reasons = [];
+
+    $proxyHeader = $this->checkProxyHeaders();
+    if ($proxyHeader) {
+      $score += 45;
+      $reasons[] = "proxy_header: $proxyHeader";
+    }
+
+    if ($this->checkSuspiciousUA()) {
+      $score += 30;
+      $reasons[] = "suspicious_user_agent";
+    }
+
+    if ($this->isDatacenterIP($this->ip)) {
+      $score += 40;
+      $reasons[] = "datacenter_ip";
+    }
+
+    return [
+      'isVPN' => $score >= 50,
+      'score' => $score,
+      'reason' => implode(', ', $reasons),
+      'ip' => $this->ip
+    ];
+  }
+
+  private function checkProxyHeaders() : string|false
+  {
+    $proxyHeaders = ['HTTP_VIA', 'HTTP_X_PROXY_ID', 'HTTP_X_FORWARDED_HOST'];
+    
+    foreach ($proxyHeaders as $header) {
+      if (!empty($_SERVER[$header])) {
+        return $header;
+      }
+    }
+
+    return false;
+  }
+
+  private function checkSuspiciousUA() : bool
+  {
+    $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    $suspicious = ['curl', 'wget', 'python', 'java', 'okhttp', 'vpn', 'proxy'];
+    
+    foreach ($suspicious as $pattern) {
+      if (stripos($ua, $pattern) !== false) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private function isDatacenterIP(string $ip) : bool
+  {
+    $firstOctet = (int) explode('.', $ip)[0];
+    $dcRanges = [13, 20, 34, 35, 52, 54, 104, 146, 185];
+
+    return in_array($firstOctet, $dcRanges);
+  }
+
+  public function blockIfVPN(bool $throwException = true) : bool
+  {
+    $check = $this->checkVPN();
+    
+    if ($check['isVPN']) {
+      error_log(sprintf(
+        "[VPN_BLOCK] IP: %s, Score: %d, Reason: %s, URI: %s\n",
+        $check['ip'],
+        $check['score'],
+        $check['reason'],
+        $_SERVER['REQUEST_URI'] ?? '/'
+      ), 3, CMS_ROOT_DIRECTORY . '/logs/vpn-blocks.log');
+      
+      if ($throwException) {
+        throw new \Exception('VPN/proxy detected', 403);
+      }
+      
+      return false;
+    }
+    
+    return true;
+  }
+
   /**
    * Создать Cookie (Устаревшее)
    * 
