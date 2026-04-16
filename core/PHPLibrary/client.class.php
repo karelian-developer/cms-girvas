@@ -271,7 +271,7 @@ class Client
     $check = $this->checkVPN();
 
     $logDir = CMS_ROOT_DIRECTORY . '/logs';
-    $logFile = $logDir . '/vpn-blocks.log';
+    $logFile = $logDir . '/ip-blocks.log';
     
     if (!is_dir($logDir)) {
       mkdir($logDir, 0755, true);
@@ -289,7 +289,7 @@ class Client
         $check['score'],
         $check['reason'],
         $_SERVER['REQUEST_URI'] ?? '/'
-      ), 3, CMS_ROOT_DIRECTORY . '/logs/vpn-blocks.log');
+      ), 3, CMS_ROOT_DIRECTORY . '/logs/ip-blocks.log');
       
       if ($throwException) {
         throw new \Exception('VPN/proxy detected', 403);
@@ -352,7 +352,7 @@ class Client
    */
   private function getBlacklistRanges() : array
   {
-    $blacklistFile = CMS_ROOT_DIRECTORY . '/core/blacklistVPNRanges.json';
+    $blacklistFile = CMS_ROOT_DIRECTORY . '/core/blacklistIPRanges.json';
     
     if (!file_exists($blacklistFile)) {
       return [];
