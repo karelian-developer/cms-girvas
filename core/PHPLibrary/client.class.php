@@ -177,6 +177,15 @@ class Client
     $score = 0;
     $reasons = [];
 
+    if ($this->isInBlacklist()) {
+      return [
+        'isVPN' => true,
+        'score' => 100,
+        'reason' => 'ip_in_blacklist',
+        'ip' => $this->ip
+      ];
+    }
+
     $proxyHeader = $this->checkProxyHeaders();
     if ($proxyHeader) {
       $score += 45;
@@ -330,7 +339,7 @@ class Client
     $blacklist = $this->getBlacklistRanges();
 
     foreach ($blacklist as $cidr) {
-      if ($this->ipInCidr($this->ip, $cidr)) {
+      if ($this->ipInCIDR($this->ip, $cidr)) {
         return true;
       }
     }
