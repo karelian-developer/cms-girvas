@@ -243,7 +243,7 @@ class Client
   private function isDatacenterIP(string $ip) : bool
   {
     $firstOctet = (int) explode('.', $ip)[0];
-    $dcRanges = [13, 20, 34, 35, 52, 54, 104, 146, 155, 185];
+    $dcRanges = [13, 20, 34, 35, 52, 54, 104, 146, 185];
 
     return in_array($firstOctet, $dcRanges);
   }
