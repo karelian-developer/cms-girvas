@@ -210,7 +210,7 @@ if ($CMSCore->client->isLogged(2)) {
                     $textareaValue = $_PATCH[$textareaKeywordsName];
                     $textareaValue = str_replace('\'', '"', $textareaValue);
       
-                    $entryData['texts'][$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
+                    $entryData['texts'][$CMSLocaleName]['keywords'] = preg_split('/\s*[\,]+\s*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
                   }
                 }
               }
