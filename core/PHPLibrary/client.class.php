@@ -167,6 +167,11 @@ class Client
     return false;
   }
 
+  /**
+   * Проверка заголовков прокси
+   * 
+   * @return string|false
+   */
   public function checkVPN() : array
   {
     $score = 0;
@@ -196,6 +201,11 @@ class Client
     ];
   }
 
+  /**
+   * Проверка подозрительного User-Agent
+   * 
+   * @return bool
+   */
   private function checkProxyHeaders() : string|false
   {
     $proxyHeaders = ['HTTP_VIA', 'HTTP_X_PROXY_ID', 'HTTP_X_FORWARDED_HOST'];
@@ -209,6 +219,13 @@ class Client
     return false;
   }
 
+  /**
+   * Проверка, относится ли IP к дата-центру
+   * 
+   * @param string $ip
+   * 
+   * @return bool
+   */
   private function checkSuspiciousUA() : bool
   {
     $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
@@ -231,6 +248,15 @@ class Client
     return in_array($firstOctet, $dcRanges);
   }
 
+  /**
+   * Блокировка VPN (если обнаружен)
+   * 
+   * @param bool $throwException
+   * 
+   * @return bool
+   * 
+   * @throws \Exception
+   */
   public function blockIfVPN(bool $throwException = true) : bool
   {
     $check = $this->checkVPN();
@@ -252,6 +278,68 @@ class Client
     }
     
     return true;
+  }
+
+  /**
+   * Проверка принадлежности IP к CIDR сети
+   * 
+   * @param string $ip
+   * @param string $cidr (например, '185.0.0.0/8')
+   * 
+   * @return bool
+   */
+  private function ipInCIDR(string $ip, string $cidr) : bool
+  {
+    if (strpos($cidr, '/') === false) {
+      return $ip === $cidr;
+    }
+
+    list($subnet, $mask) = explode('/', $cidr);
+    
+    $ipLong = ip2long($ip);
+    $subnetLong = ip2long($subnet);
+    
+    if ($ipLong === false || $subnetLong === false) {
+      return false;
+    }
+    
+    $maskLong = -1 << (32 - (int)$mask);
+    $ipLong &= $maskLong;
+    $subnetLong &= $maskLong;
+    
+    return $ipLong === $subnetLong;
+  }
+
+  /**
+   * Проверка по черному списку
+   */
+  private function isInBlacklist() : bool
+  {
+    $blacklist = $this->getBlacklistRanges();
+
+    foreach ($blacklist as $cidr) {
+      if ($this->ipInCidr($this->ip, $cidr)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Загрузка черного списка из файла
+   */
+  private function getBlacklistRanges() : array
+  {
+    $blacklistFile = CMS_ROOT_DIRECTORY . '/core/blacklistVPNRanges.json';
+    
+    if (!file_exists($blacklistFile)) {
+      return [];
+    }
+    
+    $data = json_decode(file_get_contents($blacklistFile), true);
+    
+    return $data['ranges'] ?? [];
   }
 
   /**
