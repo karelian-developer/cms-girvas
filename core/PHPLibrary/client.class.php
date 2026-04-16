@@ -260,6 +260,18 @@ class Client
   public function blockIfVPN(bool $throwException = true) : bool
   {
     $check = $this->checkVPN();
+
+    $logDir = CMS_ROOT_DIRECTORY . '/logs';
+    $logFile = $logDir . '/vpn-blocks.log';
+    
+    if (!is_dir($logDir)) {
+      mkdir($logDir, 0755, true);
+    }
+    
+    if (!file_exists($logFile)) {
+      touch($logFile);
+      chmod($logFile, 0644);
+    }
     
     if ($check['isVPN']) {
       error_log(sprintf(
