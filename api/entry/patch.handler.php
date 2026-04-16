@@ -99,7 +99,7 @@ if ($CMSCore->client->isLogged(2)) {
                   $textareaValue = strip_tags($textareaValue);
                   $textareaValue = str_replace('\'', '"', $textareaValue);
     
-                  $entriesCategoryData['texts'][$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
+                  $entriesCategoryData['texts'][$CMSLocaleName]['keywords'] = preg_split('/\s*[\,]+\s*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
                 }
               }
             }

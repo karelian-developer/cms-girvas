@@ -83,7 +83,7 @@ if ($CMSCore->client->isLogged(2)) {
               $textareaValue = $_PUT[$textareaKeywordsName];
               $textareaValue = str_replace('\'', '"', $textareaValue);
 
-              $texts[$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
+              $texts[$CMSLocaleName]['keywords'] = preg_split('/\s*[\,]+\s*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
             }
           }
         }
@@ -189,7 +189,7 @@ if ($CMSCore->client->isLogged(2)) {
                 $textareaValue = strip_tags($textareaValue);
                 $textareaValue = str_replace('\'', '"', $textareaValue);
 
-                $texts[$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
+                $texts[$CMSLocaleName]['keywords'] = preg_split('/\s*[\,]+\s*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
               }
             }
           }
