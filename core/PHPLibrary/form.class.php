@@ -467,11 +467,15 @@ class Form implements EntityTypeContent
         $labelElement = $document->createElement('label', $DOMElementTitle);
         $labelElement->setAttribute('class', 'form__label');
 
+        $descriptionElement = $document->createElement('div', $DOMElementDescription);
+        $descriptionElement->setAttribute('class', 'form__input-description');
+
         if ($DOMElementType !== 'select') {
           $labelElement->setAttribute('for', $DOMElementID);
         }
 
         $formElement->appendChild($labelElement);
+        $formElement->appendChild($descriptionElement);
       }
 
       if ($DOMElementType === 'checkbox') {
