@@ -475,7 +475,10 @@ class Form implements EntityTypeContent
         }
 
         $formElement->appendChild($labelElement);
-        $formElement->appendChild($descriptionElement);
+
+        if (!empty($DOMElementDescription)) {
+          $formElement->appendChild($descriptionElement);
+        }
       }
 
       if ($DOMElementType === 'checkbox') {
