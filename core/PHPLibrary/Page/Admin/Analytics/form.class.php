@@ -107,8 +107,6 @@ class PageForm implements InterfacePage
     $pagination = new Pagination($this->CMSCore, count($formsData), $paginationItemsOnPage, $paginationItemCurrent);
     $pagination->assembly();
 
-    error_log(print_r($formsDatas, true));
-
     foreach ($formsDatas as $dataIndex => $data) {
       $dataArray = json_decode($data['data'], true);
 
@@ -120,6 +118,14 @@ class PageForm implements InterfacePage
 
       foreach ($formsElements as $elementIndex => $elementData) {
         $elementName = $elementData['name'];
+        $partsName = explode('_', strtolower($elementName));
+
+        $convertedName = array_shift($partsName);
+        foreach ($partsName as $part) {
+          $convertedName .= ucfirst($part);
+        }
+
+        $elementName = $convertedName;
         
         if (isset($dataArray[$elementName])) {
           $elementTitle = isset($elementData['texts'][$localeName]['title'])
