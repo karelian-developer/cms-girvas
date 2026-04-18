@@ -107,6 +107,8 @@ class PageForm implements InterfacePage
     $pagination = new Pagination($this->CMSCore, count($formsData), $paginationItemsOnPage, $paginationItemCurrent);
     $pagination->assembly();
 
+    error_log(print_r($formsDatas, true));
+
     foreach ($formsDatas as $dataIndex => $data) {
       $dataArray = json_decode($data['data'], true);
 
