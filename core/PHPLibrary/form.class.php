@@ -468,7 +468,9 @@ class Form implements EntityTypeContent
         $labelElement->setAttribute('class', 'form__label');
 
         if ($DOMElementRequired === true) {
-          $labelElement->setAttribute('class', 'form__label_required');
+          $labelElement->setAttribute('class', 'form__label form__label_is-required');
+        } else {
+          $labelElement->setAttribute('class', 'form__label');
         }
 
         $descriptionElement = $document->createElement('div', $DOMElementDescription);
