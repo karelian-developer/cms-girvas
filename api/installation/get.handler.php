@@ -21,6 +21,7 @@
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\Database\IndexType as DatabaseIndexType;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\EntriesSample as EntriesSample;
@@ -913,7 +914,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         $queryBuilder->statement->setIndexName('idx_entries_texts_gin');
         $queryBuilder->statement->setTableName('entries');
         $queryBuilder->statement->setExpression('texts');
-        $queryBuilder->statement->setIndexType(IndexType::GIN);
+        $queryBuilder->statement->setIndexType(DatabaseIndexType::GIN);
         $queryBuilder->statement->setIfNotExists(true);
         $queryBuilder->statement->assembly();
         
@@ -926,7 +927,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         $queryBuilder->statement->setIndexName('idx_entries_metadata_gin');
         $queryBuilder->statement->setTableName('entries');
         $queryBuilder->statement->setExpression('metadata');
-        $queryBuilder->statement->setIndexType(IndexType::GIN);
+        $queryBuilder->statement->setIndexType(DatabaseIndexType::GIN);
         $queryBuilder->statement->setIfNotExists(true);
         $queryBuilder->statement->assembly();
         
@@ -1047,7 +1048,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         $queryBuilder->statement->setIndexName('idx_pages_static_texts_gin');
         $queryBuilder->statement->setTableName('pages_static');
         $queryBuilder->statement->setExpression('texts');
-        $queryBuilder->statement->setIndexType(IndexType::GIN);
+        $queryBuilder->statement->setIndexType(DatabaseIndexType::GIN);
         $queryBuilder->statement->setIfNotExists(true);
         $queryBuilder->statement->assembly();
         
