@@ -38,7 +38,9 @@ require_once CMS_ROOT_DIRECTORY . '/core/PHPLibrary/systemCore.class.php';
 $CMSCore = new CMSCore();
 $CMSURLP = $CMSCore->urlp;
 
-$CMSCore->client->blockIfVPN();
+if ($CMSCore->client !== null) {
+  $CMSCore->client->blockIfVPN();
+}
 
 $CMSURLPathes = [];
 $CMSURLPathes[] = $CMSURLP->getPath(0);
