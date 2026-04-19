@@ -132,7 +132,10 @@ export class Request {
       this.addData('_grv_' + this.getRandomString(), this.getRandomString());
     }
 
-    if (this.showingNotification && this.element.getAttribute('data-notification') !== 'off') {
+    let notificationStatus = this.element.getAttribute('data-notification');
+    notificationStatus = notificationStatus ?? 'on'
+
+    if (this.showingNotification && notificationStatus !== 'off') {
       interactiveNotificationLoading = new Interactive('notification');
       interactiveNotificationLoading.target.isPopup = true;
       interactiveNotificationLoading.target.setStatusCode(-1);
@@ -148,6 +151,9 @@ export class Request {
       }
     }
 
+    let backendStatus = this.element.getAttribute('data-backend');
+    backendStatus = backendStatus ?? 'on'
+
     if (this.element.getAttribute('data-backend') !== 'off') {
       return fetch(requestURL, {
         method: requestMethod,
@@ -159,7 +165,7 @@ export class Request {
       }).then((response) => {
         return (response.ok) ? response.json() : Promise.reject(response);
       }).then((data) => {
-        if (this.showingNotification && this.element.getAttribute('data-notification') !== 'off') {
+        if (this.showingNotification && notificationStatus !== 'off') {
           interactiveNotificationLoading.target.hide();
         }
 
@@ -175,7 +181,7 @@ export class Request {
           }, 10);
         }
 
-        if (this.showingNotification && this.element.getAttribute('data-notification') !== 'off') {
+        if (this.showingNotification && notificationStatus !== 'off') {
           if (data.hasOwnProperty('message')) {
             let interactiveNotification;
             
