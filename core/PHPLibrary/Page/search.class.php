@@ -138,8 +138,16 @@ class PageSearch implements InterfacePage
 
       $this->page->breadcrumbs->assembly();
 
-      $this->CMSCore->configurator->setMetaTitle($localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_LABEL'] . ' | ' . $this->CMSCore->configurator->getSiteTitle());
-      $this->CMSCore->configurator->setMetaDescription($localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_DESCRIPTION']);
+      if ($categoryName === 'all') {
+        $siteMetaTitle = $localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_LABEL'] . ' | ' . $this->CMSCore->configurator->getSiteTitle();
+        $siteMetaDescription = $localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_DESCRIPTION'];
+      } else {
+        $siteMetaTitle = sprintf($localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_IN_CATEGORY_LABEL'], $categoryName) . ' | ' . $this->CMSCore->configurator->getSiteTitle();
+        $siteMetaDescription = sprintf($localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_IN_CATEGORY_DESCRIPTION'], $categoryName, $searchValue);
+      }
+
+      $this->CMSCore->configurator->setMetaTitle($siteMetaTitle);
+      $this->CMSCore->configurator->setMetaDescription($siteMetaDescription);
 
       /** @var Entries $entries Объект класса Entries */
       $entries = new Entries($this->CMSCore);
