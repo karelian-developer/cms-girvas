@@ -114,6 +114,7 @@ class PageSearch implements InterfacePage
 
       $pageIndex = $this->CMSCore->urlp->getParam('pageNumber');
       $searchValue = $this->CMSCore->urlp->getParam('value');
+      $searchValue = urldecode($searchValue);
       $searchValue = htmlspecialchars($searchValue, ENT_QUOTES, 'UTF-8');
 
       $entriesCountOnPage = 6;
