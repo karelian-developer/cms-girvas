@@ -62,6 +62,7 @@
   "PAGE_STATIC_PAGE_PREVIEWS_STATIC_PAGE": "Предыдущая страница",
   "PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_LABEL": "Все записи",
   "PAGE_ENTRIES_NOT_FOUND_LABEL": "Записи не найдены",
+  "PAGE_SHEARCH_BREADCRUMPS_ALL_SEARCHING_LABEL": "Поиск записей",
   "PAGE_ENTRY_COMMENTS_NOT_FOUND_LABEL": "К этой записи нет комментариев.",
   "PAGE_ENTRY_COMMENT_HIDE_LABEL": "Комментарий скрыт",
   "PAGE_ENTRY_COMMENTS_BLOCK_TITLE": "Комментарии",
