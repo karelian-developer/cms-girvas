@@ -188,6 +188,7 @@ export class Form {
       }
     }
 
+    const formElement = this.element;
     const form = formElement.firstChild;
     const formMethod = form.getAttribute('method') || 'POST';
     const formAction = form.getAttribute('action') || '/';
