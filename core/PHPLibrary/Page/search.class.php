@@ -140,7 +140,7 @@ class PageSearch implements InterfacePage
 
       if ($categoryName === 'all') {
         $siteMetaTitle = $localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_LABEL'] . ' | ' . $this->CMSCore->configurator->getSiteTitle();
-        $siteMetaDescription = $localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_DESCRIPTION'];
+        $siteMetaDescription = sprintf($localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_DESCRIPTION'], $searchValue);
       } else {
         $siteMetaTitle = sprintf($localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_IN_CATEGORY_LABEL'], $categoryName) . ' | ' . $this->CMSCore->configurator->getSiteTitle();
         $siteMetaDescription = sprintf($localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_IN_CATEGORY_DESCRIPTION'], $categoryName, $searchValue);
