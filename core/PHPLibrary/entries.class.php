@@ -21,6 +21,7 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Database\QueryBuilder\Expression\CaseExpression as CaseExpression;
 
 final class Entries
 {
