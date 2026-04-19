@@ -111,70 +111,95 @@ final class Entries
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
     
+    // Разбиваем запрос на слова, убираем знаки препинания
+    $words = preg_split('/[\s,.;!?()\[\]{}<>]+/', trim($searchQuery), -1, PREG_SPLIT_NO_EMPTY);
+    
+    // Если слов нет — возвращаем пустой массив
+    if (empty($words)) {
+        return [];
+    }
+    
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     
     // Вес для различных полей при поиске
     $weights = [
-      'title' => 10,
-      'SEOTitle' => 8,
-      'description' => 5,
-      'SEODescription' => 5,
-      'content' => 3
+        'title' => 10,
+        'SEOTitle' => 8,
+        'description' => 5,
+        'SEODescription' => 5,
+        'content' => 3
     ];
     
-    $caseExpressions = [];
+    // Создаём CASE-выражения для каждого слова и каждого поля
+    $allCaseExpressions = [];
     
-    foreach ($weights as $field => $weight) {
-      $jsonPath = sprintf("texts->'%s'->>'%s'", $localeName, $field);
-      $caseExpressions[] = $queryBuilder->createCase()
-        ->whenJsonLike($jsonPath, 'searchQuery', $weight)
-        ->else(0);
+    foreach ($words as $wordIndex => $word) {
+        $paramName = 'word' . $wordIndex;
+        
+        foreach ($weights as $field => $weight) {
+            $jsonPath = sprintf("texts->'%s'->>'%s'", $localeName, $field);
+            $allCaseExpressions[] = $queryBuilder->createCase()
+                ->whenJsonLike($jsonPath, $paramName, $weight)
+                ->else(0);
+        }
+        
+        // Поиск по ключевым словам
+        $keywordsPath = sprintf("texts->'%s'->'keywords'", $localeName);
+        $allCaseExpressions[] = $queryBuilder->createCase()
+            ->whenJsonArrayContains($keywordsPath, $paramName, 6)
+            ->else(0);
     }
     
-    // Поиск по ключевым словам (вес 6)
-    $keywordsPath = sprintf("texts->'%s'->'keywords'", $localeName);
-    $caseExpressions[] = $queryBuilder->createCase()
-      ->whenJsonArrayContains($keywordsPath, 'searchQuery', 6)
-      ->else(0);
-    
-    $relevanceExpression = CaseExpression::sum($caseExpressions, 'relevance');
-    
+    $relevanceExpression = CaseExpression::sum($allCaseExpressions, 'relevance');
     $queryBuilder->statement->addSelections(['*', $relevanceExpression]);
     
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('entries');
     $queryBuilder->statement->clauseFrom->assembly();
     
-    $whereConditions = [];
+    // Формируем WHERE-условия: каждое слово должно быть найдено хотя бы в одном поле
+    $wordConditions = [];
     
-    foreach (array_keys($weights) as $field) {
-      $whereConditions[] = match ($CMSConfigDatabase['dms']) {
+    foreach ($words as $wordIndex => $word) {
+      $paramName = 'word' . $wordIndex;
+      $fieldConditions = [];
+      
+      foreach (array_keys($weights) as $field) {
+        $fieldConditions[] = match ($CMSConfigDatabase['dms']) {
+          CMSDMS::PostgreSQL => sprintf(
+            "texts->'%s'->>'%s' ILIKE '%%' || :%s || '%%'",
+            $localeName,
+            $field,
+            $paramName
+          ),
+          CMSDMS::MySQL => sprintf(
+            "JSON_UNQUOTE(JSON_EXTRACT(texts, '$.%s.%s')) LIKE CONCAT('%%', :%s, '%%')",
+            $localeName,
+            $field,
+            $paramName
+          )
+        };
+      }
+      
+      $fieldConditions[] = match ($CMSConfigDatabase['dms']) {
         CMSDMS::PostgreSQL => sprintf(
-          "texts->'%s'->>'%s' ILIKE '%%' || :searchQuery || '%%'",
+          "EXISTS (SELECT 1 FROM jsonb_array_elements_text(texts->'%s'->'keywords') AS kw WHERE kw ILIKE '%%' || :%s || '%%')",
           $localeName,
-          $field
+          $paramName
         ),
         CMSDMS::MySQL => sprintf(
-          "JSON_UNQUOTE(JSON_EXTRACT(texts, '$.%s.%s')) LIKE CONCAT('%%', :searchQuery, '%%')",
-          $localeName,
-          $field
+          "JSON_SEARCH(texts, 'one', :%s, NULL, '$.%s.keywords[*]') IS NOT NULL",
+          $paramName,
+          $localeName
         )
       };
+      
+      $wordConditions[] = '(' . implode(' OR ', $fieldConditions) . ')';
     }
     
-    $whereConditions[] = match ($CMSConfigDatabase['dms']) {
-      CMSDMS::PostgreSQL => sprintf(
-        "EXISTS (SELECT 1 FROM jsonb_array_elements_text(texts->'%s'->'keywords') AS kw WHERE kw ILIKE '%%' || :searchQuery || '%%')",
-        $localeName
-      ),
-      CMSDMS::MySQL => sprintf(
-        "JSON_SEARCH(texts, 'one', :searchQuery, NULL, '$.%s.keywords[*]') IS NOT NULL",
-        $localeName
-      )
-    };
-    
-    $whereString = '(' . implode(' OR ', $whereConditions) . ')';
+    // Все слова должны быть найдены (AND)
+    $whereString = '(' . implode(' AND ', $wordConditions) . ')';
     
     $queryBuilder->statement->setClauseWhere();
     $queryBuilder->statement->clauseWhere->addCondition($whereString);
@@ -202,22 +227,6 @@ final class Entries
     }
     
     $queryBuilder->statement->assembly();
-
-    error_log('=== SEARCH QUERY ===');
-    error_log('Search value: ' . $searchQuery);
-    error_log('Locale: ' . $localeName);
-    error_log('SQL: ' . $queryBuilder->statement->assembled);
-    
-    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
-    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-    $databaseQuery->bindParam(':searchQuery', $searchQuery, \PDO::PARAM_STR);
-    
-    $executed = $databaseQuery->execute();
-    error_log('Execute result: ' . ($executed ? 'true' : 'false'));
-    error_log('Row count: ' . $databaseQuery->rowCount());
-    
-    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
-    error_log('Results: ' . json_encode($results, JSON_UNESCAPED_UNICODE));
     
     // Модифицируем ORDER BY для поддержки второй колонки (id)
     $queryBuilder->statement->assembled = str_replace(
@@ -228,14 +237,20 @@ final class Entries
     
     $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
     $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-    $databaseQuery->bindParam(':searchQuery', $searchQuery, \PDO::PARAM_STR);
+    
+    // Биндим параметры для каждого слова
+    foreach ($words as $wordIndex => $word) {
+      $paramName = ':word' . $wordIndex;
+      $databaseQuery->bindParam($paramName, $words[$wordIndex], \PDO::PARAM_STR);
+    }
+    
     $databaseQuery->execute();
     
     $entries = [];
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        $entries[] = new Entry($this->CMSCore, $data['id']);
+          $entries[] = new Entry($this->CMSCore, $data['id']);
       }
     }
     
