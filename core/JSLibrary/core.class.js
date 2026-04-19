@@ -181,7 +181,7 @@ export class Core {
     }
 
     for (let element of formsElements) {
-      if (!element.hasAttribute('coreignore')) {
+      if (!element.hasAttribute('data-coreignore')) {
         let staticForm = new StaticForm(element, locale);
         staticForm.initFormElement();
 
