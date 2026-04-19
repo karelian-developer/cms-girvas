@@ -202,6 +202,22 @@ final class Entries
     }
     
     $queryBuilder->statement->assembly();
+
+    error_log('=== SEARCH QUERY ===');
+    error_log('Search value: ' . $searchQuery);
+    error_log('Locale: ' . $localeName);
+    error_log('SQL: ' . $queryBuilder->statement->assembled);
+    
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':searchQuery', $searchQuery, \PDO::PARAM_STR);
+    
+    $executed = $databaseQuery->execute();
+    error_log('Execute result: ' . ($executed ? 'true' : 'false'));
+    error_log('Row count: ' . $databaseQuery->rowCount());
+    
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    error_log('Results: ' . json_encode($results, JSON_UNESCAPED_UNICODE));
     
     // Модифицируем ORDER BY для поддержки второй колонки (id)
     $queryBuilder->statement->assembled = str_replace(
