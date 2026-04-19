@@ -20,6 +20,7 @@
  */
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\EntriesSample as EntriesSample;
