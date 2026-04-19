@@ -24,10 +24,12 @@ use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;
 use \core\PHPLibrary\Database\QueryBuilder\Expression\CaseExpression as CaseExpression;
 use \core\PHPLibrary\Database\QueryBuilder\StatementAlterTable as StatementAlterTable;
 use \core\PHPLibrary\Database\QueryBuilder\StatementCreateTable as StatementCreateTable;
+use \core\PHPLibrary\Database\QueryBuilder\StatementCreateIndex as StatementCreateIndex;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect as StatementSelect;
 use \core\PHPLibrary\Database\QueryBuilder\StatementInsert as StatementInsert;
 use \core\PHPLibrary\Database\QueryBuilder\StatementUpdate as StatementUpdate;
 use \core\PHPLibrary\Database\QueryBuilder\StatementDelete as StatementDelete;
+use \core\PHPLibrary\Database\QueryBuilder\StatementDropIndex as StatementDropIndex;
 use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
 
 class QueryBuilder
@@ -111,5 +113,23 @@ class QueryBuilder
   public function createCase() : CaseExpression
   {
     return new CaseExpression($this->DMS);
+  }
+  
+  /**
+   * setStatementCreateIndex
+   *
+   * @return void
+   */
+  public function setStatementCreateIndex() : void {
+    $this->statement = new StatementCreateIndex($this);
+  }
+
+  /**
+   * setStatementDropIndex
+   *
+   * @return void
+   */
+  public function setStatementDropIndex() : void {
+    $this->statement = new StatementDropIndex($this);
   }
 }
