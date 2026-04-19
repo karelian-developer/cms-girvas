@@ -170,6 +170,7 @@ class PageEntries implements InterfacePage
         $this->page->breadcrumbs->assembly();
 
         $this->CMSCore->configurator->setMetaTitle($localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_LABEL'] . ' | ' . $this->CMSCore->configurator->getSiteTitle());
+        $this->CMSCore->configurator->setMetaDescription($localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_DESCRIPTION']);
 
         /** @var Entries $entries Объект класса Entries */
         $entries = new Entries($this->CMSCore);

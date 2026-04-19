@@ -120,7 +120,7 @@ class PageSearch implements InterfacePage
       $paginationItemCurrent = $pageIndex ?? 0;
       $paginationItemCurrent = is_numeric($paginationItemCurrent) ? (int) $paginationItemCurrent : 0;
 
-      $this->page->breadcrumbs->add($localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_LABEL'], '/entries');
+      $this->page->breadcrumbs->add($localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_LABEL'], '/search?value=' . $searchValue);
 
       $clientIsLogged = $this->CMSCore->client->isLogged(1);
       
@@ -138,6 +138,7 @@ class PageSearch implements InterfacePage
       $this->page->breadcrumbs->assembly();
 
       $this->CMSCore->configurator->setMetaTitle($localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_LABEL'] . ' | ' . $this->CMSCore->configurator->getSiteTitle());
+      $this->CMSCore->configurator->setMetaDescription($localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_DESCRIPTION']);
 
       /** @var Entries $entries Объект класса Entries */
       $entries = new Entries($this->CMSCore);

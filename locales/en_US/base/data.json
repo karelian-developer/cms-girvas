@@ -63,7 +63,7 @@
   "PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_LABEL": "All entries",
   "PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_DESCRIPTION": "All posts created on the site.",
   "PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_LABEL": "Search for entries",
-  "PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES__DESCRIPTION": "All search results for posts on the site for the query \"%s\".",
+  "PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_DESCRIPTION": "All search results for posts on the site for the query \"%s\".",
   "PAGE_ENTRIES_NOT_FOUND_LABEL": "No entries found",
   "PAGE_ENTRY_COMMENTS_NOT_FOUND_LABEL": "There are no comments for this entry.",
   "PAGE_ENTRY_COMMENT_HIDE_LABEL": "Comment hidden",
