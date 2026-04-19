@@ -424,8 +424,12 @@ class PageSearch implements InterfacePage
         'PAGE_NAME' => 'search',
         'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/search.tpl', [
           'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
-          'ENTRIES_CATEGORY_TITLE' => ($categoryName == 'all') ? $localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_LABEL'] : $category->getTitle($localeName),
-          'ENTRIES_CATEGORY_DESCRIPTION' => ($categoryName == 'all') ? $localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_DESCRIPTION'] : $category->getDescription($localeName),
+          'ENTRIES_CATEGORY_TITLE' => ($categoryName == 'all')
+            ? $localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_LABEL']
+            : sprintf($localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_LABEL'], $category->getTitle($localeName)),
+          'ENTRIES_CATEGORY_DESCRIPTION' => ($categoryName == 'all')
+            ? sprintf($localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_DESCRIPTION'], $searchValue)
+            : sprintf($localeData['PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_IN_CATEGORY_DESCRIPTION'], $category->getTitle($localeName), $searchValue),
           'ENTRIES_LIST' => (!empty($entriesArrayTemplates)) ? ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/search/entriesList/list.tpl', [
             'ENTRIES_LIST_ITEMS' => implode($entriesArrayTemplates)
           ]) : sprintf('<div class="page__simple-note">%s</div>', $localeData['PAGE_ENTRIES_NOT_FOUND_LABEL']),

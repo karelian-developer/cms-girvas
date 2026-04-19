@@ -64,6 +64,8 @@
   "PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_DESCRIPTION": "Все записи, созданные на сайте.",
   "PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_LABEL": "Поиск записей",
   "PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_DESCRIPTION": "Все результаты поиска записей на сайте по запросу «%s».",
+  "PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_IN_CATEGORY_LABEL": "Поиск записей в категории «%s»",
+  "PAGE_SEARCH_BREADCRUMPS_SEARCHING_ENTRIES_IN_CATEGORY_DESCRIPTION": "Все результаты поиска записей в категории «%s» на сайте по запросу «%s».",
   "PAGE_ENTRIES_NOT_FOUND_LABEL": "Записи не найдены",
   "PAGE_ENTRY_COMMENTS_NOT_FOUND_LABEL": "К этой записи нет комментариев.",
   "PAGE_ENTRY_COMMENT_HIDE_LABEL": "Комментарий скрыт",
