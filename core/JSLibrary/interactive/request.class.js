@@ -149,7 +149,9 @@ export class Request {
 
     return fetch(requestURL, {
       method: requestMethod,
-      body: this.data,
+      body: requestMethod !== 'GET'
+        ? this.data
+        : null,
       headers: this.headers,
       credentials: 'same-origin'
     }).then((response) => {
