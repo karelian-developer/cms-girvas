@@ -193,27 +193,31 @@ export class Form {
     const formAction = form.getAttribute('action') || '/';
 
     if (formMethod.toUpperCase() === 'GET') {
-      // Собираем данные формы вручную
       const formData = new FormData(form);
       const searchParams = new URLSearchParams();
       
       for (let [key, value] of formData.entries()) {
-        if (key === 'value') {  // поле поиска
+        if (value && value.toString().trim() !== '') {
           searchParams.append(key, value);
         }
       }
       
       // Добавляем localeMessage
-      if (locale) {
-        searchParams.append('localeMessage', locale.name)
-      };
+      if (locale && locale.name) {
+        searchParams.append('localeMessage', locale.name);
+      }
       
-      // Формируем полный URL
-      const fullURL = formAction + '?' + searchParams.toString();
+      let fullURL = formAction;
+      let queryString = searchParams.toString();
+
+      if (queryString) {
+        fullURL += (fullURL.includes('?') ? '&' : '?') + queryString;
+      }
       
       const request = new Interactive('request', {
         method: 'GET',
-        url: fullURL
+        url: fullURL,
+        data: undefined
       });
       
       request.target.send(true);
