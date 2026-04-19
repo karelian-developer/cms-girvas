@@ -62,15 +62,26 @@ final class StatementSelect implements InterfaceStatement
     $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
 
     foreach ($selections as $index => $selection) {
-      if (!preg_match('/\"[a-z0-9_]+\"/i', $selection) && !preg_match('/[a-z]+\([a-z0-9_]*[*]*\)/i', $selection) && !is_numeric($selection) && $selection !== '*') {
-        $selections[$index] = match ($CMSConfigDatabase['dms']) {
+      // Не экранируем выражения с CASE, функциями или алиасами
+      if (preg_match('/^\s*\(/', $selection) || 
+        stripos($selection, 'CASE') !== false || 
+        stripos($selection, ' AS ') !== false) {
+        $this->selections[] = $selection;
+        continue;
+      }
+      
+      if (!preg_match('/\"[a-z0-9_]+\"/i', $selection) && 
+        !preg_match('/[a-z]+\([a-z0-9_]*[*]*\)/i', $selection) && 
+        !is_numeric($selection) && 
+        $selection !== '*') {
+        $selection = match ($CMSConfigDatabase['dms']) {
           CMSDMS::MySQL => '`' . $selection . '`',
           CMSDMS::PostgreSQL => '"' . $selection . '"',
         };
       }
+      
+      $this->selections[] = $selection;
     }
-
-    $this->selections = array_merge($this->selections, $selections);
   }
   
   /**
