@@ -21,6 +21,7 @@ namespace core\PHPLibrary\Database;
 
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;
+use \core\PHPLibrary\Database\QueryBuilder\Expression\CaseExpression as CaseExpression;
 use \core\PHPLibrary\Database\QueryBuilder\StatementAlterTable as StatementAlterTable;
 use \core\PHPLibrary\Database\QueryBuilder\StatementCreateTable as StatementCreateTable;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect as StatementSelect;
@@ -100,5 +101,15 @@ class QueryBuilder
    */
   public function setStatementAlterTable() : void {
     $this->statement = new StatementAlterTable($this);
+  }
+
+  /**
+   * Создать CASE-выражение
+   *
+   * @return CaseExpression
+   */
+  public function createCase() : CaseExpression
+  {
+    return new CaseExpression($this->DMS);
   }
 }

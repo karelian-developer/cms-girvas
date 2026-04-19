@@ -26,6 +26,7 @@ use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseFrom as ClauseF
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseWhere as ClauseWhere;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseOrderBy as ClauseOrderBy;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseLimit as ClauseLimit;
+use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseJoin as ClauseJoin;
 use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
 
 final class StatementSelect implements InterfaceStatement
@@ -36,6 +37,7 @@ final class StatementSelect implements InterfaceStatement
   public ?ClauseWhere $clauseWhere = null;
   public ?ClauseOrderBy $clauseOrderBy = null;
   public ?ClauseLimit $clauseLimit = null;
+  public ?ClauseJoin $clauseJoin = null;
   public string $assembled = '';
   
   /**
@@ -113,6 +115,16 @@ final class StatementSelect implements InterfaceStatement
     $this->clauseLimit->setLimit($limit);
     $this->clauseLimit->setOffset($offset);
   }
+
+  /**
+   * Установить предложение JOIN
+   *
+   * @return void
+   */
+  public function setClauseJoin() : void
+  {
+    $this->clauseJoin = new ClauseJoin($this);
+  }
   
   /**
    * Сборка SQL-запроса
@@ -142,6 +154,7 @@ final class StatementSelect implements InterfaceStatement
   {
     return [
       $this->clauseFrom,
+      $this->clauseJoin,
       $this->clauseWhere,
       $this->clauseOrderBy,
       $this->clauseLimit
