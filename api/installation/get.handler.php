@@ -842,6 +842,320 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     }
 
     // =======================
+    // СОЗДАНИЕ ИНДЕКСОВ ДЛЯ ОПТИМИЗАЦИИ ПРОИЗВОДИТЕЛЬНОСТИ
+    // =======================
+
+    try {
+      // Индексы для таблицы entries
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_entries_category');
+      $queryBuilder->statement->setTableName('entries');
+      $queryBuilder->statement->addColumn('categoryID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_entries_author');
+      $queryBuilder->statement->setTableName('entries');
+      $queryBuilder->statement->addColumn('authorID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_entries_created');
+      $queryBuilder->statement->setTableName('entries');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'DESC');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_entries_updated');
+      $queryBuilder->statement->setTableName('entries');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      // Уникальный индекс на name записи
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_entries_name_unique');
+      $queryBuilder->statement->setTableName('entries');
+      $queryBuilder->statement->addColumn('name');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      // GIN индекс для JSONB поля texts (только PostgreSQL)
+      if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+        $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+        $queryBuilder->setStatementCreateIndex();
+        $queryBuilder->statement->setIndexName('idx_entries_texts_gin');
+        $queryBuilder->statement->setTableName('entries');
+        $queryBuilder->statement->setExpression('texts');
+        $queryBuilder->statement->setIndexType(IndexType::GIN);
+        $queryBuilder->statement->setIfNotExists(true);
+        $queryBuilder->statement->assembly();
+        
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->execute();
+        
+        // GIN индекс для JSONB поля metadata
+        $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+        $queryBuilder->setStatementCreateIndex();
+        $queryBuilder->statement->setIndexName('idx_entries_metadata_gin');
+        $queryBuilder->statement->setTableName('entries');
+        $queryBuilder->statement->setExpression('metadata');
+        $queryBuilder->statement->setIndexType(IndexType::GIN);
+        $queryBuilder->statement->setIfNotExists(true);
+        $queryBuilder->statement->assembly();
+        
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->execute();
+        
+        // Частичный индекс для опубликованных записей
+        $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+        $queryBuilder->setStatementCreateIndex();
+        $queryBuilder->statement->setIndexName('idx_entries_published');
+        $queryBuilder->statement->setTableName('entries');
+        $queryBuilder->statement->addColumn('createdUnixTimestamp', 'DESC');
+        $queryBuilder->statement->setWhereCondition("(metadata::jsonb->>'isPublished')::boolean = true");
+        $queryBuilder->statement->setIfNotExists(true);
+        $queryBuilder->statement->assembly();
+        
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->execute();
+      }
+      
+      // Индексы для таблицы entries_categories
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_entries_categories_parent');
+      $queryBuilder->statement->setTableName('entries_categories');
+      $queryBuilder->statement->addColumn('parentID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_entries_categories_name_unique');
+      $queryBuilder->statement->setTableName('entries_categories');
+      $queryBuilder->statement->addColumn('name');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      // Индексы для таблицы entries_comments
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_entries_comments_entry');
+      $queryBuilder->statement->setTableName('entries_comments');
+      $queryBuilder->statement->addColumn('entryID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_entries_comments_author');
+      $queryBuilder->statement->setTableName('entries_comments');
+      $queryBuilder->statement->addColumn('authorID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_entries_comments_created');
+      $queryBuilder->statement->setTableName('entries_comments');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'DESC');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      // Индексы для таблицы pages_static
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_pages_static_name_unique');
+      $queryBuilder->statement->setTableName('pages_static');
+      $queryBuilder->statement->addColumn('name');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_pages_static_author');
+      $queryBuilder->statement->setTableName('pages_static');
+      $queryBuilder->statement->addColumn('authorID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_pages_static_created');
+      $queryBuilder->statement->setTableName('pages_static');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'DESC');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      // GIN индекс для JSONB (только PostgreSQL)
+      if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+        $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+        $queryBuilder->setStatementCreateIndex();
+        $queryBuilder->statement->setIndexName('idx_pages_static_texts_gin');
+        $queryBuilder->statement->setTableName('pages_static');
+        $queryBuilder->statement->setExpression('texts');
+        $queryBuilder->statement->setIndexType(IndexType::GIN);
+        $queryBuilder->statement->setIfNotExists(true);
+        $queryBuilder->statement->assembly();
+        
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->execute();
+      }
+      
+      // Индексы для таблицы users
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_login_unique');
+      $queryBuilder->statement->setTableName('users');
+      $queryBuilder->statement->addColumn('login');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_email_unique');
+      $queryBuilder->statement->setTableName('users');
+      $queryBuilder->statement->addColumn('email');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      // Индексы для таблицы users_sessions
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_sessions_user');
+      $queryBuilder->statement->setTableName('users_sessions');
+      $queryBuilder->statement->addColumn('userID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_sessions_token');
+      $queryBuilder->statement->setTableName('users_sessions');
+      $queryBuilder->statement->addColumn('token');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      // Индексы для таблицы forms_data
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_forms_data_form');
+      $queryBuilder->statement->setTableName('forms_data');
+      $queryBuilder->statement->addColumn('formID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_forms_data_created');
+      $queryBuilder->statement->setTableName('forms_data');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'DESC');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      // Индексы для таблицы web_channels
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_web_channels_name_unique');
+      $queryBuilder->statement->setTableName('web_channels');
+      $queryBuilder->statement->addColumn('name');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      // Индексы для таблицы metrics
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_metrics_date');
+      $queryBuilder->statement->setTableName('metrics');
+      $queryBuilder->statement->addColumn('date');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+    } catch (PDOException $exception) {
+      // Логируем ошибку, но не прерываем установку
+      error_log('Index creation warning: ' . $exception->getMessage());
+    }
+
+    // =======================
     // ПЕРВИЧНОЕ НАПОЛНЕНИЕ БАЗЫ ДАННЫХ
     // =======================
 
