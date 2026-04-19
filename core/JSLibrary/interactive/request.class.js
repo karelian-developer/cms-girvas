@@ -132,7 +132,7 @@ export class Request {
       this.addData('_grv_' + this.getRandomString(), this.getRandomString());
     }
 
-    let notificationStatus = this.element.getAttribute('data-notification');
+    let notificationStatus = this.element?.getAttribute('data-notification');
     notificationStatus = notificationStatus ?? 'on'
 
     if (this.showingNotification && notificationStatus !== 'off') {
@@ -151,7 +151,7 @@ export class Request {
       }
     }
 
-    let backendStatus = this.element.getAttribute('data-backend');
+    let backendStatus = this.element?.getAttribute('data-backend');
     backendStatus = backendStatus ?? 'on'
 
     if (this.element.getAttribute('data-backend') !== 'off') {
