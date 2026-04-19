@@ -154,7 +154,7 @@ export class Request {
     let backendStatus = this.element?.getAttribute('data-backend');
     backendStatus = backendStatus ?? 'on'
 
-    if (this.element.getAttribute('data-backend') !== 'off') {
+    if (backendStatus !== 'off') {
       return fetch(requestURL, {
         method: requestMethod,
         body: requestMethod !== 'GET'
