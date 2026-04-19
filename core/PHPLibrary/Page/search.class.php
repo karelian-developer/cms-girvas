@@ -417,7 +417,7 @@ class PageSearch implements InterfacePage
 
       unset($entriesObjects);
 
-      $pagination = new Pagination($this->CMSCore, $entriesCount, $entriesCountOnPage, $paginationItemCurrent);
+      $pagination = new Pagination($this->CMSCore, $entriesCount, $entriesCountOnPage, $paginationItemCurrent, '?value=' . $searchValue, false);
       $pagination->assembly();
 
       $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
