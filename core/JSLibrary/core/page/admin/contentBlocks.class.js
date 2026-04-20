@@ -17,7 +17,7 @@
 
 import {Interactive} from "../../../interactive.class.js";
 
-export class PageForms {
+export class PageContentBlocks {
   constructor(page, params = {}) {
     this.page = page;
 
