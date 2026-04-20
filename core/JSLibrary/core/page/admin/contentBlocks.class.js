@@ -41,6 +41,7 @@ export class PageContentBlocks {
       interactiveCreatePageButton.target.setCallback(() => {
         window.location.href = `./contentBlock`;
       });
+      
       interactiveCreatePageButton.assembly();
     
       const interactiveContainerElement = document.querySelector('#E8548530785');

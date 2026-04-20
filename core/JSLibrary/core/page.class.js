@@ -56,7 +56,7 @@ export class Page {
 
     let searchParams = new URLParser();
 
-    if (pageCategory == 'default') {
+    if (pageCategory === 'default') {
       switch (pageName) {
         case 'entry': this.target = new PageDefaultEntry(this, params); break;
         case 'global': this.target = new PageDefaultGlobal(this, params); break;
@@ -64,7 +64,7 @@ export class Page {
       }
     }
 
-    if (pageCategory == 'admin') {
+    if (pageCategory === 'admin') {
       switch (pageName) {
         case 'analytics': this.target = new PageAdminAnalytics(this, params); break;
         case 'entry': this.target = new PageAdminEntry(this, params); break;
@@ -97,7 +97,7 @@ export class Page {
       }
     }
 
-    if (this.target != null) {
+    if (this.target !== null) {
       this.init();
     }
   }

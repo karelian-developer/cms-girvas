@@ -132,6 +132,8 @@ export class Core {
           if (this.searchParams.getPathPart(2) === 'feeds') this.pages.admin.feeds = new Page(this, 'admin', 'feeds');
           if (this.searchParams.getPathPart(2) === 'form') this.pages.admin.form = new Page(this, 'admin', 'form');
           if (this.searchParams.getPathPart(2) === 'forms') this.pages.admin.forms = new Page(this, 'admin', 'forms');
+          if (this.searchParams.getPathPart(2) === 'contentBlock') this.pages.admin.contentBlock = new Page(this, 'admin', 'contentBlock');
+          if (this.searchParams.getPathPart(2) === 'contentBlocks') this.pages.admin.contentBlocks = new Page(this, 'admin', 'contentBlocks');
         }
 
         this.pages.admin.global = new Page(this, 'admin', 'global');
