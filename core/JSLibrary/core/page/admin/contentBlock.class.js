@@ -241,16 +241,7 @@ export class PageContentBlock {
           return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data1) => {
           if (data1.statusCode === 1) {
-            contentBlockData = data1.outputData.entry;
-            
-            if (contentBlockData.previewURL !== '') {
-              let imageElement = document.createElement('img');
-              imageElement.setAttribute('src', contentBlockData.previewURL);
-              imageElement.style.width = '100%';
-
-              previewImageContainerElement.innerHTML = '';
-              previewImageContainerElement.appendChild(imageElement);
-            }
+            contentBlockData = data1.outputData.contentBlock;
 
             this.buttons.delete.target.element.style.display = 'flex';
             this.buttons.save.target.element.style.display = 'flex';
@@ -259,33 +250,32 @@ export class PageContentBlock {
             this.buttons.save.target.element.style.display = 'flex';
           }
           
-          return fetch('/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
+          return fetch('/handler/contentBlock/types' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
         }, (rejectionReason) => {
           this.page.showPopupNotification(rejectionReason, 0);
         }).then((response) => {
           return (response.ok) ? response.json() : Promise.reject(response);
         }).then((data1) => {
           if (data1.statusCode === 1) {
-            let entriesCategories = data1.outputData.entriesCategories;
+            let contentBlocksTypes = data1.outputData.contentBlocksTypes;
             
-            entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
-              interactiveTypesChoices.target.addItem(entriesCategory.title, entriesCategory.id);
+            contentBlocksTypes.forEach((contentBlockType, index) => {
+              interactiveTypesChoices.target.addItem(contentBlockType.title, contentBlockType.id);
             });
 
             if (this.statusCode !== 404) {
-              entriesCategories.forEach((entriesCategory, entriesCategoryIndex) => {
-                if (entriesCategory.id === contentBlockData.contentBlockTypeID) {
-                  interactiveTypesChoices.target.setItemSelectedIndex(entriesCategoryIndex);
+              contentBlocksTypes.forEach((contentBlockType, index) => {
+                if (contentBlockType.id === contentBlockData.contentBlockTypeID) {
+                  interactiveTypesChoices.target.setItemSelectedIndex(index);
                 }
               });
             }
             
-            interactiveTypesChoices.target.setName('entry_category_id');
+            interactiveTypesChoices.target.setName('content_block_type_id');
             interactiveTypesChoices.assembly();
     
-            const interactiveContainer = document.querySelector('[data-element="choice"][data-choice="category"]');
+            const interactiveContainer = document.querySelector('[data-element="choice"][data-choice="type"]');
             interactiveContainer.append(interactiveTypesChoices.target.element);
-            interactiveHeaderContainerElement.append(this.buttons.viewOnSite.target.element);
           }
         }, (rejectionReason) => {
           this.page.showPopupNotification(rejectionReason, 0);
