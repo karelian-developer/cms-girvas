@@ -20,6 +20,7 @@
 
 namespace core\PHPLibrary\Template;
 
+use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\LocaleInterface as LocaleInterface;
@@ -52,6 +53,29 @@ final class Collector
   public function __construct(Theme $theme)
   {
     $this->theme = $theme;
+  }
+
+  /**
+   * Сборка контент-блока
+   * 
+   * @param Theme $theme
+   * @param EntityTypeContent $contentBlock
+   * @param array $themeVars
+   * @return string
+   */
+  public static function assemblyContentBlock(
+    Theme $theme,
+    EntityTypeContent $contentBlock,
+    array $themeVars = []
+  ) : string {
+    $CMSLocale = $theme->CMSCore->locale;
+    $CMSLocaleName = $CMSLocale->getName();
+
+    $blockName = $contentBlock->getName();
+    $blockTypeName = $contentBlock->getTypeName();
+    $blockSectionIntegrationName = $contentBlock->getSectionIntegrationName();
+
+    return ThemeCollector::assemblyFileContent($theme, 'templates/sidebar/' . $blockName . '.tpl', $themeVars);
   }
 
   /**

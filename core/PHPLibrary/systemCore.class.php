@@ -838,6 +838,16 @@ final class SystemCore implements CoreInterface
    * 
    * @return bool
    */
+  public function isInstallerModeActive() : bool
+  {
+    return $this->urlp->getParam('mode') === 'install';
+  }
+
+  /**
+   * Проверка активности инсталлятора (по локации клиента)
+   * 
+   * @return bool
+   */
   public function isLocationInstallerActive() : bool
   {
     return $this->urlp->getPath(0) === 'install';

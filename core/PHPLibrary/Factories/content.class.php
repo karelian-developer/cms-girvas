@@ -22,6 +22,7 @@ namespace core\PHPLibrary\Factories;
 
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
+use \core\PHPLibrary\ContentBlock as EntityContentBlock;
 use \core\PHPLibrary\Entry as EntityEntry;
 use \core\PHPLibrary\EntryCategory as EntityEntryCategory;
 use \core\PHPLibrary\EntryComment as EntityEntryComment;
@@ -44,6 +45,7 @@ class Content
   public static function create(SystemCore $CMSCore, string $type, array $data = []) : EntityTypeContent
   {
     return match($type) {
+      'contentBlock' => new EntityContentBlock($CMSCore, $data['id']),
       'entry' => new EntityEntry($CMSCore, $data['id']),
       'entryCategory' => new EntityEntryCategory($CMSCore, $data['id']),
       'entryComment' => new EntityEntryComment($CMSCore, $data['id']),
