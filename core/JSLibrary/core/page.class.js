@@ -91,6 +91,8 @@ export class Page {
         case 'feeds': this.target = new PageAdminFeeds(this, params); break;
         case 'form': this.target = new PageAdminForm(this, params); break;
         case 'forms': this.target = new PageAdminForms(this, params); break;
+        case 'contentBlock': this.target = new PageAdminContentBlock(this, params); break;
+        case 'contentBlocks': this.target = new PageAdminContentBlocks(this, params); break;
         case 'global': this.target = new PageAdminGlobal(this, params); break;
       }
     }
