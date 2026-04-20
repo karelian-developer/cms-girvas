@@ -62,8 +62,8 @@ final class SystemCore implements CoreInterface
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS «GIRVAS»';
-  public const CMS_VERSION = '0.2.9';
-  public const CMS_STAGE_DEVELOPING = 'voitsy';
+  public const CMS_VERSION = '0.3.0';
+  public const CMS_STAGE_DEVELOPING = 'shuya';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai';
   public const CMS_PRODUCT_SITE_LINK = 'https://cms-girvas.ru';

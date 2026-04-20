@@ -1,6 +1,7 @@
 {
   "PAGE_ABOUT_CONTENT": "markdown/page/aboutContent.md",
   "PAGE_INDEX_CONTENT": "markdown/page/indexContent.md",
+  "PAGE_CONTENT_BLOCKS_SIDEBAR_BLOCK_ABOUT_DESCRIPTION": "markdown/page/content/contentBlocksSidebarAboutContent.md",
   "PAGE_FORMS_SIDEBAR_BLOCK_ABOUT_DESCRIPTION": "markdown/page/content/formsSidebarAboutContent.md",
   "PAGE_ENTRIES_SAMPLES_SIDEBAR_BLOCK_ABOUT_DESCRIPTION": "markdown/page/content/entries/samplesSidebarAboutContent.md",
   "PAGE_PAGE_STATIC_SIDEBAR_BLOCK_PERSONAL_TEMPLATE_TIP": "markdown/page/content/pageStatic/sidebarPersonalTemplateTip.md",

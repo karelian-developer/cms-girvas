@@ -89,6 +89,13 @@ class PageForms implements InterfacePage
       'link' => '/forms',
       'permanent' => false,
       'isActive' => true
+    ],
+    'blocks' => [
+      'name' => 'blocks',
+      'iconName' => 'contentBlocks',
+      'link' => '/contentBlocks',
+      'permanent' => false,
+      'isActive' => false
     ]
   ];
 

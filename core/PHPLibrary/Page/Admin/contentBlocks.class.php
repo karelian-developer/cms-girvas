@@ -24,15 +24,14 @@ use \DOMDocument as DOMDocument;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
-use \core\PHPLibrary\EntriesSamples as EntriesSamples;
-use \core\PHPLibrary\EntriesSample\EnumSortTypeID as EnumSortTypeID;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\ContentBlocks as ContentBlocks;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
 use \ReflectionEnum as ReflectionEnum;
 
-class PageEntriesSamples implements InterfacePage
+class PageContentBlocks implements InterfacePage
 {
   use TraitPage;
 
@@ -82,7 +81,7 @@ class PageEntriesSamples implements InterfacePage
       'iconName' => 'entriesSamples',
       'link' => '/entriesSamples',
       'permanent' => false,
-      'isActive' => true
+      'isActive' => false
     ],
     'forms' => [
       'name' => 'forms',
@@ -96,7 +95,7 @@ class PageEntriesSamples implements InterfacePage
       'iconName' => 'contentBlocks',
       'link' => '/contentBlocks',
       'permanent' => false,
-      'isActive' => false
+      'isActive' => true
     ]
   ];
 
@@ -118,7 +117,7 @@ class PageEntriesSamples implements InterfacePage
   }
 
   /**
-   * Сборка списка локализаций для записи
+   * Сборка списка локализаций для форм
    * 
    * @param array $localesData
    * 
@@ -146,125 +145,96 @@ class PageEntriesSamples implements InterfacePage
   }
 
   /**
-   * Сборка списка локализаций для записи
-   * 
-   * @param array $localesData
-   * 
-   * @return string
-   */
-  private function assemblyCategoriesItems(string $localeName, array $categories) : string
-  {
-    $document = new DOMDocument('1.0', 'UTF-8');
-
-    foreach ($categories as $category) {
-      $category->initData(['texts']);
-
-      $itemElement = $document->createElement('li', $category->getTitle($localeName));
-      $itemElement->setAttribute('class', 'grid-table__category');
-
-      $document->appendChild($itemElement);
-    }
-
-    return $document->saveHTML();
-  }
-
-  /**
    * Сборка
    * 
    * @return void
    */
   public function assembly() : void
   {
-    $this->CMSCore->theme->addStyle(['href' => 'styles/page/entriesSamples.css', 'rel' => 'stylesheet']);
+    $this->CMSCore->theme->addStyle(['href' => 'styles/page/contentBlocks.css', 'rel' => 'stylesheet']);
     
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
 
     /** @var int Текущий номер страницы */
-    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
+    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null
+      ? (int) $this->CMSCore->urlp->getParam('pageNumber')
+      : 0;
+
     /** @var int Максимальное количество элементов на странице */
     $paginationItemsOnPage = 12;
 
-    $entriesSamplesTableItemsAssembled = [];
+    $tableItemsAssembled = [];
 
-    $entriesSamples = new EntriesSamples($this->CMSCore);
+    $contentBlocks = new ContentBlocks($this->CMSCore);
 
     /** @var array Массив объектов выборок */
-    $entriesSamplesObjects = $entriesSamples->getAll([
+    $contentBlocksObjects = $contentBlocks->getAll([
       'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
     ]);
 
-    $pagination = new Pagination($this->CMSCore, $entriesSamples->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
+    $pagination = new Pagination($this->CMSCore, $contentBlocks->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
     $pagination->assembly();
 
-    unset($entriesSamples);
+    unset($contentBlocks);
 
-    foreach ($entriesSamplesObjects as $index => $object) {
-      $object->initData(['id', 'texts', 'name', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+    foreach ($contentBlocksObjects as $index => $object) {
+      $object->initData(['id', 'texts', 'name', 'elements', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
       $objectID = $object->getID();
+      $objectName = $object->getName();
 
-      /** @var string Дата создания выборки в формате d.m.Y H:i:s */
+      /** @var string Дата создания в формате d.m.Y H:i:s */
       $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
-      /** @var string Дата обновления выборки в формате d.m.Y H:i:s */
+      /** @var string Дата обновления в формате d.m.Y H:i:s */
       $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
-      /** @var string Заголовок выборки */
-      $entriesSampleTitle = $object->getTitle($localeName);
-      $entriesSampleTitle = strip_tags($entriesSampleTitle);
+      /** @var string Заголовок */
+      $objectTitle = $object->getTitle($localeName);
+      $objectTitle = strip_tags($objectTitle);
 
-      /** @var string Описание выборки */
-      $entriesSampleDescription = $object->getDescription($localeName);
-      $entriesSampleDescription = strip_tags($entriesSampleDescription);
+      /** @var string Описание */
+      $objectDescription = $object->getDescription($localeName);
+      $objectDescription = strip_tags($objectDescription);
       
-      /** @var int Количество записей в выборке */
-      $entriesSampleEntriesCount = $object->getEntriesCount();
-      
-      /** @var int Лимит на количество записей в выборке */
-      $entriesSampleEntriesLimitCount = $object->getLimitCount();
-
       $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
       $completedLocalesList = $this->assemblyLocalesItems($completedLocalesData);
 
-      $categories = $object->getCategories();
-      $categoriesList = $this->assemblyCategoriesItems($localeName, $categories);
+      $formMethodID = $object->getMethodID();
+      $formMethod = match ($formMethodID) {
+        1 => 'GET',
+        2 => 'POST',
+        3 => 'PUT',
+        4 => 'DELETE',
+        5 => 'PATCH',
+      };
 
-      $reflectionEnumSortType = new ReflectionEnum(EnumSortTypeID::class);
-      $reflectionEnumSortTypeCases = $reflectionEnumSortType->getCases();
-      $reflectionEnumSortTypeName = $reflectionEnumSortTypeCases[$objectID - 1]->getName();
-      $reflectionEnumSortTypeLabel = $localeData['PAGE_ENTRIES_SAMPLE_SORT_TYPE_' . $reflectionEnumSortTypeName . '_LABEL'];
-
-      array_push($entriesSamplesTableItemsAssembled,
-        ThemeCollector::assemblyFileContent(
-          $this->CMSCore->theme,
-          'templates/page/entriesSamples/tableItem.tpl',
-          [
-            'ENTRIES_SAMPLE_INDEX' => $index,
-            'ENTRIES_SAMPLE_ID' => $objectID,
-            'ENTRIES_SAMPLE_NAME' => $object->getName(),
-            'ENTRIES_SAMPLE_TITLE' => $entriesSampleTitle,
-            'ENTRIES_SAMPLE_DESCRIPTION' => $entriesSampleDescription,
-            'ENTRIES_SAMPLE_ENTRIES_COUNT' => $entriesSampleEntriesCount,
-            'ENTRIES_SAMPLE_ENTRIES_LIMIT_COUNT' => $entriesSampleEntriesLimitCount,
-            'ENTRIES_SAMPLE_LOCALES_LIST' => $completedLocalesList,
-            'ENTRIES_SAMPLE_CATEGORIES_LIST' => $categoriesList,
-            'ENTRIES_SAMPLE_METHOD_SORT_LABEL' => $reflectionEnumSortTypeLabel,
-            'ENTRIES_SAMPLE_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
-            'ENTRIES_SAMPLE_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
-          ]
-        )
+      $tableItemsAssembled[] = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/forms/item.tpl',
+        [
+          'FORM_INDEX' => $index,
+          'FORM_ID' => $objectID,
+          'FORM_NAME' => $objectName,
+          'FORM_TITLE' => $objectTitle,
+          'FORM_DESCRIPTION' => $objectDescription,
+          'FORM_METHOD' => $formMethod,
+          'FORM_LOCALES_LIST' => $completedLocalesList,
+          'FORM_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
+          'FORM_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
+        ]
       );
     }
 
     $this->assembled = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme,
-      'templates/page/entriesSamples.tpl',
+      'templates/page/contentBlocks.tpl',
       [
-        'PAGE_ENTRIES_SAMPLES_PAGINATION' => $pagination->assembled,
-        'PAGE_ENTRIES_SAMPLES_TABLE' => ThemeCollector::assemblyFileContent(
+        'PAGE_PAGINATION' => $pagination->assembled,
+        'PAGE_TABLE' => ThemeCollector::assemblyFileContent(
           $this->CMSCore->theme,
-          'templates/page/entriesSamples/table.tpl',
+          'templates/page/contentBlocks/wrapper.tpl',
           [
-            'PAGE_ENTRIES_SAMPLES_TABLE_ITEMS' => implode($entriesSamplesTableItemsAssembled)
+            'PAGE_ITEMS' => implode($tableItemsAssembled)
           ]
         )
       ]
