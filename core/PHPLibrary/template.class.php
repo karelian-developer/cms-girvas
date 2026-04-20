@@ -106,7 +106,7 @@ final class Template implements ThemeInterface
         !$this->CMSCore->isInstallerModeActive() &&
         $this->CMSCore->urlp->getPath(0) !== 'install'
       ) {
-      $contentBlocksArray = (new ContentBlocks)::getAll($this->CMSCore);
+      $contentBlocksArray = (new ContentBlocks($this->CMSCore))::getAll();
 
       foreach ($contentBlocksArray as $contentBlock) {
         $contentBlock->initData(['metadata']);
