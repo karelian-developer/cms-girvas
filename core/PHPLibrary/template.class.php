@@ -687,7 +687,7 @@ final class Template implements ThemeInterface
               }
             }
 
-            $themeSectionContentBlocksName = strtoupper(str_replace('-', '_', $sectionName));
+            $themeSectionContentBlocksName = strtoupper(preg_replace('/(?<!^)([A-Z])/', '_$1', $sectionName));
 
             $contentBlocksAssembled = implode('', $contentBlocksAssembled);
             $themeVariablesArray['CONTENT_BLOCKS_' . $themeSectionContentBlocksName] = $contentBlocksAssembled;
