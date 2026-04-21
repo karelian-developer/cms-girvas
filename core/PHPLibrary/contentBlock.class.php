@@ -610,7 +610,7 @@ class ContentBlock implements EntityTypeContent
 
     if ($execute) {
       $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return $result ? new Form($CMSCore, $result['id']) : null;
+      return $result ? new ContentBlock($CMSCore, $result['id']) : null;
     }
 
     return null;
