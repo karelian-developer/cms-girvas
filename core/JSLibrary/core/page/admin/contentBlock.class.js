@@ -207,7 +207,7 @@ export class PageContentBlock {
       this.buttons.delete.assembly();
 
       if (searchParams.getPathPart(3) === null) {
-        let request = new Interactive('request', {
+        const request = new Interactive('request', {
           method: 'GET',
           url: '/handler/contentBlocks/types' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name,
         });
@@ -215,7 +215,7 @@ export class PageContentBlock {
         request.target.showingNotification = false;
 
         request.target.send().then((responseContentBlocksTypes) => {
-          if (responseContentBlocksTypes.statusCode === 1 && responseContentBlocksTypes.outputData.hasOwnProperty('entriesCategories')) {
+          if (responseContentBlocksTypes.statusCode === 1 && responseContentBlocksTypes.outputData.hasOwnProperty('contentBlocksTypes')) {
             const contentBlocksTypes = responseContentBlocksTypes.outputData.contentBlocksTypes;
             
             contentBlocksTypes.forEach((contentBlocksType, contentBlocksTypeIndex) => {
