@@ -197,7 +197,7 @@ class PageContentBlocks implements InterfacePage
       $objectDescription = $object->getDescription($localeName);
       $objectDescription = strip_tags($objectDescription);
 
-      $objectTypeTitle = $objectType->getTitle($localeName);
+      $objectTypeTitle = $objectType->getTitle($this->CMSCore->locale);
       
       $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
       $completedLocalesList = $this->assemblyLocalesItems($completedLocalesData);
