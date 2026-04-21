@@ -659,7 +659,8 @@ final class Template implements ThemeInterface
             foreach ($sectionContentBlocks as $contentBlock) {
               $contentBlock->initData(['name', 'texts', 'metadata']);
               
-              $contentBlockTypeName = $contentBlock->getTypeName();
+              $contentBlockType = $contentBlock->getType();
+              $contentBlockTypeName = $contentBlockType->getTechnicalName();
               $contentBlockTemplateName = $contentBlock->getTemplateName();
 
               if ($contentBlockTypeName === 'custom') {

@@ -156,6 +156,17 @@ class ContentBlock implements EntityTypeContent
   }
   
   /**
+   * Получить тип
+   *
+   * @return EnumContentBlock
+   */
+  public function getType() : EnumContentBlock
+  {
+    $typeID = $this->getTypeID();
+    return EnumContentBlock::getTypeFromID($typeID);
+  }
+  
+  /**
    * Получить ID типа
    *
    * @return int
