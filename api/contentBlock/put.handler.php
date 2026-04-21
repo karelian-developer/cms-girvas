@@ -87,7 +87,6 @@ if ($CMSCore->client->isLogged(2)) {
         $contentBlock = ContentBlock::create($CMSCore, $contentBlockName, $texts, $metadata);
         if ($contentBlock !== null) {
           $contentBlock->initData(['texts']);
-          $contentBlock->update($contentBlockData);
 
           $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_CONTENT_BLOCK_CREATED, [
             'clientIP' => $CMSCore->client->getIPAddress(),
