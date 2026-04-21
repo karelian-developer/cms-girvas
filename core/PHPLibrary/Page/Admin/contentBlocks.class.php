@@ -182,6 +182,7 @@ class PageContentBlocks implements InterfacePage
       $object->initData(['id', 'texts', 'name', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
       $objectID = $object->getID();
       $objectName = $object->getName();
+      $objectType = $object->getType();
 
       /** @var string Дата создания в формате d.m.Y H:i:s */
       $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
@@ -195,6 +196,8 @@ class PageContentBlocks implements InterfacePage
       /** @var string Описание */
       $objectDescription = $object->getDescription($localeName);
       $objectDescription = strip_tags($objectDescription);
+
+      $objectTypeTitle = $objectType->getTitle($localeName);
       
       $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
       $completedLocalesList = $this->assemblyLocalesItems($completedLocalesData);
@@ -208,6 +211,7 @@ class PageContentBlocks implements InterfacePage
           'CONTENT_BLOCK_NAME' => $objectName,
           'CONTENT_BLOCK_TITLE' => $objectTitle,
           'CONTENT_BLOCK_DESCRIPTION' => $objectDescription,
+          'CONTENT_BLOCK_TYPE' => $objectTypeTitle,
           'CONTENT_BLOCK_LOCALES_LIST' => $completedLocalesList,
           'CONTENT_BLOCK_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
           'CONTENT_BLOCK_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
