@@ -156,20 +156,20 @@ class ContentBlock implements EntityTypeContent
   }
   
   /**
-   * Получить тип
+   * Получить ID типа
    *
-   * @return string
+   * @return int
    */
-  public function getTypeName() : string
+  public function getTypeID() : int
   {
     if (property_exists($this, 'metadata')) {
       $metadata = json_decode($this->metadata, true);
-      if (isset($metadata['typeName'])) {
-        return $metadata['typeName'];
+      if (isset($metadata['typeID'])) {
+        return $metadata['typeID'];
       }
     }
 
-    return '';
+    return 0;
   }
   
   /**

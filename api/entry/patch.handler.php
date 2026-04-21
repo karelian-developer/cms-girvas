@@ -130,9 +130,6 @@ if ($CMSCore->client->isLogged(2)) {
       }
     }
   } else {
-    $entryTitleLengthMax = 80;
-    $entryDescriptionLengthMax = 600;
-
     if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_ENTRIES_EDIT)) {
       if (isset($_PATCH['entry_id'])) {
         $entryName = isset($_PATCH['entry_name']) ? urlencode(htmlentities($_PATCH['entry_name'])) : '';

@@ -42,6 +42,7 @@ class UserGroup
   public const PERMISSION_ADMIN_VIEWING_LOGS                  = 1 << 6;
   public const PERMISSION_ADMIN_FEEDS_MANAGEMENT              = 1 << 17;
   public const PERMISSION_ADMIN_FORMS_MANAGEMENT              = 1 << 19;
+  public const PERMISSION_ADMIN_CONTENT_BLOCKS_MANAGEMENT     = 1 << 20;
   public const PERMISSION_ADMIN_SUPERUSER                     = 1 << 18;
   // Права модерации
   public const PERMISSION_MODER_USERS_BAN                     = 1 << 7;
@@ -52,6 +53,7 @@ class UserGroup
   public const PERMISSION_EDITOR_ENTRIES_EDIT                 = 1 << 11;
   public const PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT      = 1 << 12;
   public const PERMISSION_EDITOR_PAGES_STATIC_EDIT            = 1 << 13;
+  public const PERMISSION_EDITOR_CONTENT_BLOCKS_EDIT          = 1 << 21;
 
   public const PERMISSION_BASE_ENTRY_COMMENT_CREATE           = 1 << 14;
   public const PERMISSION_BASE_ENTRY_COMMENT_CHANGE           = 1 << 15;
@@ -507,6 +509,16 @@ class UserGroup
   public function hasPermissionEditorPagesStaticEdit() : bool
   {
     return $this->permissionCheck(self::PERMISSION_EDITOR_PAGES_STATIC_EDIT);
+  }
+
+  /**
+   * Проверить наличие права редактирования контент-блоков
+   * 
+   * @return bool
+   */
+  public function hasPermissionEditorContentBlocksEdit() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_EDITOR_CONTENT_BLOCKS_EDIT);
   }
 
   /**

@@ -114,9 +114,6 @@ if ($CMSCore->client->isLogged(2)) {
   }
 
   if ($CMSCore->urlp->getPath(2) == null) {
-    $entryTitleLengthMax = 80;
-    $entryDescriptionLengthMax = 600;
-
     if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_ENTRIES_EDIT)) {
       $entryName = isset($_PUT['entry_name']) ? urlencode(htmlentities($_PUT['entry_name'])) : '';
 
