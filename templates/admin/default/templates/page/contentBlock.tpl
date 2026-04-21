@@ -80,7 +80,7 @@
           </div>
         </div>
         <div class="cell grid-table__cell grid-table__cell_data">
-          <textarea name="content_block_url_rule" class="textarea form__textarea" placeholder="/^\/entry\/([^/]+)$/" data-element="input-description" required>{CONTENT_BLOCK_DESCRIPTION}</textarea>
+          <textarea name="content_block_url_rule" class="textarea form__textarea" placeholder="/^\/entry\/([^/]+)$/" data-element="input-url-rule">{CONTENT_BLOCK_URL_RULE}</textarea>
         </div>
         <div class="cell grid-table__cell grid-table__cell_editor" data-element="editor">
           {CONTENT_BLOCK_EDITOR}
