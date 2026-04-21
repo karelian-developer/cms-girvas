@@ -319,7 +319,7 @@ class ContentBlock implements EntityTypeContent
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections($columns);
     $queryBuilder->statement->setClauseFrom();
-    $queryBuilder->statement->clauseFrom->addTable('forms');
+    $queryBuilder->statement->clauseFrom->addTable('content_blocks');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
     $queryBuilder->statement->clauseWhere->addConditionAdaptive([
@@ -367,7 +367,7 @@ class ContentBlock implements EntityTypeContent
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['1']);
     $queryBuilder->statement->setClauseFrom();
-    $queryBuilder->statement->clauseFrom->addTable('forms');
+    $queryBuilder->statement->clauseFrom->addTable('content_blocks');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
     $queryBuilder->statement->clauseWhere->addConditionAdaptive([
@@ -412,7 +412,7 @@ class ContentBlock implements EntityTypeContent
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['1']);
     $queryBuilder->statement->setClauseFrom();
-    $queryBuilder->statement->clauseFrom->addTable('forms');
+    $queryBuilder->statement->clauseFrom->addTable('content_blocks');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
     $queryBuilder->statement->clauseWhere->addConditionAdaptive([
@@ -502,7 +502,7 @@ class ContentBlock implements EntityTypeContent
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
-    $queryBuilder->statement->clauseFrom->addTable('forms');
+    $queryBuilder->statement->clauseFrom->addTable('content_blocks');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
     $queryBuilder->statement->clauseWhere->addConditionAdaptive([
@@ -548,7 +548,7 @@ class ContentBlock implements EntityTypeContent
     
     $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementInsert();
-    $queryBuilder->statement->setTable('forms');
+    $queryBuilder->statement->setTable('content_blocks');
     $queryBuilder->statement->addColumn('name');
     $queryBuilder->statement->addColumn('texts');
     $queryBuilder->statement->addColumn('metadata');
@@ -587,7 +587,7 @@ class ContentBlock implements EntityTypeContent
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
       $queryBuilder->statement->setClauseFrom();
-      $queryBuilder->statement->clauseFrom->addTable('forms');
+      $queryBuilder->statement->clauseFrom->addTable('content_blocks');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
       $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
@@ -630,7 +630,7 @@ class ContentBlock implements EntityTypeContent
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementUpdate();
-    $queryBuilder->statement->setTable('forms');
+    $queryBuilder->statement->setTable('content_blocks');
     $queryBuilder->statement->setClauseSet();
 
     foreach ($data as $name => $value) {
@@ -722,7 +722,7 @@ class ContentBlock implements EntityTypeContent
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementDelete();
     $queryBuilder->statement->setClauseFrom();
-    $queryBuilder->statement->clauseFrom->addTable('forms');
+    $queryBuilder->statement->clauseFrom->addTable('content_blocks');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
     $queryBuilder->statement->clauseWhere->addConditionAdaptive([
