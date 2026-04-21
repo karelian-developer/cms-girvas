@@ -661,7 +661,6 @@ final class Template implements ThemeInterface
               
               $contentBlockType = $contentBlock->getType();
               $contentBlockTypeName = $contentBlockType->getTechnicalName();
-              $contentBlockTemplateName = $contentBlock->getTemplateName();
 
               if ($contentBlockTypeName === 'custom') {
                 $templateContentBlockVars = [
@@ -675,8 +674,7 @@ final class Template implements ThemeInterface
                 ];
               }
               
-              $contentBlockTemplateName = $contentBlockTemplateName !== '' ? $contentBlockTemplateName : $contentBlockTypeName;
-              $contentBlocksAssembled[] = ThemeCollector::assemblyFileContent($this->theme, 'templates/contentBlock/' . $contentBlockTemplateName . '.tpl', $templateContentBlockVars);
+              $contentBlocksAssembled[] = ThemeCollector::assemblyFileContent($this->theme, 'templates/contentBlock/' . $contentBlockTypeName . '.tpl', $templateContentBlockVars);
             }
 
             $themeSectionContentBlocksName = strtoupper(str_replace('-', '_', $sectionName));
