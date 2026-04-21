@@ -674,7 +674,7 @@ final class Template implements ThemeInterface
                 ];
               }
               
-              $contentBlocksAssembled[] = ThemeCollector::assemblyFileContent($this->theme, 'templates/contentBlock/' . $contentBlockTypeName . '.tpl', $templateContentBlockVars);
+              $contentBlocksAssembled[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/contentBlock/' . $contentBlockTypeName . '.tpl', $templateContentBlockVars);
             }
 
             $themeSectionContentBlocksName = strtoupper(str_replace('-', '_', $sectionName));
