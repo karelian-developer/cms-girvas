@@ -41,7 +41,7 @@ export class PageContentBlocks {
       interactiveCreatePageButton.target.setCallback(() => {
         window.location.href = `./contentBlock`;
       });
-      
+
       interactiveCreatePageButton.assembly();
     
       const interactiveContainerElement = document.querySelector('#E8548530785');
@@ -76,7 +76,7 @@ export class PageContentBlocks {
       
                 request.target.send().then((data) => {
                   if (data.statusCode === 1) {
-                    window.location.href = '/admin/forms';
+                    window.location.href = '/admin/contentBlocks';
                   }
                 });
               });
