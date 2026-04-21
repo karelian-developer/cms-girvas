@@ -265,7 +265,7 @@ export class PageContentBlock {
 
             if (this.statusCode !== 404) {
               contentBlocksTypes.forEach((contentBlockType, index) => {
-                if (contentBlockType.id === contentBlockData.contentBlockTypeID) {
+                if (contentBlockType.id === contentBlockData.typeID) {
                   interactiveTypesChoices.target.setItemSelectedIndex(index);
                 }
               });
