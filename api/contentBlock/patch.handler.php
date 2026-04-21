@@ -31,7 +31,7 @@ if ($CMSCore->client->isLogged(2)) {
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_CONTENT_BLOCKS_EDIT)) {
     if (isset($_PATCH['content_block_id'])) {
       $contentBlockName = isset($_PATCH['content_block_name']) ? urlencode(htmlentities($_PATCH['content_block_name'])) : '';
-      $contentBlockID = $_PATCH['entry_id'] ?? 0;
+      $contentBlockID = $_PATCH['content_block_id'] ?? 0;
       $contentBlockID = is_numeric($contentBlockID) ? (int) $contentBlockID : 0;
 
       if (ContentBlock::existsByID($CMSCore, $contentBlockID)) {
