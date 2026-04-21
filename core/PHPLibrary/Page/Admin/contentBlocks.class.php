@@ -179,7 +179,7 @@ class PageContentBlocks implements InterfacePage
     unset($contentBlocks);
 
     foreach ($contentBlocksObjects as $index => $object) {
-      $object->initData(['id', 'texts', 'name', 'elements', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+      $object->initData(['id', 'texts', 'name', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
       $objectID = $object->getID();
       $objectName = $object->getName();
 
@@ -199,28 +199,18 @@ class PageContentBlocks implements InterfacePage
       $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
       $completedLocalesList = $this->assemblyLocalesItems($completedLocalesData);
 
-      $formMethodID = $object->getMethodID();
-      $formMethod = match ($formMethodID) {
-        1 => 'GET',
-        2 => 'POST',
-        3 => 'PUT',
-        4 => 'DELETE',
-        5 => 'PATCH',
-      };
-
       $tableItemsAssembled[] = ThemeCollector::assemblyFileContent(
         $this->CMSCore->theme,
-        'templates/page/forms/item.tpl',
+        'templates/page/contentBlocks/item.tpl',
         [
-          'FORM_INDEX' => $index,
-          'FORM_ID' => $objectID,
-          'FORM_NAME' => $objectName,
-          'FORM_TITLE' => $objectTitle,
-          'FORM_DESCRIPTION' => $objectDescription,
-          'FORM_METHOD' => $formMethod,
-          'FORM_LOCALES_LIST' => $completedLocalesList,
-          'FORM_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
-          'FORM_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
+          'CONTENT_BLOCK_INDEX' => $index,
+          'CONTENT_BLOCK_ID' => $objectID,
+          'CONTENT_BLOCK_NAME' => $objectName,
+          'CONTENT_BLOCK_TITLE' => $objectTitle,
+          'CONTENT_BLOCK_DESCRIPTION' => $objectDescription,
+          'CONTENT_BLOCK_LOCALES_LIST' => $completedLocalesList,
+          'CONTENT_BLOCK_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
+          'CONTENT_BLOCK_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
         ]
       );
     }
