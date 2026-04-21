@@ -32,4 +32,7 @@ if ($CMSCore->urlp->getPath(2) === 'types') {
   foreach ($contentBlocksTypes as $type) {
     $handlerOutputData['contentBlocksTypes'][] = ['id' => $type->getID(), 'name' => $type->getTechnicalName(), 'title' => $type->getTitle($CMSCore->locale)];
   }
+
+  $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+  $handlerStatusCode = $handlerStatusCode ?? 1;
 }

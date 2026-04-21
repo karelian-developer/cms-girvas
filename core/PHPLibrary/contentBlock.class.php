@@ -524,7 +524,7 @@ class ContentBlock implements EntityTypeContent
    * 
    * @return EntityTypeContent
    */
-  public static function create(CoreInterface $CMSCore, string $name, array $texts, array $elements, array $metadata = []) : ?EntityTypeContent
+  public static function create(CoreInterface $CMSCore, string $name, array $texts, array $metadata = []) : ?EntityTypeContent
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -535,7 +535,6 @@ class ContentBlock implements EntityTypeContent
     $queryBuilder->statement->addColumn('name');
     $queryBuilder->statement->addColumn('texts');
     $queryBuilder->statement->addColumn('metadata');
-    $queryBuilder->statement->addColumn('elements');
     $queryBuilder->statement->addColumn('createdUnixTimestamp');
     $queryBuilder->statement->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->setClauseReturning();
