@@ -482,7 +482,7 @@
   "PAGE_USERS_GROUP_PERSMISSION_ENTRIES_EDITING_TITLE": "Редактирование записей",
   "PAGE_USERS_GROUP_PERSMISSION_ENTRIES_CATEGORIES_EDITING_TITLE": "Редактирование категорий записей",
   "PAGE_USERS_GROUP_PERSMISSION_STATIC_PAGES_EDITING_TITLE": "Редактирование статических страниц",
-  "PAGE_USERS_GROUP_PERSMISSION_STATIC_PAGES_EDITING_TITLE": "Редактирование контент-блоков",
+  "PAGE_USERS_GROUP_PERSMISSION_CONTENT_BLOCKS_EDITING_TITLE": "Редактирование контент-блоков",
   "PAGE_USERS_GROUP_PERSMISSION_ENTRIES_COMMENTS_CREATING_TITLE": "Создание новых комментариев",
   "PAGE_USERS_GROUP_PERSMISSION_ENTRIES_COMMENTS_CHANGING_TITLE": "Изменение собственных комментариев",
   "PAGE_USERS_GROUP_PERSMISSION_ENTRIES_COMMENTS_RATING_CHANGING_TITLE": "Изменение рейтинга комментариев (за исключением своих)",
