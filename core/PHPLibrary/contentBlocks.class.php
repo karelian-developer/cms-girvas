@@ -76,7 +76,7 @@ final class ContentBlocks
 
       if ($results) {
         foreach ($results as $data) {
-          $array[] = new Form($this->CMSCore, $data['id']);
+          $array[] = new ContentBlock($this->CMSCore, $data['id']);
         }
       }
 
