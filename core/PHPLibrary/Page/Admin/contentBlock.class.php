@@ -153,11 +153,27 @@ class PageContentBlock implements InterfacePage
       );
     }
 
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'CONTENT_BLOCK_SECTION_INTEGRATION_NAME')) {
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'CONTENT_BLOCK_SECTION_INTEGRATION_NAME',
+        $contentBlock !== null ? $contentBlock->getSectionIntegrationName() : ''
+      );
+    }
+
     if (ThemeCollector::existsTemplateVariable($templateContent, 'CONTENT_BLOCK_NAME')) {
       ThemeCollector::addTemplateVariable(
         $templatesAssembled,
         'CONTENT_BLOCK_NAME',
         $contentBlock !== null ? $contentBlock->getName() : ''
+      );
+    }
+
+    if (ThemeCollector::existsTemplateVariable($templateContent, 'CONTENT_BLOCK_URL_RULE')) {
+      ThemeCollector::addTemplateVariable(
+        $templatesAssembled,
+        'CONTENT_BLOCK_URL_RULE',
+        $contentBlock !== null ? $contentBlock->getURLRule() : ''
       );
     }
 
