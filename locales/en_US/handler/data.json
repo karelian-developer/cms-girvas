@@ -1,4 +1,8 @@
 {
+  "DEFAULT_CONTENT_BLOCK_TYPE_CUSTOM_LABEL": "Customized",
+  "DEFAULT_CONTENT_BLOCK_TYPE_CABINET_LABEL": "Cabinet",
+  "DEFAULT_CONTENT_BLOCK_TYPE_CATEGORIES_LABEL": "All Post Categories",
+  "DEFAULT_CONTENT_BLOCK_TYPE_EMPTY_LABEL": "Empty",
   "API_ERROR_DONT_HAVE_PERMISSIONS": "There are insufficient rights to perform the current action.",
   "API_ERROR_DONT_HAVE_PERMISSIONS_WRITABLE": "Insufficient permissions to write: %s.",
   "API_ERROR_HANDLER_NOT_FOUND": "No handler was found for the current request.",

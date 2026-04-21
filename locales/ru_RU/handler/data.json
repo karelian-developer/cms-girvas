@@ -1,4 +1,8 @@
 {
+  "DEFAULT_CONTENT_BLOCK_TYPE_CUSTOM_LABEL": "Персонализированный",
+  "DEFAULT_CONTENT_BLOCK_TYPE_CABINET_LABEL": "Кабинет",
+  "DEFAULT_CONTENT_BLOCK_TYPE_CATEGORIES_LABEL": "Все категории записей",
+  "DEFAULT_CONTENT_BLOCK_TYPE_EMPTY_LABEL": "Пустой",
   "API_ERROR_DONT_HAVE_PERMISSIONS": "Для выполнения текущего действия недостаточно прав.",
   "API_ERROR_DONT_HAVE_PERMISSIONS_WRITABLE": "Недостаточно прав для записи: %s.",
   "API_ERROR_HANDLER_NOT_FOUND": "Обработчик для текущего запроса не обнаружен.",
