@@ -88,9 +88,9 @@ export class PageContentBlock {
     
             request.target.send().then((data) => {
               if (data.statusCode === 1) {
-                contentTextareaElement.value = data.outputData.entry.content;
-                descriptionTextareaElement.value = data.outputData.entry.description;
-                titleInputElement.value = data.outputData.entry.title;
+                contentTextareaElement.value = data.outputData.contentBlock.content;
+                descriptionTextareaElement.value = data.outputData.contentBlock.description;
+                titleInputElement.value = data.outputData.contentBlock.title;
               }
             });
           }
@@ -118,9 +118,9 @@ export class PageContentBlock {
       
               request.target.send().then((data) => {
                 if (data.statusCode === 1) {
-                  contentTextareaElement.value = data.outputData.entry.content;
-                  descriptionTextareaElement.value = data.outputData.entry.description;
-                  titleInputElement.value = data.outputData.entry.title;
+                  contentTextareaElement.value = data.outputData.contentBlock.content;
+                  descriptionTextareaElement.value = data.outputData.contentBlock.description;
+                  titleInputElement.value = data.outputData.contentBlock.title;
                 }
               });
             }
