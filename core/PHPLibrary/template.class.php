@@ -653,28 +653,38 @@ final class Template implements ThemeInterface
         $this->CMSCore->urlp->getPath(0) !== 'install'
       ) {
         if (count($this->contentBlocks) > 0) {
+          $requestURI = $_SERVER['REQUEST_URI'] ?? '';
+
           foreach ($this->contentBlocks as $sectionName => $sectionContentBlocks) {
             $contentBlocksAssembled = [];
 
             foreach ($sectionContentBlocks as $contentBlock) {
               $contentBlock->initData(['name', 'texts', 'metadata']);
               
-              $contentBlockType = $contentBlock->getType();
-              $contentBlockTypeName = $contentBlockType->getTechnicalName();
+              $contentBlockURLRule = $contentBlock->getURLRule();
+              $contentBlockIsShowed = preg_match($contentBlockURLRule, $requestURI);
+              $contentBlockIsShowed = $contentBlockURLRule !== ''
+                ? $contentBlockIsShowed
+                : true;
 
-              if ($contentBlockTypeName === 'custom') {
-                $templateContentBlockVars = [
-                  'BLOCK_TITLE' => $contentBlock->getTitle($localeName),
-                  'BLOCK_CONTENT' => $contentBlock->getContent($localeName)
-                ];
-              } else {
-                $templateContentBlockVars = [
-                  'BLOCK_TITLE' => $contentBlock->getTitle($localeName),
-                  'BLOCK_CONTENT' => $contentBlock->getContent($localeName)
-                ];
+              if ($contentBlockIsShowed) {
+                $contentBlockType = $contentBlock->getType();
+                $contentBlockTypeName = $contentBlockType->getTechnicalName();
+
+                if ($contentBlockTypeName === 'custom') {
+                  $templateContentBlockVars = [
+                    'BLOCK_TITLE' => $contentBlock->getTitle($localeName),
+                    'BLOCK_CONTENT' => $contentBlock->getContent($localeName)
+                  ];
+                } else {
+                  $templateContentBlockVars = [
+                    'BLOCK_TITLE' => $contentBlock->getTitle($localeName),
+                    'BLOCK_CONTENT' => $contentBlock->getContent($localeName)
+                  ];
+                }
+                
+                $contentBlocksAssembled[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/contentBlock/' . $contentBlockTypeName . '.tpl', $templateContentBlockVars);
               }
-              
-              $contentBlocksAssembled[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/contentBlock/' . $contentBlockTypeName . '.tpl', $templateContentBlockVars);
             }
 
             $themeSectionContentBlocksName = strtoupper(str_replace('-', '_', $sectionName));
