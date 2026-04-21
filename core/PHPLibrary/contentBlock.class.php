@@ -563,7 +563,6 @@ class ContentBlock implements EntityTypeContent
 
     $texts = !empty($texts) ? json_encode($texts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
     $metadata = !empty($metadata) ? json_encode($metadata, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '{}';
-    $elements = !empty($elements) ? json_encode($elements, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) : '[]';
 
     try {
       $databaseConnection = $CMSCore->databaseConnector->database->connection;
@@ -571,7 +570,6 @@ class ContentBlock implements EntityTypeContent
       $databaseQuery->bindParam(':name', $name, \PDO::PARAM_STR);
       $databaseQuery->bindParam(':texts', $texts, \PDO::PARAM_STR);
       $databaseQuery->bindParam(':metadata', $metadata, \PDO::PARAM_STR);
-      $databaseQuery->bindParam(':elements', $elements, \PDO::PARAM_STR);
       $databaseQuery->bindParam(':createdUnixTimestamp', $createdUnixTimestamp, \PDO::PARAM_INT);
       $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
       $execute = $databaseQuery->execute();
@@ -636,12 +634,12 @@ class ContentBlock implements EntityTypeContent
     $queryBuilder->statement->setClauseSet();
 
     foreach ($data as $name => $value) {
-      if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata', 'elements'])) {
+      if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata'])) {
         $queryBuilder->statement->clauseSet->addColumn($name);
       }
     }
 
-    foreach (['texts', 'metadata', 'elements'] as $columnName) {
+    foreach (['texts', 'metadata'] as $columnName) {
       $fieldsJSON = [];
       
       if (!isset($data[$columnName])) {
@@ -651,31 +649,17 @@ class ContentBlock implements EntityTypeContent
       foreach ($data[$columnName] as $name => $value) {
         $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         
-        if ($columnName === 'elements') {
-          $fieldsJSON[] = match ($queryBuilder->DMS) {
-            CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
-            CMSDMS::PostgreSQL => sprintf('(\'{"%s": %s}\'::jsonb)', $name, $valueJSON)
-          };
-        } else {
-          $fieldsJSON[] = match ($queryBuilder->DMS) {
-            CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
-            CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
-          };
-        }
+        $fieldsJSON[] = match ($queryBuilder->DMS) {
+          CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
+          CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
+        };
       }
 
       if (!empty($data[$columnName])) {
-        if ($columnName === 'elements') {
-          $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-            'mysql' => 'CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON)',
-            'postgresql' => implode(' || ', $fieldsJSON)
-          ]);
-        } else {
-          $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-            'mysql' => 'JSON_MERGE_PATCH(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
-            'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
-          ]);
-        }
+        $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
+          'mysql' => 'JSON_MERGE_PATCH(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
+          'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
+        ]);
       }
     }
 
@@ -697,7 +681,7 @@ class ContentBlock implements EntityTypeContent
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       
       foreach ($data as $name => $value) {
-        if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata', 'elements'])) {
+        if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts', 'metadata'])) {
           $valueTypeName = gettype($value);
           $valueType = match ($valueTypeName) {
             'boolean' => \PDO::PARAM_BOOL,
