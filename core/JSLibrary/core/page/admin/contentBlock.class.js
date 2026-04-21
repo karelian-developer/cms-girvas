@@ -209,7 +209,7 @@ export class PageContentBlock {
       if (searchParams.getPathPart(3) === null) {
         let request = new Interactive('request', {
           method: 'GET',
-          url: '/handler/contentBlock/types' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name,
+          url: '/handler/contentBlocks/types' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name,
         });
 
         request.target.showingNotification = false;
@@ -250,7 +250,7 @@ export class PageContentBlock {
             this.buttons.save.target.element.style.display = 'flex';
           }
           
-          return fetch('/handler/contentBlock/types' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
+          return fetch('/handler/contentBlocks/types' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
         }, (rejectionReason) => {
           this.page.showPopupNotification(rejectionReason, 0);
         }).then((response) => {
