@@ -106,7 +106,7 @@ if ($CMSCore->client->isLogged(2)) {
             /** @var CMSReport Новый отчет */
             $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_CONTENT_BLOCK_EDITED, [
               'clientIP' => $CMSCore->client->getIPAddress(),
-              'contentBlockID' => $entcontentBlockry->getID()
+              'contentBlockID' => $contentBlock->getID()
             ]);
 
             $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
