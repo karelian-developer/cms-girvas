@@ -207,6 +207,23 @@ class ContentBlock implements EntityTypeContent
   }
   
   /**
+   * Получить правило адресной строки
+   *
+   * @return string
+   */
+  public function getURLRule() : string
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+      if (isset($metadata['URLRule'])) {
+        return $metadata['URLRule'];
+      }
+    }
+
+    return '';
+  }
+  
+  /**
    * Получить шаблонную переменную
    *
    * @return string

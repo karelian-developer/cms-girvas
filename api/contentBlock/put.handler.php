@@ -31,6 +31,8 @@ if ($CMSCore->client->isLogged(2)) {
       if (!ContentBlock::existsByName($CMSCore, $contentBlockName)) {
         $contentBlockTypeID = $_PUT['content_block_type_id'] ?? 1;
         $contentBlockTypeID = is_numeric($contentBlockTypeID) ? (int) $contentBlockTypeID : 0;
+        $contentBlockSectionIntegrationName = $_PUT['content_block_section_integration_name'] ?? '';
+        $contentBlockURLRule = $_PUT['content_block_url_rule'] ?? '';
         $texts = [];
 
         $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
@@ -76,13 +78,15 @@ if ($CMSCore->client->isLogged(2)) {
           }
         }
 
+        $metadata = [];
+        $metadata['typeID'] = $contentBlockTypeID;
+        $metadata['sectionIntegrationName'] = $contentBlockSectionIntegrationName;
+        $metadata['URLRule'] = $contentBlockURLRule;
+
         $clientSession = $CMSCore->client->getSession(2, ['userID']);
-        $contentBlock = ContentBlock::create($CMSCore, $contentBlockName, $texts);
+        $contentBlock = ContentBlock::create($CMSCore, $contentBlockName, $texts, $metadata);
         if ($contentBlock !== null) {
           $contentBlock->initData(['texts']);
-
-          // Обновление дополнительной информации
-          $contentBlockData['typeID'] = $contentBlockTypeID;
           $contentBlock->update($contentBlockData);
 
           $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_CONTENT_BLOCK_CREATED, [

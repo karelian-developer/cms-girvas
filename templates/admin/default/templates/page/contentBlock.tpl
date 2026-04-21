@@ -22,6 +22,18 @@
         <div class="cell grid-table__cell grid-table__cell_data">
           <input name="content_block_name" type="text" class="input form__input form__input_text" value="{CONTENT_BLOCK_NAME}" placeholder="myFirstContentBlock" data-element="input-name" required>
         </div>
+        <!-- Поле: Техническое наименование секции -->
+        <div class="cell grid-table__cell grid-table__cell_text">
+          <div class="cell__title">
+            {LANG:PAGE_CONTENT_BLOCK_INPUT_SECTION_INTEGRATION_NAME_LABEL}
+          </div>
+          <div class="cell__description">
+            {LANG:PAGE_CONTENT_BLOCK_INPUT_SECTION_INTEGRATION_NAME_DESCRIPTION}
+          </div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <input name="content_block_section_integration_name" type="text" class="input form__input form__input_text" value="{CONTENT_BLOCK_SECTION_INTEGRATION_NAME}" placeholder="sectionName" data-element="input-section-integration-name" required>
+        </div>
         <!-- Поле: Заголовок контент-блока -->
         <div class="cell grid-table__cell grid-table__cell_text">
           <div class="cell__title">
@@ -46,7 +58,7 @@
         <div class="cell grid-table__cell grid-table__cell_data">
           <textarea name="content_block_description_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_CONTENT_BLOCK_INPUT_DESCRIPTION_PLACEHOLDER}" data-element="input-description" required>{CONTENT_BLOCK_DESCRIPTION}</textarea>
         </div>
-        <!-- Поле: Категория записи -->
+        <!-- Поле: Тип наполнения -->
         <div class="cell grid-table__cell grid-table__cell_text">
           <div class="cell__title">
             {LANG:PAGE_CONTENT_BLOCK_SELECT_TYPE_LABEL}
@@ -57,6 +69,18 @@
         </div>
         <div class="cell grid-table__cell grid-table__cell_data">
           <div data-element="choice" data-choice="type"></div>
+        </div>
+        <!-- Поле: Правило для адресной строки -->
+        <div class="cell grid-table__cell grid-table__cell_text">
+          <div class="cell__title">
+            {LANG:PAGE_CONTENT_BLOCK_INPUT_URL_RULE_LABEL}
+          </div>
+          <div class="cell__description">
+            {LANG:PAGE_CONTENT_BLOCK_INPUT_URL_RULE_DESCRIPTION}
+          </div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <textarea name="content_block_url_rule" class="textarea form__textarea" placeholder="/^\/entry\/([^/]+)$/" data-element="input-description" required>{CONTENT_BLOCK_DESCRIPTION}</textarea>
         </div>
         <div class="cell grid-table__cell grid-table__cell_editor" data-element="editor">
           {CONTENT_BLOCK_EDITOR}

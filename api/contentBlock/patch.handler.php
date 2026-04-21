@@ -92,7 +92,9 @@ if ($CMSCore->client->isLogged(2)) {
           }
 
           if (isset($_PATCH['content_block_name'])) $contentBlockData['name'] = urlencode(htmlentities($_PATCH['content_block_name']));
-          if (isset($_PATCH['content_block_type_id'])) $contentBlockData['typeID'] = $_PATCH['content_block_type_id'];
+          if (isset($_PATCH['content_block_type_id'])) $contentBlockData['metadata']['typeID'] = $_PATCH['content_block_type_id'];
+          if (isset($_PATCH['content_block_section_integration_name'])) $contentBlockData['metadata']['sectionIntegrationName'] = $_PATCH['content_block_section_integration_name'];
+          if (isset($_PATCH['content_block_url_rule'])) $contentBlockData['metadata']['URLRule'] = $_PATCH['content_block_url_rule'];
 
           $isUpdated = $contentBlock->update($contentBlockData);
           $isUpdated = isset($isUpdated) ? $isUpdated : false;
