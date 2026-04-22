@@ -137,7 +137,7 @@
 .sidebar {
   position: sticky;
   display: grid;
-  grid-template-rows: minmax(200px, min-content);
+  grid-template-rows: min-content;
   grid-auto-rows: min-content;
   row-gap: 16px;
   height: min-content;
@@ -174,12 +174,6 @@
   border-bottom-right-radius: 8px;
   padding: 11px 13px 13px 15px;
   width: 100%;
-}
-
-@media (min-width: 670px) {
-  .sidebar__block-content {
-    min-height: fit-content;
-  }
 }
 
 /* =====================
