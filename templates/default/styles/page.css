@@ -228,6 +228,12 @@
   gap: 8px;
 }
 
+@media (max-width: 340px) {
+  .sideblock__mini-cabinet .mini-cabinet__panel {
+    grid-template-columns: 1fr;
+  }
+}
+
 .block__sample {
   display: flex;
   flex-direction: column;
