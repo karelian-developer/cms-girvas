@@ -671,16 +671,30 @@ final class Template implements ThemeInterface
                 $contentBlockType = $contentBlock->getType();
                 $contentBlockTypeName = $contentBlockType->getTechnicalName();
 
-                if ($contentBlockTypeName === 'custom') {
-                  $templateContentBlockVars = [
-                    'BLOCK_TITLE' => $contentBlock->getTitle($localeName),
-                    'BLOCK_CONTENT' => $contentBlock->getContent($localeName)
-                  ];
-                } else {
-                  $templateContentBlockVars = [
-                    'BLOCK_TITLE' => $contentBlock->getTitle($localeName),
-                    'BLOCK_CONTENT' => $contentBlock->getContent($localeName)
-                  ];
+                $templateContentBlockVars = [
+                  'BLOCK_TITLE' => $contentBlock->getTitle($localeName),
+                  'BLOCK_CONTENT' => $contentBlock->getContent($localeName)
+                ];
+
+                if ($contentBlockTypeName === 'cabinet') {
+                  $CMSClient = $this->CMSCore->client;
+                  $CMSClientIsLogged = $CMSClient->isLogged(1);
+                  $cabinetVars = [];
+
+                  if ($CMSClientIsLogged) {
+                    $CMSClientUser = $CMSClient->getUser(1);
+                    $CMSClientUser->initData(['login', 'metadata']);
+                    $CMSClientUserGroup = $CMSClientUser->getGroup();
+                    $CMSClientUserGroup->initData(['texts']);
+
+                    $cabinetVars['USER_LOGIN'] = $CMSClientUser->getLogin();
+                    $cabinetVars['USER_AVATAR_URL'] = $CMSClientUser->getAvatarURL(64);
+                    $cabinetVars['USER_GROUP_LABEL'] = $CMSClientUserGroup->getTitle($localeName);
+                  }
+
+                  $templateContentBlockVars['BLOCK_CABINET'] = $CMSClientIsLogged
+                    ? ThemeCollector::assemblyFileContent($this->theme, 'templates/contentBlock/cabinet/user.tpl', $cabinetVars)
+                    : ThemeCollector::assemblyFileContent($this->theme, 'templates/contentBlock/cabinet/auth.tpl', $cabinetVars);
                 }
                 
                 $contentBlocksAssembled[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/contentBlock/' . $contentBlockTypeName . '.tpl', $templateContentBlockVars);
