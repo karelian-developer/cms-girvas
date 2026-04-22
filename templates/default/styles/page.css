@@ -192,6 +192,13 @@
   gap: 24px;
 }
 
+.sideblock__mini-cabinet .mini-cabinet__avatar {
+  border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
+  width: 100%;
+  max-width: 64px;
+}
+
 .sideblock__mini-cabinet .mini-cabinet__user-login {
   font-weight: 600;
   margin-bottom: 8px;
