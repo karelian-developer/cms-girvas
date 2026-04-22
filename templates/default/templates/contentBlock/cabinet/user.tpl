@@ -6,12 +6,8 @@
     <div class="mini-cabinet__user-login">{USER_LOGIN}</div>
     <div class="mini-cabinet__metadata-container">
       <div class="mini-cabinet__metadata">
-        <div class="mini-cabinet__metadata-label">
-          Группа
-        </div>
-        <div class="mini-cabinet__metadata-value">
-          {USER_GROUP_LABEL}
-        </div>
+        <div class="mini-cabinet__metadata-label">Группа</div>
+        <div class="mini-cabinet__metadata-value">{USER_GROUP_LABEL}</div>
       </div>
     </div>
     <div class="mini-cabinet__panel">

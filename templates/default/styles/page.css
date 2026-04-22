@@ -178,7 +178,7 @@
 
 @media (min-width: 670px) {
   .sidebar__block-content {
-    min-height: 151px;
+    min-height: fit-content;
   }
 }
 
@@ -189,7 +189,7 @@
 .sideblock__mini-cabinet {
   display: grid;
   grid-template-columns: 64px 1fr;
-  gap: 24px;
+  gap: 16px;
 }
 
 .sideblock__mini-cabinet .mini-cabinet__avatar {
@@ -206,7 +206,7 @@
 
 .sideblock__mini-cabinet .mini-cabinet__metadata {
   display: grid;
-  grid-template-columns: 40% 1fr;
+  grid-template-columns: 80px 1fr;
   column-gap: 16px;
   row-gap: 8px;
 }
