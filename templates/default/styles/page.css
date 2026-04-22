@@ -182,6 +182,39 @@
   }
 }
 
+/* =====================
+ *     МИНИ-КАБИНЕТ
+ * =================== */
+
+.sideblock__mini-cabinet {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 24px;
+}
+
+.sideblock__mini-cabinet .mini-cabinet__user-login {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.sideblock__mini-cabinet .mini-cabinet__metadata {
+  display: grid;
+  grid-template-columns: 40% 1fr;
+  column-gap: 16px;
+  row-gap: 8px;
+}
+
+.sideblock__mini-cabinet .mini-cabinet__metadata-label {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.sideblock__mini-cabinet .mini-cabinet__metadata-label::after {
+  font-weight: 500;
+  content: ':';
+  margin-right: 4px;
+}
+
 .block__sample {
   display: flex;
   flex-direction: column;

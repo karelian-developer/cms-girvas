@@ -3,13 +3,15 @@
     <img src="{USER_AVATAR_URL}" alt="{USER_LOGIN}" class="mini-cabinet__avatar">
   </div>
   <div class="mini-cabinet__right-column">
-    <h4 class="mini-cabinet__user-login">{USER_LOGIN}</h4>
-    <div class="mini-cabinet__infobase">
-      <div class="mini-cabinet__infobase-label">
-        Группа
-      </div>
-      <div class="mini-cabinet__infobase-value">
-        {USER_GROUP_LABEL}
+    <div class="mini-cabinet__user-login">{USER_LOGIN}</div>
+    <div class="mini-cabinet__metadata-container">
+      <div class="mini-cabinet__metadata">
+        <div class="mini-cabinet__metadata-label">
+          Группа
+        </div>
+        <div class="mini-cabinet__metadata-value">
+          {USER_GROUP_LABEL}
+        </div>
       </div>
     </div>
     <div class="mini-cabinet__panel">
