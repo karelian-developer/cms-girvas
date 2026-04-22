@@ -693,11 +693,11 @@ final class Template implements ThemeInterface
                   }
 
                   $templateContentBlockVars['BLOCK_CABINET'] = $CMSClientIsLogged
-                    ? ThemeCollector::assemblyFileContent($this->theme, 'templates/contentBlock/cabinet/user.tpl', $cabinetVars)
-                    : ThemeCollector::assemblyFileContent($this->theme, 'templates/contentBlock/cabinet/auth.tpl', $cabinetVars);
+                    ? ThemeCollector::assemblyFileContent($this, 'templates/contentBlock/cabinet/user.tpl', $cabinetVars)
+                    : ThemeCollector::assemblyFileContent($this, 'templates/contentBlock/cabinet/auth.tpl', $cabinetVars);
                 }
                 
-                $contentBlocksAssembled[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/contentBlock/' . $contentBlockTypeName . '.tpl', $templateContentBlockVars);
+                $contentBlocksAssembled[] = ThemeCollector::assemblyFileContent($this, 'templates/contentBlock/' . $contentBlockTypeName . '.tpl', $templateContentBlockVars);
               }
             }
 
