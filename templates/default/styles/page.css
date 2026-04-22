@@ -207,19 +207,25 @@
 .sideblock__mini-cabinet .mini-cabinet__metadata {
   display: grid;
   grid-template-columns: 80px 1fr;
-  column-gap: 16px;
+  margin-bottom: 8px;
+  column-gap: 4px;
   row-gap: 8px;
 }
 
 .sideblock__mini-cabinet .mini-cabinet__metadata-label {
   font-weight: 500;
-  margin-bottom: 8px;
 }
 
 .sideblock__mini-cabinet .mini-cabinet__metadata-label::after {
   font-weight: 500;
   content: ':';
   margin-right: 4px;
+}
+
+.sideblock__mini-cabinet .mini-cabinet__panel {
+  display: grid;
+  grid-template-columns: repeat(2, calc(50% - 4px));
+  gap: 8px;
 }
 
 .block__sample {
