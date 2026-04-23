@@ -263,7 +263,7 @@ class PageArchive implements InterfacePage
       // Сборка списка доступных годов/месяцев
       $archiveNavHtml = $this->buildArchiveNavigation($entries, $categoryName, $isPublished, $localeName);
       unset($entries);
-      
+
       // Пагинация
       $paginationHtml = '';
       if ($showEntries && $entriesCount > 0) {
@@ -322,7 +322,7 @@ class PageArchive implements InterfacePage
       return '';
     }
 
-    $html = '<ul class="archive-nav">';
+    $html = '<ul class="archive-navigation">';
     
     foreach ($availableYears as $yearData) {
       $year = (int)$yearData['year'];
@@ -330,9 +330,9 @@ class PageArchive implements InterfacePage
       
       $yearUrl = '/archive' . ($categoryName !== 'all' ? '/' . $categoryName : '') . '?year=' . $year;
       
-      $html .= '<li class="archive-nav__year">';
-      $html .= sprintf('<a href="%s" class="archive-nav__year-link">%d</a>', $yearUrl, $year);
-      $html .= sprintf('<span class="archive-nav__count">(%d)</span>', $yearCount);
+      $html .= '<li class="archive-navigation__year">';
+      $html .= sprintf('<a href="%s" class="archive-navigation__year-link">%d</a>', $yearUrl, $year);
+      $html .= sprintf('<span class="archive-navigation__count">(%d)</span>', $yearCount);
       
       // Показываем месяцы только если выбран год или это первый год
       $yearParam = $this->CMSCore->urlp->getParam('year');
@@ -340,7 +340,7 @@ class PageArchive implements InterfacePage
         $availableMonths = $entries->getAvailableMonths($year, $isPublished);
         
         if (!empty($availableMonths)) {
-          $html .= '<ul class="archive-nav__months">';
+          $html .= '<ul class="archive-navigation__months">';
           
           foreach ($availableMonths as $monthData) {
             $month = (int)$monthData['month'];
@@ -348,9 +348,9 @@ class PageArchive implements InterfacePage
             $monthUrl = $yearUrl . '&month=' . $month;
             $monthName = $this->getMonthName($month, $localeName);
             
-            $html .= '<li class="archive-nav__month">';
-            $html .= sprintf('<a href="%s" class="archive-nav__month-link">%s</a>', $monthUrl, $monthName);
-            $html .= sprintf('<span class="archive-nav__count">(%d)</span>', $monthCount);
+            $html .= '<li class="archive-navigation__month">';
+            $html .= sprintf('<a href="%s" class="archive-navigation__month-link">%s</a>', $monthUrl, $monthName);
+            $html .= sprintf('<span class="archive-navigation__count">(%d)</span>', $monthCount);
             $html .= '</li>';
           }
           
