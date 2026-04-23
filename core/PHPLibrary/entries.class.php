@@ -466,6 +466,7 @@ final class Entries
     $queryBuilder->statement->clauseOrderBy->setColumn('year');
     $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
     $queryBuilder->statement->clauseOrderBy->assembly();
+    $queryBuilder->statement->assembly();
     
     // GROUP BY
     $queryBuilder->statement->assembled = str_replace(
@@ -538,6 +539,7 @@ final class Entries
     $queryBuilder->statement->clauseOrderBy->setColumn('month');
     $queryBuilder->statement->clauseOrderBy->setSortType('ASC');
     $queryBuilder->statement->clauseOrderBy->assembly();
+    $queryBuilder->statement->assembly();
     
     // GROUP BY
     $queryBuilder->statement->assembled = str_replace(
