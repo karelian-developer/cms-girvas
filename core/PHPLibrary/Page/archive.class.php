@@ -22,12 +22,14 @@ namespace core\PHPLibrary\Page;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\Pagination as Pagination;
 use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \DOMDocument as DOMDocument;
 
 class PageArchive implements InterfacePage
 {
@@ -112,7 +114,7 @@ class PageArchive implements InterfacePage
           $startTimestamp = mktime(0, 0, 0, $month, 1, $year);
           $endTimestamp = mktime(23, 59, 59, $month, date('t', $startTimestamp), $year);
           
-          $archiveTitle = sprintf('%s %d', $this->getMonthName($month, $localeName), $year);
+          $archiveTitle = sprintf('%s %d', $this::getMonthName($month, $this->CMSCore->locale), $year);
           $archiveDescription = sprintf($localeData['PAGE_ARCHIVE_MONTH_DESCRIPTION'], $archiveTitle);
         } else {
           $startTimestamp = mktime(0, 0, 0, 1, 1, $year);
@@ -160,7 +162,7 @@ class PageArchive implements InterfacePage
       }
       
       if (isset($month)) {
-        $this->page->breadcrumbs->add($this->getMonthName($month, $localeName), '');
+        $this->page->breadcrumbs->add($this::getMonthName($month, $this->CMSCore->locale), '');
       }
       
       $this->page->breadcrumbs->assembly();
@@ -490,7 +492,12 @@ class PageArchive implements InterfacePage
       return '';
     }
 
-    $html = '<ul class="archive-navigation">';
+    $document = new \DOMDocument();
+    
+    $ulYears = $document->createElement('ul');
+    $ulYears->setAttribute('class', 'archive-navigation');
+    
+    $yearParam = $this->CMSCore->urlp->getParam('year');
     
     foreach ($availableYears as $yearData) {
       $year = (int)$yearData['year'];
@@ -498,56 +505,89 @@ class PageArchive implements InterfacePage
       
       $yearUrl = '/archive' . ($categoryName !== 'all' ? '/' . $categoryName : '') . '?year=' . $year;
       
-      $html .= '<li class="archive-navigation__year">';
-      $html .= sprintf('<a href="%s" class="archive-navigation__year-link">%d</a>', $yearUrl, $year);
-      $html .= sprintf('<span class="archive-navigation__count">(%d)</span>', $yearCount);
+      $liYear = $document->createElement('li');
+      $liYear->setAttribute('class', 'archive-navigation__year');
       
-      // Показываем месяцы только если выбран год или это первый год
-      $yearParam = $this->CMSCore->urlp->getParam('year');
-      if (($yearParam && (int)$yearParam === $year) || !$yearParam) {
+      $aYear = $document->createElement('a', (string)$year);
+      $aYear->setAttribute('href', $yearUrl);
+      $aYear->setAttribute('class', 'archive-navigation__year-link');
+      
+      $spanYearCount = $document->createElement('span', '(' . $yearCount . ')');
+      $spanYearCount->setAttribute('class', 'archive-navigation__count');
+      
+      $liYear->appendChild($aYear);
+      $liYear->appendChild($spanYearCount);
+      
+      // Показываем месяцы только если выбран год или параметр года отсутствует
+      if (($yearParam !== null && (int)$yearParam === $year) || $yearParam === null) {
         $availableMonths = $entries->getAvailableMonths($year, $isPublished);
         
         if (!empty($availableMonths)) {
-          $html .= '<ul class="archive-navigation__months">';
+          $ulMonths = $document->createElement('ul');
+          $ulMonths->setAttribute('class', 'archive-navigation__months');
           
           foreach ($availableMonths as $monthData) {
             $month = (int)$monthData['month'];
             $monthCount = (int)$monthData['count'];
             $monthUrl = $yearUrl . '&month=' . $month;
-            $monthName = $this->getMonthName($month, $localeName);
+            $monthName = $this::getMonthName($month, $this->CMSCore->locale);
             
-            $html .= '<li class="archive-navigation__month">';
-            $html .= sprintf('<a href="%s" class="archive-navigation__month-link">%s</a>', $monthUrl, $monthName);
-            $html .= sprintf('<span class="archive-navigation__count">(%d)</span>', $monthCount);
-            $html .= '</li>';
+            $liMonth = $document->createElement('li');
+            $liMonth->setAttribute('class', 'archive-navigation__month');
+            
+            $aMonth = $document->createElement('a', $monthName);
+            $aMonth->setAttribute('href', $monthUrl);
+            $aMonth->setAttribute('class', 'archive-navigation__month-link');
+            
+            $spanMonthCount = $document->createElement('span', '(' . $monthCount . ')');
+            $spanMonthCount->setAttribute('class', 'archive-navigation__count');
+            
+            $liMonth->appendChild($aMonth);
+            $liMonth->appendChild($spanMonthCount);
+            
+            $ulMonths->appendChild($liMonth);
           }
           
-          $html .= '</ul>';
+          $liYear->appendChild($ulMonths);
         }
       }
       
-      $html .= '</li>';
+      $ulYears->appendChild($liYear);
     }
     
-    $html .= '</ul>';
+    $document->appendChild($ulYears);
     
-    return $html;
+    return $document->saveHTML();
   }
 
   /**
    * Получить название месяца по номеру
    *
-   * @param int $month
-   * @param string $localeName
+   * @param int $month Номер месяца (1-12)
+   * @param CMSLocale $locale Объект локали
    * @return string
    */
-  private function getMonthName(int $month, string $localeName) : string
+  public static function getMonthName(int $month, CMSLocale $locale) : string
   {
-    $months = [
-      'ru_RU' => ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
-      'en_US' => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    $localeData = $locale->getData();
+    
+    $monthKeys = [
+      1 => 'january',
+      2 => 'february',
+      3 => 'march',
+      4 => 'april',
+      5 => 'may',
+      6 => 'june',
+      7 => 'july',
+      8 => 'august',
+      9 => 'september',
+      10 => 'october',
+      11 => 'november',
+      12 => 'december'
     ];
     
-    return $months[$localeName][$month - 1] ?? $months['en_US'][$month - 1];
+    $key = 'DEFAULT_TEXT_MONTH_' . strtoupper($monthKeys[$month]);
+    
+    return $localeData[$key] ?? (string)$month;
   }
 }
