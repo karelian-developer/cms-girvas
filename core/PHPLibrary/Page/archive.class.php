@@ -492,7 +492,7 @@ class PageArchive implements InterfacePage
       return '';
     }
 
-    $document = new \DOMDocument();
+    $document = new DOMDocument();
     
     $ulYears = $document->createElement('ul');
     $ulYears->setAttribute('class', 'archive-navigation');
