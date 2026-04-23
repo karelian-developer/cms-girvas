@@ -256,6 +256,302 @@ final class Entries
     
     return $entries;
   }
+
+  /**
+   * Получить записи за определённый период
+   *
+   * @param int $startTimestamp Начальная метка времени
+   * @param int $endTimestamp Конечная метка времени
+   * @param string $localeName Имя локали
+   * @param array $params Дополнительные параметры (limit, offset, categoryID)
+   * @param bool $isPublished Только опубликованные записи
+   * @return array Массив объектов Entry
+   */
+  public function getByDateRange(
+    int $startTimestamp,
+    int $endTimestamp,
+    string $localeName = 'en_US',
+    array $params = [],
+    bool $isPublished = false
+  ) : array {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    
+    // WHERE: фильтр по дате
+    $queryBuilder->statement->setClauseWhere();
+    
+    $dateCondition = match ($CMSConfigDatabase['dms']) {
+      CMSDMS::PostgreSQL => sprintf(
+        '"createdUnixTimestamp" >= %d AND "createdUnixTimestamp" <= %d',
+        $startTimestamp,
+        $endTimestamp
+      ),
+      CMSDMS::MySQL => sprintf(
+        '`createdUnixTimestamp` >= %d AND `createdUnixTimestamp` <= %d',
+        $startTimestamp,
+        $endTimestamp
+      )
+    };
+    
+    $queryBuilder->statement->clauseWhere->addCondition($dateCondition);
+    
+    // Дополнительный фильтр по категории
+    if (isset($params['categoryID']) && $params['categoryID'] > 0) {
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'AND `categoryID` = :categoryID',
+        'postgresql' => 'AND "categoryID" = :categoryID'
+      ]);
+    }
+    
+    // Фильтр по опубликованности
+    if ($isPublished) {
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => 'AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
+    }
+    
+    $queryBuilder->statement->clauseWhere->assembly();
+    
+    // ORDER BY
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
+    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    $queryBuilder->statement->clauseOrderBy->assembly();
+    
+    // LIMIT и OFFSET
+    if (array_key_exists('limit', $params)) {
+      if (is_array($params['limit'])) {
+        $limit = is_integer($params['limit'][0]) ? $params['limit'][0] : 0;
+        $offset = is_integer($params['limit'][1]) ? $params['limit'][1] : 0;
+        $queryBuilder->statement->setClauseLimit($limit, $offset);
+      }
+    }
+    
+    $queryBuilder->statement->assembly();
+    
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    
+    if (isset($params['categoryID']) && $params['categoryID'] > 0) {
+      $databaseQuery->bindParam(':categoryID', $params['categoryID'], \PDO::PARAM_INT);
+    }
+    
+    $databaseQuery->execute();
+    
+    $entries = [];
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    if ($results) {
+      foreach ($results as $data) {
+        $entries[] = new Entry($this->CMSCore, $data['id']);
+      }
+    }
+    
+    return $entries;
+  }
+
+  /**
+   * Получить количество записей за определённый период
+   *
+   * @param int $startTimestamp Начальная метка времени
+   * @param int $endTimestamp Конечная метка времени
+   * @param array $params Дополнительные параметры (categoryID)
+   * @param bool $isPublished Только опубликованные записи
+   * @return int Количество записей
+   */
+  public function getCountByDateRange(
+    int $startTimestamp,
+    int $endTimestamp,
+    array $params = [],
+    bool $isPublished = false
+  ) : int {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['count(*) AS count']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    
+    $queryBuilder->statement->setClauseWhere();
+    
+    $dateCondition = match ($CMSConfigDatabase['dms']) {
+      CMSDMS::PostgreSQL => sprintf(
+        '"createdUnixTimestamp" >= %d AND "createdUnixTimestamp" <= %d',
+        $startTimestamp,
+        $endTimestamp
+      ),
+      CMSDMS::MySQL => sprintf(
+        '`createdUnixTimestamp` >= %d AND `createdUnixTimestamp` <= %d',
+        $startTimestamp,
+        $endTimestamp
+      )
+    };
+    
+    $queryBuilder->statement->clauseWhere->addCondition($dateCondition);
+    
+    if (isset($params['categoryID']) && $params['categoryID'] > 0) {
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'AND `categoryID` = :categoryID',
+        'postgresql' => 'AND "categoryID" = :categoryID'
+      ]);
+    }
+    
+    if ($isPublished) {
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => 'AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
+    }
+    
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+    
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    
+    if (isset($params['categoryID']) && $params['categoryID'] > 0) {
+      $databaseQuery->bindParam(':categoryID', $params['categoryID'], \PDO::PARAM_INT);
+    }
+    
+    $databaseQuery->execute();
+    
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? (int)$result['count'] : 0;
+  }
+
+  /**
+   * Получить список доступных годов с записями
+   *
+   * @param bool $isPublished Только опубликованные записи
+   * @return array Массив годов
+   */
+  public function getAvailableYears(bool $isPublished = false) : array
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    
+    $yearExpression = match ($CMSConfigDatabase['dms']) {
+      CMSDMS::PostgreSQL => 'EXTRACT(YEAR FROM to_timestamp("createdUnixTimestamp")) AS year',
+      CMSDMS::MySQL => 'YEAR(FROM_UNIXTIME(`createdUnixTimestamp`)) AS year'
+    };
+    
+    $queryBuilder->statement->addSelections(['DISTINCT ' . $yearExpression, 'COUNT(*) AS count']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    
+    if ($isPublished) {
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => '(metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
+      $queryBuilder->statement->clauseWhere->assembly();
+    }
+    
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('year');
+    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    $queryBuilder->statement->clauseOrderBy->assembly();
+    
+    // GROUP BY
+    $queryBuilder->statement->assembled = str_replace(
+      'ORDER BY',
+      'GROUP BY year ORDER BY',
+      $queryBuilder->statement->assembled
+    );
+    
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->execute();
+    
+    return $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+  }
+
+  /**
+   * Получить список месяцев с записями за указанный год
+   *
+   * @param int $year Год
+   * @param bool $isPublished Только опубликованные записи
+   * @return array Массив месяцев
+   */
+  public function getAvailableMonths(int $year, bool $isPublished = false) : array
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    
+    $startTimestamp = mktime(0, 0, 0, 1, 1, $year);
+    $endTimestamp = mktime(23, 59, 59, 12, 31, $year);
+    
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    
+    $monthExpression = match ($CMSConfigDatabase['dms']) {
+      CMSDMS::PostgreSQL => 'EXTRACT(MONTH FROM to_timestamp("createdUnixTimestamp")) AS month',
+      CMSDMS::MySQL => 'MONTH(FROM_UNIXTIME(`createdUnixTimestamp`)) AS month'
+    };
+    
+    $queryBuilder->statement->addSelections(['DISTINCT ' . $monthExpression, 'COUNT(*) AS count']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    
+    $queryBuilder->statement->setClauseWhere();
+    
+    $dateCondition = match ($CMSConfigDatabase['dms']) {
+      CMSDMS::PostgreSQL => sprintf(
+        '"createdUnixTimestamp" >= %d AND "createdUnixTimestamp" <= %d',
+        $startTimestamp,
+        $endTimestamp
+      ),
+      CMSDMS::MySQL => sprintf(
+        '`createdUnixTimestamp` >= %d AND `createdUnixTimestamp` <= %d',
+        $startTimestamp,
+        $endTimestamp
+      )
+    };
+    
+    $queryBuilder->statement->clauseWhere->addCondition($dateCondition);
+    
+    if ($isPublished) {
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => 'AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
+    }
+    
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('month');
+    $queryBuilder->statement->clauseOrderBy->setSortType('ASC');
+    $queryBuilder->statement->clauseOrderBy->assembly();
+    
+    // GROUP BY
+    $queryBuilder->statement->assembled = str_replace(
+      'ORDER BY',
+      'GROUP BY month ORDER BY',
+      $queryBuilder->statement->assembled
+    );
+    
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->execute();
+    
+    return $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+  }
       
   /**
    * Получить объекты записей для определенной категории
