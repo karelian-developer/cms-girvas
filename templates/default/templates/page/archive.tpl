@@ -1,6 +1,6 @@
 <div class="page__entries-wrapper">
   <div class="page__breadcrumbs breadcrumbs">{PAGE_BREADCRUMPS}</div>
-  <h1 class="page__title">{PAGE_ARCHIVE_TITLE}</h1>
+  <h1 class="page__title">{LANG:PAGE_ARCHIVE_TITLE}</h1>
   <div class="page__archive-navigation-container">{ARCHIVE_NAVIGATION}</div>
   <div class="page__pagination">{ENTRIES_PAGINATION}</div>
   <div class="page__entries-container">
