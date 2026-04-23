@@ -145,8 +145,6 @@ class PageArchive implements InterfacePage
         $archiveDescription = $localeData['PAGE_ARCHIVE_DESCRIPTION'];
       }
 
-      unset($entries);
-
       // Хлебные крошки
       $this->page->breadcrumbs->add($localeData['PAGE_ARCHIVE_BREADCRUMBS_LABEL'], '/archive');
       
@@ -264,7 +262,8 @@ class PageArchive implements InterfacePage
 
       // Сборка списка доступных годов/месяцев
       $archiveNavHtml = $this->buildArchiveNavigation($entries, $categoryName, $isPublished, $localeName);
-
+      unset($entries);
+      
       // Пагинация
       $paginationHtml = '';
       if ($showEntries && $entriesCount > 0) {
