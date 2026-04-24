@@ -92,7 +92,7 @@ if (defined('IS_NOT_HACKED')) {
       $archiveBaseURL = sprintf('https://%s/archive', $CMSConfigDomain);
       $sitemapBuilder->addURL($archiveBaseURL, time(), 'weekly', 0.7);
 
-      $availableYears = $entries->getAvailableYears(true); // только опубликованные
+      $availableYears = $entries->getAvailableYears(true);
       foreach ($availableYears as $yearData) {
         $year = (int)$yearData['year'];
         $yearURL = sprintf('%s?year=%d', $archiveBaseURL, $year);
