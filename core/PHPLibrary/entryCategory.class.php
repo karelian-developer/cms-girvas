@@ -349,6 +349,8 @@ class EntryCategory implements EntityTypeContent
   {
     $chain = [$this];
     $current = $this;
+
+    $current->initData(['metadata']);
     
     while ($current->getParentID() !== 0) {
       $parent = new EntryCategory($this->CMSCore, $current->getParentID());
