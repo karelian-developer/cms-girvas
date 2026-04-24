@@ -89,6 +89,23 @@ if (defined('IS_NOT_HACKED')) {
         }
       }
 
+      $archiveBaseURL = sprintf('https://%s/archive', $CMSConfigDomain);
+      $sitemapBuilder->addURL($archiveBaseURL, time(), 'weekly', 0.7);
+
+      $availableYears = $entries->getAvailableYears(true); // только опубликованные
+      foreach ($availableYears as $yearData) {
+        $year = (int)$yearData['year'];
+        $yearURL = sprintf('%s?year=%d', $archiveBaseURL, $year);
+        $sitemapBuilder->addURL($yearURL, time(), 'monthly', 0.6);
+        
+        $availableMonths = $entries->getAvailableMonths($year, true);
+        foreach ($availableMonths as $monthData) {
+          $month = (int)$monthData['month'];
+          $monthURL = sprintf('%s?year=%d&month=%d', $archiveBaseURL, $year, $month);
+          $sitemapBuilder->addURL($monthURL, time(), 'monthly', 0.5);
+        }
+      }
+
       $sitemapBuilder->assembly();
 
       http_response_code(200);
