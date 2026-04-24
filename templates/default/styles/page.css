@@ -39,7 +39,6 @@
 }
 
 .page__caption-description {
-  text-transform: uppercase;
   font-weight: 400;
   font-size: 14px;
   color: var(--primary-color-5);
