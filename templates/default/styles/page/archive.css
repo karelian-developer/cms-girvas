@@ -247,10 +247,38 @@
   filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, .25));
 }
 
-.page__archive-container {
+.page__archive {
   background-color: var(--primary-color-4);
   border-radius: 8px;
   border: 1px solid var(--common-secondary-color-10);
   padding: 8px 24px;
   margin-bottom: 16px;
+}
+
+.page__archive .archive-navigation {
+  display: grid;
+  grid-template-columns: repeat(6, calc((100% - 5 * 8px) / 6));
+  gap: 8px;
+}
+
+.page__archive .archive-navigation .archive-navigation__year-link {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--common-secondary-color-3);
+  margin-right: 4px;
+}
+
+.page__archive .archive-navigation .archive-navigation__count {
+  font-size: 14px;
+  color: var(--primary-color-5);
+}
+
+.page__archive .archive-navigation .archive-navigation__months {
+  padding-top: 8px;
+}
+
+.page__archive .archive-navigation .archive-navigation__month-link {
+  font-size: 14px;
+  color: var(--common-secondary-color-3);
+  margin-right: 4px;
 }

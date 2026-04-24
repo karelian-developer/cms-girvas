@@ -4,7 +4,7 @@
     <h1 class="page__caption-title">{LANG:PAGE_ARCHIVE_TITLE}</h1>
     <div class="page__caption-description">{LANG:PAGE_ARCHIVE_DESCRIPTION}</div>
   </div>
-  <div class="page__archive-container">
+  <div class="page__archive">
     {ARCHIVE_NAVIGATION}
   </div>
   <div class="page__pagination">{ENTRIES_PAGINATION}</div>
