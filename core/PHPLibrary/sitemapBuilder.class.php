@@ -79,8 +79,6 @@ final class SitemapBuilder
    */
   public function assembly() : void
   {
-    error_log(print_r($this->urls, true));
-
     $elementURLSet = $this->document->createElement('urlset');
     $elementURLSetAttributeXMLns = $this->document->createAttribute('xmlns');
     $elementURLSetAttributeXMLns->value = 'https://www.sitemaps.org/schemas/sitemap/0.9';
@@ -88,7 +86,8 @@ final class SitemapBuilder
 
     foreach ($this->urls as $url) {
       $elementURL = $this->document->createElement('url');
-      $elementLoc = $this->document->createElement('loc', $url['loc']);
+      $elementLoc = $this->document->createElement('loc');
+      $elementLoc->appendChild($this->document->createTextNode($url['loc']));
       $elementLastmod = $this->document->createElement('lastmod', $url['lastmod']);
       $elementChangefreq = $this->document->createElement('changefreq', $url['changefreq']);
       $elementPriority = $this->document->createElement('priority', $url['priority']);
