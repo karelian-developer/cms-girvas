@@ -99,10 +99,12 @@ if (defined('IS_NOT_HACKED')) {
         $sitemapBuilder->addURL($yearURL, time(), 'monthly', 0.6);
         
         $availableMonths = $entries->getAvailableMonths($year, true);
-        foreach ($availableMonths as $monthData) {
-          $month = (int) $monthData['month'];
-          $monthURL = $archiveBaseURL . '?year=' . $year . '&month=' . $month;
-          $sitemapBuilder->addURL($monthURL, time(), 'monthly', 0.5);
+        if (!empty($availableMonths)) {
+          foreach ($availableMonths as $monthData) {
+            $month = (int) $monthData['month'];
+            $monthURL = $archiveBaseURL . '?year=' . $year . '&month=' . $month;
+            $sitemapBuilder->addURL($monthURL, time(), 'monthly', 0.5);
+          }
         }
       }
 
