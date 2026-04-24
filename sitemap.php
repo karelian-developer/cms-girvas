@@ -103,7 +103,6 @@ if (defined('IS_NOT_HACKED')) {
           foreach ($availableMonths as $monthData) {
             $month = (int) $monthData['month'];
             $monthURL = $archiveBaseURL . '?year=' . $year . '&month=' . $month;
-            error_log($monthURL);
             $sitemapBuilder->addURL($monthURL, time(), 'monthly', 0.5);
           }
         }
