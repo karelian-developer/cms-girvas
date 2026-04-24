@@ -134,7 +134,7 @@ class PageEntries implements InterfacePage
 
       if ($categoryName !== 'all') {
         $category = EntryCategory::getByName($this->CMSCore, $categoryName);
-        $category->initData(['name', 'texts']);
+        $category->initData(['name', 'texts', 'parentID']);
         $categoryID = $category->getID();
 
         $categoryTitle = strip_tags($category->getTitle($localeName));
@@ -164,7 +164,7 @@ class PageEntries implements InterfacePage
             '/entries/' . $chainCategory->getName()
           );
         }
-        
+
         $this->page->breadcrumbs->assembly();
 
         /** @var Entries $entries Объект класса Entries */
