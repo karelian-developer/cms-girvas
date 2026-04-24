@@ -64,12 +64,12 @@ final class SitemapBuilder
    */
   public function addURL(string $loc, int $lastmodUnix, string $changefreq, float $priority) : void
   {
-    array_push($this->urls, [
+    $this->urls[] = [
       'loc' => $loc,
       'lastmod' => date('Y-m-d', $lastmodUnix),
       'changefreq' => $changefreq,
       'priority' => $priority
-    ]);
+    ];
   }
 
   /**
