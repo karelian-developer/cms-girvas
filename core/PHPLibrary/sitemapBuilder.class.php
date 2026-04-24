@@ -79,7 +79,7 @@ final class SitemapBuilder
    */
   public function assembly() : void
   {
-    error_log(print_r($this->urls[], true));
+    error_log(print_r($this->urls, true));
 
     $elementURLSet = $this->document->createElement('urlset');
     $elementURLSetAttributeXMLns = $this->document->createAttribute('xmlns');
