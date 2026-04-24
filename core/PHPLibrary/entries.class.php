@@ -93,6 +93,145 @@ final class Entries
   }
 
   /**
+   * Получить объекты записей для нескольких категорий
+   *
+   * @param array $categoriesIDs Массив ID категорий
+   * @param array $params Параметры (limit, offset)
+   * @param bool $isPublished Только опубликованные
+   * @return array Массив объектов Entry
+   */
+  public function getByCategoriesIDs(array $categoriesIDs, array $params = [], bool $isPublished = false) : array
+  {
+    if (empty($categoriesIDs)) {
+      return [];
+    }
+
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    
+    // Формируем IN-условие для массива ID
+    $placeholders = [];
+    foreach ($categoriesIDs as $index => $categoryID) {
+      $placeholders[] = ':categoryID' . $index;
+    }
+    
+    $inCondition = match ($CMSConfigDatabase['dms']) {
+      CMSDMS::PostgreSQL => '"categoryID" IN (' . implode(', ', $placeholders) . ')',
+      CMSDMS::MySQL => '`categoryID` IN (' . implode(', ', $placeholders) . ')'
+    };
+    
+    $queryBuilder->statement->clauseWhere->addCondition($inCondition);
+
+    if ($isPublished) {
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => 'AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
+    }
+
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
+    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    
+    if (array_key_exists('limit', $params)) {
+      if (is_array($params['limit'])) {
+        $limit = is_integer($params['limit'][0]) ? $params['limit'][0] : 0;
+        $offset = is_integer($params['limit'][1]) ? $params['limit'][1] : 0;
+        $queryBuilder->statement->setClauseLimit($limit, $offset);
+      }
+    }
+    
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    
+    foreach ($categoriesIDs as $index => $categoryID) {
+      $databaseQuery->bindParam(':categoryID' . $index, $categoriesIDs[$index], \PDO::PARAM_INT);
+    }
+    
+    $databaseQuery->execute();
+
+    $entries = [];
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    if ($results) {
+      foreach ($results as $data) {
+        $entries[] = new Entry($this->CMSCore, $data['id']);
+      }
+    }
+
+    return $entries;
+  }
+
+  /**
+   * Получить количество записей для нескольких категорий
+   *
+   * @param array $categoriesIDs Массив ID категорий
+   * @param bool $isPublished Только опубликованные
+   * @return int Количество записей
+   */
+  public function getCountByCategoriesIDs(array $categoriesIDs, bool $isPublished = false) : int
+  {
+    if (empty($categoriesIDs)) {
+      return 0;
+    }
+
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['count(*) AS count']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    
+    $placeholders = [];
+    foreach ($categoriesIDs as $index => $categoryID) {
+      $placeholders[] = ':categoryID' . $index;
+    }
+    
+    $inCondition = match ($CMSConfigDatabase['dms']) {
+      CMSDMS::PostgreSQL => '"categoryID" IN (' . implode(', ', $placeholders) . ')',
+      CMSDMS::MySQL => '`categoryID` IN (' . implode(', ', $placeholders) . ')'
+    };
+    
+    $queryBuilder->statement->clauseWhere->addCondition($inCondition);
+
+    if ($isPublished) {
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
+        'postgresql' => 'AND (metadata::jsonb->>\'isPublished\')::boolean = true'
+      ]);
+    }
+
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    
+    foreach ($categoriesIDs as $index => $categoryID) {
+      $databaseQuery->bindParam(':categoryID' . $index, $categoriesIDs[$index], \PDO::PARAM_INT);
+    }
+    
+    $databaseQuery->execute();
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+    return $result ? (int)$result['count'] : 0;
+  }
+
+  /**
    * Поиск записей по строке запроса с учётом локализации
    *
    * @param string $searchQuery Строка поискового запроса

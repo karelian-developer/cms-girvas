@@ -156,16 +156,28 @@ class PageEntries implements InterfacePage
         $this->CMSCore->configurator->setMetaDescription($categorySEODescription);
         $this->CMSCore->configurator->setMetaKeywords($categoryKeywords);
 
-        $this->page->breadcrumbs->add($category->getTitle($localeName), '/entries/' . $category->getName());
+        $parentChain = $category->getParentChain();
+        foreach ($parentChain as $chainCategory) {
+          $chainCategory->initData(['name', 'texts']);
+          $this->page->breadcrumbs->add(
+            $chainCategory->getTitle($localeName),
+            '/entries/' . $chainCategory->getName()
+          );
+        }
+        
         $this->page->breadcrumbs->assembly();
 
         /** @var Entries $entries Объект класса Entries */
         $entries = new Entries($this->CMSCore);
-        $entriesObjects = $entries->getByCategoryID($categoryID, [
-          'limit' => [$entriesCountOnPage, $paginationItemCurrent * $entriesCountOnPage]
-        ], $isPublished);
-        
-        $entriesCount = $entries->getCountByCategoryID($categoryID, $isPublished);
+        $entriesObjects = $entries->getByCategoriesIDs(
+          array_merge([$categoryID], $category->getChildCategoriesIDs()),
+          ['limit' => [$entriesCountOnPage, $paginationItemCurrent * $entriesCountOnPage]],
+          $isPublished
+        );
+        $entriesCount = $entries->getCountByCategoriesIDs(
+          array_merge([$categoryID], $category->getChildCategoriesIDs()),
+          $isPublished
+        );
       } else {
         $this->page->breadcrumbs->assembly();
 

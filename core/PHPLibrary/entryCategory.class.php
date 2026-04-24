@@ -98,9 +98,9 @@ class EntryCategory implements EntityTypeContent
   /**
    * Получить родительскую категории
    *
-   * @return EntryCategory|null
+   * @return ?EntryCategory
    */
-  public function getParent() : EntryCategory|null
+  public function getParent() : ?EntryCategory
   {
     return $this->getParentID() !== 0 ? new EntryCategory($this->CMSCore, $this->getParentID()) : null;
   }
@@ -339,18 +339,43 @@ class EntryCategory implements EntityTypeContent
   {
     return '/entries/' . $this->getName();
   }
+
+  /**
+   * Получить цепочку родительских категорий от текущей до корня
+   *
+   * @return array Массив объектов EntryCategory от корня до текущей
+   */
+  public function getParentChain() : array
+  {
+    $chain = [$this];
+    $current = $this;
+    
+    while ($current->getParentID() !== 0) {
+      $parent = new EntryCategory($this->CMSCore, $current->getParentID());
+      array_unshift($chain, $parent);
+      $current = $parent;
+    }
+    
+    return $chain;
+  }
   
   /**
    * Получить массив объектов записей
    *
    * @param  array $params
    * @param  bool $isPublished
-   * 
+   * @param bool $includeChildren
    * @return array
    */
-  public function getEntries(array $params = [], $isPublished = false) : array
+  public function getEntries(array $params = [], $isPublished = false, bool $includeChildren = false) : array
   {
-    return (new Entries($this->CMSCore))->getByCategoryID($this->id, $params, $isPublished);
+    if (!$includeChildren) {
+      return (new Entries($this->CMSCore))->getByCategoryID($this->id, $params, $isPublished);
+    }
+    
+    $categoryIDs = array_merge([$this->id], $this->getChildCategoriesIDs());
+    
+    return (new Entries($this->CMSCore))->getByCategoriesIDs($categoryIDs, $params, $isPublished);
   }
 
   /**
@@ -358,22 +383,71 @@ class EntryCategory implements EntityTypeContent
    *
    * @param  array $params
    * @param  bool $isPublished
-   * 
+   * @param bool $includeChildren
    * @return int
    */
-  public function getEntriesCount(array $params = [], $isPublished = false) : int
+  public function getEntriesCount(array $params = [], bool $isPublished = false, bool $includeChildren = false) : int
   {
-    return count($this->getEntries($params, $isPublished));
+    if (!$includeChildren) {
+      return count($this->getEntries($params, $isPublished, false));
+    }
+    
+    $categoryIDs = array_merge([$this->id], $this->getChildCategoriesIDs());
+    
+    return (new Entries($this->CMSCore))->getCountByCategoriesIDs($categoryIDs, $isPublished);
+  }
+
+  /**
+   * Получить массив ID всех дочерних категорий (рекурсивно)
+   *
+   * @return array Массив ID дочерних категорий
+   */
+  public function getChildCategoriesIDs() : array
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('entries_categories');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`parentID` = :parentID',
+      'postgresql' => '"parentID" = :parentID'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+    $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+    $databaseQuery->bindParam(':parentID', $this->id, \PDO::PARAM_INT);
+    $databaseQuery->execute();
+
+    $childIDs = [];
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    
+    foreach ($results as $result) {
+      $childID = (int)$result['id'];
+      $childIDs[] = $childID;
+      
+      // Рекурсивно получаем дочерние категории
+      $childCategory = new EntryCategory($this->CMSCore, $childID);
+      $childIDs = array_merge($childIDs, $childCategory->getChildCategoriesIDs());
+    }
+    
+    return $childIDs;
   }
   
   /**
    * Получить данные колонок записи в базе данных
    *
    * @param  array $columns
-   * 
-   * @return void
+   * @return ?array
    */
-  private function getDatabaseColumnsData(array $columns = ['*']) : array|null
+  private function getDatabaseColumnsData(array $columns = ['*']) : ?array
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -509,9 +583,9 @@ class EntryCategory implements EntityTypeContent
    * @param  SystemCore $CMSCore
    * @param  string $categoryName
    * 
-   * @return EntryCategory
+   * @return ?EntryCategory
    */
-  public static function getByName(SystemCore $CMSCore, string $categoryName) : EntryCategory|null
+  public static function getByName(SystemCore $CMSCore, string $categoryName) : ?EntryCategory
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -558,9 +632,9 @@ class EntryCategory implements EntityTypeContent
    * @param  array $texts
    * @param  array $metadata
    * 
-   * @return EntryCategory|null
+   * @return ?EntryCategory
    */
-  public static function create(SystemCore $CMSCore, string $name, int $parentID, array $texts, array $metadata = []) : EntryCategory|null
+  public static function create(SystemCore $CMSCore, string $name, int $parentID, array $texts, array $metadata = []) : ?EntryCategory
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
