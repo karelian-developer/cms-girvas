@@ -28,6 +28,9 @@ use \PDOException as PDOException;
 #[\AllowDynamicProperties]
 class UserGroup
 {
+  private bool $isDataFullyInitialized = false;
+  private array $initializedColumns = [];
+
   // ID первичных групп пользователей
   public const GROUP_SUPER_ID   = 1;
   public const GROUP_USER_ID    = 4;
@@ -80,9 +83,30 @@ class UserGroup
    */
   public function initData(array $columns = ['*']) : void
   {
-    $columnsData = $this->getDatabaseColumnsData($columns);
-    foreach ($columnsData as $name => $data) {
-      $this->{$name} = $data;
+    if ($this->isDataFullyInitialized) {
+      return;
+    }
+    
+    if ($columns !== ['*'] && empty(array_diff($columns, $this->initializedColumns))) {
+      return;
+    }
+    
+    $columnsToLoad = $this->isDataFullyInitialized 
+      ? array_diff($columns, $this->initializedColumns) 
+      : $columns;
+    
+    $columnsData = $this->getDatabaseColumnsData($columnsToLoad);
+    
+    if ($columnsData !== null) {
+      foreach ($columnsData as $name => $data) {
+        $this->{$name} = $data;
+      }
+      
+      if ($columns === ['*']) {
+        $this->isDataFullyInitialized = true;
+      } else {
+        $this->initializedColumns = array_merge($this->initializedColumns, $columns);
+      }
     }
   }
   
