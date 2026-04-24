@@ -95,13 +95,13 @@ if (defined('IS_NOT_HACKED')) {
       $availableYears = $entries->getAvailableYears(true);
       foreach ($availableYears as $yearData) {
         $year = (int)$yearData['year'];
-        $yearURL = sprintf('%s?year=%d', $archiveBaseURL, $year);
+        $yearURL = $archiveBaseURL . '?year=' . $year;
         $sitemapBuilder->addURL($yearURL, time(), 'monthly', 0.6);
         
         $availableMonths = $entries->getAvailableMonths($year, true);
         foreach ($availableMonths as $monthData) {
           $month = (int)$monthData['month'];
-          $monthURL = sprintf('%s?year=%d&month=%d', $archiveBaseURL, $year, $month);
+          $monthURL = $archiveBaseURL . '?year=' . $year . '&month=' . $month;
           $sitemapBuilder->addURL($monthURL, time(), 'monthly', 0.5);
         }
       }
