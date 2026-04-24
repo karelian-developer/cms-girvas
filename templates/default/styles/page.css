@@ -22,16 +22,27 @@
   }
 }
 
-.page__title {
+.page__caption {
   background-color: var(--primary-color-4);
-  text-transform: uppercase;
-  font-weight: 400;
-  font-size: 18px;
-  color: var(--primary-color-2);
   border-radius: 8px;
   border: 1px solid var(--common-secondary-color-10);
   padding: 8px 24px;
   margin-bottom: 16px;
+}
+
+.page__caption-title {
+  text-transform: uppercase;
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--primary-color-2);
+  margin-bottom: 8px;
+}
+
+.page__caption-description {
+  text-transform: uppercase;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--primary-color-5);
 }
 
 .page__pagination:not(:last-child) {
