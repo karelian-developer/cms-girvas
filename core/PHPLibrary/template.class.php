@@ -31,6 +31,7 @@ use \core\PHPLibrary\Template\EnumWeight as ThemeEnumWeight;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \core\PHPLibrary\Template\Locale as ThemeLocale;
+use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \DOMDocument as DOMDocument;
 
 final class Template implements ThemeInterface
@@ -617,6 +618,8 @@ final class Template implements ThemeInterface
         $siteCharset = $CMSConfigurator->getSiteCharset();
       }
 
+      $nadvoParse = new NadvoParse();
+
       $systemStageDevelopingLabel = str_replace('-', '_', strtoupper($this->CMSCore->getCMSStageDeveloping()));
 
       $themeCategory = $this->getCategory();
@@ -670,10 +673,12 @@ final class Template implements ThemeInterface
               if ($contentBlockIsShowed) {
                 $contentBlockType = $contentBlock->getType();
                 $contentBlockTypeName = $contentBlockType->getTechnicalName();
+                $contentBlockContent = $contentBlock->getContent($localeName);
+                $contentBlockContentParsed = $nadvoParse->parse(htmlspecialchars($contentBlockContent, ENT_QUOTES, 'UTF-8'));
 
                 $templateContentBlockVars = [
                   'BLOCK_TITLE' => $contentBlock->getTitle($localeName),
-                  'BLOCK_CONTENT' => $contentBlock->getContent($localeName)
+                  'BLOCK_CONTENT' => $contentBlockContentParsed
                 ];
 
                 if ($contentBlockTypeName === 'cabinet') {
