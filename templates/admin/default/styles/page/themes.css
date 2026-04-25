@@ -55,7 +55,7 @@
 .page.page_themes .themes-list .item__icon-container {
   background-color: var(--common-main-color-4);
   background-size: cover;
-  background-position: center center;
+  background-position: center top;
   height: 180px;
 }
 
