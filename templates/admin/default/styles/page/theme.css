@@ -44,7 +44,7 @@
 
 .page.page_template .template__gallary-container {
   background-image: url('../../images/pages/template/screenshots-not-found.png');
-  background-position: center center;
+  background-position: center top;
   background-repeat: no-repeat;
   background-size: cover;
   position: relative;
