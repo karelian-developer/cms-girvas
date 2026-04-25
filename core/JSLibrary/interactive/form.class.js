@@ -224,7 +224,7 @@ export class Form {
       request.target.send(true);
     } else {
       const request = new Interactive('request', {
-        method: 'POST',
+        method: formMethod,
         url: formAction + `?localeMessage=${locale.name}`,
         data: form
       });
