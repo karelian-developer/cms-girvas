@@ -53,7 +53,7 @@
   margin-bottom: 20px;
   width: 100%;
   height: fit-content;
-  min-height: 225px;
+  height: 225px;
 }
 
 @media (max-width: 600px) {
