@@ -665,9 +665,8 @@ final class Template implements ThemeInterface
               $contentBlock->initData(['name', 'texts', 'metadata']);
               
               $contentBlockURLRule = $contentBlock->getURLRule();
-              $contentBlockIsShowed = preg_match($contentBlockURLRule, $requestURI);
               $contentBlockIsShowed = $contentBlockURLRule !== ''
-                ? $contentBlockIsShowed
+                ? preg_match($contentBlockURLRule, $requestURI)
                 : true;
 
               if ($contentBlockIsShowed) {
