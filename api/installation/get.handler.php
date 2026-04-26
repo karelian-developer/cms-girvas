@@ -1460,7 +1460,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         'type' => 'email',
         'texts' => [
           'en_US' => [
-            'title' => 'Your Email,'
+            'title' => 'Your Email',
             'description' => 'Please provide your current email address so we can contact you.',
             'placeholder' => 'example@mail.ru'
           ],
