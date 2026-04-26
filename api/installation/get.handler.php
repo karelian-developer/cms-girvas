@@ -25,6 +25,8 @@ use \core\PHPLibrary\Database\IndexType as DatabaseIndexType;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\EntriesSample as EntriesSample;
+use \core\PHPLibrary\PageStatic as PageStatic;
+use \core\PHPLibrary\Form as Form;
 use \core\PHPLibrary\SystemCore\Database\Connector as CMSDatabaseConnector;
 use \core\PHPLibrary\SystemCore\Configurator as CMSConfigurator;
 use \core\PHPLibrary\UserGroup as UserGroup;
@@ -1209,8 +1211,100 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     $firstEntry = Entry::create($CMSCore, 'hello-world', 1, 1, $firstEntryTexts);
     $firstEntry->update(['metadata' => ['isPublished' => true]]);
     $firstEntry->update(['metadata' => ['previewURL' => '/uploads/media/example.webp']]);
+    
+    $pageFeedbackTexts = [
+      'en_US' => [
+        'title' => 'Feedback',
+        'SEOTitle' => 'Feedback Form',
+        'description' => 'This form is intended for sending official inquiries',
+        'SEODescription' => 'This form is intended for sending official inquiries, requests, and suggestions through the website',
+        'content' => "This form is intended for sending official inquiries, requests, and suggestions. Completing all fields marked with an \"*\" is mandatory. The information provided is used exclusively for responding to the request and is not shared with third parties. The response will be sent to the specified email address within the timeframe established by the organization's internal regulations.\r\n\r\n{FORM_FEEDBACK}",
+        'keywords' => ['feedback', 'feedback form']
+      ],
+      'ru_RU' => [
+        'title' => 'Обратная связь',
+        'SEOTitle' => 'Форма обратной связи',
+        'description' => 'Форма предназначена для направления официальных обращений',
+        'SEODescription' => 'Форма предназначена для направления официальных обращений через сайт',
+        'content' => "Настоящая форма предназначена для направления официальных обращений, запросов и предложений. Заполнение всех полей, отмеченных знаком «*», является обязательным. Указанные данные используются исключительно для ответа по существу обращения и не передаются третьим лицам. Ответ направляется на указанный электронный адрес в срок, установленный внутренними регламентами организации.\r\n\r\n{FORM_FEEDBACK}",
+        'keywords' => ['обратная связь', 'форма обратной связи']
+      ]
+    ];
 
-    $firstEntriesSampleTexts = [
+    $pageFeedback = PageStatic::create($CMSCore, 'feedback', 1, $pageFeedbackTexts);
+    $pageFeedback->update(['metadata' => ['isPublished' => true]]);
+    $pageFeedback->update(['metadata' => ['previewURL' => '/uploads/media/example.webp']]);
+    
+    $pageDocumentPrivacyPolicyTexts = [
+      'en_US' => [
+        'title' => 'Privacy Policy',
+        'SEOTitle' => 'Website Privacy Policy',
+        'description' => 'Privacy Policy Document',
+        'SEODescription' => 'Website Privacy Policy Document',
+        'content' => 'Place your privacy policy text here.',
+        'keywords' => ['privacy policy', 'personal data processing', '152-FZ', 'personal data protection']
+      ]
+      'ru_RU' => [
+        'title' => 'Политика конфиденциальности',
+        'SEOTitle' => 'Политика конфиденциальности сайта',
+        'description' => 'Документ политики конфиденциальности',
+        'SEODescription' => 'Документ политики конфиденциальности сайта',
+        'content' => 'Разместите здесь текст политики конфиденциальности.',
+        'keywords' => ['политика конфиденциальности', 'обработка персональных данных', '152-ФЗ', 'защита персональных данных']
+      ]
+    ];
+
+    $pageDocumentPrivacyPolicy = PageStatic::create($CMSCore, 'document--privacy-policy', 1, $pageDocumentPrivacyPolicyTexts);
+    $pageDocumentPrivacyPolicy->update(['metadata' => ['isPublished' => true]]);
+    $pageDocumentPrivacyPolicy->update(['metadata' => ['previewURL' => '/uploads/media/example.webp']]);
+    
+    $pageDocumentTermsOfUseTexts = [
+      'en_US' => [
+        'title' => 'User Agreement',
+        'SEOTitle' => 'Website User Agreement',
+        'description' => 'User Agreement Document',
+        'SEODescription' => 'Website User Agreement Document',
+        'content' => 'Place the text of the user agreement here.',
+        'keywords' => ['user agreement', 'terms of use', 'website rules', 'license agreement']
+      ]
+      'ru_RU' => [
+        'title' => 'Пользовательское соглашение',
+        'SEOTitle' => 'Пользовательское соглашение сайта',
+        'description' => 'Документ пользовательского соглашения',
+        'SEODescription' => 'Документ пользовательского соглашения сайта',
+        'content' => 'Разместите здесь текст пользовательского соглашения.',
+        'keywords' => ['пользовательское соглашение', 'условия использования сайта', 'правила сайта', 'лицензионное соглашение']
+      ]
+    ];
+
+    $pageDocumentTermsOfUse = PageStatic::create($CMSCore, 'document--terms-of-use', 1, $pageDocumentTermsOfUseTexts);
+    $pageDocumentTermsOfUse->update(['metadata' => ['isPublished' => true]]);
+    $pageDocumentTermsOfUse->update(['metadata' => ['previewURL' => '/uploads/media/example.webp']]);
+    
+    $pageDocumentUsingCookiesFilesTexts = [
+      'en_US' => [
+        'title' => 'Cookie Notice',
+        'SEOTitle' => 'Cookie Usage on the Website',
+        'description' => 'Cookie Policy on the Website',
+        'SEODescription' => 'Cookie Policy Document on the Website',
+        'content' => 'Place your cookie policy here.',
+        'keywords' => ['cookies', 'cookie usage', 'cookie management', 'cookie policy', 'personal data']
+      ]
+      'ru_RU' => [
+        'title' => 'Уведомление об использовании файлов куки (cookie)',
+        'SEOTitle' => 'Использование файлов cookie на сайте',
+        'description' => 'Политика использования файлов cookie на сайте',
+        'SEODescription' => 'Документ политики использования файлов cookie на сайте',
+        'content' => 'Разместите здесь текст своей политики использования файлов cookie на сайте.',
+        'keywords' => ['файлы cookie', 'использование куки', 'управление cookie', 'политика cookie', 'персональные данные']
+      ]
+    ];
+
+    $pageDocumentUsingCookiesFiles = PageStatic::create($CMSCore, 'document--using-cookies-files', 1, $pageDocumentUsingCookiesFilesTexts);
+    $pageDocumentUsingCookiesFiles->update(['metadata' => ['isPublished' => true]]);
+    $pageDocumentUsingCookiesFiles->update(['metadata' => ['previewURL' => '/uploads/media/example.webp']]);
+
+    $sampleLastNewsTexts = [
       'en_US' => [
         'title' => 'Last news',
         'description' => 'Last news on site'
@@ -1221,7 +1315,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       ]
     ];
 
-    $secondEntriesSampleTexts = [
+    $sampleIndexEntriesTexts = [
       'en_US' => [
         'title' => 'Index entries',
         'description' => 'Last entries for index page'
@@ -1232,42 +1326,177 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       ]
     ];
 
-    $firstEntriesSample = EntriesSample::create($CMSCore, 'last-news', $firstEntriesSampleTexts, [
+    $sampleLastNews = EntriesSample::create($CMSCore, 'last-news', $sampleLastNewsTexts, [
       'limitCount' => 6,
       'sortTypeID' => 2,
       'categoriesIDs' => [1]
     ]);
 
-    $secondEntriesSample = EntriesSample::create($CMSCore, 'index-entries', $secondEntriesSampleTexts, [
+    $sampleIndexEntries = EntriesSample::create($CMSCore, 'index-entries', $sampleIndexEntriesTexts, [
       'limitCount' => 8,
       'sortTypeID' => 2,
       'categoriesIDs' => [1, 2]
     ]);
 
-    $firstUsersGroupTexts = [
+    $usersGroupAdministratorTexts = [
       'en_US' => ['title' => 'Administrator'],
       'ru_RU' => ['title' => 'Администратор']
     ];
 
-    $secondUsersGroupTexts = [
+    $usersGroupModeratorTexts = [
       'en_US' => ['title' => 'Moderator'],
       'ru_RU' => ['title' => 'Модератор']
     ];
 
-    $thirtyUsersGroupTexts = [
+    $usersGroupEditorTexts = [
       'en_US' => ['title' => 'Editor'],
       'ru_RU' => ['title' => 'Редактор']
     ];
 
-    $fourtyUsersGroupTexts = [
+    $usersGroupUserTexts = [
       'en_US' => ['title' => 'User'],
       'ru_RU' => ['title' => 'Пользователь']
     ];
 
-    $firstUsersGroup = UserGroup::create($CMSCore, 'admin', $firstUsersGroupTexts, 786431);
-    $secondUsersGroup = UserGroup::create($CMSCore, 'moder', $secondUsersGroupTexts, 115585);
-    $thirtyUsersGroup = UserGroup::create($CMSCore, 'editor', $thirtyUsersGroupTexts, 130049);
-    $fourtyUsersGroup = UserGroup::create($CMSCore, 'user', $fourtyUsersGroupTexts, 114688);
+    $usersGroupAdministrator = UserGroup::create($CMSCore, 'admin', $usersGroupAdministratorTexts, 786431);
+    $usersGroupModerator = UserGroup::create($CMSCore, 'moder', $usersGroupModeratorTexts, 115585);
+    $usersGroupEditor = UserGroup::create($CMSCore, 'editor', $usersGroupEditorTexts, 130049);
+    $usersGroupUser = UserGroup::create($CMSCore, 'user', $usersGroupUserTexts, 114688);
+    
+    $formFeedbackTexts = [
+      'en_US' => [
+        'title' => 'Feedback',
+        'description' => 'Feedback Form',
+      ],
+      'ru_RU' => [
+        'title' => 'Обратная связь',
+        'description' => 'Форма обратной связи',
+      ]
+    ];
+
+    $formFeedbackElements = [
+      0 => [
+        'name' => 'message_theme',
+        'type' => 'text',
+        'texts' => [
+          'en_US' => [
+            'title' => 'Subject of your message',
+            'description' => 'Enter the title of your message',
+            'placeholder' => 'Subject of your message'
+          ],
+          'ru_RU' => [
+            'title' => 'Тема обращения',
+            'description' => 'Укажите заголовок Вашего письма',
+            'placeholder' => 'Тема Вашего обращения'
+          ]
+        ],
+        'number' => 1,
+        'required' => true,
+        'sequenceNumber' => '3'
+      ],
+      1 => [
+        'name' => 'message_content',
+        'type' => 'textarea',
+        'texts' => [
+          'en_US' => [
+            'title' => 'Contents of your request',
+            'description' => 'Describe in detail the essence of your request',
+            'placeholder' => 'The essence of your request'
+          ],
+          'ru_RU' => [
+            'title' => 'Содержимое обращения',
+            'description' => 'Опишите подробно суть Вашего обращения',
+            'placeholder' => 'Суть Вашего обращения'
+          ]
+        ],
+        'number' => 2,
+        'required' => true,
+        'sequenceNumber' => '4'
+      ],
+      2 => [
+        'name' => 'message_author_name',
+        'type' => 'text',
+        'texts' => [
+          'en_US' => [
+            'title' => 'Your name',
+            'description' => 'Please provide your full last name, first name, and patronymic (if applicable).',
+            'placeholder' => 'Ivanov Ivan Ivanovich'
+          ],
+          'ru_RU' => [
+            'title' => 'Ваше имя',
+            'description' => 'Укажите полностью свою фамилию, имя и отчество (при наличии).',
+            'placeholder' => 'Иванов Иван Иванович'
+          ]
+        ],
+        'number' => 3,
+        'required' => true,
+        'sequenceNumber' => '1'
+      ],
+      3 => [
+        'name' => 'message_author_email',
+        'type' => 'email',
+        'texts' => [
+          'en_US' => [
+            'title' => 'Your Email,'
+            'description' => 'Please provide your current email address so we can contact you.',
+            'placeholder' => 'example@mail.ru'
+          ],
+          'ru_RU' => [
+            'title' => 'Ваш E-Mail',
+            'description' => 'Укажите Ваш настоящий адрес электронной почты (E-Mail), чтобы с Вами могли связаться.',
+            'placeholder' => 'example@mail.ru'
+          ]
+        ],
+        'number' => 4,
+        'required' => true,
+        'sequenceNumber' => '2'
+      ],
+      4 => [
+        'name' => 'client_personal_data',
+        'type' => 'checkbox',
+        'texts' => [
+          'en_US' => [
+            'title' => 'Consent to Processing',
+            'description' => "I consent to the processing of my personal data in accordance with the <a href=\"/page/document--privacy-policy\" target=\"_blank\">Privacy Policy</a> and accept the <a href=\"/page/document--terms-of-use\" target=\"_blank\">User Agreement</a>.",
+            'placeholder' => ''
+          ],
+          'ru_RU' => [
+            'title' => 'Согласие на обработку',
+            'description' => "Я даю свое согласие на обработку моих персональных данных в соответствии с <a href=\"/page/document--privacy-policy\" target=\"_blank\">Политикой конфиденциальности</a> и принимаю <a href=\"/page/document--terms-of-use\" target=\"_blank\">Пользовательское соглашение</a>.",
+            'placeholder' => ''
+          ]
+        ],
+        'number' => 5,
+        'required' => true,
+        'sequenceNumber' => '5'
+      ],
+      5 => [
+        'name' => 'submit',
+        'type' => 'submit',
+        'texts' => [
+          'en_US' => [
+            'title' => 'Submit',
+            'description' => '',
+            'placeholder' => ''
+          ],
+          'ru_RU' => [
+            'title' => 'Отправить',
+            'description' => '',
+            'placeholder' => ''
+          ]
+        ],
+        'number' => 6,
+        'required' => true,
+        'sequenceNumber' => '6'
+      ]
+    ];
+
+    $formFeedbackMetadata = [
+      'action' => '/handler/form/feedback',
+      'methodID' => '2'
+    ];
+
+    $formFeedback = Form::create($CMSCore, 'feedback', $formFeedbackTexts, $formFeedbackElements, $formFeedbackMetadata);
     
     $CMSCore->configurator->insertDatabaseEntryValue('base_template', 'default');
     $CMSCore->configurator->insertDatabaseEntryValue('base_site_title', 'CMS «ГИРВАС»');
