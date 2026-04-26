@@ -1303,6 +1303,29 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     $pageDocumentUsingCookiesFiles = PageStatic::create($CMSCore, 'document--using-cookies-files', 1, $pageDocumentUsingCookiesFilesTexts);
     $pageDocumentUsingCookiesFiles->update(['metadata' => ['isPublished' => true]]);
     $pageDocumentUsingCookiesFiles->update(['metadata' => ['previewURL' => '/uploads/media/example.webp']]);
+    
+    $pageAboutTexts = [
+      'en_US' => [
+        'title' => 'About us',
+        'SEOTitle' => 'About the project',
+        'description' => 'Description of the project and its team.',
+        'SEODescription' => 'Full description of the project and its team.',
+        'content' => 'Tell us about your website, project, yourself, or your company here.',
+        'keywords' => ['about us']
+      ]
+      'ru_RU' => [
+        'title' => 'О нас',
+        'SEOTitle' => 'О проекте',
+        'description' => 'Описание проекта и его команды.',
+        'SEODescription' => 'Полное описание проекта и его команды.',
+        'content' => 'Расскажите здесь о своем сайте, проекте, о себе или своей компании.',
+        'keywords' => ['о нас']
+      ]
+    ];
+
+    $pageAbout = PageStatic::create($CMSCore, 'about', 1, $pageAboutTexts);
+    $pageAbout->update(['metadata' => ['isPublished' => true]]);
+    $pageAbout->update(['metadata' => ['previewURL' => '/uploads/media/example.webp']]);
 
     $sampleLastNewsTexts = [
       'en_US' => [
