@@ -530,6 +530,27 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $execute = $databaseQuery->execute();
 
       // =======================
+      // ТАБЛИЦА КОНТЕНТ-БЛОКОВ
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('content_blocks');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      $execute = $databaseQuery->execute();
+
+      // =======================
       // ТАБЛИЦА ЗАПИСЕЙ
       // =======================
 
