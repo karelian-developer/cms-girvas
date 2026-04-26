@@ -1243,7 +1243,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         'SEODescription' => 'Website Privacy Policy Document',
         'content' => 'Place your privacy policy text here.',
         'keywords' => ['privacy policy', 'personal data processing', '152-FZ', 'personal data protection']
-      ]
+      ],
       'ru_RU' => [
         'title' => 'Политика конфиденциальности',
         'SEOTitle' => 'Политика конфиденциальности сайта',
@@ -1266,7 +1266,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         'SEODescription' => 'Website User Agreement Document',
         'content' => 'Place the text of the user agreement here.',
         'keywords' => ['user agreement', 'terms of use', 'website rules', 'license agreement']
-      ]
+      ],
       'ru_RU' => [
         'title' => 'Пользовательское соглашение',
         'SEOTitle' => 'Пользовательское соглашение сайта',
@@ -1289,7 +1289,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         'SEODescription' => 'Cookie Policy Document on the Website',
         'content' => 'Place your cookie policy here.',
         'keywords' => ['cookies', 'cookie usage', 'cookie management', 'cookie policy', 'personal data']
-      ]
+      ],
       'ru_RU' => [
         'title' => 'Уведомление об использовании файлов куки (cookie)',
         'SEOTitle' => 'Использование файлов cookie на сайте',
@@ -1312,7 +1312,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         'SEODescription' => 'Full description of the project and its team.',
         'content' => 'Tell us about your website, project, yourself, or your company here.',
         'keywords' => ['about us']
-      ]
+      ],
       'ru_RU' => [
         'title' => 'О нас',
         'SEOTitle' => 'О проекте',
