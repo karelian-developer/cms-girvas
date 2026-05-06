@@ -46,6 +46,199 @@ export class PageEntry {
     };
   }
 
+  /**
+   * Отрисовка SEO-результатов в сайдбар-блоке через DOM
+   */
+  renderSEOResults(SEOData) {
+    const sidebarBlock = document.querySelector('[data-element="aside-block-seo-analyzer"]');
+    if (!sidebarBlock) return;
+
+    const blockContent = sidebarBlock.querySelector('.block-content');
+    if (!blockContent) return;
+
+    const report = SEOData.report;
+    const rating = report.rating;
+
+    blockContent.innerHTML = '';
+
+    const analyzer = this._createElement('div', { class: 'seo-analyzer' });
+
+    // --- Общая оценка ---
+    const totalBlock = this._createElement('div', { class: 'seo-analyzer__total' });
+
+    const scoreDiv = this._createElement('div', {
+      class: 'seo-analyzer__score',
+      style: `color: ${rating.color};`
+    });
+    scoreDiv.textContent = report.score;
+
+    const scoreLabel = this._createElement('span', { class: 'seo-analyzer__score-label' });
+    scoreLabel.textContent = '/100';
+    scoreDiv.appendChild(scoreLabel);
+    totalBlock.appendChild(scoreDiv);
+
+    const ratingDiv = this._createElement('div', {
+      class: 'seo-analyzer__rating',
+      style: `color: ${rating.color};`
+    });
+    ratingDiv.textContent = rating.level;
+    totalBlock.appendChild(ratingDiv);
+
+    analyzer.appendChild(totalBlock);
+
+    // --- Секции ---
+    const sections = this._createElement('div', { class: 'seo-analyzer__sections' });
+
+    const sectionDefs = [
+      { title: 'Заголовок', data: report.details.title },
+      { title: 'Описание', data: report.details.description },
+      { title: 'Ключевые слова', data: report.details.keywords },
+      { title: 'Контент', data: report.details.content },
+      { title: 'URL', data: report.details.url }
+    ];
+
+    sectionDefs.forEach(def => {
+      sections.appendChild(this._buildSEOSectionDOM(def.title, def.data));
+    });
+
+    analyzer.appendChild(sections);
+
+    // --- Рекомендации ---
+    if (report.recommendations.length > 0) {
+      const recommendations = this._createElement('div', { class: 'seo-analyzer__recommendations' });
+
+      const recTitle = this._createElement('div', { class: 'seo-analyzer__recommendations-title' });
+      recTitle.textContent = 'Рекомендации по улучшению';
+      recommendations.appendChild(recTitle);
+
+      report.recommendations.forEach(recText => {
+        const item = this._createElement('div', { class: 'seo-analyzer__recommendation-item' });
+        item.textContent = recText;
+        recommendations.appendChild(item);
+      });
+
+      analyzer.appendChild(recommendations);
+    }
+
+    blockContent.appendChild(analyzer);
+  }
+
+  /**
+   * Сборка DOM-элемента для секции анализа
+   */
+  _buildSEOSectionDOM(title, section) {
+    const score = section.score;
+    const color = score >= 75 ? 'var(--color-green, #28a745)'
+      : score >= 50 ? 'var(--color-yellow, #ffc107)'
+      : 'var(--color-red, #dc3545)';
+
+    const container = this._createElement('div', { class: 'seo-analyzer__section' });
+
+    // Заголовок
+    const header = this._createElement('div', { class: 'seo-analyzer__section-header' });
+
+    const titleSpan = this._createElement('span', { class: 'seo-analyzer__section-title' });
+    titleSpan.textContent = title;
+    header.appendChild(titleSpan);
+
+    const scoreSpan = this._createElement('span', {
+      class: 'seo-analyzer__section-score',
+      style: `color: ${color};`
+    });
+    scoreSpan.textContent = `${score}%`;
+    header.appendChild(scoreSpan);
+
+    container.appendChild(header);
+
+    // Полоса прогресса
+    const bar = this._createElement('div', { class: 'seo-analyzer__section-bar' });
+    const barFill = this._createElement('div', {
+      class: 'seo-analyzer__section-bar-fill',
+      style: `width: ${score}%; background: ${color};`
+    });
+    bar.appendChild(barFill);
+    container.appendChild(bar);
+
+    // Детали
+    const details = this._createElement('div', { class: 'seo-analyzer__section-details' });
+
+    (section.issues || []).forEach(text => {
+      details.appendChild(this._createIssueElement(text, 'error'));
+    });
+
+    (section.warnings || []).forEach(text => {
+      details.appendChild(this._createIssueElement(text, 'warning'));
+    });
+
+    (section.success || []).forEach(text => {
+      details.appendChild(this._createIssueElement(text, 'success'));
+    });
+
+    container.appendChild(details);
+
+    return container;
+  }
+
+  /**
+   * Элемент строки с иконкой
+   */
+  _createIssueElement(text, type) {
+    const div = this._createElement('div', {
+      class: `seo-analyzer__issue seo-analyzer__issue--${type}`
+    });
+
+    const icons = { error: '❌', warning: '⚠️', success: '✅' };
+    div.textContent = `${icons[type] || ''} ${text}`;
+
+    return div;
+  }
+
+  /**
+   * Плейсхолдер до первого анализа
+   */
+  showSEAPlaceholder() {
+    const sidebarBlock = document.querySelector('[data-element="aside-block-seo-analyzer"]');
+    if (!sidebarBlock) return;
+
+    const blockContent = sidebarBlock.querySelector('.block-content');
+    if (!blockContent) return;
+
+    blockContent.innerHTML = '';
+
+    const noteBlock = this._createElement('div', { class: 'note-block note-block_blue' });
+
+    const paragraphs = [
+      'Для проверки SEO-оптимизации контента нажмите кнопку «SEO-анализ» под формой редактирования.',
+      'Анализатор проверит заголовки, описание, ключевые слова, контент и URL на соответствие рекомендациям поисковых систем.',
+      'После проверки здесь появятся результаты с оценками по каждому разделу и рекомендации по улучшению.'
+    ];
+
+    paragraphs.forEach(text => {
+      const p = this._createElement('p', { class: 'block-content__phar' });
+      p.textContent = text;
+      noteBlock.appendChild(p);
+    });
+
+    blockContent.appendChild(noteBlock);
+  }
+
+  /**
+   * Хелпер создания элемента
+   */
+  _createElement(tag, attrs = {}) {
+    const el = document.createElement(tag);
+    Object.entries(attrs).forEach(([key, value]) => {
+      if (key === 'class') {
+        el.className = value;
+      } else if (key === 'style') {
+        el.style.cssText = value;
+      } else {
+        el.setAttribute(key, value);
+      }
+    });
+    return el;
+  }
+
   init() {
     const searchParams = new URLParser();
     const elementForm = document.querySelector('[data-element="main-form"]');
@@ -220,7 +413,7 @@ export class PageEntry {
           content: contentTextareaElement.value
         });
 
-        console.log(SEOAnalyze.report);
+        this.renderSEOResults(SEOAnalyze);
       });
 
       this.buttons.save.target.setCallback((event) => {
@@ -629,5 +822,7 @@ export class PageEntry {
       interactiveFooterContainer.append(this.buttons.save.target.element);
       interactiveFooterContainer.append(this.buttons.SEOAnalyze.target.element);
     });
+
+    this.showSEAPlaceholder();
   }
 }
