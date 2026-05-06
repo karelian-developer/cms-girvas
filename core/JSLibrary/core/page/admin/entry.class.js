@@ -815,12 +815,13 @@ export class PageEntry {
         });
       }
 
-      let interactiveFooterContainer = document.querySelector('[data-element="panel"]');
+      const interactiveFooterContainer = document.querySelector('[data-element="panel"]');
+      const sidebarSEOAnalyzerBlockPanelElement = document.querySelector('[data-element="aside-block-seo-analyzer"] .page-aside__block-content');
       interactiveFooterContainer.append(this.buttons.delete.target.element);
       interactiveFooterContainer.append(this.buttons.unpublish.target.element);
       interactiveFooterContainer.append(this.buttons.publish.target.element);
       interactiveFooterContainer.append(this.buttons.save.target.element);
-      interactiveFooterContainer.append(this.buttons.SEOAnalyze.target.element);
+      sidebarSEOAnalyzerBlockPanelElement.append(this.buttons.SEOAnalyze.target.element);
     });
 
     this.showSEAPlaceholder();
