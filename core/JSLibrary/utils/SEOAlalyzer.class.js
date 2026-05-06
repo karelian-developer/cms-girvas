@@ -61,7 +61,7 @@ export class SEOAnalyzer {
       success.push(`Оптимальная длина заголовка (${length} символов)`);
     }
 
-    // Проверка на наличие ключевых слов в начале
+    // Проверка на стоп-слова
     if (primaryTitle && primaryTitle.length > 0) {
       const firstWord = primaryTitle.split(' ')[0].toLowerCase();
       const stopWords = ['как', 'что', 'где', 'когда', 'почему', 'a', 'the', 'in', 'on', 'at', 'to', 'for'];
@@ -78,9 +78,12 @@ export class SEOAnalyzer {
       warnings.push('SEO title совпадает с заголовком страницы');
     } else if (SEOTitle && title) {
       success.push('SEO title отличается от заголовка страницы');
+    } else if (!SEOTitle && title) {
+      // SEO title не заполнен — поисковик получит title страницы
+      warnings.push('SEO title не заполнен. Поисковые системы получат заголовок страницы — это дублирование');
     }
 
-    // Проверка на наличие разделителей
+    // Проверка на разделители
     if (primaryTitle && (primaryTitle.includes('|') || primaryTitle.includes('-') || primaryTitle.includes('–'))) {
       success.push('Заголовок содержит разделители');
     }
@@ -112,7 +115,7 @@ export class SEOAnalyzer {
       success.push(`Оптимальная длина описания (${length} символов)`);
     }
 
-    // Проверка на CTA (призыв к действию)
+    // Проверка на CTA
     if (primaryDescription) {
       const ctaWords = ['узнать', 'заказать', 'купить', 'получить', 'скачать', 'читать', 'подробнее', 'learn', 'buy', 'get', 'download', 'read'];
       const hasCTA = ctaWords.some(word => primaryDescription.toLowerCase().includes(word));
@@ -122,6 +125,15 @@ export class SEOAnalyzer {
       } else {
         warnings.push('Добавьте призыв к действию в описание');
       }
+    }
+
+    // Проверка уникальности SEO description
+    if (SEODescription && description && SEODescription === description) {
+      warnings.push('SEO description совпадает с описанием страницы');
+    } else if (SEODescription && description) {
+      success.push('SEO description отличается от описания страницы');
+    } else if (!SEODescription && description) {
+      warnings.push('SEO description не заполнен. Поисковые системы получат описание страницы — это дублирование');
     }
 
     return {
