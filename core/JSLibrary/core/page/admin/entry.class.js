@@ -626,10 +626,11 @@ export class PageEntry {
         this.buttons.save.target.element.style.display = 'flex';
         this.buttons.SEOAnalyze.target.element.style.display = 'flex';
       } else {
-        let interactiveButtonPreviewUpload = new Interactive('button');
+        const interactiveButtonPreviewUpload = new Interactive('button');
 
-        let previewBlockElement = document.querySelector('[data-element="aside-block-cover"]');
-        let previewBlockContentContainerElement = previewBlockElement.querySelector('.page-aside__block-content');
+        const previewBlockElement = document.querySelector('[data-element="aside-block-cover"]');
+        const previewBlockContentContainerElement = previewBlockElement.querySelector('.page-aside__block-content');
+        const previewBlockPanelContainerElement = previewBlockElement.querySelector('.page-aside__block-panel');
         
         let previewFormElement = document.createElement('form');
         previewFormElement.setAttribute('formmethod', 'PATCH');
@@ -716,7 +717,7 @@ export class PageEntry {
             previewFormElement.appendChild(previewFormInputFileElement);
             previewFormElement.appendChild(interactiveButtonPreviewUpload.target.element);
             previewBlockContentContainerElement.appendChild(previewImageContainerElement);
-            previewBlockContentContainerElement.appendChild(previewFormElement);
+            previewBlockPanelContainerElement.appendChild(previewFormElement);
 
             this.buttons.viewOnSite.target.element.style.display = 'flex';
             this.buttons.unpublish.target.element.style.display = (entryData.isPublished) ? 'flex' : 'none';
@@ -816,7 +817,7 @@ export class PageEntry {
       }
 
       const interactiveFooterContainer = document.querySelector('[data-element="panel"]');
-      const sidebarSEOAnalyzerBlockPanelElement = document.querySelector('[data-element="aside-block-seo-analyzer"] .page-aside__block-content');
+      const sidebarSEOAnalyzerBlockPanelElement = document.querySelector('[data-element="aside-block-seo-analyzer"] .page-aside__block-panel');
       interactiveFooterContainer.append(this.buttons.delete.target.element);
       interactiveFooterContainer.append(this.buttons.unpublish.target.element);
       interactiveFooterContainer.append(this.buttons.publish.target.element);
