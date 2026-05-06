@@ -351,6 +351,7 @@ export class PageEntry {
       this.buttons.delete.assembly();
       this.buttons.publish.assembly();
       this.buttons.unpublish.assembly();
+      this.buttons.SEOAnalyze.assembly();
 
       if (searchParams.getPathPart(3) === null) {
         let request = new Interactive('request', {
@@ -430,6 +431,7 @@ export class PageEntry {
         this.buttons.publish.target.element.style.display = 'none';
         this.buttons.delete.target.element.style.display = 'none';
         this.buttons.save.target.element.style.display = 'flex';
+        this.buttons.SEOAnalyze.target.element.style.display = 'flex';
       } else {
         let interactiveButtonPreviewUpload = new Interactive('button');
 
@@ -528,12 +530,14 @@ export class PageEntry {
             this.buttons.publish.target.element.style.display = (entryData.isPublished) ? 'none' : 'flex';
             this.buttons.delete.target.element.style.display = 'flex';
             this.buttons.save.target.element.style.display = 'flex';
+            this.buttons.SEOAnalyze.target.element.style.display = 'flex';
           } else {
             this.buttons.viewOnSite.target.element.style.display = 'none';
             this.buttons.unpublish.target.element.style.display = 'none';
             this.buttons.publish.target.element.style.display = 'none';
             this.buttons.delete.target.element.style.display = 'none';
             this.buttons.save.target.element.style.display = 'flex';
+            this.buttons.SEOAnalyze.target.element.style.display = 'flex';
           }
           
           return fetch('/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
@@ -623,6 +627,7 @@ export class PageEntry {
       interactiveFooterContainer.append(this.buttons.unpublish.target.element);
       interactiveFooterContainer.append(this.buttons.publish.target.element);
       interactiveFooterContainer.append(this.buttons.save.target.element);
+      interactiveFooterContainer.append(this.buttons.SEOAnalyze.target.element);
     });
   }
 }
