@@ -18,13 +18,32 @@
 import {Interactive} from "../../../interactive.class.js";
 import {URLParser} from "../../../urlParser.class.js";
 import {Utils} from "../../../utils.class.js";
+import {SEOAnalyzer} from "../../../utils/SEOAlalyzer.class.js";
 
 export class PageEntry {
   constructor(page, params = {}) {
+    this.buttons = {save: null, delete: null, publish: null, unpublish: null, SEOAnalyze: null};
+    this.analyzer = new SEOAnalyzer(page.core.locales.admin);
     this.page = page;
     this.statusCode = this.page.getPageStatusCode()
+  }
 
-    this.buttons = {save: null, delete: null, publish: null, unpublish: null};
+  SEOAnalyze(data) {
+    data.title = data.title ?? '';
+    data.SEOTitle = data.SEOTitle ?? '';
+    data.description = data.description ?? '';
+    data.SEODescription = data.SEODescription ?? '';
+    data.keywords = data.keywords ?? '';
+    data.name = data.name ?? '';
+    data.content = data.content ?? '';
+
+    const analysis = this.analyzer.analyze(data);
+    const report = this.analyzer.generateReport(analysis);
+
+    return {
+      analysis: analysis,
+      report: report
+    };
   }
 
   init() {
@@ -43,13 +62,13 @@ export class PageEntry {
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let contentTextareaElement = document.querySelector('[data-element="input-content"]');
-      let descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
-      let SEODescriptionTextareaElement = document.querySelector('[data-element="input-seo-description"]');
-      let titleInputElement = document.querySelector('[data-element="input-title"]');
-      let SEOTitleInputElement = document.querySelector('[data-element="input-seo-title"]');
-      let keywordsInputElement = document.querySelector('[data-element="input-keywords"]');
-      let urlInputElement = document.querySelector('[data-element="input-url"]');
+      const contentTextareaElement = document.querySelector('[data-element="input-content"]');
+      const descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
+      const SEODescriptionTextareaElement = document.querySelector('[data-element="input-seo-description"]');
+      const titleInputElement = document.querySelector('[data-element="input-title"]');
+      const SEOTitleInputElement = document.querySelector('[data-element="input-seo-title"]');
+      const keywordsInputElement = document.querySelector('[data-element="input-keywords"]');
+      const urlInputElement = document.querySelector('[data-element="input-url"]');
 
       locales.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
@@ -163,18 +182,21 @@ export class PageEntry {
       this.buttons.delete = new Interactive('button');
       this.buttons.publish = new Interactive('button');
       this.buttons.unpublish = new Interactive('button');
+      this.buttons.SEOAnalyze = new Interactive('button');
 
       this.buttons.viewOnSite.target.setLabel(localeData.BUTTON_VIEW_ON_SITE_LABEL);
       this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
       this.buttons.publish.target.setLabel(localeData.BUTTON_PUBLISH_LABEL);
       this.buttons.unpublish.target.setLabel(localeData.BUTTON_UNPUBLISH_LABEL);
       this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
+      this.buttons.SEOAnalyze.target.setLabel(localeData.BUTTON_SEO_ANALYZE_LABEL);
 
       this.buttons.viewOnSite.target.setStyle('default');
       this.buttons.unpublish.target.setStyle('red');
       this.buttons.publish.target.setStyle('green');
       this.buttons.delete.target.setStyle('red');
       this.buttons.save.target.setStyle('green');
+      this.buttons.SEOAnalyze.target.setStyle('default');
 
       this.buttons.viewOnSite.target.setCallback((event) => {
         event.preventDefault();
@@ -183,6 +205,22 @@ export class PageEntry {
         let entryLocaleName = interactiveChoicesSelectElement.value;
 
         window.open(`/entry/${entryURL}?locale=${entryLocaleName}`, '_blank');
+      });
+
+      this.buttons.SEOAnalyze.target.setCallback((event) => {
+        event.preventDefault();
+
+        const SEOAnalyze = this.SEOAnalyze({
+          title: titleInputElement.value,
+          SEOTitle: SEOTitleInputElement.value,
+          description: descriptionTextareaElement.value,
+          SEODescription: SEODescriptionTextareaElement.value,
+          keywords: keywordsInputElement.value,
+          name: urlInputElement.value,
+          content: contentTextareaElement.value
+        });
+
+        console.log(SEOAnalyze.report);
       });
 
       this.buttons.save.target.setCallback((event) => {
