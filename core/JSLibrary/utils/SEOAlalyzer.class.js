@@ -197,10 +197,8 @@ export class SEOAnalyzer {
       };
     }
 
-    // Анализ Markdown
     const markdownAnalysis = this.analyzeMarkdown(content);
     
-    // Длина контента (без учета Markdown синтаксиса)
     const plainText = this.stripMarkdown(content);
     const length = plainText.length;
     
@@ -212,23 +210,19 @@ export class SEOAnalyzer {
       success.push(`Оптимальная длина контента (${length} символов)`);
     }
 
-    // Проверка заголовков
-    if (markdownAnalysis.headings.length === 0) {
-      issues.push('Отсутствуют заголовки в контенте');
+    // Проверка заголовков (H1 подгружается автоматически через тему, проверяем H2–H6)
+    const contentHeadings = markdownAnalysis.headings.filter(h => h.level >= 2);
+    
+    if (contentHeadings.length === 0) {
+      warnings.push('Рекомендуется использовать заголовки H2–H6 для структурирования контента');
     } else {
-      success.push(`Найдено ${markdownAnalysis.headings.length} заголовков`);
+      success.push(`Найдено ${contentHeadings.length} заголовков в контенте`);
       
-      // Проверка иерархии заголовков
       if (this.config.headingsHierarchy) {
-        const hierarchyIssue = this.checkHeadingHierarchy(markdownAnalysis.headings);
+        const hierarchyIssue = this.checkHeadingHierarchy(contentHeadings);
         if (hierarchyIssue) {
           warnings.push(hierarchyIssue);
         }
-      }
-      
-      // Проверка наличия H1
-      if (!markdownAnalysis.headings.some(h => h.level === 1)) {
-        warnings.push('Отсутствует H1 заголовок в контенте');
       }
     }
 
@@ -238,17 +232,13 @@ export class SEOAnalyzer {
     } else {
       success.push(`Найдено ${markdownAnalysis.images.length} изображений`);
       
-      // Проверка alt текста
       const imagesWithoutAlt = markdownAnalysis.images.filter(img => !img.alt || img.alt.trim() === '');
       if (imagesWithoutAlt.length > 0 && this.config.imageAltRequired) {
         issues.push(`${imagesWithoutAlt.length} изображений без alt текста`);
       }
       
-      // Проверка ключевых слов в alt
-      const imagesWithKeywords = markdownAnalysis.images.filter(img => 
-        img.alt && img.alt.length > 0
-      );
-      if (imagesWithKeywords.length > 0) {
+      const imagesWithAlt = markdownAnalysis.images.filter(img => img.alt && img.alt.length > 0);
+      if (imagesWithAlt.length > 0) {
         success.push('Изображения содержат alt текст');
       }
     }
@@ -259,13 +249,11 @@ export class SEOAnalyzer {
     } else {
       success.push(`Найдено ${markdownAnalysis.links.length} ссылок`);
       
-      // Проверка title атрибутов
       const linksWithoutTitle = markdownAnalysis.links.filter(link => !link.title);
       if (linksWithoutTitle.length > 0 && this.config.linkTitleRequired) {
         warnings.push(`${linksWithoutTitle.length} ссылок без title атрибута`);
       }
       
-      // Проверка внешних ссылок с nofollow
       const externalLinks = markdownAnalysis.links.filter(link => 
         link.url.startsWith('http') || link.url.startsWith('www')
       );
