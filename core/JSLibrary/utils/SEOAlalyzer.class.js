@@ -304,19 +304,6 @@ export class SEOAnalyzer {
       }
     }
 
-    // Проверка вхождения ключевых слов в начале контента
-    if (title) {
-      const firstParagraph = plainText.split('\n\n')[0];
-      const titleWords = title.toLowerCase().split(' ').filter(w => w.length > 3);
-      const keywordInIntro = titleWords.some(word => firstParagraph.toLowerCase().includes(word));
-      
-      if (keywordInIntro) {
-        success.push('Ключевые слова встречаются в начале контента');
-      } else {
-        warnings.push('Ключевые слова не найдены в первом абзаце');
-      }
-    }
-
     // Проверка плотности текста со ссылками
     const linkTextLength = markdownAnalysis.links.reduce((sum, link) => sum + link.text.length, 0);
     const linkDensity = length > 0 ? (linkTextLength / length) * 100 : 0;
