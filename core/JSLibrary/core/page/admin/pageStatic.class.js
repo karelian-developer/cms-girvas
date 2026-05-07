@@ -52,7 +52,7 @@ export class PagePageStatic {
     uString.source = uString.source.toLowerCase();
     uString.source = uString.source.replace(/[^a-z0-9\-]/g, '');
     uString.source = uString.source.replace(/^-|-$/g, '');
-    
+
     return uString.source;
   }
 
@@ -314,9 +314,9 @@ export class PagePageStatic {
         
         let removedBefore = 0;
         for (let i = 0; i < cursorPos; i++) {
-          if (!/[a-z0-9\-]/.test(oldValue[i].toLowerCase())) {
-            removedBefore++;
-          }
+            if (!/[a-z0-9\-]/.test(oldValue[i].toLowerCase())) {
+                removedBefore++;
+            }
         }
         
         event.target.value = newValue;
@@ -329,9 +329,10 @@ export class PagePageStatic {
 
       urlInputElement.addEventListener('paste', (event) => {
         event.preventDefault();
-
         let inputValue = (event.clipboardData || window.clipboardData).getData('text');
         event.target.value = formatUrlString(inputValue);
+        
+        event.target.dispatchEvent(new Event('input', { bubbles: true }));
       });
 
       let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
