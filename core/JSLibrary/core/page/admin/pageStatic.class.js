@@ -45,17 +45,6 @@ export class PagePageStatic {
     };
   }
 
-  formatUrlString(inputValue) {
-    let utils = new Utils();
-    let uString = utils.createString(inputValue);
-    uString.source = uString.translitToEN(true);
-    uString.source = uString.source.toLowerCase();
-    uString.source = uString.source.replace(/[^a-z0-9\-]/g, '');
-    uString.source = uString.source.replace(/^-|-$/g, '');
-
-    return uString.source;
-  }
-
   /**
    * Отрисовка SEO-результатов в сайдбар-блоке через DOM
    */
@@ -305,7 +294,31 @@ export class PagePageStatic {
       interactiveContainerElement.append(interactiveLocaleChoices.target.element);
 
       urlInputElement.addEventListener('input', (event) => {
-        event.target.value = formatUrlString(event.target.value);
+        let inputValue = event.target.value;
+
+        let utils = new Utils();
+        let uString = utils.createString(inputValue);
+        uString.source = uString.translitToEN(true);
+        uString.source = uString.source.toLowerCase();
+        uString.source = uString.source.replace(/[^a-z0-9\-]/g, '');
+        uString.source = uString.source.replace(/^-|-$/g, '');
+
+        event.target.value = uString.source;
+      });
+
+      urlInputElement.addEventListener('paste', (event) => {
+        event.preventDefault();
+
+        let inputValue = (event.clipboardData || window.clipboardData).getData('text');
+
+        let utils = new Utils();
+        let uString = utils.createString(inputValue);
+        uString.source = uString.translitToEN(true);
+        uString.source = uString.source.toLowerCase();
+        uString.source = uString.source.replace(/[^a-z0-9\-]/g, '');
+        uString.source = uString.source.replace(/^-|-$/g, '');
+
+        event.target.value = uString.source;
       });
 
       let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
