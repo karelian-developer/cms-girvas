@@ -28,13 +28,48 @@ export class SEOAnalyzer {
     };
   }
 
+  /**
+   * Локализация с поддержкой %s, %d, %.Nf
+   * @param {string} key - ключ строки
+   * @param {...*} args - аргументы для подстановки
+   * @returns {string}
+   */
+  _t(key, ...args) {
+    let text = this.localeData[key] || key;
+    
+    if (args.length === 0) return text;
+    
+    // Имитация sprintf для %s, %d, %.Nf
+    let argIndex = 0;
+    return text.replace(/%([.0-9]*)([sdf])/g, (match, precision, type) => {
+      if (argIndex >= args.length) return match;
+      
+      const value = args[argIndex++];
+      
+      switch (type) {
+        case 's':
+          return String(value);
+        case 'd':
+          return parseInt(value, 10);
+        case 'f':
+          if (precision && precision.startsWith('.')) {
+            const decimals = parseInt(precision.slice(1), 10);
+            return parseFloat(value).toFixed(decimals);
+          }
+          return parseFloat(value);
+        default:
+          return match;
+      }
+    });
+  }
+
   analyze(SEOData) {
     const results = {
       title: this.analyzeTitle(SEOData.title, SEOData.SEOTitle, SEOData.keywords),
       description: this.analyzeDescription(SEOData.description, SEOData.SEODescription, SEOData.keywords),
       keywords: this.analyzeKeywords(SEOData.keywords),
       content: this.analyzeContent(SEOData.content, SEOData.keywords),
-      url: this.analyzeUrl(SEOData.name),
+      url: this.analyzeURL(SEOData.name),
       overallScore: 0
     };
 
@@ -48,43 +83,38 @@ export class SEOAnalyzer {
     const success = [];
     const primaryTitle = SEOTitle || title;
     
-    // Проверка длины
     const length = primaryTitle.length;
     if (length === 0) {
-      issues.push('Заголовок отсутствует');
+      issues.push(this._t('SEO_ANALYZER_TITLE_ABSENT'));
     } else if (length < this.config.titleLength.min) {
-      issues.push(`Заголовок слишком короткий (${length}/${this.config.titleLength.min} символов)`);
+      issues.push(this._t('SEO_ANALYZER_TITLE_TOO_SHORT', length, this.config.titleLength.min));
     } else if (length > this.config.titleLength.max) {
-      warnings.push(`Заголовок слишком длинный (${length}/${this.config.titleLength.max} символов)`);
+      warnings.push(this._t('SEO_ANALYZER_TITLE_TOO_LONG', length, this.config.titleLength.max));
     } else {
-      success.push(`Оптимальная длина заголовка (${length} символов)`);
+      success.push(this._t('SEO_ANALYZER_TITLE_OPTIMAL', length));
     }
 
-    // Проверка на стоп-слова
     if (primaryTitle && primaryTitle.length > 0) {
       const firstWord = primaryTitle.split(' ')[0].toLowerCase();
       const stopWords = ['как', 'что', 'где', 'когда', 'почему', 'a', 'the', 'in', 'on', 'at', 'to', 'for'];
       
       if (stopWords.includes(firstWord)) {
-        warnings.push('Заголовок начинается со стоп-слова');
+        warnings.push(this._t('SEO_ANALYZER_TITLE_STOP_WORD'));
       } else {
-        success.push('Заголовок начинается с сильного слова');
+        success.push(this._t('SEO_ANALYZER_TITLE_STRONG_WORD'));
       }
     }
 
-    // Проверка уникальности SEO title
     if (SEOTitle && title && SEOTitle === title) {
-      warnings.push('SEO title совпадает с заголовком страницы');
+      warnings.push(this._t('SEO_ANALYZER_TITLE_SEO_DUPLICATE'));
     } else if (SEOTitle && title) {
-      success.push('SEO title отличается от заголовка страницы');
+      success.push(this._t('SEO_ANALYZER_TITLE_SEO_DIFFERENT'));
     } else if (!SEOTitle && title) {
-      // SEO title не заполнен — поисковик получит title страницы
-      warnings.push('SEO title не заполнен. Поисковые системы получат заголовок страницы — это дублирование');
+      warnings.push(this._t('SEO_ANALYZER_TITLE_SEO_EMPTY'));
     }
 
-    // Проверка на разделители
     if (primaryTitle && (primaryTitle.includes('|') || primaryTitle.includes('-') || primaryTitle.includes('–'))) {
-      success.push('Заголовок содержит разделители');
+      success.push(this._t('SEO_ANALYZER_TITLE_HAS_SEPARATOR'));
     }
 
     if (keywords && keywords.trim() !== '' && primaryTitle) {
@@ -94,9 +124,9 @@ export class SEOAnalyzer {
       const foundKeywords = keywordList.filter(kw => titleLower.includes(kw));
       
       if (foundKeywords.length > 0) {
-        success.push(`Заголовок содержит ${foundKeywords.length} ключевых слов: ${foundKeywords.join(', ')}`);
+        success.push(this._t('SEO_ANALYZER_TITLE_HAS_KEYWORDS', foundKeywords.length, keywordList.length));
       } else {
-        warnings.push('Заголовок не содержит ключевых слов');
+        warnings.push(this._t('SEO_ANALYZER_TITLE_NO_KEYWORDS'));
       }
     }
 
@@ -118,34 +148,32 @@ export class SEOAnalyzer {
     const length = primaryDescription ? primaryDescription.length : 0;
     
     if (length === 0) {
-      issues.push('Meta description отсутствует');
+      issues.push(this._t('SEO_ANALYZER_DESCRIPTION_ABSENT'));
     } else if (length < this.config.descriptionLength.min) {
-      issues.push(`Описание слишком короткое (${length}/${this.config.descriptionLength.min} символов)`);
+      issues.push(this._t('SEO_ANALYZER_DESCRIPTION_TOO_SHORT', length, this.config.descriptionLength.min));
     } else if (length > this.config.descriptionLength.max) {
-      warnings.push(`Описание слишком длинное (${length}/${this.config.descriptionLength.max} символов)`);
+      warnings.push(this._t('SEO_ANALYZER_DESCRIPTION_TOO_LONG', length, this.config.descriptionLength.max));
     } else {
-      success.push(`Оптимальная длина описания (${length} символов)`);
+      success.push(this._t('SEO_ANALYZER_DESCRIPTION_OPTIMAL', length));
     }
 
-    // Проверка на CTA
     if (primaryDescription) {
       const ctaWords = ['узнать', 'заказать', 'купить', 'получить', 'скачать', 'читать', 'подробнее', 'learn', 'buy', 'get', 'download', 'read'];
       const hasCTA = ctaWords.some(word => primaryDescription.toLowerCase().includes(word));
       
       if (hasCTA) {
-        success.push('Описание содержит призыв к действию');
+        success.push(this._t('SEO_ANALYZER_DESCRIPTION_HAS_CTA'));
       } else {
-        warnings.push('Добавьте призыв к действию в описание');
+        warnings.push(this._t('SEO_ANALYZER_DESCRIPTION_NO_CTA'));
       }
     }
 
-    // Проверка уникальности SEO description
     if (SEODescription && description && SEODescription === description) {
-      warnings.push('SEO description совпадает с описанием страницы');
+      warnings.push(this._t('SEO_ANALYZER_DESCRIPTION_SEO_DUPLICATE'));
     } else if (SEODescription && description) {
-      success.push('SEO description отличается от описания страницы');
+      success.push(this._t('SEO_ANALYZER_DESCRIPTION_SEO_DIFFERENT'));
     } else if (!SEODescription && description) {
-      warnings.push('SEO description не заполнен. Поисковые системы получат описание страницы — это дублирование');
+      warnings.push(this._t('SEO_ANALYZER_DESCRIPTION_SEO_EMPTY'));
     }
 
     if (keywords && keywords.trim() !== '' && primaryDescription) {
@@ -155,9 +183,9 @@ export class SEOAnalyzer {
       const foundKeywords = keywordList.filter(kw => descriptionLower.includes(kw));
       
       if (foundKeywords.length > 0) {
-        success.push(`Описание содержит ${foundKeywords.length} ключевых слов: ${foundKeywords.join(', ')}`);
+        success.push(this._t('SEO_ANALYZER_DESCRIPTION_HAS_KEYWORDS', foundKeywords.length, keywordList.length));
       } else {
-        warnings.push('Описание не содержит ключевых слов');
+        warnings.push(this._t('SEO_ANALYZER_DESCRIPTION_NO_KEYWORDS'));
       }
     }
 
@@ -176,7 +204,7 @@ export class SEOAnalyzer {
     const success = [];
     
     if (!keywords || keywords.trim() === '') {
-      issues.push('Ключевые слова отсутствуют');
+      issues.push(this._t('SEO_ANALYZER_KEYWORDS_ABSENT'));
       return {
         score: 0,
         issues,
@@ -189,23 +217,21 @@ export class SEOAnalyzer {
     const keywordList = keywords.split(',').map(k => k.trim()).filter(k => k.length > 0);
     
     if (keywordList.length < this.config.keywordsCount.min) {
-      warnings.push(`Мало ключевых слов (${keywordList.length}/${this.config.keywordsCount.min})`);
+      warnings.push(this._t('SEO_ANALYZER_KEYWORDS_TOO_FEW', keywordList.length, this.config.keywordsCount.min));
     } else if (keywordList.length > this.config.keywordsCount.max) {
-      warnings.push(`Слишком много ключевых слов (${keywordList.length}/${this.config.keywordsCount.max})`);
+      warnings.push(this._t('SEO_ANALYZER_KEYWORDS_TOO_MANY', keywordList.length, this.config.keywordsCount.max));
     } else {
-      success.push(`Оптимальное количество ключевых слов (${keywordList.length})`);
+      success.push(this._t('SEO_ANALYZER_KEYWORDS_OPTIMAL', keywordList.length));
     }
 
-    // Проверка на длину ключевых слов
     const longKeywords = keywordList.filter(k => k.length > 60);
     if (longKeywords.length > 0) {
-      issues.push(`${longKeywords.length} ключевых слов слишком длинные (>60 символов)`);
+      issues.push(this._t('SEO_ANALYZER_KEYWORDS_TOO_LONG', longKeywords.length));
     }
 
-    // Проверка на повторения
     const duplicates = keywordList.filter((item, index) => keywordList.indexOf(item) !== index);
     if (duplicates.length > 0) {
-      warnings.push('Обнаружены повторяющиеся ключевые слова');
+      warnings.push(this._t('SEO_ANALYZER_KEYWORDS_DUPLICATE'));
     }
 
     return {
@@ -224,7 +250,7 @@ export class SEOAnalyzer {
     const success = [];
     
     if (!content || content.trim() === '') {
-      issues.push('Контент отсутствует');
+      issues.push(this._t('SEO_ANALYZER_CONTENT_ABSENT'));
       return {
         score: 0,
         issues,
@@ -240,29 +266,27 @@ export class SEOAnalyzer {
     const length = plainText.length;
     
     if (length < this.config.contentLength.min) {
-      issues.push(`Контент слишком короткий (${length}/${this.config.contentLength.min} символов)`);
+      issues.push(this._t('SEO_ANALYZER_CONTENT_TOO_SHORT', length, this.config.contentLength.min));
     } else if (length > this.config.contentLength.max) {
-      warnings.push(`Контент очень длинный (${length} символов)`);
+      warnings.push(this._t('SEO_ANALYZER_CONTENT_TOO_LONG', length));
     } else {
-      success.push(`Оптимальная длина контента (${length} символов)`);
+      success.push(this._t('SEO_ANALYZER_CONTENT_OPTIMAL', length));
     }
 
-    // Проверка заголовков (H1 подгружается автоматически через тему, проверяем H2–H6)
     const contentHeadings = markdownAnalysis.headings.filter(h => h.level >= 2);
     
     if (contentHeadings.length === 0) {
-      warnings.push('Рекомендуется использовать заголовки H2–H6 для структурирования контента');
+      warnings.push(this._t('SEO_ANALYZER_CONTENT_NO_HEADINGS'));
     } else {
-      success.push(`Найдено ${contentHeadings.length} заголовков в контенте`);
+      success.push(this._t('SEO_ANALYZER_CONTENT_HEADINGS_FOUND', contentHeadings.length));
       
       if (this.config.headingsHierarchy) {
         const hierarchyIssue = this.checkHeadingHierarchy(contentHeadings);
         if (hierarchyIssue) {
-          warnings.push(hierarchyIssue);
+          warnings.push(this._t('SEO_ANALYZER_CONTENT_HEADINGS_HIERARCHY', ...hierarchyIssue));
         }
       }
 
-      // Проверка вхождения ключевых слов в заголовки контента
       if (keywords && keywords.trim() !== '') {
         const keywordList = keywords.split(',').map(k => k.trim().toLowerCase()).filter(k => k.length > 0);
         
@@ -272,31 +296,30 @@ export class SEOAnalyzer {
         });
         
         if (headingsWithKeywords.length === contentHeadings.length) {
-          success.push('Все заголовки контента содержат ключевые слова');
+          success.push(this._t('SEO_ANALYZER_CONTENT_HEADINGS_ALL_KEYWORDS'));
         } else if (headingsWithKeywords.length > 0) {
           warnings.push(
-            `${headingsWithKeywords.length} из ${contentHeadings.length} заголовков содержат ключевые слова`
+            this._t('SEO_ANALYZER_CONTENT_HEADINGS_SOME_KEYWORDS', headingsWithKeywords.length, contentHeadings.length)
           );
         } else {
-          warnings.push('Заголовки контента не содержат ключевых слов');
+          warnings.push(this._t('SEO_ANALYZER_CONTENT_HEADINGS_NO_KEYWORDS'));
         }
       }
     }
 
-    // Проверка изображений
     if (markdownAnalysis.images.length === 0) {
-      success.push('Контент без изображений — допустимо, но изображения улучшают восприятие');
+      success.push(this._t('SEO_ANALYZER_CONTENT_NO_IMAGES'));
     } else {
-      success.push(`Найдено ${markdownAnalysis.images.length} изображений`);
+      success.push(this._t('SEO_ANALYZER_CONTENT_IMAGES_FOUND', markdownAnalysis.images.length));
       
       const imagesWithoutAlt = markdownAnalysis.images.filter(img => !img.alt || img.alt.trim() === '');
       if (imagesWithoutAlt.length > 0) {
-        warnings.push(`${imagesWithoutAlt.length} изображений без alt текста — рекомендуется заполнить`);
+        warnings.push(this._t('SEO_ANALYZER_CONTENT_IMAGES_NO_ALT', imagesWithoutAlt.length));
       }
       
       const imagesWithAlt = markdownAnalysis.images.filter(img => img.alt && img.alt.length > 0);
       if (imagesWithAlt.length > 0) {
-        success.push('Изображения содержат alt текст');
+        success.push(this._t('SEO_ANALYZER_CONTENT_IMAGES_HAS_ALT'));
       }
     }
 
@@ -308,41 +331,38 @@ export class SEOAnalyzer {
       const notFoundKeywords = keywordList.filter(kw => !plainTextLower.includes(kw));
       
       if (foundKeywords.length === keywordList.length) {
-        success.push('Все ключевые слова встречаются в контенте');
+        success.push(this._t('SEO_ANALYZER_CONTENT_ALL_KEYWORDS'));
       } else if (foundKeywords.length > 0) {
         warnings.push(
-          `Найдено ${foundKeywords.length} из ${keywordList.length} ключевых слов в контенте. Отсутствуют: ${notFoundKeywords.join(', ')}`
+          this._t('SEO_ANALYZER_CONTENT_SOME_KEYWORDS', foundKeywords.length, keywordList.length, notFoundKeywords.join(', '))
         );
       } else {
-        warnings.push('Ключевые слова не найдены в контенте');
+        warnings.push(this._t('SEO_ANALYZER_CONTENT_NO_KEYWORDS'));
       }
       
-      // Отдельно — проверка первого абзаца
       const firstParagraph = plainTextLower.split('\n\n')[0];
       const keywordsInIntro = keywordList.filter(kw => firstParagraph.includes(kw));
       
       if (keywordsInIntro.length > 0) {
-        success.push('Ключевые слова встречаются в первом абзаце');
+        success.push(this._t('SEO_ANALYZER_CONTENT_KEYWORDS_IN_INTRO'));
       } else {
-        warnings.push('Добавьте ключевые слова в первый абзац контента');
+        warnings.push(this._t('SEO_ANALYZER_CONTENT_NO_KEYWORDS_IN_INTRO'));
       }
     } else {
-      warnings.push('Ключевые слова не заданы — невозможно проверить вхождение в контент');
+      warnings.push(this._t('SEO_ANALYZER_CONTENT_KEYWORDS_NOT_SET'));
     }
 
-    // Проверка ссылок
     if (markdownAnalysis.links.length === 0) {
-      warnings.push('В контенте отсутствуют ссылки');
+      warnings.push(this._t('SEO_ANALYZER_CONTENT_NO_LINKS'));
     } else {
       const bareLinks = markdownAnalysis.links.filter(l => !l.isMarkdown);
       
-      success.push(`Найдено ${markdownAnalysis.links.length} ссылок`);
+      success.push(this._t('SEO_ANALYZER_CONTENT_LINKS_FOUND', markdownAnalysis.links.length));
       
       if (bareLinks.length > 0) {
-        warnings.push(`${bareLinks.length} голых URL — оформите как Markdown-ссылки для лучшего SEO`);
+        warnings.push(this._t('SEO_ANALYZER_CONTENT_BARE_URLS', bareLinks.length));
       }
       
-      // Проверка внешних ссылок и rel
       const externalLinks = markdownAnalysis.links.filter(link => 
         link.url.startsWith('http') || link.url.startsWith('www')
       );
@@ -355,19 +375,18 @@ export class SEOAnalyzer {
         
         if (missingNofollow > 0) {
           warnings.push(
-            `${missingNofollow} из ${externalLinks.length} внешних ссылок без rel="nofollow"`
+            this._t('SEO_ANALYZER_CONTENT_NOFOLLOW_MISSING', missingNofollow, externalLinks.length)
           );
         } else {
-          success.push('Все внешние ссылки содержат rel="nofollow"');
+          success.push(this._t('SEO_ANALYZER_CONTENT_NOFOLLOW_OK'));
         }
       }
     }
 
-    // Проверка плотности текста со ссылками
     const linkTextLength = markdownAnalysis.links.reduce((sum, link) => sum + link.text.length, 0);
     const linkDensity = length > 0 ? (linkTextLength / length) * 100 : 0;
     if (linkDensity > 10) {
-      warnings.push(`Высокая плотность ссылок: ${linkDensity.toFixed(1)}%`);
+      warnings.push(this._t('SEO_ANALYZER_CONTENT_LINK_DENSITY', linkDensity));
     }
 
     return {
@@ -513,45 +532,40 @@ export class SEOAnalyzer {
     return null;
   }
 
-  analyzeUrl(url) {
+  analyzeURL(url) {
     const issues = [];
     const warnings = [];
     const success = [];
     
     if (!url || url.trim() === '') {
-      issues.push('URL отсутствует');
+      issues.push(this._t('SEO_ANALYZER_URL_ABSENT'));
       return { score: 0, issues, warnings, success, value: '' };
     }
 
-    // Проверка длины
     if (url.length > 75) {
-      warnings.push('URL слишком длинный (>75 символов)');
+      warnings.push(this._t('SEO_ANALYZER_URL_TOO_LONG'));
     } else {
-      success.push('Оптимальная длина URL');
+      success.push(this._t('SEO_ANALYZER_URL_OPTIMAL'));
     }
 
-    // Проверка на использование кириллицы
     if (/[а-яА-ЯёЁ]/.test(url)) {
-      issues.push('URL содержит кириллические символы');
+      issues.push(this._t('SEO_ANALYZER_URL_CYRILLIC'));
     } else {
-      success.push('URL использует латиницу');
+      success.push(this._t('SEO_ANALYZER_URL_LATIN'));
     }
 
-    // Проверка на специальные символы
     if (/[^\w\-/]/.test(url)) {
-      warnings.push('URL содержит нежелательные символы');
+      warnings.push(this._t('SEO_ANALYZER_URL_SPECIAL_CHARS'));
     }
 
-    // Проверка на использование дефисов вместо подчеркиваний
     if (url.includes('_')) {
-      warnings.push('Замените подчеркивания на дефисы в URL');
+      warnings.push(this._t('SEO_ANALYZER_URL_UNDERSCORES'));
     }
 
-    // Проверка на заглавные буквы
     if (/[A-Z]/.test(url)) {
-      issues.push('URL содержит заглавные буквы');
+      issues.push(this._t('SEO_ANALYZER_URL_UPPERCASE'));
     } else {
-      success.push('URL использует строчные буквы');
+      success.push(this._t('SEO_ANALYZER_URL_LOWERCASE'));
     }
 
     return {
@@ -599,41 +613,42 @@ export class SEOAnalyzer {
   }
 
   getRating(score) {
-    if (score >= 90) return { level: 'Отлично', color: '#28a745' };
-    if (score >= 75) return { level: 'Хорошо', color: '#17a2b8' };
-    if (score >= 60) return { level: 'Удовлетворительно', color: '#ffc107' };
-    return { level: 'Требует улучшения', color: '#dc3545' };
+    if (score >= 90) return { level: this._t('SEO_ANALYZER_RATING_EXCELLENT'), color: '#28a745' };
+    if (score >= 75) return { level: this._t('SEO_ANALYZER_RATING_GOOD'), color: '#17a2b8' };
+    if (score >= 60) return { level: this._t('SEO_ANALYZER_RATING_SATISFACTORY'), color: '#ffc107' };
+    return { level: this._t('SEO_ANALYZER_RATING_NEEDS_IMPROVEMENT'), color: '#dc3545' };
   }
 
   generateSummary(analysis) {
-    const totalIssues = Object.values(analysis).reduce((sum, section) => {
-      return sum + (section.issues ? section.issues.length : 0);
-    }, 0);
+    const sections = ['title', 'description', 'keywords', 'content', 'url'];
+    let totalIssues = 0;
+    let totalWarnings = 0;
 
-    const totalWarnings = Object.values(analysis).reduce((sum, section) => {
-      return sum + (section.warnings ? section.warnings.length : 0);
-    }, 0);
+    for (const section of sections) {
+      totalIssues += analysis[section]?.issues?.length || 0;
+      totalWarnings += analysis[section]?.warnings?.length || 0;
+    }
 
-    return `Найдено проблем: ${totalIssues}, предупреждений: ${totalWarnings}. Общая оценка: ${analysis.overallScore}/100`;
+    return this._t('SEO_ANALYZER_SUMMARY', totalIssues, totalWarnings, analysis.overallScore);
   }
 
   generateRecommendations(analysis) {
     const recommendations = [];
     
     if (analysis.title.score < 70) {
-      recommendations.push('Улучшите заголовок: оптимальная длина 30-60 символов');
+      recommendations.push(this._t('SEO_ANALYZER_RECOMMENDATION_TITLE'));
     }
     if (analysis.description.score < 70) {
-      recommendations.push('Улучшите описание: оптимальная длина 120-160 символов');
+      recommendations.push(this._t('SEO_ANALYZER_RECOMMENDATION_DESCRIPTION'));
     }
     if (analysis.keywords.score < 70) {
-      recommendations.push('Добавьте 5-15 ключевых слов через запятую');
+      recommendations.push(this._t('SEO_ANALYZER_RECOMMENDATION_KEYWORDS'));
     }
     if (analysis.content.score < 70) {
-      recommendations.push('Увеличьте контент минимум до 300 символов');
+      recommendations.push(this._t('SEO_ANALYZER_RECOMMENDATION_CONTENT'));
     }
     if (analysis.url.score < 70) {
-      recommendations.push('Оптимизируйте URL: используйте латиницу, дефисы, строчные буквы');
+      recommendations.push(this._t('SEO_ANALYZER_RECOMMENDATION_URL'));
     }
 
     return recommendations;
