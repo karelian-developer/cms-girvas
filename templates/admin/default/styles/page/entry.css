@@ -189,3 +189,136 @@
 .main__page-aside .page-aside__block textarea:disabled {
   background-color: var(--common-main-color-2);
 }
+
+.main__page_entry .seo-analyzer {
+  display: grid;
+  gap: 20px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text, #333);
+}
+
+/* --- Общая оценка --- */
+.main__page_entry .seo-analyzer__total {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border, #e9ecef);
+}
+
+.main__page_entry .seo-analyzer__score {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.main__page_entry .seo-analyzer__score-label {
+  font-size: 18px;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.main__page_entry .seo-analyzer__rating {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --- Секции --- */
+.main__page_entry .seo-analyzer__sections {
+  display: grid;
+  gap: 14px;
+}
+
+.main__page_entry .seo-analyzer__section {
+  display: grid;
+  gap: 4px;
+}
+
+.main__page_entry .seo-analyzer__section-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.main__page_entry .seo-analyzer__section-title {
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--color-text-muted, #6c757d);
+}
+
+.main__page_entry .seo-analyzer__section-score {
+  font-weight: 700;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Полоса прогресса */
+.main__page_entry .seo-analyzer__section-bar {
+  height: 4px;
+  background: var(--color-border, #e9ecef);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.main__page_entry .seo-analyzer__section-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+/* Детали */
+.main__page_entry .seo-analyzer__section-details {
+  display: grid;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.main__page_entry .seo-analyzer__issue {
+  font-size: 11px;
+  line-height: 1.5;
+  padding: 2px 0;
+}
+
+.main__page_entry .seo-analyzer__issue--error {
+  color: var(--color-red, #dc3545);
+}
+
+.main__page_entry .seo-analyzer__issue--warning {
+  color: var(--color-yellow, #b8860b);
+}
+
+.main__page_entry .seo-analyzer__issue--success {
+  color: var(--color-green, #198754);
+}
+
+/* --- Рекомендации --- */
+.main__page_entry .seo-analyzer__recommendations {
+  display: grid;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border, #e9ecef);
+}
+
+.main__page_entry .seo-analyzer__recommendations-title {
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--color-text-muted, #6c757d);
+}
+
+.main__page_entry .seo-analyzer__recommendation-item {
+  font-size: 12px;
+  padding: 8px 10px;
+  background: var(--color-warning-bg, #fff8e1);
+  border-left: 3px solid var(--color-yellow, #ffc107);
+  border-radius: 0 4px 4px 0;
+  line-height: 1.4;
+}
