@@ -101,11 +101,11 @@
   </div>
   <div class="page-aside__block" data-element="aside-block-seo-analyzer">
     <h2 class="page-aside__block-title">
-      {LANG:PAGE_STATIC_PAGE_SIDEBAR_SEO_ANALYZER_TITLE}
+      {LANG:PAGE_PAGE_STATIC_SIDEBAR_SEO_ANALYZER_TITLE}
     </h2>
     <div class="page-aside__block-content block-content">
       <div class="note-block note-block_blue">
-        {LANG:MD:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_SEO_ANALYZER_TIP}
+        {LANG:MD:PAGE_PAGE_STATIC_SIDEBAR_BLOCK_SEO_ANALYZER_TIP}
       </div>
     </div>
     <div class="page-aside__block-panel block-panel"></div>
