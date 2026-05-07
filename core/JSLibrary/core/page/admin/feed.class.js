@@ -42,7 +42,7 @@ export class PageFeed {
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let urlInputElement = document.querySelector('[data-element="input-url"]');
+      const urlInputElement = document.querySelector('[data-element="input-url"]');
 
       this.buttons.save = new Interactive('button');
       this.buttons.delete = new Interactive('button');
@@ -227,7 +227,7 @@ export class PageFeed {
 
         interactiveLocalesChoices.assembly();
 
-        let interactiveContainerElement = document.querySelector('[data-element="header-interactive"]');
+        const interactiveContainerElement = document.querySelector('[data-element="header-interactive"]');
         interactiveContainerElement.append(interactiveLocalesChoices.target.element);
 
         urlInputElement.addEventListener('input', (event) => {
