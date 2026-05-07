@@ -1,1 +1,1 @@
-You can add additional field values ​​directly to the static page content using the **template variable**: *{ENTRY_ADDITIONAL_DATA_<TECHNICAL_NAME>}* (without <>).
+You can add additional field values ​​directly to the static page content using the **template variable**: `{ENTRY_ADDITIONAL_DATA_<TECHNICAL_NAME>}` (without <>).
