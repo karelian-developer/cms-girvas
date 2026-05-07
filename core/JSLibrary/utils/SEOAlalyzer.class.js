@@ -27,6 +27,8 @@ export class SEOAnalyzer {
       imageAltRequired: true,
       linkTitleRequired: true
     };
+
+    console.log(localeData);
   }
 
   analyze(SEOData) {
