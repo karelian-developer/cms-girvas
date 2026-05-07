@@ -193,7 +193,7 @@ export class SEOAnalyzer {
     };
   }
 
-  analyzeContent(content, title, SEOTitle) {
+  analyzeContent(content, title, SEOTitle, keywords) {
     const issues = [];
     const warnings = [];
     const success = [];
