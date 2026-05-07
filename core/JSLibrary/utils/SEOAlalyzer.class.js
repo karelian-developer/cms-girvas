@@ -290,18 +290,33 @@ export class SEOAnalyzer {
     if (markdownAnalysis.links.length === 0) {
       warnings.push('В контенте отсутствуют ссылки');
     } else {
+      const markdownLinks = markdownAnalysis.links.filter(l => l.isMarkdown);
+      const bareLinks = markdownAnalysis.links.filter(l => !l.isMarkdown);
+      
       success.push(`Найдено ${markdownAnalysis.links.length} ссылок`);
       
-      const linksWithoutTitle = markdownAnalysis.links.filter(link => !link.title);
-      if (linksWithoutTitle.length > 0 && this.config.linkTitleRequired) {
-        warnings.push(`${linksWithoutTitle.length} ссылок без title атрибута`);
+      if (bareLinks.length > 0) {
+        warnings.push(`${bareLinks.length} голых URL — оформите как Markdown-ссылки для лучшего SEO`);
       }
       
+      // Проверка внешних ссылок и rel
       const externalLinks = markdownAnalysis.links.filter(link => 
         link.url.startsWith('http') || link.url.startsWith('www')
       );
+      
       if (externalLinks.length > 0) {
-        warnings.push(`${externalLinks.length} внешних ссылок. Рекомендуется добавить rel="nofollow"`);
+        const nofollowLinks = externalLinks.filter(link => 
+          link.rel && link.rel.includes('nofollow')
+        );
+        const missingNofollow = externalLinks.length - nofollowLinks.length;
+        
+        if (missingNofollow > 0) {
+          warnings.push(
+            `${missingNofollow} из ${externalLinks.length} внешних ссылок без rel="nofollow"`
+          );
+        } else {
+          success.push('Все внешние ссылки содержат rel="nofollow"');
+        }
       }
     }
 
@@ -350,9 +365,7 @@ export class SEOAnalyzer {
       if (match[3]) {
         try {
           attrs = JSON.parse(`{${match[3]}}`);
-        } catch (e) {
-          // невалидный JSON — игнорируем
-        }
+        } catch (e) {}
       }
       
       result.images.push({
@@ -369,17 +382,37 @@ export class SEOAnalyzer {
       if (match[3]) {
         try {
           attrs = JSON.parse(`{${match[3]}}`);
-        } catch (e) {
-          // невалидный JSON — игнорируем
-        }
+        } catch (e) {}
       }
       
       result.links.push({
         text: match[1],
         url: match[2],
         title: attrs.title || null,
+        rel: attrs.rel || null,
         isMarkdown: true
       });
+    }
+
+    // Поиск голых URL
+    const usedUrls = new Set([
+      ...result.links.map(l => l.url),
+      ...result.images.map(i => i.url)
+    ]);
+    
+    const bareUrlRegex = /(?<!\]\(\s*|!\[[^\]]*\]\(\s*)(https?:\/\/[^\s<>"')\]]+)/gi;
+    while ((match = bareUrlRegex.exec(content)) !== null) {
+      const url = match[1].replace(/[.,;:!?]+$/, '');
+      if (!usedUrls.has(url)) {
+        result.links.push({
+          text: url,
+          url: url,
+          title: null,
+          rel: null,
+          isMarkdown: false
+        });
+        usedUrls.add(url);
+      }
     }
 
     // Поиск списков
