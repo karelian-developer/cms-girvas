@@ -34,7 +34,7 @@ export class SEOAnalyzer {
       title: this.analyzeTitle(SEOData.title, SEOData.SEOTitle),
       description: this.analyzeDescription(SEOData.description, SEOData.SEODescription),
       keywords: this.analyzeKeywords(SEOData.keywords),
-      content: this.analyzeContent(SEOData.content, SEOData.title, SEOData.SEOTitle),
+      content: this.analyzeContent(SEOData.content, SEOData.title, SEOData.SEOTitle, SEOData.keywords),
       url: this.analyzeUrl(SEOData.name),
       overallScore: 0
     };
@@ -253,6 +253,36 @@ export class SEOAnalyzer {
       if (imagesWithAlt.length > 0) {
         success.push('Изображения содержат alt текст');
       }
+    }
+
+    if (keywords && keywords.trim() !== '') {
+      const keywordList = keywords.split(',').map(k => k.trim().toLowerCase()).filter(k => k.length > 0);
+      const plainTextLower = plainText.toLowerCase();
+      
+      const foundKeywords = keywordList.filter(kw => plainTextLower.includes(kw));
+      const notFoundKeywords = keywordList.filter(kw => !plainTextLower.includes(kw));
+      
+      if (foundKeywords.length === keywordList.length) {
+        success.push('Все ключевые слова встречаются в контенте');
+      } else if (foundKeywords.length > 0) {
+        warnings.push(
+          `Найдено ${foundKeywords.length} из ${keywordList.length} ключевых слов в контенте. Отсутствуют: ${notFoundKeywords.join(', ')}`
+        );
+      } else {
+        warnings.push('Ключевые слова не найдены в контенте');
+      }
+      
+      // Отдельно — проверка первого абзаца
+      const firstParagraph = plainTextLower.split('\n\n')[0];
+      const keywordsInIntro = keywordList.filter(kw => firstParagraph.includes(kw));
+      
+      if (keywordsInIntro.length > 0) {
+        success.push('Ключевые слова встречаются в первом абзаце');
+      } else {
+        warnings.push('Добавьте ключевые слова в первый абзац контента');
+      }
+    } else {
+      warnings.push('Ключевые слова не заданы — невозможно проверить вхождение в контент');
     }
 
     // Проверка ссылок
