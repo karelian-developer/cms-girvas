@@ -294,31 +294,32 @@ export class PagePageStatic {
       interactiveContainerElement.append(interactiveLocaleChoices.target.element);
 
       urlInputElement.addEventListener('input', (event) => {
-        let inputValue = event.target.value;
+        let oldValue = event.target.value;
+        let cursorPos = event.target.selectionStart;
 
         let utils = new Utils();
-        let uString = utils.createString(inputValue);
+        let uString = utils.createString(oldValue);
         uString.source = uString.translitToEN(true);
         uString.source = uString.source.toLowerCase();
         uString.source = uString.source.replace(/[^a-z0-9\-]/g, '');
-        uString.source = uString.source.replace(/^-|-$/g, '');
 
-        event.target.value = uString.source;
-      });
+        let newValue = uString.source;
 
-      urlInputElement.addEventListener('paste', (event) => {
-        event.preventDefault();
+        if (oldValue === newValue) return;
 
-        let inputValue = (event.clipboardData || window.clipboardData).getData('text');
+        let removedBefore = 0;
+        for (let i = 0; i < cursorPos; i++) {
+          if (!/[a-z0-9\-]/.test(oldValue[i].toLowerCase())) {
+            removedBefore++;
+          }
+        }
 
-        let utils = new Utils();
-        let uString = utils.createString(inputValue);
-        uString.source = uString.translitToEN(true);
-        uString.source = uString.source.toLowerCase();
-        uString.source = uString.source.replace(/[^a-z0-9\-]/g, '');
-        uString.source = uString.source.replace(/^-|-$/g, '');
+        event.target.value = newValue;
 
-        event.target.value = uString.source;
+        let newCursorPos = cursorPos - removedBefore;
+        if (newCursorPos < 0) newCursorPos = 0;
+        if (newCursorPos > newValue.length) newCursorPos = newValue.length;
+        event.target.setSelectionRange(newCursorPos, newCursorPos);
       });
 
       let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
