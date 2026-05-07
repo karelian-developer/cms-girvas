@@ -307,18 +307,31 @@ export class PagePageStatic {
 
         if (oldValue === newValue) return;
 
-        let removedBefore = 0;
+        // считаем, сколько допустимых символов было до курсора в старом значении
+        let validBefore = 0;
         for (let i = 0; i < cursorPos; i++) {
-          if (!/[a-z0-9\-]/.test(oldValue[i].toLowerCase())) {
-            removedBefore++;
+          if (/[a-z0-9\-]/.test(oldValue[i].toLowerCase())) {
+            validBefore++;
           }
         }
 
         event.target.value = newValue;
 
-        let newCursorPos = cursorPos - removedBefore;
-        if (newCursorPos < 0) newCursorPos = 0;
-        if (newCursorPos > newValue.length) newCursorPos = newValue.length;
+        // ищем позицию в новом значении, где количество допустимых символов совпадает
+        let newCursorPos = 0;
+        let count = 0;
+        for (let i = 0; i < newValue.length; i++) {
+          if (count >= validBefore) {
+            newCursorPos = i;
+            break;
+          }
+          
+          if (/[a-z0-9\-]/.test(newValue[i])) {
+            count++;
+          }
+          newCursorPos = i + 1;
+        }
+
         event.target.setSelectionRange(newCursorPos, newCursorPos);
       });
 
