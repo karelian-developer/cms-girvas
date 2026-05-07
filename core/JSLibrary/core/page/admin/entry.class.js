@@ -25,7 +25,7 @@ export class PageEntry {
     this.buttons = {save: null, delete: null, publish: null, unpublish: null, SEOAnalyze: null};
     this.analyzer = null;
     this.page = page;
-    this.statusCode = this.page.getPageStatusCode()
+    this.statusCode = this.page.getPageStatusCode();
   }
 
   SEOAnalyze(data) {
@@ -605,12 +605,12 @@ export class PageEntry {
         const previewBlockContentContainerElement = previewBlockElement.querySelector('.page-aside__block-content');
         const previewBlockPanelContainerElement = previewBlockElement.querySelector('.page-aside__block-panel');
         
-        let previewFormElement = document.createElement('form');
+        const previewFormElement = document.createElement('form');
         previewFormElement.setAttribute('formmethod', 'PATCH');
         previewFormElement.classList.add('form');
         previewFormElement.classList.add('form-entry-preview');
 
-        let previewFormInputFileElement = document.createElement('input');
+        const previewFormInputFileElement = document.createElement('input');
         previewFormInputFileElement.setAttribute('type', 'file');
         previewFormInputFileElement.setAttribute('name', 'entry_preview');
         previewFormInputFileElement.style.display = 'none';
