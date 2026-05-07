@@ -99,6 +99,15 @@
     </h2>
     <div class="page-aside__block-content block-content"></div>
   </div>
+  <div class="page-aside__block" data-element="aside-block-seo-analyzer">
+    <h2 class="page-aside__block-title">
+      {LANG:PAGE_STATIC_PAGE_SIDEBAR_SEO_ANALYZER_TITLE}
+    </h2>
+    <div class="page-aside__block-content block-content">
+      {LANG:MD:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_SEO_ANALYZER_TIP}
+    </div>
+    <div class="page-aside__block-panel block-panel"></div>
+  </div>
   <div class="page-aside__block block">
     <h2 class="page-aside__block-title">
       {LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_PERSONAL_TEMPLATE_TITLE}

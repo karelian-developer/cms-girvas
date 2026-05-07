@@ -194,35 +194,6 @@ export class PageEntry {
   }
 
   /**
-   * Плейсхолдер до первого анализа
-   */
-  showSEAPlaceholder() {
-    const sidebarBlock = document.querySelector('[data-element="aside-block-seo-analyzer"]');
-    if (!sidebarBlock) return;
-
-    const blockContent = sidebarBlock.querySelector('.block-content');
-    if (!blockContent) return;
-
-    blockContent.innerHTML = '';
-
-    const noteBlock = this._createElement('div', { class: 'note-block note-block_blue' });
-
-    const paragraphs = [
-      'Для проверки SEO-оптимизации контента нажмите кнопку «SEO-анализ» под формой редактирования.',
-      'Анализатор проверит заголовки, описание, ключевые слова, контент и URL на соответствие рекомендациям поисковых систем.',
-      'После проверки здесь появятся результаты с оценками по каждому разделу и рекомендации по улучшению.'
-    ];
-
-    paragraphs.forEach(text => {
-      const p = this._createElement('p', { class: 'block-content__phar' });
-      p.textContent = text;
-      noteBlock.appendChild(p);
-    });
-
-    blockContent.appendChild(noteBlock);
-  }
-
-  /**
    * Хелпер создания элемента
    */
   _createElement(tag, attrs = {}) {
@@ -824,7 +795,5 @@ export class PageEntry {
       interactiveFooterContainer.append(this.buttons.save.target.element);
       sidebarSEOAnalyzerBlockPanelElement.append(this.buttons.SEOAnalyze.target.element);
     });
-
-    this.showSEAPlaceholder();
   }
 }
