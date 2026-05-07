@@ -314,9 +314,9 @@ export class PagePageStatic {
         
         let removedBefore = 0;
         for (let i = 0; i < cursorPos; i++) {
-            if (!/[a-z0-9\-]/.test(oldValue[i].toLowerCase())) {
-                removedBefore++;
-            }
+          if (!/[a-z0-9\-]/.test(oldValue[i].toLowerCase())) {
+            removedBefore++;
+          }
         }
         
         event.target.value = newValue;
@@ -325,15 +325,6 @@ export class PagePageStatic {
         if (newCursorPos < 0) newCursorPos = 0;
         if (newCursorPos > newValue.length) newCursorPos = newValue.length;
         event.target.setSelectionRange(newCursorPos, newCursorPos);
-      });
-
-      urlInputElement.addEventListener('paste', (event) => {
-        event.preventDefault();
-        
-        let inputValue = (event.clipboardData || window.clipboardData).getData('text');
-        event.target.value = formatUrlString(inputValue);
-        
-        event.target.dispatchEvent(new Event('input', { bubbles: true }));
       });
 
       let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
