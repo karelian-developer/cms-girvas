@@ -223,13 +223,15 @@ export class PagePageStatic {
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let urlInputElement = document.querySelector('[data-element="input-url"]');
-      let titleInputElement = document.querySelector('[data-element="input-title"]');
-      let SEOTitleInputElement = document.querySelector('[data-element="input-seo-title"]');
-      let descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
-      let SEODescriptionTextareaElement = document.querySelector('[data-element="input-seo-description"]');
-      let keywordsInputElement = document.querySelector('[data-element="input-keywords"]');
-      let contentTextareaElement = document.querySelector('[data-element="input-content"]');
+      this.analyzer = new SEOAnalyzer(localeData);
+
+      const urlInputElement = document.querySelector('[data-element="input-url"]');
+      const titleInputElement = document.querySelector('[data-element="input-title"]');
+      const SEOTitleInputElement = document.querySelector('[data-element="input-seo-title"]');
+      const descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
+      const SEODescriptionTextareaElement = document.querySelector('[data-element="input-seo-description"]');
+      const keywordsInputElement = document.querySelector('[data-element="input-keywords"]');
+      const contentTextareaElement = document.querySelector('[data-element="input-content"]');
 
       locales.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
