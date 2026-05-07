@@ -116,7 +116,9 @@
       {LANG:PAGE_ENTRY_SIDEBAR_SEO_ANALYZER_TITLE}
     </h2>
     <div class="page-aside__block-content block-content">
-      {LANG:MD:PAGE_ENTRY_SIDEBAR_BLOCK_SEO_ANALYZER_TIP}
+      <div class="note-block note-block_blue">
+        {LANG:MD:PAGE_ENTRY_SIDEBAR_BLOCK_SEO_ANALYZER_TIP}
+      </div>
     </div>
     <div class="page-aside__block-panel block-panel"></div>
   </div>

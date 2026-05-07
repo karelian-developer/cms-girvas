@@ -101,6 +101,14 @@
   padding: 20px;
 }
 
+.main__page-aside .page-aside__block-panel {
+  display: flex;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--admin-panel-main-aside-block-content-font-color);
+  padding: 20px;
+}
+
 .page__title {
   display: flex;
   align-items: center;
