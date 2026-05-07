@@ -46,11 +46,15 @@ class NadvoParse
     'dangerous_tags' => '/<\?(?:php)?.*?\?>|<(script|iframe)[^>]*>.*?<\/\1>/is'
   ];
 
+  private array $usedHeaderIds = [];
+
   public function __construct()
   {}
 
   public function parse(string $markdown) : string
   {
+    $this->usedHeaderIds = [];
+
     $markdown = $this->sanitizeInput($markdown);
     $markdown = $this->parseCodeBlocks($markdown);
     $markdown = $this->parseQuotes($markdown);
@@ -421,7 +425,11 @@ class NadvoParse
           $currentParagraph = '';
         }
 
-        $html .= '<h' . strlen($matches[1]) . '>' . $matches[2] . '</h' . strlen($matches[1]) . '>' . "\n";
+        $level = strlen($matches[1]);
+        $text = $matches[2];
+        $id = $this->generateHeaderId($text);
+
+        $html .= '<h' . $level . ' id="' . $id . '">' . $text . '</h' . $level . '>' . "\n";
         continue;
       }
       
@@ -596,5 +604,28 @@ class NadvoParse
     $html = preg_replace(self::PATTERNS['underline'], '<u>$1</u>', $html);
     
     return $html;
+  }
+
+  private function generateHeaderId(string $text) : string
+  {
+    $text = Utils::transliterate($text);
+    $text = mb_strtolower($text, 'UTF-8');
+    $text = preg_replace('/[^a-z0-9]+/', '-', $text);
+    $text = trim($text, '-');
+    
+    if (empty($text)) {
+        $text = 'heading-' . substr(md5($text), 0, 8);
+    }
+    
+    $original = $text;
+    $counter = 1;
+    
+    while (in_array($text, $this->usedHeaderIds, true)) {
+        $text = $original . '-' . $counter++;
+    }
+    
+    $this->usedHeaderIds[] = $text;
+    
+    return $text;
   }
 }
