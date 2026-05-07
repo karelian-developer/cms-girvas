@@ -344,22 +344,41 @@ export class SEOAnalyzer {
     }
 
     // Поиск изображений
-    const imageRegex = /!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g;
+    const imageRegex = /!\[([^\]]*)\]\(([^)\s]+)\)(?:\{([^}]*)\})?/g;
     while ((match = imageRegex.exec(content)) !== null) {
+      let attrs = {};
+      if (match[3]) {
+        try {
+          attrs = JSON.parse(`{${match[3]}}`);
+        } catch (e) {
+          // невалидный JSON — игнорируем
+        }
+      }
+      
       result.images.push({
         alt: match[1],
         url: match[2],
-        title: match[3] || null
+        title: attrs.title || null
       });
     }
 
     // Поиск ссылок (исключая изображения)
-    const linkRegex = /(?<!!)\[([^\]]+)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g;
+    const linkRegex = /(?<!\!)\[([^\]]+)\]\(([^)\s]+)\)(?:\{([^}]*)\})?/g;
     while ((match = linkRegex.exec(content)) !== null) {
+      let attrs = {};
+      if (match[3]) {
+        try {
+          attrs = JSON.parse(`{${match[3]}}`);
+        } catch (e) {
+          // невалидный JSON — игнорируем
+        }
+      }
+      
       result.links.push({
         text: match[1],
         url: match[2],
-        title: match[3] || null
+        title: attrs.title || null,
+        isMarkdown: true
       });
     }
 
