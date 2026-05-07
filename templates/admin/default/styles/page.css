@@ -106,6 +106,7 @@
   justify-content: center;
   font-size: 14px;
   color: var(--admin-panel-main-aside-block-content-font-color);
+  border-top: 1px solid var(--common-main-color-2);
   padding: 20px;
 }
 
@@ -516,7 +517,7 @@
   gap: 20px;
   font-size: 13px;
   line-height: 1.5;
-  color: var(--color-text, #333);
+  color: var(--common-main-color-4);
 }
 
 /* --- Общая оценка --- */
@@ -571,7 +572,7 @@
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  color: var(--color-text-muted, #6c757d);
+  color: var(--common-main-color-3);
 }
 
 .main__page-wrapper .seo-analyzer__section-score {
@@ -632,7 +633,7 @@
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  color: var(--color-text-muted, #6c757d);
+  color: var(--common-main-color-3);
 }
 
 .main__page-wrapper .seo-analyzer__recommendation-item {
