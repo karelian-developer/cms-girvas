@@ -118,7 +118,7 @@
     <div class="page-aside__block-content block-content">
       <div class="block__input-container input-container">
         {LANG:MD:PAGE_PAGE_STATIC_SIDEBAR_BLOCK_PERSONAL_TEMPLATE_TIP}
-        <input class="block__input input input_text" type="text" name="page_static_template_path" pattern="^(?!.*(?:\.\./|\./))[A-Za-z0-9/]+[A-Za-z0-9_.]*(-[A-Za-z0-9_.]+)*\.tpl$" placeholder="page/static/snowka.tpl" value="{PAGE_STATIC_PERSONAL_TEMPLATE_PATH}">
+        <input class="block__input input input_text" type="text" name="page_static_template_path" pattern="^(?!.*(\.\.\/|\.\/))[A-Za-z0-9\/]+[A-Za-z0-9_.]*(\-[A-Za-z0-9_.]+)*\.tpl$" placeholder="page/static/snowka.tpl" value="{PAGE_STATIC_PERSONAL_TEMPLATE_PATH}">
       </div>
     </div>
   </div>
