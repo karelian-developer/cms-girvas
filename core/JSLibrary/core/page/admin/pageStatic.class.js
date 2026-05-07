@@ -305,26 +305,7 @@ export class PagePageStatic {
       interactiveContainerElement.append(interactiveLocaleChoices.target.element);
 
       urlInputElement.addEventListener('input', (event) => {
-        let oldValue = event.target.value;
-        let newValue = formatUrlString(oldValue);
-        
-        if (oldValue === newValue) return;
-
-        let cursorPos = event.target.selectionStart;
-        
-        let removedBefore = 0;
-        for (let i = 0; i < cursorPos; i++) {
-          if (!/[a-z0-9\-]/.test(oldValue[i].toLowerCase())) {
-            removedBefore++;
-          }
-        }
-        
-        event.target.value = newValue;
-        
-        let newCursorPos = cursorPos - removedBefore;
-        if (newCursorPos < 0) newCursorPos = 0;
-        if (newCursorPos > newValue.length) newCursorPos = newValue.length;
-        event.target.setSelectionRange(newCursorPos, newCursorPos);
+        event.target.value = formatUrlString(event.target.value);
       });
 
       let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
