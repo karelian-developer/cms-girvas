@@ -329,6 +329,7 @@ export class PagePageStatic {
 
       urlInputElement.addEventListener('paste', (event) => {
         event.preventDefault();
+        
         let inputValue = (event.clipboardData || window.clipboardData).getData('text');
         event.target.value = formatUrlString(inputValue);
         
