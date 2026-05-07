@@ -240,13 +240,14 @@ export class SEOAnalyzer {
 
     // Проверка изображений
     if (markdownAnalysis.images.length === 0) {
-      warnings.push('В контенте отсутствуют изображения');
+      // Не warning, а просто информационное сообщение
+      success.push('Контент без изображений — допустимо, но изображения улучшают восприятие');
     } else {
       success.push(`Найдено ${markdownAnalysis.images.length} изображений`);
       
       const imagesWithoutAlt = markdownAnalysis.images.filter(img => !img.alt || img.alt.trim() === '');
-      if (imagesWithoutAlt.length > 0 && this.config.imageAltRequired) {
-        issues.push(`${imagesWithoutAlt.length} изображений без alt текста`);
+      if (imagesWithoutAlt.length > 0) {
+        warnings.push(`${imagesWithoutAlt.length} изображений без alt текста — рекомендуется заполнить`);
       }
       
       const imagesWithAlt = markdownAnalysis.images.filter(img => img.alt && img.alt.length > 0);
