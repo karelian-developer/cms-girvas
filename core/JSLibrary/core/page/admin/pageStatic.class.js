@@ -290,7 +290,7 @@ export class PagePageStatic {
 
       interactiveLocaleChoices.assembly();
 
-      let interactiveContainerElement = document.querySelector('[data-element="header-interactive"]');
+      const interactiveContainerElement = document.querySelector('[data-element="header-interactive"]');
       interactiveContainerElement.append(interactiveLocaleChoices.target.element);
 
       urlInputElement.addEventListener('input', (event) => {
