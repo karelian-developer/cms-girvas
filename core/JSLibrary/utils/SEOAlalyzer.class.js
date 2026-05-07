@@ -24,19 +24,16 @@ export class SEOAnalyzer {
       keywordsCount: { min: 5, max: 15 },
       contentLength: { min: 300, max: 3000, recommended: 2000 },
       headingsHierarchy: true,
-      imageAltRequired: true,
-      linkTitleRequired: true
+      imageAltRequired: true
     };
-
-    console.log(localeData);
   }
 
   analyze(SEOData) {
     const results = {
-      title: this.analyzeTitle(SEOData.title, SEOData.SEOTitle),
-      description: this.analyzeDescription(SEOData.description, SEOData.SEODescription),
+      title: this.analyzeTitle(SEOData.title, SEOData.SEOTitle, SEOData.keywords),
+      description: this.analyzeDescription(SEOData.description, SEOData.SEODescription, SEOData.keywords),
       keywords: this.analyzeKeywords(SEOData.keywords),
-      content: this.analyzeContent(SEOData.content, SEOData.title, SEOData.SEOTitle, SEOData.keywords),
+      content: this.analyzeContent(SEOData.content, SEOData.keywords),
       url: this.analyzeUrl(SEOData.name),
       overallScore: 0
     };
@@ -45,7 +42,7 @@ export class SEOAnalyzer {
     return results;
   }
 
-  analyzeTitle(title, SEOTitle) {
+  analyzeTitle(title, SEOTitle, keywords) {
     const issues = [];
     const warnings = [];
     const success = [];
@@ -90,6 +87,19 @@ export class SEOAnalyzer {
       success.push('Заголовок содержит разделители');
     }
 
+    if (keywords && keywords.trim() !== '' && primaryTitle) {
+      const keywordList = keywords.split(',').map(k => k.trim().toLowerCase()).filter(k => k.length > 0);
+      const titleLower = primaryTitle.toLowerCase();
+      
+      const foundKeywords = keywordList.filter(kw => titleLower.includes(kw));
+      
+      if (foundKeywords.length > 0) {
+        success.push(`Заголовок содержит ${foundKeywords.length} ключевых слов: ${foundKeywords.join(', ')}`);
+      } else {
+        warnings.push('Заголовок не содержит ключевых слов');
+      }
+    }
+
     return {
       score: this.calculateSectionScore(issues.length, warnings.length, success.length),
       issues,
@@ -99,7 +109,7 @@ export class SEOAnalyzer {
     };
   }
 
-  analyzeDescription(description, SEODescription) {
+  analyzeDescription(description, SEODescription, keywords) {
     const issues = [];
     const warnings = [];
     const success = [];
@@ -136,6 +146,19 @@ export class SEOAnalyzer {
       success.push('SEO description отличается от описания страницы');
     } else if (!SEODescription && description) {
       warnings.push('SEO description не заполнен. Поисковые системы получат описание страницы — это дублирование');
+    }
+
+    if (keywords && keywords.trim() !== '' && primaryDescription) {
+      const keywordList = keywords.split(',').map(k => k.trim().toLowerCase()).filter(k => k.length > 0);
+      const descriptionLower = primaryDescription.toLowerCase();
+      
+      const foundKeywords = keywordList.filter(kw => descriptionLower.includes(kw));
+      
+      if (foundKeywords.length > 0) {
+        success.push(`Описание содержит ${foundKeywords.length} ключевых слов: ${foundKeywords.join(', ')}`);
+      } else {
+        warnings.push('Описание не содержит ключевых слов');
+      }
     }
 
     return {
@@ -195,7 +218,7 @@ export class SEOAnalyzer {
     };
   }
 
-  analyzeContent(content, title, SEOTitle, keywords) {
+  analyzeContent(content, keywords) {
     const issues = [];
     const warnings = [];
     const success = [];
@@ -238,11 +261,30 @@ export class SEOAnalyzer {
           warnings.push(hierarchyIssue);
         }
       }
+
+      // Проверка вхождения ключевых слов в заголовки контента
+      if (keywords && keywords.trim() !== '') {
+        const keywordList = keywords.split(',').map(k => k.trim().toLowerCase()).filter(k => k.length > 0);
+        
+        const headingsWithKeywords = contentHeadings.filter(h => {
+          const headingLower = h.text.toLowerCase();
+          return keywordList.some(kw => headingLower.includes(kw));
+        });
+        
+        if (headingsWithKeywords.length === contentHeadings.length) {
+          success.push('Все заголовки контента содержат ключевые слова');
+        } else if (headingsWithKeywords.length > 0) {
+          warnings.push(
+            `${headingsWithKeywords.length} из ${contentHeadings.length} заголовков содержат ключевые слова`
+          );
+        } else {
+          warnings.push('Заголовки контента не содержат ключевых слов');
+        }
+      }
     }
 
     // Проверка изображений
     if (markdownAnalysis.images.length === 0) {
-      // Не warning, а просто информационное сообщение
       success.push('Контент без изображений — допустимо, но изображения улучшают восприятие');
     } else {
       success.push(`Найдено ${markdownAnalysis.images.length} изображений`);
@@ -292,7 +334,6 @@ export class SEOAnalyzer {
     if (markdownAnalysis.links.length === 0) {
       warnings.push('В контенте отсутствуют ссылки');
     } else {
-      const markdownLinks = markdownAnalysis.links.filter(l => l.isMarkdown);
       const bareLinks = markdownAnalysis.links.filter(l => !l.isMarkdown);
       
       success.push(`Найдено ${markdownAnalysis.links.length} ссылок`);
@@ -433,19 +474,29 @@ export class SEOAnalyzer {
   }
 
   stripMarkdown(content) {
-    if (!content) return '';
-    
-    return content
-      // Удаляем изображения
-      .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1')
-      // Удаляем ссылки, оставляя текст
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-      // Удаляем форматирование
-      .replace(/[*_~`#]/g, '')
-      // Удаляем HTML теги
-      .replace(/<[^>]*>/g, '')
-      .trim();
-  }
+  if (!content) return '';
+  
+  return content
+    // Удаляем HTML комментарии
+    .replace(/<!--[\s\S]*?-->/g, '')
+    // Удаляем блоки кода
+    .replace(/```[\s\S]*?```/g, '')
+    // Удаляем изображения (оставляем alt)
+    .replace(/!\[([^\]]*)\]\([^)]*\)(?:\{[^}]*\})?/g, '$1')
+    // Удаляем ссылки, оставляя текст
+    .replace(/\[([^\]]+)\]\([^)]*\)(?:\{[^}]*\})?/g, '$1')
+    // Удаляем заголовки (с пробелом и без)
+    .replace(/^#{1,6}\s*/gm, '')
+    // Удаляем маркеры списков
+    .replace(/^[\s]*[-*+]\s/gm, '')
+    // Удаляем нумерованные списки
+    .replace(/^\d+\.\s/gm, '')
+    // Удаляем символы форматирования
+    .replace(/[*_~`>|]/g, '')
+    // Нормализуем пробелы
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
 
   checkHeadingHierarchy(headings) {
     if (headings.length < 2) return null;
