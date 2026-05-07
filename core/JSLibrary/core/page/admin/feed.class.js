@@ -231,45 +231,18 @@ export class PageFeed {
         interactiveContainerElement.append(interactiveLocalesChoices.target.element);
 
         urlInputElement.addEventListener('input', (event) => {
-          let oldValue = event.target.value;
-          let cursorPos = event.target.selectionStart;
-
+          /** @var {String} */
+          let inputValue = event.target.value;
+  
+          /** @var {Utils} */
           let utils = new Utils();
-          let uString = utils.createString(oldValue);
+          /** @var {UString} */
+          let uString = utils.createString(inputValue);
           uString.source = uString.translitToEN(true);
           uString.source = uString.source.toLowerCase();
-          uString.source = uString.source.replace(/[^a-z0-9\-]/g, '');
+          uString.source = uString.source.replace(/[^a-z0-9\-]/, '');
 
-          let newValue = uString.source;
-
-          if (oldValue === newValue) return;
-
-          if (Math.abs(newValue.length - oldValue.length) > 1) {
-            event.target.value = newValue;
-            event.target.setSelectionRange(newValue.length, newValue.length);
-
-            return;
-          }
-
-          let removedBefore = 0;
-          for (let i = 0; i < cursorPos; i++) {
-            if (!/[a-z0-9\-]/.test(oldValue[i].toLowerCase())) {
-              removedBefore++;
-            }
-          }
-
-          event.target.value = newValue;
-
-          let newCursorPos = cursorPos - removedBefore;
-          
-          if (newValue.length >= oldValue.length) {
-            newCursorPos++;
-          }
-          
-          if (newCursorPos < 0) newCursorPos = 0;
-          if (newCursorPos > newValue.length) newCursorPos = newValue.length;
-          
-          event.target.setSelectionRange(newCursorPos, newCursorPos);
+          event.target.value = uString.source;
         });
 
         let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
