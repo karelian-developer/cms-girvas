@@ -23,7 +23,7 @@ import {SEOAnalyzer} from "../../../utils/SEOAlalyzer.class.js";
 export class PageEntry {
   constructor(page, params = {}) {
     this.buttons = {save: null, delete: null, publish: null, unpublish: null, SEOAnalyze: null};
-    this.analyzer = new SEOAnalyzer(page.core.locales.admin);
+    this.analyzer = null;
     this.page = page;
     this.statusCode = this.page.getPageStatusCode()
   }
@@ -226,6 +226,8 @@ export class PageEntry {
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
+      this.analyzer = new SEOAnalyzer(localeData);
+
       const contentTextareaElement = document.querySelector('[data-element="input-content"]');
       const descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
       const SEODescriptionTextareaElement = document.querySelector('[data-element="input-seo-description"]');
