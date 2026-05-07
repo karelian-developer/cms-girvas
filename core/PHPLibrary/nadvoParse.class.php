@@ -56,6 +56,7 @@ class NadvoParse
     $this->usedHeaderIds = [];
 
     $markdown = $this->sanitizeInput($markdown);
+    $markdown = $this->parseAutoLinks($markdown);
     $markdown = $this->parseCodeBlocks($markdown);
     $markdown = $this->parseQuotes($markdown);
     $markdown = $this->parseLists($markdown);
@@ -71,6 +72,7 @@ class NadvoParse
     $markdown = preg_replace_callback('/\{[^{}]+\}/', function($matches) use (&$jsonBlocks) {
       $placeholder = '%%JSON_' . count($jsonBlocks) . '%%';
       $jsonBlocks[$placeholder] = $matches[0];
+      
       return $placeholder;
     }, $markdown);
     
@@ -606,6 +608,13 @@ class NadvoParse
     return $html;
   }
 
+  /**
+   * Генерация ID заголовков
+   * 
+   * @param string $text
+   * 
+   * @return string
+   */
   private function generateHeaderId(string $text) : string
   {
     $text = Utils::transliterate($text);
@@ -627,5 +636,41 @@ class NadvoParse
     $this->usedHeaderIds[] = $text;
     
     return $text;
+  }
+
+  /**
+   * Парсинг «голых» ссылок
+   * 
+   * @param string $markdown
+   * 
+   * @return string
+   */
+  private function parseAutoLinks(string $markdown) : string
+  {
+    // Не трогаем уже существующие ссылки и изображения
+    $protected = [];
+    $markdown = preg_replace_callback(
+      '/!?\[.*?\]\(\s*\S+\s*\)/',
+      function($matches) use (&$protected) {
+        $placeholder = '%%PROTECTED_' . count($protected) . '%%';
+        $protected[$placeholder] = $matches[0];
+        return $placeholder;
+      },
+      $markdown
+    );
+
+    // Находим "голые" URL и оборачиваем в ссылку
+    $markdown = preg_replace(
+      '/(?<!["\(\/\>])(https?:\/\/[^\s<>\[\]]+)/',
+      '[$1]($1)',
+      $markdown
+    );
+
+    // Возвращаем защищённые фрагменты на место
+    foreach ($protected as $placeholder => $value) {
+      $markdown = str_replace($placeholder, $value, $markdown);
+    }
+
+    return $markdown;
   }
 }
