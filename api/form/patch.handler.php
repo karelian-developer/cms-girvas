@@ -134,7 +134,6 @@ if ($CMSCore->client->isLogged(2)) {
               }
               
               if ($CMSLocaleName === $commonLocale) {
-                
                 $formElementTitlesTrimmed = trim($formElementTitles[$i]);
                 $formElementDescriptionsTrimmed = trim($formElementDescriptions[$i]);
                 $formElementPlaceholdersTrimmed = trim($formElementPlaceholders[$i]);
@@ -146,33 +145,32 @@ if ($CMSCore->client->isLogged(2)) {
                 ];
               }
 
-              if (isset($formElements[$i]['options'])) {
+              if ($formElements[$i]['type'] === 'select') {
                 $elementName = $formElements[$i]['name'];
                 
-                // Проверяем, существуют ли данные для этого элемента в $_PATCH
                 $optionLabelsKey = 'form_element_select_' . $elementName . '_option_label';
                 $optionValuesKey = 'form_element_select_' . $elementName . '_option_value';
                 
-                if (isset($_PATCH[$optionLabelsKey]) && isset($_PATCH[$optionValuesKey])) {
-                  $formElements[$i]['options'] = [];
-                  
+                if (isset($_PATCH[$optionLabelsKey]) && is_array($_PATCH[$optionLabelsKey])) {
                   foreach ($_PATCH[$optionLabelsKey] as $optionIndex => $optionLabel) {
-                    $optionValue = $_PATCH[$optionValuesKey][$optionIndex];
+                    $optionValue = $_PATCH[$optionValuesKey][$optionIndex] ?? '';
                     
+                    // Проверяем, существует ли уже опция с таким индексом
                     if (!isset($formElements[$i]['options'][$optionIndex])) {
                       $formElements[$i]['options'][$optionIndex] = [];
-                    }
-
-                    if (!isset($formElements[$i]['options'][$optionIndex]['texts'])) {
                       $formElements[$i]['options'][$optionIndex]['texts'] = [];
                     }
-
+                    
+                    // Устанавливаем/обновляем value
+                    $formElements[$i]['options'][$optionIndex]['value'] = htmlspecialchars(str_replace('\'', '"', $optionValue));
+                    
+                    // Добавляем текстовую метку для текущей локали
                     if (!isset($formElements[$i]['options'][$optionIndex]['texts'][$commonLocale])) {
                       $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale] = [];
                     }
-
-                    $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale]['label'] = htmlspecialchars(str_replace('\'', '"', $optionLabel));
-                    $formElements[$i]['options'][$optionIndex]['value'] = htmlspecialchars(str_replace('\'', '"', $optionValue));
+                    
+                    $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale]['label'] = 
+                      htmlspecialchars(str_replace('\'', '"', $optionLabel));
                   }
                 }
               }
@@ -225,6 +223,24 @@ if ($CMSCore->client->isLogged(2)) {
 
       $formData['metadata']['telegramChatsIDs'] = $formTelegramChatsIDs ?? [];
       $formData['metadata']['maxChatsIDs'] = $formMaxChatsIDs ?? [];
+
+      // Переиндексация опций для select-элементов (ОДИН РАЗ после всех обработок)
+      foreach ($formElements as $idx => $element) {
+        if ($element['type'] === 'select' && isset($element['options']) && !empty($element['options'])) {
+          // Переиндексируем массив опций, чтобы индексы шли по порядку
+          $formElements[$idx]['options'] = array_values($element['options']);
+          
+          // Убеждаемся, что каждая опция имеет корректную структуру
+          foreach ($formElements[$idx]['options'] as $optIdx => $option) {
+            if (!isset($option['value'])) {
+              $formElements[$idx]['options'][$optIdx]['value'] = '';
+            }
+            if (!isset($option['texts'])) {
+              $formElements[$idx]['options'][$optIdx]['texts'] = [];
+            }
+          }
+        }
+      }
 
       $formData['elements'] = $formElements;
       $isUpdated = $form->update($formData);
