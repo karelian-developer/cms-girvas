@@ -26,6 +26,14 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Form as Form;
 
+error_log("=== PUT/PATCH REQUEST ===");
+error_log("form_element_type: " . print_r($_PUT['form_element_type'] ?? [], true));
+foreach ($_PUT as $key => $value) {
+    if (strpos($key, 'option') !== false) {
+        error_log("$key: " . print_r($value, true));
+    }
+}
+
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
   $clientUser->initData(['metadata']);
