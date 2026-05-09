@@ -229,6 +229,34 @@ export class PageForm {
     this.buttons.delete.target.setCallback((event) => this.handleDelete(event));
   }
 
+  reindexSelectOptions(selectElementName) {
+    const options = document.querySelectorAll(`[data-element="select-option-label"][data-select="${selectElementName}"]`);
+    
+    options.forEach((option, newIndex) => {
+      // Находим соответствующий valueInput ДО изменения имени label
+      const valueInput = option.parentElement.querySelector('[data-element="select-option-value"]');
+      
+      if (valueInput) {
+        // Обновляем name для value
+        const oldValueName = valueInput.getAttribute('name');
+        const newValueName = oldValueName.replace(/\[(\d+)\]/, `[${newIndex}]`);
+        valueInput.setAttribute('name', newValueName);
+      }
+      
+      // Обновляем name для label
+      const oldLabelName = option.getAttribute('name');
+      const newLabelName = oldLabelName.replace(/\[(\d+)\]/, `[${newIndex}]`);
+      option.setAttribute('name', newLabelName);
+      
+      // Обновляем заголовок опции
+      const optionRow = option.closest('.row');
+      const titleElement = optionRow.querySelector('.grid-table__cell_title');
+      if (titleElement) {
+        titleElement.innerText = `Option #${newIndex + 1}`;
+      }
+    });
+  }
+
   // Обработка сохранения формы
   handleSave(event) {
     event.preventDefault();
@@ -541,7 +569,7 @@ export class PageForm {
         const rowOption = this.createRowSelectOption(
           localeData,
           formElements.inputName,
-          optionIndex,
+          null,
           option.label,
           option.value
         );
@@ -734,11 +762,17 @@ export class PageForm {
     button.target.setStyle('default');
     button.target.setCallback((event) => {
       event.preventDefault();
-      const rowOptions = document.querySelectorAll(`[data-element="select-option-label"][data-select="${inputName.value}"]`);
-      const rowOption = this.createRowSelectOption(localeData, inputName, rowOptions.length);
+      
+      const currentOptions = document.querySelectorAll(`[data-element="select-option-label"][data-select="${inputName.value}"]`);
+      const newIndex = currentOptions.length;
+      
+      console.log(`Adding new option at index ${newIndex}, total options will be: ${newIndex + 1}`);
+      
+      const rowOption = this.createRowSelectOption(localeData, inputName, newIndex);
+      
       rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
     });
-
+    
     button.assembly();
     return button;
   }
@@ -765,10 +799,10 @@ export class PageForm {
   // Настройка слушателя изменения типа поля
   setupTypeChangeListener(typeSelect, rowsElement, inputName, addOptionButton, localeData) {
     typeSelect.target.elementSelect.addEventListener('change', (event) => {
-      const isSelectType = typeSelect.target.itemSelectedIndex === 7; // Индекс типа "Select"
+      const isSelectType = typeSelect.target.itemSelectedIndex === 7;
       
       if (isSelectType) {
-        const rowOption = this.createRowSelectOption(localeData, inputName, 0);
+        const rowOption = this.createRowSelectOption(localeData, inputName, null);
         rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
         addOptionButton.target.element.style.display = 'flex';
       } else {
@@ -827,15 +861,37 @@ export class PageForm {
     }
   }
 
-  createRowSelectOption(localeData, inputName, index, label = '', value = '') {
+  createRemoveOptionButton(localeData, inputName, optionRow, optionIndex) {
+    const button = new Interactive('button');
+    button.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+    button.target.setStyle('red');
+    button.target.setCallback((event) => {
+      event.preventDefault();
+      const row = button.target.element.closest('.row');
+      if (row) {
+        row.remove();
+        // Переиндексируем оставшиеся опции
+        this.reindexSelectOptions(inputName.value);
+      }
+    });
+    button.assembly();
+    return button;
+  }
+
+  createRowSelectOption(localeData, inputName, index = null, label = '', value = '') {
+    // Не используем переданный index, вычисляем актуальный
+    const currentOptionsCount = document.querySelectorAll(`[data-element="select-option-label"][data-select="${inputName.value}"]`).length;
+    const actualIndex = currentOptionsCount;
+    
+    console.log(`Creating option at actual index: ${actualIndex}`);
+    
     const inputGroupElement = document.createElement('div');
     inputGroupElement.classList.add('grid-table__input-group');
     
     const inputOptionLabelElement = document.createElement('input');
-    inputOptionLabelElement.classList.add('form__input');
-    inputOptionLabelElement.classList.add('form__input_text');
+    inputOptionLabelElement.classList.add('form__input', 'form__input_text');
     inputOptionLabelElement.setAttribute('type', 'text');
-    inputOptionLabelElement.setAttribute('name', 'form_element_select_' + inputName.value + '_option_label[' + index + ']');
+    inputOptionLabelElement.setAttribute('name', `form_element_select_${inputName.value}_option_label[${actualIndex}]`);
     inputOptionLabelElement.setAttribute('data-element', 'select-option-label');
     inputOptionLabelElement.setAttribute('data-select', inputName.value);
     inputOptionLabelElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_LABEL_PLACEHOLDER);
@@ -845,10 +901,9 @@ export class PageForm {
     }
     
     const inputOptionValueElement = document.createElement('input');
-    inputOptionValueElement.classList.add('form__input');
-    inputOptionValueElement.classList.add('form__input_text');
+    inputOptionValueElement.classList.add('form__input', 'form__input_text');
     inputOptionValueElement.setAttribute('type', 'text');
-    inputOptionValueElement.setAttribute('name', 'form_element_select_' + inputName.value + '_option_value[' + index + ']');
+    inputOptionValueElement.setAttribute('name', `form_element_select_${inputName.value}_option_value[${actualIndex}]`);
     inputOptionValueElement.setAttribute('data-element', 'select-option-value');
     inputOptionValueElement.setAttribute('data-select', inputName.value);
     inputOptionValueElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_VALUE_PLACEHOLDER);
@@ -856,28 +911,17 @@ export class PageForm {
     if (value) {
       inputOptionValueElement.value = value;
     }
-
-    inputGroupElement.append(inputOptionLabelElement);
-    inputGroupElement.append(inputOptionValueElement);
     
-    const removeOptionButton = new Interactive('button');
-    removeOptionButton.target.setLabel(localeData.BUTTON_DELETE_LABEL);
-    removeOptionButton.target.setStyle('red');
-    removeOptionButton.target.setCallback((event) => {
-      event.preventDefault();
-      const row = removeOptionButton.target.element.closest('.row');
-      if (row) {
-        row.remove();
-      }
-    });
-
-    removeOptionButton.assembly();
+    inputGroupElement.append(inputOptionLabelElement, inputOptionValueElement);
     
+    const removeOptionButton = this.createRemoveOptionButton(localeData, inputName, null, actualIndex);
     inputGroupElement.appendChild(removeOptionButton.target.element);
-
-    return this.createRowElement(
-      localeData.PAGE_FORM_ELEMENT_OPTION_TITLE + ' #' + (index + 1),
+    
+    const row = this.createRowElement(
+      `${localeData.PAGE_FORM_ELEMENT_OPTION_TITLE} #${actualIndex + 1}`,
       inputGroupElement
     );
+    
+    return row;
   }
 }
