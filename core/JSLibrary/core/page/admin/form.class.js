@@ -25,6 +25,8 @@ export class PageForm {
     
     this.buttons = {save: null, delete: null, addElement: null};
     this.elementsCount = 0;
+
+    this.reindexSelectOptions = this.reindexSelectOptions.bind(this);
   }
 
   init() {
@@ -61,6 +63,34 @@ export class PageForm {
     this.loadExistingFormData();
     this.setupLocaleChangeListener();
     this.setupButtonsUI();
+  }
+
+  reindexSelectOptions(selectElementName) {
+    const options = document.querySelectorAll(`[data-element="select-option-label"][data-select="${selectElementName}"]`);
+    
+    options.forEach((option, newIndex) => {
+      // Находим строку (row) этой опции
+      const row = option.closest('.row');
+      
+      // Обновляем name для label
+      const oldLabelName = option.getAttribute('name');
+      const newLabelName = oldLabelName.replace(/\[(\d+)\]/, `[${newIndex}]`);
+      option.setAttribute('name', newLabelName);
+      
+      // Находим и обновляем value
+      const valueInput = row.querySelector('[data-element="select-option-value"]');
+      if (valueInput) {
+        const oldValueName = valueInput.getAttribute('name');
+        const newValueName = oldValueName.replace(/\[(\d+)\]/, `[${newIndex}]`);
+        valueInput.setAttribute('name', newValueName);
+      }
+      
+      // Обновляем заголовок
+      const titleElement = row.querySelector('.grid-table__cell_title');
+      if (titleElement) {
+        titleElement.innerText = `Option #${newIndex + 1}`;
+      }
+    });
   }
 
   // Получение DOM элементов формы
@@ -868,6 +898,7 @@ export class PageForm {
       const row = removeOptionButton.target.element.closest('.row');
       if (row) {
         row.remove();
+        this.reindexSelectOptions(inputName.value);
       }
     });
 
