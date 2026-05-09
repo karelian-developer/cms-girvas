@@ -26,14 +26,6 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Form as Form;
 
-error_log("=== PUT/PATCH REQUEST ===");
-error_log("form_element_type: " . print_r($_PUT['form_element_type'] ?? [], true));
-foreach ($_PUT as $key => $value) {
-    if (strpos($key, 'option') !== false) {
-        error_log("$key: " . print_r($value, true));
-    }
-}
-
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
   $clientUser->initData(['metadata']);
@@ -171,32 +163,18 @@ if ($CMSCore->client->isLogged(2)) {
               $elements[$elementIndex]['texts'][$commonLocale]['placeholder'] = htmlspecialchars(str_replace('\'', '"', trim($_PUT['form_element_placeholder'][$elementIndex])));
             }
 
-            $elementName = $elements[$elementIndex]['name'] ?? '';
+            $elements[$elementIndex]['options'] = [];
+            $elementName = $elements[$elementIndex]['name'];
 
-            if ($elementTypeName === 'select' && $elementName && isset($elements[$elementIndex]['options'])) {
-              $optionLabelKey = 'form_element_select_' . $elementName . '_option_label';
-              $optionValueKey = 'form_element_select_' . $elementName . '_option_value';
+            foreach ($_PUT['form_element_select_' . $elementName . '_option_label'] as $optionIndex => $optionLabel) {
+              $optionValue = $_PUT['form_element_select_' . $elementName . '_option_value'][$optionIndex];
+
+              $elements[$elementIndex]['options'][$optionIndex] = [];
+              $elements[$elementIndex]['options'][$optionIndex]['texts'] = [];
+              $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale] = [];
               
-              if (isset($_PUT[$optionLabelKey]) && is_array($_PUT[$optionLabelKey])) {
-                foreach ($_PUT[$optionLabelKey] as $optionIndex => $optionLabel) {
-                  $optionValue = $_PUT[$optionValueKey][$optionIndex] ?? '';
-                  
-                  // Проверяем, существует ли уже опция с таким индексом
-                  if (!isset($elements[$elementIndex]['options'][$optionIndex])) {
-                    $elements[$elementIndex]['options'][$optionIndex] = [];
-                    $elements[$elementIndex]['options'][$optionIndex]['value'] = $optionValue;
-                    $elements[$elementIndex]['options'][$optionIndex]['texts'] = [];
-                  }
-                  
-                  // Добавляем только текстовую метку для текущей локали
-                  if (!isset($elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale])) {
-                    $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale] = [];
-                  }
-                  
-                  $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale]['label'] = 
-                    htmlspecialchars(str_replace('\'', '"', trim($optionLabel)));
-                }
-              }
+              $elements[$elementIndex]['options'][$optionIndex]['texts'][$commonLocale]['label'] = $optionLabel;
+              $elements[$elementIndex]['options'][$optionIndex]['value'] = $optionValue;
             }
           }
         }
