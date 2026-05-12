@@ -806,35 +806,95 @@ export class PageForm {
   }
 
   // Настройка слушателя изменения имени поля
+  // Настройка слушателя изменения имени поля
   setupNameChangeListener(inputName, rowsElement) {
+    // Сохраняем начальное значение
+    inputName.dataset.oldName = inputName.value;
+    
     inputName.addEventListener('change', (event) => {
       const oldName = inputName.dataset.oldName || '';
       const newName = inputName.value;
       
-      const selectOptionsElements = rowsElement.querySelectorAll('[data-select]');
+      console.log(`Name changed from "${oldName}" to "${newName}"`);
       
-      selectOptionsElements.forEach(element => {
-        const match = element.getAttribute('name').match(/\[(\d+)\]/);
-        const number = match ? parseInt(match[1], 10) : 0;
+      // Ищем ВСЕ option'ы, связанные с этим полем (включая с пустым именем)
+      const allSelectOptions = rowsElement.querySelectorAll('[data-element="select-option-label"]');
+      const allSelectValues = rowsElement.querySelectorAll('[data-element="select-option-value"]');
+      
+      // Обновляем option labels
+      allSelectOptions.forEach(element => {
+        const currentDataSelect = element.getAttribute('data-select');
         
-        // Обновляем data-select атрибут
-        element.setAttribute('data-select', newName);
-        
-        if (element.getAttribute('data-element') === 'select-option-label') {
+        // Обновляем, если это наш элемент (по старому имени или если имя пустое)
+        if (currentDataSelect === oldName || currentDataSelect === '' || currentDataSelect === newName) {
+          const match = element.getAttribute('name').match(/\[(\d+)\]/);
+          const number = match ? parseInt(match[1], 10) : 0;
+          
+          element.setAttribute('data-select', newName);
           element.setAttribute('name', `form_element_select_${newName}_option_label[${number}]`);
-        }
-        
-        if (element.getAttribute('data-element') === 'select-option-value') {
-          element.setAttribute('name', `form_element_select_${newName}_option_value[${number}]`);
+          
+          console.log(`Updated option label ${number}: ${element.getAttribute('name')}`);
         }
       });
       
-      // Сохраняем старое имя для следующего изменения
+      // Обновляем option values
+      allSelectValues.forEach(element => {
+        const currentDataSelect = element.getAttribute('data-select');
+        
+        if (currentDataSelect === oldName || currentDataSelect === '' || currentDataSelect === newName) {
+          const match = element.getAttribute('name').match(/\[(\d+)\]/);
+          const number = match ? parseInt(match[1], 10) : 0;
+          
+          element.setAttribute('data-select', newName);
+          element.setAttribute('name', `form_element_select_${newName}_option_value[${number}]`);
+          
+          console.log(`Updated option value ${number}: ${element.getAttribute('name')}`);
+        }
+      });
+      
+      // Обновляем data-select у кнопок удаления опций
+      const removeButtons = rowsElement.querySelectorAll('button');
+      removeButtons.forEach(button => {
+        const onclick = button.getAttribute('onclick');
+        if (onclick && onclick.includes('reindexSelectOptions')) {
+          // Обновляем если нужно (сложно обновить колбэк, но можно пересоздать)
+        }
+      });
+      
+      // Сохраняем новое имя как старое для следующего изменения
       inputName.dataset.oldName = newName;
     });
     
-    // Инициализируем старое имя
-    inputName.dataset.oldName = inputName.value;
+    // Добавляем также обработчик input для实时ного обновления
+    inputName.addEventListener('input', (event) => {
+      const newName = inputName.value;
+      const oldName = inputName.dataset.oldName || '';
+      
+      if (newName && newName !== oldName) {
+        // Обновляем data-select у существующих option'ов
+        const allOptions = rowsElement.querySelectorAll('[data-element="select-option-label"], [data-element="select-option-value"]');
+        allOptions.forEach(element => {
+          element.setAttribute('data-select', newName);
+        });
+        
+        // Обновляем имена, сохраняя индексы
+        const optionLabels = rowsElement.querySelectorAll('[data-element="select-option-label"]');
+        optionLabels.forEach(element => {
+          const match = element.getAttribute('name').match(/\[(\d+)\]/);
+          const number = match ? parseInt(match[1], 10) : 0;
+          element.setAttribute('name', `form_element_select_${newName}_option_label[${number}]`);
+        });
+        
+        const optionValues = rowsElement.querySelectorAll('[data-element="select-option-value"]');
+        optionValues.forEach(element => {
+          const match = element.getAttribute('name').match(/\[(\d+)\]/);
+          const number = match ? parseInt(match[1], 10) : 0;
+          element.setAttribute('name', `form_element_select_${newName}_option_value[${number}]`);
+        });
+      }
+      
+      inputName.dataset.oldName = newName;
+    });
   }
 
   // Настройка слушателя изменения типа поля
