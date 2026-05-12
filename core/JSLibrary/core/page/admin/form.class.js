@@ -509,8 +509,15 @@ export class PageForm {
     
     this.setupElementValues(formElements, data);
     
-    // КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: Настраиваем автоматическое обновление всех option'ов
-    // при изменении имени поля
+    formElements.inputName.addEventListener('input', (event) => {
+      const utils = new Utils();
+      const uString = utils.createString(event.target.value);
+      uString.source = uString.translitToEN(true);
+      uString.source = uString.source.toLowerCase();
+      uString.source = uString.source.replace(/[^a-z0-9_]/g, '');
+      event.target.value = uString.source;
+    });
+
     this.setupRealTimeNameUpdate(formElements.inputName, rowsElement);
     
     const typeSelect = this.createTypeSelect(localeData, data.type);
