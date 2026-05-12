@@ -559,7 +559,6 @@ export class PageForm {
     return rowElement;
   }
 
-  // Основной метод, который теперь работает как оркестратор
   addElement(localeData, anchorElement, data = {}) {
     const rowsElement = this.createRowsContainer();
     rowsElement.setAttribute('data-element', 'form-element');
@@ -567,7 +566,10 @@ export class PageForm {
     const formElements = this.createFormElements(localeData, data);
     
     this.setupElementValues(formElements, data);
-    this.setupNameChangeListener(formElements.inputName);
+    
+    // КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: Настраиваем автоматическое обновление всех option'ов
+    // при изменении имени поля
+    this.setupRealTimeNameUpdate(formElements.inputName, rowsElement);
     
     const typeSelect = this.createTypeSelect(localeData, data.type);
     const requiredCheckbox = this.createRequiredCheckbox(data.required, this.elementsCount);
@@ -607,11 +609,141 @@ export class PageForm {
     this.elementsCount++;
   }
 
-  // Создание контейнера для строк
-  createRowsContainer() {
-    const rowsElement = document.createElement('div');
-    rowsElement.classList.add('grid-table__rows');
-    return rowsElement;
+  setupRealTimeNameUpdate(inputName, rowsElement) {
+    // Функция для обновления всех option'ов в контейнере
+    const updateAllOptions = () => {
+      const currentName = inputName.value;
+      if (!currentName) return; // Не обновляем, если имя пустое
+      
+      const optionLabels = rowsElement.querySelectorAll('[data-element="select-option-label"]');
+      const optionValues = rowsElement.querySelectorAll('[data-element="select-option-value"]');
+      
+      optionLabels.forEach(label => {
+        const match = label.getAttribute('name').match(/\[(\d+)\]/);
+        const index = match ? parseInt(match[1], 10) : 0;
+        
+        const newName = `form_element_select_${currentName}_option_label[${index}]`;
+        if (label.getAttribute('name') !== newName) {
+          console.log(`Updating label from ${label.getAttribute('name')} to ${newName}`);
+          label.setAttribute('name', newName);
+          label.setAttribute('data-select', currentName);
+        }
+      });
+      
+      optionValues.forEach(value => {
+        const match = value.getAttribute('name').match(/\[(\d+)\]/);
+        const index = match ? parseInt(match[1], 10) : 0;
+        
+        const newName = `form_element_select_${currentName}_option_value[${index}]`;
+        if (value.getAttribute('name') !== newName) {
+          console.log(`Updating value from ${value.getAttribute('name')} to ${newName}`);
+          value.setAttribute('name', newName);
+          value.setAttribute('data-select', currentName);
+        }
+      });
+    };
+    
+    // Слушаем изменения имени поля
+    inputName.addEventListener('input', updateAllOptions);
+    inputName.addEventListener('change', updateAllOptions);
+    
+    // Также обновляем при создании новых option'ов
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1) { // Element node
+              // Проверяем, есть ли в добавленном элементе option'ы
+              if (node.querySelector && (
+                node.querySelector('[data-element="select-option-label"]') ||
+                node.matches('[data-element="select-option-label"]')
+              )) {
+                setTimeout(updateAllOptions, 0);
+              }
+            }
+          });
+        }
+      });
+    });
+    
+    observer.observe(rowsElement, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  // ИСПРАВЛЕННЫЙ МЕТОД createRowSelectOption
+  createRowSelectOption(localeData, inputName, index, label = '', value = '') {
+    const inputGroupElement = document.createElement('div');
+    inputGroupElement.classList.add('grid-table__input-group');
+    
+    // ВСЕГДА используем актуальное значение имени поля
+    const fieldName = inputName.value || '';
+    
+    const inputOptionLabelElement = document.createElement('input');
+    inputOptionLabelElement.classList.add('form__input', 'form__input_text');
+    inputOptionLabelElement.setAttribute('type', 'text');
+    // Имя формируем с актуальным именем поля
+    inputOptionLabelElement.setAttribute('name', `form_element_select_${fieldName}_option_label[${index}]`);
+    inputOptionLabelElement.setAttribute('data-element', 'select-option-label');
+    inputOptionLabelElement.setAttribute('data-select', fieldName);
+    inputOptionLabelElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_LABEL_PLACEHOLDER);
+    
+    if (label) {
+      inputOptionLabelElement.value = label;
+    }
+    
+    const inputOptionValueElement = document.createElement('input');
+    inputOptionValueElement.classList.add('form__input', 'form__input_text');
+    inputOptionValueElement.setAttribute('type', 'text');
+    inputOptionValueElement.setAttribute('name', `form_element_select_${fieldName}_option_value[${index}]`);
+    inputOptionValueElement.setAttribute('data-element', 'select-option-value');
+    inputOptionValueElement.setAttribute('data-select', fieldName);
+    inputOptionValueElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_VALUE_PLACEHOLDER);
+    
+    if (value) {
+      inputOptionValueElement.value = value;
+    }
+
+    inputGroupElement.append(inputOptionLabelElement);
+    inputGroupElement.append(inputOptionValueElement);
+    
+    const removeOptionButton = new Interactive('button');
+    removeOptionButton.target.setLabel(localeData.BUTTON_DELETE_LABEL);
+    removeOptionButton.target.setStyle('red');
+    removeOptionButton.target.setCallback((event) => {
+      event.preventDefault();
+      const row = removeOptionButton.target.element.closest('.row');
+      if (row) {
+        const selectName = inputName.value; // Используем актуальное имя
+        row.remove();
+        this.reindexSelectOptions(selectName);
+      }
+    });
+
+    removeOptionButton.assembly();
+    
+    inputGroupElement.appendChild(removeOptionButton.target.element);
+
+    // Планируем обновление имени сразу после вставки в DOM
+    setTimeout(() => {
+      if (inputName.value) {
+        const newLabelName = `form_element_select_${inputName.value}_option_label[${index}]`;
+        const newValueName = `form_element_select_${inputName.value}_option_value[${index}]`;
+        
+        inputOptionLabelElement.setAttribute('name', newLabelName);
+        inputOptionLabelElement.setAttribute('data-select', inputName.value);
+        inputOptionValueElement.setAttribute('name', newValueName);
+        inputOptionValueElement.setAttribute('data-select', inputName.value);
+        
+        console.log(`Corrected option names: ${newLabelName}, ${newValueName}`);
+      }
+    }, 0);
+
+    return this.createRowElement(
+      localeData.PAGE_FORM_ELEMENT_OPTION_TITLE + ' #' + (index + 1),
+      inputGroupElement
+    );
   }
 
   // Создание всех полей формы
