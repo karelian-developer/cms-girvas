@@ -270,6 +270,8 @@ export class PageForm {
       return;
     }
     
+    const formData = new FormData(this.elementForm);
+    
     formData.append('common_locale', this.interactiveLocaleChoices.target.getValue());
     
     const formId = this.searchParams.getPathPart(3);
@@ -287,7 +289,7 @@ export class PageForm {
     
     request.target.send().then((data) => {
       if (data.statusCode === 1 && formId === null) {
-        window.location.href = `/admin/form/${data.outputData.form.id}`;
+        // window.location.href = `/admin/form/${data.outputData.form.id}`;
       }
     });
   }
@@ -345,8 +347,6 @@ export class PageForm {
         value: option.value,
         label: option.texts?.[window.CMSCore.locales.admin.name]?.label || ''
       })) || [];
-
-      console.log(element.options);
 
       this.addElement(this.localeData, anchorElement, {
         index: index,
@@ -572,7 +572,6 @@ export class PageForm {
         
         const newName = `form_element_select_${currentName}_option_label[${index}]`;
         if (label.getAttribute('name') !== newName) {
-          console.log(`Updating label from ${label.getAttribute('name')} to ${newName}`);
           label.setAttribute('name', newName);
           label.setAttribute('data-select', currentName);
         }
@@ -584,7 +583,6 @@ export class PageForm {
         
         const newName = `form_element_select_${currentName}_option_value[${index}]`;
         if (value.getAttribute('name') !== newName) {
-          console.log(`Updating value from ${value.getAttribute('name')} to ${newName}`);
           value.setAttribute('name', newName);
           value.setAttribute('data-select', currentName);
         }
@@ -620,18 +618,15 @@ export class PageForm {
     });
   }
 
-  // ИСПРАВЛЕННЫЙ МЕТОД createRowSelectOption
   createRowSelectOption(localeData, inputName, index, label = '', value = '') {
     const inputGroupElement = document.createElement('div');
     inputGroupElement.classList.add('grid-table__input-group');
     
-    // ВСЕГДА используем актуальное значение имени поля
     const fieldName = inputName.value || '';
     
     const inputOptionLabelElement = document.createElement('input');
     inputOptionLabelElement.classList.add('form__input', 'form__input_text');
     inputOptionLabelElement.setAttribute('type', 'text');
-    // Имя формируем с актуальным именем поля
     inputOptionLabelElement.setAttribute('name', `form_element_select_${fieldName}_option_label[${index}]`);
     inputOptionLabelElement.setAttribute('data-element', 'select-option-label');
     inputOptionLabelElement.setAttribute('data-select', fieldName);
@@ -683,8 +678,6 @@ export class PageForm {
         inputOptionLabelElement.setAttribute('data-select', inputName.value);
         inputOptionValueElement.setAttribute('name', newValueName);
         inputOptionValueElement.setAttribute('data-select', inputName.value);
-        
-        console.log(`Corrected option names: ${newLabelName}, ${newValueName}`);
       }
     }, 0);
 
@@ -895,8 +888,6 @@ export class PageForm {
       const oldName = inputName.dataset.oldName || '';
       const newName = inputName.value;
       
-      console.log(`Name changed from "${oldName}" to "${newName}"`);
-      
       // Ищем ВСЕ option'ы, связанные с этим полем (включая с пустым именем)
       const allSelectOptions = rowsElement.querySelectorAll('[data-element="select-option-label"]');
       const allSelectValues = rowsElement.querySelectorAll('[data-element="select-option-value"]');
@@ -912,8 +903,6 @@ export class PageForm {
           
           element.setAttribute('data-select', newName);
           element.setAttribute('name', `form_element_select_${newName}_option_label[${number}]`);
-          
-          console.log(`Updated option label ${number}: ${element.getAttribute('name')}`);
         }
       });
       
@@ -927,8 +916,6 @@ export class PageForm {
           
           element.setAttribute('data-select', newName);
           element.setAttribute('name', `form_element_select_${newName}_option_value[${number}]`);
-          
-          console.log(`Updated option value ${number}: ${element.getAttribute('name')}`);
         }
       });
       
