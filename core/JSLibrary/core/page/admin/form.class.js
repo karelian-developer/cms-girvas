@@ -270,33 +270,6 @@ export class PageForm {
       return;
     }
     
-    // ДОБАВЛЯЕМ ОТЛАДОЧНЫЙ КОД
-    console.log('=== DEBUG: Form elements before submit ===');
-    const allSelectOptions = document.querySelectorAll('[data-element="select-option-label"]');
-    allSelectOptions.forEach((option, index) => {
-      console.log(`Option ${index}:`, {
-        name: option.getAttribute('name'),
-        value: option.value,
-        dataSelect: option.getAttribute('data-select')
-      });
-    });
-    
-    const allSelectValues = document.querySelectorAll('[data-element="select-option-value"]');
-    allSelectValues.forEach((value, index) => {
-      console.log(`Value ${index}:`, {
-        name: value.getAttribute('name'),
-        value: value.value,
-        dataSelect: value.getAttribute('data-select')
-      });
-    });
-    
-    const formData = new FormData(this.elementForm);
-    console.log('=== DEBUG: FormData entries ===');
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ': ' + pair[1]);
-    }
-    // КОНЕЦ ОТЛАДОЧНОГО КОДА
-    
     formData.append('common_locale', this.interactiveLocaleChoices.target.getValue());
     
     const formId = this.searchParams.getPathPart(3);
@@ -314,7 +287,7 @@ export class PageForm {
     
     request.target.send().then((data) => {
       if (data.statusCode === 1 && formId === null) {
-        // window.location.href = `/admin/form/${data.outputData.form.id}`;
+        window.location.href = `/admin/form/${data.outputData.form.id}`;
       }
     });
   }
@@ -526,37 +499,6 @@ export class PageForm {
     }
 
     return '';
-  }
-
-  createRowElement(title, dataElement = null) {
-    const rowElement = document.createElement('div');
-    const cellInfoElement = document.createElement('div');
-    const cellDataElement = document.createElement('div');
-    const cellTitleElement = document.createElement('div');
-
-    rowElement.classList.add('row');
-    rowElement.classList.add('grid-table__row');
-    rowElement.setAttribute('data-element', 'form-element');
-    cellInfoElement.classList.add('cell');
-    cellInfoElement.classList.add('grid-table__cell');
-    cellInfoElement.classList.add('grid-table__cell_text');
-    cellDataElement.classList.add('cell');
-    cellDataElement.classList.add('grid-table__cell');
-    cellDataElement.classList.add('grid-table__cell_data');
-    cellTitleElement.classList.add('grid-table__cell-title');
-
-    if (title !== null) {
-      cellTitleElement.innerText = title;
-      cellInfoElement.append(cellTitleElement);
-      rowElement.append(cellInfoElement);
-    }
-    
-    if (dataElement !== null) {
-      cellDataElement.appendChild(dataElement);
-      rowElement.appendChild(cellDataElement);
-    }
-
-    return rowElement;
   }
 
   addElement(localeData, anchorElement, data = {}) {
@@ -1106,60 +1048,5 @@ export class PageForm {
       
       this.setupElementValues(formElements, data);
     }
-  }
-
-  createRowSelectOption(localeData, inputName, index, label = '', value = '') {
-    const inputGroupElement = document.createElement('div');
-    inputGroupElement.classList.add('grid-table__input-group');
-    
-    const inputOptionLabelElement = document.createElement('input');
-    inputOptionLabelElement.classList.add('form__input');
-    inputOptionLabelElement.classList.add('form__input_text');
-    inputOptionLabelElement.setAttribute('type', 'text');
-    inputOptionLabelElement.setAttribute('name', 'form_element_select_' + inputName.value + '_option_label[' + index + ']');
-    inputOptionLabelElement.setAttribute('data-element', 'select-option-label');
-    inputOptionLabelElement.setAttribute('data-select', inputName.value);
-    inputOptionLabelElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_LABEL_PLACEHOLDER);
-    
-    if (label) {
-      inputOptionLabelElement.value = label;
-    }
-    
-    const inputOptionValueElement = document.createElement('input');
-    inputOptionValueElement.classList.add('form__input');
-    inputOptionValueElement.classList.add('form__input_text');
-    inputOptionValueElement.setAttribute('type', 'text');
-    inputOptionValueElement.setAttribute('name', 'form_element_select_' + inputName.value + '_option_value[' + index + ']');
-    inputOptionValueElement.setAttribute('data-element', 'select-option-value');
-    inputOptionValueElement.setAttribute('data-select', inputName.value);
-    inputOptionValueElement.setAttribute('placeholder', localeData.PAGE_FORM_ELEMENT_OPTION_VALUE_PLACEHOLDER);
-    
-    if (value) {
-      inputOptionValueElement.value = value;
-    }
-
-    inputGroupElement.append(inputOptionLabelElement);
-    inputGroupElement.append(inputOptionValueElement);
-    
-    const removeOptionButton = new Interactive('button');
-    removeOptionButton.target.setLabel(localeData.BUTTON_DELETE_LABEL);
-    removeOptionButton.target.setStyle('red');
-    removeOptionButton.target.setCallback((event) => {
-      event.preventDefault();
-      const row = removeOptionButton.target.element.closest('.row');
-      if (row) {
-        row.remove();
-        this.reindexSelectOptions(inputName.value);
-      }
-    });
-
-    removeOptionButton.assembly();
-    
-    inputGroupElement.appendChild(removeOptionButton.target.element);
-
-    return this.createRowElement(
-      localeData.PAGE_FORM_ELEMENT_OPTION_TITLE + ' #' + (index + 1),
-      inputGroupElement
-    );
   }
 }
