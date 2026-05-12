@@ -289,7 +289,7 @@ export class PageForm {
     
     request.target.send().then((data) => {
       if (data.statusCode === 1 && formId === null) {
-        // window.location.href = `/admin/form/${data.outputData.form.id}`;
+        window.location.href = `/admin/form/${data.outputData.form.id}`;
       }
     });
   }
