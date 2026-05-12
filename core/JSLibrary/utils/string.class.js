@@ -61,7 +61,11 @@ export class UString {
             default: result += source[i];
           }
         } else {
-          result += source[i];
+          switch (source[i]) {
+            case ' ': result += '_'; break;
+            case '-': result += '_'; break; 
+            default: result += source[i];
+          }
         }
       } else {
         result += chars[source[i]];

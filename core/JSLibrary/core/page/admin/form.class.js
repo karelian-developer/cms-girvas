@@ -512,9 +512,9 @@ export class PageForm {
     formElements.inputName.addEventListener('input', (event) => {
       const utils = new Utils();
       const uString = utils.createString(event.target.value);
-      uString.source = uString.translitToEN(true);
+      uString.source = uString.translitToEN(false);
       uString.source = uString.source.toLowerCase();
-      uString.source = uString.source.replace(/[^a-z0-9\-]/, '');
+      uString.source = uString.source.replace(/[^a-z0-9\_]/, '');
       event.target.value = uString.source;
     });
 
