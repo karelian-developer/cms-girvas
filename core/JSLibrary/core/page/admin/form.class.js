@@ -270,7 +270,33 @@ export class PageForm {
       return;
     }
     
+    // ДОБАВЛЯЕМ ОТЛАДОЧНЫЙ КОД
+    console.log('=== DEBUG: Form elements before submit ===');
+    const allSelectOptions = document.querySelectorAll('[data-element="select-option-label"]');
+    allSelectOptions.forEach((option, index) => {
+      console.log(`Option ${index}:`, {
+        name: option.getAttribute('name'),
+        value: option.value,
+        dataSelect: option.getAttribute('data-select')
+      });
+    });
+    
+    const allSelectValues = document.querySelectorAll('[data-element="select-option-value"]');
+    allSelectValues.forEach((value, index) => {
+      console.log(`Value ${index}:`, {
+        name: value.getAttribute('name'),
+        value: value.value,
+        dataSelect: value.getAttribute('data-select')
+      });
+    });
+    
     const formData = new FormData(this.elementForm);
+    console.log('=== DEBUG: FormData entries ===');
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ': ' + pair[1]);
+    }
+    // КОНЕЦ ОТЛАДОЧНОГО КОДА
+    
     formData.append('common_locale', this.interactiveLocaleChoices.target.getValue());
     
     const formId = this.searchParams.getPathPart(3);
@@ -288,7 +314,7 @@ export class PageForm {
     
     request.target.send().then((data) => {
       if (data.statusCode === 1 && formId === null) {
-        window.location.href = `/admin/form/${data.outputData.form.id}`;
+        // window.location.href = `/admin/form/${data.outputData.form.id}`;
       }
     });
   }
