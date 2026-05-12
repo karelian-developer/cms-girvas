@@ -65,19 +65,18 @@ export class PageForm {
     this.setupButtonsUI();
   }
 
-  reindexSelectOptions(selectElementName) {
-    const options = document.querySelectorAll(`[data-element="select-option-label"][data-select="${selectElementName}"]`);
+  reindexSelectOptions(selectElementName, rowsElement) {
+    // Если передан rowsElement, ищем только в нём
+    const container = rowsElement || document;
+    const options = container.querySelectorAll(`[data-element="select-option-label"][data-select="${selectElementName}"]`);
     
     options.forEach((option, newIndex) => {
-      // Находим строку (row) этой опции
       const row = option.closest('.row');
       
-      // Обновляем name для label
       const oldLabelName = option.getAttribute('name');
       const newLabelName = oldLabelName.replace(/\[(\d+)\]/, `[${newIndex}]`);
       option.setAttribute('name', newLabelName);
       
-      // Находим и обновляем value
       const valueInput = row.querySelector('[data-element="select-option-value"]');
       if (valueInput) {
         const oldValueName = valueInput.getAttribute('name');
@@ -85,7 +84,6 @@ export class PageForm {
         valueInput.setAttribute('name', newValueName);
       }
       
-      // Обновляем заголовок
       const titleElement = row.querySelector('.grid-table__cell_title');
       if (titleElement) {
         titleElement.innerText = `Option #${newIndex + 1}`;
@@ -741,7 +739,7 @@ export class PageForm {
   }
 
   // Создание кнопки удаления поля
-  createRemoveButton(localeData, rowsElement) {
+  createRemoveButton(localeData, rowsElement, inputName) {
     const button = new Interactive('button');
     button.target.setLabel(localeData.BUTTON_DELETE_LABEL);
     button.target.setStyle('red');
@@ -749,8 +747,15 @@ export class PageForm {
       event.preventDefault();
       this.elementsCount--;
       rowsElement.remove();
-      button.target.element.parentElement.previousElementSibling.remove();
-      button.target.element.parentElement.remove();
+      // Находим и удаляем связанные элементы (заголовок и панель кнопок)
+      const previousRow = rowsElement.previousElementSibling;
+      const nextRow = rowsElement.nextElementSibling;
+      if (previousRow && previousRow.classList.contains('row')) {
+        previousRow.remove();
+      }
+      if (nextRow && nextRow.classList.contains('row')) {
+        nextRow.remove();
+      }
     });
 
     button.assembly();
@@ -764,7 +769,8 @@ export class PageForm {
     button.target.setStyle('default');
     button.target.setCallback((event) => {
       event.preventDefault();
-      const rowOptions = document.querySelectorAll(`[data-element="select-option-label"][data-select="${inputName.value}"]`);
+      // Ищем option'ы только внутри текущего rowsElement
+      const rowOptions = rowsElement.querySelectorAll(`[data-element="select-option-label"]`);
       const rowOption = this.createRowSelectOption(localeData, inputName, rowOptions.length);
       rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
     });
@@ -774,19 +780,19 @@ export class PageForm {
   }
 
   // Настройка слушателя изменения имени поля
-  setupNameChangeListener(inputName) {
+  setupNameChangeListener(inputName, rowsElement) {
     inputName.addEventListener('change', (event) => {
-      const selectOptionsElements = document.querySelectorAll('[data-select]');
       const oldName = inputName.dataset.oldName || '';
       const newName = inputName.value;
+      
+      const selectOptionsElements = rowsElement.querySelectorAll('[data-select]');
       
       selectOptionsElements.forEach(element => {
         const match = element.getAttribute('name').match(/\[(\d+)\]/);
         const number = match ? parseInt(match[1], 10) : 0;
         
-        if (element.getAttribute('data-select') === oldName || element.getAttribute('data-select') === '') {
-          element.setAttribute('data-select', newName);
-        }
+        // Обновляем data-select атрибут
+        element.setAttribute('data-select', newName);
         
         if (element.getAttribute('data-element') === 'select-option-label') {
           element.setAttribute('name', `form_element_select_${newName}_option_label[${number}]`);
@@ -811,17 +817,22 @@ export class PageForm {
       const isSelectType = typeSelect.target.itemSelectedIndex === 7;
       
       if (isSelectType) {
-        const existingOptions = document.querySelectorAll(`[data-select="${inputName.value}"]`);
+        // Проверяем option'ы только внутри текущего rowsElement
+        const existingOptions = rowsElement.querySelectorAll('[data-element="select-option-label"]');
         if (existingOptions.length === 0) {
           const rowOption = this.createRowSelectOption(localeData, inputName, 0);
           rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
         }
         addOptionButton.target.element.style.display = 'flex';
       } else {
-        const rowOptions = document.querySelectorAll(`[data-element="select-option-label"][data-select="${inputName.value}"]`);
+        // Удаляем option'ы только из текущего rowsElement
+        const rowOptions = rowsElement.querySelectorAll('[data-element="select-option-label"]');
         if (rowOptions.length > 0) {
           rowOptions.forEach(rowOption => {
-            rowOption.parentElement.parentElement.parentElement.remove();
+            const parentRow = rowOption.closest('.row');
+            if (parentRow) {
+              parentRow.remove();
+            }
           });
         }
         addOptionButton.target.element.style.display = 'none';
