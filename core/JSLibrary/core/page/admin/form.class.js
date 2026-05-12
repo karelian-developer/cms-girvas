@@ -879,7 +879,6 @@ export class PageForm {
   }
 
   // Настройка слушателя изменения имени поля
-  // Настройка слушателя изменения имени поля
   setupNameChangeListener(inputName, rowsElement) {
     // Сохраняем начальное значение
     inputName.dataset.oldName = inputName.value;
