@@ -514,7 +514,7 @@ export class PageForm {
       const uString = utils.createString(event.target.value);
       uString.source = uString.translitToEN(true);
       uString.source = uString.source.toLowerCase();
-      uString.source = uString.source.replace(/[^a-z0-9_]/g, '');
+      uString.source = uString.source.replace(/[^a-z0-9_]/, '');
       event.target.value = uString.source;
     });
 
