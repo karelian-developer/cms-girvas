@@ -777,29 +777,45 @@ export class PageForm {
   setupNameChangeListener(inputName) {
     inputName.addEventListener('change', (event) => {
       const selectOptionsElements = document.querySelectorAll('[data-select]');
+      const oldName = inputName.dataset.oldName || '';
+      const newName = inputName.value;
+      
       selectOptionsElements.forEach(element => {
         const match = element.getAttribute('name').match(/\[(\d+)\]/);
         const number = match ? parseInt(match[1], 10) : 0;
         
+        if (element.getAttribute('data-select') === oldName || element.getAttribute('data-select') === '') {
+          element.setAttribute('data-select', newName);
+        }
+        
         if (element.getAttribute('data-element') === 'select-option-label') {
-          element.setAttribute('name', `form_element_select_${inputName.value}_option_label[${number}]`);
+          element.setAttribute('name', `form_element_select_${newName}_option_label[${number}]`);
         }
         
         if (element.getAttribute('data-element') === 'select-option-value') {
-          element.setAttribute('name', `form_element_select_${inputName.value}_option_value[${number}]`);
+          element.setAttribute('name', `form_element_select_${newName}_option_value[${number}]`);
         }
       });
+      
+      // Сохраняем старое имя для следующего изменения
+      inputName.dataset.oldName = newName;
     });
+    
+    // Инициализируем старое имя
+    inputName.dataset.oldName = inputName.value;
   }
 
   // Настройка слушателя изменения типа поля
   setupTypeChangeListener(typeSelect, rowsElement, inputName, addOptionButton, localeData) {
     typeSelect.target.elementSelect.addEventListener('change', (event) => {
-      const isSelectType = typeSelect.target.itemSelectedIndex === 7; // Индекс типа "Select"
+      const isSelectType = typeSelect.target.itemSelectedIndex === 7;
       
       if (isSelectType) {
-        const rowOption = this.createRowSelectOption(localeData, inputName, 0);
-        rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
+        const existingOptions = document.querySelectorAll(`[data-select="${inputName.value}"]`);
+        if (existingOptions.length === 0) {
+          const rowOption = this.createRowSelectOption(localeData, inputName, 0);
+          rowsElement.children.item(rowsElement.children.length - 1).before(rowOption);
+        }
         addOptionButton.target.element.style.display = 'flex';
       } else {
         const rowOptions = document.querySelectorAll(`[data-element="select-option-label"][data-select="${inputName.value}"]`);
