@@ -134,7 +134,7 @@ class PageEntries implements InterfacePage
 
       if ($categoryName !== 'all') {
         $category = EntryCategory::getByName($this->CMSCore, $categoryName);
-        $category->initData(['name', 'texts']);
+        $category->initData(['name', 'texts', 'parentID']);
         $categoryID = $category->getID();
 
         $categoryTitle = strip_tags($category->getTitle($localeName));
@@ -152,24 +152,37 @@ class PageEntries implements InterfacePage
         $categoryKeywords = $category->getKeywords($localeName);
         $categoryKeywords = str_replace('"', '&quot;', $categoryKeywords);
 
-        $this->CMSCore->configurator->setMetaTitle($categorySEOTitle . ' | ' . $localeData['DEFAULT_PAGE'] . ' ' . $pageIndex + 1);
+        $this->CMSCore->configurator->setMetaTitle($categorySEOTitle . ' | ' . $localeData['DEFAULT_TEXT_PAGE'] . ' ' . $pageIndex + 1);
         $this->CMSCore->configurator->setMetaDescription($categorySEODescription);
         $this->CMSCore->configurator->setMetaKeywords($categoryKeywords);
 
-        $this->page->breadcrumbs->add($category->getTitle($localeName), '/entries/' . $category->getName());
+        $parentChain = $category->getParentChain();
+        foreach ($parentChain as $chainCategory) {
+          $chainCategory->initData(['name', 'texts']);
+          $this->page->breadcrumbs->add(
+            $chainCategory->getTitle($localeName),
+            '/entries/' . $chainCategory->getName()
+          );
+        }
+
         $this->page->breadcrumbs->assembly();
 
         /** @var Entries $entries Объект класса Entries */
         $entries = new Entries($this->CMSCore);
-        $entriesObjects = $entries->getByCategoryID($categoryID, [
-          'limit' => [$entriesCountOnPage, $paginationItemCurrent * $entriesCountOnPage]
-        ], $isPublished);
-        
-        $entriesCount = $entries->getCountByCategoryID($categoryID, $isPublished);
+        $entriesObjects = $entries->getByCategoriesIDs(
+          array_merge([$categoryID], $category->getChildCategoriesIDs()),
+          ['limit' => [$entriesCountOnPage, $paginationItemCurrent * $entriesCountOnPage]],
+          $isPublished
+        );
+        $entriesCount = $entries->getCountByCategoriesIDs(
+          array_merge([$categoryID], $category->getChildCategoriesIDs()),
+          $isPublished
+        );
       } else {
         $this->page->breadcrumbs->assembly();
 
         $this->CMSCore->configurator->setMetaTitle($localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_LABEL'] . ' | ' . $this->CMSCore->configurator->getSiteTitle());
+        $this->CMSCore->configurator->setMetaDescription($localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_DESCRIPTION']);
 
         /** @var Entries $entries Объект класса Entries */
         $entries = new Entries($this->CMSCore);

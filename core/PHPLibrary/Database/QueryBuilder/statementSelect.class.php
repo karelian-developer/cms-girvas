@@ -26,6 +26,7 @@ use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseFrom as ClauseF
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseWhere as ClauseWhere;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseOrderBy as ClauseOrderBy;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseLimit as ClauseLimit;
+use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseJoin as ClauseJoin;
 use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
 
 final class StatementSelect implements InterfaceStatement
@@ -36,6 +37,7 @@ final class StatementSelect implements InterfaceStatement
   public ?ClauseWhere $clauseWhere = null;
   public ?ClauseOrderBy $clauseOrderBy = null;
   public ?ClauseLimit $clauseLimit = null;
+  public ?ClauseJoin $clauseJoin = null;
   public string $assembled = '';
   
   /**
@@ -60,15 +62,26 @@ final class StatementSelect implements InterfaceStatement
     $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
 
     foreach ($selections as $index => $selection) {
-      if (!preg_match('/\"[a-z0-9_]+\"/i', $selection) && !preg_match('/[a-z]+\([a-z0-9_]*[*]*\)/i', $selection) && !is_numeric($selection) && $selection !== '*') {
-        $selections[$index] = match ($CMSConfigDatabase['dms']) {
+      // Не экранируем выражения с CASE, функциями или алиасами
+      if (preg_match('/^\s*\(/', $selection) || 
+        stripos($selection, 'CASE') !== false || 
+        stripos($selection, ' AS ') !== false) {
+        $this->selections[] = $selection;
+        continue;
+      }
+      
+      if (!preg_match('/\"[a-z0-9_]+\"/i', $selection) && 
+        !preg_match('/[a-z]+\([a-z0-9_]*[*]*\)/i', $selection) && 
+        !is_numeric($selection) && 
+        $selection !== '*') {
+        $selection = match ($CMSConfigDatabase['dms']) {
           CMSDMS::MySQL => '`' . $selection . '`',
           CMSDMS::PostgreSQL => '"' . $selection . '"',
         };
       }
+      
+      $this->selections[] = $selection;
     }
-
-    $this->selections = array_merge($this->selections, $selections);
   }
   
   /**
@@ -113,6 +126,16 @@ final class StatementSelect implements InterfaceStatement
     $this->clauseLimit->setLimit($limit);
     $this->clauseLimit->setOffset($offset);
   }
+
+  /**
+   * Установить предложение JOIN
+   *
+   * @return void
+   */
+  public function setClauseJoin() : void
+  {
+    $this->clauseJoin = new ClauseJoin($this);
+  }
   
   /**
    * Сборка SQL-запроса
@@ -142,6 +165,7 @@ final class StatementSelect implements InterfaceStatement
   {
     return [
       $this->clauseFrom,
+      $this->clauseJoin,
       $this->clauseWhere,
       $this->clauseOrderBy,
       $this->clauseLimit

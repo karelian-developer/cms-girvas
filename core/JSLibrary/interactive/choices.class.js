@@ -115,7 +115,7 @@ export class Choices {
       selectContainerElement.classList.add('select-imitation_is-disclosed');
     }
 
-    selectContainerElement.style.width = this.width + 'px';
+    selectContainerElement.style.width = this.width;
 
     let selectedItemContainerElement = document.createElement('div');
     let selectContainerButton, selectContainerButtonIcon;

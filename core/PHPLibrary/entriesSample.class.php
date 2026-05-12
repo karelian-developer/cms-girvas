@@ -29,6 +29,9 @@ use \PDOException as PDOException;
 #[\AllowDynamicProperties]
 class EntriesSample implements EntityTypeContent
 {
+  private bool $isDataFullyInitialized = false;
+  private array $initializedColumns = [];
+
   /**
    * __construct
    *
@@ -50,9 +53,30 @@ class EntriesSample implements EntityTypeContent
    */
   public function initData(array $columns = ['*']) : void
   {
-    $columnsData = $this->getDatabaseColumnsData($columns);
-    foreach ($columnsData as $name => $data) {
-      $this->{$name} = $data;
+    if ($this->isDataFullyInitialized) {
+      return;
+    }
+    
+    if ($columns !== ['*'] && empty(array_diff($columns, $this->initializedColumns))) {
+      return;
+    }
+    
+    $columnsToLoad = $this->isDataFullyInitialized 
+      ? array_diff($columns, $this->initializedColumns) 
+      : $columns;
+    
+    $columnsData = $this->getDatabaseColumnsData($columnsToLoad);
+    
+    if ($columnsData !== null) {
+      foreach ($columnsData as $name => $data) {
+        $this->{$name} = $data;
+      }
+      
+      if ($columns === ['*']) {
+        $this->isDataFullyInitialized = true;
+      } else {
+        $this->initializedColumns = array_merge($this->initializedColumns, $columns);
+      }
     }
   }
   
@@ -589,8 +613,6 @@ class EntriesSample implements EntityTypeContent
       $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
-
-      error_log('SQL: ' . $queryBuilder->statement->assembled);
 
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;

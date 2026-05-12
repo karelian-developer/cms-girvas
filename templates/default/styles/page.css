@@ -22,16 +22,26 @@
   }
 }
 
-.page__title {
+.page__caption {
   background-color: var(--primary-color-4);
-  text-transform: uppercase;
-  font-weight: 400;
-  font-size: 18px;
-  color: var(--primary-color-2);
   border-radius: 8px;
   border: 1px solid var(--common-secondary-color-10);
   padding: 8px 24px;
   margin-bottom: 16px;
+}
+
+.page__caption-title {
+  text-transform: uppercase;
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--primary-color-2);
+  margin-bottom: 8px;
+}
+
+.page__caption-description {
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--primary-color-5);
 }
 
 .page__pagination:not(:last-child) {
@@ -137,7 +147,7 @@
 .sidebar {
   position: sticky;
   display: grid;
-  grid-template-rows: minmax(200px, min-content);
+  grid-template-rows: min-content;
   grid-auto-rows: min-content;
   row-gap: 16px;
   height: min-content;
@@ -176,9 +186,55 @@
   width: 100%;
 }
 
-@media (min-width: 670px) {
-  .sidebar__block-content {
-    min-height: 151px;
+/* =====================
+ *     МИНИ-КАБИНЕТ
+ * =================== */
+
+.sideblock__mini-cabinet {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 16px;
+}
+
+.sideblock__mini-cabinet .mini-cabinet__avatar {
+  border-radius: 8px;
+  border: 1px solid var(--common-secondary-color-10);
+  width: 100%;
+  max-width: 64px;
+}
+
+.sideblock__mini-cabinet .mini-cabinet__user-login {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.sideblock__mini-cabinet .mini-cabinet__metadata {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  margin-bottom: 8px;
+  column-gap: 4px;
+  row-gap: 8px;
+}
+
+.sideblock__mini-cabinet .mini-cabinet__metadata-label {
+  font-weight: 500;
+}
+
+.sideblock__mini-cabinet .mini-cabinet__metadata-label::after {
+  font-weight: 500;
+  content: ':';
+  margin-right: 4px;
+}
+
+.sideblock__mini-cabinet .mini-cabinet__panel {
+  display: grid;
+  grid-template-columns: repeat(2, calc(50% - 4px));
+  gap: 8px;
+}
+
+@media (max-width: 340px) {
+  .sideblock__mini-cabinet .mini-cabinet__panel {
+    grid-template-columns: 1fr;
   }
 }
 

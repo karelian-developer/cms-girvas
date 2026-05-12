@@ -185,6 +185,22 @@ if (defined('IS_NOT_HACKED')) {
       $APIFilePath = CMS_ROOT_DIRECTORY . '/api/pagesStatic.api.php';
       include_once $APIFilePath;
     }
+  } else if ($CMSURLPathes[1] === 'contentBlock' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSClient->getIPAddress();
+
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/contentBlock.api.php';
+      include_once $APIFilePath;
+    }
+  } else if ($CMSURLPathes[1] === 'contentBlocks' && $CMSCore::coreRESTCookieExists()) {
+    $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
+    $clientIP = $CMSClient->getIPAddress();
+
+    if ($CMSCore::coreRESTCookieIsValid($CMSCoreRESTCookie, $clientIP)) {
+      $APIFilePath = CMS_ROOT_DIRECTORY . '/api/contentBlocks.api.php';
+      include_once $APIFilePath;
+    }
   } else if ($CMSURLPathes[1] === 'settings' && $CMSCore::coreRESTCookieExists()) {
     $CMSCoreRESTCookie = $CMSCore::getCoreRESTCookie();
     $clientIP = $CMSClient->getIPAddress();

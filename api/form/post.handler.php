@@ -93,7 +93,23 @@ if (Form::existsByName($CMSCore, $formName)) {
                 ? $elementData['texts'][$formLocale]['title']
                 : $elementName;
 
-              $formDataFormated[] = '*' . $elementTitle . ':* `' . $POSTData . '`';
+              if ($elementData['type'] === 'select') {
+                $selectedLabel = '';
+                foreach ($elementData['options'] as $option) {
+                  if ($option['value'] === $POSTData) {
+                    // Получаем label для текущей локали
+                    $selectedLabel = isset($option['texts'][$formLocale]['label']) 
+                      ? $option['texts'][$formLocale]['label'] 
+                      : $option['value'];
+                    break;
+                  }
+                }
+                $elementValue = $selectedLabel;
+              } else {
+                $elementValue = $POSTData;
+              }
+              
+              $formDataFormated[] = $elementTitle . ': ' . $elementValue;
             }
           }
         }
@@ -138,7 +154,23 @@ if (Form::existsByName($CMSCore, $formName)) {
                 ? $elementData['texts'][$formLocale]['title']
                 : $elementName;
 
-              $formDataFormated[] = $elementTitle . ': ' . $POSTData;
+              if ($elementData['type'] === 'select') {
+                $selectedLabel = '';
+                foreach ($elementData['options'] as $option) {
+                  if ($option['value'] === $POSTData) {
+                    // Получаем label для текущей локали
+                    $selectedLabel = isset($option['texts'][$formLocale]['label']) 
+                      ? $option['texts'][$formLocale]['label'] 
+                      : $option['value'];
+                    break;
+                  }
+                }
+                $elementValue = $selectedLabel;
+              } else {
+                $elementValue = $POSTData;
+              }
+              
+              $formDataFormated[] = $elementTitle . ': ' . $elementValue;
             }
           }
         }

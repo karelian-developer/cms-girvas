@@ -20,6 +20,9 @@
 
 namespace core\PHPLibrary;
 
+use \core\PHPLibrary\ContentBlocks as ContentBlocks;
+use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
+use \core\PHPLibrary\Factories\Content as CMSContent;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\SystemCore\FileConnector as SystemCoreFileConnector;
@@ -28,6 +31,7 @@ use \core\PHPLibrary\Template\EnumWeight as ThemeEnumWeight;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Template\InterfaceCore as ThemeInterfaceCore;
 use \core\PHPLibrary\Template\Locale as ThemeLocale;
+use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \DOMDocument as DOMDocument;
 
 final class Template implements ThemeInterface
@@ -37,6 +41,7 @@ final class Template implements ThemeInterface
   private string $path;
   private string $url;
   
+  private array $contentBlocks = [];
   private array $styles = [];
   private array $scripts = [];
 
@@ -97,6 +102,22 @@ final class Template implements ThemeInterface
     $this->addStyle(['href' => 'default-fonts.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
     $this->addStyle(['href' => 'default-interactive.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
     $this->addStyle(['href' => 'default-notifications.css', 'rel' => 'preload', 'as' => 'style', 'onload' => 'this.rel=\'stylesheet\'', 'isCore' => true]);
+
+    if (
+        !$this->CMSCore->isInstallerModeActive() &&
+        $this->CMSCore->urlp->getPath(0) !== 'install'
+      ) {
+      $contentBlocksArray = (new ContentBlocks($this->CMSCore))->getAll();
+
+      foreach ($contentBlocksArray as $contentBlock) {
+        $contentBlock->initData(['metadata']);
+        $this->addContentBlock($contentBlock);
+      }
+    }
+
+    foreach ($this->CMSCore->deferredStyles as $data) {
+      $this->addExternalStyle($data);
+    }
 
     /** @var string $corePath Путь до файла ядра шаблона */
     $corePath = $this->getCorePath();
@@ -329,6 +350,16 @@ final class Template implements ThemeInterface
   }
   
   /**
+   * Получить массив контент-блоков
+   *
+   * @return array
+   */
+  private function getContentBlocks() : array
+  {
+    return $this->contentBlocks;
+  }
+  
+  /**
    * Получить массив стилей
    *
    * @return array
@@ -351,7 +382,7 @@ final class Template implements ThemeInterface
   /**
    * Добавить стиль в массив стилей
    *
-   * @param  mixed $data
+   * @param array $data
    * 
    * @return void
    */
@@ -361,9 +392,43 @@ final class Template implements ThemeInterface
   }
   
   /**
+   * Добавить контент-блок в массив
+   *
+   * @param EntityTypeContent $contentBlock
+   * 
+   * @return void
+   */
+  public function addContentBlock(EntityTypeContent $contentBlock) : void {
+    $blockSectionIntegrationName = $contentBlock->getSectionIntegrationName();
+    $blockSectionIntegrationName = $blockSectionIntegrationName !== ''
+      ? $blockSectionIntegrationName
+      : 'undefined';
+
+    if (!isset($this->contentBlocks[$blockSectionIntegrationName])) {
+      $this->contentBlocks[$blockSectionIntegrationName] = [];
+    }
+    
+    $this->contentBlocks[$blockSectionIntegrationName][] = $contentBlock;
+  }
+  
+  /**
+   * Добавить внешний скрипт в массив стилей
+   *
+   * @param array $data
+   * 
+   * @return void
+   */
+  public function addExternalStyle(array $data) : void
+  {
+    $data['isExternal'] = true;
+    $this->styles[] = $data;
+  }
+  
+  /**
    * Добавить скрипт в массив стилей
    *
    * @param array $data
+   * @param bool $isCMSCore
    * 
    * @return void
    */
@@ -399,6 +464,7 @@ final class Template implements ThemeInterface
   /**
    * Получить вес шаблона в байтах
    * 
+   * @param Template $theme
    * @param ThemeEnumWeight $enumWeight
    * 
    * @return float
@@ -531,10 +597,8 @@ final class Template implements ThemeInterface
   public function getCoreAssembled() : string
   {
     if (isset($this->core->assembled)) {
-      /** @var bool Режим установщика */
-      $isInstallationMode = $this->CMSCore->urlp->getParam('mode') === 'install';
-
-      if ($isInstallationMode) {
+      
+      if ($this->CMSCore->isInstallerModeActive()) {
         $siteTitle = 'Installation | ' . SystemCore::CMS_TITLE;
         $siteDescription = 'This site is not installed yet, but will be soon.';
         $siteKeywords = 'girvas';
@@ -553,6 +617,8 @@ final class Template implements ThemeInterface
         $siteKeywords = $CMSConfigurator->getMetaKeywordsImploded() ?: $CMSConfigurator->getSiteKeywords();
         $siteCharset = $CMSConfigurator->getSiteCharset();
       }
+
+      $nadvoParse = new NadvoParse();
 
       $systemStageDevelopingLabel = str_replace('-', '_', strtoupper($this->CMSCore->getCMSStageDeveloping()));
 
@@ -585,7 +651,67 @@ final class Template implements ThemeInterface
         'CMS_CSRF_TOKEN' => $this->CMSCore::generateCSRFToken()
       ];
 
-      if (!$isInstallationMode && $this->CMSCore->urlp->getPath(0) !== 'install') {
+      if (
+        !$this->CMSCore->isInstallerModeActive() &&
+        $this->CMSCore->urlp->getPath(0) !== 'install'
+      ) {
+        if (count($this->contentBlocks) > 0) {
+          $requestURI = $_SERVER['REQUEST_URI'] ?? '';
+
+          foreach ($this->contentBlocks as $sectionName => $sectionContentBlocks) {
+            $contentBlocksAssembled = [];
+
+            foreach ($sectionContentBlocks as $contentBlock) {
+              $contentBlock->initData(['name', 'texts', 'metadata']);
+              
+              $contentBlockURLRule = $contentBlock->getURLRule();
+              $contentBlockIsShowed = $contentBlockURLRule !== ''
+                ? preg_match($contentBlockURLRule, $requestURI)
+                : true;
+
+              if ($contentBlockIsShowed) {
+                $contentBlockType = $contentBlock->getType();
+                $contentBlockTypeName = $contentBlockType->getTechnicalName();
+                $contentBlockContent = $contentBlock->getContent($localeName);
+                $contentBlockContentParsed = $nadvoParse->parse(htmlspecialchars($contentBlockContent, ENT_QUOTES, 'UTF-8'));
+
+                $templateContentBlockVars = [
+                  'BLOCK_TITLE' => $contentBlock->getTitle($localeName),
+                  'BLOCK_CONTENT' => $contentBlockContentParsed
+                ];
+
+                if ($contentBlockTypeName === 'cabinet') {
+                  $CMSClient = $this->CMSCore->client;
+                  $CMSClientIsLogged = $CMSClient->isLogged(1);
+                  $cabinetVars = [];
+
+                  if ($CMSClientIsLogged) {
+                    $CMSClientUser = $CMSClient->getUser(1);
+                    $CMSClientUser->initData(['login', 'metadata']);
+                    $CMSClientUserGroup = $CMSClientUser->getGroup();
+                    $CMSClientUserGroup->initData(['texts']);
+
+                    $cabinetVars['USER_LOGIN'] = $CMSClientUser->getLogin();
+                    $cabinetVars['USER_AVATAR_URL'] = $CMSClientUser->getAvatarURL(64);
+                    $cabinetVars['USER_GROUP_LABEL'] = $CMSClientUserGroup->getTitle($localeName);
+                  }
+
+                  $templateContentBlockVars['BLOCK_CABINET'] = $CMSClientIsLogged
+                    ? ThemeCollector::assemblyFileContent($this, 'templates/contentBlock/cabinet/user.tpl', $cabinetVars)
+                    : ThemeCollector::assemblyFileContent($this, 'templates/contentBlock/cabinet/auth.tpl', $cabinetVars);
+                }
+                
+                $contentBlocksAssembled[] = ThemeCollector::assemblyFileContent($this, 'templates/contentBlock/' . $contentBlockTypeName . '.tpl', $templateContentBlockVars);
+              }
+            }
+
+            $themeSectionContentBlocksName = strtoupper(preg_replace('/(?<!^)([A-Z])/', '_$1', $sectionName));
+
+            $contentBlocksAssembled = implode('', $contentBlocksAssembled);
+            $themeVariablesArray['CONTENT_BLOCKS_' . $themeSectionContentBlocksName] = $contentBlocksAssembled;
+          }
+        }
+
         $forms = new Forms($this->CMSCore);
         $formsArray = $forms->getAll();
 
@@ -966,20 +1092,25 @@ final class Template implements ThemeInterface
 
           if (isset($elementData['rel']) && isset($elementData['href'])) {
             $styleIsCore = false;
-            if (array_key_exists('isCore', $elementData)) {
-              if ($elementData['isCore'] === true) {
-                $styleIsCore = true;
-                $styleHref = '/core/CSSCore/' . $elementData['href'];
+
+            if (!array_key_exists('isExternal', $elementData)) {
+              if (array_key_exists('isCore', $elementData)) {
+                if ($elementData['isCore'] === true) {
+                  $styleIsCore = true;
+                  $styleHref = '/core/CSSCore/' . $elementData['href'];
+                }
               }
-            }
 
-            if (!$styleIsCore) {
-              $themeName = $this->getName();
-              $themeCategoryName = $this->getCategory();
+              if (!$styleIsCore) {
+                $themeName = $this->getName();
+                $themeCategoryName = $this->getCategory();
 
-              $styleHrefIsNotBase = '/templates/' . $themeCategoryName . '/' . $themeName . '/' . $elementData['href'];
-              $styleHrefIsBase = '/templates/' . $themeName . '/' . $elementData['href'];
-              $styleHref = $themeCategoryName !== 'base' ? $styleHrefIsNotBase : $styleHrefIsBase;
+                $styleHrefIsNotBase = '/templates/' . $themeCategoryName . '/' . $themeName . '/' . $elementData['href'];
+                $styleHrefIsBase = '/templates/' . $themeName . '/' . $elementData['href'];
+                $styleHref = $themeCategoryName !== 'base' ? $styleHrefIsNotBase : $styleHrefIsBase;
+              }
+            } else {
+              $styleHref = $elementData['href'];
             }
 
             $elementLink->setAttribute('href', $styleHref);

@@ -42,6 +42,8 @@ import {PageFeed as PageAdminFeed} from './page/admin/feed.class.js';
 import {PageFeeds as PageAdminFeeds} from './page/admin/feeds.class.js';
 import {PageForm as PageAdminForm} from './page/admin/form.class.js';
 import {PageForms as PageAdminForms} from './page/admin/forms.class.js';
+import {PageContentBlock as PageAdminContentBlock} from './page/admin/contentBlock.class.js';
+import {PageContentBlocks as PageAdminContentBlocks} from './page/admin/contentBlocks.class.js';
 import {PageGlobal as PageAdminGlobal} from './page/admin/global.class.js';
 import {PageGlobal as PageDefaultGlobal} from './page/global.class.js';
 import {Interactive} from '../interactive.class.js';
@@ -54,7 +56,7 @@ export class Page {
 
     let searchParams = new URLParser();
 
-    if (pageCategory == 'default') {
+    if (pageCategory === 'default') {
       switch (pageName) {
         case 'entry': this.target = new PageDefaultEntry(this, params); break;
         case 'global': this.target = new PageDefaultGlobal(this, params); break;
@@ -62,7 +64,7 @@ export class Page {
       }
     }
 
-    if (pageCategory == 'admin') {
+    if (pageCategory === 'admin') {
       switch (pageName) {
         case 'analytics': this.target = new PageAdminAnalytics(this, params); break;
         case 'entry': this.target = new PageAdminEntry(this, params); break;
@@ -89,11 +91,13 @@ export class Page {
         case 'feeds': this.target = new PageAdminFeeds(this, params); break;
         case 'form': this.target = new PageAdminForm(this, params); break;
         case 'forms': this.target = new PageAdminForms(this, params); break;
+        case 'contentBlock': this.target = new PageAdminContentBlock(this, params); break;
+        case 'contentBlocks': this.target = new PageAdminContentBlocks(this, params); break;
         case 'global': this.target = new PageAdminGlobal(this, params); break;
       }
     }
 
-    if (this.target != null) {
+    if (this.target !== null) {
       this.init();
     }
   }

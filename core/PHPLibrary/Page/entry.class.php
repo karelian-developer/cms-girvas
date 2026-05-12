@@ -215,6 +215,8 @@ class PageEntry implements InterfacePage
         http_response_code(200);
 
         $category = $entry->getCategory();
+        $category->initData(['name', 'texts', 'parentID']);
+
         $categoryTitle = $category->getTitle($localeName);
 
         $entryTitle = strip_tags($entry->getTitle($localeName));
@@ -238,7 +240,14 @@ class PageEntry implements InterfacePage
         $this->CMSCore->configurator->setMetaKeywords($entryKeywords);
 
         $this->page->breadcrumbs->add($localeData['PAGE_ENTRY_BREADCRUMPS_ALL_ENTRIES_LABEL'], '/entries');
-        $this->page->breadcrumbs->add($categoryTitle, '/entries/' . $category->getName());
+        $parentChain = $category->getParentChain();
+        foreach ($parentChain as $chainCategory) {
+          $chainCategory->initData(['name', 'texts']);
+          $this->page->breadcrumbs->add(
+            $chainCategory->getTitle($localeName),
+            '/entries/' . $chainCategory->getName()
+          );
+        }
         $this->page->breadcrumbs->add($entryTitle, '/entry/' . $entry->getName());
         $this->page->breadcrumbs->assembly();
 

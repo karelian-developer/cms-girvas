@@ -118,6 +118,14 @@ class PageForm implements InterfacePage
 
       foreach ($formsElements as $elementIndex => $elementData) {
         $elementName = $elementData['name'];
+        $partsName = explode('_', strtolower($elementName));
+
+        $convertedName = array_shift($partsName);
+        foreach ($partsName as $part) {
+          $convertedName .= ucfirst($part);
+        }
+
+        $elementName = $convertedName;
         
         if (isset($dataArray[$elementName])) {
           $elementTitle = isset($elementData['texts'][$localeName]['title'])

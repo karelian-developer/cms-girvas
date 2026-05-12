@@ -49,8 +49,6 @@ if ($CMSCore->client->isLogged(2)) {
         return isset($_PATCH['form_element_name']) && in_array($element['name'], $_PATCH['form_element_name']);
       });
 
-      error_log(print_r($_PATCH, true));
-
       $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
       if (count($CMSLocalesNames) > 0) {
         foreach ($CMSLocalesNames as $index => $name) {
@@ -128,6 +126,12 @@ if ($CMSCore->client->isLogged(2)) {
               $formElements[$i]['sequenceNumber'] = is_numeric($formElementSequenceNumbers[$i])
                 ? $formElementSequenceNumbers[$i]
                 : 0;
+
+              if ($formElements[$i]['type'] === 'select') {
+                if (!isset($formElements[$i]['options'])) {
+                  $formElements[$i]['options'] = [];
+                }
+              }
               
               if ($CMSLocaleName === $commonLocale) {
                 
@@ -135,11 +139,42 @@ if ($CMSCore->client->isLogged(2)) {
                 $formElementDescriptionsTrimmed = trim($formElementDescriptions[$i]);
                 $formElementPlaceholdersTrimmed = trim($formElementPlaceholders[$i]);
 
-                $formElements[$i]['texts'][$CMSLocaleName] = [
+                $formElements[$i]['texts'][$commonLocale] = [
                   'title' => htmlspecialchars(str_replace('\'', '"', $formElementTitlesTrimmed)),
                   'description' => str_replace('\'', '"', $formElementDescriptionsTrimmed),
                   'placeholder' => str_replace('\'', '"', $formElementPlaceholdersTrimmed)
                 ];
+              }
+
+              if (isset($formElements[$i]['options'])) {
+                $elementName = $formElements[$i]['name'];
+                
+                // Проверяем, существуют ли данные для этого элемента в $_PATCH
+                $optionLabelsKey = 'form_element_select_' . $elementName . '_option_label';
+                $optionValuesKey = 'form_element_select_' . $elementName . '_option_value';
+                
+                if (isset($_PATCH[$optionLabelsKey]) && isset($_PATCH[$optionValuesKey])) {
+                  $formElements[$i]['options'] = [];
+                  
+                  foreach ($_PATCH[$optionLabelsKey] as $optionIndex => $optionLabel) {
+                    $optionValue = $_PATCH[$optionValuesKey][$optionIndex];
+                    
+                    if (!isset($formElements[$i]['options'][$optionIndex])) {
+                      $formElements[$i]['options'][$optionIndex] = [];
+                    }
+
+                    if (!isset($formElements[$i]['options'][$optionIndex]['texts'])) {
+                      $formElements[$i]['options'][$optionIndex]['texts'] = [];
+                    }
+
+                    if (!isset($formElements[$i]['options'][$optionIndex]['texts'][$commonLocale])) {
+                      $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale] = [];
+                    }
+
+                    $formElements[$i]['options'][$optionIndex]['texts'][$commonLocale]['label'] = htmlspecialchars(str_replace('\'', '"', $optionLabel));
+                    $formElements[$i]['options'][$optionIndex]['value'] = htmlspecialchars(str_replace('\'', '"', $optionValue));
+                  }
+                }
               }
             }
           }

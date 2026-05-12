@@ -32,8 +32,9 @@ export class Request {
 
     this.setMethod(method);
     this.setURL(url);
-
-    this.data = (data === undefined || data === null) ? undefined : new FormData(data);
+    
+    this.element = data;
+    this.data = (data === undefined || data === null) ? undefined : new FormData(this.element);
     this.headers = {};
     this.showingNotification = true;
   }
@@ -131,7 +132,10 @@ export class Request {
       this.addData('_grv_' + this.getRandomString(), this.getRandomString());
     }
 
-    if (this.showingNotification) {
+    let notificationStatus = this.element?.getAttribute('data-notification');
+    notificationStatus = notificationStatus ?? 'on'
+
+    if (this.showingNotification && notificationStatus !== 'off') {
       interactiveNotificationLoading = new Interactive('notification');
       interactiveNotificationLoading.target.isPopup = true;
       interactiveNotificationLoading.target.setStatusCode(-1);
@@ -147,57 +151,64 @@ export class Request {
       }
     }
 
-    return fetch(requestURL, {
-      method: requestMethod,
-      body: this.data,
-      headers: this.headers,
-      credentials: 'same-origin'
-    }).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      if (this.showingNotification) {
-        interactiveNotificationLoading.target.hide();
-      }
+    let backendStatus = this.element?.getAttribute('data-backend');
+    backendStatus = backendStatus ?? 'on'
 
-      if (typeof(data.outputData.reload) !== 'undefined') {
-        setTimeout(() => {
-          window.location.reload();
-        }, 10);
-      }
-
-      if (typeof(data.outputData.href) !== 'undefined') {
-        setTimeout(() => {
-          window.location.href = data.outputData.href;
-        }, 10);
-      }
-
-      if (this.showingNotification) {
-        if (data.hasOwnProperty('message')) {
-          let interactiveNotification;
-          
-          interactiveNotification = new Interactive('notification');
-          interactiveNotification.target.isPopup = true;
-          interactiveNotification.target.setStatusCode(data.statusCode);
-          interactiveNotification.target.setContent(data.message);
-          interactiveNotification.target.assembly();
-
-          interactiveNotification.target.show();
-        } else {
-          console.info('The handler did not transmit the message in the required format.');
+    if (backendStatus !== 'off') {
+      return fetch(requestURL, {
+        method: requestMethod,
+        body: requestMethod !== 'GET'
+          ? this.data
+          : null,
+        headers: this.headers,
+        credentials: 'same-origin'
+      }).then((response) => {
+        return (response.ok) ? response.json() : Promise.reject(response);
+      }).then((data) => {
+        if (this.showingNotification && notificationStatus !== 'off') {
+          interactiveNotificationLoading.target.hide();
         }
-      }
 
-      console.log(data);
+        if (typeof(data.outputData.reload) !== 'undefined') {
+          setTimeout(() => {
+            window.location.reload();
+          }, 10);
+        }
 
-      return data;
-    }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
+        if (typeof(data.outputData.href) !== 'undefined') {
+          setTimeout(() => {
+            window.location.href = data.outputData.href;
+          }, 10);
+        }
 
-      interactiveNotification.target.show();
-    });
+        if (this.showingNotification && notificationStatus !== 'off') {
+          if (data.hasOwnProperty('message')) {
+            let interactiveNotification;
+            
+            interactiveNotification = new Interactive('notification');
+            interactiveNotification.target.isPopup = true;
+            interactiveNotification.target.setStatusCode(data.statusCode);
+            interactiveNotification.target.setContent(data.message);
+            interactiveNotification.target.assembly();
+
+            interactiveNotification.target.show();
+          } else {
+            console.info('The handler did not transmit the message in the required format.');
+          }
+        }
+
+        return data;
+      }, (rejectionReason) => {
+        let interactiveNotification = new Interactive('notification');
+        interactiveNotification.target.isPopup = true;
+        interactiveNotification.target.setStatusCode(0);
+        interactiveNotification.target.setContent(rejectionReason);
+        interactiveNotification.target.assembly();
+
+        interactiveNotification.target.show();
+      });
+    } else {
+      return true;
+    }
   }
 }

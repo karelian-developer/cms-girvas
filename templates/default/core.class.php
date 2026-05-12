@@ -282,6 +282,10 @@ final class Core implements ThemeInterfaceCore
       $CMSTheme->addScript(['src' => 'core.class.js', 'type' => 'module'], true);
       $CMSTheme->addScript(['src' => 'core.class.js', 'type' => 'module']);
 
+      foreach ($CMSTheme->CMSCore->deferredScripts as $data) {
+        $CMSTheme->addExternalScript($data);
+      }
+
       $profileLink = $clientIsLogged
         ? $this->assemblyProfileLink($localeData)
         : $this->assemblyLoginLink($localeData);

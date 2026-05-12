@@ -53,7 +53,13 @@
   margin-bottom: 20px;
   width: 100%;
   height: fit-content;
-  min-height: 225px;
+  height: 225px;
+}
+
+@media (max-width: 600px) {
+  .page.page_template .template__gallary-container {
+    min-height: unset;
+  }
 }
 
 @media (max-width: 600px) {
@@ -121,7 +127,18 @@
 }
 
 .page.page_template .gallery__item-image {
+  object-fit: contain;
   width: 100%;
+  height: 100%;
+}
+
+.page.page_template .template__description-container {
+  margin-bottom: 20px;
+}
+
+.page.page_template .template__properties {
+  font-size: 14px;
+  color: var(--common-main-color-3);
 }
 
 .page.page_template .template__description-container {

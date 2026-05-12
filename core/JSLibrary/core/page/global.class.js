@@ -109,6 +109,25 @@ export class PageGlobal {
         });
       }
 
+      // Подмена интерактивной базы «Select» на интерактивный элемент «Choice»
+      const intractiveChoiceBases = document.querySelectorAll('[data-interactive-base]');
+      intractiveChoiceBases.forEach(selectElement => {
+        if (selectElement.tagName === 'SELECT') {
+          const selectElementOptionsElements = selectElement.querySelectorAll('option');
+          const intractiveChoice = new Interactive('choices');
+          
+          selectElementOptionsElements.forEach(optionElement => {
+            intractiveChoice.target.addItem(optionElement.innerText, optionElement.value);
+          });
+
+          intractiveChoice.target.setWidth('100%');
+          intractiveChoice.target.setName(selectElement.getAttribute('name'));
+          intractiveChoice.assembly();
+
+          selectElement.replaceWith(intractiveChoice.target.element);
+        }
+      });
+
       let systemGlobalElements = document.querySelectorAll('[id^=SYSTEM_GE_]');
       systemGlobalElements.forEach((element, elementIndex) => {
         if (element.id.includes('IMC_00000001')) {

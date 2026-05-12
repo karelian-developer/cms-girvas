@@ -20,6 +20,7 @@
 
 namespace core\PHPLibrary\Template;
 
+use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\LocaleInterface as LocaleInterface;
@@ -55,6 +56,29 @@ final class Collector
   }
 
   /**
+   * Сборка контент-блока
+   * 
+   * @param Theme $theme
+   * @param EntityTypeContent $contentBlock
+   * @param array $themeVars
+   * @return string
+   */
+  public static function assemblyContentBlock(
+    Theme $theme,
+    EntityTypeContent $contentBlock,
+    array $themeVars = []
+  ) : string {
+    $CMSLocale = $theme->CMSCore->locale;
+    $CMSLocaleName = $CMSLocale->getName();
+
+    $blockName = $contentBlock->getName();
+    $blockTypeName = $contentBlock->getTypeName();
+    $blockSectionIntegrationName = $contentBlock->getSectionIntegrationName();
+
+    return ThemeCollector::assemblyFileContent($theme, 'templates/sidebar/' . $blockName . '.tpl', $themeVars);
+  }
+
+  /**
    * Сборка элементов link-стилей для последующего встраивания в секцию HEAD
    * 
    * @param Theme $theme
@@ -69,15 +93,22 @@ final class Collector
     foreach ($stylesArray as $style) {
       if (array_key_exists('href', $style) && array_key_exists('rel', $style)) {
         $styleIsCore = false;
-        if (array_key_exists('isCore', $style)) {
-          if ($style['isCore'] == true) {
-            $styleIsCore = true;
-            $styleHref = '/core/CSSCore/' . $style['href'];
-          }
-        }
 
-        if (!$styleIsCore) {
-          $styleHref = ($theme->getCategory() !== 'default') ? '/templates/' . $theme->getCategory() . '/' . $theme->getName() . '/' .$style['href'] : '/templates/' . $theme->getName() . '/' . $style['href'];
+        if (!array_key_exists('isExternal', $style)) {
+          if (array_key_exists('isCore', $style)) {
+            if ($style['isCore'] == true) {
+              $styleIsCore = true;
+              $styleHref = '/core/CSSCore/' . $style['href'];
+            }
+          }
+
+          if (!$styleIsCore) {
+            $styleHref = ($theme->getCategory() !== 'default')
+              ? '/templates/' . $theme->getCategory() . '/' . $theme->getName() . '/' .$style['href']
+              : '/templates/' . $theme->getName() . '/' . $style['href'];
+          }
+        } else {
+          $styleHref = $style['href'];
         }
 
         $linkElement = $document->createElement('link');

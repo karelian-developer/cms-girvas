@@ -28,6 +28,9 @@ use \PDOException as PDOException;
 #[\AllowDynamicProperties]
 class UserGroup
 {
+  private bool $isDataFullyInitialized = false;
+  private array $initializedColumns = [];
+
   // ID первичных групп пользователей
   public const GROUP_SUPER_ID   = 1;
   public const GROUP_USER_ID    = 4;
@@ -42,6 +45,7 @@ class UserGroup
   public const PERMISSION_ADMIN_VIEWING_LOGS                  = 1 << 6;
   public const PERMISSION_ADMIN_FEEDS_MANAGEMENT              = 1 << 17;
   public const PERMISSION_ADMIN_FORMS_MANAGEMENT              = 1 << 19;
+  public const PERMISSION_ADMIN_CONTENT_BLOCKS_MANAGEMENT     = 1 << 20;
   public const PERMISSION_ADMIN_SUPERUSER                     = 1 << 18;
   // Права модерации
   public const PERMISSION_MODER_USERS_BAN                     = 1 << 7;
@@ -52,6 +56,7 @@ class UserGroup
   public const PERMISSION_EDITOR_ENTRIES_EDIT                 = 1 << 11;
   public const PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT      = 1 << 12;
   public const PERMISSION_EDITOR_PAGES_STATIC_EDIT            = 1 << 13;
+  public const PERMISSION_EDITOR_CONTENT_BLOCKS_EDIT          = 1 << 21;
 
   public const PERMISSION_BASE_ENTRY_COMMENT_CREATE           = 1 << 14;
   public const PERMISSION_BASE_ENTRY_COMMENT_CHANGE           = 1 << 15;
@@ -78,9 +83,30 @@ class UserGroup
    */
   public function initData(array $columns = ['*']) : void
   {
-    $columnsData = $this->getDatabaseColumnsData($columns);
-    foreach ($columnsData as $name => $data) {
-      $this->{$name} = $data;
+    if ($this->isDataFullyInitialized) {
+      return;
+    }
+    
+    if ($columns !== ['*'] && empty(array_diff($columns, $this->initializedColumns))) {
+      return;
+    }
+    
+    $columnsToLoad = $this->isDataFullyInitialized 
+      ? array_diff($columns, $this->initializedColumns) 
+      : $columns;
+    
+    $columnsData = $this->getDatabaseColumnsData($columnsToLoad);
+    
+    if ($columnsData !== null) {
+      foreach ($columnsData as $name => $data) {
+        $this->{$name} = $data;
+      }
+      
+      if ($columns === ['*']) {
+        $this->isDataFullyInitialized = true;
+      } else {
+        $this->initializedColumns = array_merge($this->initializedColumns, $columns);
+      }
     }
   }
   
@@ -507,6 +533,16 @@ class UserGroup
   public function hasPermissionEditorPagesStaticEdit() : bool
   {
     return $this->permissionCheck(self::PERMISSION_EDITOR_PAGES_STATIC_EDIT);
+  }
+
+  /**
+   * Проверить наличие права редактирования контент-блоков
+   * 
+   * @return bool
+   */
+  public function hasPermissionEditorContentBlocksEdit() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_EDITOR_CONTENT_BLOCKS_EDIT);
   }
 
   /**

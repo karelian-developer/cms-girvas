@@ -1,0 +1,1 @@
+**Content blocks** are a special type of website content that is embedded as block elements in various places on the website. Typically, these places are side columns.

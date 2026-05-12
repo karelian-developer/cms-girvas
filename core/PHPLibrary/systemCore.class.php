@@ -62,8 +62,8 @@ final class SystemCore implements CoreInterface
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS «GIRVAS»';
-  public const CMS_VERSION = '0.2.9';
-  public const CMS_STAGE_DEVELOPING = 'voitsy';
+  public const CMS_VERSION = '0.3.0';
+  public const CMS_STAGE_DEVELOPING = 'shuya';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai';
   public const CMS_PRODUCT_SITE_LINK = 'https://cms-girvas.ru';
@@ -94,6 +94,14 @@ final class SystemCore implements CoreInterface
    * @var Theme Класс шаблона системы 
    */
   public ?Theme $theme = null;
+  /**
+   * @var array Массив с отложенными стилями
+   */
+  public array $deferredStyles = [];
+  /**
+   * @var array Массив с отложенными стилями
+   */
+  public array $deferredScripts = [];
 
   private CMSLocaleFactory $CMSLocaleFactory;
 
@@ -830,6 +838,16 @@ final class SystemCore implements CoreInterface
    * 
    * @return bool
    */
+  public function isInstallerModeActive() : bool
+  {
+    return $this->urlp->getParam('mode') === 'install';
+  }
+
+  /**
+   * Проверка активности инсталлятора (по локации клиента)
+   * 
+   * @return bool
+   */
   public function isLocationInstallerActive() : bool
   {
     return $this->urlp->getPath(0) === 'install';
@@ -1126,5 +1144,29 @@ final class SystemCore implements CoreInterface
     }
 
     return ($_SERVER['SERVER_PORT'] ?? null) === 443;
+  }
+
+  /**
+   * Добавить стиль в массив отложенных стилей
+   *
+   * @param  array $data
+   * 
+   * @return void
+   */
+  public function addDeferredStyle(array $data) : void
+  {
+    $this->deferredStyles[] = $data;
+  }
+
+  /**
+   * Добавить скрипт в массив отложенных скриптов
+   *
+   * @param  array $data
+   * 
+   * @return void
+   */
+  public function addDeferredScript(array $data) : void
+  {
+    $this->deferredScripts[] = $data;
   }
 }

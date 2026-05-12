@@ -90,6 +90,13 @@ class PageEntriesComments implements InterfacePage
       'link' => '/forms',
       'permanent' => false,
       'isActive' => false
+    ],
+    'blocks' => [
+      'name' => 'blocks',
+      'iconName' => 'contentBlocks',
+      'link' => '/contentBlocks',
+      'permanent' => false,
+      'isActive' => false
     ]
   ];
 

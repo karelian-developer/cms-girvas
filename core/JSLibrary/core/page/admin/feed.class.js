@@ -42,7 +42,7 @@ export class PageFeed {
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let urlInputElement = document.querySelector('[data-element="input-url"]');
+      const urlInputElement = document.querySelector('[data-element="input-url"]');
 
       this.buttons.save = new Interactive('button');
       this.buttons.delete = new Interactive('button');
@@ -119,6 +119,48 @@ export class PageFeed {
 
       this.buttons.save.assembly();
       this.buttons.delete.assembly();
+
+      urlInputElement.addEventListener('input', (event) => {
+        let oldValue = event.target.value;
+        let cursorPos = event.target.selectionStart;
+
+        let utils = new Utils();
+        let uString = utils.createString(oldValue);
+        uString.source = uString.translitToEN(true);
+        uString.source = uString.source.toLowerCase();
+        uString.source = uString.source.replace(/[^a-z0-9\-]/g, '');
+
+        let newValue = uString.source;
+
+        if (oldValue === newValue) return;
+
+        if (Math.abs(newValue.length - oldValue.length) > 1) {
+          event.target.value = newValue;
+          event.target.setSelectionRange(newValue.length, newValue.length);
+
+          return;
+        }
+
+        let removedBefore = 0;
+        for (let i = 0; i < cursorPos; i++) {
+          if (!/[a-z0-9\-]/.test(oldValue[i].toLowerCase())) {
+            removedBefore++;
+          }
+        }
+
+        event.target.value = newValue;
+
+        let newCursorPos = cursorPos - removedBefore;
+        
+        if (newValue.length >= oldValue.length) {
+          newCursorPos++;
+        }
+        
+        if (newCursorPos < 0) newCursorPos = 0;
+        if (newCursorPos > newValue.length) newCursorPos = newValue.length;
+        
+        event.target.setSelectionRange(newCursorPos, newCursorPos);
+      });
 
       if (searchParams.getPathPart(3) !== null) {
         let feedsTypes;
@@ -227,23 +269,8 @@ export class PageFeed {
 
         interactiveLocalesChoices.assembly();
 
-        let interactiveContainerElement = document.querySelector('[data-element="header-interactive"]');
+        const interactiveContainerElement = document.querySelector('[data-element="header-interactive"]');
         interactiveContainerElement.append(interactiveLocalesChoices.target.element);
-
-        urlInputElement.addEventListener('input', (event) => {
-          /** @var {String} */
-          let inputValue = event.target.value;
-  
-          /** @var {Utils} */
-          let utils = new Utils();
-          /** @var {UString} */
-          let uString = utils.createString(inputValue);
-          uString.source = uString.translitToEN(true);
-          uString.source = uString.source.toLowerCase();
-          uString.source = uString.source.replace(/[^a-z0-9\-]/, '');
-
-          event.target.value = uString.source;
-        });
 
         let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
         interactiveChoicesSelectElement.addEventListener('change', (event) => {

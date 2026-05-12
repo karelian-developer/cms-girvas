@@ -1,12 +1,15 @@
 {
   "PAGE_ABOUT_CONTENT": "markdown/page/aboutContent.md",
   "PAGE_INDEX_CONTENT": "markdown/page/indexContent.md",
+  "PAGE_CONTENT_BLOCKS_SIDEBAR_BLOCK_ABOUT_DESCRIPTION": "markdown/page/content/contentBlocksSidebarAboutContent.md",
   "PAGE_FORMS_SIDEBAR_BLOCK_ABOUT_DESCRIPTION": "markdown/page/content/formsSidebarAboutContent.md",
   "PAGE_ENTRIES_SAMPLES_SIDEBAR_BLOCK_ABOUT_DESCRIPTION": "markdown/page/content/entries/samplesSidebarAboutContent.md",
   "PAGE_PAGE_STATIC_SIDEBAR_BLOCK_PERSONAL_TEMPLATE_TIP": "markdown/page/content/pageStatic/sidebarPersonalTemplateTip.md",
+  "PAGE_PAGE_STATIC_SIDEBAR_BLOCK_SEO_ANALYZER_TIP": "markdown/page/content/pageStatic/sidebarSEOAnalyzerTip.md",
   "PAGE_PAGE_STATIC_SIDEBAR_BLOCK_SCHEDULER_TIP": "markdown/page/content/pageStatic/sidebarSchedulerTip.md",
   "PAGE_PAGE_STATIC_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TIP": "markdown/page/content/pageStatic/sidebarAdditionalFieldsTip.md",
   "PAGE_ENTRY_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TIP": "markdown/page/content/entry/sidebarAdditionalFieldsTip.md",
+  "PAGE_ENTRY_SIDEBAR_BLOCK_SEO_ANALYZER_TIP": "markdown/page/content/entry/sidebarSEOAnalyzerTip.md",
   "PAGE_ENTRY_SIDEBAR_BLOCK_SCHEDULER_TIP": "markdown/page/content/entry/sidebarSchedulerTip.md",
   "PAGE_SETTINGS_SETTING_SECURITY_RESTRICTING_ACCESS_TO_AP_BY_IP_DESCRIPTION" : "markdown/page/settings/security/restrictingAccessToAPByIPDescription.md" 
 }

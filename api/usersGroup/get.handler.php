@@ -31,6 +31,7 @@ if ($CMSCore->urlp->getPath(3) == 'permissions') {
     $handlerOutputData['usersGroup']['permissions']['admin_templates_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT);
     $handlerOutputData['usersGroup']['permissions']['admin_feeds_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_FEEDS_MANAGEMENT);
     $handlerOutputData['usersGroup']['permissions']['admin_forms_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT);
+    $handlerOutputData['usersGroup']['permissions']['admin_content_blocks_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_CONTENT_BLOCKS_MANAGEMENT);
     $handlerOutputData['usersGroup']['permissions']['admin_settings_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT);
     $handlerOutputData['usersGroup']['permissions']['admin_viewing_logs'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_VIEWING_LOGS);
     $handlerOutputData['usersGroup']['permissions']['moder_users_ban'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_MODER_USERS_BAN);
@@ -40,6 +41,7 @@ if ($CMSCore->urlp->getPath(3) == 'permissions') {
     $handlerOutputData['usersGroup']['permissions']['editor_entries_edit'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_EDITOR_ENTRIES_EDIT);
     $handlerOutputData['usersGroup']['permissions']['editor_entries_categories_edit'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT);
     $handlerOutputData['usersGroup']['permissions']['editor_pages_static_edit'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_EDITOR_PAGES_STATIC_EDIT);
+    $handlerOutputData['usersGroup']['permissions']['editor_content_blocks_edit'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_EDITOR_CONTENT_BLOCKS_EDIT);
     $handlerOutputData['usersGroup']['permissions']['base_entry_comment_create'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_BASE_ENTRY_COMMENT_CREATE);
     $handlerOutputData['usersGroup']['permissions']['base_entry_comment_change'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_BASE_ENTRY_COMMENT_CHANGE);
     $handlerOutputData['usersGroup']['permissions']['base_entry_comment_rate'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_BASE_ENTRY_COMMENT_RATE);

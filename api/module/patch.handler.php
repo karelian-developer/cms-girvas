@@ -27,46 +27,67 @@ if ($CMSCore->client->isLogged(2)) {
       $module = new Module($CMSCore, $moduleName);
 
       if (isset($_PATCH['module_event'])) {
+        $moduleDirectoryPath = CMS_ROOT_DIRECTORY . '/modules/' . $moduleName;
+        $moduleCorePath = $moduleDirectoryPath . '/core.class.php';
+        $moduleCoreNamespace = '\\modules\\' . $moduleName . '\\Core';
         $moduleEvent = $_PATCH['module_event'];
 
-        if ($moduleEvent === 'enable') {
-          if (!$module->isEnabled()) {
-            $module->enable();
+        if (file_exists($moduleCorePath)) {
+          require_once($moduleCorePath);
+          
+          $moduleCore = new $moduleCoreNamespace($CMSCore, $module);
 
-            if ($module->isEnabled()) {
-              http_response_code(200);
-              $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_ENABLED');
-              $handlerStatusCode = $handlerStatusCode ?? 1;
-            } else {
-              http_response_code(500);
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
-              $handlerStatusCode = $handlerStatusCode ?? 0;
-            }
-          } else {
-            http_response_code(500);
-            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_ALREADY_ENABLED');
-            $handlerStatusCode = $handlerStatusCode ?? 0;
-          }
-        }
-
-        if ($moduleEvent === 'disable') {
-          if ($module->isEnabled()) {
-            $module->disable();
-
+          if ($moduleEvent === 'enable') {
             if (!$module->isEnabled()) {
-              http_response_code(200);
-              $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_DISABLED');
-              $handlerStatusCode = $handlerStatusCode ?? 1;
+              if (method_exists($moduleCore, 'enable')) {
+                $moduleCore->enable();
+              } else {
+                $module->enable();
+              }
+
+              if ($module->isEnabled()) {
+                http_response_code(200);
+                $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_ENABLED');
+                $handlerStatusCode = $handlerStatusCode ?? 1;
+              } else {
+                http_response_code(500);
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+                $handlerStatusCode = $handlerStatusCode ?? 0;
+              }
             } else {
               http_response_code(500);
-              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+              $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_ALREADY_ENABLED');
               $handlerStatusCode = $handlerStatusCode ?? 0;
             }
-          } else {
-            http_response_code(500);
-            $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_ALREADY_DISABLED');
-            $handlerStatusCode = $handlerStatusCode ?? 0;
           }
+
+          if ($moduleEvent === 'disable') {
+            if ($module->isEnabled()) {
+              if (method_exists($moduleCore, 'disable')) {
+                $moduleCore->disable();
+              } else {
+                $module->disable();
+              }
+
+              if (!$module->isEnabled()) {
+                http_response_code(200);
+                $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_DISABLED');
+                $handlerStatusCode = $handlerStatusCode ?? 1;
+              } else {
+                http_response_code(500);
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+                $handlerStatusCode = $handlerStatusCode ?? 0;
+              }
+            } else {
+              http_response_code(500);
+              $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_ALREADY_DISABLED');
+              $handlerStatusCode = $handlerStatusCode ?? 0;
+            }
+          }
+        } else {
+          http_response_code(500);
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_MODULE_ERROR_CORE_NOT_FOUND');
+          $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       }
     }

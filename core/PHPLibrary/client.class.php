@@ -168,6 +168,202 @@ class Client
   }
 
   /**
+   * Проверка заголовков прокси
+   * 
+   * @return string|false
+   */
+  public function checkVPN() : array
+  {
+    $score = 0;
+    $reasons = [];
+
+    if ($this->isInBlacklist()) {
+      return [
+        'isVPN' => true,
+        'score' => 100,
+        'reason' => 'ip_in_blacklist',
+        'ip' => $this->ip
+      ];
+    }
+
+    $proxyHeader = $this->checkProxyHeaders();
+    if ($proxyHeader) {
+      $score += 45;
+      $reasons[] = "proxy_header: $proxyHeader";
+    }
+
+    if ($this->checkSuspiciousUA()) {
+      $score += 30;
+      $reasons[] = "suspicious_user_agent";
+    }
+
+    if ($this->isDatacenterIP($this->ip)) {
+      $score += 40;
+      $reasons[] = "datacenter_ip";
+    }
+
+    return [
+      'isVPN' => $score >= 50,
+      'score' => $score,
+      'reason' => implode(', ', $reasons),
+      'ip' => $this->ip
+    ];
+  }
+
+  /**
+   * Проверка подозрительного User-Agent
+   * 
+   * @return bool
+   */
+  private function checkProxyHeaders() : string|false
+  {
+    $proxyHeaders = ['HTTP_VIA', 'HTTP_X_PROXY_ID', 'HTTP_X_FORWARDED_HOST'];
+    
+    foreach ($proxyHeaders as $header) {
+      if (!empty($_SERVER[$header])) {
+        return $header;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Проверка, относится ли IP к дата-центру
+   * 
+   * @param string $ip
+   * 
+   * @return bool
+   */
+  private function checkSuspiciousUA() : bool
+  {
+    $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    $suspicious = ['curl', 'wget', 'python', 'java', 'okhttp', 'vpn', 'proxy'];
+    
+    foreach ($suspicious as $pattern) {
+      if (stripos($ua, $pattern) !== false) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private function isDatacenterIP(string $ip) : bool
+  {
+    $firstOctet = (int) explode('.', $ip)[0];
+    $dcRanges = [13, 20, 34, 35, 52, 54, 104, 146, 185];
+
+    return in_array($firstOctet, $dcRanges);
+  }
+
+  /**
+   * Блокировка VPN (если обнаружен)
+   * 
+   * @param bool $throwException
+   * 
+   * @return bool
+   * 
+   * @throws \Exception
+   */
+  public function blockIfVPN(bool $throwException = true) : bool
+  {
+    $check = $this->checkVPN();
+
+    $logDir = CMS_ROOT_DIRECTORY . '/logs';
+    $logFile = $logDir . '/ip-blocks.log';
+    
+    if (!is_dir($logDir)) {
+      mkdir($logDir, 0755, true);
+    }
+    
+    if (!file_exists($logFile)) {
+      touch($logFile);
+      chmod($logFile, 0644);
+    }
+    
+    if ($check['isVPN']) {
+      error_log(sprintf(
+        "[VPN_BLOCK] IP: %s, Score: %d, Reason: %s, URI: %s\n",
+        $check['ip'],
+        $check['score'],
+        $check['reason'],
+        $_SERVER['REQUEST_URI'] ?? '/'
+      ), 3, CMS_ROOT_DIRECTORY . '/logs/ip-blocks.log');
+      
+      if ($throwException) {
+        throw new \Exception('VPN/proxy detected', 403);
+      }
+      
+      return false;
+    }
+    
+    return true;
+  }
+
+  /**
+   * Проверка принадлежности IP к CIDR сети
+   * 
+   * @param string $ip
+   * @param string $cidr (например, '185.0.0.0/8')
+   * 
+   * @return bool
+   */
+  private function ipInCIDR(string $ip, string $cidr) : bool
+  {
+    if (strpos($cidr, '/') === false) {
+      return $ip === $cidr;
+    }
+
+    list($subnet, $mask) = explode('/', $cidr);
+    
+    $ipLong = ip2long($ip);
+    $subnetLong = ip2long($subnet);
+    
+    if ($ipLong === false || $subnetLong === false) {
+      return false;
+    }
+    
+    $maskLong = -1 << (32 - (int)$mask);
+    $ipLong &= $maskLong;
+    $subnetLong &= $maskLong;
+    
+    return $ipLong === $subnetLong;
+  }
+
+  /**
+   * Проверка по черному списку
+   */
+  private function isInBlacklist() : bool
+  {
+    $blacklist = $this->getBlacklistRanges();
+
+    foreach ($blacklist as $cidr) {
+      if ($this->ipInCIDR($this->ip, $cidr)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Загрузка черного списка из файла
+   */
+  private function getBlacklistRanges() : array
+  {
+    $blacklistFile = CMS_ROOT_DIRECTORY . '/core/blacklistIPRanges.json';
+    
+    if (!file_exists($blacklistFile)) {
+      return [];
+    }
+    
+    $data = json_decode(file_get_contents($blacklistFile), true);
+    
+    return $data['ranges'] ?? [];
+  }
+
+  /**
    * Создать Cookie (Устаревшее)
    * 
    * @param SystemCore $CMSCore

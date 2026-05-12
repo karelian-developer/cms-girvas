@@ -30,6 +30,9 @@ use \PDOException as PDOException;
 #[\AllowDynamicProperties]
 class Form implements EntityTypeContent
 {
+  private bool $isDataFullyInitialized = false;
+  private array $initializedColumns = [];
+
   /**
    * __construct
    *
@@ -51,9 +54,30 @@ class Form implements EntityTypeContent
    */
   public function initData(array $columns = ['*']) : void
   {
-    $columnsData = $this->getDatabaseColumnsData($columns);
-    foreach ($columnsData as $name => $data) {
-      $this->{$name} = $data;
+    if ($this->isDataFullyInitialized) {
+      return;
+    }
+    
+    if ($columns !== ['*'] && empty(array_diff($columns, $this->initializedColumns))) {
+      return;
+    }
+    
+    $columnsToLoad = $this->isDataFullyInitialized 
+      ? array_diff($columns, $this->initializedColumns) 
+      : $columns;
+    
+    $columnsData = $this->getDatabaseColumnsData($columnsToLoad);
+    
+    if ($columnsData !== null) {
+      foreach ($columnsData as $name => $data) {
+        $this->{$name} = $data;
+      }
+      
+      if ($columns === ['*']) {
+        $this->isDataFullyInitialized = true;
+      } else {
+        $this->initializedColumns = array_merge($this->initializedColumns, $columns);
+      }
     }
   }
   
@@ -410,27 +434,32 @@ class Form implements EntityTypeContent
 
     foreach ($elements as $index => $element) {
       $DOMElementName = $formName . '_' . $element['name'];
-      $DOMElementTitle = $element['texts'][$CMSLocaleName]['title'];
-      $DOMElementDescription = $element['texts'][$CMSLocaleName]['description'];
-      $DOMElementPlaceholder = $element['texts'][$CMSLocaleName]['placeholder'];
-      $DOMElementType = $element['type'];
+      $DOMElementTitle = $element['texts'][$CMSLocaleName]['title'] ?? '';
+      $DOMElementDescription = $element['texts'][$CMSLocaleName]['description'] ?? '';
+      $DOMElementPlaceholder = $element['texts'][$CMSLocaleName]['placeholder'] ?? '';
+      $DOMElementType = $element['type']  ?? 'text';
       $DOMElementRequired = $element['required'] ?? false;
       $DOMElementID = 'FORM_' . strtoupper(str_replace('-', '_', $formName)) . '_' . strtoupper($DOMElementName);
 
-      $DOMElement = $DOMElementType === 'textarea' 
-        ? $document->createElement('textarea')
-        : $document->createElement('input');
-      
-      if ($DOMElementType !== 'textarea') {
+      $DOMElement = match ($DOMElementType) {
+        'textarea' => $document->createElement('textarea'),
+        'select' => $document->createElement('select'),
+        default => $document->createElement('input')
+      };
+
+      if ($DOMElementType === 'textarea') {
+        $DOMElement->setAttribute('class', 'form__textarea');
+        $DOMElement->setAttribute('placeholder', $DOMElementPlaceholder);
+      } else if ($DOMElementType === 'select') {
+        $DOMElement->setAttribute('class', 'form__select');
+      } else {
         $DOMElement->setAttribute('type', $DOMElementType);
         $DOMElement->setAttribute('class', 'form__input form__input_' . $DOMElementType);
         $DOMElement->setAttribute('autocomplete', 'off');
-      } else {
-        $DOMElement->setAttribute('class', 'form__textarea');
+        $DOMElement->setAttribute('placeholder', $DOMElementPlaceholder);
       }
       
       $DOMElement->setAttribute('id', $DOMElementID);
-      $DOMElement->setAttribute('placeholder', $DOMElementPlaceholder);
       $DOMElement->setAttribute('name', $DOMElementName);
 
       if ($DOMElementRequired === true) {
@@ -441,6 +470,19 @@ class Form implements EntityTypeContent
         $DOMElement->setAttribute('value', $DOMElementTitle);
       }
 
+      if ($DOMElementType === 'select') {
+        $DOMElement->setAttribute('data-interactive-base', 'choice');
+
+        foreach ($element['options'] as $optionIndex => $optionData) {
+          $optionLabel = $optionData['texts'][$CMSLocaleName]['label'];
+          $optionValue = $optionData['value'];
+
+          $optionElement = $document->createElement('option', $optionLabel);
+          $optionElement->setAttribute('value', $optionValue);
+          $DOMElement->appendChild($optionElement);
+        }
+      }
+
       $DOMElementContainerElement = $document->createElement('div');
       $DOMElementContainerElement->setAttribute('class', 'form__input-container input-container');
       $DOMElementContainerElement->appendChild($DOMElement);
@@ -448,8 +490,25 @@ class Form implements EntityTypeContent
       if (!in_array($DOMElementType, ['submit', 'reset', 'checkbox'])) {
         $labelElement = $document->createElement('label', $DOMElementTitle);
         $labelElement->setAttribute('class', 'form__label');
-        $labelElement->setAttribute('for', $DOMElementID);
+
+        if ($DOMElementRequired === true) {
+          $labelElement->setAttribute('class', 'form__label form__label_is-required');
+        } else {
+          $labelElement->setAttribute('class', 'form__label');
+        }
+
+        $descriptionElement = $document->createElement('div', $DOMElementDescription);
+        $descriptionElement->setAttribute('class', 'form__input-description');
+
+        if ($DOMElementType !== 'select') {
+          $labelElement->setAttribute('for', $DOMElementID);
+        }
+
         $formElement->appendChild($labelElement);
+
+        if (!empty($DOMElementDescription)) {
+          $formElement->appendChild($descriptionElement);
+        }
       }
 
       if ($DOMElementType === 'checkbox') {

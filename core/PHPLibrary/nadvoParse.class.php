@@ -29,7 +29,7 @@ class NadvoParse
     'bold' => '/\*\*(.+?)\*\*|__(.+?)__/s',
     'italic' => '/\*(.+?)\*/s',
     'underline' => '/\~\~(.+?)\~\~/s',
-    'link' => '/\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
+    'link' => '/\[(.*?)\]\(\s*([^)\s]+)\s*\)(\{[^{}]+\})?/s',
     'image' => '/!\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'figure' => '/![f]\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'video' => '/!\[video\]\((.+?)\)/',
@@ -46,12 +46,17 @@ class NadvoParse
     'dangerous_tags' => '/<\?(?:php)?.*?\?>|<(script|iframe)[^>]*>.*?<\/\1>/is'
   ];
 
+  private array $usedHeaderIds = [];
+
   public function __construct()
   {}
 
   public function parse(string $markdown) : string
   {
+    $this->usedHeaderIds = [];
+
     $markdown = $this->sanitizeInput($markdown);
+    $markdown = $this->parseAutoLinks($markdown);
     $markdown = $this->parseCodeBlocks($markdown);
     $markdown = $this->parseQuotes($markdown);
     $markdown = $this->parseLists($markdown);
@@ -62,8 +67,22 @@ class NadvoParse
 
   private function sanitizeInput(string $markdown) : string
   {
-    //$markdown = preg_replace(self::PATTERNS['dangerous_tags'], '', $markdown);
+    // Сохраняем JSON-блоки с атрибутами
+    $jsonBlocks = [];
+    $markdown = preg_replace_callback('/\{[^{}]+\}/', function($matches) use (&$jsonBlocks) {
+      $placeholder = '%%JSON_' . count($jsonBlocks) . '%%';
+      $jsonBlocks[$placeholder] = $matches[0];
+      
+      return $placeholder;
+    }, $markdown);
+    
+    // Экранируем остальной текст
     $markdown = htmlspecialchars($markdown, ENT_NOQUOTES, 'UTF-8', false);
+    
+    // Возвращаем JSON-блоки на место
+    foreach ($jsonBlocks as $placeholder => $json) {
+      $markdown = str_replace($placeholder, $json, $markdown);
+    }
     
     return $markdown;
   }
@@ -337,24 +356,37 @@ class NadvoParse
     $html = '';
     $currentParagraph = '';
     $inTable = false;
+    $tableBuffer = [];
+
+    // Список тегов, которые не должны оборачиваться в параграфы
+    $blockTags = [
+        'pre', '/pre', 'blockquote', '/blockquote',
+        'ul', '/ul', 'ol', '/ol', 'li', '/li',
+        'figure', '/figure', 'figcaption', '/figcaption',
+        'table', '/table', 'thead', '/thead', 'tbody', '/tbody',
+        'tr', '/tr', 'th', '/th', 'td', '/td',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        '/h1', '/h2', '/h3', '/h4', '/h5', '/h6'
+    ];
+    
+    // Инлайн-теги, которые могут быть внутри строки
+    $inlineTags = ['a', 'strong', 'em', 'u', 'code', 'img', 'video', 'iframe'];
 
     foreach ($lines as $line) {
-      if (str_starts_with(trim($line), '<pre>') || 
-        str_starts_with(trim($line), '</pre>') ||
-        str_starts_with(trim($line), '<blockquote>') ||
-        str_starts_with(trim($line), '</blockquote>') ||
-        str_starts_with(trim($line), '<table>') ||
-        str_starts_with(trim($line), '</table>') ||
-        str_starts_with(trim($line), '<ul>') ||
-        str_starts_with(trim($line), '<ol>') ||
-        str_starts_with(trim($line), '</ul>') ||
-        str_starts_with(trim($line), '</ol>') ||
-        str_starts_with(trim($line), '<li>') ||
-        str_starts_with(trim($line), '</li>') ||
-        str_starts_with(trim($line), '<figure>') ||
-        str_starts_with(trim($line), '</figure>'))
-      {
-
+      $trimmedLine = trim($line);
+      
+      // Проверяем, начинается ли строка с блочного тега
+      $isBlockTag = false;
+      foreach ($blockTags as $tag) {
+        if (str_starts_with($trimmedLine, '<' . $tag . '>') || 
+          str_starts_with($trimmedLine, '<' . $tag . ' ')) {
+          $isBlockTag = true;
+          break;
+        }
+      }
+      
+      // Если это блочный тег - закрываем параграф и выводим строку как есть
+      if ($isBlockTag) {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
@@ -363,40 +395,69 @@ class NadvoParse
         $html .= $line . "\n";
         continue;
       }
-
-      if (str_starts_with(trim($line), '|')) {
+      
+      // Обработка таблиц
+      if (str_starts_with($trimmedLine, '|')) {
         if (!$inTable) {
           if (!empty($currentParagraph)) {
             $html .= '<p>' . $currentParagraph . '</p>';
             $currentParagraph = '';
           }
+
           $inTable = true;
+          $tableBuffer = [$line];
+        } else {
+          $tableBuffer[] = $line;
         }
         continue;
       }
-
-      $inTable = false;
-
+      
+      // Завершение таблицы
+      if ($inTable && !str_starts_with($trimmedLine, '|')) {
+        $html .= implode("\n", $tableBuffer) . "\n";
+        $tableBuffer = [];
+        $inTable = false;
+      }
+      
+      // Обработка заголовков
       if (preg_match('/^(#{1,6})\s+(.+)/', $line, $matches)) {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
         }
-        $html .= '<h' . strlen($matches[1]) . '>' . $matches[2] . '</h' . strlen($matches[1]) . '>' . "\n";
-      } elseif (empty(trim($line))) {
+
+        $level = strlen($matches[1]);
+        $text = $matches[2];
+        $id = $this->generateHeaderId($text);
+
+        $html .= '<h' . $level . ' id="' . $id . '">' . $text . '</h' . $level . '>' . "\n";
+        continue;
+      }
+      
+      // Обработка пустых строк
+      if (empty($trimmedLine)) {
         if (!empty($currentParagraph)) {
           $html .= '<p>' . $currentParagraph . '</p>';
           $currentParagraph = '';
         }
-      } else {
-        $currentParagraph .= $line . ' ';
+
+        continue;
       }
+      
+      // Обычный текст - добавляем в текущий параграф
+      $currentParagraph .= $line . ' ';
     }
-
+    
+    // Закрываем последний параграф
     if (!empty($currentParagraph)) {
-      $html .= '<p>' . $currentParagraph . '</p>';
+      $html .= '<p>' . trim($currentParagraph) . '</p>';
     }
-
+    
+    // Закрываем таблицу, если осталась
+    if ($inTable && !empty($tableBuffer)) {
+      $html .= implode("\n", $tableBuffer) . "\n";
+    }
+    
     return $html;
   }
 
@@ -510,27 +571,31 @@ class NadvoParse
       self::PATTERNS['link'],
       function($matches) {
         $href = trim($matches[2]);
-        
         $text = trim($matches[1]);
         $text = empty($text) ? $href : $text;
         $attrs = [];
         
-        if (isset($matches[3])) {
+        if (isset($matches[3]) && !empty($matches[3])) {
+          // Восстанавливаем кавычки из &quot; в "
+          $jsonString = html_entity_decode($matches[3], ENT_QUOTES, 'UTF-8');
+          
           try {
-            $json = json_decode('{' . $matches[3] . '}', true);
-            if ($json) {
+            $json = json_decode($jsonString, true);
+
+            if ($json && is_array($json)) {
               foreach ($json as $key => $value) {
-                if (in_array($key, ['class', 'id', 'target', 'rel'])) {
-                  $attrs[] = $key . ' = ' . "\"" . $value . "\"";
+                if (in_array($key, ['class', 'id', 'target', 'rel', 'title'])) {
+                  $attrs[] = $key . '="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '"';
                 }
               }
             }
           } catch (Exception $e) {
-            // ...
+            // Ошибка парсинга JSON
           }
         }
         
-        return '<a href="' . $href . '"' . (count($attrs) ? ' ' . implode(' ', $attrs) : '') . '>' . $text . '</a>';
+        $attrString = !empty($attrs) ? ' ' . implode(' ', $attrs) : '';
+        return '<a href="' . htmlspecialchars($href, ENT_QUOTES, 'UTF-8') . '"' . $attrString . '>' . $text . '</a>';
       },
       $html
     );
@@ -540,5 +605,71 @@ class NadvoParse
     $html = preg_replace(self::PATTERNS['underline'], '<u>$1</u>', $html);
     
     return $html;
+  }
+
+  /**
+   * Генерация ID заголовков
+   * 
+   * @param string $text
+   * 
+   * @return string
+   */
+  private function generateHeaderId(string $text) : string
+  {
+    $text = Utils::transliterate($text);
+    $text = mb_strtolower($text, 'UTF-8');
+    $text = preg_replace('/[^a-z0-9]+/', '-', $text);
+    $text = trim($text, '-');
+    
+    if (empty($text)) {
+        $text = 'heading-' . substr(md5($text), 0, 8);
+    }
+    
+    $original = $text;
+    $counter = 1;
+    
+    while (in_array($text, $this->usedHeaderIds, true)) {
+        $text = $original . '-' . $counter++;
+    }
+    
+    $this->usedHeaderIds[] = $text;
+    
+    return $text;
+  }
+
+  /**
+   * Парсинг «голых» ссылок
+   * 
+   * @param string $markdown
+   * 
+   * @return string
+   */
+  private function parseAutoLinks(string $markdown) : string
+  {
+    // Не трогаем уже существующие ссылки и изображения
+    $protected = [];
+    $markdown = preg_replace_callback(
+      '/!?\[.*?\]\(\s*\S+\s*\)/',
+      function($matches) use (&$protected) {
+        $placeholder = '%%PROTECTED_' . count($protected) . '%%';
+        $protected[$placeholder] = $matches[0];
+        return $placeholder;
+      },
+      $markdown
+    );
+
+    // Находим "голые" URL и оборачиваем в ссылку
+    $markdown = preg_replace(
+      '/(?<!["\(\/\>])(https?:\/\/[^\s<>\[\]]+)/',
+      '[$1]($1)',
+      $markdown
+    );
+
+    // Возвращаем защищённые фрагменты на место
+    foreach ($protected as $placeholder => $value) {
+      $markdown = str_replace($placeholder, $value, $markdown);
+    }
+
+    return $markdown;
   }
 }

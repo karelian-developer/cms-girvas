@@ -122,6 +122,18 @@
             <label class="checkbox-container__label form__label" for="I1474308912"></label>
           </div>
         </div>
+        <!-- Поле: Управление контент-блоками CMS -->
+        <div class="cell grid-table__cell grid-table__cell_text">
+          <div class="cell__title">
+            {LANG:PAGE_USERS_GROUP_PERSMISSION_MANAGE_CMS_CONTENT_BLOCKS_TITLE}
+          </div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <div class="form__checkbox-container checkbox-container">
+            <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308913" name="user_group_permissions[]" type="checkbox" value="admin_content_blocks_management" {USERS_GROUP_PERMISSION_ADMIN_CONTENT_BLOCKS_MANAGEMENT_VALUE}>
+            <label class="checkbox-container__label form__label" for="I1474308913"></label>
+          </div>
+        </div>
         <!-- Поле: Управление настройками CMS -->
         <div class="cell grid-table__cell grid-table__cell_text">
           <div class="cell__title">
@@ -224,6 +236,18 @@
           <div class="form__checkbox-container checkbox-container">
             <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308981" name="user_group_permissions[]" type="checkbox" value="editor_pages_static_edit" {USERS_GROUP_PERMISSION_EDITOR_PAGES_STATIC_EDIT_VALUE}>
             <label class="checkbox-container__label form__label" for="I1474308981"></label>
+          </div>
+        </div>
+        <!-- Поле: Редактирование контент-блоков -->
+        <div class="cell grid-table__cell grid-table__cell_text">
+          <div class="cell__title">
+            {LANG:PAGE_USERS_GROUP_PERSMISSION_CONTENT_BLOCKS_EDITING_TITLE}
+          </div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <div class="form__checkbox-container checkbox-container">
+            <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308984" name="user_group_permissions[]" type="checkbox" value="editor_content_blocks_edit" {USERS_GROUP_PERMISSION_EDITOR_CONTENT_BLOCKS_EDIT_VALUE}>
+            <label class="checkbox-container__label form__label" for="I1474308984"></label>
           </div>
         </div>
         <!-- Поле: Управление медиа-файлами -->

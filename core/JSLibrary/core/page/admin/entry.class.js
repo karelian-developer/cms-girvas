@@ -18,13 +18,196 @@
 import {Interactive} from "../../../interactive.class.js";
 import {URLParser} from "../../../urlParser.class.js";
 import {Utils} from "../../../utils.class.js";
+import {SEOAnalyzer} from "../../../utils/SEOAlalyzer.class.js";
 
 export class PageEntry {
   constructor(page, params = {}) {
+    this.buttons = {save: null, delete: null, publish: null, unpublish: null, SEOAnalyze: null};
+    this.analyzer = null;
     this.page = page;
-    this.statusCode = this.page.getPageStatusCode()
+    this.statusCode = this.page.getPageStatusCode();
+  }
 
-    this.buttons = {save: null, delete: null, publish: null, unpublish: null};
+  SEOAnalyze(data) {
+    data.title = data.title ?? '';
+    data.SEOTitle = data.SEOTitle ?? '';
+    data.description = data.description ?? '';
+    data.SEODescription = data.SEODescription ?? '';
+    data.keywords = data.keywords ?? '';
+    data.name = data.name ?? '';
+    data.content = data.content ?? '';
+
+    const analysis = this.analyzer.analyze(data);
+    const report = this.analyzer.generateReport(analysis);
+
+    return {
+      analysis: analysis,
+      report: report
+    };
+  }
+
+  /**
+   * Отрисовка SEO-результатов в сайдбар-блоке через DOM
+   */
+  renderSEOResults(SEOData) {
+    const sidebarBlock = document.querySelector('[data-element="aside-block-seo-analyzer"]');
+    if (!sidebarBlock) return;
+
+    const blockContent = sidebarBlock.querySelector('.block-content');
+    if (!blockContent) return;
+
+    const report = SEOData.report;
+    const rating = report.rating;
+
+    blockContent.innerHTML = '';
+
+    const analyzer = this._createElement('div', { class: 'seo-analyzer' });
+
+    // --- Общая оценка ---
+    const totalBlock = this._createElement('div', { class: 'seo-analyzer__total' });
+
+    const scoreDiv = this._createElement('div', {
+      class: 'seo-analyzer__score',
+      style: `color: ${rating.color};`
+    });
+    scoreDiv.textContent = report.score;
+
+    const scoreLabel = this._createElement('span', { class: 'seo-analyzer__score-label' });
+    scoreLabel.textContent = '/100';
+    scoreDiv.appendChild(scoreLabel);
+    totalBlock.appendChild(scoreDiv);
+
+    const ratingDiv = this._createElement('div', {
+      class: 'seo-analyzer__rating',
+      style: `color: ${rating.color};`
+    });
+    ratingDiv.textContent = rating.level;
+    totalBlock.appendChild(ratingDiv);
+
+    analyzer.appendChild(totalBlock);
+
+    // --- Секции ---
+    const sections = this._createElement('div', { class: 'seo-analyzer__sections' });
+
+    const sectionDefs = [
+      { title: 'Заголовок', data: report.details.title },
+      { title: 'Описание', data: report.details.description },
+      { title: 'Ключевые слова', data: report.details.keywords },
+      { title: 'Контент', data: report.details.content },
+      { title: 'URL', data: report.details.url }
+    ];
+
+    sectionDefs.forEach(def => {
+      sections.appendChild(this._buildSEOSectionDOM(def.title, def.data));
+    });
+
+    analyzer.appendChild(sections);
+
+    // --- Рекомендации ---
+    if (report.recommendations.length > 0) {
+      const recommendations = this._createElement('div', { class: 'seo-analyzer__recommendations' });
+
+      const recTitle = this._createElement('div', { class: 'seo-analyzer__recommendations-title' });
+      recTitle.textContent = 'Рекомендации по улучшению';
+      recommendations.appendChild(recTitle);
+
+      report.recommendations.forEach(recText => {
+        const item = this._createElement('div', { class: 'seo-analyzer__recommendation-item' });
+        item.textContent = recText;
+        recommendations.appendChild(item);
+      });
+
+      analyzer.appendChild(recommendations);
+    }
+
+    blockContent.appendChild(analyzer);
+  }
+
+  /**
+   * Сборка DOM-элемента для секции анализа
+   */
+  _buildSEOSectionDOM(title, section) {
+    const score = section.score;
+    const color = score >= 75 ? 'var(--color-green, #28a745)'
+      : score >= 50 ? 'var(--color-yellow, #ffc107)'
+      : 'var(--color-red, #dc3545)';
+
+    const container = this._createElement('div', { class: 'seo-analyzer__section' });
+
+    // Заголовок
+    const header = this._createElement('div', { class: 'seo-analyzer__section-header' });
+
+    const titleSpan = this._createElement('span', { class: 'seo-analyzer__section-title' });
+    titleSpan.textContent = title;
+    header.appendChild(titleSpan);
+
+    const scoreSpan = this._createElement('span', {
+      class: 'seo-analyzer__section-score',
+      style: `color: ${color};`
+    });
+    scoreSpan.textContent = `${score}%`;
+    header.appendChild(scoreSpan);
+
+    container.appendChild(header);
+
+    // Полоса прогресса
+    const bar = this._createElement('div', { class: 'seo-analyzer__section-bar' });
+    const barFill = this._createElement('div', {
+      class: 'seo-analyzer__section-bar-fill',
+      style: `width: ${score}%; background: ${color};`
+    });
+    bar.appendChild(barFill);
+    container.appendChild(bar);
+
+    // Детали
+    const details = this._createElement('div', { class: 'seo-analyzer__section-details' });
+
+    (section.issues || []).forEach(text => {
+      details.appendChild(this._createIssueElement(text, 'error'));
+    });
+
+    (section.warnings || []).forEach(text => {
+      details.appendChild(this._createIssueElement(text, 'warning'));
+    });
+
+    (section.success || []).forEach(text => {
+      details.appendChild(this._createIssueElement(text, 'success'));
+    });
+
+    container.appendChild(details);
+
+    return container;
+  }
+
+  /**
+   * Элемент строки с иконкой
+   */
+  _createIssueElement(text, type) {
+    const div = this._createElement('div', {
+      class: `seo-analyzer__issue seo-analyzer__issue--${type}`
+    });
+
+    const icons = { error: '❌', warning: '⚠️', success: '✅' };
+    div.textContent = `${icons[type] || ''} ${text}`;
+
+    return div;
+  }
+
+  /**
+   * Хелпер создания элемента
+   */
+  _createElement(tag, attrs = {}) {
+    const el = document.createElement(tag);
+    Object.entries(attrs).forEach(([key, value]) => {
+      if (key === 'class') {
+        el.className = value;
+      } else if (key === 'style') {
+        el.style.cssText = value;
+      } else {
+        el.setAttribute(key, value);
+      }
+    });
+    return el;
   }
 
   init() {
@@ -43,13 +226,15 @@ export class PageEntry {
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
-      let contentTextareaElement = document.querySelector('[data-element="input-content"]');
-      let descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
-      let SEODescriptionTextareaElement = document.querySelector('[data-element="input-seo-description"]');
-      let titleInputElement = document.querySelector('[data-element="input-title"]');
-      let SEOTitleInputElement = document.querySelector('[data-element="input-seo-title"]');
-      let keywordsInputElement = document.querySelector('[data-element="input-keywords"]');
-      let urlInputElement = document.querySelector('[data-element="input-url"]');
+      this.analyzer = new SEOAnalyzer(localeData);
+
+      const contentTextareaElement = document.querySelector('[data-element="input-content"]');
+      const descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
+      const SEODescriptionTextareaElement = document.querySelector('[data-element="input-seo-description"]');
+      const titleInputElement = document.querySelector('[data-element="input-title"]');
+      const SEOTitleInputElement = document.querySelector('[data-element="input-seo-title"]');
+      const keywordsInputElement = document.querySelector('[data-element="input-keywords"]');
+      const urlInputElement = document.querySelector('[data-element="input-url"]');
 
       locales.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
@@ -108,22 +293,49 @@ export class PageEntry {
 
       interactiveLocaleChoices.assembly();
 
-      let interactiveHeaderContainerElement = document.querySelector('[data-element="header-interactive"]');
+      const interactiveHeaderContainerElement = document.querySelector('[data-element="header-interactive"]');
       interactiveHeaderContainerElement.append(interactiveLocaleChoices.target.element);
 
       urlInputElement.addEventListener('input', (event) => {
-        /** @var {String} */
-        let inputValue = event.target.value;
-        
-        /** @var {Utils} */
+        let oldValue = event.target.value;
+        let cursorPos = event.target.selectionStart;
+
         let utils = new Utils();
-        /** @var {UString} */
-        let uString = utils.createString(inputValue);
+        let uString = utils.createString(oldValue);
         uString.source = uString.translitToEN(true);
         uString.source = uString.source.toLowerCase();
-        uString.source = uString.source.replace(/[^a-z0-9\-]/, '');
+        uString.source = uString.source.replace(/[^a-z0-9\-]/g, '');
 
-        event.target.value = uString.source;
+        let newValue = uString.source;
+
+        if (oldValue === newValue) return;
+
+        if (Math.abs(newValue.length - oldValue.length) > 1) {
+          event.target.value = newValue;
+          event.target.setSelectionRange(newValue.length, newValue.length);
+
+          return;
+        }
+
+        let removedBefore = 0;
+        for (let i = 0; i < cursorPos; i++) {
+          if (!/[a-z0-9\-]/.test(oldValue[i].toLowerCase())) {
+            removedBefore++;
+          }
+        }
+
+        event.target.value = newValue;
+
+        let newCursorPos = cursorPos - removedBefore;
+        
+        if (newValue.length >= oldValue.length) {
+          newCursorPos++;
+        }
+        
+        if (newCursorPos < 0) newCursorPos = 0;
+        if (newCursorPos > newValue.length) newCursorPos = newValue.length;
+        
+        event.target.setSelectionRange(newCursorPos, newCursorPos);
       });
 
       let interactiveChoicesSelectElement = interactiveHeaderContainerElement.querySelector('select');
@@ -163,18 +375,21 @@ export class PageEntry {
       this.buttons.delete = new Interactive('button');
       this.buttons.publish = new Interactive('button');
       this.buttons.unpublish = new Interactive('button');
+      this.buttons.SEOAnalyze = new Interactive('button');
 
       this.buttons.viewOnSite.target.setLabel(localeData.BUTTON_VIEW_ON_SITE_LABEL);
       this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
       this.buttons.publish.target.setLabel(localeData.BUTTON_PUBLISH_LABEL);
       this.buttons.unpublish.target.setLabel(localeData.BUTTON_UNPUBLISH_LABEL);
       this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
+      this.buttons.SEOAnalyze.target.setLabel(localeData.BUTTON_SEO_ANALYZE_LABEL);
 
       this.buttons.viewOnSite.target.setStyle('default');
       this.buttons.unpublish.target.setStyle('red');
       this.buttons.publish.target.setStyle('green');
       this.buttons.delete.target.setStyle('red');
       this.buttons.save.target.setStyle('green');
+      this.buttons.SEOAnalyze.target.setStyle('default');
 
       this.buttons.viewOnSite.target.setCallback((event) => {
         event.preventDefault();
@@ -183,6 +398,22 @@ export class PageEntry {
         let entryLocaleName = interactiveChoicesSelectElement.value;
 
         window.open(`/entry/${entryURL}?locale=${entryLocaleName}`, '_blank');
+      });
+
+      this.buttons.SEOAnalyze.target.setCallback((event) => {
+        event.preventDefault();
+
+        const SEOAnalyze = this.SEOAnalyze({
+          title: titleInputElement.value,
+          SEOTitle: SEOTitleInputElement.value,
+          description: descriptionTextareaElement.value,
+          SEODescription: SEODescriptionTextareaElement.value,
+          keywords: keywordsInputElement.value,
+          name: urlInputElement.value,
+          content: contentTextareaElement.value
+        });
+
+        this.renderSEOResults(SEOAnalyze);
       });
 
       this.buttons.save.target.setCallback((event) => {
@@ -313,6 +544,7 @@ export class PageEntry {
       this.buttons.delete.assembly();
       this.buttons.publish.assembly();
       this.buttons.unpublish.assembly();
+      this.buttons.SEOAnalyze.assembly();
 
       if (searchParams.getPathPart(3) === null) {
         let request = new Interactive('request', {
@@ -392,18 +624,20 @@ export class PageEntry {
         this.buttons.publish.target.element.style.display = 'none';
         this.buttons.delete.target.element.style.display = 'none';
         this.buttons.save.target.element.style.display = 'flex';
+        this.buttons.SEOAnalyze.target.element.style.display = 'flex';
       } else {
-        let interactiveButtonPreviewUpload = new Interactive('button');
+        const interactiveButtonPreviewUpload = new Interactive('button');
 
-        let previewBlockElement = document.querySelector('[data-element="aside-block-cover"]');
-        let previewBlockContentContainerElement = previewBlockElement.querySelector('.page-aside__block-content');
+        const previewBlockElement = document.querySelector('[data-element="aside-block-cover"]');
+        const previewBlockContentContainerElement = previewBlockElement.querySelector('.page-aside__block-content');
+        const previewBlockPanelContainerElement = previewBlockElement.querySelector('.page-aside__block-panel');
         
-        let previewFormElement = document.createElement('form');
+        const previewFormElement = document.createElement('form');
         previewFormElement.setAttribute('formmethod', 'PATCH');
         previewFormElement.classList.add('form');
         previewFormElement.classList.add('form-entry-preview');
 
-        let previewFormInputFileElement = document.createElement('input');
+        const previewFormInputFileElement = document.createElement('input');
         previewFormInputFileElement.setAttribute('type', 'file');
         previewFormInputFileElement.setAttribute('name', 'entry_preview');
         previewFormInputFileElement.style.display = 'none';
@@ -483,19 +717,21 @@ export class PageEntry {
             previewFormElement.appendChild(previewFormInputFileElement);
             previewFormElement.appendChild(interactiveButtonPreviewUpload.target.element);
             previewBlockContentContainerElement.appendChild(previewImageContainerElement);
-            previewBlockContentContainerElement.appendChild(previewFormElement);
+            previewBlockPanelContainerElement.appendChild(previewFormElement);
 
             this.buttons.viewOnSite.target.element.style.display = 'flex';
             this.buttons.unpublish.target.element.style.display = (entryData.isPublished) ? 'flex' : 'none';
             this.buttons.publish.target.element.style.display = (entryData.isPublished) ? 'none' : 'flex';
             this.buttons.delete.target.element.style.display = 'flex';
             this.buttons.save.target.element.style.display = 'flex';
+            this.buttons.SEOAnalyze.target.element.style.display = 'flex';
           } else {
             this.buttons.viewOnSite.target.element.style.display = 'none';
             this.buttons.unpublish.target.element.style.display = 'none';
             this.buttons.publish.target.element.style.display = 'none';
             this.buttons.delete.target.element.style.display = 'none';
             this.buttons.save.target.element.style.display = 'flex';
+            this.buttons.SEOAnalyze.target.element.style.display = 'flex';
           }
           
           return fetch('/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
@@ -580,11 +816,13 @@ export class PageEntry {
         });
       }
 
-      let interactiveFooterContainer = document.querySelector('[data-element="panel"]');
+      const interactiveFooterContainer = document.querySelector('[data-element="panel"]');
+      const sidebarSEOAnalyzerBlockPanelElement = document.querySelector('[data-element="aside-block-seo-analyzer"] .page-aside__block-panel');
       interactiveFooterContainer.append(this.buttons.delete.target.element);
       interactiveFooterContainer.append(this.buttons.unpublish.target.element);
       interactiveFooterContainer.append(this.buttons.publish.target.element);
       interactiveFooterContainer.append(this.buttons.save.target.element);
+      sidebarSEOAnalyzerBlockPanelElement.append(this.buttons.SEOAnalyze.target.element);
     });
   }
 }

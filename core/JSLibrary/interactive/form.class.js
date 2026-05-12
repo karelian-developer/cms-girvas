@@ -188,23 +188,49 @@ export class Form {
       }
     }
 
-    let formElement, formMethod, formAction;
+    const formElement = this.element;
+    const form = formElement.firstChild;
+    const formMethod = form.getAttribute('method') || 'POST';
+    const formAction = form.getAttribute('action') || '/';
 
-    formElement = this.element;
-    formAction = (typeof senderParams.action == 'undefined') ? formElement.firstChild.getAttribute('action') : senderParams.action;
-    formMethod = (typeof senderParams.method == 'undefined') ? formElement.firstChild.getAttribute('method') : senderParams.method;
+    if (formMethod.toUpperCase() === 'GET') {
+      const formData = new FormData(form);
+      const searchParams = new URLSearchParams();
+      
+      for (let [key, value] of formData.entries()) {
+        if (value && value.toString().trim() !== '') {
+          searchParams.append(key, value);
+        }
+      }
+      
+      // Добавляем localeMessage
+      if (locale && locale.name) {
+        searchParams.append('localeMessage', locale.name);
+      }
+      
+      let fullURL = formAction;
+      let queryString = searchParams.toString();
 
-    let request, requestURL;
+      if (queryString) {
+        fullURL += (fullURL.includes('?') ? '&' : '?') + queryString;
+      }
+      
+      const request = new Interactive('request', {
+        method: 'GET',
+        url: fullURL,
+        data: undefined
+      });
+      
+      request.target.send(true);
+    } else {
+      const request = new Interactive('request', {
+        method: formMethod,
+        url: formAction + `?localeMessage=${locale.name}`,
+        data: form
+      });
 
-    requestURL = formAction;
-
-    request = new Interactive('request', {
-      method: formMethod,
-      url: formAction + `?localeMessage=${locale.name}`,
-      data: formElement.firstChild
-    });
-
-    request.target.send(true);
+      request.target.send(true);
+    }
   }
 
   assembly() {

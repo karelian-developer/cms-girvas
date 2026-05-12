@@ -98,6 +98,18 @@
       {LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_COVER_TITLE}
     </h2>
     <div class="page-aside__block-content block-content"></div>
+    <div class="page-aside__block-panel block-panel"></div>
+  </div>
+  <div class="page-aside__block" data-element="aside-block-seo-analyzer">
+    <h2 class="page-aside__block-title">
+      {LANG:PAGE_STATIC_PAGE_SIDEBAR_SEO_ANALYZER_TITLE}
+    </h2>
+    <div class="page-aside__block-content block-content">
+      <div class="note-block note-block_blue">
+        {LANG:MD:PAGE_PAGE_STATIC_SIDEBAR_BLOCK_SEO_ANALYZER_TIP}
+      </div>
+    </div>
+    <div class="page-aside__block-panel block-panel"></div>
   </div>
   <div class="page-aside__block block">
     <h2 class="page-aside__block-title">
@@ -106,7 +118,7 @@
     <div class="page-aside__block-content block-content">
       <div class="block__input-container input-container">
         {LANG:MD:PAGE_PAGE_STATIC_SIDEBAR_BLOCK_PERSONAL_TEMPLATE_TIP}
-        <input class="block__input input input_text" type="text" name="page_static_template_path" pattern="^(?!.*(?:\.\./|\./))[a-zA-Z0-9/]+[a-zA-Z0-9_.-]*\.tpl$" placeholder="page/static/snowka.tpl" value="{PAGE_STATIC_PERSONAL_TEMPLATE_PATH}">
+        <input class="block__input input input_text" type="text" name="page_static_template_path" pattern="^(?!.*(\.\./|\./))[a-zA-Z0-9_\/\-]+[.]tpl$" placeholder="page/static/snowka.tpl" value="{PAGE_STATIC_PERSONAL_TEMPLATE_PATH}">
       </div>
     </div>
   </div>

@@ -6,29 +6,35 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
-.main__page_form .grid-table {
+.grid-table__rows {
+  margin-bottom: 16px;
+}
+
+.main__page_form .grid-table__row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  row-gap: 20px;
+  padding-top: 16px;
+  row-gap: 16px;
 }
 
-.main__page_form .grid-table__cell:not(:last-child) {
+.main__page_form .grid-table__row_header {
+  grid-template-columns: 1fr;
+}
+ 
+.main__page_form .grid-table__row:not(:last-child) {
   border-bottom: 1px solid var(--color-neutral-lightgray);
-  padding-bottom: 20px;
+  padding-bottom: 16px;
 }
 
-@media (min-width: 801px) {
-  .main__page_form .grid-table__cell_text {
-    padding-right: 20px;
-  }
-
-  .main__page_form .grid-table__cell_data {
-    padding-left: 20px;
-  }
+.grid-table__input-group {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
 }
 
-.main__page_form .grid-table__cell_text {
-  grid-column: 1;
+.grid-table__cell_panel > .grid-table__cell_data {
+  display: flex;
+  gap: 8px;
 }
 
 @media (max-width: 800px) {
@@ -38,17 +44,17 @@
   }
 }
 
-.main__page_form .grid-table__cell_text .cell__title {
+.main__page_form .grid-table__cell_text .grid-table__cell-title {
   text-transform: uppercase;
   font-weight: 500;
   font-size: 16px;
 }
 
-.main__page_form .grid-table__cell_text .cell__title:not(:last-child) {
+.main__page_form .grid-table__cell_text .grid-table__cell-title:not(:last-child) {
   margin-bottom: 10px;
 }
 
-.main__page_form .grid-table__cell_text .cell__description {
+.main__page_form .grid-table__cell_text .grid-table__cell-description {
   font-size: 14px;
   opacity: .6;
 }
@@ -57,8 +63,8 @@
   grid-column: 2;
 }
 
+.main__page_form .grid-table__row_header,
 .main__page_form .grid-table__cell_header {
-  grid-column: 1 / -1;
   text-transform: uppercase;
   text-align: center;
   font-weight: 500;
@@ -74,16 +80,16 @@
 }
 
 .main__page_form .grid-table__cell_editor,
-.main__page_form .grid-table__cell_panel {
+.main__page_form .grid-table__row_panel {
   grid-column: 1 / -1;
 }
 
-.main__page_form .grid-table__cell_panel {
+.main__page_form .grid-table__row_panel {
   display: flex;
   justify-content: flex-end;
 }
 
-.main__page_form .grid-table__cell_panel > * {
+.main__page_form .grid-table__row_panel > * {
   &:not(:last-child) {
     margin-right: 10px;
   }

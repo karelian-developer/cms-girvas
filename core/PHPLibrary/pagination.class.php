@@ -45,7 +45,9 @@ class Pagination
     private CoreInterface $CMSCore,
     private int $itemsTotalCount,
     private int $itemsInPageCount,
-    private int $itemCurrent = 0
+    private int $itemCurrent = 0,
+    private string $startPart = '',
+    private bool $pageNumberParamIsFirst = true
   ) {}
   
   /**
@@ -81,7 +83,7 @@ class Pagination
 
         $aElement = $DOMDocument->createElement('a', $itemIndex === 0 ? '&#10094;&#10094;' : '&#10094;');
         $aElement->setAttribute('class', 'pagination-list__item-link item-link');
-        $aElement->setAttribute('href', '?pageNumber=' . $pageNumber);
+        $aElement->setAttribute('href', $this->pageNumberParamIsFirst ? '?pageNumber=' . $pageNumber : $this->startPart . '&pageNumber=' . $pageNumber);
 
         $liElement->appendChild($aElement);
         $ulElement->appendChild($liElement);
@@ -95,7 +97,7 @@ class Pagination
 
         $aElement = $DOMDocument->createElement('a', $pageNumber);
         $aElement->setAttribute('class', 'pagination-list__item-link item-link');
-        $aElement->setAttribute('href', '?pageNumber=' . $itemIndex);
+        $aElement->setAttribute('href', $this->pageNumberParamIsFirst ? '?pageNumber=' . $itemIndex : $this->startPart . '&pageNumber=' . $itemIndex);
 
         $liElement = $DOMDocument->createElement('li');
         $liElement->setAttribute('class', $itemClass);
@@ -114,7 +116,7 @@ class Pagination
 
         $aElement = $DOMDocument->createElement('a', $itemIndex === 0 ? '&#10095;' : '&#10095;&#10095;');
         $aElement->setAttribute('class', 'pagination-list__item-link item-link');
-        $aElement->setAttribute('href', '?pageNumber=' . $pageNumber);
+        $aElement->setAttribute('href', $this->pageNumberParamIsFirst ? '?pageNumber=' . $pageNumber : $this->startPart . '&pageNumber=' . $pageNumber);
 
         $liElement->appendChild($aElement);
         $ulElement->appendChild($liElement);
