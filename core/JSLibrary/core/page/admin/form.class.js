@@ -609,6 +609,12 @@ export class PageForm {
     this.elementsCount++;
   }
 
+  createRowsContainer() {
+    const rowsElement = document.createElement('div');
+    rowsElement.classList.add('grid-table__rows');
+    return rowsElement;
+  }
+
   setupRealTimeNameUpdate(inputName, rowsElement) {
     // Функция для обновления всех option'ов в контейнере
     const updateAllOptions = () => {
