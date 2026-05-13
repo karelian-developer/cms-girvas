@@ -93,18 +93,6 @@ final class Entries
   }
       
   /**
-   * Получить объекты записей для определенной категории
-   *
-   * @param  int $id
-   * @param  array $params
-   * @return array
-   */
-  public function getByCategoryID(int $id, array $params = [], $isPublished = false) : array
-  {
-    $CMSConfigurator = $this->CMSCore->configurator;
-    $CMSConfigDatabase = $CMSConfigurator->get('database');
-
-  /**
    * Получить объекты записей для нескольких категорий
    *
    * @param array $categoriesIDs Массив ID категорий
