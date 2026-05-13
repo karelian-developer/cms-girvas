@@ -274,8 +274,8 @@
         </div>
         <div class="cell grid-table__cell grid-table__cell_data">
           <div class="form__checkbox-container checkbox-container">
-            <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308984" name="user_group_permissions[]" type="checkbox" value="base_entry_comment_create" {USERS_GROUP_PERMISSION_BASE_ENTRY_COMMENT_CREATE_VALUE}>
-            <label class="checkbox-container__label form__label" for="I1474308984"></label>
+            <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308986" name="user_group_permissions[]" type="checkbox" value="base_entry_comment_create" {USERS_GROUP_PERMISSION_BASE_ENTRY_COMMENT_CREATE_VALUE}>
+            <label class="checkbox-container__label form__label" for="I1474308986"></label>
           </div>
         </div>
         <!-- Поле: Изменение собственных комментариев -->
