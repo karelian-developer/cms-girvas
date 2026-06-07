@@ -70,7 +70,10 @@ class SettingsSeo implements SettingsPageInterface
     $formTemplatePath = self::FORM_PATH . '/' . $this->name . '.tpl';
 
     $fileRobotsTXTPath = CMS_ROOT_DIRECTORY . '/robots.txt';
+    $fileLLMSTXTPath = CMS_ROOT_DIRECTORY . '/llms.txt';
+
     $fileRobotsTXTContent = file_exists($fileRobotsTXTPath) ? file_get_contents($fileRobotsTXTPath) : '';
+    $fileLLMSTXTContent = file_exists($fileLLMSTXTPath) ? file_get_contents($fileLLMSTXTPath) : '';
     
     $settingPermanentRedirectWWWStatusValue = $this->CMSCore->configurator->getPermanentRedirectToWWWStatus();
 
@@ -88,6 +91,7 @@ class SettingsSeo implements SettingsPageInterface
           ? implode(', ', json_decode($this->CMSCore->configurator->getDatabaseEntryValue('seo_site_keywords'), true))
           : '',
         'SETTING_SITE_ROBOTS_TXT_VALUE' => $fileRobotsTXTContent,
+        'SETTING_SITE_LLMS_TXT_VALUE' => $fileLLMSTXTContent,
         'SETTING_PERMANENT_REDIRECT_WWW_STATUS_VALUE' => $settingPermanentRedirectWWWStatusValue ? 'on' : 'off',
         'SETTING_PERMANENT_REDIRECT_WWW_CHECKED_VALUE' => $settingPermanentRedirectWWWStatusValue ? 'checked' : '',
       ]

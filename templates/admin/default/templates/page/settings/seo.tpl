@@ -64,6 +64,18 @@
     <div class="cell grid-table__cell grid-table__cell_data">
       <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_robots_txt" cols="30" rows="10">{SETTING_SITE_ROBOTS_TXT_VALUE}</textarea>
     </div>
+    <!-- Поле: Содержимое файла llms.txt -->
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">
+        {LANG:PAGE_SETTINGS_SETTING_SEO_LLMS_TXT_TITLE}
+      </div>
+      <div class="cell__description">
+        {LANG:PAGE_SETTINGS_SETTING_SEO_LLMS_TXT_DESCRIPTION}
+      </div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_llms_txt" cols="30" rows="10">{SETTING_SITE_LLMS_TXT_VALUE}</textarea>
+    </div>
     <!-- Панель формы -->
     <div class="cell grid-table__cell grid-table__cell_panel" data-element="panel"></div>
   </div>

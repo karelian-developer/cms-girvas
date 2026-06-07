@@ -607,6 +607,8 @@
   "PAGE_SETTINGS_SETTING_SEO_INPUT_KEYWORDS_PLACEHOLDER": "Вулкан Гирвас, Республика Карелия, Ловля рыбы в поселке Надвоицы",
   "PAGE_SETTINGS_SETTING_SEO_ROBOTS_TXT_TITLE": "Содержимое файла robots.txt",
   "PAGE_SETTINGS_SETTING_SEO_ROBOTS_TXT_DESCRIPTION": "Robots.txt &mdash; это текстовый файл, который содержит параметры индексирования сайта для роботов поисковых систем. В robots.txt можно ограничить индексирование роботами страниц сайта, что может снизить нагрузку на сайт и ускорить его работу. [<a href=\"https://yandex.ru/support/webmaster/controlling-robot/robots-txt.html\" target=\"_blank\">Подробнее</a>]",
+  "PAGE_SETTINGS_SETTING_SEO_LLMS_TXT_TITLE": "Содержимое файла llms.txt",
+  "PAGE_SETTINGS_SETTING_SEO_LLMS_TXT_DESCRIPTION": "LLMS.txt &mdash; это текстовый файл в формате Markdown. Он предназначен для помощи большим языковым моделям (LLM) и AI-ассистентам в понимании структуры и содержания сайта, а также в интерпретации его контента.",
   "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_WEBMASTER_TITLE": "Код для верификации в сервисе &laquo;Яндекс: Вебмастер&raquo;",
   "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_WEBMASTER_DESCRIPTION": "Данный код используется для подтверждения прав на сайт в сервисе &laquo;Яндекс: Вебмастер&raquo;.",
   "PAGE_SETTINGS_SETTING_SEO_PERMANENT_REDIRECT_WWW_TITLE": "Принудительная переадресация на поддомен WWW",

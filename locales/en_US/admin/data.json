@@ -606,6 +606,8 @@
   "PAGE_SETTINGS_SETTING_SEO_KEYWORDS_DESCRIPTION": "Keywords should help your site be found in search engines. To select keywords, we recommend using the following services: \"<a href=\"https://wordstat.yandex.ru/\" target=\"_blank\">Yandex&nbsp;Wordstat</a>\" and \"<a href=\"https://trends.google.com/\" target=\"_blank\">Google&nbsp;Trends</a>\".",
   "PAGE_SETTINGS_SETTING_SEO_ROBOTS_TXT_TITLE": "Contents of robots.txt file",
   "PAGE_SETTINGS_SETTING_SEO_ROBOTS_TXT_DESCRIPTION": "Robots.txt is a text file that contains site indexing parameters for search engine robots. In robots.txt, you can limit the indexing of site pages by robots, which can reduce the load on the site and speed up its operation. [<a href=\"https://yandex.ru/support/webmaster/controlling-robot/robots-txt.html\" target=\"_blank\">More</a>]",
+  "PAGE_SETTINGS_SETTING_SEO_LLMS_TXT_TITLE": "Contents of the llms.txt file",
+  "PAGE_SETTINGS_SETTING_SEO_LLMS_TXT_DESCRIPTION": "LLMS.txt is a text file in Markdown format. It is designed to help large language models (LLM) and AI assistants understand the structure and content of a website, as well as interpret its content.",
   "PAGE_SETTINGS_SETTING_SEO_INPUT_KEYWORDS_PLACEHOLDER": "Girvas Volcano, Republic of Karelia, Fishing in the village of Nadvoitsy",
   "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_WEBMASTER_TITLE": "Verification code for Yandex: Webmaster",
   "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_WEBMASTER_DESCRIPTION": "This code is used to confirm site rights in Yandex: Webmaster.",
