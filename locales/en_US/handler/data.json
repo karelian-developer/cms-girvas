@@ -112,6 +112,7 @@
   "API_SETTINGS_USERS_PASSWORD_LENGTH_MAX_TOO_SMALL": "The maximum number of characters is too small. The length password cannot be negative.",
   "API_SETTINGS_USERS_PASSWORD_LENGTH_MIN_LARGE_MAX": "The minimum number of characters cannot be greater than the maximum. Math violation.",
   "API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED": "The server does not have access to robots.txt, check the rights.",
+  "API_SETTINGS_LLMS_TXT_PERMISSION_DENIED": "The server does not have access to llms.txt, check the rights.",
   "API_UTILS_SECRET_CODES_GENERATED_SUCCESS": "Secret codes for accessing the administration panel have been successfully updated.",
   "API_UTILS_PARSEDOWN_TRANSFORMED_SUCCESS": "The text has been successfully converted.",
   "API_UTILS_USER_REGISTRATION_SENDED_SUCCESS": "Registration successfully completed. A notification has been sent to your email address with a link to the account activation page.",

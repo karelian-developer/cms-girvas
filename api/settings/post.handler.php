@@ -119,6 +119,28 @@ if ($CMSCore->client->isLogged(2)) {
               continue;
             }
 
+            if ($settingName == 'seo_llms_txt') {
+              $fileLLMSTXTPath = CMS_ROOT_DIRECTORY . '/llms.txt';
+
+              try {
+                $fileLLMSTXT = @fopen($fileLLMSTXTPath, 'w+');
+                if ($fileLLMSTXT === false) {
+                  $exceptionMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_LLMS_TXT_PERMISSION_DENIED');
+                  throw new Exception($exceptionMessage);
+                }
+
+                fwrite($fileLLMSTXT, $settingValue);
+                fclose($fileLLMSTXT);
+                chmod($fileLLMSTXTPath, 0664);
+              } catch (Exception $exception) {
+                $exceptionMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_LLMS_TXT_PERMISSION_DENIED');
+                $handlerMessage = $handlerMessage ?? $exceptionMessage;
+                $handlerStatusCode = $handlerStatusCode ?? 0;
+              }
+
+              continue;
+            }
+
             if (in_array($settingName, ['email_smtp_host', 'email_smtp_port', 'email_smtp_username', 'email_smtp_password', 'email_smtp_domain'])) {
               $SMTPConfugration[$settingName] = $settingValue;
               continue;
