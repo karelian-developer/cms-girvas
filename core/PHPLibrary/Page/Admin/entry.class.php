@@ -162,7 +162,7 @@ class PageEntry implements InterfacePage
         $document = new DOMDocument('1.0', 'UTF-8');
 
         $elementValue = (isset($fieldValue)) ? $fieldValue : '';
-        $element = $document->createElement('input');
+        $element = $document->createElement('input', $elementValue);
         $element->setAttribute('name', 'entry_additional_field_' . $fieldsNames[$index]);
         $element->setAttribute('type', $fieldsTypes[$index]);
         $element->setAttribute('data-category-id', $fieldsCategoriesIDs[$index]);
