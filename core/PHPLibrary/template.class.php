@@ -783,7 +783,9 @@ final class Template implements ThemeInterface
             
             if (count($entryAdditionalFieldsData) > 0) {
               foreach ($entryAdditionalFieldsData as $name => $data) {
-                $variableName = 'ENTRY_ADDITIONAL_DATA_' . strtoupper($name);
+                $nameTransformed = preg_split('/(?=[A-Z])/', $name);
+                $nameTransformed = implode('_', $nameTransformed);
+                $variableName = 'ENTRY_ADDITIONAL_DATA_' . strtoupper($nameTransformed);
 
                 if (ThemeCollector::existsTemplateVariable($entriesSampleTemplateContent, $variableName)) {
                   ThemeCollector::addTemplateVariable(
