@@ -126,10 +126,10 @@ class PageEntry implements InterfacePage
       }
 
       $fieldNameTransformed = implode($fieldNameExploded);
-      $fieldValue = $entry->getAdditionalFieldData($fieldNameTransformed);
 
       if ($type === 'textarea') {
         if ($entry !== null) {
+          $fieldValue = $entry->getAdditionalFieldData($fieldNameTransformed);
           $fieldValue = $fieldValue !== null ? $fieldValue : '';
         }
 
@@ -155,6 +155,7 @@ class PageEntry implements InterfacePage
         );
       } else {
         if ($entry !== null) {
+          $fieldValue = $entry->getAdditionalFieldData($fieldNameTransformed);
           $fieldValue = $fieldValue !== null ? $fieldValue : '';
         }
 
