@@ -126,7 +126,7 @@ class PageEntry implements InterfacePage
       }
 
       $fieldNameTransformed = implode($fieldNameExploded);
-      $fieldValue = $entry->getAdditionalFieldData($fieldNameExploded);
+      $fieldValue = $entry->getAdditionalFieldData($fieldNameTransformed);
 
       if ($type === 'textarea') {
         if ($entry !== null) {
