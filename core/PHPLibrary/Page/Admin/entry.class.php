@@ -129,9 +129,8 @@ class PageEntry implements InterfacePage
 
       if ($type === 'textarea') {
         if ($entry !== null) {
-          $fieldValue = $entry->getAdditionalFieldData($fieldsNames[$index]) !== null
-            ? $entry->getAdditionalFieldData($fieldsNames[$index])
-            : '';
+          $fieldValue = $entry->getAdditionalFieldData($fieldsNames[$index]);
+          $fieldValue = $fieldValue !== null ? $fieldValue : '';
         }
 
         /** @var DOMDocument */
@@ -156,9 +155,7 @@ class PageEntry implements InterfacePage
         );
       } else {
         if ($entry !== null) {
-          $fieldValue = $entry->getAdditionalFieldData($fieldsNames[$index]) !== null
-            ? $entry->getAdditionalFieldData($fieldsNames[$index])
-            : '';
+          $fieldValue = $fieldValue !== null ? $fieldValue : '';
         }
 
         /** @var DOMDocument */

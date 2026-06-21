@@ -780,7 +780,7 @@ final class Template implements ThemeInterface
 
             $entryCategory = $entry->getCategory();
             $entryAdditionalFieldsData = $entry->getAdditionalFieldsData();
-            error_log('asdasdsa');
+            
             if (count($entryAdditionalFieldsData) > 0) {
               foreach ($entryAdditionalFieldsData as $name => $data) {
                 $variableName = 'ENTRY_ADDITIONAL_DATA_' . strtoupper($name);
