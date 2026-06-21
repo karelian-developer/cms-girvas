@@ -202,6 +202,7 @@ class PageEntriesSamples implements InterfacePage
     foreach ($entriesSamplesObjects as $index => $object) {
       $object->initData(['id', 'texts', 'name', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
       $objectID = $object->getID();
+      $sortTypeID = $object->getSortTypeID();
 
       /** @var string Дата создания выборки в формате d.m.Y H:i:s */
       $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
@@ -230,7 +231,7 @@ class PageEntriesSamples implements InterfacePage
 
       $reflectionEnumSortType = new ReflectionEnum(EnumSortTypeID::class);
       $reflectionEnumSortTypeCases = $reflectionEnumSortType->getCases();
-      $reflectionEnumSortTypeName = $reflectionEnumSortTypeCases[$objectID - 1]->getName();
+      $reflectionEnumSortTypeName = $reflectionEnumSortTypeCases[$sortTypeID - 1]->getName();
       $reflectionEnumSortTypeLabel = $localeData['PAGE_ENTRIES_SAMPLE_SORT_TYPE_' . $reflectionEnumSortTypeName . '_LABEL'];
 
       array_push($entriesSamplesTableItemsAssembled,
