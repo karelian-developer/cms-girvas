@@ -779,6 +779,21 @@ final class Template implements ThemeInterface
             $templatesAssembled = [];
 
             $entryCategory = $entry->getCategory();
+            $entryAdditionalFieldsData = $entry->getAdditionalFieldsData();
+            
+            if (count($entryAdditionalFieldsData) > 0) {
+              foreach ($entryAdditionalFieldsData as $name => $data) {
+                $variableName = 'ENTRY_ADDITIONAL_DATA_' . strtoupper($name);
+
+                if (ThemeCollector::existsTemplateVariable($entriesSampleTemplateContent, $variableName)) {
+                  ThemeCollector::addTemplateVariable(
+                    $templatesAssembled,
+                    $variableName,
+                    $data
+                  );
+                }
+              }
+            }
             
             if (ThemeCollector::existsTemplateVariable($entriesSampleTemplateContent, 'ENTRY_CATEGORY_TITLE')) {
               ThemeCollector::addTemplateVariable(
