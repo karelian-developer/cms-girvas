@@ -474,7 +474,7 @@ class Form implements EntityTypeContent
         $DOMElement->setAttribute('data-interactive-base', 'choice');
 
         foreach ($element['options'] as $optionIndex => $optionData) {
-          $optionLabel = $optionData['texts'][$CMSLocaleName]['label'];
+          $optionLabel = $optionData['texts'][$CMSLocaleName]['label'] ?? '';
           $optionValue = $optionData['value'];
 
           $optionElement = $document->createElement('option', $optionLabel);

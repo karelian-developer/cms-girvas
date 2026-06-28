@@ -1,6 +1,9 @@
 {
   "title": "English",
   "authorName": "Andrey Shestakov (Drelagas)",
+  "translator": "DeepSeek AI",
+  "reviewedBy": "",
+  "reviewedByNative": true,
   "iso639_1": "en",
   "iso639_2": "eng",
   "version": "1.0.2"
