@@ -514,17 +514,20 @@ class Form implements EntityTypeContent
       if ($DOMElementType === 'checkbox') {
         $DOMElementDescription = mb_convert_encoding($DOMElementDescription, 'HTML-ENTITIES', 'UTF-8');
 
-        $documentFragment = new DOMDocument('1.0', 'UTF-8');
-        $documentFragment->loadHTML($DOMElementDescription, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-        $descriptionElement = $document->importNode($documentFragment->documentElement, true);
-
-        $DOMElementContainerLabelElement = $document->createElement('div');
-
-        $DOMElementContainerElement->setAttribute('class', 'form__input-container input-container input-container_flex-checkbox');
-        $DOMElementContainerLabelElement->setAttribute('class', 'input-container__label label');
-
-        $DOMElementContainerLabelElement->appendChild($descriptionElement);
-        $DOMElementContainerElement->appendChild($DOMElementContainerLabelElement);
+        if (!empty(trim($DOMElementDescription))) {
+          $documentFragment = new DOMDocument('1.0', 'UTF-8');
+          $documentFragment->loadHTML($DOMElementDescription, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+          $descriptionElement = $document->importNode($documentFragment->documentElement, true);
+          
+          $DOMElementContainerLabelElement = $document->createElement('div');
+          $DOMElementContainerElement->setAttribute('class', 'form__input-container input-container input-container_flex-checkbox');
+          $DOMElementContainerLabelElement->setAttribute('class', 'input-container__label label');
+          
+          $DOMElementContainerLabelElement->appendChild($descriptionElement);
+          $DOMElementContainerElement->appendChild($DOMElementContainerLabelElement);
+        } else {
+          $DOMElementContainerElement->setAttribute('class', 'form__input-container input-container input-container_flex-checkbox');
+        }
       }
 
       $formElement->appendChild($DOMElementContainerElement);
