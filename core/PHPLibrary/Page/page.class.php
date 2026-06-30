@@ -32,6 +32,7 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\User as User;
 use \DateTime as DateTime;
 use \DateTimeZone as DateTimeZone;
+use \DOMDocument as DOMDocument;
 
 class PagePage implements InterfacePage
 {

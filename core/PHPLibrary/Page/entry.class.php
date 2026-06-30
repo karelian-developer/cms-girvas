@@ -32,6 +32,7 @@ use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \DateTime as DateTime;
 use \DateTimeZone as DateTimeZone;
+use \DOMDocument as DOMDocument;
 
 class PageEntry implements InterfacePage
 {
