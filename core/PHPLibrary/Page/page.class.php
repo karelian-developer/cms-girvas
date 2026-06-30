@@ -163,6 +163,7 @@ class PagePage implements InterfacePage
 
       $aElement = $document->createElement('a', $localeData['title']);
       $aElement->setAttribute('class', 'page-locales__link');
+      $aElement->setAttribute('href', $this->targetObject->getURL() . '?locale=' . $localeData['name']);
 
       $itemElement->appendChild($aElement);
 

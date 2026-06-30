@@ -200,14 +200,15 @@ class PageEntry implements InterfacePage
 
       $aElement = $document->createElement('a', $localeData['title']);
       $aElement->setAttribute('class', 'entry-locales__link');
+      $aElement->setAttribute('href', $this->targetObject->getURL() . '?locale=' . $localeData['name']);
 
       $itemElement->appendChild($aElement);
 
       if (!empty($localeData['iconURL'])) {
-          $iconElement = $document->createElement('img');
-          $iconElement->setAttribute('class', 'entry-locales__locale-icon');
-          $iconElement->setAttribute('src', $localeData['iconURL']);
-          $itemElement->prepend($iconElement);
+        $iconElement = $document->createElement('img');
+        $iconElement->setAttribute('class', 'entry-locales__locale-icon');
+        $iconElement->setAttribute('src', $localeData['iconURL']);
+        $itemElement->prepend($iconElement);
       }
 
       $ulElement->appendChild($itemElement);

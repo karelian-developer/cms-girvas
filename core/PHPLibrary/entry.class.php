@@ -291,7 +291,8 @@ class Entry implements EntityTypeContent
         $CMSLocale->initPathes();
         $locales[$localeName] = [
           'title' => $CMSLocale->getTitle(),
-          'iconURL' => $CMSLocale->getIconURL()
+          'iconURL' => $CMSLocale->getIconURL(),
+          'name' => $localeName
         ];
       }
 
