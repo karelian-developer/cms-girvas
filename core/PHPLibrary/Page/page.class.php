@@ -142,6 +142,34 @@ class PagePage implements InterfacePage
   {
     return $this->targetObject;
   }
+
+  /**
+   * Сборка списка локализаций для записи
+   * 
+   * @param array $localesData
+   * 
+   * @return string
+   */
+  private function assemblyLocalesItems(array $localesData) : string
+  {
+    $document = new DOMDocument('1.0', 'UTF-8');
+
+    foreach ($localesData as $localeData) {
+      $itemElement = $document->createElement('li', $localeData['title']);
+      $itemElement->setAttribute('class', 'page-locales');
+
+      if (!empty($localeData['iconURL'])) {
+        $iconElement = $document->createElement('img');
+        $iconElement->setAttribute('class', 'page-locales__locale-icon');
+        $iconElement->setAttribute('src', $localeData['iconURL']);
+        $itemElement->prepend($iconElement);
+      }
+
+      $document->appendChild($itemElement);
+    }
+
+    return $document->saveHTML();
+  }
   
   /**
    * Сборка шаблона страницы
@@ -253,6 +281,9 @@ class PagePage implements InterfacePage
           $authorSurname = $author->getSurname();
           $authorPatronymic = $author->getPatronymic();
 
+          $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
+          $completedLocales = $this->assemblyLocalesItems($completedLocalesData);
+
           $pageTemplateVariables = [
             'PAGE_ID' => $pageStatic->getID(),
             'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
@@ -263,6 +294,7 @@ class PagePage implements InterfacePage
             'PAGE_AUTHOR_NAME' => $authorName,
             'PAGE_AUTHOR_SURNAME' => $authorSurname,
             'PAGE_AUTHOR_PATRONYMIC' => $authorPatronymic,
+            'PAGE_LOCALES_LIST' => $completedLocales,
             'PAGE_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
             'PAGE_PUBLISHED_DATE_TIMESTAMP' => $pageStatic->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestamp : date('d.m.Y H:i:s', 0),
             'PAGE_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp,

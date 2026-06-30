@@ -179,6 +179,35 @@ class PageEntry implements InterfacePage
   {
     return $this->targetObject;
   }
+
+  /**
+   * Сборка списка локализаций для записи
+   * 
+   * @param array $localesData
+   * 
+   * @return string
+   */
+  private function assemblyLocalesItems(array $localesData) : string
+  {
+    $document = new DOMDocument('1.0', 'UTF-8');
+
+    foreach ($localesData as $localeData) {
+      $itemElement = $document->createElement('li', $localeData['title']);
+      $itemElement->setAttribute('class', 'entry-locales');
+
+      if (!empty($localeData['iconURL'])) {
+        $iconElement = $document->createElement('img');
+        $iconElement->setAttribute('class', 'entry-locales__locale-icon');
+        $iconElement->setAttribute('src', $localeData['iconURL']);
+        $itemElement->prepend($iconElement);
+      }
+
+      $document->appendChild($itemElement);
+    }
+
+    return $document->saveHTML();
+  }
+
   
   /**
    * Сборка шаблона страницы
@@ -319,7 +348,13 @@ class PageEntry implements InterfacePage
         $publishedDateTimestamp = $entry->getPublishedUnixTimestamp();
         $updatedDateTimestamp = $entry->getUpdatedUnixTimestamp();
 
-        $author = $entry->getAuthor();
+        $author = $object->getAuthor();
+        if ($author !== null) {
+          $author->initData(['login']);
+        }
+
+        $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
+        $completedLocales = $this->assemblyLocalesItems($completedLocalesData);
 
         $entryPrevious = $entry->getPreviousEntry();
         $entryNext = $entry->getNextEntry();
@@ -514,6 +549,14 @@ class PageEntry implements InterfacePage
               ThemeCollector::SAFE_SYMBOLS,
               htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
             )
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_LOCALES_LIST')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_LOCALES_LIST',
+            $completedLocales
           );
         }
 

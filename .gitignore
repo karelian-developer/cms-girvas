@@ -30,9 +30,16 @@ sqlExecute.php
 /core/PHPLibrary/Page/Admin/concerts.class.php
 /core/PHPLibrary/Page/Admin/mediabox.class.php
 /core/configuration.php
-/locales/fi_FI
+
+# Игнорируем все в locales
+/locales/*
+# Но исключаем ru_RU и en_US
+!/locales/ru_RU
+!/locales/en_US
+# Игнорируем game и .git внутри всех папок (кроме исключённых)
 /locales/*/game
 /locales/*/.git
+
 /templates/*
 !/templates/default
 !/templates/admin
