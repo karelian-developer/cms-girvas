@@ -353,7 +353,7 @@ class PageEntry implements InterfacePage
           $author->initData(['login']);
         }
 
-        $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
+        $completedLocalesData = $entry->getCompletedLocalesData($this->CMSCore);
         $completedLocales = $this->assemblyLocalesItems($completedLocalesData);
 
         $entryPrevious = $entry->getPreviousEntry();
