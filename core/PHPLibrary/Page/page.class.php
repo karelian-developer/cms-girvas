@@ -154,20 +154,29 @@ class PagePage implements InterfacePage
   private function assemblyLocalesItems(array $localesData) : string
   {
     $document = new DOMDocument('1.0', 'UTF-8');
+    $ulElement = $document->createElement('ul');
+    $ulElement->setAttribute('class', 'page-locales');
 
     foreach ($localesData as $localeData) {
-      $itemElement = $document->createElement('li', $localeData['title']);
-      $itemElement->setAttribute('class', 'page-locales');
+      $itemElement = $document->createElement('li');
+      $itemElement->setAttribute('class', 'page-locales__item');
+
+      $aElement = $document->createElement('a', $localeData['title']);
+      $aElement->setAttribute('class', 'page-locales__link');
+
+      $itemElement->appendChild($aElement);
 
       if (!empty($localeData['iconURL'])) {
-        $iconElement = $document->createElement('img');
-        $iconElement->setAttribute('class', 'page-locales__locale-icon');
-        $iconElement->setAttribute('src', $localeData['iconURL']);
-        $itemElement->prepend($iconElement);
+          $iconElement = $document->createElement('img');
+          $iconElement->setAttribute('class', 'page-locales__locale-icon');
+          $iconElement->setAttribute('src', $localeData['iconURL']);
+          $itemElement->prepend($iconElement);
       }
 
-      $document->appendChild($itemElement);
+      $ulElement->appendChild($itemElement);
     }
+
+    $document->appendChild($ulElement);
 
     return $document->saveHTML();
   }
