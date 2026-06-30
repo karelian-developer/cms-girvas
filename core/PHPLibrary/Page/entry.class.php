@@ -348,7 +348,7 @@ class PageEntry implements InterfacePage
         $publishedDateTimestamp = $entry->getPublishedUnixTimestamp();
         $updatedDateTimestamp = $entry->getUpdatedUnixTimestamp();
 
-        $author = $object->getAuthor();
+        $author = $entry->getAuthor();
         if ($author !== null) {
           $author->initData(['login']);
         }
