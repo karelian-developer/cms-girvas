@@ -292,7 +292,7 @@ class PagePage implements InterfacePage
           $authorSurname = $author->getSurname();
           $authorPatronymic = $author->getPatronymic();
 
-          $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
+          $completedLocalesData = $pageStatic->getCompletedLocalesData($this->CMSCore);
           $completedLocales = $this->assemblyLocalesItems($completedLocalesData);
 
           $pageTemplateVariables = [
