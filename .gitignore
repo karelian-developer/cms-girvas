@@ -9,7 +9,6 @@ sqlExecute.php
 /modules/*
 **/.git/
 !/modules/README.md
-/OLD/
 /api/logoped.api.php
 /api/logoped/*
 /api/rowney
@@ -29,7 +28,10 @@ sqlExecute.php
 /core/PHPLibrary/service.class.php
 /core/PHPLibrary/Page/Admin/concerts.class.php
 /core/PHPLibrary/Page/Admin/mediabox.class.php
+
 /core/configuration.php
+/core/configuration.*.php
+!/core/configuration.*.sample.php
 
 # Игнорируем все в locales
 /locales/*
