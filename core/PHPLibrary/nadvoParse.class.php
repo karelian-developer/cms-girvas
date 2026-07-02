@@ -512,7 +512,7 @@ class NadvoParse
             function($matches) {
               $oid = '-' . $matches[1];
               $id = $matches[2];
-              return 'https://vk.com/video_ext.php?oid=' . $oid . '&id=' . $id . '&autoplay=1';
+              return 'https://vk.com/video_ext.php?oid=' . $oid . '&id=' . $id;
             },
             $url
         );
