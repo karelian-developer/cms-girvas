@@ -536,42 +536,6 @@ class NadvoParse
       },
       $html
     );
-    
-    // Сборка iframe с видеороликом из Одноклассники
-    $html = preg_replace_callback(
-      self::PATTERNS['video_ok'],
-      function($matches) {
-        $url = trim($matches[1]);
-
-        // Преобразуем URL из vkvideo.ru/video-209953203_456239053 в vk.com/video_ext.php?oid=-209953203&id=456239053&autoplay=1
-        $convertedUrl = preg_replace_callback(
-          '#https?://ok\.ru/video/(\d+)#',
-          function($matches) {
-            $id = $matches[1];
-            return '//ok.ru/videoembed/' . $id . '?nochat=1';
-          },
-          $url
-        );
-
-        $dom = new DOMDocument();
-        $dom->formatOutput = true;
-
-        // Создаем элемент iframe
-        $iframe = $dom->createElement('iframe');
-        $iframe->setAttribute('src', $convertedUrl);
-        $iframe->setAttribute('width', '853');
-        $iframe->setAttribute('height', '480');
-        $iframe->setAttribute('style', 'background-color: #000');
-        $iframe->setAttribute('allow', 'encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;');
-        $iframe->setAttribute('frameborder', '0');
-        $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
-
-        $dom->appendChild($iframe);
-
-        return $dom->saveHTML();
-      },
-      $html
-    );
 
     // Сборка iframe с видеороликом из RUTUBE
     $html = preg_replace_callback(
