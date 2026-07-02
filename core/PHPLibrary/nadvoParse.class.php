@@ -34,6 +34,8 @@ class NadvoParse
     'figure' => '/![f]\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'video' => '/!\[video\]\((.+?)\)/',
     'video_vk' => '/!\[video\-vk\]\((.+?)\)/',
+    'video_ok' => '/!\[video\-ok\]\((.+?)\)/',
+    'video_rt' => '/!\[video\-rt\]\((.+?)\)/',
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(\>+)\s?(.*)$/m',
@@ -119,6 +121,7 @@ class NadvoParse
           ];
           $currentLevel = $level;
         }
+
         // Если изменился тип списка на том же уровне
         elseif (end($stack)['isOrdered'] !== $isOrdered) {
           $result[] = array_pop($stack)['close'];
@@ -469,19 +472,130 @@ class NadvoParse
       function($matches) {
         $url = trim($matches[1]);
         $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
-        
-        return '<div class="video-container"><video controls><source src="' . $url . '" type="video/' . $extension . '">' .
-               'Ваш браузер не поддерживает работу с видео.</video></div>';
+
+        $dom = new DOMDocument();
+        $dom->formatOutput = true;
+
+        $container = $dom->createElement('div');
+        $container->setAttribute('class', 'video-container');
+
+        $video = $dom->createElement('video');
+        $video->setAttribute('controls', 'controls');
+
+        $source = $dom->createElement('source');
+        $source->setAttribute('src', $url);
+        $source->setAttribute('type', 'video/' . $extension);
+
+        $video->appendChild($source);
+
+        $fallbackText = $dom->createTextNode('Ваш браузер не поддерживает работу с видео.');
+        $video->appendChild($fallbackText);
+
+        $container->appendChild($video);
+
+        $dom->appendChild($container);
+
+        return $dom->saveHTML();
       },
       $html
     );
-
+    
+    // Сборка iframe с видеороликом из ВКонтакте
     $html = preg_replace_callback(
       self::PATTERNS['video_vk'],
       function($matches) {
         $url = trim($matches[1]);
-        
-        return '<iframe src="' . $url . '" width="640" height="360" frameborder="0" allowfullscreen="1" allow="autoplay; encrypted-media; fullscreen; picture-in-picture"></iframe>';
+
+        // Преобразуем URL из vkvideo.ru/video-209953203_456239053 в vk.com/video_ext.php?oid=-209953203&id=456239053&autoplay=1
+        $convertedUrl = preg_replace_callback(
+            '#https?://vkvideo\.ru/video-(\d+)_(\d+)#',
+            function($matches) {
+              $oid = '-' . $matches[1];
+              $id = $matches[2];
+              return 'https://vk.com/video_ext.php?oid=' . $oid . '&id=' . $id . '&autoplay=1';
+            },
+            $url
+        );
+
+        $dom = new DOMDocument();
+        $dom->formatOutput = true;
+
+        // Создаем элемент iframe
+        $iframe = $dom->createElement('iframe');
+        $iframe->setAttribute('src', $convertedUrl);
+        $iframe->setAttribute('width', '853');
+        $iframe->setAttribute('height', '480');
+        $iframe->setAttribute('style', 'background-color: #000');
+        $iframe->setAttribute('allow', 'autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;');
+        $iframe->setAttribute('frameborder', '0');
+        $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
+
+        $dom->appendChild($iframe);
+
+        return $dom->saveHTML();
+      },
+      $html
+    );
+    
+    // Сборка iframe с видеороликом из Одноклассники
+    $html = preg_replace_callback(
+      self::PATTERNS['video_ok'],
+      function($matches) {
+        $url = trim($matches[1]);
+
+        // Преобразуем URL из ok.ru/video/ID в //ok.ru/videoembed/ID?nochat=1
+        $convertedUrl = preg_replace(
+          '#https?://ok\.ru/video/([^/?#]+)#',
+          '//ok.ru/videoembed/$1?nochat=1',
+          $url
+        );
+
+        $dom = new DOMDocument();
+        $dom->formatOutput = true;
+
+        // Создаем элемент iframe
+        $iframe = $dom->createElement('iframe');
+        $iframe->setAttribute('width', '560');
+        $iframe->setAttribute('height', '315');
+        $iframe->setAttribute('src', $convertedUrl);
+        $iframe->setAttribute('frameborder', '0');
+        $iframe->setAttribute('allow', 'autoplay');
+        $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
+
+        $dom->appendChild($iframe);
+
+        return $dom->saveHTML();
+      },
+      $html
+    );
+
+    // Сборка iframe с видеороликом из RUTUBE
+    $html = preg_replace_callback(
+      self::PATTERNS['video_rt'],
+      function($matches) {
+        $url = trim($matches[1]);
+
+        $convertedUrl = preg_replace(
+          '#https?://rutube\.ru/video/([^/?#]+)#',
+          'https://rutube.ru/play/embed/$1',
+          $url
+        );
+
+        $dom = new DOMDocument();
+        $dom->formatOutput = true;
+
+        // Создаем элемент iframe
+        $iframe = $dom->createElement('iframe');
+        $iframe->setAttribute('width', '720');
+        $iframe->setAttribute('height', '405');
+        $iframe->setAttribute('src', $convertedUrl);
+        $iframe->setAttribute('style', 'border: none;');
+        $iframe->setAttribute('allow', 'clipboard-write; autoplay');
+        $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
+
+        $dom->appendChild($iframe);
+
+        return $dom->saveHTML();
       },
       $html
     );
