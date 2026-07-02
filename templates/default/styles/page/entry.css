@@ -114,9 +114,9 @@
   color: var(--primary-color-5);
 }
 
-.page__article .article__content .video-container:nth-of-type(n+5),
 .page__article .article__content img:nth-child(n+5),
-.page__article .article__content figure:nth-child(n+5) {
+.page__article .article__content figure:nth-child(n+5),
+.page__article .article__content .video-container {
   grid-column: 1 / -1;
   max-width: 100%;
 }
