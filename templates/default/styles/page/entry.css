@@ -136,7 +136,7 @@
 }
 
 .page__article .article__content iframe {
-  height: auto;
+  height: 480px;
 }
 
 .page__article .article__content > figure {
