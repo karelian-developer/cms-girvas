@@ -559,8 +559,6 @@ class NadvoParse
         $iframe->setAttribute('frameborder', '0');
         $iframe->setAttribute('allow', 'autoplay');
         $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
-        $iframe->setAttribute('referrerpolicy', 'no-referrer'); // Отключаем referrer
-        $iframe->setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms'); // Ограничиваем права
         $iframe->setAttribute('loading', 'lazy');
 
         $dom->appendChild($iframe);
