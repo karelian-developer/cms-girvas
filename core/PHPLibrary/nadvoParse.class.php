@@ -543,9 +543,12 @@ class NadvoParse
       function($matches) {
         $url = trim($matches[1]);
 
-        $convertedUrl = preg_replace(
-          '#https?://rutube\.ru/video/([^/?#]+)#',
-          'https://rutube.ru/play/embed/$1',
+        $convertedUrl = preg_replace_callback(
+          '#https?://rutube\.ru/video/([A-Za-z0-9]+)#',
+          function($matches) {
+            $id = $matches[2];
+            return 'https://rutube.ru/play/embed/' . $id;
+          },
           $url
         );
 
