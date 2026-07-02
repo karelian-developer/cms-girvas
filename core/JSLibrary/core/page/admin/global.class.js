@@ -97,7 +97,7 @@ export class PageGlobal {
         this.buttons.siteDeveloper.target.setLabel(localeData.BUTTON_SITE_DEVELOPER);
         this.buttons.siteDeveloper.target.setCallback((event) => {
           event.preventDefault();
-          window.open('https://www.garbalo.com', '_blank');
+          window.open('https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai/', '_blank');
         });
 
         // Кнопка "Проверить обновления"
