@@ -542,10 +542,10 @@ class NadvoParse
       self::PATTERNS['video_ok'],
       function($matches) {
         $url = trim($matches[1]);
-
-        if (preg_match('#https?://ok\.ru/video/([^/?#]+)#', $url, $urlMatches)) {
-          $videoId = $urlMatches[1];
-          $convertedUrl = '//ok.ru/videoembed/' . $videoId;
+        
+        if (preg_match('#ok\.ru/video/([^/?#]+)#', $url, $matches)) {
+          $videoId = $matches[1];
+          $convertedUrl = 'https://ok.ru/videoembed/' . $videoId;
         } else {
           $convertedUrl = $url;
         }
@@ -559,6 +559,7 @@ class NadvoParse
         $iframe->setAttribute('height', '315');
         $iframe->setAttribute('frameborder', '0');
         $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
+        $iframe->setAttribute('allow', 'autoplay'); // Разрешаем автовоспроизведение
 
         $dom->appendChild($iframe);
 
