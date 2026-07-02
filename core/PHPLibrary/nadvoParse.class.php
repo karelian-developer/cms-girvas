@@ -542,10 +542,10 @@ class NadvoParse
       self::PATTERNS['video_ok'],
       function($matches) {
         $url = trim($matches[1]);
-        
+
         if (preg_match('#ok\.ru/video/([^/?#]+)#', $url, $matches)) {
           $videoId = $matches[1];
-          $convertedUrl = 'https://ok.ru/videoembed/' . $videoId;
+          $convertedUrl = '//ok.ru/videoembed/' . $videoId;
         } else {
           $convertedUrl = $url;
         }
