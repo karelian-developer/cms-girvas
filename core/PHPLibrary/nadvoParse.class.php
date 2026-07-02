@@ -527,8 +527,6 @@ class NadvoParse
         // Создаем элемент iframe
         $iframe = $dom->createElement('iframe');
         $iframe->setAttribute('src', $convertedUrl);
-        $iframe->setAttribute('width', '853');
-        $iframe->setAttribute('height', '480');
         $iframe->setAttribute('style', 'background-color: #000');
         $iframe->setAttribute('allow', 'encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;');
         $iframe->setAttribute('frameborder', '0');
@@ -566,8 +564,6 @@ class NadvoParse
 
         // Создаем элемент iframe
         $iframe = $dom->createElement('iframe');
-        $iframe->setAttribute('width', '720');
-        $iframe->setAttribute('height', '405');
         $iframe->setAttribute('src', $convertedUrl);
         $iframe->setAttribute('style', 'border: none;');
         $iframe->setAttribute('allow', 'clipboard-write;');
