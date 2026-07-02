@@ -130,7 +130,8 @@
 }
 
 .page__article .article__content .video-container,
-.page__article .article__content video {
+.page__article .article__content video,
+.page__article .article__content iframe {
   width: 100%;
 }
 
