@@ -542,24 +542,24 @@ class NadvoParse
       self::PATTERNS['video_ok'],
       function($matches) {
         $url = trim($matches[1]);
-
+        
         if (preg_match('#ok\.ru/video/([^/?#]+)#', $url, $matches)) {
           $videoId = $matches[1];
-          $convertedUrl = '//ok.ru/videoembed/' . $videoId;
+          $embedUrl = 'https://ok.ru/videoembed/' . $videoId;
         } else {
-          $convertedUrl = $url;
+          return '<p>Неверный формат ссылки на видео OK</p>';
         }
 
         $dom = new DOMDocument();
         $dom->formatOutput = true;
 
         $iframe = $dom->createElement('iframe');
-        $iframe->setAttribute('src', $convertedUrl);
+        $iframe->setAttribute('src', $embedUrl); // Используем videoembed
         $iframe->setAttribute('width', '560');
         $iframe->setAttribute('height', '315');
         $iframe->setAttribute('frameborder', '0');
         $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
-        $iframe->setAttribute('allow', 'autoplay'); // Разрешаем автовоспроизведение
+        $iframe->setAttribute('loading', 'lazy');
 
         $dom->appendChild($iframe);
 
