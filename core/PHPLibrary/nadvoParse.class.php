@@ -520,6 +520,10 @@ class NadvoParse
         $dom = new DOMDocument();
         $dom->formatOutput = true;
 
+        // Создаем контейнер
+        $container = $dom->createElement('div');
+        $container->setAttribute('class', 'video-container');
+
         // Создаем элемент iframe
         $iframe = $dom->createElement('iframe');
         $iframe->setAttribute('src', $convertedUrl);
@@ -530,7 +534,8 @@ class NadvoParse
         $iframe->setAttribute('frameborder', '0');
         $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
 
-        $dom->appendChild($iframe);
+        $container->appendChild($iframe);
+        $dom->appendChild($container);
 
         return $dom->saveHTML();
       },
@@ -555,6 +560,10 @@ class NadvoParse
         $dom = new DOMDocument();
         $dom->formatOutput = true;
 
+        // Создаем контейнер
+        $container = $dom->createElement('div');
+        $container->setAttribute('class', 'video-container');
+
         // Создаем элемент iframe
         $iframe = $dom->createElement('iframe');
         $iframe->setAttribute('width', '720');
@@ -564,7 +573,8 @@ class NadvoParse
         $iframe->setAttribute('allow', 'clipboard-write;');
         $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
 
-        $dom->appendChild($iframe);
+        $container->appendChild($iframe);
+        $dom->appendChild($container);
 
         return $dom->saveHTML();
       },
