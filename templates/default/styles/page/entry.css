@@ -122,8 +122,7 @@
 }
 
 .page__article .article__content img,
-.page__article .article__content figure,
-.page__article .article__content .video-container {
+.page__article .article__content figure {
   grid-column: auto;
   max-width: 100%;
   height: auto;
