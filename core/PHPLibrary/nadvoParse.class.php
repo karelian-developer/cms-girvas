@@ -562,7 +562,7 @@ class NadvoParse
         $iframe->setAttribute('width', '853');
         $iframe->setAttribute('height', '480');
         $iframe->setAttribute('style', 'background-color: #000');
-        $iframe->setAttribute('allow', 'fullscreen;');
+        $iframe->setAttribute('allow', 'encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;');
         $iframe->setAttribute('frameborder', '0');
         $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
 
