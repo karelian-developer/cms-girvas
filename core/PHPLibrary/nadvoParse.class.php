@@ -543,11 +543,12 @@ class NadvoParse
       function($matches) {
         $url = trim($matches[1]);
 
-        $convertedUrl = preg_replace(
-            '#https?://ok\.ru/video/([^/?#]+)#',
-            '//ok.ru/videoembed/$1',
-            $url
-        );
+        if (preg_match('#https?://ok\.ru/video/([^/?#]+)#', $url, $urlMatches)) {
+          $videoId = $urlMatches[1];
+          $convertedUrl = '//ok.ru/videoembed/' . $videoId;
+        } else {
+          $convertedUrl = $url;
+        }
 
         $dom = new DOMDocument();
         $dom->formatOutput = true;
