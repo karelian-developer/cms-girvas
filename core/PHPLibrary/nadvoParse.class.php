@@ -543,24 +543,25 @@ class NadvoParse
       function($matches) {
         $url = trim($matches[1]);
 
-        // Преобразуем URL из ok.ru/video/ID в //ok.ru/videoembed/ID?nochat=1
         $convertedUrl = preg_replace(
-          '#https?://ok\.ru/video/([^/?#]+)#',
-          'https://ok.ru/videoembed/$1?nochat=1',
-          $url
+            '#https?://ok\.ru/video/([^/?#]+)#',
+            '//ok.ru/videoembed/$1?nochat=1',
+            $url
         );
 
         $dom = new DOMDocument();
         $dom->formatOutput = true;
 
-        // Создаем элемент iframe
         $iframe = $dom->createElement('iframe');
+        $iframe->setAttribute('src', $convertedUrl);
         $iframe->setAttribute('width', '560');
         $iframe->setAttribute('height', '315');
-        $iframe->setAttribute('src', $convertedUrl);
         $iframe->setAttribute('frameborder', '0');
         $iframe->setAttribute('allow', 'autoplay');
         $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
+        $iframe->setAttribute('referrerpolicy', 'no-referrer'); // Отключаем referrer
+        $iframe->setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-forms'); // Ограничиваем права
+        $iframe->setAttribute('loading', 'lazy');
 
         $dom->appendChild($iframe);
 
