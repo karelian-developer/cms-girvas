@@ -558,8 +558,8 @@ class NadvoParse
         $iframe->setAttribute('width', '560');
         $iframe->setAttribute('height', '315');
         $iframe->setAttribute('frameborder', '0');
+        $iframe->setAttribute('allow', 'fullscreen;');
         $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
-        $iframe->setAttribute('loading', 'lazy');
 
         $dom->appendChild($iframe);
 
