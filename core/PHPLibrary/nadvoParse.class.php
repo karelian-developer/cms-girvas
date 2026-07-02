@@ -545,7 +545,7 @@ class NadvoParse
 
         $convertedUrl = preg_replace(
             '#https?://ok\.ru/video/([^/?#]+)#',
-            'https://ok.ru/videoembed/$1',
+            '//ok.ru/videoembed/$1',
             $url
         );
 
@@ -559,7 +559,6 @@ class NadvoParse
         $iframe->setAttribute('frameborder', '0');
         $iframe->setAttribute('allow', 'autoplay');
         $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
-        $iframe->setAttribute('loading', 'lazy');
 
         $dom->appendChild($iframe);
 
