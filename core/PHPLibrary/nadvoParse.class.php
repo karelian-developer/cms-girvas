@@ -561,7 +561,7 @@ class NadvoParse
         $iframe->setAttribute('height', '405');
         $iframe->setAttribute('src', $convertedUrl);
         $iframe->setAttribute('style', 'border: none;');
-        $iframe->setAttribute('allow', 'clipboard-write; autoplay');
+        $iframe->setAttribute('allow', 'clipboard-write;');
         $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
 
         $dom->appendChild($iframe);
