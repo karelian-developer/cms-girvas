@@ -545,7 +545,7 @@ class NadvoParse
 
         $convertedUrl = preg_replace(
             '#https?://ok\.ru/video/([^/?#]+)#',
-            '//ok.ru/videoembed/$1?nochat=1',
+            'https://ok.ru/videoembed/$1',
             $url
         );
 
