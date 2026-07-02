@@ -548,7 +548,7 @@ class NadvoParse
           '#https?://ok\.ru/video/(\d+)#',
           function($matches) {
             $id = $matches[1];
-            return 'ok.ru/videoembed/' . $id;
+            return 'https://ok.ru/videoembed/' . $id;
           },
           $url
         );
