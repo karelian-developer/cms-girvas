@@ -508,13 +508,13 @@ class NadvoParse
 
         // Преобразуем URL из vkvideo.ru/video-209953203_456239053 в vk.com/video_ext.php?oid=-209953203&id=456239053&autoplay=1
         $convertedUrl = preg_replace_callback(
-            '#https?://vkvideo\.ru/video-(\d+)_(\d+)#',
-            function($matches) {
-              $oid = '-' . $matches[1];
-              $id = $matches[2];
-              return 'https://vk.com/video_ext.php?oid=' . $oid . '&id=' . $id;
-            },
-            $url
+          '#https?://vkvideo\.ru/video-(\d+)_(\d+)#',
+          function($matches) {
+            $oid = '-' . $matches[1];
+            $id = $matches[2];
+            return 'https://vk.com/video_ext.php?oid=' . $oid . '&id=' . $id;
+          },
+          $url
         );
 
         $dom = new DOMDocument();
@@ -542,23 +542,28 @@ class NadvoParse
       self::PATTERNS['video_ok'],
       function($matches) {
         $url = trim($matches[1]);
-        
-        if (preg_match('#ok\.ru/video/([^/?#]+)#', $url, $matches)) {
-          $videoId = $matches[1];
-          $embedUrl = 'https://ok.ru/videoembed/' . $videoId;
-        } else {
-          return '<p>Неверный формат ссылки на видео OK</p>';
-        }
+
+        // Преобразуем URL из vkvideo.ru/video-209953203_456239053 в vk.com/video_ext.php?oid=-209953203&id=456239053&autoplay=1
+        $convertedUrl = preg_replace_callback(
+          '#https?://ok\.ru/video/(\d+)#',
+          function($matches) {
+            $id = $matches[1];
+            return 'ok.ru/videoembed/' . $id;
+          },
+          $url
+        );
 
         $dom = new DOMDocument();
         $dom->formatOutput = true;
 
+        // Создаем элемент iframe
         $iframe = $dom->createElement('iframe');
-        $iframe->setAttribute('src', $embedUrl); // Используем videoembed
-        $iframe->setAttribute('width', '560');
-        $iframe->setAttribute('height', '315');
-        $iframe->setAttribute('frameborder', '0');
+        $iframe->setAttribute('src', $convertedUrl);
+        $iframe->setAttribute('width', '853');
+        $iframe->setAttribute('height', '480');
+        $iframe->setAttribute('style', 'background-color: #000');
         $iframe->setAttribute('allow', 'fullscreen;');
+        $iframe->setAttribute('frameborder', '0');
         $iframe->setAttribute('allowfullscreen', 'allowfullscreen');
 
         $dom->appendChild($iframe);
