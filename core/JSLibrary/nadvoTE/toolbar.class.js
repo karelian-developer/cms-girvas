@@ -20,6 +20,7 @@ import {ToolBold} from './toolbar/toolBold.class.js';
 import {ToolItalic} from './toolbar/toolItalic.class.js';
 import {ToolUnderline} from './toolbar/toolUnderline.class.js';
 import {ToolHeader} from './toolbar/toolHeader.class.js';
+import {ToolHeaders} from './toolbar/toolHeaders.class.js';
 import {ToolQuote} from './toolbar/toolQuote.class.js';
 import {ToolPreview} from './toolbar/toolPreview.class.js';
 import {ToolSource} from './toolbar/toolSource.class.js';
