@@ -75,7 +75,7 @@ if ($CMSCore->client->isLogged(2)) {
                   'avif' => EnumFileFormat::AVIF,
                   'gif' => EnumFileFormat::GIF,
                   default => EnumFileFormat::JPG
-                }
+                };
 
                 $image = match ($fileExtensionEnum) {
                   EnumFileFormat::JPG => imagecreatefromjpeg($_FILES['mediaFile']['tmp_name']),
