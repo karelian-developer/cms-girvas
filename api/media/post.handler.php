@@ -131,6 +131,19 @@ if ($CMSCore->client->isLogged(2)) {
                       
                       /** @var FileConverter Объект-конвектор файлов */
                       $fileConverter = new FileConverter($CMSCore);
+
+                      // Перед вызовом convert() добавьте:
+                      error_log('FileConverter debug:');
+                      error_log('- Source file: ' . $_FILES['mediaFile']['tmp_name']);
+                      error_log('- Source file exists: ' . (file_exists($_FILES['mediaFile']['tmp_name']) ? 'yes' : 'no'));
+                      error_log('- Source file size: ' . filesize($_FILES['mediaFile']['tmp_name']));
+                      error_log('- Target extension: ' . $fileExtensionConvertedEnum->name);
+                      error_log('- Quality: ' . $quality);
+
+                      $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true, 4658, $quality);
+
+                      error_log('Convert result: ' . var_export($fileConverted, true));
+
                       /** @var array|bool Конвертированный файл */
                       $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true);
 
