@@ -26,16 +26,51 @@ export class ToolHeaders extends Tool {
       element: element
     });
 
-    this.initClickEvent();
+    this.selectedText = '';
+    this.initFocusHandlers();
+  }
+
+  initFocusHandlers() {
+    this.editor.textarea.element.addEventListener('blur', () => {
+      this.selectedText = this.editor.getSelectionString();
+    });
+
+    this.editor.textarea.element.addEventListener('mouseup', () => {
+      this.selectedText = this.editor.getSelectionString();
+    });
+
+    this.editor.textarea.element.addEventListener('keyup', (e) => {
+      if (e.key === 'Shift' || e.key.startsWith('Arrow')) {
+        this.selectedText = this.editor.getSelectionString();
+      }
+    });
   }
 
   initClickEvent() {
-    super.addChangeEvent(() => {
-      console.log(`[NADVO TE] Tool ${this.name} selected!`);
-      const selectElement = this.element.querySelector('select');
-      this.editor.textarea.replaceStringSelection(
-        '#'.repeat(selectElement.value) + ' ' + this.editor.getSelectionString()
-      );
-    });
+    const selectElement = this.element.querySelector('select');
+    if (selectElement) {
+      selectElement.addEventListener('change', (event) => {
+        event.preventDefault();
+        
+        this.editor.textarea.element.focus();
+        
+        const textToWrap = this.selectedText || this.editor.getSelectionString();
+        
+        if (textToWrap) {
+          console.log(`[NADVO TE] Tool ${this.name} selected!`);
+          this.editor.textarea.replaceStringSelection(
+            '#'.repeat(selectElement.value) + ' ' + textToWrap
+          );
+        }
+        
+        selectElement.selectedIndex = 0;
+        
+        this.selectedText = '';
+      });
+
+      selectElement.addEventListener('mousedown', (event) => {
+        this.selectedText = this.editor.getSelectionString();
+      });
+    }
   }
 }
