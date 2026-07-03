@@ -47,7 +47,7 @@ export class Toolbar {
         optionItemElement.classList.add('nadvo-te__toolbar-item');
         optionItemElement.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
         
-        const optionItemInteractiveElement;
+        let optionItemInteractiveElement;
         if (optionItem.type == 'button') {
           const toolButton = new Interactive('button');
           toolButton.target.setLabel('Включить');
