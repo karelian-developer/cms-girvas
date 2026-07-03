@@ -112,15 +112,18 @@ final class Converter implements InterfaceConverter
 
       $convertedResult = false;
       if ($fileSourcePath !== '' && file_exists($fileSourcePath)) {
-        if (($fileExtension === 'jpeg' || $fileExtension === 'jpg') && $convertToExtension === 'png') {
+        // Все варианты JPEG расширений
+        $jpegExtensions = ['jpeg', 'jpg', 'jfif', 'pjpeg', 'jpe'];
+        
+        if (in_array($fileExtension, $jpegExtensions) && $convertToExtension === 'png') {
           $convertedResult = $this->convertJPEGToPNG($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
 
-        if (($fileExtension === 'jpeg' || $fileExtension === 'jpg') && $convertToExtension === 'webp') {
+        if (in_array($fileExtension, $jpegExtensions) && $convertToExtension === 'webp') {
           $convertedResult = $this->convertJPEGToWEBP($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
 
-        if (($fileExtension === 'jpeg' || $fileExtension === 'jpg') && $convertToExtension === 'avif') {
+        if (in_array($fileExtension, $jpegExtensions) && $convertToExtension === 'avif') {
           $convertedResult = $this->convertJPEGToAVIF($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
@@ -136,7 +139,7 @@ final class Converter implements InterfaceConverter
           $convertedResult = $this->convertPNGToAVIF($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
-        if ($fileExtension === 'webp' && ($convertToExtension === 'jpeg' || $convertToExtension === 'jpg')) {
+        if ($fileExtension === 'webp' && in_array($convertToExtension, $jpegExtensions)) {
           $convertedResult = $this->convertWEBPToJPEG($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
@@ -148,7 +151,7 @@ final class Converter implements InterfaceConverter
           $convertedResult = $this->convertWEBPToAVIF($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
-        if ($fileExtension === 'avif' && ($convertToExtension === 'jpeg' || $convertToExtension === 'jpg')) {
+        if ($fileExtension === 'avif' && in_array($convertToExtension, $jpegExtensions)) {
           $convertedResult = $this->convertAVIFToJPEG($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
@@ -160,18 +163,17 @@ final class Converter implements InterfaceConverter
           $convertedResult = $this->convertAVIFToWEBP($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
 
-        if (($fileExtension === $convertToExtension)) {
+        if ($fileExtension === $convertToExtension) {
           if (file_exists($fileSourcePath)) {
             if ($fileExtension === 'gif') {
               $convertedResult = $this->sanitizeGIF($fileSourcePath, $fileOutputPath, $deleteOldFile);
             } else {
               $fileRenamed = rename($fileSourcePath, $fileOutputPath);
-
               if ($fileRenamed) {
                 $convertedResult = true;
               }
             }
-          };
+          }
         }
       }
 
