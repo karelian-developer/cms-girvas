@@ -20,7 +20,7 @@ import {Tool} from './tool.class.js';
 export class ToolHeaders extends Tool {
   constructor(editor, element) {
     super(editor, {
-      name: 'header' + level,
+      name: 'headers',
       type: 'button',
       iconPath: '',
       element: element
