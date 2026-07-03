@@ -26,33 +26,52 @@ export class ToolHeaders extends Tool {
       element: element
     });
 
-    this.selectedText = '';
-    this.initFocusHandlers();
-  }
-
-  initFocusHandlers() {
-    this.editor.textarea.element.addEventListener('blur', () => {
-      this.selectedText = this.editor.getSelectionString();
-    });
-
-    this.editor.textarea.element.addEventListener('mouseup', () => {
-      this.selectedText = this.editor.getSelectionString();
-    });
-
-    this.editor.textarea.element.addEventListener('keyup', (e) => {
-      if (e.key === 'Shift' || e.key.startsWith('Arrow')) {
-        this.selectedText = this.editor.getSelectionString();
-      }
-    });
+    this.savedSelection = {
+      text: '',
+      start: 0,
+      end: 0
+    };
   }
 
   initClickEvent() {
-    super.addChangeEvent(() => {
-      console.log(`[NADVO TE] Tool ${this.name} selected!`);
-      const selectElement = this.element.querySelector('select');
-      this.editor.textarea.replaceStringSelection(
-        '#'.repeat(selectElement.value) + ' ' + this.editor.getSelectionString()
+    const selectElement = this.element.querySelector('select');
+    const textarea = this.editor.textarea.element;
+    
+    // Сохраняем выделение при клике на select (срабатывает до потери фокуса)
+    selectElement.addEventListener('mousedown', () => {
+      this.savedSelection.text = textarea.value.substring(
+        textarea.selectionStart, 
+        textarea.selectionEnd
       );
+      this.savedSelection.start = textarea.selectionStart;
+      this.savedSelection.end = textarea.selectionEnd;
+    });
+    
+    // При изменении select используем сохранённое выделение
+    selectElement.addEventListener('change', (event) => {
+      event.preventDefault();
+      
+      const headerLevel = selectElement.value;
+      
+      if (headerLevel && this.savedSelection.text) {
+        // Возвращаем фокус и восстанавливаем выделение
+        textarea.focus();
+        textarea.setSelectionRange(
+          this.savedSelection.start, 
+          this.savedSelection.end
+        );
+        
+        // Вставляем заголовок
+        this.editor.textarea.replaceStringSelection(
+          '#'.repeat(headerLevel) + ' ' + this.savedSelection.text
+        );
+        
+        // Сбрасываем select
+        selectElement.selectedIndex = 0;
+        
+        // Очищаем сохранённое
+        this.savedSelection.text = '';
+      }
     });
   }
 }
