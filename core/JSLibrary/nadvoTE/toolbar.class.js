@@ -38,16 +38,16 @@ export class Toolbar {
   }
 
   init() {
-    let toolbarElement = this.editor.createElementUl();
+    const toolbarElement = this.editor.createElementUl();
     toolbarElement.classList.add('nadvo-te__toolbar-list');
 
     if (typeof(this.options) != 'undefined') {
       for (let optionItem of this.options) {
-        let optionItemElement = this.editor.createElementLi();
+        const optionItemElement = this.editor.createElementLi();
         optionItemElement.classList.add('nadvo-te__toolbar-item');
         optionItemElement.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
         
-        let optionItemInteractiveElement;
+        const optionItemInteractiveElement;
         if (optionItem.type == 'button') {
           const toolButton = new Interactive('button');
           toolButton.target.setLabel('Включить');
@@ -59,21 +59,21 @@ export class Toolbar {
         }
 
         if (optionItem.type == 'choices') {
-          const toolChoice = new Interactive('choices');
+          const toolChoices = new Interactive('choices');
 
           if (optionItem.name === 'headers') {
             [1, 2, 3, 4, 5, 6].forEach((headerLevelID, headerLevelIndex) => {
-              toolChoice.target.addItem('H' + headerLevelID, headerLevelID);
+              toolChoices.target.addItem('H' + headerLevelID, headerLevelID);
             });
           }
 
-          toolChoice.assembly();
+          toolChoices.assembly();
 
-          toolChoice.target.element.classList.add('nadvo-te__toolbar-item');
-          toolChoice.target.element.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
+          // toolChoices.target.element.classList.add('nadvo-te__toolbar-item');
+          // toolChoices.target.element.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
 
-          optionItemInteractiveElement = toolChoice.target.element;
-          optionItemInteractiveElement.firstChild.classList.add('nadvo-te__toolbar-choice');
+          // optionItemInteractiveElement = toolChoices.target.element;
+          // optionItemInteractiveElement.firstChild.classList.add('nadvo-te__toolbar-choices');
         }
         
         switch (optionItem.name) {
