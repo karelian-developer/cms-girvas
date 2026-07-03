@@ -23,11 +23,7 @@ export class NadvoTE {
   constructor(element, options = {}) {
     this.element = element;
     this.options = options;
-    this._savedSelection = {
-      text: '',
-      start: 0,
-      end: 0
-    };
+    this.selection = '';
     console.log(`[NADVO TE] Object created.`);
   }
 
@@ -40,11 +36,6 @@ export class NadvoTE {
     this.element.appendChild(this.toolbar.element);
     this.element.appendChild(this.textarea.element);
     this.element.appendChild(this.textareaVisual.element);
-
-    // Сохраняем выделение при уходе фокуса с textarea
-    this.textarea.element.addEventListener('blur', () => {
-      this.saveSelection();
-    });
 
     const copyright = this.createElementDiv();
     copyright.classList.add('nadvo-te__copyright');
@@ -67,38 +58,6 @@ export class NadvoTE {
     textareaVisual.init();
   }
 
-  // Новый метод для сохранения выделения
-  saveSelection() {
-    const textarea = this.textarea.element;
-    this._savedSelection.text = textarea.value.substring(
-      textarea.selectionStart, 
-      textarea.selectionEnd
-    );
-    this._savedSelection.start = textarea.selectionStart;
-    this._savedSelection.end = textarea.selectionEnd;
-  }
-
-  // Обновлённый метод получения выделенного текста
-  getSelectionString() {
-    const textarea = this.textarea.element;
-    
-    // Если textarea в фокусе, берём текущее выделение
-    if (document.activeElement === textarea) {
-      return textarea.value.substring(
-        textarea.selectionStart, 
-        textarea.selectionEnd
-      );
-    }
-    
-    // Иначе используем сохранённое выделение
-    return this._savedSelection.text;
-  }
-
-  async fetchJSON(url, data) {
-    return fetch(url, data).then(response => response.ok ? response.json() : Promise.reject(response));
-  }
-  
-  // Остальные методы без изменений
   createElementTextarea() {
     return document.createElement('textarea');
   }
@@ -122,6 +81,27 @@ export class NadvoTE {
   createElementButton(content) {
     let element = document.createElement('button');
     element.innerHTML = content;
+
     return element;
+  }
+  
+  getSelectionString() {
+    const textarea = this.textarea.element;
+    
+    if (document.activeElement === textarea) {
+      this.selection = textarea.value.substring(
+        textarea.selectionStart,
+        textarea.selectionEnd
+      );
+    } else {
+      this.selection = this.selection || '';
+    }
+    
+    console.log('[NADVO TE] Selection:', this.selection);
+    return this.selection;
+  }
+
+  async fetchJSON(url, data) {
+    return fetch(url, data).then(response => response.ok ? response.json() : Promise.reject(response));
   }
 }
