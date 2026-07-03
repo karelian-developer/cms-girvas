@@ -18,38 +18,13 @@
 
 .nadvo-te__toolbar-list {
   position: relative;
-  display: grid;
-  grid-template-columns: repeat(12, 32px);
+  display: flex;
+  flex-wrap: wrap;
   list-style-type: none;
   padding-left: 0;
   padding-right: 32px;
   margin-top: 0;
   margin-bottom: 8px;
-}
-
-@media (max-width: 600px) {
-  .nadvo-te__toolbar-list {
-    grid-template-columns: repeat(8, 48px);
-    padding-right: 48px;
-  }
-}
-
-@media (max-width: 530px) {
-  .nadvo-te__toolbar-list {
-    grid-template-columns: repeat(6, 48px);
-  }
-}
-
-@media (max-width: 440px) {
-  .nadvo-te__toolbar-list {
-    grid-template-columns: repeat(4, 48px);
-  }
-}
-
-@media (max-width: 340px) {
-  .nadvo-te__toolbar-list {
-    grid-template-columns: repeat(3, 48px);
-  }
 }
 
 .nadvo-te__toolbar-item_preview {
