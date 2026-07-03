@@ -12,7 +12,7 @@
         {'name': 'bold', 'type': 'button'},
         {'name': 'italic', 'type': 'button'},
         {'name': 'underline', 'type': 'button'},
-        {'name': 'headers', 'type': 'choice'},
+        {'name': 'headers', 'type': 'choices'},
         {'name': 'header1', 'type': 'button'},
         {'name': 'header2', 'type': 'button'},
         {'name': 'header3', 'type': 'button'},

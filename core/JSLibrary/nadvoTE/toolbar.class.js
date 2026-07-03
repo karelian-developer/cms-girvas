@@ -57,8 +57,8 @@ export class Toolbar {
           optionItemInteractiveElement.firstChild.classList.add('nadvo-te__toolbar-button');
         }
 
-        if (optionItem.type == 'choice') {
-          const toolChoice = new Interactive('choice');
+        if (optionItem.type == 'choices') {
+          const toolChoice = new Interactive('choices');
 
           if (optionItem.name === 'headers') {
             [1, 2, 3, 4, 5, 6].forEach((headerLevelID, headerLevelIndex) => {
