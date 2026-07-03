@@ -21,7 +21,7 @@ export class ToolHeaders extends Tool {
   constructor(editor, element) {
     super(editor, {
       name: 'headers',
-      type: 'button',
+      type: 'choices',
       iconPath: '',
       element: element
     });
