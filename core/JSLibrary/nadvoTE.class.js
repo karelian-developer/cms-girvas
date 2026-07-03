@@ -93,8 +93,6 @@ export class NadvoTE {
         textarea.selectionStart,
         textarea.selectionEnd
       );
-    } else {
-      this.selection = this.selection || '';
     }
     
     console.log('[NADVO TE] Selection:', this.selection);
