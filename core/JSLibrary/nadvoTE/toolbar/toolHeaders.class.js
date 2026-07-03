@@ -34,7 +34,7 @@ export class ToolHeaders extends Tool {
       console.log(`[NADVO TE] Tool ${this.name} selected!`);
       const selectElement = this.element.querySelector('select');
       this.editor.textarea.replaceStringSelection(
-        '#'.repeat(selectElement.value) + ' ' + this.editor.selection
+        '#'.repeat(selectElement.value) + ' ' + this.editor.getSelectionString()
       );
     });
   }
