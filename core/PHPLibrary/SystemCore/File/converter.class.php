@@ -104,9 +104,16 @@ final class Converter implements InterfaceConverter
       } else if (is_array($file)) {
         if (file_exists($file['tmp_name'])) {
           $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
+          error_log('FileConverter: Original extension from filename: ' . $fileExtension);
+          
           $fileSourceName = $fileOutputName . '.' . $fileExtension;
           $fileSourcePath = $fileOutputFolderPath . '/' . $fileSourceName;
-          @move_uploaded_file($file['tmp_name'], $fileSourcePath);
+          
+          error_log('FileConverter: Source path: ' . $fileSourcePath);
+          
+          $moveResult = @move_uploaded_file($file['tmp_name'], $fileSourcePath);
+          error_log('FileConverter: Move result: ' . ($moveResult ? 'true' : 'false'));
+          error_log('FileConverter: Source file exists after move: ' . (file_exists($fileSourcePath) ? 'yes' : 'no'));
         }
       }
 
