@@ -37,12 +37,50 @@ export class NadvoTE {
     this.element.appendChild(this.textarea.element);
     this.element.appendChild(this.textareaVisual.element);
 
+    // Сохраняем выделение при каждом выделении текста в textarea
+    this.textarea.element.addEventListener('mouseup', () => {
+      this.saveTextareaSelection();
+    });
+    
+    // Для выделения с клавиатуры (Shift + стрелки)
+    this.textarea.element.addEventListener('keyup', (e) => {
+      if (e.shiftKey || e.key.startsWith('Arrow')) {
+        this.saveTextareaSelection();
+      }
+    });
+
     const copyright = this.createElementDiv();
     copyright.classList.add('nadvo-te__copyright');
     copyright.innerHTML = 'Визуальный редактор &laquo;NadvoTE&raquo; разработан компанией &laquo;Карельский разработчик&raquo; специально для CMS &laquo;ГИРВАС&raquo;.';
     this.element.appendChild(copyright);
   }
 
+  // Новый метод для сохранения выделения
+  saveTextareaSelection() {
+    const textarea = this.textarea.element;
+    
+    // Сохраняем только если textarea в фокусе
+    if (document.activeElement === textarea) {
+      const selectedText = textarea.value.substring(
+        textarea.selectionStart,
+        textarea.selectionEnd
+      );
+      
+      // Сохраняем только если есть выделенный текст
+      if (selectedText) {
+        this.selection = selectedText;
+        console.log('[NADVO TE] Selection saved:', this.selection);
+      }
+    }
+  }
+
+  // Упрощённый метод получения выделения
+  getSelectionString() {
+    console.log('[NADVO TE] Get selection:', this.selection);
+    return this.selection;
+  }
+
+  // Остальные методы без изменений...
   initEditorToolbar() {
     let toolbar = new Toolbar(this, this.options.toolbar);
     toolbar.init();
@@ -81,22 +119,7 @@ export class NadvoTE {
   createElementButton(content) {
     let element = document.createElement('button');
     element.innerHTML = content;
-
     return element;
-  }
-  
-  getSelectionString() {
-    const textarea = this.textarea.element;
-    
-    if (document.activeElement === textarea) {
-      this.selection = textarea.value.substring(
-        textarea.selectionStart,
-        textarea.selectionEnd
-      );
-    }
-    
-    console.log('[NADVO TE] Selection:', this.selection);
-    return this.selection;
   }
 
   async fetchJSON(url, data) {
