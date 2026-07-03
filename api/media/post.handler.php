@@ -75,13 +75,6 @@ if ($CMSCore->client->isLogged(2)) {
                   'avif' => EnumFileFormat::AVIF,
                   'gif' => EnumFileFormat::GIF,
                   default => EnumFileFormat::JPG
-                };
-
-                if ($image === false) {
-                  $imageData = file_get_contents($_FILES['mediaFile']['tmp_name']);
-                  if ($imageData !== false) {
-                    $image = @imagecreatefromstring($imageData);
-                  }
                 }
 
                 $image = match ($fileExtensionEnum) {
@@ -91,6 +84,13 @@ if ($CMSCore->client->isLogged(2)) {
                   EnumFileFormat::AVIF => imagecreatefromavif($_FILES['mediaFile']['tmp_name']),
                   EnumFileFormat::GIF => imagecreatefromgif($_FILES['mediaFile']['tmp_name'])
                 };
+
+                if ($image === false) {
+                  $imageData = file_get_contents($_FILES['mediaFile']['tmp_name']);
+                  if ($imageData !== false) {
+                    $image = @imagecreatefromstring($imageData);
+                  }
+                }
                 
                 if ($image === false) {
                   $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
