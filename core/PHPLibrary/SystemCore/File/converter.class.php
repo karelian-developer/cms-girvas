@@ -201,9 +201,38 @@ final class Converter implements InterfaceConverter
    */
   private function convertJPEGToPNG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
-    $imageSource = imagecreatefromjpeg($fileSourcePath);
-    if ($imageSource === false) {
+    if (!file_exists($fileSourcePath)) {
       return false;
+    }
+
+    $imageInfo = @getimagesize($fileSourcePath);
+    if ($imageInfo === false) {
+      return false;
+    }
+
+    $jpegTypes = [IMAGETYPE_JPEG, IMAGETYPE_JPEG2000];
+    if (!in_array($imageInfo[2], $jpegTypes)) {
+      $finfo = finfo_open(FILEINFO_MIME_TYPE);
+      $mimeType = finfo_file($finfo, $fileSourcePath);
+      finfo_close($finfo);
+      
+      if (!in_array($mimeType, ['image/jpeg', 'image/jfif', 'image/pjpeg'])) {
+        return false;
+      }
+    }
+
+    $imageSource = @imagecreatefromjpeg($fileSourcePath);
+    
+    if ($imageSource === false) {
+      $imageData = file_get_contents($fileSourcePath);
+      if ($imageData === false) {
+        return false;
+      }
+      
+      $imageSource = @imagecreatefromstring($imageData);
+      if ($imageSource === false) {
+        return false;
+      }
     }
 
     $imageSourceWidth = imagesx($imageSource);
@@ -211,14 +240,23 @@ final class Converter implements InterfaceConverter
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
     if ($imageConverted === false) {
+      imagedestroy($imageSource);
       return false;
     }
 
+    imagealphablending($imageConverted, false);
+    imagesavealpha($imageConverted, true);
+
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imagepng($imageConverted, $fileOutputPath, $quality);
+    
+    $result = imagepng($imageConverted, $fileOutputPath, $quality);
     
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
+
+    if (!$result) {
+      return false;
+    }
 
     if ($deleteOldFile && file_exists($fileSourcePath)) {
       unlink($fileSourcePath);
@@ -239,9 +277,31 @@ final class Converter implements InterfaceConverter
    */
   private function convertJPEGToWEBP(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
-    $imageSource = imagecreatefromjpeg($fileSourcePath);
-    if ($imageSource === false) {
+    if (!file_exists($fileSourcePath)) {
       return false;
+    }
+
+    if (!function_exists('imagewebp')) {
+      return false;
+    }
+
+    $imageSource = @imagecreatefromjpeg($fileSourcePath);
+    
+    if ($imageSource === false) {
+      $imageData = @file_get_contents($fileSourcePath);
+      if ($imageData === false) {
+        return false;
+      }
+      
+      $startPos = strpos($imageData, "\xFF\xD8");
+      if ($startPos !== false && $startPos > 0) {
+        $imageData = substr($imageData, $startPos);
+      }
+      
+      $imageSource = @imagecreatefromstring($imageData);
+      if ($imageSource === false) {
+        return false;
+      }
     }
 
     $imageSourceWidth = imagesx($imageSource);
@@ -249,14 +309,23 @@ final class Converter implements InterfaceConverter
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
     if ($imageConverted === false) {
+      imagedestroy($imageSource);
       return false;
     }
-    
+
+    imagealphablending($imageConverted, false);
+    imagesavealpha($imageConverted, true);
+
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imagewebp($imageConverted, $fileOutputPath, $quality);
+    
+    $result = imagewebp($imageConverted, $fileOutputPath, $quality);
 
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
+
+    if (!$result) {
+      return false;
+    }
 
     if ($deleteOldFile && file_exists($fileSourcePath)) {
       unlink($fileSourcePath);
@@ -276,9 +345,31 @@ final class Converter implements InterfaceConverter
    */
   private function convertJPEGToAVIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
-    $imageSource = imagecreatefromjpeg($fileSourcePath);
-    if ($imageSource === false) {
+    if (!file_exists($fileSourcePath)) {
       return false;
+    }
+
+    if (!function_exists('imageavif')) {
+      return false;
+    }
+
+    $imageSource = @imagecreatefromjpeg($fileSourcePath);
+    
+    if ($imageSource === false) {
+      $imageData = @file_get_contents($fileSourcePath);
+      if ($imageData === false) {
+        return false;
+      }
+      
+      $startPos = strpos($imageData, "\xFF\xD8");
+      if ($startPos !== false && $startPos > 0) {
+        $imageData = substr($imageData, $startPos);
+      }
+      
+      $imageSource = @imagecreatefromstring($imageData);
+      if ($imageSource === false) {
+        return false;
+      }
     }
 
     $imageSourceWidth = imagesx($imageSource);
@@ -286,14 +377,23 @@ final class Converter implements InterfaceConverter
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
     if ($imageConverted === false) {
+      imagedestroy($imageSource);
       return false;
     }
-    
+
+    imagealphablending($imageConverted, false);
+    imagesavealpha($imageConverted, true);
+
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imageavif($imageConverted, $fileOutputPath, $quality);
+    
+    $result = imageavif($imageConverted, $fileOutputPath, $quality);
 
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
+
+    if (!$result) {
+      return false;
+    }
 
     if ($deleteOldFile && file_exists($fileSourcePath)) {
       unlink($fileSourcePath);
