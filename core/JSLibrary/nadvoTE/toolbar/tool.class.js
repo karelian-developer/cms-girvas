@@ -25,7 +25,10 @@ export class Tool {
     this.setType(data.type);
     this.setIconPath(data.iconPath);
     this.setElement(data.element);
-    this.setElementIcon(data.iconPath);
+
+    if (data.type === 'button') {
+      this.setElementIcon(data.iconPath);
+    }
 
     console.log(`[NADVO TE] Tool ${data.name} created.`);
   }

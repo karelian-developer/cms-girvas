@@ -69,11 +69,11 @@ export class Toolbar {
 
           toolChoices.assembly();
 
-          // toolChoices.target.element.classList.add('nadvo-te__toolbar-item');
-          // toolChoices.target.element.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
+          toolChoices.target.element.classList.add('nadvo-te__toolbar-item');
+          toolChoices.target.element.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
 
-          // optionItemInteractiveElement = toolChoices.target.element;
-          // optionItemInteractiveElement.firstChild.classList.add('nadvo-te__toolbar-choices');
+          optionItemInteractiveElement = toolChoices.target.element;
+          optionItemInteractiveElement.firstChild.classList.add('nadvo-te__toolbar-choices');
         }
         
         switch (optionItem.name) {
