@@ -104,16 +104,9 @@ final class Converter implements InterfaceConverter
       } else if (is_array($file)) {
         if (file_exists($file['tmp_name'])) {
           $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
-          error_log('FileConverter: Original extension from filename: ' . $fileExtension);
-          
           $fileSourceName = $fileOutputName . '.' . $fileExtension;
           $fileSourcePath = $fileOutputFolderPath . '/' . $fileSourceName;
-          
-          error_log('FileConverter: Source path: ' . $fileSourcePath);
-          
-          $moveResult = @move_uploaded_file($file['tmp_name'], $fileSourcePath);
-          error_log('FileConverter: Move result: ' . ($moveResult ? 'true' : 'false'));
-          error_log('FileConverter: Source file exists after move: ' . (file_exists($fileSourcePath) ? 'yes' : 'no'));
+          @move_uploaded_file($file['tmp_name'], $fileSourcePath);
         }
       }
 
@@ -170,19 +163,12 @@ final class Converter implements InterfaceConverter
           $convertedResult = $this->convertAVIFToWEBP($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
 
-        $jpegExtensions = ['jpeg', 'jpg', 'jfif', 'pjpeg', 'jpe'];
-        $isSourceJPEG = in_array($fileExtension, $jpegExtensions);
-        $isTargetJPEG = in_array($convertToExtension, $jpegExtensions);
-
-        if ($fileExtension === $convertToExtension || ($isSourceJPEG && $isTargetJPEG)) {
+        if ($fileExtension === $convertToExtension) {
           if (file_exists($fileSourcePath)) {
             if ($fileExtension === 'gif') {
               $convertedResult = $this->sanitizeGIF($fileSourcePath, $fileOutputPath, $deleteOldFile);
             } else {
-              error_log('FileConverter: Same format, renaming file');
               $fileRenamed = rename($fileSourcePath, $fileOutputPath);
-              error_log('FileConverter: Rename result: ' . ($fileRenamed ? 'true' : 'false'));
-              
               if ($fileRenamed) {
                 $convertedResult = true;
               }
@@ -293,127 +279,61 @@ final class Converter implements InterfaceConverter
    */
   private function convertJPEGToWEBP(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
-      error_log('convertJPEGToWEBP: Starting');
-      
-      if (!file_exists($fileSourcePath)) {
-          error_log('convertJPEGToWEBP: Source file not found');
-          return false;
-      }
+    if (!file_exists($fileSourcePath)) {
+      return false;
+    }
 
-      if (!function_exists('imagewebp')) {
-          error_log('convertJPEGToWEBP: imagewebp function not available');
-          return false;
-      }
+    if (!function_exists('imagewebp')) {
+      return false;
+    }
 
-      $imageSource = @imagecreatefromjpeg($fileSourcePath);
+    $imageSource = @imagecreatefromjpeg($fileSourcePath);
+    
+    if ($imageSource === false) {
+      $imageData = @file_get_contents($fileSourcePath);
+      if ($imageData === false) {
+        return false;
+      }
       
+      $startPos = strpos($imageData, "\xFF\xD8");
+      if ($startPos !== false && $startPos > 0) {
+        $imageData = substr($imageData, $startPos);
+      }
+      
+      $imageSource = @imagecreatefromstring($imageData);
       if ($imageSource === false) {
-          error_log('convertJPEGToWEBP: imagecreatefromjpeg failed, trying alternative methods');
-          
-          // Метод 1: Пробуем через imagecreatefromstring
-          $imageData = @file_get_contents($fileSourcePath);
-          if ($imageData === false) {
-              error_log('convertJPEGToWEBP: file_get_contents failed');
-              return false;
-          }
-          
-          // Ищем начало JPEG данных и обрезаем всё лишнее
-          $startPos = strpos($imageData, "\xFF\xD8");
-          if ($startPos !== false && $startPos > 0) {
-              error_log('convertJPEGToWEBP: Trimming data before JPEG marker at position ' . $startPos);
-              $imageData = substr($imageData, $startPos);
-          }
-          
-          $imageSource = @imagecreatefromstring($imageData);
-          
-          // Метод 2: Если не сработало, пробуем создать изображение через временный файл
-          if ($imageSource === false) {
-              error_log('convertJPEGToWEBP: imagecreatefromstring failed, trying temp file method');
-              
-              // Создаем временный файл с правильным именем
-              $tempFile = tempnam(sys_get_temp_dir(), 'jpeg_convert_') . '.jpg';
-              if (file_put_contents($tempFile, $imageData) !== false) {
-                  error_log('convertJPEGToWEBP: Temp file created: ' . $tempFile);
-                  $imageSource = @imagecreatefromjpeg($tempFile);
-                  unlink($tempFile); // Удаляем временный файл
-                  
-                  if ($imageSource === false) {
-                      error_log('convertJPEGToWEBP: Temp file method also failed');
-                  } else {
-                      error_log('convertJPEGToWEBP: Temp file method succeeded');
-                  }
-              }
-          }
-          
-          // Метод 3: Пробуем через Imagick, если GD не справляется
-          if ($imageSource === false && class_exists('Imagick')) {
-              error_log('convertJPEGToWEBP: Trying Imagick as last resort');
-              try {
-                  $imagick = new \Imagick();
-                  $imagick->readImageBlob($imageData);
-                  $imagick->setImageFormat('png'); // Конвертируем в PNG через Imagick
-                  
-                  // Сохраняем как PNG во временный файл
-                  $tempPngFile = tempnam(sys_get_temp_dir(), 'imagick_convert_') . '.png';
-                  $imagick->writeImage($tempPngFile);
-                  $imagick->destroy();
-                  
-                  // Загружаем PNG через GD
-                  $imageSource = @imagecreatefrompng($tempPngFile);
-                  unlink($tempPngFile);
-                  
-                  if ($imageSource !== false) {
-                      error_log('convertJPEGToWEBP: Imagick method succeeded');
-                  }
-              } catch (\Exception $e) {
-                  error_log('convertJPEGToWEBP: Imagick failed: ' . $e->getMessage());
-              }
-          }
-          
-          if ($imageSource === false) {
-              error_log('convertJPEGToWEBP: All methods failed');
-              return false;
-          }
-      } else {
-          error_log('convertJPEGToWEBP: imagecreatefromjpeg succeeded');
+        return false;
       }
+    }
 
-      $imageSourceWidth = imagesx($imageSource);
-      $imageSourceHeight = imagesy($imageSource);
-      error_log('convertJPEGToWEBP: Image dimensions: ' . $imageSourceWidth . 'x' . $imageSourceHeight);
+    $imageSourceWidth = imagesx($imageSource);
+    $imageSourceHeight = imagesy($imageSource);
 
-      $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
-      if ($imageConverted === false) {
-          error_log('convertJPEGToWEBP: imagecreatetruecolor failed');
-          imagedestroy($imageSource);
-          return false;
-      }
-
-      imagealphablending($imageConverted, false);
-      imagesavealpha($imageConverted, true);
-
-      imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-      
-      error_log('convertJPEGToWEBP: Saving WebP with quality ' . $quality);
-      $result = imagewebp($imageConverted, $fileOutputPath, $quality);
-      error_log('convertJPEGToWEBP: imagewebp result: ' . ($result ? 'true' : 'false'));
-
+    $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+    if ($imageConverted === false) {
       imagedestroy($imageSource);
-      imagedestroy($imageConverted);
+      return false;
+    }
 
-      if (!$result) {
-          error_log('convertJPEGToWEBP: Failed to save WebP');
-          return false;
-      }
+    imagealphablending($imageConverted, false);
+    imagesavealpha($imageConverted, true);
 
-      if ($deleteOldFile && file_exists($fileSourcePath)) {
-          unlink($fileSourcePath);
-      }
+    imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
+    
+    $result = imagewebp($imageConverted, $fileOutputPath, $quality);
 
-      $fileExists = file_exists($fileOutputPath);
-      error_log('convertJPEGToWEBP: Output file exists: ' . ($fileExists ? 'yes' : 'no'));
-      
-      return $fileExists;
+    imagedestroy($imageSource);
+    imagedestroy($imageConverted);
+
+    if (!$result) {
+      return false;
+    }
+
+    if ($deleteOldFile && file_exists($fileSourcePath)) {
+      unlink($fileSourcePath);
+    }
+
+    return file_exists($fileOutputPath);
   }
   
   /**
@@ -863,12 +783,10 @@ final class Converter implements InterfaceConverter
   private function sanitizeGIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
   {
     if (!file_exists($fileSourcePath)) {
-      error_log("File does not exist: " . $fileSourcePath);
       return false;
     }
 
     if (filesize($fileSourcePath) === 0) {
-      error_log("File is empty: " . $fileSourcePath);
       return false;
     }
     
@@ -877,13 +795,11 @@ final class Converter implements InterfaceConverter
     finfo_close($finfo);
     
     if ($mimeType !== 'image/gif') {
-      error_log("Invalid MIME type: " . $mimeType . " for file: " . $fileSourcePath);
       return false;
     }
     
     $handle = fopen($fileSourcePath, 'rb');
     if (!$handle) {
-      error_log("Cannot open file for reading: " . $fileSourcePath);
       return false;
     }
     
@@ -891,7 +807,6 @@ final class Converter implements InterfaceConverter
     fclose($handle);
     
     if (!in_array($header, ['GIF87a', 'GIF89a'])) {
-      error_log("Invalid GIF header: " . bin2hex($header));
       return false;
     }
     
@@ -905,7 +820,6 @@ final class Converter implements InterfaceConverter
       $contentToCheck = $start . $end;
       
       if (preg_match('/<\?php|<\?=|<\?|<\s*\%|<\s*script\s*language\s*=\s*["\']?\s*php/i', $contentToCheck)) {
-        error_log("Potential PHP code detected in GIF: " . $fileSourcePath);
         return false;
       }
     }
@@ -922,17 +836,14 @@ final class Converter implements InterfaceConverter
     imagedestroy($imageSource);
     
     if ($width <= 0 || $height <= 0 || $width > 5000 || $height > 5000) {
-      error_log("Suspicious GIF dimensions: {$width}x{$height}");
       return false;
     }
     
     if (!copy($fileSourcePath, $fileOutputPath)) {
-      error_log("Failed to copy file to: " . $fileOutputPath);
       return false;
     }
     
     if (!file_exists($fileOutputPath) || filesize($fileOutputPath) === 0) {
-      error_log("Copied file is missing or empty");
       return false;
     }
     
