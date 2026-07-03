@@ -25,62 +25,34 @@ export class ToolHeaders extends Tool {
       iconPath: '',
       element: element
     });
-    
+
     this.selectedText = '';
-    this.selectionStart = 0;
-    this.selectionEnd = 0;
+    this.initFocusHandlers();
+  }
+
+  initFocusHandlers() {
+    this.editor.textarea.element.addEventListener('blur', () => {
+      this.selectedText = this.editor.getSelectionString();
+    });
+
+    this.editor.textarea.element.addEventListener('mouseup', () => {
+      this.selectedText = this.editor.getSelectionString();
+    });
+
+    this.editor.textarea.element.addEventListener('keyup', (e) => {
+      if (e.key === 'Shift' || e.key.startsWith('Arrow')) {
+        this.selectedText = this.editor.getSelectionString();
+      }
+    });
   }
 
   initClickEvent() {
-    const selectElement = this.element.querySelector('select');
-    if (selectElement) {
-      // Захватываем выделение ДО того, как select получит фокус
-      selectElement.addEventListener('mousedown', (event) => {
-        const textarea = this.editor.textarea.element;
-        this.selectedText = textarea.value.substring(
-          textarea.selectionStart,
-          textarea.selectionEnd
-        );
-        this.selectionStart = textarea.selectionStart;
-        this.selectionEnd = textarea.selectionEnd;
-        
-        console.log('[NADVO TE] Captured selection:', {
-          text: this.selectedText,
-          start: this.selectionStart,
-          end: this.selectionEnd
-        });
-      });
-
-      // Обрабатываем изменение выбора
-      selectElement.addEventListener('change', (event) => {
-        event.preventDefault();
-        
-        const headerLevel = parseInt(selectElement.value);
-        
-        // Проверяем, что уровень выбран и есть сохранённый текст
-        if (headerLevel > 0 && this.selectedText) {
-          console.log(`[NADVO TE] Tool ${this.name} selected! Level: ${headerLevel}`);
-          
-          // Возвращаем фокус в текстовое поле
-          const textarea = this.editor.textarea.element;
-          textarea.focus();
-          
-          // Восстанавливаем выделение
-          textarea.setSelectionRange(this.selectionStart, this.selectionEnd);
-          
-          // Вставляем заголовок
-          const newText = '#'.repeat(headerLevel) + ' ' + this.selectedText;
-          this.editor.textarea.replaceStringSelection(newText);
-          
-          // Сбрасываем значение select
-          selectElement.selectedIndex = 0;
-          
-          // Очищаем сохранённые данные
-          this.selectedText = '';
-          this.selectionStart = 0;
-          this.selectionEnd = 0;
-        }
-      });
-    }
+    super.addChangeEvent(() => {
+      console.log(`[NADVO TE] Tool ${this.name} selected!`);
+      const selectElement = this.element.querySelector('select');
+      this.editor.textarea.replaceStringSelection(
+        '#'.repeat(selectElement.value) + ' ' + this.editor.getSelectionString()
+      );
+    });
   }
 }
