@@ -508,7 +508,7 @@ class NadvoParse
 
         // Преобразуем URL из vkvideo.ru/video-209953203_456239053 в vk.com/video_ext.php?oid=-209953203&id=456239053&autoplay=1
         $convertedUrl = preg_replace_callback(
-          '#https?://vkvideo\.ru/video-(\d+)_(\d+)#',
+          '#https?://vkvideo\.ru/video-?(\d+)_(\d+)#',
           function($matches) {
             $oid = '-' . $matches[1];
             $id = $matches[2];
