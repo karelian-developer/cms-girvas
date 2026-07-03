@@ -34,7 +34,7 @@ if ($CMSCore->client->isLogged(2)) {
       $fileUploadedExtension = pathinfo($_FILES['mediaFile']['name'], PATHINFO_EXTENSION);
       
       /** @var array Массив разрешенных расширений передаваемых файлов */
-      $fileExtensionsAllowed = ['png', 'gif', 'jpg', 'jpeg', 'jfif', 'webp', 'gif', 'pdf'];
+      $fileExtensionsAllowed = ['png', 'gif', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'jpe', 'jif', 'webp', 'avif', 'pdf'];
 
       /** @var string Путь до загружаемых файлов */
       $filesDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
