@@ -34,7 +34,7 @@ if ($CMSCore->client->isLogged(2)) {
       $fileUploadedExtension = pathinfo($_FILES['mediaFile']['name'], PATHINFO_EXTENSION);
       
       /** @var array Массив разрешенных расширений передаваемых файлов */
-      $fileExtensionsAllowed = ['png', 'gif', 'jpg', 'jpeg', 'webp', 'gif', 'pdf'];
+      $fileExtensionsAllowed = ['png', 'gif', 'jpg', 'jpeg', 'jfif', 'webp', 'gif', 'pdf'];
 
       /** @var string Путь до загружаемых файлов */
       $filesDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
@@ -70,6 +70,8 @@ if ($CMSCore->client->isLogged(2)) {
                 
                 $fileExtensionEnum = match ($fileExtension) {
                   'jpeg' => EnumFileFormat::JPG,
+                  'jpg' => EnumFileFormat::JPG,
+                  'jfif' => EnumFileFormat::JPG,
                   'png' => EnumFileFormat::PNG,
                   'webp' => EnumFileFormat::WEBP,
                   'avif' => EnumFileFormat::AVIF,
