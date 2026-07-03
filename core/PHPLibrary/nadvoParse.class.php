@@ -536,7 +536,8 @@ class NadvoParse
         $dom->appendChild($container);
 
         return $dom->saveHTML();
-      }
+      },
+      $html
     );
 
     // Сборка iframe с видеороликом из RUTUBE
