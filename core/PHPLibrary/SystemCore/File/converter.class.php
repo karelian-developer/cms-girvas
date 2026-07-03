@@ -170,12 +170,19 @@ final class Converter implements InterfaceConverter
           $convertedResult = $this->convertAVIFToWEBP($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
 
-        if ($fileExtension === $convertToExtension) {
+        $jpegExtensions = ['jpeg', 'jpg', 'jfif', 'pjpeg', 'jpe'];
+        $isSourceJPEG = in_array($fileExtension, $jpegExtensions);
+        $isTargetJPEG = in_array($convertToExtension, $jpegExtensions);
+
+        if ($fileExtension === $convertToExtension || ($isSourceJPEG && $isTargetJPEG)) {
           if (file_exists($fileSourcePath)) {
             if ($fileExtension === 'gif') {
               $convertedResult = $this->sanitizeGIF($fileSourcePath, $fileOutputPath, $deleteOldFile);
             } else {
+              error_log('FileConverter: Same format, renaming file');
               $fileRenamed = rename($fileSourcePath, $fileOutputPath);
+              error_log('FileConverter: Rename result: ' . ($fileRenamed ? 'true' : 'false'));
+              
               if ($fileRenamed) {
                 $convertedResult = true;
               }
