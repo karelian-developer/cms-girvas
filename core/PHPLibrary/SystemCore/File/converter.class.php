@@ -293,38 +293,51 @@ final class Converter implements InterfaceConverter
    */
   private function convertJPEGToWEBP(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
+    error_log('convertJPEGToWEBP: Starting');
+    
     if (!file_exists($fileSourcePath)) {
+      error_log('convertJPEGToWEBP: Source file not found');
       return false;
     }
 
     if (!function_exists('imagewebp')) {
+      error_log('convertJPEGToWEBP: imagewebp function not available');
       return false;
     }
 
     $imageSource = @imagecreatefromjpeg($fileSourcePath);
     
     if ($imageSource === false) {
+      error_log('convertJPEGToWEBP: imagecreatefromjpeg failed, trying string method');
       $imageData = @file_get_contents($fileSourcePath);
       if ($imageData === false) {
+        error_log('convertJPEGToWEBP: file_get_contents failed');
         return false;
       }
       
       $startPos = strpos($imageData, "\xFF\xD8");
       if ($startPos !== false && $startPos > 0) {
+        error_log('convertJPEGToWEBP: Trimming data before JPEG marker at position ' . $startPos);
         $imageData = substr($imageData, $startPos);
       }
       
       $imageSource = @imagecreatefromstring($imageData);
       if ($imageSource === false) {
+        error_log('convertJPEGToWEBP: imagecreatefromstring also failed');
         return false;
       }
+      error_log('convertJPEGToWEBP: imagecreatefromstring succeeded');
+    } else {
+      error_log('convertJPEGToWEBP: imagecreatefromjpeg succeeded');
     }
 
     $imageSourceWidth = imagesx($imageSource);
     $imageSourceHeight = imagesy($imageSource);
+    error_log('convertJPEGToWEBP: Image dimensions: ' . $imageSourceWidth . 'x' . $imageSourceHeight);
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
     if ($imageConverted === false) {
+      error_log('convertJPEGToWEBP: imagecreatetruecolor failed');
       imagedestroy($imageSource);
       return false;
     }
@@ -334,12 +347,15 @@ final class Converter implements InterfaceConverter
 
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
     
+    error_log('convertJPEGToWEBP: Saving WebP with quality ' . $quality);
     $result = imagewebp($imageConverted, $fileOutputPath, $quality);
+    error_log('convertJPEGToWEBP: imagewebp result: ' . ($result ? 'true' : 'false'));
 
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
 
     if (!$result) {
+      error_log('convertJPEGToWEBP: Failed to save WebP');
       return false;
     }
 
@@ -347,7 +363,10 @@ final class Converter implements InterfaceConverter
       unlink($fileSourcePath);
     }
 
-    return file_exists($fileOutputPath);
+    $fileExists = file_exists($fileOutputPath);
+    error_log('convertJPEGToWEBP: Output file exists: ' . ($fileExists ? 'yes' : 'no'));
+    
+    return $fileExists;
   }
   
   /**
