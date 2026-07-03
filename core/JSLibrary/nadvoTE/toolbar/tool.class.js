@@ -80,4 +80,14 @@ export class Tool {
       callback();
     });
   }
+
+  addChangeEvent(callback) {
+    const selectElement = this.element.querySelector('select');
+
+    selectElement.addEventListener('change', (event) => {
+      event.preventDefault();
+
+      callback();
+    });
+  }
 }

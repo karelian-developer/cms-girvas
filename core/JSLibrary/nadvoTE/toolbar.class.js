@@ -48,19 +48,38 @@ export class Toolbar {
         
         let optionItemInteractiveElement;
         if (optionItem.type == 'button') {
-          let buttonTest = new Interactive('button');
-          buttonTest.target.setLabel('Включить');
-          buttonTest.target.setCallback(() => {});
-          buttonTest.assembly();
+          const toolButton = new Interactive('button');
+          toolButton.target.setLabel('Включить');
+          toolButton.target.setCallback(() => {});
+          toolButton.assembly();
 
-          optionItemInteractiveElement = buttonTest.target.element;
+          optionItemInteractiveElement = toolButton.target.element;
           optionItemInteractiveElement.firstChild.classList.add('nadvo-te__toolbar-button');
+        }
+
+        if (optionItem.type == 'choice') {
+          const toolChoice = new Interactive('choice');
+
+          if (optionItem.name === 'headers') {
+            [1, 2, 3, 4, 5, 6].forEach((headerLevelID, headerLevelIndex) => {
+              toolChoice.target.addItem('H' + headerLevelID, headerLevelID);
+            });
+          }
+
+          toolChoice.assembly();
+
+          toolChoice.target.element.classList.add('nadvo-te__toolbar-item');
+          toolChoice.target.element.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
+
+          optionItemInteractiveElement = toolChoice.target.element;
+          optionItemInteractiveElement.firstChild.classList.add('nadvo-te__toolbar-choice');
         }
         
         switch (optionItem.name) {
           case 'bold': this.tools.bold = new ToolBold(this.editor, optionItemInteractiveElement); break;
           case 'italic': this.tools.italic = new ToolItalic(this.editor, optionItemInteractiveElement); break;
           case 'underline': this.tools.underline = new ToolUnderline(this.editor, optionItemInteractiveElement); break;
+          case 'headers': this.tools.headers = new ToolHeaders(this.editor, optionItemInteractiveElement); break;
           case 'header1': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 1); break;
           case 'header2': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 2); break;
           case 'header3': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 3); break;
