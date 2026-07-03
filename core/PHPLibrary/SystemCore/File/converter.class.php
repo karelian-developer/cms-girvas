@@ -293,80 +293,127 @@ final class Converter implements InterfaceConverter
    */
   private function convertJPEGToWEBP(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
-    error_log('convertJPEGToWEBP: Starting');
-    
-    if (!file_exists($fileSourcePath)) {
-      error_log('convertJPEGToWEBP: Source file not found');
-      return false;
-    }
-
-    if (!function_exists('imagewebp')) {
-      error_log('convertJPEGToWEBP: imagewebp function not available');
-      return false;
-    }
-
-    $imageSource = @imagecreatefromjpeg($fileSourcePath);
-    
-    if ($imageSource === false) {
-      error_log('convertJPEGToWEBP: imagecreatefromjpeg failed, trying string method');
-      $imageData = @file_get_contents($fileSourcePath);
-      if ($imageData === false) {
-        error_log('convertJPEGToWEBP: file_get_contents failed');
-        return false;
-      }
+      error_log('convertJPEGToWEBP: Starting');
       
-      $startPos = strpos($imageData, "\xFF\xD8");
-      if ($startPos !== false && $startPos > 0) {
-        error_log('convertJPEGToWEBP: Trimming data before JPEG marker at position ' . $startPos);
-        $imageData = substr($imageData, $startPos);
+      if (!file_exists($fileSourcePath)) {
+          error_log('convertJPEGToWEBP: Source file not found');
+          return false;
       }
+
+      if (!function_exists('imagewebp')) {
+          error_log('convertJPEGToWEBP: imagewebp function not available');
+          return false;
+      }
+
+      $imageSource = @imagecreatefromjpeg($fileSourcePath);
       
-      $imageSource = @imagecreatefromstring($imageData);
       if ($imageSource === false) {
-        error_log('convertJPEGToWEBP: imagecreatefromstring also failed');
-        return false;
+          error_log('convertJPEGToWEBP: imagecreatefromjpeg failed, trying alternative methods');
+          
+          // Метод 1: Пробуем через imagecreatefromstring
+          $imageData = @file_get_contents($fileSourcePath);
+          if ($imageData === false) {
+              error_log('convertJPEGToWEBP: file_get_contents failed');
+              return false;
+          }
+          
+          // Ищем начало JPEG данных и обрезаем всё лишнее
+          $startPos = strpos($imageData, "\xFF\xD8");
+          if ($startPos !== false && $startPos > 0) {
+              error_log('convertJPEGToWEBP: Trimming data before JPEG marker at position ' . $startPos);
+              $imageData = substr($imageData, $startPos);
+          }
+          
+          $imageSource = @imagecreatefromstring($imageData);
+          
+          // Метод 2: Если не сработало, пробуем создать изображение через временный файл
+          if ($imageSource === false) {
+              error_log('convertJPEGToWEBP: imagecreatefromstring failed, trying temp file method');
+              
+              // Создаем временный файл с правильным именем
+              $tempFile = tempnam(sys_get_temp_dir(), 'jpeg_convert_') . '.jpg';
+              if (file_put_contents($tempFile, $imageData) !== false) {
+                  error_log('convertJPEGToWEBP: Temp file created: ' . $tempFile);
+                  $imageSource = @imagecreatefromjpeg($tempFile);
+                  unlink($tempFile); // Удаляем временный файл
+                  
+                  if ($imageSource === false) {
+                      error_log('convertJPEGToWEBP: Temp file method also failed');
+                  } else {
+                      error_log('convertJPEGToWEBP: Temp file method succeeded');
+                  }
+              }
+          }
+          
+          // Метод 3: Пробуем через Imagick, если GD не справляется
+          if ($imageSource === false && class_exists('Imagick')) {
+              error_log('convertJPEGToWEBP: Trying Imagick as last resort');
+              try {
+                  $imagick = new \Imagick();
+                  $imagick->readImageBlob($imageData);
+                  $imagick->setImageFormat('png'); // Конвертируем в PNG через Imagick
+                  
+                  // Сохраняем как PNG во временный файл
+                  $tempPngFile = tempnam(sys_get_temp_dir(), 'imagick_convert_') . '.png';
+                  $imagick->writeImage($tempPngFile);
+                  $imagick->destroy();
+                  
+                  // Загружаем PNG через GD
+                  $imageSource = @imagecreatefrompng($tempPngFile);
+                  unlink($tempPngFile);
+                  
+                  if ($imageSource !== false) {
+                      error_log('convertJPEGToWEBP: Imagick method succeeded');
+                  }
+              } catch (\Exception $e) {
+                  error_log('convertJPEGToWEBP: Imagick failed: ' . $e->getMessage());
+              }
+          }
+          
+          if ($imageSource === false) {
+              error_log('convertJPEGToWEBP: All methods failed');
+              return false;
+          }
+      } else {
+          error_log('convertJPEGToWEBP: imagecreatefromjpeg succeeded');
       }
-      error_log('convertJPEGToWEBP: imagecreatefromstring succeeded');
-    } else {
-      error_log('convertJPEGToWEBP: imagecreatefromjpeg succeeded');
-    }
 
-    $imageSourceWidth = imagesx($imageSource);
-    $imageSourceHeight = imagesy($imageSource);
-    error_log('convertJPEGToWEBP: Image dimensions: ' . $imageSourceWidth . 'x' . $imageSourceHeight);
+      $imageSourceWidth = imagesx($imageSource);
+      $imageSourceHeight = imagesy($imageSource);
+      error_log('convertJPEGToWEBP: Image dimensions: ' . $imageSourceWidth . 'x' . $imageSourceHeight);
 
-    $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
-    if ($imageConverted === false) {
-      error_log('convertJPEGToWEBP: imagecreatetruecolor failed');
+      $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
+      if ($imageConverted === false) {
+          error_log('convertJPEGToWEBP: imagecreatetruecolor failed');
+          imagedestroy($imageSource);
+          return false;
+      }
+
+      imagealphablending($imageConverted, false);
+      imagesavealpha($imageConverted, true);
+
+      imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
+      
+      error_log('convertJPEGToWEBP: Saving WebP with quality ' . $quality);
+      $result = imagewebp($imageConverted, $fileOutputPath, $quality);
+      error_log('convertJPEGToWEBP: imagewebp result: ' . ($result ? 'true' : 'false'));
+
       imagedestroy($imageSource);
-      return false;
-    }
+      imagedestroy($imageConverted);
 
-    imagealphablending($imageConverted, false);
-    imagesavealpha($imageConverted, true);
+      if (!$result) {
+          error_log('convertJPEGToWEBP: Failed to save WebP');
+          return false;
+      }
 
-    imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    
-    error_log('convertJPEGToWEBP: Saving WebP with quality ' . $quality);
-    $result = imagewebp($imageConverted, $fileOutputPath, $quality);
-    error_log('convertJPEGToWEBP: imagewebp result: ' . ($result ? 'true' : 'false'));
+      if ($deleteOldFile && file_exists($fileSourcePath)) {
+          unlink($fileSourcePath);
+      }
 
-    imagedestroy($imageSource);
-    imagedestroy($imageConverted);
-
-    if (!$result) {
-      error_log('convertJPEGToWEBP: Failed to save WebP');
-      return false;
-    }
-
-    if ($deleteOldFile && file_exists($fileSourcePath)) {
-      unlink($fileSourcePath);
-    }
-
-    $fileExists = file_exists($fileOutputPath);
-    error_log('convertJPEGToWEBP: Output file exists: ' . ($fileExists ? 'yes' : 'no'));
-    
-    return $fileExists;
+      $fileExists = file_exists($fileOutputPath);
+      error_log('convertJPEGToWEBP: Output file exists: ' . ($fileExists ? 'yes' : 'no'));
+      
+      return $fileExists;
   }
   
   /**
