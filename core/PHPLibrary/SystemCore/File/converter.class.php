@@ -113,7 +113,7 @@ final class Converter implements InterfaceConverter
       $convertedResult = false;
       if ($fileSourcePath !== '' && file_exists($fileSourcePath)) {
         // Все варианты JPEG расширений
-        $jpegExtensions = ['jpeg', 'jpg', 'jfif', 'pjpeg', 'jpe'];
+        $jpegExtensions = ['jpeg', 'jpg', 'jfif', 'pjpeg', 'jpe', 'jif'];
         
         if (in_array($fileExtension, $jpegExtensions) && $convertToExtension === 'png') {
           $convertedResult = $this->convertJPEGToPNG($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
