@@ -131,20 +131,17 @@ if ($CMSCore->client->isLogged(2)) {
                       
                       /** @var FileConverter Объект-конвектор файлов */
                       $fileConverter = new FileConverter($CMSCore);
-                      /** @var array Конвертированный файл */
-                      $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true, 4658, $quality);
+                      /** @var array|bool Конвертированный файл */
+                      $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true);
 
-                      /** @var array Данные конвертированного файла */
-                      $fileData = [];
-
-                      $fileData['URL'] = '/uploads/media/' . $fileConverted['fileName'];
-                      $fileData['isDirectory'] = is_dir(CMS_ROOT_DIRECTORY . $fileData['URL']);
-                      $fileData['fullname'] = $fileConverted['fileName'];
-                      $fileData['extension'] = $fileConverted['extensionNew'];
-                      
-                      $handlerOutputData['file'] = $fileData;
-
-                      if (is_array($fileConverted)) {
+                      if (is_array($fileConverted) && isset($fileConverted['fileName'], $fileConverted['extensionNew'])) {
+                        $fileData = [];
+                        $fileData['URL'] = '/uploads/media/' . $fileConverted['fileName'];
+                        $fileData['isDirectory'] = is_dir(CMS_ROOT_DIRECTORY . $fileData['URL']);
+                        $fileData['fullname'] = $fileConverted['fileName'];
+                        $fileData['extension'] = $fileConverted['extensionNew'];
+                        
+                        $handlerOutputData['file'] = $fileData;
                         $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_POST_FILES_SUCCESS');
                         $handlerStatusCode = $handlerStatusCode ?? 1;
                       } else {
@@ -172,20 +169,17 @@ if ($CMSCore->client->isLogged(2)) {
 
                 /** @var FileConverter Объект-конвектор файлов */
                 $fileConverter = new FileConverter($CMSCore);
-                /** @var array Конвертированный файл */
-                $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true);
+                /** @var array|bool Конвертированный файл */
+                $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true, 4658, $quality);
 
-                /** @var array Данные конвертированного файла */
-                $fileData = [];
-
-                $fileData['URL'] = '/uploads/media/' . $fileConverted['fileName'];
-                $fileData['isDirectory'] = is_dir(CMS_ROOT_DIRECTORY . $fileData['URL']);
-                $fileData['fullname'] = $fileConverted['fileName'];
-                $fileData['extension'] = $fileConverted['extensionNew'];
-                
-                $handlerOutputData['file'] = $fileData;
-
-                if (is_array($fileConverted)) {
+                if (is_array($fileConverted) && isset($fileConverted['fileName'], $fileConverted['extensionNew'])) {
+                  $fileData = [];
+                  $fileData['URL'] = '/uploads/media/' . $fileConverted['fileName'];
+                  $fileData['isDirectory'] = is_dir(CMS_ROOT_DIRECTORY . $fileData['URL']);
+                  $fileData['fullname'] = $fileConverted['fileName'];
+                  $fileData['extension'] = $fileConverted['extensionNew'];
+                  
+                  $handlerOutputData['file'] = $fileData;
                   $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_POST_FILES_SUCCESS');
                   $handlerStatusCode = $handlerStatusCode ?? 1;
                 } else {
