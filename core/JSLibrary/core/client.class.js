@@ -80,15 +80,20 @@ export class Client {
     let cookie = document.cookie;
     let cookiePrefix = name + "=";
     let begin = cookie.indexOf("; " + cookiePrefix);
+    let end;
 
-    if (begin == -1) {
+    if (begin === -1) {
       begin = cookie.indexOf(cookiePrefix);
       if (begin != 0) return null;
+      // Если begin == 0, то куки найдена в начале строки
+      end = cookie.indexOf(";", begin);
+      if (end === -1) {
+        end = cookie.length;
+      }
     } else {
       begin += 2;
-      
-      let end = document.cookie.indexOf(";", begin);
-      if (end == -1) {
+      end = cookie.indexOf(";", begin);
+      if (end === -1) {
         end = cookie.length;
       }
     }
