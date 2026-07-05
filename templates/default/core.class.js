@@ -57,11 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
         localeIsQual = true;
       } else {
         // Cookie не задан → используем localeBase, ничего не предлагаем
-        localeIsQual = true;  // ← ВОТ ЗДЕСЬ БЫЛА ОШИБКА!
+        localeIsQual = true;
       }
     }
 
-    if (!localeLocation) {
+    if (!localeIsQual) {
       fetch('/handler/locales', {method: 'GET'}).then((response) => {
         return (response.ok) ? response.json() : Promise.reject(response);
       }).then((data) => {
