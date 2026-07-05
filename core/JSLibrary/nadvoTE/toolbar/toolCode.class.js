@@ -37,6 +37,9 @@ export class ToolCode extends Tool {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
       const stringSelection = this.editor.getSelectionString();
+
+      const modalBodyContent = document.createElement('div');
+      modalBodyContent.classList.add('code-manager');
       
       const inputLanguageLabelElement = document.createElement('input');
       inputLanguageLabelElement.setAttribute('placeholder', 'Язык программирования/командной строки');
