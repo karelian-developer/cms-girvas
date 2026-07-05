@@ -29,13 +29,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const localeLocation = window.CMSCore.searchParams.getParam('locale');
     
     let localeIsQual;
+
     if (localeLocation !== null) {
-      localeIsQual = localeBase !== localeLocation;
-      if (!localeIsQual) {
-        localeIsQual = localeLocation === Client.getCookie('locale');
+      const cookieLocale = Client.getCookie('locale');
+      
+      if (localeLocation === localeBase) {
+        localeIsQual = true;
+      } else if (cookieLocale === null || cookieLocale === undefined) {
+        localeIsQual = false;
+      } else {
+        localeIsQual = localeLocation === cookieLocale;
       }
     } else {
-      localeIsQual = localeBase === Client.getCookie('locale');
+      localeIsQual = true;
     }
 
     if (!localeLocation) {
