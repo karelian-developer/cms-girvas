@@ -34,9 +34,10 @@
         {'name': 'italic', 'type': 'button'},
         {'name': 'underline', 'type': 'button'},
         {'name': 'headers', 'type': 'choices'},
-        {'name': 'quote', 'type': 'button'},
         {'name': 'link', 'type': 'button'},
         {'name': 'image', 'type': 'button'},
+        {'name': 'quote', 'type': 'button'},
+        {'name': 'code', 'type': 'button'},
         {'name': 'preview', 'type': 'button'},
         {'name': 'source', 'type': 'button'},
       ]

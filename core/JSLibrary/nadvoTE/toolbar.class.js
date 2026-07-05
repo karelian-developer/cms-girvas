@@ -26,6 +26,7 @@ import {ToolPreview} from './toolbar/toolPreview.class.js';
 import {ToolSource} from './toolbar/toolSource.class.js';
 import {ToolLink} from './toolbar/toolLink.class.js';
 import {ToolImage} from './toolbar/toolImage.class.js';
+import {ToolCode} from './toolbar/toolCode.class.js';
 
 export class Toolbar {
   constructor(editor, options = []) {
