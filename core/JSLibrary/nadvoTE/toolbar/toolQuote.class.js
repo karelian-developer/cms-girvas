@@ -33,7 +33,7 @@ export class ToolQuote extends Tool {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
       this.editor.textarea.replaceStringSelection(
-        '> ' + this.editor.getSelectionString()
+        "\n\r" + '> ' + this.editor.getSelectionString() + "\n\r"
       );
     });
   }
