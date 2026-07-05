@@ -29,13 +29,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const localeLocation = window.CMSCore.searchParams.getParam('locale');
 
     if (localeBase !== localeLocation) {
+      const modalBodyContent = document.createElement('div');
+      modalBodyContent.classList.add('locale-manager');
+
+      const interactiveLocaleChoices = new Interactive('choices');
+      locales.forEach((locale, localeIndex) => {
+        let localeTitle = locale.title;
+        let localeIconURL = locale.iconURL;
+        let localeName = locale.name;
+        let localeISO639_2 = locale.iso639_2;
+
+        let localeIconImageElement = document.createElement('img');
+        localeIconImageElement.setAttribute('src', localeIconURL);
+        localeIconImageElement.setAttribute('alt', localeTitle);
+
+        let localeLabelElement = document.createElement('span');
+        localeLabelElement.innerText = localeTitle;
+
+        let localeTemplate = document.createElement('template');
+        localeTemplate.innerHTML += localeIconImageElement.outerHTML;
+        localeTemplate.innerHTML += localeLabelElement.outerHTML;
+
+        interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, localeName);
+      });
+
+      locales.forEach((locale, localeIndex) => {
+        if (locale.name === window.CMSCore.locales.base.name) {
+          interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
+        }
+      });
+
+      interactiveLocaleChoices.assembly();
+
+      modalBodyContent.appendChild(interactiveLocaleChoices.target.element);
+
       const interactiveLanguageModal = new Interactive('modal', {
         title: window.CMSCore.localeData.MODAL_LOCALE_CHANGE_TITLE,
-        content: window.CMSCore.localeData.MODAL_LOCALE_CHANGE_DESCRIPTION
+        content: modalBodyContent
       });
 
       interactiveLanguageModal.target.addButton(window.CMSCore.localeData.BUTTON_SUBMIT_LABEL, () => {
-        document.cookie = `locale=${element.name}; max-age=max-age-in-seconds; path=/`;
+        const localeSelected = interactiveLocaleChoices.target.getValue();
+        document.cookie = `locale=${localeSelected}; max-age=max-age-in-seconds; path=/`;
         window.location.reload();
       });
 
