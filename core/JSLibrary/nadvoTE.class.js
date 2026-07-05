@@ -23,37 +23,42 @@ export class NadvoTE {
   constructor(element, options = {}) {
     this.element = element;
     this.options = options;
+    this.localeData = {};
     this.selection = '';
     console.log(`[NADVO TE] Object created.`);
-    console.log(this.options);
   }
 
   init() {
-    this.element.classList.add('nadvo-te');
-    this.initEditorTextarea();
-    this.initEditorToolbar();
-    this.initEditorTextareaVisual();
+    this.options.locale.then((localeData) => {
+      this.localeData = localeData;
+      console.log(this.localeData);
 
-    this.element.appendChild(this.toolbar.element);
-    this.element.appendChild(this.textarea.element);
-    this.element.appendChild(this.textareaVisual.element);
+      this.element.classList.add('nadvo-te');
+      this.initEditorTextarea();
+      this.initEditorToolbar();
+      this.initEditorTextareaVisual();
 
-    // Сохраняем выделение при каждом выделении текста в textarea
-    this.textarea.element.addEventListener('mouseup', () => {
-      this.saveTextareaSelection();
-    });
-    
-    // Для выделения с клавиатуры (Shift + стрелки)
-    this.textarea.element.addEventListener('keyup', (e) => {
-      if (e.shiftKey || e.key.startsWith('Arrow')) {
+      this.element.appendChild(this.toolbar.element);
+      this.element.appendChild(this.textarea.element);
+      this.element.appendChild(this.textareaVisual.element);
+
+      // Сохраняем выделение при каждом выделении текста в textarea
+      this.textarea.element.addEventListener('mouseup', () => {
         this.saveTextareaSelection();
-      }
-    });
+      });
+      
+      // Для выделения с клавиатуры (Shift + стрелки)
+      this.textarea.element.addEventListener('keyup', (e) => {
+        if (e.shiftKey || e.key.startsWith('Arrow')) {
+          this.saveTextareaSelection();
+        }
+      });
 
-    const copyright = this.createElementDiv();
-    copyright.classList.add('nadvo-te__copyright');
-    copyright.innerHTML = 'Визуальный редактор &laquo;NadvoTE&raquo; разработан компанией &laquo;Карельский разработчик&raquo; специально для CMS &laquo;ГИРВАС&raquo;.';
-    this.element.appendChild(copyright);
+      const copyright = this.createElementDiv();
+      copyright.classList.add('nadvo-te__copyright');
+      copyright.innerHTML = 'Визуальный редактор &laquo;NadvoTE&raquo; разработан компанией &laquo;Карельский разработчик&raquo; специально для CMS &laquo;ГИРВАС&raquo;.';
+      this.element.appendChild(copyright);
+    });
   }
 
   // Новый метод для сохранения выделения
