@@ -32,6 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
       fetch('/handler/locales', {method: 'GET'}).then((response) => {
         return (response.ok) ? response.json() : Promise.reject(response);
       }).then((data) => {
+        const locales = data.outputData.locales;
+
         const modalBodyContent = document.createElement('div');
         modalBodyContent.classList.add('locale-manager');
 
