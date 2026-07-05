@@ -30,18 +30,34 @@ document.addEventListener('DOMContentLoaded', () => {
     
     let localeIsQual;
 
-    if (localeLocation !== null) {
+    if (localeLocation !== null && localeLocation !== undefined && localeLocation !== "") {
+      // localeLocation задан
       const cookieLocale = Client.getCookie('locale');
       
-      if (localeLocation === localeBase) {
-        localeIsQual = true;
-      } else if (cookieLocale === null || cookieLocale === undefined) {
-        localeIsQual = false;
+      if (localeLocation !== localeBase) {
+        // Параметр отличается от базовой локали
+        if (!cookieLocale) {
+          // Cookie не задан → предлагаем выбрать язык
+          localeIsQual = false;
+        } else {
+          // Cookie задан → сравниваем
+          localeIsQual = localeLocation === cookieLocale;
+        }
       } else {
-        localeIsQual = localeLocation === cookieLocale;
+        // Параметр равен базовой локали → всё ок
+        localeIsQual = true;
       }
     } else {
-      localeIsQual = true;
+      // localeLocation НЕ задан
+      const cookieLocale = Client.getCookie('locale');
+      
+      if (cookieLocale) {
+        // Cookie задан → используем его, ничего не предлагаем
+        localeIsQual = true;
+      } else {
+        // Cookie не задан → используем localeBase, ничего не предлагаем
+        localeIsQual = true;  // ← ВОТ ЗДЕСЬ БЫЛА ОШИБКА!
+      }
     }
 
     if (!localeLocation) {
