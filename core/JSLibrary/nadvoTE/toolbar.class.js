@@ -66,7 +66,7 @@ export class Toolbar {
               let labelElement = document.createElement('span');
               labelElement.innerText = this.editor.localeData.NTE_TOOL_HEADER_COMMON_LABEL + ' ' + headerLevelID;
               labelElement.style.fontSize = 18 - headerLevelIndex + 'px';
-              toolChoices.target.addItem(labelElement.innerHTML, headerLevelID);
+              toolChoices.target.addItem(labelElement.outerHTML, headerLevelID);
             });
           }
 
