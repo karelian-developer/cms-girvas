@@ -29,18 +29,20 @@ export class NadvoTE {
   }
 
   init() {
+    this.element.classList.add('nadvo-te');
+    this.initEditorTextarea();
+    this.initEditorTextareaVisual();
+
+    this.element.appendChild(this.textarea.element);
+    this.element.appendChild(this.textareaVisual.element);
+
     this.options.locale.getData().then((localeData) => {
       this.localeData = localeData;
       console.log(this.localeData);
 
-      this.element.classList.add('nadvo-te');
-      this.initEditorTextarea();
       this.initEditorToolbar();
-      this.initEditorTextareaVisual();
 
-      this.element.appendChild(this.toolbar.element);
-      this.element.appendChild(this.textarea.element);
-      this.element.appendChild(this.textareaVisual.element);
+      this.element.prepend(this.toolbar.element);
 
       // Сохраняем выделение при каждом выделении текста в textarea
       this.textarea.element.addEventListener('mouseup', () => {
