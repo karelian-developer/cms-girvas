@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modalBodyContent.classList.add('locale-manager');
 
         const descriptionElement = document.createElement('div');
-        descriptionElement.innerHTML = localeData.MODAL_LOCALE_CHANGE_DESCRIPTION;
+        descriptionElement.innerHTML = window.CMSCore.localeData.MODAL_LOCALE_CHANGE_DESCRIPTION;
 
         const interactiveLocaleChoices = new Interactive('choices');
         locales.forEach((locale, localeIndex) => {
