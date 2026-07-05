@@ -86,7 +86,7 @@ export class ToolCode extends Tool {
         const textareaCode = textareaCodeElement.value;
         
         this.editor.textarea.replaceStringSelection(
-          `\`\`\`${inputLanguageLabel}` + "\n" +  `${textareaCode})` + "\n\`\`\`"
+          `\`\`\`${inputLanguageLabel}` + "\n" +  `${textareaCode}` + "\n\`\`\`"
         );
 
         this.modal.target.close();
