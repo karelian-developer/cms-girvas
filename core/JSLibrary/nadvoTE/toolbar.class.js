@@ -63,7 +63,7 @@ export class Toolbar {
 
           if (optionItem.name === 'headers') {
             [1, 2, 3, 4, 5, 6].forEach((headerLevelID, headerLevelIndex) => {
-              toolChoices.target.addItem('H' + headerLevelID, headerLevelID);
+              toolChoices.target.addItem(this.editor.localeData.NTE_TOOL_HEADER_COMMON_LABEL + ' ' + headerLevelID, headerLevelID);
             });
           }
 
