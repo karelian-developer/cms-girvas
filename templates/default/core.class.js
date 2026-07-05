@@ -8,6 +8,7 @@
 
 'use strict';
 
+import {Client} from "../../core/JSLibrary/core/client.class.js";
 import {Interactive} from "../../core/JSLibrary/interactive.class.js";
 
 export class Core {
@@ -32,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (localeLocation !== null && localeLocation !== undefined && localeLocation !== "") {
       // localeLocation задан
-      const cookieLocale = window.CMSCore.client.getCookie('locale');
+      const cookieLocale = Client.getCookie('locale');
       
       if (localeLocation !== localeBase) {
         // Параметр отличается от базовой локали
@@ -49,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } else {
       // localeLocation НЕ задан
-      const cookieLocale = window.CMSCore.client.getCookie('locale');
+      const cookieLocale = Client.getCookie('locale');
       
       if (cookieLocale) {
         // Cookie задан → используем его, ничего не предлагаем
