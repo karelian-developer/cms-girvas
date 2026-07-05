@@ -107,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         interactiveLocaleChoices.assembly();
 
+        modalBodyContent.appendChild(descriptionElement);
         modalBodyContent.appendChild(interactiveLocaleChoices.target.element);
 
         const interactiveLanguageModal = new Interactive('modal', {
@@ -130,7 +131,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         interactiveLanguageModal.assembly();
-        document.body.appendChild(descriptionElement);
         document.body.appendChild(interactiveLanguageModal.target.element);
 
         interactiveLanguageModal.target.show();
