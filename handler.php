@@ -345,6 +345,22 @@ if (defined('IS_NOT_HACKED')) {
         'iso639_2' => $CMSLocale->getISO639(2),
       ];
     }
+
+    // Локализация административной панели
+    if ($CMSURLPathes[2] === 'nadvoTE') {
+      $CMSLocaleSetted = $CMSConfigurator->getDatabaseEntryValue('base_admin_locale') ?? 'en_US';
+      $CMSLocale = new CMSLocale($CMSCore, $CMSLocaleSetted);
+      $CMSLocale->setTypeName('handler');
+      $CMSLocale->initPathes();
+
+      $handlerOutputData['locale'] = [
+        'title' => $CMSLocale->getTitle(),
+        'iconURL' => $CMSLocale->getIconURL(),
+        'name' => $CMSLocale->getName(),
+        'iso639_1' => $CMSLocale->getISO639(1),
+        'iso639_2' => $CMSLocale->getISO639(2),
+      ];
+    }
   
   // Получить перечень доступных локализаций
   } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSURLPathes[1] === 'locales') {
