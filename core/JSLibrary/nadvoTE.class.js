@@ -25,6 +25,7 @@ export class NadvoTE {
     this.options = options;
     this.selection = '';
     console.log(`[NADVO TE] Object created.`);
+    console.log(this.options);
   }
 
   init() {
