@@ -381,7 +381,6 @@
 .interactive .interactive__modal .modal__body-container {
   font-size: 14px;
   padding: 10px;
-  overflow-y: auto;
 }
 
 .interactive .interactive__modal .modal__body-container > *:not(:last-child) {
