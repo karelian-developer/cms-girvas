@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (localeLocation !== null && localeLocation !== undefined && localeLocation !== "") {
       // localeLocation задан
-      const cookieLocale = Client.getCookie('locale');
+      const cookieLocale = this.CMSCore.client.getCookie('locale');
       
       if (localeLocation !== localeBase) {
         // Параметр отличается от базовой локали
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } else {
       // localeLocation НЕ задан
-      const cookieLocale = Client.getCookie('locale');
+      const cookieLocale = this.CMSCore.client.getCookie('locale');
       
       if (cookieLocale) {
         // Cookie задан → используем его, ничего не предлагаем
