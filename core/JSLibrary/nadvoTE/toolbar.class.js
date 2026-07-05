@@ -65,7 +65,7 @@ export class Toolbar {
             [1, 2, 3, 4, 5, 6].forEach((headerLevelID, headerLevelIndex) => {
               let labelElement = document.createElement('span', this.editor.localeData.NTE_TOOL_HEADER_COMMON_LABEL + ' ' + headerLevelID);
               labelElement.style.fontSize = 18 - headerLevelIndex + 'px';
-              toolChoices.target.addItem(labelElement, headerLevelID);
+              toolChoices.target.addItem(labelElement.outerHTML, headerLevelID);
             });
           }
 
