@@ -25,6 +25,33 @@ document.addEventListener('DOMContentLoaded', () => {
     window.CMSCore.templateCore = new Core(window.CMSCore);
     window.CMSCore.templateCore.init();
 
-    console.log(window.CMSCore.locales.base);
+    const localeBase = window.CMSCore.locales.base;
+    const localeLocation = window.CMSCore.searchParams.getParam('locale');
+
+    if (localeBase !== localeLocation) {
+      const interactiveLanguageModal = new Interactive('modal', {
+        title: window.CMSCore.localeData.MODAL_LOCALE_CHANGE_TITLE,
+        content: window.CMSCore.localeData.MODAL_LOCALE_CHANGE_DESCRIPTION
+      });
+
+      interactiveLanguageModal.target.addButton(window.CMSCore.localeData.BUTTON_SUBMIT_LABEL, () => {
+        document.cookie = `locale=${element.name}; max-age=max-age-in-seconds; path=/`;
+        window.location.reload();
+      });
+
+      interactiveLanguageModal.target.addButton(window.CMSCore.localeData.BUTTON_DONT_ASK_AGAIN_LABEL, () => {
+        Client.setCookie('ignoreLanguageChanged', true, 366);
+        interactiveLanguageModal.target.close();
+      });
+
+      interactiveLanguageModal.target.onClose(() => {
+        interactiveLanguageModal.target.close();
+      });
+
+      interactiveLanguageModal.assembly();
+      document.body.appendChild(interactiveLanguageModal.target.element);
+
+      interactiveLanguageModal.target.show();
+    }
   });
 });
