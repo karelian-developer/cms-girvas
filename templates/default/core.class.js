@@ -28,9 +28,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const localeBase = window.CMSCore.locales.base;
     const localeLocation = window.CMSCore.searchParams.getParam('locale');
     
-    let localeIsQual = localeBase !== localeLocation;
-    if (!localeIsQual) {
-      localeIsQual = localeLocation === Client.getCookie('locale');
+    let localeIsQual;
+    if (localeLocation !== null) {
+      localeIsQual = localeBase !== localeLocation;
+      if (!localeIsQual) {
+        localeIsQual = localeLocation === Client.getCookie('locale');
+      }
+    } else {
+      localeIsQual = localeBase === Client.getCookie('locale');
     }
 
     if (!localeLocation) {
