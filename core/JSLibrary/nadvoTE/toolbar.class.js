@@ -91,8 +91,8 @@ export class Toolbar {
           case 'header4': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 4); break;
           case 'header5': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 5); break;
           case 'header6': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 6); break;
-          case 'quote': this.tools.header = new ToolQuote(this.editor, optionItemInteractiveElement); break;
-          case 'code': this.tools.source = new ToolCode(this.editor, optionItemInteractiveElement); break;
+          case 'quote': this.tools.quote = new ToolQuote(this.editor, optionItemInteractiveElement); break;
+          case 'code': this.tools.code = new ToolCode(this.editor, optionItemInteractiveElement); break;
           case 'preview': this.tools.preview = new ToolPreview(this.editor, optionItemInteractiveElement); break;
           case 'source': this.tools.source = new ToolSource(this.editor, optionItemInteractiveElement); break;
           case 'link': this.tools.link = new ToolLink(this.editor, optionItemInteractiveElement); break;
