@@ -27,8 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const localeBase = window.CMSCore.locales.base;
     const localeLocation = window.CMSCore.searchParams.getParam('locale');
+    
+    let localeIsQual = localeBase !== localeLocation;
+    if (!localeIsQual) {
+      localeIsQual = localeLocation === Client.getCookie('locale');
+    }
 
-    if (localeBase !== localeLocation) {
+    if (!localeLocation) {
       fetch('/handler/locales', {method: 'GET'}).then((response) => {
         return (response.ok) ? response.json() : Promise.reject(response);
       }).then((data) => {
