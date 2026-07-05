@@ -62,13 +62,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (!localeIsQual) {
+      let locales;
+
       fetch('/handler/locales', {method: 'GET'}).then((response) => {
         return (response.ok) ? response.json() : Promise.reject(response);
       }).then((data) => {
-        const locales = data.outputData.locales;
-
+        locales = data.outputData.locales;
+        return window.CMSCore.locales.admin.getData();
+      }, (rejectionReason) => {
+        this.page.showPopupNotification(rejectionReason, 0);
+      }).then((localeData) => {
         const modalBodyContent = document.createElement('div');
         modalBodyContent.classList.add('locale-manager');
+
+        const descriptionElement = document.createElement('div');
+        descriptionElement.innerHTML = localeData.MODAL_LOCALE_CHANGE_DESCRIPTION;
 
         const interactiveLocaleChoices = new Interactive('choices');
         locales.forEach((locale, localeIndex) => {
@@ -122,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         interactiveLanguageModal.assembly();
+        document.body.appendChild(descriptionElement);
         document.body.appendChild(interactiveLanguageModal.target.element);
 
         interactiveLanguageModal.target.show();
