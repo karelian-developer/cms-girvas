@@ -63,7 +63,6 @@ export class ToolCode extends Tool {
       inputsGroupContainer.append(formElement);
 
       modalBodyContent.append(inputsGroupContainer);
-      modalBodyContent.append(mediaContainerElement);
 
       this.modal = new Interactive('modal',
         {
