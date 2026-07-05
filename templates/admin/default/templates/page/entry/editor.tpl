@@ -23,7 +23,7 @@
 
   function createEditor() {
     const editorContent = document.querySelector('#E3473967486_CONTENT');
-    const editorLocale = window.CMSCore?.locales.admin;
+    const editorLocale = window.CMSCore?.locales.nadvoTE;
     if (!editorContent) return;
 
     const nadvoTE = new NadvoTE(document.querySelector('#E3473967486'), {

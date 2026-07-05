@@ -33,7 +33,7 @@ export class Core {
   constructor() {
     this.searchParams = new URLParser();
     this.pages = {default: {}, admin: {}, install: {}};
-    this.locales = {base: {}, admin: {}, install: {}};
+    this.locales = {base: {}, admin: {}, install: {}, nadvoTE: {}};
     this.client = new Client(this);
     this.metrics = new Metrics(this);
     this.debugLevel = 1;
@@ -83,6 +83,12 @@ export class Core {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
       this.locales.admin = new Locale(data.outputData.locale.name, 'admin');
+
+      return fetch('/handler/locale/nadvoTE', {method: 'GET'});
+    }).then((response) => {
+      return (response.ok) ? response.json() : Promise.reject(response);
+    }).then((data) => {
+      this.locales.nadvoTE = new Locale(data.outputData.locale.name, 'admin');
     }, (rejectionReason) => {
       let interactiveNotification = new Interactive('notification');
       interactiveNotification.target.isPopup = true;

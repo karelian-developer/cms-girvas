@@ -38,7 +38,6 @@ export class NadvoTE {
 
     this.options.locale.getData().then((localeData) => {
       this.localeData = localeData;
-      console.log(this.localeData);
 
       this.initEditorToolbar();
 
@@ -58,7 +57,7 @@ export class NadvoTE {
 
       const copyright = this.createElementDiv();
       copyright.classList.add('nadvo-te__copyright');
-      copyright.innerHTML = 'Визуальный редактор &laquo;NadvoTE&raquo; разработан компанией &laquo;Карельский разработчик&raquo; специально для CMS &laquo;ГИРВАС&raquo;.';
+      copyright.innerText = this.localeData.NTE_COPYRIGHT;
       this.element.appendChild(copyright);
     });
   }
