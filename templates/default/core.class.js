@@ -24,5 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.CMSCore.addEventListener('ready', () => {
     window.CMSCore.templateCore = new Core(window.CMSCore);
     window.CMSCore.templateCore.init();
+
+    console.log(window.CMSCore.locales.base);
   });
 });
