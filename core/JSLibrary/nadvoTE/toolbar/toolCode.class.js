@@ -51,6 +51,7 @@ export class ToolCode extends Tool {
       textareaCodeElement.classList.add('form__textarea');
       textareaCodeElement.setAttribute('placeholder', 'echo \'Hello, world!\';');
       textareaCodeElement.setAttribute('name', 'code');
+      textareaCodeElement.rows = '20';
 
       const formElement = document.createElement('form');
       formElement.classList.add('form');
