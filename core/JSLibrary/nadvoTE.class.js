@@ -29,7 +29,7 @@ export class NadvoTE {
   }
 
   init() {
-    this.options.locale.then((localeData) => {
+    this.options.locale.getData().then((localeData) => {
       this.localeData = localeData;
       console.log(this.localeData);
 
