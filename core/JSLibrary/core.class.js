@@ -88,7 +88,7 @@ export class Core {
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
-      this.locales.nadvoTE = new Locale(data.outputData.locale.name, 'admin');
+      this.locales.nadvoTE = new Locale(data.outputData.locale.name, 'nadvoTE');
     }, (rejectionReason) => {
       let interactiveNotification = new Interactive('notification');
       interactiveNotification.target.isPopup = true;
