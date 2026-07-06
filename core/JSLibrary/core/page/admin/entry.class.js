@@ -438,27 +438,23 @@ export class PageEntry {
             });
           }
 
-          for (const [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-          }
-
-          // let request = new Interactive('request', {
-          //   method: searchParams.getPathPart(3) === null || this.statusCode === 404
-          //     ? 'PUT'
-          //     : 'PATCH',
-          //   url: '/handler/entry?localeMessage=' + window.CMSCore.locales.admin.name
-          // });
+          let request = new Interactive('request', {
+            method: searchParams.getPathPart(3) === null || this.statusCode === 404
+              ? 'PUT'
+              : 'PATCH',
+            url: '/handler/entry?localeMessage=' + window.CMSCore.locales.admin.name
+          });
   
-          // request.target.data = formData;
+          request.target.data = formData;
   
-          // request.target.send().then((data) => {
-          //   if (data.statusCode === 1 && searchParams.getPathPart(3) === null) {
-          //     if (data.outputData.hasOwnProperty('entry')) {
-          //       let entryData = data.outputData.entry;
-          //       window.location.href = '/admin/entry/' + entryData.id;
-          //     }
-          //   }
-          // });
+          request.target.send().then((data) => {
+            if (data.statusCode === 1 && searchParams.getPathPart(3) === null) {
+              if (data.outputData.hasOwnProperty('entry')) {
+                let entryData = data.outputData.entry;
+                window.location.href = '/admin/entry/' + entryData.id;
+              }
+            }
+          });
         } else {
           this.page.showPopupNotification(rejectionReason, 0);
         }
