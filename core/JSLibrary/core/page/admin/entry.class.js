@@ -438,7 +438,7 @@ export class PageEntry {
             });
           }
 
-          console.log(formData);
+          console.log(formData.getAll());
 
           // let request = new Interactive('request', {
           //   method: searchParams.getPathPart(3) === null || this.statusCode === 404
