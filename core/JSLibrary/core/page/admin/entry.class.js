@@ -438,7 +438,9 @@ export class PageEntry {
             });
           }
 
-          console.log(formData.getAll());
+          for (const [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+          }
 
           // let request = new Interactive('request', {
           //   method: searchParams.getPathPart(3) === null || this.statusCode === 404
