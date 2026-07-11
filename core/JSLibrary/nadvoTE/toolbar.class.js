@@ -86,7 +86,7 @@ export class Toolbar {
 
           const selectElement = toolChoices.target.element.querySelector('select');
           selectElement.addEventListener('change', (event) => {
-            toolChoices.target.setItemSelectedIndex = 0;
+            toolChoices.target.setItemSelectedIndex(0);
           });
         }
         
