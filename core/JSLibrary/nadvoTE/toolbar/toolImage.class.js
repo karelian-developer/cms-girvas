@@ -167,7 +167,11 @@ export class ToolImage extends Tool {
   initClickEvent() {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
-      const stringSelection = this.editor.getSelectionString();
+      const selection = this.editor.getSelectionString();
+
+      if (selection) {
+        this.editor.clearSelection();
+      }
 
       const modalBodyContent = document.createElement('div');
       modalBodyContent.classList.add('file-manager');
@@ -193,7 +197,7 @@ export class ToolImage extends Tool {
       inputImageLabelElement.setAttribute('placeholder', 'Подпись изображения');
       inputImageLabelElement.setAttribute('name', 'image_label');
       inputImageLabelElement.classList.add('form__input');
-      inputImageLabelElement.value = stringSelection;
+      inputImageLabelElement.value = selection;
 
       const inputImageLinkElement = document.createElement('input');
       inputImageLinkElement.classList.add('form__input');
