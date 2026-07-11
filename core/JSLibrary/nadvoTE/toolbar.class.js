@@ -49,8 +49,6 @@ export class Toolbar {
         optionItemElement.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
         
         let optionItemInteractiveElement;
-        let interactiveElement;
-
         if (optionItem.type == 'button') {
           const toolButton = new Interactive('button');
           toolButton.target.setLabel('Включить');
@@ -62,36 +60,41 @@ export class Toolbar {
         }
 
         if (optionItem.type == 'choices') {
-          interactiveElement = new Interactive('choices');
-          
-          let labelElement = document.createElement('span');
-          labelElement.innerText = this.editor.localeData.NTE_TOOL_HEADER_SELECT_LABEL;
-          labelElement.style.fontSize = '14px';
-          interactiveElement.target.addItem(labelElement.outerHTML, 0);
+          const toolChoices = new Interactive('choices');
+
+          let labelEmptyElement = document.createElement('span');
+          labelEmptyElement.innerText = this.editor.localeData.NTE_TOOL_HEADER_SELECT_LABEL;
+          labelEmptyElement.style.fontSize = '14px';
+          toolChoices.target.addItem(labelEmptyElement.outerHTML, 0);
 
           if (optionItem.name === 'headers') {
             [1, 2, 3, 4, 5, 6].forEach((headerLevelID, headerLevelIndex) => {
-              labelElement = document.createElement('span');
+              let labelElement = document.createElement('span');
               labelElement.innerText = this.editor.localeData.NTE_TOOL_HEADER_COMMON_LABEL + ' ' + headerLevelID;
               labelElement.style.fontSize = 18 - headerLevelIndex + 'px';
-              interactiveElement.target.addItem(labelElement.outerHTML, headerLevelID);
+              toolChoices.target.addItem(labelElement.outerHTML, headerLevelID);
             });
           }
 
-          interactiveElement.assembly();
+          toolChoices.assembly();
 
-          interactiveElement.target.element.classList.add('nadvo-te__toolbar-item');
-          interactiveElement.target.element.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
+          toolChoices.target.element.classList.add('nadvo-te__toolbar-item');
+          toolChoices.target.element.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
           
-          optionItemInteractiveElement = interactiveElement.target.element;
+          optionItemInteractiveElement = toolChoices.target.element;
           optionItemInteractiveElement.firstChild.classList.add('nadvo-te__toolbar-choices');
+
+          const selectElement = toolChoices.target.element.querySelector('select');
+          selectElement.addEventLinstener('change', (event) => {
+            toolChoices.target.setItemSelectedIndex = 0;
+          });
         }
         
         switch (optionItem.name) {
           case 'bold': this.tools.bold = new ToolBold(this.editor, optionItemInteractiveElement); break;
           case 'italic': this.tools.italic = new ToolItalic(this.editor, optionItemInteractiveElement); break;
           case 'underline': this.tools.underline = new ToolUnderline(this.editor, optionItemInteractiveElement); break;
-          case 'headers': this.tools.headers = new ToolHeaders(this.editor, interactiveElement ?? null); break;
+          case 'headers': this.tools.headers = new ToolHeaders(this.editor, optionItemInteractiveElement); break;
           case 'header1': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 1); break;
           case 'header2': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 2); break;
           case 'header3': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 3); break;
