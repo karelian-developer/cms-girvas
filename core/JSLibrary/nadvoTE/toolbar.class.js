@@ -49,6 +49,8 @@ export class Toolbar {
         optionItemElement.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
         
         let optionItemInteractiveElement;
+        let interactiveElement;
+
         if (optionItem.type == 'button') {
           const toolButton = new Interactive('button');
           toolButton.target.setLabel('Включить');
@@ -60,7 +62,7 @@ export class Toolbar {
         }
 
         if (optionItem.type == 'choices') {
-          const interactiveElement = new Interactive('choices');
+          interactiveElement = new Interactive('choices');
           
           let labelElement = document.createElement('span');
           labelElement.innerText = this.editor.localeData.NTE_TOOL_HEADER_SELECT_LABEL;
