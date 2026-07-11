@@ -85,7 +85,7 @@ export class Toolbar {
           optionItemInteractiveElement.firstChild.classList.add('nadvo-te__toolbar-choices');
 
           const selectElement = toolChoices.target.element.querySelector('select');
-          selectElement.addEventLinstener('change', (event) => {
+          selectElement.addEventListener('change', (event) => {
             toolChoices.target.setItemSelectedIndex = 0;
           });
         }
