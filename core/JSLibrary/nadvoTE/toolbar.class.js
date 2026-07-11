@@ -60,23 +60,28 @@ export class Toolbar {
         }
 
         if (optionItem.type == 'choices') {
-          const toolChoices = new Interactive('choices');
+          const interactiveElement = new Interactive('choices');
+          
+          let labelElement = document.createElement('span');
+          labelElement.innerText = this.editor.localeData.NTE_TOOL_HEADER_SELECT_LABEL;
+          labelElement.style.fontSize = '14px';
+          interactiveElement.target.addItem(labelElement.outerHTML, 0);
 
           if (optionItem.name === 'headers') {
             [1, 2, 3, 4, 5, 6].forEach((headerLevelID, headerLevelIndex) => {
-              let labelElement = document.createElement('span');
+              labelElement = document.createElement('span');
               labelElement.innerText = this.editor.localeData.NTE_TOOL_HEADER_COMMON_LABEL + ' ' + headerLevelID;
               labelElement.style.fontSize = 18 - headerLevelIndex + 'px';
-              toolChoices.target.addItem(labelElement.outerHTML, headerLevelID);
+              interactiveElement.target.addItem(labelElement.outerHTML, headerLevelID);
             });
           }
 
-          toolChoices.assembly();
+          interactiveElement.assembly();
 
-          toolChoices.target.element.classList.add('nadvo-te__toolbar-item');
-          toolChoices.target.element.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
+          interactiveElement.target.element.classList.add('nadvo-te__toolbar-item');
+          interactiveElement.target.element.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
           
-          optionItemInteractiveElement = toolChoices.target.element;
+          optionItemInteractiveElement = interactiveElement.target.element;
           optionItemInteractiveElement.firstChild.classList.add('nadvo-te__toolbar-choices');
         }
         
@@ -84,7 +89,7 @@ export class Toolbar {
           case 'bold': this.tools.bold = new ToolBold(this.editor, optionItemInteractiveElement); break;
           case 'italic': this.tools.italic = new ToolItalic(this.editor, optionItemInteractiveElement); break;
           case 'underline': this.tools.underline = new ToolUnderline(this.editor, optionItemInteractiveElement); break;
-          case 'headers': this.tools.headers = new ToolHeaders(this.editor, optionItemInteractiveElement); break;
+          case 'headers': this.tools.headers = new ToolHeaders(this.editor, interactiveElement ?? null); break;
           case 'header1': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 1); break;
           case 'header2': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 2); break;
           case 'header3': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 3); break;

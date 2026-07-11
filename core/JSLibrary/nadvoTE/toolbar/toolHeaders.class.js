@@ -18,12 +18,12 @@
 import {Tool} from './tool.class.js';
 
 export class ToolHeaders extends Tool {
-  constructor(editor, element) {
+  constructor(editor, interactiveElement) {
     super(editor, {
       name: 'headers',
       type: 'choices',
       iconPath: '',
-      element: element
+      interactiveElement: interactiveElement
     });
 
     this.initClickEvent();
@@ -33,7 +33,7 @@ export class ToolHeaders extends Tool {
     super.addChangeEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} selected!`);
 
-      const selectElement = this.element.querySelector('select');
+      const selectElement = this.interactiveElement.element.querySelector('select');
       const selection = this.editor.getSelectionString();
 
       if (selection) {
