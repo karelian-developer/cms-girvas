@@ -81,13 +81,17 @@ export class NadvoTE {
     }
   }
 
-  // Упрощённый метод получения выделения
-  getSelectionString() {
-    console.log('[NADVO TE] Get selection:', this.selection);
-    return this.selection;
+  clearSelection() {
+    this.selection = '';
+    console.log('[NADVO TE] Selection cleared');
   }
 
-  // Остальные методы без изменений...
+  getSelectionString() {
+    const selection = this.selection;
+    console.log('[NADVO TE] Get selection:', selection);
+    return selection;
+  }
+
   initEditorToolbar() {
     let toolbar = new Toolbar(this, this.options.toolbar);
     toolbar.init();
