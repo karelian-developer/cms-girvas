@@ -24,7 +24,13 @@ export class Tool {
     this.setName(data.name);
     this.setType(data.type);
     this.setIconPath(data.iconPath);
-    this.setElement(data.element);
+    this.setInteractiveElement(data.interactiveElement);
+
+    if (data.interactiveElement !== null) {
+      this.setElement(data.interactiveElement.element);
+    } else {
+      this.setElement(data.element);
+    }
 
     if (data.type === 'button') {
       this.setElementIcon(data.iconPath);
