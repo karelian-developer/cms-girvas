@@ -51,6 +51,10 @@ export class Tool {
     this.iconPath = value;
   }
 
+  setInteractiveElement(element) {
+    this.interactiveElement = element;
+  }
+
   setElement(element) {
     this.element = element;
   }
