@@ -36,7 +36,12 @@ export class ToolCode extends Tool {
   initClickEvent() {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
-      const stringSelection = this.editor.getSelectionString();
+      
+      const selection = this.editor.getSelectionString();
+
+      if (selection) {
+        this.editor.clearSelection();
+      }
 
       const modalBodyContent = document.createElement('div');
       modalBodyContent.classList.add('code-manager');
@@ -45,7 +50,7 @@ export class ToolCode extends Tool {
       inputLanguageLabelElement.setAttribute('placeholder', 'Язык программирования/командной строки');
       inputLanguageLabelElement.setAttribute('name', 'language_name');
       inputLanguageLabelElement.classList.add('form__input');
-      inputLanguageLabelElement.value = stringSelection;
+      inputLanguageLabelElement.value = selection;
 
       const textareaCodeElement = document.createElement('textarea');
       textareaCodeElement.classList.add('form__textarea');

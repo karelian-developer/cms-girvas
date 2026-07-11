@@ -32,9 +32,16 @@ export class ToolUnderline extends Tool {
   initClickEvent() {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
-      this.editor.textarea.replaceStringSelection(
-        '<u>' + this.editor.getSelectionString() + '</u>'
-      );
+      
+      const selection = this.editor.getSelectionString();
+      
+      if (selection) {
+        this.editor.textarea.replaceStringSelection(
+          '<u>' + this.editor.getSelectionString() + '</u>'
+        );
+        
+        this.editor.clearSelection();
+      }
     });
   }
 }

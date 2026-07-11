@@ -32,10 +32,17 @@ export class ToolHeaders extends Tool {
   initClickEvent() {
     super.addChangeEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} selected!`);
+
       const selectElement = this.element.querySelector('select');
-      this.editor.textarea.replaceStringSelection(
-        "\n\r" + '#'.repeat(selectElement.value) + ' ' + this.editor.getSelectionString() + "\n\r"
-      );
+      const selection = this.editor.getSelectionString();
+
+      if (selection) {
+        this.editor.textarea.replaceStringSelection(
+          "\n\r" + '#'.repeat(selectElement.value) + ' ' + selection + "\n\r"
+        );
+        
+        this.editor.clearSelection();
+      }
     });
   }
 }

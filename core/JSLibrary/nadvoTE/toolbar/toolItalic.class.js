@@ -32,9 +32,16 @@ export class ToolItalic extends Tool {
   initClickEvent() {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
-      this.editor.textarea.replaceStringSelection(
-        '*' + this.editor.getSelectionString() + '*'
-      );
+
+      const selection = this.editor.getSelectionString();
+      
+      if (selection) {
+        this.editor.textarea.replaceStringSelection(
+          '*' + selection + '*'
+        );
+        
+        this.editor.clearSelection();
+      }
     });
   }
 }

@@ -32,9 +32,16 @@ export class ToolQuote extends Tool {
   initClickEvent() {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
-      this.editor.textarea.replaceStringSelection(
-        "\n\r" + '> ' + this.editor.getSelectionString() + "\n\r"
-      );
+      
+      const selection = this.editor.getSelectionString();
+      
+      if (selection) {
+        this.editor.textarea.replaceStringSelection(
+          "\n\r" + '> ' + this.editor.getSelectionString() + "\n\r"
+        );
+        
+        this.editor.clearSelection();
+      }
     });
   }
 }
