@@ -29,6 +29,7 @@ import {DataSearcher} from './interactive/dataSearcher.class.js';
 export class Interactive {
   constructor(interactiveName, interactiveParams = {}) {
     this.id = this.generateUniqueID();
+    this.name = '';
 
     let data = {};
 
@@ -72,6 +73,14 @@ export class Interactive {
     }
   }
 
+  setName(value) {
+    this.name = value;
+  }
+
+  getName() {
+    return this.name;
+  }
+
   generateRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -95,6 +104,10 @@ export class Interactive {
   assembly() {
     this.target.assembly();
     this.target.element.setAttribute('cmsg-interactive-uid', this.id);
+
+    if (this.name !== '') {
+      this.target.element.setAttribute('cmsg-interactive-name', this.name);
+    }
     
     this.target.element.classList.add(`interactive`);
 

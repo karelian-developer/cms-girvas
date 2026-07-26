@@ -30,6 +30,10 @@ export class Modal {
     this.onCloseCallbackFunction = () => {};
   }
 
+  setWidth(value, units = 'px') {
+    this.width = value + units;
+  }
+
   show() {
     let elementWrapper = this.element.querySelector('.interactive__modal-wrapper');
     let interval = setInterval(() => {
@@ -156,7 +160,7 @@ export class Modal {
 
     let modalElement = document.createElement('div');
     modalElement.classList.add('interactive__modal');
-    modalElement.style.width = this.width + 'px';
+    modalElement.style.width = this.width;
 
     modalElement.appendChild(childrenElements.header);
 
