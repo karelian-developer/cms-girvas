@@ -55,7 +55,7 @@ class PageError implements InterfacePage
 
     switch ($errorCode) {
       case 404:
-        $this->errorTitle = $localeData['PAGE_ERROR_404_TITLE'];
+        $this->errorTitle = $localeData['PAGE_ERROR_404_TITLE'] ?? 'Error ' . $errorCode;
         $this->errorDescription = sprintf($localeData['PAGE_ERROR_404_DESCRIPTION'], strip_tags(urldecode($_SERVER['REQUEST_URI'])));
         break;
       case 500:
