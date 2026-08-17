@@ -63,7 +63,7 @@ if (defined('IS_NOT_HACKED')) {
   };
 
   if ($APISecretInput !== API_SECRET || empty(API_SECRET)) {
-    if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $CMSURLP->getPath(1) !== 'install') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $CMSURLP->getPath(1) !== 'install' && $CMSURLP->getPath(1) !== 'oauth') {
       $cookieToken = $_COOKIE['_grv_csrf'] ?? null;
       $headerToken = $normalizedHeaders['x-csrf-token'] ?? null;
 
@@ -75,7 +75,6 @@ if (defined('IS_NOT_HACKED')) {
           'message' => $handlerMessage,
           'statusCode' => $handlerStatusCode,
           'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
         exit;
