@@ -893,7 +893,22 @@ class NadvoParse
         $attrs = [];
         
         if (isset($matches[3]) && !empty($matches[3])) {
-          $attrs = $this->parseAttributes($matches[3]);
+          // Восстанавливаем кавычки из &quot; в "
+          $jsonString = html_entity_decode($matches[3], ENT_QUOTES, 'UTF-8');
+          
+          try {
+            $json = json_decode($jsonString, true);
+
+            if ($json && is_array($json)) {
+              foreach ($json as $key => $value) {
+                if ($this->isAllowedAttribute($key)) {
+                  $attrs[$key] = $value;
+                }
+              }
+            }
+          } catch (Exception $e) {
+            // Ошибка парсинга JSON
+          }
         }
         
         $attrString = $this->buildAttributeString($attrs);
