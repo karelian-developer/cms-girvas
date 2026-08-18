@@ -25,7 +25,7 @@ use \DOMDocument as DOMDocument;
 class NadvoParse
 {
   private const PATTERNS = [
-    'header' => '/^(#{1,6})\s(.+)/m',
+    'header' => '/^(#{1,6})\s+(.+?)(?:\s*\{([^{}]+)\})?\s*$/m',
     'bold' => '/\*\*(.+?)\*\*|__(.+?)__/s',
     'italic' => '/\*(.+?)\*/s',
     'underline' => '/\~\~(.+?)\~\~/s',
@@ -45,11 +45,46 @@ class NadvoParse
     'ul_item' => '/^([*+-])\s+(.+)/',
     'ol_item' => '/^(\d+)\.\s+(.+)/',
     'list_group' => '/^([*+-]|\d+\.)\s+.+(?:\n\1\s+.+)*/m',
-    'dangerous_tags' => '/<\?(?:php)?.*?\?>|<(script|iframe)[^>]*>.*?<\/\1>/is'
+    'dangerous_tags' => '/<\?(?:php)?.*?\?>|<(script|iframe)[^>]*>.*?<\/\1>/is',
+    'paragraph_with_attrs' => '/^(.*?)(?:\s*\{([^{}]+)\})?\s*$/s'
   ];
 
   private array $usedHeaderIds = [];
   private array $codeBlockPlaceholders = [];
+  private array $allowedSchemaOrgAttributes = [
+    // Основные атрибуты Schema.org
+    'itemprop', 'itemscope', 'itemtype', 'itemid', 'itemref',
+    
+    // Дополнительные атрибуты для микроразметки
+    'content', 'datetime', 'href', 'src', 'title', 'alt',
+    
+    // Атрибуты для RDFa (связанные со Schema.org)
+    'property', 'resource', 'typeof', 'about', 'datatype',
+    'rel', 'rev', 'vocab', 'prefix', 'inlist'
+  ];
+  
+  private array $allowedAttributes = [
+    'class', 'id', 'style', 'title', 'lang', 'dir', 'hidden',
+    'tabindex', 'accesskey', 'draggable', 'spellcheck', 'translate',
+    'role', 'aria-label', 'aria-labelledby', 'aria-describedby',
+    'aria-hidden', 'aria-expanded', 'aria-controls', 'aria-current',
+    'data-*', // разрешаем data-атрибуты
+    
+    // HTML5 структурные атрибуты
+    'slot', 'part', 'exportparts',
+    
+    // Атрибуты для доступности
+    'aria-atomic', 'aria-busy', 'aria-live', 'aria-relevant',
+    'aria-autocomplete', 'aria-checked', 'aria-disabled', 'aria-errormessage',
+    'aria-haspopup', 'aria-invalid', 'aria-label', 'aria-level',
+    'aria-modal', 'aria-multiline', 'aria-multiselectable', 'aria-orientation',
+    'aria-placeholder', 'aria-pressed', 'aria-readonly', 'aria-required',
+    'aria-selected', 'aria-sort', 'aria-valuemax', 'aria-valuemin',
+    'aria-valuenow', 'aria-valuetext',
+    
+    // Атрибуты для интернационализации
+    'xml:lang', 'xmlns'
+  ];
 
   public function __construct()
   {}
@@ -475,7 +510,7 @@ class NadvoParse
       // Если это блочный тег - закрываем параграф и выводим строку как есть
       if ($isBlockTag) {
         if (!empty($currentParagraph)) {
-          $html .= '<p>' . $currentParagraph . '</p>';
+          $html .= $this->wrapParagraph($currentParagraph);
           $currentParagraph = '';
         }
 
@@ -487,7 +522,7 @@ class NadvoParse
       if (str_starts_with($trimmedLine, '|')) {
         if (!$inTable) {
           if (!empty($currentParagraph)) {
-            $html .= '<p>' . $currentParagraph . '</p>';
+            $html .= $this->wrapParagraph($currentParagraph);
             $currentParagraph = '';
           }
 
@@ -506,25 +541,32 @@ class NadvoParse
         $inTable = false;
       }
       
-      // Обработка заголовков
-      if (preg_match('/^(#{1,6})\s+(.+)/', $line, $matches)) {
+      // Обработка заголовков с атрибутами
+      if (preg_match('/^(#{1,6})\s+(.+?)(?:\s*\{([^{}]+)\})?\s*$/', $line, $matches)) {
         if (!empty($currentParagraph)) {
-          $html .= '<p>' . $currentParagraph . '</p>';
+          $html .= $this->wrapParagraph($currentParagraph);
           $currentParagraph = '';
         }
 
         $level = strlen($matches[1]);
         $text = $matches[2];
         $id = $this->generateHeaderId($text);
-
-        $html .= '<h' . $level . ' id="' . $id . '">' . $text . '</h' . $level . '>' . "\n";
+        $attrs = $this->parseAttributes($matches[3] ?? '');
+        
+        // Добавляем id если его нет в атрибутах
+        if (!isset($attrs['id'])) {
+          $attrs['id'] = $id;
+        }
+        
+        $attrString = $this->buildAttributeString($attrs);
+        $html .= '<h' . $level . $attrString . '>' . $text . '</h' . $level . '>' . "\n";
         continue;
       }
       
       // Обработка пустых строк
       if (empty($trimmedLine)) {
         if (!empty($currentParagraph)) {
-          $html .= '<p>' . $currentParagraph . '</p>';
+          $html .= $this->wrapParagraph($currentParagraph);
           $currentParagraph = '';
         }
 
@@ -537,7 +579,7 @@ class NadvoParse
     
     // Закрываем последний параграф
     if (!empty($currentParagraph)) {
-      $html .= '<p>' . trim($currentParagraph) . '</p>';
+      $html .= $this->wrapParagraph($currentParagraph);
     }
     
     // Закрываем таблицу, если осталась
@@ -546,6 +588,116 @@ class NadvoParse
     }
     
     return $html;
+  }
+
+  /**
+   * Оборачивает текст в параграф с атрибутами
+   */
+  private function wrapParagraph(string $content) : string
+  {
+    $content = trim($content);
+    
+    // Проверяем наличие атрибутов в конце строки
+    if (preg_match('/^(.*?)(?:\s*\{([^{}]+)\})\s*$/s', $content, $matches)) {
+      $text = trim($matches[1]);
+      $attrs = $this->parseAttributes($matches[2]);
+      $attrString = $this->buildAttributeString($attrs);
+      
+      return '<p' . $attrString . '>' . $text . '</p>';
+    }
+    
+    return '<p>' . $content . '</p>';
+  }
+
+  /**
+   * Парсит строку атрибутов в массив
+   */
+  private function parseAttributes(string $attrString) : array
+  {
+    $attrs = [];
+    
+    if (empty($attrString)) {
+      return $attrs;
+    }
+    
+    // Пробуем распарсить как JSON
+    $jsonString = '{' . $attrString . '}';
+    $json = json_decode($jsonString, true);
+    
+    if ($json && is_array($json)) {
+      foreach ($json as $key => $value) {
+        if ($this->isAllowedAttribute($key)) {
+          $attrs[$key] = $value;
+        }
+      }
+    } else {
+      // Пробуем распарсить в формате key="value" или key=value
+      preg_match_all('/([a-zA-Z_][a-zA-Z0-9_-]*)\s*=\s*["\']([^"\']*)["\']/', $attrString, $matches, PREG_SET_ORDER);
+      
+      foreach ($matches as $match) {
+        $key = $match[1];
+        $value = $match[2];
+        
+        if ($this->isAllowedAttribute($key)) {
+          $attrs[$key] = $value;
+        }
+      }
+    }
+    
+    return $attrs;
+  }
+
+  /**
+   * Проверяет, разрешен ли атрибут
+   */
+  private function isAllowedAttribute(string $attrName) : bool
+  {
+    // Разрешаем Schema.org атрибуты
+    if (in_array($attrName, $this->allowedSchemaOrgAttributes)) {
+      return true;
+    }
+    
+    // Разрешаем стандартные атрибуты
+    if (in_array($attrName, $this->allowedAttributes)) {
+      return true;
+    }
+    
+    // Разрешаем data-атрибуты
+    if (str_starts_with($attrName, 'data-')) {
+      return true;
+    }
+    
+    // Разрешаем aria-атрибуты
+    if (str_starts_with($attrName, 'aria-')) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  /**
+   * Строит строку атрибутов для HTML-элемента
+   */
+  private function buildAttributeString(array $attrs) : string
+  {
+    if (empty($attrs)) {
+      return '';
+    }
+    
+    $attrString = '';
+    
+    foreach ($attrs as $key => $value) {
+      if (is_bool($value)) {
+        // Для булевых атрибутов
+        if ($value) {
+          $attrString .= ' ' . $key;
+        }
+      } else {
+        $attrString .= ' ' . $key . '="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '"';
+      }
+    }
+    
+    return $attrString;
   }
 
   private function parseInlineElements(string $html) : string
@@ -668,18 +820,7 @@ class NadvoParse
         $attrs = [];
         
         if (isset($matches[3])) {
-          try {
-            $json = json_decode('{' . $matches[3] . '}', true);
-            if ($json) {
-              foreach ($json as $key => $value) {
-                if (in_array($key, ['class', 'id'])) {
-                  $attrs[$key] = $value;
-                }
-              }
-            }
-          } catch (Exception $e) {
-            // ...
-          }
+          $attrs = $this->parseAttributes($matches[3]);
         }
 
         $document = new DOMDocument();
@@ -689,7 +830,13 @@ class NadvoParse
         $imageElement->setAttribute('alt', $caption);
 
         foreach($attrs as $attrName => $attrValue) {
-          $imageElement->setAttribute($attrName, $attrValue);
+          if (is_bool($attrValue)) {
+            if ($attrValue) {
+              $imageElement->setAttribute($attrName, '');
+            }
+          } else {
+            $imageElement->setAttribute($attrName, $attrValue);
+          }
         }
 
         $document->appendChild($imageElement);
@@ -707,18 +854,7 @@ class NadvoParse
         $attrs = [];
         
         if (isset($matches[3])) {
-          try {
-            $json = json_decode('{' . $matches[3] . '}', true);
-            if ($json) {
-              foreach ($json as $key => $value) {
-                if (in_array($key, ['class', 'id'])) {
-                  $attrs[$key] = $value;
-                }
-              }
-            }
-          } catch (Exception $e) {
-            // ...
-          }
+          $attrs = $this->parseAttributes($matches[3]);
         }
 
         $document = new DOMDocument();
@@ -730,7 +866,13 @@ class NadvoParse
         $imageElement->setAttribute('alt', $caption);
 
         foreach($attrs as $attrName => $attrValue) {
-          $figureElement->setAttribute($attrName, $attrValue);
+          if (is_bool($attrValue)) {
+            if ($attrValue) {
+              $figureElement->setAttribute($attrName, '');
+            }
+          } else {
+            $figureElement->setAttribute($attrName, $attrValue);
+          }
         }
 
         $figureElement->appendChild($imageElement);
@@ -751,25 +893,10 @@ class NadvoParse
         $attrs = [];
         
         if (isset($matches[3]) && !empty($matches[3])) {
-          // Восстанавливаем кавычки из &quot; в "
-          $jsonString = html_entity_decode($matches[3], ENT_QUOTES, 'UTF-8');
-          
-          try {
-            $json = json_decode($jsonString, true);
-
-            if ($json && is_array($json)) {
-              foreach ($json as $key => $value) {
-                if (in_array($key, ['class', 'id', 'target', 'rel', 'title'])) {
-                  $attrs[] = $key . '="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '"';
-                }
-              }
-            }
-          } catch (Exception $e) {
-            // Ошибка парсинга JSON
-          }
+          $attrs = $this->parseAttributes($matches[3]);
         }
         
-        $attrString = !empty($attrs) ? ' ' . implode(' ', $attrs) : '';
+        $attrString = $this->buildAttributeString($attrs);
         return '<a href="' . htmlspecialchars($href, ENT_QUOTES, 'UTF-8') . '"' . $attrString . '>' . $text . '</a>';
       },
       $html
@@ -824,7 +951,7 @@ class NadvoParse
     // Не трогаем уже существующие ссылки и изображения
     $protected = [];
     $markdown = preg_replace_callback(
-      '/!?\[.*?\]\(\s*\S+\s*\)/',
+      '/!?\[.*?\]\(\s*\S+\s*\)(?:\s*\{[^{}]+\})?/',
       function($matches) use (&$protected) {
         $placeholder = '%%PROTECTED_' . count($protected) . '%%';
         $protected[$placeholder] = $matches[0];

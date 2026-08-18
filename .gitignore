@@ -1,4 +1,7 @@
 oauth_test.php
+oauth_setup.php
+oauth_http_test.sh
+oauth_create_session.php
 INSTALLED
 sqlExecute.php
 /cron/database.config.php
