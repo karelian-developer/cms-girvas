@@ -30,7 +30,7 @@ export class PageEntry {
   }
 
   initNadvoTE() {
-    createEditor();
+    this.createEditor();
   }
 
   createEditor() {
@@ -247,7 +247,7 @@ export class PageEntry {
   }
 
   init() {
-    initNadvoTE();
+    this.initNadvoTE();
 
     const searchParams = new URLParser();
     const elementForm = document.querySelector('[data-element="main-form"]');
