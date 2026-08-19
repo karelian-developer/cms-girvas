@@ -443,35 +443,6 @@ class NadvoParse
     return implode("\n", $result);
   }
 
-  private function parseCodeBlocks(string $markdown) : string
-  {
-    $markdown = preg_replace_callback(
-      self::PATTERNS['code_block'],
-      function($matches) {
-        $language = trim($matches[1]);
-        $code = trim($matches[2]);
-        
-        if ($language) {
-          return '<pre><code class="language-' . $language . '">' . $code . '</code></pre>';
-        } else {
-          return '<pre><code>' . $code . '</code></pre>';
-        }
-      },
-      $markdown
-    );
-
-    $markdown = preg_replace_callback(
-      self::PATTERNS['inline_code'],
-      function($matches) {
-        $code = trim($matches[1]);
-        return '<code>' . $code . '</code>';
-      },
-      $markdown
-    );
-
-    return $markdown;
-  }
-
   private function parseBlocks(string $markdown) : string
   {
     $lines = explode("\n", $markdown);
@@ -482,17 +453,14 @@ class NadvoParse
 
     // Список тегов, которые не должны оборачиваться в параграфы
     $blockTags = [
-        'pre', '/pre', 'blockquote', '/blockquote',
-        'ul', '/ul', 'ol', '/ol', 'li', '/li',
-        'figure', '/figure', 'figcaption', '/figcaption',
-        'table', '/table', 'thead', '/thead', 'tbody', '/tbody',
-        'tr', '/tr', 'th', '/th', 'td', '/td',
-        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-        '/h1', '/h2', '/h3', '/h4', '/h5', '/h6'
+      'pre', '/pre', 'blockquote', '/blockquote',
+      'ul', '/ul', 'ol', '/ol', 'li', '/li',
+      'figure', '/figure', 'figcaption', '/figcaption',
+      'table', '/table', 'thead', '/thead', 'tbody', '/tbody',
+      'tr', '/tr', 'th', '/th', 'td', '/td',
+      'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      '/h1', '/h2', '/h3', '/h4', '/h5', '/h6'
     ];
-    
-    // Инлайн-теги, которые могут быть внутри строки
-    $inlineTags = ['a', 'strong', 'em', 'u', 'code', 'img', 'video', 'iframe'];
 
     foreach ($lines as $line) {
       $trimmedLine = trim($line);
@@ -551,7 +519,12 @@ class NadvoParse
         $level = strlen($matches[1]);
         $text = $matches[2];
         $id = $this->generateHeaderId($text);
-        $attrs = $this->parseAttributes($matches[3] ?? '');
+        $attrs = [];
+        
+        // Проверяем, есть ли атрибуты и не являются ли они шаблонной переменной
+        if (isset($matches[3]) && !$this->isTemplateVariable($matches[3])) {
+          $attrs = $this->parseAttributes($matches[3]);
+        }
         
         // Добавляем id если его нет в атрибутах
         if (!isset($attrs['id'])) {
@@ -600,13 +573,54 @@ class NadvoParse
     // Проверяем наличие атрибутов в конце строки
     if (preg_match('/^(.*?)(?:\s*\{([^{}]+)\})\s*$/s', $content, $matches)) {
       $text = trim($matches[1]);
-      $attrs = $this->parseAttributes($matches[2]);
-      $attrString = $this->buildAttributeString($attrs);
+      $attrString = trim($matches[2]);
       
-      return '<p' . $attrString . '>' . $text . '</p>';
+      // Проверяем, является ли содержимое фигурных скобок атрибутами
+      // Если это шаблонная переменная - оставляем как есть
+      if (!$this->isTemplateVariable($attrString)) {
+        $attrs = $this->parseAttributes($attrString);
+        
+        // Если атрибуты найдены - применяем их
+        if (!empty($attrs)) {
+          $attrStringHtml = $this->buildAttributeString($attrs);
+          return '<p' . $attrStringHtml . '>' . $text . '</p>';
+        }
+      }
     }
     
     return '<p>' . $content . '</p>';
+  }
+
+  /**
+   * Проверяет, является ли строка шаблонной переменной
+   * 
+   * Поддерживаемые форматы:
+   * - {NAME} - только заглавные буквы
+   * - {name} - только строчные буквы  
+   * - {NAME_NAME} - заглавные с подчёркиванием
+   * - {name_name} - строчные с подчёркиванием
+   * - {Name_Name} - смешанный регистр с подчёркиванием
+   * - {NAME123} - с цифрами
+   * - {name_123} - строчные с цифрами и подчёркиванием
+   */
+  private function isTemplateVariable(string $str) : bool
+  {
+    $str = trim($str);
+    
+    // Проверяем, что строка не пустая
+    if (empty($str)) {
+      return false;
+    }
+    
+    // Проверяем, что строка состоит только из букв, цифр и подчёркиваний
+    if (preg_match('/^[A-Za-z0-9_]+$/', $str)) {
+      // Дополнительная проверка: не должна содержать двоеточий, кавычек, равенств
+      if (!preg_match('/[:="\']/', $str)) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 
   /**
@@ -618,6 +632,11 @@ class NadvoParse
     
     if (empty($attrString)) {
       return $attrs;
+    }
+    
+    // Проверяем, является ли строка шаблонной переменной
+    if ($this->isTemplateVariable($attrString)) {
+      return $attrs; // Это шаблонная переменная, не атрибуты
     }
     
     // Пробуем распарсить как JSON
@@ -632,7 +651,7 @@ class NadvoParse
       }
     } else {
       // Пробуем распарсить в формате key="value" или key=value
-      preg_match_all('/([a-zA-Z_][a-zA-Z0-9_-]*)\s*=\s*["\']([^"\']*)["\']/', $attrString, $matches, PREG_SET_ORDER);
+      preg_match_all('/([a-zA-Z_][a-zA-Z0-9_:.-]*)\s*=\s*["\']([^"\']*)["\']/', $attrString, $matches, PREG_SET_ORDER);
       
       foreach ($matches as $match) {
         $key = $match[1];
@@ -939,14 +958,14 @@ class NadvoParse
     $text = trim($text, '-');
     
     if (empty($text)) {
-        $text = 'heading-' . substr(md5($text), 0, 8);
+      $text = 'heading-' . substr(md5($text), 0, 8);
     }
     
     $original = $text;
     $counter = 1;
     
     while (in_array($text, $this->usedHeaderIds, true)) {
-        $text = $original . '-' . $counter++;
+      $text = $original . '-' . $counter++;
     }
     
     $this->usedHeaderIds[] = $text;
@@ -963,6 +982,18 @@ class NadvoParse
    */
   private function parseAutoLinks(string $markdown) : string
   {
+    // Защищаем шаблонные переменные
+    $templateVars = [];
+    $markdown = preg_replace_callback(
+      '/\{[A-Za-z_][A-Za-z0-9_]*\}/',
+      function($matches) use (&$templateVars) {
+        $placeholder = '%%TEMPLATE_VAR_' . count($templateVars) . '%%';
+        $templateVars[$placeholder] = $matches[0];
+        return $placeholder;
+      },
+      $markdown
+    );
+    
     // Не трогаем уже существующие ссылки и изображения
     $protected = [];
     $markdown = preg_replace_callback(
@@ -984,6 +1015,11 @@ class NadvoParse
 
     // Возвращаем защищённые фрагменты на место
     foreach ($protected as $placeholder => $value) {
+      $markdown = str_replace($placeholder, $value, $markdown);
+    }
+    
+    // Возвращаем шаблонные переменные на место
+    foreach ($templateVars as $placeholder => $value) {
       $markdown = str_replace($placeholder, $value, $markdown);
     }
 
