@@ -15,6 +15,7 @@
 
 'use strict';
 
+import {NadvoTE} from '/core/JSLibrary/nadvoTE.class.js';
 import {Interactive} from "../../../interactive.class.js";
 import {URLParser} from "../../../urlParser.class.js";
 import {Utils} from "../../../utils.class.js";
