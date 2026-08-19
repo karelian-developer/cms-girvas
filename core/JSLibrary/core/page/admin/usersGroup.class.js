@@ -30,20 +30,13 @@ export class PageUsersGroup {
     let searchParams = new URLParser(), locales;
     const elementForm = document.querySelector('[data-element="main-form"]');
 
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
+    this.page.core.locales.admin.getData().then((localeData) => {
       const interactiveChoicesLocales = new Interactive('choices');
 
       const urlInputElement = document.querySelector('[data-element="input-name"]');
       const usersGroupTitleInputElement = document.querySelector('[data-element="input-title"]');
 
-      locales.forEach((locale, localeIndex) => {
+      this.page.core.locales.list.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
         let localeIconURL = locale.iconURL;
         let localeName = locale.name;
@@ -135,7 +128,7 @@ export class PageUsersGroup {
 
       let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
-        locales.forEach((locale, localeIndex) => {
+        this.page.core.locales.list.forEach((locale, localeIndex) => {
           if (locale.name === event.target.value) {
             usersGroupTitleInputElement.setAttribute('name', 'user_group_title_' + locale.iso639_2);
 

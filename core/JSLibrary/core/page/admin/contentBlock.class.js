@@ -35,20 +35,13 @@ export class PageContentBlock {
     const interactiveLocaleChoices = new Interactive('choices');
     const interactiveTypesChoices = new Interactive('choices');
     
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
+    this.page.core.locales.admin.getData().then((localeData) => {
       const contentTextareaElement = document.querySelector('[data-element="input-content"]');
       const descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
       const titleInputElement = document.querySelector('[data-element="input-title"]');
       const nameInputElement = document.querySelector('[data-element="input-name"]');
 
-      locales.forEach((locale, localeIndex) => {
+      this.page.core.locales.list.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
         let localeIconURL = locale.iconURL;
         let localeName = locale.name;
@@ -68,7 +61,7 @@ export class PageContentBlock {
         interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, localeName);
       });
 
-      locales.forEach((locale, localeIndex) => {
+      this.page.core.locales.list.forEach((locale, localeIndex) => {
         if (locale.name === window.CMSCore.locales.admin.name) {
           interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
         }
@@ -104,7 +97,7 @@ export class PageContentBlock {
 
       let interactiveChoicesSelectElement = interactiveHeaderContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
-        locales.forEach((locale, localeIndex) => {
+        this.page.core.locales.list.forEach((locale, localeIndex) => {
           if (locale.name === event.target.value) {
             contentTextareaElement.setAttribute('name', 'content_block_content_' + locale.iso639_2);
             descriptionTextareaElement.setAttribute('name', 'content_block_description_' + locale.iso639_2);

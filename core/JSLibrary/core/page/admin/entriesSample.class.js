@@ -35,19 +35,12 @@ export class PageEntriesSample {
     const interactiveCategoriesChoices = new Interactive('choices');
     const interactiveSortTypeChoices = new Interactive('choices');
 
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
+    this.page.core.locales.admin.getData().then((localeData) => {
       let urlInputElement = document.querySelector('[data-element="input-name"]');
       let titleInputElement = document.querySelector('[data-element="input-title"]');
       let descriptionTextareaElement = document.querySelector('[data-element="input-description"]');
 
-      locales.forEach((locale, localeIndex) => {
+      this.page.core.locales.list.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
         let localeIconURL = locale.iconURL;
         let localeName = locale.name;
@@ -67,7 +60,7 @@ export class PageEntriesSample {
         interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, localeName);
       });
 
-      locales.forEach((locale, localeIndex) => {
+      this.page.core.locales.list.forEach((locale, localeIndex) => {
         if (locale.name === window.CMSCore.locales.admin.name) {
           interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
         }
@@ -235,7 +228,7 @@ export class PageEntriesSample {
         let entryTitleInputElement = document.querySelector('[data-element="input-title"]');
         let entryDescriptionTextareaElement = document.querySelector('[data-element="input-description"]');
         
-        locales.forEach((locale, localeIndex) => {
+        this.page.core.locales.list.forEach((locale, localeIndex) => {
           if (locale.name == event.target.value) {
             entryTitleInputElement.setAttribute('name', 'entries_sample_title_' + locale.iso639_2);
             entryDescriptionTextareaElement.setAttribute('name', 'entries_sample_description_' + locale.iso639_2);
