@@ -27,6 +27,41 @@ export class PagePageStatic {
     this.page = page;
   }
 
+  initNadvoTE() {
+    this.createEditor();
+  }
+
+  createEditor() {
+    const editorContent = document.querySelector('#E3473967486_CONTENT');
+    const editorLocale = window.CMSCore?.locales.nadvoTE;
+    if (!editorContent) return;
+
+    const nadvoTE = new NadvoTE(document.querySelector('#E3473967486'), {
+      'locale': editorLocale,
+      'handler': '/handler/utils/nadvoparse',
+      'toolbar': [
+        {'name': 'bold', 'type': 'button'},
+        {'name': 'italic', 'type': 'button'},
+        {'name': 'underline', 'type': 'button'},
+        {'name': 'headers', 'type': 'choices'},
+        {'name': 'link', 'type': 'button'},
+        {'name': 'image', 'type': 'button'},
+        {'name': 'quote', 'type': 'button'},
+        {'name': 'code', 'type': 'button'},
+        {'name': 'preview', 'type': 'button'},
+        {'name': 'source', 'type': 'button'},
+      ]
+    });
+    nadvoTE.init();
+    nadvoTE.textarea.element.classList.add('textarea');
+    nadvoTE.textarea.element.classList.add('form__textarea');
+    nadvoTE.textarea.element.value = editorContent.innerHTML;
+    nadvoTE.textarea.element.setAttribute('name', 'entry_content_rus');
+    nadvoTE.textarea.element.setAttribute('data-element', 'input-content');
+
+    editorContent.remove();
+  }
+
   SEOAnalyze(data) {
     data.title = data.title ?? '';
     data.SEOTitle = data.SEOTitle ?? '';
@@ -210,19 +245,14 @@ export class PagePageStatic {
   }
 
   init() {
+    this.initNadvoTE();
+
     let searchParams = new URLParser(), locales;
 
     const elementForm = document.querySelector('[data-element="main-form"]');
     const interactiveLocaleChoices = new Interactive('choices');
     
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
+    this.page.core.locales.admin.getData().then((localeData) => {
       this.analyzer = new SEOAnalyzer(localeData);
 
       const urlInputElement = document.querySelector('[data-element="input-url"]');
@@ -233,7 +263,7 @@ export class PagePageStatic {
       const keywordsInputElement = document.querySelector('[data-element="input-keywords"]');
       const contentTextareaElement = document.querySelector('[data-element="input-content"]');
 
-      locales.forEach((locale, localeIndex) => {
+      this.page.core.locales.list.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
         let localeIconURL = locale.iconURL;
         let localeName = locale.name;
@@ -253,7 +283,7 @@ export class PagePageStatic {
         interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, localeName);
       });
 
-      locales.forEach((locale, localeIndex) => {
+      this.page.core.locales.list.forEach((locale, localeIndex) => {
         if (locale.name === window.CMSCore.locales.admin.name) {
           interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
         }
@@ -337,7 +367,7 @@ export class PagePageStatic {
 
       let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
-        locales.forEach((locale, localeIndex) => {
+        this.page.core.locales.list.forEach((locale, localeIndex) => {
           if (locale.name === event.target.value) {
             contentTextareaElement.setAttribute('name', 'page_static_content_' + locale.iso639_2);
             descriptionTextareaElement.setAttribute('name', 'page_static_description_' + locale.iso639_2);
