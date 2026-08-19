@@ -15,6 +15,7 @@
 
 'use strict';
 
+import {NadvoTE} from '/core/JSLibrary/nadvoTE.class.js';
 import {Interactive} from "../../../interactive.class.js";
 import {URLParser} from "../../../urlParser.class.js";
 import {Utils} from "../../../utils.class.js";
@@ -26,6 +27,41 @@ export class PageEntry {
     this.analyzer = null;
     this.page = page;
     this.statusCode = this.page.getPageStatusCode();
+  }
+
+  initNadvoTE() {
+    createEditor();
+  }
+
+  createEditor() {
+    const editorContent = document.querySelector('#E3473967486_CONTENT');
+    const editorLocale = window.CMSCore?.locales.nadvoTE;
+    if (!editorContent) return;
+
+    const nadvoTE = new NadvoTE(document.querySelector('#E3473967486'), {
+      'locale': editorLocale,
+      'handler': '/handler/utils/nadvoparse',
+      'toolbar': [
+        {'name': 'bold', 'type': 'button'},
+        {'name': 'italic', 'type': 'button'},
+        {'name': 'underline', 'type': 'button'},
+        {'name': 'headers', 'type': 'choices'},
+        {'name': 'link', 'type': 'button'},
+        {'name': 'image', 'type': 'button'},
+        {'name': 'quote', 'type': 'button'},
+        {'name': 'code', 'type': 'button'},
+        {'name': 'preview', 'type': 'button'},
+        {'name': 'source', 'type': 'button'},
+      ]
+    });
+    nadvoTE.init();
+    nadvoTE.textarea.element.classList.add('textarea');
+    nadvoTE.textarea.element.classList.add('form__textarea');
+    nadvoTE.textarea.element.value = editorContent.innerHTML;
+    nadvoTE.textarea.element.setAttribute('name', 'entry_content_rus');
+    nadvoTE.textarea.element.setAttribute('data-element', 'input-content');
+
+    editorContent.remove();
   }
 
   SEOAnalyze(data) {
@@ -211,6 +247,8 @@ export class PageEntry {
   }
 
   init() {
+    initNadvoTE();
+
     const searchParams = new URLParser();
     const elementForm = document.querySelector('[data-element="main-form"]');
 
