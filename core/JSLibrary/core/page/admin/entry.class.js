@@ -230,7 +230,7 @@ export class PageEntry {
 
       console.log(contentTextareaElement);
 
-      Object.keys(this.page.core.locales).forEach((locale, localeIndex) => {
+      Object.keys(this.page.core.locales.list).forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
         let localeIconURL = locale.iconURL;
         let localeName = locale.name;
