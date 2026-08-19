@@ -236,6 +236,8 @@ export class PageEntry {
       const keywordsInputElement = document.querySelector('[data-element="input-keywords"]');
       const urlInputElement = document.querySelector('[data-element="input-url"]');
 
+      console.log(contentTextareaElement);
+
       locales.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
         let localeIconURL = locale.iconURL;
