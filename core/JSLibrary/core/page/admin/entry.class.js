@@ -230,7 +230,7 @@ export class PageEntry {
 
       console.log(contentTextareaElement);
 
-      this.page.core.locales.forEach((locale, localeIndex) => {
+      Object.keys(this.page.core.locales).forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
         let localeIconURL = locale.iconURL;
         let localeName = locale.name;
@@ -250,7 +250,7 @@ export class PageEntry {
         interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, localeName);
       });
 
-      this.page.core.locales.forEach((locale, localeIndex) => {
+      Object.keys(this.page.core.locales).forEach((locale, localeIndex) => {
         if (locale.name === this.page.core.locales.admin.name) {
           interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
         }
@@ -334,7 +334,7 @@ export class PageEntry {
 
       let interactiveChoicesSelectElement = interactiveHeaderContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
-        this.page.core.locales.forEach((locale, localeIndex) => {
+        Object.keys(this.page.core.locales).forEach((locale, localeIndex) => {
           if (locale.name === event.target.value) {
             contentTextareaElement.setAttribute('name', 'entry_content_' + locale.iso639_2);
             descriptionTextareaElement.setAttribute('name', 'entry_description_' + locale.iso639_2);
