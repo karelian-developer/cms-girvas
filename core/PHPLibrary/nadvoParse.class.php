@@ -46,7 +46,8 @@ class NadvoParse
     'ol_item' => '/^(\d+)\.\s+(.+)/',
     'list_group' => '/^([*+-]|\d+\.)\s+.+(?:\n\1\s+.+)*/m',
     'dangerous_tags' => '/<\?(?:php)?.*?\?>|<(script|iframe)[^>]*>.*?<\/\1>/is',
-    'paragraph_with_attrs' => '/^(.*?)(?:\s*\{([^{}]+)\})?\s*$/s'
+    'paragraph_with_attrs' => '/^(.*?)(?:\s*\{([^{}]+)\})?\s*$/s',
+    'hr' => '/^(\s*)(-{3,}|\*{3,}|_{3,})(?:\s*\{([^{}]+)\})?\s*$/m'
   ];
 
   private array $usedHeaderIds = [];
@@ -459,11 +460,29 @@ class NadvoParse
       'table', '/table', 'thead', '/thead', 'tbody', '/tbody',
       'tr', '/tr', 'th', '/th', 'td', '/td',
       'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      '/h1', '/h2', '/h3', '/h4', '/h5', '/h6'
+      '/h1', '/h2', '/h3', '/h4', '/h5', '/h6',
+      'hr', '/hr'
     ];
 
     foreach ($lines as $line) {
       $trimmedLine = trim($line);
+      
+      // Обработка горизонтальной линии
+      if (preg_match(self::PATTERNS['hr'], $trimmedLine, $hrMatches)) {
+        if (!empty($currentParagraph)) {
+          $html .= $this->wrapParagraph($currentParagraph);
+          $currentParagraph = '';
+        }
+        
+        $hrAttrs = [];
+        if (isset($hrMatches[3]) && !$this->isTemplateVariable($hrMatches[3])) {
+          $hrAttrs = $this->parseAttributes($hrMatches[3]);
+        }
+        
+        $attrString = $this->buildAttributeString($hrAttrs);
+        $html .= '<hr' . $attrString . '>' . "\n";
+        continue;
+      }
       
       // Проверяем, начинается ли строка с блочного тега
       $isBlockTag = false;
