@@ -123,7 +123,7 @@ class NadvoParse
     ':100:' => '💯',
     ':copyright:' => '©️',
     ':registered:' => '®️',
-    ':tm:' => '™️'
+    ':tm:' => '™️',
 
     // Флаги стран
     ':flag_ru:' => '🇷🇺',
