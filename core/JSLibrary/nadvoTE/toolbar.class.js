@@ -27,6 +27,7 @@ import {ToolSource} from './toolbar/toolSource.class.js';
 import {ToolLink} from './toolbar/toolLink.class.js';
 import {ToolImage} from './toolbar/toolImage.class.js';
 import {ToolCode} from './toolbar/toolCode.class.js';
+import {ToolEmoji} from './toolbar/toolEmoji.class.js';
 
 export class Toolbar {
   constructor(editor, options = []) {
@@ -107,6 +108,7 @@ export class Toolbar {
           case 'source': this.tools.source = new ToolSource(this.editor, optionItemInteractiveElement); break;
           case 'link': this.tools.link = new ToolLink(this.editor, optionItemInteractiveElement); break;
           case 'image': this.tools.image = new ToolImage(this.editor, optionItemInteractiveElement); break;
+          case 'emoji': this.tools.emoji = new ToolEmoji(this.editor, optionItemInteractiveElement); this.tools.emoji.init(); break;
         }
 
         toolbarElement.appendChild(optionItemElement);

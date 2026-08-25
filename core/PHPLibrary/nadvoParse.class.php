@@ -24,6 +24,108 @@ use \DOMDocument as DOMDocument;
 
 class NadvoParse
 {
+  private const EMOJI_MAP = [
+    // Улыбки и эмоции
+    ':smile:' => '😊',
+    ':grin:' => '😁',
+    ':joy:' => '😂',
+    ':rofl:' => '🤣',
+    ':wink:' => '😉',
+    ':blush:' => '😊',
+    ':heart_eyes:' => '😍',
+    ':kissing_heart:' => '😘',
+    ':thinking:' => '🤔',
+    ':neutral_face:' => '😐',
+    ':expressionless:' => '😑',
+    ':smirk:' => '😏',
+    ':unamused:' => '😒',
+    ':roll_eyes:' => '🙄',
+    ':relieved:' => '😌',
+    ':pensive:' => '😔',
+    ':sleepy:' => '😪',
+    ':sleeping:' => '😴',
+    ':mask:' => '😷',
+    
+    // Жесты
+    ':thumbsup:' => '👍',
+    ':thumbsdown:' => '👎',
+    ':clap:' => '👏',
+    ':wave:' => '👋',
+    ':ok_hand:' => '👌',
+    ':pray:' => '🙏',
+    ':muscle:' => '💪',
+    ':point_up:' => '☝️',
+    ':point_down:' => '👇',
+    ':point_left:' => '👈',
+    ':point_right:' => '👉',
+    
+    // Сердца и чувства
+    ':heart:' => '❤️',
+    ':orange_heart:' => '🧡',
+    ':yellow_heart:' => '💛',
+    ':green_heart:' => '💚',
+    ':blue_heart:' => '💙',
+    ':purple_heart:' => '💜',
+    ':broken_heart:' => '💔',
+    ':sparkling_heart:' => '💖',
+    ':two_hearts:' => '💕',
+    ':heartbeat:' => '💓',
+    ':heartpulse:' => '💗',
+    
+    // Животные
+    ':cat:' => '🐱',
+    ':dog:' => '🐶',
+    ':mouse:' => '🐭',
+    ':hamster:' => '🐹',
+    ':rabbit:' => '🐰',
+    ':fox:' => '🦊',
+    ':bear:' => '🐻',
+    ':panda:' => '🐼',
+    ':koala:' => '🐨',
+    ':tiger:' => '🐯',
+    ':lion:' => '🦁',
+    ':unicorn:' => '🦄',
+    
+    // Еда и напитки
+    ':apple:' => '🍎',
+    ':pizza:' => '🍕',
+    ':hamburger:' => '🍔',
+    ':fries:' => '🍟',
+    ':coffee:' => '☕',
+    ':tea:' => '🍵',
+    ':beer:' => '🍺',
+    ':wine:' => '🍷',
+    ':cake:' => '🍰',
+    ':icecream:' => '🍦',
+    ':cookie:' => '🍪',
+    ':chocolate:' => '🍫',
+    
+    // Активности и праздники
+    ':tada:' => '🎉',
+    ':confetti:' => '🎊',
+    ':balloon:' => '🎈',
+    ':gift:' => '🎁',
+    ':star:' => '⭐',
+    ':sparkles:' => '✨',
+    ':fire:' => '🔥',
+    ':zap:' => '⚡',
+    ':rainbow:' => '🌈',
+    ':sunny:' => '☀️',
+    ':moon:' => '🌙',
+    ':cloud:' => '☁️',
+    
+    // Символы
+    ':check:' => '✅',
+    ':x:' => '❌',
+    ':warning:' => '⚠️',
+    ':question:' => '❓',
+    ':exclamation:' => '❗',
+    ':100:' => '💯',
+    ':copyright:' => '©️',
+    ':registered:' => '®️',
+    ':tm:' => '™️'
+  ];
+
   private const PATTERNS = [
     'header' => '/^(#{1,6})\s+(.+?)(?:\s*\{([^{}]+)\})?\s*$/m',
     'bold' => '/\*\*(.+?)\*\*|__(.+?)__/s',
@@ -47,7 +149,8 @@ class NadvoParse
     'list_group' => '/^([*+-]|\d+\.)\s+.+(?:\n\1\s+.+)*/m',
     'dangerous_tags' => '/<\?(?:php)?.*?\?>|<(script|iframe)[^>]*>.*?<\/\1>/is',
     'paragraph_with_attrs' => '/^(.*?)(?:\s*\{([^{}]+)\})?\s*$/s',
-    'hr' => '/^(\s*)(-{3,}|\*{3,}|_{3,})(?:\s*\{([^{}]+)\})?\s*$/m'
+    'hr' => '/^(\s*)(-{3,}|\*{3,}|_{3,})(?:\s*\{([^{}]+)\})?\s*$/m',
+    'emoji' => '/:([a-z0-9_]+):/',
   ];
 
   private array $usedHeaderIds = [];
@@ -90,10 +193,38 @@ class NadvoParse
   public function __construct()
   {}
 
+  /**
+   * Обработка эмодзи
+   * 
+   * @param string $markdown
+   * @return string
+   */
+  private function parseEmoji(string $markdown) : string
+  {
+    return preg_replace_callback(
+      self::PATTERNS['emoji'],
+      function($matches) {
+        $emojiCode = ':' . $matches[1] . ':';
+        
+        // Проверяем, есть ли такой эмодзи в карте
+        if (isset(self::EMOJI_MAP[$emojiCode])) {
+          return self::EMOJI_MAP[$emojiCode];
+        }
+        
+        // Если эмодзи не найден, оставляем как есть
+        return $matches[0];
+      },
+      $markdown
+    );
+  }
+  
+  /**
+   * Обновленный метод parse
+   */
   public function parse(string $markdown) : string
   {
     $this->usedHeaderIds = [];
-
+    
     $markdown = $this->sanitizeInput($markdown);
     
     // Сначала защищаем блоки кода
@@ -108,6 +239,7 @@ class NadvoParse
     $markdown = $this->parseLists($markdown);
     $markdown = $this->parseTables($markdown);
     $markdown = $this->parseInlineElements($markdown);
+    $markdown = $this->parseEmoji($markdown); // Добавляем обработку эмодзи
     $markdown = $this->parseBlocks($markdown);
     
     // Возвращаем блоки кода на место
