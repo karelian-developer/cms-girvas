@@ -1,3 +1,5 @@
+// core/JSLibrary/core/page/global.class.js
+
 /**
  * CMS «ГИРВАС»
  * 
@@ -32,6 +34,9 @@ export class PageGlobal {
    */
   init() {
     let locales;
+    
+    // Инициализация копирования кода
+    this.initCodeCopy();
 
     /** @var {HTMLElement} */
     let navigationBurgerElement = document.querySelector('[role="navagation-burger"]');
@@ -276,5 +281,238 @@ export class PageGlobal {
 
       interactiveNotification.target.show();
     });
+  }
+
+  /**
+   * Инициализация копирования кода
+   * 
+   * Находит все <code> и <pre> на странице и добавляет кнопку копирования
+   */
+  initCodeCopy() {
+    // Обрабатываем <pre> блоки
+    const preBlocks = document.querySelectorAll('pre');
+    preBlocks.forEach((preBlock) => {
+      this.addCopyButtonToPre(preBlock);
+    });
+
+    // Обрабатываем <code> элементы, которые не внутри <pre>
+    const codeElements = document.querySelectorAll('code');
+    codeElements.forEach((codeElement) => {
+      // Пропускаем code внутри pre (уже обработаны)
+      if (!codeElement.closest('pre')) {
+        this.addCopyButtonToCode(codeElement);
+      }
+    });
+  }
+
+  /**
+   * Добавление кнопки копирования к <pre> блоку
+   */
+  addCopyButtonToPre(preBlock) {
+    // Пропускаем, если кнопка уже добавлена
+    if (preBlock.querySelector('.code-copy-button')) {
+      return;
+    }
+
+    // Создаем обертку, если нужно
+    let wrapper = preBlock.parentElement;
+    if (!wrapper.classList.contains('code-block-wrapper')) {
+      wrapper = document.createElement('div');
+      wrapper.classList.add('code-block-wrapper');
+      preBlock.parentNode.insertBefore(wrapper, preBlock);
+      wrapper.appendChild(preBlock);
+    }
+
+    // Создаем кнопку копирования
+    const copyButton = this.createCopyButton();
+    
+    // Добавляем кнопку в обертку
+    wrapper.appendChild(copyButton);
+
+    // Обработчик клика
+    copyButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      const codeText = preBlock.textContent;
+      this.copyTextToClipboard(codeText, copyButton);
+    });
+
+    // Показываем кнопку при наведении
+    wrapper.addEventListener('mouseenter', () => {
+      copyButton.classList.add('code-copy-button_visible');
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+      copyButton.classList.remove('code-copy-button_visible');
+    });
+  }
+
+  /**
+   * Добавление кнопки копирования к <code> элементу (инлайн)
+   */
+  addCopyButtonToCode(codeElement) {
+    // Пропускаем, если кнопка уже добавлена
+    if (codeElement.querySelector('.code-copy-button')) {
+      return;
+    }
+
+    // Создаем обертку
+    const wrapper = document.createElement('span');
+    wrapper.classList.add('inline-code-wrapper');
+    codeElement.parentNode.insertBefore(wrapper, codeElement);
+    wrapper.appendChild(codeElement);
+
+    // Создаем кнопку копирования
+    const copyButton = this.createCopyButton(true);
+    
+    // Добавляем кнопку в обертку
+    wrapper.appendChild(copyButton);
+
+    // Обработчик клика
+    copyButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      const codeText = codeElement.textContent;
+      this.copyTextToClipboard(codeText, copyButton);
+    });
+
+    // Показываем кнопку при наведении
+    wrapper.addEventListener('mouseenter', () => {
+      copyButton.classList.add('code-copy-button_visible');
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+      copyButton.classList.remove('code-copy-button_visible');
+    });
+  }
+
+  /**
+   * Создание кнопки копирования
+   */
+  createCopyButton(isInline = false) {
+    const button = document.createElement('button');
+    button.setAttribute('type', 'button');
+    button.setAttribute('aria-label', 'Копировать код');
+    button.classList.add('code-copy-button');
+    
+    if (isInline) {
+      button.classList.add('code-copy-button_inline');
+    }
+
+    // SVG иконка копирования
+    button.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+      <span>Копировать</span>
+    `;
+
+    return button;
+  }
+
+  /**
+   * Копирование текста в буфер обмена
+   */
+  async copyTextToClipboard(text, button) {
+    try {
+      // Пытаемся использовать современный API
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        this.showCopySuccess(button);
+      } else {
+        // Fallback для старых браузеров
+        this.copyTextToClipboardFallback(text, button);
+      }
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      this.copyTextToClipboardFallback(text, button);
+    }
+  }
+
+  /**
+   * Fallback метод копирования для старых браузеров
+   */
+  copyTextToClipboardFallback(text, button) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.top = '0';
+    textarea.style.left = '0';
+    textarea.style.opacity = '0';
+    textarea.style.pointerEvents = 'none';
+
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        this.showCopySuccess(button);
+      } else {
+        this.showCopyError(button);
+      }
+    } catch (error) {
+      console.error('Fallback failed:', error);
+      this.showCopyError(button);
+    } finally {
+      document.body.removeChild(textarea);
+    }
+  }
+
+  /**
+   * Показ успешного копирования
+   */
+  showCopySuccess(button) {
+    const label = button.querySelector('span');
+    
+    if (label) {
+      label.textContent = 'Скопировано!';
+    }
+    
+    button.classList.add('code-copy-button_success');
+    
+    // Меняем иконку на галочку
+    const svg = button.querySelector('svg');
+    if (svg) {
+      svg.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>';
+    }
+
+    // Возвращаем исходное состояние через 2 секунды
+    setTimeout(() => {
+      if (label) {
+        label.textContent = 'Копировать';
+      }
+      
+      button.classList.remove('code-copy-button_success');
+      
+      if (svg) {
+        svg.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+      }
+    }, 2000);
+  }
+
+  /**
+   * Показ ошибки копирования
+   */
+  showCopyError(button) {
+    const label = button.querySelector('span');
+    
+    if (label) {
+      label.textContent = 'Ошибка!';
+    }
+    
+    button.classList.add('code-copy-button_error');
+
+    setTimeout(() => {
+      if (label) {
+        label.textContent = 'Копировать';
+      }
+      
+      button.classList.remove('code-copy-button_error');
+    }, 2000);
   }
 }
