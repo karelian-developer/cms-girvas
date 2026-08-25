@@ -1284,9 +1284,6 @@ class NadvoParse
       $html
     );
 
-    // Жирный + курсив ***текст***
-    $html = preg_replace(self::PATTERNS['bold_italic'], '<strong><em>$1</em></strong>', $html);
-    
     // Жирный **текст**
     $html = preg_replace(self::PATTERNS['bold'], '<strong>$1</strong>', $html);
     
