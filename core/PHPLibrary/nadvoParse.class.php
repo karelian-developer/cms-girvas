@@ -437,6 +437,8 @@ class NadvoParse
     $lines = explode("\n", $markdown);
     $result = [];
     $quoteStack = [];
+    $inQuote = false;
+    $quoteContent = '';
     
     foreach ($lines as $line) {
       if (preg_match(self::PATTERNS['quote'], $line, $matches)) {
@@ -455,9 +457,29 @@ class NadvoParse
           $quoteStack[] = true;
         }
         
-        // Добавляем содержимое
+        // Добавляем содержимое без пустого параграфа
         if (!empty($content)) {
-          $result[] = '<p>' . $content . '</p>';
+          // Проверяем наличие атрибутов для параграфа внутри цитаты
+          if (preg_match('/^(.*?)(?:\s*\{([^{}]+)\})\s*$/', $content, $pAttrsMatches)) {
+            $pContent = trim($pAttrsMatches[1]);
+            $pAttrsString = trim($pAttrsMatches[2]);
+            
+            // Проверяем, что это не шаблонная переменная
+            if (!$this->isTemplateVariable($pAttrsString)) {
+              $pAttrs = $this->parseAttributes($pAttrsString);
+              
+              if (!empty($pAttrs)) {
+                $pAttrString = $this->buildAttributeString($pAttrs);
+                $result[] = '<p' . $pAttrString . '>' . $pContent . '</p>';
+              } else {
+                $result[] = '<p>' . $content . '</p>';
+              }
+            } else {
+              $result[] = '<p>' . $content . '</p>';
+            }
+          } else {
+            $result[] = '<p>' . $content . '</p>';
+          }
         }
       } else {
         // Закрываем все цитаты для обычных строк
@@ -466,8 +488,10 @@ class NadvoParse
           array_pop($quoteStack);
         }
         
-        // Добавляем саму строку
-        $result[] = $line;
+        // Добавляем саму строку, только если она не пустая
+        if (trim($line) !== '') {
+          $result[] = $line;
+        }
       }
     }
     
