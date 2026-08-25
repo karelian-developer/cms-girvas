@@ -206,7 +206,8 @@ class NadvoParse
   private const PATTERNS = [
     'header' => '/^(#{1,6})\s+(.+?)(?:\s*\{([^{}]+)\})?\s*$/m',
     'bold' => '/\*\*(.+?)\*\*|__(.+?)__/s',
-    'italic' => '/(?<!\*)\*([^*]+)\*(?!\*)/s',
+    'italic' => '/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/s',
+    'bold_italic' => '/\*\*\*(.+?)\*\*\*/s',
     'underline' => '/\~\~(.+?)\~\~/s',
     'link' => '/\[([^\]]+)\]\(([^)]+)\)(\{[^{}]+\})?/s',
     'image' => '/!\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
@@ -1283,13 +1284,16 @@ class NadvoParse
       $html
     );
 
-    // Сначала курсив
-    $html = preg_replace(self::PATTERNS['italic'], '<em>$1</em>', $html);
-
-    // Потом жирный
+    // Жирный + курсив ***текст***
+    $html = preg_replace(self::PATTERNS['bold_italic'], '<strong><em>$1</em></strong>', $html);
+    
+    // Жирный **текст**
     $html = preg_replace(self::PATTERNS['bold'], '<strong>$1</strong>', $html);
-
-    // Подчёркнутый
+    
+    // Курсив *текст*
+    $html = preg_replace(self::PATTERNS['italic'], '<em>$1</em>', $html);
+    
+    // Подчёркнутый ~~текст~~
     $html = preg_replace(self::PATTERNS['underline'], '<u>$1</u>', $html);
     
     return $html;
