@@ -503,6 +503,23 @@ class NadvoParse
     foreach ($lines as $line) {
       $trimmedLine = trim($line);
       
+      // Проверяем, является ли строка плейсхолдером блока кода
+      $isCodePlaceholder = false;
+      if (preg_match('/^%%(CODE_BLOCK|INLINE_CODE)_\d+%%$/', $trimmedLine)) {
+        $isCodePlaceholder = true;
+      }
+      
+      // Если это плейсхолдер кода - выводим как есть, без оборачивания в параграф
+      if ($isCodePlaceholder) {
+        if (!empty($currentParagraph)) {
+          $html .= $this->wrapParagraph($currentParagraph);
+          $currentParagraph = '';
+        }
+        
+        $html .= $trimmedLine . "\n";
+        continue;
+      }
+      
       // Обработка пустых строк
       if (empty($trimmedLine)) {
         // Закрываем текущий параграф, только если он не пустой
