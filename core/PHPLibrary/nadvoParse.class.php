@@ -208,7 +208,7 @@ class NadvoParse
     'bold' => '/\*\*(.+?)\*\*|__(.+?)__/s',
     'italic' => '/\*(.+?)\*/s',
     'underline' => '/\~\~(.+?)\~\~/s',
-    'link' => '/\[(.*?)\]\(\s*([^)\s]+)\s*\)(\{[^{}]+\})?/s',
+    'link' => '/\[([^\]]+)\]\(([^)]+)\)(\{[^{}]+\})?/s',
     'image' => '/!\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'figure' => '/![f]\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'video' => '/!\[video\]\((.+?)\)/',
@@ -1341,6 +1341,18 @@ class NadvoParse
       $markdown
     );
     
+    // Защищаем сноски [1], [2], [3] и т.д.
+    $footnoteRefs = [];
+    $markdown = preg_replace_callback(
+      '/\[(\d+)\]/',
+      function($matches) use (&$footnoteRefs) {
+        $placeholder = '%%FOOTNOTE_REF_' . count($footnoteRefs) . '%%';
+        $footnoteRefs[$placeholder] = $matches[0];
+        return $placeholder;
+      },
+      $markdown
+    );
+    
     // Не трогаем уже существующие ссылки и изображения
     $protected = [];
     $markdown = preg_replace_callback(
@@ -1362,6 +1374,11 @@ class NadvoParse
 
     // Возвращаем защищённые фрагменты на место
     foreach ($protected as $placeholder => $value) {
+      $markdown = str_replace($placeholder, $value, $markdown);
+    }
+    
+    // Возвращаем сноски на место
+    foreach ($footnoteRefs as $placeholder => $value) {
       $markdown = str_replace($placeholder, $value, $markdown);
     }
     
