@@ -487,6 +487,7 @@ class NadvoParse
     $html = '';
     $currentParagraph = '';
     $inTable = false;
+    $inBlockquote = false;
     $tableBuffer = [];
 
     // Список тегов, которые не должны оборачиваться в параграфы
@@ -518,6 +519,38 @@ class NadvoParse
         }
         
         $html .= $trimmedLine . "\n";
+        continue;
+      }
+      
+      // Проверяем, открывается ли blockquote
+      if (str_starts_with($trimmedLine, '<blockquote')) {
+        $inBlockquote = true;
+        
+        if (!empty($currentParagraph)) {
+          $html .= $this->wrapParagraph($currentParagraph);
+          $currentParagraph = '';
+        }
+        
+        $html .= $line . "\n";
+        continue;
+      }
+      
+      // Проверяем, закрывается ли blockquote
+      if (str_starts_with($trimmedLine, '</blockquote>')) {
+        $inBlockquote = false;
+        
+        if (!empty($currentParagraph)) {
+          $html .= $this->wrapParagraph($currentParagraph);
+          $currentParagraph = '';
+        }
+        
+        $html .= $line . "\n";
+        continue;
+      }
+      
+      // Если мы внутри blockquote - выводим строку как есть
+      if ($inBlockquote) {
+        $html .= $line . "\n";
         continue;
       }
       
@@ -606,8 +639,8 @@ class NadvoParse
       $currentParagraph .= $line . ' ';
     }
     
-    // Закрываем последний параграф
-    if (!empty($currentParagraph)) {
+    // Закрываем последний параграф, только если он не пустой
+    if (!empty($currentParagraph) && trim($currentParagraph) !== '') {
       $html .= $this->wrapParagraph($currentParagraph);
     }
     
