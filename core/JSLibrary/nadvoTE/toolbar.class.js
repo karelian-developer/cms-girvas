@@ -108,7 +108,7 @@ export class Toolbar {
           case 'source': this.tools.source = new ToolSource(this.editor, optionItemInteractiveElement); break;
           case 'link': this.tools.link = new ToolLink(this.editor, optionItemInteractiveElement); break;
           case 'image': this.tools.image = new ToolImage(this.editor, optionItemInteractiveElement); break;
-          case 'emoji': this.tools.emoji = new ToolEmoji(this.editor, optionItemInteractiveElement); this.tools.emoji.init(); break;
+          case 'emoji': this.tools.emoji = new ToolEmoji(this.editor, optionItemInteractiveElement); break;
         }
 
         toolbarElement.appendChild(optionItemElement);
