@@ -206,7 +206,7 @@ class NadvoParse
   private const PATTERNS = [
     'header' => '/^(#{1,6})\s+(.+?)(?:\s*\{([^{}]+)\})?\s*$/m',
     'bold' => '/\*\*(.+?)\*\*|__(.+?)__/s',
-    'italic' => '/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/s',
+    'italic' => '/(?<!\*)\*([^*]+)\*(?!\*)/s',
     'underline' => '/\~\~(.+?)\~\~/s',
     'link' => '/\[([^\]]+)\]\(([^)]+)\)(\{[^{}]+\})?/s',
     'image' => '/!\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
@@ -1283,8 +1283,13 @@ class NadvoParse
       $html
     );
 
-    $html = preg_replace(self::PATTERNS['bold'], '<strong>$1</strong>', $html);
+    // Сначала курсив
     $html = preg_replace(self::PATTERNS['italic'], '<em>$1</em>', $html);
+
+    // Потом жирный
+    $html = preg_replace(self::PATTERNS['bold'], '<strong>$1</strong>', $html);
+
+    // Подчёркнутый
     $html = preg_replace(self::PATTERNS['underline'], '<u>$1</u>', $html);
     
     return $html;
