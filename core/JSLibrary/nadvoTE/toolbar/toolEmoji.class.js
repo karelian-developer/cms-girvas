@@ -6,6 +6,19 @@ import {Tool} from './tool.class.js';
 import {Interactive} from '../../interactive.class.js';
 
 export class ToolEmoji extends Tool {
+  // Категории для отображения
+  static CATEGORIES = [
+    { id: 'all', name: 'Все', icon: '🌟' },
+    { id: 'emotions', name: 'Эмоции', icon: '😊' },
+    { id: 'gestures', name: 'Жесты', icon: '👍' },
+    { id: 'hearts', name: 'Сердца', icon: '❤️' },
+    { id: 'animals', name: 'Животные', icon: '🐱' },
+    { id: 'food', name: 'Еда', icon: '🍕' },
+    { id: 'activities', name: 'Активности', icon: '🎉' },
+    { id: 'symbols', name: 'Символы', icon: '✅' },
+    { id: 'flags', name: 'Флаги', icon: '🇷🇺' },
+  ];
+  
   // Стандартный набор эмодзи
   static EMOJIS = [
     // Улыбки и эмоции
@@ -124,8 +137,6 @@ export class ToolEmoji extends Tool {
     { code: ':flag_lt:', emoji: '🇱🇹', name: 'Литва', category: 'flags' },
     { code: ':flag_lv:', emoji: '🇱🇻', name: 'Латвия', category: 'flags' },
     { code: ':flag_ee:', emoji: '🇪🇪', name: 'Эстония', category: 'flags' },
-    
-    // Европейские флаги
     { code: ':flag_gb:', emoji: '🇬🇧', name: 'Великобритания', category: 'flags' },
     { code: ':flag_de:', emoji: '🇩🇪', name: 'Германия', category: 'flags' },
     { code: ':flag_fr:', emoji: '🇫🇷', name: 'Франция', category: 'flags' },
@@ -148,8 +159,6 @@ export class ToolEmoji extends Tool {
     { code: ':flag_dk:', emoji: '🇩🇰', name: 'Дания', category: 'flags' },
     { code: ':flag_fi:', emoji: '🇫🇮', name: 'Финляндия', category: 'flags' },
     { code: ':flag_ie:', emoji: '🇮🇪', name: 'Ирландия', category: 'flags' },
-    
-    // Азиатские флаги
     { code: ':flag_cn:', emoji: '🇨🇳', name: 'Китай', category: 'flags' },
     { code: ':flag_jp:', emoji: '🇯🇵', name: 'Япония', category: 'flags' },
     { code: ':flag_kr:', emoji: '🇰🇷', name: 'Южная Корея', category: 'flags' },
@@ -162,8 +171,6 @@ export class ToolEmoji extends Tool {
     { code: ':flag_ph:', emoji: '🇵🇭', name: 'Филиппины', category: 'flags' },
     { code: ':flag_sg:', emoji: '🇸🇬', name: 'Сингапур', category: 'flags' },
     { code: ':flag_mn:', emoji: '🇲🇳', name: 'Монголия', category: 'flags' },
-    
-    // Американские флаги
     { code: ':flag_us:', emoji: '🇺🇸', name: 'США', category: 'flags' },
     { code: ':flag_ca:', emoji: '🇨🇦', name: 'Канада', category: 'flags' },
     { code: ':flag_mx:', emoji: '🇲🇽', name: 'Мексика', category: 'flags' },
@@ -173,8 +180,6 @@ export class ToolEmoji extends Tool {
     { code: ':flag_co:', emoji: '🇨🇴', name: 'Колумбия', category: 'flags' },
     { code: ':flag_pe:', emoji: '🇵🇪', name: 'Перу', category: 'flags' },
     { code: ':flag_cu:', emoji: '🇨🇺', name: 'Куба', category: 'flags' },
-    
-    // Африканские и ближневосточные флаги
     { code: ':flag_eg:', emoji: '🇪🇬', name: 'Египет', category: 'flags' },
     { code: ':flag_za:', emoji: '🇿🇦', name: 'ЮАР', category: 'flags' },
     { code: ':flag_tr:', emoji: '🇹🇷', name: 'Турция', category: 'flags' },
@@ -183,12 +188,8 @@ export class ToolEmoji extends Tool {
     { code: ':flag_ae:', emoji: '🇦🇪', name: 'ОАЭ', category: 'flags' },
     { code: ':flag_ir:', emoji: '🇮🇷', name: 'Иран', category: 'flags' },
     { code: ':flag_iq:', emoji: '🇮🇶', name: 'Ирак', category: 'flags' },
-    
-    // Океания
     { code: ':flag_au:', emoji: '🇦🇺', name: 'Австралия', category: 'flags' },
     { code: ':flag_nz:', emoji: '🇳🇿', name: 'Новая Зеландия', category: 'flags' },
-    
-    // Организации и специальные флаги
     { code: ':flag_eu:', emoji: '🇪🇺', name: 'Евросоюз', category: 'flags' },
     { code: ':flag_un:', emoji: '🇺🇳', name: 'ООН', category: 'flags' },
     { code: ':rainbow_flag:', emoji: '🏳️‍🌈', name: 'Радужный флаг', category: 'flags' },
@@ -196,19 +197,6 @@ export class ToolEmoji extends Tool {
     { code: ':black_flag:', emoji: '🏴', name: 'Черный флаг', category: 'flags' },
     { code: ':pirate_flag:', emoji: '🏴‍☠️', name: 'Пиратский флаг', category: 'flags' },
     { code: ':checkered_flag:', emoji: '🏁', name: 'Клетчатый флаг', category: 'flags' },
-  ];
-  
-  // Категории для отображения
-  static CATEGORIES = [
-    { id: 'all', name: 'Все', icon: '🌟' },
-    { id: 'emotions', name: 'Эмоции', icon: '😊' },
-    { id: 'gestures', name: 'Жесты', icon: '👍' },
-    { id: 'hearts', name: 'Сердца', icon: '❤️' },
-    { id: 'animals', name: 'Животные', icon: '🐱' },
-    { id: 'food', name: 'Еда', icon: '🍕' },
-    { id: 'activities', name: 'Активности', icon: '🎉' },
-    { id: 'symbols', name: 'Символы', icon: '✅' },
-    { id: 'flags', name: 'Флаги', icon: '🇷🇺' },
   ];
   
   constructor(editor, element) {
@@ -239,40 +227,42 @@ export class ToolEmoji extends Tool {
     // Создаем контейнер с плиткой эмодзи
     const emojiGrid = document.createElement('div');
     emojiGrid.classList.add('nadvo-te__emoji-grid');
-    emojiGrid.style.cssText = `
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      gap: 8px;
-      max-height: 400px;
-      overflow-y: auto;
-      padding: 10px;
-    `;
     
     // Создаем поиск
     const searchInput = document.createElement('input');
     searchInput.setAttribute('type', 'text');
     searchInput.setAttribute('placeholder', 'Поиск эмодзи...');
     searchInput.classList.add('form__input');
-    searchInput.style.cssText = `
-      width: 100%;
-      margin-bottom: 10px;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
-    `;
+    searchInput.classList.add('nadvo-te__emoji-search');
     
-    // Создаем панель категорий
-    const categoriesPanel = document.createElement('div');
-    categoriesPanel.classList.add('nadvo-te__emoji-categories');
-    categoriesPanel.style.cssText = `
-      display: flex;
-      gap: 5px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-    `;
+    // Создаем переключатели категорий через компонент Tabs
+    const interactiveTabs = new Interactive('tabs', {
+      type: 'pills',
+      orientation: 'horizontal'
+    });
     
+    // Добавляем категории
+    ToolEmoji.CATEGORIES.forEach((category) => {
+      interactiveTabs.target.addItem(
+        `${category.name}`,
+        category.id,
+        {
+          icon: category.icon,
+          title: category.name
+        }
+      );
+    });
+    
+    // Устанавливаем обработчик изменения категории
     let currentCategory = 'all';
+    
+    interactiveTabs.target.onChange((value) => {
+      currentCategory = value;
+      displayEmojis(currentCategory, searchInput.value);
+    });
+    
+    // Собираем переключатели
+    interactiveTabs.assembly();
     
     // Функция для отображения эмодзи
     const displayEmojis = (category = 'all', searchTerm = '') => {
@@ -293,43 +283,6 @@ export class ToolEmoji extends Tool {
       });
     };
     
-    // Создаем кнопки категорий
-    ToolEmoji.CATEGORIES.forEach((category) => {
-      const categoryButton = document.createElement('button');
-      categoryButton.setAttribute('type', 'button');
-      categoryButton.classList.add('nadvo-te__emoji-category-button');
-      categoryButton.style.cssText = `
-        padding: 5px 10px;
-        border: 1px solid #ddd;
-        border-radius: 15px;
-        background: ${category.id === currentCategory ? '#e0e0e0' : 'white'};
-        cursor: pointer;
-        font-size: 14px;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      `;
-      
-      categoryButton.innerHTML = `${category.icon} ${category.name}`;
-      categoryButton.setAttribute('title', category.name);
-      
-      categoryButton.addEventListener('click', () => {
-        currentCategory = category.id;
-        
-        // Обновляем стили кнопок
-        categoriesPanel.querySelectorAll('.nadvo-te__emoji-category-button').forEach(btn => {
-          btn.style.background = 'white';
-        });
-        categoryButton.style.background = '#e0e0e0';
-        
-        // Обновляем отображение
-        displayEmojis(currentCategory, searchInput.value);
-      });
-      
-      categoriesPanel.appendChild(categoryButton);
-    });
-    
     // Обработка поиска
     searchInput.addEventListener('input', () => {
       displayEmojis(currentCategory, searchInput.value);
@@ -340,8 +293,9 @@ export class ToolEmoji extends Tool {
     
     // Собираем содержимое модального окна
     const contentContainer = document.createElement('div');
+    contentContainer.classList.add('nadvo-te__emoji-container');
     contentContainer.appendChild(searchInput);
-    contentContainer.appendChild(categoriesPanel);
+    contentContainer.appendChild(interactiveTabs.target.element);
     contentContainer.appendChild(emojiGrid);
     
     // Создаем модальное окно
@@ -378,35 +332,8 @@ export class ToolEmoji extends Tool {
     emojiButton.setAttribute('type', 'button');
     emojiButton.setAttribute('title', `${emojiData.name} (${emojiData.code})`);
     emojiButton.classList.add('nadvo-te__emoji-button');
-    emojiButton.style.cssText = `
-      font-size: 24px;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      background: white;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 40px;
-      min-height: 40px;
-    `;
     
     emojiButton.textContent = emojiData.emoji;
-    
-    // Добавляем hover эффект
-    emojiButton.addEventListener('mouseenter', () => {
-      emojiButton.style.backgroundColor = '#f0f0f0';
-      emojiButton.style.borderColor = '#999';
-      emojiButton.style.transform = 'scale(1.1)';
-    });
-    
-    emojiButton.addEventListener('mouseleave', () => {
-      emojiButton.style.backgroundColor = 'white';
-      emojiButton.style.borderColor = '#ddd';
-      emojiButton.style.transform = 'scale(1)';
-    });
     
     // Обработка клика
     emojiButton.addEventListener('click', (event) => {
