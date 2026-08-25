@@ -227,6 +227,8 @@ class NadvoParse
     'dangerous_tags' => '/<\?(?:php)?.*?\?>|<(script|iframe)[^>]*>.*?<\/\1>/is',
     'paragraph_with_attrs' => '/^(.*?)(?:\s*\{([^{}]+)\})?\s*$/s',
     'hr' => '/^(\s*)(-{3,}|\*{3,}|_{3,})(?:\s*\{([^{}]+)\})?\s*$/m',
+    'footnote_ref' => '/\[\^(\d+)\]/',
+    'footnote_def' => '/^\[\^(\d+)\]:\s+(.+)$/m',
     'emoji' => '/:([a-z0-9_]+):/',
   ];
 
@@ -294,6 +296,52 @@ class NadvoParse
       $markdown
     );
   }
+
+  private function parseFootnotes(string $markdown) : string
+  {
+    $footnotes = [];
+    
+    // Собираем определения сносок
+    $markdown = preg_replace_callback(
+      self::PATTERNS['footnote_def'],
+      function($matches) use (&$footnotes) {
+        $id = $matches[1];
+        $content = trim($matches[2]);
+        $footnotes[$id] = $content;
+        return '';
+      },
+      $markdown
+    );
+    
+    // Заменяем ссылки на сноски
+    $markdown = preg_replace_callback(
+      self::PATTERNS['footnote_ref'],
+      function($matches) use ($footnotes) {
+        $id = $matches[1];
+        
+        if (isset($footnotes[$id])) {
+          return '<sup id="fnref:' . $id . '"><a href="#fn:' . $id . '">' . $id . '</a></sup>';
+        }
+        
+        return $matches[0];
+      },
+      $markdown
+    );
+    
+    // Добавляем блок сносок в конец
+    if (!empty($footnotes)) {
+      $html = '<div class="footnotes"><ol>';
+      
+      foreach ($footnotes as $id => $content) {
+        $html .= '<li id="fn:' . $id . '">' . $content . ' <a href="#fnref:' . $id . '" class="footnote-back">↩</a></li>';
+      }
+      
+      $html .= '</ol></div>';
+      $markdown .= "\n\n" . $html;
+    }
+    
+    return $markdown;
+  }
   
   /**
    * Обновленный метод parse
@@ -316,6 +364,7 @@ class NadvoParse
     $markdown = $this->parseLists($markdown);
     $markdown = $this->parseTables($markdown);
     $markdown = $this->parseInlineElements($markdown);
+    $markdown = $this->parseFootnotes($markdown);
     $markdown = $this->parseEmoji($markdown); // Добавляем обработку эмодзи
     $markdown = $this->parseBlocks($markdown);
     
