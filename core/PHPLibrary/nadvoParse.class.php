@@ -99,6 +99,9 @@ class NadvoParse
     // Сначала защищаем блоки кода
     $markdown = $this->protectCodeBlocks($markdown);
     
+    // Обрабатываем горизонтальные линии ДО списков и инлайн-элементов
+    $markdown = $this->parseHr($markdown);
+    
     // Затем обрабатываем остальной Markdown
     $markdown = $this->parseAutoLinks($markdown);
     $markdown = $this->parseQuotes($markdown);
@@ -111,6 +114,39 @@ class NadvoParse
     $markdown = $this->restoreCodeBlocks($markdown);
     
     return $markdown;
+  }
+
+  /**
+   * Обработка горизонтальных линий
+   * 
+   * @param string $markdown
+   * @return string
+   */
+  private function parseHr(string $markdown) : string
+  {
+    $lines = explode("\n", $markdown);
+    $result = [];
+    
+    foreach ($lines as $line) {
+      $trimmedLine = trim($line);
+      
+      // Проверяем, является ли строка горизонтальной линией
+      if (preg_match(self::PATTERNS['hr'], $trimmedLine, $hrMatches)) {
+        $hrAttrs = [];
+        
+        // Проверяем наличие атрибутов
+        if (isset($hrMatches[3]) && !$this->isTemplateVariable($hrMatches[3])) {
+          $hrAttrs = $this->parseAttributes($hrMatches[3]);
+        }
+        
+        $attrString = $this->buildAttributeString($hrAttrs);
+        $result[] = '<hr' . $attrString . '>';
+      } else {
+        $result[] = $line;
+      }
+    }
+    
+    return implode("\n", $result);
   }
 
   /**
@@ -467,21 +503,14 @@ class NadvoParse
     foreach ($lines as $line) {
       $trimmedLine = trim($line);
       
-      // Обработка горизонтальной линии
-      if (preg_match(self::PATTERNS['hr'], $trimmedLine, $hrMatches)) {
+      // Обработка пустых строк
+      if (empty($trimmedLine)) {
+        // Закрываем текущий параграф, только если он не пустой
         if (!empty($currentParagraph)) {
           $html .= $this->wrapParagraph($currentParagraph);
           $currentParagraph = '';
         }
-        
-        $hrAttrs = [];
-        if (isset($hrMatches[3]) && !$this->isTemplateVariable($hrMatches[3])) {
-          $hrAttrs = $this->parseAttributes($hrMatches[3]);
-        }
-        
-        $attrString = $this->buildAttributeString($hrAttrs);
-        $html .= '<hr' . $attrString . '>' . "\n";
-        continue;
+        continue; // Пустую строку не добавляем в HTML
       }
       
       // Проверяем, начинается ли строка с блочного тега
@@ -552,16 +581,6 @@ class NadvoParse
         
         $attrString = $this->buildAttributeString($attrs);
         $html .= '<h' . $level . $attrString . '>' . $text . '</h' . $level . '>' . "\n";
-        continue;
-      }
-      
-      // Обработка пустых строк
-      if (empty($trimmedLine)) {
-        if (!empty($currentParagraph)) {
-          $html .= $this->wrapParagraph($currentParagraph);
-          $currentParagraph = '';
-        }
-
         continue;
       }
       
