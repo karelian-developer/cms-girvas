@@ -72,6 +72,9 @@ class NadvoParse
     
     // HTML5 структурные атрибуты
     'slot', 'part', 'exportparts',
+
+    // Атрибуты для ссылок
+    'target', 'rel', 'download', 'hreflang', 'type', 'referrerpolicy',
     
     // Атрибуты для доступности
     'aria-atomic', 'aria-busy', 'aria-live', 'aria-relevant',
@@ -913,20 +916,45 @@ class NadvoParse
         
         if (isset($matches[3]) && !empty($matches[3])) {
           // Восстанавливаем кавычки из &quot; в "
-          $jsonString = html_entity_decode($matches[3], ENT_QUOTES, 'UTF-8');
+          $attrString = html_entity_decode($matches[3], ENT_QUOTES, 'UTF-8');
           
-          try {
-            $json = json_decode($jsonString, true);
-
-            if ($json && is_array($json)) {
-              foreach ($json as $key => $value) {
+          // Пробуем распарсить как JSON
+          $jsonString = '{' . $attrString . '}';
+          $json = json_decode($jsonString, true);
+          
+          if ($json && is_array($json)) {
+            foreach ($json as $key => $value) {
+              if ($this->isAllowedAttribute($key)) {
+                $attrs[$key] = $value;
+              }
+            }
+          } else {
+            // Пробуем распарсить в формате key="value" или key=value
+            preg_match_all('/([a-zA-Z_][a-zA-Z0-9_:.-]*)\s*=\s*["\']([^"\']*)["\']/', $attrString, $attrMatches, PREG_SET_ORDER);
+            
+            foreach ($attrMatches as $attrMatch) {
+              $key = $attrMatch[1];
+              $value = $attrMatch[2];
+              
+              if ($this->isAllowedAttribute($key)) {
+                $attrs[$key] = $value;
+              }
+            }
+            
+            // Если не нашли атрибуты в формате key="value", 
+            // пробуем формат без кавычек: key=value
+            if (empty($attrs)) {
+              preg_match_all('/([a-zA-Z_][a-zA-Z0-9_:.-]*)\s*=\s*([^"\'\s,]+)/', $attrString, $attrMatches, PREG_SET_ORDER);
+              
+              foreach ($attrMatches as $attrMatch) {
+                $key = $attrMatch[1];
+                $value = $attrMatch[2];
+                
                 if ($this->isAllowedAttribute($key)) {
                   $attrs[$key] = $value;
                 }
               }
             }
-          } catch (Exception $e) {
-            // Ошибка парсинга JSON
           }
         }
         
