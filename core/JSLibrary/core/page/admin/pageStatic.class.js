@@ -51,6 +51,7 @@ export class PagePageStatic {
         {'name': 'code', 'type': 'button'},
         {'name': 'preview', 'type': 'button'},
         {'name': 'source', 'type': 'button'},
+        {'name': 'emoji', 'type': 'button'},
       ]
     });
     nadvoTE.init();

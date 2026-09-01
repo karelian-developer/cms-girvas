@@ -128,3 +128,95 @@
   font-size: 11px;
   opacity: .6;
 }
+
+/* ==========================================================================================
+=> NadvoTE Emoji Picker
+============================================================================================= */
+
+.nadvo-te__emoji-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nadvo-te__emoji-search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid var(--form-input-border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: var(--form-input-background-color);
+  color: var(--common-main-color-5);
+  transition: background-color .2s, border-color .2s;
+}
+
+.nadvo-te__emoji-search:hover {
+  background-color: var(--form-input-background-color--hover);
+  border-color: var(--form-input-border-color--hover);
+}
+
+.nadvo-te__emoji-search:focus {
+  background-color: var(--form-input-background-color--focus);
+  border-color: var(--form-input-border-color--focus);
+  outline: none;
+}
+
+.nadvo-te__emoji-search:active {
+  background-color: var(--form-input-background-color--active);
+  border-color: var(--form-input-border-color--active);
+}
+
+.nadvo-te__emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.nadvo-te__emoji-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  font-size: 24px;
+  padding: 8px;
+  border: 1px solid var(--common-main-color-6);
+  border-radius: 8px;
+  background-color: var(--common-main-color-1);
+  cursor: pointer;
+  transition: background-color .2s, border-color .2s, transform .2s;
+  min-width: 40px;
+  min-height: 40px;
+}
+
+.nadvo-te__emoji-button:hover {
+  background-color: var(--common-main-color-2);
+  border-color: var(--common-main-color-4);
+  transform: scale(1.1);
+}
+
+.nadvo-te__emoji-button:focus {
+  border-color: var(--common-secondary-color-3);
+  outline: none;
+}
+
+.nadvo-te__emoji-button:active {
+  background-color: var(--common-secondary-color-2);
+  border-color: var(--common-secondary-color-3);
+}
+
+/* Адаптивность для эмодзи-грида */
+@media (max-width: 599px) {
+  .nadvo-te__emoji-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+@media (max-width: 399px) {
+  .nadvo-te__emoji-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

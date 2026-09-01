@@ -24,12 +24,191 @@ use \DOMDocument as DOMDocument;
 
 class NadvoParse
 {
+  private const EMOJI_MAP = [
+    // Улыбки и эмоции
+    ':smile:' => '😊',
+    ':grin:' => '😁',
+    ':joy:' => '😂',
+    ':rofl:' => '🤣',
+    ':wink:' => '😉',
+    ':blush:' => '😊',
+    ':heart_eyes:' => '😍',
+    ':kissing_heart:' => '😘',
+    ':thinking:' => '🤔',
+    ':neutral_face:' => '😐',
+    ':expressionless:' => '😑',
+    ':smirk:' => '😏',
+    ':unamused:' => '😒',
+    ':roll_eyes:' => '🙄',
+    ':relieved:' => '😌',
+    ':pensive:' => '😔',
+    ':sleepy:' => '😪',
+    ':sleeping:' => '😴',
+    ':mask:' => '😷',
+    
+    // Жесты
+    ':thumbsup:' => '👍',
+    ':thumbsdown:' => '👎',
+    ':clap:' => '👏',
+    ':wave:' => '👋',
+    ':ok_hand:' => '👌',
+    ':pray:' => '🙏',
+    ':muscle:' => '💪',
+    ':point_up:' => '☝️',
+    ':point_down:' => '👇',
+    ':point_left:' => '👈',
+    ':point_right:' => '👉',
+    
+    // Сердца и чувства
+    ':heart:' => '❤️',
+    ':orange_heart:' => '🧡',
+    ':yellow_heart:' => '💛',
+    ':green_heart:' => '💚',
+    ':blue_heart:' => '💙',
+    ':purple_heart:' => '💜',
+    ':broken_heart:' => '💔',
+    ':sparkling_heart:' => '💖',
+    ':two_hearts:' => '💕',
+    ':heartbeat:' => '💓',
+    ':heartpulse:' => '💗',
+    
+    // Животные
+    ':cat:' => '🐱',
+    ':dog:' => '🐶',
+    ':mouse:' => '🐭',
+    ':hamster:' => '🐹',
+    ':rabbit:' => '🐰',
+    ':fox:' => '🦊',
+    ':bear:' => '🐻',
+    ':panda:' => '🐼',
+    ':koala:' => '🐨',
+    ':tiger:' => '🐯',
+    ':lion:' => '🦁',
+    ':unicorn:' => '🦄',
+    
+    // Еда и напитки
+    ':apple:' => '🍎',
+    ':pizza:' => '🍕',
+    ':hamburger:' => '🍔',
+    ':fries:' => '🍟',
+    ':coffee:' => '☕',
+    ':tea:' => '🍵',
+    ':beer:' => '🍺',
+    ':wine:' => '🍷',
+    ':cake:' => '🍰',
+    ':icecream:' => '🍦',
+    ':cookie:' => '🍪',
+    ':chocolate:' => '🍫',
+    
+    // Активности и праздники
+    ':tada:' => '🎉',
+    ':confetti:' => '🎊',
+    ':balloon:' => '🎈',
+    ':gift:' => '🎁',
+    ':star:' => '⭐',
+    ':sparkles:' => '✨',
+    ':fire:' => '🔥',
+    ':zap:' => '⚡',
+    ':rainbow:' => '🌈',
+    ':sunny:' => '☀️',
+    ':moon:' => '🌙',
+    ':cloud:' => '☁️',
+    
+    // Символы
+    ':check:' => '✅',
+    ':x:' => '❌',
+    ':warning:' => '⚠️',
+    ':question:' => '❓',
+    ':exclamation:' => '❗',
+    ':100:' => '💯',
+    ':copyright:' => '©️',
+    ':registered:' => '®️',
+    ':tm:' => '™️',
+
+    // Флаги стран
+    ':flag_ru:' => '🇷🇺',
+    ':flag_by:' => '🇧🇾',
+    ':flag_kz:' => '🇰🇿',
+    ':flag_am:' => '🇦🇲',
+    ':flag_az:' => '🇦🇿',
+    ':flag_ge:' => '🇬🇪',
+    ':flag_ua:' => '🇺🇦',
+    ':flag_uz:' => '🇺🇿',
+    ':flag_kg:' => '🇰🇬',
+    ':flag_tj:' => '🇹🇯',
+    ':flag_tm:' => '🇹🇲',
+    ':flag_md:' => '🇲🇩',
+    ':flag_lt:' => '🇱🇹',
+    ':flag_lv:' => '🇱🇻',
+    ':flag_ee:' => '🇪🇪',
+    ':flag_gb:' => '🇬🇧',
+    ':flag_de:' => '🇩🇪',
+    ':flag_fr:' => '🇫🇷',
+    ':flag_it:' => '🇮🇹',
+    ':flag_es:' => '🇪🇸',
+    ':flag_pt:' => '🇵🇹',
+    ':flag_nl:' => '🇳🇱',
+    ':flag_be:' => '🇧🇪',
+    ':flag_ch:' => '🇨🇭',
+    ':flag_at:' => '🇦🇹',
+    ':flag_pl:' => '🇵🇱',
+    ':flag_cz:' => '🇨🇿',
+    ':flag_sk:' => '🇸🇰',
+    ':flag_hu:' => '🇭🇺',
+    ':flag_ro:' => '🇷🇴',
+    ':flag_bg:' => '🇧🇬',
+    ':flag_gr:' => '🇬🇷',
+    ':flag_se:' => '🇸🇪',
+    ':flag_no:' => '🇳🇴',
+    ':flag_dk:' => '🇩🇰',
+    ':flag_fi:' => '🇫🇮',
+    ':flag_ie:' => '🇮🇪',
+    ':flag_cn:' => '🇨🇳',
+    ':flag_jp:' => '🇯🇵',
+    ':flag_kr:' => '🇰🇷',
+    ':flag_kp:' => '🇰🇵',
+    ':flag_in:' => '🇮🇳',
+    ':flag_vn:' => '🇻🇳',
+    ':flag_th:' => '🇹🇭',
+    ':flag_id:' => '🇮🇩',
+    ':flag_my:' => '🇲🇾',
+    ':flag_ph:' => '🇵🇭',
+    ':flag_sg:' => '🇸🇬',
+    ':flag_mn:' => '🇲🇳',
+    ':flag_us:' => '🇺🇸',
+    ':flag_ca:' => '🇨🇦',
+    ':flag_mx:' => '🇲🇽',
+    ':flag_br:' => '🇧🇷',
+    ':flag_ar:' => '🇦🇷',
+    ':flag_cl:' => '🇨🇱',
+    ':flag_co:' => '🇨🇴',
+    ':flag_pe:' => '🇵🇪',
+    ':flag_cu:' => '🇨🇺',
+    ':flag_eg:' => '🇪🇬',
+    ':flag_za:' => '🇿🇦',
+    ':flag_tr:' => '🇹🇷',
+    ':flag_il:' => '🇮🇱',
+    ':flag_sa:' => '🇸🇦',
+    ':flag_ae:' => '🇦🇪',
+    ':flag_ir:' => '🇮🇷',
+    ':flag_iq:' => '🇮🇶',
+    ':flag_au:' => '🇦🇺',
+    ':flag_nz:' => '🇳🇿',
+    ':flag_eu:' => '🇪🇺',
+    ':flag_un:' => '🇺🇳',
+    ':rainbow_flag:' => '🏳️‍🌈',
+    ':white_flag:' => '🏳️',
+    ':black_flag:' => '🏴',
+    ':pirate_flag:' => '🏴‍☠️',
+    ':checkered_flag:' => '🏁',
+  ];
+
   private const PATTERNS = [
     'header' => '/^(#{1,6})\s+(.+?)(?:\s*\{([^{}]+)\})?\s*$/m',
-    'bold' => '/\*\*(.+?)\*\*|__(.+?)__/s',
-    'italic' => '/\*(.+?)\*/s',
+    'bold' => '/\*\*([^*]+?)\*\*|__([^_]+?)__/s',
+    'italic' => '/(?<!\*)\*(?!\*)([^*]+?)(?<!\*)\*(?!\*)/s',
     'underline' => '/\~\~(.+?)\~\~/s',
-    'link' => '/\[(.*?)\]\(\s*([^)\s]+)\s*\)(\{[^{}]+\})?/s',
+    'link' => '/\[([^\]]+)\]\(([^)]+)\)(\{[^{}]+\})?/s',
     'image' => '/!\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'figure' => '/![f]\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'video' => '/!\[video\]\((.+?)\)/',
@@ -46,7 +225,11 @@ class NadvoParse
     'ol_item' => '/^(\d+)\.\s+(.+)/',
     'list_group' => '/^([*+-]|\d+\.)\s+.+(?:\n\1\s+.+)*/m',
     'dangerous_tags' => '/<\?(?:php)?.*?\?>|<(script|iframe)[^>]*>.*?<\/\1>/is',
-    'paragraph_with_attrs' => '/^(.*?)(?:\s*\{([^{}]+)\})?\s*$/s'
+    'paragraph_with_attrs' => '/^(.*?)(?:\s*\{([^{}]+)\})?\s*$/s',
+    'hr' => '/^(\s*)(-{3,}|\*{3,}|_{3,})(?:\s*\{([^{}]+)\})?\s*$/m',
+    'footnote_ref' => '/\[\^(\d+)\]/',
+    'footnote_def' => '/^\[\^(\d+)\]:\s+(.+)$/m',
+    'emoji' => '/:([a-z0-9_]+):/',
   ];
 
   private array $usedHeaderIds = [];
@@ -92,14 +275,91 @@ class NadvoParse
   public function __construct()
   {}
 
+  /**
+   * Обработка эмодзи
+   * 
+   * @param string $markdown
+   * @return string
+   */
+  private function parseEmoji(string $markdown) : string
+  {
+    return preg_replace_callback(
+      self::PATTERNS['emoji'],
+      function($matches) {
+        $emojiCode = ':' . $matches[1] . ':';
+        
+        // Проверяем, есть ли такой эмодзи в карте
+        if (isset(self::EMOJI_MAP[$emojiCode])) {
+          return self::EMOJI_MAP[$emojiCode];
+        }
+        
+        // Если эмодзи не найден, оставляем как есть
+        return $matches[0];
+      },
+      $markdown
+    );
+  }
+
+  private function parseFootnotes(string $markdown) : string
+  {
+    $footnotes = [];
+    
+    // Собираем определения сносок
+    $markdown = preg_replace_callback(
+      self::PATTERNS['footnote_def'],
+      function($matches) use (&$footnotes) {
+        $id = $matches[1];
+        $content = trim($matches[2]);
+        $footnotes[$id] = $content;
+        return '';
+      },
+      $markdown
+    );
+    
+    // Заменяем ссылки на сноски
+    $markdown = preg_replace_callback(
+      self::PATTERNS['footnote_ref'],
+      function($matches) use ($footnotes) {
+        $id = $matches[1];
+        
+        if (isset($footnotes[$id])) {
+          return '<sup id="fnref:' . $id . '"><a href="#fn:' . $id . '">' . $id . '</a></sup>';
+        }
+        
+        return $matches[0];
+      },
+      $markdown
+    );
+    
+    // Добавляем блок сносок в конец
+    if (!empty($footnotes)) {
+      $html = '<div class="footnotes"><ol>';
+      
+      foreach ($footnotes as $id => $content) {
+        $html .= '<li id="fn:' . $id . '">' . $content . ' <a href="#fnref:' . $id . '" class="footnote-back">↩</a></li>';
+      }
+      
+      $html .= '</ol></div>';
+      $markdown .= "\n\n" . $html;
+    }
+    
+    return $markdown;
+  }
+  
+  /**
+   * Обновленный метод parse
+   */
   public function parse(string $markdown) : string
   {
     $this->usedHeaderIds = [];
-
+    
     $markdown = $this->sanitizeInput($markdown);
     
     // Сначала защищаем блоки кода
     $markdown = $this->protectCodeBlocks($markdown);
+    
+    // Обрабатываем горизонтальные линии ДО списков и инлайн-элементов
+    $markdown = $this->parseHr($markdown);
     
     // Затем обрабатываем остальной Markdown
     $markdown = $this->parseAutoLinks($markdown);
@@ -107,12 +367,47 @@ class NadvoParse
     $markdown = $this->parseLists($markdown);
     $markdown = $this->parseTables($markdown);
     $markdown = $this->parseInlineElements($markdown);
+    $markdown = $this->parseFootnotes($markdown);
+    $markdown = $this->parseEmoji($markdown); // Добавляем обработку эмодзи
     $markdown = $this->parseBlocks($markdown);
     
     // Возвращаем блоки кода на место
     $markdown = $this->restoreCodeBlocks($markdown);
     
     return $markdown;
+  }
+
+  /**
+   * Обработка горизонтальных линий
+   * 
+   * @param string $markdown
+   * @return string
+   */
+  private function parseHr(string $markdown) : string
+  {
+    $lines = explode("\n", $markdown);
+    $result = [];
+    
+    foreach ($lines as $line) {
+      $trimmedLine = trim($line);
+      
+      // Проверяем, является ли строка горизонтальной линией
+      if (preg_match(self::PATTERNS['hr'], $trimmedLine, $hrMatches)) {
+        $hrAttrs = [];
+        
+        // Проверяем наличие атрибутов
+        if (isset($hrMatches[3]) && !$this->isTemplateVariable($hrMatches[3])) {
+          $hrAttrs = $this->parseAttributes($hrMatches[3]);
+        }
+        
+        $attrString = $this->buildAttributeString($hrAttrs);
+        $result[] = '<hr' . $attrString . '>';
+      } else {
+        $result[] = $line;
+      }
+    }
+    
+    return implode("\n", $result);
   }
 
   /**
@@ -421,10 +716,11 @@ class NadvoParse
           $quoteStack[] = true;
         }
         
-        // Добавляем содержимое
+        // Добавляем содержимое ТОЛЬКО если оно не пустое
         if (!empty($content)) {
           $result[] = '<p>' . $content . '</p>';
         }
+        // Если контент пустой — ничего не добавляем (не создаём пустой <p>)
       } else {
         // Закрываем все цитаты для обычных строк
         while (!empty($quoteStack)) {
@@ -452,6 +748,7 @@ class NadvoParse
     $html = '';
     $currentParagraph = '';
     $inTable = false;
+    $inBlockquote = false;
     $tableBuffer = [];
 
     // Список тегов, которые не должны оборачиваться в параграфы
@@ -462,11 +759,71 @@ class NadvoParse
       'table', '/table', 'thead', '/thead', 'tbody', '/tbody',
       'tr', '/tr', 'th', '/th', 'td', '/td',
       'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      '/h1', '/h2', '/h3', '/h4', '/h5', '/h6'
+      '/h1', '/h2', '/h3', '/h4', '/h5', '/h6',
+      'hr', '/hr'
     ];
 
     foreach ($lines as $line) {
       $trimmedLine = trim($line);
+      
+      // Проверяем, является ли строка плейсхолдером блока кода
+      $isCodePlaceholder = false;
+      if (preg_match('/^%%(CODE_BLOCK|INLINE_CODE)_\d+%%$/', $trimmedLine)) {
+        $isCodePlaceholder = true;
+      }
+      
+      // Если это плейсхолдер кода - выводим как есть, без оборачивания в параграф
+      if ($isCodePlaceholder) {
+        if (!empty($currentParagraph)) {
+          $html .= $this->wrapParagraph($currentParagraph);
+          $currentParagraph = '';
+        }
+        
+        $html .= $trimmedLine . "\n";
+        continue;
+      }
+      
+      // Проверяем, открывается ли blockquote
+      if (str_starts_with($trimmedLine, '<blockquote')) {
+        $inBlockquote = true;
+        
+        if (!empty($currentParagraph)) {
+          $html .= $this->wrapParagraph($currentParagraph);
+          $currentParagraph = '';
+        }
+        
+        $html .= $line . "\n";
+        continue;
+      }
+      
+      // Проверяем, закрывается ли blockquote
+      if (str_starts_with($trimmedLine, '</blockquote>')) {
+        $inBlockquote = false;
+        
+        if (!empty($currentParagraph)) {
+          $html .= $this->wrapParagraph($currentParagraph);
+          $currentParagraph = '';
+        }
+        
+        $html .= $line . "\n";
+        continue;
+      }
+      
+      // Если мы внутри blockquote - выводим строку как есть
+      if ($inBlockquote) {
+        $html .= $line . "\n";
+        continue;
+      }
+      
+      // Обработка пустых строк
+      if (empty($trimmedLine)) {
+        // Закрываем текущий параграф, только если он не пустой
+        if (!empty($currentParagraph)) {
+          $html .= $this->wrapParagraph($currentParagraph);
+          $currentParagraph = '';
+        }
+        continue; // Пустую строку не добавляем в HTML
+      }
       
       // Проверяем, начинается ли строка с блочного тега
       $isBlockTag = false;
@@ -539,22 +896,12 @@ class NadvoParse
         continue;
       }
       
-      // Обработка пустых строк
-      if (empty($trimmedLine)) {
-        if (!empty($currentParagraph)) {
-          $html .= $this->wrapParagraph($currentParagraph);
-          $currentParagraph = '';
-        }
-
-        continue;
-      }
-      
       // Обычный текст - добавляем в текущий параграф
       $currentParagraph .= $line . ' ';
     }
     
-    // Закрываем последний параграф
-    if (!empty($currentParagraph)) {
+    // Закрываем последний параграф, только если он не пустой
+    if (!empty($currentParagraph) && trim($currentParagraph) !== '') {
       $html .= $this->wrapParagraph($currentParagraph);
     }
     
@@ -964,8 +1311,13 @@ class NadvoParse
       $html
     );
 
+    // Жирный **текст**
     $html = preg_replace(self::PATTERNS['bold'], '<strong>$1</strong>', $html);
+    
+    // Курсив *текст*
     $html = preg_replace(self::PATTERNS['italic'], '<em>$1</em>', $html);
+    
+    // Подчёркнутый ~~текст~~
     $html = preg_replace(self::PATTERNS['underline'], '<u>$1</u>', $html);
     
     return $html;
@@ -1022,6 +1374,18 @@ class NadvoParse
       $markdown
     );
     
+    // Защищаем сноски [1], [2], [3] и т.д.
+    $footnoteRefs = [];
+    $markdown = preg_replace_callback(
+      '/\[(\d+)\]/',
+      function($matches) use (&$footnoteRefs) {
+        $placeholder = '%%FOOTNOTE_REF_' . count($footnoteRefs) . '%%';
+        $footnoteRefs[$placeholder] = $matches[0];
+        return $placeholder;
+      },
+      $markdown
+    );
+    
     // Не трогаем уже существующие ссылки и изображения
     $protected = [];
     $markdown = preg_replace_callback(
@@ -1043,6 +1407,11 @@ class NadvoParse
 
     // Возвращаем защищённые фрагменты на место
     foreach ($protected as $placeholder => $value) {
+      $markdown = str_replace($placeholder, $value, $markdown);
+    }
+    
+    // Возвращаем сноски на место
+    foreach ($footnoteRefs as $placeholder => $value) {
       $markdown = str_replace($placeholder, $value, $markdown);
     }
     

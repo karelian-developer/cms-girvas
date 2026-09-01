@@ -25,6 +25,7 @@ import {Request} from './interactive/request.class.js';
 import {Notification} from './interactive/notification.class.js';
 import {Slider} from './interactive/slider.class.js';
 import {DataSearcher} from './interactive/dataSearcher.class.js';
+import {Tabs} from './interactive/tabs.class.js';
 
 export class Interactive {
   constructor(interactiveName, interactiveParams = {}) {
@@ -55,6 +56,13 @@ export class Interactive {
       data.isDisclosed = (Object.hasOwn(interactiveParams, 'isDisclosed')) ? interactiveParams.isDisclosed : false;
     }
 
+    if (interactiveName == 'tabs') {
+      data.type = (Object.hasOwn(interactiveParams, 'type')) ? interactiveParams.type : 'pills';
+      data.orientation = (Object.hasOwn(interactiveParams, 'orientation')) ? interactiveParams.orientation : 'horizontal';
+      data.isMultiple = (Object.hasOwn(interactiveParams, 'isMultiple')) ? interactiveParams.isMultiple : false;
+      data.width = (Object.hasOwn(interactiveParams, 'width')) ? interactiveParams.width : 'auto';
+    }
+
     switch (interactiveName) {
       case 'button': this.target = new Button(this); break;
       case 'input': this.target = new Input(this); break;
@@ -66,6 +74,17 @@ export class Interactive {
       case 'notification': this.target = new Notification(this); break;
       case 'slider': this.target = new Slider(this); break;
       case 'dataSearcher': this.target = new DataSearcher(this); break;
+      case 'tabs': 
+        this.target = new Tabs(
+          this, 
+          {
+            type: data.type || 'pills',
+            orientation: data.orientation || 'horizontal',
+            isMultiple: data.isMultiple || false,
+            width: data.width || 'auto'
+          }
+        ); 
+        break;
     }
 
     if (typeof(window.CMSCore) != 'undefined') {

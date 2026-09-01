@@ -679,3 +679,296 @@
   width: 100%;
   height: 100%;
 }
+
+/* ==========================================================================================
+=> Tabs (Переключатели)
+============================================================================================= */
+
+.interactive .interactive__tabs {
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+}
+
+/* Ориентация */
+.interactive .interactive__tabs.tabs_orientation-horizontal {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.interactive .interactive__tabs.tabs_orientation-vertical {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* ==========================================================================================
+=> Тип: Pills (пилюли)
+============================================================================================= */
+
+.interactive .interactive__tabs.tabs_type-pills {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.interactive .interactive__tabs.tabs_type-pills .tabs__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  background-color: var(--primary-color-4);
+  color: var(--primary-color-1);
+  border: 1px solid var(--primary-color-3);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .2s, border-color .2s, color .2s;
+}
+
+.interactive .interactive__tabs.tabs_type-pills .tabs__item:hover {
+  background-color: var(--primary-color-3);
+  border-color: var(--primary-color-2);
+}
+
+.interactive .interactive__tabs.tabs_type-pills .tabs__item:focus {
+  background-color: var(--primary-color-3);
+  border-color: var(--primary-color-2);
+  outline: none;
+}
+
+.interactive .interactive__tabs.tabs_type-pills .tabs__item:active {
+  background-color: var(--secondary-color-2);
+  border-color: var(--secondary-color-3);
+}
+
+.interactive .interactive__tabs.tabs_type-pills .tabs__item.tabs__item_is-selected {
+  background-color: var(--secondary-color-2);
+  border-color: var(--secondary-color-3);
+  color: var(--secondary-color-3);
+  font-weight: 700;
+}
+
+/* ==========================================================================================
+=> Тип: Tabs (вкладки)
+============================================================================================= */
+
+.interactive .interactive__tabs.tabs_type-tabs {
+  gap: 0;
+  padding: 0;
+  border-bottom: 2px solid var(--primary-color-3);
+}
+
+.interactive .interactive__tabs.tabs_type-tabs .tabs__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  background: none;
+  color: var(--primary-color-1);
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .2s, border-color .2s, color .2s;
+}
+
+.interactive .interactive__tabs.tabs_type-tabs .tabs__item:hover {
+  background-color: var(--primary-color-3);
+}
+
+.interactive .interactive__tabs.tabs_type-tabs .tabs__item:focus {
+  background-color: var(--primary-color-3);
+  outline: none;
+}
+
+.interactive .interactive__tabs.tabs_type-tabs .tabs__item:active {
+  background-color: var(--secondary-color-2);
+}
+
+.interactive .interactive__tabs.tabs_type-tabs .tabs__item.tabs__item_is-selected {
+  border-bottom-color: var(--secondary-color-3);
+  color: var(--secondary-color-3);
+  font-weight: 700;
+}
+
+/* ==========================================================================================
+=> Тип: Buttons (кнопки)
+============================================================================================= */
+
+.interactive .interactive__tabs.tabs_type-buttons {
+  gap: 4px;
+  padding: 4px;
+  background-color: var(--primary-color-3);
+  border-radius: 8px;
+}
+
+.interactive .interactive__tabs.tabs_type-buttons .tabs__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  background: none;
+  color: var(--primary-color-1);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .2s, box-shadow .2s, color .2s;
+}
+
+.interactive .interactive__tabs.tabs_type-buttons .tabs__item:hover {
+  background-color: var(--primary-color-4--opacity-0-4);
+}
+
+.interactive .interactive__tabs.tabs_type-buttons .tabs__item:focus {
+  background-color: var(--primary-color-4--opacity-0-4);
+  outline: none;
+}
+
+.interactive .interactive__tabs.tabs_type-buttons .tabs__item:active {
+  background-color: var(--primary-color-4--opacity-0-8);
+}
+
+.interactive .interactive__tabs.tabs_type-buttons .tabs__item.tabs__item_is-selected {
+  background-color: var(--primary-color-4);
+  box-shadow: 0 2px 4px var(--primary-color-1--opacity-0-2);
+  color: var(--secondary-color-3);
+  font-weight: 700;
+}
+
+/* ==========================================================================================
+=> Тип: Segmented (сегментированный)
+============================================================================================= */
+
+.interactive .interactive__tabs.tabs_type-segmented {
+  gap: 0;
+  padding: 0;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  background-color: var(--primary-color-4);
+  color: var(--primary-color-1);
+  border: 1px solid var(--primary-color-3);
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .2s, border-color .2s, color .2s;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item:not(:first-child) {
+  margin-left: -1px;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item:hover {
+  background-color: var(--primary-color-3);
+  border-color: var(--primary-color-2);
+  z-index: 1;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item:focus {
+  background-color: var(--primary-color-3);
+  border-color: var(--primary-color-2);
+  outline: none;
+  z-index: 1;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item:active {
+  background-color: var(--secondary-color-2);
+  border-color: var(--secondary-color-3);
+  z-index: 1;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item.tabs__item_is-selected {
+  background-color: var(--secondary-color-2);
+  border-color: var(--secondary-color-3);
+  color: var(--secondary-color-3);
+  font-weight: 700;
+  z-index: 2;
+}
+
+/* ==========================================================================================
+=> Общие элементы внутри табов
+============================================================================================= */
+
+.interactive .interactive__tabs .tabs__item-icon {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.interactive .interactive__tabs .tabs__item-icon img,
+.interactive .interactive__tabs .tabs__item-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.interactive .interactive__tabs .tabs__item-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background-color: var(--secondary-color-5);
+  color: var(--secondary-color-6);
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  line-height: 1;
+}
+
+/* Состояние disabled */
+.interactive .interactive__tabs .tabs__item.tabs__item_disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Вертикальная ориентация */
+.interactive .interactive__tabs.tabs_orientation-vertical.tabs_type-pills {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.interactive .interactive__tabs.tabs_orientation-vertical.tabs_type-tabs {
+  flex-direction: column;
+  border-bottom: none;
+  border-right: 2px solid var(--primary-color-3);
+}
+
+.interactive .interactive__tabs.tabs_orientation-vertical.tabs_type-tabs .tabs__item {
+  border-bottom: none;
+  border-right: 2px solid transparent;
+  margin-bottom: 0;
+  margin-right: -2px;
+}
+
+.interactive .interactive__tabs.tabs_orientation-vertical.tabs_type-tabs .tabs__item.tabs__item_is-selected {
+  border-right-color: var(--secondary-color-3);
+}
