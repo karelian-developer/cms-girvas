@@ -989,7 +989,7 @@ class NadvoParse
       return $attrs; // Это шаблонная переменная, не атрибуты
     }
     
-    // Пробуем распарсить как JSON
+    // Пробуем распарсить как JSON (формат: {"key": "value", "key2": "value2"})
     $jsonString = '{' . $attrString . '}';
     $json = json_decode($jsonString, true);
     
@@ -1000,7 +1000,7 @@ class NadvoParse
         }
       }
     } else {
-      // Пробуем распарсить в формате key="value" или key=value
+      // Пробуем распарсить в формате key="value" key2="value2"
       preg_match_all('/([a-zA-Z_][a-zA-Z0-9_:.-]*)\s*=\s*["\']([^"\']*)["\']/', $attrString, $matches, PREG_SET_ORDER);
       
       foreach ($matches as $match) {
@@ -1011,6 +1011,53 @@ class NadvoParse
           $attrs[$key] = $value;
         }
       }
+      
+      // Если не нашли атрибуты в формате key="value", 
+      // пробуем формат без кавычек: key=value
+      if (empty($attrs)) {
+        preg_match_all('/([a-zA-Z_][a-zA-Z0-9_:.-]*)\s*=\s*([^"\'\s,]+)/', $attrString, $matches, PREG_SET_ORDER);
+        
+        foreach ($matches as $match) {
+          $key = $match[1];
+          $value = $match[2];
+          
+          if ($this->isAllowedAttribute($key)) {
+            $attrs[$key] = $value;
+          }
+        }
+      }
+      
+      // Если всё ещё пусто, пробуем формат: key="value", key2="value2"
+      if (empty($attrs)) {
+          // Убираем кавычки вокруг ключей
+          $cleanedString = preg_replace('/"([^"]+)":/', '$1:', $attrString);
+          $cleanedString = preg_replace("/'([^']+)':/", '$1:', $cleanedString);
+          
+          preg_match_all('/([a-zA-Z_][a-zA-Z0-9_:.-]*)\s*:\s*["\']([^"\']*)["\']/', $cleanedString, $matches, PREG_SET_ORDER);
+          
+          foreach ($matches as $match) {
+            $key = $match[1];
+            $value = $match[2];
+            
+            if ($this->isAllowedAttribute($key)) {
+              $attrs[$key] = $value;
+            }
+          }
+        }
+        
+        // Пробуем формат: key="value", key2="value2" с запятыми
+        if (empty($attrs)) {
+          preg_match_all('/([a-zA-Z_][a-zA-Z0-9_:.-]*)\s*:\s*["\']([^"\']*)["\']/', $attrString, $matches, PREG_SET_ORDER);
+          
+          foreach ($matches as $match) {
+            $key = $match[1];
+            $value = $match[2];
+            
+            if ($this->isAllowedAttribute($key)) {
+              $attrs[$key] = $value;
+            }
+          }
+        }
     }
     
     return $attrs;
@@ -1262,46 +1309,13 @@ class NadvoParse
         $attrs = [];
         
         if (isset($matches[3]) && !empty($matches[3])) {
-          // Восстанавливаем кавычки из &quot; в "
-          $attrString = html_entity_decode($matches[3], ENT_QUOTES, 'UTF-8');
+          // Получаем строку атрибутов из фигурных скобок
+          $attrString = trim($matches[3], '{}');
+          $attrString = html_entity_decode($attrString, ENT_QUOTES, 'UTF-8');
           
-          // Пробуем распарсить как JSON
-          $jsonString = '{' . $attrString . '}';
-          $json = json_decode($jsonString, true);
-          
-          if ($json && is_array($json)) {
-            foreach ($json as $key => $value) {
-              if ($this->isAllowedAttribute($key)) {
-                $attrs[$key] = $value;
-              }
-            }
-          } else {
-            // Пробуем распарсить в формате key="value" или key=value
-            preg_match_all('/([a-zA-Z_][a-zA-Z0-9_:.-]*)\s*=\s*["\']([^"\']*)["\']/', $attrString, $attrMatches, PREG_SET_ORDER);
-            
-            foreach ($attrMatches as $attrMatch) {
-              $key = $attrMatch[1];
-              $value = $attrMatch[2];
-              
-              if ($this->isAllowedAttribute($key)) {
-                $attrs[$key] = $value;
-              }
-            }
-            
-            // Если не нашли атрибуты в формате key="value", 
-            // пробуем формат без кавычек: key=value
-            if (empty($attrs)) {
-              preg_match_all('/([a-zA-Z_][a-zA-Z0-9_:.-]*)\s*=\s*([^"\'\s,]+)/', $attrString, $attrMatches, PREG_SET_ORDER);
-              
-              foreach ($attrMatches as $attrMatch) {
-                $key = $attrMatch[1];
-                $value = $attrMatch[2];
-                
-                if ($this->isAllowedAttribute($key)) {
-                  $attrs[$key] = $value;
-                }
-              }
-            }
+          // Проверяем, не является ли это шаблонной переменной
+          if (!$this->isTemplateVariable($attrString)) {
+            $attrs = $this->parseAttributes($attrString);
           }
         }
         
