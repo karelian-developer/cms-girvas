@@ -39,7 +39,7 @@ export class PageAnalytics {
       const analyticApp = document.querySelector('#analytic-app');
 
       if (analyticApp !== null) {
-        const attendanceScheduleContainerElement = analyticApp.querySelector('[role="attendance-schedule"]');
+        const attendanceScheduleContainerElement = analyticApp.querySelector('[data-role="attendance-schedule"]');
         
         const scheduleContainerElement = this.scheduleContainerElementCreate();
         attendanceScheduleContainerElement.append(scheduleContainerElement);
