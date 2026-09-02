@@ -34,7 +34,7 @@ export class ToolLink extends Tool {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
 
-      const selection = this.editor.getSelectionString();
+      const selection = this.editor.getSelectionString() || '';
 
       if (selection) {
         this.editor.clearSelection();

@@ -91,14 +91,16 @@ export class NadvoTE {
   }
 
   getSelectionString() {
-    if (!this.selection) {
-      const textarea = this.textarea?.element;
+    const textarea = this.textarea?.element;
 
-      if (textarea && textarea.selectionStart !== textarea.selectionEnd) {
-        this.selection = textarea.value.substring(
-          textarea.selectionStart,
-          textarea.selectionEnd
-        );
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+
+      if (start !== end) {
+        this.selection = textarea.value.substring(start, end);
+      } else {
+        this.selection = '';
       }
     }
 
