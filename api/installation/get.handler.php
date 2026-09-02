@@ -852,6 +852,91 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       $execute = $databaseQuery->execute();
+
+      // =======================
+      // ТАБЛИЦА OAUTH-КЛИЕНТОВ
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('oauth_clients');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('clientID', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('clientSecret', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('description', 'text');
+      $queryBuilder->statement->addColumn('redirectURI', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('grantTypes', 'text', 'NOT NULL DEFAULT \'authorization_code refresh_token\'');
+      $queryBuilder->statement->addColumn('scopes', 'text', 'NOT NULL DEFAULT \'profile email read\'');
+      $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('isActive', 'boolean', 'NOT NULL DEFAULT true');
+      $queryBuilder->statement->addColumn('isVerified', 'boolean', 'NOT NULL DEFAULT false');
+      $queryBuilder->statement->addColumn('verifiedAt', 'bigint');
+      $queryBuilder->statement->addColumn('verifiedBy', 'bigint');
+      $queryBuilder->statement->addColumn('ownerEmail', 'text', 'NOT NULL DEFAULT \'\'');
+      $queryBuilder->statement->addColumn('maxTokens', 'integer', 'NOT NULL DEFAULT 100');
+      $queryBuilder->statement->addColumn('tokenTTL', 'integer', 'NOT NULL DEFAULT 3600');
+      $queryBuilder->statement->addColumn('allowedIPs', 'text');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      $execute = $databaseQuery->execute();
+
+      // =======================
+      // ТАБЛИЦА OAUTH-КОДОВ АВТОРИЗАЦИИ
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('oauth_auth_codes');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('code', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('clientID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('scopes', 'text', 'NOT NULL DEFAULT \'\'');
+      $queryBuilder->statement->addColumn('redirectURI', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('codeChallenge', 'text');
+      $queryBuilder->statement->addColumn('codeChallengeMethod', 'text', 'NOT NULL DEFAULT \'S256\'');
+      $queryBuilder->statement->addColumn('expiresAt', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('isRevoked', 'boolean', 'NOT NULL DEFAULT false');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      $execute = $databaseQuery->execute();
+
+      // =======================
+      // ТАБЛИЦА OAUTH-ТОКЕНОВ ДОСТУПА
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('oauth_access_tokens');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('accessToken', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('refreshToken', 'text');
+      $queryBuilder->statement->addColumn('clientID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('scopes', 'text', 'NOT NULL DEFAULT \'\'');
+      $queryBuilder->statement->addColumn('expiresAt', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('isRevoked', 'boolean', 'NOT NULL DEFAULT false');
+      $queryBuilder->statement->addColumn('revokedAt', 'bigint');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      $execute = $databaseQuery->execute();
     } catch (PDOException $exception) {
       $tipBlockElement->setAttribute('class', 'tip tip_red');
       $tipBlockElement->nodeValue = $exception->getMessage();
@@ -1171,6 +1256,112 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIndexName('idx_metrics_date');
       $queryBuilder->statement->setTableName('metrics');
       $queryBuilder->statement->addColumn('date');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      // Индексы для таблицы oauth_clients
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_clients_client_id');
+      $queryBuilder->statement->setTableName('oauth_clients');
+      $queryBuilder->statement->addColumn('clientID');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_clients_user_id');
+      $queryBuilder->statement->setTableName('oauth_clients');
+      $queryBuilder->statement->addColumn('userID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      // Индексы для таблицы oauth_auth_codes
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_auth_codes_code');
+      $queryBuilder->statement->setTableName('oauth_auth_codes');
+      $queryBuilder->statement->addColumn('code');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_auth_codes_client_id');
+      $queryBuilder->statement->setTableName('oauth_auth_codes');
+      $queryBuilder->statement->addColumn('clientID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_auth_codes_expires_at');
+      $queryBuilder->statement->setTableName('oauth_auth_codes');
+      $queryBuilder->statement->addColumn('expiresAt');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      // Индексы для таблицы oauth_access_tokens
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_access_tokens_access_token');
+      $queryBuilder->statement->setTableName('oauth_access_tokens');
+      $queryBuilder->statement->addColumn('accessToken');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_access_tokens_refresh_token');
+      $queryBuilder->statement->setTableName('oauth_access_tokens');
+      $queryBuilder->statement->addColumn('refreshToken');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_access_tokens_user_id');
+      $queryBuilder->statement->setTableName('oauth_access_tokens');
+      $queryBuilder->statement->addColumn('userID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_access_tokens_client_id');
+      $queryBuilder->statement->setTableName('oauth_access_tokens');
+      $queryBuilder->statement->addColumn('clientID');
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
