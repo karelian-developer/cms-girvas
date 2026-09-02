@@ -34,13 +34,15 @@ export class ToolUnderline extends Tool {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
       
       const selection = this.editor.getSelectionString();
-      
+
       if (selection) {
-        this.editor.textarea.replaceStringSelection(
-          '<u>' + this.editor.getSelectionString() + '</u>'
+        const inserted = this.editor.textarea.replaceStringSelection(
+          '<u>' + selection + '</u>'
         );
-        
-        this.editor.clearSelection();
+
+        if (inserted) {
+          this.editor.clearSelection();
+        }
       }
     });
   }

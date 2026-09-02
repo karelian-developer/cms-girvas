@@ -31,15 +31,17 @@ export class ToolBold extends Tool {
   initClickEvent() {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
-      
+
       const selection = this.editor.getSelectionString();
-      
+
       if (selection) {
-        this.editor.textarea.replaceStringSelection(
+        const inserted = this.editor.textarea.replaceStringSelection(
           '**' + selection + '**'
         );
-        
-        this.editor.clearSelection();
+
+        if (inserted) {
+          this.editor.clearSelection();
+        }
       }
     });
   }

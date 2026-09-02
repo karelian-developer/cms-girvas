@@ -55,6 +55,10 @@ export class NadvoTE {
         }
       });
 
+      this.textarea.element.addEventListener('mousedown', () => {
+        this.saveTextareaSelection();
+      });
+
       const copyright = this.createElementDiv();
       copyright.classList.add('nadvo-te__copyright');
       copyright.innerText = this.localeData.NTE_COPYRIGHT;
@@ -87,9 +91,18 @@ export class NadvoTE {
   }
 
   getSelectionString() {
-    const selection = this.selection;
-    console.log('[NADVO TE] Get selection:', selection);
-    return selection;
+    if (!this.selection) {
+      const textarea = this.textarea?.element;
+
+      if (textarea && textarea.selectionStart !== textarea.selectionEnd) {
+        this.selection = textarea.value.substring(
+          textarea.selectionStart,
+          textarea.selectionEnd
+        );
+      }
+    }
+
+    return this.selection;
   }
 
   initEditorToolbar() {

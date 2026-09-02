@@ -64,9 +64,24 @@ export class Textarea {
   }
 
   replaceStringSelection(string) {
-    if (this.element.selectionStart || this.element.selectionStart == '0') {
-      let start = this.element.selectionStart, end = this.element.selectionEnd;
-      this.element.value = this.element.value.substring(0, start) + string + this.element.value.substring(end, this.element.value.length);
+    const start = this.element.selectionStart;
+    const end = this.element.selectionEnd;
+
+    if (start === end) {
+      return false;
     }
+
+    this.element.value = this.element.value.substring(0, start)
+      + string
+      + this.element.value.substring(end, this.element.value.length);
+
+    this.element.setSelectionRange(
+      start,
+      start + string.length
+    );
+
+    this.element.focus();
+
+    return true;
   }
 }
