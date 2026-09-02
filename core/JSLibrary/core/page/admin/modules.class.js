@@ -24,17 +24,9 @@ export class PageModules {
   }
 
   init() {
-    let searchParams = new URLParser(), locales;
+    let searchParams = new URLParser();
 
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
-
+    this.page.core.locales.admin.getData().then((localeData) => {
       let listItems = document.querySelectorAll('.modules-list .list__item');
       for (let listItem of listItems) {
         let buttons = {delete: null, install: null, enable: null, disable: null, more: null};

@@ -370,7 +370,6 @@ export class PageMedia {
   }
 
   init() {
-    let locales;
     const interactiveSortChoices = new Interactive('choices');
     const interactiveContainerPagePanelElement = document.querySelector('#E8548530785');
 
@@ -378,14 +377,7 @@ export class PageMedia {
     if (mediaUploaderInput !== null) {
       mediaUploaderInput.setAttribute('accept', 'image/png, image/jpeg, image/gif, image/webp, image/avif, application/pdf, .pdf');
 
-      fetch('/handler/locales', {method: 'GET'}).then((response) => {
-        return response.ok ? response.json() : Promise.reject(response);
-      }).then((data) => {
-        locales = data.outputData.locales;
-        return window.CMSCore.locales.admin.getData();
-      }, (rejectionReason) => {
-        this.page.showPopupNotification(rejectionReason, 0);
-      }).then((localeData) => {
+      this.page.core.locales.admin.getData().then((localeData) => {
         this.localeData = localeData;
 
         return this.page.core.loadIcons('/images/admin/icons/buttons').then((icons) => {

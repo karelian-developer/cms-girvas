@@ -64,7 +64,6 @@ export class PageModule {
   }
 
   init() {
-    let locales;
     const searchParams = new URLParser();
     const buttons = {enable: null, disable: null, install: null, delete: null};
 
@@ -74,15 +73,7 @@ export class PageModule {
     const moduleInstalledStatus = moduleBlock.getAttribute('data-installed-status');
     const interactiveContainerElement = document.querySelector('#E8548530785');
 
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
-
+    this.page.core.locales.admin.getData().then((localeData) => {
       if (searchParams.getPathPart(2) !== null) {
         buttons.enable = new Interactive('button');
         buttons.disable = new Interactive('button');

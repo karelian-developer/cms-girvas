@@ -73,20 +73,7 @@ export class PageTheme {
     let templateInstalledStatus = templateBlock.getAttribute('data-template-installed-status');
     let interactiveContainerElement = document.querySelector('#E8548530785');
     
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
-    }).then((localeData) => {
+    this.page.core.locales.admin.getData().then((localeData) => {
       if (searchParams.getPathPart(2) !== null) {
         let pageGalleryElement = templateBlock.querySelector('[role="gallery"]');
         if (pageGalleryElement != null) {

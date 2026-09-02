@@ -24,17 +24,7 @@ export class PageUsersGroups {
   }
 
   init() {
-    let searchParams = new URLParser(), locales;
-
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
-
+    this.page.core.locales.admin.getData().then((localeData) => {
       let interactiveCreatePageButton = new Interactive('button');
       interactiveCreatePageButton.target.setLabel(localeData.BUTTON_NEW_USERS_GROUP_LABEL);
       interactiveCreatePageButton.target.setCallback(() => {

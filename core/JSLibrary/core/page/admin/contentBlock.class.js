@@ -31,7 +31,6 @@ export class PageContentBlock {
     const searchParams = new URLParser();
     const elementForm = document.querySelector('[data-element="main-form"]');
 
-    let locales;
     const interactiveLocaleChoices = new Interactive('choices');
     const interactiveTypesChoices = new Interactive('choices');
     

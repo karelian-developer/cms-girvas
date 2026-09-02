@@ -27,7 +27,7 @@ export class PageUsersGroup {
   }
 
   init() {
-    let searchParams = new URLParser(), locales;
+    let searchParams = new URLParser();
     const elementForm = document.querySelector('[data-element="main-form"]');
 
     this.page.core.locales.admin.getData().then((localeData) => {

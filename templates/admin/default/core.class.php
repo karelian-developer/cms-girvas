@@ -213,7 +213,7 @@ final class Core implements ThemeInterfaceCore
               $itemElement->setAttribute('class', 'list__item item item_' . $navigationSectionName);
 
               if ($navigationSectionRole !== '') {
-                $itemElement->setAttribute('role', $navigationSectionRole); 
+                $itemElement->setAttribute('data-role', $navigationSectionRole); 
               }
 
               $linkElement->setAttribute('class', 'item__link link');

@@ -34,14 +34,7 @@ export class PageSettings {
     let elementForm = document.querySelector('[data-element="main-form"]');
     let interactiveLocaleChoices = new Interactive('choices');
     
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
+    this.page.core.locales.admin.getData().then((localeData) => {
       let checkboxesInputsElements = document.querySelectorAll('[type="checkbox"]');
       if (checkboxesInputsElements.length > 0) {
         checkboxesInputsElements.forEach((element, elementIndex) => {

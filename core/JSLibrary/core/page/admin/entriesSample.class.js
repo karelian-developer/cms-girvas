@@ -30,7 +30,6 @@ export class PageEntriesSample {
     let searchParams = new URLParser();
     let elementForm = document.querySelector('[data-element="main-form"]');
 
-    let locales;
     const interactiveLocaleChoices = new Interactive('choices');
     const interactiveCategoriesChoices = new Interactive('choices');
     const interactiveSortTypeChoices = new Interactive('choices');

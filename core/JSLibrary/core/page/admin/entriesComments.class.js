@@ -25,16 +25,8 @@ export class PageEntriesComments {
 
   init() {
     const tableItems = document.querySelectorAll('[data-element="entry-comment"]');
-    let locales;
-
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
+    
+    this.page.core.locales.admin.getData().then((localeData) => {
       for (let tableItem of tableItems) {
         let commentID = tableItem.getAttribute('data-id');
         let commentIsHidden = tableItem.getAttribute('data-is-hidden');

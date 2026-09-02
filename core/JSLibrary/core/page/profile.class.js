@@ -25,26 +25,10 @@ export class PageProfile {
   }
 
   init() {
-    let locales;
-
     this.clientUserPermissions = {};
     this.clientUserData = {};
 
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-
-      return (response.ok) ? response.json() : Promise.reject(response);
-    
-    }).then((data) => {
-
-      locales = data.outputData.locales;
-
-      return window.CMSCore.locales.base.getData();
-
-    }, (rejectionReason) => {
-
-      this.page.showPopupNotification(rejectionReason, 0);
-
-    }).then((localeData) => {
+    this.page.core.locales.base.getData().then((localeData) => {
 
       this.localeBaseData = localeData;
       
