@@ -438,7 +438,13 @@
 }
 
 .file-manager {
+  display: flex;
+  flex-direction: column;
   height: calc(100vh - 200px);
+}
+
+.file-manager__files-container {
+  overflow-y: auto;
 }
 
 .file-manager__media-list {
