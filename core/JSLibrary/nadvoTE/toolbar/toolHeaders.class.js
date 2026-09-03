@@ -47,17 +47,17 @@ export class ToolHeaders extends Tool {
       const before = textarea.value.substring(0, start);
       const after = textarea.value.substring(end);
 
-      const symbolBefore = before.slice(-1);
-      const symbolAfter = after.slice(0, 1);
+      const beforeEndsWithNewLine = before.endsWith('\n') || before.endsWith('\r');
+      const afterStartsWithNewLine = after.startsWith('\n') || after.startsWith('\r');
 
       let prefix = '';
       let suffix = '';
 
-      if (symbolBefore !== '\n\r') {
+      if (!beforeEndsWithNewLine) {
         prefix = '\n\r';
       }
 
-      if (symbolAfter !== '\n\r') {
+      if (!afterStartsWithNewLine) {
         suffix = '\n\r';
       }
 
