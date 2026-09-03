@@ -604,10 +604,51 @@ export class Schedule {
     this.zoom.navCanvas = navCanvas;
     this.zoom.navContext = navCanvas.getContext('2d');
 
+    // События мыши
     navCanvas.addEventListener('mousedown', (e) => this.navMouseDown(e));
     navCanvas.addEventListener('mousemove', (e) => this.navMouseMove(e));
     navCanvas.addEventListener('mouseup', () => this.navMouseUp());
-    navCanvas.addEventListener('mouseleave', () => this.navMouseUp());
+    
+    // ==========================================
+    // ИСПРАВЛЕНИЕ: mouseleave НЕ сбрасывает drag
+    // ==========================================
+    navCanvas.addEventListener('mouseleave', () => {
+      // Просто меняем курсор, если не в процессе drag
+      if (!this.zoom.isDragging && !this.zoom.isResizingLeft && !this.zoom.isResizingRight) {
+        this.zoom.navCanvas.style.cursor = 'grab';
+      }
+    });
+
+    // ==========================================
+    // ГЛОБАЛЬНЫЙ mousemove ДЛЯ ОТСЛЕЖИВАНИЯ ЗА ПРЕДЕЛАМИ CANVAS
+    // ==========================================
+    if (!this._globalMouseMoveAdded) {
+      document.addEventListener('mousemove', (e) => {
+        // Если drag активен — обрабатываем движение глобально
+        if (this.zoom.isDragging || this.zoom.isResizingLeft || this.zoom.isResizingRight) {
+          // Создаём искусственное событие для navMouseMove
+          const rect = this.zoom.navCanvas.getBoundingClientRect();
+          const fakeEvent = {
+            clientX: e.clientX,
+            clientY: e.clientY
+          };
+          this.navMouseMove(fakeEvent);
+        }
+      });
+      this._globalMouseMoveAdded = true;
+    }
+
+    // ==========================================
+    // ГЛОБАЛЬНЫЙ ОБРАБОТЧИК mouseup на document
+    // ==========================================
+    // Один раз добавляем, чтобы не плодить слушатели
+    if (!this._globalMouseUpAdded) {
+      document.addEventListener('mouseup', () => {
+        // Сбрасываем drag при отпускании кнопки где угодно
+        this.navMouseUp();
+      });
+      this._globalMouseUpAdded = true;
+    }
 
     // Собираем
     navContainer.append(zoomInBtn);
@@ -860,28 +901,33 @@ export class Schedule {
 
   navMouseDown(e) {
     const rect = this.zoom.navCanvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const handleSize = 0.02; // 2% от ширины навигатора
+    let x = (e.clientX - rect.left) / rect.width;
+    x = Math.max(0, Math.min(1, x));
     
+    const handleSize = 0.02;
     const left = this.zoom.viewStart;
     const right = this.zoom.viewEnd;
     
-    // Проверяем, попали ли в левую или правую границу
+    // Проверяем попадание в левую границу
     if (x >= left && x <= left + handleSize) {
       this.zoom.isResizingLeft = true;
       this.zoom.resizeStartX = x;
       this.zoom.resizeStartViewStart = left;
       this.zoom.resizeStartViewEnd = right;
       this.zoom.navCanvas.style.cursor = 'ew-resize';
+      // Сохраняем mouseX для глобального отслеживания
+      this.zoom._lastClientX = e.clientX;
       return;
     }
     
+    // Проверяем попадание в правую границу
     if (x >= right - handleSize && x <= right) {
       this.zoom.isResizingRight = true;
       this.zoom.resizeStartX = x;
       this.zoom.resizeStartViewStart = left;
       this.zoom.resizeStartViewEnd = right;
       this.zoom.navCanvas.style.cursor = 'ew-resize';
+      this.zoom._lastClientX = e.clientX;
       return;
     }
     
@@ -891,17 +937,24 @@ export class Schedule {
     this.zoom.dragStartViewStart = left;
     this.zoom.dragStartViewEnd = right;
     this.zoom.navCanvas.style.cursor = 'grabbing';
+    this.zoom._lastClientX = e.clientX;
   }
 
   navMouseMove(e) {
+    // Используем clientX для получения позиции, даже если курсор за пределами canvas
     const rect = this.zoom.navCanvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const handleSize = 0.02;
+    let x = (e.clientX - rect.left) / rect.width;
     
+    // ==========================================
+    // ОГРАНИЧИВАЕМ X В ПРЕДЕЛАХ [0, 1]
+    // ==========================================
+    x = Math.max(0, Math.min(1, x));
+    
+    const handleSize = 0.02;
     const left = this.zoom.viewStart;
     const right = this.zoom.viewEnd;
     
-    // Меняем курсор при наведении на границы
+    // Меняем курсор при наведении на границы (только если не в процессе)
     if (!this.zoom.isDragging && !this.zoom.isResizingLeft && !this.zoom.isResizingRight) {
       if ((x >= left && x <= left + handleSize) || (x >= right - handleSize && x <= right)) {
         this.zoom.navCanvas.style.cursor = 'ew-resize';
@@ -914,7 +967,6 @@ export class Schedule {
     // Ресайз левой границы
     if (this.zoom.isResizingLeft) {
       let newStart = Math.max(0, Math.min(right - 0.01, x));
-      // Не даём области стать слишком маленькой
       if (right - newStart < 0.01) return;
       this.zoom.viewStart = newStart;
       this.updateView();
