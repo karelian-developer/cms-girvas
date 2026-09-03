@@ -121,51 +121,59 @@ export class PageAnalytics {
             let visits1 = [];
             
             if (data) {
+              // Считаем просмотры
               for (let token in data.metrics.views) {
                 let urls = data.metrics.views[token].urls;
                 for (let url in urls) {
-                  // ==========================================
-                  // ПРОПУСКАЕМ ПУСТЫЕ URL
-                  // ==========================================
                   if (!url || typeof url !== 'string' || url.trim() === '') continue;
                   
+                  let isMatch = false;
+                  
                   if (isMainAnalytics) {
-                    urlsTotalViews += urls[url];
+                    isMatch = true;
                   } else if (targetName) {
-                    // ==========================================
-                    // ПРОВЕРКА ЧЕРЕЗ includes (БЕЗ new URL)
-                    // ==========================================
                     const urlLower = url.toLowerCase();
                     const targetLower = targetName.toLowerCase();
                     
-                    // Проверяем для страниц (/page/name)
                     if (urlLower.includes(`/page/${targetLower}`) || 
                         urlLower.includes(`/page/${targetLower}?`) ||
-                        urlLower.includes(`/page/${targetLower}&`)) {
-                      urlsTotalViews += urls[url];
+                        urlLower.includes(`/page/${targetLower}&`) ||
+                        urlLower.includes(`/entry/${targetLower}`) || 
+                        urlLower.includes(`/entry/${targetLower}?`) ||
+                        urlLower.includes(`/entry/${targetLower}&`)) {
+                      isMatch = true;
                     }
-                    // Проверяем для записей (/entry/name)
-                    else if (urlLower.includes(`/entry/${targetLower}`) || 
-                             urlLower.includes(`/entry/${targetLower}?`) ||
-                             urlLower.includes(`/entry/${targetLower}&`)) {
-                      urlsTotalViews += urls[url];
-                    }
+                  }
+                  
+                  if (isMatch) {
+                    urlsTotalViews += urls[url];
                   }
                 }
               }
               
-              let filteredVisits0 = [];
-              let filteredVisits1 = [];
-
-              for (let token in data.metrics.views) {
-                let urls = data.metrics.views[token].urls;
-                let hasMatch = false;
+              // ==========================================
+              // ФИЛЬТРУЕМ ВИЗИТЫ И ПОСЕЩЕНИЯ
+              // ==========================================
+              if (isMainAnalytics) {
+                // ==========================================
+                // ГЛАВНАЯ АНАЛИТИКА — БЕРЁМ ВСЕ ВИЗИТЫ
+                // ==========================================
+                visits0 = data.metrics.visits0 || [];
+                visits1 = data.metrics.visits1 || [];
+              } else if (targetName) {
+                // ==========================================
+                // СТРАНИЦА ЗАПИСИ/СТАТИКИ — ФИЛЬТРУЕМ
+                // ==========================================
+                let filteredVisits0 = [];
+                let filteredVisits1 = [];
                 
-                // Проверяем, есть ли у токена просмотры нашей страницы
-                for (let url in urls) {
-                  if (!url || typeof url !== 'string') continue;
+                for (let token in data.metrics.views) {
+                  let urls = data.metrics.views[token].urls;
+                  let hasMatch = false;
                   
-                  if (targetName) {
+                  for (let url in urls) {
+                    if (!url || typeof url !== 'string') continue;
+                    
                     const urlLower = url.toLowerCase();
                     const targetLower = targetName.toLowerCase();
                     
@@ -177,27 +185,25 @@ export class PageAnalytics {
                       break;
                     }
                   }
+                  
+                  if (hasMatch) {
+                    if (data.metrics.visits0?.includes(token)) {
+                      filteredVisits0.push(token);
+                    }
+                    if (data.metrics.visits1?.includes(token)) {
+                      filteredVisits1.push(token);
+                    }
+                  }
                 }
                 
-                // Если токен посещал нашу страницу — добавляем его в визиты
-                if (hasMatch) {
-                  // Проверяем, есть ли этот токен в общих visits0 и visits1
-                  if (data.metrics.visits0?.includes(token)) {
-                    filteredVisits0.push(token);
-                  }
-                  if (data.metrics.visits1?.includes(token)) {
-                    filteredVisits1.push(token);
-                  }
-                }
+                visits0 = filteredVisits0;
+                visits1 = filteredVisits1;
               }
-
-              visits0 = filteredVisits0;
-              visits1 = filteredVisits1;
             }
             
-            scheduleAttendance.target.addData(0, dayIndex, urlsTotalViews);
-            scheduleAttendance.target.addData(1, dayIndex, visits0.length);
-            scheduleAttendance.target.addData(2, dayIndex, visits1.length);
+            schedule.addData(0, dayIndex, urlsTotalViews);
+            schedule.addData(1, dayIndex, visits0.length);
+            schedule.addData(2, dayIndex, visits1.length);
           }
 
           scheduleAttendance.target.types[0].setColor('#EE82EE');
