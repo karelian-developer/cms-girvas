@@ -41,7 +41,7 @@ export class PageAnalytics {
 
         const firstDate = new Date(), lastDate = new Date();
 
-        attendanceScheduleContainerElement.innerHTML = '';
+        //attendanceScheduleContainerElement.innerHTML = '';
 
         scheduleContainerElement.setAttribute('width', `${scheduleParentElementWidth}px`);
         scheduleContainerElement.setAttribute('height', '400px');
