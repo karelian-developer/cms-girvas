@@ -43,6 +43,10 @@ export class Interactive {
       data.zoomStep = (Object.hasOwn(interactiveParams, 'zoomStep')) ? interactiveParams.zoomStep : 0.1;
       data.showNavigator = (Object.hasOwn(interactiveParams, 'showNavigator')) ? interactiveParams.showNavigator : true;
       data.padding = (Object.hasOwn(interactiveParams, 'padding')) ? interactiveParams.padding : { top: 30, right: 30, bottom: 40, left: 50 };
+      data.height = (Object.hasOwn(interactiveParams, 'height')) ? interactiveParams.height : 'auto';
+      data.minHeight = (Object.hasOwn(interactiveParams, 'minHeight')) ? interactiveParams.minHeight : 200;
+      data.maxHeight = (Object.hasOwn(interactiveParams, 'maxHeight')) ? interactiveParams.maxHeight : 600;
+      data.aspectRatio = (Object.hasOwn(interactiveParams, 'aspectRatio')) ? interactiveParams.aspectRatio : null;
     }
 
     if (interactiveName == 'modal') {
@@ -90,7 +94,11 @@ export class Interactive {
             maxZoom: data.maxZoom,
             zoomStep: data.zoomStep,
             showNavigator: data.showNavigator,
-            padding: data.padding
+            padding: data.padding,
+            height: data.height,
+            minHeight: data.minHeight,
+            maxHeight: data.maxHeight,
+            aspectRatio: data.aspectRatio
           }
         );
         break;
