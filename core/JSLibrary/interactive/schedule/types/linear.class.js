@@ -147,13 +147,16 @@ export class Linear {
     }
 
     // ==========================================
-    // ОПРЕДЕЛЯЕМ, КАКАЯ ТОЧКА ПОД МЫШЬЮ
+    // ОПРЕДЕЛЯЕМ, НАВЕДЕНЫ ЛИ НА ЭТУ ЛИНИЮ
     // ==========================================
     const mouseX = schedule.mouse.x;
     const mouseY = schedule.mouse.y;
-    let hoveredIndex = -1;
+    const typeIndex = schedule.types.indexOf(this);
+    
+    // Проверяем, есть ли точка этой линии под мышью
+    let isHovered = false;
     let hoveredData = null;
-    const hoverRadius = 10;
+    const hoverRadius = 12;
 
     for (let i = 0; i < visibleData.length; i++) {
       const data = visibleData[i];
@@ -171,38 +174,46 @@ export class Linear {
       const dy = mouseY - cy;
       
       if (dx * dx + dy * dy < hoverRadius * hoverRadius) {
-        hoveredIndex = i;
+        isHovered = true;
         hoveredData = data;
         break;
       }
     }
 
     // ==========================================
-    // ПОЛУЧАЕМ ТИП МЕТРИКИ
-    // ==========================================
-    const typeIndex = schedule.types.indexOf(this);
-    const isHovered = hoveredData !== null;
-
-    // ==========================================
     // ЛОГИКА ПРОЗРАЧНОСТИ
     // ==========================================
-    let globalAlpha = 1.0;
-
+    // Определяем, какая линия сейчас активна (на которую навели)
+    let activeTypeIndex = -1;
     if (isHovered) {
-      // Если наведены на ЭТУ линию — оставляем непрозрачной
-      if (typeIndex === hoveredTypeIndex) {
-        globalAlpha = 1.0;
+      activeTypeIndex = typeIndex;
+    } else {
+      // Если ничего не наведено — все линии видны
+      activeTypeIndex = -1;
+    }
+
+    // Если мышь не на графике — все линии видны
+    const isMouseOnCanvas = mouseX > 0 && mouseY > 0 && 
+                            mouseX < schedule.canvas.width && 
+                            mouseY < schedule.canvas.height;
+
+    let globalAlpha = 1.0;
+    if (isMouseOnCanvas && activeTypeIndex !== -1) {
+      if (typeIndex === activeTypeIndex) {
+        globalAlpha = 1.0; // Активная линия
       } else {
-        // Если наведены на ДРУГУЮ линию — делаем прозрачной
-        globalAlpha = 0.2;
+        globalAlpha = 0.15; // Остальные прозрачные
       }
     }
     
     schedule.context.globalAlpha = globalAlpha;
     
-    // Рисуем линию
+    // ==========================================
+    // РИСУЕМ ЛИНИЮ
+    // ==========================================
+    const isActiveLine = (isMouseOnCanvas && activeTypeIndex === typeIndex);
     schedule.context.strokeStyle = this.color;
-    schedule.context.lineWidth = (isHovered && typeIndex === 0) ? 3.5 : 2.5;
+    schedule.context.lineWidth = isActiveLine ? 3.5 : 2.5;
     schedule.context.beginPath();
 
     let isFirst = true;
@@ -243,7 +254,7 @@ export class Linear {
     }
 
     schedule.context.stroke();
-    schedule.context.globalAlpha = 1.0; // сбрасываем прозрачность
+    schedule.context.globalAlpha = 1.0;
 
     // ==========================================
     // РИСУЕМ ТОЧКИ
@@ -260,30 +271,27 @@ export class Linear {
       const cx = frameX + xPos;
       const cy = frameY + frameHeight - yPos;
       
-      const isHoveredPoint = (i === hoveredIndex);
+      const isHoveredPoint = (isHovered && hoveredData === data);
       const radius = isHoveredPoint ? 7 : 4;
       const borderWidth = isHoveredPoint ? 3 : 1.5;
 
       // Прозрачность точек
       let pointAlpha = 1.0;
-      if (isHovered && typeIndex !== 0) {
-        pointAlpha = 0.3;
+      if (isMouseOnCanvas && activeTypeIndex !== -1 && typeIndex !== activeTypeIndex) {
+        pointAlpha = 0.15;
       }
       schedule.context.globalAlpha = pointAlpha;
 
-      // Тень для выделенной точки
       if (isHoveredPoint) {
         schedule.context.shadowColor = this.color;
         schedule.context.shadowBlur = 15;
       }
 
-      // Заливка
       schedule.context.fillStyle = this.color;
       schedule.context.beginPath();
       schedule.context.arc(cx, cy, radius, 0, Math.PI * 2);
       schedule.context.fill();
 
-      // Обводка (белая для контраста)
       schedule.context.shadowBlur = 0;
       schedule.context.strokeStyle = '#FFFFFF';
       schedule.context.lineWidth = borderWidth;
@@ -291,7 +299,6 @@ export class Linear {
       schedule.context.arc(cx, cy, radius, 0, Math.PI * 2);
       schedule.context.stroke();
 
-      // Если точка под мышью — дополнительный внешний кружок
       if (isHoveredPoint) {
         schedule.context.strokeStyle = this.color;
         schedule.context.lineWidth = 2;
@@ -307,9 +314,9 @@ export class Linear {
     schedule.context.shadowBlur = 0;
 
     // ==========================================
-    // ТУЛТИП (всегда поверх)
+    // ТУЛТИП
     // ==========================================
-    if (hoveredData !== null) {
+    if (isHovered && hoveredData !== null) {
       const data = hoveredData;
       const relativeX = data.x - viewStart * totalDays;
       const clampedX = Math.max(0, Math.min(visibleDays, relativeX));
@@ -364,7 +371,7 @@ export class Linear {
         tooltipY = canvasHeight - tooltipHeight - 10;
       }
 
-      // Рисуем фон тултипа (поверх всего)
+      // Фон тултипа
       schedule.context.shadowBlur = 15;
       schedule.context.shadowColor = 'rgba(0, 0, 0, 0.2)';
       schedule.context.fillStyle = '#FFFFFF';
@@ -393,7 +400,7 @@ export class Linear {
 
       schedule.context.shadowBlur = 0;
 
-      // Рисуем текст
+      // Текст
       for (let i = 0; i < lines.length; i++) {
         const textY = tooltipY + padding + i * lineHeight;
         const textX = tooltipX + padding;
@@ -409,7 +416,7 @@ export class Linear {
         schedule.context.fillText(lines[i], textX, textY);
       }
 
-      // Стрелка от тултипа к точке
+      // Стрелка
       const arrowX = cx > tooltipX + tooltipWidth / 2 ? tooltipX + tooltipWidth : tooltipX;
       const arrowY = tooltipY + tooltipHeight / 2;
 
