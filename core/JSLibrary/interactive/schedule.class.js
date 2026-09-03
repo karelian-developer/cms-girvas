@@ -132,14 +132,19 @@ export class Schedule {
       const frameWidth = parentWidth - padding.left - padding.right;
       const frameHeight = height - padding.top - padding.bottom;
       
-      this.setFrameSize(frameWidth, frameHeight);
+      this.setFrameSize(frameWidth, height);
       this.setFramePosition(padding.left, padding.top);
       
       if (this.context) {
+        // ==========================================
+        // ОЧИЩАЕМ И ПЕРЕРИСОВЫВАЕМ
+        // ==========================================
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.render();
       }
     }
 
+    // Обновляем навигатор
     if (this.zoom && this.zoom.navCanvas) {
       const navParent = this.zoom.navCanvas.parentElement;
       if (navParent) {
@@ -306,7 +311,7 @@ export class Schedule {
 
     this.dataBuckup = [];
   }
-  
+
   getMaxYData() {
     let maxY = 0;
     for (let groupIndex = 0; groupIndex < this.types.length; groupIndex++) {
@@ -419,6 +424,8 @@ export class Schedule {
 
   render() {
     if (!this.canvas || !this.context) return;
+
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     this.drawGrid();
     this.drawFrame();
@@ -676,9 +683,17 @@ export class Schedule {
   }
 
   updateView() {
+    // Очищаем основной canvas
+    if (this.context) {
+      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+    
+    // Обновляем навигатор
     if (this.options.zoomable && this.options.showNavigator && this.zoom.navContext) {
       this.renderNavigator();
     }
+    
+    // Перерисовываем основной график
     this.render();
   }
 
