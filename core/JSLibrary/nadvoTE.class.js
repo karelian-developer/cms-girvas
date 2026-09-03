@@ -52,6 +52,10 @@ export class NadvoTE {
       this.initTextareaEvents();
       this.saveHistory(true);
 
+      this.history = [];
+      this.historyIndex = -1;
+      this.saveHistory(true);
+
       const copyright = this.createElementDiv();
       copyright.classList.add('nadvo-te__copyright');
       copyright.innerText = this.localeData.NTE_COPYRIGHT;
@@ -178,11 +182,11 @@ export class NadvoTE {
   }
 
   restoreHistory() {
-    const value = this.history[this.historyIndex];
-
-    if (value === undefined) {
+    if (this.historyIndex < 0 || this.historyIndex >= this.history.length) {
       return;
     }
+
+    const value = this.history[this.historyIndex];
 
     this.isRestoring = true;
 
