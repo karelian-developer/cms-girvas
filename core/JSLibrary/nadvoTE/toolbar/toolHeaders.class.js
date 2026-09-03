@@ -53,12 +53,12 @@ export class ToolHeaders extends Tool {
       let prefix = '';
       let suffix = '';
 
-      if (symbolBefore !== '\n') {
-        prefix = '\n';
+      if (symbolBefore !== '\n\r') {
+        prefix = '\n\r';
       }
 
-      if (symbolAfter !== '\n') {
-        suffix = '\n';
+      if (symbolAfter !== '\n\r') {
+        suffix = '\n\r';
       }
 
       const header = '#'.repeat(selectElement.value) + ' ' + selection;
