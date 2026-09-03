@@ -193,6 +193,7 @@ export class PageAnalytics {
       return;
     }
 
+    // Создаём график
     this.scheduleAttendance = new Interactive('schedule', {
       canvasElement: canvasElement,
       type: 'linear',
@@ -214,6 +215,9 @@ export class PageAnalytics {
       canvasElement.height - 50 - 40
     );
 
+    // ==========================================
+    // СОЗДАЁМ ГРУППЫ (ВСЕГДА ТРИ)
+    // ==========================================
     schedule.addGroup('Просмотры');
     schedule.addGroup('Визиты');
     schedule.addGroup('Посещения');
@@ -221,6 +225,7 @@ export class PageAnalytics {
     const isMainAnalytics = searchParams.getPathPart(4) === null;
     const daysInMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0).getDate();
 
+    // Группируем данные по дням
     const dailyData = {};
     metricsData.forEach((data) => {
       const time = data.metrics.time * 1000;
@@ -229,9 +234,13 @@ export class PageAnalytics {
       dailyData[day] = data;
     });
 
+    // Получаем targetName для фильтрации (если не главная аналитика)
     const targetObject = document.querySelector('article.page[data-name]');
     const targetName = targetObject?.getAttribute('data-name');
 
+    // ==========================================
+    // ПРОХОДИМ ПО ВСЕМ ДНЯМ МЕСЯЦА
+    // ==========================================
     for (let day = 1; day <= daysInMonth; day++) {
       const data = dailyData[day];
       const dayIndex = day - 1;
@@ -241,13 +250,11 @@ export class PageAnalytics {
       let visits1 = [];
       
       if (data) {
+        // Считаем просмотры
         for (let token in data.metrics.views) {
           let urls = data.metrics.views[token].urls;
-          let urlTransfers = data.metrics.views[token].url_transfers || [];
-          
-          let hasMatch = false;
-          
           for (let url in urls) {
+            // Пропускаем пустые URL
             if (!url || typeof url !== 'string' || url.trim() === '') continue;
             
             let isMatch = false;
@@ -258,58 +265,48 @@ export class PageAnalytics {
               const urlLower = url.toLowerCase();
               const targetLower = targetName.toLowerCase();
               
+              // Проверяем для страниц (/page/name)
               if (urlLower.includes(`/page/${targetLower}`) || 
                   urlLower.includes(`/page/${targetLower}?`) ||
-                  urlLower.includes(`/page/${targetLower}&`) ||
-                  urlLower.includes(`/entry/${targetLower}`) || 
-                  urlLower.includes(`/entry/${targetLower}?`) ||
-                  urlLower.includes(`/entry/${targetLower}&`)) {
+                  urlLower.includes(`/page/${targetLower}&`)) {
+                isMatch = true;
+              }
+              // Проверяем для записей (/entry/name)
+              else if (urlLower.includes(`/entry/${targetLower}`) || 
+                       urlLower.includes(`/entry/${targetLower}?`) ||
+                       urlLower.includes(`/entry/${targetLower}&`)) {
                 isMatch = true;
               }
             }
             
             if (isMatch) {
               urlsTotalViews += urls[url];
-              hasMatch = true;
-            }
-          }
-          
-          // ==========================================
-          // УЧИТЫВАЕМ ВИЗИТЫ И ПОСЕЩЕНИЯ ТОЛЬКО ДЛЯ ЭТОГО ТОКЕНА
-          // ==========================================
-          if (hasMatch) {
-            for (let transferIndex in urlTransfers) {
-              for (let transfer in urlTransfers[transferIndex]) {
-                let transferData = urlTransfers[transferIndex][transfer];
-                let urlReferral = transferData.referral || '';
-                let visitedIsNew = transferData.is_visited_new || false;
-                
-                // Визиты (не прямые заходы)
-                if (transfer !== urlReferral && urlReferral && urlReferral !== '') {
-                  if (visits0.indexOf(token) === -1) {
-                    visits0.push(token);
-                  }
-                }
-                
-                // Посещения (новые посетители)
-                if (visitedIsNew && visits1.indexOf(token) === -1) {
-                  visits1.push(token);
-                }
-              }
             }
           }
         }
+        
+        visits0 = data.metrics.visits0 || [];
+        visits1 = data.metrics.visits1 || [];
       }
       
+      // ==========================================
+      // ДОБАВЛЯЕМ ВСЕ ТРИ МЕТРИКИ
+      // ==========================================
       schedule.addData(0, dayIndex, urlsTotalViews);
       schedule.addData(1, dayIndex, visits0.length);
       schedule.addData(2, dayIndex, visits1.length);
     }
 
+    // ==========================================
+    // УСТАНАВЛИВАЕМ ЦВЕТА
+    // ==========================================
     schedule.types[0].setColor('#EE82EE');
     schedule.types[1].setColor('#5B92E5');
     schedule.types[2].setColor('#088567');
 
+    // ==========================================
+    // СТРОИМ ГРАФИК
+    // ==========================================
     schedule.buildData();
     schedule.init();
     schedule.assembly();
