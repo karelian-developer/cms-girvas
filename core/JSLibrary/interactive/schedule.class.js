@@ -98,6 +98,10 @@ export class Schedule {
       resizeStartViewEnd: 0
     };
 
+    this._renderRequested = false;
+    this._lastRenderTime = 0;
+    this._minRenderInterval = 16; // ~60 FPS
+
     // Если зум включён — инициализируем навигатор
     if (this.options.zoomable && this.options.showNavigator) {
       this.initNavigator();
@@ -623,15 +627,27 @@ export class Schedule {
     // ГЛОБАЛЬНЫЙ mousemove ДЛЯ ОТСЛЕЖИВАНИЯ ЗА ПРЕДЕЛАМИ CANVAS
     // ==========================================
     if (!this._globalMouseMoveAdded) {
+      let lastMoveTime = 0;
+      const minInterval = 16;
+      
       document.addEventListener('mousemove', (e) => {
-        // Если drag активен — обрабатываем движение глобально
         if (this.zoom.isDragging || this.zoom.isResizingLeft || this.zoom.isResizingRight) {
-          // Создаём искусственное событие для navMouseMove
-          const rect = this.zoom.navCanvas.getBoundingClientRect();
-          const fakeEvent = {
-            clientX: e.clientX,
-            clientY: e.clientY
-          };
+          const now = performance.now();
+          if (now - lastMoveTime < minInterval) {
+            // Пропускаем слишком частые вызовы
+            if (!this._renderRequested) {
+              this._renderRequested = true;
+              requestAnimationFrame(() => {
+                this._renderRequested = false;
+                lastMoveTime = performance.now();
+                const fakeEvent = { clientX: e.clientX };
+                this.navMouseMove(fakeEvent);
+              });
+            }
+            return;
+          }
+          lastMoveTime = now;
+          const fakeEvent = { clientX: e.clientX };
           this.navMouseMove(fakeEvent);
         }
       });
@@ -718,6 +734,41 @@ export class Schedule {
     this.updateView();
   }
 
+  /**
+   * Запрашивает перерисовку с ограничением частоты
+   */
+  requestRender() {
+    if (this._renderRequested) return;
+    
+    this._renderRequested = true;
+    requestAnimationFrame(() => {
+      this._renderRequested = false;
+      this.render();
+    });
+  }
+
+  /**
+   * Перерисовка с ограничением частоты (для драга)
+   */
+  renderThrottled() {
+    const now = performance.now();
+    if (now - this._lastRenderTime < this._minRenderInterval) {
+      // Если прошло меньше 16ms — откладываем
+      if (!this._renderRequested) {
+        this._renderRequested = true;
+        requestAnimationFrame(() => {
+          this._renderRequested = false;
+          this._lastRenderTime = performance.now();
+          this.render();
+        });
+      }
+      return;
+    }
+    
+    this._lastRenderTime = now;
+    this.render();
+  }
+
   navStartDrag(e) {
     if (!this.zoom.navCanvas) return;
     this.zoom.isDragging = true;
@@ -729,6 +780,9 @@ export class Schedule {
     this.zoom.dragStartViewEnd = this.zoom.viewEnd;
 
     this.zoom.navCanvas.style.cursor = 'grabbing';
+    
+    // Сохраняем начальную позицию для оптимизации
+    this._dragLastX = x;
   }
 
   navMoveDrag(e) {
@@ -736,11 +790,19 @@ export class Schedule {
 
     const rect = this.zoom.navCanvas.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
-    const delta = x - this.zoom.dragStartX;
+    
+    // ==========================================
+    // ОПТИМИЗАЦИЯ: обновляем только если сдвиг > 0.5%
+    // ==========================================
+    const delta = x - this._dragLastX;
+    if (Math.abs(delta) < 0.005) return; // игнорируем микро-движения
+    this._dragLastX = x;
+    
     const viewWidth = this.zoom.viewEnd - this.zoom.viewStart;
+    const moveDelta = (x - this.zoom.dragStartX) * viewWidth;
 
-    let newStart = this.zoom.dragStartViewStart + delta * viewWidth;
-    let newEnd = this.zoom.dragStartViewEnd + delta * viewWidth;
+    let newStart = this.zoom.dragStartViewStart + moveDelta;
+    let newEnd = this.zoom.dragStartViewEnd + moveDelta;
 
     if (newStart < 0) {
       newStart = 0;
@@ -754,7 +816,17 @@ export class Schedule {
     this.zoom.viewStart = Math.max(0, Math.min(1 - viewWidth, newStart));
     this.zoom.viewEnd = this.zoom.viewStart + viewWidth;
 
-    this.updateView();
+    // ==========================================
+    // ОПТИМИЗАЦИЯ: обновляем навигатор сразу (лёгкая операция)
+    // ==========================================
+    if (this.options.zoomable && this.options.showNavigator && this.zoom.navContext) {
+      this.renderNavigator();
+    }
+    
+    // ==========================================
+    // ОПТИМИЗАЦИЯ: основной график — с ограничением частоты
+    // ==========================================
+    this.renderThrottled();
   }
 
   navEndDrag() {
@@ -762,6 +834,8 @@ export class Schedule {
     if (this.zoom.navCanvas) {
       this.zoom.navCanvas.style.cursor = 'grab';
     }
+    // Финальная перерисовка для чистоты
+    this.render();
   }
 
   updateView() {
@@ -934,55 +1008,47 @@ export class Schedule {
     const left = this.zoom.viewStart;
     const right = this.zoom.viewEnd;
     
-    // Проверяем попадание в левую границу
     if (x >= left && x <= left + handleSize) {
       this.zoom.isResizingLeft = true;
       this.zoom.resizeStartX = x;
       this.zoom.resizeStartViewStart = left;
       this.zoom.resizeStartViewEnd = right;
       this.zoom.navCanvas.style.cursor = 'ew-resize';
-      // Сохраняем mouseX для глобального отслеживания
-      this.zoom._lastClientX = e.clientX;
+      this._dragLastX = x;
       return;
     }
     
-    // Проверяем попадание в правую границу
     if (x >= right - handleSize && x <= right) {
       this.zoom.isResizingRight = true;
       this.zoom.resizeStartX = x;
       this.zoom.resizeStartViewStart = left;
       this.zoom.resizeStartViewEnd = right;
       this.zoom.navCanvas.style.cursor = 'ew-resize';
-      this.zoom._lastClientX = e.clientX;
+      this._dragLastX = x;
       return;
     }
     
-    // Если не попали в границы — начинаем drag
     this.zoom.isDragging = true;
     this.zoom.dragStartX = x;
     this.zoom.dragStartViewStart = left;
     this.zoom.dragStartViewEnd = right;
     this.zoom.navCanvas.style.cursor = 'grabbing';
-    this.zoom._lastClientX = e.clientX;
+    this._dragLastX = x;
   }
 
   navMouseMove(e) {
-    // Используем clientX для получения позиции, даже если курсор за пределами canvas
     const rect = this.zoom.navCanvas.getBoundingClientRect();
-    let x = (e.clientX - rect.left) / rect.width;
-    
-    // ==========================================
-    // ОГРАНИЧИВАЕМ X В ПРЕДЕЛАХ [0, 1]
-    // ==========================================
-    x = Math.max(0, Math.min(1, x));
-    
+    const x = (e.clientX - rect.left) / rect.width;
+    const clampedX = Math.max(0, Math.min(1, x));
     const handleSize = 0.02;
+    
     const left = this.zoom.viewStart;
     const right = this.zoom.viewEnd;
     
-    // Меняем курсор при наведении на границы (только если не в процессе)
+    // Меняем курсор при наведении на границы
     if (!this.zoom.isDragging && !this.zoom.isResizingLeft && !this.zoom.isResizingRight) {
-      if ((x >= left && x <= left + handleSize) || (x >= right - handleSize && x <= right)) {
+      if ((clampedX >= left && clampedX <= left + handleSize) || 
+          (clampedX >= right - handleSize && clampedX <= right)) {
         this.zoom.navCanvas.style.cursor = 'ew-resize';
       } else {
         this.zoom.navCanvas.style.cursor = 'grab';
@@ -992,43 +1058,26 @@ export class Schedule {
     
     // Ресайз левой границы
     if (this.zoom.isResizingLeft) {
-      let newStart = Math.max(0, Math.min(right - 0.01, x));
+      let newStart = Math.max(0, Math.min(right - 0.01, clampedX));
       if (right - newStart < 0.01) return;
       this.zoom.viewStart = newStart;
-      this.updateView();
+      this.renderNavigator();
+      this.renderThrottled();
       return;
     }
     
     // Ресайз правой границы
     if (this.zoom.isResizingRight) {
-      let newEnd = Math.min(1, Math.max(left + 0.01, x));
+      let newEnd = Math.min(1, Math.max(left + 0.01, clampedX));
       if (newEnd - left < 0.01) return;
       this.zoom.viewEnd = newEnd;
-      this.updateView();
+      this.renderNavigator();
+      this.renderThrottled();
       return;
     }
     
-    // Drag всей области
-    if (this.zoom.isDragging) {
-      const delta = x - this.zoom.dragStartX;
-      const viewWidth = this.zoom.dragStartViewEnd - this.zoom.dragStartViewStart;
-      
-      let newStart = this.zoom.dragStartViewStart + delta * viewWidth;
-      let newEnd = this.zoom.dragStartViewEnd + delta * viewWidth;
-      
-      if (newStart < 0) {
-        newStart = 0;
-        newEnd = viewWidth;
-      }
-      if (newEnd > 1) {
-        newEnd = 1;
-        newStart = 1 - viewWidth;
-      }
-      
-      this.zoom.viewStart = Math.max(0, Math.min(1 - viewWidth, newStart));
-      this.zoom.viewEnd = this.zoom.viewStart + viewWidth;
-      this.updateView();
-    }
+    // Drag — используем оптимизированный метод
+    this.navMoveDrag(e);
   }
 
   navMouseUp() {
