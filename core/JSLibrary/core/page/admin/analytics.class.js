@@ -23,6 +23,7 @@ export class PageAnalytics {
   constructor(page, params = {}) {
     this.page = page;
     this.currentDate = this.getDateFromURL();
+    this.monthDisplay = null;
   }
 
   getDateFromURL() {
@@ -33,9 +34,6 @@ export class PageAnalytics {
       if (dateParam) {
         let parsed;
         
-        // ==========================================
-        // НОРМАЛИЗАЦИЯ: если только год-месяц → добавляем день
-        // ==========================================
         if (/^\d{4}-\d{2}$/.test(dateParam)) {
           parsed = new Date(dateParam + '-01');
         } else {
@@ -55,6 +53,34 @@ export class PageAnalytics {
     return new Date();
   }
 
+  updateMonthDisplay() {
+    if (!this.monthDisplay) return;
+    const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+                        'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+    this.monthDisplay.textContent = 
+      `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
+  }
+
+  refreshChart() {
+    const container = document.querySelector('[data-role="attendance-schedule"]');
+    if (!container) return;
+
+    const oldCanvas = container.querySelector('canvas');
+    if (!oldCanvas) return;
+
+    const newCanvas = this.scheduleContainerElementCreate();
+    container.innerHTML = '';
+    container.append(newCanvas);
+
+    this.loadChartData(newCanvas);
+  }
+
+  updateDate(date) {
+    this.currentDate = date;
+    this.updateMonthDisplay();
+    this.refreshChart();
+  }
+
   init() {
     const searchParams = new URLParser();
     
@@ -62,6 +88,19 @@ export class PageAnalytics {
       const analyticApp = document.querySelector('#analytic-app');
 
       if (analyticApp !== null) {
+        // ==========================================
+        // ДОБАВЛЯЕМ ОТОБРАЖЕНИЕ МЕСЯЦА
+        // ==========================================
+        const titleContainer = document.querySelector('.page__title-container');
+        if (titleContainer) {
+          const monthDisplay = document.createElement('span');
+          monthDisplay.className = 'analytics-month-display';
+          monthDisplay.style.cssText = 'font-size:16px;font-weight:600;color:#555;margin-left:12px;';
+          titleContainer.appendChild(monthDisplay);
+          this.monthDisplay = monthDisplay;
+          this.updateMonthDisplay();
+        }
+
         const attendanceScheduleContainerElement = analyticApp.querySelector('[data-role="attendance-schedule"]');
         
         const scheduleContainerElement = this.scheduleContainerElementCreate();
@@ -73,157 +112,7 @@ export class PageAnalytics {
         scheduleContainerElement.setAttribute('width', `${scheduleParentElementWidth}px`);
         scheduleContainerElement.setAttribute('height', '400px');
 
-        const year = this.currentDate.getFullYear();
-        const month = this.currentDate.getMonth();
-        
-        const firstDate = new Date(year, month, 1);
-        const lastDate = new Date(year, month + 1, 0);
-        
-        console.log(`📅 Загружаем данные за: ${firstDate.toLocaleDateString()} — ${lastDate.toLocaleDateString()}`);
-        
-        window.CMSCore.metrics.getDataByRangeTimestamp(firstDate.getTime(), lastDate.getTime()).then((metricsData) => {
-          const scheduleAttendance = new Interactive('schedule', {
-            canvasElement: scheduleContainerElement,
-            type: 'linear',
-            zoomable: true,
-            minZoom: 0.5,
-            maxZoom: 5,
-            zoomStep: 0.1,
-            showNavigator: true,
-            padding: { top: 30, right: 30, bottom: 40, left: 50 },
-            height: 'auto',
-            minHeight: 250,
-            maxHeight: 600
-          });
-
-          scheduleAttendance.target.setFrameSize(
-            scheduleContainerElement.width - 50,
-            scheduleContainerElement.height - 50 - 40
-          );
-
-          scheduleAttendance.target.addGroup('Просмотры');
-          scheduleAttendance.target.addGroup('Визиты');
-          scheduleAttendance.target.addGroup('Посещения');
-          
-          const isMainAnalytics = searchParams.getPathPart(4) === null;
-          const daysInMonth = lastDate.getDate();
-
-          const dailyData = {};
-          metricsData.forEach((data) => {
-            const time = data.metrics.time * 1000;
-            const date = new Date(time);
-            const day = date.getDate();
-            dailyData[day] = data;
-          });
-
-          // ==========================================
-          // ПОЛУЧАЕМ targetName ДЛЯ ФИЛЬТРАЦИИ
-          // ==========================================
-          const targetObject = document.querySelector('article.page[data-name]');
-          const targetName = targetObject?.getAttribute('data-name');
-
-          for (let day = 1; day <= daysInMonth; day++) {
-            const data = dailyData[day];
-            const dayIndex = day - 1;
-            
-            let urlsTotalViews = 0;
-            let visits0 = [];
-            let visits1 = [];
-            
-            if (data) {
-              // Считаем просмотры
-              for (let token in data.metrics.views) {
-                let urls = data.metrics.views[token].urls;
-                for (let url in urls) {
-                  if (!url || typeof url !== 'string' || url.trim() === '') continue;
-                  
-                  let isMatch = false;
-                  
-                  if (isMainAnalytics) {
-                    isMatch = true;
-                  } else if (targetName) {
-                    const urlLower = url.toLowerCase();
-                    const targetLower = targetName.toLowerCase();
-                    
-                    if (urlLower.includes(`/page/${targetLower}`) || 
-                        urlLower.includes(`/page/${targetLower}?`) ||
-                        urlLower.includes(`/page/${targetLower}&`) ||
-                        urlLower.includes(`/entry/${targetLower}`) || 
-                        urlLower.includes(`/entry/${targetLower}?`) ||
-                        urlLower.includes(`/entry/${targetLower}&`)) {
-                      isMatch = true;
-                    }
-                  }
-                  
-                  if (isMatch) {
-                    urlsTotalViews += urls[url];
-                  }
-                }
-              }
-              
-              // ==========================================
-              // ФИЛЬТРУЕМ ВИЗИТЫ И ПОСЕЩЕНИЯ
-              // ==========================================
-              if (isMainAnalytics) {
-                // ==========================================
-                // ГЛАВНАЯ АНАЛИТИКА — БЕРЁМ ВСЕ ВИЗИТЫ
-                // ==========================================
-                visits0 = data.metrics.visits0 || [];
-                visits1 = data.metrics.visits1 || [];
-              } else if (targetName) {
-                // ==========================================
-                // СТРАНИЦА ЗАПИСИ/СТАТИКИ — ФИЛЬТРУЕМ
-                // ==========================================
-                let filteredVisits0 = [];
-                let filteredVisits1 = [];
-                
-                for (let token in data.metrics.views) {
-                  let urls = data.metrics.views[token].urls;
-                  let hasMatch = false;
-                  
-                  for (let url in urls) {
-                    if (!url || typeof url !== 'string') continue;
-                    
-                    const urlLower = url.toLowerCase();
-                    const targetLower = targetName.toLowerCase();
-                    
-                    if (urlLower.includes(`/page/${targetLower}`) || 
-                        urlLower.includes(`/page/${targetLower}?`) ||
-                        urlLower.includes(`/entry/${targetLower}`) || 
-                        urlLower.includes(`/entry/${targetLower}?`)) {
-                      hasMatch = true;
-                      break;
-                    }
-                  }
-                  
-                  if (hasMatch) {
-                    if (data.metrics.visits0?.includes(token)) {
-                      filteredVisits0.push(token);
-                    }
-                    if (data.metrics.visits1?.includes(token)) {
-                      filteredVisits1.push(token);
-                    }
-                  }
-                }
-                
-                visits0 = filteredVisits0;
-                visits1 = filteredVisits1;
-              }
-            }
-            
-            scheduleAttendance.target.addData(0, dayIndex, urlsTotalViews);
-            scheduleAttendance.target.addData(1, dayIndex, visits0.length);
-            scheduleAttendance.target.addData(2, dayIndex, visits1.length);
-          }
-
-          scheduleAttendance.target.types[0].setColor('#EE82EE');
-          scheduleAttendance.target.types[1].setColor('#5B92E5');
-          scheduleAttendance.target.types[2].setColor('#088567');
-          
-          scheduleAttendance.target.buildData();
-          scheduleAttendance.target.init();
-          scheduleAttendance.assembly();
-        });
+        this.loadChartData(scheduleContainerElement);
       }
 
       if (searchParams.getPathPart(3) === 'form' && searchParams.getPathPart(4) !== null) {
@@ -278,6 +167,192 @@ export class PageAnalytics {
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     });
+  }
+
+  loadChartData(canvasElement) {
+    const year = this.currentDate.getFullYear();
+    const month = this.currentDate.getMonth();
+    const firstDate = new Date(year, month, 1);
+    const lastDate = new Date(year, month + 1, 0);
+
+    console.log(`📅 Загружаем данные за: ${firstDate.toLocaleDateString()} — ${lastDate.toLocaleDateString()}`);
+
+    // Показываем индикатор загрузки
+    const container = canvasElement.parentElement;
+    container.innerHTML = `
+      <div class="analytics-loader" style="padding:40px;text-align:center;">
+        <div style="display:inline-block;width:30px;height:30px;border:3px solid #eee;border-top-color:#2196F3;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+        <p style="margin-top:10px;color:#999;">Загрузка данных...</p>
+      </div>
+    `;
+
+    const newCanvas = document.createElement('canvas');
+    newCanvas.setAttribute('width', canvasElement.width || 800);
+    newCanvas.setAttribute('height', canvasElement.height || 400);
+    newCanvas.style.width = '100%';
+    newCanvas.style.height = '100%';
+    
+    container.innerHTML = '';
+    container.append(newCanvas);
+
+    window.CMSCore.metrics.getDataByRangeTimestamp(firstDate.getTime(), lastDate.getTime())
+      .then((metricsData) => {
+        this.buildChart(newCanvas, metricsData);
+      })
+      .catch((error) => {
+        console.error('❌ Ошибка загрузки данных:', error);
+        container.innerHTML = `
+          <div style="padding:40px;text-align:center;color:#d32f2f;">
+            <p>Ошибка загрузки данных</p>
+            <p style="font-size:12px;color:#999;">${error.message}</p>
+          </div>
+        `;
+      });
+  }
+
+  buildChart(canvasElement, metricsData) {
+    const searchParams = new URLParser();
+    const container = canvasElement.parentElement;
+    
+    if (!metricsData || metricsData.length === 0) {
+      const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+                          'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+      container.innerHTML = `
+        <div style="padding:40px;text-align:center;color:#999;">
+          <p>Нет данных за ${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}</p>
+        </div>
+      `;
+      return;
+    }
+
+    const scheduleAttendance = new Interactive('schedule', {
+      canvasElement: canvasElement,
+      type: 'linear',
+      zoomable: true,
+      minZoom: 0.5,
+      maxZoom: 5,
+      zoomStep: 0.1,
+      showNavigator: true,
+      padding: { top: 30, right: 30, bottom: 40, left: 50 },
+      height: 'auto',
+      minHeight: 250,
+      maxHeight: 600
+    });
+
+    scheduleAttendance.target.setFrameSize(
+      canvasElement.width - 50,
+      canvasElement.height - 50 - 40
+    );
+
+    scheduleAttendance.target.addGroup('Просмотры');
+    scheduleAttendance.target.addGroup('Визиты');
+    scheduleAttendance.target.addGroup('Посещения');
+    
+    const isMainAnalytics = searchParams.getPathPart(4) === null;
+    const daysInMonth = lastDate.getDate();
+
+    const dailyData = {};
+    metricsData.forEach((data) => {
+      const time = data.metrics.time * 1000;
+      const date = new Date(time);
+      const day = date.getDate();
+      dailyData[day] = data;
+    });
+
+    const targetObject = document.querySelector('article.page[data-name]');
+    const targetName = targetObject?.getAttribute('data-name');
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const data = dailyData[day];
+      const dayIndex = day - 1;
+      
+      let urlsTotalViews = 0;
+      let visits0 = [];
+      let visits1 = [];
+      
+      if (data) {
+        for (let token in data.metrics.views) {
+          let urls = data.metrics.views[token].urls;
+          for (let url in urls) {
+            if (!url || typeof url !== 'string' || url.trim() === '') continue;
+            
+            let isMatch = false;
+            
+            if (isMainAnalytics) {
+              isMatch = true;
+            } else if (targetName) {
+              const urlLower = url.toLowerCase();
+              const targetLower = targetName.toLowerCase();
+              
+              if (urlLower.includes(`/page/${targetLower}`) || 
+                  urlLower.includes(`/page/${targetLower}?`) ||
+                  urlLower.includes(`/page/${targetLower}&`) ||
+                  urlLower.includes(`/entry/${targetLower}`) || 
+                  urlLower.includes(`/entry/${targetLower}?`) ||
+                  urlLower.includes(`/entry/${targetLower}&`)) {
+                isMatch = true;
+              }
+            }
+            
+            if (isMatch) {
+              urlsTotalViews += urls[url];
+            }
+          }
+        }
+        
+        if (isMainAnalytics) {
+          visits0 = data.metrics.visits0 || [];
+          visits1 = data.metrics.visits1 || [];
+        } else if (targetName) {
+          let filteredVisits0 = [];
+          let filteredVisits1 = [];
+          
+          for (let token in data.metrics.views) {
+            let urls = data.metrics.views[token].urls;
+            let hasMatch = false;
+            
+            for (let url in urls) {
+              if (!url || typeof url !== 'string') continue;
+              
+              const urlLower = url.toLowerCase();
+              const targetLower = targetName.toLowerCase();
+              
+              if (urlLower.includes(`/page/${targetLower}`) || 
+                  urlLower.includes(`/page/${targetLower}?`) ||
+                  urlLower.includes(`/entry/${targetLower}`) || 
+                  urlLower.includes(`/entry/${targetLower}?`)) {
+                hasMatch = true;
+                break;
+              }
+            }
+            
+            if (hasMatch) {
+              if (data.metrics.visits0?.includes(token)) {
+                filteredVisits0.push(token);
+              }
+              if (data.metrics.visits1?.includes(token)) {
+                filteredVisits1.push(token);
+              }
+            }
+          }
+          
+          visits0 = filteredVisits0;
+          visits1 = filteredVisits1;
+        }
+      }
+      
+      scheduleAttendance.target.addData(0, dayIndex, urlsTotalViews);
+      scheduleAttendance.target.addData(1, dayIndex, visits0.length);
+      scheduleAttendance.target.addData(2, dayIndex, visits1.length);
+    }
+
+    scheduleAttendance.target.types[0].setColor('#EE82EE');
+    scheduleAttendance.target.types[1].setColor('#5B92E5');
+    scheduleAttendance.target.types[2].setColor('#088567');
+    
+    scheduleAttendance.target.buildData();
+    scheduleAttendance.target.init();
+    scheduleAttendance.assembly();
   }
 
   scheduleContainerElementCreate() {
