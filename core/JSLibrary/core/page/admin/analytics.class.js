@@ -92,14 +92,10 @@ export class PageAnalytics {
           );
 
           scheduleAttendance.target.addGroup('Просмотры');
+          scheduleAttendance.target.addGroup('Визиты');
+          scheduleAttendance.target.addGroup('Посещения');
           
           const isMainAnalytics = searchParams.getPathPart(4) === null;
-          
-          if (isMainAnalytics) {
-            scheduleAttendance.target.addGroup('Визиты');
-            scheduleAttendance.target.addGroup('Посещения');
-          }
-
           const daysInMonth = lastDate.getDate();
 
           const dailyData = {};
@@ -164,10 +160,8 @@ export class PageAnalytics {
             
             scheduleAttendance.target.addData(0, dayIndex, urlsTotalViews);
             
-            if (isMainAnalytics) {
-              scheduleAttendance.target.addData(1, dayIndex, visits0.length);
-              scheduleAttendance.target.addData(2, dayIndex, visits1.length);
-            }
+            scheduleAttendance.target.addData(1, dayIndex, visits0.length);
+            scheduleAttendance.target.addData(2, dayIndex, visits1.length);
           }
 
           scheduleAttendance.target.types[0].setColor('#EE82EE');
