@@ -126,7 +126,7 @@ export class Core {
     
       if (this.searchParams.getPathPart(1) === 'admin') {
         if (clientIsLogged) {
-          if (this.searchParams.getPathPart(2) === 'analytics') this.pages.admin.entry = new Page(this, 'admin', 'analytics');
+          if (this.searchParams.getPathPart(2) === 'analytics') this.pages.admin.analytics = new Page(this, 'admin', 'analytics');
           if (this.searchParams.getPathPart(2) === 'entry') this.pages.admin.entry = new Page(this, 'admin', 'entry');
           if (this.searchParams.getPathPart(2) === 'entries') this.pages.admin.entries = new Page(this, 'admin', 'entries');
           if (this.searchParams.getPathPart(2) === 'entriesCategory') this.pages.admin.entriesCategory = new Page(this, 'admin', 'entriesCategory');
