@@ -28,6 +28,8 @@ import {ToolLink} from './toolbar/toolLink.class.js';
 import {ToolImage} from './toolbar/toolImage.class.js';
 import {ToolCode} from './toolbar/toolCode.class.js';
 import {ToolEmoji} from './toolbar/toolEmoji.class.js';
+import {ToolUndo} from './toolbar/toolUndo.class.js';
+import {ToolRedo} from './toolbar/toolRedo.class.js';
 
 export class Toolbar {
   constructor(editor, options = []) {
@@ -92,23 +94,81 @@ export class Toolbar {
         }
         
         switch (optionItem.name) {
-          case 'bold': this.tools.bold = new ToolBold(this.editor, optionItemInteractiveElement); break;
-          case 'italic': this.tools.italic = new ToolItalic(this.editor, optionItemInteractiveElement); break;
-          case 'underline': this.tools.underline = new ToolUnderline(this.editor, optionItemInteractiveElement); break;
-          case 'headers': this.tools.headers = new ToolHeaders(this.editor, optionItemInteractiveElement); break;
-          case 'header1': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 1); break;
-          case 'header2': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 2); break;
-          case 'header3': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 3); break;
-          case 'header4': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 4); break;
-          case 'header5': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 5); break;
-          case 'header6': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 6); break;
-          case 'quote': this.tools.quote = new ToolQuote(this.editor, optionItemInteractiveElement); break;
-          case 'code': this.tools.code = new ToolCode(this.editor, optionItemInteractiveElement); break;
-          case 'preview': this.tools.preview = new ToolPreview(this.editor, optionItemInteractiveElement); break;
-          case 'source': this.tools.source = new ToolSource(this.editor, optionItemInteractiveElement); break;
-          case 'link': this.tools.link = new ToolLink(this.editor, optionItemInteractiveElement); break;
-          case 'image': this.tools.image = new ToolImage(this.editor, optionItemInteractiveElement); break;
-          case 'emoji': this.tools.emoji = new ToolEmoji(this.editor, optionItemInteractiveElement); break;
+          case 'bold':
+            this.tools.bold = new ToolBold(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'italic':
+            this.tools.italic = new ToolItalic(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'underline':
+            this.tools.underline = new ToolUnderline(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'headers':
+            this.tools.headers = new ToolHeaders(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'header1':
+            this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 1);
+            break;
+            
+          case 'header2':
+            this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 2);
+            break;
+            
+          case 'header3':
+            this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 3);
+            break;
+            
+          case 'header4':
+            this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 4);
+            break;
+            
+          case 'header5':
+            this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 5);
+            break;
+            
+          case 'header6':
+            this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 6);
+            break;
+            
+          case 'quote':
+            this.tools.quote = new ToolQuote(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'code':
+            this.tools.code = new ToolCode(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'preview':
+            this.tools.preview = new ToolPreview(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'source':
+            this.tools.source = new ToolSource(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'link':
+            this.tools.link = new ToolLink(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'image':
+            this.tools.image = new ToolImage(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'emoji':
+            this.tools.emoji = new ToolEmoji(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'undo':
+            this.tools.undo = new ToolUndo(this.editor, optionItemInteractiveElement);
+            break;
+
+          case 'redo':
+            this.tools.redo = new ToolRedo(this.editor, optionItemInteractiveElement);
+            break;
         }
 
         toolbarElement.appendChild(optionItemElement);

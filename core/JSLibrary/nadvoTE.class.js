@@ -25,6 +25,12 @@ export class NadvoTE {
     this.options = options;
     this.localeData = {};
     this.selection = '';
+
+    this.history = [];
+    this.historyIndex = -1;
+    this.maxHistory = 100;
+    this.isRestoring = false;
+
     console.log(`[NADVO TE] Object created.`);
   }
 
@@ -43,21 +49,8 @@ export class NadvoTE {
 
       this.element.prepend(this.toolbar.element);
 
-      // Сохраняем выделение при каждом выделении текста в textarea
-      this.textarea.element.addEventListener('mouseup', () => {
-        this.saveTextareaSelection();
-      });
-      
-      // Для выделения с клавиатуры (Shift + стрелки)
-      this.textarea.element.addEventListener('keyup', (e) => {
-        if (e.shiftKey || e.key.startsWith('Arrow')) {
-          this.saveTextareaSelection();
-        }
-      });
-
-      this.textarea.element.addEventListener('mousedown', () => {
-        this.saveTextareaSelection();
-      });
+      this.initTextareaEvents();
+      this.saveHistory(true);
 
       const copyright = this.createElementDiv();
       copyright.classList.add('nadvo-te__copyright');
@@ -66,89 +59,97 @@ export class NadvoTE {
     });
   }
 
-  // Новый метод для сохранения выделения
-  saveTextareaSelection() {
+  initTextareaEvents() {
     const textarea = this.textarea.element;
-    
-    // Сохраняем только если textarea в фокусе
-    if (document.activeElement === textarea) {
-      const selectedText = textarea.value.substring(
-        textarea.selectionStart,
-        textarea.selectionEnd
-      );
-      
-      // Сохраняем только если есть выделенный текст
-      if (selectedText) {
-        this.selection = selectedText;
-        console.log('[NADVO TE] Selection saved:', this.selection);
+
+    textarea.addEventListener('mouseup', () => {
+      this.saveTextareaSelection();
+      this.saveHistory();
+    });
+
+    textarea.addEventListener('keyup', (e) => {
+      if (e.shiftKey || e.key.startsWith('Arrow')) {
+        this.saveTextareaSelection();
       }
+
+      this.saveHistory();
+    });
+
+    textarea.addEventListener('click', () => {
+      if (textarea.selectionStart === textarea.selectionEnd) {
+        this.clearSelection();
+      }
+    });
+
+    textarea.addEventListener('input', () => {
+      this.saveHistory();
+    });
+  }
+
+  saveHistory(force = false) {
+    if (this.isRestoring) {
+      return;
+    }
+
+    const value = this.textarea?.element?.value;
+
+    if (value === undefined) {
+      return;
+    }
+
+    const lastValue = this.history[this.historyIndex];
+
+    if (!force && lastValue === value) {
+      return;
+    }
+
+    this.history = this.history.slice(0, this.historyIndex + 1);
+    this.history.push(value);
+
+    if (this.history.length > this.maxHistory) {
+      this.history.shift();
+    } else {
+      this.historyIndex++;
     }
   }
 
-  clearSelection() {
-    this.selection = '';
-    console.log('[NADVO TE] Selection cleared');
-  }
-
-  getSelectionString() {
-    const textarea = this.textarea?.element;
-
-    if (textarea) {
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-
-      if (start !== end) {
-        this.selection = textarea.value.substring(start, end);
-      } else {
-        this.selection = '';
-      }
+  undo() {
+    if (this.historyIndex <= 0) {
+      return false;
     }
 
-    return this.selection;
+    this.historyIndex--;
+    this.restoreHistory();
+
+    return true;
   }
 
-  initEditorToolbar() {
-    let toolbar = new Toolbar(this, this.options.toolbar);
-    toolbar.init();
+  redo() {
+    if (this.historyIndex >= this.history.length - 1) {
+      return false;
+    }
+
+    this.historyIndex++;
+    this.restoreHistory();
+
+    return true;
   }
 
-  initEditorTextarea(element) {
-    let textarea = new Textarea(this);
-    textarea.init();
-  }
+  restoreHistory() {
+    const value = this.history[this.historyIndex];
 
-  initEditorTextareaVisual(element) {
-    let textareaVisual = new TextareaVisual(this);
-    textareaVisual.init();
-  }
+    if (value === undefined) {
+      return;
+    }
 
-  createElementTextarea() {
-    return document.createElement('textarea');
-  }
+    this.isRestoring = true;
 
-  createElementDiv() {
-    return document.createElement('div');
-  }
+    this.textarea.element.value = value;
 
-  createElementUl() {
-    return document.createElement('ul');
-  }
+    const cursorPos = value.length;
+    this.textarea.element.setSelectionRange(cursorPos, cursorPos);
 
-  createElementLi() {
-    return document.createElement('li');
-  }
-
-  createElementIFrame() {
-    return document.createElement('iframe');
-  }
-
-  createElementButton(content) {
-    let element = document.createElement('button');
-    element.innerHTML = content;
-    return element;
-  }
-
-  async fetchJSON(url, data) {
-    return fetch(url, data).then(response => response.ok ? response.json() : Promise.reject(response));
+    this.isRestoring = false;
+    this.clearSelection();
   }
 }

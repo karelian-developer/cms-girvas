@@ -42,6 +42,8 @@ export class PageEntry {
       'locale': editorLocale,
       'handler': '/handler/utils/nadvoparse',
       'toolbar': [
+        {'name': 'undo', 'type': 'button'},
+        {'name': 'redo', 'type': 'button'},
         {'name': 'bold', 'type': 'button'},
         {'name': 'italic', 'type': 'button'},
         {'name': 'underline', 'type': 'button'},
