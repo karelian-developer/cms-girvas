@@ -128,7 +128,7 @@ export class Client {
    * Проверка авторизации клиента
    * @returns {Boolean}
    */
-  async checkLogged() {
+  async isLogged() {
     let request = new Interactive('request', {
       method: 'GET',
       url: '/handler/client/is-logged'

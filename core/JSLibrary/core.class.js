@@ -56,7 +56,7 @@ export class Core {
    * @returns
    */
   async initClient() {
-    return this.client.checkLogged().then((result) => {
+    return this.client.isLogged().then((result) => {
       this.client.isLogged = result;
       return this.client.getIPAddress();
     }).then((result) => {
@@ -122,7 +122,7 @@ export class Core {
   async initPages() {
     let locale;
 
-    return this.client.checkLogged().then((clientIsLogged) => {
+    return this.client.isLogged().then((clientIsLogged) => {
       if (this.searchParams.getPathPart(1) === 'entry') this.pages.default.entry = new Page(this, 'default', 'entry');
       if (this.searchParams.getPathPart(1) === 'profile') this.pages.default.profile = new Page(this, 'default', 'profile');
     
