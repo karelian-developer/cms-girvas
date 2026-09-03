@@ -165,10 +165,8 @@ export class PageAnalytics {
           }
 
           scheduleAttendance.target.types[0].setColor('#EE82EE');
-          if (isMainAnalytics && scheduleAttendance.target.types.length > 1) {
-            scheduleAttendance.target.types[1].setColor('#5B92E5');
-            scheduleAttendance.target.types[2].setColor('#088567');
-          }
+          scheduleAttendance.target.types[1].setColor('#5B92E5');
+          scheduleAttendance.target.types[2].setColor('#088567');
           
           scheduleAttendance.target.buildData();
           scheduleAttendance.target.init();
