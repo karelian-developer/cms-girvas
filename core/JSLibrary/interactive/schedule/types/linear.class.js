@@ -184,18 +184,18 @@ export class Linear {
     const isHovered = hoveredData !== null;
 
     // ==========================================
-    // РИСУЕМ ЛИНИЮ (с прозрачностью если не hovered)
+    // ЛОГИКА ПРОЗРАЧНОСТИ
     // ==========================================
-    const isMainLine = (hoveredData === null) || (isHovered && typeIndex === 0);
-    
-    // Определяем прозрачность
     let globalAlpha = 1.0;
-    if (isHovered && typeIndex !== 0) {
-      // Если наведены на другую линию — делаем прозрачной
-      globalAlpha = 0.2;
-    } else if (isHovered && typeIndex === 0) {
-      // Если наведены на эту линию — оставляем непрозрачной
-      globalAlpha = 1.0;
+
+    if (isHovered) {
+      // Если наведены на ЭТУ линию — оставляем непрозрачной
+      if (typeIndex === hoveredTypeIndex) {
+        globalAlpha = 1.0;
+      } else {
+        // Если наведены на ДРУГУЮ линию — делаем прозрачной
+        globalAlpha = 0.2;
+      }
     }
     
     schedule.context.globalAlpha = globalAlpha;
