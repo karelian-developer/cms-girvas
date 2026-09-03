@@ -36,13 +36,41 @@ export class ToolHeaders extends Tool {
       const selectElement = this.element.querySelector('select');
       const selection = this.editor.getSelectionString();
 
-      if (selection) {
-        this.editor.textarea.replaceStringSelection(
-          "\n" + '#'.repeat(selectElement.value) + ' ' + selection + "\n\r"
-        );
-        
-        this.editor.clearSelection();
+      if (!selection) {
+        return;
       }
+
+      const textarea = this.editor.textarea.element;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+
+      const before = textarea.value.substring(0, start);
+      const after = textarea.value.substring(end);
+
+      const symbolBefore = before.slice(-1);
+      const symbolAfter = after.slice(0, 1);
+
+      let prefix = '';
+      let suffix = '';
+
+      const needNewLineBefore = before.length > 0 && symbolBefore !== '\n';
+      const needNewLineAfter = after.length > 0 && symbolAfter !== '\n';
+
+      if (needNewLineBefore) {
+        prefix = '\n';
+      }
+
+      if (needNewLineAfter) {
+        suffix = '\n';
+      }
+
+      const header = '#'.repeat(selectElement.value) + ' ' + selection;
+
+      this.editor.textarea.replaceStringSelection(
+        prefix + header + suffix
+      );
+
+      this.editor.clearSelection();
     });
   }
 }
