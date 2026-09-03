@@ -154,8 +154,45 @@ export class PageAnalytics {
                 }
               }
               
-              visits0 = data.metrics.visits0 || [];
-              visits1 = data.metrics.visits1 || [];
+              let filteredVisits0 = [];
+              let filteredVisits1 = [];
+
+              for (let token in data.metrics.views) {
+                let urls = data.metrics.views[token].urls;
+                let hasMatch = false;
+                
+                // Проверяем, есть ли у токена просмотры нашей страницы
+                for (let url in urls) {
+                  if (!url || typeof url !== 'string') continue;
+                  
+                  if (targetName) {
+                    const urlLower = url.toLowerCase();
+                    const targetLower = targetName.toLowerCase();
+                    
+                    if (urlLower.includes(`/page/${targetLower}`) || 
+                        urlLower.includes(`/page/${targetLower}?`) ||
+                        urlLower.includes(`/entry/${targetLower}`) || 
+                        urlLower.includes(`/entry/${targetLower}?`)) {
+                      hasMatch = true;
+                      break;
+                    }
+                  }
+                }
+                
+                // Если токен посещал нашу страницу — добавляем его в визиты
+                if (hasMatch) {
+                  // Проверяем, есть ли этот токен в общих visits0 и visits1
+                  if (data.metrics.visits0?.includes(token)) {
+                    filteredVisits0.push(token);
+                  }
+                  if (data.metrics.visits1?.includes(token)) {
+                    filteredVisits1.push(token);
+                  }
+                }
+              }
+
+              visits0 = filteredVisits0;
+              visits1 = filteredVisits1;
             }
             
             scheduleAttendance.target.addData(0, dayIndex, urlsTotalViews);
