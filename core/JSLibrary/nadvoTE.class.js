@@ -67,6 +67,10 @@ export class NadvoTE {
       this.saveHistory();
     });
 
+    textarea.addEventListener('mousedown', () => {
+      this.saveTextareaSelection();
+    });
+
     textarea.addEventListener('keyup', (e) => {
       if (e.shiftKey || e.key.startsWith('Arrow')) {
         this.saveTextareaSelection();
@@ -84,6 +88,44 @@ export class NadvoTE {
     textarea.addEventListener('input', () => {
       this.saveHistory();
     });
+  }
+
+  saveTextareaSelection() {
+    const textarea = this.textarea.element;
+
+    if (document.activeElement === textarea) {
+      const selectedText = textarea.value.substring(
+        textarea.selectionStart,
+        textarea.selectionEnd
+      );
+
+      if (selectedText) {
+        this.selection = selectedText;
+        console.log('[NADVO TE] Selection saved:', this.selection);
+      }
+    }
+  }
+
+  clearSelection() {
+    this.selection = '';
+    console.log('[NADVO TE] Selection cleared');
+  }
+
+  getSelectionString() {
+    const textarea = this.textarea?.element;
+
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+
+      if (start !== end) {
+        this.selection = textarea.value.substring(start, end);
+      } else {
+        this.selection = '';
+      }
+    }
+
+    return this.selection;
   }
 
   saveHistory(force = false) {
@@ -151,5 +193,50 @@ export class NadvoTE {
 
     this.isRestoring = false;
     this.clearSelection();
+  }
+
+  initEditorToolbar() {
+    let toolbar = new Toolbar(this, this.options.toolbar);
+    toolbar.init();
+  }
+
+  initEditorTextarea(element) {
+    let textarea = new Textarea(this);
+    textarea.init();
+  }
+
+  initEditorTextareaVisual(element) {
+    let textareaVisual = new TextareaVisual(this);
+    textareaVisual.init();
+  }
+
+  createElementTextarea() {
+    return document.createElement('textarea');
+  }
+
+  createElementDiv() {
+    return document.createElement('div');
+  }
+
+  createElementUl() {
+    return document.createElement('ul');
+  }
+
+  createElementLi() {
+    return document.createElement('li');
+  }
+
+  createElementIFrame() {
+    return document.createElement('iframe');
+  }
+
+  createElementButton(content) {
+    let element = document.createElement('button');
+    element.innerHTML = content;
+    return element;
+  }
+
+  async fetchJSON(url, data) {
+    return fetch(url, data).then(response => response.ok ? response.json() : Promise.reject(response));
   }
 }
