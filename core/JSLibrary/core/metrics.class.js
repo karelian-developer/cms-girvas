@@ -21,21 +21,51 @@ import {Client} from './client.class.js';
 export class Metrics {
   constructor(core) {
     this.core = core;
+    this.sendMetrics();
+  }
 
+  // ==========================================
+  // ОТПРАВКА ДАННЫХ МЕТРИК
+  // ==========================================
+  sendMetrics() {
     const clientMetricsToken = localStorage.getItem('_grv_mtoken');
-    const formData = new FormData();
+    const tokenDate = localStorage.getItem('_grv_mtoken_date');
+    const today = new Date().toDateString();
 
+    const formData = new FormData();
     formData.append('time', Math.round(new Date().getTime() / 1000));
     formData.append('current_url', document.location.href);
-    formData.append('referrer_url', document.referrer);
+    formData.append('referrer_url', document.referrer || '');
 
-    if (clientMetricsToken == null) {
-      formData.append('is_visited_new', 1);
-      localStorage.setItem('_grv_mtoken', this.generateUniqID(64));
-    } else {
-      formData.append('is_visited_new', 0);
+    // ==========================================
+    // ИСПРАВЛЕНИЕ: is_visited_new
+    // ==========================================
+    let isNewVisitor = false;
+
+    if (clientMetricsToken == null || tokenDate !== today) {
+      // Новый токен или новый день
+      const newToken = this.generateUniqID(64);
+      localStorage.setItem('_grv_mtoken', newToken);
+      localStorage.setItem('_grv_mtoken_date', today);
+      isNewVisitor = true;
     }
 
+    formData.append('is_visited_new', isNewVisitor ? 1 : 0);
+
+    // ==========================================
+    // ЛОГ ДЛЯ ОТЛАДКИ
+    // ==========================================
+    console.log('📤 Отправка метрик:', {
+      token: localStorage.getItem('_grv_mtoken')?.substring(0, 20) + '...',
+      isNew: isNewVisitor,
+      url: document.location.href,
+      referrer: document.referrer || '(direct)',
+      date: today
+    });
+
+    // ==========================================
+    // ОТПРАВКА
+    // ==========================================
     fetch('/handler/metrics', {
       method: 'POST',
       headers: {
@@ -44,28 +74,35 @@ export class Metrics {
       },
       body: formData
     }).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
+      return response.ok ? response.json() : Promise.reject(response);
     }).then((data) => {
-
-    }, (rejectionReason) => {
-      console.log(rejectionReason);
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+      console.log('✅ Метрики отправлены:', data);
+    }).catch((rejectionReason) => {
+      console.error('❌ Ошибка отправки метрик:', rejectionReason);
+      // Показываем уведомление только в режиме отладки
+      if (this.core.debugLevel > 1) {
+        let interactiveNotification = new Interactive('notification');
+        interactiveNotification.target.isPopup = true;
+        interactiveNotification.target.setStatusCode(0);
+        interactiveNotification.target.setContent('Ошибка отправки метрики: ' + rejectionReason);
+        interactiveNotification.target.assembly();
+        interactiveNotification.target.show();
+      }
     });
   }
 
+  // ==========================================
+  // СТАТИЧЕСКИЕ МЕТОДЫ
+  // ==========================================
   static convertTimeToTimestamp(value) {
     let date = new Date();
     date.setTime(value);
-
     return `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
   }
 
+  // ==========================================
+  // ПОЛУЧЕНИЕ ДАННЫХ
+  // ==========================================
   async getDataByTimestamp(time) {
     return fetch(`/handler/metrics?time=${Math.round(time / 1000)}`, {
       method: 'GET',
@@ -73,13 +110,14 @@ export class Metrics {
         'Metrics-Token': localStorage.getItem('_grv_mtoken')
       }
     }).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
+      return response.ok ? response.json() : Promise.reject(response);
     }).then((data) => {
-      console.log(data);
-      if (data.outputData.hasOwnProperty('data')) {
+      if (data.outputData?.hasOwnProperty('data')) {
         return data.outputData.data;
       }
-
+      return [];
+    }).catch((error) => {
+      console.error('❌ Ошибка получения данных:', error);
       return [];
     });
   }
@@ -94,34 +132,28 @@ export class Metrics {
         'Metrics-Token': localStorage.getItem('_grv_mtoken')
       }
     }).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
+      return response.ok ? response.json() : Promise.reject(response);
     }).then((data) => {
-      console.log(data);
-      if (data.outputData.hasOwnProperty('data')) {
+      if (data.outputData?.hasOwnProperty('data')) {
         return data.outputData.data;
       }
-
       return [];
-    }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
+    }).catch((error) => {
+      console.error('❌ Ошибка получения данных:', error);
+      return [];
     });
   }
 
+  // ==========================================
+  // ГЕНЕРАЦИЯ ТОКЕНА
+  // ==========================================
   generateUniqID(length) {
-    let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     let result = '';
-
-    let charsLength = chars.length;
-    for ( let i = 0; i < length; i++ ) {
-        result += chars.charAt(Math.floor(Math.random() * charsLength));
+    const charsLength = chars.length;
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * charsLength));
     }
-
     return result;
   }
 }
