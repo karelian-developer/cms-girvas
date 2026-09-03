@@ -53,14 +53,11 @@ export class ToolHeaders extends Tool {
       let prefix = '';
       let suffix = '';
 
-      const needNewLineBefore = before.length > 0 && symbolBefore !== '\n';
-      const needNewLineAfter = after.length > 0 && symbolAfter !== '\n';
-
-      if (needNewLineBefore) {
+      if (symbolBefore !== '\n') {
         prefix = '\n';
       }
 
-      if (needNewLineAfter) {
+      if (symbolAfter !== '\n') {
         suffix = '\n';
       }
 
