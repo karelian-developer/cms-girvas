@@ -24,22 +24,6 @@ export class PageAnalytics {
     this.page = page;
     this.currentDate = this.getDateFromURL();
     this.monthDisplay = null;
-    
-    // ==========================================
-    // СЛЕДИМ ЗА ИЗМЕНЕНИЕМ URL (для SPA-навигации)
-    // ==========================================
-    this._handleURLChange = this._handleURLChange.bind(this);
-    window.addEventListener('popstate', this._handleURLChange);
-    
-    // Перехватываем клики по ссылкам с параметром date
-    document.addEventListener('click', (e) => {
-      const link = e.target.closest('a[href*="date="]');
-      if (link) {
-        setTimeout(() => {
-          this._handleURLChange();
-        }, 150);
-      }
-    });
   }
 
   // ==========================================
@@ -56,8 +40,6 @@ export class PageAnalytics {
         // Нормализация: YYYY-MM → YYYY-MM-01
         if (/^\d{4}-\d{2}$/.test(dateParam)) {
           parsed = new Date(dateParam + '-01');
-        } else if (/^\d{4}$/.test(dateParam)) {
-          parsed = new Date(dateParam + '-01-01');
         } else {
           parsed = new Date(dateParam);
         }
@@ -76,18 +58,6 @@ export class PageAnalytics {
   }
 
   // ==========================================
-  // ОБРАБОТЧИК ИЗМЕНЕНИЯ URL
-  // ==========================================
-  _handleURLChange() {
-    const newDate = this.getDateFromURL();
-    if (newDate.getTime() !== this.currentDate.getTime()) {
-      this.currentDate = newDate;
-      this.updateMonthDisplay();
-      this.refreshChart();
-    }
-  }
-
-  // ==========================================
   // ОБНОВЛЕНИЕ ОТОБРАЖЕНИЯ МЕСЯЦА
   // ==========================================
   updateMonthDisplay() {
@@ -96,34 +66,6 @@ export class PageAnalytics {
                         'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
     this.monthDisplay.textContent = 
       `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
-  }
-
-  // ==========================================
-  // ОБНОВЛЕНИЕ ГРАФИКА
-  // ==========================================
-  refreshChart() {
-    this.updateMonthDisplay();
-    
-    const container = document.querySelector('[data-role="attendance-schedule"]');
-    if (!container) return;
-
-    const oldCanvas = container.querySelector('canvas');
-    if (!oldCanvas) return;
-
-    const newCanvas = this.scheduleContainerElementCreate();
-    container.innerHTML = '';
-    container.append(newCanvas);
-
-    this.loadChartData(newCanvas);
-  }
-
-  // ==========================================
-  // ОБНОВЛЕНИЕ ДАТЫ (для кнопок переключения)
-  // ==========================================
-  updateDate(date) {
-    this.currentDate = date;
-    this.updateMonthDisplay();
-    this.refreshChart();
   }
 
   // ==========================================
@@ -374,7 +316,7 @@ export class PageAnalytics {
               
               const urlLower = url.toLowerCase();
               const targetLower = targetName.toLowerCase();
-            
+              
               if (urlLower.includes(`/page/${targetLower}`) || 
                   urlLower.includes(`/page/${targetLower}?`) ||
                   urlLower.includes(`/entry/${targetLower}`) || 
