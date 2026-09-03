@@ -22,7 +22,6 @@ import {URLParser} from "../../../urlParser.class.js";
 export class PageAnalytics {
   constructor(page, params = {}) {
     this.page = page;
-
     this.currentDate = this.getDateFromURL();
   }
 
@@ -33,7 +32,6 @@ export class PageAnalytics {
       
       if (dateParam) {
         const parsed = new Date(dateParam);
-        
         if (!isNaN(parsed.getTime())) {
           console.log('📅 Дата из URL:', parsed.toLocaleDateString());
           return parsed;
@@ -43,7 +41,6 @@ export class PageAnalytics {
       console.warn('⚠️ Ошибка парсинга даты из URL:', e);
     }
     
-    // Fallback: текущая дата
     console.log('📅 Используем текущую дату');
     return new Date();
   }
@@ -57,7 +54,6 @@ export class PageAnalytics {
       if (analyticApp !== null) {
         const attendanceScheduleContainerElement = analyticApp.querySelector('[data-role="attendance-schedule"]');
         
-        // Создаём canvas
         const scheduleContainerElement = this.scheduleContainerElementCreate();
         attendanceScheduleContainerElement.append(scheduleContainerElement);
         
@@ -114,7 +110,11 @@ export class PageAnalytics {
             dailyData[day] = data;
           });
 
-          let totalAdded = 0;
+          // ==========================================
+          // ПОЛУЧАЕМ targetName ДЛЯ ФИЛЬТРАЦИИ
+          // ==========================================
+          const targetObject = document.querySelector('article.page[data-name]');
+          const targetName = targetObject?.getAttribute('data-name');
 
           for (let day = 1; day <= daysInMonth; day++) {
             const data = dailyData[day];
@@ -125,18 +125,33 @@ export class PageAnalytics {
             let visits1 = [];
             
             if (data) {
-              // Считаем просмотры
               for (let token in data.metrics.views) {
                 let urls = data.metrics.views[token].urls;
                 for (let url in urls) {
+                  // ==========================================
+                  // ПРОПУСКАЕМ ПУСТЫЕ URL
+                  // ==========================================
+                  if (!url || typeof url !== 'string' || url.trim() === '') continue;
+                  
                   if (isMainAnalytics) {
                     urlsTotalViews += urls[url];
-                  } else {
-                    console.log('URL: ' + url);
-                    let urlObject = new URL(url);
-                    let urlPathParts = urlObject.pathname.split('/').filter(part => part !== '');
-                    let targetObjectName = document.querySelector('article.page[data-name]');
-                    if (targetObjectName !== null && urlPathParts[1] === targetObjectName.getAttribute('data-name')) {
+                  } else if (targetName) {
+                    // ==========================================
+                    // ПРОВЕРКА ЧЕРЕЗ includes (БЕЗ new URL)
+                    // ==========================================
+                    const urlLower = url.toLowerCase();
+                    const targetLower = targetName.toLowerCase();
+                    
+                    // Проверяем для страниц (/page/name)
+                    if (urlLower.includes(`/page/${targetLower}`) || 
+                        urlLower.includes(`/page/${targetLower}?`) ||
+                        urlLower.includes(`/page/${targetLower}&`)) {
+                      urlsTotalViews += urls[url];
+                    }
+                    // Проверяем для записей (/entry/name)
+                    else if (urlLower.includes(`/entry/${targetLower}`) || 
+                             urlLower.includes(`/entry/${targetLower}?`) ||
+                             urlLower.includes(`/entry/${targetLower}&`)) {
                       urlsTotalViews += urls[url];
                     }
                   }
@@ -148,7 +163,6 @@ export class PageAnalytics {
             }
             
             scheduleAttendance.target.addData(0, dayIndex, urlsTotalViews);
-            totalAdded++;
             
             if (isMainAnalytics) {
               scheduleAttendance.target.addData(1, dayIndex, visits0.length);
