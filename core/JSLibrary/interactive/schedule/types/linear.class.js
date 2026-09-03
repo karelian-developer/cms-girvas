@@ -1,18 +1,3 @@
-/**
- * CMS «ГИРВАС»
- * 
- * Включена в Реестр российского программного обеспечения Минцифры РФ.
- * Реестровый номер: №25012 от 27.11.2024
- * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
- *             Все права защищены.
- * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
- * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
- * @see       https://cms-girvas.ru Сайт продукта
- * @author    Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
- * @support   support@karelian-developer.ru
- */
-
 'use strict';
 
 import {DataDot} from '../dataDot.class.js';
@@ -23,7 +8,7 @@ export class Linear {
     this.data = [];
     this.color = '#000000';
     this.label = `Data #${schedule.types.length + 1}`;
-    this._hoveredIndex = -1; // Индекс точки под мышью
+    this._isHovered = false;
   }
 
   setLabel(value) {
@@ -147,73 +132,81 @@ export class Linear {
     }
 
     // ==========================================
-    // ОПРЕДЕЛЯЕМ, НАВЕДЕНЫ ЛИ НА ЭТУ ЛИНИЮ
+    // 1. ОПРЕДЕЛЯЕМ, НАВЕДЕНЫ ЛИ НА ЭТУ ЛИНИЮ
     // ==========================================
     const mouseX = schedule.mouse.x;
     const mouseY = schedule.mouse.y;
-    const typeIndex = schedule.types.indexOf(this);
+    const isMouseOnCanvas = mouseX > 0 && mouseY > 0 && 
+                            mouseX < schedule.canvas.width && 
+                            mouseY < schedule.canvas.height;
     
-    // Проверяем, есть ли точка этой линии под мышью
     let isHovered = false;
     let hoveredData = null;
     const hoverRadius = 12;
 
-    for (let i = 0; i < visibleData.length; i++) {
-      const data = visibleData[i];
-      if (!data) continue;
+    if (isMouseOnCanvas) {
+      for (let i = 0; i < visibleData.length; i++) {
+        const data = visibleData[i];
+        if (!data) continue;
 
-      const relativeX = data.x - viewStart * totalDays;
-      const clampedX = Math.max(0, Math.min(visibleDays, relativeX));
-      const xPos = clampedX * lineXStep;
-      const yPos = data.y * lineYStep;
+        const relativeX = data.x - viewStart * totalDays;
+        const clampedX = Math.max(0, Math.min(visibleDays, relativeX));
+        const xPos = clampedX * lineXStep;
+        const yPos = data.y * lineYStep;
 
-      const cx = frameX + xPos;
-      const cy = frameY + frameHeight - yPos;
+        const cx = frameX + xPos;
+        const cy = frameY + frameHeight - yPos;
 
-      const dx = mouseX - cx;
-      const dy = mouseY - cy;
-      
-      if (dx * dx + dy * dy < hoverRadius * hoverRadius) {
-        isHovered = true;
-        hoveredData = data;
-        break;
+        const dx = mouseX - cx;
+        const dy = mouseY - cy;
+        
+        if (dx * dx + dy * dy < hoverRadius * hoverRadius) {
+          isHovered = true;
+          hoveredData = data;
+          break;
+        }
       }
     }
 
+    // Сохраняем состояние для тултипа
+    this._isHovered = isHovered;
+    this._hoveredData = hoveredData;
+
     // ==========================================
-    // ЛОГИКА ПРОЗРАЧНОСТИ
+    // 2. ОПРЕДЕЛЯЕМ, КАКАЯ ЛИНИЯ АКТИВНА
     // ==========================================
-    // Определяем, какая линия сейчас активна (на которую навели)
-    let activeTypeIndex = -1;
+    const typeIndex = schedule.types.indexOf(this);
+    const isActive = isHovered;
+    
+    // Вычисляем, есть ли другая активная линия
+    let hasOtherActive = false;
     if (isHovered) {
-      activeTypeIndex = typeIndex;
-    } else {
-      // Если ничего не наведено — все линии видны
-      activeTypeIndex = -1;
-    }
-
-    // Если мышь не на графике — все линии видны
-    const isMouseOnCanvas = mouseX > 0 && mouseY > 0 && 
-                            mouseX < schedule.canvas.width && 
-                            mouseY < schedule.canvas.height;
-
-    let globalAlpha = 1.0;
-    if (isMouseOnCanvas && activeTypeIndex !== -1) {
-      if (typeIndex === activeTypeIndex) {
-        globalAlpha = 1.0; // Активная линия
-      } else {
-        globalAlpha = 0.15; // Остальные прозрачные
+      // Проверяем, есть ли другие линии, которые тоже наведены
+      for (let t = 0; t < schedule.types.length; t++) {
+        if (t !== typeIndex && schedule.types[t]._isHovered) {
+          hasOtherActive = true;
+          break;
+        }
       }
     }
-    
-    schedule.context.globalAlpha = globalAlpha;
-    
+
     // ==========================================
-    // РИСУЕМ ЛИНИЮ
+    // 3. РИСУЕМ ЛИНИЮ
     // ==========================================
-    const isActiveLine = (isMouseOnCanvas && activeTypeIndex === typeIndex);
+    // Прозрачность: если наведены на другую линию — делаем прозрачной
+    let lineAlpha = 1.0;
+    if (isHovered) {
+      lineAlpha = 1.0; // эту подсвечиваем
+    } else if (hasOtherActive) {
+      lineAlpha = 0.15; // другие делаем прозрачными
+    } else if (this._hasOtherActive) {
+      lineAlpha = 0.15;
+    }
+    
+    schedule.context.globalAlpha = lineAlpha;
+    
     schedule.context.strokeStyle = this.color;
-    schedule.context.lineWidth = isActiveLine ? 3.5 : 2.5;
+    schedule.context.lineWidth = isActive ? 3.5 : 2.5;
     schedule.context.beginPath();
 
     let isFirst = true;
@@ -237,7 +230,6 @@ export class Linear {
       }
     }
 
-    // Достраиваем до конца
     const lastData = visibleData[visibleData.length - 1];
     const lastDayOfMonth = totalDays - 1;
 
@@ -257,7 +249,7 @@ export class Linear {
     schedule.context.globalAlpha = 1.0;
 
     // ==========================================
-    // РИСУЕМ ТОЧКИ
+    // 4. РИСУЕМ ТОЧКИ
     // ==========================================
     for (let i = 0; i < visibleData.length; i++) {
       const data = visibleData[i];
@@ -275,9 +267,8 @@ export class Linear {
       const radius = isHoveredPoint ? 7 : 4;
       const borderWidth = isHoveredPoint ? 3 : 1.5;
 
-      // Прозрачность точек
       let pointAlpha = 1.0;
-      if (isMouseOnCanvas && activeTypeIndex !== -1 && typeIndex !== activeTypeIndex) {
+      if (hasOtherActive && !isActive) {
         pointAlpha = 0.15;
       }
       schedule.context.globalAlpha = pointAlpha;
@@ -314,7 +305,7 @@ export class Linear {
     schedule.context.shadowBlur = 0;
 
     // ==========================================
-    // ТУЛТИП
+    // 5. ТУЛТИП (рисуется только для этой линии)
     // ==========================================
     if (isHovered && hoveredData !== null) {
       const data = hoveredData;
@@ -371,7 +362,7 @@ export class Linear {
         tooltipY = canvasHeight - tooltipHeight - 10;
       }
 
-      // Фон тултипа
+      // Рисуем фон тултипа (всегда поверх)
       schedule.context.shadowBlur = 15;
       schedule.context.shadowColor = 'rgba(0, 0, 0, 0.2)';
       schedule.context.fillStyle = '#FFFFFF';
