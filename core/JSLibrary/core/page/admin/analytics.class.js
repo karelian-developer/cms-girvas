@@ -76,11 +76,6 @@ export class PageAnalytics {
         console.log(`📅 Загружаем данные за: ${firstDate.toLocaleDateString()} — ${lastDate.toLocaleDateString()}`);
         
         window.CMSCore.metrics.getDataByRangeTimestamp(firstDate.getTime(), lastDate.getTime()).then((metricsData) => {
-          // ==========================================
-          // 1. СОЗДАЁМ ГРАФИК
-          // ==========================================
-          console.log('🟢 === НАЧАЛО СОЗДАНИЯ ГРАФИКА ===');
-
           const scheduleAttendance = new Interactive('schedule', {
             canvasElement: scheduleContainerElement,
             type: 'linear',
@@ -95,40 +90,21 @@ export class PageAnalytics {
             maxHeight: 600
           });
 
-          console.log('✅ 1. График создан');
-          console.log('   target:', scheduleAttendance.target);
-
-          // ==========================================
-          // 2. ДОБАВЛЯЕМ ГРУППЫ
-          // ==========================================
           scheduleAttendance.target.setFrameSize(
             scheduleContainerElement.width - 50,
             scheduleContainerElement.height - 50 - 40
           );
 
-          console.log('✅ 2. Frame установлен');
-
           scheduleAttendance.target.addGroup('Просмотры');
-          console.log('✅ 3. Группа "Просмотры" добавлена');
-
+          
           const isMainAnalytics = searchParams.getPathPart(4) === null;
-          console.log('📊 isMainAnalytics:', isMainAnalytics);
-
+          
           if (isMainAnalytics) {
             scheduleAttendance.target.addGroup('Визиты');
             scheduleAttendance.target.addGroup('Посещения');
-            console.log('✅ 4. Группы "Визиты" и "Посещения" добавлены');
-          } else {
-            console.log('⚠️ 4. Пропускаем визиты и посещения (не главная аналитика)');
           }
 
-          console.log('📊 Всего групп:', scheduleAttendance.target.types.length);
-
-          // ==========================================
-          // 3. ПОДГОТАВЛИВАЕМ ДАННЫЕ ПО ДНЯМ
-          // ==========================================
           const daysInMonth = lastDate.getDate();
-          console.log(`📊 5. Дней в месяце: ${daysInMonth}`);
 
           const dailyData = {};
           metricsData.forEach((data) => {
@@ -137,11 +113,7 @@ export class PageAnalytics {
             const day = date.getDate();
             dailyData[day] = data;
           });
-          console.log(`📊 6. Заполненных дней: ${Object.keys(dailyData).length}`);
 
-          // ==========================================
-          // 4. ДОБАВЛЯЕМ ДАННЫЕ ПО ДНЯМ
-          // ==========================================
           let totalAdded = 0;
 
           for (let day = 1; day <= daysInMonth; day++) {
@@ -174,53 +146,24 @@ export class PageAnalytics {
               visits1 = data.metrics.visits1 || [];
             }
             
-            // Логируем каждый день
-            console.log(`📊 День ${day}: просмотры=${urlsTotalViews}, визиты=${visits0.length}, посещения=${visits1.length}`);
-            
-            // Добавляем просмотры
             scheduleAttendance.target.addData(0, dayIndex, urlsTotalViews);
             totalAdded++;
             
-            // Добавляем визиты и посещения (только для главной аналитики)
             if (isMainAnalytics) {
               scheduleAttendance.target.addData(1, dayIndex, visits0.length);
               scheduleAttendance.target.addData(2, dayIndex, visits1.length);
             }
           }
 
-          console.log(`📊 7. Добавлено дней: ${totalAdded}`);
-
-          // ==========================================
-          // 5. ПРОВЕРКА ПОСЛЕ ДОБАВЛЕНИЯ
-          // ==========================================
-          console.log('📊 8. ПРОВЕРКА ДАННЫХ В ГРАФИКЕ:');
-          scheduleAttendance.target.types.forEach((type, i) => {
-            console.log(`   ${i}: ${type.label} — ${type.data?.length || 0} точек`);
-            if (type.data?.length > 0) {
-              console.log(`     первые 5 значений:`, type.data.slice(0, 5).map(d => d.y));
-            }
-          });
-
-          // ==========================================
-          // 6. УСТАНАВЛИВАЕМ ЦВЕТА
-          // ==========================================
           scheduleAttendance.target.types[0].setColor('#EE82EE');
           if (isMainAnalytics && scheduleAttendance.target.types.length > 1) {
             scheduleAttendance.target.types[1].setColor('#5B92E5');
             scheduleAttendance.target.types[2].setColor('#088567');
           }
-          console.log('✅ 9. Цвета установлены');
-
-          // ==========================================
-          // 7. СТРОИМ ГРАФИК
-          // ==========================================
-          console.log('🟢 === СТРОИМ ГРАФИК ===');
+          
           scheduleAttendance.target.buildData();
           scheduleAttendance.target.init();
           scheduleAttendance.assembly();
-
-          console.log('✅ 10. График построен');
-          console.log('🟢 === КОНЕЦ СОЗДАНИЯ ГРАФИКА ===');
         });
       }
 
