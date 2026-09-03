@@ -24,6 +24,20 @@ export class PageAnalytics {
     this.page = page;
   }
 
+  getDateFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const dateParam = urlParams.get('date');
+    
+    if (dateParam) {
+      const parsed = new Date(dateParam);
+      if (!isNaN(parsed.getTime())) {
+        return parsed;
+      }
+    }
+    
+    return new Date();
+  }
+
   init() {
     const searchParams = new URLParser();
     
@@ -33,22 +47,23 @@ export class PageAnalytics {
       if (analyticApp !== null) {
         const attendanceScheduleContainerElement = analyticApp.querySelector('[data-role="attendance-schedule"]');
         
+        // Создаём canvas
         const scheduleContainerElement = this.scheduleContainerElementCreate();
         attendanceScheduleContainerElement.append(scheduleContainerElement);
         
         const scheduleParentElement = scheduleContainerElement.parentElement;
-        const scheduleParentElementWidth = scheduleParentElement.offsetWidth;
-
-        const firstDate = new Date(), lastDate = new Date();
-
-        //attendanceScheduleContainerElement.innerHTML = '';
+        const scheduleParentElementWidth = scheduleParentElement.offsetWidth || 800;
 
         scheduleContainerElement.setAttribute('width', `${scheduleParentElementWidth}px`);
         scheduleContainerElement.setAttribute('height', '400px');
 
-        firstDate.setDate(1);
-        lastDate.setMonth(firstDate.getMonth() + 1);
-        lastDate.setDate(0);
+        const year = this.currentDate.getFullYear();
+        const month = this.currentDate.getMonth();
+        
+        const firstDate = new Date(year, month, 1);
+        const lastDate = new Date(year, month + 1, 0);
+        
+        console.log(`📅 Загружаем данные за: ${firstDate.toLocaleDateString()} — ${lastDate.toLocaleDateString()}`);
         
         window.CMSCore.metrics.getDataByRangeTimestamp(firstDate.getTime(), lastDate.getTime()).then((metricsData) => {
           const scheduleAttendance = new Interactive('schedule', {
