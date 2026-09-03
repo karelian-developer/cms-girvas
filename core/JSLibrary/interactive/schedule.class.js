@@ -522,7 +522,7 @@ export class Schedule {
     const cy = frameY + frameHeight - yPos;
 
     const dayNumber = data.x + 1;
-    const monthName = this.getMonthName();
+    const monthName = type.getMonthName();
 
     const typeIndex = this.types.indexOf(type);
     const typeNames = ['Просмотры', 'Визиты', 'Посещения'];
