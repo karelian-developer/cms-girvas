@@ -37,6 +37,12 @@ export class Interactive {
     if (interactiveName == 'schedule') {
       data.canvasElement = (Object.hasOwn(interactiveParams, 'canvasElement')) ? interactiveParams.canvasElement : null;
       data.type = (Object.hasOwn(interactiveParams, 'type')) ? interactiveParams.type : 'linear';
+      data.zoomable = (Object.hasOwn(interactiveParams, 'zoomable')) ? interactiveParams.zoomable : false;
+      data.minZoom = (Object.hasOwn(interactiveParams, 'minZoom')) ? interactiveParams.minZoom : 0.5;
+      data.maxZoom = (Object.hasOwn(interactiveParams, 'maxZoom')) ? interactiveParams.maxZoom : 5;
+      data.zoomStep = (Object.hasOwn(interactiveParams, 'zoomStep')) ? interactiveParams.zoomStep : 0.1;
+      data.showNavigator = (Object.hasOwn(interactiveParams, 'showNavigator')) ? interactiveParams.showNavigator : true;
+      data.padding = (Object.hasOwn(interactiveParams, 'padding')) ? interactiveParams.padding : { top: 30, right: 30, bottom: 40, left: 50 };
     }
 
     if (interactiveName == 'modal') {
@@ -64,16 +70,48 @@ export class Interactive {
     }
 
     switch (interactiveName) {
-      case 'button': this.target = new Button(this); break;
-      case 'input': this.target = new Input(this); break;
-      case 'choices': this.target = new Choices(this, data.isDisclosed); break;
-      case 'schedule': this.target = new Schedule(this, data.canvasElement, data.type); break;
-      case 'form': this.target = new Form(this); break;
-      case 'modal': this.target = new Modal(this, data.title, data.content, data.description, data.width); break;
-      case 'request': this.target = new Request(this, data.method, data.url, data.data); break;
-      case 'notification': this.target = new Notification(this); break;
-      case 'slider': this.target = new Slider(this); break;
-      case 'dataSearcher': this.target = new DataSearcher(this); break;
+      case 'button':
+        this.target = new Button(this);
+        break;
+      case 'input':
+        this.target = new Input(this);
+        break;
+      case 'choices':
+        this.target = new Choices(this, data.isDisclosed);
+        break;
+      case 'schedule':
+        this.target = new Schedule(
+          this,
+          data.canvasElement,
+          data.type,
+          {
+            zoomable: data.zoomable,
+            minZoom: data.minZoom,
+            maxZoom: data.maxZoom,
+            zoomStep: data.zoomStep,
+            showNavigator: data.showNavigator,
+            padding: data.padding
+          }
+        );
+        break;
+      case 'form':
+        this.target = new Form(this);
+        break;
+      case 'modal':
+        this.target = new Modal(this, data.title, data.content, data.description, data.width);
+        break;
+      case 'request':
+        this.target = new Request(this, data.method, data.url, data.data);
+        break;
+      case 'notification':
+        this.target = new Notification(this);
+        break;
+      case 'slider':
+        this.target = new Slider(this);
+        break;
+      case 'dataSearcher':
+        this.target = new DataSearcher(this);
+        break;
       case 'tabs': 
         this.target = new Tabs(
           this, 

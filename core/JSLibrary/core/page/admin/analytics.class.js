@@ -51,9 +51,15 @@ export class PageAnalytics {
         lastDate.setDate(0);
         
         window.CMSCore.metrics.getDataByRangeTimestamp(firstDate.getTime(), lastDate.getTime()).then((metricsData) => {
-          let scheduleAttendance = new Interactive('schedule', {
+          const scheduleAttendance = new Interactive('schedule', {
             canvasElement: scheduleContainerElement,
-            type: 'linear'
+            type: 'linear',
+            zoomable: true,
+            minZoom: 0.5,
+            maxZoom: 5,
+            zoomStep: 0.1,
+            showNavigator: true,
+            padding: { top: 30, right: 30, bottom: 40, left: 50 }
           });
 
           scheduleAttendance.target.setFrameSize(scheduleContainerElement.width - 50, scheduleContainerElement.height - 50 - 40);
