@@ -31,6 +31,9 @@ export class Schedule {
    * @param {number} options.zoomStep - Шаг зума
    * @param {boolean} options.showNavigator - Показывать навигатор
    * @param {Object} options.padding - Отступы {top, right, bottom, left}
+   * @param {number|string} options.height - Высота canvas (число в px, 'auto', или соотношение '16:9')
+   * @param {number} options.minHeight - Минимальная высота (px)
+   * @param {number} options.maxHeight - Максимальная высота (px)
    */
   constructor(interactiveObject, canvas, type = 'linear', options = {}) {
     this.interactiveObject = interactiveObject;
@@ -44,7 +47,11 @@ export class Schedule {
       maxZoom: options.maxZoom || 5,
       zoomStep: options.zoomStep || 0.1,
       showNavigator: options.showNavigator !== undefined ? options.showNavigator : true,
-      padding: options.padding || { top: 30, right: 30, bottom: 40, left: 50 }
+      padding: options.padding || { top: 30, right: 30, bottom: 40, left: 50 },
+      height: options.height || 'auto', // 'auto', число в px, или '16:9', '4:3'
+      minHeight: options.minHeight || 200,
+      maxHeight: options.maxHeight || 600,
+      aspectRatio: options.aspectRatio || null // '16:9' или '4:3'
     };
 
     // Состояние
@@ -53,6 +60,7 @@ export class Schedule {
     this.mouse = { x: 0, y: 0 };
     this.dotsRenderInterval = null;
     this._isInited = false;
+    this._resizeObserver = null;
 
     // Рамка графика
     this.frame = {
@@ -62,11 +70,9 @@ export class Schedule {
 
     // Контекст
     this.context = typeof canvas === 'object' ? canvas.getContext('2d') : null;
-    if (this.context) {
-      this.context.width = this.getCanvasWidth();
-      this.context.height = this.getCanvasHeight();
-      this.context.lineWidth = 1;
-    }
+    
+    // Устанавливаем начальные размеры
+    this.updateCanvasSize();
 
     // Данные
     this.dataDots = [];
@@ -92,6 +98,151 @@ export class Schedule {
     if (this.options.zoomable && this.options.showNavigator) {
       this.initNavigator();
     }
+
+    // Следим за изменением размера контейнера
+    this.initResizeObserver();
+  }
+
+  // ============================================================
+  //  УПРАВЛЕНИЕ РАЗМЕРАМИ CANVAS
+  // ============================================================
+
+  /**
+   * Обновить размер canvas в зависимости от опций
+   */
+  updateCanvasSize() {
+    if (!this.canvas) return;
+
+    const parent = this.canvas.parentElement;
+    if (!parent) return;
+
+    const parentWidth = parent.clientWidth || 800;
+    let height = this.calculateHeight(parentWidth);
+
+    // Применяем ограничения
+    height = Math.max(this.options.minHeight, Math.min(this.options.maxHeight, height));
+
+    // Устанавливаем размеры canvas (атрибуты для рисования)
+    this.canvas.width = parentWidth;
+    this.canvas.height = height;
+
+    // Устанавливаем CSS-размеры
+    this.canvas.style.width = '100%';
+    this.canvas.style.height = height + 'px';
+
+    // Обновляем frame size если уже есть данные
+    if (this._isInited) {
+      const padding = this.options.padding;
+      const frameWidth = parentWidth - padding.left - padding.right;
+      const frameHeight = height - padding.top - padding.bottom;
+      
+      this.setFrameSize(frameWidth, frameHeight);
+      this.setFramePosition(padding.left, padding.top);
+      
+      if (this.context) {
+        this.render();
+      }
+    }
+
+    // Обновляем навигатор
+    if (this.zoom.navCanvas) {
+      const navParent = this.zoom.navCanvas.parentElement;
+      if (navParent) {
+        const navWidth = navParent.clientWidth - 120; // минус кнопки
+        if (navWidth > 100) {
+          this.zoom.navCanvas.width = navWidth;
+          this.zoom.navCanvas.style.width = '100%';
+          if (this.zoom.navContext) {
+            this.renderNavigator();
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Вычислить высоту canvas
+   * @param {number} width - Ширина родителя
+   * @returns {number} Высота в px
+   */
+  calculateHeight(width) {
+    const heightOption = this.options.height;
+    const aspectRatio = this.options.aspectRatio;
+
+    // Если задано соотношение сторон
+    if (aspectRatio) {
+      const ratio = this.parseAspectRatio(aspectRatio);
+      if (ratio) {
+        return width / ratio;
+      }
+    }
+
+    // Если задана строка с соотношением
+    if (typeof heightOption === 'string' && heightOption.includes(':')) {
+      const ratio = this.parseAspectRatio(heightOption);
+      if (ratio) {
+        return width / ratio;
+      }
+    }
+
+    // Если 'auto' — рассчитываем динамически
+    if (heightOption === 'auto') {
+      // Базовая высота: 60% от ширины, но не меньше 200 и не больше 600
+      let autoHeight = width * 0.6;
+      return Math.max(this.options.minHeight, Math.min(this.options.maxHeight, autoHeight));
+    }
+
+    // Если число — используем его
+    if (typeof heightOption === 'number') {
+      return heightOption;
+    }
+
+    // Если строка с px
+    if (typeof heightOption === 'string' && heightOption.endsWith('px')) {
+      const parsed = parseInt(heightOption, 10);
+      if (!isNaN(parsed)) {
+        return parsed;
+      }
+    }
+
+    // Fallback
+    return Math.max(this.options.minHeight, Math.min(this.options.maxHeight, width * 0.6));
+  }
+
+  /**
+   * Разобрать соотношение сторон из строки
+   * @param {string} ratio - '16:9' или '4:3'
+   * @returns {number|null} Ширина/высота
+   */
+  parseAspectRatio(ratio) {
+    if (typeof ratio !== 'string') return null;
+    const parts = ratio.split(':');
+    if (parts.length !== 2) return null;
+    const w = parseFloat(parts[0]);
+    const h = parseFloat(parts[1]);
+    if (isNaN(w) || isNaN(h) || h === 0) return null;
+    return w / h;
+  }
+
+  /**
+   * Наблюдатель за изменением размера контейнера
+   */
+  initResizeObserver() {
+    if (typeof ResizeObserver === 'undefined') {
+      // Fallback: обновляем при ресайзе окна
+      window.addEventListener('resize', () => {
+        this.updateCanvasSize();
+      });
+      return;
+    }
+
+    const parent = this.canvas?.parentElement;
+    if (!parent) return;
+
+    this._resizeObserver = new ResizeObserver(() => {
+      this.updateCanvasSize();
+    });
+    this._resizeObserver.observe(parent);
   }
 
   // ============================================================
@@ -144,6 +295,15 @@ export class Schedule {
       });
     }
 
+    // Устанавливаем frame size если ещё не установлен
+    if (!this._isInited) {
+      const padding = this.options.padding;
+      const width = this.canvas.width - padding.left - padding.right;
+      const height = this.canvas.height - padding.top - padding.bottom;
+      this.setFrameSize(width, height);
+      this.setFramePosition(padding.left, padding.top);
+    }
+
     // Обновляем навигатор
     if (this.options.zoomable && this.options.showNavigator && this.zoom.navContext) {
       setTimeout(() => this.renderNavigator(), 50);
@@ -180,17 +340,11 @@ export class Schedule {
   // ============================================================
 
   getCanvasWidth() {
-    if (typeof this.canvas === 'object') {
-      return Math.ceil(this.canvas.getBoundingClientRect().width) || 800;
-    }
-    return 800;
+    return this.canvas?.width || 800;
   }
 
   getCanvasHeight() {
-    if (typeof this.canvas === 'object') {
-      return Math.ceil(this.canvas.getBoundingClientRect().height) || 400;
-    }
-    return 400;
+    return this.canvas?.height || 400;
   }
 
   // ============================================================
@@ -258,7 +412,7 @@ export class Schedule {
   }
 
   render() {
-    if (!this.canvas) return;
+    if (!this.canvas || !this.context) return;
 
     this.drawGrid();
     this.drawFrame();
@@ -325,6 +479,14 @@ export class Schedule {
 
   init() {
     if (this._isInited) return;
+
+    // Устанавливаем frame size
+    const padding = this.options.padding;
+    const width = this.canvas.width - padding.left - padding.right;
+    const height = this.canvas.height - padding.top - padding.bottom;
+    this.setFrameSize(width, height);
+    this.setFramePosition(padding.left, padding.top);
+
     this._isInited = true;
 
     // Событие движения мыши
@@ -368,11 +530,6 @@ export class Schedule {
       this.getFrameSize().width,
       this.canvas.height - this.getFrameSize().height - 10
     );
-
-    // Ресайз
-    window.addEventListener('resize', () => {
-      this.render();
-    });
 
     this.render();
   }
@@ -561,11 +718,10 @@ export class Schedule {
     const pad = 4;
 
     // Рисуем линии для всех типов
-    this.types.forEach((type, index) => {
+    this.types.forEach((type) => {
       const typeData = type.data || [];
       if (typeData.length < 2) return;
 
-      // Цвет из легенды или стандартный
       const color = type.color || '#999';
       ctx.strokeStyle = color;
       ctx.lineWidth = 1.5;
@@ -608,6 +764,10 @@ export class Schedule {
    * Уничтожить график и очистить DOM
    */
   destroy() {
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+      this._resizeObserver = null;
+    }
     if (this.zoom.navContainer) {
       this.zoom.navContainer.remove();
       this.zoom.navContainer = null;
