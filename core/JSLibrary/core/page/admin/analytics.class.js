@@ -31,7 +31,17 @@ export class PageAnalytics {
       const dateParam = urlParams.get('date');
       
       if (dateParam) {
-        const parsed = new Date(dateParam);
+        let parsed;
+        
+        // ==========================================
+        // НОРМАЛИЗАЦИЯ: если только год-месяц → добавляем день
+        // ==========================================
+        if (/^\d{4}-\d{2}$/.test(dateParam)) {
+          parsed = new Date(dateParam + '-01');
+        } else {
+          parsed = new Date(dateParam);
+        }
+        
         if (!isNaN(parsed.getTime())) {
           console.log('📅 Дата из URL:', parsed.toLocaleDateString());
           return parsed;
