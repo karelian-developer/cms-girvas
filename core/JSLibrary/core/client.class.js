@@ -25,6 +25,8 @@ import {URLParser} from '../urlParser.class.js';
 export class Client {
   constructor(core) {
     this.core = core;
+    this.isLogged = false;
+    this.IPAddress = '0.0.0.0';
     this.CSRFToken = '';
     this.setRestHash();
     this.initCSRFToken();

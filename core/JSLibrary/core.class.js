@@ -51,6 +51,20 @@ export class Core {
   }
 
   /**
+   * Инициализация клиента
+   * 
+   * @returns
+   */
+  async initClient() {
+    return this.client.isLogged().then((result) => {
+      this.client.isLogged = result;
+      return this.client.getIPAddress();
+    }).then((result) => {
+      this.client.IPAddress = result;
+    });
+  }
+
+  /**
    * Инициализация локализаций
    * 
    * @returns
@@ -354,7 +368,10 @@ window.CMSCore = new Core();
 
 // Инициализация клиентского ядра CMS
 document.addEventListener('DOMContentLoaded', async () => {
-  await window.CMSCore.initLocales().then(() => {
+  await window.CMSCore.initClient().then(() => {
+    window.CMSCore.debugLog(1, 'CMSCore', 'Client initied!', true);
+    return window.CMSCore.initLocales();
+  }).then(() => {
     window.CMSCore.debugLog(1, 'CMSCore', 'Locales initied!', true);
     return window.CMSCore.initPages();
   }).then(() => {
