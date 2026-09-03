@@ -85,24 +85,18 @@ export class PageAnalytics {
                 if (searchParams.getPathPart(4) === null) {
                   urlsTotalViews += urls[url];
                 } else {
-                  let urlObject = new URL(url);
-                  let urlPathParts = urlObject.pathname.split('/');
-                  let targetObjectName = document.querySelector('article.page[data-name]');
+                  // Аналитика конкретной страницы
+                  const targetObject = document.querySelector('article.page[data-name]');
+                  const targetName = targetObject?.getAttribute('data-name');
                   
-                  if (targetObjectName !== null) {
-                    const targetName = targetObjectName.getAttribute('data-name');
+                  if (targetName) {
+                    const urlLower = url.toLowerCase();
+                    const targetLower = targetName.toLowerCase();
                     
-                    // Определяем тип страницы по URL
-                    if (urlPathParts[0] === 'entry') {
-                      // Запись: /entry/name
-                      if (urlPathParts[1] === targetName) {
-                        urlsTotalViews += urls[url];
-                      }
-                    } else if (urlPathParts[0] === 'page') {
-                      // Статическая страница: /page/name
-                      if (urlPathParts[1] === targetName) {
-                        urlsTotalViews += urls[url];
-                      }
+                    // Проверяем совпадение с /page/name
+                    if (urlLower.includes(`/page/${targetLower}`) || 
+                        urlLower.includes(`/page/${targetLower}?`)) {
+                      urlsTotalViews += urls[url];
                     }
                   }
                 }
