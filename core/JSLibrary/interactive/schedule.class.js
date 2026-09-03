@@ -681,7 +681,33 @@ export class Schedule {
     const newLevel = this.zoom.level * factor;
     if (newLevel < this.options.minZoom || newLevel > this.options.maxZoom) return;
 
+    // ==========================================
+    // ИСПРАВЛЕНИЕ: пересчитываем область просмотра
+    // ==========================================
+    const center = (this.zoom.viewStart + this.zoom.viewEnd) / 2;
+    const viewWidth = this.zoom.viewEnd - this.zoom.viewStart;
+    
+    // Новая ширина области с учётом зума
+    const newViewWidth = viewWidth / factor;
+    
+    // Ограничиваем, чтобы не выйти за пределы [0, 1]
+    let newStart = center - newViewWidth / 2;
+    let newEnd = center + newViewWidth / 2;
+    
+    // Корректируем, если вышли за границы
+    if (newStart < 0) {
+      newStart = 0;
+      newEnd = newViewWidth;
+    }
+    if (newEnd > 1) {
+      newEnd = 1;
+      newStart = 1 - newViewWidth;
+    }
+    
     this.zoom.level = newLevel;
+    this.zoom.viewStart = Math.max(0, newStart);
+    this.zoom.viewEnd = Math.min(1, newEnd);
+    
     this.updateView();
   }
 
