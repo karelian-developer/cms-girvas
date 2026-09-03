@@ -76,87 +76,55 @@ export class PageAnalytics {
           }
 
           metricsData.forEach((data) => {
-            let urlsTotalViews = 0;
-            let visits0 = [];
-            let visits1 = [];
-            let time = data.metrics.time * 1000;
-            let date = new Date(time);
-            let day = date.getDate() - 1;
+          let urlsTotalViews = 0;
+          let time = data.metrics.time * 1000;
+          let date = new Date(time);
+          let day = date.getDate() - 1;
 
-            // ==========================================
-            // 1. СЧИТАЕМ ПРОСМОТРЫ
-            // ==========================================
-            for (let token in data.metrics.views) {
-              let urls = data.metrics.views[token].urls;
-              let urlTransfers = data.metrics.views[token].url_transfers;
-
-              // Суммируем просмотры по всем URL
-              for (let url in urls) {
-                if (searchParams.getPathPart(4) === null) {
-                  urlsTotalViews += urls[url];
-                } else {
-                  // Фильтрация по конкретной записи/странице
-                  let urlObject = new URL(url);
-                  let urlPathParts = urlObject.pathname.split('/');
-                  let targetObjectName = document.querySelector('article.page[data-name]');
-                  
-                  if (targetObjectName !== null && urlPathParts[2] === targetObjectName.getAttribute('data-name')) {
-                    urlsTotalViews += urls[url];
-                  }
-                }
-              }
-
-              // ==========================================
-              // 2. СЧИТАЕМ ВИЗИТЫ (только для главной аналитики)
-              // ==========================================
+          // ==========================================
+          // 1. СЧИТАЕМ ПРОСМОТРЫ
+          // ==========================================
+          for (let token in data.metrics.views) {
+            let urls = data.metrics.views[token].urls;
+            for (let url in urls) {
               if (searchParams.getPathPart(4) === null) {
-                for (let transferIndex in urlTransfers) {
-                  for (let transfer in urlTransfers[transferIndex]) {
-                    let transferData = urlTransfers[transferIndex][transfer];
-                    let urlReferral = transferData.referral;
-                    let visitedIsNew = transferData.is_visited_new;
-                    let transferTime = transferData.time * 1000;
-                    
-                    // Если это переход (не прямой заход)
-                    if (transfer !== urlReferral && !isEmpty(urlReferral)) {
-                      // ==========================================
-                      // ИСПРАВЛЕНИЕ: используем время метрики, а не текущее
-                      // ==========================================
-                      const isNewVisit = (transferTime + (30 * 60 * 1000)) < time;
-                      
-                      // Добавляем токен в visits0, если его там нет
-                      if (visits0.indexOf(token) === -1) {
-                        visits0.push(token);
-                      }
-                      
-                      // Добавляем токен в visits1, если это новый посетитель
-                      if (visitedIsNew && visits1.indexOf(token) === -1) {
-                        visits1.push(token);
-                      }
-                    }
-                  }
+                urlsTotalViews += urls[url];
+              } else {
+                let urlObject = new URL(url);
+                let urlPathParts = urlObject.pathname.split('/');
+                let targetObjectName = document.querySelector('article.page[data-name]');
+                if (targetObjectName !== null && urlPathParts[2] === targetObjectName.getAttribute('data-name')) {
+                  urlsTotalViews += urls[url];
                 }
               }
             }
+          }
 
+          // ==========================================
+          // 2. ДОБАВЛЯЕМ ДАННЫЕ В ГРАФИК
+          // ==========================================
+          scheduleAttendance.target.addData(0, day, urlsTotalViews);
+
+          if (searchParams.getPathPart(4) === null) {
             // ==========================================
-            // 3. ДОБАВЛЯЕМ ДАННЫЕ В ГРАФИК
+            // ИСПРАВЛЕНИЕ: используем готовые данные из БД
             // ==========================================
-            scheduleAttendance.target.addData(0, day, urlsTotalViews);
+            const visits0 = data.metrics.visits0 || [];
+            const visits1 = data.metrics.visits1 || [];
+            
+            console.log(`📊 День ${day + 1}: просмотры=${urlsTotalViews}, визиты=${visits0.length}, посещения=${visits1.length}`);
+            
+            scheduleAttendance.target.addData(1, day, visits0.length);
+            scheduleAttendance.target.addData(2, day, visits1.length);
+          }
 
-            if (searchParams.getPathPart(4) === null) {
-              scheduleAttendance.target.addData(1, day, visits0.length);
-              scheduleAttendance.target.addData(2, day, visits1.length);
-            }
-
-            // Устанавливаем цвета
-            scheduleAttendance.target.types[0].setColor('#EE82EE');
-
-            if (searchParams.getPathPart(4) === null) {
-              scheduleAttendance.target.types[1].setColor('#5B92E5');
-              scheduleAttendance.target.types[2].setColor('#088567');
-            }
-          });
+          // Устанавливаем цвета
+          scheduleAttendance.target.types[0].setColor('#EE82EE');
+          if (searchParams.getPathPart(4) === null) {
+            scheduleAttendance.target.types[1].setColor('#5B92E5');
+            scheduleAttendance.target.types[2].setColor('#088567');
+          }
+        });
     
           scheduleAttendance.target.buildData();
           scheduleAttendance.target.init();
@@ -219,6 +187,9 @@ export class PageAnalytics {
   }
 
   scheduleContainerElementCreate() {
-    return document.createElement('canvas');
+    const canvas = document.createElement('canvas');
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    return canvas;
   }
 }
