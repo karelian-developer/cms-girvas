@@ -708,12 +708,13 @@ export class Schedule {
     const w = this.zoom.navCanvas.width;
     const h = this.zoom.navCanvas.height;
 
+    // ==========================================
+    // ОЧИЩАЕМ НАВИГАТОР ПЕРЕД РИСОВАНИЕМ
+    // ==========================================
     ctx.clearRect(0, 0, w, h);
 
-    // Рисуем мини-график
     this.drawMiniChart(ctx, w, h);
 
-    // Область просмотра
     const left = this.zoom.viewStart * w;
     const right = this.zoom.viewEnd * w;
 
