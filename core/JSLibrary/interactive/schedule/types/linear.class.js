@@ -301,12 +301,36 @@ export class Linear {
     schedule.context.shadowBlur = 0;
   }
 
+  // ==========================================
+  // ПОЛУЧИТЬ МЕСЯЦ ИЗ URL
+  // ==========================================
+  getMonthFromURL() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const dateParam = urlParams.get('date');
+      
+      if (dateParam) {
+        let parsed;
+        if (/^\d{4}-\d{2}$/.test(dateParam)) {
+          parsed = new Date(dateParam + '-01');
+        } else {
+          parsed = new Date(dateParam);
+        }
+        if (!isNaN(parsed.getTime())) {
+          return parsed.getMonth();
+        }
+      }
+    } catch (e) {}
+    return new Date().getMonth();
+  }
+
+  // ==========================================
+  // ПОЛУЧИТЬ НАЗВАНИЕ МЕСЯЦА
+  // ==========================================
   getMonthName() {
-    const months = [
-      'Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня',
-      'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'
-    ];
-    const now = new Date();
-    return months[now.getMonth()];
+    const months = ['Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня',
+                    'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'];
+    const monthIndex = this.getMonthFromURL();
+    return months[monthIndex] || 'Сентября';
   }
 }
