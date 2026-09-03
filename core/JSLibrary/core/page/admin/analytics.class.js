@@ -79,48 +79,91 @@ export class PageAnalytics {
             let date = new Date(time);
             let day = date.getDate() - 1;
 
+            const pathPart4 = searchParams.getPathPart(4);
+            const targetObject = document.querySelector('article.page[data-name]');
+            const targetName = targetObject?.getAttribute('data-name');
+
+            // ==========================================
+            // СЧИТАЕМ ПРОСМОТРЫ, ВИЗИТЫ И ПОСЕЩЕНИЯ
+            // ==========================================
+            let visits0 = [];
+            let visits1 = [];
+
             for (let token in data.metrics.views) {
               let urls = data.metrics.views[token].urls;
+              let urlTransfers = data.metrics.views[token].url_transfers || [];
+
               for (let url in urls) {
-                if (searchParams.getPathPart(4) === null) {
-                  urlsTotalViews += urls[url];
-                } else {
-                  // Аналитика конкретной страницы
-                  const targetObject = document.querySelector('article.page[data-name]');
-                  const targetName = targetObject?.getAttribute('data-name');
+                // Проверяем, подходит ли URL под текущую страницу
+                let isMatch = false;
+                
+                if (pathPart4 === null) {
+                  // Главная аналитика — все просмотры
+                  isMatch = true;
+                } else if (targetName) {
+                  // Аналитика конкретной записи/страницы
+                  const urlLower = url.toLowerCase();
+                  const targetLower = targetName.toLowerCase();
                   
-                  if (targetName) {
-                    const urlLower = url.toLowerCase();
-                    const targetLower = targetName.toLowerCase();
-                    
-                    // Проверяем совпадение с /page/name
-                    if (urlLower.includes(`/page/${targetLower}`) || 
-                        urlLower.includes(`/page/${targetLower}?`)) {
-                      urlsTotalViews += urls[url];
+                  // Проверяем /entry/name или /page/name
+                  if (urlLower.includes(`/entry/${targetLower}`) || 
+                      urlLower.includes(`/page/${targetLower}`) ||
+                      urlLower.includes(`/entry/${targetLower}?`) ||
+                      urlLower.includes(`/page/${targetLower}?`)) {
+                    isMatch = true;
+                  }
+                }
+                
+                if (isMatch) {
+                  urlsTotalViews += urls[url];
+                  
+                  // ==========================================
+                  // СЧИТАЕМ ВИЗИТЫ И ПОСЕЩЕНИЯ
+                  // ==========================================
+                  for (let transferIndex in urlTransfers) {
+                    for (let transfer in urlTransfers[transferIndex]) {
+                      let transferData = urlTransfers[transferIndex][transfer];
+                      let urlReferral = transferData.referral;
+                      let visitedIsNew = transferData.is_visited_new;
+                      
+                      // Визиты: переходы (не прямые заходы)
+                      if (transfer !== urlReferral && urlReferral && urlReferral !== '') {
+                        if (visits0.indexOf(token) === -1) {
+                          visits0.push(token);
+                        }
+                      }
+                      
+                      // Посещения: новые посетители
+                      if (visitedIsNew && visits1.indexOf(token) === -1) {
+                        visits1.push(token);
+                      }
                     }
                   }
                 }
               }
             }
 
+            // ==========================================
+            // ДОБАВЛЯЕМ ДАННЫЕ В ГРАФИК
+            // ==========================================
             scheduleAttendance.target.addData(0, day, urlsTotalViews);
 
-            if (searchParams.getPathPart(4) === null) {
-              const visits0 = data.metrics.visits0 || [];
-              const visits1 = data.metrics.visits1 || [];
-              
-              console.log(`📊 День ${day + 1}: просмотры=${urlsTotalViews}, визиты=${visits0.length}, посещения=${visits1.length}`);
-              
-              scheduleAttendance.target.addData(1, day, visits0.length);
-              scheduleAttendance.target.addData(2, day, visits1.length);
+            // Визиты и посещения добавляем ВСЕГДА, если есть данные
+            // Если группы ещё нет — создаём
+            if (scheduleAttendance.target.types.length < 2) {
+              scheduleAttendance.target.addGroup('Визиты');
             }
+            if (scheduleAttendance.target.types.length < 3) {
+              scheduleAttendance.target.addGroup('Посещения');
+            }
+            
+            scheduleAttendance.target.addData(1, day, visits0.length);
+            scheduleAttendance.target.addData(2, day, visits1.length);
 
             // Устанавливаем цвета
             scheduleAttendance.target.types[0].setColor('#EE82EE');
-            if (searchParams.getPathPart(4) === null) {
-              scheduleAttendance.target.types[1].setColor('#5B92E5');
-              scheduleAttendance.target.types[2].setColor('#088567');
-            }
+            scheduleAttendance.target.types[1].setColor('#5B92E5');
+            scheduleAttendance.target.types[2].setColor('#088567');
           });
     
           scheduleAttendance.target.buildData();
