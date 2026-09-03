@@ -38,7 +38,7 @@ export class ToolHeaders extends Tool {
 
       if (selection) {
         this.editor.textarea.replaceStringSelection(
-          "\n\r" + '#'.repeat(selectElement.value) + ' ' + selection + "\n\r"
+          "\n" + '#'.repeat(selectElement.value) + ' ' + selection + "\n\r"
         );
         
         this.editor.clearSelection();
