@@ -132,13 +132,8 @@ export class PageAnalytics {
                   if (isMainAnalytics) {
                     urlsTotalViews += urls[url];
                   } else {
-                    let urlObject;
-                    try {
-                      urlObject = new URL(url);
-                    } catch (e) {
-                      continue;
-                    }
-
+                    console.log('URL: ' + url);
+                    let urlObject = new URL(url);
                     let urlPathParts = urlObject.pathname.split('/').filter(part => part !== '');
                     let targetObjectName = document.querySelector('article.page[data-name]');
                     if (targetObjectName !== null && urlPathParts[1] === targetObjectName.getAttribute('data-name')) {
