@@ -79,7 +79,6 @@ export class Schedule {
     this.types = [];
     this.legend = new Legend();
 
-    // Zoom
     this.zoom = {
       level: 1,
       viewStart: 0,
@@ -91,7 +90,12 @@ export class Schedule {
       navCanvas: null,
       navContext: null,
       navContainer: null,
-      isNavVisible: false
+      isNavVisible: false,
+      isResizingLeft: false,
+      isResizingRight: false,
+      resizeStartX: 0,
+      resizeStartViewStart: 0,
+      resizeStartViewEnd: 0
     };
 
     // Если зум включён — инициализируем навигатор
@@ -388,9 +392,7 @@ export class Schedule {
     this.context.textBaseline = 'top';
     this.context.textAlign = 'center';
 
-    // ==========================================
-    // ИСПРАВЛЕНИЕ: i < totalDays (не <=)
-    // ==========================================
+    // Вертикальные линии и подписи
     const step = Math.max(1, Math.ceil(visibleDays / 20));
     for (let i = 0; i < visibleDays; i += step) {
       const x = frameX + lineXStep * i;
@@ -406,6 +408,19 @@ export class Schedule {
       }
     }
 
+    // ==========================================
+    // ДОБАВЛЯЕМ ПОДПИСЬ ПОСЛЕДНЕГО ДНЯ МЕСЯЦА
+    // ==========================================
+    // Последний день месяца
+    const lastDayX = frameX + frameWidth;
+    const lastDayNumber = totalDays;
+    
+    this.context.fillStyle = '#333';
+    this.context.font = '11px sans-serif';
+    this.context.textAlign = 'center';
+    this.context.textBaseline = 'top';
+    this.context.fillText(`${lastDayNumber}`, lastDayX, frameY + frameHeight + 6);
+
     // Горизонтальные линии
     const gridLines = 5;
     for (let i = 0; i <= gridLines; i++) {
@@ -418,6 +433,7 @@ export class Schedule {
       const val = Math.round(maxY - (maxY / gridLines) * i);
       this.context.textAlign = 'right';
       this.context.textBaseline = 'middle';
+      this.context.fillStyle = '#666';
       this.context.fillText(val.toString(), frameX - 8, y);
     }
   }
@@ -588,11 +604,10 @@ export class Schedule {
     this.zoom.navCanvas = navCanvas;
     this.zoom.navContext = navCanvas.getContext('2d');
 
-    // События навигатора
-    navCanvas.addEventListener('mousedown', (e) => this.navStartDrag(e));
-    navCanvas.addEventListener('mousemove', (e) => this.navMoveDrag(e));
-    navCanvas.addEventListener('mouseup', () => this.navEndDrag());
-    navCanvas.addEventListener('mouseleave', () => this.navEndDrag());
+    navCanvas.addEventListener('mousedown', (e) => this.navMouseDown(e));
+    navCanvas.addEventListener('mousemove', (e) => this.navMouseMove(e));
+    navCanvas.addEventListener('mouseup', () => this.navMouseUp());
+    navCanvas.addEventListener('mouseleave', () => this.navMouseUp());
 
     // Собираем
     navContainer.append(zoomInBtn);
@@ -708,9 +723,6 @@ export class Schedule {
     const w = this.zoom.navCanvas.width;
     const h = this.zoom.navCanvas.height;
 
-    // ==========================================
-    // ОЧИЩАЕМ НАВИГАТОР ПЕРЕД РИСОВАНИЕМ
-    // ==========================================
     ctx.clearRect(0, 0, w, h);
 
     this.drawMiniChart(ctx, w, h);
@@ -718,11 +730,50 @@ export class Schedule {
     const left = this.zoom.viewStart * w;
     const right = this.zoom.viewEnd * w;
 
+    // ==========================================
+    // ОБЛАСТЬ ПРОСМОТРА
+    // ==========================================
     ctx.fillStyle = 'rgba(40, 94, 142, 0.15)';
     ctx.strokeStyle = '#285E8E';
     ctx.lineWidth = 2;
     ctx.fillRect(left, 0, right - left, h);
     ctx.strokeRect(left, 0, right - left, h);
+
+    // ==========================================
+    // РУЧКИ ДЛЯ РЕСАЙЗА
+    // ==========================================
+    const handleSize = 8;
+    const handleOffset = handleSize / 2;
+    
+    // Левая ручка
+    ctx.fillStyle = '#285E8E';
+    ctx.beginPath();
+    ctx.rect(left - handleOffset, h/2 - handleOffset, handleSize, handleSize);
+    ctx.fill();
+    ctx.strokeStyle = '#1a4a6e';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+    // Правая ручка
+    ctx.fillStyle = '#285E8E';
+    ctx.beginPath();
+    ctx.rect(right - handleOffset, h/2 - handleOffset, handleSize, handleSize);
+    ctx.fill();
+    ctx.stroke();
+
+    // ==========================================
+    // ПОДПИСЬ ДИАПАЗОНА
+    // ==========================================
+    ctx.fillStyle = '#333';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    
+    const totalDays = this.getDaysCountInCurrentMonth();
+    const startDay = Math.round(this.zoom.viewStart * totalDays) + 1;
+    const endDay = Math.round(this.zoom.viewEnd * totalDays);
+    
+    ctx.fillText(`${startDay} — ${endDay}`, (left + right) / 2, h - 4);
   }
 
   drawMiniChart(ctx, w, h) {
@@ -801,5 +852,113 @@ export class Schedule {
     this.canvas = null;
     this.context = null;
     this._isInited = false;
+  }
+
+  // ============================================================
+  //  РЕСАЙЗ ОБЛАСТИ В НАВИГАТОРЕ
+  // ============================================================
+
+  navMouseDown(e) {
+    const rect = this.zoom.navCanvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const handleSize = 0.02; // 2% от ширины навигатора
+    
+    const left = this.zoom.viewStart;
+    const right = this.zoom.viewEnd;
+    
+    // Проверяем, попали ли в левую или правую границу
+    if (x >= left && x <= left + handleSize) {
+      this.zoom.isResizingLeft = true;
+      this.zoom.resizeStartX = x;
+      this.zoom.resizeStartViewStart = left;
+      this.zoom.resizeStartViewEnd = right;
+      this.zoom.navCanvas.style.cursor = 'ew-resize';
+      return;
+    }
+    
+    if (x >= right - handleSize && x <= right) {
+      this.zoom.isResizingRight = true;
+      this.zoom.resizeStartX = x;
+      this.zoom.resizeStartViewStart = left;
+      this.zoom.resizeStartViewEnd = right;
+      this.zoom.navCanvas.style.cursor = 'ew-resize';
+      return;
+    }
+    
+    // Если не попали в границы — начинаем drag
+    this.zoom.isDragging = true;
+    this.zoom.dragStartX = x;
+    this.zoom.dragStartViewStart = left;
+    this.zoom.dragStartViewEnd = right;
+    this.zoom.navCanvas.style.cursor = 'grabbing';
+  }
+
+  navMouseMove(e) {
+    const rect = this.zoom.navCanvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const handleSize = 0.02;
+    
+    const left = this.zoom.viewStart;
+    const right = this.zoom.viewEnd;
+    
+    // Меняем курсор при наведении на границы
+    if (!this.zoom.isDragging && !this.zoom.isResizingLeft && !this.zoom.isResizingRight) {
+      if ((x >= left && x <= left + handleSize) || (x >= right - handleSize && x <= right)) {
+        this.zoom.navCanvas.style.cursor = 'ew-resize';
+      } else {
+        this.zoom.navCanvas.style.cursor = 'grab';
+      }
+      return;
+    }
+    
+    // Ресайз левой границы
+    if (this.zoom.isResizingLeft) {
+      let newStart = Math.max(0, Math.min(right - 0.01, x));
+      // Не даём области стать слишком маленькой
+      if (right - newStart < 0.01) return;
+      this.zoom.viewStart = newStart;
+      this.updateView();
+      return;
+    }
+    
+    // Ресайз правой границы
+    if (this.zoom.isResizingRight) {
+      let newEnd = Math.min(1, Math.max(left + 0.01, x));
+      if (newEnd - left < 0.01) return;
+      this.zoom.viewEnd = newEnd;
+      this.updateView();
+      return;
+    }
+    
+    // Drag всей области
+    if (this.zoom.isDragging) {
+      const delta = x - this.zoom.dragStartX;
+      const viewWidth = this.zoom.dragStartViewEnd - this.zoom.dragStartViewStart;
+      
+      let newStart = this.zoom.dragStartViewStart + delta * viewWidth;
+      let newEnd = this.zoom.dragStartViewEnd + delta * viewWidth;
+      
+      if (newStart < 0) {
+        newStart = 0;
+        newEnd = viewWidth;
+      }
+      if (newEnd > 1) {
+        newEnd = 1;
+        newStart = 1 - viewWidth;
+      }
+      
+      this.zoom.viewStart = Math.max(0, Math.min(1 - viewWidth, newStart));
+      this.zoom.viewEnd = this.zoom.viewStart + viewWidth;
+      this.updateView();
+    }
+  }
+
+  navMouseUp() {
+    this.zoom.isDragging = false;
+    this.zoom.isResizingLeft = false;
+    this.zoom.isResizingRight = false;
+    if (this.zoom.navCanvas) {
+      this.zoom.navCanvas.style.cursor = 'grab';
+    }
   }
 }
