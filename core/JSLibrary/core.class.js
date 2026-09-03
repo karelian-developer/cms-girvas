@@ -56,7 +56,7 @@ export class Core {
    * @returns
    */
   async initClient() {
-    return this.client.isLogged().then((result) => {
+    return this.client.checkLogged().then((result) => {
       this.client.isLogged = result;
     });
   }
