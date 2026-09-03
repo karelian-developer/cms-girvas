@@ -9,6 +9,7 @@ export class Linear {
     this.color = '#000000';
     this.label = `Data #${schedule.types.length + 1}`;
     this._isHovered = false;
+    this._hoveredData = null;
   }
 
   setLabel(value) {
@@ -178,10 +179,8 @@ export class Linear {
     const typeIndex = schedule.types.indexOf(this);
     const isActive = isHovered;
     
-    // Вычисляем, есть ли другая активная линия
     let hasOtherActive = false;
     if (isHovered) {
-      // Проверяем, есть ли другие линии, которые тоже наведены
       for (let t = 0; t < schedule.types.length; t++) {
         if (t !== typeIndex && schedule.types[t]._isHovered) {
           hasOtherActive = true;
@@ -193,13 +192,10 @@ export class Linear {
     // ==========================================
     // 3. РИСУЕМ ЛИНИЮ
     // ==========================================
-    // Прозрачность: если наведены на другую линию — делаем прозрачной
     let lineAlpha = 1.0;
     if (isHovered) {
-      lineAlpha = 1.0; // эту подсвечиваем
+      lineAlpha = 1.0;
     } else if (hasOtherActive) {
-      lineAlpha = 0.15; // другие делаем прозрачными
-    } else if (this._hasOtherActive) {
       lineAlpha = 0.15;
     }
     
@@ -303,132 +299,6 @@ export class Linear {
 
     schedule.context.globalAlpha = 1.0;
     schedule.context.shadowBlur = 0;
-
-    // ==========================================
-    // 5. ТУЛТИП (рисуется только для этой линии)
-    // ==========================================
-    if (isHovered && hoveredData !== null) {
-      const data = hoveredData;
-      const relativeX = data.x - viewStart * totalDays;
-      const clampedX = Math.max(0, Math.min(visibleDays, relativeX));
-      const xPos = clampedX * lineXStep;
-      const yPos = data.y * lineYStep;
-
-      const cx = frameX + xPos;
-      const cy = frameY + frameHeight - yPos;
-
-      const dayNumber = data.x + 1;
-      const monthName = this.getMonthName();
-
-      const typeNames = ['Просмотры', 'Визиты', 'Посещения'];
-      const metricName = typeNames[typeIndex] || this.label;
-
-      const lines = [
-        `${dayNumber} ${monthName}`,
-        `${metricName}: ${data.y}`
-      ];
-
-      const fontSize = 13;
-      const lineHeight = 20;
-      const padding = 10;
-      const borderRadius = 6;
-
-      schedule.context.font = `${fontSize}px sans-serif`;
-      schedule.context.textAlign = 'left';
-      schedule.context.textBaseline = 'top';
-
-      let maxWidth = 0;
-      for (const line of lines) {
-        const metrics = schedule.context.measureText(line);
-        if (metrics.width > maxWidth) maxWidth = metrics.width;
-      }
-
-      const tooltipWidth = maxWidth + padding * 2;
-      const tooltipHeight = lines.length * lineHeight + padding * 2;
-
-      let tooltipX = cx + 15;
-      let tooltipY = cy - tooltipHeight / 2;
-
-      const canvasWidth = schedule.canvas.width;
-      const canvasHeight = schedule.canvas.height;
-
-      if (tooltipX + tooltipWidth > canvasWidth - 10) {
-        tooltipX = cx - tooltipWidth - 15;
-      }
-      if (tooltipY < 10) {
-        tooltipY = 10;
-      }
-      if (tooltipY + tooltipHeight > canvasHeight - 10) {
-        tooltipY = canvasHeight - tooltipHeight - 10;
-      }
-
-      // Рисуем фон тултипа (всегда поверх)
-      schedule.context.shadowBlur = 15;
-      schedule.context.shadowColor = 'rgba(0, 0, 0, 0.2)';
-      schedule.context.fillStyle = '#FFFFFF';
-      schedule.context.strokeStyle = this.color;
-      schedule.context.lineWidth = 2.5;
-      
-      const r = borderRadius;
-      const x = tooltipX;
-      const y = tooltipY;
-      const w = tooltipWidth;
-      const h = tooltipHeight;
-
-      schedule.context.beginPath();
-      schedule.context.moveTo(x + r, y);
-      schedule.context.lineTo(x + w - r, y);
-      schedule.context.quadraticCurveTo(x + w, y, x + w, y + r);
-      schedule.context.lineTo(x + w, y + h - r);
-      schedule.context.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-      schedule.context.lineTo(x + r, y + h);
-      schedule.context.quadraticCurveTo(x, y + h, x, y + h - r);
-      schedule.context.lineTo(x, y + r);
-      schedule.context.quadraticCurveTo(x, y, x + r, y);
-      schedule.context.closePath();
-      schedule.context.fill();
-      schedule.context.stroke();
-
-      schedule.context.shadowBlur = 0;
-
-      // Текст
-      for (let i = 0; i < lines.length; i++) {
-        const textY = tooltipY + padding + i * lineHeight;
-        const textX = tooltipX + padding;
-        
-        if (i === 0) {
-          schedule.context.fillStyle = '#333333';
-          schedule.context.font = `bold ${fontSize}px sans-serif`;
-        } else {
-          schedule.context.fillStyle = this.color;
-          schedule.context.font = `${fontSize}px sans-serif`;
-        }
-        
-        schedule.context.fillText(lines[i], textX, textY);
-      }
-
-      // Стрелка
-      const arrowX = cx > tooltipX + tooltipWidth / 2 ? tooltipX + tooltipWidth : tooltipX;
-      const arrowY = tooltipY + tooltipHeight / 2;
-
-      schedule.context.fillStyle = '#FFFFFF';
-      schedule.context.strokeStyle = this.color;
-      schedule.context.lineWidth = 2;
-      schedule.context.beginPath();
-      
-      if (cx > tooltipX + tooltipWidth / 2) {
-        schedule.context.moveTo(tooltipX + tooltipWidth, arrowY);
-        schedule.context.lineTo(tooltipX + tooltipWidth + 10, arrowY);
-        schedule.context.lineTo(tooltipX + tooltipWidth, arrowY - 6);
-      } else {
-        schedule.context.moveTo(tooltipX, arrowY);
-        schedule.context.lineTo(tooltipX - 10, arrowY);
-        schedule.context.lineTo(tooltipX, arrowY - 6);
-      }
-      schedule.context.closePath();
-      schedule.context.fill();
-      schedule.context.stroke();
-    }
   }
 
   getMonthName() {

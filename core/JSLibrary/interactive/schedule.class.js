@@ -443,67 +443,205 @@ export class Schedule {
   }
 
   render() {
-    if (!this.canvas || !this.context) return;
+  if (!this.canvas || !this.context) return;
 
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.drawGrid();
-    this.drawFrame();
+  this.drawGrid();
+  this.drawFrame();
 
-    // Рендерим линии
-    if (this.types.length > 0) {
-      this.types.forEach((element) => {
-        element.render(this);
-      });
-    }
+  // ==========================================
+  // 1. РИСУЕМ ЛИНИИ И ТОЧКИ
+  // ==========================================
+  if (this.types.length > 0) {
+    this.types.forEach((element) => {
+      element.render(this);
+    });
+  }
 
-    // Легенда
-    this.legend.render(
-      this.context,
-      this.getFramePosition().x,
-      this.getFramePosition().y + this.getFrameSize().height + 10
-    );
+  // ==========================================
+  // 2. РИСУЕМ ЛЕГЕНДУ
+  // ==========================================
+  // Сбрасываем прозрачность перед легендой
+  this.context.globalAlpha = 1.0;
+  
+  this.legend.render(
+    this.context,
+    this.getFramePosition().x,
+    this.getFramePosition().y + this.getFrameSize().height + 10
+  );
 
-    // Обработка коллизий для тултипа
-    let collisionDetected = false;
+  // ==========================================
+  // 3. РИСУЕМ ТУЛТИПЫ (ПОВЕРХ ЛЕГЕНДЫ)
+  // ==========================================
+  // Тултипы уже рисуются внутри element.render(),
+  // но они рисуются до легенды.
+  // Поэтому выносим тултипы в отдельный проход.
+  this.renderTooltips();
+  }
+
+  // ==========================================
+  // НОВЫЙ МЕТОД ДЛЯ ТУЛТИПОВ (ПОВЕРХ ЛЕГЕНДЫ)
+  // ==========================================
+  renderTooltips() {
+    // Проходим по всем типам и собираем данные тултипов
     for (const type of this.types) {
-      if (collisionDetected) break;
-      for (const data of type.data) {
-        if (data && data.collision) {
-          this.mouseCollision = true;
-          this.dataCollision = data;
-          collisionDetected = true;
-          break;
-        }
+      if (type._isHovered && type._hoveredData) {
+        // Рисуем тултип для этого типа
+        this.drawTooltip(type);
       }
     }
+  }
 
-    if (!collisionDetected) {
-      this.mouseCollision = false;
+  // ==========================================
+  // МЕТОД ДЛЯ ОТРИСОВКИ ОДНОГО ТУЛТИПА
+  // ==========================================
+  drawTooltip(type) {
+    const schedule = this;
+    const data = type._hoveredData;
+    if (!data) return;
+
+    const totalDays = this.getDaysCountInCurrentMonth();
+    const viewStart = this.zoom.viewStart || 0;
+    const viewEnd = this.zoom.viewEnd || 1;
+    const visibleDays = Math.max(1, (viewEnd - viewStart) * totalDays);
+    const maxY = this.getMaxYData() || 1;
+    const lineXStep = this.getFrameSize().width / visibleDays;
+    const lineYStep = this.getFrameSize().height / maxY;
+
+    const frameX = this.getFramePosition().x;
+    const frameY = this.getFramePosition().y;
+    const frameHeight = this.getFrameSize().height;
+
+    const relativeX = data.x - viewStart * totalDays;
+    const clampedX = Math.max(0, Math.min(visibleDays, relativeX));
+    const xPos = clampedX * lineXStep;
+    const yPos = data.y * lineYStep;
+
+    const cx = frameX + xPos;
+    const cy = frameY + frameHeight - yPos;
+
+    const dayNumber = data.x + 1;
+    const monthName = this.getMonthName();
+
+    const typeIndex = this.types.indexOf(type);
+    const typeNames = ['Просмотры', 'Визиты', 'Посещения'];
+    const metricName = typeNames[typeIndex] || type.label;
+
+    const lines = [
+      `${dayNumber} ${monthName}`,
+      `${metricName}: ${data.y}`
+    ];
+
+    const fontSize = 13;
+    const lineHeight = 20;
+    const padding = 10;
+    const borderRadius = 6;
+
+    this.context.font = `${fontSize}px sans-serif`;
+    this.context.textAlign = 'left';
+    this.context.textBaseline = 'top';
+
+    let maxWidth = 0;
+    for (const line of lines) {
+      const metrics = this.context.measureText(line);
+      if (metrics.width > maxWidth) maxWidth = metrics.width;
     }
 
-    // Рисуем тултип
-    if (this.mouseCollision) {
-      const tooltipX = this.mouse.x + 10;
-      const tooltipY = this.mouse.y + 10;
+    const tooltipWidth = maxWidth + padding * 2;
+    const tooltipHeight = lines.length * lineHeight + padding * 2;
 
-      this.context.strokeStyle = '#232323';
-      this.context.fillStyle = '#FFFFFF';
-      this.context.beginPath();
-      this.context.rect(tooltipX, tooltipY, 60, 20);
-      this.context.fill();
-      this.context.stroke();
+    let tooltipX = cx + 15;
+    let tooltipY = cy - tooltipHeight / 2;
 
-      this.context.textAlign = 'left';
-      this.context.textBaseline = 'top';
-      this.context.font = '12px serif';
-      this.context.fillStyle = '#232323';
-      this.context.fillText(
-        `x: ${this.dataCollision.x}, y: ${this.dataCollision.y}`,
-        tooltipX + 4,
-        tooltipY + 4
-      );
+    const canvasWidth = this.canvas.width;
+    const canvasHeight = this.canvas.height;
+
+    if (tooltipX + tooltipWidth > canvasWidth - 10) {
+      tooltipX = cx - tooltipWidth - 15;
     }
+    if (tooltipY < 10) {
+      tooltipY = 10;
+    }
+    if (tooltipY + tooltipHeight > canvasHeight - 10) {
+      tooltipY = canvasHeight - tooltipHeight - 10;
+    }
+
+    // Рисуем фон тултипа (поверх всего)
+    this.context.shadowBlur = 15;
+    this.context.shadowColor = 'rgba(0, 0, 0, 0.2)';
+    this.context.fillStyle = '#FFFFFF';
+    this.context.strokeStyle = type.color;
+    this.context.lineWidth = 2.5;
+    
+    const r = borderRadius;
+    const x = tooltipX;
+    const y = tooltipY;
+    const w = tooltipWidth;
+    const h = tooltipHeight;
+
+    this.context.beginPath();
+    this.context.moveTo(x + r, y);
+    this.context.lineTo(x + w - r, y);
+    this.context.quadraticCurveTo(x + w, y, x + w, y + r);
+    this.context.lineTo(x + w, y + h - r);
+    this.context.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    this.context.lineTo(x + r, y + h);
+    this.context.quadraticCurveTo(x, y + h, x, y + h - r);
+    this.context.lineTo(x, y + r);
+    this.context.quadraticCurveTo(x, y, x + r, y);
+    this.context.closePath();
+    this.context.fill();
+    this.context.stroke();
+
+    this.context.shadowBlur = 0;
+
+    // Текст
+    for (let i = 0; i < lines.length; i++) {
+      const textY = tooltipY + padding + i * lineHeight;
+      const textX = tooltipX + padding;
+      
+      if (i === 0) {
+        this.context.fillStyle = '#333333';
+        this.context.font = `bold ${fontSize}px sans-serif`;
+      } else {
+        this.context.fillStyle = type.color;
+        this.context.font = `${fontSize}px sans-serif`;
+      }
+      
+      this.context.fillText(lines[i], textX, textY);
+    }
+
+    // Стрелка
+    const arrowX = cx > tooltipX + tooltipWidth / 2 ? tooltipX + tooltipWidth : tooltipX;
+    const arrowY = tooltipY + tooltipHeight / 2;
+
+    this.context.fillStyle = '#FFFFFF';
+    this.context.strokeStyle = type.color;
+    this.context.lineWidth = 2;
+    this.context.beginPath();
+    
+    if (cx > tooltipX + tooltipWidth / 2) {
+      this.context.moveTo(tooltipX + tooltipWidth, arrowY);
+      this.context.lineTo(tooltipX + tooltipWidth + 10, arrowY);
+      this.context.lineTo(tooltipX + tooltipWidth, arrowY - 6);
+    } else {
+      this.context.moveTo(tooltipX, arrowY);
+      this.context.lineTo(tooltipX - 10, arrowY);
+      this.context.lineTo(tooltipX, arrowY - 6);
+    }
+    this.context.closePath();
+    this.context.fill();
+    this.context.stroke();
+  }
+
+  getMonthName() {
+    const months = [
+      'Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня',
+      'Июля', 'Августа', 'Сентября', 'Октября', 'Ноября', 'Декабря'
+    ];
+    const now = new Date();
+    return months[now.getMonth()];
   }
 
   // ============================================================
