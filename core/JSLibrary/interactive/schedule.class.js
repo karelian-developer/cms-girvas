@@ -132,7 +132,7 @@ export class Schedule {
       const frameWidth = parentWidth - padding.left - padding.right;
       const frameHeight = height - padding.top - padding.bottom;
       
-      this.setFrameSize(frameWidth, height);
+      this.setFrameSize(frameWidth, frameHeight);
       this.setFramePosition(padding.left, padding.top);
       
       if (this.context) {
