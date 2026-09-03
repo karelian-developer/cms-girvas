@@ -121,10 +121,8 @@ final class Metrics
 
     // ORDER BY
     $queryBuilder->statement->setClauseOrderBy();
-    $queryBuilder->statement->clauseOrderBy->addColumnAdaptive([
-      'mysql' => '`date`',
-      'postgresql' => '"date"'
-    ], 'ASC');
+    $queryBuilder->statement->clauseOrderBy->setColumn('date');
+    $queryBuilder->statement->clauseOrderBy->setSortType('ASC');
     $queryBuilder->statement->clauseOrderBy->assembly();
 
     // Финальная сборка
