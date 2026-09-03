@@ -123,10 +123,7 @@ export class Linear {
     const frameY = schedule.getFramePosition().y;
     const frameHeight = schedule.getFrameSize().height;
 
-    // ==========================================
     // 1. Собираем точки для отображения
-    //    (включая нулевые, чтобы линия не обрывалась)
-    // ==========================================
     const visibleData = [];
     const startDay = Math.floor(viewStart * totalDays);
     const endDay = Math.ceil(viewEnd * totalDays);
@@ -135,12 +132,10 @@ export class Linear {
       if (this.data[day]) {
         visibleData.push(this.data[day]);
       } else {
-        // Если данных нет — добавляем точку с y=0
         visibleData.push(new DataDot(day, 0));
       }
     }
 
-    // Если данных меньше 2 — показываем сообщение
     if (visibleData.length < 2) {
       schedule.context.fillStyle = '#999';
       schedule.context.font = '14px sans-serif';
@@ -154,9 +149,7 @@ export class Linear {
       return;
     }
 
-    // ==========================================
     // 2. Рисуем линию
-    // ==========================================
     schedule.context.strokeStyle = this.color;
     schedule.context.lineWidth = 2;
     schedule.context.beginPath();
@@ -181,8 +174,7 @@ export class Linear {
     }
 
     // ==========================================
-    // 3. Достраиваем линию до последнего дня месяца
-    //    (чтобы линия не обрывалась на предпоследнем дне)
+    // 3. ДОСТРАИВАЕМ ЛИНИЮ ДО КОНЦА ПОСЛЕДНЕГО ДНЯ
     // ==========================================
     const lastData = visibleData[visibleData.length - 1];
     const lastDayOfMonth = totalDays - 1;
@@ -193,7 +185,10 @@ export class Linear {
       const lastX = frameX + lastXPos;
       const lastY = frameY + frameHeight - lastYPos;
       
-      const endDayPos = (lastDayOfMonth - viewStart * totalDays) * lineXStep;
+      // ==========================================
+      // ИСПРАВЛЕНИЕ: достраиваем до КОНЦА ячейки последнего дня
+      // ==========================================
+      const endDayPos = (lastDayOfMonth + 1 - viewStart * totalDays) * lineXStep;
       const endX = frameX + endDayPos;
       const endY = lastY;
       
@@ -203,9 +198,7 @@ export class Linear {
     schedule.context.stroke();
     schedule.context.lineWidth = 1;
 
-    // ==========================================
     // 4. Рисуем точки (только для существующих данных)
-    // ==========================================
     for (let data of visibleData) {
       if (!data) continue;
       
@@ -217,7 +210,7 @@ export class Linear {
         y: frameY + frameHeight - yPos - 6
       };
 
-      // Проверка коллизии с мышью (для тултипа)
+      // Проверка коллизии с мышью
       if (schedule.mouse.x >= dot.x && schedule.mouse.x <= dot.x + 12 && 
           schedule.mouse.y >= dot.y && schedule.mouse.y <= dot.y + 12) {
         data.collision = true;
@@ -225,7 +218,6 @@ export class Linear {
         data.collision = false;
       }
 
-      // Рисуем подсветку точки при наведении
       if (data.collision) {
         schedule.context.strokeStyle = '#232323';
         schedule.context.fillStyle = '#FFFFFF';
@@ -235,25 +227,5 @@ export class Linear {
         schedule.context.stroke();
       }
     }
-
-    // ==========================================
-    // 5. Дополнительно: рисуем маркеры для нулевых дней (опционально)
-    // ==========================================
-    // Можно раскомментировать, если хотите видеть нулевые дни
-    /*
-    for (let data of visibleData) {
-      if (!data) continue;
-      if (data.y === 0) {
-        const xPos = (data.x - viewStart * totalDays) * lineXStep;
-        const x = frameX + xPos;
-        const y = frameY + frameHeight;
-        
-        schedule.context.fillStyle = '#ddd';
-        schedule.context.beginPath();
-        schedule.context.arc(x, y - 2, 2, 0, Math.PI * 2);
-        schedule.context.fill();
-      }
-    }
-    */
   }
 }
