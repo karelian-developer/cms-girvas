@@ -119,18 +119,14 @@ export class Schedule {
     const parentWidth = parent.clientWidth || 800;
     let height = this.calculateHeight(parentWidth);
 
-    // Применяем ограничения
     height = Math.max(this.options.minHeight, Math.min(this.options.maxHeight, height));
 
-    // Устанавливаем размеры canvas (атрибуты для рисования)
     this.canvas.width = parentWidth;
     this.canvas.height = height;
 
-    // Устанавливаем CSS-размеры
     this.canvas.style.width = '100%';
     this.canvas.style.height = height + 'px';
 
-    // Обновляем frame size если уже есть данные
     if (this._isInited) {
       const padding = this.options.padding;
       const frameWidth = parentWidth - padding.left - padding.right;
@@ -144,11 +140,10 @@ export class Schedule {
       }
     }
 
-    // Обновляем навигатор
-    if (this.zoom.navCanvas) {
+    if (this.zoom && this.zoom.navCanvas) {
       const navParent = this.zoom.navCanvas.parentElement;
       if (navParent) {
-        const navWidth = navParent.clientWidth - 120; // минус кнопки
+        const navWidth = navParent.clientWidth - 120;
         if (navWidth > 100) {
           this.zoom.navCanvas.width = navWidth;
           this.zoom.navCanvas.style.width = '100%';
