@@ -64,75 +64,196 @@ export class Linear {
 
   getMaxYData() {
     let maxData = {x: 0, y: 0};
-
     for (let data of this.data) {
       if (data.y > maxData.y) {
         maxData = data;
       }
     }
-
     return maxData.y;
   }
 
   getMaxXData() {
     let maxData = {x: 0, y: 0};
-
     for (let data of this.data) {
       if (data.x > maxData.x) {
         maxData = data;
       }
     }
-
     return maxData.x;
   }
 
-  render(schedule) {
-    if (typeof(schedule) == 'object') {
-      if (typeof(schedule.context) == 'object' && this.data.length > 0) {
-        let lineXStep = schedule.getFrameSize().width / schedule.getDaysCountInCurrentMonth();
-        let lineYStep = schedule.getFrameSize().height / schedule.getMaxYData();
+  /**
+   * Получить данные с учётом зума (видимая область)
+   * @returns {Array} Массив точек для отображения
+   */
+  getVisibleData() {
+    const schedule = this.schedule;
+    if (!schedule || !schedule.zoom) return this.data;
 
-        schedule.context.strokeStyle = this.color;
-        schedule.context.lineWidth = 2;
+    const totalDays = schedule.getDaysCountInCurrentMonth();
+    const viewStart = schedule.zoom.viewStart || 0;
+    const viewEnd = schedule.zoom.viewEnd || 1;
 
-        for (let dataIndex = 1; dataIndex < this.data.length; dataIndex++) {
-          let prevIndex = dataIndex - 1;
-          
-          if (typeof(this.data[dataIndex]) != 'undefined') {
-            let prevData = this.data[prevIndex], currData = this.data[dataIndex];
+    const startIdx = Math.floor(viewStart * totalDays);
+    const endIdx = Math.ceil(viewEnd * totalDays);
 
-            schedule.context.beginPath();
-            schedule.context.moveTo(schedule.getFramePosition().x + (lineXStep * prevData.x), (schedule.getFramePosition().y + schedule.getFrameSize().height) - ((lineYStep * prevData.y)));
-            schedule.context.lineTo(schedule.getFramePosition().x + (lineXStep * currData.x), (schedule.getFramePosition().y + schedule.getFrameSize().height) - ((lineYStep * currData.y)));
-            schedule.context.stroke();
-          }
-        }
-
-        schedule.context.lineWidth = 1;
-
-        for (let data of this.data) {
-          let dot = {
-            x: schedule.getFramePosition().x + ((lineXStep * data.x) - 6),
-            y: (schedule.getFramePosition().y + schedule.getFrameSize().height) - ((lineYStep * data.y) + 6)
-          };
-
-          if (schedule.mouse.x >= dot.x && schedule.mouse.x <= dot.x + 12 && schedule.mouse.y >= dot.y && schedule.mouse.y <= dot.y + 12) {
-            data.collision = true;
-          } else {
-            data.collision = false;
-          }
-
-          if (data.collision) {
-            schedule.context.strokeStyle = '#232323';
-            schedule.context.fillStyle = '#FFFFFF';
-
-            schedule.context.beginPath();
-            schedule.context.rect(dot.x + 3, dot.y + 3, 6, 6);
-            schedule.context.fill();
-            schedule.context.stroke();
-          }
-        }
+    const result = [];
+    for (let i = startIdx; i < endIdx && i < this.data.length; i++) {
+      if (this.data[i]) {
+        result.push(this.data[i]);
       }
     }
+    return result;
+  }
+
+  render(schedule) {
+    if (typeof(schedule) != 'object') return;
+    if (typeof(schedule.context) != 'object' || this.data.length === 0) return;
+
+    const totalDays = schedule.getDaysCountInCurrentMonth();
+    const viewStart = schedule.zoom.viewStart || 0;
+    const viewEnd = schedule.zoom.viewEnd || 1;
+    const visibleDays = Math.max(1, (viewEnd - viewStart) * totalDays);
+    
+    const maxY = schedule.getMaxYData() || 1;
+    const lineXStep = schedule.getFrameSize().width / visibleDays;
+    const lineYStep = schedule.getFrameSize().height / maxY;
+
+    const frameX = schedule.getFramePosition().x;
+    const frameY = schedule.getFramePosition().y;
+    const frameHeight = schedule.getFrameSize().height;
+
+    // ==========================================
+    // 1. Собираем точки для отображения
+    //    (включая нулевые, чтобы линия не обрывалась)
+    // ==========================================
+    const visibleData = [];
+    const startDay = Math.floor(viewStart * totalDays);
+    const endDay = Math.ceil(viewEnd * totalDays);
+    
+    for (let day = startDay; day < endDay && day < this.data.length; day++) {
+      if (this.data[day]) {
+        visibleData.push(this.data[day]);
+      } else {
+        // Если данных нет — добавляем точку с y=0
+        visibleData.push(new DataDot(day, 0));
+      }
+    }
+
+    // Если данных меньше 2 — показываем сообщение
+    if (visibleData.length < 2) {
+      schedule.context.fillStyle = '#999';
+      schedule.context.font = '14px sans-serif';
+      schedule.context.textAlign = 'center';
+      schedule.context.textBaseline = 'middle';
+      schedule.context.fillText(
+        'Нет данных для отображения',
+        frameX + schedule.getFrameSize().width / 2,
+        frameY + schedule.getFrameSize().height / 2
+      );
+      return;
+    }
+
+    // ==========================================
+    // 2. Рисуем линию
+    // ==========================================
+    schedule.context.strokeStyle = this.color;
+    schedule.context.lineWidth = 2;
+    schedule.context.beginPath();
+
+    let isFirst = true;
+    for (let i = 0; i < visibleData.length; i++) {
+      const data = visibleData[i];
+      if (!data) continue;
+
+      const xPos = (data.x - viewStart * totalDays) * lineXStep;
+      const yPos = data.y * lineYStep;
+
+      const x = frameX + xPos;
+      const y = frameY + frameHeight - yPos;
+
+      if (isFirst) {
+        schedule.context.moveTo(x, y);
+        isFirst = false;
+      } else {
+        schedule.context.lineTo(x, y);
+      }
+    }
+
+    // ==========================================
+    // 3. Достраиваем линию до последнего дня месяца
+    //    (чтобы линия не обрывалась на предпоследнем дне)
+    // ==========================================
+    const lastData = visibleData[visibleData.length - 1];
+    const lastDayOfMonth = totalDays - 1;
+
+    if (lastData && lastData.x < lastDayOfMonth) {
+      const lastXPos = (lastData.x - viewStart * totalDays) * lineXStep;
+      const lastYPos = lastData.y * lineYStep;
+      const lastX = frameX + lastXPos;
+      const lastY = frameY + frameHeight - lastYPos;
+      
+      const endDayPos = (lastDayOfMonth - viewStart * totalDays) * lineXStep;
+      const endX = frameX + endDayPos;
+      const endY = lastY;
+      
+      schedule.context.lineTo(endX, endY);
+    }
+
+    schedule.context.stroke();
+    schedule.context.lineWidth = 1;
+
+    // ==========================================
+    // 4. Рисуем точки (только для существующих данных)
+    // ==========================================
+    for (let data of visibleData) {
+      if (!data) continue;
+      
+      const xPos = (data.x - viewStart * totalDays) * lineXStep;
+      const yPos = data.y * lineYStep;
+
+      const dot = {
+        x: frameX + xPos - 6,
+        y: frameY + frameHeight - yPos - 6
+      };
+
+      // Проверка коллизии с мышью (для тултипа)
+      if (schedule.mouse.x >= dot.x && schedule.mouse.x <= dot.x + 12 && 
+          schedule.mouse.y >= dot.y && schedule.mouse.y <= dot.y + 12) {
+        data.collision = true;
+      } else {
+        data.collision = false;
+      }
+
+      // Рисуем подсветку точки при наведении
+      if (data.collision) {
+        schedule.context.strokeStyle = '#232323';
+        schedule.context.fillStyle = '#FFFFFF';
+        schedule.context.beginPath();
+        schedule.context.rect(dot.x + 3, dot.y + 3, 6, 6);
+        schedule.context.fill();
+        schedule.context.stroke();
+      }
+    }
+
+    // ==========================================
+    // 5. Дополнительно: рисуем маркеры для нулевых дней (опционально)
+    // ==========================================
+    // Можно раскомментировать, если хотите видеть нулевые дни
+    /*
+    for (let data of visibleData) {
+      if (!data) continue;
+      if (data.y === 0) {
+        const xPos = (data.x - viewStart * totalDays) * lineXStep;
+        const x = frameX + xPos;
+        const y = frameY + frameHeight;
+        
+        schedule.context.fillStyle = '#ddd';
+        schedule.context.beginPath();
+        schedule.context.arc(x, y - 2, 2, 0, Math.PI * 2);
+        schedule.context.fill();
+      }
+    }
+    */
   }
 }

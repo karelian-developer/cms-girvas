@@ -283,28 +283,30 @@ export class Schedule {
     }
   }
 
-  buildData() {
-    if (this.types.length > 0) {
-      this.types.forEach((element) => {
-        element.buildData(this.getDaysCountInCurrentMonth());
-      });
+  buildData(dataTotalCount) {
+    this.dataBuckup = this.data;
+    this.data = [];
+
+    // ==========================================
+    // ИСПРАВЛЕНИЕ: i < dataTotalCount (не <=)
+    // ==========================================
+    for (let i = 0; i < dataTotalCount; i++) {
+      for (let data of this.dataBuckup) {
+        if (data.x == i) {
+          this.data[i] = new DataDot(i, data.y);
+        }
+      }
     }
 
-    // Устанавливаем frame size если ещё не установлен
-    if (!this._isInited) {
-      const padding = this.options.padding;
-      const width = this.canvas.width - padding.left - padding.right;
-      const height = this.canvas.height - padding.top - padding.bottom;
-      this.setFrameSize(width, height);
-      this.setFramePosition(padding.left, padding.top);
+    for (let i = 0; i < dataTotalCount; i++) {
+      if (typeof(this.data[i]) == 'undefined') {
+        this.data[i] = new DataDot(i, 0);
+      }
     }
 
-    // Обновляем навигатор
-    if (this.options.zoomable && this.options.showNavigator && this.zoom.navContext) {
-      setTimeout(() => this.renderNavigator(), 50);
-    }
+    this.dataBuckup = [];
   }
-
+  
   getMaxYData() {
     let maxY = 0;
     for (let groupIndex = 0; groupIndex < this.types.length; groupIndex++) {
@@ -362,14 +364,18 @@ export class Schedule {
   drawGrid() {
     if (!this.context) return;
 
-    const maxX = this.getDaysCountInCurrentMonth();
+    const totalDays = this.getDaysCountInCurrentMonth();
     const maxY = this.getMaxYData();
     const frameWidth = this.getFrameSize().width;
     const frameHeight = this.getFrameSize().height;
     const frameX = this.getFramePosition().x;
     const frameY = this.getFramePosition().y;
 
-    const lineXStep = frameWidth / maxX;
+    const viewStart = this.zoom.viewStart || 0;
+    const viewEnd = this.zoom.viewEnd || 1;
+    const visibleDays = Math.max(1, (viewEnd - viewStart) * totalDays);
+    
+    const lineXStep = frameWidth / visibleDays;
     const lineYStep = maxY > 0 ? frameHeight / maxY : 10;
 
     this.context.strokeStyle = '#EAEAEA';
@@ -377,16 +383,21 @@ export class Schedule {
     this.context.textBaseline = 'top';
     this.context.textAlign = 'center';
 
-    // Вертикальные линии
-    for (let i = 0; i <= maxX; i++) {
+    // ==========================================
+    // ИСПРАВЛЕНИЕ: i < totalDays (не <=)
+    // ==========================================
+    const step = Math.max(1, Math.ceil(visibleDays / 20));
+    for (let i = 0; i < visibleDays; i += step) {
       const x = frameX + lineXStep * i;
+      const day = Math.round(viewStart * totalDays + i);
+      
       this.context.beginPath();
       this.context.moveTo(x, frameY);
       this.context.lineTo(x, frameY + frameHeight);
       this.context.stroke();
 
-      if (i % 2 === 0 || i === maxX) {
-        this.context.fillText(`${i + 1}`, x, frameY + frameHeight + 6);
+      if (day < totalDays) {
+        this.context.fillText(`${day + 1}`, x, frameY + frameHeight + 6);
       }
     }
 
