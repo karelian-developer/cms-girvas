@@ -353,6 +353,8 @@ export class PageAnalytics {
     scheduleAttendance.target.buildData();
     scheduleAttendance.target.init();
     scheduleAttendance.assembly();
+
+    window.__schedule = scheduleAttendance;
   }
 
   // ==========================================
