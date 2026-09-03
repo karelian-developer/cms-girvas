@@ -174,10 +174,10 @@ export class PageAnalytics {
     const month = this.currentDate.getMonth();
     const firstDate = new Date(year, month, 1);
     const lastDate = new Date(year, month + 1, 0);
+    const daysInMonth = lastDate.getDate();
 
     console.log(`📅 Загружаем данные за: ${firstDate.toLocaleDateString()} — ${lastDate.toLocaleDateString()}`);
 
-    // Показываем индикатор загрузки
     const container = canvasElement.parentElement;
     container.innerHTML = `
       <div class="analytics-loader" style="padding:40px;text-align:center;">
@@ -197,7 +197,7 @@ export class PageAnalytics {
 
     window.CMSCore.metrics.getDataByRangeTimestamp(firstDate.getTime(), lastDate.getTime())
       .then((metricsData) => {
-        this.buildChart(newCanvas, metricsData);
+        this.buildChart(newCanvas, metricsData, daysInMonth);
       })
       .catch((error) => {
         console.error('❌ Ошибка загрузки данных:', error);
@@ -210,7 +210,7 @@ export class PageAnalytics {
       });
   }
 
-  buildChart(canvasElement, metricsData) {
+  buildChart(canvasElement, metricsData, daysInMonth) {
     const searchParams = new URLParser();
     const container = canvasElement.parentElement;
     
@@ -249,7 +249,6 @@ export class PageAnalytics {
     scheduleAttendance.target.addGroup('Посещения');
     
     const isMainAnalytics = searchParams.getPathPart(4) === null;
-    const daysInMonth = lastDate.getDate();
 
     const dailyData = {};
     metricsData.forEach((data) => {
