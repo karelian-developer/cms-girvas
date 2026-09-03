@@ -13,7 +13,6 @@
  * @support   support@karelian-developer.ru
  */
 
-'use strict';
 import {Tool} from './tool.class.js';
 
 export class ToolBold extends Tool {
@@ -26,6 +25,7 @@ export class ToolBold extends Tool {
     });
 
     this.initClickEvent();
+    this.bindHotkey('Ctrl+B');
   }
 
   initClickEvent() {

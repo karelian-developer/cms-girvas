@@ -27,6 +27,7 @@ export class ToolItalic extends Tool {
     });
 
     this.initClickEvent();
+    this.bindHotkey('Ctrl+I');
   }
 
   initClickEvent() {

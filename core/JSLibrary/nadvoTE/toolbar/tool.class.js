@@ -32,15 +32,15 @@ export class Tool {
 
     console.log(`[NADVO TE] Tool ${data.name} created.`);
   }
-  
+
   setType(value) {
     this.type = value;
   }
-  
+
   setName(value) {
     this.name = value;
   }
-  
+
   setIconPath(value) {
     this.iconPath = value;
   }
@@ -50,7 +50,7 @@ export class Tool {
   }
 
   setElementIcon(path) {
-    fetch(path,  {
+    fetch(path, {
       method: 'GET',
       headers: {
         'Content-Type': 'image/svg+xml'
@@ -91,6 +91,32 @@ export class Tool {
       event.preventDefault();
 
       callback();
+    });
+  }
+
+  /**
+   * Привязка горячей клавиши
+   *
+   * @param {string} hotkey Например: 'Ctrl+B'
+   */
+  bindHotkey(hotkey) {
+    document.addEventListener('keydown', (event) => {
+      const pressedKey = event.key.toLowerCase();
+      const parts = hotkey.toLowerCase().split('+');
+
+      const hotkeyKey = parts.pop();
+      const needsCtrl = parts.includes('ctrl');
+      const needsShift = parts.includes('shift');
+      const needsAlt = parts.includes('alt');
+
+      const ctrlOk = needsCtrl ? (event.ctrlKey || event.metaKey) : true;
+      const shiftOk = needsShift ? event.shiftKey : true;
+      const altOk = needsAlt ? event.altKey : true;
+
+      if (ctrlOk && shiftOk && altOk && pressedKey === hotkeyKey) {
+        event.preventDefault();
+        this.element.click();
+      }
     });
   }
 }

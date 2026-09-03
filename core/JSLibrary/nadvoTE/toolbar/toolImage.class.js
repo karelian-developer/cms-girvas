@@ -30,7 +30,9 @@ export class ToolImage extends Tool {
     this.modal = null;
     this.imagesListGroup = 0;
     this.filesPath = '';
+
     this.initClickEvent();
+    this.bindHotkey('Ctrl+Shift+I');
   }
 
   async getMediaFilesArray(directory = '') {

@@ -28,6 +28,7 @@ export class ToolLink extends Tool {
     });
 
     this.initClickEvent();
+    this.bindHotkey('Ctrl+K');
   }
 
   initClickEvent() {

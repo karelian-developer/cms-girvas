@@ -27,6 +27,7 @@ export class ToolUnderline extends Tool {
     });
 
     this.initClickEvent();
+    this.bindHotkey('Ctrl+U');
   }
 
   initClickEvent() {

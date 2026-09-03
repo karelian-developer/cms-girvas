@@ -30,7 +30,9 @@ export class ToolCode extends Tool {
     this.modal = null;
     this.imagesListGroup = 0;
     this.filesPath = '';
+
     this.initClickEvent();
+    this.bindHotkey('Ctrl+Shift+C');
   }
 
   initClickEvent() {

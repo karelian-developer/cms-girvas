@@ -27,6 +27,7 @@ export class ToolQuote extends Tool {
     });
 
     this.initClickEvent();
+    this.bindHotkey('Ctrl+Shift+Q');
   }
 
   initClickEvent() {
