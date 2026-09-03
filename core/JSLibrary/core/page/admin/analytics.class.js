@@ -23,8 +23,12 @@ export class PageAnalytics {
   constructor(page, params = {}) {
     this.page = page;
     this.currentDate = this.getDateFromURL();
+    this.scheduleAttendance = null;
   }
 
+  // ==========================================
+  // ПОЛУЧИТЬ ДАТУ ИЗ URL
+  // ==========================================
   getDateFromURL() {
     try {
       const urlParams = new URLSearchParams(window.location.search);
@@ -45,6 +49,9 @@ export class PageAnalytics {
     return new Date();
   }
 
+  // ==========================================
+  // ИНИЦИАЛИЗАЦИЯ
+  // ==========================================
   init() {
     const searchParams = new URLParser();
     
@@ -54,6 +61,7 @@ export class PageAnalytics {
       if (analyticApp !== null) {
         const attendanceScheduleContainerElement = analyticApp.querySelector('[data-role="attendance-schedule"]');
         
+        // Создаём canvas
         const scheduleContainerElement = this.scheduleContainerElementCreate();
         attendanceScheduleContainerElement.append(scheduleContainerElement);
         
@@ -63,117 +71,11 @@ export class PageAnalytics {
         scheduleContainerElement.setAttribute('width', `${scheduleParentElementWidth}px`);
         scheduleContainerElement.setAttribute('height', '400px');
 
-        const year = this.currentDate.getFullYear();
-        const month = this.currentDate.getMonth();
-        
-        const firstDate = new Date(year, month, 1);
-        const lastDate = new Date(year, month + 1, 0);
-        
-        console.log(`📅 Загружаем данные за: ${firstDate.toLocaleDateString()} — ${lastDate.toLocaleDateString()}`);
-        
-        window.CMSCore.metrics.getDataByRangeTimestamp(firstDate.getTime(), lastDate.getTime()).then((metricsData) => {
-          const scheduleAttendance = new Interactive('schedule', {
-            canvasElement: scheduleContainerElement,
-            type: 'linear',
-            zoomable: true,
-            minZoom: 0.5,
-            maxZoom: 5,
-            zoomStep: 0.1,
-            showNavigator: true,
-            padding: { top: 30, right: 30, bottom: 40, left: 50 },
-            height: 'auto',
-            minHeight: 250,
-            maxHeight: 600
-          });
-
-          scheduleAttendance.target.setFrameSize(
-            scheduleContainerElement.width - 50,
-            scheduleContainerElement.height - 50 - 40
-          );
-
-          scheduleAttendance.target.addGroup('Просмотры');
-          scheduleAttendance.target.addGroup('Визиты');
-          scheduleAttendance.target.addGroup('Посещения');
-          
-          const isMainAnalytics = searchParams.getPathPart(4) === null;
-          const daysInMonth = lastDate.getDate();
-
-          const dailyData = {};
-          metricsData.forEach((data) => {
-            const time = data.metrics.time * 1000;
-            const date = new Date(time);
-            const day = date.getDate();
-            dailyData[day] = data;
-          });
-
-          // ==========================================
-          // ПОЛУЧАЕМ targetName ДЛЯ ФИЛЬТРАЦИИ
-          // ==========================================
-          const targetObject = document.querySelector('article.page[data-name]');
-          const targetName = targetObject?.getAttribute('data-name');
-
-          for (let day = 1; day <= daysInMonth; day++) {
-            const data = dailyData[day];
-            const dayIndex = day - 1;
-            
-            let urlsTotalViews = 0;
-            let visits0 = [];
-            let visits1 = [];
-            
-            if (data) {
-              for (let token in data.metrics.views) {
-                let urls = data.metrics.views[token].urls;
-                for (let url in urls) {
-                  // ==========================================
-                  // ПРОПУСКАЕМ ПУСТЫЕ URL
-                  // ==========================================
-                  if (!url || typeof url !== 'string' || url.trim() === '') continue;
-                  
-                  if (isMainAnalytics) {
-                    urlsTotalViews += urls[url];
-                  } else if (targetName) {
-                    // ==========================================
-                    // ПРОВЕРКА ЧЕРЕЗ includes (БЕЗ new URL)
-                    // ==========================================
-                    const urlLower = url.toLowerCase();
-                    const targetLower = targetName.toLowerCase();
-                    
-                    // Проверяем для страниц (/page/name)
-                    if (urlLower.includes(`/page/${targetLower}`) || 
-                        urlLower.includes(`/page/${targetLower}?`) ||
-                        urlLower.includes(`/page/${targetLower}&`)) {
-                      urlsTotalViews += urls[url];
-                    }
-                    // Проверяем для записей (/entry/name)
-                    else if (urlLower.includes(`/entry/${targetLower}`) || 
-                             urlLower.includes(`/entry/${targetLower}?`) ||
-                             urlLower.includes(`/entry/${targetLower}&`)) {
-                      urlsTotalViews += urls[url];
-                    }
-                  }
-                }
-              }
-              
-              visits0 = data.metrics.visits0 || [];
-              visits1 = data.metrics.visits1 || [];
-            }
-            
-            scheduleAttendance.target.addData(0, dayIndex, urlsTotalViews);
-            
-            scheduleAttendance.target.addData(1, dayIndex, visits0.length);
-            scheduleAttendance.target.addData(2, dayIndex, visits1.length);
-          }
-
-          scheduleAttendance.target.types[0].setColor('#EE82EE');
-          scheduleAttendance.target.types[1].setColor('#5B92E5');
-          scheduleAttendance.target.types[2].setColor('#088567');
-          
-          scheduleAttendance.target.buildData();
-          scheduleAttendance.target.init();
-          scheduleAttendance.assembly();
-        });
+        // Загружаем данные
+        this.loadChartData(scheduleContainerElement);
       }
 
+      // Обработка форм
       if (searchParams.getPathPart(3) === 'form' && searchParams.getPathPart(4) !== null) {
         const formID = searchParams.getPathPart(4);
 
@@ -228,6 +130,210 @@ export class PageAnalytics {
     });
   }
 
+  // ==========================================
+  // ЗАГРУЗКА ДАННЫХ ДЛЯ ГРАФИКА
+  // ==========================================
+  loadChartData(canvasElement) {
+    const year = this.currentDate.getFullYear();
+    const month = this.currentDate.getMonth();
+    const firstDate = new Date(year, month, 1);
+    const lastDate = new Date(year, month + 1, 0);
+
+    console.log(`📅 Загружаем данные за: ${firstDate.toLocaleDateString()} — ${lastDate.toLocaleDateString()}`);
+
+    // Показываем индикатор загрузки
+    const container = canvasElement.parentElement;
+    container.innerHTML = `
+      <div class="analytics-loader" style="padding:40px;text-align:center;">
+        <div style="display:inline-block;width:30px;height:30px;border:3px solid #eee;border-top-color:#2196F3;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+        <p style="margin-top:10px;color:#999;">Загрузка данных...</p>
+      </div>
+    `;
+
+    // Создаём новый canvas
+    const newCanvas = document.createElement('canvas');
+    newCanvas.setAttribute('width', canvasElement.width || 800);
+    newCanvas.setAttribute('height', canvasElement.height || 400);
+    newCanvas.style.width = '100%';
+    newCanvas.style.height = '100%';
+    
+    container.innerHTML = '';
+    container.append(newCanvas);
+
+    window.CMSCore.metrics.getDataByRangeTimestamp(firstDate.getTime(), lastDate.getTime())
+      .then((metricsData) => {
+        this.buildChart(newCanvas, metricsData);
+      })
+      .catch((error) => {
+        console.error('❌ Ошибка загрузки данных:', error);
+        container.innerHTML = `
+          <div style="padding:40px;text-align:center;color:#d32f2f;">
+            <p>Ошибка загрузки данных</p>
+            <p style="font-size:12px;color:#999;">${error.message}</p>
+          </div>
+        `;
+      });
+  }
+
+  // ==========================================
+  // ПОСТРОЕНИЕ ГРАФИКА
+  // ==========================================
+  buildChart(canvasElement, metricsData) {
+    const searchParams = new URLParser();
+    const container = canvasElement.parentElement;
+    
+    if (!metricsData || metricsData.length === 0) {
+      const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+                          'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+      container.innerHTML = `
+        <div style="padding:40px;text-align:center;color:#999;">
+          <p>Нет данных за ${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Создаём график
+    this.scheduleAttendance = new Interactive('schedule', {
+      canvasElement: canvasElement,
+      type: 'linear',
+      zoomable: true,
+      minZoom: 0.5,
+      maxZoom: 5,
+      zoomStep: 0.1,
+      showNavigator: true,
+      padding: { top: 30, right: 30, bottom: 40, left: 50 },
+      height: 'auto',
+      minHeight: 250,
+      maxHeight: 600
+    });
+
+    const schedule = this.scheduleAttendance.target;
+
+    schedule.setFrameSize(
+      canvasElement.width - 50,
+      canvasElement.height - 50 - 40
+    );
+
+    // ==========================================
+    // СОЗДАЁМ ГРУППЫ (ВСЕГДА ТРИ)
+    // ==========================================
+    schedule.addGroup('Просмотры');
+    schedule.addGroup('Визиты');
+    schedule.addGroup('Посещения');
+
+    const isMainAnalytics = searchParams.getPathPart(4) === null;
+    const daysInMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0).getDate();
+
+    // Группируем данные по дням
+    const dailyData = {};
+    metricsData.forEach((data) => {
+      const time = data.metrics.time * 1000;
+      const date = new Date(time);
+      const day = date.getDate();
+      dailyData[day] = data;
+    });
+
+    // Получаем targetName для фильтрации (если не главная аналитика)
+    const targetObject = document.querySelector('article.page[data-name]');
+    const targetName = targetObject?.getAttribute('data-name');
+
+    // ==========================================
+    // ПРОХОДИМ ПО ВСЕМ ДНЯМ МЕСЯЦА
+    // ==========================================
+    for (let day = 1; day <= daysInMonth; day++) {
+      const data = dailyData[day];
+      const dayIndex = day - 1;
+      
+      let urlsTotalViews = 0;
+      let visits0 = [];
+      let visits1 = [];
+      
+      if (data) {
+        // Считаем просмотры
+        for (let token in data.metrics.views) {
+          let urls = data.metrics.views[token].urls;
+          for (let url in urls) {
+            // Пропускаем пустые URL
+            if (!url || typeof url !== 'string' || url.trim() === '') continue;
+            
+            let isMatch = false;
+            
+            if (isMainAnalytics) {
+              isMatch = true;
+            } else if (targetName) {
+              const urlLower = url.toLowerCase();
+              const targetLower = targetName.toLowerCase();
+              
+              // Проверяем для страниц (/page/name)
+              if (urlLower.includes(`/page/${targetLower}`) || 
+                  urlLower.includes(`/page/${targetLower}?`) ||
+                  urlLower.includes(`/page/${targetLower}&`)) {
+                isMatch = true;
+              }
+              // Проверяем для записей (/entry/name)
+              else if (urlLower.includes(`/entry/${targetLower}`) || 
+                       urlLower.includes(`/entry/${targetLower}?`) ||
+                       urlLower.includes(`/entry/${targetLower}&`)) {
+                isMatch = true;
+              }
+            }
+            
+            if (isMatch) {
+              urlsTotalViews += urls[url];
+            }
+          }
+        }
+        
+        visits0 = data.metrics.visits0 || [];
+        visits1 = data.metrics.visits1 || [];
+      }
+      
+      // ==========================================
+      // ДОБАВЛЯЕМ ВСЕ ТРИ МЕТРИКИ
+      // ==========================================
+      schedule.addData(0, dayIndex, urlsTotalViews);
+      schedule.addData(1, dayIndex, visits0.length);
+      schedule.addData(2, dayIndex, visits1.length);
+    }
+
+    // ==========================================
+    // УСТАНАВЛИВАЕМ ЦВЕТА
+    // ==========================================
+    schedule.types[0].setColor('#EE82EE');
+    schedule.types[1].setColor('#5B92E5');
+    schedule.types[2].setColor('#088567');
+
+    // ==========================================
+    // СТРОИМ ГРАФИК
+    // ==========================================
+    schedule.buildData();
+    schedule.init();
+    schedule.assembly();
+  }
+
+  // ==========================================
+  // ОБНОВЛЕНИЕ ГРАФИКА ПРИ ИЗМЕНЕНИИ ДАТЫ
+  // ==========================================
+  refreshChart() {
+    const container = document.querySelector('[data-role="attendance-schedule"]');
+    if (!container) return;
+
+    const oldCanvas = container.querySelector('canvas');
+    if (!oldCanvas) return;
+
+    // Создаём новый canvas
+    const newCanvas = this.scheduleContainerElementCreate();
+    container.innerHTML = '';
+    container.append(newCanvas);
+
+    // Загружаем данные
+    this.loadChartData(newCanvas);
+  }
+
+  // ==========================================
+  // СОЗДАНИЕ CANVAS
+  // ==========================================
   scheduleContainerElementCreate() {
     const canvas = document.createElement('canvas');
     canvas.style.width = '100%';
