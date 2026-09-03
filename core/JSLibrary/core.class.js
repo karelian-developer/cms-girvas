@@ -58,7 +58,6 @@ export class Core {
   async initClient() {
     return this.client.isLogged().then((result) => {
       this.client.isLogged = result;
-      return this.client.getIPAddress();
     });
   }
 
