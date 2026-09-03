@@ -76,68 +76,80 @@ export class PageAnalytics {
           }
 
           metricsData.forEach((data) => {
-            let urlsTotalViews = 0, visits0 = [], visits1 = [];
+            let urlsTotalViews = 0;
+            let visits0 = [];
+            let visits1 = [];
             let time = data.metrics.time * 1000;
-            let date = new Date();
+            let date = new Date(time);
+            let day = date.getDate() - 1;
 
-            date.setTime(time);
-
+            // ==========================================
+            // 1. СЧИТАЕМ ПРОСМОТРЫ
+            // ==========================================
             for (let token in data.metrics.views) {
               let urls = data.metrics.views[token].urls;
               let urlTransfers = data.metrics.views[token].url_transfers;
 
+              // Суммируем просмотры по всем URL
               for (let url in urls) {
                 if (searchParams.getPathPart(4) === null) {
                   urlsTotalViews += urls[url];
                 } else {
+                  // Фильтрация по конкретной записи/странице
                   let urlObject = new URL(url);
                   let urlPathParts = urlObject.pathname.split('/');
-
                   let targetObjectName = document.querySelector('article.page[data-name]');
-
-                  if (targetObjectName !== null) {
-                    if (urlPathParts[2] === targetObjectName.getAttribute('data-name')) {
-                      urlsTotalViews += urls[url];
-                    }
+                  
+                  if (targetObjectName !== null && urlPathParts[2] === targetObjectName.getAttribute('data-name')) {
+                    urlsTotalViews += urls[url];
                   }
                 }
               }
 
+              // ==========================================
+              // 2. СЧИТАЕМ ВИЗИТЫ (только для главной аналитики)
+              // ==========================================
               if (searchParams.getPathPart(4) === null) {
                 for (let transferIndex in urlTransfers) {
                   for (let transfer in urlTransfers[transferIndex]) {
-                    let urlReferral = urlTransfers[transferIndex][transfer].referral;
-                    let visitedIsNew = urlTransfers[transferIndex][transfer].is_visited_new;
+                    let transferData = urlTransfers[transferIndex][transfer];
+                    let urlReferral = transferData.referral;
+                    let visitedIsNew = transferData.is_visited_new;
+                    let transferTime = transferData.time * 1000;
                     
-                    if (transfer !== urlReferral) {
-                      if (visits0.indexOf(token) != -1) {
-                        if ((urlTransfers[transferIndex][transfer].time * 1000) + (30 * 60 * 1000) < new Date().getTime()) {
-                          visits0.push(token);
-                        }
-                      } else {
+                    // Если это переход (не прямой заход)
+                    if (transfer !== urlReferral && !isEmpty(urlReferral)) {
+                      // ==========================================
+                      // ИСПРАВЛЕНИЕ: используем время метрики, а не текущее
+                      // ==========================================
+                      const isNewVisit = (transferTime + (30 * 60 * 1000)) < time;
+                      
+                      // Добавляем токен в visits0, если его там нет
+                      if (visits0.indexOf(token) === -1) {
                         visits0.push(token);
                       }
-                    }
-
-                    if (transfer !== urlReferral) {
-                      if (visits1.indexOf(token) === -1) {
-                        if (visitedIsNew) {
-                          visits1.push(token);
-                        }
-                      } 
+                      
+                      // Добавляем токен в visits1, если это новый посетитель
+                      if (visitedIsNew && visits1.indexOf(token) === -1) {
+                        visits1.push(token);
+                      }
                     }
                   }
                 }
               }
             }
 
-            scheduleAttendance.target.addData(0, date.getDate() - 1, urlsTotalViews);
+            // ==========================================
+            // 3. ДОБАВЛЯЕМ ДАННЫЕ В ГРАФИК
+            // ==========================================
+            scheduleAttendance.target.addData(0, day, urlsTotalViews);
 
             if (searchParams.getPathPart(4) === null) {
-              scheduleAttendance.target.addData(1, date.getDate() - 1, visits0.length);
-              scheduleAttendance.target.addData(2, date.getDate() - 1, visits1.length);
+              scheduleAttendance.target.addData(1, day, visits0.length);
+              scheduleAttendance.target.addData(2, day, visits1.length);
             }
 
+            // Устанавливаем цвета
             scheduleAttendance.target.types[0].setColor('#EE82EE');
 
             if (searchParams.getPathPart(4) === null) {
