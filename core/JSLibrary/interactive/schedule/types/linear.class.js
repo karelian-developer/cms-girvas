@@ -123,7 +123,9 @@ export class Linear {
     const frameY = schedule.getFramePosition().y;
     const frameHeight = schedule.getFrameSize().height;
 
-    // 1. Собираем точки для отображения
+    // ==========================================
+    // 1. СОБИРАЕМ ТОЧКИ ДЛЯ ОТОБРАЖЕНИЯ
+    // ==========================================
     const visibleData = [];
     const startDay = Math.floor(viewStart * totalDays);
     const endDay = Math.ceil(viewEnd * totalDays);
@@ -149,7 +151,9 @@ export class Linear {
       return;
     }
 
-    // 2. Рисуем линию
+    // ==========================================
+    // 2. РИСУЕМ ЛИНИЮ
+    // ==========================================
     schedule.context.strokeStyle = this.color;
     schedule.context.lineWidth = 2;
     schedule.context.beginPath();
@@ -159,7 +163,13 @@ export class Linear {
       const data = visibleData[i];
       if (!data) continue;
 
-      const xPos = (data.x - viewStart * totalDays) * lineXStep;
+      // ==========================================
+      // ИСПРАВЛЕНИЕ: смещаем координаты так, чтобы первая точка была на левой границе
+      // ==========================================
+      const relativeX = data.x - viewStart * totalDays;
+      // Ограничиваем relativeX в пределах [0, visibleDays]
+      const clampedX = Math.max(0, Math.min(visibleDays, relativeX));
+      const xPos = clampedX * lineXStep;
       const yPos = data.y * lineYStep;
 
       const x = frameX + xPos;
@@ -180,16 +190,15 @@ export class Linear {
     const lastDayOfMonth = totalDays - 1;
 
     if (lastData && lastData.x < lastDayOfMonth) {
-      const lastXPos = (lastData.x - viewStart * totalDays) * lineXStep;
+      const relativeX = lastData.x - viewStart * totalDays;
+      const clampedX = Math.max(0, Math.min(visibleDays, relativeX));
+      const lastXPos = clampedX * lineXStep;
       const lastYPos = lastData.y * lineYStep;
       const lastX = frameX + lastXPos;
       const lastY = frameY + frameHeight - lastYPos;
       
-      // ==========================================
-      // ИСПРАВЛЕНИЕ: достраиваем до КОНЦА ячейки последнего дня
-      // ==========================================
-      const endDayPos = (lastDayOfMonth + 1 - viewStart * totalDays) * lineXStep;
-      const endX = frameX + endDayPos;
+      // Достраиваем до конца видимой области
+      const endX = frameX + schedule.getFrameSize().width;
       const endY = lastY;
       
       schedule.context.lineTo(endX, endY);
@@ -198,11 +207,15 @@ export class Linear {
     schedule.context.stroke();
     schedule.context.lineWidth = 1;
 
-    // 4. Рисуем точки (только для существующих данных)
+    // ==========================================
+    // 4. РИСУЕМ ТОЧКИ
+    // ==========================================
     for (let data of visibleData) {
       if (!data) continue;
       
-      const xPos = (data.x - viewStart * totalDays) * lineXStep;
+      const relativeX = data.x - viewStart * totalDays;
+      const clampedX = Math.max(0, Math.min(visibleDays, relativeX));
+      const xPos = clampedX * lineXStep;
       const yPos = data.y * lineYStep;
 
       const dot = {
