@@ -504,8 +504,8 @@ class PageAnalytics implements InterfacePage
    */
   private function getPageStaticObjectByID(CoreInterface $CMSCore, int $id) : ?EntityTypeContent
   {
-    return Form::existsByID($CMSCore, $id)
-      ? new Form($CMSCore, $id)
+    return PageStatic::existsByID($CMSCore, $id)
+      ? new PageStatic($CMSCore, $id)
       : null;
   }
 
