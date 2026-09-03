@@ -22,6 +22,8 @@ import {URLParser} from "../../../urlParser.class.js";
 export class PageAnalytics {
   constructor(page, params = {}) {
     this.page = page;
+
+    this.currentDate = this.getDateFromURL();
   }
 
   getDateFromURL() {
