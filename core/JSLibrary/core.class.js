@@ -59,8 +59,6 @@ export class Core {
     return this.client.isLogged().then((result) => {
       this.client.isLogged = result;
       return this.client.getIPAddress();
-    }).then((result) => {
-      this.client.IPAddress = result;
     });
   }
 
