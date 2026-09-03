@@ -201,9 +201,9 @@ export class PageAnalytics {
               }
             }
             
-            schedule.addData(0, dayIndex, urlsTotalViews);
-            schedule.addData(1, dayIndex, visits0.length);
-            schedule.addData(2, dayIndex, visits1.length);
+            scheduleAttendance.target.addData(0, dayIndex, urlsTotalViews);
+            scheduleAttendance.target.addData(1, dayIndex, visits0.length);
+            scheduleAttendance.target.addData(2, dayIndex, visits1.length);
           }
 
           scheduleAttendance.target.types[0].setColor('#EE82EE');
