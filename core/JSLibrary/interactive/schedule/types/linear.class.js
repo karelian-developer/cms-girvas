@@ -147,10 +147,62 @@ export class Linear {
     }
 
     // ==========================================
-    // 1. РИСУЕМ ЛИНИЮ
+    // ОПРЕДЕЛЯЕМ, КАКАЯ ТОЧКА ПОД МЫШЬЮ
     // ==========================================
+    const mouseX = schedule.mouse.x;
+    const mouseY = schedule.mouse.y;
+    let hoveredIndex = -1;
+    let hoveredData = null;
+    const hoverRadius = 10;
+
+    for (let i = 0; i < visibleData.length; i++) {
+      const data = visibleData[i];
+      if (!data) continue;
+
+      const relativeX = data.x - viewStart * totalDays;
+      const clampedX = Math.max(0, Math.min(visibleDays, relativeX));
+      const xPos = clampedX * lineXStep;
+      const yPos = data.y * lineYStep;
+
+      const cx = frameX + xPos;
+      const cy = frameY + frameHeight - yPos;
+
+      const dx = mouseX - cx;
+      const dy = mouseY - cy;
+      
+      if (dx * dx + dy * dy < hoverRadius * hoverRadius) {
+        hoveredIndex = i;
+        hoveredData = data;
+        break;
+      }
+    }
+
+    // ==========================================
+    // ПОЛУЧАЕМ ТИП МЕТРИКИ
+    // ==========================================
+    const typeIndex = schedule.types.indexOf(this);
+    const isHovered = hoveredData !== null;
+
+    // ==========================================
+    // РИСУЕМ ЛИНИЮ (с прозрачностью если не hovered)
+    // ==========================================
+    const isMainLine = (hoveredData === null) || (isHovered && typeIndex === 0);
+    
+    // Определяем прозрачность
+    let globalAlpha = 1.0;
+    if (isHovered && typeIndex !== 0) {
+      // Если наведены на другую линию — делаем прозрачной
+      globalAlpha = 0.2;
+    } else if (isHovered && typeIndex === 0) {
+      // Если наведены на эту линию — оставляем непрозрачной
+      globalAlpha = 1.0;
+    }
+    
+    schedule.context.globalAlpha = globalAlpha;
+    
+    // Рисуем линию
     schedule.context.strokeStyle = this.color;
-    schedule.context.lineWidth = 2.5;
+    schedule.context.lineWidth = (isHovered && typeIndex === 0) ? 3.5 : 2.5;
     schedule.context.beginPath();
 
     let isFirst = true;
@@ -191,17 +243,11 @@ export class Linear {
     }
 
     schedule.context.stroke();
+    schedule.context.globalAlpha = 1.0; // сбрасываем прозрачность
 
     // ==========================================
-    // 2. РИСУЕМ ТОЧКИ (кружки)
+    // РИСУЕМ ТОЧКИ
     // ==========================================
-    const mouseX = schedule.mouse.x;
-    const mouseY = schedule.mouse.y;
-    let foundIndex = -1;
-    let foundData = null;
-    const hoverRadius = 8; // Радиус для детекции
-
-    // Сначала ищем точку под мышью
     for (let i = 0; i < visibleData.length; i++) {
       const data = visibleData[i];
       if (!data) continue;
@@ -213,40 +259,20 @@ export class Linear {
 
       const cx = frameX + xPos;
       const cy = frameY + frameHeight - yPos;
-
-      const dx = mouseX - cx;
-      const dy = mouseY - cy;
       
-      if (dx * dx + dy * dy < hoverRadius * hoverRadius) {
-        foundIndex = i;
-        foundData = data;
-        break;
+      const isHoveredPoint = (i === hoveredIndex);
+      const radius = isHoveredPoint ? 7 : 4;
+      const borderWidth = isHoveredPoint ? 3 : 1.5;
+
+      // Прозрачность точек
+      let pointAlpha = 1.0;
+      if (isHovered && typeIndex !== 0) {
+        pointAlpha = 0.3;
       }
-    }
-
-    // Сохраняем найденную точку для тултипа
-    this._hoveredIndex = foundIndex;
-
-    // Рисуем все точки
-    for (let i = 0; i < visibleData.length; i++) {
-      const data = visibleData[i];
-      if (!data) continue;
-
-      const relativeX = data.x - viewStart * totalDays;
-      const clampedX = Math.max(0, Math.min(visibleDays, relativeX));
-      const xPos = clampedX * lineXStep;
-      const yPos = data.y * lineYStep;
-
-      const cx = frameX + xPos;
-      const cy = frameY + frameHeight - yPos;
-      
-      // Размер точки: увеличиваем если под мышью
-      const isHovered = (i === foundIndex);
-      const radius = isHovered ? 7 : 4;
-      const borderWidth = isHovered ? 3 : 1.5;
+      schedule.context.globalAlpha = pointAlpha;
 
       // Тень для выделенной точки
-      if (isHovered) {
+      if (isHoveredPoint) {
         schedule.context.shadowColor = this.color;
         schedule.context.shadowBlur = 15;
       }
@@ -266,7 +292,7 @@ export class Linear {
       schedule.context.stroke();
 
       // Если точка под мышью — дополнительный внешний кружок
-      if (isHovered) {
+      if (isHoveredPoint) {
         schedule.context.strokeStyle = this.color;
         schedule.context.lineWidth = 2;
         schedule.context.setLineDash([4, 4]);
@@ -277,11 +303,14 @@ export class Linear {
       }
     }
 
+    schedule.context.globalAlpha = 1.0;
+    schedule.context.shadowBlur = 0;
+
     // ==========================================
-    // 3. РИСУЕМ ТУЛТИП
+    // ТУЛТИП (всегда поверх)
     // ==========================================
-    if (foundData !== null) {
-      const data = visibleData[foundIndex];
+    if (hoveredData !== null) {
+      const data = hoveredData;
       const relativeX = data.x - viewStart * totalDays;
       const clampedX = Math.max(0, Math.min(visibleDays, relativeX));
       const xPos = clampedX * lineXStep;
@@ -290,22 +319,17 @@ export class Linear {
       const cx = frameX + xPos;
       const cy = frameY + frameHeight - yPos;
 
-      // Формируем дату
       const dayNumber = data.x + 1;
       const monthName = this.getMonthName();
 
-      // Определяем тип метрики
-      const typeIndex = this.schedule.types.indexOf(this);
       const typeNames = ['Просмотры', 'Визиты', 'Посещения'];
       const metricName = typeNames[typeIndex] || this.label;
 
-      // Текст тултипа
       const lines = [
         `${dayNumber} ${monthName}`,
         `${metricName}: ${data.y}`
       ];
 
-      // Вычисляем размеры тултипа
       const fontSize = 13;
       const lineHeight = 20;
       const padding = 10;
@@ -324,11 +348,9 @@ export class Linear {
       const tooltipWidth = maxWidth + padding * 2;
       const tooltipHeight = lines.length * lineHeight + padding * 2;
 
-      // Позиционируем тултип (смещаем вверх и вправо от точки)
       let tooltipX = cx + 15;
       let tooltipY = cy - tooltipHeight / 2;
 
-      // Корректируем, чтобы не выходил за границы
       const canvasWidth = schedule.canvas.width;
       const canvasHeight = schedule.canvas.height;
 
@@ -342,14 +364,13 @@ export class Linear {
         tooltipY = canvasHeight - tooltipHeight - 10;
       }
 
-      // Рисуем фон тултипа
-      schedule.context.shadowBlur = 10;
-      schedule.context.shadowColor = 'rgba(0, 0, 0, 0.15)';
+      // Рисуем фон тултипа (поверх всего)
+      schedule.context.shadowBlur = 15;
+      schedule.context.shadowColor = 'rgba(0, 0, 0, 0.2)';
       schedule.context.fillStyle = '#FFFFFF';
       schedule.context.strokeStyle = this.color;
-      schedule.context.lineWidth = 2;
+      schedule.context.lineWidth = 2.5;
       
-      // Скруглённый прямоугольник
       const r = borderRadius;
       const x = tooltipX;
       const y = tooltipY;
@@ -373,16 +394,10 @@ export class Linear {
       schedule.context.shadowBlur = 0;
 
       // Рисуем текст
-      schedule.context.fillStyle = this.color;
-      schedule.context.font = `bold ${fontSize}px sans-serif`;
-      schedule.context.textBaseline = 'top';
-      schedule.context.textAlign = 'left';
-
       for (let i = 0; i < lines.length; i++) {
         const textY = tooltipY + padding + i * lineHeight;
         const textX = tooltipX + padding;
         
-        // Первая строка — день, остальные — данные
         if (i === 0) {
           schedule.context.fillStyle = '#333333';
           schedule.context.font = `bold ${fontSize}px sans-serif`;
@@ -394,8 +409,8 @@ export class Linear {
         schedule.context.fillText(lines[i], textX, textY);
       }
 
-      // Маленькая стрелка от тултипа к точке
-      const arrowX = cx > tooltipX + tooltipWidth / 2 ? tooltipX : tooltipX + tooltipWidth;
+      // Стрелка от тултипа к точке
+      const arrowX = cx > tooltipX + tooltipWidth / 2 ? tooltipX + tooltipWidth : tooltipX;
       const arrowY = tooltipY + tooltipHeight / 2;
 
       schedule.context.fillStyle = '#FFFFFF';
@@ -404,12 +419,10 @@ export class Linear {
       schedule.context.beginPath();
       
       if (cx > tooltipX + tooltipWidth / 2) {
-        // Стрелка справа
         schedule.context.moveTo(tooltipX + tooltipWidth, arrowY);
         schedule.context.lineTo(tooltipX + tooltipWidth + 10, arrowY);
         schedule.context.lineTo(tooltipX + tooltipWidth, arrowY - 6);
       } else {
-        // Стрелка слева
         schedule.context.moveTo(tooltipX, arrowY);
         schedule.context.lineTo(tooltipX - 10, arrowY);
         schedule.context.lineTo(tooltipX, arrowY - 6);
@@ -420,9 +433,6 @@ export class Linear {
     }
   }
 
-  /**
-   * Получить название месяца
-   */
   getMonthName() {
     const months = [
       'Января', 'Февраля', 'Марта', 'Апреля', 'Мая', 'Июня',
