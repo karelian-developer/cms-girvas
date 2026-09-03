@@ -30,6 +30,17 @@ export class Client {
     this.CSRFToken = '';
     this.setRestHash();
     this.initCSRFToken();
+
+    this.isNewVisitor = this.checkIsNewVisitor();
+  }
+
+  checkIsNewVisitor() {
+    const token = localStorage.getItem('_grv_mtoken');
+    const tokenDate = localStorage.getItem('_grv_mtoken_date');
+    const today = new Date().toDateString();
+    
+    // Если нет токена или дата не сегодня — новый посетитель
+    return token === null || tokenDate !== today;
   }
 
   initCSRFToken() {
