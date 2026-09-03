@@ -60,11 +60,9 @@ export class PageAnalytics {
             zoomStep: 0.1,
             showNavigator: true,
             padding: { top: 30, right: 30, bottom: 40, left: 50 },
-            
-            // НОВЫЕ ОПЦИИ ДЛЯ ВЫСОТЫ
-            height: 'auto',        // 'auto' | число (px) | '16:9' | '4:3'
-            minHeight: 250,        // минимальная высота
-            maxHeight: 600         // максимальная высота
+            height: 'auto', 
+            minHeight: 250,
+            maxHeight: 600
           });
 
           scheduleAttendance.target.setFrameSize(scheduleContainerElement.width - 50, scheduleContainerElement.height - 50 - 40);
@@ -76,55 +74,60 @@ export class PageAnalytics {
           }
 
           metricsData.forEach((data) => {
-          let urlsTotalViews = 0;
-          let time = data.metrics.time * 1000;
-          let date = new Date(time);
-          let day = date.getDate() - 1;
+            let urlsTotalViews = 0;
+            let time = data.metrics.time * 1000;
+            let date = new Date(time);
+            let day = date.getDate() - 1;
 
-          // ==========================================
-          // 1. СЧИТАЕМ ПРОСМОТРЫ
-          // ==========================================
-          for (let token in data.metrics.views) {
-            let urls = data.metrics.views[token].urls;
-            for (let url in urls) {
-              if (searchParams.getPathPart(4) === null) {
-                urlsTotalViews += urls[url];
-              } else {
-                let urlObject = new URL(url);
-                let urlPathParts = urlObject.pathname.split('/');
-                let targetObjectName = document.querySelector('article.page[data-name]');
-                if (targetObjectName !== null && urlPathParts[2] === targetObjectName.getAttribute('data-name')) {
+            for (let token in data.metrics.views) {
+              let urls = data.metrics.views[token].urls;
+              for (let url in urls) {
+                if (searchParams.getPathPart(4) === null) {
                   urlsTotalViews += urls[url];
+                } else {
+                  let urlObject = new URL(url);
+                  let urlPathParts = urlObject.pathname.split('/');
+                  let targetObjectName = document.querySelector('article.page[data-name]');
+                  
+                  if (targetObjectName !== null) {
+                    const targetName = targetObjectName.getAttribute('data-name');
+                    
+                    // Определяем тип страницы по URL
+                    if (urlPathParts[0] === 'entry') {
+                      // Запись: /entry/name
+                      if (urlPathParts[1] === targetName) {
+                        urlsTotalViews += urls[url];
+                      }
+                    } else if (urlPathParts[0] === 'page') {
+                      // Статическая страница: /page/name
+                      if (urlPathParts[1] === targetName) {
+                        urlsTotalViews += urls[url];
+                      }
+                    }
+                  }
                 }
               }
             }
-          }
 
-          // ==========================================
-          // 2. ДОБАВЛЯЕМ ДАННЫЕ В ГРАФИК
-          // ==========================================
-          scheduleAttendance.target.addData(0, day, urlsTotalViews);
+            scheduleAttendance.target.addData(0, day, urlsTotalViews);
 
-          if (searchParams.getPathPart(4) === null) {
-            // ==========================================
-            // ИСПРАВЛЕНИЕ: используем готовые данные из БД
-            // ==========================================
-            const visits0 = data.metrics.visits0 || [];
-            const visits1 = data.metrics.visits1 || [];
-            
-            console.log(`📊 День ${day + 1}: просмотры=${urlsTotalViews}, визиты=${visits0.length}, посещения=${visits1.length}`);
-            
-            scheduleAttendance.target.addData(1, day, visits0.length);
-            scheduleAttendance.target.addData(2, day, visits1.length);
-          }
+            if (searchParams.getPathPart(4) === null) {
+              const visits0 = data.metrics.visits0 || [];
+              const visits1 = data.metrics.visits1 || [];
+              
+              console.log(`📊 День ${day + 1}: просмотры=${urlsTotalViews}, визиты=${visits0.length}, посещения=${visits1.length}`);
+              
+              scheduleAttendance.target.addData(1, day, visits0.length);
+              scheduleAttendance.target.addData(2, day, visits1.length);
+            }
 
-          // Устанавливаем цвета
-          scheduleAttendance.target.types[0].setColor('#EE82EE');
-          if (searchParams.getPathPart(4) === null) {
-            scheduleAttendance.target.types[1].setColor('#5B92E5');
-            scheduleAttendance.target.types[2].setColor('#088567');
-          }
-        });
+            // Устанавливаем цвета
+            scheduleAttendance.target.types[0].setColor('#EE82EE');
+            if (searchParams.getPathPart(4) === null) {
+              scheduleAttendance.target.types[1].setColor('#5B92E5');
+              scheduleAttendance.target.types[2].setColor('#088567');
+            }
+          });
     
           scheduleAttendance.target.buildData();
           scheduleAttendance.target.init();
