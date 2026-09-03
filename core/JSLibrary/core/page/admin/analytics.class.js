@@ -25,16 +25,24 @@ export class PageAnalytics {
   }
 
   getDateFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const dateParam = urlParams.get('date');
-    
-    if (dateParam) {
-      const parsed = new Date(dateParam);
-      if (!isNaN(parsed.getTime())) {
-        return parsed;
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const dateParam = urlParams.get('date');
+      
+      if (dateParam) {
+        const parsed = new Date(dateParam);
+        
+        if (!isNaN(parsed.getTime())) {
+          console.log('📅 Дата из URL:', parsed.toLocaleDateString());
+          return parsed;
+        }
       }
+    } catch (e) {
+      console.warn('⚠️ Ошибка парсинга даты из URL:', e);
     }
     
+    // Fallback: текущая дата
+    console.log('📅 Используем текущую дату');
     return new Date();
   }
 
