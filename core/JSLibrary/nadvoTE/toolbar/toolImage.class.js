@@ -115,7 +115,7 @@ export class ToolImage extends Tool {
       const inputImageLabelElement = this.modal.target.element.querySelector('[name="image_label"]');
       const imageLabel = inputImageLabelElement.value;
 
-      this.editor.textarea.replaceStringSelection(
+      this.editor.textarea.insertStringAtLastCursor(
         `![${imageLabel}](${fileURL})`
       );
 
