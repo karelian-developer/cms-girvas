@@ -284,6 +284,9 @@ export class PageGlobal {
   }
 
   initGalleries() {
+    console.log('[PageGlobal] initGalleries');
+    console.log(document.querySelectorAll('.nadvo-gallery'));
+
     const galleryElements = document.querySelectorAll('.nadvo-gallery');
 
     galleryElements.forEach((galleryElement) => {
@@ -305,6 +308,8 @@ export class PageGlobal {
       galleryElement.innerHTML = '';
       galleryElement.appendChild(interactiveGallery.target.element);
     });
+
+    console.log('[PageGlobal] content inserted', document.querySelectorAll('.nadvo-gallery'));
   }
 
   /**
