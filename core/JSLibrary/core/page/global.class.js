@@ -291,6 +291,7 @@ export class PageGlobal {
 
     galleryElements.forEach((galleryElement) => {
       const interactiveGallery = new Interactive('gallery');
+      console.log(galleryElement.innerHTML);
 
       const images = galleryElement.querySelectorAll('img');
 
