@@ -35,8 +35,8 @@ export class PageGlobal {
   init() {
     let locales;
     
-    // Инициализация копирования кода
     this.initCodeCopy();
+    this.initGalleries();
 
     /** @var {HTMLElement} */
     let navigationBurgerElement = document.querySelector('[role="navagation-burger"]');
@@ -280,6 +280,28 @@ export class PageGlobal {
       interactiveNotification.target.assembly();
 
       interactiveNotification.target.show();
+    });
+  }
+
+  initGalleries() {
+    const galleryElements = document.querySelectorAll('.nadvo-gallery');
+
+    galleryElements.forEach((galleryElement) => {
+      const interactiveGallery = new Interactive('gallery');
+
+      const images = galleryElement.querySelectorAll('img');
+
+      images.forEach((image) => {
+        interactiveGallery.target.addItem(
+          image.getAttribute('src'),
+          image.getAttribute('alt') || ''
+        );
+      });
+
+      interactiveGallery.assembly();
+
+      galleryElement.innerHTML = '';
+      galleryElement.appendChild(interactiveGallery.target.element);
     });
   }
 

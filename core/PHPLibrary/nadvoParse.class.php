@@ -210,6 +210,7 @@ class NadvoParse
     'underline' => '/\~\~(.+?)\~\~/s',
     'link' => '/\[([^\]]+)\]\(([^)]+)\)(\{[^{}]+\})?/s',
     'image' => '/!\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
+    'gallery' => '/\[gallery\]([\s\S]*?)\[\/gallery\]/',
     'figure' => '/![f]\[([^\[\]]+)?\]\(\s*(\S+)\s*\)(?:\s*\{\s*(.+?)\s*\})?/s',
     'video' => '/!\[video\]\((.+?)\)/',
     'video_vk' => '/!\[video\-vk\]\((.+?)\)/',
@@ -366,6 +367,7 @@ class NadvoParse
     $markdown = $this->parseQuotes($markdown);
     $markdown = $this->parseLists($markdown);
     $markdown = $this->parseTables($markdown);
+    $markdown = $this->parseGallery($markdown);
     $markdown = $this->parseInlineElements($markdown);
     $markdown = $this->parseFootnotes($markdown);
     $markdown = $this->parseEmoji($markdown); // Добавляем обработку эмодзи
@@ -740,6 +742,63 @@ class NadvoParse
     }
     
     return implode("\n", $result);
+  }
+
+  private function parseGallery(string $markdown) : string
+  {
+    return preg_replace_callback(
+      self::PATTERNS['gallery'],
+      function($matches) {
+        $content = trim($matches[1]);
+
+        if (empty($content)) {
+          return '';
+        }
+
+        // Разбираем строки вида ![alt](src)
+        preg_match_all('/!\[([^\]]*)\]\(([^)]+)\)/', $content, $images, PREG_SET_ORDER);
+
+        if (empty($images)) {
+          return $matches[0];
+        }
+
+        $dom = new DOMDocument();
+        $dom->formatOutput = true;
+
+        $gallery = $dom->createElement('div');
+        $gallery->setAttribute('class', 'nadvo-gallery');
+
+        foreach ($images as $image) {
+          $alt = trim($image[1]);
+          $src = trim($image[2]);
+
+          $figure = $dom->createElement('figure');
+          $figure->setAttribute('class', 'nadvo-gallery__item');
+
+          $img = $dom->createElement('img');
+          $img->setAttribute('src', $src);
+          $img->setAttribute('alt', $alt);
+          $img->setAttribute('loading', 'lazy');
+
+          $figure->appendChild($img);
+
+          if ($alt !== '') {
+            $figcaption = $dom->createElement('figcaption');
+            $figcaption->setAttribute('class', 'nadvo-gallery__caption');
+            $figcaption->textContent = $alt;
+
+            $figure->appendChild($figcaption);
+          }
+
+          $gallery->appendChild($figure);
+        }
+
+        $dom->appendChild($gallery);
+
+        return $dom->saveHTML();
+      },
+      $markdown
+    );
   }
 
   private function parseBlocks(string $markdown) : string

@@ -26,6 +26,7 @@ import {Notification} from './interactive/notification.class.js';
 import {Slider} from './interactive/slider.class.js';
 import {DataSearcher} from './interactive/dataSearcher.class.js';
 import {Tabs} from './interactive/tabs.class.js';
+import {Gallery} from './interactive/gallery.class.js';
 
 export class Interactive {
   constructor(interactiveName, interactiveParams = {}) {
@@ -119,6 +120,9 @@ export class Interactive {
         break;
       case 'dataSearcher':
         this.target = new DataSearcher(this);
+        break;
+      case 'gallery':
+        this.target = new Gallery(this);
         break;
       case 'tabs': 
         this.target = new Tabs(
