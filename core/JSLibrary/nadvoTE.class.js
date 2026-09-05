@@ -31,6 +31,11 @@ export class NadvoTE {
     this.maxHistory = 100;
     this.isRestoring = false;
 
+    this.lastCursorPosition = {
+      start: 0,
+      end: 0
+    };
+
     console.log(`[NADVO TE] Object created.`);
   }
 
@@ -63,19 +68,35 @@ export class NadvoTE {
     });
   }
 
+  saveCursorPosition() {
+    const textarea = this.textarea?.element;
+
+    if (!textarea) {
+      return;
+    }
+
+    this.lastCursorPosition = {
+      start: textarea.selectionStart,
+      end: textarea.selectionEnd
+    };
+  }
+
   initTextareaEvents() {
     const textarea = this.textarea.element;
 
     textarea.addEventListener('mouseup', () => {
       this.saveTextareaSelection();
+      this.saveCursorPosition();
       this.saveHistory();
     });
 
     textarea.addEventListener('mousedown', () => {
-      this.saveTextareaSelection();
+      this.saveCursorPosition();
     });
 
     textarea.addEventListener('keyup', (e) => {
+      this.saveCursorPosition();
+
       if (e.shiftKey || e.key.startsWith('Arrow')) {
         this.saveTextareaSelection();
       }
@@ -84,12 +105,15 @@ export class NadvoTE {
     });
 
     textarea.addEventListener('click', () => {
+      this.saveCursorPosition();
+
       if (textarea.selectionStart === textarea.selectionEnd) {
         this.clearSelection();
       }
     });
 
     textarea.addEventListener('input', () => {
+      this.saveCursorPosition();
       this.saveHistory();
     });
   }

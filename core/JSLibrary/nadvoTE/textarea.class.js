@@ -100,4 +100,26 @@ export class Textarea {
 
     return true;
   }
+
+  insertStringAtLastCursor(string) {
+    const position = this.editor.lastCursorPosition;
+
+    if (!position) {
+      return false;
+    }
+
+    const start = position.start;
+    const end = position.end;
+
+    this.element.value = this.element.value.substring(0, start)
+      + string
+      + this.element.value.substring(end);
+
+    const cursorPos = start + string.length;
+
+    this.element.focus();
+    this.element.setSelectionRange(cursorPos, cursorPos);
+
+    return true;
+  }
 }
