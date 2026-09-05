@@ -101,19 +101,30 @@ export class Tool {
    */
   bindHotkey(hotkey) {
     document.addEventListener('keydown', (event) => {
-      const pressedKey = event.key.toLowerCase();
-      const parts = hotkey.toLowerCase().split('+');
+      const hotkeyParts = hotkey.toLowerCase().split('+');
+      const hotkeyKey = hotkeyParts.pop();
 
-      const hotkeyKey = parts.pop();
-      const needsCtrl = parts.includes('ctrl');
-      const needsShift = parts.includes('shift');
-      const needsAlt = parts.includes('alt');
+      const needsCtrl = hotkeyParts.includes('ctrl');
+      const needsShift = hotkeyParts.includes('shift');
+      const needsAlt = hotkeyParts.includes('alt');
 
       const ctrlOk = needsCtrl ? (event.ctrlKey || event.metaKey) : true;
       const shiftOk = needsShift ? event.shiftKey : true;
       const altOk = needsAlt ? event.altKey : true;
 
-      if (ctrlOk && shiftOk && altOk && pressedKey === hotkeyKey) {
+      const keyMap = {
+        'b': 'KeyB',
+        'i': 'KeyI',
+        'u': 'KeyU',
+        'k': 'KeyK',
+        'z': 'KeyZ',
+        'y': 'KeyY',
+        'c': 'KeyC'
+      };
+
+      const expectedCode = keyMap[hotkeyKey] || hotkeyKey.toUpperCase();
+
+      if (ctrlOk && shiftOk && altOk && event.code === expectedCode) {
         event.preventDefault();
         this.element.click();
       }

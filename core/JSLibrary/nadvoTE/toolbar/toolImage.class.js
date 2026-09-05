@@ -242,7 +242,7 @@ export class ToolImage extends Tool {
         const imageLabel = inputImageLabelElement.value;
         const imageLink = inputImageLinkElement.value;
         
-        this.editor.textarea.replaceStringSelection(
+        this.editor.textarea.insertStringAtCursor(
           `![${imageLabel}](${imageLink})`
         );
 

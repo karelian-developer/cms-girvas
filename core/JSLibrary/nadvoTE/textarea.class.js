@@ -63,6 +63,22 @@ export class Textarea {
     });
   }
 
+  insertStringAtCursor(string) {
+    const start = this.element.selectionStart;
+    const end = this.element.selectionEnd;
+
+    this.element.value = this.element.value.substring(0, start)
+      + string
+      + this.element.value.substring(end);
+
+    const cursorPos = start + string.length;
+
+    this.element.focus();
+    this.element.setSelectionRange(cursorPos, cursorPos);
+
+    return true;
+  }
+
   replaceStringSelection(string) {
     const start = this.element.selectionStart;
     const end = this.element.selectionEnd;
