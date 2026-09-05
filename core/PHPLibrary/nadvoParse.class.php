@@ -1458,6 +1458,16 @@ class NadvoParse
       },
       $markdown
     );
+
+    $markdown = preg_replace_callback(
+      '/\[gallery\]([\s\S]*?)\[\/gallery\]/',
+      function($matches) use (&$protected) {
+        $placeholder = '%%PROTECTED_' . count($protected) . '%%';
+        $protected[$placeholder] = $matches[0];
+        return $placeholder;
+      },
+      $markdown
+    );
     
     // Не трогаем уже существующие ссылки и изображения
     $protected = [];
