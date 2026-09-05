@@ -291,6 +291,8 @@ export class PageGlobal {
 
       const images = galleryElement.querySelectorAll('img');
 
+      console.log(images);
+
       images.forEach((image) => {
         interactiveGallery.target.addItem(
           image.getAttribute('src'),
