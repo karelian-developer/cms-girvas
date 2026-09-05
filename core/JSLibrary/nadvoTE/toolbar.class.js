@@ -17,6 +17,7 @@
 
 import {Interactive} from '../interactive.class.js';
 import {ToolBold} from './toolbar/toolBold.class.js';
+import {ToolGallery} from './toolbar/toolGallery.class.js';
 import {ToolItalic} from './toolbar/toolItalic.class.js';
 import {ToolUnderline} from './toolbar/toolUnderline.class.js';
 import {ToolHeader} from './toolbar/toolHeader.class.js';
@@ -156,6 +157,10 @@ export class Toolbar {
             
           case 'image':
             this.tools.image = new ToolImage(this.editor, optionItemInteractiveElement);
+            break;
+
+          case 'gallery':
+            this.tools.gallery = new ToolGallery(this.editor, optionItemInteractiveElement);
             break;
             
           case 'emoji':

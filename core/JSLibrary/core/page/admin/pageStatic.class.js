@@ -49,6 +49,7 @@ export class PagePageStatic {
         {'name': 'headers', 'type': 'choices'},
         {'name': 'link', 'type': 'button'},
         {'name': 'image', 'type': 'button'},
+        {'name': 'gallery', 'type': 'button'},
         {'name': 'quote', 'type': 'button'},
         {'name': 'code', 'type': 'button'},
         {'name': 'preview', 'type': 'button'},
