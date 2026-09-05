@@ -205,7 +205,7 @@ class NadvoParse
 
   private const PATTERNS = [
     'header' => '/^(#{1,6})\s+(.+?)(?:\s*\{([^{}]+)\})?\s*$/m',
-    'bold' => '/\*\*([^*]+?)\*\*|__([^_]+?)__/s',
+    'bold' => '/\*\*([^*]+?)\*\*/s',
     'italic' => '/(?<!\*)\*(?!\*)([^*]+?)(?<!\*)\*(?!\*)/s',
     'underline' => '/\~\~(.+?)\~\~/s',
     'link' => '/\[([^\]]+)\]\(([^)]+)\)(\{[^{}]+\})?/s',
@@ -757,9 +757,6 @@ class NadvoParse
 
         // Разбираем строки вида ![alt](src)
         preg_match_all('/!\[([^\]]*)\]\(([^)]+)\)/', $content, $images, PREG_SET_ORDER);
-        
-        var_dump($content);
-        var_dump($images);
 
         if (empty($images)) {
           return $matches[0];
