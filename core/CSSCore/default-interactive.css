@@ -1273,3 +1273,166 @@
     height: 12px;
   }
 }
+
+/* ==========================================================================================
+=> Gallery (Галерея)
+============================================================================================= */
+
+.interactive.interactive_gallery {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.interactive.interactive_gallery .gallery__items {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  overflow: hidden;
+  border-radius: 8px;
+  min-height: 320px;
+}
+
+.interactive.interactive_gallery .gallery__item {
+  display: none;
+  margin: 0;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.interactive.interactive_gallery .gallery__item.gallery__item_is-active {
+  display: flex;
+  flex-direction: column;
+}
+
+.interactive.interactive_gallery .gallery__image {
+  display: block;
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  cursor: zoom-in;
+  transition: transform .2s, filter .2s;
+}
+
+.interactive.interactive_gallery .gallery__image:hover {
+  filter: brightness(1.03);
+}
+
+.interactive.interactive_gallery .gallery__caption {
+  box-sizing: border-box;
+  background-color: var(--primary-color-2);
+  color: var(--primary-color-4);
+  font-size: 14px;
+  padding: 10px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Контроллеры */
+.interactive.interactive_gallery .gallery__controllers {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.interactive.interactive_gallery .controller__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 40px;
+  height: 40px;
+  margin: 0 8px;
+  background-color: var(--primary-color-4--opacity-0-8);
+  color: var(--primary-color-2);
+  border: 1px solid var(--primary-color-3);
+  border-radius: 100%;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background-color .2s, transform .2s;
+}
+
+.interactive.interactive_gallery .controller__button:hover {
+  background-color: var(--primary-color-4);
+  transform: scale(1.05);
+}
+
+.interactive.interactive_gallery .controller__button:active {
+  transform: scale(0.95);
+}
+
+.interactive.interactive_gallery .controller__button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Превью */
+.interactive.interactive_gallery .gallery__preview {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.interactive.interactive_gallery .gallery__preview-item {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: 64px;
+  height: 48px;
+  padding: 0;
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color .2s, opacity .2s;
+  opacity: .6;
+}
+
+.interactive.interactive_gallery .gallery__preview-item:hover {
+  opacity: 1;
+}
+
+.interactive.interactive_gallery .gallery__preview-item.gallery__preview-item_is-active {
+  border-color: var(--secondary-color-3);
+  opacity: 1;
+}
+
+.interactive.interactive_gallery .gallery__preview-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Модальное окно */
+.gallery-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gallery-modal .gallery-modal__image {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  margin: 0 auto;
+  border-radius: 8px;
+}
+
+.gallery-modal .gallery-modal__caption {
+  text-align: center;
+  font-size: 14px;
+  color: var(--primary-color-2);
+  padding: 4px 0;
+}
