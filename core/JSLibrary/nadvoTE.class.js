@@ -66,6 +66,8 @@ export class NadvoTE {
       copyright.innerText = this.localeData.NTE_COPYRIGHT;
       this.element.appendChild(copyright);
     });
+
+    window.nadvoDebug = this;
   }
 
   saveCursorPosition() {
