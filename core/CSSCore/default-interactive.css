@@ -558,7 +558,6 @@
 
 .file-manager .media-list__item.media-list__item_is-selected {
   outline: 2px solid var(--secondary-color-3);
-  outline-offset: -2px;
   filter: brightness(1.05);
 }
 
