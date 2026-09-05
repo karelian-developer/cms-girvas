@@ -1458,6 +1458,8 @@ class NadvoParse
       },
       $markdown
     );
+    
+    $protected = [];
 
     $markdown = preg_replace_callback(
       '/\[gallery\]([\s\S]*?)\[\/gallery\]/',
@@ -1469,8 +1471,6 @@ class NadvoParse
       $markdown
     );
     
-    // Не трогаем уже существующие ссылки и изображения
-    $protected = [];
     $markdown = preg_replace_callback(
       '/!?\[.*?\]\(\s*\S+\s*\)(?:\s*\{[^{}]+\})?/',
       function($matches) use (&$protected) {
