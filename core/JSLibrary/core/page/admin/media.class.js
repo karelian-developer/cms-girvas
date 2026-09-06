@@ -101,10 +101,13 @@ export class PageMedia {
       event.preventDefault();
 
       const filePath = fileURL.split('/').slice(0, -1).join('/');
+      const fileNameWithoutExtension = fileName.replace(/\.[^.]+$/, '');
 
       const requestMetadata = new Interactive('request', {
         method: 'GET',
-        url: '/handler/media/metadata?directory=' + filePath + '&fileName=' + fileName + '.' + fileExtension + '&localeMessage=' + window.CMSCore.locales.admin.name
+        url: '/handler/media/metadata?directory=' + filePath
+          + '&fileName=' + fileNameWithoutExtension + '.' + fileExtension
+          + '&localeMessage=' + window.CMSCore.locales.admin.name
       });
 
       requestMetadata.target.send().then((data) => {
