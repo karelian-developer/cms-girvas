@@ -27,9 +27,13 @@ use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\Entry as Entry;
+use \core\PHPLibrary\Page as Page;
 
 /**
  * Class ReportsBase
+ * 
+ * Общая сводка по всем событиям за последние 7 дней
  */
 class ReportsBase implements ReportsPageInterface
 {
@@ -110,125 +114,36 @@ class ReportsBase implements ReportsPageInterface
   }
 
   /**
-   * Получить объекты отчетов
+   * Получить объекты отчетов за период
    * 
    * @return array
    */
-  private function getAllReportsObjectsByPeriod() : array
+  private function getReportsByPeriod() : array
   {
-    $startPeriodUnix = time() - 604800;
+    $startPeriodUnix = time() - 604800; // 7 дней
     $endPeriodUnix = time();
 
     return CMSReports::getAllByPeriod(
       $this->CMSCore,
       $startPeriodUnix,
       $endPeriodUnix,
-      ['id', 'metadata', 'variables']
+      ['id', 'metadata', 'variables', 'createdUnixTimestamp']
     );
   }
 
+  /**
+   * Фильтровать отчеты по типам
+   */
   private function filterReports(array $reportsObjects, array $typeIDs) : array
   {
-    foreach ($reportsObjects as $index => $report) {
+    $filtered = [];
+    foreach ($reportsObjects as $report) {
       $typeID = $report->getTypeID();
-      $typeID = is_numeric($report->getTypeID())
-        ? (int)$report->getTypeID()
-        : 0;
-
-      if (!in_array($typeID, $typeIDs, true)) {
-        unset($reportsObjects[$index]);
+      if (in_array($typeID, $typeIDs, true)) {
+        $filtered[] = $report;
       }
     }
-
-    return $reportsObjects;
-  }
-
-  private function extractClientIPs(array $reports) : array {
-    $IPs = [];
-
-    foreach ($reports as $report) {
-      $variables = $this->viewer !== null
-        ? $report->getVariables($this->viewer)
-        : $report->getVariables();
-
-      if (isset($variables['ip'])) {
-        $IPs[] = $variables['ip'];
-      } elseif (isset($variables['clientIP'])) {
-        $IPs[] = $variables['clientIP'];
-      }
-    }
-
-    return array_unique($IPs);
-  }
-
-  /**
-   * Получить логин пользователя по ID
-   */
-  private function getUserLogin(int $userID): string
-  {
-    if ($userID <= 0) {
-      return 'system';
-    }
-
-    try {
-      $user = new \core\PHPLibrary\User($this->CMSCore, $userID);
-      $user->initData(['login']);
-      return $user->getLogin();
-    } catch (\Exception $e) {
-      return 'unknown';
-    }
-  }
-
-  /**
-   * Получить название записи по ID
-   */
-  private function getEntryTitle(int $entryID): string
-  {
-    if ($entryID <= 0) {
-      return '';
-    }
-
-    try {
-      $entry = new \core\PHPLibrary\Entry($this->CMSCore, $entryID);
-      $entry->initData(['texts']);
-      $localeName = $this->CMSCore->locale->getName();
-      return $entry->getTitle($localeName);
-    } catch (\Exception $e) {
-      return 'unknown';
-    }
-  }
-
-  /**
-   * Форматировать описание отчета с использованием локализации
-   */
-  private function formatReportDescription(CMSReport $report): string
-  {
-    $typeID = $report->getTypeID();
-    $variables = $this->viewer !== null
-      ? $report->getVariables($this->viewer)
-      : $report->getVariables();
-
-    $localeData = $this->CMSCore->locale->getData();
-    $typeName = $this->getReportTypeName($typeID);
-    $template = $localeData[$typeName] ?? '';
-
-    if (empty($template)) {
-      return $typeName . ' (ID: ' . ($variables['id'] ?? '?') . ')';
-    }
-
-    // Заменяем плейсхолдеры на значения
-    $replacements = [
-      '{ENTRY_TITLE}' => $this->getEntryTitle($variables['entryID'] ?? 0),
-      '{CLIENT_IP}' => $variables['ip'] ?? $variables['clientIP'] ?? '0.0.0.0',
-      '{USER_LOGIN}' => $this->getUserLogin($variables['userID'] ?? 0),
-      '{USER_ID}' => $variables['userID'] ?? 0,
-    ];
-
-    return str_replace(
-      array_keys($replacements),
-      array_values($replacements),
-      $template
-    );
+    return $filtered;
   }
 
   /**
@@ -249,6 +164,169 @@ class ReportsBase implements ReportsPageInterface
   }
 
   /**
+   * Получить логин пользователя по ID
+   */
+  private function getUserLogin(int $userID): string
+  {
+    if ($userID <= 0) {
+      return 'system';
+    }
+
+    try {
+      $user = new User($this->CMSCore, $userID);
+      $user->initData(['login']);
+      return $user->getLogin();
+    } catch (\Exception $e) {
+      return 'unknown';
+    }
+  }
+
+  /**
+   * Получить название записи по ID
+   */
+  private function getEntryTitle(int $entryID): string
+  {
+    if ($entryID <= 0) {
+      return '';
+    }
+
+    try {
+      $entry = new Entry($this->CMSCore, $entryID);
+      $entry->initData(['texts']);
+      $localeName = $this->CMSCore->locale->getName();
+      return $entry->getTitle($localeName);
+    } catch (\Exception $e) {
+      return 'unknown';
+    }
+  }
+
+  /**
+   * Получить название страницы по ID
+   */
+  private function getPageTitle(int $pageID): string
+  {
+    if ($pageID <= 0) {
+      return '';
+    }
+
+    try {
+      $page = new Page($this->CMSCore, $pageID);
+      $page->initData(['texts']);
+      $localeName = $this->CMSCore->locale->getName();
+      return $page->getTitle($localeName);
+    } catch (\Exception $e) {
+      return 'unknown';
+    }
+  }
+
+  /**
+   * Форматировать описание отчета с использованием локализации
+   */
+  private function formatReportDescription(CMSReport $report): string
+  {
+    $typeID = $report->getTypeID();
+    $variables = $this->viewer !== null
+      ? $report->getVariables($this->viewer)
+      : $report->getVariables();
+
+    $typeName = $this->getReportTypeName($typeID);
+    $template = $this->localeData[$typeName] ?? '';
+
+    if (empty($template)) {
+      return $typeName . ' (ID: ' . ($variables['id'] ?? '?') . ')';
+    }
+
+    $replacements = [
+      '{ENTRY_TITLE}' => $this->getEntryTitle($variables['entryID'] ?? $variables['id'] ?? 0),
+      '{PAGE_TITLE}' => $this->getPageTitle($variables['pageID'] ?? $variables['id'] ?? 0),
+      '{CATEGORY_TITLE}' => $variables['categoryTitle'] ?? $variables['name'] ?? '',
+      '{FORM_TITLE}' => $variables['formTitle'] ?? $variables['name'] ?? '',
+      '{BLOCK_TITLE}' => $variables['blockTitle'] ?? $variables['name'] ?? '',
+      '{SAMPLE_TITLE}' => $variables['sampleTitle'] ?? $variables['name'] ?? '',
+      '{FILE_NAME}' => $variables['fileName'] ?? $variables['name'] ?? '',
+      '{CLIENT_IP}' => $variables['ip'] ?? $variables['clientIP'] ?? '0.0.0.0',
+      '{USER_LOGIN}' => $this->getUserLogin($variables['userID'] ?? 0),
+      '{CREATOR_LOGIN}' => $this->getUserLogin($variables['createdByID'] ?? 0),
+      '{UPDATER_LOGIN}' => $this->getUserLogin($variables['updatedByID'] ?? 0),
+      '{DELETER_LOGIN}' => $this->getUserLogin($variables['deletedByID'] ?? 0),
+      '{TARGET_USER_LOGIN}' => $this->getUserLogin($variables['targetUserID'] ?? 0),
+      '{VIEWER_LOGIN}' => $this->getUserLogin($variables['viewedByID'] ?? 0),
+      '{COUNT}' => $variables['count'] ?? 0,
+    ];
+
+    return str_replace(
+      array_keys($replacements),
+      array_values($replacements),
+      $template
+    );
+  }
+
+  /**
+   * Группировка отчетов по часам для графика
+   */
+  private function groupReportsByHour(array $reports): array
+  {
+    $grouped = array_fill(0, 24, 0);
+    
+    foreach ($reports as $report) {
+      $hour = (int) date('H', $report->getCreatedUnixTimestamp());
+      $grouped[$hour]++;
+    }
+    
+    return $grouped;
+  }
+
+  /**
+   * Группировка отчетов по дням для графика
+   */
+  private function groupReportsByDay(array $reports): array
+  {
+    $grouped = [];
+    $now = time();
+    
+    for ($i = 6; $i >= 0; $i--) {
+      $day = strtotime('-' . $i . ' days', $now);
+      $key = date('Y-m-d', $day);
+      $grouped[$key] = 0;
+    }
+    
+    foreach ($reports as $report) {
+      $key = date('Y-m-d', $report->getCreatedUnixTimestamp());
+      if (isset($grouped[$key])) {
+        $grouped[$key]++;
+      }
+    }
+    
+    return $grouped;
+  }
+
+  /**
+   * Получить топ активных пользователей
+   */
+  private function getTopUsers(array $reports, int $limit = 5): array
+  {
+    $userActions = [];
+    
+    foreach ($reports as $report) {
+      $variables = $this->viewer !== null
+        ? $report->getVariables($this->viewer)
+        : $report->getVariables();
+      
+      $userID = $variables['userID'] ?? $variables['createdByID'] ?? $variables['updatedByID'] ?? $variables['deletedByID'] ?? 0;
+      
+      if ($userID > 0) {
+        if (!isset($userActions[$userID])) {
+          $userActions[$userID] = 0;
+        }
+        $userActions[$userID]++;
+      }
+    }
+    
+    arsort($userActions);
+    return array_slice($userActions, 0, $limit, true);
+  }
+
+  /**
    * Собрать шаблон
    * 
    * @param array $templateValues
@@ -258,92 +336,149 @@ class ReportsBase implements ReportsPageInterface
   public function assembly(array $templateValues = []) : void
   {
     $templatePath = 'templates/page/reports/' . $this->name . '.tpl';
-    $reports = $this->getAllReportsObjectsByPeriod();
-    $localeData = $this->CMSCore->locale->getData();
+    $this->localeData = $this->CMSCore->locale->getData();
+    
+    // Получаем все отчеты за период
+    $reports = $this->getReportsByPeriod();
 
-    // Типы отчетов для общей сводки
-    $reportsAll = $this->filterReports($reports, [
+    // ============================================================
+    // КАТЕГОРИИ СОБЫТИЙ
+    // ============================================================
+    
+    // Контент
+    $contentTypeIDs = [
       CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED,
+      CMSReport::REPORT_TYPE_ID_AP_ENTRY_EDITED,
+      CMSReport::REPORT_TYPE_ID_AP_ENTRY_DELETED,
       CMSReport::REPORT_TYPE_ID_AP_PAGE_CREATED,
+      CMSReport::REPORT_TYPE_ID_AP_PAGE_EDITED,
+      CMSReport::REPORT_TYPE_ID_AP_PAGE_DELETED,
       CMSReport::REPORT_TYPE_ID_AP_MEDIA_UPLOADED,
+      CMSReport::REPORT_TYPE_ID_AP_MEDIA_DELETED,
+      CMSReport::REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_CREATED,
+      CMSReport::REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_EDITED,
+      CMSReport::REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_DELETED,
+      CMSReport::REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_CREATED,
+      CMSReport::REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_EDITED,
+      CMSReport::REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_DELETED,
+      CMSReport::REPORT_TYPE_ID_AP_FORM_CREATED,
+      CMSReport::REPORT_TYPE_ID_AP_FORM_EDITED,
+      CMSReport::REPORT_TYPE_ID_AP_FORM_DELETED,
+      CMSReport::REPORT_TYPE_ID_AP_ENTRIES_COMMENT_CREATED,
+      CMSReport::REPORT_TYPE_ID_AP_ENTRIES_COMMENT_EDITED,
+      CMSReport::REPORT_TYPE_ID_AP_ENTRIES_COMMENT_DELETED,
+      CMSReport::REPORT_TYPE_ID_AP_CONTENT_BLOCK_CREATED,
+      CMSReport::REPORT_TYPE_ID_AP_CONTENT_BLOCK_EDITED,
+      CMSReport::REPORT_TYPE_ID_AP_CONTENT_BLOCK_DELETED,
+    ];
+    
+    // Пользователи
+    $userTypeIDs = [
       CMSReport::REPORT_TYPE_ID_BASE_USER_CREATED,
       CMSReport::REPORT_TYPE_ID_AP_USER_CREATED,
       CMSReport::REPORT_TYPE_ID_AP_USER_EDITED,
-      CMSReport::REPORT_TYPE_ID_AP_USER_DELETED
-    ]);
+      CMSReport::REPORT_TYPE_ID_AP_USER_DELETED,
+      CMSReport::REPORT_TYPE_ID_BASE_USER_BANNED,
+      CMSReport::REPORT_TYPE_ID_BASE_USER_UNBANNED,
+      CMSReport::REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED,
+    ];
+    
+    // Безопасность
+    $securityTypeIDs = [
+      CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS,
+      CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL,
+      CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS,
+      CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL,
+      CMSReport::REPORT_TYPE_ID_AP_VIEWING_LOGS,
+    ];
 
-    $reportsEntriesCreated = $this->filterReports($reports, [
-      CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED
-    ]);
+    // Все события
+    $allReports = $reports;
+    $contentReports = $this->filterReports($reports, $contentTypeIDs);
+    $userReports = $this->filterReports($reports, $userTypeIDs);
+    $securityReports = $this->filterReports($reports, $securityTypeIDs);
 
-    $reportsPagesCreated = $this->filterReports($reports, [
-      CMSReport::REPORT_TYPE_ID_AP_PAGE_CREATED
-    ]);
+    // ============================================================
+    // СТАТИСТИКА ПО ТИПАМ
+    // ============================================================
+    
+    // Контент
+    $statsContent = [
+      'entries_created' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED])),
+      'entries_edited' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_ENTRY_EDITED])),
+      'entries_deleted' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_ENTRY_DELETED])),
+      'pages_created' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_PAGE_CREATED])),
+      'pages_edited' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_PAGE_EDITED])),
+      'pages_deleted' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_PAGE_DELETED])),
+      'media_uploaded' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_MEDIA_UPLOADED])),
+      'media_deleted' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_MEDIA_DELETED])),
+      'categories_created' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_CREATED])),
+      'categories_edited' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_EDITED])),
+      'categories_deleted' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_DELETED])),
+      'samples_created' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_CREATED])),
+      'samples_edited' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_EDITED])),
+      'samples_deleted' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_DELETED])),
+      'forms_created' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_FORM_CREATED])),
+      'forms_edited' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_FORM_EDITED])),
+      'forms_deleted' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_FORM_DELETED])),
+      'comments_created' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_ENTRIES_COMMENT_CREATED])),
+      'comments_edited' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_ENTRIES_COMMENT_EDITED])),
+      'comments_deleted' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_ENTRIES_COMMENT_DELETED])),
+      'blocks_created' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_CONTENT_BLOCK_CREATED])),
+      'blocks_edited' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_CONTENT_BLOCK_EDITED])),
+      'blocks_deleted' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_CONTENT_BLOCK_DELETED])),
+    ];
 
-    $reportsMediaUploaded = $this->filterReports($reports, [
-      CMSReport::REPORT_TYPE_ID_AP_MEDIA_UPLOADED
-    ]);
+    // Пользователи
+    $statsUsers = [
+      'registered' => count($this->filterReports($reports, [
+        CMSReport::REPORT_TYPE_ID_BASE_USER_CREATED,
+        CMSReport::REPORT_TYPE_ID_AP_USER_CREATED
+      ])),
+      'edited' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_USER_EDITED])),
+      'deleted' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_USER_DELETED])),
+      'banned' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_BASE_USER_BANNED])),
+      'unbanned' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_BASE_USER_UNBANNED])),
+      'personal_data_views' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED])),
+    ];
 
-    $reportsUsersRegistered = $this->filterReports($reports, [
-      CMSReport::REPORT_TYPE_ID_BASE_USER_CREATED,
-      CMSReport::REPORT_TYPE_ID_AP_USER_CREATED
-    ]);
+    // Безопасность
+    $statsSecurity = [
+      'auth_success_admin' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS])),
+      'auth_fail_admin' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL])),
+      'auth_success_site' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS])),
+      'auth_fail_site' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL])),
+      'logs_views' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_VIEWING_LOGS])),
+    ];
 
-    $reportsUsersEdited = $this->filterReports($reports, [
-      CMSReport::REPORT_TYPE_ID_AP_USER_EDITED
-    ]);
+    // ============================================================
+    // ГРАФИКИ (группировка по дням и часам)
+    // ============================================================
+    
+    $activityByDay = $this->groupReportsByDay($reports);
+    $activityByHour = $this->groupReportsByHour($reports);
 
-    $reportsUsersDeleted = $this->filterReports($reports, [
-      CMSReport::REPORT_TYPE_ID_AP_USER_DELETED
-    ]);
+    // ============================================================
+    // ТОП АКТИВНЫХ ПОЛЬЗОВАТЕЛЕЙ
+    // ============================================================
+    
+    $topUsers = $this->getTopUsers($reports, 5);
 
-    $reportsSecurityAdminAuthFail = $this->filterReports($reports, [
-      CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL
-    ]);
-
-    $reportsSecurityAdminAuthSuccess = $this->filterReports($reports, [
-      CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS
-    ]);
-
-    $reportsSecurityBaseAuthFail = $this->filterReports($reports, [
-      CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL
-    ]);
-
-    $reportsSecurityBaseAuthSuccess = $this->filterReports($reports, [
-      CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS
-    ]);
-
-    $totalActions = count($reportsAll);
-    $totalEntriesCreatedActions = count($reportsEntriesCreated);
-    $totalPagesCreatedActions = count($reportsPagesCreated);
-    $totalMediaUploadedActions = count($reportsMediaUploaded);
-    $totalUsersRegisteredActions = count($reportsUsersRegistered);
-    $totalUsersEditedActions = count($reportsUsersEdited);
-    $totalUsersDeletedActions = count($reportsUsersDeleted);
-
-    $totalSecurityAdminAuthFailActions = count($reportsSecurityAdminAuthFail);
-    $totalSecurityAdminAuthSuccessActions = count($reportsSecurityAdminAuthSuccess);
-    $totalSecurityBaseAuthFailActions = count($reportsSecurityBaseAuthFail);
-    $totalSecurityBaseAuthSuccessActions = count($reportsSecurityBaseAuthSuccess);
-
-    $IPsWithSuccessfulAuth = $this->extractClientIPs($reportsSecurityAdminAuthSuccess);
-    $IPsWithFailAuth = $this->extractClientIPs($reportsSecurityAdminAuthFail);
-
-    $IPsWithSuccessfulAuthImploded = !empty($IPsWithSuccessfulAuth)
-      ? implode(', ', $IPsWithSuccessfulAuth)
-      : '-';
-    $IPsWithFailAuthImploded = !empty($IPsWithFailAuth)
-      ? implode(', ', $IPsWithFailAuth)
-      : '-';
-
-    // Сборка списка последних событий (для отображения в сводке)
+    // ============================================================
+    // ПОСЛЕДНИЕ СОБЫТИЯ
+    // ============================================================
+    
     $recentItems = [];
-    $recentReports = array_slice($reportsAll, 0, 10);
+    $recentReports = array_slice($reports, 0, 15);
     foreach ($recentReports as $report) {
       $description = $this->formatReportDescription($report);
       $createdDate = date('d.m.Y H:i:s', $report->getCreatedUnixTimestamp());
       $typeName = $this->getReportTypeName($report->getTypeID());
-      $typeLabel = $localeData[$typeName] ?? $typeName;
+      $typeLabel = $this->localeData[$typeName] ?? $typeName;
+      
+      $variables = $this->viewer !== null
+        ? $report->getVariables($this->viewer)
+        : $report->getVariables();
 
       $recentItems[] = ThemeCollector::assemblyFileContent(
         $this->CMSCore->theme,
@@ -357,26 +492,98 @@ class ReportsBase implements ReportsPageInterface
       );
     }
 
+    // ============================================================
+    // СБОРКА ШАБЛОНА
+    // ============================================================
+
     $this->assembled = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme,
       $templatePath,
       [
-        'REPORT_NAME' => $this->name,
-        'TOTAL_ACTIONS' => $totalActions,
-        'TOTAL_ENTRIES_CREATED' => $totalEntriesCreatedActions,
-        'TOTAL_PAGES_CREATED' => $totalPagesCreatedActions,
-        'TOTAL_MEDIA_UPLOADS' => $totalMediaUploadedActions,
-        'TOTAL_USERS_CREATED' => $totalUsersRegisteredActions,
-        'TOTAL_USERS_EDITED' => $totalUsersEditedActions,
-        'TOTAL_USERS_DELETED' => $totalUsersDeletedActions,
-        'TOTAL_SUCCESSFUL_AUTH_ON_THE_SITE' => $totalSecurityBaseAuthSuccessActions,
-        'TOTAL_UNSUCCESSFUL_AUTH_ON_THE_SITE' => $totalSecurityBaseAuthFailActions,
-        'TOTAL_SUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $totalSecurityAdminAuthSuccessActions,
-        'TOTAL_UNSUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $totalSecurityAdminAuthFailActions,
-        'TOTAL_IP_ADDRESS_WITH_SUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $IPsWithSuccessfulAuthImploded,
-        'TOTAL_IP_ADDRESS_WITH_UNSUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $IPsWithFailAuthImploded,
+        // Общая статистика
+        'TOTAL_ACTIONS' => count($reports),
+        'TOTAL_CONTENT_ACTIONS' => count($contentReports),
+        'TOTAL_USER_ACTIONS' => count($userReports),
+        'TOTAL_SECURITY_ACTIONS' => count($securityReports),
+
+        // Статистика по контенту
+        'CONTENT_ENTRIES_CREATED' => $statsContent['entries_created'],
+        'CONTENT_ENTRIES_EDITED' => $statsContent['entries_edited'],
+        'CONTENT_ENTRIES_DELETED' => $statsContent['entries_deleted'],
+        'CONTENT_PAGES_CREATED' => $statsContent['pages_created'],
+        'CONTENT_PAGES_EDITED' => $statsContent['pages_edited'],
+        'CONTENT_PAGES_DELETED' => $statsContent['pages_deleted'],
+        'CONTENT_MEDIA_UPLOADED' => $statsContent['media_uploaded'],
+        'CONTENT_MEDIA_DELETED' => $statsContent['media_deleted'],
+        'CONTENT_CATEGORIES_CREATED' => $statsContent['categories_created'],
+        'CONTENT_CATEGORIES_EDITED' => $statsContent['categories_edited'],
+        'CONTENT_CATEGORIES_DELETED' => $statsContent['categories_deleted'],
+        'CONTENT_SAMPLES_CREATED' => $statsContent['samples_created'],
+        'CONTENT_SAMPLES_EDITED' => $statsContent['samples_edited'],
+        'CONTENT_SAMPLES_DELETED' => $statsContent['samples_deleted'],
+        'CONTENT_FORMS_CREATED' => $statsContent['forms_created'],
+        'CONTENT_FORMS_EDITED' => $statsContent['forms_edited'],
+        'CONTENT_FORMS_DELETED' => $statsContent['forms_deleted'],
+        'CONTENT_COMMENTS_CREATED' => $statsContent['comments_created'],
+        'CONTENT_COMMENTS_EDITED' => $statsContent['comments_edited'],
+        'CONTENT_COMMENTS_DELETED' => $statsContent['comments_deleted'],
+        'CONTENT_BLOCKS_CREATED' => $statsContent['blocks_created'],
+        'CONTENT_BLOCKS_EDITED' => $statsContent['blocks_edited'],
+        'CONTENT_BLOCKS_DELETED' => $statsContent['blocks_deleted'],
+
+        // Статистика по пользователям
+        'USERS_REGISTERED' => $statsUsers['registered'],
+        'USERS_EDITED' => $statsUsers['edited'],
+        'USERS_DELETED' => $statsUsers['deleted'],
+        'USERS_BANNED' => $statsUsers['banned'],
+        'USERS_UNBANNED' => $statsUsers['unbanned'],
+        'USERS_PERSONAL_DATA_VIEWS' => $statsUsers['personal_data_views'],
+
+        // Статистика по безопасности
+        'SECURITY_AUTH_SUCCESS_ADMIN' => $statsSecurity['auth_success_admin'],
+        'SECURITY_AUTH_FAIL_ADMIN' => $statsSecurity['auth_fail_admin'],
+        'SECURITY_AUTH_SUCCESS_SITE' => $statsSecurity['auth_success_site'],
+        'SECURITY_AUTH_FAIL_SITE' => $statsSecurity['auth_fail_site'],
+        'SECURITY_LOGS_VIEWS' => $statsSecurity['logs_views'],
+
+        // Графики
+        'ACTIVITY_BY_DAY' => json_encode($activityByDay),
+        'ACTIVITY_BY_HOUR' => json_encode($activityByHour),
+
+        // Топ пользователей
+        'TOP_USERS' => $this->formatTopUsers($topUsers),
+
+        // Последние события
         'RECENT_EVENTS' => implode("\n", $recentItems)
       ]
     );
+  }
+
+  /**
+   * Форматирование топа пользователей для шаблона
+   */
+  private function formatTopUsers(array $topUsers): string
+  {
+    if (empty($topUsers)) {
+      return '<li class="report-section__list-item">' . $this->localeData['PAGE_REPORTS_TOP_USERS_EMPTY'] ?? 'Нет данных' . '</li>';
+    }
+
+    $items = [];
+    $rank = 1;
+    foreach ($topUsers as $userID => $count) {
+      $login = $this->getUserLogin($userID);
+      $items[] = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/reports/top_user_item.tpl',
+        [
+          'USER_RANK' => $rank,
+          'USER_LOGIN' => $login,
+          'USER_ACTIONS' => $count
+        ]
+      );
+      $rank++;
+    }
+
+    return implode("\n", $items);
   }
 }
