@@ -104,7 +104,7 @@ export class PageMedia {
 
       const requestMetadata = new Interactive('request', {
         method: 'GET',
-        url: '/handler/media/metadata?directory=' + filePath + '&fileName=' + fileName + '&localeMessage=' + window.CMSCore.locales.admin.name
+        url: '/handler/media/metadata?directory=' + filePath + '&fileName=' + fileName + '.' + fileExtension + '&localeMessage=' + window.CMSCore.locales.admin.name
       });
 
       requestMetadata.target.send().then((data) => {

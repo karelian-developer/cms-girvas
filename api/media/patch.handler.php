@@ -29,7 +29,7 @@ if ($CMSCore->client->isLogged(2)) {
 
     if (isset($_PATCH['file_fullname'])) {
       $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
-      $filePath =  $fileDirectoryPath . '/' . $fileFullname . '.' . $fileExtension;
+      $filePath =  $fileDirectoryPath . '/' . $fileFullname;
 
       if (file_exists($filePath)) {
         $jsonFilePath = $fileDirectoryPath . '/metadata.json';
@@ -40,8 +40,8 @@ if ($CMSCore->client->isLogged(2)) {
           $imagesData = json_decode($jsonContent, true) ?? [];
         }
 
-        $imagesData[$fileFullname . '.' . $fileExtension] = [
-          'filename' => $fileFullname . '.' . $fileExtension,
+        $imagesData[$fileFullname] = [
+          'filename' => $fileFullname,
           'extension' => $fileExtension,
           'description' => $description,
           'additionalDescription' => $additionalDescription,
