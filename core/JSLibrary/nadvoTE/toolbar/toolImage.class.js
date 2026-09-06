@@ -113,13 +113,25 @@ export class ToolImage extends Tool {
       }
 
       const inputImageLabelElement = this.modal.target.element.querySelector('[name="image_label"]');
-      const imageLabel = inputImageLabelElement.value;
+      let imageLabel = inputImageLabelElement.value.trim();
 
-      this.editor.textarea.insertStringAtLastCursor(
-        `![${imageLabel}](${fileURL})`
-      );
+      this.getFileMetadata(fileURL).then((metadata) => {
+        if (imageLabel === '' && metadata) {
+          imageLabel = metadata.description || '';
+        }
 
-      this.modal.target.close();
+        if (metadata && metadata.license) {
+          imageLabel = imageLabel !== ''
+            ? `${imageLabel} (${metadata.license})`
+            : metadata.license;
+        }
+
+        this.editor.textarea.insertStringAtLastCursor(
+          `![${imageLabel}](${fileURL})`
+        );
+
+        this.modal.target.close();
+      });
     });
 
     if (end) {
@@ -127,6 +139,33 @@ export class ToolImage extends Tool {
     } else {
       imagesListItemsElements[0].after(listItemElement);
     }
+  }
+
+  async getFileMetadata(fileURL) {
+    const url = new URL(fileURL, window.location.origin);
+
+    const pathParts = url.pathname.split('/');
+    const fileNameWithExtension = pathParts.pop();
+    const directory = pathParts.join('/');
+
+    const fileNameParts = fileNameWithExtension.split('.');
+    const extension = fileNameParts.pop();
+    const fileName = fileNameParts.join('.');
+
+    const requestURL = '/handler/media/metadata'
+      + '?directory=' + encodeURIComponent(directory)
+      + '&fileName=' + encodeURIComponent(fileName + '.' + extension)
+      + '&localeMessage=' + window.CMSCore.locales.admin.name;
+
+    const response = await fetch(requestURL, {method: 'GET'});
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+
+    return data?.outputData?.metadata || null;
   }
 
   clearImagesList() {
@@ -240,10 +279,10 @@ export class ToolImage extends Tool {
       this.modal.target.addButton('Вставить', () => {
         const inputImageLabelElement = this.modal.target.element.querySelector('[name="image_label"]');
         const inputImageLinkElement = this.modal.target.element.querySelector('[name="image_link"]');
-        
-        const imageLabel = inputImageLabelElement.value;
-        const imageLink = inputImageLinkElement.value;
-        
+
+        let imageLabel = inputImageLabelElement.value.trim();
+        const imageLink = inputImageLinkElement.value.trim();
+
         this.editor.textarea.insertStringAtLastCursor(
           `![${imageLabel}](${imageLink})`
         );
