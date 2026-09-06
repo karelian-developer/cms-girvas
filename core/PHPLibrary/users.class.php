@@ -22,6 +22,7 @@ namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\SystemCore\Report as Report;
 use \PDOException as PDOException;
 
 final class Users
@@ -36,15 +37,16 @@ final class Users
   public function __construct(
     private CoreInterface $CMSCore
   ) {}
-  
+
   /**
    * Получить все объекты пользователей
    * 
    * @param array $params
+   * @param User|null $viewer Текущий пользователь (для логирования)
    * 
    * @return array
    */
-  public function getAll(array $params = []) : array
+  public function getAll(array $params = [], ?User $viewer = null) : array
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -58,6 +60,7 @@ final class Users
     $queryBuilder->statement->setClauseOrderBy();
     $queryBuilder->statement->clauseOrderBy->setColumn('id');
     $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+
     if (array_key_exists('limit', $params)) {
       if (is_array($params['limit'])) {
         $limit = is_integer($params['limit'][0]) ? $params['limit'][0] : 0;
@@ -65,6 +68,7 @@ final class Users
         $queryBuilder->statement->setClauseLimit($limit, $offset);
       }
     }
+
     $queryBuilder->statement->assembly();
 
     try {
@@ -76,7 +80,6 @@ final class Users
         'message' => $exception->getMessage(),
         'statusCode' => 0,
         'outputData' => []
-      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
@@ -88,9 +91,23 @@ final class Users
       }
     }
 
+    if ($viewer !== null) {
+      Report::create(
+        $this->CMSCore,
+        Report::REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED,
+        [
+          'action' => 'list_view',
+          'viewedByID' => $viewer->getID(),
+          'viewedByLogin' => $viewer->getLogin(),
+          'count' => count($users),
+          'ip' => $this->CMSCore->client->getIPAddress()
+        ]
+      );
+    }
+
     return $users;
   }
-      
+
   /**
    * Получить количество пользователей для определенной группы
    *
@@ -128,14 +145,13 @@ final class Users
         'message' => $exception->getMessage(),
         'statusCode' => 0,
         'outputData' => []
-      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
     $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
     return $result['count'] ?? 0;
   }
-      
+
   /**
    * Получить общее количество
    *
@@ -145,7 +161,7 @@ final class Users
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
-    
+
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['count(*) AS count']);

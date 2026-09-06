@@ -70,11 +70,14 @@ final class Report
   public const REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS = 20000002;
 
   public const REPORT_TYPE_ID_BASE_USER_CREATED = 11100001;
-  public const REPORT_TYPE_ID_BASE_USER_EDITED = 11100001;
-  public const REPORT_TYPE_ID_BASE_USER_DELETED = 11100002;
-  public const REPORT_TYPE_ID_BASE_USER_BANNED = 11100003;
-  public const REPORT_TYPE_ID_BASE_USER_UNBANNED = 11100004;
-  public const REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED = 11100005;
+  public const REPORT_TYPE_ID_BASE_USER_EDITED = 11100002;
+  public const REPORT_TYPE_ID_BASE_USER_DELETED = 11100003;
+  public const REPORT_TYPE_ID_BASE_USER_BANNED = 11100004;
+  public const REPORT_TYPE_ID_BASE_USER_UNBANNED = 11100005;
+  public const REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED = 11100006;
+
+  /** @var string Ключ шифрования для ПДн в логах */
+  private static ?string $encryptionKey = null;
 
   /**
    * __construct
@@ -87,7 +90,7 @@ final class Report
     public CoreInterface $CMSCore,
     private int $id
   ) {}
-  
+
   /**
    * Инициализация данных из БД
    *
@@ -113,7 +116,7 @@ final class Report
   {
     $this->id = $value;
   }
-  
+
   /**
    * Получить идентификатор
    * 
@@ -183,12 +186,20 @@ final class Report
   /**
    * Получить переменные отчета
    *
+   * @param User|null $viewer Пользователь, просматривающий логи (для расшифровки ПДн)
    * @return array
    */
-  public function getVariables() : array
+  public function getVariables(?User $viewer = null) : array
   {
     if (property_exists($this, 'variables')) {
-      return json_decode($this->variables, true);
+      $variables = json_decode($this->variables, true);
+      
+      // Если есть просматривающий — расшифровываем ПДн
+      if ($viewer !== null) {
+        return $this->decryptVariables($variables, $viewer);
+      }
+      
+      return $variables;
     }
 
     return [];
@@ -212,7 +223,7 @@ final class Report
 
     return '';
   }
-  
+
   /**
    * Получить время создания в UNIX-формате
    *
@@ -222,7 +233,7 @@ final class Report
   {
     return $this->createdUnixTimestamp ?? 0;
   }
-  
+
   /**
    * Получить время обновления в UNIX-формате
    *
@@ -232,7 +243,7 @@ final class Report
   {
     return $this->updatedUnixTimestamp ?? 0;
   }
-  
+
   /**
    * Добавить переменную и ее значение
    *
@@ -244,7 +255,7 @@ final class Report
   {
     $this->variables[$name] = $value;
   }
-  
+
   /**
    * Создание записи в базе данных
    *
@@ -258,7 +269,10 @@ final class Report
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
-    
+
+    // Очищаем переменные от ПДн (с шифрованием)
+    $variables = self::sanitizeVariables($CMSCore, $variables);
+
     $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementInsert();
     $queryBuilder->statement->setTable('reports');
@@ -288,7 +302,6 @@ final class Report
         'message' => $exception->getMessage(),
         'statusCode' => 0,
         'outputData' => []
-      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
@@ -313,7 +326,6 @@ final class Report
           'message' => $exception->getMessage(),
           'statusCode' => 0,
           'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
     }
@@ -325,7 +337,123 @@ final class Report
 
     return null;
   }
-  
+
+  /**
+   * Очистка переменных от ПДн перед сохранением (с шифрованием)
+   * 
+   * @param CoreInterface $CMSCore
+   * @param array $variables
+   * @return array
+   */
+  private static function sanitizeVariables(CoreInterface $CMSCore, array $variables): array
+  {
+    $forbiddenKeys = [
+      'email', 'password', 'passwordHash', 'securityHash',
+      'phone', 'phoneNumber', 'name', 'surname', 'patronymic',
+      'birthdate', 'birthdateUnixTimestamp', 'passport',
+      'snils', 'inn', 'address', 'registrationIP', 'token',
+      'user_login', 'user_email', 'user_password', 'user_name',
+      'user_surname', 'user_patronymic', 'user_birthdate',
+      'user_password_repeat', 'user_password_old', 'user_group_id',
+      'user_id', 'user_is_block'
+    ];
+
+    foreach ($variables as $key => $value) {
+      $keyLower = strtolower($key);
+      if (in_array($keyLower, $forbiddenKeys) && !empty($value) && !is_array($value)) {
+        $variables[$key] = self::encryptValue($CMSCore, (string)$value);
+      }
+      if (is_array($value)) {
+        $variables[$key] = self::sanitizeVariables($CMSCore, $value);
+      }
+    }
+
+    return $variables;
+  }
+
+  /**
+   * Шифрование значения для хранения в логах
+   * 
+   * @param CoreInterface $CMSCore
+   * @param string $value
+   * @return string
+   */
+  private static function encryptValue(CoreInterface $CMSCore, string $value): string
+  {
+    $salt = $CMSCore->configurator->get('salt');
+    $method = 'AES-256-CBC';
+    $ivLength = openssl_cipher_iv_length($method);
+    $iv = openssl_random_pseudo_bytes($ivLength);
+    $encrypted = openssl_encrypt($value, $method, $salt, 0, $iv);
+    return '[ENCRYPTED:' . base64_encode($iv . $encrypted) . ']';
+  }
+
+  /**
+   * Проверка, зашифровано ли значение
+   * 
+   * @param mixed $value
+   * @return bool
+   */
+  public static function isEncrypted($value): bool
+  {
+    if (!is_string($value)) {
+      return false;
+    }
+    return strpos($value, '[ENCRYPTED:') === 0;
+  }
+
+  /**
+   * Расшифровка переменных (только для уполномоченных пользователей)
+   * 
+   * @param array $variables
+   * @param User $viewer
+   * @return array
+   */
+  public function decryptVariables(array $variables, User $viewer): array
+  {
+    // Проверка прав доступа к ПДн в логах
+    $viewerGroup = $viewer->getGroup();
+    $hasAccess = $viewer->isSuperAdmin() || 
+                 ($viewerGroup && $viewerGroup->hasPermissionAdminViewingLogs());
+
+    if (!$hasAccess) {
+      return $variables;
+    }
+
+    foreach ($variables as $key => $value) {
+      if (is_array($value)) {
+        $variables[$key] = $this->decryptVariables($value, $viewer);
+      } elseif (self::isEncrypted($value)) {
+        $variables[$key] = self::decryptValue($this->CMSCore, $value);
+      }
+    }
+
+    return $variables;
+  }
+
+  /**
+   * Расшифровка одного значения
+   * 
+   * @param CoreInterface $CMSCore
+   * @param string $encrypted
+   * @return string
+   */
+  private static function decryptValue(CoreInterface $CMSCore, string $encrypted): string
+  {
+    if (preg_match('/\[ENCRYPTED:([^\]]+)\]/', $encrypted, $matches)) {
+      $salt = $CMSCore->configurator->get('salt');
+      $method = 'AES-256-CBC';
+      $data = base64_decode($matches[1]);
+      $ivLength = openssl_cipher_iv_length($method);
+      $iv = substr($data, 0, $ivLength);
+      $encryptedData = substr($data, $ivLength);
+      $decrypted = openssl_decrypt($encryptedData, $method, $salt, 0, $iv);
+      return $decrypted ?: '[DECRYPTION_FAILED]';
+    }
+
+    return $encrypted;
+  }
+
   /**
    * Получить данные колонок записи в базе данных
    *
@@ -347,7 +475,7 @@ final class Report
     $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
-    
+
     /** @var int Идентификационный номер записи */
     $id = $this->getID();
 
@@ -361,7 +489,6 @@ final class Report
         'message' => $exception->getMessage(),
         'statusCode' => 0,
         'outputData' => []
-      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 

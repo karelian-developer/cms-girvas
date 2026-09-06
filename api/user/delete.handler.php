@@ -14,6 +14,7 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\SystemCore\Report as Report;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
@@ -28,6 +29,22 @@ if ($CMSCore->client->isLogged(2)) {
       if ($userID != 1) {
         if (User::existsByID($CMSCore, $userID)) {
           $user = new User($CMSCore, $userID);
+          $user->initData(['login', 'metadata']);
+
+          // Сохраняем данные для лога перед удалением
+          $userLogin = $user->getLogin();
+
+          Report::create(
+            $CMSCore,
+            Report::REPORT_TYPE_ID_AP_USER_DELETED,
+            [
+              'userID' => $userID,
+              'userLogin' => $userLogin,
+              'deletedByID' => $clientUser->getID(),
+              'deletedByLogin' => $clientUser->getLogin(),
+              'ip' => $CMSCore->client->getIPAddress()
+            ]
+          );
 
           $userIsDeleted = $user->delete();
           if ($userIsDeleted) {

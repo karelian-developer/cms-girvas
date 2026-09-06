@@ -29,6 +29,7 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
 use \core\PHPLibrary\Pagination as Pagination;
+use \core\PHPLibrary\SystemCore\Report as Report;
 
 class PageUsers implements InterfacePage
 {
@@ -105,12 +106,29 @@ class PageUsers implements InterfacePage
     $pagination = new Pagination($this->CMSCore, $users->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
     $pagination->assembly();
 
+    $clientUser = $this->CMSCore->client->getUser(2); // typeID=2 для админов
+    if ($clientUser !== null) {
+      Report::create(
+        $this->CMSCore,
+        Report::REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED,
+        [
+          'action' => 'list_view',
+          'viewedByID' => $clientUser->getID(),
+          'viewedByLogin' => $clientUser->getLogin(),
+          'count' => count($usersObjects),
+          'page' => $paginationItemCurrent,
+          'perPage' => $paginationItemsOnPage,
+          'ip' => $this->CMSCore->client->getIPAddress()
+        ]
+      );
+    }
+
     unset($users);
 
     $userNumber = 1;
     foreach ($usersObjects as $object) {
       $object->initData(['id', 'login', 'email', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata', 'emailIsSubmitted']);
-      
+
       $objectID = $object->getGroupID();
       $userGroupObject = new UserGroup($this->CMSCore, $objectID);
       $userGroupObject->initData(['texts']);

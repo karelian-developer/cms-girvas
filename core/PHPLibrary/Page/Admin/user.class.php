@@ -26,6 +26,7 @@ use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
+use \core\PHPLibrary\SystemCore\Report as Report;
 use \DOMDocument as DOMDocument;
 
 class PageUser implements InterfacePage
@@ -78,25 +79,30 @@ class PageUser implements InterfacePage
       $userID = is_numeric($this->CMSCore->urlp->getPath(2)) ? (int) $this->CMSCore->urlp->getPath(2) : 0;
       /** @var User|null Объект пользователя */
       $user = User::existsByID($this->CMSCore, $userID) ? new User($this->CMSCore, $userID) : null;
-      
+
       if ($user !== null) {
-        // Инициализация набора данных пользователя
         $user->initData(['*']);
+
+        $clientUser = $this->CMSCore->client->getUser(2); // typeID=2 для админов
+        if ($clientUser !== null && $clientUser->getID() !== $user->getID()) {
+          Report::create(
+            $this->CMSCore,
+            Report::REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED,
+            [
+              'targetUserID' => $user->getID(),
+              'targetUserLogin' => $user->getLogin(),
+              'viewedByID' => $clientUser->getID(),
+              'viewedByLogin' => $clientUser->getLogin(),
+              'ip' => $this->CMSCore->client->getIPAddress()
+            ]
+          );
+        }
       }
     }
 
-    /** ===================
-     *  Дополнительные поля
-     *  ===================
-     */
-
-    /** @var array Типы полей */
     $fieldsTypes = $this->CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_type') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_type'), true) : [];
-    /** @var array Заголовки полей */
     $fieldsTitles = $this->CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_title') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_title'), true) : [];
-    /** @var array Описания полей */
     $fieldsDescriptions = $this->CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_description') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_description'), true) : [];
-    /** @var array Имена полей */
     $fieldsNames = $this->CMSCore->configurator->existsDatabaseEntryValue('users_additional_field_name') ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_name'), true) : [];
 
     $additionalFieldsElements = [];

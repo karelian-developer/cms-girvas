@@ -25,13 +25,14 @@ use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\SystemCore\Report as Report;
 
 #[\AllowDynamicProperties]
 class Session
 {
   private readonly CoreInterface $CMSCore;
   private int $id;
-  
+
   /**
    * __construct
    *
@@ -71,7 +72,7 @@ class Session
   {
     $this->id = $value;
   }
-  
+
   /**
    * Получить идентификатор записи
    *
@@ -83,7 +84,7 @@ class Session
   {
     return $this->id;
   }
-  
+
   /**
    * Получить идентификатор пользователя, к которому привязана сессия
    *
@@ -95,7 +96,7 @@ class Session
   {
     return $this->userID;
   }
-  
+
   /**
    * Получить объект пользователя, к которому привязана сессия
    *
@@ -218,7 +219,7 @@ class Session
     ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
-    
+
     /** @var int $sessionID Идентификационный номер записи */
     $sessionID = $this->getID();
 
@@ -447,7 +448,7 @@ class Session
 
     return $databaseQuery->fetchColumn() ? true : false;
   }
-  
+
   /**
    * Проверить существование сессии по IP-адресу
    *
@@ -524,7 +525,7 @@ class Session
 
     $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
     $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-    
+
     foreach ($data as $name => $value) {
       if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp'])) {
         $valueTypeName = gettype($value);
@@ -535,18 +536,18 @@ class Session
           'string' => \PDO::PARAM_STR,
           'null' => \PDO::PARAM_NULL,
         };
-        
+
         $databaseQuery->bindParam(':' . $name, $data[$name], $valueType);
       }
     }
-    
+
     $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
     $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
     $execute = $databaseQuery->execute();
 
     return $execute ? true : false;
   }
-  
+
   /**
    * Создать
    *
@@ -559,7 +560,7 @@ class Session
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
-    
+
     $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementInsert();
     $queryBuilder->statement->setTable('users_sessions');
@@ -575,7 +576,7 @@ class Session
 
     $createdUnixTimestamp = time();
     $updatedUnixTimestamp = $createdUnixTimestamp;
-    
+
     try {
       $databaseConnection = $CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
@@ -591,7 +592,6 @@ class Session
         'message' => $exception->getMessage(),
         'statusCode' => 0,
         'outputData' => []
-      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
@@ -618,19 +618,39 @@ class Session
           'message' => $exception->getMessage(),
           'statusCode' => 0,
           'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
     }
 
     if ($execute) {
       $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+
+      if ($result) {
+        $user = new User($CMSCore, (int) $data['userID']);
+        $user->initData(['login']);
+
+        $reportType = $data['typeID'] === 2
+          ? Report::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS
+          : Report::REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS;
+
+        Report::create(
+          $CMSCore,
+          $reportType,
+          [
+            'userID' => $user->getID(),
+            'userLogin' => $user->getLogin(),
+            'ip' => $data['userIP'],
+            'typeID' => $data['typeID']
+          ]
+        );
+      }
+
       return $result ? new Session($CMSCore, (int) $result['id']) : null;
     }
 
     return null;
   }
-  
+
   /**
    * Удалить
    * 
@@ -640,6 +660,11 @@ class Session
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $user = $this->getUser();
+    $userLogin = $user !== null ? $user->getLogin() : 'unknown';
+    $userID = $user !== null ? $user->getID() : 0;
+    $typeID = $this->typeID ?? 1;
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementDelete();
@@ -658,6 +683,24 @@ class Session
     $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
     $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
     $execute = $databaseQuery->execute();
+
+    if ($execute && $user !== null) {
+      $reportType = $typeID === 2
+        ? Report::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL
+        : Report::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL;
+
+      Report::create(
+        $this->CMSCore,
+        $reportType,
+        [
+          'userID' => $userID,
+          'userLogin' => $userLogin,
+          'ip' => $this->userIP ?? '0.0.0.0',
+          'typeID' => $typeID,
+          'action' => 'logout'
+        ]
+      );
+    }
 
     return $execute ? true : false;
   }
