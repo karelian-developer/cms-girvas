@@ -81,9 +81,9 @@ class PageUser implements InterfacePage
       $user = User::existsByID($this->CMSCore, $userID) ? new User($this->CMSCore, $userID) : null;
 
       if ($user !== null) {
-        $user->initData(['*']);
+        $user->initData();
 
-        $clientUser = $this->CMSCore->client->getUser(2); // typeID=2 для админов
+        $clientUser = $this->CMSCore->client->getUser(2);
         if ($clientUser !== null && $clientUser->getID() !== $user->getID()) {
           Report::create(
             $this->CMSCore,
