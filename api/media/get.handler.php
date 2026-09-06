@@ -32,15 +32,17 @@ if ($CMSCore->client->isLogged(2)) {
       $filename = $CMSURLP->getParam('fileName');
       $metadata = file_get_contents($fileMetadataPath);
       $metadataJSON = json_decode($metadata, true);
+
       $handlerOutputData['metadata'] = $filename === null
         ? $metadataJSON
-        : $metadataJSON[$filename];
-      
+        : ($metadataJSON[$filename] ?? []);
+
       $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
       $handlerStatusCode = $handlerStatusCode ?? 1;
     } else {
-      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
-      $handlerStatusCode = $handlerStatusCode ?? 0;
+      $handlerOutputData['metadata'] = [];
+      $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+      $handlerStatusCode = $handlerStatusCode ?? 1;
     }
 
   } else {
