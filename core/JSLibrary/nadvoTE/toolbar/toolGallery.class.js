@@ -138,6 +138,33 @@ export class ToolGallery extends Tool {
     }
   }
 
+  async getFileMetadata(fileURL) {
+    const url = new URL(fileURL, window.location.origin);
+
+    const pathParts = url.pathname.split('/');
+    const fileNameWithExtension = pathParts.pop();
+    const directory = pathParts.join('/');
+
+    const fileNameParts = fileNameWithExtension.split('.');
+    const extension = fileNameParts.pop();
+    const fileName = fileNameParts.join('.');
+
+    const requestURL = '/handler/media/metadata'
+      + '?directory=' + encodeURIComponent(directory)
+      + '&fileName=' + encodeURIComponent(fileName + '.' + extension)
+      + '&localeMessage=' + window.CMSCore.locales.admin.name;
+
+    const response = await fetch(requestURL, {method: 'GET'});
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+
+    return data?.outputData?.metadata || null;
+  }
+
   clearImagesList() {
     const targetElement = document.querySelector('#SYSTEM_MODAL_6438654857');
     const imagesListItemsElements = targetElement.querySelectorAll('li');
@@ -231,17 +258,17 @@ export class ToolGallery extends Tool {
         self.imagesListGroup = 0;
       });
 
-      this.modal.target.addButton('Вставить', () => {
-        if (this.selectedFiles.length === 0) {
-          return;
-        }
+      this.modal.target.addButton('Вставить', async () => {
+      if (this.selectedFiles.length === 0) {
+        return;
+      }
 
-        const galleryMarkdown = this.buildGalleryMarkdown(this.selectedFiles);
+      const galleryMarkdown = await this.buildGalleryMarkdown(this.selectedFiles);
 
-        this.editor.textarea.insertStringAtLastCursor(galleryMarkdown);
+      this.editor.textarea.insertStringAtLastCursor(galleryMarkdown);
 
-        this.modal.target.close();
-      });
+      this.modal.target.close();
+    });
 
       this.modal.target.addButton('Отмена', () => {
         this.modal.target.close();
@@ -339,15 +366,28 @@ export class ToolGallery extends Tool {
     });
   }
 
-  buildGalleryMarkdown(files) {
+  async buildGalleryMarkdown(files) {
     const lines = [];
 
     lines.push('[gallery]');
 
-    files.forEach((file) => {
-      const title = file.name || '';
-      lines.push(`![${title}](${file.url})`);
-    });
+    for (const file of files) {
+      const metadata = await this.getFileMetadata(file.url);
+
+      let title = file.name || '';
+      let license = '';
+
+      if (metadata) {
+        title = metadata.description || title;
+        license = metadata.license || '';
+      }
+
+      const caption = license !== ''
+        ? `${title} (${license})`
+        : title;
+
+      lines.push(`![${caption}](${file.url})`);
+    }
 
     lines.push('[/gallery]');
 
