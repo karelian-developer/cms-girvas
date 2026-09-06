@@ -201,11 +201,11 @@ export class PageMedia {
         if (data.statusCode === 1) {
           const metadata = data?.outputData?.metadata;
 
-          if (metadata !== undefined) {
-            inputDescriptionElement.value = metadata.description;
-            inputAdditionalDescriptionElement.value = metadata.additionalDescription;
-            inputLicenseElement.value = metadata.license;
-            inputGEOLocationElement.value = metadata.GEOLocation;
+          if (metadata && typeof metadata === 'object') {
+            inputDescriptionElement.value = metadata.description || '';
+            inputAdditionalDescriptionElement.value = metadata.additionalDescription || '';
+            inputLicenseElement.value = metadata.license || '';
+            inputGEOLocationElement.value = metadata.GEOLocation || '';
           }
         }
       });
