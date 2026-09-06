@@ -92,9 +92,7 @@ if ($CMSCore->urlp->getPath(3) === 'permissions') {
         Report::REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED,
         [
           'targetUserID' => $user->getID(),
-          'targetUserLogin' => $user->getLogin(),
           'viewedByID' => $clientUser->getID(),
-          'viewedByLogin' => $clientUser->getLogin(),
           'ip' => $CMSCore->client->getIPAddress()
         ]
       );

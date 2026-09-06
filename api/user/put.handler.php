@@ -245,9 +245,7 @@ if ($CMSCore->client->isLogged(2)) {
           Report::REPORT_TYPE_ID_AP_USER_CREATED,
           [
             'userID' => $user->getID(),
-            'userLogin' => $user->getLogin(),
             'createdByID' => $clientUser->getID(),
-            'createdByLogin' => $clientUser->getLogin(),
             'ip' => $CMSCore->client->getIPAddress()
           ]
         );

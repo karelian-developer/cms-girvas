@@ -114,7 +114,6 @@ class PageUsers implements InterfacePage
         [
           'action' => 'list_view',
           'viewedByID' => $clientUser->getID(),
-          'viewedByLogin' => $clientUser->getLogin(),
           'count' => count($usersObjects),
           'page' => $paginationItemCurrent,
           'perPage' => $paginationItemsOnPage,

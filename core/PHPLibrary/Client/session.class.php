@@ -638,7 +638,6 @@ class Session
           $reportType,
           [
             'userID' => $user->getID(),
-            'userLogin' => $user->getLogin(),
             'ip' => $data['userIP'],
             'typeID' => $data['typeID']
           ]
@@ -662,7 +661,6 @@ class Session
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
     $user = $this->getUser();
-    $userLogin = $user !== null ? $user->getLogin() : 'unknown';
     $userID = $user !== null ? $user->getID() : 0;
     $typeID = $this->typeID ?? 1;
 
@@ -694,7 +692,6 @@ class Session
         $reportType,
         [
           'userID' => $userID,
-          'userLogin' => $userLogin,
           'ip' => $this->userIP ?? '0.0.0.0',
           'typeID' => $typeID,
           'action' => 'logout'

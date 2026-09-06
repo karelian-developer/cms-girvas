@@ -334,9 +334,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
             Report::REPORT_TYPE_ID_AP_USER_EDITED,
             [
               'userID' => $user->getID(),
-              'userLogin' => $user->getLogin(),
               'updatedByID' => $clientUser->getID(),
-              'updatedByLogin' => $clientUser->getLogin(),
               'changedFields' => $changedFields,
               'ip' => $CMSCore->client->getIPAddress()
             ]
@@ -349,9 +347,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               $isBlocked ? Report::REPORT_TYPE_ID_BASE_USER_BANNED : Report::REPORT_TYPE_ID_BASE_USER_UNBANNED,
               [
                 'userID' => $user->getID(),
-                'userLogin' => $user->getLogin(),
                 'actionByID' => $clientUser->getID(),
-                'actionByLogin' => $clientUser->getLogin(),
                 'ip' => $CMSCore->client->getIPAddress()
               ]
             );

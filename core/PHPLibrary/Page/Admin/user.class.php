@@ -90,9 +90,7 @@ class PageUser implements InterfacePage
             Report::REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED,
             [
               'targetUserID' => $user->getID(),
-              'targetUserLogin' => $user->getLogin(),
               'viewedByID' => $clientUser->getID(),
-              'viewedByLogin' => $clientUser->getLogin(),
               'ip' => $this->CMSCore->client->getIPAddress()
             ]
           );
