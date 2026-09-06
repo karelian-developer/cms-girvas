@@ -625,25 +625,6 @@ class Session
     if ($execute) {
       $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
 
-      if ($result) {
-        $user = new User($CMSCore, (int) $data['userID']);
-        $user->initData(['login']);
-
-        $reportType = $data['typeID'] === 2
-          ? Report::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS
-          : Report::REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS;
-
-        Report::create(
-          $CMSCore,
-          $reportType,
-          [
-            'userID' => $user->getID(),
-            'ip' => $data['userIP'],
-            'typeID' => $data['typeID']
-          ]
-        );
-      }
-
       return $result ? new Session($CMSCore, (int) $result['id']) : null;
     }
 
@@ -681,23 +662,6 @@ class Session
     $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
     $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
     $execute = $databaseQuery->execute();
-
-    if ($execute && $user !== null) {
-      $reportType = $typeID === 2
-        ? Report::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL
-        : Report::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL;
-
-      Report::create(
-        $this->CMSCore,
-        $reportType,
-        [
-          'userID' => $userID,
-          'ip' => $this->userIP ?? '0.0.0.0',
-          'typeID' => $typeID,
-          'action' => 'logout'
-        ]
-      );
-    }
 
     return $execute ? true : false;
   }

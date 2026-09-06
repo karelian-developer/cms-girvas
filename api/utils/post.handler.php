@@ -199,6 +199,15 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                         $theme = new Theme($CMSCore, $themeBaseName);
                         $registrationSubmit = $user->createRegistrationSubmit();
 
+                        CMSReport::create(
+                          $CMSCore,
+                          CMSReport::REPORT_TYPE_ID_BASE_USER_CREATED,
+                          [
+                            'userID' => $user->getID(),
+                            'ip' => $CMSCore->client->getRealIPAddress()
+                          ]
+                        );
+
                         if (is_array($registrationSubmit)) {
                           $siteTitle = empty($CMSCore->configurator->getMetaTitle())
                             ? $CMSCore->configurator->getSiteTitle()
@@ -357,10 +366,14 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
               $handlerOutputData['reload'] = true;
 
-              CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS, [
-                'clientIP' => $CMSCore->client->getRealIPAddress(),
-                'userTargetID' => $user->getID()
-              ]);
+              CMSReport::create(
+                $CMSCore,
+                CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS,
+                [
+                  'userID' => $user->getID(),
+                  'ip' => $clientIP
+                ]
+              );
 
               $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_SUCCESS');
               $handlerStatusCode = $handlerStatusCode ?? 1;
@@ -370,19 +383,29 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             }
 
           } else {
-            CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL, [
-              'clientIP' => $CMSCore->client->getRealIPAddress(),
-              'userTargetID' => $user->getID()
-            ]);
+            CMSReport::create(
+              $CMSCore,
+              CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL,
+              [
+                'userID' => $user !== null ? $user->getID() : 0,
+                'ip' => $clientIP,
+                'login' => $userLogin
+              ]
+            );
 
             $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
-          CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL, [
-            'clientIP' => $CMSCore->client->getRealIPAddress(),
-            'userTargetID' => 0
-          ]);
+          CMSReport::create(
+            $CMSCore,
+            CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL,
+            [
+              'userID' => $user !== null ? $user->getID() : 0,
+              'ip' => $clientIP,
+              'login' => $userLogin
+            ]
+          );
 
           $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
           $handlerStatusCode = $handlerStatusCode ?? 0;
@@ -500,10 +523,14 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
                 $CMSCore->client::createCookie($CMSCore, '_grv_atoken', $userSessionAdmin, $userRememberMe ? $userSessionAdminExpires : 0);
 
-                CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS, [
-                  'clientIP' => $clientIP,
-                  'userTargetID' => $user->getID()
-                ]);
+                CMSReport::create(
+                  $CMSCore,
+                  CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS,
+                  [
+                    'userID' => $user->getID(),
+                    'ip' => $clientIP
+                  ]
+                );
 
                 $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
                 $CMSMaxNotifierKey = $CMSCore->configurator->getNotifierKey('max');
@@ -574,10 +601,15 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
               }
 
             } else {
-              $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
-                'clientIP' => $clientIP,
-                'userTargetID' => $user->getID()
-              ]);
+              CMSReport::create(
+                $CMSCore,
+                CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL,
+                [
+                  'userID' => $user !== null ? $user->getID() : 0,
+                  'ip' => $clientIP,
+                  'login' => $userLogin
+                ]
+              );
 
               $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
               $CMSMaxNotifierKey = $CMSCore->configurator->getNotifierKey('max');
@@ -641,10 +673,15 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
               $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           } else {
-            $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
-              'clientIP' => $clientIP,
-              'userTargetID' => $user->getID()
-            ]);
+            CMSReport::create(
+              $CMSCore,
+              CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL,
+              [
+                'userID' => $user !== null ? $user->getID() : 0,
+                'ip' => $clientIP,
+                'login' => $userLogin
+              ]
+            );
 
             $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
             $CMSMaxNotifierKey = $CMSCore->configurator->getNotifierKey('max');
@@ -695,7 +732,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
               $CMSMaxNotifier->setMessage($CMSMaxNotifierMessage);
 
-              foreach ($CMSMaxNotifierChatsIDsCount as $index => $id) {
+              foreach ($CMSMaxNotifierChatsIDs as $index => $id) {
                 
                 $CMSMaxNotifier->setChatID($id);
                 $CMSMaxNotifier->send($CMSMaxNotifierKey);
@@ -707,10 +744,15 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
-          $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
-            'clientIP' => $CMSCore->client->getIPAddress(),
-            'userTargetID' => 0
-          ]);
+          CMSReport::create(
+            $CMSCore,
+            CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL,
+            [
+              'userID' => $user !== null ? $user->getID() : 0,
+              'ip' => $clientIP,
+              'login' => $userLogin
+            ]
+          );
 
           $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
           $CMSMaxNotifierKey = $CMSCore->configurator->getNotifierKey('max');

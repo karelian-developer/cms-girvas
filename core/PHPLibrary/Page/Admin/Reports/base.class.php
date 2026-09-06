@@ -26,6 +26,7 @@ use \core\PHPLibrary\SystemCore\Reports as CMSReports;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\User as User;
 
 /**
  * Class ReportsBase
@@ -37,6 +38,8 @@ class ReportsBase implements ReportsPageInterface
   public string $title;
   public string $description;
   public string $assembled = '';
+  protected ?User $viewer = null;
+  protected array $localeData = [];
 
   /**
    * __construct
@@ -74,7 +77,7 @@ class ReportsBase implements ReportsPageInterface
   {
     $this->description = $value;
   }
-  
+
   /**
    * Получить заголовок
    * 
@@ -96,12 +99,23 @@ class ReportsBase implements ReportsPageInterface
   }
 
   /**
+   * Установить пользователя для расшифровки ПДн
+   * 
+   * @param User $viewer
+   * @return void
+   */
+  public function setViewer(User $viewer) : void
+  {
+    $this->viewer = $viewer;
+  }
+
+  /**
    * Получить объекты отчетов
    * 
    * @return array
    */
   private function getAllReportsObjectsByPeriod() : array
-  { 
+  {
     $startPeriodUnix = time() - 604800;
     $endPeriodUnix = time();
 
@@ -131,16 +145,107 @@ class ReportsBase implements ReportsPageInterface
 
   private function extractClientIPs(array $reports) : array {
     $IPs = [];
-    
-    foreach ($reports as $report) {
-      $variables = $report->getVariables();
 
-      if (isset($variables['clientIP'])) {
+    foreach ($reports as $report) {
+      $variables = $this->viewer !== null
+        ? $report->getVariables($this->viewer)
+        : $report->getVariables();
+
+      if (isset($variables['ip'])) {
+        $IPs[] = $variables['ip'];
+      } elseif (isset($variables['clientIP'])) {
         $IPs[] = $variables['clientIP'];
       }
     }
-    
+
     return array_unique($IPs);
+  }
+
+  /**
+   * Получить логин пользователя по ID
+   */
+  private function getUserLogin(int $userID): string
+  {
+    if ($userID <= 0) {
+      return 'system';
+    }
+
+    try {
+      $user = new \core\PHPLibrary\User($this->CMSCore, $userID);
+      $user->initData(['login']);
+      return $user->getLogin();
+    } catch (\Exception $e) {
+      return 'unknown';
+    }
+  }
+
+  /**
+   * Получить название записи по ID
+   */
+  private function getEntryTitle(int $entryID): string
+  {
+    if ($entryID <= 0) {
+      return '';
+    }
+
+    try {
+      $entry = new \core\PHPLibrary\Entry($this->CMSCore, $entryID);
+      $entry->initData(['texts']);
+      $localeName = $this->CMSCore->locale->getName();
+      return $entry->getTitle($localeName);
+    } catch (\Exception $e) {
+      return 'unknown';
+    }
+  }
+
+  /**
+   * Форматировать описание отчета с использованием локализации
+   */
+  private function formatReportDescription(CMSReport $report): string
+  {
+    $typeID = $report->getTypeID();
+    $variables = $this->viewer !== null
+      ? $report->getVariables($this->viewer)
+      : $report->getVariables();
+
+    $localeData = $this->CMSCore->locale->getData();
+    $typeName = $this->getReportTypeName($typeID);
+    $template = $localeData[$typeName] ?? '';
+
+    if (empty($template)) {
+      return $typeName . ' (ID: ' . ($variables['id'] ?? '?') . ')';
+    }
+
+    // Заменяем плейсхолдеры на значения
+    $replacements = [
+      '{ENTRY_TITLE}' => $this->getEntryTitle($variables['entryID'] ?? 0),
+      '{CLIENT_IP}' => $variables['ip'] ?? $variables['clientIP'] ?? '0.0.0.0',
+      '{USER_LOGIN}' => $this->getUserLogin($variables['userID'] ?? 0),
+      '{USER_ID}' => $variables['userID'] ?? 0,
+    ];
+
+    return str_replace(
+      array_keys($replacements),
+      array_values($replacements),
+      $template
+    );
+  }
+
+  /**
+   * Получить имя типа отчета
+   */
+  private function getReportTypeName(int $typeID): string
+  {
+    $reflectionClass = new \ReflectionClass('\core\PHPLibrary\SystemCore\Report');
+    $constants = $reflectionClass->getConstants();
+
+    foreach ($constants as $name => $value) {
+      if ($value === $typeID) {
+        return $name;
+      }
+    }
+
+    return 'UNKNOWN';
   }
 
   /**
@@ -148,18 +253,23 @@ class ReportsBase implements ReportsPageInterface
    * 
    * @param array $templateValues
    * 
-   * @return string
+   * @return void
    */
   public function assembly(array $templateValues = []) : void
   {
     $templatePath = 'templates/page/reports/' . $this->name . '.tpl';
     $reports = $this->getAllReportsObjectsByPeriod();
+    $localeData = $this->CMSCore->locale->getData();
 
+    // Типы отчетов для общей сводки
     $reportsAll = $this->filterReports($reports, [
       CMSReport::REPORT_TYPE_ID_AP_ENTRY_CREATED,
       CMSReport::REPORT_TYPE_ID_AP_PAGE_CREATED,
       CMSReport::REPORT_TYPE_ID_AP_MEDIA_UPLOADED,
-      CMSReport::REPORT_TYPE_ID_BASE_USER_CREATED
+      CMSReport::REPORT_TYPE_ID_BASE_USER_CREATED,
+      CMSReport::REPORT_TYPE_ID_AP_USER_CREATED,
+      CMSReport::REPORT_TYPE_ID_AP_USER_EDITED,
+      CMSReport::REPORT_TYPE_ID_AP_USER_DELETED
     ]);
 
     $reportsEntriesCreated = $this->filterReports($reports, [
@@ -175,7 +285,16 @@ class ReportsBase implements ReportsPageInterface
     ]);
 
     $reportsUsersRegistered = $this->filterReports($reports, [
-      CMSReport::REPORT_TYPE_ID_BASE_USER_CREATED
+      CMSReport::REPORT_TYPE_ID_BASE_USER_CREATED,
+      CMSReport::REPORT_TYPE_ID_AP_USER_CREATED
+    ]);
+
+    $reportsUsersEdited = $this->filterReports($reports, [
+      CMSReport::REPORT_TYPE_ID_AP_USER_EDITED
+    ]);
+
+    $reportsUsersDeleted = $this->filterReports($reports, [
+      CMSReport::REPORT_TYPE_ID_AP_USER_DELETED
     ]);
 
     $reportsSecurityAdminAuthFail = $this->filterReports($reports, [
@@ -199,6 +318,8 @@ class ReportsBase implements ReportsPageInterface
     $totalPagesCreatedActions = count($reportsPagesCreated);
     $totalMediaUploadedActions = count($reportsMediaUploaded);
     $totalUsersRegisteredActions = count($reportsUsersRegistered);
+    $totalUsersEditedActions = count($reportsUsersEdited);
+    $totalUsersDeletedActions = count($reportsUsersDeleted);
 
     $totalSecurityAdminAuthFailActions = count($reportsSecurityAdminAuthFail);
     $totalSecurityAdminAuthSuccessActions = count($reportsSecurityAdminAuthSuccess);
@@ -214,7 +335,28 @@ class ReportsBase implements ReportsPageInterface
     $IPsWithFailAuthImploded = !empty($IPsWithFailAuth)
       ? implode(', ', $IPsWithFailAuth)
       : '-';
-    
+
+    // Сборка списка последних событий (для отображения в сводке)
+    $recentItems = [];
+    $recentReports = array_slice($reportsAll, 0, 10);
+    foreach ($recentReports as $report) {
+      $description = $this->formatReportDescription($report);
+      $createdDate = date('d.m.Y H:i:s', $report->getCreatedUnixTimestamp());
+      $typeName = $this->getReportTypeName($report->getTypeID());
+      $typeLabel = $localeData[$typeName] ?? $typeName;
+
+      $recentItems[] = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/reports/item.tpl',
+        [
+          'REPORT_TYPE' => $typeLabel,
+          'REPORT_DESCRIPTION' => $description,
+          'REPORT_DATE' => $createdDate,
+          'REPORT_IP' => $variables['ip'] ?? $variables['clientIP'] ?? '0.0.0.0'
+        ]
+      );
+    }
+
     $this->assembled = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme,
       $templatePath,
@@ -225,12 +367,15 @@ class ReportsBase implements ReportsPageInterface
         'TOTAL_PAGES_CREATED' => $totalPagesCreatedActions,
         'TOTAL_MEDIA_UPLOADS' => $totalMediaUploadedActions,
         'TOTAL_USERS_CREATED' => $totalUsersRegisteredActions,
-        'TOTAL_SUCCESSFUL_AUTH_ON_THE_SITE' => $totalSecurityAdminAuthSuccessActions,
-        'TOTAL_UNSUCCESSFUL_AUTH_ON_THE_SITE' => $totalSecurityAdminAuthFailActions,
-        'TOTAL_SUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $totalSecurityBaseAuthSuccessActions,
-        'TOTAL_UNSUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $totalSecurityBaseAuthFailActions,
+        'TOTAL_USERS_EDITED' => $totalUsersEditedActions,
+        'TOTAL_USERS_DELETED' => $totalUsersDeletedActions,
+        'TOTAL_SUCCESSFUL_AUTH_ON_THE_SITE' => $totalSecurityBaseAuthSuccessActions,
+        'TOTAL_UNSUCCESSFUL_AUTH_ON_THE_SITE' => $totalSecurityBaseAuthFailActions,
+        'TOTAL_SUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $totalSecurityAdminAuthSuccessActions,
+        'TOTAL_UNSUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $totalSecurityAdminAuthFailActions,
         'TOTAL_IP_ADDRESS_WITH_SUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $IPsWithSuccessfulAuthImploded,
-        'TOTAL_IP_ADDRESS_WITH_UNSUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $IPsWithFailAuthImploded
+        'TOTAL_IP_ADDRESS_WITH_UNSUCCESSFUL_AUTH_ON_THE_ADMIN_PANEL' => $IPsWithFailAuthImploded,
+        'RECENT_EVENTS' => implode("\n", $recentItems)
       ]
     );
   }
