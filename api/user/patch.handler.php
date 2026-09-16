@@ -14,6 +14,8 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\User\Consent as UserConsent;
+use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\SystemCore\Report as Report;
 
 if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
@@ -27,8 +29,88 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
   if (isset($_PATCH['user_id'])) {
     if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT) || $clientUser->getID() === (int) $_PATCH['user_id']) {
       $userID = is_numeric($_PATCH['user_id']) ? (int) $_PATCH['user_id'] : 0;
-
+      
       if (User::existsByID($CMSCore, $userID)) {
+        // ============================================================
+        // ОТЗЫВ СОГЛАСИЯ (152-ФЗ)
+        // ============================================================
+        if (($_PATCH['consent_event'] ?? '') === 'revoke') {
+          $consentID = is_numeric($_PATCH['consent_id'] ?? 0) ? (int) $_PATCH['consent_id'] : 0;
+          $revokeReason = trim((string)($_PATCH['consent_revoke_reason'] ?? ''));
+
+          // Отзывать может только сам пользователь
+          if ($userID !== $clientUser->getID()) {
+            $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
+            return;
+          }
+
+          if ($consentID <= 0) {
+            $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
+            return;
+          }
+
+          // Проверяем, что согласие принадлежит этому пользователю и активно
+          $consentIsValid = false;
+          $activeConsents = UserConsent::getActiveByUser($CMSCore, $userID);
+
+          foreach ($activeConsents as $activeConsent) {
+            $activeConsent->initData();
+            if ($activeConsent->getID() === $consentID) {
+              $consentIsValid = true;
+              break;
+            }
+          }
+
+          if (!$consentIsValid) {
+            $handlerMessage = 'API ERROR: Согласие не найдено или уже отозвано.';
+            $handlerStatusCode = $handlerStatusCode ?? 0;
+            return;
+          }
+
+          // Отзываем
+          $revoked = UserConsent::revoke($CMSCore, $consentID, $revokeReason);
+
+          if ($revoked) {
+            // Логируем факт отзыва
+            $consentForLog = new UserConsent($CMSCore, $consentID);
+            $consentForLog->initData();
+
+            $pageStaticTitle = '';
+            if ($consentForLog->getPageStaticID() > 0) {
+              $pageStatic = new PageStatic($CMSCore, $consentForLog->getPageStaticID());
+              if ($pageStatic !== null) {
+                $pageStatic->initData(['name', 'texts']);
+                $pageStaticTitle = $pageStatic->getTitle($CMSCore->locale->getName());
+              }
+            }
+
+            Report::create(
+              $CMSCore,
+              Report::REPORT_TYPE_ID_BASE_CONSENT_REVOKED,
+              [
+                'userID' => $userID,
+                'consentID' => $consentID,
+                'pageStaticID' => $consentForLog->getPageStaticID(),
+                'documentKey' => $pageStaticTitle !== '' ? $pageStaticTitle : '',
+                'documentVersion' => $consentForLog->getDocumentVersion(),
+                'locale' => $consentForLog->getLocale(),
+                'revokeReason' => $revokeReason,
+                'ip' => $CMSCore->client->getRealIPAddress()
+              ]
+            );
+
+            $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_CONSENT_REVOKED_SUCCESS');
+            $handlerStatusCode = $handlerStatusCode ?? 1;
+          } else {
+            $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+            $handlerStatusCode = $handlerStatusCode ?? 0;
+          }
+
+          return;
+        }
+
         $user = new User($CMSCore, $userID);
         $user->initData(['login', 'email', 'securityHash', 'passwordHash', 'metadata']);
 
