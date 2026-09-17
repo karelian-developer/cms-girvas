@@ -237,15 +237,9 @@ class PageProfile implements InterfacePage
               }
             }
 
-            // Блок согласий — только для владельца профиля
-            $consentsBlock = '';
-            if ($user->getID() === $profileUser->getID()) {
-              $consentsBlock = $this->buildConsentsBlock($profileUser);
-            }
-
             $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
-              'PAGE_NAME' => 'profile',
-              'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile.tpl', [
+              'PAGE_NAME' => 'profile-editor',
+              'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/editor.tpl', [
                 'USER_ID' => $profileUser->getID(),
                 'USER_LOGIN' => $profileUser->getLogin(),
                 'USER_AVATAR_URL' => $profileUser->getAvatarURL(128),
@@ -253,11 +247,12 @@ class PageProfile implements InterfacePage
                 'USER_NAME' => $profileUser->getName(),
                 'USER_SURNAME' => $profileUser->getSurname(),
                 'USER_PATRONYMIC' => $profileUser->getPatronymic(),
-                'USER_BIRTHDATE' => date('d.m.Y', $profileUser->getBirthdateUnixTimestamp()),
-                'USER_BIRTHDATE_MINIMUM' => date('Y-m-d', time() - 3155760000),
-                'USER_BIRTHDATE_MAXIMUM' => date('Y-m-d', time() - 441763200),
+                'USER_BIRTHDATE' => date('Y-m-d', $profileUser->getBirthdateUnixTimestamp()),
                 'PROFILE_ADDITIONAL_FIELDS' => implode($additionalFieldsElements),
-                'PROFILE_CONSENTS_BLOCK' => $consentsBlock
+                'USERS_PASSWORD_LENGTH_MAX' => $CMSConfigurator->getUsersPasswordLengthMax(),
+                'USERS_PASSWORD_LENGTH_MIN' => $CMSConfigurator->getUsersPasswordLengthMin(),
+                'USERS_LOGIM_LENGTH_MAX' => $CMSConfigurator->getUsersPasswordLengthMax(),
+                'USERS_LOGIM_LENGTH_MIN' => $CMSConfigurator->getUsersPasswordLengthMIN()
               ])
             ]);
           } else {
@@ -286,6 +281,11 @@ class PageProfile implements InterfacePage
             ]);
           }
 
+          $consentsBlock = '';
+          if ($user->getID() === $profileUser->getID()) {
+            $consentsBlock = $this->buildConsentsBlock($profileUser);
+          }
+
           $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
             'PAGE_NAME' => 'profile',
             'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile.tpl', [
@@ -299,7 +299,8 @@ class PageProfile implements InterfacePage
               'USER_BIRTHDATE' => date('d.m.Y', $profileUser->getBirthdateUnixTimestamp()),
               'USER_BIRTHDATE_MINIMUM' => date('Y-m-d', time() - 3155760000),
               'USER_BIRTHDATE_MAXIMUM' => date('Y-m-d', time() - 441763200),
-              'PROFILE_ADDITIONAL_FIELDS' => implode($additionalFieldsElements)
+              'PROFILE_ADDITIONAL_FIELDS' => implode($additionalFieldsElements),
+              'PROFILE_CONSENTS_BLOCK' => $consentsBlock
             ])
           ]);
         }
