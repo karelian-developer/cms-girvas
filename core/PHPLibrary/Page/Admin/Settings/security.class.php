@@ -94,6 +94,9 @@ class SettingsSecurity implements SettingsPageInterface
       $currentLegalDocuments = json_decode($rawValue, true) ?? [];
     }
 
+    error_log('DOC_NAMES: ' . json_encode(array_column($legalDocuments, 'name')));
+    error_log('CURRENT_DOCS: ' . json_encode($currentLegalDocuments));
+
     /** @var string HTML-чекбоксы юридических документов */
     $legalDocumentsElements = [];
 
@@ -113,6 +116,18 @@ class SettingsSecurity implements SettingsPageInterface
     $legalDocumentsHTML = !empty($legalDocumentsElements)
       ? implode("\n", $legalDocumentsElements)
       : '<p class="settings-empty">' . htmlspecialchars($this->CMSCore->locale->getSingleValueByKey('PAGE_SETTINGS_SETTING_SECURITY_LEGAL_DOCUMENTS_EMPTY')) . '</p>';
+
+    error_log('=== SECURITY_LEGAL_DOCS DEBUG ===');
+    error_log('EXISTS: ' . var_export($this->CMSCore->configurator->existsDatabaseEntryValue('security_legal_documents'), true));
+    error_log('RAW: ' . var_export($this->CMSCore->configurator->getDatabaseEntryValue('security_legal_documents'), true));
+    error_log('DECODED: ' . json_encode($currentLegalDocuments));
+    error_log('PAGES_COUNT: ' . count($legalDocuments));
+    error_log('PAGES_NAMES: ' . json_encode(array_column($legalDocuments, 'name')));
+
+    foreach ($legalDocuments as $document) {
+      $isChecked = in_array($document['name'], $currentLegalDocuments, true);
+      error_log('CHECK[' . $document['name'] . ']: ' . ($isChecked ? 'YES' : 'no'));
+    }
 
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
       'SETTINGS_NAME' => $this->name,
