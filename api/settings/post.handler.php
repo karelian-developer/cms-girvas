@@ -355,6 +355,9 @@ if ($CMSCore->client->isLogged(2)) {
               'static_pages_additional_field_description' => $settingValue,
               'static_pages_additional_field_type' => $settingValue,
               'static_pages_additional_field_name' => $settingValue,
+              'security_legal_documents' => is_array($settingValue)
+                ? json_encode(array_values(array_filter($settingValue, fn($v) => $v !== '')))
+                : json_encode([]),
               default => htmlspecialchars(str_replace('\'', '"', $settingValue))
             };
 
@@ -425,17 +428,10 @@ if ($CMSCore->client->isLogged(2)) {
          * Проверка идёт по подстроке в имени поля (без префикса setting_).
          */
         $sensitivePatterns = [
-          'password',
-          'token',
-          'secret',
-          'hash',
-          'salt',
-          'smtp_password',
-          'smtp_username',
-          'allowed_admin_ip',
-          'allowed_emails',
-          'notification_telegram_chats_ids',
-          'notification_max_chats_ids',
+          'password', 'token', 'secret', 'hash', 'salt',
+          'smtp_password', 'smtp_username',
+          'allowed_admin_ip', 'allowed_emails',
+          'notification_telegram_chats_ids', 'notification_max_chats_ids',
           'logins_blacklist',
           'premoderation_words_filter_list',
           'additional_field',

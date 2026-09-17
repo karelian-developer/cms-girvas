@@ -585,6 +585,66 @@ class PageStatic implements EntityTypeContent
   }
 
   /**
+   * Получить все статические страницы с флагом isLegalDocument = true
+   *
+   * @param SystemCore $CMSCore
+   * @param string $localeName
+   * @return array Массив ['name' => ..., 'title' => ...]
+   */
+  public static function getAllLegalDocuments(SystemCore $CMSCore, string $localeName = 'en_US') : array
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id', 'name', 'texts', 'metadata']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('pages_static');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    
+    // Фильтр по metadata->isLegalDocument = true
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => "JSON_EXTRACT(`metadata`, '$.isLegalDocument') = TRUE",
+      'postgresql' => "(\"metadata\"->>'isLegalDocument')::boolean = TRUE"
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('name');
+    $queryBuilder->statement->clauseOrderBy->setSortType('ASC');
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    $documents = [];
+
+    foreach ($results as $row) {
+      $texts = json_decode($row['texts'], true);
+      $title = $texts[$localeName]['title'] ?? '';
+
+      $documents[] = [
+        'id' => (int) $row['id'],
+        'name' => $row['name'],
+        'title' => $title !== '' ? $title : $row['name']
+      ];
+    }
+
+    return $documents;
+  }
+
+  /**
    * Получить данные по дополнительному полю
    * 
    * @param string $fieldName

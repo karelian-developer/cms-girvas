@@ -20,6 +20,7 @@
 
 namespace core\PHPLibrary\Page\Admin\Settings;
 
+use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
@@ -76,6 +77,43 @@ class SettingsSecurity implements SettingsPageInterface
     $settingPremoderationLinksFilterStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_links_filter_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_links_filter_status') : '';
     $settingPremoderationWordsFilterStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_words_filter_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_words_filter_status') : '';
 
+    // ============================================================
+    // ЮРИДИЧЕСКИЕ ДОКУМЕНТЫ (152-ФЗ)
+    // ============================================================
+
+    /** @var string Текущая локаль админки */
+    $adminLocaleName = $this->CMSCore->locale->getName();
+
+    /** @var array Все статические страницы с isLegalDocument = true */
+    $legalDocuments = PageStatic::getAllLegalDocuments($this->CMSCore, $adminLocaleName);
+
+    /** @var array Текущее значение настройки (JSON → массив) */
+    $currentLegalDocuments = [];
+    if ($this->CMSCore->configurator->existsDatabaseEntryValue('security_legal_documents')) {
+      $rawValue = $this->CMSCore->configurator->getDatabaseEntryValue('security_legal_documents');
+      $currentLegalDocuments = json_decode($rawValue, true) ?? [];
+    }
+
+    /** @var string HTML-чекбоксы юридических документов */
+    $legalDocumentsElements = [];
+
+    foreach ($legalDocuments as $document) {
+      $legalDocumentsElements[] = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/settings/security/legalDocumentItem.tpl',
+        [
+          'DOCUMENT_ID' => $document['id'],
+          'DOCUMENT_KEY' => htmlspecialchars($document['name']),
+          'DOCUMENT_TITLE' => htmlspecialchars($document['title']),
+          'DOCUMENT_CHECKED' => in_array($document['name'], $currentLegalDocuments, true) ? 'checked' : ''
+        ]
+      );
+    }
+
+    $legalDocumentsHTML = !empty($legalDocumentsElements)
+      ? implode("\n", $legalDocumentsElements)
+      : '<p class="settings-empty">' . htmlspecialchars($this->CMSCore->locale->getSingleValueByKey('PAGE_SETTINGS_SETTING_SECURITY_LEGAL_DOCUMENTS_EMPTY')) . '</p>';
+
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
       'SETTINGS_NAME' => $this->name,
       'SETTING_NOTIFICATION_TELEGRAM_CHATS_IDS' => $this->CMSCore->configurator->existsDatabaseEntryValue('security_notification_telegram_chats_ids') ? implode(', ', json_decode($this->CMSCore->configurator->getDatabaseEntryValue('security_notification_telegram_chats_ids'), true)) : '',
@@ -96,6 +134,7 @@ class SettingsSecurity implements SettingsPageInterface
       'SETTING_PREMODERATION_WORDS_FILTER_LIST_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_words_filter_list') ? implode(', ', json_decode($this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_words_filter_list'), true)) : '',
       'SETTING_PREMODERATION_WORDS_FILTER_STATUS_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_words_filter_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_words_filter_status') : 'off',
       'SETTING_PREMODERATION_WORDS_FILTER_CHECKED_VALUE' => $settingPremoderationWordsFilterStatusValue === 'on' ? 'checked' : '',
+      'SETTING_LEGAL_DOCUMENTS_ELEMENTS' => $legalDocumentsHTML,
     ]);
   }
 }
