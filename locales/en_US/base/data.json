@@ -133,6 +133,8 @@
   "PROFILE_CONSENTS_REVOKE_MODAL_TITLE": "Revoke consent",
   "PROFILE_CONSENTS_REVOKE_MODAL_DESCRIPTION": "Are you sure you want to revoke consent for the document '%s' (version %s)?",
   "PROFILE_CONSENTS_REVOKE_REASON_PLACEHOLDER": "Reason for revocation (optional)",
+  "MODAL_CONSENT_REVOKE_TITLE": "Revoke consent",
+  "MODAL_CONSENT_REVOKE_DESCRIPTION": "Are you sure you want to revoke consent?",
   "PAGE_ERROR_404_TITLE": "Page not found",
   "PAGE_ERROR_404_DESCRIPTION": "Unfortunately, the page you are looking for at \"%s\" has been deleted or moved. We recommend returning to the <a href=\"/\" title=\"{SITE_TITLE}\">main page</a>.",
   "PAGE_ERROR_500_TITLE": "Internal server error",

@@ -34,6 +34,10 @@ export class Modal {
     this.width = value + units;
   }
 
+  setContentElement(element) {
+    this.content = element;
+  }
+
   show() {
     let elementWrapper = this.element.querySelector('.interactive__modal-wrapper');
     let interval = setInterval(() => {

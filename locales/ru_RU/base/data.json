@@ -139,6 +139,8 @@
   "PROFILE_CONSENTS_REVOKE_MODAL_TITLE": "Отзыв согласия",
   "PROFILE_CONSENTS_REVOKE_MODAL_DESCRIPTION": "Вы действительно хотите отозвать согласие по документу «%s» (версия %s)?",
   "PROFILE_CONSENTS_REVOKE_REASON_PLACEHOLDER": "Причина отзыва (необязательно)",
+  "MODAL_CONSENT_REVOKE_TITLE": "Отзыв согласия",
+  "MODAL_CONSENT_REVOKE_DESCRIPTION": "Вы действительно хотите отозвать согласие?",
   "BUTTON_CONSENT_REVOKE_SUBMIT": "Отозвать согласие",
   "PAGE_ERROR_404_TITLE": "Страница не найдена",
   "PAGE_ERROR_404_DESCRIPTION": "К сожалению, искомая Вами страница по адресу \"%s\" была удалена, либо перенесена. Рекомендуем вернуться на <a href=\"/\" title=\"{SITE_TITLE}\">главную страницу</a>.",

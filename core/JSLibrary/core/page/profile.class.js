@@ -274,17 +274,22 @@ export class PageProfile {
 
     const reasonTextarea = document.createElement('textarea');
     reasonTextarea.classList.add('form__textarea');
-    reasonTextarea.setAttribute('placeholder', this.localeBaseData.PROFILE_CONSENTS_REVOKE_REASON_PLACEHOLDER);
     reasonTextarea.setAttribute('name', 'consent_revoke_reason');
+    reasonTextarea.setAttribute(
+      'placeholder',
+      this.localeBaseData.PROFILE_CONSENTS_REVOKE_REASON_PLACEHOLDER
+      || 'Причина отзыва (необязательно)'
+    );
 
-    modal.target.elementContent.append(reasonTextarea);
+    // Перезаписываем content как DOM-элемент (textarea)
+    modal.target.content = reasonTextarea;
 
     modal.target.addButton(this.localeBaseData.BUTTON_CONSENT_REVOKE_SUBMIT, () => {
       const formData = new FormData();
       formData.append('user_id', this.clientUserData.id);
       formData.append('consent_event', 'revoke');
       formData.append('consent_id', consentID);
-      formData.append('consent_revoke_reason', reasonTextarea.value);
+      formData.append('consent_revoke_reason', reasonTextarea.value);   // ← ЧИТАЕМ ЗНАЧЕНИЕ
 
       const request = new Interactive('request', {
         method: 'PATCH',
@@ -299,12 +304,14 @@ export class PageProfile {
           if (row !== null) {
             row.remove();
 
-            // Если это было последнее согласие — показать сообщение "нет согласий"
+            // Если это было последнее согласие — показать сообщение
             const itemsContainer = document.querySelector('.consents__items');
             if (itemsContainer !== null && itemsContainer.querySelectorAll('[data-consent-id]').length === 0) {
               const emptyRow = document.createElement('tr');
               emptyRow.classList.add('table__row');
-              emptyRow.innerHTML = '<td class="table__cell" colspan="2">' + this.localeBaseData.PROFILE_CONSENTS_EMPTY + '</td>';
+              emptyRow.innerHTML = '<td class="table__cell" colspan="2">'
+                + (this.localeBaseData.PROFILE_CONSENTS_EMPTY || 'У вас нет активных согласий.')
+                + '</td>';
               itemsContainer.append(emptyRow);
             }
           }
