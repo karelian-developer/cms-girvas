@@ -335,7 +335,9 @@ if ($CMSCore->client->isLogged(2)) {
               $settingValue = $formChatsIDs;
             }
 
-            if (is_array($settingValue)) $settingValue = json_encode($settingValue);
+            if (is_array($settingValue) && $settingName !== 'security_legal_documents') {
+              $settingValue = json_encode($settingValue);
+            }
 
             $settingValue = match ($settingName) {
               'security_notification_telegram_chats_ids' => !empty($settingValue) ? $settingValue : json_encode([]),
