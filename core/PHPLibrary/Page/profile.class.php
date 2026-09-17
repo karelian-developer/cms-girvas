@@ -23,8 +23,10 @@ namespace core\PHPLibrary\Page;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\User\Consent as UserConsent;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\SystemCore\Report as Report;
@@ -63,6 +65,82 @@ class PageProfile implements InterfacePage
         ]
       );
     }
+  }
+
+  /**
+   * Собрать HTML-блок «Мои согласия» для владельца профиля
+   *
+   * @param User $profileUser
+   * @return string
+   */
+  private function buildConsentsBlock(User $profileUser) : string
+  {
+    $localeName = $this->CMSCore->locale->getName();
+    $localeData = $this->CMSCore->locale->getData();
+
+    $activeConsents = UserConsent::getActiveByUser($this->CMSCore, $profileUser->getID());
+
+    if (empty($activeConsents)) {
+      $itemsHTML = '<tr class="table__row"><td class="table__cell" colspan="2">'
+        . htmlspecialchars($localeData['PROFILE_CONSENTS_EMPTY'] ?? 'У вас нет активных согласий.')
+        . '</td></tr>';
+    } else {
+      $items = [];
+
+      foreach ($activeConsents as $consent) {
+        $consent->initData();
+
+        // Заголовок документа из PageStatic
+        $documentTitle = '';
+        if ($consent->getPageStaticID() > 0) {
+          $pageStatic = new PageStatic($this->CMSCore, $consent->getPageStaticID());
+          if ($pageStatic !== null) {
+            $pageStatic->initData(['name', 'texts']);
+            $documentTitle = $pageStatic->getTitle($localeName);
+            if (empty($documentTitle)) {
+              $documentTitle = $pageStatic->getName();
+            }
+          }
+        }
+
+        if (empty($documentTitle)) {
+          $documentTitle = '—';
+        }
+
+        // Источник
+        $source = $consent->getSource();
+        $sourceLabel = match ($source) {
+          'form' => $localeData['PROFILE_CONSENTS_SOURCE_FORM'] ?? 'Форма',
+          'registration' => $localeData['PROFILE_CONSENTS_SOURCE_REGISTRATION'] ?? 'Регистрация',
+          default => $source
+        };
+
+        $items[] = ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme,
+          'templates/page/profile/consentItem.tpl',
+          [
+            'CONSENT_ID' => $consent->getID(),
+            'CONSENT_DOCUMENT_TITLE' => htmlspecialchars($documentTitle),
+            'CONSENT_VERSION' => htmlspecialchars($consent->getDocumentVersion()),
+            'CONSENT_DATE' => date('d.m.Y H:i', $consent->getConsentedAt()),
+            'CONSENT_SOURCE_LABEL' => htmlspecialchars($sourceLabel),
+            'CONSENT_LOCALE' => htmlspecialchars($consent->getLocale())
+          ]
+        );
+      }
+
+      $itemsHTML = implode("\n", $items);
+    }
+
+    return ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme,
+      'templates/page/profile/consentsBlock.tpl',
+      [
+        'PROFILE_CONSENTS_BLOCK_TITLE' => $localeData['PROFILE_CONSENTS_BLOCK_TITLE'] ?? 'Мои согласия',
+        'PROFILE_CONSENTS_BLOCK_DESCRIPTION' => $localeData['PROFILE_CONSENTS_BLOCK_DESCRIPTION'] ?? '',
+        'PROFILE_CONSENTS_ITEMS' => $itemsHTML
+      ]
+    );
   }
   
   /**
@@ -159,9 +237,15 @@ class PageProfile implements InterfacePage
               }
             }
 
+            // Блок согласий — только для владельца профиля
+            $consentsBlock = '';
+            if ($user->getID() === $profileUser->getID()) {
+              $consentsBlock = $this->buildConsentsBlock($profileUser);
+            }
+
             $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
-              'PAGE_NAME' => 'profile-editor',
-              'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile/editor.tpl', [
+              'PAGE_NAME' => 'profile',
+              'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile.tpl', [
                 'USER_ID' => $profileUser->getID(),
                 'USER_LOGIN' => $profileUser->getLogin(),
                 'USER_AVATAR_URL' => $profileUser->getAvatarURL(128),
@@ -169,12 +253,11 @@ class PageProfile implements InterfacePage
                 'USER_NAME' => $profileUser->getName(),
                 'USER_SURNAME' => $profileUser->getSurname(),
                 'USER_PATRONYMIC' => $profileUser->getPatronymic(),
-                'USER_BIRTHDATE' => date('Y-m-d', $profileUser->getBirthdateUnixTimestamp()),
+                'USER_BIRTHDATE' => date('d.m.Y', $profileUser->getBirthdateUnixTimestamp()),
+                'USER_BIRTHDATE_MINIMUM' => date('Y-m-d', time() - 3155760000),
+                'USER_BIRTHDATE_MAXIMUM' => date('Y-m-d', time() - 441763200),
                 'PROFILE_ADDITIONAL_FIELDS' => implode($additionalFieldsElements),
-                'USERS_PASSWORD_LENGTH_MAX' => $CMSConfigurator->getUsersPasswordLengthMax(),
-                'USERS_PASSWORD_LENGTH_MIN' => $CMSConfigurator->getUsersPasswordLengthMin(),
-                'USERS_LOGIM_LENGTH_MAX' => $CMSConfigurator->getUsersPasswordLengthMax(),
-                'USERS_LOGIM_LENGTH_MIN' => $CMSConfigurator->getUsersPasswordLengthMIN()
+                'PROFILE_CONSENTS_BLOCK' => $consentsBlock
               ])
             ]);
           } else {

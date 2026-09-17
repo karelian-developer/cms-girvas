@@ -240,5 +240,83 @@ export class PageProfile {
       this.page.showPopupNotification(rejectionReason, 0);
 
     });
+
+    this.setupConsentsRevokeListeners();
+  }
+
+  /**
+   * Навесить обработчики на кнопки «Отозвать согласие»
+   */
+  setupConsentsRevokeListeners() {
+    const revokeButtons = document.querySelectorAll('[data-consent-action="revoke"]');
+    revokeButtons.forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        const consentID = button.getAttribute('data-consent-id');
+        this.handleConsentRevoke(consentID, button);
+      });
+    });
+  }
+
+  /**
+   * Открыть модалку подтверждения и отправить запрос на отзыв
+   *
+   * @param {string} consentID
+   * @param {HTMLElement} button
+   */
+  handleConsentRevoke(consentID, button) {
+    if (!consentID) return;
+
+    const modal = new Interactive('modal', {
+      title: this.localeBaseData.MODAL_CONSENT_REVOKE_TITLE,
+      content: this.localeBaseData.MODAL_CONSENT_REVOKE_DESCRIPTION
+    });
+
+    const reasonTextarea = document.createElement('textarea');
+    reasonTextarea.classList.add('form__textarea');
+    reasonTextarea.setAttribute('placeholder', this.localeBaseData.PROFILE_CONSENTS_REVOKE_REASON_PLACEHOLDER);
+    reasonTextarea.setAttribute('name', 'consent_revoke_reason');
+
+    modal.target.elementContent.append(reasonTextarea);
+
+    modal.target.addButton(this.localeBaseData.BUTTON_CONSENT_REVOKE_SUBMIT, () => {
+      const formData = new FormData();
+      formData.append('user_id', this.clientUserData.id);
+      formData.append('consent_event', 'revoke');
+      formData.append('consent_id', consentID);
+      formData.append('consent_revoke_reason', reasonTextarea.value);
+
+      const request = new Interactive('request', {
+        method: 'PATCH',
+        url: '/handler/user?localeMessage=' + window.CMSCore.locales.base.name
+      });
+
+      request.target.data = formData;
+
+      request.target.send().then((data) => {
+        if (data.statusCode === 1) {
+          const row = button.closest('tr');
+          if (row !== null) {
+            row.remove();
+
+            // Если это было последнее согласие — показать сообщение "нет согласий"
+            const itemsContainer = document.querySelector('.consents__items');
+            if (itemsContainer !== null && itemsContainer.querySelectorAll('[data-consent-id]').length === 0) {
+              const emptyRow = document.createElement('tr');
+              emptyRow.classList.add('table__row');
+              emptyRow.innerHTML = '<td class="table__cell" colspan="2">' + this.localeBaseData.PROFILE_CONSENTS_EMPTY + '</td>';
+              itemsContainer.append(emptyRow);
+            }
+          }
+        }
+        modal.target.close();
+      });
+    });
+
+    modal.target.addButton(this.localeBaseData.BUTTON_CANCEL_LABEL, () => modal.target.close());
+
+    modal.assembly();
+    document.body.appendChild(modal.target.element);
+    modal.target.show();
   }
 }

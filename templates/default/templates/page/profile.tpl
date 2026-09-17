@@ -38,6 +38,7 @@
         </table>
       </div>
     </div>
+    {PROFILE_CONSENTS_BLOCK}
   </div>
 </article>
 <aside class="sidebar" role="siteSidebarRight">
