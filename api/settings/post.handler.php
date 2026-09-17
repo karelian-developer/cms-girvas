@@ -107,6 +107,9 @@ if ($CMSCore->client->isLogged(2)) {
             : null;
         }
 
+        error_log('SETTINGS_POST_KEYS: ' . json_encode(array_keys($_POST)));
+        error_log('LEGAL_DOCS_VALUE: ' . json_encode($_POST['setting_security_legal_documents'] ?? 'NOT_SET'));
+
         foreach ($_POST as $settingName => $settingValue) {
           if (preg_match('/^setting_([a-z0-9_]+)$/', $settingName, $matches, PREG_OFFSET_CAPTURE)) {
             $settingName = $matches[1][0];
