@@ -126,6 +126,8 @@ class PageUsersConsents implements InterfacePage
       return;
     }
 
+    $clientUser->initData(['metadata']);
+
     $clientUserGroup = $clientUser->getGroup();
     $clientUserGroup->initData(['permissions']);
     $clientIsSuper = $clientUserGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_CONSENTS_MANAGEMENT)
