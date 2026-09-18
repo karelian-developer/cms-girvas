@@ -13,6 +13,8 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
+define('API_HANDLERS_ABSOLUTE_PATH', CMS_ROOT_DIRECTORY . '/api/user/consent');
+
 if (isset($CMSCore)) {
   // Определение абсолютного пути до обработчика текущего API
   $handlerPath = match ($_SERVER['REQUEST_METHOD']) {
