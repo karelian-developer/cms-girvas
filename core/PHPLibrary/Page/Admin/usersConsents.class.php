@@ -121,12 +121,12 @@ class PageUsersConsents implements InterfacePage
       return;
     }
 
+    $clientUser->initData(['metadata']);
+
     if (!$this->canViewConsents($clientUser)) {
       http_response_code(403);
       return;
     }
-
-    $clientUser->initData(['metadata']);
 
     $clientUserGroup = $clientUser->getGroup();
     $clientUserGroup->initData(['permissions']);
