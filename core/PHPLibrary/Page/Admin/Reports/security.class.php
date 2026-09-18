@@ -301,9 +301,11 @@ class ReportsSecurity implements ReportsPageInterface
       // ============================================================
       // СОГЛАСИЯ (152-ФЗ)
       // ============================================================
-      '{DOCUMENT_TITLE}' => $variables['documentTitle']
-        ?? $this->getPageStaticTitle($variables['pageStaticID'] ?? 0)
-        ?: ($variables['documentKey'] ?? ''),
+      '{DOCUMENT_TITLE}' => !empty($variables['documentTitles'][$currentLocale])
+        ? $variables['documentTitles'][$currentLocale]
+        : (!empty($variables['documentTitle'])
+          ? $variables['documentTitle']
+          : ($this->getPageStaticTitle($variables['pageStaticID'] ?? 0) ?: ($variables['documentKey'] ?? ''))),
       '{DOCUMENT_KEY}' => $variables['documentKey'] ?? '',
       '{DOCUMENT_VERSION}' => $variables['documentVersion'] ?? '',
       '{LOCALE}' => $variables['locale'] ?? '',

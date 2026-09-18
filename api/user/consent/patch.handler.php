@@ -19,19 +19,6 @@ use \core\PHPLibrary\User\Consent as UserConsent;
 use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\SystemCore\Report as Report;
 
-error_log('CONSENT_PATCH_DEBUG: ' . json_encode([
-  'request_method' => $_SERVER['REQUEST_METHOD'],
-  'path0' => $CMSCore->urlp->getPath(0),
-  'path1' => $CMSCore->urlp->getPath(1),
-  'path2' => $CMSCore->urlp->getPath(2),
-  'path3' => $CMSCore->urlp->getPath(3),
-  'path4' => $CMSCore->urlp->getPath(4),
-  'PATCH_keys' => array_keys($_PATCH),
-  'PATCH_raw' => $_PATCH,
-  'consentID' => $consentID,
-  'revokeReason' => $revokeReason
-]));
-
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
   $clientUser->initData(['login', 'metadata']);
