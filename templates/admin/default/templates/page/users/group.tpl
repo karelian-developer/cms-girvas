@@ -158,6 +158,18 @@
             <label class="checkbox-container__label form__label" for="I1474308976"></label>
           </div>
         </div>
+        <!-- Поле: Управление согласиями (ФЗ-152) -->
+        <div class="cell grid-table__cell grid-table__cell_text">
+          <div class="cell__title">
+            {LANG:PAGE_USERS_GROUP_PERSMISSION_MANAGE_USERS_CONSENTS_TITLE}
+          </div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <div class="form__checkbox-container checkbox-container">
+            <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308978" name="user_group_permissions[]" type="checkbox" value="admin_users_consents_management" {USERS_GROUP_PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT_VALUE}>
+            <label class="checkbox-container__label form__label" for="I1474308978"></label>
+          </div>
+        </div>
         <!-- Раздел: Права модерации -->
         <div class="cell grid-table__cell grid-table__cell_header">
           {LANG:PAGE_USERS_GROUP_PERSMISSIONS_GROUP_MODERATOR_TITLE}

@@ -158,9 +158,9 @@ class PageUserGroup implements InterfacePage
       'USERS_GROUP_PERMISSION_BASE_ENTRY_COMMENT_RATE_VALUE' => $usersGroup === null
         ? ''
         : (($usersGroup->permissionCheck(UserGroup::PERMISSION_BASE_ENTRY_COMMENT_RATE)) ? 'checked' : ''),
-      'USERS_GROUP_PERMISSION_ADMIN_CONSENTS_MANAGEMENT_VALUE' => $usersGroup === null
+      'USERS_GROUP_PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT_VALUE' => $usersGroup === null
         ? ''
-        : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_CONSENTS_MANAGEMENT)) ? 'checked' : ''),
+        : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT)) ? 'checked' : ''),
     ]);
   }
 }
