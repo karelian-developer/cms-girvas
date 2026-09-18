@@ -601,7 +601,10 @@ final class Report
     $queryBuilder->statement->clauseFrom->addTable('reports');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 

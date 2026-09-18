@@ -529,17 +529,6 @@ class ReportsSecurity implements ReportsPageInterface
       $variables = $this->viewer !== null
         ? $report->getVariables($this->viewer)
         : $report->getVariables();
-
-      if ($typeID === CMSReport::REPORT_TYPE_ID_BASE_CONSENT_REVOKED) {
-        error_log('VARIABLES_DEBUG: ' . json_encode([
-          'typeID' => $typeID,
-          'has_documentTitle' => isset($variables['documentTitle']),
-          'documentTitle_val' => $variables['documentTitle'] ?? 'NOT_SET',
-          'has_documentTitles' => isset($variables['documentTitles']),
-          'has_documentKey' => isset($variables['documentKey']),
-          'keys' => array_keys($variables)
-        ]));
-      }
       
       $ip = $variables['ip'] ?? $variables['clientIP'] ?? null;
       $typeID = $report->getTypeID();
