@@ -1,64 +1,129 @@
 /**
- * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * CMS «ГИРВАС»
  * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
- * @copyright   Copyright (c) 2021 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
- * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * Включена в Реестр российского программного обеспечения Минцифры РФ.
+ * Реестровый номер: №25012 от 27.11.2024
+ * 
+ * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ *             Все права защищены.
+ * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
+ * @see       https://cms-girvas.ru Сайт продукта
+ * @author    Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
+ * @support   support@karelian-developer.ru
  */
 
 .grid-table__item_consent {
   display: grid;
   grid-template-areas:
-    'id user document locale'
-    'source status date ip'
-    'user-agent user-agent user-agent panel';
-  grid-template-columns: max-content 1fr 1fr 1fr;
+    'id user document locale source'
+    'status date ip user-agent panel';
+  grid-template-columns: max-content 1fr 1fr 1fr 1fr;
   column-gap: 15px;
-  row-gap: 5px;
+  row-gap: 8px;
   font-size: 14px;
-  padding: 15px 0;
+  padding: 10px 0;
 }
 
 .grid-table__item_consent:not(:last-child) {
   border-bottom: 1px solid var(--color-neutral-lightgray);
 }
 
-.grid-table__cell_id      { grid-area: id; }
-.grid-table__cell_user    { grid-area: user; }
-.grid-table__cell_document { grid-area: document; }
-.grid-table__cell_locale  { grid-area: locale; }
-.grid-table__cell_source  { grid-area: source; }
-.grid-table__cell_status  { grid-area: status; }
-.grid-table__cell_date    { grid-area: date; }
-.grid-table__cell_ip      { grid-area: ip; }
-.grid-table__cell_user-agent { grid-area: user-agent; }
-.grid-table__cell_panel   { grid-area: panel; justify-content: flex-end; }
+.grid-table__cell_id          { grid-area: id; }
+.grid-table__cell_user        { grid-area: user; }
+.grid-table__cell_document    { grid-area: document; }
+.grid-table__cell_locale      { grid-area: locale; }
+.grid-table__cell_source      { grid-area: source; }
+.grid-table__cell_status      { grid-area: status; }
+.grid-table__cell_date        { grid-area: date; }
+.grid-table__cell_ip          { grid-area: ip; }
+.grid-table__cell_user-agent  { grid-area: user-agent; }
+.grid-table__cell_panel       {
+  grid-area: panel;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
 
+/* Статусы */
 .consent-status {
+  display: inline-block;
   font-weight: 500;
-  text-transform: uppercase;
   font-size: 12px;
-  padding: 2px 6px;
+  text-transform: uppercase;
+  padding: 3px 8px;
   border-radius: 3px;
+  white-space: nowrap;
 }
 
 .consent-status.status-active {
-  color: var(--color-brand-primary);
-  background-color: rgba(76, 175, 80, 0.1);
+  color: #2e7d32;
+  background-color: rgba(76, 175, 80, 0.12);
 }
 
 .consent-status.status-revoked {
-  color: var(--color-link-negative);
-  background-color: rgba(244, 67, 54, 0.1);
+  color: #c62828;
+  background-color: rgba(244, 67, 54, 0.12);
 }
 
+/* Версия документа */
 .grid-table__version {
+  display: block;
   font-size: 12px;
-  opacity: .6;
-  margin-left: 5px;
+  font-style: italic;
+  color: var(--color-brand-darkgray2);
+  margin-top: 3px;
+  opacity: .7;
 }
 
-@media (max-width: 1600px) {
+/* Локаль */
+.grid-table__cell_locale {
+  font-size: 13px;
+  text-transform: lowercase;
+}
+
+/* IP */
+.grid-table__cell_ip {
+  font-family: monospace;
+  font-size: 13px;
+}
+
+/* User-Agent */
+.grid-table__cell_user-agent {
+  font-size: 12px;
+  color: var(--color-brand-darkgray2);
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Панель действий */
+.grid-table__panel-list {
+  display: flex;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  gap: 10px;
+}
+
+.grid-table__panel-link {
+  font-size: 13px;
+  text-transform: lowercase;
+  color: var(--color-link-default);
+  text-decoration: none;
+}
+
+.grid-table__panel-link:hover {
+  text-decoration: underline;
+}
+
+.grid-table__panel-link_red {
+  color: var(--color-link-negative);
+}
+
+/* Адаптив */
+@media (max-width: 1400px) {
   .grid-table__item_consent {
     grid-template-areas:
       'id user document'
@@ -83,5 +148,15 @@
       'user-agent'
       'panel';
     grid-template-columns: 1fr;
+    row-gap: 5px;
+  }
+
+  .grid-table__cell_panel {
+    justify-content: flex-start;
+  }
+
+  .grid-table__cell_user-agent {
+    max-width: none;
+    white-space: normal;
   }
 }
