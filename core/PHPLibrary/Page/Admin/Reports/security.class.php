@@ -301,9 +301,22 @@ class ReportsSecurity implements ReportsPageInterface
       // ============================================================
       // СОГЛАСИЯ (152-ФЗ)
       // ============================================================
-      '{DOCUMENT_TITLE}' => $variables['documentTitle']
-        ?? $this->getPageStaticTitle($variables['pageStaticID'] ?? 0)
-        ?: ($variables['documentKey'] ?? ''),
+      '{DOCUMENT_TITLE}' => (function() use ($variables, $currentLocale) {
+        if (isset($variables['documentTitles']) && is_array($variables['documentTitles'])) {
+          if (!empty($variables['documentTitles'][$currentLocale])) {
+            return $variables['documentTitles'][$currentLocale];
+          }
+          foreach ($variables['documentTitles'] as $title) {
+            if (!empty($title)) return $title;
+          }
+        }
+        if (!empty($variables['documentTitle'])) {
+          return $variables['documentTitle'];
+        }
+        $dbTitle = $this->getPageStaticTitle($variables['pageStaticID'] ?? 0);
+        if (!empty($dbTitle)) return $dbTitle;
+        return $variables['documentKey'] ?? '';
+      })(),
       '{DOCUMENT_KEY}' => $variables['documentKey'] ?? '',
       '{DOCUMENT_VERSION}' => $variables['documentVersion'] ?? '',
       '{LOCALE}' => $variables['locale'] ?? '',
@@ -563,17 +576,6 @@ class ReportsSecurity implements ReportsPageInterface
     $recentReports = array_slice($reports, 0, 20);
 
     foreach ($recentReports as $report) {
-      error_log('DEEP_DEBUG: ' . json_encode([
-        'class' => get_class($report),
-        'object_id' => $report->getID(),
-        'this_variables_exists' => property_exists($report, 'variables'),
-        'this_variables_raw' => property_exists($report, 'variables') ? $report->variables : 'NO_PROPERTY',
-        'this_metadata_exists' => property_exists($report, 'metadata'),
-        'this_metadata_raw' => property_exists($report, 'metadata') ? $report->metadata : 'NO_PROPERTY',
-        'getTypeID' => $report->getTypeID(),
-        'getVariables_keys' => array_keys($report->getVariables()),
-      ]));
-
       $typeLabel = $this->getReportTypeLabel($report->getTypeID());
       $description = $this->formatReportDescription($report);
       $createdDate = date('d.m.Y H:i:s', $report->getCreatedUnixTimestamp());

@@ -286,9 +286,22 @@ class ReportsContent implements ReportsPageInterface
       // ============================================================
       // СОГЛАСИЯ (152-ФЗ)
       // ============================================================
-      '{DOCUMENT_TITLE}' => $variables['documentTitle']
-        ?? $this->getPageStaticTitle($variables['pageStaticID'] ?? 0)
-        ?: ($variables['documentKey'] ?? ''),
+      '{DOCUMENT_TITLE}' => (function() use ($variables, $currentLocale) {
+        if (isset($variables['documentTitles']) && is_array($variables['documentTitles'])) {
+          if (!empty($variables['documentTitles'][$currentLocale])) {
+            return $variables['documentTitles'][$currentLocale];
+          }
+          foreach ($variables['documentTitles'] as $title) {
+            if (!empty($title)) return $title;
+          }
+        }
+        if (!empty($variables['documentTitle'])) {
+          return $variables['documentTitle'];
+        }
+        $dbTitle = $this->getPageStaticTitle($variables['pageStaticID'] ?? 0);
+        if (!empty($dbTitle)) return $dbTitle;
+        return $variables['documentKey'] ?? '';
+      })(),
       '{DOCUMENT_KEY}' => $variables['documentKey'] ?? '',
       '{DOCUMENT_VERSION}' => $variables['documentVersion'] ?? '',
       '{LOCALE}' => $variables['locale'] ?? '',
