@@ -89,14 +89,14 @@ class PageUsersConsents implements InterfacePage
   }
 
   /**
-   * Проверка прав: PERMISSION_ADMIN_CONSENTS_MANAGEMENT или SuperID
+   * Проверка прав: PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT или SuperID
    */
   private function canViewConsents(User $clientUser) : bool
   {
     $clientUserGroup = $clientUser->getGroup();
     $clientUserGroup->initData(['permissions']);
 
-    if ($clientUserGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_CONSENTS_MANAGEMENT)) {
+    if ($clientUserGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT)) {
       return true;
     }
 
@@ -140,7 +140,7 @@ class PageUsersConsents implements InterfacePage
 
     $clientUserGroup = $clientUser->getGroup();
     $clientUserGroup->initData(['permissions']);
-    $clientIsSuper = $clientUserGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_CONSENTS_MANAGEMENT)
+    $clientIsSuper = $clientUserGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT)
       || (defined('UserGroup::GROUP_SUPER_ID') && $clientUserGroup->getID() === UserGroup::GROUP_SUPER_ID);
 
     // Пагинация
