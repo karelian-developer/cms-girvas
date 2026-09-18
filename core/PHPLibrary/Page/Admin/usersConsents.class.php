@@ -118,6 +118,11 @@ class PageUsersConsents implements InterfacePage
     $clientUser = $this->CMSCore->client->getUser(2);
     if ($clientUser === null) {
       http_response_code(401);
+
+      $pageError = new PageError($this->CMSCore, $this->page, 401);
+      $pageError->assembly();
+      $this->assembled = $pageError->assembled;
+
       return;
     }
 
@@ -125,6 +130,11 @@ class PageUsersConsents implements InterfacePage
 
     if (!$this->canViewConsents($clientUser)) {
       http_response_code(403);
+
+      $pageError = new PageError($this->CMSCore, $this->page, 403);
+      $pageError->assembly();
+      $this->assembled = $pageError->assembled;
+
       return;
     }
 
