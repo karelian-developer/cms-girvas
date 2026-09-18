@@ -70,7 +70,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           }
 
           // Отзываем
-          $revoked = UserConsent::revoke($CMSCore, $consentID, $revokeReason);
+          $revoked = UserConsent::revoke($CMSCore, $consentID, $revokeReason, $userID);
 
           if ($revoked) {
             // Логируем факт отзыва

@@ -186,6 +186,7 @@
   "API_NOTIFIER_BANNED_LABEL": "Заблокирован",
   "API_NOTIFIER_COPYRIGHT_LABEL": "Отчет автоматически сгенерирован системой отчетности %s. Если возникли проблемы с формированием данных, то необходимо обратиться в техническую поддержку компании-производителя «Карельский разработчик»: support@karelian-developer.ru.",
   "API_CONSENT_REVOKED_SUCCESS": "Согласие успешно отозвано.",
+  "API_CONSENT_REVOKE_ERROR_REASON_REQUIRED": "Необходимо указать причину отзыва.",
   "API_CONSENT_REVOKE_ERROR_NOT_FOUND": "Согласие не найдено или уже отозвано.",
   "API_CONSENT_REVOKE_ERROR_NO_PERMISSION": "Вы можете отозвать только своё согласие.",
   "API_CONSENT_REVOKE_ERROR_NO_USER_ID": "Не указан идентификатор пользователя."

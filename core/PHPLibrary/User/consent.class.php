@@ -221,6 +221,16 @@ class Consent
   }
 
   /**
+   * Получить ID отзыва
+   * 
+   * @return int
+   */
+  public function getRevokedByID() : int
+  {
+    return $this->revokedByID ?? 0;
+  }
+
+  /**
    * Получить данные колонок согласия из БД
    *
    * @param array $columns
@@ -559,7 +569,7 @@ class Consent
    * @param string $reason
    * @return bool
    */
-  public static function revoke(CMSCore $CMSCore, int $consentID, string $reason = '') : bool
+  public static function revoke(CMSCore $CMSCore, int $consentID, string $reason = '', int $revokedByID = 0) : bool
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -570,6 +580,7 @@ class Consent
     $queryBuilder->statement->setClauseSet();
     $queryBuilder->statement->clauseSet->addColumn('revokedAt');
     $queryBuilder->statement->clauseSet->addColumn('revokeReason');
+    $queryBuilder->statement->clauseSet->addColumn('revokedByID');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
     $queryBuilder->statement->clauseWhere->addConditionAdaptive([
@@ -586,6 +597,7 @@ class Consent
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       $databaseQuery->bindParam(':revokedAt', $revokedAt, \PDO::PARAM_INT);
       $databaseQuery->bindParam(':revokeReason', $reason, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':revokedByID', $revokedByID, \PDO::PARAM_INT);
       $databaseQuery->bindParam(':id', $consentID, \PDO::PARAM_INT);
       return $databaseQuery->execute();
     } catch (PDOException $exception) {
@@ -607,6 +619,88 @@ class Consent
   public static function getActiveByUser(CMSCore $CMSCore, int $userID) : array
   {
     return self::getAllByUser($CMSCore, $userID, true);
+  }
+
+    /**
+   * Получить все согласия с пагинацией
+   *
+   * @param CMSCore $CMSCore
+   * @param int $limit
+   * @param int $offset
+   * @return array
+   */
+  public static function getAll(CMSCore $CMSCore, int $limit = 20, int $offset = 0) : array
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('users_consents');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('consentedAt');
+    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    $queryBuilder->statement->setClauseLimit($limit);
+    $queryBuilder->statement->setClauseOffset($offset);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $consents = [];
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+
+    foreach ($results as $row) {
+      $consents[] = new Consent($CMSCore, (int) $row['id']);
+    }
+
+    return $consents;
+  }
+
+  /**
+   * Получить общее количество согласий
+   *
+   * @param CMSCore $CMSCore
+   * @return int
+   */
+  public static function countAll(CMSCore $CMSCore) : int
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['COUNT(*)']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('users_consents');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    return (int) $databaseQuery->fetchColumn();
   }
 
   /**

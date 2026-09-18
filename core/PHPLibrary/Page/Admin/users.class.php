@@ -62,6 +62,13 @@ class PageUsers implements InterfacePage
       'permanent' => false,
       'isActive' => false
     ],
+    'consents' => [
+      'name' => 'consents',
+      'iconName' => 'usersConsents',
+      'link' => '/usersConsents',
+      'permanent' => false,
+      'isActive' => false
+    ],
   ];
 
   public function __construct(SystemCore $CMSCore, Page $page)

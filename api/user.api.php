@@ -15,27 +15,32 @@ if (!defined('IS_NOT_HACKED')) {
 
 define('API_HANDLERS_ABSOLUTE_PATH', CMS_ROOT_DIRECTORY . '/api/user');
 
-if (isset($CMSCore)) {
-  // Определение абсолютного пути до обработчика текущего API
-  $handlerPath = match ($_SERVER['REQUEST_METHOD']) {
-    'POST' => API_HANDLERS_ABSOLUTE_PATH . '/post.handler.php',
-    'GET' => API_HANDLERS_ABSOLUTE_PATH . '/get.handler.php',
-    'PATCH' => API_HANDLERS_ABSOLUTE_PATH . '/patch.handler.php',
-    'DELETE' => API_HANDLERS_ABSOLUTE_PATH . '/delete.handler.php',
-    'PUT' => API_HANDLERS_ABSOLUTE_PATH . '/put.handler.php',
-  };
+if ($CMSCore->urlp->getPath(2) === 'consent') {
+  $APIFilePath =  CMS_ROOT_DIRECTORY . '/api/user/consent.api.php';
+  include_once $APIFilePath;
+} else {
+  if (isset($CMSCore)) {
+    // Определение абсолютного пути до обработчика текущего API
+    $handlerPath = match ($_SERVER['REQUEST_METHOD']) {
+      'POST' => API_HANDLERS_ABSOLUTE_PATH . '/post.handler.php',
+      'GET' => API_HANDLERS_ABSOLUTE_PATH . '/get.handler.php',
+      'PATCH' => API_HANDLERS_ABSOLUTE_PATH . '/patch.handler.php',
+      'DELETE' => API_HANDLERS_ABSOLUTE_PATH . '/delete.handler.php',
+      'PUT' => API_HANDLERS_ABSOLUTE_PATH . '/put.handler.php',
+    };
 
-  $handlerIsExists = isset($handlerPath) && file_exists($handlerPath);
+    $handlerIsExists = isset($handlerPath) && file_exists($handlerPath);
 
-  // Если абсолютный путь не был инициализирован, то запрещаем дальше работать с API
-  if (!$handlerIsExists) {
-    http_response_code(500);
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_HANDLER_NOT_FOUND');
-    $handlerStatusCode = $handlerStatusCode ?? 0;
-  }
+    // Если абсолютный путь не был инициализирован, то запрещаем дальше работать с API
+    if (!$handlerIsExists) {
+      http_response_code(500);
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_HANDLER_NOT_FOUND');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
+    }
 
-  // Подключаем файл необходимого обработчика
-  if ($handlerIsExists) {
-    include_once $handlerPath;
+    // Подключаем файл необходимого обработчика
+    if ($handlerIsExists) {
+      include_once $handlerPath;
+    }
   }
 }
