@@ -563,6 +563,17 @@ class ReportsSecurity implements ReportsPageInterface
     $recentReports = array_slice($reports, 0, 20);
 
     foreach ($recentReports as $report) {
+      error_log('DEEP_DEBUG: ' . json_encode([
+        'class' => get_class($report),
+        'object_id' => $report->getID(),
+        'this_variables_exists' => property_exists($report, 'variables'),
+        'this_variables_raw' => property_exists($report, 'variables') ? $report->variables : 'NO_PROPERTY',
+        'this_metadata_exists' => property_exists($report, 'metadata'),
+        'this_metadata_raw' => property_exists($report, 'metadata') ? $report->metadata : 'NO_PROPERTY',
+        'getTypeID' => $report->getTypeID(),
+        'getVariables_keys' => array_keys($report->getVariables()),
+      ]));
+
       $typeLabel = $this->getReportTypeLabel($report->getTypeID());
       $description = $this->formatReportDescription($report);
       $createdDate = date('d.m.Y H:i:s', $report->getCreatedUnixTimestamp());
