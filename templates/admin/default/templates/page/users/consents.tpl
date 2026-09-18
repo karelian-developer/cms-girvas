@@ -3,7 +3,7 @@
   <div class="page__title-container">
     <h1 class="page__title">{LANG:PAGE_USERS_CONSENTS_TITLE}</h1>
     <div class="page__interactive-container">
-      <button class="button" data-action="export-consents">Экспорт CSV</button>
+      <div class="page__interactive-container" data-element="export-container"></div>
     </div>
   </div>
   <div class="page__pagination">

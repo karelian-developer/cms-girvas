@@ -521,6 +521,8 @@
   "PAGE_USERS_CONSENTS_STATUS_REVOKED": "Revoked",
   "PAGE_USERS_CONSENTS_BUTTON_REVOKE": "Revoke",
   "PAGE_USERS_CONSENTS_REVOKE_REASON_PLACEHOLDER": "Revoke reason (required)",
+  "PAGE_USERS_CONSENTS_BUTTON_EXPORT": "Export CSV",
+  "PAGE_USERS_CONSENTS_EXPORT_ERROR": "Export failed.",
   "MODAL_CONSENT_REVOKE_BY_ADMIN_TITLE": "Revoke consent by administrator",
   "MODAL_CONSENT_REVOKE_BY_ADMIN_DESCRIPTION": "You are revoking consent on behalf of the user. This is allowed if the user has sent a written revocation request. Specify the reason.",
   "BUTTON_CONSENT_REVOKE_SUBMIT": "Revoke consent",

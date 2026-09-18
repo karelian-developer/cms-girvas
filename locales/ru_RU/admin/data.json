@@ -521,6 +521,8 @@
   "PAGE_USERS_CONSENTS_STATUS_REVOKED": "Отозвано",
   "PAGE_USERS_CONSENTS_BUTTON_REVOKE": "Отозвать",
   "PAGE_USERS_CONSENTS_REVOKE_REASON_PLACEHOLDER": "Причина отзыва (обязательно)",
+  "PAGE_USERS_CONSENTS_BUTTON_EXPORT": "Экспорт CSV",
+  "PAGE_USERS_CONSENTS_EXPORT_ERROR": "Не удалось выполнить экспорт.",
   "MODAL_CONSENT_REVOKE_BY_ADMIN_TITLE": "Отзыв согласия администратором",
   "MODAL_CONSENT_REVOKE_BY_ADMIN_DESCRIPTION": "Вы отзываете согласие от имени пользователя. Это допустимо, если пользователь направил письменный запрос на отзыв. Укажите причину.",
   "BUTTON_CONSENT_REVOKE_SUBMIT": "Отозвать согласие",

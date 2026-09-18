@@ -11,7 +11,21 @@ export class PageUsersConsents {
     this.page.core.locales.admin.getData().then((localeData) => {
       this.localeData = localeData;
 
-      // Кнопки «Отозвать»
+      // Кнопка «Экспорт CSV»
+      const exportContainer = document.querySelector('[data-element="export-container"]');
+      if (exportContainer !== null) {
+        const exportButton = new Interactive('button');
+        exportButton.target.setLabel(localeData.PAGE_USERS_CONSENTS_BUTTON_EXPORT || 'Экспорт CSV');
+        exportButton.target.setStyle('default');
+        exportButton.target.setCallback((event) => {
+          event.preventDefault();
+          this.handleExport();
+        });
+        exportButton.assembly();
+        exportContainer.append(exportButton.target.element);
+      }
+
+      // Кнопки «Отозвать» — оставить как есть (они уже работают)
       const revokeButtons = document.querySelectorAll('[data-event="revoke"]');
       revokeButtons.forEach((button) => {
         button.addEventListener('click', (event) => {
@@ -20,15 +34,6 @@ export class PageUsersConsents {
           this.handleRevoke(consentID, button);
         });
       });
-
-      // Кнопка экспорта
-      const exportButton = document.querySelector('[data-action="export-consents"]');
-      if (exportButton !== null) {
-        exportButton.addEventListener('click', (event) => {
-          event.preventDefault();
-          this.handleExport();
-        });
-      }
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     });
@@ -83,20 +88,53 @@ export class PageUsersConsents {
     modal.target.show();
   }
 
-  handleExport() {
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = '/handler/user/consent/export?localeMessage=' + window.CMSCore.locales.admin.name;
-    form.style.display = 'none';
+  async handleExport() {
+    const formData = new FormData();
+    formData.append('export', 'csv');
+    // Защита от кэша — как в Request::send()
+    formData.append('_grv_' + Math.random().toString(36).slice(2), Math.random().toString(36).slice(2));
 
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'export';
-    input.value = 'csv';
-    form.appendChild(input);
+    const headers = {};
+    if (window.CMSCore && window.CMSCore.client && window.CMSCore.client.CSRFToken !== '') {
+      headers['X-CSRF-Token'] = window.CMSCore.client.CSRFToken;
+    }
 
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
+    try {
+      const response = await fetch(
+        '/handler/user/consent/export?localeMessage=' + window.CMSCore.locales.admin.name,
+        {
+          method: 'POST',
+          body: formData,
+          headers: headers,
+          credentials: 'same-origin'
+        }
+      );
+
+      if (!response.ok) {
+        // Если сервер вернул JSON с ошибкой (CSRF, права)
+        try {
+          const errorData = await response.json();
+          this.page.showPopupNotification(errorData.message || 'Ошибка экспорта', 0);
+        } catch (e) {
+          this.page.showPopupNotification('Ошибка экспорта: ' + response.status, 0);
+        }
+        return;
+      }
+
+      // Получаем blob
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      // Скачиваем
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'consents_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      this.page.showPopupNotification('Ошибка сети: ' + error, 0);
+    }
   }
 }
