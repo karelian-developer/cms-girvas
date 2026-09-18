@@ -643,8 +643,7 @@ class Consent
     $queryBuilder->statement->setClauseOrderBy();
     $queryBuilder->statement->clauseOrderBy->setColumn('consentedAt');
     $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
-    $queryBuilder->statement->setClauseLimit($limit);
-    $queryBuilder->statement->setClauseOffset($offset);
+    $queryBuilder->statement->setClauseLimit($limit, $offset);
     $queryBuilder->statement->assembly();
 
     try {
