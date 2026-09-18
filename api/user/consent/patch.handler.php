@@ -38,7 +38,7 @@ if ($CMSCore->client->isLogged(2)) {
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
-  $hasAccess = $clientUserGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_CONSENTS_MANAGEMENT)
+  $hasAccess = $clientUserGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT)
   || $clientUserGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_SUPERUSER);
 
   if (!$hasAccess) {
