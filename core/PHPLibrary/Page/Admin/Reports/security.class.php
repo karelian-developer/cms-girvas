@@ -252,6 +252,17 @@ class ReportsSecurity implements ReportsPageInterface
       ? $report->getVariables($this->viewer)
       : $report->getVariables();
 
+    if ($typeID === CMSReport::REPORT_TYPE_ID_BASE_CONSENT_REVOKED) {
+      error_log('DOC_TITLE_RENDER_DEBUG: ' . json_encode([
+        'report_id' => $report->getID(),
+        'currentLocale' => $currentLocale,
+        'has_documentTitles' => isset($variables['documentTitles']),
+        'documentTitles_val' => $variables['documentTitles'] ?? 'NOT_SET',
+        'documentTitle_val' => $variables['documentTitle'] ?? 'NOT_SET',
+        'would_return' => $variables['documentTitles'][$currentLocale] ?? 'NOT_FOUND'
+      ]));
+    }
+
     $typeName = $this->getReportTypeName($typeID);
     $template = $this->localeData[$typeName] ?? '';
 
