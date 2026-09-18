@@ -38,6 +38,7 @@ import {PageUser as PageAdminUser} from './page/admin/user.class.js';
 import {PageUsers as PageAdminUsers} from './page/admin/users.class.js';
 import {PageUsersGroup as PageAdminUsersGroup} from './page/admin/usersGroup.class.js';
 import {PageUsersGroups as PageAdminUsersGroups} from './page/admin/usersGroups.class.js';
+import {PageUsersConsents as PageAdminUsersConsents} from './page/admin/usersConsents.class.js';
 import {PageFeed as PageAdminFeed} from './page/admin/feed.class.js';
 import {PageFeeds as PageAdminFeeds} from './page/admin/feeds.class.js';
 import {PageForm as PageAdminForm} from './page/admin/form.class.js';
@@ -87,6 +88,7 @@ export class Page {
         case 'users': this.target = new PageAdminUsers(this, params); break;
         case 'usersGroup': this.target = new PageAdminUsersGroup(this, params); break;
         case 'usersGroups': this.target = new PageAdminUsersGroups(this, params); break;
+        case 'usersConsents': this.target = new PageAdminUsersConsents(this, params); break;
         case 'feed': this.target = new PageAdminFeed(this, params); break;
         case 'feeds': this.target = new PageAdminFeeds(this, params); break;
         case 'form': this.target = new PageAdminForm(this, params); break;
