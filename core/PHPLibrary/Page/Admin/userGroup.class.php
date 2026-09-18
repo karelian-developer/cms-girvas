@@ -81,7 +81,7 @@ class PageUserGroup implements InterfacePage
     }
 
     /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/usersGroup.tpl', [
+    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/users/group.tpl', [
       'ADMIN_PANEL_PAGE_NAME' => 'user-group',
       'USERS_GROUP_ID' => $usersGroup !== null
         ? $usersGroup->getID()
