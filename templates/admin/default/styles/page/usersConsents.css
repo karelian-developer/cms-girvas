@@ -1,0 +1,87 @@
+/**
+ * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
+ * @copyright   Copyright (c) 2021 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ */
+
+.grid-table__item_consent {
+  display: grid;
+  grid-template-areas:
+    'id user document locale'
+    'source status date ip'
+    'user-agent user-agent user-agent panel';
+  grid-template-columns: max-content 1fr 1fr 1fr;
+  column-gap: 15px;
+  row-gap: 5px;
+  font-size: 14px;
+  padding: 15px 0;
+}
+
+.grid-table__item_consent:not(:last-child) {
+  border-bottom: 1px solid var(--color-neutral-lightgray);
+}
+
+.grid-table__cell_id      { grid-area: id; }
+.grid-table__cell_user    { grid-area: user; }
+.grid-table__cell_document { grid-area: document; }
+.grid-table__cell_locale  { grid-area: locale; }
+.grid-table__cell_source  { grid-area: source; }
+.grid-table__cell_status  { grid-area: status; }
+.grid-table__cell_date    { grid-area: date; }
+.grid-table__cell_ip      { grid-area: ip; }
+.grid-table__cell_user-agent { grid-area: user-agent; }
+.grid-table__cell_panel   { grid-area: panel; justify-content: flex-end; }
+
+.consent-status {
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.consent-status.status-active {
+  color: var(--color-brand-primary);
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.consent-status.status-revoked {
+  color: var(--color-link-negative);
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+.grid-table__version {
+  font-size: 12px;
+  opacity: .6;
+  margin-left: 5px;
+}
+
+@media (max-width: 1600px) {
+  .grid-table__item_consent {
+    grid-template-areas:
+      'id user document'
+      'locale source status'
+      'date ip user-agent'
+      'panel panel panel';
+    grid-template-columns: max-content 1fr 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .grid-table__item_consent {
+    grid-template-areas:
+      'id'
+      'user'
+      'document'
+      'locale'
+      'source'
+      'status'
+      'date'
+      'ip'
+      'user-agent'
+      'panel';
+    grid-template-columns: 1fr;
+  }
+}
