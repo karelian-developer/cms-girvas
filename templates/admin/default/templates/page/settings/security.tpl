@@ -135,20 +135,19 @@
       </div>
       <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_premoderation_words_filter_list" id="I1474308815" cols="30" rows="10" placeholder="{LANG:PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_PLACEHOLDER}">{SETTING_PREMODERATION_WORDS_FILTER_LIST_VALUE}</textarea>
     </div>
-    <!-- ============================================================ -->
-    <!-- ЮРИДИЧЕСКИЕ ДОКУМЕНТЫ (152-ФЗ) -->
-    <!-- ============================================================ -->
-    <section class="settings-section">
-      <h2 class="settings-section__title">
+    <!-- Юридические документы (152-ФЗ) -->
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">
         {LANG:PAGE_SETTINGS_SETTING_SECURITY_LEGAL_DOCUMENTS_TITLE}
-      </h2>
-      <p class="settings-section__description">
-        {LANG:PAGE_SETTINGS_SETTING_SECURITY_LEGAL_DOCUMENTS_DESCRIPTION}
-      </p>
-      <div class="settings-section__content">
-        {SETTING_LEGAL_DOCUMENTS_ELEMENTS}
       </div>
-    </section>
+      <div class="cell__description">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_LEGAL_DOCUMENTS_DESCRIPTION}
+      </div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <!-- Пустая ячейка для пары -->
+    </div>
+    {SETTING_LEGAL_DOCUMENTS_ELEMENTS}
     <!-- Панель формы -->
     <div class="cell grid-table__cell grid-table__cell_panel" data-element="panel"></div>
   </div>

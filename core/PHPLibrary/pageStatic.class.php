@@ -603,8 +603,6 @@ class PageStatic implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('pages_static');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    
-    // Фильтр по metadata->isLegalDocument = true
     $queryBuilder->statement->clauseWhere->addConditionAdaptive([
       'mysql' => "JSON_EXTRACT(`metadata`, '$.isLegalDocument') = TRUE",
       'postgresql' => "(\"metadata\"->>'isLegalDocument')::boolean = TRUE"

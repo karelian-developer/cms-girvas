@@ -360,9 +360,6 @@ if ($CMSCore->client->isLogged(2)) {
               'static_pages_additional_field_description' => $settingValue,
               'static_pages_additional_field_type' => $settingValue,
               'static_pages_additional_field_name' => $settingValue,
-              'security_legal_documents' => is_array($settingValue)
-                ? json_encode(array_values(array_filter($settingValue, fn($v) => $v !== '')))
-                : json_encode([]),
               default => htmlspecialchars(str_replace('\'', '"', $settingValue))
             };
 

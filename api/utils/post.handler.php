@@ -219,11 +219,24 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                         $registrationIP = $CMSCore->client->getRealIPAddress();
                         $registrationUserAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
-                        // Читаем список документов из настроек
+                        // ============================================================
+                        // Собираем документы, у которых _status = 'on' (152-ФЗ)
+                        // ============================================================
                         $legalDocuments = [];
-                        if ($CMSCore->configurator->existsDatabaseEntryValue('security_legal_documents')) {
-                          $legalDocumentsRaw = $CMSCore->configurator->getDatabaseEntryValue('security_legal_documents');
-                          $legalDocuments = json_decode($legalDocumentsRaw, true) ?? [];
+                        $allLegalDocuments = PageStatic::getAllLegalDocuments($CMSCore, $registrationLocale ?? $CMSCore->locale->getName());
+
+                        foreach ($allLegalDocuments as $document) {
+                          $settingName = 'security_legal_documents_' . $document['id'] . '_status';
+                          
+                          if (!$CMSCore->configurator->existsDatabaseEntryValue($settingName)) {
+                            continue;
+                          }
+                          
+                          if ($CMSCore->configurator->getDatabaseEntryValue($settingName) !== 'on') {
+                            continue;
+                          }
+                          
+                          $legalDocuments[] = $document['name'];
                         }
 
                         // Собираем данные по документам для batch-сохранения

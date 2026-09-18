@@ -117,17 +117,39 @@ class SettingsSecurity implements SettingsPageInterface
       ? implode("\n", $legalDocumentsElements)
       : '<p class="settings-empty">' . htmlspecialchars($this->CMSCore->locale->getSingleValueByKey('PAGE_SETTINGS_SETTING_SECURITY_LEGAL_DOCUMENTS_EMPTY')) . '</p>';
 
-    error_log('=== SECURITY_LEGAL_DOCS DEBUG ===');
-    error_log('EXISTS: ' . var_export($this->CMSCore->configurator->existsDatabaseEntryValue('security_legal_documents'), true));
-    error_log('RAW: ' . var_export($this->CMSCore->configurator->getDatabaseEntryValue('security_legal_documents'), true));
-    error_log('DECODED: ' . json_encode($currentLegalDocuments));
-    error_log('PAGES_COUNT: ' . count($legalDocuments));
-    error_log('PAGES_NAMES: ' . json_encode(array_column($legalDocuments, 'name')));
+    // ============================================================
+    // ЮРИДИЧЕСКИЕ ДОКУМЕНТЫ (152-ФЗ)
+    // ============================================================
+    $adminLocaleName = $this->CMSCore->locale->getName();
+    $legalDocuments = PageStatic::getAllLegalDocuments($this->CMSCore, $adminLocaleName);
 
+    $legalDocumentsElements = [];
     foreach ($legalDocuments as $document) {
-      $isChecked = in_array($document['name'], $currentLegalDocuments, true);
-      error_log('CHECK[' . $document['name'] . ']: ' . ($isChecked ? 'YES' : 'no'));
+      $settingName = 'security_legal_documents_' . $document['id'] . '_status';
+      $settingValue = $this->CMSCore->configurator->existsDatabaseEntryValue($settingName)
+        ? $this->CMSCore->configurator->getDatabaseEntryValue($settingName)
+        : 'off';
+
+      $legalDocumentsElements[] = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/settings/security/legalDocumentItem.tpl',
+        [
+          'DOCUMENT_ID' => $document['id'],
+          'DOCUMENT_KEY' => htmlspecialchars($document['name']),
+          'DOCUMENT_TITLE' => htmlspecialchars($document['title']),
+          'HIDDEN_INPUT_ID' => 'I' . random_int(1000000000, 9999999999),
+          'CHECKBOX_INPUT_ID' => 'I' . random_int(1000000000, 9999999999),
+          'STATUS_VALUE' => $settingValue === 'on' ? 'on' : 'off',
+          'CHECKED' => $settingValue === 'on' ? 'checked' : ''
+        ]
+      );
     }
+
+    $legalDocumentsHTML = !empty($legalDocumentsElements)
+      ? implode("\n", $legalDocumentsElements)
+      : '<div class="cell grid-table__cell grid-table__cell_data">' 
+        . htmlspecialchars($this->CMSCore->locale->getSingleValueByKey('PAGE_SETTINGS_SETTING_SECURITY_LEGAL_DOCUMENTS_EMPTY') ?? '')
+        . '</div>';
 
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
       'SETTINGS_NAME' => $this->name,
