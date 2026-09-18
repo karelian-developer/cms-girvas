@@ -145,6 +145,7 @@ export class Core {
           if (this.searchParams.getPathPart(2) === 'users') this.pages.admin.users = new Page(this, 'admin', 'users');
           if (this.searchParams.getPathPart(2) === 'userGroup') this.pages.admin.usersGroup = new Page(this, 'admin', 'usersGroup');
           if (this.searchParams.getPathPart(2) === 'usersGroups') this.pages.admin.usersGroups = new Page(this, 'admin', 'usersGroups');
+          if (this.searchParams.getPathPart(2) === 'usersConsents') this.pages.admin.usersConsents = new Page(this, 'admin', 'usersConsents');
           if (this.searchParams.getPathPart(2) === 'feed') this.pages.admin.feed = new Page(this, 'admin', 'feed');
           if (this.searchParams.getPathPart(2) === 'feeds') this.pages.admin.feeds = new Page(this, 'admin', 'feeds');
           if (this.searchParams.getPathPart(2) === 'form') this.pages.admin.form = new Page(this, 'admin', 'form');
