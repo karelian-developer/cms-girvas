@@ -42,11 +42,11 @@ if ($CMSCore->urlp->getPath(3) === 'permissions') {
         $handlerOutputData['user']['permissions']['admin_panel_auth'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_PANEL_AUTH);
         $handlerOutputData['user']['permissions']['admin_users_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT);
         $handlerOutputData['user']['permissions']['admin_users_groups_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_GROUPS_MANAGEMENT);
+        $handlerOutputData['user']['permissions']['admin_users_consents_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT);
         $handlerOutputData['user']['permissions']['admin_modules_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT);
         $handlerOutputData['user']['permissions']['admin_templates_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT);
         $handlerOutputData['user']['permissions']['admin_settings_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT);
         $handlerOutputData['user']['permissions']['admin_viewing_logs'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_VIEWING_LOGS);
-        $handlerOutputData['user']['permissions']['admin_users_consents_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT);
         $handlerOutputData['user']['permissions']['moder_users_ban'] = $userGroup->permissionCheck(UserGroup::PERMISSION_MODER_USERS_BAN);
         $handlerOutputData['user']['permissions']['moder_entries_comments_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT);
         $handlerOutputData['user']['permissions']['moder_users_warns'] = $userGroup->permissionCheck(UserGroup::PERMISSION_MODER_USERS_WARNS);

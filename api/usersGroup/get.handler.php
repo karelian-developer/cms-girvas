@@ -27,6 +27,7 @@ if ($CMSCore->urlp->getPath(3) == 'permissions') {
     $handlerOutputData['usersGroup']['permissions']['admin_panel_auth'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_PANEL_AUTH);
     $handlerOutputData['usersGroup']['permissions']['admin_users_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT);
     $handlerOutputData['usersGroup']['permissions']['admin_users_groups_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_GROUPS_MANAGEMENT);
+    $handlerOutputData['usersGroup']['permissions']['admin_users_consents_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT);
     $handlerOutputData['usersGroup']['permissions']['admin_modules_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT);
     $handlerOutputData['usersGroup']['permissions']['admin_templates_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT);
     $handlerOutputData['usersGroup']['permissions']['admin_feeds_management'] = $usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_FEEDS_MANAGEMENT);
