@@ -37,6 +37,43 @@ class PageError implements InterfacePage
   private string $errorDescription;
   
   /**
+   * Карта поддерживаемых кодов ошибок.
+   * Ключ — HTTP-код, значение — суффикс ключей локализации.
+   *
+   * @var array<int, string>
+   */
+  private const ERROR_LOCALE_MAP = [
+    400 => '400',
+    401 => '401',
+    403 => '403',
+    404 => '404',
+    405 => '405',
+    408 => '408',
+    410 => '410',
+    413 => '413',
+    414 => '414',
+    429 => '429',
+    451 => '451',
+    500 => '500',
+    501 => '501',
+    502 => '502',
+    503 => '503',
+    504 => '504',
+  ];
+
+  /**
+   * Коды, для которых в описание подставляется URI запроса.
+   *
+   * @var array<int, bool>
+   */
+  private const ERROR_CODES_WITH_URI = [
+    400 => true,
+    404 => true,
+    410 => true,
+    414 => true,
+  ];
+
+  /**
    * __construct
    *
    * @param  CMSCore $CMSCore
@@ -51,29 +88,25 @@ class PageError implements InterfacePage
     $this->errorCode = $errorCode;
 
     $localeData = $this->CMSCore->locale->getData();
-    $localeName = $this->CMSCore->locale->getName();
 
-    switch ($errorCode) {
-      case 404:
-        $this->errorTitle = $localeData['PAGE_ERROR_404_TITLE'];
-        $this->errorDescription = sprintf(
-          $localeData['PAGE_ERROR_404_DESCRIPTION'],
-          strip_tags(urldecode($_SERVER['REQUEST_URI']))
+    $suffix = self::ERROR_LOCALE_MAP[$errorCode] ?? null;
+
+    if ($suffix !== null && isset($localeData["PAGE_ERROR_{$suffix}_TITLE"])) {
+      $this->errorTitle = $localeData["PAGE_ERROR_{$suffix}_TITLE"];
+      $description = $localeData["PAGE_ERROR_{$suffix}_DESCRIPTION"] ?? '';
+
+      if (isset(self::ERROR_CODES_WITH_URI[$errorCode])) {
+        $description = sprintf(
+          $description,
+          strip_tags(urldecode($_SERVER['REQUEST_URI'] ?? ''))
         );
-        break;
-      case 500:
-        $this->errorTitle = $localeData['PAGE_ERROR_500_TITLE'];
-        $this->errorDescription = $localeData['PAGE_ERROR_500_DESCRIPTION'];
-        break;
-      case 503:
-        $this->errorTitle = $localeData['PAGE_ERROR_503_TITLE'];
-        $this->errorDescription = $localeData['PAGE_ERROR_503_DESCRIPTION'];
-        break;
-      default:
-        $this->errorTitle = $localeData['PAGE_ERROR_UNKNOWN_TITLE'];
-        $this->errorDescription = $localeData['PAGE_ERROR_UNKNOWN_DESCRIPTION'];
-    }
+      }
 
+      $this->errorDescription = $description;
+    } else {
+      $this->errorTitle = $localeData['PAGE_ERROR_UNKNOWN_TITLE'];
+      $this->errorDescription = $localeData['PAGE_ERROR_UNKNOWN_DESCRIPTION'];
+    }
   }
   
   /**
