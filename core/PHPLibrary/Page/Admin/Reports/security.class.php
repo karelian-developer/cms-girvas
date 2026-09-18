@@ -262,17 +262,6 @@ class ReportsSecurity implements ReportsPageInterface
     // Текущая локаль админки
     $currentLocale = $this->CMSCore->locale->getName();
 
-    if ($typeID === CMSReport::REPORT_TYPE_ID_BASE_CONSENT_REVOKED) {
-      error_log('DOC_TITLE_RENDER_DEBUG: ' . json_encode([
-        'report_id' => $report->getID(),
-        'currentLocale' => $currentLocale,
-        'has_documentTitles' => isset($variables['documentTitles']),
-        'documentTitles_val' => $variables['documentTitles'] ?? 'NOT_SET',
-        'documentTitle_val' => $variables['documentTitle'] ?? 'NOT_SET',
-        'would_return' => $variables['documentTitles'][$currentLocale] ?? 'NOT_FOUND'
-      ]));
-    }
-
     // Хелпер: получить заголовок из массива по локалям
     $getLocalizedTitle = function($titlesKey, $singleKey, $idKey, $dbGetter) use ($variables, $currentLocale) {
       if (isset($variables[$titlesKey]) && is_array($variables[$titlesKey])) {

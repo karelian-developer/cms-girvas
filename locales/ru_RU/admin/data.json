@@ -963,7 +963,7 @@
   "REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED": "Просмотр ПДн пользователя {TARGET_USER_LOGIN} (просматривал: {VIEWER_LOGIN}) [IP: {CLIENT_IP}].",
   "REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED_LIST": "Просмотр списка пользователей ({COUNT} записей) [IP: {CLIENT_IP}].",
   "REPORT_TYPE_ID_BASE_CONSENT_GIVEN": "Получено согласие на обработку ПДн по документу «{DOCUMENT_TITLE}» (версия {DOCUMENT_VERSION}), локаль {LOCALE} [IP: {CLIENT_IP}].",
-  "REPORT_TYPE_ID_BASE_CONSENT_REVOKED": "Отозвано согласие на обработку ПДн по документу «{DOCUMENT_KEY}» (версия {DOCUMENT_VERSION}) [IP: {CLIENT_IP}].",
+  "REPORT_TYPE_ID_BASE_CONSENT_REVOKED": "Отозвано согласие на обработку ПДн по документу «{DOCUMENT_TITLE}» (версия {DOCUMENT_VERSION}) [IP: {CLIENT_IP}].",
   "REPORT_TYPE_ID_AP_ENTRY_CREATED": "Создана новая запись: &laquo;{ENTRY_TITLE}&raquo; [IP: {CLIENT_IP}].",
   "REPORT_TYPE_ID_AP_ENTRY_EDITED": "Запись &laquo;{ENTRY_TITLE}&raquo; отредактирована [IP: {CLIENT_IP}].",
   "REPORT_TYPE_ID_AP_ENTRY_DELETED": "Запись &laquo;{ENTRY_TITLE}&raquo; удалена [IP: {CLIENT_IP}].",
