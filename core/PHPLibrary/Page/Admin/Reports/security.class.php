@@ -301,11 +301,9 @@ class ReportsSecurity implements ReportsPageInterface
       // ============================================================
       // СОГЛАСИЯ (152-ФЗ)
       // ============================================================
-      '{DOCUMENT_TITLE}' => !empty($variables['documentTitles'][$currentLocale])
-        ? $variables['documentTitles'][$currentLocale]
-        : (!empty($variables['documentTitle'])
-          ? $variables['documentTitle']
-          : ($this->getPageStaticTitle($variables['pageStaticID'] ?? 0) ?: ($variables['documentKey'] ?? ''))),
+      '{DOCUMENT_TITLE}' => $variables['documentTitle']
+        ?? $this->getPageStaticTitle($variables['pageStaticID'] ?? 0)
+        ?: ($variables['documentKey'] ?? ''),
       '{DOCUMENT_KEY}' => $variables['documentKey'] ?? '',
       '{DOCUMENT_VERSION}' => $variables['documentVersion'] ?? '',
       '{LOCALE}' => $variables['locale'] ?? '',
@@ -531,6 +529,17 @@ class ReportsSecurity implements ReportsPageInterface
       $variables = $this->viewer !== null
         ? $report->getVariables($this->viewer)
         : $report->getVariables();
+
+      if ($typeID === CMSReport::REPORT_TYPE_ID_BASE_CONSENT_REVOKED) {
+        error_log('VARIABLES_DEBUG: ' . json_encode([
+          'typeID' => $typeID,
+          'has_documentTitle' => isset($variables['documentTitle']),
+          'documentTitle_val' => $variables['documentTitle'] ?? 'NOT_SET',
+          'has_documentTitles' => isset($variables['documentTitles']),
+          'has_documentKey' => isset($variables['documentKey']),
+          'keys' => array_keys($variables)
+        ]));
+      }
       
       $ip = $variables['ip'] ?? $variables['clientIP'] ?? null;
       $typeID = $report->getTypeID();
