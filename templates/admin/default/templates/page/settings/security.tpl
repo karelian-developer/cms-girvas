@@ -147,7 +147,7 @@
     <div class="cell grid-table__cell grid-table__cell_data">
       <div class="form__checkbox-container checkbox-container">
         <input type="hidden" name="setting_{SETTINGS_NAME}_cookie_banner_status" id="I_cookie_banner_status" value="{SETTING_COOKIE_BANNER_STATUS_VALUE}">
-        <input class="checkbox-container__input form__input form__input_checkbox" id="I_cookie_banner_checkbox" type="checkbox" {SETTING_COOKIE_BANNER_CHECKED_VALUE} data-logic-block="I_cookie_banner_document_wrapper" data-status-block="I_cookie_banner_status">
+        <input class="checkbox-container__input form__input form__input_checkbox" id="I_cookie_banner_checkbox" type="checkbox" {SETTING_COOKIE_BANNER_CHECKED_VALUE} data-status-block="I_cookie_banner_status">
         <label class="checkbox-container__label form__label" for="I_cookie_banner_checkbox"></label>
       </div>
     </div>

@@ -536,6 +536,28 @@ export class PageSettings {
             cookieBannerCheckbox.addEventListener('change', toggleCookieDocumentVisibility);
           }
         }
+
+        // ============================================================
+        // Показ/скрытие блока документа cookie-баннера
+        // (data-logic-block через disabled не работает для div)
+        // ============================================================
+        const cookieBannerCheckbox = document.getElementById('I_cookie_banner_checkbox');
+        const cookieBannerDocumentWrapper = document.getElementById('I_cookie_banner_document_wrapper');
+        const cookieBannerDocumentData = document.getElementById('I_cookie_banner_document_data');
+
+        if (cookieBannerCheckbox && cookieBannerDocumentWrapper && cookieBannerDocumentData) {
+          const toggleCookieDocumentVisibility = () => {
+            const isChecked = cookieBannerCheckbox.checked;
+            cookieBannerDocumentWrapper.style.display = isChecked ? '' : 'none';
+            cookieBannerDocumentData.style.display = isChecked ? '' : 'none';
+          };
+
+          // Начальное состояние
+          toggleCookieDocumentVisibility();
+
+          // Реакция на изменение
+          cookieBannerCheckbox.addEventListener('change', toggleCookieDocumentVisibility);
+        }
       }
 
       if (searchParams.getPathPart(3) === 'email') {
