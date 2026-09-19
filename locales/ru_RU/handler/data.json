@@ -191,5 +191,6 @@
   "API_CONSENT_REVOKE_ERROR_NO_PERMISSION": "Вы можете отозвать только своё согласие.",
   "API_CONSENT_REVOKE_ERROR_NO_USER_ID": "Не указан идентификатор пользователя.",
   "API_CONSENT_COOKIE_SUCCESS": "Согласие на использование cookie зафиксировано.",
+  "API_CONSENT_COOKIE_ALREADY_RECORDED": "Согласие уже зафиксировано.",
   "API_CONSENT_COOKIE_ANONYMOUS_SUCCESS": "Cookie приняты."
 }

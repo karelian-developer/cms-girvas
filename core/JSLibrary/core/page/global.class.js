@@ -410,32 +410,30 @@ export class PageGlobal {
    * @param {boolean} accepted
    */
   submitCookieConsent(cookieDocument, accepted) {
-    console.log('[Cookie] submitCookieConsent called', { cookieDocument, accepted });
-
     Client.setCookie('allowCookies', accepted ? 'true' : 'false', 366);
 
     if (!accepted) {
-      console.log('[Cookie] declined, no request');
       return;
     }
 
     const documentVersion = cookieDocument ? cookieDocument.currentVersion : '';
-    console.log('[Cookie] documentVersion:', documentVersion);
-    console.log('[Cookie] cookieDocument.id:', cookieDocument ? cookieDocument.id : null);
-    console.log('[Cookie] isLogged:', this.page.core.client ? this.page.core.client.isLogged : 'no client');
 
     if (!cookieDocument || !cookieDocument.id || !documentVersion) {
-      console.log('[Cookie] skipping request — no document/version');
       return;
     }
 
-    if (!this.page.core.client || !this.page.core.client.isLogged) {
-      console.log('[Cookie] skipping request — not logged');
-      return;
-    }
+    const formData = new FormData();
+    formData.append('pageStaticID', cookieDocument.id);
+    formData.append('documentVersion', documentVersion);
+    formData.append('locale', this.page.core.locales.base.name);
 
-    // ... отправка ...
-    console.log('[Cookie] sending request');
+    const request = new Interactive('request', {
+      method: 'POST',
+      url: '/handler/client/consent-cookie?localeMessage=' + this.page.core.locales.base.name
+    });
+
+    request.target.data = formData;
+    request.target.send();
   }
 
   /**

@@ -31,48 +31,76 @@ if ($CMSCore->urlp->getPath(2) === 'consent-cookie') {
 
   $clientIP = $CMSCore->client::getRealIPAddress($CMSCore);
   $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+  $userAgent = mb_substr($userAgent, 0, 512);
+
+  // Определяем userID: авторизован или аноним
+  $userID = 0;
+  $userLogin = '';
 
   if ($CMSCore->client->isLogged(1)) {
     $user = $CMSCore->client->getUser(1);
     $user->initData(['login', 'metadata']);
+    $userID = $user->getID();
+    $userLogin = $user->getLogin();
+  }
 
-    $consent = UserConsent::give(
+  // ============================================================
+  // Защита от дубликатов: если такое же согласие есть за последние 5 минут
+  // — возвращаем его, не создаём новое
+  // ============================================================
+  $existingConsent = UserConsent::findRecent(
+    $CMSCore,
+    $userID,
+    $clientIP,
+    $userAgent,
+    $pageStaticID,
+    $documentVersion,
+    'cookie_banner',
+    300
+  );
+
+  if ($existingConsent !== null) {
+    $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_CONSENT_COOKIE_ALREADY_RECORDED');
+    $handlerStatusCode = 1;
+    return;
+  }
+
+  // Фиксируем согласие
+  $consent = UserConsent::give(
+    $CMSCore,
+    $userID,
+    0,
+    0,
+    $pageStaticID,
+    $documentVersion,
+    $locale,
+    $clientIP,
+    $userAgent,
+    'cookie_banner'
+  );
+
+  if ($consent !== null) {
+    CMSReport::create(
       $CMSCore,
-      $user->getID(),
-      0,
-      0,
-      $pageStaticID,
-      $documentVersion,
-      $locale,
-      $clientIP,
-      $userAgent,
-      'cookie_banner'
+      CMSReport::REPORT_TYPE_ID_BASE_CONSENT_GIVEN,
+      [
+        'userID' => $userID,
+        'userLogin' => $userLogin,
+        'consentID' => $consent->getID(),
+        'pageStaticID' => $pageStaticID,
+        'documentVersion' => $documentVersion,
+        'locale' => $locale,
+        'ip' => $clientIP,
+        'source' => 'cookie_banner',
+        'isAnonymous' => $userID === 0
+      ]
     );
 
-    if ($consent !== null) {
-      CMSReport::create(
-        $CMSCore,
-        CMSReport::REPORT_TYPE_ID_BASE_CONSENT_GIVEN,
-        [
-          'userID' => $user->getID(),
-          'consentID' => $consent->getID(),
-          'pageStaticID' => $pageStaticID,
-          'documentVersion' => $documentVersion,
-          'locale' => $locale,
-          'ip' => $clientIP,
-          'source' => 'cookie_banner'
-        ]
-      );
-
-      $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_CONSENT_COOKIE_SUCCESS');
-      $handlerStatusCode = 1;
-    } else {
-      $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
-      $handlerStatusCode = 0;
-    }
-  } else {
-    $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_CONSENT_COOKIE_ANONYMOUS_SUCCESS');
+    $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_CONSENT_COOKIE_SUCCESS');
     $handlerStatusCode = 1;
+  } else {
+    $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+    $handlerStatusCode = 0;
   }
 }
 

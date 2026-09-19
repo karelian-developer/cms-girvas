@@ -362,6 +362,8 @@ class Consent
     string $userAgent = '',
     string $source = 'form'
   ) : ?Consent {
+    $userAgent = mb_substr($userAgent, 0, 512);
+    
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
@@ -417,6 +419,97 @@ class Consent
 
       $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
       return $result ? new Consent($CMSCore, (int)$result['id']) : null;
+    }
+
+    return null;
+  }
+
+  /**
+   * Проверить наличие свежего согласия по условиям
+   *
+   * @param CMSCore $CMSCore
+   * @param int $userID
+   * @param string $ip
+   * @param string $userAgent
+   * @param int $pageStaticID
+   * @param string $documentVersion
+   * @param string $source
+   * @param int $withinSeconds — временное окно (по умолчанию 300 = 5 минут)
+   * @return ?Consent
+   */
+  public static function findRecent(
+    CMSCore $CMSCore,
+    int $userID,
+    string $ip,
+    string $userAgent,
+    int $pageStaticID,
+    string $documentVersion,
+    string $source = 'cookie_banner',
+    int $withinSeconds = 300
+  ) : ?Consent {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('users_consents');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+
+    $threshold = time() - $withinSeconds;
+
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`userID` = :userID
+                  AND `ip` = :ip
+                  AND `userAgent` = :userAgent
+                  AND `pageStaticID` = :pageStaticID
+                  AND `documentVersion` = :documentVersion
+                  AND `source` = :source
+                  AND `consentedAt` >= :threshold
+                  AND `revokedAt` IS NULL',
+      'postgresql' => '"userID" = :userID
+                       AND "ip" = :ip
+                       AND "userAgent" = :userAgent
+                       AND "pageStaticID" = :pageStaticID
+                       AND "documentVersion" = :documentVersion
+                       AND "source" = :source
+                       AND "consentedAt" >= :threshold
+                       AND "revokedAt" IS NULL'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('id');
+    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    $queryBuilder->statement->setClauseLimit(1);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':userID', $userID, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':ip', $ip, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':userAgent', $userAgent, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':pageStaticID', $pageStaticID, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':documentVersion', $documentVersion, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':source', $source, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':threshold', $threshold, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+
+    if ($result) {
+      $consent = new Consent($CMSCore, (int)$result['id']);
+      $consent->initData();
+      return $consent;
     }
 
     return null;
