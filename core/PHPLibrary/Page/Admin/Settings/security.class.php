@@ -70,12 +70,27 @@ class SettingsSecurity implements SettingsPageInterface
   {
     $formTemplatePath = self::FORM_PATH . '/' . $this->name . '.tpl';
     
-    $settingAllowedUsersRegistrationStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_users_registration_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_users_registration_status') : '';
-    $settingAllowedEmailsStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_emails_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_emails_status') : '';
-    $settingAllowedIPAdminStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_admin_ip_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_admin_ip_status') : '';
-    $settingPremoderationCreateStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_create_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_create_status') : '';
-    $settingPremoderationLinksFilterStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_links_filter_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_links_filter_status') : '';
-    $settingPremoderationWordsFilterStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_words_filter_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_words_filter_status') : '';
+    $settingAllowedUsersRegistrationStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_users_registration_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_users_registration_status')
+      : '';
+    $settingAllowedEmailsStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_emails_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_emails_status')
+      : '';
+    $settingAllowedIPAdminStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_admin_ip_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_admin_ip_status')
+      : '';
+    $settingPremoderationCreateStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_create_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_create_status')
+      : '';
+    $settingPremoderationLinksFilterStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_links_filter_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_links_filter_status')
+      : '';
+    $settingPremoderationWordsFilterStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_words_filter_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_words_filter_status')
+      : '';
+    $settingCookieBannerStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_cookie_banner_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_cookie_banner_status')
+      : 'off';
 
     // ============================================================
     // ЮРИДИЧЕСКИЕ ДОКУМЕНТЫ (152-ФЗ)
@@ -93,9 +108,6 @@ class SettingsSecurity implements SettingsPageInterface
       $rawValue = $this->CMSCore->configurator->getDatabaseEntryValue('security_legal_documents');
       $currentLegalDocuments = json_decode($rawValue, true) ?? [];
     }
-
-    error_log('DOC_NAMES: ' . json_encode(array_column($legalDocuments, 'name')));
-    error_log('CURRENT_DOCS: ' . json_encode($currentLegalDocuments));
 
     /** @var string HTML-чекбоксы юридических документов */
     $legalDocumentsElements = [];
@@ -172,6 +184,8 @@ class SettingsSecurity implements SettingsPageInterface
       'SETTING_PREMODERATION_WORDS_FILTER_STATUS_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_words_filter_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_words_filter_status') : 'off',
       'SETTING_PREMODERATION_WORDS_FILTER_CHECKED_VALUE' => $settingPremoderationWordsFilterStatusValue === 'on' ? 'checked' : '',
       'SETTING_LEGAL_DOCUMENTS_ELEMENTS' => $legalDocumentsHTML,
+      'SETTING_COOKIE_BANNER_STATUS_VALUE' => $settingCookieBannerStatusValue,
+      'SETTING_COOKIE_BANNER_CHECKED_VALUE' => $settingCookieBannerStatusValue === 'on' ? 'checked' : '',
     ]);
   }
 }

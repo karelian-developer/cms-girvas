@@ -135,6 +135,22 @@
       </div>
       <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_premoderation_words_filter_list" id="I1474308815" cols="30" rows="10" placeholder="{LANG:PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_PLACEHOLDER}">{SETTING_PREMODERATION_WORDS_FILTER_LIST_VALUE}</textarea>
     </div>
+    <!-- Поле: Cookie-баннер (152-ФЗ) -->
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_COOKIE_BANNER_TITLE}
+      </div>
+      <div class="cell__description">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_COOKIE_BANNER_DESCRIPTION}
+      </div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <div class="form__checkbox-container checkbox-container">
+        <input type="hidden" name="setting_{SETTINGS_NAME}_cookie_banner_status" id="I1474308120" value="{SETTING_COOKIE_BANNER_STATUS_VALUE}">
+        <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308820" type="checkbox" {SETTING_COOKIE_BANNER_CHECKED_VALUE} data-status-block="I1474308120">
+        <label class="checkbox-container__label form__label" for="I1474308820"></label>
+      </div>
+    </div>
     <!-- Юридические документы (152-ФЗ) -->
     <div class="cell grid-table__cell grid-table__cell_text">
       <div class="cell__title">

@@ -97,7 +97,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
                 'documentVersion' => $consentForLog->getDocumentVersion(),
                 'locale' => $consentForLog->getLocale(),
                 'revokeReason' => $revokeReason,
-                'ip' => $CMSCore->client->getRealIPAddress()
+                'ip' => $CMSCore->client::getRealIPAddress($CMSCore)
               ]
             );
 

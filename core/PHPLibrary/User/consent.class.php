@@ -378,8 +378,10 @@ class Consent
     $queryBuilder->statement->addColumn('userAgent');
     $queryBuilder->statement->addColumn('source');
     $queryBuilder->statement->addColumn('consentedAt');
-    $queryBuilder->statement->setClauseReturning();
-    $queryBuilder->statement->clauseReturning->addColumn('id');
+    if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+      $queryBuilder->statement->setClauseReturning();
+      $queryBuilder->statement->clauseReturning->addColumn('id');
+    }
     $queryBuilder->statement->assembly();
 
     $consentedAt = time();
@@ -460,18 +462,9 @@ class Consent
     $consentedAt = time();
     $userAgent = mb_substr($userAgent, 0, 512);
 
-    // Колонки
     $columns = [
-      'userID',
-      'formID',
-      'formReportID',
-      'pageStaticID',
-      'documentVersion',
-      'locale',
-      'ip',
-      'userAgent',
-      'source',
-      'consentedAt'
+      'userID', 'formID', 'formReportID', 'pageStaticID',
+      'documentVersion', 'locale', 'ip', 'userAgent', 'source', 'consentedAt'
     ];
 
     $quotedColumns = [];
@@ -482,79 +475,129 @@ class Consent
       };
     }
 
-    $valuePlaceholders = [];
-    $bindings = [];
-
-    foreach (array_values($consents) as $index => $consent) {
-      $rowPlaceholders = [
-        ':userID_' . $index,
-        ':formID_' . $index,
-        ':formReportID_' . $index,
-        ':pageStaticID_' . $index,
-        ':documentVersion_' . $index,
-        ':locale_' . $index,
-        ':ip_' . $index,
-        ':userAgent_' . $index,
-        ':source_' . $index,
-        ':consentedAt_' . $index
-      ];
-
-      $valuePlaceholders[] = '(' . implode(', ', $rowPlaceholders) . ')';
-
-      $bindings[':userID_' . $index] = [$userID, \PDO::PARAM_INT];
-      $bindings[':formID_' . $index] = [$formID, \PDO::PARAM_INT];
-      $bindings[':formReportID_' . $index] = [$formReportID, \PDO::PARAM_INT];
-      $bindings[':pageStaticID_' . $index] = [(int)$consent['pageStaticID'], \PDO::PARAM_INT];
-      $bindings[':documentVersion_' . $index] = [$consent['documentVersion'], \PDO::PARAM_STR];
-      $bindings[':locale_' . $index] = [$locale, \PDO::PARAM_STR];
-      $bindings[':ip_' . $index] = [$ip, \PDO::PARAM_STR];
-      $bindings[':userAgent_' . $index] = [$userAgent, \PDO::PARAM_STR];
-      $bindings[':source_' . $index] = [$source, \PDO::PARAM_STR];
-      $bindings[':consentedAt_' . $index] = [$consentedAt, \PDO::PARAM_INT];
-    }
-
     $tableName = match ($CMSConfigDatabase['dms']) {
       CMSDMS::MySQL => '`users_consents`',
       CMSDMS::PostgreSQL => '"users_consents"'
     };
 
-    $returning = ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) ? ' RETURNING "id", "pageStaticID"' : '';
-
-    $sql = sprintf(
-      'INSERT INTO %s (%s) VALUES %s%s',
-      $tableName,
-      implode(', ', $quotedColumns),
-      implode(', ', $valuePlaceholders),
-      $returning
-    );
-
-    try {
-      $databaseQuery = $databaseConnection->prepare($sql);
-      foreach ($bindings as $placeholder => [$value, $type]) {
-        $databaseQuery->bindValue($placeholder, $value, $type);
-      }
-      $databaseQuery->execute();
-    } catch (PDOException $exception) {
-      die(json_encode([
-        'message' => $exception->getMessage(),
-        'statusCode' => 0,
-        'outputData' => []
-      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-    }
-
     $result = [];
 
     if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+      // ============================================================
+      // PostgreSQL: bulk INSERT + RETURNING (точные ID)
+      // ============================================================
+      $valuePlaceholders = [];
+      $bindings = [];
+
+      foreach (array_values($consents) as $index => $consent) {
+        $rowPlaceholders = [
+          ':userID_' . $index,
+          ':formID_' . $index,
+          ':formReportID_' . $index,
+          ':pageStaticID_' . $index,
+          ':documentVersion_' . $index,
+          ':locale_' . $index,
+          ':ip_' . $index,
+          ':userAgent_' . $index,
+          ':source_' . $index,
+          ':consentedAt_' . $index
+        ];
+
+        $valuePlaceholders[] = '(' . implode(', ', $rowPlaceholders) . ')';
+
+        $bindings[':userID_' . $index] = [$userID, \PDO::PARAM_INT];
+        $bindings[':formID_' . $index] = [$formID, \PDO::PARAM_INT];
+        $bindings[':formReportID_' . $index] = [$formReportID, \PDO::PARAM_INT];
+        $bindings[':pageStaticID_' . $index] = [(int)$consent['pageStaticID'], \PDO::PARAM_INT];
+        $bindings[':documentVersion_' . $index] = [$consent['documentVersion'], \PDO::PARAM_STR];
+        $bindings[':locale_' . $index] = [$locale, \PDO::PARAM_STR];
+        $bindings[':ip_' . $index] = [$ip, \PDO::PARAM_STR];
+        $bindings[':userAgent_' . $index] = [$userAgent, \PDO::PARAM_STR];
+        $bindings[':source_' . $index] = [$source, \PDO::PARAM_STR];
+        $bindings[':consentedAt_' . $index] = [$consentedAt, \PDO::PARAM_INT];
+      }
+
+      $sql = sprintf(
+        'INSERT INTO %s (%s) VALUES %s RETURNING "id", "pageStaticID"',
+        $tableName,
+        implode(', ', $quotedColumns),
+        implode(', ', $valuePlaceholders)
+      );
+
+      try {
+        $databaseQuery = $databaseConnection->prepare($sql);
+        foreach ($bindings as $placeholder => [$value, $type]) {
+          $databaseQuery->bindValue($placeholder, $value, $type);
+        }
+        $databaseQuery->execute();
+      } catch (PDOException $exception) {
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+      }
+
       $rows = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
       foreach ($rows as $row) {
         $result[(int)$row['pageStaticID']] = new Consent($CMSCore, (int)$row['id']);
       }
     } else {
-      $firstID = (int)$databaseConnection->lastInsertId();
-      $index = 0;
-      foreach ($consents as $consent) {
-        $result[(int)$consent['pageStaticID']] = new Consent($CMSCore, $firstID + $index);
-        $index++;
+      // ============================================================
+      // MySQL: транзакция + поштучный INSERT + lastInsertId()
+      // (не полагаемся на последовательность AUTO_INCREMENT)
+      // ============================================================
+      $singleInsertSql = sprintf(
+        'INSERT INTO %s (%s) VALUES (%s)',
+        $tableName,
+        implode(', ', $quotedColumns),
+        implode(', ', [
+          ':userID', ':formID', ':formReportID', ':pageStaticID',
+          ':documentVersion', ':locale', ':ip', ':userAgent',
+          ':source', ':consentedAt'
+        ])
+      );
+
+      // Безопасная вложенность: если транзакция уже открыта — не открываем новую
+      $ownTransaction = !$databaseConnection->inTransaction();
+      if ($ownTransaction) {
+        $databaseConnection->beginTransaction();
+      }
+
+      try {
+        $singleQuery = $databaseConnection->prepare($singleInsertSql);
+
+        foreach ($consents as $consent) {
+          $singleQuery->bindValue(':userID', $userID, \PDO::PARAM_INT);
+          $singleQuery->bindValue(':formID', $formID, \PDO::PARAM_INT);
+          $singleQuery->bindValue(':formReportID', $formReportID, \PDO::PARAM_INT);
+          $singleQuery->bindValue(':pageStaticID', (int)$consent['pageStaticID'], \PDO::PARAM_INT);
+          $singleQuery->bindValue(':documentVersion', $consent['documentVersion'], \PDO::PARAM_STR);
+          $singleQuery->bindValue(':locale', $locale, \PDO::PARAM_STR);
+          $singleQuery->bindValue(':ip', $ip, \PDO::PARAM_STR);
+          $singleQuery->bindValue(':userAgent', $userAgent, \PDO::PARAM_STR);
+          $singleQuery->bindValue(':source', $source, \PDO::PARAM_STR);
+          $singleQuery->bindValue(':consentedAt', $consentedAt, \PDO::PARAM_INT);
+
+          $singleQuery->execute();
+
+          $insertedID = (int)$databaseConnection->lastInsertId();
+          $result[(int)$consent['pageStaticID']] = new Consent($CMSCore, $insertedID);
+        }
+
+        if ($ownTransaction) {
+          $databaseConnection->commit();
+        }
+      } catch (PDOException $exception) {
+        if ($ownTransaction) {
+          $databaseConnection->rollBack();
+        }
+
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
     }
 

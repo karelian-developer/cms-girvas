@@ -614,8 +614,10 @@ class Version
       $queryBuilder->setStatementInsert();
       $queryBuilder->statement->setTable('pages_static_versions');
 
-      $queryBuilder->statement->setClauseReturning();
-      $queryBuilder->statement->clauseReturning->addColumn('id');
+      if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+        $queryBuilder->statement->setClauseReturning();
+        $queryBuilder->statement->clauseReturning->addColumn('id');
+      }
       $queryBuilder->statement->assembly();
 
       $currentUnixTimestamp = time();
@@ -710,97 +712,92 @@ class Version
       $databaseQuery->execute();
 
       // ============================================================
-      // 2. Формируем batch INSERT
-      // ============================================================
-      $columns = [
-        'pageStaticID',
-        'version',
-        'locale',
-        'texts',
-        'effectiveFrom',
-        'createdUnixTimestamp',
-        'createdByID',
-        'isCurrent'
-      ];
-
-      $quotedColumns = [];
-      foreach ($columns as $col) {
-        $quotedColumns[] = match ($CMSConfigDatabase['dms']) {
-          CMSDMS::MySQL => '`' . $col . '`',
-          CMSDMS::PostgreSQL => '"' . $col . '"'
-        };
-      }
-
-      $valuePlaceholders = [];
-      $bindings = [];
-
-      foreach (array_values($locales) as $index => $locale) {
-        $rowPlaceholders = [];
-        $rowPlaceholders[] = ':pageStaticID_' . $index;
-        $rowPlaceholders[] = ':version_' . $index;
-        $rowPlaceholders[] = ':locale_' . $index;
-        $rowPlaceholders[] = ':texts_' . $index;
-        $rowPlaceholders[] = ':effectiveFrom_' . $index;
-        $rowPlaceholders[] = ':createdUnixTimestamp_' . $index;
-        $rowPlaceholders[] = ':createdByID_' . $index;
-        $rowPlaceholders[] = ':isCurrent_' . $index;
-
-        $valuePlaceholders[] = '(' . implode(', ', $rowPlaceholders) . ')';
-
-        $bindings[':pageStaticID_' . $index] = [$pageStaticID, \PDO::PARAM_INT];
-        $bindings[':version_' . $index] = [$version, \PDO::PARAM_STR];
-        $bindings[':locale_' . $index] = [$locale, \PDO::PARAM_STR];
-        $bindings[':texts_' . $index] = [$textsJSON, \PDO::PARAM_STR];
-        $bindings[':effectiveFrom_' . $index] = [$currentUnixTimestamp, \PDO::PARAM_INT];
-        $bindings[':createdUnixTimestamp_' . $index] = [$currentUnixTimestamp, \PDO::PARAM_INT];
-        $bindings[':createdByID_' . $index] = [$createdByID, \PDO::PARAM_INT];
-        $bindings[':isCurrent_' . $index] = [true, \PDO::PARAM_BOOL];
-      }
-
-      $tableName = match ($CMSConfigDatabase['dms']) {
-        CMSDMS::MySQL => '`pages_static_versions`',
-        CMSDMS::PostgreSQL => '"pages_static_versions"'
-      };
-
-      // PostgreSQL — добавляем RETURNING
-      $returning = ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) ? ' RETURNING "id", "locale"' : '';
-
-      $sql = sprintf(
-        'INSERT INTO %s (%s) VALUES %s%s',
-        $tableName,
-        implode(', ', $quotedColumns),
-        implode(', ', $valuePlaceholders),
-        $returning
-      );
-
-      $databaseQuery = $databaseConnection->prepare($sql);
-
-      foreach ($bindings as $placeholder => [$value, $type]) {
-        $databaseQuery->bindValue($placeholder, $value, $type);
-      }
-
-      $databaseQuery->execute();
-
-      // ============================================================
-      // 3. Получаем ID созданных версий
+      // 2. INSERT новых версий (раздельно по СУБД)
       // ============================================================
       $versions = [];
 
       if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
-        // PostgreSQL — RETURNING вернёт все строки
-        $rows = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+        // --------------------------------------------------------
+        // PostgreSQL: bulk INSERT + RETURNING
+        // --------------------------------------------------------
+        $columns = [
+          'pageStaticID', 'version', 'locale', 'texts',
+          'effectiveFrom', 'createdUnixTimestamp', 'createdByID', 'isCurrent'
+        ];
 
+        $quotedColumns = [];
+        foreach ($columns as $col) {
+          $quotedColumns[] = '"' . $col . '"';
+        }
+
+        $valuePlaceholders = [];
+        $bindings = [];
+
+        foreach (array_values($locales) as $index => $locale) {
+          $rowPlaceholders = [
+            ':pageStaticID_' . $index,
+            ':version_' . $index,
+            ':locale_' . $index,
+            ':texts_' . $index,
+            ':effectiveFrom_' . $index,
+            ':createdUnixTimestamp_' . $index,
+            ':createdByID_' . $index,
+            ':isCurrent_' . $index
+          ];
+
+          $valuePlaceholders[] = '(' . implode(', ', $rowPlaceholders) . ')';
+
+          $bindings[':pageStaticID_' . $index] = [$pageStaticID, \PDO::PARAM_INT];
+          $bindings[':version_' . $index] = [$version, \PDO::PARAM_STR];
+          $bindings[':locale_' . $index] = [$locale, \PDO::PARAM_STR];
+          $bindings[':texts_' . $index] = [$textsJSON, \PDO::PARAM_STR];
+          $bindings[':effectiveFrom_' . $index] = [$currentUnixTimestamp, \PDO::PARAM_INT];
+          $bindings[':createdUnixTimestamp_' . $index] = [$currentUnixTimestamp, \PDO::PARAM_INT];
+          $bindings[':createdByID_' . $index] = [$createdByID, \PDO::PARAM_INT];
+          $bindings[':isCurrent_' . $index] = [true, \PDO::PARAM_BOOL];
+        }
+
+        $sql = sprintf(
+          'INSERT INTO "pages_static_versions" (%s) VALUES %s RETURNING "id", "locale"',
+          implode(', ', $quotedColumns),
+          implode(', ', $valuePlaceholders)
+        );
+
+        $databaseQuery = $databaseConnection->prepare($sql);
+        foreach ($bindings as $placeholder => [$value, $type]) {
+          $databaseQuery->bindValue($placeholder, $value, $type);
+        }
+        $databaseQuery->execute();
+
+        $rows = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
         foreach ($rows as $row) {
           $versions[$row['locale']] = new Version($CMSCore, (int)$row['id']);
         }
       } else {
-        // MySQL — lastInsertId вернёт первый ID
-        $firstID = (int)$databaseConnection->lastInsertId();
-        $index = 0;
+        // --------------------------------------------------------
+        // MySQL: поштучный INSERT + lastInsertId()
+        // (не полагаемся на последовательность AUTO_INCREMENT)
+        // --------------------------------------------------------
+        $singleInsertSql = 'INSERT INTO `pages_static_versions` '
+          . '(`pageStaticID`, `version`, `locale`, `texts`, `effectiveFrom`, `createdUnixTimestamp`, `createdByID`, `isCurrent`) '
+          . 'VALUES (:pageStaticID, :version, :locale, :texts, :effectiveFrom, :createdUnixTimestamp, :createdByID, :isCurrent)';
+
+        $singleQuery = $databaseConnection->prepare($singleInsertSql);
 
         foreach ($locales as $locale) {
-          $versions[$locale] = new Version($CMSCore, $firstID + $index);
-          $index++;
+          $singleQuery->bindValue(':pageStaticID', $pageStaticID, \PDO::PARAM_INT);
+          $singleQuery->bindValue(':version', $version, \PDO::PARAM_STR);
+          $singleQuery->bindValue(':locale', $locale, \PDO::PARAM_STR);
+          $singleQuery->bindValue(':texts', $textsJSON, \PDO::PARAM_STR);
+          $singleQuery->bindValue(':effectiveFrom', $currentUnixTimestamp, \PDO::PARAM_INT);
+          $singleQuery->bindValue(':createdUnixTimestamp', $currentUnixTimestamp, \PDO::PARAM_INT);
+          $singleQuery->bindValue(':createdByID', $createdByID, \PDO::PARAM_INT);
+          $singleQuery->bindValue(':isCurrent', true, \PDO::PARAM_BOOL);
+
+          $singleQuery->execute();
+
+          $insertedID = (int)$databaseConnection->lastInsertId();
+          $versions[$locale] = new Version($CMSCore, $insertedID);
         }
       }
 

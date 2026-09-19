@@ -360,6 +360,36 @@ export class Core {
     await Promise.all(promises);
     return icons;
   }
+
+  /**
+   * Получить настройки CMS через API
+   *
+   * @param {string[]} keys
+   * 
+   * @returns {Promise<Object>} 
+   */
+  async getSettings(keys = []) {
+    const keysParam = Array.isArray(keys) && keys.length > 0
+      ? '?keys=' + encodeURIComponent(keys.join(','))
+      : '';
+
+    return fetch('/handler/settings' + keysParam, {
+      method: 'GET',
+      credentials: 'same-origin'
+    }).then((response) => {
+      return (response.ok) ? response.json() : Promise.reject(response);
+    }).then((data) => {
+      if (data.statusCode === 1 && data.outputData && data.outputData.settings) {
+        return data.outputData.settings;
+      }
+      return {};
+    }).catch((error) => {
+      if (window.CMSCore && window.CMSCore.debugError) {
+        window.CMSCore.debugError(1, 'CMSCore', 'Failed to fetch settings: ' + error);
+      }
+      return {};
+    });
+  }
 }
 
 window.CMSCore = new Core();
