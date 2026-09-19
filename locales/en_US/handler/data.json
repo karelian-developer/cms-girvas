@@ -183,5 +183,7 @@
   "API_CONSENT_REVOKE_ERROR_REASON_REQUIRED": "Revoke reason is required.",
   "API_CONSENT_REVOKE_ERROR_NOT_FOUND": "Consent not found or already revoked.",
   "API_CONSENT_REVOKE_ERROR_NO_PERMISSION": "You can only revoke your own consent.",
-  "API_CONSENT_REVOKE_ERROR_NO_USER_ID": "User ID not specified."
+  "API_CONSENT_REVOKE_ERROR_NO_USER_ID": "User ID not specified.",
+  "API_CONSENT_COOKIE_SUCCESS": "Cookie consent has been recorded.",
+  "API_CONSENT_COOKIE_ANONYMOUS_SUCCESS": "Cookies accepted."
 }

@@ -427,7 +427,7 @@ export class PageGlobal {
 
     const request = new Interactive('request', {
       method: 'POST',
-      url: '/handler/consent/cookie?localeMessage=' + window.CMSCore.locales.base.name
+      url: '/handler/client/consent-cookie?localeMessage=' + window.CMSCore.locales.base.name
     });
 
     request.target.data = formData;

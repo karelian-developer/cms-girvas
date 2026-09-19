@@ -189,5 +189,7 @@
   "API_CONSENT_REVOKE_ERROR_REASON_REQUIRED": "Необходимо указать причину отзыва.",
   "API_CONSENT_REVOKE_ERROR_NOT_FOUND": "Согласие не найдено или уже отозвано.",
   "API_CONSENT_REVOKE_ERROR_NO_PERMISSION": "Вы можете отозвать только своё согласие.",
-  "API_CONSENT_REVOKE_ERROR_NO_USER_ID": "Не указан идентификатор пользователя."
+  "API_CONSENT_REVOKE_ERROR_NO_USER_ID": "Не указан идентификатор пользователя.",
+  "API_CONSENT_COOKIE_SUCCESS": "Согласие на использование cookie зафиксировано.",
+  "API_CONSENT_COOKIE_ANONYMOUS_SUCCESS": "Cookie приняты."
 }
