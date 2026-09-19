@@ -98,6 +98,9 @@ final class Report
   // ЭКСПОРТ ДАННЫХ СУБЪЕКТА (152-ФЗ)
   public const REPORT_TYPE_ID_BASE_SUBJECT_DATA_EXPORTED = 11100009;
 
+  // ОБЕЗЛИЧИВАНИЕ ПДн (152-ФЗ)
+  public const REPORT_TYPE_ID_AP_USER_ANONYMIZED = 11100010;
+
   // АВТОРИЗАЦИЯ (АДМИНКА)
   public const REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL = 10000001;
   public const REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS = 10000002;
@@ -205,6 +208,7 @@ final class Report
     self::REPORT_TYPE_ID_BASE_CONSENT_GIVEN            => self::CATEGORY_SECURITY,
     self::REPORT_TYPE_ID_BASE_CONSENT_REVOKED          => self::CATEGORY_SECURITY,
     self::REPORT_TYPE_ID_BASE_SUBJECT_DATA_EXPORTED    => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_AP_USER_ANONYMIZED            => self::CATEGORY_SECURITY,
   ];
 
   /** @var string Ключ шифрования для ПДн в логах */
