@@ -14,7 +14,6 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 $allowedSettings = [
-  'security_cookie_banner_status' => 'bool',
   'base_site_title'               => 'string',
   'base_locale'                   => 'string',
   'security_cookie_banner_status'   => 'bool',

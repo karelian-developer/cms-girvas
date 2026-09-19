@@ -322,28 +322,33 @@ export class PageGlobal {
    * показывает модалку при первом заходе, фиксирует согласие.
    */
   async initCookieBanner() {
-    // 1. Проверяем cookie — если пользователь уже дал согласие/отказ, не показываем
     if (Client.existsCookie('allowCookies')) {
       return;
     }
 
-    // 2. Запрашиваем настройку через Core
-    const settings = await window.CMSCore.getSettings(['security_cookie_banner_status']);
+    const settings = await window.CMSCore.getSettings([
+      'security_cookie_banner_status',
+      'security_cookie_banner_document_id'
+    ]);
 
     if (settings.security_cookie_banner_status !== true) {
       return;
     }
 
-    // 3. Запрашиваем документ cookie-политики через API
-    const documentKey = 'document--using-cookies-files';
+    const cookieDocumentID = parseInt(settings.security_cookie_banner_document_id, 10) || 0;
+
+    if (cookieDocumentID <= 0) {
+      return;
+    }
+
     let cookieDocument = null;
 
     try {
       const response = await fetch(
-        '/handler/pageStatic/' + encodeURIComponent(documentKey) +
+        '/handler/pageStatic/' + cookieDocumentID +
         '?locale=' + window.CMSCore.locales.base.name +
         '&localeMessage=' + window.CMSCore.locales.base.name,
-        { method: 'GET' }
+        { method: 'GET', credentials: 'same-origin' }
       );
 
       if (response.ok) {
@@ -353,17 +358,19 @@ export class PageGlobal {
         }
       }
     } catch (e) {
-      // Игнорируем — покажем баннер без ссылки
-      window.CMSCore.debugError(1, 'CookieBanner', 'Failed to fetch cookie document: ' + e);
+      window.CMSCore.debugError(1, 'CookieBanner', 'Failed to fetch document: ' + e);
+      return;
     }
 
-    // 4. Формируем контент баннера
+    if (!cookieDocument || !cookieDocument.id) {
+      return;
+    }
+
     const localeData = window.CMSCore.localeData;
     const contentElement = document.createElement('div');
     contentElement.classList.add('cookie-banner');
     contentElement.innerHTML = localeData.MODAL_COOKIE_SITE_USING_DESCRIPTION || '';
 
-    // Ссылка на документ (если удалось получить)
     if (cookieDocument && cookieDocument.name) {
       const linkElement = document.createElement('a');
       linkElement.href = '/page/' + cookieDocument.name;
@@ -376,7 +383,6 @@ export class PageGlobal {
       contentElement.appendChild(linkElement);
     }
 
-    // 5. Показываем модалку
     const modal = new Interactive('modal', {
       title: localeData.MODAL_COOKIE_SITE_USING_TITLE || 'Использование cookie',
       content: contentElement
