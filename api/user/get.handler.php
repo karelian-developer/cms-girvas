@@ -109,6 +109,7 @@ if ($CMSCore->urlp->getPath(3) === 'permissions') {
       'id' => $userGroup->getID(),
       'title' => $userGroup->getTitle($locale)
     ];
+    $handlerOutputData['user']['isAnonymized'] = $user->isAnonymized();
 
     if ($CMSCore->urlp->getPath(2) === '@me') {
       $handlerOutputData['user']['isLogged'] = $CMSCore->client->isLogged(1);

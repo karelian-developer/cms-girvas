@@ -196,5 +196,5 @@
   "API_ANONYMIZE_SUCCESS": "Персональные данные пользователя обезличены.",
   "API_ANONYMIZE_ERROR_SUPERADMIN": "Нельзя обезличить супер-администратора.",
   "API_ANONYMIZE_ERROR_SELF": "Нельзя обезличить самого себя.",
-  "API_ANONYMIZE_ERROR_ALREADY": "User is already anonymized."
+  "API_ANONYMIZE_ERROR_ALREADY": "Пользователь уже обезличен."
 }

@@ -22,7 +22,7 @@ export class PageUser {
   constructor(page, params = {}) {
     this.page = page;
 
-    this.buttons = {save: null, delete: null, block: null, unblock: null, export: null};
+    this.buttons = {save: null, delete: null, block: null, unblock: null, export: null, anonymize: null};
   }
 
   init() {
@@ -108,18 +108,26 @@ export class PageUser {
       this.buttons.block = new Interactive('button');
       this.buttons.unblock = new Interactive('button');
       this.buttons.export = new Interactive('button');
+      this.buttons.anonymize = new Interactive('button');
 
       this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
       this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
       this.buttons.block.target.setLabel(localeData.BUTTON_BAN_LABEL);
       this.buttons.unblock.target.setLabel(localeData.BUTTON_UNBAN_LABEL);
       this.buttons.export.target.setLabel(localeData.PAGE_USER_BUTTON_EXPORT_SUBJECT_DATA);
+      this.buttons.anonymize.target.setLabel(localeData.PAGE_USER_BUTTON_ANONYMIZE);
       
       this.buttons.save.target.setStyle('green');
       this.buttons.delete.target.setStyle('red');
       this.buttons.block.target.setStyle('red');
       this.buttons.unblock.target.setStyle('green');
       this.buttons.export.target.setStyle('default');
+      this.buttons.anonymize.target.setStyle('red');
+
+      this.buttons.anonymize.target.setCallback((event) => {
+        event.preventDefault();
+        this.handleAnonymize(searchParams.getPathPart(3), userData, localeData);
+      });
 
       this.buttons.export.target.setCallback((event) => {
         event.preventDefault();
@@ -231,11 +239,16 @@ export class PageUser {
         interactiveModal.target.show();
       });
 
+      this.buttons.anonymize.assembly();
       this.buttons.export.assembly();
       this.buttons.save.assembly();
       this.buttons.delete.assembly();
       this.buttons.block.assembly();
       this.buttons.unblock.assembly();
+
+      if (userData.isAnonymized) {
+        this.buttons.anonymize.target.element.style.display = 'none';
+      }
   
       if (searchParams.getPathPart(3) === null) {
         this.buttons.unblock.target.element.style.display = 'none';
@@ -257,6 +270,7 @@ export class PageUser {
       if (interactiveFormPanelContainer !== null) {
         if (searchParams.getPathPart(3) !== null) {
           interactiveFormPanelContainer.append(this.buttons.export.target.element);
+          interactiveFormPanelContainer.append(this.buttons.anonymize.target.element);
         }
 
         interactiveFormPanelContainer.append(this.buttons.delete.target.element);
@@ -317,6 +331,69 @@ export class PageUser {
       } catch (error) {
         this.page.showPopupNotification('Ошибка сети: ' + error, 0);
       }
+      modal.target.close();
+    });
+
+    modal.target.addButton(localeData.BUTTON_CANCEL_LABEL, () => modal.target.close());
+
+    modal.assembly();
+    document.body.appendChild(modal.target.element);
+    modal.target.show();
+  }
+
+  /**
+   * Обезличить ПДн пользователя
+   *
+   * @param {string} userID
+   * @param {object} userData
+   * @param {object} localeData
+   */
+  handleAnonymize(userID, userData, localeData) {
+    const loginInput = document.querySelector('[data-element="input-login"]');
+    const login = loginInput ? loginInput.value : (userData.login || '');
+
+    const modal = new Interactive('modal', {
+      title: localeData.MODAL_ANONYMIZE_TITLE || 'Обезличивание ПДн',
+      content: (localeData.MODAL_ANONYMIZE_DESCRIPTION || 'Вы собираетесь обезличить персональные данные пользователя «{LOGIN}». Действие необратимо. Продолжить?').replace('{LOGIN}', login)
+    });
+
+    // Поле причины
+    const reasonTextarea = document.createElement('textarea');
+    reasonTextarea.classList.add('form__textarea');
+    reasonTextarea.setAttribute('placeholder', localeData.PAGE_USER_ANONYMIZE_REASON_PLACEHOLDER || 'Причина (например, истечение срока хранения)');
+    modal.target.content = reasonTextarea;
+
+    modal.target.addButton(localeData.BUTTON_ANONYMIZE_SUBMIT || 'Обезличить', async () => {
+      const formData = new FormData();
+      formData.append('user_id', userID);
+      formData.append('reason', reasonTextarea.value.trim() || 'retention_expired');
+
+      const match = document.cookie.match(/_grv_csrf=([^;]+)/);
+      const freshToken = match ? decodeURIComponent(match[1]) : '';
+
+      const headers = {};
+      if (freshToken !== '') {
+        headers['X-CSRF-Token'] = freshToken;
+      }
+
+      try {
+        const response = await fetch(
+          '/handler/user/anonymize?localeMessage=' + window.CMSCore.locales.admin.name,
+          { method: 'POST', body: formData, headers: headers, credentials: 'same-origin' }
+        );
+
+        const data = await response.json();
+
+        if (data.statusCode === 1) {
+          this.page.showPopupNotification(data.message, 1);
+          window.location.reload();
+        } else {
+          this.page.showPopupNotification(data.message, 0);
+        }
+      } catch (error) {
+        this.page.showPopupNotification('Ошибка сети: ' + error, 0);
+      }
+
       modal.target.close();
     });
 
