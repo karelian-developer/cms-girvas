@@ -17,6 +17,8 @@ $allowedSettings = [
   'security_cookie_banner_status' => 'bool',
   'base_site_title'               => 'string',
   'base_locale'                   => 'string',
+  'security_cookie_banner_status'   => 'bool',
+  'security_cookie_banner_document' => 'string',
   'security_allowed_users_registration_status' => 'bool',
   'seo_site_keywords' => 'json',
 ];

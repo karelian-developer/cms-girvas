@@ -88,9 +88,29 @@ class SettingsSecurity implements SettingsPageInterface
     $settingPremoderationWordsFilterStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_words_filter_status')
       ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_words_filter_status')
       : '';
+    // ============================================================
+    // COOKIE-БАННЕР (152-ФЗ)
+    // ============================================================
     $settingCookieBannerStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_cookie_banner_status')
       ? $this->CMSCore->configurator->getDatabaseEntryValue('security_cookie_banner_status')
       : 'off';
+
+    $settingCookieBannerDocumentValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_cookie_banner_document')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_cookie_banner_document')
+      : '';
+
+    // Список юр. документов
+    $legalDocumentsForCookie = PageStatic::getAllLegalDocuments($this->CMSCore, $adminLocaleName);
+
+    $cookieDocumentItems = [];
+    foreach ($legalDocumentsForCookie as $document) {
+      $cookieDocumentItems[] = [
+        'name'  => $document['name'],
+        'title' => $document['title'],
+      ];
+    }
+
+    $cookieDocumentItemsJSON = json_encode($cookieDocumentItems, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
     // ============================================================
     // ЮРИДИЧЕСКИЕ ДОКУМЕНТЫ (152-ФЗ)
@@ -186,6 +206,8 @@ class SettingsSecurity implements SettingsPageInterface
       'SETTING_LEGAL_DOCUMENTS_ELEMENTS' => $legalDocumentsHTML,
       'SETTING_COOKIE_BANNER_STATUS_VALUE' => $settingCookieBannerStatusValue,
       'SETTING_COOKIE_BANNER_CHECKED_VALUE' => $settingCookieBannerStatusValue === 'on' ? 'checked' : '',
+      'SETTING_COOKIE_BANNER_DOCUMENT_VALUE' => htmlspecialchars($settingCookieBannerDocumentValue),
+      'SETTING_COOKIE_BANNER_DOCUMENT_ITEMS' => htmlspecialchars($cookieDocumentItemsJSON, ENT_QUOTES),
     ]);
   }
 }

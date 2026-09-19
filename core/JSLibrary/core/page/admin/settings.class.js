@@ -472,6 +472,72 @@ export class PageSettings {
         tableAdditionalFieldsButtonContainer.append(buttons.addField.target.element);
       }
 
+      if (searchParams.getPathPart(3) === 'security') {
+        // ============================================================
+        // Cookie-баннер (152-ФЗ): селект документа
+        // ============================================================
+        const cookieBannerDocumentContainer = document.querySelector('[data-element="choice"][data-choice="cookie-banner-document"]');
+
+        if (cookieBannerDocumentContainer !== null) {
+          const itemsJSON = cookieBannerDocumentContainer.getAttribute('data-items') || '[]';
+          const currentValue = cookieBannerDocumentContainer.getAttribute('data-value') || '';
+
+          let items = [];
+          try {
+            items = JSON.parse(itemsJSON);
+          } catch (e) {
+            window.CMSCore.debugError(1, 'CookieBanner', 'Failed to parse items: ' + e);
+          }
+
+          const interactiveChoicesCookieDocument = new Interactive('choices');
+
+          // Плейсхолдер «— не выбрано —»
+          interactiveChoicesCookieDocument.target.addItem(
+            localeData.PAGE_SETTINGS_SETTING_SECURITY_COOKIE_BANNER_DOCUMENT_PLACEHOLDER || '— не выбрано —',
+            ''
+          );
+
+          // Документы
+          let selectedIndex = 0;
+          items.forEach((item, index) => {
+            interactiveChoicesCookieDocument.target.addItem(item.title, item.name);
+
+            if (item.name === currentValue) {
+              selectedIndex = index + 1; // +1 из-за плейсхолдера
+            }
+          });
+
+          interactiveChoicesCookieDocument.target.setItemSelectedIndex(selectedIndex);
+          interactiveChoicesCookieDocument.target.setName('setting_security_cookie_banner_document');
+          interactiveChoicesCookieDocument.target.setWidth('100%');
+          interactiveChoicesCookieDocument.assembly();
+
+          cookieBannerDocumentContainer.appendChild(interactiveChoicesCookieDocument.target.element);
+
+          // ============================================================
+          // Показ/скрытие блока документа по чекбоксу
+          // (data-logic-block через disabled не работает для div)
+          // ============================================================
+          const cookieBannerCheckbox = document.getElementById('I_cookie_banner_checkbox');
+          const cookieBannerDocumentWrapper = document.getElementById('I_cookie_banner_document_wrapper');
+          const cookieBannerDocumentData = document.getElementById('I_cookie_banner_document_data');
+
+          if (cookieBannerCheckbox && cookieBannerDocumentWrapper && cookieBannerDocumentData) {
+            const toggleCookieDocumentVisibility = () => {
+              const isChecked = cookieBannerCheckbox.checked;
+              cookieBannerDocumentWrapper.style.display = isChecked ? '' : 'none';
+              cookieBannerDocumentData.style.display = isChecked ? '' : 'none';
+            };
+
+            // Начальное состояние
+            toggleCookieDocumentVisibility();
+
+            // Реакция на изменение
+            cookieBannerCheckbox.addEventListener('change', toggleCookieDocumentVisibility);
+          }
+        }
+      }
+
       if (searchParams.getPathPart(3) === 'email') {
         this.buttons.sendTestEmail = new Interactive('button');
         this.buttons.sendTestEmail.target.setLabel(localeData.BUTTON_SEND_TEST_EMAIL);

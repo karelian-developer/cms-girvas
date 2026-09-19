@@ -135,7 +135,7 @@
       </div>
       <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_premoderation_words_filter_list" id="I1474308815" cols="30" rows="10" placeholder="{LANG:PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_PLACEHOLDER}">{SETTING_PREMODERATION_WORDS_FILTER_LIST_VALUE}</textarea>
     </div>
-    <!-- Поле: Cookie-баннер (152-ФЗ) -->
+    <!-- Cookie-баннер (152-ФЗ) -->
     <div class="cell grid-table__cell grid-table__cell_text">
       <div class="cell__title">
         {LANG:PAGE_SETTINGS_SETTING_SECURITY_COOKIE_BANNER_TITLE}
@@ -146,10 +146,27 @@
     </div>
     <div class="cell grid-table__cell grid-table__cell_data">
       <div class="form__checkbox-container checkbox-container">
-        <input type="hidden" name="setting_{SETTINGS_NAME}_cookie_banner_status" id="I1474308120" value="{SETTING_COOKIE_BANNER_STATUS_VALUE}">
-        <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308820" type="checkbox" {SETTING_COOKIE_BANNER_CHECKED_VALUE} data-status-block="I1474308120">
-        <label class="checkbox-container__label form__label" for="I1474308820"></label>
+        <input type="hidden" name="setting_{SETTINGS_NAME}_cookie_banner_status" id="I_cookie_banner_status" value="{SETTING_COOKIE_BANNER_STATUS_VALUE}">
+        <input class="checkbox-container__input form__input form__input_checkbox" id="I_cookie_banner_checkbox" type="checkbox" {SETTING_COOKIE_BANNER_CHECKED_VALUE} data-logic-block="I_cookie_banner_document_wrapper" data-status-block="I_cookie_banner_status">
+        <label class="checkbox-container__label form__label" for="I_cookie_banner_checkbox"></label>
       </div>
+    </div>
+    <!-- Поле: Документ для cookie-баннера -->
+    <div class="cell grid-table__cell grid-table__cell_text" id="I_cookie_banner_document_wrapper">
+      <div class="cell__title">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_COOKIE_BANNER_DOCUMENT_TITLE}
+      </div>
+      <div class="cell__description">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_COOKIE_BANNER_DOCUMENT_DESCRIPTION}
+      </div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data" id="I_cookie_banner_document_data">
+      <div
+        data-element="choice"
+        data-choice="cookie-banner-document"
+        data-value="{SETTING_COOKIE_BANNER_DOCUMENT_VALUE}"
+        data-items="{SETTING_COOKIE_BANNER_DOCUMENT_ITEMS}"
+      ></div>
     </div>
     <!-- Юридические документы (152-ФЗ) -->
     <div class="cell grid-table__cell grid-table__cell_text">

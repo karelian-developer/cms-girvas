@@ -18,6 +18,7 @@
 'use strict';
 
 import {Interactive} from "../../interactive.class.js";
+import {Client} from "../client.class.js";
 
 export class PageGlobal {
   constructor(page, params = {}) {
@@ -37,6 +38,7 @@ export class PageGlobal {
     
     this.initCodeCopy();
     this.initGalleries();
+    this.initCookieBanner();
 
     /** @var {HTMLElement} */
     let navigationBurgerElement = document.querySelector('[role="navagation-burger"]');
@@ -311,6 +313,125 @@ export class PageGlobal {
     });
 
     console.log('[PageGlobal] content inserted', document.querySelectorAll('.nadvo-gallery'));
+  }
+
+  /**
+   * Инициализация cookie-баннера (152-ФЗ)
+   *
+   * Проверяет настройку `security_cookie_banner_status` через API,
+   * показывает модалку при первом заходе, фиксирует согласие.
+   */
+  async initCookieBanner() {
+    // 1. Проверяем cookie — если пользователь уже дал согласие/отказ, не показываем
+    if (Client.existsCookie('allowCookies')) {
+      return;
+    }
+
+    // 2. Запрашиваем настройку через Core
+    const settings = await window.CMSCore.getSettings(['security_cookie_banner_status']);
+
+    if (settings.security_cookie_banner_status !== true) {
+      return;
+    }
+
+    // 3. Запрашиваем документ cookie-политики через API
+    const documentKey = 'document--using-cookies-files';
+    let cookieDocument = null;
+
+    try {
+      const response = await fetch(
+        '/handler/pageStatic/' + encodeURIComponent(documentKey) +
+        '?locale=' + window.CMSCore.locales.base.name +
+        '&localeMessage=' + window.CMSCore.locales.base.name,
+        { method: 'GET' }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.statusCode === 1 && data.outputData && data.outputData.pageStatic) {
+          cookieDocument = data.outputData.pageStatic;
+        }
+      }
+    } catch (e) {
+      // Игнорируем — покажем баннер без ссылки
+      window.CMSCore.debugError(1, 'CookieBanner', 'Failed to fetch cookie document: ' + e);
+    }
+
+    // 4. Формируем контент баннера
+    const localeData = window.CMSCore.localeData;
+    const contentElement = document.createElement('div');
+    contentElement.classList.add('cookie-banner');
+    contentElement.innerHTML = localeData.MODAL_COOKIE_SITE_USING_DESCRIPTION || '';
+
+    // Ссылка на документ (если удалось получить)
+    if (cookieDocument && cookieDocument.name) {
+      const linkElement = document.createElement('a');
+      linkElement.href = '/page/' + cookieDocument.name;
+      linkElement.target = '_blank';
+      linkElement.rel = 'noopener';
+      linkElement.textContent = localeData.MODAL_COOKIE_SITE_USING_LINK_LABEL || 'Подробнее';
+      linkElement.classList.add('cookie-banner__link');
+
+      contentElement.appendChild(document.createElement('br'));
+      contentElement.appendChild(linkElement);
+    }
+
+    // 5. Показываем модалку
+    const modal = new Interactive('modal', {
+      title: localeData.MODAL_COOKIE_SITE_USING_TITLE || 'Использование cookie',
+      content: contentElement
+    });
+
+    modal.target.addButton(localeData.BUTTON_SUBMIT_LABEL || 'Принять', () => {
+      this.submitCookieConsent(cookieDocument, true);
+      modal.target.close();
+    });
+
+    modal.target.addButton(localeData.BUTTON_DECLINE_LABEL || 'Отказаться', () => {
+      this.submitCookieConsent(cookieDocument, false);
+      modal.target.close();
+    });
+
+    modal.assembly();
+    document.body.appendChild(modal.target.element);
+    modal.target.show();
+  }
+
+  /**
+   * Отправить согласие/отказ на cookie
+   *
+   * @param {Object|null} cookieDocument — объект документа (id, version)
+   * @param {boolean} accepted
+   */
+  submitCookieConsent(cookieDocument, accepted) {
+    // Cookie ставим в любом случае — чтобы не показывать баннер повторно
+    Client.setCookie('allowCookies', accepted ? 'true' : 'false', 366);
+
+    if (!accepted) {
+      return; // отказ не фиксируем в БД
+    }
+
+    // Фиксация в БД — только для авторизованных и при наличии документа
+    if (!cookieDocument || !cookieDocument.id || !cookieDocument.version) {
+      return;
+    }
+
+    if (!window.CMSCore.client || !window.CMSCore.client.isLogged) {
+      return; // аноним — только cookie
+    }
+
+    const formData = new FormData();
+    formData.append('pageStaticID', cookieDocument.id);
+    formData.append('documentVersion', cookieDocument.version);
+    formData.append('locale', window.CMSCore.locales.base.name);
+
+    const request = new Interactive('request', {
+      method: 'POST',
+      url: '/handler/consent/cookie?localeMessage=' + window.CMSCore.locales.base.name
+    });
+
+    request.target.data = formData;
+    request.target.send();
   }
 
   /**
