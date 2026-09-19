@@ -472,7 +472,7 @@
   "API_SUBJECT_DATA_EXPORT_ERROR_NOT_FOUND": "Пользователь не найден.",
   "REPORT_TYPE_ID_BASE_SUBJECT_DATA_EXPORTED": "Выгружены персональные данные субъекта «{SUBJECT_LOGIN}» по запросу администратора «{EXPORTED_BY_LOGIN}» [IP: {CLIENT_IP}].",
   "REPORT_TYPE_NAME_BASE_SUBJECT_DATA_EXPORTED": "Экспорт данных субъекта",
-  "PAGE_USERS_GROUP_PERSMISSION_ADMIN_USERS_DATA_EXPORT_TITLE": "Экспорт данных субъектов ПДн",
+  "PAGE_USERS_GROUP_PERSMISSION_MANAGE_USERS_DATA_EXPORT_TITLE": "Экспорт данных субъектов ПДн",
   "PAGE_USERS_GROUP_TITLE": "Редактирование группы пользователей",
   "PAGE_USERS_GROUP_NAVIGATION_BACK_LABEL": "Назад",
   "PAGE_USERS_GROUP_TITLE_TITLE": "Заголовок",
