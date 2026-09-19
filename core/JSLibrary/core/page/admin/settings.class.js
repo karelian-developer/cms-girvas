@@ -538,6 +538,23 @@ export class PageSettings {
         }
 
         // ============================================================
+        // Ротация отчётов (152-ФЗ): кнопка запуска
+        // ============================================================
+        const rotateReportsButtonContainer = document.querySelector('[data-element="rotate-reports-button"]');
+
+        if (rotateReportsButtonContainer !== null) {
+          const rotateReportsButton = new Interactive('button');
+          rotateReportsButton.target.setLabel(localeData.PAGE_SETTINGS_SETTING_SECURITY_REPORTS_ROTATION_BUTTON || 'Запустить ротацию сейчас');
+          rotateReportsButton.target.setStyle('red');
+          rotateReportsButton.target.setCallback((event) => {
+            event.preventDefault();
+            this.handleRotateReports(localeData);
+          });
+          rotateReportsButton.assembly();
+          rotateReportsButtonContainer.append(rotateReportsButton.target.element);
+        }
+
+        // ============================================================
         // Показ/скрытие блока документа cookie-баннера
         // (data-logic-block через disabled не работает для div)
         // ============================================================
@@ -1176,5 +1193,49 @@ export class PageSettings {
     additionalFieldInputDescription.value = data.description !== undefined
       ? data.description
       : '';
+  }
+
+  /**
+   * Запустить ротацию отчётов вручную
+   *
+   * @param {object} localeData
+   */
+  handleRotateReports(localeData) {
+    const retentionInput = document.querySelector('[data-element="input-reports-retention-days"]');
+    const days = retentionInput ? retentionInput.value : '365';
+
+    const modal = new Interactive('modal', {
+      title: localeData.MODAL_REPORTS_ROTATION_TITLE || 'Запуск ротации отчётов',
+      content: (localeData.MODAL_REPORTS_ROTATION_DESCRIPTION || 'Вы собираетесь запустить ротацию: все отчёты старше {DAYS} дней будут перемещены в архив. Продолжить?').replace('{DAYS}', days)
+    });
+
+    modal.target.addButton(localeData.BUTTON_REPORTS_ROTATION_SUBMIT || 'Запустить', () => {
+      const freshToken = this.page.core.client.getCSRFToken();
+
+      fetch('/handler/settings/rotateReports?localeMessage=' + this.page.core.locales.admin.name, {
+        method: 'POST',
+        headers: { 'X-CSRF-Token': freshToken },
+        credentials: 'same-origin'
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.statusCode === 1) {
+            this.page.showPopupNotification(data.message, 1);
+          } else {
+            this.page.showPopupNotification(data.message, 0);
+          }
+        })
+        .catch(error => {
+          this.page.showPopupNotification('Ошибка сети: ' + error, 0);
+        });
+
+      modal.target.close();
+    });
+
+    modal.target.addButton(localeData.BUTTON_CANCEL_LABEL, () => modal.target.close());
+
+    modal.assembly();
+    document.body.appendChild(modal.target.element);
+    modal.target.show();
   }
 }

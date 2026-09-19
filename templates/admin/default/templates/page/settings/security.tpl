@@ -135,6 +135,37 @@
       </div>
       <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_premoderation_words_filter_list" id="I1474308815" cols="30" rows="10" placeholder="{LANG:PAGE_SETTINGS_SETTING_SECURITY_ENTRY_COMMENTS_PREMODERATION_FILTER_BY_WORDS_PLACEHOLDER}">{SETTING_PREMODERATION_WORDS_FILTER_LIST_VALUE}</textarea>
     </div>
+    <!-- Ротация отчётов (152-ФЗ) -->
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_REPORTS_ROTATION_TITLE}
+      </div>
+      <div class="cell__description">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_REPORTS_ROTATION_DESCRIPTION}
+      </div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <div class="form__checkbox-container checkbox-container">
+        <input type="hidden" name="setting_{SETTINGS_NAME}_reports_rotation_status" id="I_reports_rotation_status" value="{SETTING_REPORTS_ROTATION_STATUS_VALUE}">
+        <input class="checkbox-container__input form__input form__input_checkbox" id="I_reports_rotation_checkbox" type="checkbox" {SETTING_REPORTS_ROTATION_CHECKED_VALUE} data-status-block="I_reports_rotation_status">
+        <label class="checkbox-container__label form__label" for="I_reports_rotation_checkbox"></label>
+      </div>
+    </div>
+    <!-- Поле: Срок хранения отчётов -->
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_REPORTS_RETENTION_DAYS_TITLE}
+      </div>
+      <div class="cell__description">
+        {LANG:PAGE_SETTINGS_SETTING_SECURITY_REPORTS_RETENTION_DAYS_DESCRIPTION}
+      </div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <input name="setting_{SETTINGS_NAME}_reports_retention_days" type="number" class="input form__input form__input_number" value="{SETTING_REPORTS_RETENTION_DAYS_VALUE}" min="1" placeholder="365" data-element="input-reports-retention-days">
+    </div>
+    <!-- Кнопка «Запустить ротацию сейчас» (заполняется JS) -->
+    <div class="cell grid-table__cell grid-table__cell_text"></div>
+    <div class="cell grid-table__cell grid-table__cell_data" data-element="rotate-reports-button"></div>
     <!-- Cookie-баннер (152-ФЗ) -->
     <div class="cell grid-table__cell grid-table__cell_text">
       <div class="cell__title">

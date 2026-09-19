@@ -72,7 +72,16 @@ class SettingsSecurity implements SettingsPageInterface
     $adminLocaleName = $this->CMSCore->locale->getName();
 
     $formTemplatePath = self::FORM_PATH . '/' . $this->name . '.tpl';
-    
+
+    // ============================================================
+    // РОТАЦИЯ ОТЧЁТОВ (152-ФЗ)
+    // ============================================================
+    $settingReportsRotationStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_reports_rotation_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_reports_rotation_status')
+      : 'off';
+    $settingReportsRetentionDaysValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_reports_retention_days')
+      ? (int)$this->CMSCore->configurator->getDatabaseEntryValue('security_reports_retention_days')
+      : 365;
     $settingAllowedUsersRegistrationStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_users_registration_status')
       ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_users_registration_status')
       : '';
@@ -115,10 +124,6 @@ class SettingsSecurity implements SettingsPageInterface
 
     $cookieDocumentItemsJSON = json_encode($cookieDocumentItems, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-    // ============================================================
-    // ЮРИДИЧЕСКИЕ ДОКУМЕНТЫ (152-ФЗ)
-    // ============================================================
-
     /** @var array Все статические страницы с isLegalDocument = true */
     $legalDocuments = PageStatic::getAllLegalDocuments($this->CMSCore, $adminLocaleName);
 
@@ -132,30 +137,9 @@ class SettingsSecurity implements SettingsPageInterface
     /** @var string HTML-чекбоксы юридических документов */
     $legalDocumentsElements = [];
 
-    foreach ($legalDocuments as $document) {
-      $legalDocumentsElements[] = ThemeCollector::assemblyFileContent(
-        $this->CMSCore->theme,
-        'templates/page/settings/security/legalDocumentItem.tpl',
-        [
-          'DOCUMENT_ID' => $document['id'],
-          'DOCUMENT_KEY' => htmlspecialchars($document['name']),
-          'DOCUMENT_TITLE' => htmlspecialchars($document['title']),
-          'DOCUMENT_CHECKED' => in_array($document['name'], $currentLegalDocuments, true) ? 'checked' : ''
-        ]
-      );
-    }
-
-    $legalDocumentsHTML = !empty($legalDocumentsElements)
-      ? implode("\n", $legalDocumentsElements)
-      : '<p class="settings-empty">' . htmlspecialchars($this->CMSCore->locale->getSingleValueByKey('PAGE_SETTINGS_SETTING_SECURITY_LEGAL_DOCUMENTS_EMPTY')) . '</p>';
-
     // ============================================================
     // ЮРИДИЧЕСКИЕ ДОКУМЕНТЫ (152-ФЗ)
     // ============================================================
-    $adminLocaleName = $this->CMSCore->locale->getName();
-    $legalDocuments = PageStatic::getAllLegalDocuments($this->CMSCore, $adminLocaleName);
-
-    $legalDocumentsElements = [];
     foreach ($legalDocuments as $document) {
       $settingName = 'security_legal_documents_' . $document['id'] . '_status';
       $settingValue = $this->CMSCore->configurator->existsDatabaseEntryValue($settingName)
@@ -208,6 +192,9 @@ class SettingsSecurity implements SettingsPageInterface
       'SETTING_COOKIE_BANNER_CHECKED_VALUE' => $settingCookieBannerStatusValue === 'on' ? 'checked' : '',
       'SETTING_COOKIE_BANNER_DOCUMENT_VALUE' => htmlspecialchars($settingCookieBannerDocumentValue),
       'SETTING_COOKIE_BANNER_DOCUMENT_ITEMS' => htmlspecialchars($cookieDocumentItemsJSON, ENT_QUOTES),
+      'SETTING_REPORTS_ROTATION_STATUS_VALUE' => $settingReportsRotationStatusValue,
+      'SETTING_REPORTS_ROTATION_CHECKED_VALUE' => $settingReportsRotationStatusValue === 'on' ? 'checked' : '',
+      'SETTING_REPORTS_RETENTION_DAYS_VALUE' => $settingReportsRetentionDaysValue,
     ]);
   }
 }
