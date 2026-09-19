@@ -371,8 +371,7 @@ export class PageUser {
       formData.append('user_id', userID);
       formData.append('reason', reasonTextarea.value.trim() || 'retention_expired');
 
-      const match = document.cookie.match(/_grv_csrf=([^;]+)/);
-      const freshToken = match ? decodeURIComponent(match[1]) : '';
+      const freshToken = window.CMSCore.client.getCSRFToken();
 
       const headers = {};
       if (freshToken !== '') {

@@ -747,6 +747,53 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $execute = $databaseQuery->execute();
 
       // =======================
+      // ТАБЛИЦА АРХИВА ОТЧЕТОВ
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('reports_archive');
+      $queryBuilder->statement->addColumn('id', 'bigint', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('variables', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('archivedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $execute = $databaseQuery->execute();
+
+      // =======================
+      // ТАБЛИЦА СОГЛАСИЙ ПОЛЬЗОВАТЕЛЕЙ (152-ФЗ)
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('users_consents');
+      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('formID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('formReportID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('pageStaticID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('documentVersion', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('locale', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('ip', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('userAgent', 'text');
+      $queryBuilder->statement->addColumn('source', 'text', 'NOT NULL DEFAULT \'form\'');
+      $queryBuilder->statement->addColumn('consentedAt', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('revokedAt', 'bigint');
+      $queryBuilder->statement->addColumn('revokeReason', 'text');
+      $queryBuilder->statement->addColumn('revokedByID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $execute = $databaseQuery->execute();
+
+      // =======================
       // ТАБЛИЦА ПОЛЬЗОВАТЕЛЕЙ
       // =======================
 
@@ -1416,6 +1463,80 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      // Индекс для ротации отчётов
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_reports_created');
+      $queryBuilder->statement->setTableName('reports');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      // Индексы для users_consents
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_consents_user');
+      $queryBuilder->statement->setTableName('users_consents');
+      $queryBuilder->statement->addColumn('userID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_consents_recent');
+      $queryBuilder->statement->setTableName('users_consents');
+      $queryBuilder->statement->addColumn('userID');
+      $queryBuilder->statement->addColumn('ip');
+      $queryBuilder->statement->addColumn('pageStaticID');
+      $queryBuilder->statement->addColumn('documentVersion');
+      $queryBuilder->statement->addColumn('source');
+      $queryBuilder->statement->addColumn('consentedAt');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      // Индексы для users_registration_submits
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_registration_submits_user');
+      $queryBuilder->statement->setTableName('users_registration_submits');
+      $queryBuilder->statement->addColumn('userID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_registration_submits_submit_token');
+      $queryBuilder->statement->setTableName('users_registration_submits');
+      $queryBuilder->statement->addColumn('submitToken');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_registration_submits_refusal_token');
+      $queryBuilder->statement->setTableName('users_registration_submits');
+      $queryBuilder->statement->addColumn('refusalToken');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       $databaseQuery->execute();
       
