@@ -86,6 +86,9 @@ final class Report
   // НАСТРОЙКИ CMS
   public const REPORT_TYPE_ID_AP_SETTINGS_EDITED = 11000033;
 
+  // Ротация отчетов
+  public const REPORT_TYPE_ID_AP_REPORTS_ROTATED = 11100011;
+
   // ВЕРСИОНИРОВАНИЕ ДОКУМЕНТОВ (152-ФЗ)
   public const REPORT_TYPE_ID_AP_DOCUMENT_VERSION_CREATED   = 11000034;
   public const REPORT_TYPE_ID_AP_DOCUMENT_VERSION_PUBLISHED = 11000035;
@@ -171,6 +174,8 @@ final class Report
     // ------------------------------------------------------------
     // Настройки CMS
     self::REPORT_TYPE_ID_AP_SETTINGS_EDITED            => self::CATEGORY_SECURITY,
+
+    self::REPORT_TYPE_ID_AP_REPORTS_ROTATED            => self::CATEGORY_SECURITY,
 
     // Авторизация
     self::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS      => self::CATEGORY_SECURITY,

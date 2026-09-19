@@ -303,6 +303,9 @@ class ReportsSecurity implements ReportsPageInterface
       '{TARGET_USER_LOGIN}' => $variables['targetUserLoginBefore'] ?? $this->getUserLogin($variables['targetUserID'] ?? 0),
       '{ANONYMIZED_BY_LOGIN}' => $variables['anonymizedByLogin'] ?? $this->getUserLogin($variables['anonymizedByID'] ?? 0),
       '{REASON}' => $variables['reason'] ?? '',
+      '{ROTATED_COUNT}' => $variables['rotatedCount'] ?? 0,
+      '{DAYS}' => $variables['days'] ?? 0,
+      '{INITIATED_BY_LOGIN}' => $variables['initiatedByLogin'] ?? $this->getUserLogin($variables['initiatedByID'] ?? 0),
       // ============================================================
       // СОГЛАСИЯ (152-ФЗ)
       // ============================================================

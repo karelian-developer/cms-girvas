@@ -16,6 +16,9 @@ if (!defined('IS_NOT_HACKED')) {
 if ($CMSCore->urlp->getPath(2) === 'email') {
   $APIFilePath =  CMS_ROOT_DIRECTORY . '/api/settings/email.api.php';
   include_once $APIFilePath;
+} elseif ($CMSCore->urlp->getPath(2) === 'rotateReports') {
+  $APIFilePath = CMS_ROOT_DIRECTORY . '/api/settings/rotateReports.api.php';
+  include_once $APIFilePath;
 } else {
   define('API_HANDLERS_ABSOLUTE_PATH', CMS_ROOT_DIRECTORY . '/api/settings');
 
