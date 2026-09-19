@@ -134,7 +134,7 @@ if ($CMSCore->urlp->getPath(2) === 'export') {
       'id' => $subject->getID(),
       'login' => $subject->getLogin(),
       'email' => $subject->getEmail(),
-      'emailIsSubmitted' => $subject->emailIsSubmitted(),
+      'emailIsSubmitted' => !empty($subject->emailIsSubmitted()),
       'name' => $subject->getName(),
       'surname' => $subject->getSurname(),
       'patronymic' => $subject->getPatronymic(),
@@ -191,25 +191,48 @@ if ($CMSCore->urlp->getPath(2) === 'export') {
     }
 
     // ============================================================
-    // 3. reports.csv
+    // 3. Логирование факта экспорта (ДО сбора reports.csv,
+    //    чтобы запись об экспорте попала в саму выгрузку)
+    // ============================================================
+    Report::create(
+      $CMSCore,
+      Report::REPORT_TYPE_ID_BASE_SUBJECT_DATA_EXPORTED,
+      [
+        'subjectUserID' => $subject->getID(),
+        'subjectUserLogin' => $subject->getLogin(),
+        'exportedByID' => $clientUser->getID(),
+        'exportedByLogin' => $clientUser->getLogin(),
+        'format' => 'zip',
+        'components' => ['profile', 'consents', 'reports'],
+        'ip' => $CMSCore->client->getIPAddress(),
+      ]
+    );
+
+    // ============================================================
+    // 4. reports.csv
     // ============================================================
     $reportsCsv = "\xEF\xBB\xBF";
-    $reportsCsv .= "ID;Тип;Дата;Переменные\n";
+    $reportsCsv .= "ID;Тип;Дата;IP;Метаданные (JSON);Переменные (JSON)\n";
 
     $reports = Reports::getAllByUser($CMSCore, $subject->getID(), 10000, 0);
     foreach ($reports as $report) {
       $report->initData(['metadata', 'variables', 'createdUnixTimestamp']);
+
+      $reportVariables = $report->getVariables();
+      $reportIP = $reportVariables['ip'] ?? $reportVariables['clientIP'] ?? '';
+
       $reportsCsv .= implode(';', [
         $report->getID(),
         $report->getTypeID(),
         date('d.m.Y H:i:s', $report->getCreatedUnixTimestamp()),
+        $reportIP,
         '"' . str_replace('"', '""', json_encode($report->getMetadata(), JSON_UNESCAPED_UNICODE)) . '"',
-        '"' . str_replace('"', '""', json_encode($report->getVariables(), JSON_UNESCAPED_UNICODE)) . '"',
+        '"' . str_replace('"', '""', json_encode($reportVariables, JSON_UNESCAPED_UNICODE)) . '"',
       ]) . "\n";
     }
 
     // ============================================================
-    // 4. manifest.json
+    // 5. manifest.json
     // ============================================================
     $manifest = [
       'generatedAt' => date('c'),
@@ -227,7 +250,7 @@ if ($CMSCore->urlp->getPath(2) === 'export') {
     ];
 
     // ============================================================
-    // 5. Сборка ZIP
+    // 6. Сборка ZIP
     // ============================================================
     $tmpPath = tempnam(sys_get_temp_dir(), 'girvas_subject_');
     $zip = new ZipArchive();
@@ -242,23 +265,6 @@ if ($CMSCore->urlp->getPath(2) === 'export') {
     $zip->addFromString('reports.csv', $reportsCsv);
     $zip->addFromString('manifest.json', json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
     $zip->close();
-
-    // ============================================================
-    // 6. Логирование
-    // ============================================================
-    Report::create(
-      $CMSCore,
-      Report::REPORT_TYPE_ID_BASE_SUBJECT_DATA_EXPORTED,
-      [
-        'subjectUserID' => $subject->getID(),
-        'subjectUserLogin' => $subject->getLogin(),
-        'exportedByID' => $clientUser->getID(),
-        'exportedByLogin' => $clientUser->getLogin(),
-        'format' => 'zip',
-        'components' => ['profile', 'consents', 'reports'],
-        'ip' => $CMSCore->client->getIPAddress(),
-      ]
-    );
 
     // ============================================================
     // 7. Отдача файла
