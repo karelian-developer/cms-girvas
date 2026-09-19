@@ -16,6 +16,7 @@ if (!defined('IS_NOT_HACKED')) {
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Mail\SMTPClient as SMTPClient;
+use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\User\Consent as UserConsent;
 use \core\PHPLibrary\UserGroup as UserGroup;
