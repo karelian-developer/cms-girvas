@@ -50,7 +50,7 @@ class Client
    */
   private function setIPAddress() : void
   {
-    $this->ip = self::getRealIPAddress();
+    $this->ip = self::getRealIPAddress($this->CMSCore);
   }
 
   /**
@@ -64,23 +64,227 @@ class Client
   }
 
   /**
-   * Получить реальный IP-адрес клиента
+   * Получить реальный IP-адрес клиента с учётом доверенных прокси
    *
+   * Алгоритм:
+   * 1. Если REMOTE_ADDR не входит в список trustedProxies —
+   *    возвращаем REMOTE_ADDR, игнорируя заголовки (защита от подделки).
+   * 2. Если REMOTE_ADDR доверенный — читаем Forwarded / X-Forwarded-For / X-Real-IP
+   *    и идём справа налево, пропуская доверенные прокси.
+   * 3. Первый недоверенный IP — реальный клиент.
+   *
+   * @param CoreInterface|null $CMSCore
    * @return string
    */
-  public static function getRealIPAddress() : string
+  public static function getRealIPAddress(?CoreInterface $CMSCore = null) : string
   {
-    $ip = '';
+    $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
 
-    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-      $ip = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0];
-    } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-      $ip = $_SERVER['HTTP_CLIENT_IP'];
-    } else {
-      $ip = $_SERVER['REMOTE_ADDR'];
+    if (!filter_var($remoteAddr, FILTER_VALIDATE_IP)) {
+      return '0.0.0.0';
     }
 
-    return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '0.0.0.0';
+    $trustedProxies = self::getTrustedProxies($CMSCore);
+
+    // Если REMOTE_ADDR не доверенный — игнорируем все заголовки
+    if (!self::ipInRanges($remoteAddr, $trustedProxies)) {
+      return $remoteAddr;
+    }
+
+    // REMOTE_ADDR доверенный — собираем цепочку IP из заголовков
+    $chain = self::extractIPChainFromHeaders();
+
+    if (empty($chain)) {
+      return $remoteAddr;
+    }
+
+    // Идём справа налево, пропуская доверенные прокси
+    $chainReversed = array_reverse($chain);
+
+    foreach ($chainReversed as $ip) {
+      if (!filter_var($ip, FILTER_VALIDATE_IP)) {
+        continue;
+      }
+
+      if (!self::ipInRanges($ip, $trustedProxies)) {
+        return $ip;
+      }
+    }
+
+    // Все IP в цепочке доверенные — возвращаем крайний левый
+    foreach ($chain as $ip) {
+      if (filter_var($ip, FILTER_VALIDATE_IP)) {
+        return $ip;
+      }
+    }
+
+    return $remoteAddr;
+  }
+
+  /**
+   * Извлечь цепочку IP из заголовков запроса
+   *
+   * Приоритет: Forwarded (RFC 7239) → X-Forwarded-For → X-Real-IP
+   *
+   * @return array
+   */
+  private static function extractIPChainFromHeaders() : array
+  {
+    // 1. Forwarded (RFC 7239): for=192.0.2.60;proto=http;by=203.0.113.43
+    if (!empty($_SERVER['HTTP_FORWARDED'])) {
+      $forwarded = $_SERVER['HTTP_FORWARDED'];
+      $chain = [];
+
+      foreach (explode(',', $forwarded) as $part) {
+        if (preg_match('/for=("?\[?)([^;\]"]+)\1/i', trim($part), $matches)) {
+          $chain[] = trim($matches[2], '[]');
+        }
+      }
+
+      if (!empty($chain)) {
+        return $chain;
+      }
+    }
+
+    // 2. X-Forwarded-For: client, proxy1, proxy2
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+      $chain = array_map('trim', explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']));
+      $chain = array_filter($chain, function($ip) {
+        return filter_var($ip, FILTER_VALIDATE_IP) !== false;
+      });
+
+      if (!empty($chain)) {
+        return array_values($chain);
+      }
+    }
+
+    // 3. X-Real-IP (nginx)
+    if (!empty($_SERVER['HTTP_X_REAL_IP'])) {
+      $ip = trim($_SERVER['HTTP_X_REAL_IP']);
+      if (filter_var($ip, FILTER_VALIDATE_IP)) {
+        return [$ip];
+      }
+    }
+
+    return [];
+  }
+
+  /**
+   * Получить список доверенных прокси из конфигурации
+   *
+   * @param CoreInterface|null $CMSCore
+   * @return array
+   */
+  private static function getTrustedProxies(?CoreInterface $CMSCore = null) : array
+  {
+    $defaultRanges = [
+      '127.0.0.1/32',
+      '::1/128',
+    ];
+
+    if ($CMSCore === null) {
+      return $defaultRanges;
+    }
+
+    try {
+      $configurator = $CMSCore->configurator;
+      $trustedProxies = $configurator->get('trustedProxies');
+
+      if (!is_array($trustedProxies) || empty($trustedProxies)) {
+        return $defaultRanges;
+      }
+
+      return array_merge($defaultRanges, $trustedProxies);
+    } catch (\Exception $e) {
+      return $defaultRanges;
+    }
+  }
+
+  /**
+   * Проверить, входит ли IP в один из диапазонов (CIDR)
+   *
+   * @param string $ip
+   * @param array $ranges
+   * @return bool
+   */
+  private static function ipInRanges(string $ip, array $ranges) : bool
+  {
+    foreach ($ranges as $range) {
+      if (self::ipInCIDR($ip, $range)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Проверка принадлежности IP к CIDR-сети
+   * Поддерживает IPv4 и IPv6
+   *
+   * @param string $ip
+   * @param string $cidr
+   * @return bool
+   */
+  private function ipInCIDR(string $ip, string $cidr) : bool
+  {
+    // Точное совпадение без маски
+    if (strpos($cidr, '/') === false) {
+      return $ip === $cidr;
+    }
+
+    list($subnet, $mask) = explode('/', $cidr, 2);
+    $mask = (int) $mask;
+
+    // IPv4
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)
+      && filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+      if ($mask < 0 || $mask > 32) {
+        return false;
+      }
+
+      $ipLong = ip2long($ip);
+      $subnetLong = ip2long($subnet);
+
+      if ($ipLong === false || $subnetLong === false) {
+        return false;
+      }
+
+      $maskLong = $mask === 0 ? 0 : (-1 << (32 - $mask));
+      return ($ipLong & $maskLong) === ($subnetLong & $maskLong);
+    }
+
+    // IPv6
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)
+      && filter_var($subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+      if ($mask < 0 || $mask > 128) {
+        return false;
+      }
+
+      $ipBin = inet_pton($ip);
+      $subnetBin = inet_pton($subnet);
+
+      if ($ipBin === false || $subnetBin === false) {
+        return false;
+      }
+
+      $bytes = intdiv($mask, 8);
+      $bits = $mask % 8;
+
+      if ($bytes > 0 && substr($ipBin, 0, $bytes) !== substr($subnetBin, 0, $bytes)) {
+        return false;
+      }
+
+      if ($bits > 0) {
+        $maskByte = (0xFF << (8 - $bits)) & 0xFF;
+        if ((ord($ipBin[$bytes]) & $maskByte) !== (ord($subnetBin[$bytes]) & $maskByte)) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -339,7 +543,7 @@ class Client
     $blacklist = $this->getBlacklistRanges();
 
     foreach ($blacklist as $cidr) {
-      if ($this->ipInCIDR($this->ip, $cidr)) {
+      if (self::ipInCIDR($this->ip, $cidr)) {
         return true;
       }
     }

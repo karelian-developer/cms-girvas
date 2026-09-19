@@ -136,7 +136,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
                   // ЛОГИРОВАНИЕ СОЗДАНИЯ АДМИНИСТРАТОРА (152-ФЗ)
                   // ============================================================
                   $admin->initData(['login']);
-                  $clientIP = Client::getRealIPAddress();
+                  $clientIP = Client::getRealIPAddress($CMSCore);
                   
                   CMSReport::create(
                     $CMSCore,
@@ -233,7 +233,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
   if ($CMSCore->urlp->getPath(2) === 'finish') {
     $fileInstalledPath = sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY);
 
-    $clientIP = Client::getRealIPAddress();
+    $clientIP = Client::getRealIPAddress($CMSCore);
 
     $externalIP = @file_get_contents('https://api.ipify.org');
     if ($externalIP === false) {

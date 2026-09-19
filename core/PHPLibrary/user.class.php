@@ -845,7 +845,7 @@ class User
       'surname' => '',
       'patronymic' => '',
       'groupID' => 4,
-      'registrationIP' => Client::getRealIPAddress(),
+      'registrationIP' => Client::getRealIPAddress($CMSCore),
       'passwordResetToken' => '',
       'passwordResetTokenCreatedUnixTimestamp' => '',
     ];

@@ -206,7 +206,7 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                           CMSReport::REPORT_TYPE_ID_BASE_USER_CREATED,
                           [
                             'userID' => $user->getID(),
-                            'ip' => $CMSCore->client->getRealIPAddress()
+                            'ip' => $CMSCore->client::getRealIPAddress($CMSCore)
                           ]
                         );
                         $userReportID = $userCreatedReport !== null ? $userCreatedReport->getID() : 0;
@@ -216,7 +216,7 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                         // Фиксируем согласие на все документы из security_legal_documents
                         // ============================================================
                         $registrationLocale = $CMSCore->locale->getName();
-                        $registrationIP = $CMSCore->client->getRealIPAddress();
+                        $registrationIP = $CMSCore->client::getRealIPAddress($CMSCore);
                         $registrationUserAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
                         // ============================================================
@@ -407,7 +407,7 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
 }
 
 if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('method') === 'base') {
-  $clientIP = $CMSCore->client->getRealIPAddress();
+  $clientIP = $CMSCore->client::getRealIPAddress($CMSCore);
   
   if (!$CMSCore->client->isLogged(1)) {
     $userLogin = trim($_POST['user_login']) ?? null;
@@ -532,7 +532,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('method') === 'admin') {
   $CMSTelegramNotifier = CMSNotifier::create($CMSCore, 'telegram');
   $CMSMaxNotifier = CMSNotifier::create($CMSCore, 'max');
-  $clientIP = $CMSCore->client->getRealIPAddress();
+  $clientIP = $CMSCore->client::getRealIPAddress($CMSCore);
   
   if (!$CMSCore->client->isLogged(2)) {
     $userLogin = trim($_POST['user_login']) ?? null;
@@ -649,7 +649,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                 if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
                   $eventDatetime = date('Y-m-d H:i', time());
-                  $userIP = $CMSCore->client->getRealIPAddress();
+                  $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
                   $userLoginRec = str_replace(['_'], ['\_'], $userLogin);
 
                   $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
@@ -673,7 +673,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                 if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
 
                   $eventDatetime = date('Y-m-d H:i', time());
-                  $userIP = $CMSCore->client->getRealIPAddress();
+                  $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
                   $userLoginRec = $userLogin;
 
                   $CMSMaxNotifierMessage = "\xF0\x9F\x94\x93 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "\n\n";
@@ -728,7 +728,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
               if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
                 $eventDatetime = date('Y-m-d H:i', time());
-                $userIP = $CMSCore->client->getRealIPAddress();
+                $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
                 $userLoginRec = str_replace(['_'], ['\_'], $userLogin);
                 
                 $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
@@ -752,7 +752,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
               if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
 
                 $eventDatetime = date('Y-m-d H:i', time());
-                $userIP = $CMSCore->client->getRealIPAddress();
+                $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
                 $userLoginRec = $userLogin;
                 
                 $CMSMaxNotifierMessage = "\xF0\x9F\x94\x93 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "\n\n";
@@ -800,7 +800,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
               $eventDatetime = date('Y-m-d H:i', time());
-              $userIP = $CMSCore->client->getRealIPAddress();
+              $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
               $userLoginRec = str_replace(['_'], ['\_'], $userLogin);
               
               $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
@@ -824,7 +824,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
 
               $eventDatetime = date('Y-m-d H:i', time());
-              $userIP = $CMSCore->client->getRealIPAddress();
+              $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
               $userLoginRec = $userLogin;
               
               $CMSMaxNotifierMessage = "\xF0\x9F\x94\x93 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "\n\n";
@@ -871,7 +871,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
           if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
             $eventDatetime = date('Y-m-d H:i', time());
-            $userIP = $CMSCore->client->getRealIPAddress();
+            $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
             $userLoginRec = str_replace(['_'], ['\_'], $userLogin);
             
             $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
@@ -894,7 +894,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
           if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
 
             $eventDatetime = date('Y-m-d H:i', time());
-            $userIP = $CMSCore->client->getRealIPAddress();
+            $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
             $userLoginRec = $userLogin;
             
             $CMSMaxNotifierMessage = "\xF0\x9F\x94\x93 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "\n\n";
@@ -930,7 +930,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
         if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
           $eventDatetime = date('Y-m-d H:i', time());
-          $userIP = $CMSCore->client->getRealIPAddress();
+          $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
           $userLoginRec = str_replace(['_'], ['\_'], $userLogin);
           
           $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x94 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_LIMIT_TITLE') . "*\n\n";
@@ -954,7 +954,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
         if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
 
           $eventDatetime = date('Y-m-d H:i', time());
-          $userIP = $CMSCore->client->getRealIPAddress();
+          $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
           $userLoginRec = $userLogin;
           
           $CMSMaxNotifierMessage = "\xF0\x9F\x94\x94 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_LIMIT_TITLE') . "\n\n";
