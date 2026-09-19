@@ -45,6 +45,31 @@ foreach ($requestedKeys as $key) {
   };
 }
 
+// ============================================================
+// Спец-обработка: вычисляемый ID документа cookie-политики
+// ============================================================
+if (
+  in_array('security_cookie_banner_document_id', $requestedKeys, true)
+  || in_array('security_cookie_banner_document', $requestedKeys, true)
+) {
+  $cookieDocumentName = $result['security_cookie_banner_document'] ?? '';
+
+  if (empty($cookieDocumentName) && $CMSCore->configurator->existsDatabaseEntryValue('security_cookie_banner_document')) {
+    $cookieDocumentName = $CMSCore->configurator->getDatabaseEntryValue('security_cookie_banner_document');
+  }
+
+  $cookieDocumentID = 0;
+
+  if (!empty($cookieDocumentName)) {
+    $cookieDocument = \core\PHPLibrary\PageStatic::getByName($CMSCore, $cookieDocumentName);
+    if ($cookieDocument !== null) {
+      $cookieDocumentID = $cookieDocument->getID();
+    }
+  }
+
+  $result['security_cookie_banner_document_id'] = $cookieDocumentID;
+}
+
 $handlerOutputData['settings'] = $result;
 $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
 $handlerStatusCode = $handlerStatusCode ?? 1;
