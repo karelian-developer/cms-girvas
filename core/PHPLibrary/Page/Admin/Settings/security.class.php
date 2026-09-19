@@ -68,6 +68,9 @@ class SettingsSecurity implements SettingsPageInterface
 
   public function assembly(array $templateValues = []) : void
   {
+    /** @var string Текущая локаль админки */
+    $adminLocaleName = $this->CMSCore->locale->getName();
+
     $formTemplatePath = self::FORM_PATH . '/' . $this->name . '.tpl';
     
     $settingAllowedUsersRegistrationStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_users_registration_status')
@@ -115,9 +118,6 @@ class SettingsSecurity implements SettingsPageInterface
     // ============================================================
     // ЮРИДИЧЕСКИЕ ДОКУМЕНТЫ (152-ФЗ)
     // ============================================================
-
-    /** @var string Текущая локаль админки */
-    $adminLocaleName = $this->CMSCore->locale->getName();
 
     /** @var array Все статические страницы с isLegalDocument = true */
     $legalDocuments = PageStatic::getAllLegalDocuments($this->CMSCore, $adminLocaleName);
