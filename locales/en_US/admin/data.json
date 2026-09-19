@@ -1008,6 +1008,8 @@
   "REPORT_TYPE_ID_AP_ENTRIES_COMMENT_DELETED": "Comment for entry &laquo;{ENTRY_TITLE}&raquo; deleted [IP: {CLIENT_IP}].",
   "REPORT_TYPE_ID_AP_VIEWING_LOGS": "Viewing system logs by user {USER_LOGIN} [IP: {CLIENT_IP}].",
   "REPORT_TYPE_ID_AP_SETTINGS_EDITED": "CMS settings updated by {USER_LOGIN} [IP: {CLIENT_IP}]. {CHANGED_VALUES}",
+  "REPORT_TYPE_ID_AP_USER_ANONYMIZED": "Anonymized personal data of user «{TARGET_USER_LOGIN}» by administrator «{ANONYMIZED_BY_LOGIN}» (reason: {REASON}) [IP: {CLIENT_IP}].",
+  "REPORT_TYPE_NAME_AP_USER_ANONYMIZED": "Personal data anonymization",
   "REPORT_CATEGORY_AUTHORIZATION": "Authorization",
   "REPORT_CATEGORY_AUTHORIZATION_ADMIN": "Authorization (admin panel)",
   "REPORT_CATEGORY_AUTHORIZATION_SITE": "Authorization (site)",

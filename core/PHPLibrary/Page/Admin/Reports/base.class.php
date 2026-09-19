@@ -290,6 +290,9 @@ class ReportsBase implements ReportsPageInterface
       '{SUBJECT_LOGIN}' => $variables['subjectUserLogin'] ?? $this->getUserLogin($variables['subjectUserID'] ?? 0),
       '{EXPORTED_BY_LOGIN}' => $variables['exportedByLogin'] ?? $this->getUserLogin($variables['exportedByID'] ?? 0),
       '{VIEWER_LOGIN}' => $variables['viewedByLogin'] ?? $this->getUserLogin($variables['viewedByID'] ?? 0),
+      '{TARGET_USER_LOGIN}' => $variables['targetUserLoginBefore'] ?? $this->getUserLogin($variables['targetUserID'] ?? 0),
+      '{ANONYMIZED_BY_LOGIN}' => $variables['anonymizedByLogin'] ?? $this->getUserLogin($variables['anonymizedByID'] ?? 0),
+      '{REASON}' => $variables['reason'] ?? '',
       // ============================================================
       // СОГЛАСИЯ (152-ФЗ)
       // ============================================================

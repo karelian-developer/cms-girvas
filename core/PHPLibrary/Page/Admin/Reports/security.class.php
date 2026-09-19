@@ -300,6 +300,9 @@ class ReportsSecurity implements ReportsPageInterface
         is_array($variables['changedValues'] ?? null) ? $variables['changedValues'] : [],
         is_array($variables['sensitiveChanged'] ?? null) ? $variables['sensitiveChanged'] : []
       ),
+      '{TARGET_USER_LOGIN}' => $variables['targetUserLoginBefore'] ?? $this->getUserLogin($variables['targetUserID'] ?? 0),
+      '{ANONYMIZED_BY_LOGIN}' => $variables['anonymizedByLogin'] ?? $this->getUserLogin($variables['anonymizedByID'] ?? 0),
+      '{REASON}' => $variables['reason'] ?? '',
       // ============================================================
       // СОГЛАСИЯ (152-ФЗ)
       // ============================================================
@@ -602,6 +605,7 @@ class ReportsSecurity implements ReportsPageInterface
         CMSReport::REPORT_TYPE_ID_BASE_USER_BANNED,
         CMSReport::REPORT_TYPE_ID_AP_USER_DELETED,
         CMSReport::REPORT_TYPE_ID_AP_USERS_GROUP_DELETED,
+        CMSReport::REPORT_TYPE_ID_AP_USER_ANONYMIZED,
       ])) {
         $statusClass = 'danger';
       }
