@@ -410,25 +410,25 @@ export class PageGlobal {
    * @param {boolean} accepted
    */
   submitCookieConsent(cookieDocument, accepted) {
-    // Cookie ставим в любом случае — чтобы не показывать баннер повторно
     Client.setCookie('allowCookies', accepted ? 'true' : 'false', 366);
 
     if (!accepted) {
-      return; // отказ не фиксируем в БД
+      return;
     }
 
-    // Фиксация в БД — только для авторизованных и при наличии документа
-    if (!cookieDocument || !cookieDocument.id || !cookieDocument.version) {
+    const documentVersion = cookieDocument.currentVersion || '';
+
+    if (!cookieDocument.id || !documentVersion) {
       return;
     }
 
     if (!window.CMSCore.client || !window.CMSCore.client.isLogged) {
-      return; // аноним — только cookie
+      return;
     }
 
     const formData = new FormData();
     formData.append('pageStaticID', cookieDocument.id);
-    formData.append('documentVersion', cookieDocument.version);
+    formData.append('documentVersion', documentVersion);
     formData.append('locale', window.CMSCore.locales.base.name);
 
     const request = new Interactive('request', {
