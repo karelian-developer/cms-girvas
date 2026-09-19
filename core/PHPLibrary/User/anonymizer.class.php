@@ -58,7 +58,7 @@ class Anonymizer
     // 1. Обезличиваем users
     // ============================================================
     $anonymizedLogin = 'anon_' . $userID;
-    $anonymizedEmail = '';
+    $anonymizedEmail = 'anon_' . $userID . '@anonymized.local';
 
     $anonymizedMetadata = [
       'name' => '',
