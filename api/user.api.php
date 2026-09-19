@@ -14,7 +14,10 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 if ($CMSCore->urlp->getPath(2) === 'consent') {
-  $APIFilePath =  CMS_ROOT_DIRECTORY . '/api/user/consent.api.php';
+  $APIFilePath = CMS_ROOT_DIRECTORY . '/api/user/consent.api.php';
+  include_once $APIFilePath;
+} elseif ($CMSCore->urlp->getPath(2) === 'anonymize') {
+  $APIFilePath = CMS_ROOT_DIRECTORY . '/api/user/anonymize.api.php';
   include_once $APIFilePath;
 } else {
   define('API_HANDLERS_ABSOLUTE_PATH', CMS_ROOT_DIRECTORY . '/api/user');
