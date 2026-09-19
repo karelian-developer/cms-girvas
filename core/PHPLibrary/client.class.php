@@ -225,7 +225,7 @@ class Client
    * @param string $cidr
    * @return bool
    */
-  private function ipInCIDR(string $ip, string $cidr) : bool
+  private static function ipInCIDR(string $ip, string $cidr) : bool
   {
     // Точное совпадение без маски
     if (strpos($cidr, '/') === false) {
@@ -503,36 +503,6 @@ class Client
     }
     
     return true;
-  }
-
-  /**
-   * Проверка принадлежности IP к CIDR сети
-   * 
-   * @param string $ip
-   * @param string $cidr (например, '185.0.0.0/8')
-   * 
-   * @return bool
-   */
-  private function ipInCIDR(string $ip, string $cidr) : bool
-  {
-    if (strpos($cidr, '/') === false) {
-      return $ip === $cidr;
-    }
-
-    list($subnet, $mask) = explode('/', $cidr);
-    
-    $ipLong = ip2long($ip);
-    $subnetLong = ip2long($subnet);
-    
-    if ($ipLong === false || $subnetLong === false) {
-      return false;
-    }
-    
-    $maskLong = -1 << (32 - (int)$mask);
-    $ipLong &= $maskLong;
-    $subnetLong &= $maskLong;
-    
-    return $ipLong === $subnetLong;
   }
 
   /**
