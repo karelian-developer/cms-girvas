@@ -186,5 +186,8 @@
   "API_CONSENT_REVOKE_ERROR_NO_USER_ID": "User ID not specified.",
   "API_CONSENT_COOKIE_SUCCESS": "Cookie consent has been recorded.",
   "API_CONSENT_COOKIE_ALREADY_RECORDED": "Consent has already been recorded.",
-  "API_CONSENT_COOKIE_ANONYMOUS_SUCCESS": "Cookies accepted."
+  "API_CONSENT_COOKIE_ANONYMOUS_SUCCESS": "Cookies accepted.",
+  "API_ANONYMIZE_SUCCESS": "User personal data has been anonymized.",
+  "API_ANONYMIZE_ERROR_SUPERADMIN": "Superadmin cannot be anonymized.",
+  "API_ANONYMIZE_ERROR_SELF": "Cannot anonymize yourself."
 }

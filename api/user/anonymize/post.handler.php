@@ -66,6 +66,8 @@ if ($user->getID() === $clientUser->getID()) {
   return;
 }
 
+$loginBefore = $user->getLogin();
+
 $reason = trim((string)($_POST['reason'] ?? 'retention_expired'));
 
 $anonymized = UserAnonymizer::anonymize($CMSCore, $userID, $reason, $clientUser->getID());
@@ -76,7 +78,7 @@ if ($anonymized) {
     CMSReport::REPORT_TYPE_ID_AP_USER_ANONYMIZED,
     [
       'targetUserID' => $userID,
-      'targetUserLoginBefore' => $user->getLogin(),
+      'targetUserLoginBefore' => $loginBefore,
       'anonymizedByID' => $clientUser->getID(),
       'anonymizedByLogin' => $clientUser->getLogin(),
       'reason' => $reason,

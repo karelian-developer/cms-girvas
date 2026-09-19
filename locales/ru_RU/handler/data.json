@@ -192,5 +192,8 @@
   "API_CONSENT_REVOKE_ERROR_NO_USER_ID": "Не указан идентификатор пользователя.",
   "API_CONSENT_COOKIE_SUCCESS": "Согласие на использование cookie зафиксировано.",
   "API_CONSENT_COOKIE_ALREADY_RECORDED": "Согласие уже зафиксировано.",
-  "API_CONSENT_COOKIE_ANONYMOUS_SUCCESS": "Cookie приняты."
+  "API_CONSENT_COOKIE_ANONYMOUS_SUCCESS": "Cookie приняты.",
+  "API_ANONYMIZE_SUCCESS": "Персональные данные пользователя обезличены.",
+  "API_ANONYMIZE_ERROR_SUPERADMIN": "Нельзя обезличить супер-администратора.",
+  "API_ANONYMIZE_ERROR_SELF": "Нельзя обезличить самого себя."
 }
