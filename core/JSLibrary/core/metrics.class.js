@@ -70,7 +70,7 @@ export class Metrics {
       method: 'POST',
       headers: {
         'Metrics-Token': localStorage.getItem('_grv_mtoken'),
-        'X-CSRF-Token': this.core.client.CSRFToken
+        'X-CSRF-Token': this.core.client.getCSRFToken()
       },
       body: formData
     }).then((response) => {

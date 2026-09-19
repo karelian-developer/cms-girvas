@@ -155,8 +155,9 @@ export class Request {
     }
 
     if (window.CMSCore !== undefined) {
-      if (window.CMSCore.client.CSRFToken !== '') {
-        this.headers['X-CSRF-Token'] = window.CMSCore.client.CSRFToken;
+      const freshToken = window.CMSCore.client.getCSRFToken();
+      if (freshToken !== '') {
+        this.headers['X-CSRF-Token'] = freshToken;
       }
     }
 

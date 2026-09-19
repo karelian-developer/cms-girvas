@@ -53,7 +53,8 @@ export class Client {
   }
 
   getCSRFToken() {
-    return this.CSRFToken;
+    const match = document.cookie.match(/_grv_csrf=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : this.CSRFToken;
   }
 
   setRestHash() {

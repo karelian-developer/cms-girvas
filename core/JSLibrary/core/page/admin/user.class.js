@@ -270,7 +270,10 @@ export class PageUser {
       if (interactiveFormPanelContainer !== null) {
         if (searchParams.getPathPart(3) !== null) {
           interactiveFormPanelContainer.append(this.buttons.export.target.element);
-          interactiveFormPanelContainer.append(this.buttons.anonymize.target.element);
+          
+          if (!userData.isAnonymized) {
+            interactiveFormPanelContainer.append(this.buttons.anonymize.target.element);
+          }
         }
 
         interactiveFormPanelContainer.append(this.buttons.delete.target.element);
@@ -298,8 +301,8 @@ export class PageUser {
       formData.append('_grv_' + Math.random().toString(36).slice(2), Math.random().toString(36).slice(2));
 
       const headers = {};
-      if (window.CMSCore && window.CMSCore.client && window.CMSCore.client.CSRFToken !== '') {
-        headers['X-CSRF-Token'] = window.CMSCore.client.CSRFToken;
+      if (window.CMSCore && window.CMSCore.client && window.CMSCore.client.getCSRFToken() !== '') {
+        headers['X-CSRF-Token'] = window.CMSCore.client.getCSRFToken();
       }
 
       try {

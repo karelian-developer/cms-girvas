@@ -95,8 +95,8 @@ export class PageUsersConsents {
     formData.append('_grv_' + Math.random().toString(36).slice(2), Math.random().toString(36).slice(2));
 
     const headers = {};
-    if (window.CMSCore && window.CMSCore.client && window.CMSCore.client.CSRFToken !== '') {
-      headers['X-CSRF-Token'] = window.CMSCore.client.CSRFToken;
+    if (window.CMSCore && window.CMSCore.client && window.CMSCore.client.getCSRFToken() !== '') {
+      headers['X-CSRF-Token'] = window.CMSCore.client.getCSRFToken();
     }
 
     try {
