@@ -294,6 +294,8 @@ class ReportsSecurity implements ReportsPageInterface
       '{DELETER_LOGIN}' => $variables['deletedByLogin'] ?? $this->getUserLogin($variables['deletedByID'] ?? 0),
       '{TARGET_USER_LOGIN}' => $variables['targetUserLogin'] ?? $this->getUserLogin($variables['targetUserID'] ?? 0),
       '{VIEWER_LOGIN}' => $variables['viewedByLogin'] ?? $this->getUserLogin($variables['viewedByID'] ?? 0),
+      '{SUBJECT_LOGIN}' => $variables['subjectUserLogin'] ?? $this->getUserLogin($variables['subjectUserID'] ?? 0),
+      '{EXPORTED_BY_LOGIN}' => $variables['exportedByLogin'] ?? $this->getUserLogin($variables['exportedByID'] ?? 0),
       '{CHANGED_VALUES}' => $this->formatSettingsChanges(
         is_array($variables['changedValues'] ?? null) ? $variables['changedValues'] : [],
         is_array($variables['sensitiveChanged'] ?? null) ? $variables['sensitiveChanged'] : []

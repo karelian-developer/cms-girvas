@@ -94,6 +94,9 @@ final class Report
   // СОГЛАСИЯ (152-ФЗ)
   public const REPORT_TYPE_ID_BASE_CONSENT_GIVEN   = 11100007;
   public const REPORT_TYPE_ID_BASE_CONSENT_REVOKED = 11100008;
+  
+  // ЭКСПОРТ ДАННЫХ СУБЪЕКТА (152-ФЗ)
+  public const REPORT_TYPE_ID_BASE_SUBJECT_DATA_EXPORTED = 11100009;
 
   // АВТОРИЗАЦИЯ (АДМИНКА)
   public const REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL = 10000001;
@@ -201,6 +204,7 @@ final class Report
     self::REPORT_TYPE_ID_AP_DOCUMENT_VERSION_ARCHIVED  => self::CATEGORY_CONTENT,
     self::REPORT_TYPE_ID_BASE_CONSENT_GIVEN            => self::CATEGORY_SECURITY,
     self::REPORT_TYPE_ID_BASE_CONSENT_REVOKED          => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_BASE_SUBJECT_DATA_EXPORTED    => self::CATEGORY_SECURITY,
   ];
 
   /** @var string Ключ шифрования для ПДн в логах */

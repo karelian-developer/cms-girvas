@@ -161,6 +161,9 @@ class PageUserGroup implements InterfacePage
       'USERS_GROUP_PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT_VALUE' => $usersGroup === null
         ? ''
         : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT)) ? 'checked' : ''),
+      'USERS_GROUP_PERMISSION_ADMIN_USERS_DATA_EXPORT_VALUE' => $usersGroup === null
+        ? ''
+        : (($usersGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_DATA_EXPORT)) ? 'checked' : ''),
     ]);
   }
 }

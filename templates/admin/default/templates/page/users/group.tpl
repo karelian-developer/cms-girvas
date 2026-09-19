@@ -170,6 +170,18 @@
             <label class="checkbox-container__label form__label" for="I1474308978"></label>
           </div>
         </div>
+        <!-- Поле: Экспорт данных субъектов (ФЗ-152) -->
+        <div class="cell grid-table__cell grid-table__cell_text">
+          <div class="cell__title">
+            {LANG:PAGE_USERS_GROUP_PERSMISSION_MANAGE_USERS_DATA_EXPORT_TITLE}
+          </div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <div class="form__checkbox-container checkbox-container">
+            <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308979" name="user_group_permissions[]" type="checkbox" value="admin_users_data_export" {USERS_GROUP_PERMISSION_ADMIN_USERS_DATA_EXPORT_VALUE}>
+            <label class="checkbox-container__label form__label" for="I1474308979"></label>
+          </div>
+        </div>
         <!-- Раздел: Права модерации -->
         <div class="cell grid-table__cell grid-table__cell_header">
           {LANG:PAGE_USERS_GROUP_PERSMISSIONS_GROUP_MODERATOR_TITLE}
@@ -206,8 +218,8 @@
         </div>
         <div class="cell grid-table__cell grid-table__cell_data">
           <div class="form__checkbox-container checkbox-container">
-            <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308978" name="user_group_permissions[]" type="checkbox" value="moder_users_warns" {USERS_GROUP_PERMISSION_MODER_USERS_WARNS_VALUE}>
-            <label class="checkbox-container__label form__label" for="I1474308978"></label>
+            <input class="checkbox-container__input form__input form__input_checkbox" id="I1474308991" name="user_group_permissions[]" type="checkbox" value="moder_users_warns" {USERS_GROUP_PERMISSION_MODER_USERS_WARNS_VALUE}>
+            <label class="checkbox-container__label form__label" for="I1474308991"></label>
           </div>
         </div>
         <!-- Раздел: Права редакции -->

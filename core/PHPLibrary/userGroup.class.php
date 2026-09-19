@@ -48,6 +48,7 @@ class UserGroup
   public const PERMISSION_ADMIN_CONTENT_BLOCKS_MANAGEMENT     = 1 << 20;
   public const PERMISSION_ADMIN_SUPERUSER                     = 1 << 18;
   public const PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT     = 1 << 22;
+  public const PERMISSION_ADMIN_USERS_DATA_EXPORT             = 1 << 23;
   // Права модерации
   public const PERMISSION_MODER_USERS_BAN                     = 1 << 7;
   public const PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT   = 1 << 8;
@@ -384,6 +385,16 @@ class UserGroup
   public function hasPermissionAdminPanelAuth() : bool
   {
     return $this->permissionCheck(self::PERMISSION_ADMIN_PANEL_AUTH);
+  }
+
+  /**
+   * Проверить наличие права экспорта данных субъекта
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminUsersDataExport() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_USERS_DATA_EXPORT);
   }
 
   /**

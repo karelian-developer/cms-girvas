@@ -22,7 +22,7 @@ export class PageUser {
   constructor(page, params = {}) {
     this.page = page;
 
-    this.buttons = {save: null, delete: null, block: null, unblock: null};
+    this.buttons = {save: null, delete: null, block: null, unblock: null, export: null};
   }
 
   init() {
@@ -107,16 +107,24 @@ export class PageUser {
       this.buttons.delete = new Interactive('button');
       this.buttons.block = new Interactive('button');
       this.buttons.unblock = new Interactive('button');
+      this.buttons.export = new Interactive('button');
 
       this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
       this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
       this.buttons.block.target.setLabel(localeData.BUTTON_BAN_LABEL);
       this.buttons.unblock.target.setLabel(localeData.BUTTON_UNBAN_LABEL);
+      this.buttons.export.target.setLabel(localeData.PAGE_USER_BUTTON_EXPORT_SUBJECT_DATA);
       
       this.buttons.save.target.setStyle('green');
       this.buttons.delete.target.setStyle('red');
       this.buttons.block.target.setStyle('red');
       this.buttons.unblock.target.setStyle('green');
+      this.buttons.export.target.setStyle('default');
+
+      this.buttons.export.target.setCallback((event) => {
+        event.preventDefault();
+        this.handleExport(searchParams.getPathPart(3), userData, localeData);
+      });
 
       this.buttons.save.target.setCallback((event) => {
         event.preventDefault();
@@ -223,6 +231,7 @@ export class PageUser {
         interactiveModal.target.show();
       });
 
+      this.buttons.export.assembly();
       this.buttons.save.assembly();
       this.buttons.delete.assembly();
       this.buttons.block.assembly();
@@ -246,6 +255,10 @@ export class PageUser {
       const interactiveChoicesUsersGroupsContainer = document.querySelector('[data-element="choice"][data-choice="group"]');
 
       if (interactiveFormPanelContainer !== null) {
+        if (searchParams.getPathPart(3) !== null) {
+          interactiveFormPanelContainer.append(this.buttons.export.target.element);
+        }
+
         interactiveFormPanelContainer.append(this.buttons.delete.target.element);
         interactiveFormPanelContainer.append(this.buttons.unblock.target.element);
         interactiveFormPanelContainer.append(this.buttons.block.target.element);
@@ -258,5 +271,59 @@ export class PageUser {
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     });
+  }
+
+  handleExport(userID, userData, localeData) {
+    const modal = new Interactive('modal', {
+      title: localeData.MODAL_SUBJECT_DATA_EXPORT_TITLE,
+      content: localeData.MODAL_SUBJECT_DATA_EXPORT_DESCRIPTION.replace('{LOGIN}', userData.login || '')
+    });
+
+    modal.target.addButton(localeData.BUTTON_SUBJECT_DATA_EXPORT_SUBMIT, async () => {
+      const formData = new FormData();
+      formData.append('_grv_' + Math.random().toString(36).slice(2), Math.random().toString(36).slice(2));
+
+      const headers = {};
+      if (window.CMSCore && window.CMSCore.client && window.CMSCore.client.CSRFToken !== '') {
+        headers['X-CSRF-Token'] = window.CMSCore.client.CSRFToken;
+      }
+
+      try {
+        const response = await fetch(
+          '/handler/user/export/' + userID + '?localeMessage=' + window.CMSCore.locales.admin.name,
+          { method: 'POST', body: formData, headers: headers, credentials: 'same-origin' }
+        );
+
+        if (!response.ok) {
+          try {
+            const errorData = await response.json();
+            this.page.showPopupNotification(errorData.message || 'Ошибка экспорта', 0);
+          } catch (e) {
+            this.page.showPopupNotification('Ошибка экспорта: ' + response.status, 0);
+          }
+          modal.target.close();
+          return;
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'subject_' + (userData.login || userID) + '_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.zip';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        this.page.showPopupNotification('Ошибка сети: ' + error, 0);
+      }
+      modal.target.close();
+    });
+
+    modal.target.addButton(localeData.BUTTON_CANCEL_LABEL, () => modal.target.close());
+
+    modal.assembly();
+    document.body.appendChild(modal.target.element);
+    modal.target.show();
   }
 }

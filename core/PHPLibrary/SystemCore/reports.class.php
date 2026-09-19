@@ -207,6 +207,72 @@ final class Reports
   }
 
   /**
+   * Получить отчёты, связанные с пользователем (как субъектом ПДн)
+   *
+   * @param CoreInterface $CMSCore
+   * @param int $userID
+   * @param int $limit
+   * @param int $offset
+   * @return array
+   */
+  public static function getAllByUser(
+    CoreInterface $CMSCore,
+    int $userID,
+    int $limit = 10000,
+    int $offset = 0
+  ) : array {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('reports');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => 'JSON_EXTRACT(`variables`, \'$.targetUserID\') = :userID
+                OR JSON_EXTRACT(`variables`, \'$.userID\') = :userID
+                OR JSON_EXTRACT(`variables`, \'$.subjectUserID\') = :userID
+                OR JSON_EXTRACT(`variables`, \'$.viewedByID\') = :userID',
+      'postgresql' => '(variables::jsonb->>\'targetUserID\')::int = :userID
+                      OR (variables::jsonb->>\'userID\')::int = :userID
+                      OR (variables::jsonb->>\'subjectUserID\')::int = :userID
+                      OR (variables::jsonb->>\'viewedByID\')::int = :userID'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
+    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    $queryBuilder->statement->setClauseLimit($limit, $offset);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':userID', $userID, \PDO::PARAM_INT);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $reports = [];
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    if ($results) {
+      foreach ($results as $data) {
+        $reports[] = new Report($CMSCore, (int) $data['id']);
+      }
+    }
+
+    return $reports;
+  }
+
+  /**
    * Получить объекты отчетов определенного типа
    *
    * @param  int $typeID
