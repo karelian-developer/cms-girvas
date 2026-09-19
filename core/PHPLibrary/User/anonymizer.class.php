@@ -50,6 +50,10 @@ class Anonymizer
     $user = new User($CMSCore, $userID);
     $user->initData(['login', 'email', 'metadata']);
 
+    if ($user->isAnonymized()) {
+      return false;
+    }
+
     // ============================================================
     // 1. Обезличиваем users
     // ============================================================

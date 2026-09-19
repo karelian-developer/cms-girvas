@@ -418,6 +418,24 @@ class User
   }
 
   /**
+   * Проверить, обезличен ли пользователь
+   *
+   * @return bool
+   */
+  public function isAnonymized() : bool
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+
+      if (isset($metadata['anonymizedAt']) && (int)$metadata['anonymizedAt'] > 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Хешировать пароль
    * 
    * @param CMSCore $CMSCore

@@ -50,18 +50,22 @@ if ($userID <= 0 || !User::existsByID($CMSCore, $userID)) {
 }
 
 $user = new User($CMSCore, $userID);
-$user->initData(['login']);
+$user->initData(['login', 'metadata']);
 
-// Нельзя обезличить супер-админа
 if ($user->isSuperAdmin()) {
   $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ANONYMIZE_ERROR_SUPERADMIN');
   $handlerStatusCode = 0;
   return;
 }
 
-// Нельзя обезличить самого себя
 if ($user->getID() === $clientUser->getID()) {
   $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ANONYMIZE_ERROR_SELF');
+  $handlerStatusCode = 0;
+  return;
+}
+
+if ($user->isAnonymized()) {
+  $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ANONYMIZE_ERROR_ALREADY');
   $handlerStatusCode = 0;
   return;
 }
