@@ -84,7 +84,7 @@ export class PageGlobal {
         footerLocalesListContainerElement.append(footerLocalesListElement);
       }
 
-      return window.CMSCore.locales.base.getData();
+      return this.page.core.locales.base.getData();
     }, (rejectionReason) => {
       let interactiveNotification = new Interactive('notification');
       interactiveNotification.target.isPopup = true;
@@ -145,7 +145,7 @@ export class PageGlobal {
             let authForm = new Interactive('form');
             authForm.target.init({
               method: 'POST',
-              action: '/handler/utils/authorization?method=base&localeMessage=' + window.CMSCore.locales.base.name
+              action: '/handler/utils/authorization?method=base&localeMessage=' + this.page.core.locales.base.name
             });
 
             /** @type {ElementInput} */
@@ -217,7 +217,7 @@ export class PageGlobal {
               let requestForm = new Interactive('form');
               requestForm.target.init({
                 method: 'POST',
-                action: '/handler/user/reset?localeMessage=' + window.CMSCore.locales.base.name
+                action: '/handler/user/reset?localeMessage=' + this.page.core.locales.base.name
               });
               
               /** Модальное окно для создания запроса на восстановление пароля
@@ -326,7 +326,7 @@ export class PageGlobal {
       return;
     }
 
-    const settings = await window.CMSCore.getSettings([
+    const settings = await this.page.core.getSettings([
       'security_cookie_banner_status',
       'security_cookie_banner_document_id'
     ]);
@@ -346,8 +346,8 @@ export class PageGlobal {
     try {
       const response = await fetch(
         '/handler/pageStatic/' + cookieDocumentID +
-        '?locale=' + window.CMSCore.locales.base.name +
-        '&localeMessage=' + window.CMSCore.locales.base.name,
+        '?locale=' + this.page.core.locales.base.name +
+        '&localeMessage=' + this.page.core.locales.base.name,
         { method: 'GET', credentials: 'same-origin' }
       );
 
@@ -358,7 +358,7 @@ export class PageGlobal {
         }
       }
     } catch (e) {
-      window.CMSCore.debugError(1, 'CookieBanner', 'Failed to fetch document: ' + e);
+      this.page.core.debugError(1, 'CookieBanner', 'Failed to fetch document: ' + e);
       return;
     }
 
@@ -366,7 +366,7 @@ export class PageGlobal {
       return;
     }
 
-    const localeData = window.CMSCore.localeData;
+    const localeData = this.page.core.localeData;
     const contentElement = document.createElement('div');
     contentElement.classList.add('cookie-banner');
     contentElement.innerHTML = localeData.MODAL_COOKIE_SITE_USING_DESCRIPTION || '';
@@ -410,32 +410,34 @@ export class PageGlobal {
    * @param {boolean} accepted
    */
   submitCookieConsent(cookieDocument, accepted) {
-    console.log('[Cookie] submitCookieConsent called', { cookieDocument, accepted });
-
     Client.setCookie('allowCookies', accepted ? 'true' : 'false', 366);
 
     if (!accepted) {
-      console.log('[Cookie] declined, no request');
       return;
     }
 
-    const documentVersion = cookieDocument ? cookieDocument.currentVersion : '';
-    console.log('[Cookie] documentVersion:', documentVersion);
-    console.log('[Cookie] cookieDocument.id:', cookieDocument ? cookieDocument.id : null);
-    console.log('[Cookie] isLogged:', window.CMSCore.client ? window.CMSCore.client.isLogged : 'no client');
+    const documentVersion = cookieDocument.currentVersion || '';
 
-    if (!cookieDocument || !cookieDocument.id || !documentVersion) {
-      console.log('[Cookie] skipping request — no document/version');
+    if (!cookieDocument.id || !documentVersion) {
       return;
     }
 
-    if (!window.CMSCore.client || !window.CMSCore.client.isLogged) {
-      console.log('[Cookie] skipping request — not logged');
+    if (!this.page.core.client || !this.page.core.client.isLogged) {
       return;
     }
 
-    // ... отправка ...
-    console.log('[Cookie] sending request');
+    const formData = new FormData();
+    formData.append('pageStaticID', cookieDocument.id);
+    formData.append('documentVersion', documentVersion);
+    formData.append('locale', this.page.core.locales.base.name);
+
+    const request = new Interactive('request', {
+      method: 'POST',
+      url: '/handler/client/consent-cookie?localeMessage=' + this.page.core.locales.base.name
+    });
+
+    request.target.data = formData;
+    request.target.send();
   }
 
   /**
