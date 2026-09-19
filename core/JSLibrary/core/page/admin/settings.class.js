@@ -512,7 +512,7 @@ export class PageSettings {
           interactiveChoicesCookieDocument.target.setWidth('100%');
           interactiveChoicesCookieDocument.assembly();
 
-          cookieBannerDocumentContainer.appendChild(interactiveChoicesCookieDocument.target.element);
+          cookieBannerDocumentContainer.append(interactiveChoicesCookieDocument.target.element);
 
           // ============================================================
           // Показ/скрытие блока документа по чекбоксу
