@@ -191,5 +191,5 @@
   "API_ANONYMIZE_ERROR_SUPERADMIN": "Superadmin cannot be anonymized.",
   "API_ANONYMIZE_ERROR_SELF": "Cannot anonymize yourself.",
   "API_ANONYMIZE_ERROR_ALREADY": "User is already anonymized.",
-  "API_REPORTS_ROTATION_SUCCESS": "Rotation completed. Archived records: {COUNT}."
+  "API_REPORTS_ROTATION_SUCCESS": "Rotation completed."
 }

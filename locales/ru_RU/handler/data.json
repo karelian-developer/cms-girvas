@@ -197,5 +197,5 @@
   "API_ANONYMIZE_ERROR_SUPERADMIN": "Нельзя обезличить супер-администратора.",
   "API_ANONYMIZE_ERROR_SELF": "Нельзя обезличить самого себя.",
   "API_ANONYMIZE_ERROR_ALREADY": "Пользователь уже обезличен.",
-  "API_REPORTS_ROTATION_SUCCESS": "Ротация выполнена. Архивировано записей: {COUNT}."
+  "API_REPORTS_ROTATION_SUCCESS": "Ротация выполнена."
 }
