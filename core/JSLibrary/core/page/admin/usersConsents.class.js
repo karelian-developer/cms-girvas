@@ -25,21 +25,33 @@ export class PageUsersConsents {
         exportContainer.append(exportButton.target.element);
       }
 
-      // Кнопки «Отозвать» — оставить как есть (они уже работают)
-      const revokeButtons = document.querySelectorAll('[data-event="revoke"]');
-      revokeButtons.forEach((button) => {
-        button.addEventListener('click', (event) => {
+      const consentPanels = document.querySelectorAll('[data-element="consent"] [data-role="revoke-panel"]');
+      consentPanels.forEach((panel) => {
+        const consentItem = panel.closest('[data-element="consent"]');
+        const consentID = consentItem ? consentItem.getAttribute('data-id') : null;
+
+        if (!consentID) return;
+
+        const isRevoked = consentItem.getAttribute('data-revoked') === '1';
+        const canRevoke = consentItem.getAttribute('data-can-revoke') === '1';
+        if (isRevoked || !canRevoke) return;
+
+        const revokeButton = new Interactive('button');
+        revokeButton.target.setLabel(localeData.PAGE_USERS_CONSENTS_BUTTON_REVOKE || 'Отозвать');
+        revokeButton.target.setStyle('red');
+        revokeButton.target.setCallback((event) => {
           event.preventDefault();
-          const consentID = button.getAttribute('data-consent-id');
-          this.handleRevoke(consentID, button);
+          this.handleRevoke(consentID, revokeButton);
         });
+        revokeButton.assembly();
+        panel.append(revokeButton.target.element);
       });
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     });
   }
 
-  handleRevoke(consentID, button) {
+  handleRevoke(consentID, revokeButton) {
     if (!consentID) return;
 
     const modal = new Interactive('modal', {
@@ -111,7 +123,6 @@ export class PageUsersConsents {
       );
 
       if (!response.ok) {
-        // Если сервер вернул JSON с ошибкой (CSRF, права)
         try {
           const errorData = await response.json();
           this.page.showPopupNotification(errorData.message || 'Ошибка экспорта', 0);
@@ -121,11 +132,9 @@ export class PageUsersConsents {
         return;
       }
 
-      // Получаем blob
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
 
-      // Скачиваем
       const a = document.createElement('a');
       a.href = url;
       a.download = 'consents_' + new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '.csv';

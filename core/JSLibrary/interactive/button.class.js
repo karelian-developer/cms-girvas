@@ -106,7 +106,7 @@ export class Button {
 
     if (this.iconUrl != null) {
       buttonIconElement.classList.add('interactive__button-icon');
-      buttonIconElement.setAttribute('scr', this.iconUrl);
+      buttonIconElement.setAttribute('src', this.iconUrl);
       buttonElement.append(buttonIconElement);
     }
 

@@ -162,7 +162,7 @@ export class Interactive {
 
     let interactiveRepetitiveElement = document.querySelector(`[cmsg-interactive-uid="${randomNumber.toString(16)}"]`);
     if (interactiveRepetitiveElement != null) {
-      return interactiveRepetitiveElement.generateUniqueID();
+      return this.generateUniqueID();
     } else {
       resultID = randomNumber;
     }

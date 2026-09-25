@@ -237,13 +237,7 @@ class PageUsersConsents implements InterfacePage
         ? mb_substr($userAgentFull, 0, 40) . '…'
         : $userAgentFull;
 
-      // Кнопка отзыва
-      $revokeButton = '';
-      if ($clientIsSuper && !$consent->isRevoked()) {
-        $revokeButton = '<button type="button" class="grid-table__panel-link grid-table__panel-link_red" data-event="revoke" data-consent-id="' . $consent->getID() . '">'
-          . ($localeData['PAGE_USERS_CONSENTS_BUTTON_REVOKE'] ?? 'Отозвать')
-          . '</button>';
-      }
+      $canRevoke = $clientIsSuper && !$consent->isRevoked();
 
       $tableItemsAssembled[] = ThemeCollector::assemblyFileContent(
         $this->CMSCore->theme,
@@ -261,7 +255,8 @@ class PageUsersConsents implements InterfacePage
           'CONSENTED_DATE' => $consentedDate,
           'IP' => htmlspecialchars($consent->getIP()),
           'USER_AGENT_SHORT' => htmlspecialchars($userAgentShort),
-          'REVOKE_BUTTON' => $revokeButton
+          'IS_REVOKED' => $consent->isRevoked() ? '1' : '0',
+          'CAN_REVOKE' => $canRevoke ? '1' : '0'
         ]
       );
 
