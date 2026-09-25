@@ -20,7 +20,6 @@
 
 namespace core\PHPLibrary\Database\QueryBuilder\StatementSelect;
 
-use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\InterfaceClause as InterfaceClause;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect as StatementSelect;
 
@@ -74,13 +73,7 @@ final class ClauseOrderBy implements InterfaceClause
    */
   public function assembly() : void
   {
-    $queryBuilder = $this->statement->queryBuilder;
-
-    $columnQuoted = match ($queryBuilder->DMS) {
-      DMS::MySQL      => '`' . $this->column . '`',
-      DMS::PostgreSQL => '"' . strtolower($this->column) . '"',
-    };
-
-    $this->assembled = sprintf('ORDER BY %s %s', $columnQuoted, $this->sortType);
+    $this->assembled = sprintf('ORDER BY "%s" %s', $this->column, $this->sortType);
   }
+
 }
