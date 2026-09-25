@@ -40,11 +40,12 @@ final class Entries
   /**
    * Получить все объекты записей
    *
-   * @param   array $params
-   * @param   bool 
+   * @param   array   $params
+   * @param   bool    $isPublished
+   * @param   string  $sortRule — одно из правил сортировки
    * @return  array
    */
-  public function getAll(array $params = [], $isPublished = false) : array
+  public function getAll(array $params = [], $isPublished = false, string $sortRule = 'by_createdtimestamp_decrease') : array
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -65,9 +66,21 @@ final class Entries
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
+    // Сортировка
+    $sortMap = [
+      'by_createdtimestamp_increase' => ['column' => 'createdUnixTimestamp', 'direction' => 'ASC'],
+      'by_createdtimestamp_decrease' => ['column' => 'createdUnixTimestamp', 'direction' => 'DESC'],
+      'by_updatedtimestamp_increase' => ['column' => 'updatedUnixTimestamp', 'direction' => 'ASC'],
+      'by_updatedtimestamp_decrease' => ['column' => 'updatedUnixTimestamp', 'direction' => 'DESC'],
+      'by_alphabet_increase'         => ['column' => 'name',                 'direction' => 'ASC'],
+      'by_alphabet_decrease'         => ['column' => 'name',                 'direction' => 'DESC'],
+    ];
+    $sortConfig = $sortMap[$sortRule] ?? $sortMap['by_createdtimestamp_decrease'];
+
     $queryBuilder->statement->setClauseOrderBy();
-    $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
-    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    $queryBuilder->statement->clauseOrderBy->setColumn($sortConfig['column']);
+    $queryBuilder->statement->clauseOrderBy->setSortType($sortConfig['direction']);
+
     if (array_key_exists('limit', $params)) {
       if (is_array($params['limit'])) {
         $limit = (is_integer($params['limit'][0])) ? $params['limit'][0] : 0;

@@ -154,6 +154,7 @@
   "PAGE_ENTRIES_TABLE_COLUMN_CREATED_DATE_LABEL": "Дата создания",
   "PAGE_ENTRIES_TABLE_COLUMN_PUBLISHED_DATE_LABEL": "Дата публикации",
   "PAGE_ENTRIES_TABLE_COLUMN_UPDATED_DATE_LABEL": "Дата обновления",
+  "PAGE_ENTRIES_SEARCH_PLACEHOLDER": "Поиск по названию и содержимому",
   "PAGE_ENTRIES_SIDEBAR_BLOCK_POPULAR_ENTRIES_TITLE": "Популярные записи",
   "PAGE_ENTRIES_SIDEBAR_BLOCK_ABOUT_TITLE": "О записях",
   "PAGE_ENTRIES_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_1": "<b>Записи</b> &mdash; это основная единица контента, которая содержит информацию о конкретной теме или событии. Веб-сайты состоят из различных записей, таких как статьи, новости, страницы товаров и так далее.",

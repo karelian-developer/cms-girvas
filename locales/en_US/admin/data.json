@@ -154,6 +154,7 @@
   "PAGE_ENTRIES_TABLE_COLUMN_CREATED_DATE_LABEL": "Created date",
   "PAGE_ENTRIES_TABLE_COLUMN_PUBLISHED_DATE_LABEL": "Published date",
   "PAGE_ENTRIES_TABLE_COLUMN_UPDATED_DATE_LABEL": "Updated date",
+  "PAGE_ENTRIES_SEARCH_PLACEHOLDER": "Search by title and content",
   "PAGE_ENTRIES_SIDEBAR_BLOCK_POPULAR_ENTRIES_TITLE": "Popular entries",
   "PAGE_ENTRIES_SIDEBAR_BLOCK_ABOUT_TITLE": "About entries",
   "PAGE_ENTRIES_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_1": "<b>Entries</b> &mdash; are the main unit of content that contains information about a specific topic or event. Websites consist of various entries, such as articles, news, product pages, and so on.",
