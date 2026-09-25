@@ -58,6 +58,7 @@
   box-sizing: border-box;
   position: absolute;
   border: 1px solid #EAEAEA;
+  margin-bottom: 0px;
   max-height: 128px;
   height: 0;
   width: calc(100% + 2px);
