@@ -38,6 +38,18 @@ class PageEntriesSamples implements InterfacePage
 
   const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_CONTENT_NAVIGATION_%s_LABEL';
 
+  /**
+   * Допустимые правила сортировки
+   */
+  private const ALLOWED_SORT_RULES = [
+    'by_createdtimestamp_increase',
+    'by_createdtimestamp_decrease',
+    'by_updatedtimestamp_increase',
+    'by_updatedtimestamp_decrease',
+    'by_alphabet_increase',
+    'by_alphabet_decrease',
+  ];
+
   public SystemCore $CMSCore;
   public Page $page;
   public string $assembled = '';
@@ -146,9 +158,10 @@ class PageEntriesSamples implements InterfacePage
   }
 
   /**
-   * Сборка списка локализаций для записи
+   * Сборка списка категорий для записи
    * 
-   * @param array $localesData
+   * @param string $localeName
+   * @param array $categories
    * 
    * @return string
    */
@@ -169,6 +182,20 @@ class PageEntriesSamples implements InterfacePage
   }
 
   /**
+   * Query string для пагинации
+   */
+  private function buildQueryString(string $searchValue, string $sortRule) : string
+  {
+    $parts = [];
+    if ($searchValue !== '') {
+      $parts[] = 'value=' . urlencode($searchValue);
+    }
+    $parts[] = 'sort=' . urlencode($sortRule);
+
+    return '?' . implode('&', $parts);
+  }
+
+  /**
    * Сборка
    * 
    * @return void
@@ -185,16 +212,35 @@ class PageEntriesSamples implements InterfacePage
     /** @var int Максимальное количество элементов на странице */
     $paginationItemsOnPage = 12;
 
+    // Поиск
+    $searchValue = $this->CMSCore->urlp->getParam('value');
+    $searchValue = $searchValue !== null ? trim(urldecode($searchValue)) : '';
+
+    // Сортировка
+    $sortRule = $this->CMSCore->urlp->getParam('sort') ?? EntriesSamples::DEFAULT_SORT_RULE;
+    if (!in_array($sortRule, self::ALLOWED_SORT_RULES, true)) {
+      $sortRule = EntriesSamples::DEFAULT_SORT_RULE;
+    }
+
     $entriesSamplesTableItemsAssembled = [];
 
     $entriesSamples = new EntriesSamples($this->CMSCore);
 
     /** @var array Массив объектов выборок */
-    $entriesSamplesObjects = $entriesSamples->getAll([
-      'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
-    ]);
+    $entriesSamplesObjects = $entriesSamples->getAll(
+      ['limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]],
+      $searchValue,
+      $sortRule
+    );
 
-    $pagination = new Pagination($this->CMSCore, $entriesSamples->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
+    $pagination = new Pagination(
+      $this->CMSCore,
+      $entriesSamples->getCountTotal($searchValue),
+      $paginationItemsOnPage,
+      $paginationItemCurrent,
+      $this->buildQueryString($searchValue, $sortRule),
+      false
+    );
     $pagination->assembly();
 
     unset($entriesSamples);
@@ -239,7 +285,7 @@ class PageEntriesSamples implements InterfacePage
           $this->CMSCore->theme,
           'templates/page/entriesSamples/tableItem.tpl',
           [
-            'ENTRIES_SAMPLE_INDEX' => $index,
+            'ENTRIES_SAMPLE_INDEX' => $paginationItemCurrent * $paginationItemsOnPage + $index + 1,
             'ENTRIES_SAMPLE_ID' => $objectID,
             'ENTRIES_SAMPLE_NAME' => $object->getName(),
             'ENTRIES_SAMPLE_TITLE' => $entriesSampleTitle,
@@ -267,7 +313,9 @@ class PageEntriesSamples implements InterfacePage
           [
             'PAGE_ENTRIES_SAMPLES_TABLE_ITEMS' => implode($entriesSamplesTableItemsAssembled)
           ]
-        )
+        ),
+        'ENTRIES_SAMPLES_SEARCH_VALUE' => htmlspecialchars($searchValue, ENT_QUOTES, 'UTF-8'),
+        'ENTRIES_SAMPLES_SORT_VALUE'   => htmlspecialchars($sortRule, ENT_QUOTES, 'UTF-8'),
       ]
     );
   }

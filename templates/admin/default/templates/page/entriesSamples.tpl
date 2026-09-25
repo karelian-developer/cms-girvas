@@ -1,4 +1,7 @@
-<article class="main__page page page_entries-samples">
+<article class="main__page page page_entries-samples"
+         data-element="entries-samples-page"
+         data-search-value="{ENTRIES_SAMPLES_SEARCH_VALUE}"
+         data-sort-value="{ENTRIES_SAMPLES_SORT_VALUE}">
   <nav id="SYSTEM_AP_SUBNAVIGATION" class="page__navigation navigation"></nav>
   <div class="page__title-container">
     <h1 class="page__title">{LANG:PAGE_ENTRIES_SAMPLES_TITLE}</h1>
