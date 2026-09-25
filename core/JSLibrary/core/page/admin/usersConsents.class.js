@@ -36,23 +36,6 @@ export class PageUsersConsents {
       const currentSort = pageElement?.getAttribute('data-sort-value') || 'by_consentedat_decrease';
       const currentSearch = pageElement?.getAttribute('data-search-value') || '';
 
-      // ----- 1. Кнопка «Экспорт CSV» -----
-      const exportContainer = container.querySelector('[data-element="export-container"]')
-        || document.querySelector('[data-element="export-container"]');
-
-      if (exportContainer !== null) {
-        const exportButton = new Interactive('button');
-        exportButton.target.setLabel(localeData.PAGE_USERS_CONSENTS_BUTTON_EXPORT || 'Экспорт CSV');
-        exportButton.target.setStyle('default');
-        exportButton.target.setCallback((event) => {
-          event.preventDefault();
-          this.handleExport();
-        });
-        exportButton.assembly();
-        exportContainer.append(exportButton.target.element);
-      }
-
-      // ----- 2. Поле поиска по ID пользователя -----
       const searchInput = new Interactive('input');
       searchInput.target.setType('search');
       searchInput.target.setPlaceholder(
@@ -72,7 +55,6 @@ export class PageUsersConsents {
         });
       }
 
-      // ----- 3. Кнопка поиска -----
       const searchButton = new Interactive('button');
       searchButton.target.setLabel(localeData.BUTTON_SEARCH_LABEL || 'Найти');
       searchButton.target.setStyle('default');
@@ -82,7 +64,6 @@ export class PageUsersConsents {
       });
       searchButton.assembly();
 
-      // ----- 4. Сортировка -----
       const sortChoices = new Interactive('choices');
       sortChoices.target.setWidth('280px');
       sortChoices.target.addItem(localeData.SORT_BY_CONSENTEDAT_INCREASE,   'by_consentedat_increase');
@@ -110,10 +91,28 @@ export class PageUsersConsents {
         window.location.href = url.toString();
       });
 
+      const exportContainer = container.querySelector('[data-element="export-container"]')
+        || document.querySelector('[data-element="export-container"]');
+
+      if (exportContainer !== null) {
+        const exportButton = new Interactive('button');
+        exportButton.target.setLabel(localeData.PAGE_USERS_CONSENTS_BUTTON_EXPORT || 'Экспорт CSV');
+        exportButton.target.setStyle('default');
+        exportButton.target.setCallback((event) => {
+          event.preventDefault();
+          this.handleExport();
+        });
+        exportButton.assembly();
+      }
+
       // ----- Сборка панели -----
       container.append(sortChoices.target.element);
       container.append(searchInput.target.element);
       container.append(searchButton.target.element);
+
+      if (exportContainer !== null) {
+        exportContainer.append(exportButton.target.element);
+      }
 
       // ----- Сохранение value/sort в ссылках пагинации -----
       const paginationLinks = document.querySelectorAll('.page__pagination a');
