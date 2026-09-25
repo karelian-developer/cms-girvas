@@ -33,39 +33,6 @@ class Consent
   private array $initializedColumns = [];
 
   /**
-   * Допустимые правила сортировки.
-   * Значения — SQL-фрагменты в camelCase (как в MySQL).
-   * Для PostgreSQL имена колонок будут приведены к нижнему регистру в getAll().
-   */
-  private const SORT_RULES = [
-    'by_consentedat_increase'  => 'consentedAt ASC',
-    'by_consentedat_decrease'  => 'consentedAt DESC',
-    'by_status_active_first'   => 'revokedAt IS NULL DESC, consentedAt DESC',
-    'by_status_revoked_first'  => 'revokedAt IS NULL ASC, consentedAt DESC',
-    'by_source_increase'       => 'source ASC, consentedAt DESC',
-    'by_source_decrease'       => 'source DESC, consentedAt DESC',
-  ];
-
-  public const DEFAULT_SORT_RULE = 'by_consentedat_decrease';
-
-  /**
-   * Маппинг колонок из БД (lower) в camelCase-свойства класса.
-   * Нужен для PostgreSQL, где PDO отдаёт ключи в нижнем регистре.
-   */
-  private const COLUMN_ALIASES = [
-    'userid'          => 'userID',
-    'formid'          => 'formID',
-    'formreportid'    => 'formReportID',
-    'pagestaticid'    => 'pageStaticID',
-    'documentversion' => 'documentVersion',
-    'consentedat'     => 'consentedAt',
-    'revokedat'       => 'revokedAt',
-    'revokereason'    => 'revokeReason',
-    'revokedbyid'     => 'revokedByID',
-    'useragent'       => 'userAgent',
-  ];
-
-  /**
    * __construct
    *
    * @param CoreInterface $CMSCore
@@ -103,13 +70,6 @@ class Consent
     if ($columnsData !== null) {
       foreach ($columnsData as $name => $data) {
         $this->{$name} = $data;
-
-        // Для PostgreSQL имена колонок приходят в нижнем регистре —
-        // дублируем их в camelCase, чтобы геттеры находили данные.
-        $alias = self::COLUMN_ALIASES[strtolower($name)] ?? null;
-        if ($alias !== null && $alias !== $name) {
-          $this->{$alias} = $data;
-        }
       }
 
       if ($columns === ['*']) {
@@ -337,7 +297,7 @@ class Consent
 
     foreach (array_keys($conditions) as $key) {
       $conditionPartsMysql[] = '`' . $key . '` = :' . $key;
-      $conditionPartsPostgres[] = '"' . strtolower($key) . '" = :' . $key;
+      $conditionPartsPostgres[] = '"' . $key . '" = :' . $key;
     }
 
     $queryBuilder->statement->clauseWhere->addConditionAdaptive([
@@ -509,14 +469,14 @@ class Consent
                   AND `source` = :source
                   AND `consentedAt` >= :threshold
                   AND `revokedAt` IS NULL',
-      'postgresql' => '"userid" = :userID
+      'postgresql' => '"userID" = :userID
                        AND "ip" = :ip
-                       AND "useragent" = :userAgent
-                       AND "pagestaticid" = :pageStaticID
-                       AND "documentversion" = :documentVersion
+                       AND "userAgent" = :userAgent
+                       AND "pageStaticID" = :pageStaticID
+                       AND "documentVersion" = :documentVersion
                        AND "source" = :source
-                       AND "consentedat" >= :threshold
-                       AND "revokedat" IS NULL'
+                       AND "consentedAt" >= :threshold
+                       AND "revokedAt" IS NULL'
     ]);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseOrderBy();
@@ -559,7 +519,11 @@ class Consent
    * Зафиксировать несколько согласий одним batch-запросом
    *
    * @param CMSCore $CMSCore
-   * @param array $consents
+   * @param array $consents Массив вида:
+   *   [
+   *     ['pageStaticID' => 4, 'documentVersion' => '1.0'],
+   *     ['pageStaticID' => 5, 'documentVersion' => '2.0'],
+   *   ]
    * @param int $userID
    * @param int $formID
    * @param int $formReportID
@@ -567,7 +531,7 @@ class Consent
    * @param string $ip
    * @param string $userAgent
    * @param string $source
-   * @return array
+   * @return array Массив ['pageStaticID' => Consent, ...]
    */
   public static function giveBatch(
     CMSCore $CMSCore,
@@ -600,7 +564,7 @@ class Consent
     foreach ($columns as $col) {
       $quotedColumns[] = match ($CMSConfigDatabase['dms']) {
         CMSDMS::MySQL => '`' . $col . '`',
-        CMSDMS::PostgreSQL => '"' . strtolower($col) . '"'
+        CMSDMS::PostgreSQL => '"' . $col . '"'
       };
     }
 
@@ -647,7 +611,7 @@ class Consent
       }
 
       $sql = sprintf(
-        'INSERT INTO %s (%s) VALUES %s RETURNING "id", "pagestaticid"',
+        'INSERT INTO %s (%s) VALUES %s RETURNING "id", "pageStaticID"',
         $tableName,
         implode(', ', $quotedColumns),
         implode(', ', $valuePlaceholders)
@@ -669,11 +633,12 @@ class Consent
 
       $rows = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
       foreach ($rows as $row) {
-        $result[(int)$row['pagestaticid']] = new Consent($CMSCore, (int)$row['id']);
+        $result[(int)$row['pageStaticID']] = new Consent($CMSCore, (int)$row['id']);
       }
     } else {
       // ============================================================
       // MySQL: транзакция + поштучный INSERT + lastInsertId()
+      // (не полагаемся на последовательность AUTO_INCREMENT)
       // ============================================================
       $singleInsertSql = sprintf(
         'INSERT INTO %s (%s) VALUES (%s)',
@@ -686,6 +651,7 @@ class Consent
         ])
       );
 
+      // Безопасная вложенность: если транзакция уже открыта — не открываем новую
       $ownTransaction = !$databaseConnection->inTransaction();
       if ($ownTransaction) {
         $databaseConnection->beginTransaction();
@@ -737,7 +703,6 @@ class Consent
    * @param CMSCore $CMSCore
    * @param int $consentID
    * @param string $reason
-   * @param int $revokedByID
    * @return bool
    */
   public static function revoke(CMSCore $CMSCore, int $consentID, string $reason = '', int $revokedByID = 0) : bool
@@ -749,21 +714,9 @@ class Consent
     $queryBuilder->setStatementUpdate();
     $queryBuilder->statement->setTable('users_consents');
     $queryBuilder->statement->setClauseSet();
-
-    // Имена колонок под каждую СУБД: MySQL — camelCase, PostgreSQL — lower.
-    $queryBuilder->statement->clauseSet->addColumnAdaptive('revokedAt', [
-      'mysql' => '`revokedAt`',
-      'postgresql' => '"revokedat"'
-    ]);
-    $queryBuilder->statement->clauseSet->addColumnAdaptive('revokeReason', [
-      'mysql' => '`revokeReason`',
-      'postgresql' => '"revokereason"'
-    ]);
-    $queryBuilder->statement->clauseSet->addColumnAdaptive('revokedByID', [
-      'mysql' => '`revokedByID`',
-      'postgresql' => '"revokedbyid"'
-    ]);
-
+    $queryBuilder->statement->clauseSet->addColumn('revokedAt');
+    $queryBuilder->statement->clauseSet->addColumn('revokeReason');
+    $queryBuilder->statement->clauseSet->addColumn('revokedByID');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
     $queryBuilder->statement->clauseWhere->addConditionAdaptive([
@@ -804,14 +757,12 @@ class Consent
     return self::getAllByUser($CMSCore, $userID, true);
   }
 
-  /**
-   * Получить все согласия с пагинацией, поиском и сортировкой
+    /**
+   * Получить все согласия с пагинацией
    *
    * @param CMSCore $CMSCore
    * @param int $limit
    * @param int $offset
-   * @param string $searchValue — поиск по userID (строка, будет приведена к int)
-   * @param string $sortRule    — одно из SORT_RULES
    * @return array
    */
   public static function getAll(
@@ -832,7 +783,7 @@ class Consent
     $queryBuilder->statement->clauseFrom->addTable('users_consents');
     $queryBuilder->statement->clauseFrom->assembly();
 
-    // Поиск по userID (только если введено целое число)
+    // Поиск по userID
     $hasSearch = false;
     $searchUserID = 0;
     if ($searchValue !== '' && ctype_digit($searchValue)) {
@@ -847,40 +798,27 @@ class Consent
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
-    // Сортировка — из белого списка.
-    $sortSQL = self::SORT_RULES[$sortRule] ?? self::SORT_RULES[self::DEFAULT_SORT_RULE];
+    // Сортировка — одной колонкой, без вторичных выражений
+    $sortMap = [
+      'by_consentedat_increase' => ['column' => 'consentedAt', 'direction' => 'ASC'],
+      'by_consentedat_decrease' => ['column' => 'consentedAt', 'direction' => 'DESC'],
+      'by_status_active_first'  => ['column' => 'revokedAt',   'direction' => 'DESC'],
+      'by_status_revoked_first' => ['column' => 'revokedAt',   'direction' => 'ASC'],
+      'by_source_increase'      => ['column' => 'source',      'direction' => 'ASC'],
+      'by_source_decrease'      => ['column' => 'source',      'direction' => 'DESC'],
+    ];
+    $sortConfig = $sortMap[$sortRule] ?? $sortMap[self::DEFAULT_SORT_RULE];
 
-    // Для PostgreSQL имена колонок в БД в нижнем регистре.
-    if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
-      $sortSQL = str_replace(
-        ['consentedAt', 'revokedAt', 'source'],
-        ['"consentedat"', '"revokedat"', '"source"'],
-        $sortSQL
-      );
-    }
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn($sortConfig['column']);
+    $queryBuilder->statement->clauseOrderBy->setSortType($sortConfig['direction']);
 
-    // Лимит
     $queryBuilder->statement->setClauseLimit($limit, $offset);
     $queryBuilder->statement->assembly();
 
-    // Вставляем ORDER BY перед LIMIT
-    $assembledSQL = $queryBuilder->statement->assembled;
-    if (stripos($assembledSQL, 'ORDER BY') === false) {
-      if (stripos($assembledSQL, 'LIMIT') !== false) {
-        $assembledSQL = preg_replace(
-          '/\s+LIMIT\s+/i',
-          ' ORDER BY ' . $sortSQL . ' LIMIT ',
-          $assembledSQL,
-          1
-        );
-      } else {
-        $assembledSQL .= ' ORDER BY ' . $sortSQL;
-      }
-    }
-
     try {
       $databaseConnection = $CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($assembledSQL);
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
       if ($hasSearch) {
         $databaseQuery->bindValue(':searchUserID', $searchUserID, \PDO::PARAM_INT);
@@ -906,10 +844,9 @@ class Consent
   }
 
   /**
-   * Получить общее количество согласий (с учётом поиска по userID)
+   * Получить общее количество согласий
    *
    * @param CMSCore $CMSCore
-   * @param string $searchValue
    * @return int
    */
   public static function countAll(CMSCore $CMSCore, string $searchValue = '') : int
@@ -982,11 +919,11 @@ class Consent
     $queryBuilder->statement->setClauseWhere();
 
     $conditionMysql = '`userID` = :userID';
-    $conditionPostgres = '"userid" = :userID';
+    $conditionPostgres = '"userID" = :userID';
 
     if ($onlyActive) {
       $conditionMysql .= ' AND `revokedAt` IS NULL';
-      $conditionPostgres .= ' AND "revokedat" IS NULL';
+      $conditionPostgres .= ' AND "revokedAt" IS NULL';
     }
 
     $queryBuilder->statement->clauseWhere->addConditionAdaptive([
@@ -997,12 +934,6 @@ class Consent
     $queryBuilder->statement->setClauseOrderBy();
     $queryBuilder->statement->clauseOrderBy->setColumn('consentedAt');
     $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
-
-    // Для PostgreSQL имя колонки в ORDER BY — lower
-    if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
-      $queryBuilder->statement->clauseOrderBy->setColumn('consentedat');
-    }
-
     $queryBuilder->statement->assembly();
 
     try {
