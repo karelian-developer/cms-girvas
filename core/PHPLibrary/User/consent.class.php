@@ -797,7 +797,7 @@ class Consent
       $queryBuilder->statement->setClauseWhere();
       $queryBuilder->statement->clauseWhere->addConditionAdaptive([
         'mysql'      => '`userID` = :searchUserID',
-        'postgresql' => '"userid" = :searchUserID'
+        'postgresql' => '"userID" = :searchUserID'
       ]);
       $queryBuilder->statement->clauseWhere->assembly();
     }
