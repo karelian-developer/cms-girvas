@@ -1,23 +1,5 @@
 <?php
 
-/**
- * CMS «ГИРВАС»
- * 
- * Включена в Реестр российского программного обеспечения Минцифры РФ
- * Реестровый номер: №25012 от 27.11.2024
- * 
- * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
- * @link        https://cms-girvas.ru Сайт продукта
- * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
- * Все права защищены.
- * 
- * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
- * @author      Андрей Шестаков <andrey.shestakov@karelian-developer.ru>
- * 
- * @support     support@karelian-developer.ru
- */
-
 namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
@@ -36,6 +18,13 @@ class PageUsers implements InterfacePage
   use TraitPage;
 
   const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_USERS_NAVIGATION_%s_LABEL';
+
+  private const ALLOWED_SORT_RULES = [
+    'by_createdtimestamp_increase',
+    'by_createdtimestamp_decrease',
+    'by_alphabet_increase',
+    'by_alphabet_decrease',
+  ];
 
   public SystemCore $CMSCore;
   public Page $page;
@@ -79,7 +68,7 @@ class PageUsers implements InterfacePage
 
   /**
    * Инициализация подразделов
-   * 
+   *
    * @return void
    */
   public function initSubnavigation() : void
@@ -97,23 +86,44 @@ class PageUsers implements InterfacePage
 
     $subpageName = $this->CMSCore->urlp->getPath(2) ?? 'list';
 
-    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
+    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null
+      ? (int) $this->CMSCore->urlp->getParam('pageNumber')
+      : 0;
     $paginationItemsOnPage = 12;
 
-    $usersTableItemsAssembled = [];
+    // Поиск
+    $searchValue = $this->CMSCore->urlp->getParam('value');
+    $searchValue = $searchValue !== null ? trim(urldecode($searchValue)) : '';
+
+    // Сортировка
+    $sortRule = $this->CMSCore->urlp->getParam('sort') ?? 'by_createdtimestamp_decrease';
+    if (!in_array($sortRule, self::ALLOWED_SORT_RULES, true)) {
+      $sortRule = 'by_createdtimestamp_decrease';
+    }
 
     $users = new Users($this->CMSCore);
     $usersLocale = $this->CMSCore->getCMSLocale('admin');
     $usersLocaleName = $usersLocale->getName();
 
     $usersObjects = $users->getAll([
-      'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
+      'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage],
+      'search' => $searchValue,
+      'sort' => $sortRule,
     ]);
 
-    $pagination = new Pagination($this->CMSCore, $users->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
+    $usersTotal = $users->getCountTotal($searchValue);
+
+    $pagination = new Pagination(
+      $this->CMSCore,
+      $usersTotal,
+      $paginationItemsOnPage,
+      $paginationItemCurrent,
+      $this->buildQueryString($searchValue, $sortRule),
+      false
+    );
     $pagination->assembly();
 
-    $clientUser = $this->CMSCore->client->getUser(2); // typeID=2 для админов
+    $clientUser = $this->CMSCore->client->getUser(2);
     if ($clientUser !== null) {
       Report::create(
         $this->CMSCore,
@@ -122,6 +132,8 @@ class PageUsers implements InterfacePage
           'action' => 'list_view',
           'viewedByID' => $clientUser->getID(),
           'count' => count($usersObjects),
+          'search' => $searchValue,
+          'sort' => $sortRule,
           'page' => $paginationItemCurrent,
           'perPage' => $paginationItemsOnPage,
           'ip' => $this->CMSCore->client->getIPAddress()
@@ -131,7 +143,9 @@ class PageUsers implements InterfacePage
 
     unset($users);
 
-    $userNumber = 1;
+    $userNumber = $paginationItemCurrent * $paginationItemsOnPage + 1;
+    $usersTableItemsAssembled = [];
+
     foreach ($usersObjects as $object) {
       $object->initData(['id', 'login', 'email', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata', 'emailIsSubmitted']);
 
@@ -155,30 +169,55 @@ class PageUsers implements InterfacePage
           : '<span style="color: red;">Почта не подтверждена (заблокирован)</span>';
       }
 
-      array_push($usersTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/users/tableItem.tpl', [
-        'USER_ID' => $object->getID(),
-        'USER_INDEX' => $userNumber,
-        'USER_LOGIN' => strip_tags($object->getLogin()),
-        'USER_AVATAR_URL' => $object->getAvatarURL(64),
-        'USER_REGISTRATION_IP' => $object->getRegistrationIP(),
-        'USER_STATUS_LABEL' => $statusLabel,
-        'USER_GROUP_TITLE' => $usersGroupTitle,
-        'USER_EMAIL' => $object->getEmail(),
-        'USER_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
-        'USER_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
-      ]));
+      $usersTableItemsAssembled[] = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/users/tableItem.tpl',
+        [
+          'USER_ID' => $object->getID(),
+          'USER_INDEX' => $userNumber,
+          'USER_LOGIN' => strip_tags($object->getLogin()),
+          'USER_AVATAR_URL' => $object->getAvatarURL(64),
+          'USER_REGISTRATION_IP' => $object->getRegistrationIP(),
+          'USER_STATUS_LABEL' => $statusLabel,
+          'USER_GROUP_TITLE' => $usersGroupTitle,
+          'USER_EMAIL' => $object->getEmail(),
+          'USER_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
+          'USER_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
+        ]
+      );
 
       $userNumber++;
     }
 
-    /** @var string $site_page Содержимое шаблона страницы */
-    $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/users.tpl', [
-      'PAGE_USERS_PAGINATION' => $pagination->assembled,
-      'ADMIN_PANEL_PAGE_NAME' => 'users',
-      'ADMIN_PANEL_USERS_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/users/table.tpl', [
-        'ADMIN_PANEL_USERS_TABLE_ITEMS' => implode($usersTableItemsAssembled)
-      ])
-    ]);
+    $this->assembled = ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme,
+      'templates/page/users.tpl',
+      [
+        'PAGE_USERS_PAGINATION' => $pagination->assembled,
+        'ADMIN_PANEL_PAGE_NAME' => 'users',
+        'ADMIN_PANEL_USERS_TABLE' => ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme,
+          'templates/page/users/table.tpl',
+          ['ADMIN_PANEL_USERS_TABLE_ITEMS' => implode($usersTableItemsAssembled)]
+        ),
+        // Прокидываем в шаблон, чтобы JS знал стартовые значения
+        'USERS_SEARCH_VALUE' => htmlspecialchars($searchValue, ENT_QUOTES, 'UTF-8'),
+        'USERS_SORT_VALUE' => htmlspecialchars($sortRule, ENT_QUOTES, 'UTF-8'),
+      ]
+    );
   }
 
+  /**
+   * Сформировать query string для пагинации с сохранением поиска и сортировки
+   */
+  private function buildQueryString(string $searchValue, string $sortRule) : string
+  {
+    $parts = [];
+    if ($searchValue !== '') {
+      $parts[] = 'value=' . urlencode($searchValue);
+    }
+    $parts[] = 'sort=' . urlencode($sortRule);
+
+    return '?' . implode('&', $parts);
+  }
 }

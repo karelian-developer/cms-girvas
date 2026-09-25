@@ -16,53 +16,126 @@
 'use strict';
 
 import {Interactive} from "../../../interactive.class.js";
-import {URLParser} from "../../../urlParser.class.js";
 
 export class PageUsers {
   constructor(page, params = {}) {
     this.page = page;
+    this.localeData = null;
+    this.searchInput = null;
   }
 
   init() {
     this.page.core.locales.admin.getData().then((localeData) => {
-      let interactiveCreatePageButton = new Interactive('button');
-      
-      interactiveCreatePageButton.target.setLabel(localeData.BUTTON_NEW_USER_LABEL);
-      interactiveCreatePageButton.target.setCallback(() => {
-        window.location.href = `./user`;
+      this.localeData = localeData;
+
+      const pageElement = document.querySelector('[data-element="users-page"]');
+      const container = document.querySelector('#E8548530785');
+
+      if (container === null) return;
+
+      const currentSort = pageElement?.getAttribute('data-sort-value') || 'by_createdtimestamp_decrease';
+      const currentSearch = pageElement?.getAttribute('data-search-value') || '';
+
+      const createButton = new Interactive('button');
+      createButton.target.setLabel(localeData.BUTTON_NEW_USER_LABEL);
+      createButton.target.setCallback((event) => {
+        event.preventDefault();
+        window.location.href = './user';
       });
-      interactiveCreatePageButton.assembly();
-    
-      const interactiveContainerElement = document.querySelector('#E8548530785');
-      interactiveContainerElement.append(interactiveCreatePageButton.target.element);
+      createButton.assembly();
+
+      const searchInput = new Interactive('input');
+      searchInput.target.setType('search');
+      searchInput.target.setPlaceholder(localeData.PAGE_USERS_SEARCH_PLACEHOLDER || 'Поиск по логину или e-mail');
+      searchInput.target.setValue(currentSearch);
+      searchInput.assembly();
+      this.searchInput = searchInput;
+
+      searchInput.target.element.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          this.applySearch();
+        }
+      });
+
+      const searchButton = new Interactive('button');
+      searchButton.target.setLabel(localeData.BUTTON_SEARCH_LABEL || 'Найти');
+      searchButton.target.setStyle('default');
+      searchButton.target.setCallback((event) => {
+        event.preventDefault();
+        this.applySearch();
+      });
+      searchButton.assembly();
+
+      const sortChoices = new Interactive('choices');
+      sortChoices.target.setWidth('280px');
+      sortChoices.target.addItem(localeData.SORT_BY_CREATEDTIMESTAMP_INCREASE, 'by_createdtimestamp_increase');
+      sortChoices.target.addItem(localeData.SORT_BY_CREATEDTIMESTAMP_DECREASE, 'by_createdtimestamp_decrease');
+      sortChoices.target.addItem(localeData.SORT_BY_ALPHABET_INCREASE, 'by_alphabet_increase');
+      sortChoices.target.addItem(localeData.SORT_BY_ALPHABET_DECREASE, 'by_alphabet_decrease');
+
+      const sortIndexMap = {
+        'by_createdtimestamp_increase': 0,
+        'by_createdtimestamp_decrease': 1,
+        'by_alphabet_increase': 2,
+        'by_alphabet_decrease': 3,
+      };
+      sortChoices.target.setItemSelectedIndex(sortIndexMap[currentSort] ?? 1);
+      sortChoices.assembly();
+
+      sortChoices.target.elementSelect.addEventListener('change', () => {
+        const currentURL = new URL(window.location.href);
+        currentURL.searchParams.set('sort', sortChoices.target.getValue());
+
+        currentURL.searchParams.delete('pageNumber');
+        window.location.href = currentURL.toString();
+      });
+
+      container.append(sortChoices.target.element);
+      container.append(searchInput.target.element);
+      container.append(searchButton.target.element);
+      container.append(createButton.target.element);
+
+      const paginationLinks = document.querySelectorAll('.page__pagination a');
+      paginationLinks.forEach((link) => {
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        const url = new URL(href, window.location.origin);
+        if (currentSearch !== '') {
+          url.searchParams.set('value', currentSearch);
+        }
+        url.searchParams.set('sort', currentSort);
+        link.setAttribute('href', url.pathname + url.search);
+      });
 
       const tableItems = document.querySelectorAll('[data-element="user"]');
-      for (let tableItem of tableItems) {
+      for (const tableItem of tableItems) {
         const userID = tableItem.getAttribute('data-id');
         const panelElement = tableItem.querySelector('[data-element="panel"]');
-        const panelEventElements = panelElement.querySelectorAll('[data-event]');
+        if (panelElement === null) continue;
 
-        for (let eventElement of panelEventElements) {
+        const panelEventElements = panelElement.querySelectorAll('[data-event]');
+        for (const eventElement of panelEventElements) {
           eventElement.addEventListener('click', (event) => {
             event.preventDefault();
 
             if (eventElement.getAttribute('data-event') === 'remove') {
-              let interactiveModal = new Interactive('modal', {
+              const interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_USER_DELETE_TITLE,
                 content: localeData.MODAL_USER_DELETE_DESCRIPTION
               });
-              
+
               interactiveModal.target.addButton(localeData.BUTTON_DELETE_LABEL, () => {
-                let formData = new FormData();
+                const formData = new FormData();
                 formData.append('user_id', userID);
 
-                let request = new Interactive('request', {
+                const request = new Interactive('request', {
                   method: 'DELETE',
                   url: '/handler/user/' + userID + '?localeMessage=' + window.CMSCore.locales.admin.name
                 });
-      
+
                 request.target.data = formData;
-      
                 request.target.send().then((data) => {
                   if (data.statusCode === 1) {
                     window.location.href = '/admin/users';
@@ -84,5 +157,27 @@ export class PageUsers {
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     });
+  }
+
+  /**
+   * Применить поиск: перейти на тот же раздел с ?value=...&sort=...
+   */
+  applySearch() {
+    if (this.searchInput === null) return;
+
+    const value = (this.searchInput.target.getValue() || '').trim();
+    const currentSort = document.querySelector('[data-element="users-page"]')
+      ?.getAttribute('data-sort-value') || 'by_createdtimestamp_decrease';
+
+    const url = new URL(window.location.href);
+    if (value === '') {
+      url.searchParams.delete('value');
+    } else {
+      url.searchParams.set('value', value);
+    }
+    url.searchParams.set('sort', currentSort);
+    url.searchParams.delete('pageNumber');
+
+    window.location.href = url.toString();
   }
 }

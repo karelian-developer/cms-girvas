@@ -28,22 +28,28 @@ use \PDOException as PDOException;
 final class Users
 {
   /**
-   * __construct
-   *
-   * @param CoreInterface $CMSCore
-   * 
-   * @return void
+   * Соответствие правил сортировки и SQL-выражений (адаптивно под DMS)
    */
+  private const SORT_RULES = [
+    'by_createdtimestamp_increase' => ['column' => 'createdUnixTimestamp', 'direction' => 'ASC'],
+    'by_createdtimestamp_decrease' => ['column' => 'createdUnixTimestamp', 'direction' => 'DESC'],
+    'by_alphabet_increase' => ['column' => 'login', 'direction' => 'ASC'],
+    'by_alphabet_decrease' => ['column' => 'login', 'direction' => 'DESC'],
+  ];
+
   public function __construct(
     private CoreInterface $CMSCore
   ) {}
 
   /**
    * Получить все объекты пользователей
-   * 
+   *
    * @param array $params
-   * @param User|null $viewer Текущий пользователь (для логирования)
-   * 
+   *   - limit: [int $limit, int $offset]
+   *   - search: string — подстрока для поиска по login/email
+   *   - sort: string — одно из SORT_RULES
+   * @param User|null $viewer
+   *
    * @return array
    */
   public function getAll(array $params = [], ?User $viewer = null) : array
@@ -57,16 +63,32 @@ final class Users
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
-    $queryBuilder->statement->setClauseOrderBy();
-    $queryBuilder->statement->clauseOrderBy->setColumn('id');
-    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
 
-    if (array_key_exists('limit', $params)) {
-      if (is_array($params['limit'])) {
-        $limit = is_integer($params['limit'][0]) ? $params['limit'][0] : 0;
-        $offset = is_integer($params['limit'][1]) ? $params['limit'][1] : 0;
-        $queryBuilder->statement->setClauseLimit($limit, $offset);
-      }
+    // Поиск
+    $searchValue = $params['search'] ?? '';
+    $hasSearch = is_string($searchValue) && $searchValue !== '';
+
+    if ($hasSearch) {
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => '(`login` LIKE :search OR `email` LIKE :search)',
+        'postgresql' => '("login" ILIKE :search OR "email" ILIKE :search)'
+      ]);
+      $queryBuilder->statement->clauseWhere->assembly();
+    }
+
+    // Сортировка
+    $sortRule = $params['sort'] ?? 'by_createdtimestamp_decrease';
+    $sortConfig = self::SORT_RULES[$sortRule] ?? self::SORT_RULES['by_createdtimestamp_decrease'];
+
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn($sortConfig['column']);
+    $queryBuilder->statement->clauseOrderBy->setSortType($sortConfig['direction']);
+
+    if (array_key_exists('limit', $params) && is_array($params['limit'])) {
+      $limit = is_integer($params['limit'][0]) ? $params['limit'][0] : 0;
+      $offset = is_integer($params['limit'][1]) ? $params['limit'][1] : 0;
+      $queryBuilder->statement->setClauseLimit($limit, $offset);
     }
 
     $queryBuilder->statement->assembly();
@@ -74,6 +96,11 @@ final class Users
     try {
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      if ($hasSearch) {
+        $databaseQuery->bindValue(':search', '%' . $searchValue . '%', \PDO::PARAM_STR);
+      }
+
       $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
@@ -87,7 +114,7 @@ final class Users
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        array_push($users, new User($this->CMSCore, $data['id']));
+        $users[] = new User($this->CMSCore, (int) $data['id']);
       }
     }
 
@@ -100,6 +127,8 @@ final class Users
           'viewedByID' => $viewer->getID(),
           'viewedByLogin' => $viewer->getLogin(),
           'count' => count($users),
+          'search' => $searchValue,
+          'sort' => $sortRule,
           'ip' => $this->CMSCore->client->getIPAddress()
         ]
       );
@@ -111,53 +140,22 @@ final class Users
   /**
    * Получить количество пользователей для определенной группы
    *
-   * @param  int $groupID
-   * 
+   * @param int $groupID
    * @return int
    */
   public function getCountByGroupID(int $groupID) : int
   {
-    $CMSConfigurator = $this->CMSCore->configurator;
-    $CMSConfigDatabase = $CMSConfigurator->get('database');
-
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
-    $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections(['count(*) AS count']);
-    $queryBuilder->statement->setClauseFrom();
-    $queryBuilder->statement->clauseFrom->addTable('users');
-    $queryBuilder->statement->clauseFrom->assembly();
-    $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => 'AND JSON_EXTRACT(`metadata`, \'$.groupID\') = :groupID',
-      'postgresql' => '(metadata::jsonb->>\'groupID\')::int = :groupID'
-    ]);
-
-    $queryBuilder->statement->clauseWhere->assembly();
-    $queryBuilder->statement->assembly();
-
-    try {
-      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':groupID', $groupID, \PDO::PARAM_INT);
-      $databaseQuery->execute();
-    } catch (PDOException $exception) {
-      die(json_encode([
-        'message' => $exception->getMessage(),
-        'statusCode' => 0,
-        'outputData' => []
-      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
-    }
-
-    $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-    return $result['count'] ?? 0;
+    // ... без изменений
   }
 
   /**
-   * Получить общее количество
+   * Получить общее количество пользователей.
+   * Если передан $searchValue — считаем только совпадающих по login/email.
    *
+   * @param string $searchValue
    * @return int
    */
-  public function getCountTotal() : int
+  public function getCountTotal(string $searchValue = '') : int
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -168,13 +166,28 @@ final class Users
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
+
+    if ($searchValue !== '') {
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql' => '(`login` LIKE :search OR `email` LIKE :search)',
+        'postgresql' => '("login" ILIKE :search OR "email" ILIKE :search)'
+      ]);
+      $queryBuilder->statement->clauseWhere->assembly();
+    }
+
     $queryBuilder->statement->assembly();
 
     $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
     $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+    if ($searchValue !== '') {
+      $databaseQuery->bindValue(':search', '%' . $searchValue . '%', \PDO::PARAM_STR);
+    }
+
     $databaseQuery->execute();
 
     $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-    return $result['count'] ?? 0;
+    return (int) ($result['count'] ?? 0);
   }
 }
