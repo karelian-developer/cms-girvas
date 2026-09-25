@@ -37,6 +37,18 @@ class PagePages implements InterfacePage
 
   const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_CONTENT_NAVIGATION_%s_LABEL';
 
+  /**
+   * Допустимые правила сортировки
+   */
+  private const ALLOWED_SORT_RULES = [
+    'by_createdtimestamp_increase',
+    'by_createdtimestamp_decrease',
+    'by_updatedtimestamp_increase',
+    'by_updatedtimestamp_decrease',
+    'by_alphabet_increase',
+    'by_alphabet_decrease',
+  ];
+
   public SystemCore $CMSCore;
   public Page $page;
   public string $assembled = '';
@@ -144,6 +156,20 @@ class PagePages implements InterfacePage
     return $document->saveHTML();
   }
 
+  /**
+   * Query string для пагинации
+   */
+  private function buildQueryString(string $searchValue, string $sortRule) : string
+  {
+    $parts = [];
+    if ($searchValue !== '') {
+      $parts[] = 'value=' . urlencode($searchValue);
+    }
+    $parts[] = 'sort=' . urlencode($sortRule);
+
+    return '?' . implode('&', $parts);
+  }
+
   public function assembly() : void
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/pages.css', 'rel' => 'stylesheet']);
@@ -154,19 +180,41 @@ class PagePages implements InterfacePage
     $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
     $paginationItemsOnPage = 12;
 
+    // Поиск
+    $searchValue = $this->CMSCore->urlp->getParam('value');
+    $searchValue = $searchValue !== null ? trim(urldecode($searchValue)) : '';
+
+    // Сортировка
+    $sortRule = $this->CMSCore->urlp->getParam('sort') ?? Pages::DEFAULT_SORT_RULE;
+    if (!in_array($sortRule, self::ALLOWED_SORT_RULES, true)) {
+      $sortRule = Pages::DEFAULT_SORT_RULE;
+    }
+
     $pagesStaticTableItemsAssembled = [];
     $pagesStatic = new Pages($this->CMSCore);
     $pagesStaticLocale = $this->CMSCore->getCMSLocale('admin');
     $pagesStaticLocaleName = $this->CMSCore->locale->getName();
 
-    $pagesStaticObjects = $pagesStatic->getAll([
-      'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
-    ]);
+    $pagesStaticObjects = $pagesStatic->getAll(
+      ['limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]],
+      false,
+      $searchValue,
+      $sortRule
+    );
 
-    $pagination = new Pagination($this->CMSCore, $pagesStatic->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
+    $pagination = new Pagination(
+      $this->CMSCore,
+      $pagesStatic->getCountTotal($searchValue),
+      $paginationItemsOnPage,
+      $paginationItemCurrent,
+      $this->buildQueryString($searchValue, $sortRule),
+      false
+    );
     $pagination->assembly();
 
-    unset($entries);
+    unset($pagesStatic);
+
+    $tableItemsAssembled = [];
 
     foreach ($pagesStaticObjects as $index => $object) {
       $object->initData(['id', 'texts', 'name', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata', 'authorID']);
@@ -201,36 +249,21 @@ class PagePages implements InterfacePage
       );
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_INDEX')) {
-        ThemeCollector::addTemplateVariable(
-          $templatesAssembled,
-          'PAGE_STATIC_INDEX',
-          $index
-        );
+        ThemeCollector::addTemplateVariable($templatesAssembled, 'PAGE_STATIC_INDEX', $index);
       }
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_ID')) {
         $value = $object !== null ? $object->getID() : 0;
-
-        ThemeCollector::addTemplateVariable(
-          $templatesAssembled,
-          'PAGE_STATIC_ID',
-          $value
-        );
+        ThemeCollector::addTemplateVariable($templatesAssembled, 'PAGE_STATIC_ID', $value);
       }
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_NAME')) {
         $value = $object !== null ? $object->getName() : '';
-
-        ThemeCollector::addTemplateVariable(
-          $templatesAssembled,
-          'PAGE_STATIC_NAME',
-          $value
-        );
+        ThemeCollector::addTemplateVariable($templatesAssembled, 'PAGE_STATIC_NAME', $value);
       }
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_TITLE')) {
         $value = $object !== null ? $object->getTitle($localeName) : '';
-
         ThemeCollector::addTemplateVariable(
           $templatesAssembled,
           'PAGE_STATIC_TITLE',
@@ -244,7 +277,6 @@ class PagePages implements InterfacePage
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_DESCRIPTION')) {
         $value = $object !== null ? $object->getDescription($localeName) : '';
-
         ThemeCollector::addTemplateVariable(
           $templatesAssembled,
           'PAGE_STATIC_DESCRIPTION',
@@ -257,80 +289,40 @@ class PagePages implements InterfacePage
       }
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_URL')) {
-        $value = $object->getURL();
-
-        ThemeCollector::addTemplateVariable(
-          $templatesAssembled,
-          'PAGE_STATIC_URL',
-          $value
-        );
+        ThemeCollector::addTemplateVariable($templatesAssembled, 'PAGE_STATIC_URL', $object->getURL());
       }
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_AUTHOR_LOGIN')) {
-        ThemeCollector::addTemplateVariable(
-          $templatesAssembled,
-          'PAGE_STATIC_AUTHOR_LOGIN',
-          $authorLogin
-        );
+        ThemeCollector::addTemplateVariable($templatesAssembled, 'PAGE_STATIC_AUTHOR_LOGIN', $authorLogin);
       }
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_LOCALES_LIST')) {
-        ThemeCollector::addTemplateVariable(
-          $templatesAssembled,
-          'PAGE_STATIC_LOCALES_LIST',
-          $completedLocales
-        );
+        ThemeCollector::addTemplateVariable($templatesAssembled, 'PAGE_STATIC_LOCALES_LIST', $completedLocales);
       }
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_SEO_STATUS')) {
-        ThemeCollector::addTemplateVariable(
-          $templatesAssembled,
-          'PAGE_STATIC_SEO_STATUS',
-          $SEOStatus
-        );
+        ThemeCollector::addTemplateVariable($templatesAssembled, 'PAGE_STATIC_SEO_STATUS', $SEOStatus);
       }
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_CREATED_DATE_TIMESTAMP')) {
-        $value = date('d.m.Y H:i:s', $createdDateTimestamp);
-        
-        ThemeCollector::addTemplateVariable(
-          $templatesAssembled,
-          'PAGE_STATIC_CREATED_DATE_TIMESTAMP',
-          $value
-        );
+        ThemeCollector::addTemplateVariable($templatesAssembled, 'PAGE_STATIC_CREATED_DATE_TIMESTAMP', date('d.m.Y H:i:s', $createdDateTimestamp));
       }
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_PUBLISHED_DATE_TIMESTAMP')) {
         $value = $publishedDateTimestamp > 0 ? date('d.m.Y H:i:s', $publishedDateTimestamp) : '-';
-
-        ThemeCollector::addTemplateVariable(
-          $templatesAssembled,
-          'PAGE_STATIC_PUBLISHED_DATE_TIMESTAMP',
-          $value
-        );
+        ThemeCollector::addTemplateVariable($templatesAssembled, 'PAGE_STATIC_PUBLISHED_DATE_TIMESTAMP', $value);
       }
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_UPDATED_DATE_TIMESTAMP')) {
-        $value = date('d.m.Y H:i:s', $updatedDateTimestamp);
-        
-        ThemeCollector::addTemplateVariable(
-          $templatesAssembled,
-          'PAGE_STATIC_UPDATED_DATE_TIMESTAMP',
-          $value
-        );
+        ThemeCollector::addTemplateVariable($templatesAssembled, 'PAGE_STATIC_UPDATED_DATE_TIMESTAMP', date('d.m.Y H:i:s', $updatedDateTimestamp));
       }
 
       if (ThemeCollector::existsTemplateVariable($templateContent, 'PAGE_STATIC_PUBLISHED_STATUS')) {
         $value = $object->isPublished() ? 'published' : 'not-published';
-
-        ThemeCollector::addTemplateVariable(
-          $templatesAssembled,
-          'PAGE_STATIC_PUBLISHED_STATUS',
-          $value
-        );
+        ThemeCollector::addTemplateVariable($templatesAssembled, 'PAGE_STATIC_PUBLISHED_STATUS', $value);
       }
 
-      $tableItemsAssembled[] =  ThemeCollector::assemblyFileContent(
+      $tableItemsAssembled[] = ThemeCollector::assemblyFileContent(
         $this->CMSCore->theme,
         'templates/page/pages/tableItem.tpl',
         $templatesAssembled
@@ -350,7 +342,9 @@ class PagePages implements InterfacePage
           [
             'ADMIN_PANEL_PAGES_STATIC_TABLE_ITEMS' => implode($tableItemsAssembled)
           ]
-        )
+        ),
+        'PAGES_SEARCH_VALUE' => htmlspecialchars($searchValue, ENT_QUOTES, 'UTF-8'),
+        'PAGES_SORT_VALUE'   => htmlspecialchars($sortRule, ENT_QUOTES, 'UTF-8'),
       ]
     );
   }

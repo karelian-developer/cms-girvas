@@ -27,6 +27,20 @@ use \PDOException as PDOException;
 final class Pages
 {
   /**
+   * Допустимые правила сортировки
+   */
+  private const SORT_RULES = [
+    'by_createdtimestamp_increase' => ['column' => 'createdUnixTimestamp', 'direction' => 'ASC'],
+    'by_createdtimestamp_decrease' => ['column' => 'createdUnixTimestamp', 'direction' => 'DESC'],
+    'by_updatedtimestamp_increase' => ['column' => 'updatedUnixTimestamp', 'direction' => 'ASC'],
+    'by_updatedtimestamp_decrease' => ['column' => 'updatedUnixTimestamp', 'direction' => 'DESC'],
+    'by_alphabet_increase'         => ['column' => 'name',                 'direction' => 'ASC'],
+    'by_alphabet_decrease'         => ['column' => 'name',                 'direction' => 'DESC'],
+  ];
+
+  public const DEFAULT_SORT_RULE = 'by_createdtimestamp_decrease';
+
+  /**
    * __construct
    *
    * @param CoreInterface $CMSCore
@@ -36,16 +50,22 @@ final class Pages
   public function __construct(
     private CoreInterface $CMSCore
   ) {}
-      
+
   /**
    * Получить все объекты страниц
    *
-   * @param  array $paramsArray
-   * @param   bool
-   * 
-   * @return array
+   * @param   array   $paramsArray
+   * @param   bool    $isPublised
+   * @param   string  $searchValue — подстрока для поиска по name
+   * @param   string  $sortRule    — одно из SORT_RULES
+   * @return  array
    */
-  public function getAll(array $paramsArray = [], $isPublised = false) : array
+  public function getAll(
+    array $paramsArray = [],
+    $isPublised = false,
+    string $searchValue = '',
+    string $sortRule = self::DEFAULT_SORT_RULE
+  ) : array
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -57,18 +77,43 @@ final class Pages
     $queryBuilder->statement->clauseFrom->addTable('pages_static');
     $queryBuilder->statement->clauseFrom->assembly();
 
+    // Условия WHERE собираем в массив — поиск и публикация могут применяться одновременно
+    $hasWhere = false;
+
     if ($isPublised) {
       $queryBuilder->statement->setClauseWhere();
       $queryBuilder->statement->clauseWhere->addConditionAdaptive([
         'mysql' => 'JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
         'postgresql' => '(metadata::jsonb->>\'isPublished\')::boolean = true'
       ]);
+      $hasWhere = true;
+    }
+
+    // Поиск по name
+    $hasSearch = $searchValue !== '';
+    if ($hasSearch) {
+      if (!$hasWhere) {
+        $queryBuilder->statement->setClauseWhere();
+        $hasWhere = true;
+      }
+
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql'      => ($isPublised ? 'AND ' : '') . '`name` LIKE :search',
+        'postgresql' => ($isPublised ? 'AND ' : '') . '"name" ILIKE :search'
+      ]);
+    }
+
+    if ($hasWhere) {
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
+    // Сортировка
+    $sortConfig = self::SORT_RULES[$sortRule] ?? self::SORT_RULES[self::DEFAULT_SORT_RULE];
+
     $queryBuilder->statement->setClauseOrderBy();
-    $queryBuilder->statement->clauseOrderBy->setColumn('id');
-    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    $queryBuilder->statement->clauseOrderBy->setColumn($sortConfig['column']);
+    $queryBuilder->statement->clauseOrderBy->setSortType($sortConfig['direction']);
+
     if (array_key_exists('limit', $paramsArray)) {
       if (is_array($paramsArray['limit'])) {
         $limit = is_integer($paramsArray['limit'][0]) ? $paramsArray['limit'][0] : 0;
@@ -81,6 +126,11 @@ final class Pages
     try {
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      if ($hasSearch) {
+        $databaseQuery->bindValue(':search', '%' . $searchValue . '%', \PDO::PARAM_STR);
+      }
+
       $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
@@ -101,15 +151,14 @@ final class Pages
 
     return $pages;
   }
-      
+
   /**
-   * Получить объекты записей для определенной категории
+   * Получить общее количество (с учётом поиска по name)
    *
-   * @param  int $category_id
-   * 
-   * @return array
+   * @param   string $searchValue
+   * @return  int
    */
-  public function getCountTotal() : int
+  public function getCountTotal(string $searchValue = '') : int
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -120,11 +169,27 @@ final class Pages
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('pages_static');
     $queryBuilder->statement->clauseFrom->assembly();
+
+    $hasSearch = $searchValue !== '';
+    if ($hasSearch) {
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql'      => '`name` LIKE :search',
+        'postgresql' => '"name" ILIKE :search'
+      ]);
+      $queryBuilder->statement->clauseWhere->assembly();
+    }
+
     $queryBuilder->statement->assembly();
 
     try {
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      if ($hasSearch) {
+        $databaseQuery->bindValue(':search', '%' . $searchValue . '%', \PDO::PARAM_STR);
+      }
+
       $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
@@ -136,6 +201,6 @@ final class Pages
     }
 
     $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-    return $result ? $result['count'] : 0;
+    return $result ? (int) $result['count'] : 0;
   }
 }

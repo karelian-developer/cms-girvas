@@ -1,4 +1,7 @@
-<article class="main__page page page_{ADMIN_PANEL_PAGE_NAME}">
+<article class="main__page page page_{ADMIN_PANEL_PAGE_NAME}"
+         data-element="pages-page"
+         data-search-value="{PAGES_SEARCH_VALUE}"
+         data-sort-value="{PAGES_SORT_VALUE}">
   <nav id="SYSTEM_AP_SUBNAVIGATION" class="page__navigation navigation"></nav>
   <div class="page__title-container">
     <h1 class="page__title">{LANG:PAGE_STATIC_PAGES_TITLE}</h1>

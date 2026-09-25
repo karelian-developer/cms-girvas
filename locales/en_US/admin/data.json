@@ -325,6 +325,7 @@
   "PAGE_STATIC_PAGES_SIDEBAR_BLOCK_ABOUT_TITLE": "About static pages",
   "PAGE_STATIC_PAGES_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_1": "<b>A static page</b> &mdash; is a web page whose content remains unchanged and does not depend on user actions.",
   "PAGE_STATIC_PAGES_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_2": "Static pages are important for a website because they can load quickly and ensure stable content display. They can also be used to create the main pages of the site, such as \"About Us\", \"Contacts\", \"Services\", which helps users easily find information about the company or products. It is important to consider that static pages can be used in combination with dynamic elements to create a more interactive user experience.",
+  "PAGE_PAGES_SEARCH_PLACEHOLDER": "Search by page name",
   "PAGE_STATIC_PAGE_TITLE": "Edit static page",
   "PAGE_STATIC_PAGE_NAVIGATION_BACK_LABEL": "Back",
   "PAGE_STATIC_PAGE_INPUT_TECH_NAME_LABEL": "Technical name",
