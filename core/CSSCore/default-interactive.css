@@ -383,23 +383,17 @@
   padding: 10px;
 }
 
-.interactive .interactive__modal .modal__body-container > *:not(:last-child) {
+.interactive .interactive__modal .modal__body-container *:not(:last-child) {
   margin-bottom: 10px;
 }
 
-.interactive .interactive__modal .modal__body-container form input,
-.interactive .interactive__modal .modal__body-container form textarea,
-.interactive .interactive__modal .modal__body-container form select {
+.interactive .interactive__modal .modal__body-container input,
+.interactive .interactive__modal .modal__body-container textarea,
+.interactive .interactive__modal .modal__body-container select {
   width: 100%;
 }
 
-.interactive .interactive__modal .modal__body-container form input:not(:last-child),
-.interactive .interactive__modal .modal__body-container form textarea:not(:last-child),
-.interactive .interactive__modal .modal__body-container form select:not(:last-child) {
-  margin-bottom: 10px;
-}
-
-.interactive .interactive__modal .modal__body-container form textarea {
+.interactive .interactive__modal .modal__body-container textarea {
   resize: none;
 }
 
