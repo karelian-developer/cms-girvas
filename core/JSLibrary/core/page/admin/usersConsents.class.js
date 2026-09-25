@@ -49,6 +49,7 @@ export class PageUsersConsents {
           this.handleExport();
         });
         exportButton.assembly();
+        exportContainer.append(exportButton.target.element);
       }
 
       // ----- 2. Поле поиска по ID пользователя -----
@@ -113,10 +114,6 @@ export class PageUsersConsents {
       container.append(sortChoices.target.element);
       container.append(searchInput.target.element);
       container.append(searchButton.target.element);
-
-      if (exportContainer !== null) {
-        exportContainer.append(exportButton.target.element);
-      }
 
       // ----- Сохранение value/sort в ссылках пагинации -----
       const paginationLinks = document.querySelectorAll('.page__pagination a');
