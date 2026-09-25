@@ -36,6 +36,18 @@ class PageUsersGroups implements InterfacePage
 
   const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_USERS_GROUPS_NAVIGATION_%s_LABEL';
 
+  /**
+   * Допустимые значения параметра sort
+   */
+  private const ALLOWED_SORT_RULES = [
+    'by_createdtimestamp_increase',
+    'by_createdtimestamp_decrease',
+    'by_updatedtimestamp_increase',
+    'by_updatedtimestamp_decrease',
+    'by_alphabet_increase',
+    'by_alphabet_decrease',
+  ];
+
   public SystemCore $CMSCore;
   public Page $page;
   public string $assembled = '';
@@ -78,7 +90,7 @@ class PageUsersGroups implements InterfacePage
 
   /**
    * Инициализация подразделов
-   * 
+   *
    * @return void
    */
   public function initSubnavigation() : void
@@ -89,9 +101,8 @@ class PageUsersGroups implements InterfacePage
 
   /**
    * Сборка списка локализаций для записи
-   * 
+   *
    * @param array $localesData
-   * 
    * @return string
    */
   private function assemblyLocalesItems(array $localesData) : string
@@ -117,7 +128,7 @@ class PageUsersGroups implements InterfacePage
 
   /**
    * Сборка
-   * 
+   *
    * @return void
    */
   public function assembly() : void
@@ -127,8 +138,20 @@ class PageUsersGroups implements InterfacePage
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
 
-    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
+    $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null
+      ? (int) $this->CMSCore->urlp->getParam('pageNumber')
+      : 0;
     $paginationItemsOnPage = 12;
+
+    // Поиск
+    $searchValue = $this->CMSCore->urlp->getParam('value');
+    $searchValue = $searchValue !== null ? trim(urldecode($searchValue)) : '';
+
+    // Сортировка
+    $sortRule = $this->CMSCore->urlp->getParam('sort') ?? 'by_createdtimestamp_decrease';
+    if (!in_array($sortRule, self::ALLOWED_SORT_RULES, true)) {
+      $sortRule = 'by_createdtimestamp_decrease';
+    }
 
     $usersGroupsTableItemsAssembled = [];
     $usersGroups = new UsersGroups($this->CMSCore);
@@ -137,53 +160,85 @@ class PageUsersGroups implements InterfacePage
     $usersGroupsLocaleName = $usersGroupsLocale->getName();
 
     $usersGroupsObjects = $usersGroups->getAll([
-      'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
+      'limit'  => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage],
+      'search' => $searchValue,
+      'sort'   => $sortRule,
     ]);
 
-    $pagination = new Pagination($this->CMSCore, $usersGroups->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
+    $usersGroupsTotal = $usersGroups->getCountTotal($searchValue);
+
+    $pagination = new Pagination(
+      $this->CMSCore,
+      $usersGroupsTotal,
+      $paginationItemsOnPage,
+      $paginationItemCurrent,
+      $this->buildQueryString($searchValue, $sortRule),
+      false
+    );
     $pagination->assembly();
 
     unset($usersGroups);
 
-    $userGroupNumber = 1;
+    $userGroupNumber = $paginationItemCurrent * $paginationItemsOnPage + 1;
     foreach ($usersGroupsObjects as $object) {
       $object->initData(['id', 'texts', 'name', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
 
       /** @var string Заголовок группы пользователей */
       $usersGroupTitle = $object->getTitle($usersGroupsLocaleName);
       $usersGroupTitle = strip_tags($usersGroupTitle);
-      
+
       $createdUnixTimestamp = date('d.m.Y H:i:s', $object->getCreatedUnixTimestamp());
       $updatedUnixTimestamp = date('d.m.Y H:i:s', $object->getUpdatedUnixTimestamp());
 
       $completedLocalesData = $object->getCompletedLocalesData($this->CMSCore);
       $completedLocales = $this->assemblyLocalesItems($completedLocalesData);
 
-      array_push($usersGroupsTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/usersGroups/tableItem.tpl', [
-        'USERS_GROUP_ID' => $object->getID(),
-        'USERS_GROUP_INDEX' => $userGroupNumber,
-        'USERS_GROUP_NAME' => $object->getName(),
-        'USERS_GROUP_TITLE' => $usersGroupTitle,
-        'USERS_GROUP_LOCALES_LIST' => $completedLocales,
-        'USERS_GROUP_USERS_COUNT' => $object->getUsersCount(),
-        'USERS_GROUP_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
-        'USERS_GROUP_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
-      ]));
+      $usersGroupsTableItemsAssembled[] = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/usersGroups/tableItem.tpl',
+        [
+          'USERS_GROUP_ID' => $object->getID(),
+          'USERS_GROUP_INDEX' => $userGroupNumber,
+          'USERS_GROUP_NAME' => $object->getName(),
+          'USERS_GROUP_TITLE' => $usersGroupTitle,
+          'USERS_GROUP_LOCALES_LIST' => $completedLocales,
+          'USERS_GROUP_USERS_COUNT' => $object->getUsersCount(),
+          'USERS_GROUP_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
+          'USERS_GROUP_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
+        ]
+      );
 
       $userGroupNumber++;
     }
 
-    /** @var string $site_page Содержимое шаблона страницы */
     $this->assembled = ThemeCollector::assemblyFileContent(
       $this->CMSCore->theme,
       'templates/page/users/groups.tpl',
       [
         'PAGE_USERS_GROUPS_PAGINATION' => $pagination->assembled,
         'ADMIN_PANEL_PAGE_NAME' => 'users-groups',
-        'ADMIN_PANEL_USERS_GROUPS_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/usersGroups/table.tpl', [
-          'ADMIN_PANEL_USERS_GROUPS_TABLE_ITEMS' => implode($usersGroupsTableItemsAssembled)
-        ])
+        'ADMIN_PANEL_USERS_GROUPS_TABLE' => ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme,
+          'templates/page/usersGroups/table.tpl',
+          ['ADMIN_PANEL_USERS_GROUPS_TABLE_ITEMS' => implode($usersGroupsTableItemsAssembled)]
+        ),
+        'USERS_GROUPS_SEARCH_VALUE' => htmlspecialchars($searchValue, ENT_QUOTES, 'UTF-8'),
+        'USERS_GROUPS_SORT_VALUE'   => htmlspecialchars($sortRule, ENT_QUOTES, 'UTF-8'),
       ]
     );
+  }
+
+  /**
+   * Query string для пагинации с сохранением поиска и сортировки
+   */
+  private function buildQueryString(string $searchValue, string $sortRule) : string
+  {
+    $parts = [];
+    if ($searchValue !== '') {
+      $parts[] = 'value=' . urlencode($searchValue);
+    }
+    $parts[] = 'sort=' . urlencode($sortRule);
+
+    return '?' . implode('&', $parts);
   }
 }
