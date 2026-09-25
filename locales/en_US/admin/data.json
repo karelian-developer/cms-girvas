@@ -169,6 +169,7 @@
   "PAGE_ENTRIES_CATEGORIES_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_1": "<b>Entry categories</b> are a way of organizing content on a website in a content management system such as WordPress. They allow grouping entries by certain topics or categories, which makes site navigation more convenient for users.",
   "PAGE_ENTRIES_CATEGORIES_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_2": "Entry categories are important for a website because they help organize content and make it more accessible to visitors. In addition, using categories helps improve the site's SEO optimization, as search engines can better understand the structure and subject matter of the content.",
   "PAGE_ENTRIES_CATEGORIES_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_3": "Thus, entry categories play an important role in managing content on a website, helping to improve user experience and increase the site's visibility in search results.",
+  "PAGE_ENTRIES_CATEGORIES_SEARCH_PLACEHOLDER": "Search by category name",
   "PAGE_ENTRIES_CATEGORY_TITLE": "Edit entry category",
   "PAGE_ENTRIES_CATEGORY_NAVIGATION_BACK_LABEL": "Back",
   "PAGE_ENTRIES_CATEGORY_INPUT_TECH_NAME_LABEL": "Technical name",

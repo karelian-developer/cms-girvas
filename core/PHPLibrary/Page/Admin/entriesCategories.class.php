@@ -37,6 +37,18 @@ class PageEntriesCategories implements InterfacePage
 
   const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_CONTENT_NAVIGATION_%s_LABEL';
 
+  /**
+   * Допустимые правила сортировки
+   */
+  private const ALLOWED_SORT_RULES = [
+    'by_createdtimestamp_increase',
+    'by_createdtimestamp_decrease',
+    'by_updatedtimestamp_increase',
+    'by_updatedtimestamp_decrease',
+    'by_alphabet_increase',
+    'by_alphabet_decrease',
+  ];
+
   public CoreInterface $CMSCore;
   public Page $page;
   public string $assembled = '';
@@ -144,6 +156,20 @@ class PageEntriesCategories implements InterfacePage
     return $document->saveHTML();
   }
 
+  /**
+   * Query string для пагинации
+   */
+  private function buildQueryString(string $searchValue, string $sortRule) : string
+  {
+    $parts = [];
+    if ($searchValue !== '') {
+      $parts[] = 'value=' . urlencode($searchValue);
+    }
+    $parts[] = 'sort=' . urlencode($sortRule);
+
+    return '?' . implode('&', $parts);
+  }
+
   public function assembly() : void
   {
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/entriesCategories.css', 'rel' => 'stylesheet']);
@@ -154,17 +180,36 @@ class PageEntriesCategories implements InterfacePage
     $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null ? (int) $this->CMSCore->urlp->getParam('pageNumber') : 0;
     $paginationItemsOnPage = 12;
 
+    // Поиск
+    $searchValue = $this->CMSCore->urlp->getParam('value');
+    $searchValue = $searchValue !== null ? trim(urldecode($searchValue)) : '';
+
+    // Сортировка
+    $sortRule = $this->CMSCore->urlp->getParam('sort') ?? EntriesCategories::DEFAULT_SORT_RULE;
+    if (!in_array($sortRule, self::ALLOWED_SORT_RULES, true)) {
+      $sortRule = EntriesCategories::DEFAULT_SORT_RULE;
+    }
+
     $entriesCategoriesTableItemsAssembled = [];
     $entriesCategories = new EntriesCategories($this->CMSCore);
 
     $entriesCategoriesLocale = $this->CMSCore->getCMSLocale('admin');
     $entriesCategoriesLocaleName = $entriesCategoriesLocale->getName();
 
-    $entriesCategoriesObjects = $entriesCategories->getAll([
-      'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
-    ]);
+    $entriesCategoriesObjects = $entriesCategories->getAll(
+      ['limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]],
+      $searchValue,
+      $sortRule
+    );
 
-    $pagination = new Pagination($this->CMSCore, $entriesCategories->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
+    $pagination = new Pagination(
+      $this->CMSCore,
+      $entriesCategories->getCountTotal($searchValue),
+      $paginationItemsOnPage,
+      $paginationItemCurrent,
+      $this->buildQueryString($searchValue, $sortRule),
+      false
+    );
     $pagination->assembly();
 
     unset($entriesCategories);
@@ -211,7 +256,9 @@ class PageEntriesCategories implements InterfacePage
       'ADMIN_PANEL_PAGE_NAME' => 'entries-categories',
       'ADMIN_PANEL_ENTRIES_CATEGORIES_TABLE' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesCategories/table.tpl', [
         'ADMIN_PANEL_ENTRIES_CATEGORIES_TABLE_ITEMS' => implode($entriesCategoriesTableItemsAssembled)
-      ])
+      ]),
+      'ENTRIES_CATEGORIES_SEARCH_VALUE' => htmlspecialchars($searchValue, ENT_QUOTES, 'UTF-8'),
+      'ENTRIES_CATEGORIES_SORT_VALUE'   => htmlspecialchars($sortRule, ENT_QUOTES, 'UTF-8'),
     ]);
   }
 }
