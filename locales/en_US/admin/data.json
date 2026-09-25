@@ -214,6 +214,7 @@
   "PAGE_ENTRIES_COMMENTS_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_1": "<b>Entry comments</b> are a feature that allows users to leave their comments and reviews under published entries on the website. This feature allows creating interactive interaction between the content author and site visitors, as well as between the visitors themselves.",
   "PAGE_ENTRIES_COMMENTS_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_2": "Entry comments are important for a website because they contribute to increasing audience engagement, discussing the topic, and increasing user activity on the site. In addition, comments can be useful for getting feedback from users, their opinions, ideas, and suggestions.",
   "PAGE_ENTRIES_COMMENTS_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_3": "Thus, this feature is an important tool for creating an interactive and lively community on the website, as well as for improving the quality of content and interaction with the audience.",
+  "PAGE_ENTRIES_COMMENTS_SEARCH_PLACEHOLDER": "Search by comment content",
   "PAGE_ENTRIES_SAMPLE_TITLE": "Edit sample",
   "PAGE_ENTRIES_SAMPLE_NAME_LABEL": "Technical name",
   "PAGE_ENTRIES_SAMPLE_NAME_DESCRIPTION": "The technical name of the sample is used to generate a template variable for subsequent embedding in the site template. Example: <b>{ENTRIES_SAMPLE_&lt;NAME&gt;}</b>.",
