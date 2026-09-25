@@ -106,7 +106,7 @@
 }
 
 .interactive .interactive__input:focus {
-  background-color: var(--common-main-color-3);
+  background-color: var(--common-secondary-color-1);
   border: 1px solid var(--common-secondary-color-2);
 }
 
