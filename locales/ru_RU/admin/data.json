@@ -366,6 +366,7 @@
   "PAGE_STATIC_PAGE_MODAL_PUBLISH_VERSION_DESCRIPTION": "Вы собираетесь выпустить версию %version% документа. Будет создан снимок текста на всех локалях. Продолжить?",
   "PAGE_FORMS_TITLE": "Формы",
   "PAGE_FORMS_SIDEBAR_BLOCK_ABOUT_TITLE": "О формах",
+  "PAGE_FORMS_SEARCH_PLACEHOLDER": "Поиск по имени формы",
   "PAGE_FORM_TITLE": "Редактирование формы",
   "PAGE_FORM_NAVIGATION_BACK_LABEL": "Назад",
   "PAGE_FORM_TECHNICAL_NAME_TITLE": "Техническое наименование",

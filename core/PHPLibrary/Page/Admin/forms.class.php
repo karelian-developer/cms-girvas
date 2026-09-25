@@ -37,6 +37,18 @@ class PageForms implements InterfacePage
 
   const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_CONTENT_NAVIGATION_%s_LABEL';
 
+  /**
+   * Допустимые правила сортировки
+   */
+  private const ALLOWED_SORT_RULES = [
+    'by_createdtimestamp_increase',
+    'by_createdtimestamp_decrease',
+    'by_updatedtimestamp_increase',
+    'by_updatedtimestamp_decrease',
+    'by_alphabet_increase',
+    'by_alphabet_decrease',
+  ];
+
   public SystemCore $CMSCore;
   public Page $page;
   public string $assembled = '';
@@ -145,6 +157,20 @@ class PageForms implements InterfacePage
   }
 
   /**
+   * Query string для пагинации
+   */
+  private function buildQueryString(string $searchValue, string $sortRule) : string
+  {
+    $parts = [];
+    if ($searchValue !== '') {
+      $parts[] = 'value=' . urlencode($searchValue);
+    }
+    $parts[] = 'sort=' . urlencode($sortRule);
+
+    return '?' . implode('&', $parts);
+  }
+
+  /**
    * Сборка
    * 
    * @return void
@@ -164,16 +190,35 @@ class PageForms implements InterfacePage
     /** @var int Максимальное количество элементов на странице */
     $paginationItemsOnPage = 12;
 
+    // Поиск
+    $searchValue = $this->CMSCore->urlp->getParam('value');
+    $searchValue = $searchValue !== null ? trim(urldecode($searchValue)) : '';
+
+    // Сортировка
+    $sortRule = $this->CMSCore->urlp->getParam('sort') ?? Forms::DEFAULT_SORT_RULE;
+    if (!in_array($sortRule, self::ALLOWED_SORT_RULES, true)) {
+      $sortRule = Forms::DEFAULT_SORT_RULE;
+    }
+
     $formsTableItemsAssembled = [];
 
     $forms = new Forms($this->CMSCore);
 
-    /** @var array Массив объектов выборок */
-    $formsObjects = $forms->getAll([
-      'limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]
-    ]);
+    /** @var array Массив объектов форм */
+    $formsObjects = $forms->getAll(
+      ['limit' => [$paginationItemsOnPage, $paginationItemCurrent * $paginationItemsOnPage]],
+      $searchValue,
+      $sortRule
+    );
 
-    $pagination = new Pagination($this->CMSCore, $forms->getCountTotal(), $paginationItemsOnPage, $paginationItemCurrent);
+    $pagination = new Pagination(
+      $this->CMSCore,
+      $forms->getCountTotal($searchValue),
+      $paginationItemsOnPage,
+      $paginationItemCurrent,
+      $this->buildQueryString($searchValue, $sortRule),
+      false
+    );
     $pagination->assembly();
 
     unset($forms);
@@ -212,7 +257,7 @@ class PageForms implements InterfacePage
         $this->CMSCore->theme,
         'templates/page/forms/item.tpl',
         [
-          'FORM_INDEX' => $index,
+          'FORM_INDEX' => $paginationItemCurrent * $paginationItemsOnPage + $index + 1,
           'FORM_ID' => $objectID,
           'FORM_NAME' => $objectName,
           'FORM_TITLE' => $objectTitle,
@@ -236,7 +281,9 @@ class PageForms implements InterfacePage
           [
             'PAGE_ITEMS' => implode($formsTableItemsAssembled)
           ]
-        )
+        ),
+        'FORMS_SEARCH_VALUE' => htmlspecialchars($searchValue, ENT_QUOTES, 'UTF-8'),
+        'FORMS_SORT_VALUE'   => htmlspecialchars($sortRule, ENT_QUOTES, 'UTF-8'),
       ]
     );
   }

@@ -1,4 +1,7 @@
-<article class="main__page page page_forms">
+<article class="main__page page page_forms"
+         data-element="forms-page"
+         data-search-value="{FORMS_SEARCH_VALUE}"
+         data-sort-value="{FORMS_SORT_VALUE}">
   <nav id="SYSTEM_AP_SUBNAVIGATION" class="page__navigation navigation"></nav>
   <div class="page__title-container">
     <h1 class="page__title">{LANG:PAGE_FORMS_TITLE}</h1>

@@ -366,6 +366,7 @@
   "PAGE_STATIC_PAGE_MODAL_PUBLISH_VERSION_DESCRIPTION": "You are about to publish version %version% of the document. A snapshot of the text in all locales will be created. Continue?",
   "PAGE_FORMS_TITLE": "Forms",
   "PAGE_FORMS_SIDEBAR_BLOCK_ABOUT_TITLE": "About forms",
+  "PAGE_FORMS_SEARCH_PLACEHOLDER": "Search by form name",
   "PAGE_FORM_TITLE": "Edit form",
   "PAGE_FORM_NAVIGATION_BACK_LABEL": "Back",
   "PAGE_FORM_TECHNICAL_NAME_TITLE": "Technical name",
