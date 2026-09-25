@@ -405,6 +405,7 @@
   "PAGE_FORM_NOTIFICATIONS_MAX_CHATS_DESCRIPTION": "List of Max chats where the notifier will send the results of this form. You need to list their IDs separated by commas.",
   "PAGE_CONTENT_BLOCKS_TITLE": "Content blocks",
   "PAGE_CONTENT_BLOCKS_SIDEBAR_BLOCK_ABOUT_TITLE": "About content blocks",
+  "PAGE_CONTENT_BLOCKS_SEARCH_PLACEHOLDER": "Search by block name",
   "PAGE_CONTENT_BLOCK_TITLE": "Edit content block",
   "PAGE_CONTENT_BLOCK_NAVIGATION_BACK_LABEL": "Back",
   "PAGE_CONTENT_BLOCK_INPUT_TECH_NAME_LABEL": "Technical name",

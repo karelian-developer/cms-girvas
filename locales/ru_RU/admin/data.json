@@ -405,6 +405,7 @@
   "PAGE_FORM_NOTIFICATIONS_MAX_CHATS_DESCRIPTION": "Список чатов в Max, куда уведомитель будет отправлять результаты данной формы. Необходимо перечислить их ID через запятую.",
   "PAGE_CONTENT_BLOCKS_TITLE": "Контент-блоки",
   "PAGE_CONTENT_BLOCKS_SIDEBAR_BLOCK_ABOUT_TITLE": "О контент-блоках",
+  "PAGE_CONTENT_BLOCKS_SEARCH_PLACEHOLDER": "Поиск по имени блока",
   "PAGE_CONTENT_BLOCK_TITLE": "Редактирование контент-блока",
   "PAGE_CONTENT_BLOCK_NAVIGATION_BACK_LABEL": "Назад",
   "PAGE_CONTENT_BLOCK_INPUT_TECH_NAME_LABEL": "Техническое наименование",
