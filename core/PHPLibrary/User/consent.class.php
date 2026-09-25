@@ -32,6 +32,8 @@ class Consent
   private bool $isDataFullyInitialized = false;
   private array $initializedColumns = [];
 
+  public const DEFAULT_SORT_RULE = 'by_consentedat_decrease';
+
   /**
    * __construct
    *
@@ -763,6 +765,8 @@ class Consent
    * @param CMSCore $CMSCore
    * @param int $limit
    * @param int $offset
+   * @param string $searchValue
+   * @param string $sortRule
    * @return array
    */
   public static function getAll(
@@ -782,48 +786,15 @@ class Consent
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('users_consents');
     $queryBuilder->statement->clauseFrom->assembly();
-
-    // Поиск по userID
-    $hasSearch = false;
-    $searchUserID = 0;
-    if ($searchValue !== '' && ctype_digit($searchValue)) {
-      $hasSearch = true;
-      $searchUserID = (int) $searchValue;
-
-      $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql'      => '`userID` = :searchUserID',
-        'postgresql' => '"userid" = :searchUserID'
-      ]);
-      $queryBuilder->statement->clauseWhere->assembly();
-    }
-
-    // Сортировка — одной колонкой, без вторичных выражений
-    $sortMap = [
-      'by_consentedat_increase' => ['column' => 'consentedAt', 'direction' => 'ASC'],
-      'by_consentedat_decrease' => ['column' => 'consentedAt', 'direction' => 'DESC'],
-      'by_status_active_first'  => ['column' => 'revokedAt',   'direction' => 'DESC'],
-      'by_status_revoked_first' => ['column' => 'revokedAt',   'direction' => 'ASC'],
-      'by_source_increase'      => ['column' => 'source',      'direction' => 'ASC'],
-      'by_source_decrease'      => ['column' => 'source',      'direction' => 'DESC'],
-    ];
-    $sortConfig = $sortMap[$sortRule] ?? $sortMap[self::DEFAULT_SORT_RULE];
-
     $queryBuilder->statement->setClauseOrderBy();
-    $queryBuilder->statement->clauseOrderBy->setColumn($sortConfig['column']);
-    $queryBuilder->statement->clauseOrderBy->setSortType($sortConfig['direction']);
-
+    $queryBuilder->statement->clauseOrderBy->setColumn('consentedAt');
+    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
     $queryBuilder->statement->setClauseLimit($limit, $offset);
     $queryBuilder->statement->assembly();
 
     try {
       $databaseConnection = $CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-
-      if ($hasSearch) {
-        $databaseQuery->bindValue(':searchUserID', $searchUserID, \PDO::PARAM_INT);
-      }
-
       $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
@@ -847,6 +818,7 @@ class Consent
    * Получить общее количество согласий
    *
    * @param CMSCore $CMSCore
+   * @param string $searchValue
    * @return int
    */
   public static function countAll(CMSCore $CMSCore, string $searchValue = '') : int
@@ -860,31 +832,11 @@ class Consent
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('users_consents');
     $queryBuilder->statement->clauseFrom->assembly();
-
-    $hasSearch = false;
-    $searchUserID = 0;
-    if ($searchValue !== '' && ctype_digit($searchValue)) {
-      $hasSearch = true;
-      $searchUserID = (int) $searchValue;
-
-      $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql'      => '`userID` = :searchUserID',
-        'postgresql' => '"userid" = :searchUserID'
-      ]);
-      $queryBuilder->statement->clauseWhere->assembly();
-    }
-
     $queryBuilder->statement->assembly();
 
     try {
       $databaseConnection = $CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-
-      if ($hasSearch) {
-        $databaseQuery->bindValue(':searchUserID', $searchUserID, \PDO::PARAM_INT);
-      }
-
       $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
