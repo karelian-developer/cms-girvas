@@ -39,9 +39,9 @@ export class PageUsersConsents {
       // ----- 1. Кнопка «Экспорт CSV» -----
       const exportContainer = container.querySelector('[data-element="export-container"]')
         || document.querySelector('[data-element="export-container"]');
-
-      const exportButton = new Interactive('button');
+      
       if (exportContainer !== null) {
+        const exportButton = new Interactive('button');
         exportButton.target.setLabel(localeData.PAGE_USERS_CONSENTS_BUTTON_EXPORT || 'Экспорт CSV');
         exportButton.target.setStyle('default');
         exportButton.target.setCallback((event) => {
@@ -49,6 +49,7 @@ export class PageUsersConsents {
           this.handleExport();
         });
         exportButton.assembly();
+        exportContainer.append(exportButton.target.element);
       }
 
       // ----- 2. Поле поиска по ID пользователя -----
@@ -113,10 +114,6 @@ export class PageUsersConsents {
       container.append(sortChoices.target.element);
       container.append(searchInput.target.element);
       container.append(searchButton.target.element);
-
-      if (exportContainer !== null) {
-        exportContainer.append(exportButton.target.element);
-      }
 
       // ----- Сохранение value/sort в ссылках пагинации -----
       const paginationLinks = document.querySelectorAll('.page__pagination a');
