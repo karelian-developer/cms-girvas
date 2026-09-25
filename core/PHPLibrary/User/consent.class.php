@@ -32,6 +32,17 @@ class Consent
   private bool $isDataFullyInitialized = false;
   private array $initializedColumns = [];
 
+  private const SORT_RULES = [
+    'by_consentedat_increase'  => 'consentedAt ASC',
+    'by_consentedat_decrease'  => 'consentedAt DESC',
+    'by_status_active_first'   => 'revokedAt IS NULL DESC, consentedAt DESC',
+    'by_status_revoked_first'  => 'revokedAt IS NULL ASC, consentedAt DESC',
+    'by_source_increase'       => 'source ASC, consentedAt DESC',
+    'by_source_decrease'       => 'source DESC, consentedAt DESC',
+  ];
+
+  public const DEFAULT_SORT_RULE = 'by_consentedat_decrease';
+
   /**
    * __construct
    *
@@ -757,15 +768,23 @@ class Consent
     return self::getAllByUser($CMSCore, $userID, true);
   }
 
-    /**
-   * Получить все согласия с пагинацией
+  /**
+   * Получить все согласия с пагинацией, поиском и сортировкой
    *
    * @param CMSCore $CMSCore
    * @param int $limit
    * @param int $offset
+   * @param string $searchValue — поиск по userID (строка, будет приведена к int)
+   * @param string $sortRule    — одно из SORT_RULES
    * @return array
    */
-  public static function getAll(CMSCore $CMSCore, int $limit = 20, int $offset = 0) : array
+  public static function getAll(
+    CMSCore $CMSCore,
+    int $limit = 20,
+    int $offset = 0,
+    string $searchValue = '',
+    string $sortRule = self::DEFAULT_SORT_RULE
+  ) : array
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -776,15 +795,51 @@ class Consent
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('users_consents');
     $queryBuilder->statement->clauseFrom->assembly();
-    $queryBuilder->statement->setClauseOrderBy();
-    $queryBuilder->statement->clauseOrderBy->setColumn('consentedAt');
-    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+
+    // Поиск по userID (только если введено целое число)
+    $hasSearch = false;
+    $searchUserID = 0;
+    if ($searchValue !== '' && ctype_digit($searchValue)) {
+      $hasSearch = true;
+      $searchUserID = (int) $searchValue;
+
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql'      => '`userID` = :searchUserID',
+        'postgresql' => '"userID" = :searchUserID'
+      ]);
+      $queryBuilder->statement->clauseWhere->assembly();
+    }
+
+    // Сортировка — из белого списка, безопасно подставляется в SQL
+    $sortSQL = self::SORT_RULES[$sortRule] ?? self::SORT_RULES[self::DEFAULT_SORT_RULE];
+
+    // Лимит
     $queryBuilder->statement->setClauseLimit($limit, $offset);
     $queryBuilder->statement->assembly();
 
+    $assembledSQL = $queryBuilder->statement->assembled;
+    if (stripos($assembledSQL, 'ORDER BY') === false) {
+      if (stripos($assembledSQL, 'LIMIT') !== false) {
+        $assembledSQL = preg_replace(
+          '/\s+LIMIT\s+/i',
+          ' ORDER BY ' . $sortSQL . ' LIMIT ',
+          $assembledSQL,
+          1
+        );
+      } else {
+        $assembledSQL .= ' ORDER BY ' . $sortSQL;
+      }
+    }
+
     try {
       $databaseConnection = $CMSCore->databaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery = $databaseConnection->prepare($assembledSQL);
+
+      if ($hasSearch) {
+        $databaseQuery->bindValue(':searchUserID', $searchUserID, \PDO::PARAM_INT);
+      }
+
       $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
@@ -805,12 +860,13 @@ class Consent
   }
 
   /**
-   * Получить общее количество согласий
+   * Получить общее количество согласий (с учётом поиска по userID)
    *
    * @param CMSCore $CMSCore
+   * @param string $searchValue
    * @return int
    */
-  public static function countAll(CMSCore $CMSCore) : int
+  public static function countAll(CMSCore $CMSCore, string $searchValue = '') : int
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -821,11 +877,31 @@ class Consent
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('users_consents');
     $queryBuilder->statement->clauseFrom->assembly();
+
+    $hasSearch = false;
+    $searchUserID = 0;
+    if ($searchValue !== '' && ctype_digit($searchValue)) {
+      $hasSearch = true;
+      $searchUserID = (int) $searchValue;
+
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+        'mysql'      => '`userID` = :searchUserID',
+        'postgresql' => '"userID" = :searchUserID'
+      ]);
+      $queryBuilder->statement->clauseWhere->assembly();
+    }
+
     $queryBuilder->statement->assembly();
 
     try {
       $databaseConnection = $CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      if ($hasSearch) {
+        $databaseQuery->bindValue(':searchUserID', $searchUserID, \PDO::PARAM_INT);
+      }
+
       $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([

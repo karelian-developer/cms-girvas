@@ -1,9 +1,12 @@
-<article class="main__page page page_users-consents">
+<article class="main__page page page_{ADMIN_PANEL_PAGE_NAME}"
+         data-element="users-consents-page"
+         data-search-value="{USERS_CONSENTS_SEARCH_VALUE}"
+         data-sort-value="{USERS_CONSENTS_SORT_VALUE}">
   <nav id="SYSTEM_AP_SUBNAVIGATION" class="page__navigation navigation"></nav>
   <div class="page__title-container">
     <h1 class="page__title">{LANG:PAGE_USERS_CONSENTS_TITLE}</h1>
-    <div class="page__interactive-container">
-      <div class="page__interactive-container" data-element="export-container"></div>
+    <div id="E8548530785" class="page__interactive-container">
+      <div data-element="export-container"></div>
     </div>
   </div>
   <div class="page__pagination">
@@ -18,10 +21,10 @@
 </article>
 <aside class="main__page-aside page-aside">
   <article class="page-aside__block">
-    <h2 class="page-aside__block-title">{LANG:PAGE_USERS_CONSENTS_SIDEBAR_ABOUT_TITLE}</h2>
+    <h2 class="page-aside__block-title">{LANG:PAGE_USERS_CONSENTS_SIDEBAR_BLOCK_ABOUT_TITLE}</h2>
     <div class="page-aside__block-content block-content">
       <div class="note-block note-block_blue">
-        <p class="block-content__phar">{LANG:PAGE_USERS_CONSENTS_SIDEBAR_ABOUT_DESCRIPTION}</p>
+        <p class="block-content__phar">{LANG:PAGE_USERS_CONSENTS_SIDEBAR_BLOCK_ABOUT_DESCRIPTION_1}</p>
       </div>
     </div>
   </article>

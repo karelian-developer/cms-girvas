@@ -39,6 +39,18 @@ class PageUsersConsents implements InterfacePage
 
   const LANG_PAGE_NAVIGATION_LABLE_TEMPLATE = 'PAGE_USERS_CONSENTS_NAVIGATION_%s_LABEL';
 
+  /**
+   * Допустимые правила сортировки (должны совпадать с Consent::SORT_RULES)
+   */
+  private const ALLOWED_SORT_RULES = [
+    'by_consentedat_increase',
+    'by_consentedat_decrease',
+    'by_status_active_first',
+    'by_status_revoked_first',
+    'by_source_increase',
+    'by_source_decrease',
+  ];
+
   public SystemCore $CMSCore;
   public Page $page;
   public string $assembled = '';
@@ -149,6 +161,16 @@ class PageUsersConsents implements InterfacePage
       : 0;
     $paginationItemsOnPage = 20;
 
+    // Поиск по userID
+    $searchValue = $this->CMSCore->urlp->getParam('value');
+    $searchValue = $searchValue !== null ? trim(urldecode($searchValue)) : '';
+
+    // Сортировка
+    $sortRule = $this->CMSCore->urlp->getParam('sort') ?? UserConsent::DEFAULT_SORT_RULE;
+    if (!in_array($sortRule, self::ALLOWED_SORT_RULES, true)) {
+      $sortRule = UserConsent::DEFAULT_SORT_RULE;
+    }
+
     // Логируем просмотр
     Report::create(
       $this->CMSCore,
@@ -156,6 +178,8 @@ class PageUsersConsents implements InterfacePage
       [
         'action' => 'consents_list_view',
         'viewedByID' => $clientUser->getID(),
+        'search' => $searchValue,
+        'sort' => $sortRule,
         'page' => $paginationItemCurrent,
         'perPage' => $paginationItemsOnPage,
         'ip' => $this->CMSCore->client->getIPAddress()
@@ -166,11 +190,20 @@ class PageUsersConsents implements InterfacePage
     $consents = UserConsent::getAll(
       $this->CMSCore,
       $paginationItemsOnPage,
-      $paginationItemCurrent * $paginationItemsOnPage
+      $paginationItemCurrent * $paginationItemsOnPage,
+      $searchValue,
+      $sortRule
     );
-    $consentsTotal = UserConsent::countAll($this->CMSCore);
+    $consentsTotal = UserConsent::countAll($this->CMSCore, $searchValue);
 
-    $pagination = new Pagination($this->CMSCore, $consentsTotal, $paginationItemsOnPage, $paginationItemCurrent);
+    $pagination = new Pagination(
+      $this->CMSCore,
+      $consentsTotal,
+      $paginationItemsOnPage,
+      $paginationItemCurrent,
+      $this->buildQueryString($searchValue, $sortRule),
+      false
+    );
     $pagination->assembly();
 
     $tableItemsAssembled = [];
@@ -269,8 +302,24 @@ class PageUsersConsents implements InterfacePage
       [
         'PAGE_CONSENTS_PAGINATION' => $pagination->assembled,
         'ADMIN_PANEL_PAGE_NAME' => 'users-consents',
-        'ADMIN_PANEL_CONSENTS_TABLE' => implode("\n", $tableItemsAssembled)
+        'ADMIN_PANEL_CONSENTS_TABLE' => implode("\n", $tableItemsAssembled),
+        'USERS_CONSENTS_SEARCH_VALUE' => htmlspecialchars($searchValue, ENT_QUOTES, 'UTF-8'),
+        'USERS_CONSENTS_SORT_VALUE'   => htmlspecialchars($sortRule, ENT_QUOTES, 'UTF-8'),
       ]
     );
+  }
+
+  /**
+   * Query string для пагинации с сохранением поиска и сортировки
+   */
+  private function buildQueryString(string $searchValue, string $sortRule) : string
+  {
+    $parts = [];
+    if ($searchValue !== '') {
+      $parts[] = 'value=' . urlencode($searchValue);
+    }
+    $parts[] = 'sort=' . urlencode($sortRule);
+
+    return '?' . implode('&', $parts);
   }
 }
