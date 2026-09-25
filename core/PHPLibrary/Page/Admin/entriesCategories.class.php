@@ -156,18 +156,17 @@ class PageEntriesCategories implements InterfacePage
     return $document->saveHTML();
   }
 
-  /**
-   * Query string для пагинации
-   */
   private function buildQueryString(string $searchValue, string $sortRule) : string
   {
+    $basePath = '/admin/entriesCategories';
+
     $parts = [];
     if ($searchValue !== '') {
       $parts[] = 'value=' . urlencode($searchValue);
     }
     $parts[] = 'sort=' . urlencode($sortRule);
 
-    return '?' . implode('&', $parts);
+    return $basePath . '?' . implode('&', $parts);
   }
 
   public function assembly() : void

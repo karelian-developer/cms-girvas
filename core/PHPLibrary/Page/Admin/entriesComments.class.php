@@ -130,13 +130,15 @@ class PageEntriesComments implements InterfacePage
    */
   private function buildQueryString(string $searchValue, string $sortRule) : string
   {
+    $basePath = '/admin/entriesComments';
+
     $parts = [];
     if ($searchValue !== '') {
       $parts[] = 'value=' . urlencode($searchValue);
     }
     $parts[] = 'sort=' . urlencode($sortRule);
 
-    return '?' . implode('&', $parts);
+    return $basePath . '?' . implode('&', $parts);
   }
 
   public function assembly() : void
