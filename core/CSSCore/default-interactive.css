@@ -121,14 +121,18 @@
 
 .interactive .interactive__input {
   box-sizing: border-box;
-  background-color: var(--primary-color-4);
   font-size: 14px;
+  border-radius: 8px;
   border-width: 1px;
   border-style: solid;
-  border-color: var(--primary-color-2);
   outline: 0;
   padding: 10px;
   transition: background-color .2s, border-color .2s;
+}
+
+.interactive .interactive__input {
+  background-color: var(--primary-color-4);
+  border-color: var(--primary-color-2);
 }
 
 .interactive .interactive__input:hover {
@@ -141,6 +145,12 @@
 
 .interactive .interactive__input:active {
   border-color: var(--primary-color-1);
+}
+
+.interactive .interactive__input:invalid,
+.interactive .interactive__input:invalid {
+  background-color: var(--common-secondary-color-5);
+  border-color: var(--common-secondary-color-6);
 }
 
 .interactive .interactive__data-searcher {
