@@ -78,41 +78,39 @@ export class Client {
     document.cookie = `${name}=${value};${expires};path=/`;
   }
 
+  /**
+   * Проверить наличие cookie
+   * 
+   * @param {string} name
+   * @returns {boolean}
+   */
   static existsCookie(name) {
-    let cookie = document.cookie;
-    let cookiePrefix = name + "=";
-    let begin = cookie.indexOf("; " + cookiePrefix);
+    const cookiePrefix = name + '=';
 
-    if (begin == -1) {
-      return false;
-    }
-
-    return true;
+    return document.cookie
+      .split(';')
+      .some((item) => item.trim().startsWith(cookiePrefix));
   }
 
+  /**
+   * Получить cookie по имени
+   * 
+   * @param {string} name
+   * @returns {string|null}
+   */
   static getCookie(name) {
-    let cookie = document.cookie;
-    let cookiePrefix = name + "=";
-    let begin = cookie.indexOf("; " + cookiePrefix);
-    let end;
+    const cookiePrefix = name + '=';
+    const cookies = document.cookie.split(';');
 
-    if (begin === -1) {
-      begin = cookie.indexOf(cookiePrefix);
-      if (begin != 0) return null;
-      // Если begin == 0, то куки найдена в начале строки
-      end = cookie.indexOf(";", begin);
-      if (end === -1) {
-        end = cookie.length;
-      }
-    } else {
-      begin += 2;
-      end = cookie.indexOf(";", begin);
-      if (end === -1) {
-        end = cookie.length;
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+
+      if (cookie.startsWith(cookiePrefix)) {
+        return decodeURIComponent(cookie.substring(cookiePrefix.length));
       }
     }
 
-    return decodeURI(cookie.substring(begin + cookiePrefix.length, end));
+    return null;
   }
 
   /**
