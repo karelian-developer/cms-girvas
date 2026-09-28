@@ -212,7 +212,11 @@ class PageEntriesComments implements InterfacePage
           'COMMENT_AUTHOR_LOGIN' => $authorLogin,
           'COMMENT_ENTRY_TITLE' => $entryTitle,
           'COMMENT_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
-          'COMMENT_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp
+          'COMMENT_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp,
+          'COMMENT_TOGGLE_EVENT' => $commentIsHidden ? 'show' : 'hide',
+          'COMMENT_TOGGLE_LABEL' => $commentIsHidden
+            ? ($localeData['PAGE_ENTRIES_COMMENTS_BUTTON_SHOW'] ?? 'Опубликовать')
+            : ($localeData['PAGE_ENTRIES_COMMENTS_BUTTON_HIDE'] ?? 'Снять с публикации'),
         ]));
       }
     }

@@ -135,7 +135,7 @@ export class PageEntriesComments {
 
                 const request = new Interactive('request', {
                   method: 'DELETE',
-                  url: '/handler/entry/comment/' + commentID + '?localeMessage=' + window.CMSCore.locales.admin.name
+                  url: '/handler/entry/comment?localeMessage=' + window.CMSCore.locales.admin.name
                 });
 
                 request.target.data = formData;
@@ -155,15 +155,65 @@ export class PageEntriesComments {
               interactiveModal.target.show();
             }
 
-            if (eventName === 'hide' || eventName === 'show') {
-              const isHide = eventName === 'hide';
+            if (eventName === 'hide') {
+              const interactiveModal = new Interactive('modal', {
+                title: localeData.MODAL_ENTRY_COMMENT_HIDE_TITLE || 'Скрытие комментария',
+                content: localeData.MODAL_ENTRY_COMMENT_HIDE_DESCRIPTION || 'Укажите причину скрытия комментария'
+              });
 
+              const reasonTextarea = document.createElement('textarea');
+              reasonTextarea.classList.add('form__textarea');
+              reasonTextarea.setAttribute('placeholder', localeData.PAGE_ENTRIES_COMMENTS_HIDDEN_REASON_PLACEHOLDER || 'Причина скрытия');
+              reasonTextarea.setAttribute('required', 'required');
+              reasonTextarea.setAttribute('name', 'comment_hidden_reason');
+
+              interactiveModal.target.content = reasonTextarea;
+
+              interactiveModal.target.addButton(localeData.BUTTON_HIDE_SUBMIT || 'Скрыть', () => {
+                const reason = reasonTextarea.value.trim();
+
+                if (reason === '') {
+                  this.page.showPopupNotification(
+                    localeData.PAGE_ENTRIES_COMMENTS_ERROR_HIDDEN_REASON_REQUIRED || 'Укажите причину скрытия',
+                    0
+                  );
+                  return;
+                }
+
+                const formData = new FormData();
+                formData.append('comment_id', commentID);
+                formData.append('comment_is_hidden', 'on');
+                formData.append('comment_hidden_reason', reason);
+
+                const request = new Interactive('request', {
+                  method: 'PATCH',
+                  url: '/handler/entry/comment?localeMessage=' + window.CMSCore.locales.admin.name
+                });
+
+                request.target.data = formData;
+                request.target.send().then((data) => {
+                  if (data.statusCode === 1) {
+                    window.location.reload();
+                  }
+                  interactiveModal.target.close();
+                });
+              });
+
+              interactiveModal.target.addButton(localeData.BUTTON_CANCEL_LABEL, () => {
+                interactiveModal.target.close();
+              });
+
+              interactiveModal.assembly();
+              document.body.appendChild(interactiveModal.target.element);
+              interactiveModal.target.show();
+            }
+
+            if (eventName === 'show') {
+              // Публикация — без причины, сразу
               const formData = new FormData();
               formData.append('comment_id', commentID);
-              formData.append('is_hidden', isHide ? 1 : 0);
-              if (isHide) {
-                formData.append('hidden_reason', '');
-              }
+              formData.append('comment_is_hidden', 'off');
+              formData.append('comment_hidden_reason', '');
 
               const request = new Interactive('request', {
                 method: 'PATCH',
