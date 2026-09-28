@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
           interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, localeName);
         });
 
-        locales.forEach((locale, localeIndex) => {
+        window.CMSCore.locales.list.forEach((locale, localeIndex) => {
           if (locale.name === window.CMSCore.locales.base.name) {
             interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
           }
