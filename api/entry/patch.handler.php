@@ -279,8 +279,15 @@ if ($CMSCore->client->isLogged(2)) {
             }
             
             if (isset($_PATCH['entry_preview'])) {
-              // ... обработка превью (оставляем как есть) ...
-              // Добавляем $changedFields[] = 'preview';
+              $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
+              $fileConverter = new FileConverter($CMSCore);
+              $fileConverted = $fileConverter->convert($_PATCH['entry_preview'], $fileDirectoryPath, FileConverterEnumFileFormat::WEBP, true);
+              
+              if (is_array($fileConverted)) {
+                if (!array_key_exists('metadata', $entryData)) $entryData['metadata'] = [];
+                $entryData['metadata']['previewURL'] = '/uploads/media/' . $fileConverted['fileName'];
+                $changedFields[] = 'preview';
+              }
             }
 
             foreach ($_PATCH as $name => $value) {
