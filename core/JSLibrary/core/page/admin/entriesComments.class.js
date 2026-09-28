@@ -160,14 +160,14 @@ export class PageEntriesComments {
 
               const formData = new FormData();
               formData.append('comment_id', commentID);
-              formData.append('is_hidden', isHide ? 1 : 0);
+              formData.append('comment_is_hidden', isHide ? 1 : 0);
               if (isHide) {
-                formData.append('hidden_reason', '');
+                formData.append('comment_hidden_reason', '');
               }
 
               const request = new Interactive('request', {
                 method: 'PATCH',
-                url: '/handler/entry/comment/' + commentID + '?localeMessage=' + window.CMSCore.locales.admin.name
+                url: '/handler/entry/comment?localeMessage=' + window.CMSCore.locales.admin.name
               });
 
               request.target.data = formData;
