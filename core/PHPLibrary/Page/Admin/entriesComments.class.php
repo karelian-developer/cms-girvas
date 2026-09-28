@@ -203,7 +203,9 @@ class PageEntriesComments implements InterfacePage
 
         $entryTitle = $entry !== null ? $entry->getTitle($localeName) : 'Entry deleted';
 
-        array_push($commentsTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesComments/tableItem.tpl', [
+        $commentIsHidden = $object->isHidden();
+
+        $commentsTableItemsAssembled[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesComments/tableItem.tpl', [
           'COMMENT_ID' => $object->getID(),
           'COMMENT_IS_HIDDEN_STATUS' => var_export($object->isHidden(), true),
           'COMMENT_HIDDEN_REASON' => strip_tags($object->getHiddenReason()),
@@ -217,7 +219,7 @@ class PageEntriesComments implements InterfacePage
           'COMMENT_TOGGLE_LABEL' => $commentIsHidden
             ? ($localeData['PAGE_ENTRIES_COMMENTS_BUTTON_SHOW'] ?? 'Опубликовать')
             : ($localeData['PAGE_ENTRIES_COMMENTS_BUTTON_HIDE'] ?? 'Снять с публикации'),
-        ]));
+        ]);
       }
     }
 
