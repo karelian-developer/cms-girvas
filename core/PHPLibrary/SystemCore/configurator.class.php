@@ -163,7 +163,7 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getSiteTitle() : string
   {
-    $value = $this->getLocalizedDatabaseValue('base_site_title');
+    $value = $this->getLocalizedDatabaseValue('base_site_title', $this->resolveCurrentLocaleName());
 
     if (is_array($value)) {
       $value = implode(', ', $value);
@@ -181,7 +181,7 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getSiteDescription() : string
   {
-    $value = $this->getLocalizedDatabaseValue('seo_site_description');
+    $value = $this->getLocalizedDatabaseValue('seo_site_description', $this->resolveCurrentLocaleName());
 
     if (is_array($value)) {
       $value = implode(', ', $value);
@@ -189,7 +189,7 @@ final class Configurator implements ConfiguratorInterface
 
     return is_string($value) && $value !== ''
       ? $value
-      : sprintf('%s %s developed by www.garbalo.com', $this->CMSCore->getCMSTitle(), $this->CMSCore->getCMSVersion());
+      : sprintf('%s %s developed by karelian-developer.ru', $this->CMSCore->getCMSTitle(), $this->CMSCore->getCMSVersion());
   }
 
   /**
@@ -199,7 +199,7 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getSiteKeywords() : string
   {
-    $value = $this->getLocalizedDatabaseValue('seo_site_keywords');
+    $value = $this->getLocalizedDatabaseValue('seo_site_keywords', $this->resolveCurrentLocaleName());
 
     if (is_array($value)) {
       return implode(', ', $value);
@@ -209,7 +209,7 @@ final class Configurator implements ConfiguratorInterface
       return $value;
     }
 
-    return implode(', ', ['cms girvas', 'empty site', 'karelian developer']);
+    return implode(', ', ['cms girvas', 'empty site', 'karelian developer', 'karelian cms']);
   }
 
   /**
@@ -967,6 +967,27 @@ final class Configurator implements ConfiguratorInterface
   }
 
   /**
+   * Имя локали, в контексте которой рендерится текущая страница
+   * 
+   * @return ?string
+   */
+  private function resolveCurrentLocaleName() : ?string
+  {
+    if ($this->CMSCore->locale !== null) {
+      return $this->CMSCore->locale->getName();
+    }
+
+    $isAdmin = $this->CMSCore->urlp !== null
+      && $this->CMSCore->urlp->getPath(0) === 'admin';
+
+    $localeConfigKey = $isAdmin ? 'base_admin_locale' : 'base_locale';
+
+    return $this->existsDatabaseEntryValue($localeConfigKey)
+      ? (string) $this->getDatabaseEntryValue($localeConfigKey)
+      : null;
+  }
+
+  /**
    * Обновить запись конфигураций CMS в базе данных
    * 
    * @param string $name
@@ -1017,7 +1038,7 @@ final class Configurator implements ConfiguratorInterface
    * Получить локализованное значение настройки из БД
    *
    * @param string $settingName
-   * @param string|null $localeName  Если null — берётся админская локаль
+   * @param ?string $localeName
    *
    * @return mixed
    */
@@ -1035,24 +1056,27 @@ final class Configurator implements ConfiguratorInterface
 
     $decoded = json_decode($raw, true);
 
+    // JSON-объект по локалям
     if (is_array($decoded) && !array_is_list($decoded)) {
-      if ($localeName === null) {
-        $localeConfigKey = $this->CMSCore->locale->getTypeName() === 'admin'
-          ? 'base_admin_locale'
-          : 'base_locale';
-
-        $localeName = $this->existsDatabaseEntryValue($localeConfigKey)
-          ? (string) $this->getDatabaseEntryValue($localeConfigKey)
-          : 'ru_RU';
+      if ($localeName !== null && isset($decoded[$localeName])) {
+        return $decoded[$localeName];
       }
 
-      return $decoded[$localeName] ?? null;
+      // Fallback: первое непустое значение
+      foreach ($decoded as $value) {
+        if (is_string($value) && $value !== '') return $value;
+        if (is_array($value) && !empty($value)) return $value;
+      }
+
+      return null;
     }
 
+    // Плоский список (старый seo_site_keywords)
     if (is_array($decoded) && array_is_list($decoded)) {
       return $decoded;
     }
 
+    // Плоская строка
     return $raw;
   }
   
