@@ -4,6 +4,7 @@
     <h1 class="page__title">
       {LANG:PAGE_SETTINGS_TITLE}&nbsp;&mdash;&nbsp;{SETTINGS_TITLE}
     </h1>
+    <div class="page__interactive-container" data-element="header-interactive"></div>
   </div>
   <div class="page__content">
     {SETTINGS_FORM}

@@ -14,11 +14,12 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 $allowedSettings = [
-  'base_site_title'               => 'string',
+  'base_site_title'               => 'json',
   'base_locale'                   => 'string',
   'security_cookie_banner_status'   => 'bool',
   'security_cookie_banner_document' => 'string',
   'security_allowed_users_registration_status' => 'bool',
+  'seo_site_description' => 'json',
   'seo_site_keywords' => 'json',
 ];
 

@@ -35,6 +35,91 @@ export class PageSettings {
     let interactiveLocaleChoices = new Interactive('choices');
     
     this.page.core.locales.admin.getData().then((localeData) => {
+      // ============================================================
+      // Мультиязычные настройки: base_site_title / seo_site_description / seo_site_keywords
+      // ============================================================
+      const localizableSelectors = {
+        base_site_title:      '[data-element="input-title"]',
+        seo_site_description: '[data-element="input-seo-description"]',
+        seo_site_keywords:    '[data-element="input-seo-keywords"]',
+      };
+
+      const existingLocalizable = Object.entries(localizableSelectors)
+        .filter(([, sel]) => document.querySelector(sel) !== null);
+
+      if (existingLocalizable.length > 0) {
+        const interactiveLocaleChoices = new Interactive('choices');
+
+        this.page.core.locales.list.forEach((locale, localeIndex) => {
+          const localeIconImageElement = document.createElement('img');
+          localeIconImageElement.setAttribute('src', locale.iconURL);
+          localeIconImageElement.setAttribute('alt', locale.title);
+
+          const localeLabelElement = document.createElement('span');
+          localeLabelElement.innerText = locale.title;
+
+          const localeTemplate = document.createElement('template');
+          localeTemplate.innerHTML += localeIconImageElement.outerHTML;
+          localeTemplate.innerHTML += localeLabelElement.outerHTML;
+
+          interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, locale.name);
+
+          if (locale.name === this.page.core.locales.admin.name) {
+            interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
+          }
+        });
+
+        interactiveLocaleChoices.assembly();
+
+        const interactiveHeaderContainerElement = document.querySelector('[data-element="header-interactive"]');
+        if (interactiveHeaderContainerElement !== null) {
+          interactiveHeaderContainerElement.append(interactiveLocaleChoices.target.element);
+        }
+
+        const localeSelectElement = interactiveLocaleChoices.target.element.querySelector('select');
+        const settingsLocaleHiddenInput = document.querySelector('input[name="_settings_locale"]');
+
+        const applySettingsToFields = (settings, localeName) => {
+          existingLocalizable.forEach(([settingName, selector]) => {
+            const fieldElement = document.querySelector(selector);
+            if (fieldElement === null) return;
+
+            const rawValue = settings[settingName];
+            let value = '';
+
+            if (rawValue !== undefined && rawValue !== null) {
+              if (rawValue && typeof rawValue === 'object' && !Array.isArray(rawValue)) {
+                // Новый формат: { "ru_RU": "...", "en_US": "..." }
+                const localized = rawValue[localeName];
+                value = Array.isArray(localized) ? localized.join(', ') : (localized ?? '');
+              } else if (Array.isArray(rawValue)) {
+                value = rawValue.join(', ');
+              } else {
+                // Старое плоское значение (fallback)
+                value = rawValue ?? '';
+              }
+            }
+
+            fieldElement.value = value;
+          });
+        };
+
+        localeSelectElement.addEventListener('change', (event) => {
+          const selectedLocaleName = event.target.value;
+
+          if (settingsLocaleHiddenInput !== null) {
+            settingsLocaleHiddenInput.value = selectedLocaleName;
+          }
+
+          this.page.core.getSettings(existingLocalizable.map(([name]) => name))
+            .then((settings) => applySettingsToFields(settings, selectedLocaleName));
+        });
+
+        if (settingsLocaleHiddenInput !== null) {
+          settingsLocaleHiddenInput.value = this.page.core.locales.admin.name;
+        }
+      }
+
       let checkboxesInputsElements = document.querySelectorAll('[type="checkbox"]');
       if (checkboxesInputsElements.length > 0) {
         checkboxesInputsElements.forEach((element, elementIndex) => {

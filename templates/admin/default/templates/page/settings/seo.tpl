@@ -1,4 +1,5 @@
 <form class="form page__form" data-element="main-form">
+  <input type="hidden" name="_settings_locale" value="{SETTINGS_ADMIN_LOCALE}">
   <div class="grid-table page__grid-table">
     <!-- Поле: Код для верификации в сервисе «Яндекс: Вебмастер» -->
     <div class="cell grid-table__cell grid-table__cell_text">
@@ -38,7 +39,7 @@
       </div>
     </div>
     <div class="cell grid-table__cell grid-table__cell_data">
-      <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_site_description" cols="30" rows="10" placeholder="{LANG:PAGE_SETTINGS_SETTING_SEO_SITE_DESCRIPTION_TITLE}">{SETTING_SITE_DESCRIPTION_VALUE}</textarea>
+      <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_site_description" cols="30" rows="10" placeholder="{LANG:PAGE_SETTINGS_SETTING_SEO_SITE_DESCRIPTION_TITLE}" data-element="input-seo-description">{SETTING_SITE_DESCRIPTION_VALUE}</textarea>
     </div>
     <!-- Поле: Ключевые слова -->
     <div class="cell grid-table__cell grid-table__cell_text">
@@ -50,7 +51,7 @@
       </div>
     </div>
     <div class="cell grid-table__cell grid-table__cell_data">
-      <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_site_keywords" cols="30" rows="10" placeholder="{LANG:PAGE_SETTINGS_SETTING_SEO_INPUT_KEYWORDS_PLACEHOLDER}">{SETTING_SITE_KEYWORDS_VALUE}</textarea>
+      <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_site_keywords" cols="30" rows="10" placeholder="{LANG:PAGE_SETTINGS_SETTING_SEO_INPUT_KEYWORDS_PLACEHOLDER}" data-element="input-seo-keywords">{SETTING_SITE_KEYWORDS_VALUE}</textarea>
     </div>
     <!-- Поле: Содержимое файла robots.txt -->
     <div class="cell grid-table__cell grid-table__cell_text">

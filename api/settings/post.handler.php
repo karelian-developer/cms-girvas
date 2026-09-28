@@ -307,6 +307,38 @@ if ($CMSCore->client->isLogged(2)) {
               }
             }
 
+            // ============================================================
+            // МУЛЬТИЯЗЫЧНЫЕ НАСТРОЙКИ: base_site_title, seo_site_description, seo_site_keywords
+            // ============================================================
+            $localizableSettings = ['base_site_title', 'seo_site_description', 'seo_site_keywords'];
+
+            if (in_array($settingName, $localizableSettings, true) && isset($_POST['_settings_locale'])) {
+              $localeName = (string) $_POST['_settings_locale'];
+
+              $values = $CMSCore->configurator->existsDatabaseEntryValue($settingName)
+                ? json_decode($CMSCore->configurator->getDatabaseEntryValue($settingName), true)
+                : [];
+
+              if (!is_array($values)) {
+                // Миграция старого плоского значения в админскую локаль
+                $adminLocale = $CMSCore->configurator->existsDatabaseEntryValue('base_admin_locale')
+                  ? (string) $CMSCore->configurator->getDatabaseEntryValue('base_admin_locale')
+                  : 'ru_RU';
+
+                $values = [$adminLocale => $values];
+              }
+
+              if ($settingName === 'seo_site_keywords') {
+                $values[$localeName] = !empty($settingValue)
+                  ? preg_split('/\s*,\s*/', $settingValue)
+                  : [];
+              } else {
+                $values[$localeName] = htmlspecialchars(str_replace('\'', '"', (string) $settingValue));
+              }
+
+              $settingValue = json_encode($values, JSON_UNESCAPED_UNICODE);
+            }
+
             if ($settingName === 'setting_static_pages_additional_field_category_id') {
 
               foreach ($settingValue as $key => $value) {
@@ -340,6 +372,9 @@ if ($CMSCore->client->isLogged(2)) {
             }
 
             $settingValue = match ($settingName) {
+              'base_site_title',
+              'seo_site_description',
+              'seo_site_keywords' => $settingValue,
               'security_notification_telegram_chats_ids' => !empty($settingValue) ? $settingValue : json_encode([]),
               'security_notification_max_chats_ids' => !empty($settingValue) ? $settingValue : json_encode([]),
               'security_allowed_admin_ip' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),

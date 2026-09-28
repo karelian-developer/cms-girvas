@@ -1,4 +1,5 @@
 <form class="form page__form" data-element="main-form">
+  <input type="hidden" name="_settings_locale" value="{SETTINGS_ADMIN_LOCALE}">
   <div class="grid-table page__grid-table">
     <!-- Поле: Название сайта -->
     <div class="cell grid-table__cell grid-table__cell_text">
