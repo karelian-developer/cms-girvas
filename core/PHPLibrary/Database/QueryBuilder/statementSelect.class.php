@@ -77,6 +77,7 @@ final class StatementSelect implements InterfaceStatement
         $selection = match ($CMSConfigDatabase['dms']) {
           CMSDMS::MySQL => '`' . $selection . '`',
           CMSDMS::PostgreSQL => '"' . $selection . '"',
+          default => $selection,
         };
       }
       
