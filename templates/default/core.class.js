@@ -1,3 +1,11 @@
+/**
+ * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas Путь до репозитория системы
+ * @copyright   Copyright (c) 2022 - 2024, Andrey Shestakov & Garbalo (https://www.garbalo.com/)
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ */
+
 'use strict';
 
 import {Client} from "../../core/JSLibrary/core/client.class.js";
@@ -18,97 +26,108 @@ document.addEventListener('DOMContentLoaded', () => {
     window.CMSCore.templateCore = new Core(window.CMSCore);
     window.CMSCore.templateCore.init();
 
-    const localeURL = window.CMSCore.searchParams.getParam('locale');
+    const localeBase = window.CMSCore.locales.base;
+    const localeLocation = window.CMSCore.searchParams.getParam('locale');
+    
+    let localeIsQual;
 
-    // Если в URL нет параметра locale — нечего предлагать
-    if (localeURL === null || localeURL === undefined || localeURL === '') {
-      return;
+    if (localeLocation !== null && localeLocation !== undefined && localeLocation !== "") {
+      // localeLocation задан
+      const cookieLocale = Client.getCookie('locale');
+      
+      if (localeLocation !== localeBase) {
+        // Параметр отличается от базовой локали
+        if (!cookieLocale) {
+          // Cookie не задан → предлагаем выбрать язык
+          localeIsQual = false;
+        } else {
+          // Cookie задан → сравниваем
+          localeIsQual = localeLocation === cookieLocale;
+        }
+      } else {
+        // Параметр равен базовой локали → всё ок
+        localeIsQual = true;
+      }
+    } else {
+      // localeLocation НЕ задан
+      const cookieLocale = Client.getCookie('locale');
+      
+      if (cookieLocale) {
+        // Cookie задан → используем его, ничего не предлагаем
+        localeIsQual = true;
+      } else {
+        // Cookie не задан → используем localeBase, ничего не предлагаем
+        localeIsQual = true;
+      }
     }
 
-    // Если пользователь ранее нажал «не спрашивать» — не показываем
-    if (Client.getCookie('ignoreLanguageChanged')) {
-      return;
+    if (!localeIsQual) {
+      let locales;
+
+      this.page.core.locales.base.getData().then((localeData) => {
+        const modalBodyContent = document.createElement('div');
+        modalBodyContent.classList.add('locale-manager');
+
+        const descriptionElement = document.createElement('div');
+        descriptionElement.innerHTML = localeData.MODAL_LOCALE_CHANGE_DESCRIPTION;
+
+        const interactiveLocaleChoices = new Interactive('choices');
+        locales.forEach((locale, localeIndex) => {
+          let localeTitle = locale.title;
+          let localeIconURL = locale.iconURL;
+          let localeName = locale.name;
+          let localeISO639_2 = locale.iso639_2;
+
+          let localeIconImageElement = document.createElement('img');
+          localeIconImageElement.setAttribute('src', localeIconURL);
+          localeIconImageElement.setAttribute('alt', localeTitle);
+
+          let localeLabelElement = document.createElement('span');
+          localeLabelElement.innerText = localeTitle;
+
+          let localeTemplate = document.createElement('template');
+          localeTemplate.innerHTML += localeIconImageElement.outerHTML;
+          localeTemplate.innerHTML += localeLabelElement.outerHTML;
+
+          interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, localeName);
+        });
+
+        locales.forEach((locale, localeIndex) => {
+          if (locale.name === window.CMSCore.locales.base.name) {
+            interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
+          }
+        });
+
+        interactiveLocaleChoices.assembly();
+
+        modalBodyContent.appendChild(descriptionElement);
+        modalBodyContent.appendChild(interactiveLocaleChoices.target.element);
+
+        const interactiveLanguageModal = new Interactive('modal', {
+          title: localeData.MODAL_LOCALE_CHANGE_TITLE,
+          content: modalBodyContent
+        });
+
+        interactiveLanguageModal.target.addButton(localeData.BUTTON_SUBMIT_LABEL, () => {
+          const localeSelected = interactiveLocaleChoices.target.getValue();
+          document.cookie = `locale=${localeSelected}; max-age=max-age-in-seconds; path=/`;
+          window.location.reload();
+        });
+
+        interactiveLanguageModal.target.addButton(localeData.BUTTON_DONT_ASK_AGAIN_LABEL, () => {
+          Client.setCookie('ignoreLanguageChanged', true, 366);
+          interactiveLanguageModal.target.close();
+        });
+
+        interactiveLanguageModal.target.onClose(() => {
+          interactiveLanguageModal.target.close();
+        });
+
+        interactiveLanguageModal.assembly();
+        document.body.appendChild(interactiveLanguageModal.target.element);
+
+        interactiveLanguageModal.target.show();
+      });
     }
-
-    // Текущая локаль пользователя: cookie > base_locale
-    const cookieLocale = Client.getCookie('locale');
-    const currentLocale = cookieLocale
-      ? cookieLocale
-      : (window.CMSCore.locales.base?.name ?? null);
-
-    // Если URL-локаль совпадает с текущей — ничего не предлагаем
-    if (localeURL === currentLocale) {
-      return;
-    }
-
-    // Пришли с другой локалью через URL — предлагаем зафиксировать
-    showLanguageModal(localeURL);
   });
 });
-
-function showLanguageModal(targetLocaleName) {
-  const locales = window.CMSCore.locales.list;
-  const baseLocale = window.CMSCore.locales.base;
-
-  baseLocale.getData().then((localeData) => {
-    const modalBodyContent = document.createElement('div');
-    modalBodyContent.classList.add('locale-manager');
-
-    const descriptionElement = document.createElement('div');
-    descriptionElement.innerHTML = localeData.MODAL_LOCALE_CHANGE_DESCRIPTION;
-    modalBodyContent.appendChild(descriptionElement);
-
-    const interactiveLocaleChoices = new Interactive('choices');
-
-    locales.forEach((locale) => {
-      const localeIconImageElement = document.createElement('img');
-      localeIconImageElement.setAttribute('src', locale.iconURL);
-      localeIconImageElement.setAttribute('alt', locale.title);
-
-      const localeLabelElement = document.createElement('span');
-      localeLabelElement.innerText = locale.title;
-
-      const localeTemplate = document.createElement('template');
-      localeTemplate.innerHTML += localeIconImageElement.outerHTML;
-      localeTemplate.innerHTML += localeLabelElement.outerHTML;
-
-      interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, locale.name);
-    });
-
-    // Предвыбираем локаль из URL
-    locales.forEach((locale, index) => {
-      if (locale.name === targetLocaleName) {
-        interactiveLocaleChoices.target.setItemSelectedIndex(index);
-      }
-    });
-
-    interactiveLocaleChoices.assembly();
-    modalBodyContent.appendChild(interactiveLocaleChoices.target.element);
-
-    const interactiveLanguageModal = new Interactive('modal', {
-      title: localeData.MODAL_LOCALE_CHANGE_TITLE,
-      content: modalBodyContent
-    });
-
-    interactiveLanguageModal.target.addButton(localeData.BUTTON_SUBMIT_LABEL, () => {
-      const localeSelected = interactiveLocaleChoices.target.getValue();
-
-      // Ставим cookie на год
-      Client.setCookie('locale', localeSelected, 366);
-
-      // Убираем мусорный параметр из URL и перезагружаем
-      const url = new URL(window.location.href);
-      url.searchParams.delete('locale');
-      window.location.href = url.toString();
-    });
-
-    interactiveLanguageModal.target.addButton(localeData.BUTTON_DONT_ASK_AGAIN_LABEL, () => {
-      Client.setCookie('ignoreLanguageChanged', true, 366);
-      interactiveLanguageModal.target.close();
-    });
-
-    interactiveLanguageModal.assembly();
-    document.body.appendChild(interactiveLanguageModal.target.element);
-    interactiveLanguageModal.target.show();
-  });
-}
