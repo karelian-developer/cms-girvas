@@ -420,7 +420,7 @@
   padding: 10px;
 }
 
-.interactive .interactive__modal .modal__body-container *:not(:last-child) {
+.interactive .interactive__modal .modal__body-container > *:not(:last-child) {
   margin-bottom: 10px;
 }
 
