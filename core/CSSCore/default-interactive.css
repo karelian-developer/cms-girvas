@@ -91,6 +91,7 @@
   align-items: center;
   font-size: 14px;
   padding: 10px;
+  margin-bottom: 0;
   cursor: pointer;
 }
 
