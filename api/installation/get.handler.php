@@ -1263,6 +1263,19 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
 
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       $databaseQuery->execute();
+
+      if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+        $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+        $queryBuilder->setStatementCreateIndex();
+        $queryBuilder->statement->setIndexName('idx_pages_static_versions_texts_gin');
+        $queryBuilder->statement->setTableName('pages_static_versions');
+        $queryBuilder->statement->setExpression('texts');
+        $queryBuilder->statement->setIndexType(DatabaseIndexType::GIN);
+        $queryBuilder->statement->setIfNotExists(true);
+        $queryBuilder->statement->assembly();
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        $databaseQuery->execute();
+      }
       
       // Индексы для таблицы users
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1484,6 +1497,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIndexName('idx_users_consents_user');
       $queryBuilder->statement->setTableName('users_consents');
       $queryBuilder->statement->addColumn('userID');
+      $queryBuilder->statement->addColumn('pageStaticID');
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
@@ -1496,6 +1510,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setTableName('users_consents');
       $queryBuilder->statement->addColumn('userID');
       $queryBuilder->statement->addColumn('ip');
+      $queryBuilder->statement->addColumn('userAgent');
       $queryBuilder->statement->addColumn('pageStaticID');
       $queryBuilder->statement->addColumn('documentVersion');
       $queryBuilder->statement->addColumn('source');
@@ -1503,6 +1518,50 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_consents_active');
+      $queryBuilder->statement->setTableName('users_consents');
+      $queryBuilder->statement->addColumn('userID');
+      $queryBuilder->statement->setWhereCondition('"revokedAt" IS NULL');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_consents_document');
+      $queryBuilder->statement->setTableName('users_consents');
+      $queryBuilder->statement->addColumn('pageStaticID');
+      $queryBuilder->statement->addColumn('documentVersion');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_consents_form');
+      $queryBuilder->statement->setTableName('users_consents');
+      $queryBuilder->statement->addColumn('formID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_consents_revoked_by');
+      $queryBuilder->statement->setTableName('users_consents');
+      $queryBuilder->statement->addColumn('revokedByID');
+      $queryBuilder->statement->setWhereCondition('"revokedByID" > 0');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       $databaseQuery->execute();
 

@@ -687,9 +687,6 @@ class Version
     try {
       $databaseConnection->beginTransaction();
 
-      // ============================================================
-      // 1. Снимаем isCurrent со всех версий этой страницы (для всех локалей сразу)
-      // ============================================================
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementUpdate();
       $queryBuilder->statement->setTable('pages_static_versions');
@@ -711,15 +708,9 @@ class Version
       $databaseQuery->bindParam(':pageStaticID', $pageStaticID, \PDO::PARAM_INT);
       $databaseQuery->execute();
 
-      // ============================================================
-      // 2. INSERT новых версий (раздельно по СУБД)
-      // ============================================================
       $versions = [];
 
       if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
-        // --------------------------------------------------------
-        // PostgreSQL: bulk INSERT + RETURNING
-        // --------------------------------------------------------
         $columns = [
           'pageStaticID', 'version', 'locale', 'texts',
           'effectiveFrom', 'createdUnixTimestamp', 'createdByID', 'isCurrent'
@@ -774,10 +765,6 @@ class Version
           $versions[$row['locale']] = new Version($CMSCore, (int)$row['id']);
         }
       } else {
-        // --------------------------------------------------------
-        // MySQL: поштучный INSERT + lastInsertId()
-        // (не полагаемся на последовательность AUTO_INCREMENT)
-        // --------------------------------------------------------
         $singleInsertSql = 'INSERT INTO `pages_static_versions` '
           . '(`pageStaticID`, `version`, `locale`, `texts`, `effectiveFrom`, `createdUnixTimestamp`, `createdByID`, `isCurrent`) '
           . 'VALUES (:pageStaticID, :version, :locale, :texts, :effectiveFrom, :createdUnixTimestamp, :createdByID, :isCurrent)';
