@@ -26,16 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
     window.CMSCore.templateCore = new Core(window.CMSCore);
     window.CMSCore.templateCore.init();
 
-    const localeBase = window.CMSCore.locales.base;
+    const localeBaseName = window.CMSCore.locales.base?.name ?? null;
     const localeLocation = window.CMSCore.searchParams.getParam('locale');
-    
+
     let localeIsQual;
 
     if (localeLocation !== null && localeLocation !== undefined && localeLocation !== "") {
-      // localeLocation задан
       const cookieLocale = Client.getCookie('locale');
-      
-      if (localeLocation !== localeBase) {
+
+      if (localeLocation !== localeBaseName) {
         // Параметр отличается от базовой локали
         if (!cookieLocale) {
           // Cookie не задан → предлагаем выбрать язык
