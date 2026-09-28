@@ -29,6 +29,7 @@
 .interactive .interactive__select-imitation .select-imitation__selected-item-container {
   box-sizing: border-box;
   flex-grow: 1;
+  margin-bottom: 0 !important;
   height: 32px;
 }
 
