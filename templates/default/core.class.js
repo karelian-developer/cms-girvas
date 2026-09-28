@@ -62,9 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (!localeIsQual) {
-      let locales;
-
-      this.core.locales.base.getData().then((localeData) => {
+      this.CMSCore.locales.base.getData().then((localeData) => {
         const modalBodyContent = document.createElement('div');
         modalBodyContent.classList.add('locale-manager');
 
@@ -72,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         descriptionElement.innerHTML = localeData.MODAL_LOCALE_CHANGE_DESCRIPTION;
 
         const interactiveLocaleChoices = new Interactive('choices');
-        locales.forEach((locale, localeIndex) => {
+        this.CMSCore.locales.forEach((locale, localeIndex) => {
           let localeTitle = locale.title;
           let localeIconURL = locale.iconURL;
           let localeName = locale.name;
