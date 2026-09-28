@@ -38,7 +38,7 @@ export class ToolUnderline extends Tool {
 
       if (selection) {
         const inserted = this.editor.textarea.replaceStringSelection(
-          '<u>' + selection + '</u>'
+          '~~' + selection + '~~'
         );
 
         if (inserted) {
