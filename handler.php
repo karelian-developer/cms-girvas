@@ -445,13 +445,28 @@ if (defined('IS_NOT_HACKED')) {
 
   /** @var array $handlerOutputData Выходные данные обработчика */
   $handlerOutputData = $handlerOutputData ?? [];
+  
+  // Скрываем чувствительные поля из debug-вывода
+  $sensitiveKeys = ['client_secret', 'code_verifier', 'access_token', 'refresh_token', 'password', 'user_password', 'APISecret'];
+
+  $maskSensitiveData = function(array $data) use ($sensitiveKeys) : array {
+    foreach ($data as $key => $value) {
+      if (in_array($key, $sensitiveKeys, true)) {
+        $data[$key] = '***REDACTED***';
+      } elseif (is_array($value)) {
+        $data[$key] = $maskSensitiveData($value);
+      }
+    }
+    return $data;
+  };
+
   $handlerOutputData['debug']['method'] = $_SERVER['REQUEST_METHOD'];
   $handlerOutputData['debug']['clientIP'] = $_SERVER['REMOTE_ADDR'];
-  $handlerOutputData['debug']['postData'] = $_POST ?? null;
-  $handlerOutputData['debug']['getData'] = $_GET ?? null;
-  $handlerOutputData['debug']['patchData'] = $_PATCH ?? null;
-  $handlerOutputData['debug']['putData'] = $_PUT ?? null;
-  $handlerOutputData['debug']['deleteData'] = $_DELETE ?? null;
+  $handlerOutputData['debug']['postData'] = $maskSensitiveData($_POST ?? []);
+  $handlerOutputData['debug']['getData'] = $maskSensitiveData($_GET ?? []);
+  $handlerOutputData['debug']['patchData'] = $maskSensitiveData($_PATCH ?? []);
+  $handlerOutputData['debug']['putData'] = $maskSensitiveData($_PUT ?? []);
+  $handlerOutputData['debug']['deleteData'] = $maskSensitiveData($_DELETE ?? []);
 
   $loadTime = microtime(true) - $startTime; // Конечное время
   header('X-Load-Time: ' . round($loadTime, 3) . 's');
