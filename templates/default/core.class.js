@@ -62,6 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (!localeIsQual) {
+      if (Client.getCookie('ignoreLanguageChanged')) {
+        return;
+      }
+
       window.CMSCore.locales.base.getData().then((localeData) => {
         const modalBodyContent = document.createElement('div');
         modalBodyContent.classList.add('locale-manager');
@@ -108,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         interactiveLanguageModal.target.addButton(localeData.BUTTON_SUBMIT_LABEL, () => {
           const localeSelected = interactiveLocaleChoices.target.getValue();
-          document.cookie = `locale=${localeSelected}; max-age=max-age-in-seconds; path=/`;
+          document.cookie = `locale=${localeSelected}; max-age=${365 * 24 * 60 * 60}; path=/; SameSite=Strict`;
           window.location.reload();
         });
 
