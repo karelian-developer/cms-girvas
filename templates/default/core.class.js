@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!localeIsQual) {
       let locales;
 
-      this.page.core.locales.base.getData().then((localeData) => {
+      this.core.locales.base.getData().then((localeData) => {
         const modalBodyContent = document.createElement('div');
         modalBodyContent.classList.add('locale-manager');
 
