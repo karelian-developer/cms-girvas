@@ -367,6 +367,10 @@ if ($CMSCore->client->isLogged(2)) {
               $settingValue = $formChatsIDs;
             }
 
+            if ($settingName === 'seo_code_yandex_metrika') {
+              $settingValue = preg_replace('/\D/', '', (string) $settingValue);
+            }
+
             if (is_array($settingValue) && $settingName !== 'security_legal_documents') {
               $settingValue = json_encode($settingValue);
             }

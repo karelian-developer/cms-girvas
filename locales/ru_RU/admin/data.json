@@ -833,6 +833,8 @@
   "PAGE_SETTINGS_SETTING_SEO_LLMS_TXT_DESCRIPTION": "LLMS.txt &mdash; это текстовый файл в формате Markdown. Он предназначен для помощи большим языковым моделям (LLM) и AI-ассистентам в понимании структуры и содержания сайта, а также в интерпретации его контента.",
   "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_WEBMASTER_TITLE": "Код для верификации в сервисе &laquo;Яндекс: Вебмастер&raquo;",
   "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_WEBMASTER_DESCRIPTION": "Данный код используется для подтверждения прав на сайт в сервисе &laquo;Яндекс: Вебмастер&raquo;.",
+  "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_METRIKA_TITLE": "Код счётчика Яндекс.Метрики",
+  "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_METRIKA_DESCRIPTION": "Укажите числовой ID счётчика из Яндекс.Метрики. Он отобразится на всех страницах сайта. Если пусто — счётчик не выводится.",
   "PAGE_SETTINGS_SETTING_SEO_PERMANENT_REDIRECT_WWW_TITLE": "Принудительная переадресация на поддомен WWW",
   "PAGE_SETTINGS_SETTING_SEO_PERMANENT_REDIRECT_WWW_DESCRIPTION": "Принудительная переадресация на поддомен может помочь с оптимизацией сайта для поисковых роботов в том случае, если необходимо считать поддомен WWW главным адресом Вашего сайта. К примеру, если Вы используете сервис-инструмент веб-мастера в &laquo;Яндекс&raquo;, то это будет полезно для реализации переезда сайта на поддомен WWW, как на главный адрес.",
   "PAGE_SETTINGS_SETTING_USERS_UPLOAD_AVATAR_TITLE": "Загрузка аватара",

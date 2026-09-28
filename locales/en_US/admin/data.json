@@ -833,6 +833,8 @@
   "PAGE_SETTINGS_SETTING_SEO_LLMS_TXT_DESCRIPTION": "LLMS.txt &mdash; is a text file in Markdown format. It is designed to help large language models (LLM) and AI assistants understand the structure and content of the site, as well as interpret its content.",
   "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_WEBMASTER_TITLE": "Verification code for &laquo;Yandex: Webmaster&raquo; service",
   "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_WEBMASTER_DESCRIPTION": "This code is used to confirm rights to the site in the &laquo;Yandex: Webmaster&raquo; service.",
+  "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_METRIKA_TITLE": "Yandex.Metrika counter ID",
+  "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_METRIKA_DESCRIPTION": "Enter the numeric counter ID from Yandex.Metrika. It will be shown on all pages. Leave empty to disable.",
   "PAGE_SETTINGS_SETTING_SEO_PERMANENT_REDIRECT_WWW_TITLE": "Forced redirect to WWW subdomain",
   "PAGE_SETTINGS_SETTING_SEO_PERMANENT_REDIRECT_WWW_DESCRIPTION": "Forced redirect to a subdomain can help with site optimization for search engine robots if you need to consider the WWW subdomain as the main address of your site. For example, if you use the webmaster tool service in &laquo;Yandex&raquo;, this will be useful for implementing the site's move to the WWW subdomain as the main address.",
   "PAGE_SETTINGS_SETTING_USERS_UPLOAD_AVATAR_TITLE": "Avatar upload",

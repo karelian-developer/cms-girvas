@@ -21,6 +21,7 @@ $allowedSettings = [
   'security_allowed_users_registration_status' => 'bool',
   'seo_site_description' => 'json',
   'seo_site_keywords' => 'json',
+  'seo_code_yandex_metrika' => 'string',
 ];
 
 $keysParam = $_GET['keys'] ?? '';

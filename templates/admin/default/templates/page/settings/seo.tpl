@@ -13,6 +13,18 @@
     <div class="cell grid-table__cell grid-table__cell_data">
       <input class="input form__input form__input_text" name="setting_{SETTINGS_NAME}_code_yandex_webmaster" placeholder="b0dbc8c312c05273" value="{SETTING_CODE_YANDEX_WEBMASTER_VALUE}">
     </div>
+    <!-- Поле: Код счётчика Яндекс.Метрики -->
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">
+        {LANG:PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_METRIKA_TITLE}
+      </div>
+      <div class="cell__description">
+        {LANG:PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_METRIKA_DESCRIPTION}
+      </div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <input class="input form__input form__input_text" name="setting_{SETTINGS_NAME}_code_yandex_metrika" placeholder="94682915" value="{SETTING_CODE_YANDEX_METRIKA_VALUE}">
+    </div>
     <!-- Поле: Принудительная переадресация на поддомен WWW -->
     <div class="cell grid-table__cell grid-table__cell_text">
       <div class="cell__title">
