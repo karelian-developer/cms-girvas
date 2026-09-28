@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         descriptionElement.innerHTML = localeData.MODAL_LOCALE_CHANGE_DESCRIPTION;
 
         const interactiveLocaleChoices = new Interactive('choices');
-        window.CMSCore.locales.forEach((locale, localeIndex) => {
+        window.CMSCore.locales.list.forEach((locale, localeIndex) => {
           let localeTitle = locale.title;
           let localeIconURL = locale.iconURL;
           let localeName = locale.name;
