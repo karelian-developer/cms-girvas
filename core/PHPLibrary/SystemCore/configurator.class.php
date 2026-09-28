@@ -163,7 +163,15 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getSiteTitle() : string
   {
-    return $this->existsDatabaseEntryValue('base_site_title') ? $this->getDatabaseEntryValue('base_site_title') : $this->CMSCore->getCMSTitle();
+    $value = $this->getLocalizedDatabaseValue('base_site_title');
+
+    if (is_array($value)) {
+      $value = implode(', ', $value);
+    }
+
+    return is_string($value) && $value !== ''
+      ? $value
+      : $this->CMSCore->getCMSTitle();
   }
 
   /**
@@ -173,7 +181,15 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getSiteDescription() : string
   {
-    return $this->existsDatabaseEntryValue('seo_site_description') ? $this->getDatabaseEntryValue('seo_site_description') : sprintf('%s %s developed by www.garbalo.com', $this->CMSCore->getCMSTitle(), $this->CMSCore->getCMSVersion());
+    $value = $this->getLocalizedDatabaseValue('seo_site_description');
+
+    if (is_array($value)) {
+      $value = implode(', ', $value);
+    }
+
+    return is_string($value) && $value !== ''
+      ? $value
+      : sprintf('%s %s developed by www.garbalo.com', $this->CMSCore->getCMSTitle(), $this->CMSCore->getCMSVersion());
   }
 
   /**
@@ -183,7 +199,17 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getSiteKeywords() : string
   {
-    return $this->existsDatabaseEntryValue('seo_site_keywords') ? implode(', ', json_decode($this->getDatabaseEntryValue('seo_site_keywords'), true)) : implode(', ', ['cms girvas', 'empty site', 'karelian developer']);
+    $value = $this->getLocalizedDatabaseValue('seo_site_keywords');
+
+    if (is_array($value)) {
+      return implode(', ', $value);
+    }
+
+    if (is_string($value) && $value !== '') {
+      return $value;
+    }
+
+    return implode(', ', ['cms girvas', 'empty site', 'karelian developer']);
   }
 
   /**
@@ -445,7 +471,13 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getEngineeringWorksText() : string
   {
-    return $this->existsDatabaseEntryValue('base_engineering_works_text') ? (string) $this->getDatabaseEntryValue('base_engineering_works_text') : '';
+    $value = $this->getLocalizedDatabaseValue('base_engineering_works_text');
+
+    if (is_array($value)) {
+      $value = implode(', ', $value);
+    }
+
+    return is_string($value) ? $value : '';
   }
 
   /**
@@ -979,6 +1011,49 @@ final class Configurator implements ConfiguratorInterface
     }
 
     return false;
+  }
+
+  /**
+   * Получить локализованное значение настройки из БД
+   *
+   * @param string $settingName
+   * @param string|null $localeName  Если null — берётся админская локаль
+   *
+   * @return mixed
+   */
+  private function getLocalizedDatabaseValue(string $settingName, ?string $localeName = null): mixed
+  {
+    if (!$this->existsDatabaseEntryValue($settingName)) {
+      return null;
+    }
+
+    $raw = $this->getDatabaseEntryValue($settingName);
+
+    if (!is_string($raw) || $raw === '') {
+      return $raw;
+    }
+
+    $decoded = json_decode($raw, true);
+
+    if (is_array($decoded) && !array_is_list($decoded)) {
+      if ($localeName === null) {
+        $localeConfigKey = $this->CMSCore->locale->getTypeName() === 'admin'
+          ? 'base_admin_locale'
+          : 'base_locale';
+
+        $localeName = $this->existsDatabaseEntryValue($localeConfigKey)
+          ? (string) $this->getDatabaseEntryValue($localeConfigKey)
+          : 'ru_RU';
+      }
+
+      return $decoded[$localeName] ?? null;
+    }
+
+    if (is_array($decoded) && array_is_list($decoded)) {
+      return $decoded;
+    }
+
+    return $raw;
   }
   
   /**
