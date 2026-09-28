@@ -445,16 +445,16 @@ if (defined('IS_NOT_HACKED')) {
 
   /** @var array $handlerOutputData Выходные данные обработчика */
   $handlerOutputData = $handlerOutputData ?? [];
-
+  
   // Скрываем чувствительные поля из debug-вывода
   $sensitiveKeys = ['client_secret', 'code_verifier', 'access_token', 'refresh_token', 'password', 'user_password', 'APISecret'];
 
-  $maskSensitiveData = function(array $data) use ($sensitiveKeys) : array {
+  $maskSensitiveData = function(array $data) use ($sensitiveKeys, &$maskSensitiveData) : array {
     foreach ($data as $key => $value) {
       if (in_array($key, $sensitiveKeys, true)) {
         $data[$key] = '***REDACTED***';
       } elseif (is_array($value)) {
-        $data[$key] = self($value);
+        $data[$key] = $maskSensitiveData($value);
       }
     }
     return $data;
