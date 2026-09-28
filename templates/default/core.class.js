@@ -64,19 +64,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!localeIsQual) {
       let locales;
 
-      fetch('/handler/locales', {method: 'GET'}).then((response) => {
-        return (response.ok) ? response.json() : Promise.reject(response);
-      }).then((data) => {
-        locales = data.outputData.locales;
-        return window.CMSCore.locales.admin.getData();
-      }, (rejectionReason) => {
-        this.page.showPopupNotification(rejectionReason, 0);
-      }).then((localeData) => {
+      this.page.core.locales.admin.getData().then((localeData) => {
         const modalBodyContent = document.createElement('div');
         modalBodyContent.classList.add('locale-manager');
 
         const descriptionElement = document.createElement('div');
-        descriptionElement.innerHTML = window.CMSCore.localeData.MODAL_LOCALE_CHANGE_DESCRIPTION;
+        descriptionElement.innerHTML = localeData.MODAL_LOCALE_CHANGE_DESCRIPTION;
 
         const interactiveLocaleChoices = new Interactive('choices');
         locales.forEach((locale, localeIndex) => {
@@ -111,17 +104,17 @@ document.addEventListener('DOMContentLoaded', () => {
         modalBodyContent.appendChild(interactiveLocaleChoices.target.element);
 
         const interactiveLanguageModal = new Interactive('modal', {
-          title: window.CMSCore.localeData.MODAL_LOCALE_CHANGE_TITLE,
+          title: localeData.MODAL_LOCALE_CHANGE_TITLE,
           content: modalBodyContent
         });
 
-        interactiveLanguageModal.target.addButton(window.CMSCore.localeData.BUTTON_SUBMIT_LABEL, () => {
+        interactiveLanguageModal.target.addButton(localeData.BUTTON_SUBMIT_LABEL, () => {
           const localeSelected = interactiveLocaleChoices.target.getValue();
           document.cookie = `locale=${localeSelected}; max-age=max-age-in-seconds; path=/`;
           window.location.reload();
         });
 
-        interactiveLanguageModal.target.addButton(window.CMSCore.localeData.BUTTON_DONT_ASK_AGAIN_LABEL, () => {
+        interactiveLanguageModal.target.addButton(localeData.BUTTON_DONT_ASK_AGAIN_LABEL, () => {
           Client.setCookie('ignoreLanguageChanged', true, 366);
           interactiveLanguageModal.target.close();
         });
