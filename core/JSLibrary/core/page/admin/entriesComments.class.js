@@ -160,9 +160,9 @@ export class PageEntriesComments {
 
               const formData = new FormData();
               formData.append('comment_id', commentID);
-              formData.append('comment_is_hidden', isHide ? 1 : 0);
+              formData.append('is_hidden', isHide ? 1 : 0);
               if (isHide) {
-                formData.append('comment_hidden_reason', '');
+                formData.append('hidden_reason', '');
               }
 
               const request = new Interactive('request', {
