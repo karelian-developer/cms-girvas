@@ -207,7 +207,7 @@ switch ($grantType) {
       return;
     }
 
-    $token->initData(['accessToken', 'refreshToken', 'expiresAt']);
+    $token->initData(['accessToken', 'refreshToken', 'expiresAt', 'scopes']);
 
     // Формируем ответ
     $handlerOutputData['access_token'] = $token->getAccessToken();
@@ -288,7 +288,7 @@ switch ($grantType) {
       return;
     }
 
-    $newToken->initData(['accessToken', 'refreshToken', 'expiresAt']);
+    $newToken->initData(['accessToken', 'refreshToken', 'expiresAt', 'scopes']);
 
     // Формируем ответ
     $handlerOutputData['access_token'] = $newToken->getAccessToken();

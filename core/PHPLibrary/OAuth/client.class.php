@@ -911,15 +911,48 @@ class Client
   /**
    * Обновить clientSecret
    *
-   * @return string|null Новый открытый secret (только в момент создания)
+   * @return ?string
    */
-  public function regenerateSecret() : string|null
+  public function regenerateSecret() : ?string
   {
     $newSecret = self::generateClientSecret();
     $newSecretHash = self::hashSecret($newSecret);
     
-    $result = $this->update(['clientSecret' => $newSecretHash]);
-    
-    return $result ? $newSecret : null;
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementUpdate();
+    $queryBuilder->statement->setTable('oauth_clients');
+    $queryBuilder->statement->setClauseSet();
+    $queryBuilder->statement->clauseSet->addColumn('clientSecret');
+    $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
+    $queryBuilder->statement->clauseSet->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
+      'mysql' => '`id` = :id',
+      'postgresql' => '"id" = :id'
+    ]);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->assembly();
+
+    $updatedUnixTimestamp = time();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
+      $databaseQuery->bindParam(':clientSecret', $newSecretHash, \PDO::PARAM_STR);
+      $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
+      $execute = $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    return $execute ? $newSecret : null;
   }
 }
