@@ -58,11 +58,6 @@ final class MySql extends BaseDialect
     };
   }
 
-  public function resolveAdaptiveCondition(array $conditions) : string
-  {
-    return $conditions['mysql'] ?? $conditions['default'] ?? '';
-  }
-
   /**
    * @param  string $column
    * @param  string $key

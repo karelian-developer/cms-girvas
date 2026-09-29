@@ -120,11 +120,6 @@ final class PostgreSql extends BaseDialect
   {
     return '"' . $identifier . '"';
   }
-  
-  public function resolveAdaptiveCondition(array $conditions) : string
-  {
-    return $conditions['postgresql'] ?? $conditions['default'] ?? '';
-  }
 
   /**
    * @param  string $column
