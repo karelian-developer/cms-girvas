@@ -66,9 +66,9 @@ final class CaseExpression
    * @return self
    */
   public function whenJsonLike(
-    string $jsonPath, 
-    string $paramName, 
-    int $weight, 
+    string $jsonPath,
+    string $paramName,
+    int $weight,
     bool $caseInsensitive = true
   ) : self
   {
@@ -79,13 +79,17 @@ final class CaseExpression
         $caseInsensitive ? 'ILIKE' : 'LIKE',
         $paramName
       ),
-      CMSDMS::MySQL => sprintf(
-        "JSON_UNQUOTE(JSON_EXTRACT(%s)) LIKE CONCAT('%%', :%s, '%%')",
-        $this->convertJsonPathToMySQL($jsonPath),
-        $paramName
-      )
+      CMSDMS::MySQL => (function () use ($jsonPath, $paramName) {
+        [$column, $path] = $this->parseJsonPath($jsonPath);
+        return sprintf(
+          "JSON_UNQUOTE(JSON_EXTRACT(%s, %s)) LIKE CONCAT('%%', :%s, '%%')",
+          $column,
+          $path,
+          $paramName
+        );
+      })()
     };
-    
+
     return $this->when($condition, $weight);
   }
   
@@ -109,13 +113,17 @@ final class CaseExpression
         $jsonArrayPath,
         $paramName
       ),
-      CMSDMS::MySQL => sprintf(
-        "JSON_SEARCH(%s, 'one', :%s, NULL) IS NOT NULL",
-        $this->convertJsonPathToMySQL($jsonArrayPath),
-        $paramName
-      )
+      CMSDMS::MySQL => (function () use ($jsonArrayPath, $paramName) {
+        [$column, $path] = $this->parseJsonPath($jsonArrayPath);
+        return sprintf(
+          "JSON_SEARCH(%s, 'one', :%s, NULL, %s) IS NOT NULL",
+          $column,
+          $paramName,
+          $path
+        );
+      })()
     };
-    
+
     return $this->when($condition, $weight);
   }
   
@@ -233,22 +241,22 @@ final class CaseExpression
   }
   
   /**
-   * Конвертировать PostgreSQL JSON-путь в MySQL формат
+   * Разобрать PostgreSQL-подобный JSON-путь на колонку и MySQL-путь.
    *
-   * @param string $pgPath
-   * @return string
+   * @param  string $pgPath
+   * @return array{0: string, 1: string} [column, mysqlJsonPath]
    */
-  private function convertJsonPathToMySQL(string $pgPath) : string
+  private function parseJsonPath(string $pgPath) : array
   {
     if (preg_match("/^(\w+)->'(\w+)'->>'(\w+)'$/", $pgPath, $matches)) {
-      return sprintf("%s, '$.%s.%s'", $matches[1], $matches[2], $matches[3]);
+      return [$matches[1], sprintf("'$.%s.%s'", $matches[2], $matches[3])];
     }
-    
+
     if (preg_match("/^(\w+)->'(\w+)'->'(\w+)'$/", $pgPath, $matches)) {
-      return sprintf("%s, '$.%s.%s[*]'", $matches[1], $matches[2], $matches[3]);
+      return [$matches[1], sprintf("'$.%s.%s[*]'", $matches[2], $matches[3])];
     }
-    
-    return $pgPath;
+
+    return [$pgPath, ''];
   }
   
   public function __toString() : string
