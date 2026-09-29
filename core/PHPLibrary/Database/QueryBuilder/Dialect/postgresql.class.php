@@ -208,17 +208,6 @@ final class PostgreSql extends BaseDialect
     );
   }
 
-  public function jsonArrayContainsLike(string $column, string $locale, string $field, string $paramName) : string
-  {
-    return sprintf(
-      "EXISTS (SELECT 1 FROM jsonb_array_elements_text(%s->'%s'->'%s') AS kw WHERE kw ILIKE '%%' || :%s || '%%')",
-      $this->quoteIdentifier($column),
-      $locale,
-      $field,
-      $paramName
-    );
-  }
-
   /**
    * @param  IndexType $type
    * @return bool
