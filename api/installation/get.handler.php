@@ -39,8 +39,6 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
-  $JSONDataTypeDMS = 'json';
-
   $installationStepIndex = $CMSCore->urlp->getParam('stepIndex');
   $installationStepIndex = $installationStepIndex ?? 1;
   $installationStepIndex = is_numeric($installationStepIndex) ? (int) $installationStepIndex : 1;
@@ -472,11 +470,6 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       chmod($fileCMSConfigurationPath, 0664);
     }
 
-    $JSONDataTypeDMS = match (strval($_GET['database_dms'])) {
-      'DMS::PostgreSQL' => 'jsonb',
-      default => 'json'
-    };
-
     if (file_exists($fileCMSConfigurationPath)) {
       $tipBlockElement->setAttribute('class', 'tip tip_green');
       $tipBlockElement->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_CONFIGURATION_FILE_CREATED');
@@ -496,11 +489,6 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     $CMSDatabaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
     $CMSConfigDatabase = $CMSCore->configurator->get('database');
 
-    switch ($CMSConfigDatabase['dms']->getString()) {
-      case 'PostgreSQL': $JSONDataTypeDMS = 'jsonb'; break;
-      default: $JSONDataTypeDMS = 'json';
-    }
-
     $document = new DOMDocument();
     $tipBlockElement = $document->createElement('div');
 
@@ -518,10 +506,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('configurations');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('value', 'text');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('texts', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -539,10 +527,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('content_blocks');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('texts', 'json');
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -560,12 +548,12 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('categoryID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('authorID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('texts', 'json');
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -583,11 +571,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries_categories');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('parentID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('texts', 'json');
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -605,11 +593,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries_comments');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('entryID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('authorID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('content', 'text');
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -627,10 +615,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries_samples');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('texts', 'json');
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -648,11 +636,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('forms');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('elements', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('elements', 'json');
+      $queryBuilder->statement->addColumn('texts', 'json');
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -670,9 +658,9 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('forms_data');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('formID', 'integer', 'NOT NULL');
-      $queryBuilder->statement->addColumn('data', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('data', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -690,11 +678,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('pages_static');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('texts', 'json');
       $queryBuilder->statement->addColumn('authorID', 'bigint');
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -712,11 +700,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('pages_static_versions');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('pageStaticID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('version', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('locale', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS, 'NOT NULL');
+      $queryBuilder->statement->addColumn('texts', 'json', 'NOT NULL');
       $queryBuilder->statement->addColumn('effectiveFrom', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('createdByID', 'bigint', 'NOT NULL DEFAULT 0');
@@ -735,9 +723,9 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('reports');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->addColumn('variables', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('variables', 'json');
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
@@ -755,8 +743,8 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('reports_archive');
       $queryBuilder->statement->addColumn('id', 'bigint', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->addColumn('variables', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('variables', 'json');
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('archivedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -773,7 +761,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('users_consents');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('formID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('formReportID', 'bigint', 'NOT NULL DEFAULT 0');
@@ -782,7 +770,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('locale', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('ip', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('userAgent', 'text');
-      $queryBuilder->statement->addColumn('source', 'text', 'NOT NULL DEFAULT \'form\'');
+      $queryBuilder->statement->addColumn('source', 'string:64', 'NOT NULL DEFAULT \'form\'');
       $queryBuilder->statement->addColumn('consentedAt', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('revokedAt', 'bigint');
       $queryBuilder->statement->addColumn('revokeReason', 'text');
@@ -801,12 +789,12 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('users');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('login', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('email', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('passwordHash', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('securityHash', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('emailIsSubmitted', 'boolean', 'NOT NULL DEFAULT false');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
@@ -825,11 +813,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('users_groups');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('texts', 'json');
       $queryBuilder->statement->addColumn('permissions', 'integer', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -847,7 +835,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('users_registration_submits');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('submitToken', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('refusalToken', 'text', 'NOT NULL');
@@ -867,7 +855,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('users_sessions');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('token', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('userIP', 'text', 'NOT NULL');
@@ -889,11 +877,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('web_channels');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('entriesCategoryID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('typeID', 'integer', 'NOT NULL DEFAULT 1');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('texts', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -911,9 +899,9 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('metrics');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('date', 'integer', 'NOT NULL');
-      $queryBuilder->statement->addColumn('data', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('data', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -931,20 +919,20 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('oauth_clients');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('clientID', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('clientSecret', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('description', 'text');
       $queryBuilder->statement->addColumn('redirectURI', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('grantTypes', 'text', 'NOT NULL DEFAULT \'authorization_code refresh_token\'');
-      $queryBuilder->statement->addColumn('scopes', 'text', 'NOT NULL DEFAULT \'profile email read\'');
+      $queryBuilder->statement->addColumn('grantTypes', 'string:255', 'NOT NULL DEFAULT \'authorization_code refresh_token\'');
+      $queryBuilder->statement->addColumn('scopes', 'string:255', 'NOT NULL DEFAULT \'profile email read\'');
       $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('isActive', 'boolean', 'NOT NULL DEFAULT true');
       $queryBuilder->statement->addColumn('isVerified', 'boolean', 'NOT NULL DEFAULT false');
       $queryBuilder->statement->addColumn('verifiedAt', 'bigint');
       $queryBuilder->statement->addColumn('verifiedBy', 'bigint');
-      $queryBuilder->statement->addColumn('ownerEmail', 'text', 'NOT NULL DEFAULT \'\'');
+      $queryBuilder->statement->addColumn('ownerEmail', 'string:255', 'NOT NULL DEFAULT \'\'');
       $queryBuilder->statement->addColumn('maxTokens', 'integer', 'NOT NULL DEFAULT 100');
       $queryBuilder->statement->addColumn('tokenTTL', 'integer', 'NOT NULL DEFAULT 3600');
       $queryBuilder->statement->addColumn('allowedIPs', 'text');
@@ -965,14 +953,14 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('oauth_auth_codes');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('code', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('clientID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->addColumn('scopes', 'text', 'NOT NULL DEFAULT \'\'');
+      $queryBuilder->statement->addColumn('scopes', 'string:255', 'NOT NULL DEFAULT \'\'');
       $queryBuilder->statement->addColumn('redirectURI', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('codeChallenge', 'text');
-      $queryBuilder->statement->addColumn('codeChallengeMethod', 'text', 'NOT NULL DEFAULT \'S256\'');
+      $queryBuilder->statement->addColumn('codeChallengeMethod', 'string:16', 'NOT NULL DEFAULT \'S256\'');
       $queryBuilder->statement->addColumn('expiresAt', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('isRevoked', 'boolean', 'NOT NULL DEFAULT false');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
@@ -991,12 +979,12 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('oauth_access_tokens');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('accessToken', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('refreshToken', 'text');
       $queryBuilder->statement->addColumn('clientID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->addColumn('scopes', 'text', 'NOT NULL DEFAULT \'\'');
+      $queryBuilder->statement->addColumn('scopes', 'string:255', 'NOT NULL DEFAULT \'\'');
       $queryBuilder->statement->addColumn('expiresAt', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('isRevoked', 'boolean', 'NOT NULL DEFAULT false');
       $queryBuilder->statement->addColumn('revokedAt', 'bigint');
