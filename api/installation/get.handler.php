@@ -766,7 +766,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('formID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('formReportID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('pageStaticID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->addColumn('documentVersion', 'string:255', 'NOT NULL');
+      $queryBuilder->statement->addColumn('documentVersion', 'string:64', 'NOT NULL');
       $queryBuilder->statement->addColumn('locale', 'string:16', 'NOT NULL');
       $queryBuilder->statement->addColumn('ip', 'string:64', 'NOT NULL');
       $queryBuilder->statement->addColumn('userAgent', 'string:512');
@@ -1015,6 +1015,27 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     // СОЗДАНИЕ ИНДЕКСОВ ДЛЯ ОПТИМИЗАЦИИ ПРОИЗВОДИТЕЛЬНОСТИ
     // =======================
 
+    /**
+     * Безопасное создание индекса.
+     *
+     * Логирует ошибку, но не прерывает установку остальных индексов.
+     *
+     * @param  DatabaseQueryBuilder  $queryBuilder
+     * @param  PDO                   $databaseConnection
+     * @return bool
+     */
+    function createIndexSafe(DatabaseQueryBuilder $queryBuilder, \PDO $databaseConnection): bool
+    {
+      try {
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        return $databaseQuery->execute();
+      } catch (PDOException $exception) {
+        error_log('Index creation warning: ' . $exception->getMessage());
+        error_log('Failed SQL: ' . $queryBuilder->statement->assembled);
+        return false;
+      }
+    }
+
     try {
       // Индексы для таблицы entries
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1026,8 +1047,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->assembly();
       
       $databaseConnection = $CMSDatabaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1037,8 +1057,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1048,8 +1067,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1059,8 +1077,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // Уникальный индекс на name записи
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1072,8 +1089,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // GIN индекс для JSONB поля texts (только PostgreSQL)
       if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
@@ -1086,8 +1102,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         $queryBuilder->statement->setIfNotExists(true);
         $queryBuilder->statement->assembly();
         
-        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-        $databaseQuery->execute();
+        createIndexSafe($queryBuilder, $databaseConnection);
         
         // GIN индекс для JSONB поля metadata
         $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1099,8 +1114,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         $queryBuilder->statement->setIfNotExists(true);
         $queryBuilder->statement->assembly();
         
-        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-        $databaseQuery->execute();
+        createIndexSafe($queryBuilder, $databaseConnection);
         
         // Частичный индекс для опубликованных записей
         $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1112,8 +1126,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         $queryBuilder->statement->setIfNotExists(true);
         $queryBuilder->statement->assembly();
         
-        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-        $databaseQuery->execute();
+        createIndexSafe($queryBuilder, $databaseConnection);
       }
       
       // Индексы для таблицы entries_categories
@@ -1125,8 +1138,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1137,8 +1149,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // Индексы для таблицы entries_comments
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1149,8 +1160,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1160,8 +1170,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1171,8 +1180,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       // Индексы для таблицы pages_static
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1184,8 +1192,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1195,8 +1202,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1206,8 +1212,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       // GIN индекс для JSONB (только PostgreSQL)
       if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
@@ -1220,8 +1225,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         $queryBuilder->statement->setIfNotExists(true);
         $queryBuilder->statement->assembly();
         
-        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-        $databaseQuery->execute();
+        createIndexSafe($queryBuilder, $databaseConnection);
       }
 
       // Индексы для таблицы pages_static_versions
@@ -1236,8 +1240,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1249,8 +1252,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
         $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1261,8 +1263,8 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         $queryBuilder->statement->setIndexType(DatabaseIndexType::GIN);
         $queryBuilder->statement->setIfNotExists(true);
         $queryBuilder->statement->assembly();
-        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-        $databaseQuery->execute();
+
+        createIndexSafe($queryBuilder, $databaseConnection);
       }
       
       // Индексы для таблицы users
@@ -1275,8 +1277,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1287,8 +1288,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // Индексы для таблицы users_sessions
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1299,8 +1299,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1310,8 +1309,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // Индексы для таблицы forms_data
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1322,8 +1320,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1333,8 +1330,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // Индексы для таблицы web_channels
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1346,8 +1342,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // Индексы для таблицы metrics
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1358,8 +1353,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       // Индексы для таблицы oauth_clients
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1371,8 +1365,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1382,8 +1375,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // Индексы для таблицы oauth_auth_codes
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1395,8 +1387,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1406,8 +1397,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1417,8 +1407,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // Индексы для таблицы oauth_access_tokens
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1430,8 +1419,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1442,8 +1430,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1453,8 +1440,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1464,8 +1450,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       // Индекс для ротации отчётов
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1476,8 +1461,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       // Индексы для users_consents
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1489,25 +1473,19 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
       $queryBuilder->statement->setIndexName('idx_users_consents_recent');
       $queryBuilder->statement->setTableName('users_consents');
       $queryBuilder->statement->addColumn('userID');
-      $queryBuilder->statement->addColumn('ip');
-      $queryBuilder->statement->addColumn('userAgent');
       $queryBuilder->statement->addColumn('pageStaticID');
-      $queryBuilder->statement->addColumn('documentVersion');
-      $queryBuilder->statement->addColumn('source');
       $queryBuilder->statement->addColumn('consentedAt');
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1518,8 +1496,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1529,8 +1506,8 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('documentVersion');
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1539,8 +1516,8 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('formID');
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1550,8 +1527,8 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setWhereCondition('"revokedByID" > 0');
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       // Индексы для users_registration_submits
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1562,8 +1539,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1573,8 +1549,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1584,8 +1559,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
     } catch (PDOException $exception) {
       // Логируем ошибку, но не прерываем установку
