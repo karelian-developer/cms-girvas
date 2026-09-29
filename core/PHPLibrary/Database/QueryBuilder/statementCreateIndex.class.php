@@ -38,7 +38,7 @@ final class StatementCreateIndex implements InterfaceStatement
   private string $whereCondition = '';
   private ?string $expression = null;
   public string $assembled = '';
-  
+
   /**
    * __construct
    *
@@ -49,7 +49,7 @@ final class StatementCreateIndex implements InterfaceStatement
   {
     $this->queryBuilder = $queryBuilder;
   }
-  
+
   /**
    * Установить имя индекса
    *
@@ -60,7 +60,7 @@ final class StatementCreateIndex implements InterfaceStatement
   {
     $this->indexName = $name;
   }
-  
+
   /**
    * Установить имя таблицы
    *
@@ -71,21 +71,21 @@ final class StatementCreateIndex implements InterfaceStatement
   public function setTableName(string $name, string $prefix = '') : void
   {
     $databaseConfig = $this->queryBuilder->CMSCore->configurator->get('database');
-    
+
     $tableFullname = '';
     if ($databaseConfig['scheme'] !== '') {
       $tableFullname .= $databaseConfig['scheme'] . '.';
     }
-    
+
     $tablePrefix = $prefix === '' ? $databaseConfig['prefix'] : $prefix;
     if ($tablePrefix !== '') {
       $tableFullname .= $tablePrefix . '_';
     }
-    
+
     $tableFullname .= $name;
     $this->tableName = $tableFullname;
   }
-  
+
   /**
    * Добавить колонку в индекс
    *
@@ -100,7 +100,7 @@ final class StatementCreateIndex implements InterfaceStatement
       'order' => strtoupper($order)
     ];
   }
-  
+
   /**
    * Установить тип индекса
    *
@@ -111,7 +111,7 @@ final class StatementCreateIndex implements InterfaceStatement
   {
     $this->indexType = $type;
   }
-  
+
   /**
    * Установить уникальность индекса
    *
@@ -122,7 +122,7 @@ final class StatementCreateIndex implements InterfaceStatement
   {
     $this->unique = $value;
   }
-  
+
   /**
    * Установить конкурентное создание (только PostgreSQL)
    *
@@ -133,7 +133,7 @@ final class StatementCreateIndex implements InterfaceStatement
   {
     $this->concurrently = $value;
   }
-  
+
   /**
    * Установить IF NOT EXISTS
    *
@@ -144,7 +144,7 @@ final class StatementCreateIndex implements InterfaceStatement
   {
     $this->ifNotExists = $value;
   }
-  
+
   /**
    * Установить WHERE-условие для частичного индекса (только PostgreSQL)
    *
@@ -155,7 +155,7 @@ final class StatementCreateIndex implements InterfaceStatement
   {
     $this->whereCondition = $condition;
   }
-  
+
   /**
    * Установить выражение для индекса (вместо колонок)
    *
@@ -166,7 +166,7 @@ final class StatementCreateIndex implements InterfaceStatement
   {
     $this->expression = $expression;
   }
-  
+
   /**
    * Сборка SQL-запроса
    *
@@ -174,59 +174,56 @@ final class StatementCreateIndex implements InterfaceStatement
    */
   public function assembly() : void
   {
-    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+    $dialect = $this->queryBuilder->dialect;
+
     $parts = [];
-    
+
     $parts[] = 'CREATE';
-    
+
     if ($this->unique) {
       $parts[] = 'UNIQUE';
     }
-    
+
     $parts[] = 'INDEX';
-    
-    if ($this->concurrently && $CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+
+    if ($this->concurrently && $dialect->supportsConcurrently()) {
       $parts[] = 'CONCURRENTLY';
     }
-    
-    if ($this->ifNotExists && $CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+
+    if ($this->ifNotExists && $dialect->supportsIfNotExistsForIndex()) {
       $parts[] = 'IF NOT EXISTS';
     }
-    
+
     $parts[] = $this->indexName;
     $parts[] = 'ON';
     $parts[] = $this->tableName;
-    
-    // Тип индекса
-    if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+
+    if ($dialect->requiresUsingClause($this->indexType)) {
       $parts[] = 'USING ' . $this->indexType->value;
     }
-    
-    // Колонки или выражение
+
     if ($this->expression !== null) {
       $parts[] = '(' . $this->expression . ')';
     } else {
       $columnDefinitions = [];
+
       foreach ($this->columns as $column) {
-        $colDef = match ($CMSConfigDatabase['dms']) {
-          CMSDMS::MySQL => '`' . $column['name'] . '`',
-          CMSDMS::PostgreSQL => '"' . $column['name'] . '"'
-        };
-        
+        $colDef = $dialect->quoteIdentifier($column['name']);
+
         if ($this->indexType === IndexType::BTREE && $column['order'] !== 'ASC') {
           $colDef .= ' ' . $column['order'];
         }
-        
+
         $columnDefinitions[] = $colDef;
       }
+
       $parts[] = '(' . implode(', ', $columnDefinitions) . ')';
     }
-    
-    // WHERE для частичного индекса (PostgreSQL)
-    if (!empty($this->whereCondition) && $CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+
+    if (!empty($this->whereCondition) && $dialect->supportsPartialIndex()) {
       $parts[] = 'WHERE ' . $this->whereCondition;
     }
-    
+
     $this->assembled = implode(' ', $parts) . ';';
   }
 }

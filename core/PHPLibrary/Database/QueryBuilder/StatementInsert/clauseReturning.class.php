@@ -43,12 +43,12 @@ final class ClauseReturning implements InterfaceClause
   /**
    * Добавить колонку значения
    *
-   * @param  mixed $name
+   * @param  string $name
    * @return void
    */
   public function addColumn(string $name) : void
   {
-    array_push($this->columns, '"' . $name . '"');
+    $this->columns[] = $this->statement->getDialect()->quoteIdentifier($name);
   }
   
   /**

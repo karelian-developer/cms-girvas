@@ -18,25 +18,29 @@
  * @support     support@karelian-developer.ru
  */
 
-namespace core\PHPLibrary\Database;
-  
-enum DatabaseManagementSystem : string
+namespace core\PHPLibrary\Database\QueryBuilder\Dialect;
+
+use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;
+use \core\PHPLibrary\Database\QueryBuilder\Dialect as BaseDialect;
+
+/**
+ * Фабрика SQL-диалектов.
+ *
+ * Централизованное место, где тип СУБД превращается
+ * в конкретный экземпляр диалекта. При добавлении новой СУБД
+ * достаточно расширить match в create().
+ */
+final class Factory
 {
-  case MySQL = 'mysql';
-  case PostgreSQL = 'pgsql';
-
-  public function getString() : string {
-    return match ($this) {
-      self::MySQL => 'MySQL',
-      self::PostgreSQL => 'PostgreSQL',
-    };
-  }
-
-  public function adaptiveKey() : string
+  /**
+   * @param  DMS $dms
+   * @return BaseDialect
+   */
+  public static function create(DMS $dms) : BaseDialect
   {
-    return match ($this) {
-      self::MySQL => 'mysql',
-      self::PostgreSQL => 'postgresql',
+    return match ($dms) {
+      DMS::PostgreSQL => new PostgreSql(),
+      DMS::MySQL      => new MySql(),
     };
   }
 }

@@ -21,7 +21,7 @@
 namespace core\PHPLibrary\Database\QueryBuilder;
 
 use \core\PHPLibrary\Database\QueryBuilder as QueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\Database\QueryBuilder\Dialect as BaseDialect;
 use \core\PHPLibrary\Database\QueryBuilder\StatementInsert\ClauseReturning as ClauseReturning;
 use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
 
@@ -38,7 +38,7 @@ final class StatementInsert implements InterfaceStatement
   /**
    * __construct
    *
-   * @param  mixed $queryBuilder
+   * @param  QueryBuilder $queryBuilder
    * @return void
    */
   public function __construct(QueryBuilder $queryBuilder)
@@ -46,6 +46,11 @@ final class StatementInsert implements InterfaceStatement
     $this->queryBuilder = $queryBuilder;
   }
 
+  /**
+   * Установить выражение RETURNING
+   * 
+   * @return void
+   */
   public function setClauseReturning() : void
   {
     $this->clauseReturning = new ClauseReturning($this);
@@ -76,7 +81,17 @@ final class StatementInsert implements InterfaceStatement
     $this->tableName = $name;
     $this->tablePrefix = $prefix;
   }
-  
+
+  /**
+   * Получить объект диалекта
+   * 
+   * @return BaseDialect
+   */
+  public function getDialect() : BaseDialect
+  {
+    return $this->queryBuilder->dialect;
+  }
+    
   /**
    * Получить наименование таблицы
    *
@@ -84,9 +99,11 @@ final class StatementInsert implements InterfaceStatement
    */
   public function getTable() : string
   {
+    $dialect = $this->queryBuilder->dialect;
     $databaseConfigurations = $this->queryBuilder->CMSCore->configurator->get('database');
-    
+
     $tableFullname = '';
+
     if ($databaseConfigurations !== null) {
       if ($databaseConfigurations['scheme'] !== '') {
         $tableFullname .= $databaseConfigurations['scheme'] . '.';
@@ -100,7 +117,14 @@ final class StatementInsert implements InterfaceStatement
 
     $tableFullname .= $this->tableName;
 
-    return $tableFullname;
+    // Экранируем каждый сегмент отдельно
+    $segments = explode('.', $tableFullname);
+    $quotedSegments = array_map(
+      fn(string $segment) => $dialect->quoteIdentifier($segment),
+      $segments
+    );
+
+    return implode('.', $quotedSegments);
   }
 
   /**
@@ -110,18 +134,15 @@ final class StatementInsert implements InterfaceStatement
    */
   public function assembly() : void
   {
-    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+    $dialect = $this->queryBuilder->dialect;
     $queryArray = [];
 
     if (!empty($this->batchRows)) {
       $columns = array_keys($this->batchRows[0]);
-      
+
       $quotedColumns = [];
       foreach ($columns as $columnName) {
-        $quotedColumns[] = match ($CMSConfigDatabase['dms']) {
-          CMSDMS::MySQL => '`' . $columnName . '`',
-          CMSDMS::PostgreSQL => '"' . $columnName . '"',
-        };
+        $quotedColumns[] = $dialect->quoteIdentifier($columnName);
       }
 
       $valuePlaceholders = [];
@@ -133,30 +154,39 @@ final class StatementInsert implements InterfaceStatement
         $valuePlaceholders[] = '(' . implode(', ', $rowPlaceholders) . ')';
       }
 
-      $queryArray[] = sprintf('(%s) VALUES %s', implode(', ', $quotedColumns), implode(', ', $valuePlaceholders));
+      $queryArray[] = sprintf(
+        '(%s) VALUES %s',
+        implode(', ', $quotedColumns),
+        implode(', ', $valuePlaceholders)
+      );
     } else {
       $columnsValues = [];
       foreach ($this->columns as $index => $columnName) {
-        if (!preg_match('/\"[a-z0-9_]+\"/i', $columnName)) {
-          $this->columns[$index] = match ($CMSConfigDatabase['dms']) {
-            CMSDMS::MySQL => '`' . $columnName . '`',
-            CMSDMS::PostgreSQL => '"' . $columnName . '"',
-          };
+        if (!preg_match('/^["`].+["`]$/', $columnName)) {
+          $this->columns[$index] = $dialect->quoteIdentifier($columnName);
         }
         $columnsValues[] = ':' . $columnName;
       }
-      $queryArray[] = sprintf('(%s) VALUES (%s)', implode(', ', $this->columns), implode(', ', $columnsValues));
+      $queryArray[] = sprintf(
+        '(%s) VALUES (%s)',
+        implode(', ', $this->columns),
+        implode(', ', $columnsValues)
+      );
     }
 
-    $clausesToPrecess = $this->getClausesToProcess();
-    foreach ($clausesToPrecess as $clause) {
+    $clausesToProcess = $this->getClausesToProcess();
+    foreach ($clausesToProcess as $clause) {
       if ($clause !== null) {
         $clause->assembly();
         $queryArray[] = $clause->assembled;
       }
     }
 
-    $this->assembled = sprintf('INSERT INTO %s %s;', $this->getTable(), implode(' ', $queryArray));
+    $this->assembled = sprintf(
+      'INSERT INTO %s %s;',
+      $this->getTable(),
+      implode(' ', $queryArray)
+    );
   }
 
   /**
@@ -164,14 +194,14 @@ final class StatementInsert implements InterfaceStatement
    */
   private function getClausesToProcess() : array
   {
-    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+    $dialect = $this->queryBuilder->dialect;
 
-    if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
-      return [
-        $this->clauseReturning
-      ];
+    if (!$dialect->supportsInsertReturning()) {
+      return [];
     }
 
-    return [];
+    return array_filter([
+      $this->clauseReturning,
+    ]);
   }
 }

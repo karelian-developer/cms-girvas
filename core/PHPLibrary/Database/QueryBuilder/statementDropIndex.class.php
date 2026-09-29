@@ -21,7 +21,6 @@
 namespace core\PHPLibrary\Database\QueryBuilder;
 
 use \core\PHPLibrary\Database\QueryBuilder as QueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
 
 final class StatementDropIndex implements InterfaceStatement
@@ -31,7 +30,7 @@ final class StatementDropIndex implements InterfaceStatement
   private bool $concurrently = false;
   private bool $ifExists = false;
   public string $assembled = '';
-  
+
   /**
    * __construct
    *
@@ -42,7 +41,7 @@ final class StatementDropIndex implements InterfaceStatement
   {
     $this->queryBuilder = $queryBuilder;
   }
-  
+
   /**
    * Установить имя индекса
    *
@@ -53,7 +52,7 @@ final class StatementDropIndex implements InterfaceStatement
   {
     $this->indexName = $name;
   }
-  
+
   /**
    * Установить конкурентное удаление (только PostgreSQL)
    *
@@ -64,7 +63,7 @@ final class StatementDropIndex implements InterfaceStatement
   {
     $this->concurrently = $value;
   }
-  
+
   /**
    * Установить IF EXISTS
    *
@@ -75,7 +74,7 @@ final class StatementDropIndex implements InterfaceStatement
   {
     $this->ifExists = $value;
   }
-  
+
   /**
    * Сборка SQL-запроса
    *
@@ -83,21 +82,22 @@ final class StatementDropIndex implements InterfaceStatement
    */
   public function assembly() : void
   {
-    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+    $dialect = $this->queryBuilder->dialect;
+
     $parts = [];
-    
+
     $parts[] = 'DROP INDEX';
-    
-    if ($this->concurrently && $CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+
+    if ($this->concurrently && $dialect->supportsDropIndexConcurrently()) {
       $parts[] = 'CONCURRENTLY';
     }
-    
-    if ($this->ifExists) {
+
+    if ($this->ifExists && $dialect->supportsDropIndexIfExists()) {
       $parts[] = 'IF EXISTS';
     }
-    
-    $parts[] = $this->indexName;
-    
+
+    $parts[] = $dialect->quoteIdentifier($this->indexName);
+
     $this->assembled = implode(' ', $parts) . ';';
   }
 }

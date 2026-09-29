@@ -20,7 +20,6 @@
 
 namespace core\PHPLibrary\Database\QueryBuilder\StatementDelete;
 
-use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;
 use \core\PHPLibrary\Database\QueryBuilder\StatementDelete\InterfaceClause as InterfaceClause;
 use \core\PHPLibrary\Database\QueryBuilder\StatementDelete as StatementDelete;
 
@@ -61,16 +60,9 @@ final class ClauseWhere implements InterfaceClause
    */
   public function addConditionAdaptive(array $conditions) : void
   {
-    $CMSConfigurator = $this->statement->queryBuilder->CMSCore->configurator;
-    $CMSConfigDatabase = $CMSConfigurator->get('database');
-
-    $condition = match ($CMSConfigDatabase['dms']) {
-      DMS::MySQL => $conditions['mysql'] ?? '',
-      DMS::PostgreSQL => $conditions['postgresql'] ?? '',
-      default => ''
-    };
-    $this->condition = $condition;
-  } 
+    $dialect = $this->statement->queryBuilder->dialect;
+    $this->condition = $dialect->resolveAdaptiveCondition($conditions);
+  }
   
   /**
    * assembly
@@ -79,7 +71,8 @@ final class ClauseWhere implements InterfaceClause
    */
   public function assembly() : void
   {
-    $this->assembled = !empty(trim($this->condition)) ? sprintf('WHERE %s', $this->condition) : '';
+    $this->assembled = trim($this->condition) !== ''
+      ? sprintf('WHERE %s', $this->condition)
+      : '';
   }
-
 }

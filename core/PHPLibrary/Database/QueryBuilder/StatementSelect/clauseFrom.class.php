@@ -27,7 +27,7 @@ use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseFrom\Table as T
 final class ClauseFrom implements InterfaceClause
 {
   private StatementSelect $statement;
-  public array $tables;
+  public array $tables = [];
   public string $assembled = '';
   
   /**
@@ -59,16 +59,17 @@ final class ClauseFrom implements InterfaceClause
    */
   public function assembly() : void
   {
-    $queryArray = [];
-
+    $dialect = $this->statement->queryBuilder->dialect;
     $databaseConfigurations = $this->statement->queryBuilder->CMSCore->configurator->get('database');
+
+    $queryArray = [];
 
     foreach ($this->tables as $table) {
       $tableFullname = '';
 
       if (!is_null($databaseConfigurations)) {
         if ($databaseConfigurations['scheme'] !== '') {
-          $tableFullname .= sprintf('%s.', $databaseConfigurations['scheme']);
+          $tableFullname .= $databaseConfigurations['scheme'] . '.';
         }
 
         if ($databaseConfigurations['prefix'] !== '' || $table->getPrefix() !== '') {
@@ -78,9 +79,18 @@ final class ClauseFrom implements InterfaceClause
       }
 
       $tableFullname .= $table->getName();
-      array_push($queryArray, $tableFullname);
+
+      $segments = explode('.', $tableFullname);
+      $quotedSegments = array_map(
+        fn(string $segment) => $dialect->quoteIdentifier($segment),
+        $segments
+      );
+
+      $queryArray[] = implode('.', $quotedSegments);
     }
 
-    $this->assembled = count($this->tables) > 0 ? sprintf('FROM %s', implode(', ', $queryArray)) : '';
+    $this->assembled = count($this->tables) > 0
+      ? sprintf('FROM %s', implode(', ', $queryArray))
+      : '';
   }
 }

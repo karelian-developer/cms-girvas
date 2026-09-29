@@ -24,30 +24,31 @@ final class Table
 {
   private string $name = '';
   private string $prefix = '';
-  
+
   /**
    * __construct
    *
-   * @param  mixed $name
+   * @param  string $name
+   * @param  string $prefix
    * @return void
    */
-  public function __construct(string $name, string $prefix)
+  public function __construct(string $name, string $prefix = '')
   {
     $this->setName($name);
     $this->setPrefix($prefix);
   }
-  
+
   /**
    * setName
    *
-   * @param  mixed $value
+   * @param  string $value
    * @return void
    */
   private function setName(string $value) : void
   {
     $this->name = $value;
   }
-  
+
   /**
    * getName
    *
@@ -57,7 +58,7 @@ final class Table
   {
     return $this->name;
   }
-  
+
   /**
    * setPrefix
    *
@@ -68,7 +69,7 @@ final class Table
   {
     $this->prefix = $value;
   }
-  
+
   /**
    * getPrefix
    *
@@ -78,5 +79,4 @@ final class Table
   {
     return $this->prefix;
   }
-
 }

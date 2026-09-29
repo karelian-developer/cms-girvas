@@ -26,7 +26,7 @@ use \core\PHPLibrary\Database\QueryBuilder\StatementSelect as StatementSelect;
 final class ClauseLimit implements InterfaceClause
 {
   private StatementSelect $statement;
-  public int $limit = 100;
+  public int $limit = 0;
   public int $offset = 0;
   public string $assembled = '';
   
@@ -70,15 +70,7 @@ final class ClauseLimit implements InterfaceClause
    */
   public function assembly() : void
   {
-    if ($this->limit >= 1) {
-      if ($this->offset <= 0) {
-        $this->assembled = sprintf('LIMIT %d', $this->limit);
-      } else {
-        $this->assembled = sprintf('LIMIT %d OFFSET %d', $this->limit, $this->offset);
-      }
-    } else {
-      $this->assembled = '';
-    }
+    $dialect = $this->statement->queryBuilder->dialect;
+    $this->assembled = $dialect->buildLimitOffsetClause($this->limit, $this->offset);
   }
-
 }

@@ -35,7 +35,7 @@ final class StatementDelete implements InterfaceStatement
   /**
    * __construct
    *
-   * @param  mixed $queryBuilder
+   * @param  QueryBuilder $queryBuilder
    * @return void
    */
   public function __construct(QueryBuilder $queryBuilder)

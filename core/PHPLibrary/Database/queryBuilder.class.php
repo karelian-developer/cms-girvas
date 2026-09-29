@@ -21,6 +21,8 @@ namespace core\PHPLibrary\Database;
 
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;
+use \core\PHPLibrary\Database\QueryBuilder\Dialect as Dialect;
+use \core\PHPLibrary\Database\QueryBuilder\Dialect\Factory as DialectFactory;
 use \core\PHPLibrary\Database\QueryBuilder\Expression\CaseExpression as CaseExpression;
 use \core\PHPLibrary\Database\QueryBuilder\StatementAlterTable as StatementAlterTable;
 use \core\PHPLibrary\Database\QueryBuilder\StatementCreateTable as StatementCreateTable;
@@ -36,7 +38,8 @@ class QueryBuilder
 {
   public InterfaceStatement $statement;
   public readonly CMSCore $CMSCore;
-  public DMS $DMS;
+  public readonly DMS $DMS;
+  public readonly Dialect $dialect;
 
   /**
    * __construct
@@ -49,6 +52,7 @@ class QueryBuilder
   public function __construct(CMSCore $CMSCore, DMS $DMS = DMS::PostgreSQL) {
     $this->CMSCore = $CMSCore;
     $this->DMS = $DMS;
+    $this->dialect = DialectFactory::create($DMS);
   }
   
   /**
