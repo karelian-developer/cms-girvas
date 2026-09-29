@@ -858,7 +858,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('token', 'string:255', 'NOT NULL');
-      $queryBuilder->statement->addColumn('userIP', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('userIP', 'string:64', 'NOT NULL');
       $queryBuilder->statement->addColumn('typeID', 'integer', 'NOT NULL DEFAULT 1');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
