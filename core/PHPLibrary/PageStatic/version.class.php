@@ -23,7 +23,6 @@ namespace core\PHPLibrary\PageStatic;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \PDOException as PDOException;
 
 #[\AllowDynamicProperties]
@@ -294,10 +293,12 @@ class Version
     $queryBuilder->statement->clauseFrom->addTable('pages_static_versions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -341,15 +342,17 @@ class Version
     $conditionPartsMysql = [];
     $conditionPartsPostgres = [];
 
+    $conditionParts = [];
+
     foreach (array_keys($conditions) as $key) {
-      $conditionPartsMysql[] = '`' . $key . '` = :' . $key;
-      $conditionPartsPostgres[] = '"' . $key . '" = :' . $key;
+      $conditionParts[] = sprintf(
+        '%s = :%s',
+        $queryBuilder->dialect->quoteIdentifier($key),
+        $key
+      );
     }
 
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => implode(' AND ', $conditionPartsMysql),
-      'postgresql' => implode(' AND ', $conditionPartsPostgres)
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(implode(' AND ', $conditionParts));
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -518,18 +521,14 @@ class Version
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
 
-    $conditionMysql = '`pageStaticID` = :pageStaticID';
-    $conditionPostgres = '"pageStaticID" = :pageStaticID';
+    $dialect = $queryBuilder->dialect;
+    $condition = sprintf('%s = :pageStaticID', $dialect->quoteIdentifier('pageStaticID'));
 
     if ($locale !== null) {
-      $conditionMysql .= ' AND `locale` = :locale';
-      $conditionPostgres .= ' AND "locale" = :locale';
+      $condition .= sprintf(' AND %s = :locale', $dialect->quoteIdentifier('locale'));
     }
 
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => $conditionMysql,
-      'postgresql' => $conditionPostgres
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition($condition);
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseOrderBy();
     $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
@@ -592,16 +591,18 @@ class Version
       $queryBuilder->setStatementUpdate();
       $queryBuilder->statement->setTable('pages_static_versions');
       $queryBuilder->statement->setClauseSet();
-      $queryBuilder->statement->clauseSet->addColumnAdaptive('isCurrent', [
-        'mysql' => 'FALSE',
-        'postgresql' => 'FALSE'
-      ]);
+      $queryBuilder->statement->clauseSet->addColumn('isCurrent', 'FALSE');
       $queryBuilder->statement->clauseSet->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => '`pageStaticID` = :pageStaticID AND `locale` = :locale',
-        'postgresql' => '"pageStaticID" = :pageStaticID AND "locale" = :locale'
-      ]);
+      $dialect = $queryBuilder->dialect;
+
+      $queryBuilder->statement->clauseWhere->addCondition(
+        sprintf(
+          '%s = :pageStaticID AND %s = :locale',
+          $dialect->quoteIdentifier('pageStaticID'),
+          $dialect->quoteIdentifier('locale')
+        )
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
@@ -614,7 +615,7 @@ class Version
       $queryBuilder->setStatementInsert();
       $queryBuilder->statement->setTable('pages_static_versions');
 
-      if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+      if ($queryBuilder->dialect->supportsInsertReturning()) {
         $queryBuilder->statement->setClauseReturning();
         $queryBuilder->statement->clauseReturning->addColumn('id');
       }
@@ -636,7 +637,7 @@ class Version
 
       $databaseConnection->commit();
 
-      if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+      if (!$queryBuilder->dialect->supportsInsertReturning()) {
         $lastID = $databaseConnection->lastInsertId();
         return new Version($CMSCore, (int)$lastID);
       }
@@ -691,16 +692,15 @@ class Version
       $queryBuilder->setStatementUpdate();
       $queryBuilder->statement->setTable('pages_static_versions');
       $queryBuilder->statement->setClauseSet();
-      $queryBuilder->statement->clauseSet->addColumnAdaptive('isCurrent', [
-        'mysql' => 'FALSE',
-        'postgresql' => 'FALSE'
-      ]);
+      $queryBuilder->statement->clauseSet->addColumn('isCurrent', 'FALSE');
       $queryBuilder->statement->clauseSet->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => '`pageStaticID` = :pageStaticID',
-        'postgresql' => '"pageStaticID" = :pageStaticID'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        sprintf(
+          '%s = :pageStaticID',
+          $queryBuilder->dialect->quoteIdentifier('pageStaticID')
+        )
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
@@ -710,7 +710,7 @@ class Version
 
       $versions = [];
 
-      if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+      if ($queryBuilder->dialect->supportsInsertReturning()) {
         $columns = [
           'pageStaticID', 'version', 'locale', 'texts',
           'effectiveFrom', 'createdUnixTimestamp', 'createdByID', 'isCurrent'

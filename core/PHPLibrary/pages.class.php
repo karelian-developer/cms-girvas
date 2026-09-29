@@ -82,10 +82,9 @@ final class Pages
 
     if ($isPublised) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => 'JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
-        'postgresql' => '(metadata::jsonb->>\'isPublished\')::boolean = true'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished')
+      );
       $hasWhere = true;
     }
 
@@ -97,10 +96,12 @@ final class Pages
         $hasWhere = true;
       }
 
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql'      => ($isPublised ? 'AND ' : '') . '`name` LIKE :search',
-        'postgresql' => ($isPublised ? 'AND ' : '') . '"name" ILIKE :search'
-      ]);
+      $conjunction = $isPublised ? 'AND' : '';
+
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->stringLike('name', 'search', true),
+        $conjunction
+      );
     }
 
     if ($hasWhere) {
@@ -173,10 +174,9 @@ final class Pages
     $hasSearch = $searchValue !== '';
     if ($hasSearch) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql'      => '`name` LIKE :search',
-        'postgresql' => '"name" ILIKE :search'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->stringLike('name', 'search', true)
+      );
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
