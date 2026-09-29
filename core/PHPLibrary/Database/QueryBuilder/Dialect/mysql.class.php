@@ -110,6 +110,47 @@ final class MySql extends BaseDialect
     );
   }
 
+  public function jsonExtractInt(string $column, string $key) : string
+  {
+    return sprintf(
+      'CAST(JSON_UNQUOTE(JSON_EXTRACT(%s, \'$.%s\')) AS SIGNED)',
+      $this->quoteIdentifier($column),
+      $key
+    );
+  }
+
+  public function jsonBuildObject(array $pairs) : string
+  {
+    $parts = [];
+    foreach ($pairs as $key => $value) {
+      $parts[] = sprintf("'%s', %s", $key, $value);
+    }
+    return sprintf('JSON_OBJECT(%s)', implode(', ', $parts));
+  }
+
+  public function jsonMergePatches(string $column, array $patches) : string
+  {
+    if (empty($patches)) {
+      return $this->quoteIdentifier($column);
+    }
+
+    return sprintf(
+      'JSON_MERGE_PRESERVE(COALESCE(%s, JSON_OBJECT()), %s)',
+      $this->quoteIdentifier($column),
+      implode(', ', $patches)
+    );
+  }
+
+  public function jsonObjectMergeKey(string $column, string $key, string $jsonFragment) : string
+  {
+    return sprintf(
+      'JSON_MERGE_PRESERVE(COALESCE(JSON_EXTRACT(%s, \'$.%s\'), JSON_OBJECT()), CAST(%s AS JSON))',
+      $this->quoteIdentifier($column),
+      $key,
+      $jsonFragment
+    );
+  }
+
   /**
    * @param  string $column
    * @return string

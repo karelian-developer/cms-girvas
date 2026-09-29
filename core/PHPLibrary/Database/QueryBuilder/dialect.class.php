@@ -104,6 +104,11 @@ abstract class Dialect
    */
   abstract public function stringLike(string $column, string $paramName, bool $caseInsensitive = true) : string;
 
+  abstract public function jsonExtractInt(string $column, string $key) : string;
+  abstract public function jsonBuildObject(array $pairs) : string;
+  abstract public function jsonMergePatches(string $column, array $patches) : string;
+  abstract public function jsonObjectMergeKey(string $column, string $key, string $jsonFragment) : string;
+
   /**
    * Извлечь год из колонки с UNIX-временем.
    *

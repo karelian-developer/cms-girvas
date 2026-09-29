@@ -167,6 +167,47 @@ final class PostgreSql extends BaseDialect
     );
   }
 
+  public function jsonExtractInt(string $column, string $key) : string
+  {
+    return sprintf(
+      '(%s::jsonb->>\'%s\')::int',
+      $this->quoteIdentifier($column),
+      $key
+    );
+  }
+
+  public function jsonBuildObject(array $pairs) : string
+  {
+    $parts = [];
+    foreach ($pairs as $key => $value) {
+      $parts[] = sprintf("'%s', %s", $key, $value);
+    }
+    return sprintf('jsonb_build_object(%s)', implode(', ', $parts));
+  }
+
+  public function jsonMergePatches(string $column, array $patches) : string
+  {
+    if (empty($patches)) {
+      return $this->quoteIdentifier($column);
+    }
+
+    return sprintf(
+      '%s::jsonb || %s::jsonb',
+      $this->quoteIdentifier($column),
+      implode(' || ', array_map(fn($p) => "({$p})", $patches))
+    );
+  }
+
+  public function jsonObjectMergeKey(string $column, string $key, string $jsonFragment) : string
+  {
+    return sprintf(
+      'COALESCE(%s::jsonb->\'%s\', \'{}\'::jsonb) || %s::jsonb',
+      $this->quoteIdentifier($column),
+      $key,
+      $jsonFragment
+    );
+  }
+
   /**
    * @param  string $column
    * @return string
