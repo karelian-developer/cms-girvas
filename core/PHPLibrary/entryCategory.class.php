@@ -723,7 +723,11 @@ class EntryCategory implements EntityTypeContent
         $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
         $databaseQuery->execute();
       } catch (PDOException $exception) {
-        die(json_encode([...], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        die(json_encode([
+          'message' => $exception->getMessage(),
+          'statusCode' => 0,
+          'outputData' => []
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
     }
 
