@@ -59,10 +59,9 @@ final class Entries
 
     if ($isPublished) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => 'JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
-        'postgresql' => '(metadata::jsonb->>\'isPublished\')::boolean = true'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
@@ -142,7 +141,8 @@ final class Entries
 
     if ($isPublished) {
       $queryBuilder->statement->clauseWhere->addCondition(
-        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished')
+        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished'),
+        'AND'
       );
     }
 
@@ -216,7 +216,8 @@ final class Entries
 
     if ($isPublished) {
       $queryBuilder->statement->clauseWhere->addCondition(
-        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished')
+        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished'),
+        'AND'
       );
     }
 
@@ -260,7 +261,7 @@ final class Entries
     
     // Если слов нет — возвращаем пустой массив
     if (empty($words)) {
-        return [];
+      return [];
     }
     
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
@@ -268,31 +269,31 @@ final class Entries
     
     // Вес для различных полей при поиске
     $weights = [
-        'title' => 10,
-        'SEOTitle' => 8,
-        'description' => 5,
-        'SEODescription' => 5,
-        'content' => 3
+      'title' => 10,
+      'SEOTitle' => 8,
+      'description' => 5,
+      'SEODescription' => 5,
+      'content' => 3
     ];
     
     // Создаём CASE-выражения для каждого слова и каждого поля
     $allCaseExpressions = [];
     
     foreach ($words as $wordIndex => $word) {
-        $paramName = 'word' . $wordIndex;
-        
-        foreach ($weights as $field => $weight) {
-            $jsonPath = sprintf("texts->'%s'->>'%s'", $localeName, $field);
-            $allCaseExpressions[] = $queryBuilder->createCase()
-                ->whenJsonLike($jsonPath, $paramName, $weight)
-                ->else(0);
-        }
-        
-        // Поиск по ключевым словам
-        $keywordsPath = sprintf("texts->'%s'->'keywords'", $localeName);
+      $paramName = 'word' . $wordIndex;
+      
+      foreach ($weights as $field => $weight) {
+        $jsonPath = sprintf("texts->'%s'->>'%s'", $localeName, $field);
         $allCaseExpressions[] = $queryBuilder->createCase()
-            ->whenJsonArrayContains($keywordsPath, $paramName, 6)
-            ->else(0);
+          ->whenJsonLike($jsonPath, $paramName, $weight)
+          ->else(0);
+      }
+      
+      // Поиск по ключевым словам
+      $keywordsPath = sprintf("texts->'%s'->'keywords'", $localeName);
+      $allCaseExpressions[] = $queryBuilder->createCase()
+        ->whenJsonArrayContains($keywordsPath, $paramName, 6)
+        ->else(0);
     }
     
     $relevanceExpression = CaseExpression::sum($allCaseExpressions, 'relevance');
@@ -326,7 +327,8 @@ final class Entries
     
     if ($isPublished) {
       $queryBuilder->statement->clauseWhere->addCondition(
-        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished')
+        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished'),
+        'AND'
       );
     }
     
@@ -406,33 +408,35 @@ final class Entries
     // WHERE: фильтр по дате
     $queryBuilder->statement->setClauseWhere();
     
-    $dateCondition = match ($CMSConfigDatabase['dms']) {
-      CMSDMS::PostgreSQL => sprintf(
-        '"createdUnixTimestamp" >= %d AND "createdUnixTimestamp" <= %d',
-        $startTimestamp,
-        $endTimestamp
-      ),
-      CMSDMS::MySQL => sprintf(
-        '`createdUnixTimestamp` >= %d AND `createdUnixTimestamp` <= %d',
-        $startTimestamp,
-        $endTimestamp
-      )
-    };
+    $dialect = $queryBuilder->dialect;
+    $tsColumn = $dialect->quoteIdentifier('createdUnixTimestamp');
+
+    $dateCondition = sprintf(
+      '%s >= %d AND %s <= %d',
+      $tsColumn,
+      $startTimestamp,
+      $tsColumn,
+      $endTimestamp
+    );
     
     $queryBuilder->statement->clauseWhere->addCondition($dateCondition);
     
     // Дополнительный фильтр по категории
     if (isset($params['categoryID']) && $params['categoryID'] > 0) {
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => 'AND `categoryID` = :categoryID',
-        'postgresql' => 'AND "categoryID" = :categoryID'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        sprintf(
+          '%s = :categoryID',
+          $queryBuilder->dialect->quoteIdentifier('categoryID')
+        ),
+        'AND'
+      );
     }
     
     // Фильтр по опубликованности
     if ($isPublished) {
       $queryBuilder->statement->clauseWhere->addCondition(
-        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished')
+        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished'),
+        'AND'
       );
     }
     
@@ -502,31 +506,32 @@ final class Entries
     
     $queryBuilder->statement->setClauseWhere();
     
-    $dateCondition = match ($CMSConfigDatabase['dms']) {
-      CMSDMS::PostgreSQL => sprintf(
-        '"createdUnixTimestamp" >= %d AND "createdUnixTimestamp" <= %d',
-        $startTimestamp,
-        $endTimestamp
-      ),
-      CMSDMS::MySQL => sprintf(
-        '`createdUnixTimestamp` >= %d AND `createdUnixTimestamp` <= %d',
-        $startTimestamp,
-        $endTimestamp
-      )
-    };
+    $tsColumn = $queryBuilder->dialect->quoteIdentifier('createdUnixTimestamp');
+
+    $dateCondition = sprintf(
+      '%s >= %d AND %s <= %d',
+      $tsColumn,
+      $startTimestamp,
+      $tsColumn,
+      $endTimestamp
+    );
     
     $queryBuilder->statement->clauseWhere->addCondition($dateCondition);
     
     if (isset($params['categoryID']) && $params['categoryID'] > 0) {
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => 'AND `categoryID` = :categoryID',
-        'postgresql' => 'AND "categoryID" = :categoryID'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        sprintf(
+          '%s = :categoryID',
+          $queryBuilder->dialect->quoteIdentifier('categoryID')
+        ),
+        'AND'
+      );
     }
     
     if ($isPublished) {
       $queryBuilder->statement->clauseWhere->addCondition(
-        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished')
+        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished'),
+        'AND'
       );
     }
     
@@ -569,10 +574,9 @@ final class Entries
     
     if ($isPublished) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => 'JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
-        'postgresql' => '(metadata::jsonb->>\'isPublished\')::boolean = true'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
     }
     
@@ -614,10 +618,7 @@ final class Entries
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     
-    $monthExpression = match ($CMSConfigDatabase['dms']) {
-      CMSDMS::PostgreSQL => 'EXTRACT(MONTH FROM to_timestamp("createdUnixTimestamp")) AS month',
-      CMSDMS::MySQL => 'MONTH(FROM_UNIXTIME(`createdUnixTimestamp`)) AS month'
-    };
+    $monthExpression = $queryBuilder->dialect->extractMonthFromUnixTimestamp('createdUnixTimestamp') . ' AS month';
     
     $queryBuilder->statement->addSelections(['DISTINCT ' . $monthExpression, 'COUNT(*) AS count']);
     $queryBuilder->statement->setClauseFrom();
@@ -626,24 +627,22 @@ final class Entries
     
     $queryBuilder->statement->setClauseWhere();
     
-    $dateCondition = match ($CMSConfigDatabase['dms']) {
-      CMSDMS::PostgreSQL => sprintf(
-        '"createdUnixTimestamp" >= %d AND "createdUnixTimestamp" <= %d',
-        $startTimestamp,
-        $endTimestamp
-      ),
-      CMSDMS::MySQL => sprintf(
-        '`createdUnixTimestamp` >= %d AND `createdUnixTimestamp` <= %d',
-        $startTimestamp,
-        $endTimestamp
-      )
-    };
+    $tsColumn = $queryBuilder->dialect->quoteIdentifier('createdUnixTimestamp');
+
+    $dateCondition = sprintf(
+      '%s >= %d AND %s <= %d',
+      $tsColumn,
+      $startTimestamp,
+      $tsColumn,
+      $endTimestamp
+    );
     
     $queryBuilder->statement->clauseWhere->addCondition($dateCondition);
     
     if ($isPublished) {
       $queryBuilder->statement->clauseWhere->addCondition(
-        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished')
+        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished'),
+        'AND'
       );
     }
     
@@ -687,14 +686,17 @@ final class Entries
     $queryBuilder->statement->clauseFrom->addTable('entries');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`categoryID` = :categoryID',
-      'postgresql' => '"categoryID" = :categoryID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :categoryID',
+        $queryBuilder->dialect->quoteIdentifier('categoryID')
+      )
+    );
 
     if ($isPublished) {
       $queryBuilder->statement->clauseWhere->addCondition(
-        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished')
+        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished'),
+        'AND'
       );
     }
 
@@ -758,30 +760,10 @@ final class Entries
     $whereConditions = [];
     
     foreach ($weights as $field) {
-      $whereConditions[] = match ($CMSConfigDatabase['dms']) {
-        CMSDMS::PostgreSQL => sprintf(
-          "texts->'%s'->>'%s' ILIKE '%%' || :searchQuery || '%%'",
-          $localeName,
-          $field
-        ),
-        CMSDMS::MySQL => sprintf(
-          "JSON_UNQUOTE(JSON_EXTRACT(texts, '$.%s.%s')) LIKE CONCAT('%%', :searchQuery, '%%')",
-          $localeName,
-          $field
-        )
-      };
+      $whereConditions[] = $queryBuilder->dialect->jsonLike('texts', $localeName, $field, 'searchQuery');
     }
-    
-    $whereConditions[] = match ($CMSConfigDatabase['dms']) {
-      CMSDMS::PostgreSQL => sprintf(
-        "EXISTS (SELECT 1 FROM jsonb_array_elements_text(texts->'%s'->'keywords') AS kw WHERE kw ILIKE '%%' || :searchQuery || '%%')",
-        $localeName
-      ),
-      CMSDMS::MySQL => sprintf(
-        "JSON_SEARCH(texts, 'one', :searchQuery, NULL, '$.%s.keywords[*]') IS NOT NULL",
-        $localeName
-      )
-    };
+
+    $whereConditions[] = $queryBuilder->dialect->jsonArrayContainsLike('texts', $localeName, 'keywords', 'searchQuery');
     
     $whereString = '(' . implode(' OR ', $whereConditions) . ')';
     
@@ -790,7 +772,8 @@ final class Entries
     
     if ($isPublished) {
       $queryBuilder->statement->clauseWhere->addCondition(
-        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished')
+        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished'),
+        'AND'
       );
     }
     
@@ -824,14 +807,17 @@ final class Entries
     $queryBuilder->statement->clauseFrom->addTable('entries');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`categoryID` = :categoryID',
-      'postgresql' => '"categoryID" = :categoryID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :categoryID',
+        $queryBuilder->dialect->quoteIdentifier('categoryID')
+      )
+    );
 
     if ($isPublished) {
       $queryBuilder->statement->clauseWhere->addCondition(
-        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished')
+        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished'),
+        'AND'
       );
     }
 
@@ -866,10 +852,9 @@ final class Entries
 
     if ($isPublished) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => 'JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
-        'postgresql' => '(metadata::jsonb->>\'isPublished\')::boolean = true'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isPublished')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
