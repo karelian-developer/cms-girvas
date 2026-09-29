@@ -231,10 +231,12 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => 'JSON_EXTRACT(`metadata`, \'$.parentID\') = :parentID',
-      'postgresql' => '(metadata::jsonb->>\'parentID\')::int = :parentID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :parentID',
+        $queryBuilder->dialect->jsonExtractInt('metadata', 'parentID')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
