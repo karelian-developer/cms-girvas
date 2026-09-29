@@ -127,6 +127,34 @@ final class PostgreSql extends BaseDialect
   }
 
   /**
+   * @param  string $column
+   * @param  string $key
+   * @return string
+   */
+  public function jsonExtractBoolean(string $column, string $key) : string
+  {
+    return sprintf(
+      '(%s::jsonb->>\'%s\')::boolean',
+      $this->quoteIdentifier($column),
+      $key
+    );
+  }
+
+  /**
+   * @param  string $column
+   * @param  string $jsonObject
+   * @return string
+   */
+  public function jsonMergePatch(string $column, string $jsonObject) : string
+  {
+    return sprintf(
+      '%s::jsonb || %s::jsonb',
+      $this->quoteIdentifier($column),
+      $jsonObject
+    );
+  }
+
+  /**
    * @param  IndexType $type
    * @return bool
    */

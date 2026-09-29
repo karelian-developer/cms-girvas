@@ -64,6 +64,36 @@ final class MySql extends BaseDialect
   }
 
   /**
+   * @param  string $column
+   * @param  string $key
+   * @return string
+   */
+  public function jsonExtractBoolean(string $column, string $key) : string
+  {
+    // MySQL: JSON_EXTRACT возвращает JSON-значение.
+    // Оператор ->> возвращает текст. Сравниваем с 'true'.
+    return sprintf(
+      '%s->>\'$.%s\' = \'true\'',
+      $this->quoteIdentifier($column),
+      $key
+    );
+  }
+
+  /**
+   * @param  string $column
+   * @param  string $jsonObject
+   * @return string
+   */
+  public function jsonMergePatch(string $column, string $jsonObject) : string
+  {
+    return sprintf(
+      'JSON_MERGE_PATCH(COALESCE(%s, JSON_OBJECT()), CAST(%s AS JSON))',
+      $this->quoteIdentifier($column),
+      $jsonObject
+    );
+  }
+
+  /**
    * @param  int $length
    * @return string
    */

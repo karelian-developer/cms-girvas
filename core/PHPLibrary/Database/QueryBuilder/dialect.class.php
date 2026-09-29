@@ -66,6 +66,24 @@ abstract class Dialect
   abstract public function quoteIdentifier(string $identifier) : string;
 
   /**
+  * Извлечь boolean-значение из JSON-колонки.
+  *
+  * @param  string $column Имя колонки
+  * @param  string $key    Ключ в JSON
+  * @return string SQL-выражение, возвращающее boolean
+  */
+  abstract public function jsonExtractBoolean(string $column, string $key) : string;
+
+  /**
+   * Слить JSON-колонку с новым объектом.
+   *
+   * @param  string $column Имя колонки
+   * @param  string $jsonObject SQL-литерал JSON-объекта
+   * @return string SQL-выражение
+   */
+  abstract public function jsonMergePatch(string $column, string $jsonObject) : string;
+
+  /**
    * Главный метод: логический тип -> физический.
    *
    * Поддерживает синтаксис string:N для строк заданной длины.
