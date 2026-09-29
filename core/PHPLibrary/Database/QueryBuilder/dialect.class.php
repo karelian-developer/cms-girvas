@@ -84,6 +84,17 @@ abstract class Dialect
   abstract public function jsonMergePatch(string $column, string $jsonObject) : string;
 
   /**
+   * Построить условие для получения ID последней вставленной записи.
+   *
+   * Для MySQL: `id` = LAST_INSERT_ID()
+   * Для PostgreSQL: этот метод не должен вызываться — используйте RETURNING.
+   *
+   * @param  string $column
+   * @return string
+   */
+  abstract public function getLastInsertedIDCondition(string $column) : string;
+
+  /**
    * Извлечь год из колонки с UNIX-временем.
    *
    * @param  string $column

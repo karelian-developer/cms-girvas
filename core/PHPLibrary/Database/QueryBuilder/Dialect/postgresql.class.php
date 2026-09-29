@@ -149,6 +149,14 @@ final class PostgreSql extends BaseDialect
     );
   }
 
+  public function getLastInsertedIDCondition(string $column) : string
+  {
+    throw new \LogicException(
+      'PostgreSQL uses RETURNING clause instead of LAST_INSERT_ID(). ' .
+      'This method should not be called for PostgreSQL.'
+    );
+  }
+
   /**
    * @param  string $column
    * @return string

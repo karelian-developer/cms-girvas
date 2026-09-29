@@ -88,6 +88,11 @@ final class MySql extends BaseDialect
     );
   }
 
+  public function getLastInsertedIDCondition(string $column) : string
+  {
+    return sprintf('%s = LAST_INSERT_ID()', $this->quoteIdentifier($column));
+  }
+
   /**
    * @param  string $column
    * @return string
@@ -179,14 +184,6 @@ final class MySql extends BaseDialect
   public function requiresUsingClause(IndexType $type) : bool
   {
     return false;
-  }
-
-  /**
-   * @return bool
-   */
-  public function supportsDropIndexConcurrently() : bool
-  {
-    return true;
   }
 
   /**
