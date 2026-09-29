@@ -747,7 +747,7 @@ class Entry implements EntityTypeContent
     $queryBuilder->statement->setClauseWhere();
     $queryBuilder->statement->clauseWhere->addCondition(
       sprintf(
-        '%s < :id AND %s',
+        '%s > :id AND %s',
         $dialect->quoteIdentifier('id'),
         $dialect->jsonExtractBoolean('metadata', 'isPublished')
       )
