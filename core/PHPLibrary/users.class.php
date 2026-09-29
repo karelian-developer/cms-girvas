@@ -70,10 +70,15 @@ final class Users
 
     if ($hasSearch) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => '(`login` LIKE :search OR `email` LIKE :search)',
-        'postgresql' => '("login" ILIKE :search OR "email" ILIKE :search)'
-      ]);
+      $dialect = $queryBuilder->dialect;
+
+      $queryBuilder->statement->clauseWhere->addCondition(
+        sprintf(
+          '(%s OR %s)',
+          $dialect->stringLike('login', 'search', true),
+          $dialect->stringLike('email', 'search', true)
+        )
+      );
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
@@ -156,10 +161,12 @@ final class Users
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql'      => 'JSON_EXTRACT(`metadata`, \'$.groupID\') = :groupID',
-      'postgresql' => '(metadata::jsonb->>\'groupID\')::int = :groupID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :groupID',
+        $queryBuilder->dialect->jsonExtractInt('metadata', 'groupID')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -201,10 +208,15 @@ final class Users
 
     if ($searchValue !== '') {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => '(`login` LIKE :search OR `email` LIKE :search)',
-        'postgresql' => '("login" ILIKE :search OR "email" ILIKE :search)'
-      ]);
+      $dialect = $queryBuilder->dialect;
+
+      $queryBuilder->statement->clauseWhere->addCondition(
+        sprintf(
+          '(%s OR %s)',
+          $dialect->stringLike('login', 'search', true),
+          $dialect->stringLike('email', 'search', true)
+        )
+      );
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
