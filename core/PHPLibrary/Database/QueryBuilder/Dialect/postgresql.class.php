@@ -157,6 +157,16 @@ final class PostgreSql extends BaseDialect
     );
   }
 
+  public function stringLike(string $column, string $paramName, bool $caseInsensitive = true) : string
+  {
+    return sprintf(
+      '%s %s :%s',
+      $this->quoteIdentifier($column),
+      $caseInsensitive ? 'ILIKE' : 'LIKE',
+      $paramName
+    );
+  }
+
   /**
    * @param  string $column
    * @return string

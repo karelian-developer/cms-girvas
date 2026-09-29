@@ -78,10 +78,9 @@ final class EntriesCategories
     $hasSearch = $searchValue !== '';
     if ($hasSearch) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql'      => '`name` LIKE :search',
-        'postgresql' => '"name" ILIKE :search'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->stringLike('name', 'search', true)
+      );
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
@@ -142,10 +141,9 @@ final class EntriesCategories
     $hasSearch = $searchValue !== '';
     if ($hasSearch) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql'      => '`name` LIKE :search',
-        'postgresql' => '"name" ILIKE :search'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->stringLike('name', 'search', true)
+      );
       $queryBuilder->statement->clauseWhere->assembly();
     }
 

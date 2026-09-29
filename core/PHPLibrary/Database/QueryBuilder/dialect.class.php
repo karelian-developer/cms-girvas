@@ -95,6 +95,16 @@ abstract class Dialect
   abstract public function getLastInsertedIDCondition(string $column) : string;
 
   /**
+   * Построить условие LIKE по строковой колонке.
+   *
+   * @param  string $column          Имя колонки
+   * @param  string $paramName       Имя плейсхолдера (без ':')
+   * @param  bool   $caseInsensitive Регистронезависимый поиск
+   * @return string
+   */
+  abstract public function stringLike(string $column, string $paramName, bool $caseInsensitive = true) : string;
+
+  /**
    * Извлечь год из колонки с UNIX-временем.
    *
    * @param  string $column

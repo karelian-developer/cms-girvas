@@ -93,6 +93,23 @@ final class MySql extends BaseDialect
     return sprintf('%s = LAST_INSERT_ID()', $this->quoteIdentifier($column));
   }
 
+  public function stringLike(string $column, string $paramName, bool $caseInsensitive = true) : string
+  {
+    if ($caseInsensitive) {
+      return sprintf(
+        'LOWER(%s) LIKE LOWER(:%s)',
+        $this->quoteIdentifier($column),
+        $paramName
+      );
+    }
+
+    return sprintf(
+      '%s LIKE :%s',
+      $this->quoteIdentifier($column),
+      $paramName
+    );
+  }
+
   /**
    * @param  string $column
    * @return string
