@@ -369,10 +369,12 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -416,10 +418,12 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -457,10 +461,12 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -653,10 +659,12 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
