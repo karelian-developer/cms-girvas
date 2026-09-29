@@ -94,6 +94,60 @@ final class MySql extends BaseDialect
   }
 
   /**
+   * @param  string $column
+   * @return string
+   */
+  public function extractYearFromUnixTimestamp(string $column) : string
+  {
+    return sprintf('YEAR(FROM_UNIXTIME(%s))', $this->quoteIdentifier($column));
+  }
+
+  /**
+   * @param  string $column
+   * @return string
+   */
+  public function extractMonthFromUnixTimestamp(string $column) : string
+  {
+    return sprintf('MONTH(FROM_UNIXTIME(%s))', $this->quoteIdentifier($column));
+  }
+
+  /**
+   * @param  string $column
+   * @param  string $locale
+   * @param  string $field
+   * @param  string $paramName
+   * @return string
+   */
+  public function jsonLike(string $column, string $locale, string $field, string $paramName) : string
+  {
+    return sprintf(
+      "JSON_UNQUOTE(JSON_EXTRACT(%s, '$.%s.%s')) LIKE CONCAT('%%', :%s, '%%')",
+      $this->quoteIdentifier($column),
+      $locale,
+      $field,
+      $paramName
+    );
+  }
+
+  /**
+   * @param  string $column
+   * @param  string $locale
+   * @param  string $field
+   * @param  string $paramName
+   * @return string
+   */
+  public function jsonArrayContainsLike(string $column, string $locale, string $field, string $paramName) : string
+  {
+    return sprintf(
+      "JSON_SEARCH(%s, 'one', :%s, NULL, '$.%s.%s[*]') IS NOT NULL",
+      $this->quoteIdentifier($column),
+      $paramName,
+      $locale,
+      $field
+    );
+  }
+
+  /**
    * @param  int $length
    * @return string
    */

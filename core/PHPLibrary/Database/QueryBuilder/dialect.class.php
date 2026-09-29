@@ -84,6 +84,44 @@ abstract class Dialect
   abstract public function jsonMergePatch(string $column, string $jsonObject) : string;
 
   /**
+   * Извлечь год из колонки с UNIX-временем.
+   *
+   * @param  string $column
+   * @return string
+   */
+  abstract public function extractYearFromUnixTimestamp(string $column) : string;
+
+  /**
+   * Извлечь месяц из колонки с UNIX-временем.
+   *
+   * @param  string $column
+   * @return string
+   */
+  abstract public function extractMonthFromUnixTimestamp(string $column) : string;
+
+  /**
+   * Проверить, содержит ли JSON-поле в указанной локали подстроку.
+   *
+   * @param  string $column    Имя JSON-колонки
+   * @param  string $locale    Локаль (например, 'ru_RU')
+   * @param  string $field     Поле (например, 'title')
+   * @param  string $paramName Имя плейсхолдера
+   * @return string
+   */
+  abstract public function jsonLike(string $column, string $locale, string $field, string $paramName) : string;
+
+  /**
+   * Проверить, содержит ли JSON-массив в указанной локали подстроку.
+   *
+   * @param  string $column    Имя JSON-колонки
+   * @param  string $locale    Локаль
+   * @param  string $field     Поле-массив (например, 'keywords')
+   * @param  string $paramName Имя плейсхолдера
+   * @return string
+   */
+  abstract public function jsonArrayContainsLike(string $column, string $locale, string $field, string $paramName) : string;
+
+  /**
    * Главный метод: логический тип -> физический.
    *
    * Поддерживает синтаксис string:N для строк заданной длины.
@@ -253,6 +291,22 @@ abstract class Dialect
     }
 
     return sprintf('LIMIT %d OFFSET %d', $limit, $offset);
+  }
+
+  /**
+   * Построить условие IN.
+   *
+   * @param  string $column       Имя колонки
+   * @param  array  $placeholders Массив плейсхолдеров (':p1', ':p2', ...)
+   * @return string
+   */
+  final public function buildInCondition(string $column, array $placeholders) : string
+  {
+    return sprintf(
+      '%s IN (%s)',
+      $this->quoteIdentifier($column),
+      implode(', ', $placeholders)
+    );
   }
 
   /**

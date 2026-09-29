@@ -155,6 +155,71 @@ final class PostgreSql extends BaseDialect
   }
 
   /**
+   * @param  string $column
+   * @return string
+   */
+  public function extractYearFromUnixTimestamp(string $column) : string
+  {
+    return sprintf('EXTRACT(YEAR FROM to_timestamp(%s))', $this->quoteIdentifier($column));
+  }
+
+  /**
+   * @param  string $column
+   * @return string
+   */
+  public function extractMonthFromUnixTimestamp(string $column) : string
+  {
+    return sprintf('EXTRACT(MONTH FROM to_timestamp(%s))', $this->quoteIdentifier($column));
+  }
+
+  /**
+   * @param  string $column
+   * @param  string $locale
+   * @param  string $field
+   * @param  string $paramName
+   * @return string
+   */
+  public function jsonLike(string $column, string $locale, string $field, string $paramName) : string
+  {
+    return sprintf(
+      "%s->'%s'->>'%s' ILIKE '%%' || :%s || '%%'",
+      $this->quoteIdentifier($column),
+      $locale,
+      $field,
+      $paramName
+    );
+  }
+
+  /**
+   * @param  string $column
+   * @param  string $locale
+   * @param  string $field
+   * @param  string $paramName
+   * @return string
+   */
+  public function jsonArrayContainsLike(string $column, string $locale, string $field, string $paramName) : string
+  {
+    return sprintf(
+      "EXISTS (SELECT 1 FROM jsonb_array_elements_text(%s->'%s'->'%s') AS kw WHERE kw ILIKE '%%' || :%s || '%%')",
+      $this->quoteIdentifier($column),
+      $locale,
+      $field,
+      $paramName
+    );
+  }
+
+  public function jsonArrayContainsLike(string $column, string $locale, string $field, string $paramName) : string
+  {
+    return sprintf(
+      "EXISTS (SELECT 1 FROM jsonb_array_elements_text(%s->'%s'->'%s') AS kw WHERE kw ILIKE '%%' || :%s || '%%')",
+      $this->quoteIdentifier($column),
+      $locale,
+      $field,
+      $paramName
+    );
+  }
+
+  /**
    * @param  IndexType $type
    * @return bool
    */
