@@ -13,5 +13,6 @@
   "PAGE_ENTRY_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TIP": "markdown/page/content/entry/sidebarAdditionalFieldsTip.md",
   "PAGE_ENTRY_SIDEBAR_BLOCK_SEO_ANALYZER_TIP": "markdown/page/content/entry/sidebarSEOAnalyzerTip.md",
   "PAGE_ENTRY_SIDEBAR_BLOCK_SCHEDULER_TIP": "markdown/page/content/entry/sidebarSchedulerTip.md",
+  "PAGE_USERS_CONSENTS_SIDEBAR_BLOCK_ABOUT_DESCRIPTION": "markdown/page/users/consents/sidebarAboutContent.md",
   "PAGE_SETTINGS_SETTING_SECURITY_RESTRICTING_ACCESS_TO_AP_BY_IP_DESCRIPTION" : "markdown/page/settings/security/restrictingAccessToAPByIPDescription.md" 
 }
