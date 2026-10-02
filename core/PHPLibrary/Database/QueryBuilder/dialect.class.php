@@ -109,6 +109,7 @@ abstract class Dialect
   abstract public function jsonMergePatches(string $column, array $patches) : string;
   abstract public function jsonObjectMergeKey(string $column, string $key, string $jsonFragment) : string;
   abstract public function jsonReplace(string $column, string $jsonValue) : string;
+  abstract public function quoteLiteral(string $value) : string;
 
   /**
    * Извлечь год из колонки с UNIX-временем.

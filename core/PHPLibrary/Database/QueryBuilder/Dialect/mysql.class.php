@@ -156,6 +156,15 @@ final class MySql extends BaseDialect
     return sprintf('CAST(%s AS JSON)', $jsonValue);
   }
 
+  public function quoteLiteral(string $value) : string
+  {
+    return "'" . str_replace(
+      ["\\",  "'"],
+      ["\\\\", "''"],
+      $value
+    ) . "'";
+  }
+
   /**
    * @param  string $column
    * @return string

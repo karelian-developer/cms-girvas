@@ -112,6 +112,11 @@ final class PostgreSql extends BaseDialect
     return true;
   }
 
+  public function quoteLiteral(string $value) : string
+  {
+    return "'" . str_replace("'", "''", $value) . "'";
+  }
+
   /**
    * @param  string $identifier
    * @return string
