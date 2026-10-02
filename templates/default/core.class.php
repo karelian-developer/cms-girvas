@@ -122,16 +122,6 @@ final class Core implements ThemeInterfaceCore
     $sitePage = $this->theme->CMSCore->getInitedPage();
     $sitePage->assembly();
 
-    $localeData = $this->theme->locale->getData();
-    
-    $themeVars['SITE_PAGE'] = ThemeCollector::assembly($sitePage->assembled, [
-      'SIDEBAR_BLOCK_DEMO' => $this->assemblySidebarBlock('default', [
-        'BLOCK_TITLE' => $localeData['THEME_IDEBAR_BLOCK_DEMO_TITLE'],
-        'BLOCK_CONTENT' => $localeData['THEME_SIDEBAR_BLOCK_DEMO_CONTENT']
-      ]),
-      'SIDEBAR_BLOCK_LAST_NEWS' => $this->assemblySidebarBlock('lastNews', []),
-    ]);
-
     return ThemeCollector::assemblyFileContent($this->theme, 'templates/main.tpl', $themeVars);
   }
   
