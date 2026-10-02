@@ -98,6 +98,13 @@ final class Core implements ThemeInterfaceCore
       'permanent' => false,
       'role' => ''
     ],
+    'reports' => [
+      'name' => 'reports',
+      'iconName' => 'reports',
+      'link' => '/reports',
+      'permanent' => true,
+      'role' => ''
+    ],
     'settings' => [
       'name' => 'settings_cms',
       'iconName' => 'settings',
