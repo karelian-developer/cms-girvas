@@ -455,6 +455,7 @@ class Session
     $queryBuilderStatement->setClauseWhere();
 
     $dialect = $queryBuilder->dialect;
+    $queryBuilderStatementClauseWhere = $queryBuilderStatement->clauseWhere;
     $queryBuilderStatementClauseWhere->addCondition(
       sprintf(
         '%s = :userIP AND %s = :typeID AND %s = :token',

@@ -24,7 +24,7 @@ use \core\PHPLibrary\SystemCore\Report as Report;
 use \core\PHPLibrary\SystemCore\Reports as Reports;
 use \core\PHPLibrary\SystemCore\File\Converter as FileConverter;
 use \core\PHPLibrary\SystemCore\File\EnumFormat as EnumFileFormat;
-use \ZipArchive;
+use \ZipArchive as ZipArchive;
 
 /**
  * Загрузка аватара для пользователя
