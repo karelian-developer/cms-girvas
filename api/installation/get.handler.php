@@ -20,7 +20,7 @@
  */
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\Database\QueryBuilder\Dialect\Factory as DialectFactory;
 use \core\PHPLibrary\Database\IndexType as DatabaseIndexType;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
@@ -1090,9 +1090,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->assembly();
       
       createIndexSafe($queryBuilder, $databaseConnection);
+
+      $dialect = DialectFactory::create($CMSConfigDatabase['dms']);
       
       // GIN индекс для JSONB поля texts (только PostgreSQL)
-      if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+      if ($dialect->supportsIndexType(DatabaseIndexType::GIN)) {
         $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
         $queryBuilder->setStatementCreateIndex();
         $queryBuilder->statement->setIndexName('idx_entries_texts_gin');
@@ -1214,8 +1216,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
 
       createIndexSafe($queryBuilder, $databaseConnection);
 
+      $dialect = DialectFactory::create($CMSConfigDatabase['dms']);
+      
       // GIN индекс для JSONB (только PostgreSQL)
-      if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+      if ($dialect->supportsIndexType(DatabaseIndexType::GIN)) {
         $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
         $queryBuilder->setStatementCreateIndex();
         $queryBuilder->statement->setIndexName('idx_pages_static_texts_gin');
@@ -1254,7 +1258,9 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
 
       createIndexSafe($queryBuilder, $databaseConnection);
 
-      if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+      $dialect = DialectFactory::create($CMSConfigDatabase['dms']);
+
+      if ($dialect->supportsIndexType(DatabaseIndexType::GIN)) {
         $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
         $queryBuilder->setStatementCreateIndex();
         $queryBuilder->statement->setIndexName('idx_pages_static_versions_texts_gin');
