@@ -47,84 +47,85 @@ final class Core implements ThemeInterfaceCore
       'iconName' => 'index',
       'link' => '/',
       'permanent' => true,
-      'role' => ''
+      'permission' => null,
     ],
     'content' => [
       'name' => 'content',
       'iconName' => 'content',
       'link' => '/entries',
       'permanent' => false,
-      'role' => ''
+      'permission' => 'hasAnyEditorPermission',
     ],
     'media' => [
       'name' => 'media',
       'iconName' => 'media',
       'link' => '/media',
       'permanent' => false,
-      'role' => ''
+      'permission' => 'hasPermissionEditorMediaFilesManagement',
     ],
     'users' => [
       'name' => 'users',
       'iconName' => 'users',
       'link' => '/users',
       'permanent' => false,
-      'role' => ''
+      'permission' => 'hasPermissionAdminUsersManagement',
     ],
     'feeds' => [
       'name' => 'feeds',
       'iconName' => 'feeds',
       'link' => '/feeds',
       'permanent' => false,
-      'role' => ''
+      'permission' => 'hasPermissionAdminFeedsManagement',
     ],
     'modules' => [
       'name' => 'modules',
       'iconName' => 'modules',
       'link' => '/modules',
       'permanent' => false,
-      'role' => ''
+      'permission' => 'hasPermissionAdminModulesManagement',
     ],
     'templates' => [
       'name' => 'templates',
       'iconName' => 'templates',
       'link' => '/templates',
       'permanent' => false,
-      'role' => ''
+      'permission' => 'hasPermissionAdminThemesManagement',
     ],
     'analytics' => [
       'name' => 'analytics',
       'iconName' => 'analytics',
       'link' => '/analytics',
       'permanent' => false,
-      'role' => ''
+      'permission' => 'hasReportsAccess',
     ],
     'reports' => [
       'name' => 'reports',
       'iconName' => 'reports',
       'link' => '/reports',
       'permanent' => true,
-      'role' => ''
+      'permission' => 'hasReportsAccess',
     ],
     'settings' => [
       'name' => 'settings_cms',
       'iconName' => 'settings',
       'link' => '/settings',
       'permanent' => true,
-      'role' => ''
+      'permission' => 'hasPermissionAdminSettingsManagement',
     ],
     'about' => [
       'name' => 'about_cms',
       'iconName' => 'about',
       'link' => '/about',
       'permanent' => true,
-      'role' => ''
+      'permission' => null,
     ],
     'exit' => [
       'name' => 'exit_cms',
       'iconName' => 'exit',
       'link' => '/',
       'permanent' => true,
-      'role' => 'mainNavigationExit'
+      'role' => 'mainNavigationExit',
+      'permission' => null,
     ]
   ];
   
@@ -179,70 +180,86 @@ final class Core implements ThemeInterfaceCore
    */
   public function initMainNavigation() : void
   {
-    if ($this->source !== null) {
-      $elementCMSAPMainNavigation = $this->source->getElementById('SYSTEM_AP_MAIN_NAVIGATION');
-      if ($elementCMSAPMainNavigation !== null) {
-        $listElement = $elementCMSAPMainNavigation->ownerDocument->createElement('ul');
-        $listElement->setAttribute('class', 'navigation__list list list-reset');
+    if ($this->source === null) {
+        return;
+    }
 
-        if (count($this->navigationSections) > 0) {
-          foreach ($this->navigationSections as $navigationSectionIndex => $navigationSectionData) {
-            $navigationSectionName = $navigationSectionData['name'];
-            $navigationSectionLink = $navigationSectionData['link'];
-            $navigationSectionIconName = $navigationSectionData['iconName'];
-            $navigationSectionPermanentStatus = $navigationSectionData['permanent'];
-            $navigationSectionRole = $navigationSectionData['role'];
-            
-            $sectionAllowed = false;
+    $elementCMSAPMainNavigation = $this->source->getElementById('SYSTEM_AP_MAIN_NAVIGATION');
+    if ($elementCMSAPMainNavigation === null) {
+      return;
+    }
 
-            if (!$navigationSectionPermanentStatus) {
-              $methodSectionCheckerName = 'getSection' . ucfirst((string) $navigationSectionIndex) . 'Status';
-              
-              if (method_exists($this->theme->CMSCore->configurator, $methodSectionCheckerName)) {
-                if ($this->theme->CMSCore->configurator->{$methodSectionCheckerName}(true)) {
-                  $sectionAllowed = true;
-                }
-              } else {
-                $sectionAllowed = true;
-              }
-            } else {
-              $sectionAllowed = true;
-            }
+    // Получаем пользователя и его группу
+    $user = $this->theme->CMSCore->client->getUser(2);
+    if ($user === null) {
+      return;
+    }
+    $user->initData(['metadata']);
 
-            if ($sectionAllowed) {
-              $itemTitle = sprintf('{LANG:MAIN_NAVIGATION_%s_LABEL}', strtoupper($navigationSectionName));
-              $itemTitle = ThemeCollector::assemblyLocale($itemTitle, $this->theme->CMSCore->locale);
-              
-              $itemElement = $elementCMSAPMainNavigation->ownerDocument->createElement('li');
-              $linkElement = $elementCMSAPMainNavigation->ownerDocument->createElement('a');
-              $labelElement = $elementCMSAPMainNavigation->ownerDocument->createElement('div', $itemTitle);
-              
-              $itemElement->setAttribute('class', 'list__item item item_' . $navigationSectionName);
+    $userGroup = $user->getGroup();
+    if ($userGroup === null) {
+      return;
+    }
+    $userGroup->initData(['permissions']);
 
-              if ($navigationSectionRole !== '') {
-                $itemElement->setAttribute('data-role', $navigationSectionRole); 
-              }
+    $listElement = $elementCMSAPMainNavigation->ownerDocument->createElement('ul');
+    $listElement->setAttribute('class', 'navigation__list list list-reset');
 
-              $linkElement->setAttribute('class', 'item__link link');
-              $linkElement->setAttribute('href', '/admin' . $navigationSectionLink);
-              $linkElement->setAttribute('title', $itemTitle);
-              $labelElement->setAttribute('class', 'item__label label');
-              
-              $SVGElement = new DOMDocument();
-              $SVGElement->load($this->getMainNavigationIconPath($navigationSectionIconName));
-              $SVGImportedElement = $this->source->importNode($SVGElement->documentElement, true);
-              $SVGImportedElement->setAttribute('class', 'item__icon icon');
+    if (count($this->navigationSections) > 0) {
+      foreach ($this->navigationSections as $navigationSectionIndex => $navigationSectionData) {
+        $navigationSectionName = $navigationSectionData['name'];
+        $navigationSectionLink = $navigationSectionData['link'];
+        $navigationSectionIconName = $navigationSectionData['iconName'];
+        $navigationSectionPermission = $navigationSectionData['permission'] ?? null;
+        $navigationSectionRole = $navigationSectionData['role'] ?? '';
 
-              $linkElement->appendChild($SVGImportedElement);
-              $linkElement->appendChild($labelElement);
-              $itemElement->appendChild($linkElement);
-              $listElement->appendChild($itemElement);
-            }
-          }
+        // Проверка права доступа
+        $sectionAllowed = true;
 
-          $elementCMSAPMainNavigation->appendChild($listElement);
+        if ($navigationSectionPermission !== null) {
+          $sectionAllowed = method_exists($userGroup, $navigationSectionPermission)
+            && $userGroup->{$navigationSectionPermission}();
         }
+
+        if (!$sectionAllowed) {
+          continue;
+        }
+
+        $itemTitle = sprintf('{LANG:MAIN_NAVIGATION_%s_LABEL}', strtoupper($navigationSectionName));
+        $itemTitle = ThemeCollector::assemblyLocale($itemTitle, $this->theme->CMSCore->locale);
+
+        $itemElement = $elementCMSAPMainNavigation->ownerDocument->createElement('li');
+        $linkElement = $elementCMSAPMainNavigation->ownerDocument->createElement('a');
+        $labelElement = $elementCMSAPMainNavigation->ownerDocument->createElement('div', $itemTitle);
+
+        $itemElement->setAttribute('class', 'list__item item item_' . $navigationSectionName);
+
+        if ($navigationSectionRole !== '') {
+          $itemElement->setAttribute('data-role', $navigationSectionRole);
+        }
+
+        $linkElement->setAttribute('class', 'item__link link');
+        $linkElement->setAttribute('href', '/admin' . $navigationSectionLink);
+        $linkElement->setAttribute('title', $itemTitle);
+        $labelElement->setAttribute('class', 'item__label label');
+
+        $iconPath = $this->getMainNavigationIconPath($navigationSectionIconName);
+        if (file_exists($iconPath)) {
+          $SVGElement = new DOMDocument();
+          $SVGElement->load($iconPath);
+          if ($SVGElement->documentElement !== null) {
+            $SVGImportedElement = $this->source->importNode($SVGElement->documentElement, true);
+            $SVGImportedElement->setAttribute('class', 'item__icon icon');
+            $linkElement->appendChild($SVGImportedElement);
+          }
+        }
+
+        $linkElement->appendChild($labelElement);
+        $itemElement->appendChild($linkElement);
+        $listElement->appendChild($itemElement);
       }
+
+      $elementCMSAPMainNavigation->appendChild($listElement);
     }
   }
   

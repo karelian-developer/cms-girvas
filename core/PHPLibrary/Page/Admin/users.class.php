@@ -5,6 +5,7 @@ namespace core\PHPLibrary\Page\Admin;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\Users as Users;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
@@ -35,28 +36,32 @@ class PageUsers implements InterfacePage
       'iconName' => 'index',
       'link' => '/',
       'permanent' => true,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => null,
     ],
     'users' => [
       'name' => 'users',
       'iconName' => 'users',
       'link' => '/users',
       'permanent' => false,
-      'isActive' => true
+      'isActive' => true,
+      'permission' => 'hasPermissionAdminUsersManagement',
     ],
     'groups' => [
       'name' => 'groups',
       'iconName' => 'usersGroups',
       'link' => '/usersGroups',
       'permanent' => false,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => 'hasPermissionAdminUsersGroupsManagement',
     ],
     'consents' => [
       'name' => 'consents',
       'iconName' => 'usersConsents',
       'link' => '/usersConsents',
       'permanent' => false,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => 'hasPermissionAdminUsersConsentsManagement',
     ],
   ];
 
@@ -67,18 +72,120 @@ class PageUsers implements InterfacePage
   }
 
   /**
+   * Получить группу текущего авторизованного пользователя админки
+   * 
+   * @return UserGroup|null
+   */
+  private function getCurrentUserGroup() : ?UserGroup
+  {
+    /** @var User|null $user */
+    $user = $this->CMSCore->client->getUser(2);
+    if ($user === null) {
+      return null;
+    }
+
+    $user->initData(['metadata']);
+
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $user->getGroup();
+    if ($userGroup === null) {
+      return null;
+    }
+
+    $userGroup->initData(['permissions']);
+
+    return $userGroup;
+  }
+
+  /**
+   * Проверить, есть ли у текущего пользователя право управления пользователями
+   * 
+   * @return bool
+   */
+  private function currentUserCanManageUsers() : bool
+  {
+    $userGroup = $this->getCurrentUserGroup();
+
+    return $userGroup !== null
+      && method_exists($userGroup, 'hasPermissionAdminUsersManagement')
+      && $userGroup->hasPermissionAdminUsersManagement();
+  }
+
+  /**
+   * Собрать страницу ошибки и подменить итоговую сборку
+   * 
+   * @param int $httpCode
+   * 
+   * @return void
+   */
+  private function assemblyError(int $httpCode) : void
+  {
+    http_response_code($httpCode);
+
+    $pageError = new PageError($this->CMSCore, $this->page, $httpCode);
+    $pageError->assembly();
+    $this->assembled = $pageError->assembled;
+  }
+
+  /**
+   * Отфильтровать подразделы по правам текущего пользователя
+   * 
+   * @param UserGroup $userGroup
+   * 
+   * @return void
+   */
+  private function filterSubsections(UserGroup $userGroup) : void
+  {
+    foreach ($this->navigationSubsections as $index => $subsection) {
+      $permission = $subsection['permission'] ?? null;
+
+      if ($permission === null) {
+        continue;
+      }
+
+      $allowed = method_exists($userGroup, $permission) && $userGroup->{$permission}();
+
+      if (!$allowed) {
+        unset($this->navigationSubsections[$index]);
+      }
+    }
+  }
+
+  /**
    * Инициализация подразделов
    *
    * @return void
    */
   public function initSubnavigation() : void
   {
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $this->getCurrentUserGroup();
+
+    if ($userGroup === null) {
+      return;
+    }
+
+    // Если нет доступа ни к одному подразделу — не собираем навигацию
+    if (!$this->currentUserCanManageUsers()
+      && !$userGroup->hasPermissionAdminUsersGroupsManagement()
+      && !$userGroup->hasPermissionAdminUsersConsentsManagement()) {
+      return;
+    }
+
+    $this->filterSubsections($userGroup);
+
     $themeSource =& $this->CMSCore->theme->core->source;
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
   public function assembly() : void
   {
+    // Защита от прямого захода по URL без прав
+    if (!$this->currentUserCanManageUsers()) {
+      $this->assemblyError(403);
+      return;
+    }
+
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/users.css', 'rel' => 'stylesheet']);
 
     $localeData = $this->CMSCore->locale->getData();

@@ -29,6 +29,8 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\Metrics as Metrics;
@@ -62,14 +64,16 @@ class PageAnalytics implements InterfacePage
       'iconName' => 'back',
       'link' => '/',
       'permanent' => true,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => null,
     ],
     'forms' => [
       'name' => 'forms',
       'iconName' => 'forms',
       'link' => '/analytics/forms',
       'permanent' => false,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => 'hasPermissionAdminViewingLogs',
     ]
   ];
 
@@ -85,12 +89,106 @@ class PageAnalytics implements InterfacePage
   ) {}
 
   /**
+   * Получить группу текущего авторизованного пользователя админки
+   * 
+   * @return UserGroup|null
+   */
+  private function getCurrentUserGroup() : ?UserGroup
+  {
+    /** @var User|null $user */
+    $user = $this->CMSCore->client->getUser(2);
+    if ($user === null) {
+      return null;
+    }
+
+    $user->initData(['metadata']);
+
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $user->getGroup();
+    if ($userGroup === null) {
+      return null;
+    }
+
+    $userGroup->initData(['permissions']);
+
+    return $userGroup;
+  }
+
+  /**
+   * Проверить, есть ли у текущего пользователя право просмотра аналитики
+   * 
+   * @return bool
+   */
+  private function currentUserCanViewAnalytics() : bool
+  {
+    $userGroup = $this->getCurrentUserGroup();
+
+    return $userGroup !== null
+      && method_exists($userGroup, 'hasPermissionAdminViewingLogs')
+      && $userGroup->hasPermissionAdminViewingLogs();
+  }
+
+  /**
+   * Собрать страницу ошибки и подменить итоговую сборку
+   * 
+   * @param int $httpCode
+   * 
+   * @return void
+   */
+  private function assemblyError(int $httpCode) : void
+  {
+    http_response_code($httpCode);
+
+    $pageError = new PageError($this->CMSCore, $this->page, $httpCode);
+    $pageError->assembly();
+    $this->assembled = $pageError->assembled;
+  }
+
+  /**
+   * Отфильтровать подразделы по правам текущего пользователя
+   * 
+   * @param UserGroup $userGroup
+   * 
+   * @return void
+   */
+  private function filterSubsections(UserGroup $userGroup) : void
+  {
+    foreach ($this->navigationSubsections as $index => $subsection) {
+      $permission = $subsection['permission'] ?? null;
+
+      if ($permission === null) {
+        continue;
+      }
+
+      $allowed = method_exists($userGroup, $permission) && $userGroup->{$permission}();
+
+      if (!$allowed) {
+        unset($this->navigationSubsections[$index]);
+      }
+    }
+  }
+
+  /**
    * Инициализация подразделов
    * 
    * @return void
    */
   public function initSubnavigation() : void
   {
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $this->getCurrentUserGroup();
+
+    if ($userGroup === null) {
+      return;
+    }
+
+    // Если нет прав на просмотр логов — подразделы не собираем
+    if (!$this->currentUserCanViewAnalytics()) {
+      return;
+    }
+
+    $this->filterSubsections($userGroup);
+
     $themeSource =& $this->CMSCore->theme->core->source;
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
@@ -311,6 +409,12 @@ class PageAnalytics implements InterfacePage
    */
   public function assembly() : void
   {
+    // Защита от прямого захода по URL без прав
+    if (!$this->currentUserCanViewAnalytics()) {
+      $this->assemblyError(403);
+      return;
+    }
+
     $CMSCore = $this->CMSCore;
     $CMSURLP = $CMSCore->urlp;
     $CMSTheme = $CMSCore->theme;
@@ -340,12 +444,8 @@ class PageAnalytics implements InterfacePage
 
         $this->assembled = $page->assembled;
       } else {
-        http_response_code(404);
-
-        $pageError = new PageError($this->CMSCore, $this->page, 404);
-        $pageError->assembly();
-
-        $this->assembled = $pageError->assembled;
+        $this->assemblyError(404);
+        return;
       }
     } elseif ($CMSURLP->getPath(2) === 'page' && $CMSURLP->getPath(3) !== null) {
       $pageStatic = null;
@@ -365,12 +465,8 @@ class PageAnalytics implements InterfacePage
 
         $this->assembled = $page->assembled;
       } else {
-        http_response_code(404);
-
-        $pageError = new PageError($this->CMSCore, $this->page, 404);
-        $pageError->assembly();
-        
-        $this->assembled = $pageError->assembled;
+        $this->assemblyError(404);
+        return;
       }
     } elseif ($CMSURLP->getPath(2) === 'forms') {
       $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics/forms.css', 'rel' => 'stylesheet']);
@@ -403,12 +499,8 @@ class PageAnalytics implements InterfacePage
 
         $this->assembled = $page->assembled;
       } else {
-        http_response_code(404);
-
-        $pageError = new PageError($this->CMSCore, $this->page, 404);
-        $pageError->assembly();
-        
-        $this->assembled = $pageError->assembled;
+        $this->assemblyError(404);
+        return;
       }
     } else {
       // ==========================================

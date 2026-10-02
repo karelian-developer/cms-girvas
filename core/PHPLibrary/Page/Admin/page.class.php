@@ -22,6 +22,8 @@ namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\PageStatic\Version as PageStaticVersion;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
@@ -44,7 +46,8 @@ class PagePage implements InterfacePage
       'iconName' => 'back',
       'link' => '/pages',
       'permanent' => true,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => 'hasPermissionEditorPagesStaticEdit',
     ],
   ];
 
@@ -55,18 +58,85 @@ class PagePage implements InterfacePage
   }
 
   /**
+   * Получить группу текущего авторизованного пользователя админки
+   * 
+   * @return UserGroup|null
+   */
+  private function getCurrentUserGroup() : ?UserGroup
+  {
+    /** @var User|null $user */
+    $user = $this->CMSCore->client->getUser(2);
+    if ($user === null) {
+      return null;
+    }
+
+    $user->initData(['metadata']);
+
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $user->getGroup();
+    if ($userGroup === null) {
+      return null;
+    }
+
+    $userGroup->initData(['permissions']);
+
+    return $userGroup;
+  }
+
+  /**
+   * Проверить, есть ли у текущего пользователя право редактирования статических страниц
+   * 
+   * @return bool
+   */
+  private function currentUserCanEditPages() : bool
+  {
+    $userGroup = $this->getCurrentUserGroup();
+
+    return $userGroup !== null
+      && method_exists($userGroup, 'hasPermissionEditorPagesStaticEdit')
+      && $userGroup->hasPermissionEditorPagesStaticEdit();
+  }
+
+  /**
+   * Собрать страницу ошибки и подменить итоговую сборку
+   * 
+   * @param int $httpCode
+   * 
+   * @return void
+   */
+  private function assemblyError(int $httpCode) : void
+  {
+    http_response_code($httpCode);
+
+    $pageError = new PageError($this->CMSCore, $this->page, $httpCode);
+    $pageError->assembly();
+    $this->assembled = $pageError->assembled;
+  }
+
+  /**
    * Инициализация подразделов
    * 
    * @return void
    */
   public function initSubnavigation() : void
   {
+    // Если нет прав на редактирование статических страниц — подразделы не собираем
+    if (!$this->currentUserCanEditPages()) {
+      return;
+    }
+
     $themeSource =& $this->CMSCore->theme->core->source;
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
   public function assembly() : void
   {
+    // Защита от прямого захода по URL без прав
+    if (!$this->currentUserCanEditPages()) {
+      $this->assemblyError(403);
+      return;
+    }
+
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/pageStatic.css', 'rel' => 'stylesheet']);
     $this->CMSCore->theme->addStyle(['href' => 'styles/nadvoTE.css', 'rel' => 'stylesheet']);
 
@@ -349,5 +419,4 @@ class PagePage implements InterfacePage
       $templatesAssembled
     );
   }
-
 }

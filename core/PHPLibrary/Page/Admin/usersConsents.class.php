@@ -60,28 +60,32 @@ class PageUsersConsents implements InterfacePage
       'iconName' => 'index',
       'link' => '/',
       'permanent' => true,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => null,
     ],
     'users' => [
       'name' => 'users',
       'iconName' => 'users',
       'link' => '/users',
       'permanent' => false,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => 'hasPermissionAdminUsersManagement',
     ],
     'groups' => [
       'name' => 'groups',
       'iconName' => 'usersGroups',
       'link' => '/usersGroups',
       'permanent' => false,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => 'hasPermissionAdminUsersGroupsManagement',
     ],
     'consents' => [
       'name' => 'consents',
       'iconName' => 'usersConsents',
       'link' => '/usersConsents',
       'permanent' => false,
-      'isActive' => true
+      'isActive' => true,
+      'permission' => 'hasPermissionAdminUsersConsentsManagement',
     ],
   ];
 
@@ -92,31 +96,111 @@ class PageUsersConsents implements InterfacePage
   }
 
   /**
-   * Инициализация подразделов
+   * Получить группу текущего авторизованного пользователя админки
+   * 
+   * @return UserGroup|null
    */
-  public function initSubnavigation() : void
+  private function getCurrentUserGroup() : ?UserGroup
   {
-    $themeSource =& $this->CMSCore->theme->core->source;
-    $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
+    /** @var User|null $user */
+    $user = $this->CMSCore->client->getUser(2);
+    if ($user === null) {
+      return null;
+    }
+
+    $user->initData(['metadata']);
+
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $user->getGroup();
+    if ($userGroup === null) {
+      return null;
+    }
+
+    $userGroup->initData(['permissions']);
+
+    return $userGroup;
   }
 
   /**
-   * Проверка прав: PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT или SuperID
+   * Проверить, есть ли у группы право управления согласиями (152-ФЗ)
+   * 
+   * @param UserGroup $userGroup
+   * 
+   * @return bool
    */
-  private function canViewConsents(User $clientUser) : bool
+  private function userGroupCanManageConsents(UserGroup $userGroup) : bool
   {
-    $clientUserGroup = $clientUser->getGroup();
-    $clientUserGroup->initData(['permissions']);
+    return $userGroup->hasPermissionAdminUsersConsentsManagement()
+      || $userGroup->isSuperGroup();
+  }
 
-    if ($clientUserGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT)) {
-      return true;
+  /**
+   * Собрать страницу ошибки и подменить итоговую сборку
+   * 
+   * @param int $httpCode
+   * 
+   * @return void
+   */
+  private function assemblyError(int $httpCode) : void
+  {
+    http_response_code($httpCode);
+
+    $pageError = new PageError($this->CMSCore, $this->page, $httpCode);
+    $pageError->assembly();
+    $this->assembled = $pageError->assembled;
+  }
+
+  /**
+   * Отфильтровать подразделы по правам текущего пользователя
+   * 
+   * @param UserGroup $userGroup
+   * 
+   * @return void
+   */
+  private function filterSubsections(UserGroup $userGroup) : void
+  {
+    foreach ($this->navigationSubsections as $index => $subsection) {
+      $permission = $subsection['permission'] ?? null;
+
+      if ($permission === null) {
+        continue;
+      }
+
+      $allowed = method_exists($userGroup, $permission) && $userGroup->{$permission}();
+
+      if (!$allowed) {
+        unset($this->navigationSubsections[$index]);
+      }
+    }
+  }
+
+  /**
+   * Инициализация подразделов
+   * 
+   * @return void
+   */
+  public function initSubnavigation() : void
+  {
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $this->getCurrentUserGroup();
+
+    if ($userGroup === null) {
+      return;
     }
 
-    if (defined('UserGroup::GROUP_SUPER_ID') && $clientUserGroup->getID() === UserGroup::GROUP_SUPER_ID) {
-      return true;
+    // Если у пользователя вообще нет доступа ни к одному подразделу — не собираем
+    $hasAnyAccess = $this->userGroupCanManageConsents($userGroup)
+      || $userGroup->hasPermissionAdminUsersManagement()
+      || $userGroup->hasPermissionAdminUsersGroupsManagement();
+
+    if (!$hasAnyAccess) {
+      return;
     }
 
-    return false;
+    $this->filterSubsections($userGroup);
+
+    $themeSource =& $this->CMSCore->theme->core->source;
+    $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
   public function assembly() : void
@@ -126,34 +210,23 @@ class PageUsersConsents implements InterfacePage
     $localeData = $this->CMSCore->locale->getData();
     $localeName = $this->CMSCore->locale->getName();
 
-    // Проверка прав
+    // Получаем текущего пользователя админки
+    /** @var User|null $clientUser */
     $clientUser = $this->CMSCore->client->getUser(2);
     if ($clientUser === null) {
-      http_response_code(401);
-
-      $pageError = new PageError($this->CMSCore, $this->page, 401);
-      $pageError->assembly();
-      $this->assembled = $pageError->assembled;
-
+      $this->assemblyError(401);
       return;
     }
 
-    $clientUser->initData(['metadata']);
-
-    if (!$this->canViewConsents($clientUser)) {
-      http_response_code(403);
-
-      $pageError = new PageError($this->CMSCore, $this->page, 403);
-      $pageError->assembly();
-      $this->assembled = $pageError->assembled;
-
+    /** @var UserGroup|null $clientUserGroup */
+    $clientUserGroup = $this->getCurrentUserGroup();
+    if ($clientUserGroup === null || !$this->userGroupCanManageConsents($clientUserGroup)) {
+      $this->assemblyError(403);
       return;
     }
 
-    $clientUserGroup = $clientUser->getGroup();
-    $clientUserGroup->initData(['permissions']);
-    $clientIsSuper = $clientUserGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT)
-      || (defined('UserGroup::GROUP_SUPER_ID') && $clientUserGroup->getID() === UserGroup::GROUP_SUPER_ID);
+    // Отзывать согласия может только супергруппа
+    $clientIsSuper = $clientUserGroup->isSuperGroup();
 
     // Пагинация
     $paginationItemCurrent = $this->CMSCore->urlp->getParam('pageNumber') !== null

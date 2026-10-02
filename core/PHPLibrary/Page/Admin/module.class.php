@@ -22,6 +22,8 @@ namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\Module as Module;
 use \core\PHPLibrary\Module\EnumMetadata as ModuleEnumMetadata;
 use \core\PHPLibrary\Module\EnumWeight as ModuleEnumWeight;
@@ -69,7 +71,8 @@ class PageModule implements InterfacePage
       'iconName' => 'back',
       'link' => '/modules',
       'permanent' => true,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => 'hasPermissionAdminModulesManagement',
     ],
   ];
 
@@ -85,12 +88,73 @@ class PageModule implements InterfacePage
   }
 
   /**
+   * Получить группу текущего авторизованного пользователя админки
+   * 
+   * @return UserGroup|null
+   */
+  private function getCurrentUserGroup() : ?UserGroup
+  {
+    /** @var User|null $user */
+    $user = $this->CMSCore->client->getUser(2);
+    if ($user === null) {
+      return null;
+    }
+
+    $user->initData(['metadata']);
+
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $user->getGroup();
+    if ($userGroup === null) {
+      return null;
+    }
+
+    $userGroup->initData(['permissions']);
+
+    return $userGroup;
+  }
+
+  /**
+   * Проверить, есть ли у текущего пользователя право управления модулями
+   * 
+   * @return bool
+   */
+  private function currentUserCanManageModules() : bool
+  {
+    $userGroup = $this->getCurrentUserGroup();
+
+    return $userGroup !== null
+      && method_exists($userGroup, 'hasPermissionAdminModulesManagement')
+      && $userGroup->hasPermissionAdminModulesManagement();
+  }
+
+  /**
+   * Собрать страницу ошибки и подменить итоговую сборку
+   * 
+   * @param int $httpCode
+   * 
+   * @return void
+   */
+  private function assemblyError(int $httpCode) : void
+  {
+    http_response_code($httpCode);
+
+    $pageError = new PageError($this->CMSCore, $this->page, $httpCode);
+    $pageError->assembly();
+    $this->assembled = $pageError->assembled;
+  }
+
+  /**
    * Инициализация подразделов
    * 
    * @return void
    */
   public function initSubnavigation() : void
   {
+    // Если нет прав на управление модулями — подразделы не собираем
+    if (!$this->currentUserCanManageModules()) {
+      return;
+    }
+
     $themeSource =& $this->CMSCore->theme->core->source;
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
@@ -102,6 +166,12 @@ class PageModule implements InterfacePage
    */
   public function assembly() : void
   {
+    // Защита от прямого захода по URL без прав
+    if (!$this->currentUserCanManageModules()) {
+      $this->assemblyError(403);
+      return;
+    }
+
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/module.css', 'rel' => 'stylesheet']);
     
     $localeData = $this->CMSCore->locale->getData();
@@ -268,11 +338,7 @@ class PageModule implements InterfacePage
         'MODULE_INSTALLED_STATUS' => $module->isInstalled() ? 'installed' : 'not-installed'
       ]);
     } else {
-      http_response_code(404);
-
-      $pageError = new PageError($this->CMSCore, $this->page, 404);
-      $pageError->assembly();
-      $this->assembled = $pageError->assembled;
+      $this->assemblyError(404);
     }
   }
 }

@@ -23,6 +23,8 @@ namespace core\PHPLibrary\Page\Admin;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\Feeds as Feeds;
 use \core\PHPLibrary\Feed\Builder as FeedBuilder;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
@@ -46,14 +48,16 @@ class PageFeeds implements InterfacePage
       'iconName' => 'index',
       'link' => '/',
       'permanent' => true,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => null,
     ],
     'feeds' => [
       'name' => 'feeds',
       'iconName' => 'feeds',
       'link' => '/feeds',
       'permanent' => false,
-      'isActive' => true
+      'isActive' => true,
+      'permission' => 'hasPermissionAdminFeedsManagement',
     ],
   ];
 
@@ -70,12 +74,73 @@ class PageFeeds implements InterfacePage
   }
 
   /**
+   * Получить группу текущего авторизованного пользователя админки
+   * 
+   * @return UserGroup|null
+   */
+  private function getCurrentUserGroup() : ?UserGroup
+  {
+    /** @var User|null $user */
+    $user = $this->CMSCore->client->getUser(2);
+    if ($user === null) {
+      return null;
+    }
+
+    $user->initData(['metadata']);
+
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $user->getGroup();
+    if ($userGroup === null) {
+      return null;
+    }
+
+    $userGroup->initData(['permissions']);
+
+    return $userGroup;
+  }
+
+  /**
+   * Проверить, есть ли у текущего пользователя право управления фидами
+   * 
+   * @return bool
+   */
+  private function currentUserCanManageFeeds() : bool
+  {
+    $userGroup = $this->getCurrentUserGroup();
+
+    return $userGroup !== null
+      && method_exists($userGroup, 'hasPermissionAdminFeedsManagement')
+      && $userGroup->hasPermissionAdminFeedsManagement();
+  }
+
+  /**
+   * Собрать страницу ошибки и подменить итоговую сборку
+   * 
+   * @param int $httpCode
+   * 
+   * @return void
+   */
+  private function assemblyError(int $httpCode) : void
+  {
+    http_response_code($httpCode);
+
+    $pageError = new PageError($this->CMSCore, $this->page, $httpCode);
+    $pageError->assembly();
+    $this->assembled = $pageError->assembled;
+  }
+
+  /**
    * Инициализация подразделов
    * 
    * @return void
    */
   public function initSubnavigation() : void
   {
+    // Если нет прав на управление фидами — подразделы не собираем
+    if (!$this->currentUserCanManageFeeds()) {
+      return;
+    }
+
     $themeSource =& $this->CMSCore->theme->core->source;
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
@@ -115,6 +180,12 @@ class PageFeeds implements InterfacePage
    */
   public function assembly() : void
   {
+    // Защита от прямого захода по URL без прав
+    if (!$this->currentUserCanManageFeeds()) {
+      $this->assemblyError(403);
+      return;
+    }
+
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/feeds.css', 'rel' => 'stylesheet']);
 
     $localeData = $this->CMSCore->locale->getData();

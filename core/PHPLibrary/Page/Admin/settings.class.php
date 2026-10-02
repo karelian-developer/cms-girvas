@@ -26,6 +26,8 @@ use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\Page\Admin\Settings\SettingsPageInterface as SettingsPageInterface;
 use \core\PHPLibrary\TraitPage as TraitPage;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\UserGroup as UserGroup;
 
 class PageSettings implements InterfacePage
 {
@@ -40,7 +42,8 @@ class PageSettings implements InterfacePage
       'iconName' => 'index',
       'link' => '/',
       'permanent' => true,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => null,
     ],
   ];
 
@@ -53,6 +56,62 @@ class PageSettings implements InterfacePage
   ) {}
 
   /**
+   * Получить группу текущего авторизованного пользователя админки
+   * 
+   * @return UserGroup|null
+   */
+  private function getCurrentUserGroup() : ?UserGroup
+  {
+    /** @var User|null $user */
+    $user = $this->CMSCore->client->getUser(2);
+    if ($user === null) {
+      return null;
+    }
+
+    $user->initData(['metadata']);
+
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $user->getGroup();
+    if ($userGroup === null) {
+      return null;
+    }
+
+    $userGroup->initData(['permissions']);
+
+    return $userGroup;
+  }
+
+  /**
+   * Проверить, есть ли у текущего пользователя право управления настройками
+   * 
+   * @return bool
+   */
+  private function currentUserCanManageSettings() : bool
+  {
+    $userGroup = $this->getCurrentUserGroup();
+
+    return $userGroup !== null
+      && method_exists($userGroup, 'hasPermissionAdminSettingsManagement')
+      && $userGroup->hasPermissionAdminSettingsManagement();
+  }
+
+  /**
+   * Собрать страницу ошибки и подменить итоговую сборку
+   * 
+   * @param int $httpCode
+   * 
+   * @return void
+   */
+  private function assemblyError(int $httpCode) : void
+  {
+    http_response_code($httpCode);
+
+    $pageError = new PageError($this->CMSCore, $this->page, $httpCode);
+    $pageError->assembly();
+    $this->assembled = $pageError->assembled;
+  }
+
+  /**
    * Инициализация подразделов
    * 
    * @return void
@@ -60,6 +119,11 @@ class PageSettings implements InterfacePage
   public function initSubnavigation() : void
   {
     $themeSource =& $this->CMSCore->theme->core->source;
+
+    // Если нет прав на управление настройками — подразделы не собираем
+    if (!$this->currentUserCanManageSettings()) {
+      return;
+    }
 
     $availableSettingsCategories = $this->getAvailableSettingsCategoriesArray();
     if (!empty($availableSettingsCategories)) {
@@ -71,7 +135,8 @@ class PageSettings implements InterfacePage
           'iconName' => 'settingsGroup' . ucfirst($category),
           'link' => '/settings/' . $category,
           'permanent' => true,
-          'isActive' => $settingsName === $category ? true : false
+          'isActive' => $settingsName === $category ? true : false,
+          'permission' => 'hasPermissionAdminSettingsManagement',
         ];
       }
     }
@@ -124,6 +189,12 @@ class PageSettings implements InterfacePage
 
   public function assembly() : void
   {
+    // Защита от прямого захода по URL без прав
+    if (!$this->currentUserCanManageSettings()) {
+      $this->assemblyError(403);
+      return;
+    }
+
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/settings.css', 'rel' => 'stylesheet']);
 
     $localeData = $this->CMSCore->locale->getData();
@@ -147,7 +218,8 @@ class PageSettings implements InterfacePage
       $settingsDescription = $settings->getDescription();
       $settings->assembly();
     } else {
-      http_response_code(404);
+      $this->assemblyError(404);
+      return;
     }
 
     /** @var string $site_page Содержимое шаблона страницы */

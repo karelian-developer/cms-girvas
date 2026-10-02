@@ -23,6 +23,8 @@ namespace core\PHPLibrary\Page\Admin;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \core\PHPLibrary\SystemCore\Reports as CMSReports;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
@@ -43,28 +45,32 @@ final class PageReports implements InterfacePage
       'iconName' => 'index',
       'link' => '/',
       'permanent' => true,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => null,
     ],
     'all' => [
       'name' => 'base',
       'iconName' => 'base',
       'link' => '/reports',
       'permanent' => true,
-      'isActive' => true
+      'isActive' => true,
+      'permission' => 'hasPermissionAdminViewingLogs',
     ],
     'content' => [
       'name' => 'content',
       'iconName' => 'content',
       'link' => '/reports/content',
       'permanent' => false,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => 'hasPermissionAdminViewingLogs',
     ],
     'security' => [
       'name' => 'security',
       'iconName' => 'security',
       'link' => '/reports/security',
       'permanent' => false,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => 'hasPermissionAdminViewingLogs',
     ],
   ];
 
@@ -74,6 +80,22 @@ final class PageReports implements InterfacePage
   ) {}
 
   /**
+   * Собрать страницу ошибки и подменить итоговую сборку
+   * 
+   * @param int $httpCode
+   * 
+   * @return void
+   */
+  private function assemblyError(int $httpCode) : void
+  {
+    http_response_code($httpCode);
+
+    $pageError = new PageError($this->CMSCore, $this->page, $httpCode);
+    $pageError->assembly();
+    $this->assembled = $pageError->assembled;
+  }
+
+  /**
    * Инициализация подразделов
    * 
    * @return void
@@ -81,7 +103,29 @@ final class PageReports implements InterfacePage
   public function initSubnavigation() : void
   {
     $themeSource =& $this->CMSCore->theme->core->source;
-    $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
+
+    /** @var User Объект авторизованного пользователя */
+    $user = $this->CMSCore->client->getUser(2);
+    $user->initData(['metadata']);
+
+    /** @var UserGroup Объект группы пользователя */
+    $userGroup = $user->getGroup();
+    $userGroup->initData(['permissions']);
+
+    // Отфильтровываем подразделы по правам
+    $filteredSubsections = [];
+    foreach ($this->navigationSubsections as $subsectionIndex => $subsectionData) {
+      $permission = $subsectionData['permission'] ?? null;
+
+      $allowed = $permission === null
+        || (method_exists($userGroup, $permission) && $userGroup->{$permission}());
+
+      if ($allowed) {
+        $filteredSubsections[$subsectionIndex] = $subsectionData;
+      }
+    }
+
+    $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource, $filteredSubsections);
   }
 
   public function getAvailableReportsCategoriesArray() : array
@@ -128,6 +172,31 @@ final class PageReports implements InterfacePage
 
   public function assembly() : void
   {
+    // Защита от прямого захода по URL без прав
+    /** @var User|null $user */
+    $user = $this->CMSCore->client->getUser(2);
+    if ($user === null) {
+      $this->assemblyError(401);
+      return;
+    }
+    $user->initData(['metadata']);
+
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $user->getGroup();
+    if ($userGroup === null) {
+      $this->assemblyError(403);
+      return;
+    }
+    $userGroup->initData(['permissions']);
+
+    $canViewReports = $userGroup->hasReportsAccess()
+      || $userGroup->hasPermissionAdminViewingLogs();
+
+    if (!$canViewReports) {
+      $this->assemblyError(403);
+      return;
+    }
+
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/reports.css', 'rel' => 'stylesheet']);
     $this->CMSCore->theme->addScript(['src' => 'admin/page/reports.js'], true);
 
@@ -153,10 +222,9 @@ final class PageReports implements InterfacePage
 
       $reportsPageAssembled = $reportsPage->assembled;
     } else {
-      http_response_code(404);
+      $this->assemblyError(404);
+      return;
     }
-
-    $reportsPageAssembled = $reportsPageAssembled ?? '';
 
     /** @var string $site_page Содержимое шаблона страницы */
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/reports.tpl', [

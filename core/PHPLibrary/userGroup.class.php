@@ -441,6 +441,49 @@ class UserGroup
   }
 
   /**
+   * Проверить наличие права управления согласиями пользователей (152-ФЗ)
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminUsersConsentsManagement() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT);
+  }
+
+  /**
+   * Проверить наличие любого права редактора
+   * 
+   * Используется для агрегированной проверки доступа к контент-разделу:
+   * если у пользователя есть хотя бы одно из прав редактора, ему доступен
+   * раздел «Контент» в главной навигации.
+   * 
+   * @return bool
+   */
+  public function hasAnyEditorPermission() : bool
+  {
+    return $this->hasPermissionEditorEntriesEdit()
+      || $this->hasPermissionEditorEntriesCategoriesEdit()
+      || $this->hasPermissionEditorPagesStaticEdit()
+      || $this->hasPermissionEditorContentBlocksEdit()
+      || $this->hasPermissionEditorMediaFilesManagement();
+  }
+
+  /**
+   * Проверить наличие доступа к разделу отчётов
+   * 
+   * Отчёты содержат чувствительные данные (логи, ПДн, согласия),
+   * поэтому доступ даётся тем, у кого есть хотя бы одно из «смежных» прав.
+   * 
+   * @return bool
+   */
+  public function hasReportsAccess() : bool
+  {
+    return $this->hasPermissionAdminViewingLogs()
+      || $this->hasPermissionAdminUsersDataExport()
+      || $this->hasPermissionAdminUsersConsentsManagement();
+  }
+
+  /**
    * Проверить наличие права просмотра логов
    * 
    * @return bool
@@ -458,6 +501,26 @@ class UserGroup
   public function hasPermissionAdminFeedsManagement() : bool
   {
     return $this->permissionCheck(self::PERMISSION_ADMIN_FEEDS_MANAGEMENT);
+  }
+
+  /**
+   * Проверить наличие права управления модулями
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminModulesManagement() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_MODULES_MANAGEMENT);
+  }
+
+  /**
+   * Проверить наличие права управления контент-блоками
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminContentBlocksManagement() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_CONTENT_BLOCKS_MANAGEMENT);
   }
 
   /**
