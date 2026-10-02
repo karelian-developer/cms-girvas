@@ -208,6 +208,11 @@ final class PostgreSql extends BaseDialect
     );
   }
 
+  public function jsonReplace(string $column, string $jsonValue) : string
+  {
+    return sprintf('%s::jsonb', $jsonValue);
+  }
+
   /**
    * @param  string $column
    * @return string

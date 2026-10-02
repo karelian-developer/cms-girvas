@@ -21,7 +21,6 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \DOMDocument as DOMDocument;
@@ -616,10 +615,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -664,10 +662,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -709,10 +706,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`name` = :name',
-      'postgresql' => '"name" = :name'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :name', $queryBuilder->dialect->quoteIdentifier('name'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -754,10 +750,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms_data');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -799,10 +794,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`name` = :name',
-      'postgresql' => '"name" = :name'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :name', $queryBuilder->dialect->quoteIdentifier('name'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -879,7 +873,7 @@ class Form implements EntityTypeContent
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+    if (!$dialect->supportsInsertReturning()) {
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
@@ -887,7 +881,9 @@ class Form implements EntityTypeContent
       $queryBuilder->statement->clauseFrom->addTable('forms');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $dialect->getLastInsertedIDCondition('id')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
@@ -900,7 +896,6 @@ class Form implements EntityTypeContent
           'message' => $exception->getMessage(),
           'statusCode' => 0,
           'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
     }
@@ -936,51 +931,36 @@ class Form implements EntityTypeContent
       }
     }
 
-    foreach (['texts', 'metadata', 'elements'] as $columnName) {
-      $fieldsJSON = [];
-      
-      if (!isset($data[$columnName])) {
+    $dialect = $queryBuilder->dialect;
+
+    foreach (['texts', 'metadata'] as $columnName) {
+      if (empty($data[$columnName])) {
         continue;
       }
 
-      foreach ($data[$columnName] as $name => $value) {
-        $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        
-        if ($columnName === 'elements') {
-          $fieldsJSON[] = match ($queryBuilder->DMS) {
-            CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
-            CMSDMS::PostgreSQL => sprintf('(\'{"%s": %s}\'::jsonb)', $name, $valueJSON)
-          };
-        } else {
-          $fieldsJSON[] = match ($queryBuilder->DMS) {
-            CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
-            CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
-          };
-        }
-      }
+      $jsonObject = json_encode($data[$columnName], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-      if (!empty($data[$columnName])) {
-        if ($columnName === 'elements') {
-          $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-            'mysql' => 'CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON)',
-            'postgresql' => implode(' || ', $fieldsJSON)
-          ]);
-        } else {
-          $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-            'mysql' => 'JSON_MERGE_PATCH(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
-            'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
-          ]);
-        }
-      }
+      $queryBuilder->statement->clauseSet->addColumn(
+        $columnName,
+        $dialect->jsonMergePatch($columnName, sprintf("'%s'", $jsonObject))
+      );
+    }
+
+    if (!empty($data['elements'])) {
+      $elementsJson = json_encode($data['elements'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+      $queryBuilder->statement->clauseSet->addColumn(
+        'elements',
+        $dialect->jsonReplace('elements', sprintf("'%s'", $elementsJson))
+      );
     }
 
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -1036,10 +1016,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -1079,10 +1058,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms_data');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -1150,20 +1128,22 @@ class Form implements EntityTypeContent
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
-      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    if (!$dialect->supportsInsertReturning()) {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
       $queryBuilder->statement->setClauseFrom();
       $queryBuilder->statement->clauseFrom->addTable('forms_data');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $dialect->getLastInsertedIDCondition('id')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
       try {
-        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
         $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
         $databaseQuery->execute();
       } catch (PDOException $exception) {
@@ -1171,7 +1151,6 @@ class Form implements EntityTypeContent
           'message' => $exception->getMessage(),
           'statusCode' => 0,
           'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
     }
@@ -1196,10 +1175,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms_data');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`formID` = :formID',
-      'postgresql' => '"formID" = :formID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :formID', $queryBuilder->dialect->quoteIdentifier('formID'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 

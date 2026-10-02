@@ -151,6 +151,11 @@ final class MySql extends BaseDialect
     );
   }
 
+  public function jsonReplace(string $column, string $jsonValue) : string
+  {
+    return sprintf('CAST(%s AS JSON)', $jsonValue);
+  }
+
   /**
    * @param  string $column
    * @return string

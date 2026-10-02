@@ -771,10 +771,7 @@ class User
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
     $queryBuilder->statement->clauseWhere->addCondition(
-      sprintf(
-        '%s = :id',
-        $queryBuilder->dialect->quoteIdentifier('id')
-      )
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
     );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
@@ -814,10 +811,7 @@ class User
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
     $queryBuilder->statement->clauseWhere->addCondition(
-      sprintf(
-        '%s = :id',
-        $queryBuilder->dialect->quoteIdentifier('id')
-      )
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
     );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
