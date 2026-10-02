@@ -150,12 +150,7 @@ if ($user === null) {
 
 $user->initData(['login', 'email', 'metadata']);
 
-// Формируем consent-страницу
 $CMSLocale = $CMSCore->locale;
-$CMSLocale->setTypeName('handler');
-$CMSLocale->initPathes();
-
-$theme = $CMSCore->getTheme();
 
 // Человекочитаемые описания scopes
 $scopeDescriptions = [
