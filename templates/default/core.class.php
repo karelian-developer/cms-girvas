@@ -121,6 +121,8 @@ final class Core implements ThemeInterfaceCore
     $this->theme->CMSCore->initPage($this->theme->CMSCore->urlp->getPathString());
     $sitePage = $this->theme->CMSCore->getInitedPage();
     $sitePage->assembly();
+    
+    $themeVars['SITE_PAGE'] = ThemeCollector::assembly($sitePage->assembled, []);
 
     return ThemeCollector::assemblyFileContent($this->theme, 'templates/main.tpl', $themeVars);
   }
