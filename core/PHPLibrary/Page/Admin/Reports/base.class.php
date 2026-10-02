@@ -505,13 +505,11 @@ class ReportsBase implements ReportsPageInterface
     // КАТЕГОРИИ СОБЫТИЙ
     // ============================================================
     
-    $usersTypeIDs  = CMSReport::getTypeIDsByCategory(CMSReport::CATEGORY_USERS);
     $contentTypeIDs  = CMSReport::getTypeIDsByCategory(CMSReport::CATEGORY_CONTENT);
     $securityTypeIDs = CMSReport::getTypeIDsByCategory(CMSReport::CATEGORY_SECURITY);
 
     // Все события
     $allReports = $reports;
-    $usersReports = $this->filterReports($reports, $usersTypeIDs);
     $contentReports = $this->filterReports($reports, $contentTypeIDs);
     $securityReports = $this->filterReports($reports, $securityTypeIDs);
 
