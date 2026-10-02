@@ -8,6 +8,7 @@
   "PAGE_PAGE_STATIC_SIDEBAR_BLOCK_SEO_ANALYZER_TIP": "markdown/page/content/pageStatic/sidebarSEOAnalyzerTip.md",
   "PAGE_PAGE_STATIC_SIDEBAR_BLOCK_SCHEDULER_TIP": "markdown/page/content/pageStatic/sidebarSchedulerTip.md",
   "PAGE_PAGE_STATIC_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TIP": "markdown/page/content/pageStatic/sidebarAdditionalFieldsTip.md",
+  "PAGE_PAGE_STATIC_SIDEBAR_BLOCK_DOCUMENT_VERSION_TIP": "markdown/page/content/pageStatic/sidebarDocumentVersionTip.md",
   "PAGE_ENTRY_SIDEBAR_BLOCK_ADDITIONAL_FIELDS_TIP": "markdown/page/content/entry/sidebarAdditionalFieldsTip.md",
   "PAGE_ENTRY_SIDEBAR_BLOCK_SEO_ANALYZER_TIP": "markdown/page/content/entry/sidebarSEOAnalyzerTip.md",
   "PAGE_ENTRY_SIDEBAR_BLOCK_SCHEDULER_TIP": "markdown/page/content/entry/sidebarSchedulerTip.md",
