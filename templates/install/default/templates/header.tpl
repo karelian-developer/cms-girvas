@@ -12,7 +12,7 @@
         <div class="header__copyright-container copyright-container">
           <p class="copyright-container__phar phar"><b>{CMS_DEVELOPER_TITLE}</b></p>
           <p class="copyright-container__phar phar"><b>{LANG:INSTALLER_VERSION_CMS_LABEL}:</b> {CMS_VERSION_LABEL}</p>
-          <p class="copyright-container__phar phar">&copy;&nbsp;2021&nbsp;&mdash;&nbsp;2025</p>
+          <p class="copyright-container__phar phar">&copy;&nbsp;2021&nbsp;&mdash;&nbsp;2027</p>
         </div>
       </div>
     </div>
