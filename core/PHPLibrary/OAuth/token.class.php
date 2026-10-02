@@ -298,10 +298,9 @@ class Token
     $queryBuilder->statement->clauseFrom->addTable('oauth_access_tokens');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -344,10 +343,9 @@ class Token
     $queryBuilder->statement->clauseFrom->addTable('oauth_access_tokens');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`accessToken` = :accessToken',
-      'postgresql' => '"accessToken" = :accessToken'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :accessToken', $queryBuilder->dialect->quoteIdentifier('accessToken'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -389,10 +387,9 @@ class Token
     $queryBuilder->statement->clauseFrom->addTable('oauth_access_tokens');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`refreshToken` = :refreshToken',
-      'postgresql' => '"refreshToken" = :refreshToken'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :refreshToken', $queryBuilder->dialect->quoteIdentifier('refreshToken'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -434,10 +431,9 @@ class Token
     $queryBuilder->statement->clauseFrom->addTable('oauth_access_tokens');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`accessToken` = :accessToken',
-      'postgresql' => '"accessToken" = :accessToken'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :accessToken', $queryBuilder->dialect->quoteIdentifier('accessToken'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -478,11 +474,18 @@ class Token
     $queryBuilder->statement->clauseFrom->addTable('oauth_access_tokens');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`clientID` = :clientID AND `isRevoked` = :isRevoked AND `expiresAt` > :now',
-      'postgresql' => '"clientID" = :clientID AND "isRevoked" = :isRevoked AND "expiresAt" > :now'
-    ]);
+
+    $dialect = $queryBuilder->dialect;
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :clientID AND %s = :isRevoked AND %s > :now',
+        $dialect->quoteIdentifier('clientID'),
+        $dialect->quoteIdentifier('isRevoked'),
+        $dialect->quoteIdentifier('expiresAt')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
+
     $queryBuilder->statement->assembly();
 
     $isRevoked = false;
@@ -558,7 +561,9 @@ class Token
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    if ($CMSConfigDatabase['dms'] === \core\PHPLibrary\Database\DatabaseManagementSystem::MySQL) {
+    $dialect = $queryBuilder->dialect;
+
+    if (!$dialect->supportsInsertReturning()) {
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
@@ -566,7 +571,9 @@ class Token
       $queryBuilder->statement->clauseFrom->addTable('oauth_access_tokens');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $dialect->getLastInsertedIDCondition('id')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
@@ -609,10 +616,9 @@ class Token
     $queryBuilder->statement->clauseSet->addColumn('revokedAt');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -658,10 +664,14 @@ class Token
     $queryBuilder->statement->clauseSet->addColumn('revokedAt');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`userID` = :userID AND `isRevoked` = :isRevoked',
-      'postgresql' => '"userID" = :userID AND "isRevoked" = :isRevoked'
-    ]);
+    $dialect = $queryBuilder->dialect;
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :userID AND %s = :isRevoked',
+        $dialect->quoteIdentifier('userID'),
+        $dialect->quoteIdentifier('isRevoked')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -708,10 +718,13 @@ class Token
     $queryBuilder->statement->clauseSet->addColumn('revokedAt');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`clientID` = :clientID AND `isRevoked` = :isRevoked',
-      'postgresql' => '"clientID" = :clientID AND "isRevoked" = :isRevoked'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :clientID AND %s = :isRevoked',
+        $dialect->quoteIdentifier('clientID'),
+        $dialect->quoteIdentifier('isRevoked')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -754,10 +767,15 @@ class Token
     $queryBuilder->statement->clauseFrom->addTable('oauth_access_tokens');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '(`expiresAt` < :now AND `isRevoked` = :isRevokedTrue) OR `isRevoked` = :isRevokedFalse',
-      'postgresql' => '("expiresAt" < :now AND "isRevoked" = :isRevokedTrue) OR "isRevoked" = :isRevokedFalse'
-    ]);
+    $dialect = $queryBuilder->dialect;
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '(%s < :now AND %s = :isRevokedTrue) OR %s = :isRevokedFalse',
+        $dialect->quoteIdentifier('expiresAt'),
+        $dialect->quoteIdentifier('isRevoked'),
+        $dialect->quoteIdentifier('isRevoked')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 

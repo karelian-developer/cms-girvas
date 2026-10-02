@@ -318,10 +318,9 @@ class AuthCode
     $queryBuilder->statement->clauseFrom->addTable('oauth_auth_codes');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -364,10 +363,9 @@ class AuthCode
     $queryBuilder->statement->clauseFrom->addTable('oauth_auth_codes');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`code` = :code',
-      'postgresql' => '"code" = :code'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :code', $queryBuilder->dialect->quoteIdentifier('code'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -409,10 +407,9 @@ class AuthCode
     $queryBuilder->statement->clauseFrom->addTable('oauth_auth_codes');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`code` = :code',
-      'postgresql' => '"code" = :code'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :code', $queryBuilder->dialect->quoteIdentifier('code'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -488,7 +485,9 @@ class AuthCode
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    if ($CMSConfigDatabase['dms'] === \core\PHPLibrary\Database\DatabaseManagementSystem::MySQL) {
+    $dialect = $queryBuilder->dialect;
+
+    if (!$dialect->supportsInsertReturning()) {
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
@@ -496,7 +495,9 @@ class AuthCode
       $queryBuilder->statement->clauseFrom->addTable('oauth_auth_codes');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $dialect->getLastInsertedIDCondition('id')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
@@ -538,10 +539,9 @@ class AuthCode
     $queryBuilder->statement->clauseSet->addColumn('isRevoked');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -582,10 +582,16 @@ class AuthCode
     $queryBuilder->statement->clauseFrom->addTable('oauth_auth_codes');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`expiresAt` < :now OR `isRevoked` = :isRevoked',
-      'postgresql' => '"expiresAt" < :now OR "isRevoked" = :isRevoked'
-    ]);
+    
+    $dialect = $queryBuilder->dialect;
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s < :now OR %s = :isRevoked',
+        $dialect->quoteIdentifier('expiresAt'),
+        $dialect->quoteIdentifier('isRevoked')
+      )
+    );
+    
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
