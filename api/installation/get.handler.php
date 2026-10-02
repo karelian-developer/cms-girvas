@@ -1932,6 +1932,47 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     ];
 
     $formFeedback = Form::create($CMSCore, 'feedback', $formFeedbackTexts, $formFeedbackElements, $formFeedbackMetadata);
+
+    $demoBlockTexts = [
+      'en_US' => [
+        'title' => 'Demo Block',
+        'description' => 'About CMS GIRVAS',
+        'content' => "**GIRVAS** is a free, open-source content management system developed in the Republic of Karelia, Russia. It is listed in the Russian Software Registry (No. 25012, November 27, 2024).\r\n\r\nBuilt on **PHP 8.2+** with support for **PostgreSQL** and **MySQL**, GIRVAS offers:\r\n\r\n- Multilingual content support\r\n- Markdown parsing (NadvoParse)\r\n- Modular architecture\r\n- Built-in analytics\r\n\r\n> This block can be edited in the admin panel: **Content => Content Blocks**."
+      ],
+      'ru_RU' => [
+        'title' => 'Демонстрационный блок',
+        'description' => 'О системе CMS «ГИРВАС»',
+        'content' => "**«ГИРВАС»** — это бесплатная система управления содержимым с открытым исходным кодом, разработанная в Республике Карелия. Внесена в Реестр российского ПО (запись №25012 от 27.11.2024).\r\n\r\nРаботает на **PHP 8.2+** с поддержкой **PostgreSQL** и **MySQL**. Основные возможности:\r\n\r\n- Мультиязычный контент\r\n- Поддержка разметки Markdown (NadvoParse)\r\n- Модульная архитектура\r\n- Встроенная аналитика\r\n\r\n> Этот блок можно отредактировать в админке: **Контент => Контент-блоки**."
+      ]
+    ];
+
+    $demoBlockMetadata = [
+      'typeID' => 1,
+      'sectionIntegrationName' => 'right_sidebar'
+    ];
+
+    $demoBlock = ContentBlock::create($CMSCore, 'demo-block', $demoBlockTexts, $demoBlockMetadata);
+
+    $lastNewsBlockTexts = [
+      'en_US' => [
+        'title' => 'Latest News',
+        'description' => 'Latest news from the site',
+        'content' => "{ENTRIES_SAMPLE_LAST_NEWS}"
+      ],
+      'ru_RU' => [
+        'title' => 'Последние новости',
+        'description' => 'Последние новости на сайте',
+        'content' => "{ENTRIES_SAMPLE_LAST_NEWS}"
+      ]
+    ];
+
+    $lastNewsBlockMetadata = [
+      'typeID' => 1,
+      'sectionIntegrationName' => 'right_sidebar',
+      'URLRule' => '#^/$#u'
+    ];
+
+    $lastNewsBlock = ContentBlock::create($CMSCore, 'last-news-block', $lastNewsBlockTexts, $lastNewsBlockMetadata);
     
     $CMSCore->configurator->insertDatabaseEntryValue('base_template', 'default');
     $CMSCore->configurator->insertDatabaseEntryValue('base_site_title', 'CMS «ГИРВАС»');

@@ -42,5 +42,5 @@
   </div>
 </article>
 <aside class="sidebar" role="siteSidebarRight">
-  {SIDEBAR_BLOCK_DEMO}
+  {CONTENT_BLOCKS_RIGHT_SIDEBAR}
 </aside>
