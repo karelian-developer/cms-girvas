@@ -85,6 +85,10 @@ export class InstallationMaster {
             let localeIconURL = locale.iconURL;
             let localeName = locale.name;
             let localeISO639_2 = locale.iso639_2;
+
+            if (!['ru_RU', 'en_US'].includes(localeName)) {
+              return;
+            }
     
             let localeIconImageElement = document.createElement('img');
             localeIconImageElement.setAttribute('src', localeIconURL);
