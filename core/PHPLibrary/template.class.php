@@ -671,6 +671,7 @@ final class Template implements ThemeInterface
 
               if ($contentBlockIsShowed) {
                 $contentBlockType = $contentBlock->getType();
+                $contentBlockName = $contentBlock->getName();
                 $contentBlockTypeName = $contentBlockType->getTechnicalName();
                 $contentBlockContent = $contentBlock->getContent($localeName);
                 $contentBlockContentParsed = $nadvoParse->parse(htmlspecialchars($contentBlockContent, ENT_QUOTES, 'UTF-8'));
@@ -679,6 +680,13 @@ final class Template implements ThemeInterface
                   'BLOCK_TITLE' => $contentBlock->getTitle($localeName),
                   'BLOCK_CONTENT' => $contentBlockContentParsed
                 ];
+
+                if ($contentBlockTypeName === 'custom') {
+                  $parts = preg_split('/[-_\s]+/', $contentBlockName);
+                  $parts = array_map('ucfirst', $parts);
+                  $parts[0] = lcfirst($parts[0]);
+                  $contentBlockTPLName = implode('', $parts);
+                }
 
                 if ($contentBlockTypeName === 'cabinet') {
                   $CMSClient = $this->CMSCore->client;
@@ -699,9 +707,11 @@ final class Template implements ThemeInterface
                   $templateContentBlockVars['BLOCK_CABINET'] = $CMSClientIsLogged
                     ? ThemeCollector::assemblyFileContent($this, 'templates/contentBlock/cabinet/user.tpl', $cabinetVars)
                     : ThemeCollector::assemblyFileContent($this, 'templates/contentBlock/cabinet/auth.tpl', $cabinetVars);
+                  
+                  $contentBlockTPLName = 'cabinet';
                 }
                 
-                $contentBlocksAssembled[] = ThemeCollector::assemblyFileContent($this, 'templates/contentBlock/' . $contentBlockTypeName . '.tpl', $templateContentBlockVars);
+                $contentBlocksAssembled[] = ThemeCollector::assemblyFileContent($this, 'templates/contentBlock/' . $contentBlockTPLName . '.tpl', $templateContentBlockVars);
               }
             }
 
