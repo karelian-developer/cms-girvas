@@ -385,10 +385,9 @@ final class Session
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -438,10 +437,9 @@ final class Session
     $queryBuilder->statement->clauseFrom->addTable('metrics');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
