@@ -368,6 +368,8 @@ final class Session
       }
     }
 
+    $dialect = $queryBuilder->dialect;
+
     foreach (['data'] as $columnName) {
       if (empty($data[$columnName])) {
         continue;
