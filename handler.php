@@ -52,7 +52,6 @@ if (defined('IS_NOT_HACKED')) {
       'message' => $handlerMessage,
       'statusCode' => $handlerStatusCode,
       'outputData' => []
-    // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   }
 
@@ -446,7 +445,6 @@ if (defined('IS_NOT_HACKED')) {
   /** @var array $handlerOutputData Выходные данные обработчика */
   $handlerOutputData = $handlerOutputData ?? [];
   
-  // Скрываем чувствительные поля из debug-вывода
   $sensitiveKeys = ['client_secret', 'code_verifier', 'access_token', 'refresh_token', 'password', 'user_password', 'APISecret'];
 
   $maskSensitiveData = function(array $data) use ($sensitiveKeys, &$maskSensitiveData) : array {

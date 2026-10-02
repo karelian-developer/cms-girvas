@@ -46,7 +46,7 @@ if ($CMSCore->client->isLogged(2)) {
           [
             'pageID' => $pageStaticID,
             'pageName' => $pageName,
-            'pageTitles' => $pageTitles, // ← массив по локалям
+            'pageTitles' => $pageTitles,
             'deletedByID' => $clientUser->getID(),
             'deletedByLogin' => $clientUser->getLogin(),
             'ip' => $CMSCore->client->getIPAddress()

@@ -106,7 +106,7 @@ if ($action === 'allow') {
     'redirectURI' => $redirectURI,
     'codeChallenge' => $codeChallenge,
     'codeChallengeMethod' => $codeChallengeMethod,
-    'expiresAt' => time() + 60, // 60 секунд
+    'expiresAt' => time() + 60,
     'isRevoked' => false
   ]);
 

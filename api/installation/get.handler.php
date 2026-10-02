@@ -1568,7 +1568,6 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       createIndexSafe($queryBuilder, $databaseConnection);
       
     } catch (PDOException $exception) {
-      // Логируем ошибку, но не прерываем установку
       error_log('Index creation warning: ' . $exception->getMessage());
     }
 

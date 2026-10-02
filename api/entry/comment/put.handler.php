@@ -142,7 +142,7 @@ if ($CMSCore->client->isLogged(1)) {
                 [
                   'commentID' => $comment->getID(),
                   'entryID' => $commentEntryID,
-                  'entryTitles' => $entryTitles,  // ← массив по локалям
+                  'entryTitles' => $entryTitles,
                   'authorID' => $clientUser->getID(),
                   'authorLogin' => $clientUser->getLogin(),
                   'ip' => $CMSCore->client->getIPAddress()

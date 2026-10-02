@@ -116,17 +116,6 @@ if (array_key_exists('Metrics-Token', $handlerHeaders)) {
     $metricsDataSort['metrics']['visits0'] = $visits0;
     $metricsDataSort['metrics']['visits1'] = $visits1;
 
-    // ==========================================
-    // ЛОГ ДЛЯ ОТЛАДКИ
-    // ==========================================
-    error_log(sprintf(
-      '[Metrics] POST: token=%s, visits0=%d, visits1=%d, transfers=%d',
-      substr($metricsToken, 0, 20) . '...',
-      count($visits0),
-      count($visits1),
-      isset($metricsDataSort['metrics']['views'][$metricsToken]['URLTransfers']) ? count($metricsDataSort['metrics']['views'][$metricsToken]['URLTransfers']) : 0
-    ));
-
     $metricsData['data'] = $metricsDataSort;
     $metricsSession->update($metricsData);
   }

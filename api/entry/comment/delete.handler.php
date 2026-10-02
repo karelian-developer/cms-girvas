@@ -84,7 +84,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           [
             'commentID' => $commentID,
             'entryID' => $entryID,
-            'entryTitles' => $entryTitles,  // ← массив
+            'entryTitles' => $entryTitles,
             'authorID' => $authorID,
             'authorLogin' => $authorLogin,
             'deletedByID' => $clientUser->getID(),

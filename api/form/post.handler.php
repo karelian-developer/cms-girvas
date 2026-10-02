@@ -80,7 +80,7 @@ if (Form::existsByName($CMSCore, $formName)) {
         'formID' => $formID,
         'formName' => $formName,
         'formTitle' => $formTitle,
-        'fields' => $fieldNames, // Только названия полей, без значений!
+        'fields' => $fieldNames,
         'ip' => $formSendedAuthorIP
       ]
     );

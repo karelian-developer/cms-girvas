@@ -16,7 +16,6 @@ use \core\PHPLibrary\Mail\SMTPClient as SMTPClient;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\SystemCore as CMSCore;
 
-// Абсолютный путь до корневой директории CMS
 define('CMS_ROOT_DIRECTORY', preg_replace('/[\/]*$/', '', $_SERVER['DOCUMENT_ROOT']));
 
 ini_set('display_errors', 0);
@@ -170,7 +169,7 @@ if ($CMSURLPathes[0] === 'handler') {
   $theme = $CMSCore->getTheme();
   $theme->assemblyGlobalVariables();
 
-  $loadTime = microtime(true) - $startTime; // Конечное время
+  $loadTime = microtime(true) - $startTime;
   header('X-Load-Time: ' . round($loadTime, 3) . 's');
 
   echo $theme->core->assembled;

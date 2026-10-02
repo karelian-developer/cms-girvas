@@ -1115,8 +1115,6 @@ class Entry implements EntityTypeContent
       $databaseQuery->bindParam(':id', $this->id, \PDO::PARAM_INT);
       $databaseQuery->bindParam(':updatedUnixTimestamp', $updatedUnixTimestamp, \PDO::PARAM_INT);
 
-      error_log('SQL: ' . $queryBuilder->statement->assembled);
-
       $execute = $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
