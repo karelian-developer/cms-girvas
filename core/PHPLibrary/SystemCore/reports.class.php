@@ -115,10 +115,18 @@ final class Reports
     $queryBuilder->statement->clauseFrom->addTable('reports');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`createdUnixTimestamp` BETWEEN :startPeriodUnix AND :endPeriodUnix AND JSON_UNQUOTE(JSON_EXTRACT(metadata, \'$.typeID\')) IS NOT NULL AND CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, \'$.typeID\')) AS UNSIGNED) = :typeID',
-      'postgresql' => '"createdUnixTimestamp" BETWEEN :startPeriodUnix AND :endPeriodUnix AND (metadata::jsonb->>\'typeID\') IS NOT NULL AND (metadata::jsonb->>\'typeID\')::integer = :typeID'
-    ]);
+
+    $dialect = $queryBuilder->dialect;
+
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s BETWEEN :startPeriodUnix AND :endPeriodUnix AND %s IS NOT NULL AND %s = :typeID',
+        $dialect->quoteIdentifier('createdUnixTimestamp'),
+        $dialect->jsonExtractInt('metadata', 'typeID'),
+        $dialect->jsonExtractInt('metadata', 'typeID')
+      )
+    );
+
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -170,10 +178,12 @@ final class Reports
     $queryBuilder->statement->clauseFrom->addTable('reports');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`createdUnixTimestamp` BETWEEN :startPeriodUnix AND :endPeriodUnix',
-      'postgresql' => '"createdUnixTimestamp" BETWEEN :startPeriodUnix AND :endPeriodUnix'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s BETWEEN :startPeriodUnix AND :endPeriodUnix',
+        $queryBuilder->dialect->quoteIdentifier('createdUnixTimestamp')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -231,16 +241,19 @@ final class Reports
     $queryBuilder->statement->clauseFrom->addTable('reports');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => 'JSON_EXTRACT(`variables`, \'$.targetUserID\') = :userID
-                OR JSON_EXTRACT(`variables`, \'$.userID\') = :userID
-                OR JSON_EXTRACT(`variables`, \'$.subjectUserID\') = :userID
-                OR JSON_EXTRACT(`variables`, \'$.viewedByID\') = :userID',
-      'postgresql' => '(variables::jsonb->>\'targetUserID\')::int = :userID
-                      OR (variables::jsonb->>\'userID\')::int = :userID
-                      OR (variables::jsonb->>\'subjectUserID\')::int = :userID
-                      OR (variables::jsonb->>\'viewedByID\')::int = :userID'
-    ]);
+
+    $dialect = $queryBuilder->dialect;
+    $jsonColumns = ['targetUserID', 'userID', 'subjectUserID', 'viewedByID'];
+    $parts = [];
+    $bindings = [];
+    
+    foreach ($jsonColumns as $i => $key) {
+      $param = ':userID_' . $i;
+      $parts[] = sprintf('%s = %s', $dialect->jsonExtractInt('variables', $key), $param);
+      $bindings[$param] = $userID;
+    }
+
+    $queryBuilder->statement->clauseWhere->addCondition('(' . implode(' OR ', $parts) . ')');
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseOrderBy();
     $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
@@ -251,7 +264,9 @@ final class Reports
     try {
       $databaseConnection = $CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->bindParam(':userID', $userID, \PDO::PARAM_INT);
+      foreach ($bindings as $param => $value) {
+        $databaseQuery->bindValue($param, $value, \PDO::PARAM_INT);
+      }
       $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
@@ -284,18 +299,20 @@ final class Reports
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     
     $conditionTypeIDs = [];
     foreach ($typeIDs as $typeID) {
-      $conditionTypeIDs[] = match ($CMSConfigDatabase['dms']) {
-        DMS::PostgreSQL => '(metadata::jsonb->>\'typeID\')::int = ' . $typeID,
-        DMS::MySQL => 'JSON_EXTRACT(`metadata`, \'$.typeID\') = ' . $typeID,
-      };
+      $conditionTypeIDs[] = sprintf(
+        '%s = %d',
+        $queryBuilder->dialect->jsonExtractInt('metadata', 'typeID'),
+        (int) $typeID
+      );
     }
 
     $conditionTypeIDsImploded = implode(' OR ', $conditionTypeIDs);
 
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();

@@ -23,7 +23,6 @@ namespace core\PHPLibrary\User;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \PDOException as PDOException;
 
 class Anonymizer
@@ -125,10 +124,9 @@ class Anonymizer
     $queryBuilder->statement->clauseSet->addColumn('revokeReason');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`userID` = :userID',
-      'postgresql' => '"userID" = :userID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :userID', $queryBuilder->dialect->quoteIdentifier('userID'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -232,10 +230,9 @@ class Anonymizer
     $queryBuilder->statement->clauseSet->addColumn('variables');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 

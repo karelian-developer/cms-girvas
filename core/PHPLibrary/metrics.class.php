@@ -102,30 +102,31 @@ final class Metrics
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
 
-    // SELECT
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
-
-    // FROM
+    
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('metrics');
     $queryBuilder->statement->clauseFrom->assembly();
 
-    // WHERE
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`date` >= :dateStart AND `date` <= :dateEnd',
-      'postgresql' => '"date" >= :dateStart AND "date" <= :dateEnd'
-    ]);
+
+    $dialect = $queryBuilder->dialect;
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s >= :dateStart AND %s <= :dateEnd',
+        $dialect->quoteIdentifier('date'),
+        $dialect->quoteIdentifier('date')
+      )
+    );
+
     $queryBuilder->statement->clauseWhere->assembly();
 
-    // ORDER BY
     $queryBuilder->statement->setClauseOrderBy();
     $queryBuilder->statement->clauseOrderBy->setColumn('date');
     $queryBuilder->statement->clauseOrderBy->setSortType('ASC');
     $queryBuilder->statement->clauseOrderBy->assembly();
 
-    // Финальная сборка
     $queryBuilder->statement->assembly();
 
     try {
@@ -481,17 +482,20 @@ final class Metrics
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
 
-    // DELETE
     $queryBuilder->setStatementDelete();
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('metrics');
-
-    // WHERE
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`date` >= :dateStart AND `date` <= :dateEnd',
-      'postgresql' => '"date" >= :dateStart AND "date" <= :dateEnd'
-    ]);
+
+    $dialect = $queryBuilder->dialect;
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s >= :dateStart AND %s <= :dateEnd',
+        $dialect->quoteIdentifier('date'),
+        $dialect->quoteIdentifier('date')
+      )
+    );
+
     $queryBuilder->statement->clauseWhere->assembly();
 
     $queryBuilder->statement->assembly();

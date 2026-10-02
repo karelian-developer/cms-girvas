@@ -61,9 +61,6 @@ class Rotator
     while ($iteration < $maxIterations) {
       $iteration++;
 
-      // ============================================================
-      // 1. Получить батч ID для архивации
-      // ============================================================
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
@@ -71,10 +68,9 @@ class Rotator
       $queryBuilder->statement->clauseFrom->addTable('reports');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => '`createdUnixTimestamp` < :threshold',
-        'postgresql' => '"createdUnixTimestamp" < :threshold'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        sprintf('%s < :threshold', $queryBuilder->dialect->quoteIdentifier('createdUnixTimestamp'))
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->setClauseOrderBy();
       $queryBuilder->statement->clauseOrderBy->setColumn('id');
@@ -110,30 +106,32 @@ class Rotator
       $idsImploded = implode(', ', $idsPlaceholders);
       $currentTimestamp = time();
 
-      // ============================================================
-      // 2. Транзакция: INSERT в архив + DELETE из reports
-      // ============================================================
       $ownTransaction = !$databaseConnection->inTransaction();
       if ($ownTransaction) {
         $databaseConnection->beginTransaction();
       }
 
       try {
-        // INSERT INTO reports_archive
-        $insertSql = match ($CMSConfigDatabase['dms']) {
-          CMSDMS::MySQL => sprintf(
-            'INSERT INTO `reports_archive` (`id`, `variables`, `metadata`, `createdUnixTimestamp`, `archivedUnixTimestamp`)
-             SELECT `id`, `variables`, `metadata`, `createdUnixTimestamp`, :archivedUnixTimestamp
-             FROM `reports` WHERE `id` IN (%s)',
-            $idsImploded
-          ),
-          CMSDMS::PostgreSQL => sprintf(
-            'INSERT INTO "reports_archive" ("id", "variables", "metadata", "createdUnixTimestamp", "archivedUnixTimestamp")
-             SELECT "id", "variables", "metadata", "createdUnixTimestamp", :archivedUnixTimestamp
-             FROM "reports" WHERE "id" IN (%s)',
-            $idsImploded
-          )
-        };
+        $dialect = $queryBuilder->dialect;
+
+        $reportsArchive = $dialect->quoteIdentifier('reports_archive');
+        $reportsTable = $dialect->quoteIdentifier('reports');
+
+        $columns = ['id', 'variables', 'metadata', 'createdUnixTimestamp', 'archivedUnixTimestamp'];
+        $quotedColumns = implode(', ', array_map(
+          fn($c) => $dialect->quoteIdentifier($c),
+          $columns
+        ));
+
+        $insertSql = sprintf(
+          'INSERT INTO %s (%s) SELECT %s, :archivedUnixTimestamp FROM %s WHERE %s IN (%s)',
+          $reportsArchive,
+          $quotedColumns,
+          implode(', ', array_map(fn($c) => $dialect->quoteIdentifier($c), array_slice($columns, 0, 4))),
+          $reportsTable,
+          $dialect->quoteIdentifier('id'),
+          $idsImploded
+        );
 
         $insertQuery = $databaseConnection->prepare($insertSql);
         $insertQuery->bindValue(':archivedUnixTimestamp', $currentTimestamp, \PDO::PARAM_INT);
@@ -142,11 +140,12 @@ class Rotator
         }
         $insertQuery->execute();
 
-        // DELETE FROM reports
-        $deleteSql = match ($CMSConfigDatabase['dms']) {
-          CMSDMS::MySQL => sprintf('DELETE FROM `reports` WHERE `id` IN (%s)', $idsImploded),
-          CMSDMS::PostgreSQL => sprintf('DELETE FROM "reports" WHERE "id" IN (%s)', $idsImploded)
-        };
+        $deleteSql = sprintf(
+          'DELETE FROM %s WHERE %s IN (%s)',
+          $reportsTable,
+          $dialect->quoteIdentifier('id'),
+          $idsImploded
+        );
 
         $deleteQuery = $databaseConnection->prepare($deleteSql);
         foreach ($idsBindings as $placeholder => $id) {
@@ -160,7 +159,6 @@ class Rotator
 
         $totalRotated += count($ids);
 
-        // Если батч меньше batchSize — данных больше нет
         if (count($ids) < $batchSize) {
           break;
         }
