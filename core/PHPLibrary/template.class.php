@@ -688,6 +688,10 @@ final class Template implements ThemeInterface
                   $contentBlockTPLName = implode('', $parts);
                 }
 
+                if ($contentBlockTypeName === 'empty') {
+                  $contentBlockTPLName = 'default';
+                }
+
                 if ($contentBlockTypeName === 'cabinet') {
                   $CMSClient = $this->CMSCore->client;
                   $CMSClientIsLogged = $CMSClient->isLogged(1);

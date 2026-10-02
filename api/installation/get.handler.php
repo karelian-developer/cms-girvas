@@ -1948,7 +1948,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     ];
 
     $demoBlockMetadata = [
-      'typeID' => 1,
+      'typeID' => 4,
       'sectionIntegrationName' => 'rightSidebar'
     ];
 
