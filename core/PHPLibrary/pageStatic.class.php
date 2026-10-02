@@ -1094,10 +1094,10 @@ class PageStatic implements EntityTypeContent
       }
 
       $jsonObject = json_encode($data[$columnName], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-
+      
       $queryBuilder->statement->clauseSet->addColumn(
         $columnName,
-        $dialect->jsonMergePatch($columnName, sprintf("'%s'", $jsonObject))
+        $dialect->jsonMergePatch($columnName, $dialect->quoteLiteral($jsonObject))
       );
     }
 
