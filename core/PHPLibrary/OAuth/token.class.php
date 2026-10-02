@@ -718,6 +718,9 @@ class Token
     $queryBuilder->statement->clauseSet->addColumn('revokedAt');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
+
+    $dialect = $queryBuilder->dialect;
+
     $queryBuilder->statement->clauseWhere->addCondition(
       sprintf(
         '%s = :clientID AND %s = :isRevoked',
