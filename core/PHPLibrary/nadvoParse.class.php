@@ -272,6 +272,7 @@ class NadvoParse
     // Атрибуты для интернационализации
     'xml:lang', 'xmlns'
   ];
+  private array $templatePlaceholders = [];
 
   public function __construct()
   {}
@@ -299,6 +300,42 @@ class NadvoParse
       },
       $markdown
     );
+  }
+
+  /**
+   * Защита шаблонных переменных от обработки
+   *
+   * @param string $markdown
+   * @return string
+   */
+  private function protectTemplateVariables(string $markdown) : string
+  {
+    $this->templatePlaceholders = [];
+    
+    return preg_replace_callback(
+      '/\{([A-Za-z_][A-Za-z0-9_]*)\}/',
+      function($matches) {
+        $placeholder = '%%TEMPLATE_VAR_' . count($this->templatePlaceholders) . '%%';
+        $this->templatePlaceholders[$placeholder] = $matches[0];
+        return $placeholder;
+      },
+      $markdown
+    );
+  }
+
+  /**
+   * Восстановление шаблонных переменных
+   *
+   * @param string $html
+   * @return string
+   */
+  private function restoreTemplateVariables(string $html) : string
+  {
+    foreach ($this->templatePlaceholders as $placeholder => $value) {
+      $html = str_replace($placeholder, $value, $html);
+    }
+    
+    return $html;
   }
 
   private function parseFootnotes(string $markdown) : string
@@ -355,14 +392,14 @@ class NadvoParse
     $this->usedHeaderIds = [];
     
     $markdown = $this->sanitizeInput($markdown);
+
+    // Защищаем шаблонные переменные ДО всего остального
+    $markdown = $this->protectTemplateVariables($markdown);
     
     // Сначала защищаем блоки кода
     $markdown = $this->protectCodeBlocks($markdown);
     
-    // Обрабатываем горизонтальные линии ДО списков и инлайн-элементов
     $markdown = $this->parseHr($markdown);
-    
-    // Затем обрабатываем остальной Markdown
     $markdown = $this->parseAutoLinks($markdown);
     $markdown = $this->parseQuotes($markdown);
     $markdown = $this->parseLists($markdown);
@@ -375,6 +412,9 @@ class NadvoParse
     
     // Возвращаем блоки кода на место
     $markdown = $this->restoreCodeBlocks($markdown);
+
+    // Восстанавливаем шаблонные переменные
+    $markdown = $this->restoreTemplateVariables($markdown);
     
     return $markdown;
   }
@@ -827,7 +867,7 @@ class NadvoParse
       
       // Проверяем, является ли строка плейсхолдером блока кода
       $isCodePlaceholder = false;
-      if (preg_match('/^%%(CODE_BLOCK|INLINE_CODE)_\d+%%$/', $trimmedLine)) {
+      if (preg_match('/^%%(CODE_BLOCK|INLINE_CODE|TEMPLATE_VAR)_\d+%%$/', $trimmedLine)) {
         $isCodePlaceholder = true;
       }
       
@@ -978,11 +1018,19 @@ class NadvoParse
   private function wrapParagraph(string $content) : string
   {
     $content = trim($content);
+
+    if ($content === '') {
+      return '';
+    }
     
     // Проверяем наличие атрибутов в конце строки
     if (preg_match('/^(.*?)(?:\s*\{([^{}]+)\})\s*$/s', $content, $matches)) {
       $text = trim($matches[1]);
       $attrString = trim($matches[2]);
+
+      if ($text === '') {
+        return $content;
+      }
       
       // Проверяем, является ли содержимое фигурных скобок атрибутами
       // Если это шаблонная переменная - оставляем как есть
