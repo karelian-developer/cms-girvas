@@ -22,6 +22,7 @@
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\QueryBuilder\Dialect\Factory as DialectFactory;
 use \core\PHPLibrary\Database\IndexType as DatabaseIndexType;
+use \core\PHPLibrary\ContentBlock as ContentBlock;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\EntriesSample as EntriesSample;
