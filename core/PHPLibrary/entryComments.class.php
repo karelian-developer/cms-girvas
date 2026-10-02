@@ -21,7 +21,6 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \PDOException as PDOException;
 
 final class EntryComments
@@ -77,10 +76,9 @@ final class EntryComments
     $hasSearch = $searchValue !== '';
     if ($hasSearch) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql'      => '`content` LIKE :search',
-        'postgresql' => '"content" ILIKE :search'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->stringLike('content', 'search', true)
+      );
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
@@ -152,10 +150,10 @@ final class EntryComments
       sprintf('%s = :entryID', $queryBuilder->dialect->quoteIdentifier('entryID'))
     );
     if (array_key_exists('parentID', $params)) {
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => sprintf('AND JSON_EXTRACT(`metadata`, \'$.parentID\') = %d', $params['parentID']),
-        'postgresql' => sprintf('AND (metadata::jsonb->\'parentID\')::int = %d', $params['parentID'])
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        sprintf('%s = :parentID', $queryBuilder->dialect->jsonExtractInt('metadata', 'parentID')),
+        'AND'
+      );
     }
 
     $queryBuilder->statement->clauseWhere->assembly();
@@ -182,6 +180,11 @@ final class EntryComments
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       $databaseQuery->bindParam(':entryID', $entryID, \PDO::PARAM_INT);
+
+      if (array_key_exists('parentID', $params)) {
+        $databaseQuery->bindParam(':parentID', $params['parentID'], \PDO::PARAM_INT);
+      }
+
       $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
@@ -266,10 +269,9 @@ final class EntryComments
     $hasSearch = $searchValue !== '';
     if ($hasSearch) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql'      => '`content` LIKE :search',
-        'postgresql' => '"content" ILIKE :search'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->stringLike('content', 'search', true)
+      );
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
