@@ -23,7 +23,6 @@ namespace core\PHPLibrary\User;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \PDOException as PDOException;
 
 #[\AllowDynamicProperties]
@@ -250,10 +249,9 @@ class Consent
     $queryBuilder->statement->clauseFrom->addTable('users_consents');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -294,18 +292,15 @@ class Consent
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
 
-    $conditionPartsMysql = [];
-    $conditionPartsPostgres = [];
+    $dialect = $queryBuilder->dialect;
+    $conditionParts = [];
 
     foreach (array_keys($conditions) as $key) {
-      $conditionPartsMysql[] = '`' . $key . '` = :' . $key;
-      $conditionPartsPostgres[] = '"' . $key . '" = :' . $key;
+      $conditionParts[] = sprintf('%s = :%s', $dialect->quoteIdentifier($key), $key);
     }
 
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => implode(' AND ', $conditionPartsMysql),
-      'postgresql' => implode(' AND ', $conditionPartsPostgres)
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(implode(' AND ', $conditionParts));
+    
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -382,10 +377,14 @@ class Consent
     $queryBuilder->statement->addColumn('userAgent');
     $queryBuilder->statement->addColumn('source');
     $queryBuilder->statement->addColumn('consentedAt');
-    if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+
+    $dialect = $queryBuilder->dialect;
+
+    if ($dialect->supportsInsertReturning()) {
       $queryBuilder->statement->setClauseReturning();
       $queryBuilder->statement->clauseReturning->addColumn('id');
     }
+
     $queryBuilder->statement->assembly();
 
     $consentedAt = time();
@@ -414,13 +413,13 @@ class Consent
     }
 
     if ($execute) {
-      if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
-        $lastID = (int)$databaseConnection->lastInsertId();
-        return new Consent($CMSCore, $lastID);
+      if ($dialect->supportsInsertReturning()) {
+        $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
+        return $result ? new Consent($CMSCore, (int)$result['id']) : null;
       }
 
-      $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-      return $result ? new Consent($CMSCore, (int)$result['id']) : null;
+      $lastID = (int)$databaseConnection->lastInsertId();
+      return new Consent($CMSCore, $lastID);
     }
 
     return null;
@@ -462,25 +461,22 @@ class Consent
 
     $threshold = time() - $withinSeconds;
 
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`userID` = :userID
-                  AND `ip` = :ip
-                  AND `userAgent` = :userAgent
-                  AND `pageStaticID` = :pageStaticID
-                  AND `documentVersion` = :documentVersion
-                  AND `source` = :source
-                  AND `consentedAt` >= :threshold
-                  AND `revokedAt` IS NULL',
-      'postgresql' => '"userID" = :userID
-                       AND "ip" = :ip
-                       AND "userAgent" = :userAgent
-                       AND "pageStaticID" = :pageStaticID
-                       AND "documentVersion" = :documentVersion
-                       AND "source" = :source
-                       AND "consentedAt" >= :threshold
-                       AND "revokedAt" IS NULL'
-    ]);
+    $dialect = $queryBuilder->dialect;
+
+    $conditions = [
+      sprintf('%s = :userID', $dialect->quoteIdentifier('userID')),
+      sprintf('%s = :ip', $dialect->quoteIdentifier('ip')),
+      sprintf('%s = :userAgent', $dialect->quoteIdentifier('userAgent')),
+      sprintf('%s = :pageStaticID', $dialect->quoteIdentifier('pageStaticID')),
+      sprintf('%s = :documentVersion', $dialect->quoteIdentifier('documentVersion')),
+      sprintf('%s = :source', $dialect->quoteIdentifier('source')),
+      sprintf('%s >= :threshold', $dialect->quoteIdentifier('consentedAt')),
+      sprintf('%s IS NULL', $dialect->quoteIdentifier('revokedAt')),
+    ];
+
+    $queryBuilder->statement->clauseWhere->addCondition(implode(' AND ', $conditions));
     $queryBuilder->statement->clauseWhere->assembly();
+
     $queryBuilder->statement->setClauseOrderBy();
     $queryBuilder->statement->clauseOrderBy->setColumn('id');
     $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
@@ -562,22 +558,14 @@ class Consent
       'documentVersion', 'locale', 'ip', 'userAgent', 'source', 'consentedAt'
     ];
 
-    $quotedColumns = [];
-    foreach ($columns as $col) {
-      $quotedColumns[] = match ($CMSConfigDatabase['dms']) {
-        CMSDMS::MySQL => '`' . $col . '`',
-        CMSDMS::PostgreSQL => '"' . $col . '"'
-      };
-    }
+    $dialect = \core\PHPLibrary\Database\QueryBuilder\Dialect\Factory::create($CMSConfigDatabase['dms']);
 
-    $tableName = match ($CMSConfigDatabase['dms']) {
-      CMSDMS::MySQL => '`users_consents`',
-      CMSDMS::PostgreSQL => '"users_consents"'
-    };
+    $quotedColumns = array_map(fn($col) => $dialect->quoteIdentifier($col), $columns);
+    $tableName = $dialect->quoteIdentifier('users_consents');
 
     $result = [];
 
-    if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+    if ($dialect->supportsInsertReturning()) {
       // ============================================================
       // PostgreSQL: bulk INSERT + RETURNING (точные ID)
       // ============================================================
@@ -612,11 +600,17 @@ class Consent
         $bindings[':consentedAt_' . $index] = [$consentedAt, \PDO::PARAM_INT];
       }
 
+      $returning = sprintf('%s, %s',
+        $dialect->quoteIdentifier('id'),
+        $dialect->quoteIdentifier('pageStaticID')
+      );
+
       $sql = sprintf(
-        'INSERT INTO %s (%s) VALUES %s RETURNING "id", "pageStaticID"',
+        'INSERT INTO %s (%s) VALUES %s RETURNING %s',
         $tableName,
         implode(', ', $quotedColumns),
-        implode(', ', $valuePlaceholders)
+        implode(', ', $valuePlaceholders),
+        $returning
       );
 
       try {
@@ -721,10 +715,9 @@ class Consent
     $queryBuilder->statement->clauseSet->addColumn('revokedByID');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -795,10 +788,9 @@ class Consent
       $searchUserID = (int) $searchValue;
 
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql'      => '`userID` = :searchUserID',
-        'postgresql' => '"userID" = :searchUserID'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        sprintf('%s = :searchUserID', $queryBuilder->dialect->quoteIdentifier('userID'))
+      );
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
@@ -874,10 +866,9 @@ class Consent
       $searchUserID = (int) $searchValue;
 
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql'      => '`userID` = :searchUserID',
-        'postgresql' => '"userID" = :searchUserID'
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        sprintf('%s = :searchUserID', $queryBuilder->dialect->quoteIdentifier('userID'))
+      );
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
@@ -924,19 +915,16 @@ class Consent
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
 
-    $conditionMysql = '`userID` = :userID';
-    $conditionPostgres = '"userID" = :userID';
+    $dialect = $queryBuilder->dialect;
+    $condition = sprintf('%s = :userID', $dialect->quoteIdentifier('userID'));
 
     if ($onlyActive) {
-      $conditionMysql .= ' AND `revokedAt` IS NULL';
-      $conditionPostgres .= ' AND "revokedAt" IS NULL';
+      $condition .= sprintf(' AND %s IS NULL', $dialect->quoteIdentifier('revokedAt'));
     }
 
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => $conditionMysql,
-      'postgresql' => $conditionPostgres
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition($condition);
     $queryBuilder->statement->clauseWhere->assembly();
+
     $queryBuilder->statement->setClauseOrderBy();
     $queryBuilder->statement->clauseOrderBy->setColumn('consentedAt');
     $queryBuilder->statement->clauseOrderBy->setSortType('DESC');

@@ -24,7 +24,6 @@ use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\SystemCore\Report as Report;
 
 #[\AllowDynamicProperties]
@@ -174,10 +173,9 @@ class Session
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -213,10 +211,9 @@ class Session
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -263,10 +260,16 @@ class Session
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`userIP` = :userIP AND `typeID` = :typeID',
-      'postgresql' => '"userIP" = :userIP AND "typeID" = :typeID'
-    ]);
+    
+    $dialect = $queryBuilder->dialect;
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :userIP AND %s = :typeID',
+        $dialect->quoteIdentifier('userIP'),
+        $dialect->quoteIdentifier('typeID')
+      )
+    );
+
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -303,10 +306,17 @@ class Session
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`userIP` = :userIP AND `userID` = :userID AND `typeID` = :typeID',
-      'postgresql' => '"userIP" = :userIP AND "userID" = :userID AND "typeID" = :typeID'
-    ]);
+    
+    $dialect = $queryBuilder->dialect;
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :userIP AND %s = :typeID AND %s = :userID',
+        $dialect->quoteIdentifier('userIP'),
+        $dialect->quoteIdentifier('typeID'),
+        $dialect->quoteIdentifier('userID')
+      )
+    );
+
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -344,10 +354,17 @@ class Session
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`userIP` = :userIP AND `token` = :token AND `typeID` = :typeID',
-      'postgresql' => '"userIP" = :userIP AND "token" = :token AND "typeID" = :typeID'
-    ]);
+    
+    $dialect = $queryBuilder->dialect;
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :userIP AND %s = :typeID AND %s = :token',
+        $dialect->quoteIdentifier('userIP'),
+        $dialect->quoteIdentifier('typeID'),
+        $dialect->quoteIdentifier('token')
+      )
+    );
+
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -385,10 +402,17 @@ class Session
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`userIP` = :userIP AND `userID` = :userID AND `typeID` = :typeID',
-      'postgresql' => '"userIP" = :userIP AND "userID" = :userID AND "typeID" = :typeID'
-    ]);
+
+    $dialect = $queryBuilder->dialect;
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :userIP AND %s = :typeID AND %s = :userID',
+        $dialect->quoteIdentifier('userIP'),
+        $dialect->quoteIdentifier('typeID'),
+        $dialect->quoteIdentifier('userID')
+      )
+    );
+
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -430,11 +454,16 @@ class Session
     $queryBuilderStatementClauseFrom->assembly();
     $queryBuilderStatement->setClauseWhere();
 
-    $queryBuilderStatementClauseWhere = $queryBuilderStatement->clauseWhere;
-    $queryBuilderStatementClauseWhere->addConditionAdaptive([
-      'mysql' => '`userIP` = :userIP AND `token` = :token AND `typeID` = :typeID',
-      'postgresql' => '"userIP" = :userIP AND "token" = :token AND "typeID" = :typeID'
-    ]);
+    $dialect = $queryBuilder->dialect;
+    $queryBuilderStatementClauseWhere->addCondition(
+      sprintf(
+        '%s = :userIP AND %s = :typeID AND %s = :token',
+        $dialect->quoteIdentifier('userIP'),
+        $dialect->quoteIdentifier('typeID'),
+        $dialect->quoteIdentifier('token')
+      )
+    );
+
     $queryBuilderStatementClauseWhere->assembly();
     $queryBuilderStatement->setClauseLimit(1);
     $queryBuilderStatement->assembly();
@@ -470,10 +499,16 @@ class Session
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`userIP` = :userIP AND `typeID` = :typeID',
-      'postgresql' => '"userIP" = :userIP AND "typeID" = :typeID'
-    ]);
+    
+    $dialect = $queryBuilder->dialect;
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :userIP AND %s = :typeID',
+        $dialect->quoteIdentifier('userIP'),
+        $dialect->quoteIdentifier('typeID')
+      )
+    );
+
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -513,10 +548,9 @@ class Session
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -595,7 +629,9 @@ class Session
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+    $dialect = $queryBuilder->dialect;
+
+    if (!$dialect->supportsInsertReturning()) {
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
@@ -603,11 +639,11 @@ class Session
       $queryBuilder->statement->clauseFrom->addTable('users_sessions');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $dialect->getLastInsertedIDCondition('id')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
-
-      error_log('SQL: ' . $queryBuilder->statement->assembled);
 
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;
@@ -651,10 +687,9 @@ class Session
     $queryBuilder->statement->clauseFrom->addTable('users_sessions');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
