@@ -505,11 +505,13 @@ class ReportsBase implements ReportsPageInterface
     // КАТЕГОРИИ СОБЫТИЙ
     // ============================================================
     
+    $usersTypeIDs  = CMSReport::getTypeIDsByCategory(CMSReport::CATEGORY_USERS);
     $contentTypeIDs  = CMSReport::getTypeIDsByCategory(CMSReport::CATEGORY_CONTENT);
     $securityTypeIDs = CMSReport::getTypeIDsByCategory(CMSReport::CATEGORY_SECURITY);
 
     // Все события
     $allReports = $reports;
+    $usersReports = $this->filterReports($reports, $usersTypeIDs);
     $contentReports = $this->filterReports($reports, $contentTypeIDs);
     $securityReports = $this->filterReports($reports, $securityTypeIDs);
 
@@ -546,16 +548,29 @@ class ReportsBase implements ReportsPageInterface
 
     // Пользователи
     $statsUsers = [
-      'registered' => count($this->filterReports($reports, [
-        CMSReport::REPORT_TYPE_ID_BASE_USER_CREATED,
+      // Создание/регистрация
+      'registered_site' => count($this->filterReports($reports, [
+        CMSReport::REPORT_TYPE_ID_BASE_USER_CREATED
+      ])),
+      'registered_admin' => count($this->filterReports($reports, [
         CMSReport::REPORT_TYPE_ID_AP_USER_CREATED
       ])),
       'edited' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_USER_EDITED])),
       'deleted' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_USER_DELETED])),
+      // Блокировки
       'banned' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_BASE_USER_BANNED])),
       'unbanned' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_BASE_USER_UNBANNED])),
+      // Доступ к ПДн
       'personal_data_views' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED])),
-    ];
+      // Согласия (152-ФЗ)
+      'consents_given' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_BASE_CONSENT_GIVEN])),
+      'consents_revoked' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_BASE_CONSENT_REVOKED])),
+      // Экспорт/анонимизация (152-ФЗ)
+      'subject_data_exported' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_BASE_SUBJECT_DATA_EXPORTED])),
+      'users_anonymized' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_USER_ANONYMIZED])),
+      // Ротация логов (152-ФЗ)
+      'reports_rotated' => count($this->filterReports($reports, [CMSReport::REPORT_TYPE_ID_AP_REPORTS_ROTATED])),
+    ];  
 
     // Безопасность
     $statsSecurity = [
@@ -623,6 +638,7 @@ class ReportsBase implements ReportsPageInterface
       [
         // Общая статистика
         'TOTAL_ACTIONS' => count($reports),
+        'TOTAL_USERS_ACTIONS' => count($usersReports),
         'TOTAL_CONTENT_ACTIONS' => count($contentReports),
         'TOTAL_SECURITY_ACTIONS' => count($securityReports),
 
@@ -652,12 +668,19 @@ class ReportsBase implements ReportsPageInterface
         'CONTENT_BLOCKS_DELETED' => $statsContent['blocks_deleted'],
 
         // Статистика по пользователям
-        'USERS_REGISTERED' => $statsUsers['registered'],
+        'USERS_REGISTERED_SITE' => $statsUsers['registered_site'],
+        'USERS_REGISTERED_ADMIN' => $statsUsers['registered_admin'],
+        'USERS_REGISTERED_TOTAL' => $statsUsers['registered_site'] + $statsUsers['registered_admin'],
         'USERS_EDITED' => $statsUsers['edited'],
         'USERS_DELETED' => $statsUsers['deleted'],
         'USERS_BANNED' => $statsUsers['banned'],
         'USERS_UNBANNED' => $statsUsers['unbanned'],
         'USERS_PERSONAL_DATA_VIEWS' => $statsUsers['personal_data_views'],
+        'USERS_CONSENTS_GIVEN' => $statsUsers['consents_given'],
+        'USERS_CONSENTS_REVOKED' => $statsUsers['consents_revoked'],
+        'USERS_SUBJECT_DATA_EXPORTED' => $statsUsers['subject_data_exported'],
+        'USERS_ANONYMIZED' => $statsUsers['users_anonymized'],
+        'USERS_REPORTS_ROTATED' => $statsUsers['reports_rotated'],
 
         // Статистика по безопасности
         'SECURITY_AUTH_SUCCESS_ADMIN' => $statsSecurity['auth_success_admin'],
