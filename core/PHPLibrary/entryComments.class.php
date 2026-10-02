@@ -37,7 +37,7 @@ final class EntryComments
   ];
 
   public const DEFAULT_SORT_RULE = 'by_createdtimestamp_decrease';
-  
+
   /**
    * __construct
    *
@@ -148,10 +148,9 @@ final class EntryComments
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`entryID` = :entryID',
-      'postgresql' => '"entryID" = :entryID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :entryID', $queryBuilder->dialect->quoteIdentifier('entryID'))
+    );
     if (array_key_exists('parentID', $params)) {
       $queryBuilder->statement->clauseWhere->addConditionAdaptive([
         'mysql' => sprintf('AND JSON_EXTRACT(`metadata`, \'$.parentID\') = %d', $params['parentID']),
@@ -222,10 +221,9 @@ final class EntryComments
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`entryID` = :entryID',
-      'postgresql' => '"entryID" = :entryID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :entryID', $queryBuilder->dialect->quoteIdentifier('entryID'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
