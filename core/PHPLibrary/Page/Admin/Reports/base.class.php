@@ -636,7 +636,6 @@ class ReportsBase implements ReportsPageInterface
       [
         // Общая статистика
         'TOTAL_ACTIONS' => count($reports),
-        'TOTAL_USERS_ACTIONS' => count($usersReports),
         'TOTAL_CONTENT_ACTIONS' => count($contentReports),
         'TOTAL_SECURITY_ACTIONS' => count($securityReports),
 
