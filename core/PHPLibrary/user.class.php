@@ -722,10 +722,7 @@ class User
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
     $queryBuilder->statement->clauseWhere->addCondition(
-      sprintf(
-        'LOWER(%s) = :email',
-        $queryBuilder->dialect->quoteIdentifier('email')
-      )
+      sprintf('LOWER(%s) = :email', $queryBuilder->dialect->quoteIdentifier('email'))
     );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);

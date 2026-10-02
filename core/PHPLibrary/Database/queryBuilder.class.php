@@ -116,7 +116,7 @@ class QueryBuilder
    */
   public function createCase() : CaseExpression
   {
-    return new CaseExpression($this->DMS);
+    return new CaseExpression($this->dialect);
   }
   
   /**

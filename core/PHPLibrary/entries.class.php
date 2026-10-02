@@ -20,7 +20,6 @@
 
 namespace core\PHPLibrary;
 
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\QueryBuilder\Expression\CaseExpression as CaseExpression;
 
@@ -281,18 +280,15 @@ final class Entries
     
     foreach ($words as $wordIndex => $word) {
       $paramName = 'word' . $wordIndex;
-      
+
       foreach ($weights as $field => $weight) {
-        $jsonPath = sprintf("texts->'%s'->>'%s'", $localeName, $field);
         $allCaseExpressions[] = $queryBuilder->createCase()
-          ->whenJsonLike($jsonPath, $paramName, $weight)
+          ->whenJsonLike('texts', $localeName, $field, $paramName, $weight)
           ->else(0);
       }
-      
-      // Поиск по ключевым словам
-      $keywordsPath = sprintf("texts->'%s'->'keywords'", $localeName);
+
       $allCaseExpressions[] = $queryBuilder->createCase()
-        ->whenJsonArrayContains($keywordsPath, $paramName, 6)
+        ->whenJsonArrayContains('texts', $localeName, 'keywords', $paramName, 6)
         ->else(0);
     }
     
@@ -350,9 +346,10 @@ final class Entries
     $queryBuilder->statement->assembly();
     
     // Модифицируем ORDER BY для поддержки второй колонки (id)
+    $dialect = $queryBuilder->dialect;
     $queryBuilder->statement->assembled = str_replace(
-      'ORDER BY "relevance" DESC',
-      'ORDER BY relevance DESC, id',
+      sprintf('ORDER BY %s DESC', $dialect->quoteIdentifier('relevance')),
+      sprintf('ORDER BY %s DESC, %s', $dialect->quoteIdentifier('relevance'), $dialect->quoteIdentifier('id')),
       $queryBuilder->statement->assembled
     );
     
