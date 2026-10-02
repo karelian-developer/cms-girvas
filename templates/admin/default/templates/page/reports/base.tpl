@@ -14,10 +14,6 @@
         <span class="report-section__data-value">{TOTAL_CONTENT_ACTIONS}</span>
       </li>
       <li>
-        <span class="report-section__data-label">{LANG:PAGE_REPORTS_STATS_USER_ACTIONS}</span>
-        <span class="report-section__data-value">{TOTAL_USER_ACTIONS}</span>
-      </li>
-      <li>
         <span class="report-section__data-label">{LANG:PAGE_REPORTS_STATS_SECURITY_ACTIONS}</span>
         <span class="report-section__data-value">{TOTAL_SECURITY_ACTIONS}</span>
       </li>
@@ -31,7 +27,6 @@
       {TOP_USERS}
     </ul>
   </section>
-  
 </div>
 
 <!-- Средний ряд: Контент | Пользователи | Безопасность -->
