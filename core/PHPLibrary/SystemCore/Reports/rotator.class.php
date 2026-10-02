@@ -23,7 +23,6 @@ namespace core\PHPLibrary\SystemCore\Reports;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \PDOException as PDOException;
 
 class Rotator

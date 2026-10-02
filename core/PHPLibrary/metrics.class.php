@@ -22,7 +22,6 @@ namespace core\PHPLibrary;
 use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\Pages as Pages;
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Metrics\Session as MetricsSession;
 use \PDOException as PDOException;
 
@@ -104,7 +103,7 @@ final class Metrics
 
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
-    
+
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('metrics');
     $queryBuilder->statement->clauseFrom->assembly();
