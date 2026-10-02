@@ -836,7 +836,7 @@ class Form implements EntityTypeContent
     
     $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $dialect = $queryBuilder->dialect;
-    
+
     $queryBuilder->setStatementInsert();
     $queryBuilder->statement->setTable('forms');
     $queryBuilder->statement->addColumn('name');
@@ -951,10 +951,14 @@ class Form implements EntityTypeContent
     if (!empty($data['elements'])) {
       $elementsJson = json_encode($data['elements'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-      $queryBuilder->statement->clauseSet->addColumn(
-        'elements',
-        $dialect->jsonReplace('elements', sprintf("'%s'", $elementsJson))
-      );
+      if ($elementsJson === false) {
+        error_log('[Form] json_encode failed for "elements": ' . json_last_error_msg());
+      } else {
+        $queryBuilder->statement->clauseSet->addColumn(
+          'elements',
+          $dialect->jsonReplace('elements', $dialect->quoteLiteral($elementsJson))
+        );
+      }
     }
 
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
