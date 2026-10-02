@@ -1949,10 +1949,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
 
     $demoBlockMetadata = [
       'typeID' => 1,
-      'sectionIntegrationName' => 'right_sidebar'
+      'sectionIntegrationName' => 'rightSidebar'
     ];
 
-    $demoBlock = ContentBlock::create($CMSCore, 'demo-block', $demoBlockTexts, $demoBlockMetadata);
+    $demoBlock = ContentBlock::create($CMSCore, 'demo', $demoBlockTexts, $demoBlockMetadata);
 
     $lastNewsBlockTexts = [
       'en_US' => [
@@ -1969,11 +1969,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
 
     $lastNewsBlockMetadata = [
       'typeID' => 1,
-      'sectionIntegrationName' => 'right_sidebar',
+      'sectionIntegrationName' => 'rightSidebar',
       'URLRule' => '#^/$#u'
     ];
 
-    $lastNewsBlock = ContentBlock::create($CMSCore, 'last-news-block', $lastNewsBlockTexts, $lastNewsBlockMetadata);
+    $lastNewsBlock = ContentBlock::create($CMSCore, 'last-news', $lastNewsBlockTexts, $lastNewsBlockMetadata);
     
     $CMSCore->configurator->insertDatabaseEntryValue('base_template', 'default');
     $CMSCore->configurator->insertDatabaseEntryValue('base_site_title', 'CMS «ГИРВАС»');
