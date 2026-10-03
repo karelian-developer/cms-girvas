@@ -12,7 +12,7 @@
   "INSTALLER_ADMINISTRATOR_ACCOUNT_CONFIGURATION_EMAIL_LABEL": "Электронная почта",
   "INSTALLER_ADMINISTRATOR_ACCOUNT_CONFIGURATION_LOGIN_DESCRIPTION": "Придумайте логин для Вашего администратора. Старайтесь избегать популярных логинов: admin, user и других.",
   "INSTALLER_ADMINISTRATOR_ACCOUNT_CONFIGURATION_LOGIN_LABEL": "Логин",
-  "INSTALLER_ADMINISTRATOR_ACCOUNT_CONFIGURATION_PASSWORD_DESCRIPTION": "Придумайте сложный пароль. Хороший пароль должен ключать в себя минимум 8 символов, включать в себя латинские символы, цифры и специальные символы: !@#$%^&*(){}.",
+  "INSTALLER_ADMINISTRATOR_ACCOUNT_CONFIGURATION_PASSWORD_DESCRIPTION": "Придумайте сложный пароль. Хороший пароль должен содержать минимум 8 символов и может включать латинские буквы (a-z), цифры (0-9) и специальные символы: _ $ % & # @ ?.",
   "INSTALLER_ADMINISTRATOR_ACCOUNT_CONFIGURATION_PASSWORD_LABEL": "Пароль",
   "INSTALLER_ADMINISTRATOR_ACCOUNT_CONFIGURATION_PASSWORD_REPEAT_LABEL": "Повторите пароль",
   "INSTALLER_DEVELOPER_LABEL": "Разработчик",

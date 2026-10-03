@@ -12,7 +12,7 @@
   "INSTALLER_ADMINISTRATOR_ACCOUNT_CONFIGURATION_EMAIL_LABEL": "Email",
   "INSTALLER_ADMINISTRATOR_ACCOUNT_CONFIGURATION_LOGIN_DESCRIPTION": "Come up with a login for your administrator. Try to avoid popular logins: admin, user, and others.",
   "INSTALLER_ADMINISTRATOR_ACCOUNT_CONFIGURATION_LOGIN_LABEL": "Login",
-  "INSTALLER_ADMINISTRATOR_ACCOUNT_CONFIGURATION_PASSWORD_DESCRIPTION": "Come up with a strong password. A good password should include at least 8 characters, including Latin characters, digits, and special characters: !@#$%^&*(){}.",
+  "INSTALLER_ADMINISTRATOR_ACCOUNT_CONFIGURATION_PASSWORD_DESCRIPTION": "Create a strong password. A good password should contain at least 8 characters and may include Latin letters (a-z), digits (0-9), and special characters: _ $ % & # @ ?.",
   "INSTALLER_ADMINISTRATOR_ACCOUNT_CONFIGURATION_PASSWORD_LABEL": "Password",
   "INSTALLER_ADMINISTRATOR_ACCOUNT_CONFIGURATION_PASSWORD_REPEAT_LABEL": "Repeat password",
   "INSTALLER_DEVELOPER_LABEL": "Developer",
