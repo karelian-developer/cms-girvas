@@ -21,6 +21,7 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\ContentBlocks as ContentBlocks;
+use \core\PHPLibrary\EntriesCategories as EntriesCategories;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\Factories\Content as CMSContent;
 use \core\PHPLibrary\SystemCore as SystemCore;
@@ -694,6 +695,118 @@ final class Template implements ThemeInterface
 
                 if ($contentBlockTypeName === 'categories') {
                   $contentBlockTPLName = 'categories';
+
+                  // Получаем все категории записей
+                  $categoriesArray = (new EntriesCategories($this->CMSCore))->getAll();
+
+                  // Карта категорий по ID и индекс дочерних категорий по parentID
+                  $categoriesMap = [];
+                  $childrenByParent = [];
+
+                  foreach ($categoriesArray as $category) {
+                    $category->initData(['name', 'texts', 'metadata', 'parentID']);
+
+                    $categoryID = $category->getID();
+                    $parentID = $category->getParentID();
+
+                    $categoriesMap[$categoryID] = $category;
+                    $childrenByParent[$parentID][] = $category;
+                  }
+
+                  // Корневые категории — те, у которых parentID = 0 или родитель отсутствует
+                  $rootCategories = [];
+                  foreach ($categoriesMap as $categoryID => $category) {
+                    $parentID = $category->getParentID();
+
+                    if ($parentID === 0 || !isset($categoriesMap[$parentID])) {
+                      $rootCategories[] = $category;
+                    }
+                  }
+
+                  // Рекурсивная сборка DOM-списка категорий с учётом вложенности
+                  $buildCategoriesList = function (
+                    array $categories,
+                    array $childrenByParent,
+                    \DOMDocument $document,
+                    string $localeName,
+                    array &$visitedIDs,
+                    int $depth = 0
+                  ) use (&$buildCategoriesList): \DOMElement {
+                    $listElement = $document->createElement('ul');
+                    $listElement->setAttribute(
+                      'class',
+                      $depth > 0
+                        ? 'categories-list categories-list--nested'
+                        : 'categories-list'
+                    );
+
+                    foreach ($categories as $category) {
+                      $categoryID = $category->getID();
+
+                      // Защита от циклических ссылок в дереве категорий
+                      if (in_array($categoryID, $visitedIDs, true)) {
+                        continue;
+                      }
+
+                      $visitedIDs[] = $categoryID;
+
+                      $categoryName = $category->getName();
+                      $categoryTitle = $category->getTitle($localeName);
+                      $categoryURL = $category->getURL();
+
+                      $children = $childrenByParent[$categoryID] ?? [];
+                      $hasChildren = !empty($children);
+
+                      $itemElement = $document->createElement('li');
+                      $itemElement->setAttribute(
+                        'class',
+                        $hasChildren
+                          ? 'categories-list__item categories-list__item--has-children'
+                          : 'categories-list__item'
+                      );
+                      $itemElement->setAttribute('data-category-id', (string) $categoryID);
+                      $itemElement->setAttribute('data-category-name', $categoryName);
+
+                      $linkElement = $document->createElement('a');
+                      $linkElement->setAttribute('class', 'categories-list__link');
+                      $linkElement->setAttribute('href', $categoryURL);
+                      $linkElement->setAttribute('title', $categoryTitle);
+                      $linkElement->appendChild($document->createTextNode($categoryTitle));
+
+                      $itemElement->appendChild($linkElement);
+
+                      if ($hasChildren) {
+                        $childrenListElement = $buildCategoriesList(
+                          $children,
+                          $childrenByParent,
+                          $document,
+                          $localeName,
+                          $visitedIDs,
+                          $depth + 1
+                        );
+
+                        $itemElement->appendChild($childrenListElement);
+                      }
+
+                      $listElement->appendChild($itemElement);
+                    }
+
+                    return $listElement;
+                  };
+
+                  $categoriesDocument = new \DOMDocument('1.0', 'UTF-8');
+                  $visitedIDs = [];
+
+                  $categoriesListElement = $buildCategoriesList(
+                    $rootCategories,
+                    $childrenByParent,
+                    $categoriesDocument,
+                    $localeName,
+                    $visitedIDs
+                  );
+
+                  $categoriesDocument->appendChild($categoriesListElement);
+                  $templateContentBlockVars['BLOCK_CONTENT'] = $categoriesDocument->saveHTML($categoriesListElement);
                 }
 
                 if ($contentBlockTypeName === 'cabinet') {
