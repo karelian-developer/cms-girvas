@@ -176,6 +176,7 @@
 }
 
 .sidebar__block-content {
+  display: grid;
   box-sizing: border-box;
   flex-grow: 1;
   background-color: var(--primary-color-4);
@@ -184,6 +185,16 @@
   border-bottom-right-radius: 8px;
   padding: 11px 13px 13px 15px;
   width: 100%;
+  row-gap: 8px;
+}
+
+.sidebar__block-content > * {
+  margin-bottom: 0 !important;
+}
+
+.sidebar__block-content ul,
+.sidebar__block-content ol {
+  padding-left: 24px;
 }
 
 /* =====================
