@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -21,7 +21,6 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \DOMDocument as DOMDocument;
@@ -444,6 +443,7 @@ class Form implements EntityTypeContent
       $DOMElement = match ($DOMElementType) {
         'textarea' => $document->createElement('textarea'),
         'select' => $document->createElement('select'),
+        'consent' => $document->createElement('input'),
         default => $document->createElement('input')
       };
 
@@ -452,6 +452,10 @@ class Form implements EntityTypeContent
         $DOMElement->setAttribute('placeholder', $DOMElementPlaceholder);
       } else if ($DOMElementType === 'select') {
         $DOMElement->setAttribute('class', 'form__select');
+      } else if ($DOMElementType === 'consent') {
+        $DOMElement->setAttribute('type', 'checkbox');
+        $DOMElement->setAttribute('class', 'form__input form__input_checkbox');
+        $DOMElement->setAttribute('value', '1');
       } else {
         $DOMElement->setAttribute('type', $DOMElementType);
         $DOMElement->setAttribute('class', 'form__input form__input_' . $DOMElementType);
@@ -474,7 +478,7 @@ class Form implements EntityTypeContent
         $DOMElement->setAttribute('data-interactive-base', 'choice');
 
         foreach ($element['options'] as $optionIndex => $optionData) {
-          $optionLabel = $optionData['texts'][$CMSLocaleName]['label'];
+          $optionLabel = $optionData['texts'][$CMSLocaleName]['label'] ?? '';
           $optionValue = $optionData['value'];
 
           $optionElement = $document->createElement('option', $optionLabel);
@@ -487,7 +491,7 @@ class Form implements EntityTypeContent
       $DOMElementContainerElement->setAttribute('class', 'form__input-container input-container');
       $DOMElementContainerElement->appendChild($DOMElement);
 
-      if (!in_array($DOMElementType, ['submit', 'reset', 'checkbox'])) {
+      if (!in_array($DOMElementType, ['submit', 'reset', 'checkbox', 'consent'])) {
         $labelElement = $document->createElement('label', $DOMElementTitle);
         $labelElement->setAttribute('class', 'form__label');
 
@@ -510,20 +514,77 @@ class Form implements EntityTypeContent
           $formElement->appendChild($descriptionElement);
         }
       }
-
+      
       if ($DOMElementType === 'checkbox') {
         $DOMElementDescription = mb_convert_encoding($DOMElementDescription, 'HTML-ENTITIES', 'UTF-8');
 
-        $documentFragment = new DOMDocument('1.0', 'UTF-8');
-        $documentFragment->loadHTML($DOMElementDescription, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-        $descriptionElement = $document->importNode($documentFragment->documentElement, true);
+        if (!empty(trim($DOMElementDescription))) {
+          $documentFragment = new DOMDocument('1.0', 'UTF-8');
+          $documentFragment->loadHTML($DOMElementDescription, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+          $descriptionElement = $document->importNode($documentFragment->documentElement, true);
+          
+          $DOMElementContainerLabelElement = $document->createElement('div');
+          $DOMElementContainerElement->setAttribute('class', 'form__input-container input-container input-container_flex-checkbox');
+          $DOMElementContainerLabelElement->setAttribute('class', 'input-container__label label');
+          
+          $DOMElementContainerLabelElement->appendChild($descriptionElement);
+          $DOMElementContainerElement->appendChild($DOMElementContainerLabelElement);
+        } else {
+          $DOMElementContainerElement->setAttribute('class', 'form__input-container input-container input-container_flex-checkbox');
+        }
+      }
+
+      if ($DOMElementType === 'consent') {
+        // ============================================================
+        // СОГЛАСИЕ (152-ФЗ)
+        // ============================================================
+        $DOMElementContainerElement->setAttribute('class', 'form__input-container input-container input-container_flex-checkbox');
+
+        $documentKey = $element['documentKey'] ?? '';
+        $documentLink = '';
+        $documentLabel = $DOMElementTitle;
+
+        if (!empty($documentKey)) {
+          $pageStaticDocument = \core\PHPLibrary\PageStatic::getByName($this->CMSCore, $documentKey);
+
+          if ($pageStaticDocument !== null) {
+            $pageStaticDocument->initData(['id', 'name', 'texts', 'metadata']);
+
+            if ($pageStaticDocument->isLegalDocument()) {
+              $documentTitle = $pageStaticDocument->getTitle($CMSLocaleName);
+              $currentVersion = $pageStaticDocument->getCurrentVersion($CMSLocaleName);
+              $versionString = $currentVersion !== null ? $currentVersion->getVersion() : '';
+
+              $documentURL = '/page/' . $pageStaticDocument->getName()
+                . ($versionString !== '' ? '?version=' . urlencode($versionString) : '');
+
+              if (!empty($documentTitle)) {
+                $documentLabel = $documentTitle;
+              }
+
+              $documentLink = sprintf(
+                '<a href="%s" target="_blank">%s%s</a>',
+                htmlspecialchars($documentURL, ENT_QUOTES, 'UTF-8'),
+                htmlspecialchars($documentLabel, ENT_QUOTES, 'UTF-8'),
+                $versionString !== '' ? ' (' . htmlspecialchars($versionString, ENT_QUOTES, 'UTF-8') . ')' : ''
+              );
+            }
+          }
+        }
+
+        // Fallback: если ссылка не сформирована, показываем title
+        if (empty($documentLink)) {
+          $documentLink = htmlspecialchars($documentLabel, ENT_QUOTES, 'UTF-8');
+        }
 
         $DOMElementContainerLabelElement = $document->createElement('div');
-
-        $DOMElementContainerElement->setAttribute('class', 'form__input-container input-container input-container_flex-checkbox');
         $DOMElementContainerLabelElement->setAttribute('class', 'input-container__label label');
 
-        $DOMElementContainerLabelElement->appendChild($descriptionElement);
+        // Вставляем HTML-ссылку через fragment
+        $fragment = $document->createDocumentFragment();
+        $fragment->appendXML($documentLink);
+        $DOMElementContainerLabelElement->appendChild($fragment);
+
         $DOMElementContainerElement->appendChild($DOMElementContainerLabelElement);
       }
 
@@ -554,10 +615,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -602,10 +662,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -647,10 +706,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`name` = :name',
-      'postgresql' => '"name" = :name'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :name', $queryBuilder->dialect->quoteIdentifier('name'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -692,10 +750,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms_data');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -737,10 +794,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`name` = :name',
-      'postgresql' => '"name" = :name'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :name', $queryBuilder->dialect->quoteIdentifier('name'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -779,6 +835,8 @@ class Form implements EntityTypeContent
     $CMSConfigDatabase = $CMSConfigurator->get('database');
     
     $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $dialect = $queryBuilder->dialect;
+
     $queryBuilder->setStatementInsert();
     $queryBuilder->statement->setTable('forms');
     $queryBuilder->statement->addColumn('name');
@@ -817,7 +875,7 @@ class Form implements EntityTypeContent
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+    if (!$dialect->supportsInsertReturning()) {
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
@@ -825,7 +883,9 @@ class Form implements EntityTypeContent
       $queryBuilder->statement->clauseFrom->addTable('forms');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $dialect->getLastInsertedIDCondition('id')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
@@ -838,7 +898,6 @@ class Form implements EntityTypeContent
           'message' => $exception->getMessage(),
           'statusCode' => 0,
           'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
     }
@@ -874,51 +933,40 @@ class Form implements EntityTypeContent
       }
     }
 
-    foreach (['texts', 'metadata', 'elements'] as $columnName) {
-      $fieldsJSON = [];
-      
-      if (!isset($data[$columnName])) {
+    $dialect = $queryBuilder->dialect;
+
+    foreach (['texts', 'metadata'] as $columnName) {
+      if (empty($data[$columnName])) {
         continue;
       }
 
-      foreach ($data[$columnName] as $name => $value) {
-        $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        
-        if ($columnName === 'elements') {
-          $fieldsJSON[] = match ($queryBuilder->DMS) {
-            CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
-            CMSDMS::PostgreSQL => sprintf('(\'{"%s": %s}\'::jsonb)', $name, $valueJSON)
-          };
-        } else {
-          $fieldsJSON[] = match ($queryBuilder->DMS) {
-            CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
-            CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
-          };
-        }
-      }
+      $jsonObject = json_encode($data[$columnName], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      
+      $queryBuilder->statement->clauseSet->addColumn(
+        $columnName,
+        $dialect->jsonMergePatch($columnName, $dialect->quoteLiteral($jsonObject))
+      );
+    }
 
-      if (!empty($data[$columnName])) {
-        if ($columnName === 'elements') {
-          $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-            'mysql' => 'CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON)',
-            'postgresql' => implode(' || ', $fieldsJSON)
-          ]);
-        } else {
-          $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-            'mysql' => 'JSON_MERGE_PATCH(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
-            'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
-          ]);
-        }
+    if (!empty($data['elements'])) {
+      $elementsJson = json_encode($data['elements'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+      if ($elementsJson === false) {
+        error_log('[Form] json_encode failed for "elements": ' . json_last_error_msg());
+      } else {
+        $queryBuilder->statement->clauseSet->addColumn(
+          'elements',
+          $dialect->jsonReplace('elements', $dialect->quoteLiteral($elementsJson))
+        );
       }
     }
 
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -974,10 +1022,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -1017,10 +1064,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms_data');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -1088,20 +1134,22 @@ class Form implements EntityTypeContent
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
-      $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    if (!$dialect->supportsInsertReturning()) {
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
       $queryBuilder->statement->setClauseFrom();
       $queryBuilder->statement->clauseFrom->addTable('forms_data');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $dialect->getLastInsertedIDCondition('id')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
       try {
-        $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+        $databaseConnection = $CMSCore->databaseConnector->database->connection;
         $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
         $databaseQuery->execute();
       } catch (PDOException $exception) {
@@ -1109,7 +1157,6 @@ class Form implements EntityTypeContent
           'message' => $exception->getMessage(),
           'statusCode' => 0,
           'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
     }
@@ -1134,10 +1181,9 @@ class Form implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('forms_data');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`formID` = :formID',
-      'postgresql' => '"formID" = :formID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :formID', $queryBuilder->dialect->quoteIdentifier('formID'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 

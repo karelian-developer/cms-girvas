@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -25,9 +25,22 @@ import {URLParser} from '../urlParser.class.js';
 export class Client {
   constructor(core) {
     this.core = core;
+    this.isLogged = false;
+    this.IPAddress = '0.0.0.0';
     this.CSRFToken = '';
     this.setRestHash();
     this.initCSRFToken();
+
+    this.isNewVisitor = this.checkIsNewVisitor();
+  }
+
+  checkIsNewVisitor() {
+    const token = localStorage.getItem('_grv_mtoken');
+    const tokenDate = localStorage.getItem('_grv_mtoken_date');
+    const today = new Date().toDateString();
+    
+    // Если нет токена или дата не сегодня — новый посетитель
+    return token === null || tokenDate !== today;
   }
 
   initCSRFToken() {
@@ -40,7 +53,8 @@ export class Client {
   }
 
   getCSRFToken() {
-    return this.CSRFToken;
+    const match = document.cookie.match(/_grv_csrf=([^;]+)/);
+    return match ? decodeURIComponent(match[1]) : this.CSRFToken;
   }
 
   setRestHash() {
@@ -64,36 +78,39 @@ export class Client {
     document.cookie = `${name}=${value};${expires};path=/`;
   }
 
+  /**
+   * Проверить наличие cookie
+   * 
+   * @param {string} name
+   * @returns {boolean}
+   */
   static existsCookie(name) {
-    let cookie = document.cookie;
-    let cookiePrefix = name + "=";
-    let begin = cookie.indexOf("; " + cookiePrefix);
+    const cookiePrefix = name + '=';
 
-    if (begin == -1) {
-      return false;
-    }
-
-    return true;
+    return document.cookie
+      .split(';')
+      .some((item) => item.trim().startsWith(cookiePrefix));
   }
 
+  /**
+   * Получить cookie по имени
+   * 
+   * @param {string} name
+   * @returns {string|null}
+   */
   static getCookie(name) {
-    let cookie = document.cookie;
-    let cookiePrefix = name + "=";
-    let begin = cookie.indexOf("; " + cookiePrefix);
+    const cookiePrefix = name + '=';
+    const cookies = document.cookie.split(';');
 
-    if (begin == -1) {
-      begin = cookie.indexOf(cookiePrefix);
-      if (begin != 0) return null;
-    } else {
-      begin += 2;
-      
-      let end = document.cookie.indexOf(";", begin);
-      if (end == -1) {
-        end = cookie.length;
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+
+      if (cookie.startsWith(cookiePrefix)) {
+        return decodeURIComponent(cookie.substring(cookiePrefix.length));
       }
     }
 
-    return decodeURI(cookie.substring(begin + cookiePrefix.length, end));
+    return null;
   }
 
   /**
@@ -121,7 +138,7 @@ export class Client {
    * Проверка авторизации клиента
    * @returns {Boolean}
    */
-  async isLogged() {
+  async checkLogged() {
     let request = new Interactive('request', {
       method: 'GET',
       url: '/handler/client/is-logged'

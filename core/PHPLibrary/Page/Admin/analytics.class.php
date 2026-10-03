@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -28,6 +28,8 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\Entries as Entries;
 use \core\PHPLibrary\Metrics as Metrics;
@@ -61,14 +63,16 @@ class PageAnalytics implements InterfacePage
       'iconName' => 'back',
       'link' => '/',
       'permanent' => true,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => null,
     ],
     'forms' => [
       'name' => 'forms',
       'iconName' => 'forms',
       'link' => '/analytics/forms',
       'permanent' => false,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => 'hasPermissionAdminViewingLogs',
     ]
   ];
 
@@ -84,12 +88,106 @@ class PageAnalytics implements InterfacePage
   ) {}
 
   /**
+   * Получить группу текущего авторизованного пользователя админки
+   * 
+   * @return UserGroup|null
+   */
+  private function getCurrentUserGroup() : ?UserGroup
+  {
+    /** @var User|null $user */
+    $user = $this->CMSCore->client->getUser(2);
+    if ($user === null) {
+      return null;
+    }
+
+    $user->initData(['metadata']);
+
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $user->getGroup();
+    if ($userGroup === null) {
+      return null;
+    }
+
+    $userGroup->initData(['permissions']);
+
+    return $userGroup;
+  }
+
+  /**
+   * Проверить, есть ли у текущего пользователя право просмотра аналитики
+   * 
+   * @return bool
+   */
+  private function currentUserCanViewAnalytics() : bool
+  {
+    $userGroup = $this->getCurrentUserGroup();
+
+    return $userGroup !== null
+      && method_exists($userGroup, 'hasPermissionAdminViewingLogs')
+      && $userGroup->hasPermissionAdminViewingLogs();
+  }
+
+  /**
+   * Собрать страницу ошибки и подменить итоговую сборку
+   * 
+   * @param int $httpCode
+   * 
+   * @return void
+   */
+  private function assemblyError(int $httpCode) : void
+  {
+    http_response_code($httpCode);
+
+    $pageError = new PageError($this->CMSCore, $this->page, $httpCode);
+    $pageError->assembly();
+    $this->assembled = $pageError->assembled;
+  }
+
+  /**
+   * Отфильтровать подразделы по правам текущего пользователя
+   * 
+   * @param UserGroup $userGroup
+   * 
+   * @return void
+   */
+  private function filterSubsections(UserGroup $userGroup) : void
+  {
+    foreach ($this->navigationSubsections as $index => $subsection) {
+      $permission = $subsection['permission'] ?? null;
+
+      if ($permission === null) {
+        continue;
+      }
+
+      $allowed = method_exists($userGroup, $permission) && $userGroup->{$permission}();
+
+      if (!$allowed) {
+        unset($this->navigationSubsections[$index]);
+      }
+    }
+  }
+
+  /**
    * Инициализация подразделов
    * 
    * @return void
    */
   public function initSubnavigation() : void
   {
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $this->getCurrentUserGroup();
+
+    if ($userGroup === null) {
+      return;
+    }
+
+    // Если нет прав на просмотр логов — подразделы не собираем
+    if (!$this->currentUserCanViewAnalytics()) {
+      return;
+    }
+
+    $this->filterSubsections($userGroup);
+
     $themeSource =& $this->CMSCore->theme->core->source;
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
@@ -310,6 +408,12 @@ class PageAnalytics implements InterfacePage
    */
   public function assembly() : void
   {
+    // Защита от прямого захода по URL без прав
+    if (!$this->currentUserCanViewAnalytics()) {
+      $this->assemblyError(403);
+      return;
+    }
+
     $CMSCore = $this->CMSCore;
     $CMSURLP = $CMSCore->urlp;
     $CMSTheme = $CMSCore->theme;
@@ -339,12 +443,8 @@ class PageAnalytics implements InterfacePage
 
         $this->assembled = $page->assembled;
       } else {
-        http_response_code(404);
-
-        $pageError = new PageError($this->CMSCore, $this->page, 404);
-        $pageError->assembly();
-
-        $this->assembled = $pageError->assembled;
+        $this->assemblyError(404);
+        return;
       }
     } elseif ($CMSURLP->getPath(2) === 'page' && $CMSURLP->getPath(3) !== null) {
       $pageStatic = null;
@@ -364,12 +464,8 @@ class PageAnalytics implements InterfacePage
 
         $this->assembled = $page->assembled;
       } else {
-        http_response_code(404);
-
-        $pageError = new PageError($this->CMSCore, $this->page, 404);
-        $pageError->assembly();
-        
-        $this->assembled = $pageError->assembled;
+        $this->assemblyError(404);
+        return;
       }
     } elseif ($CMSURLP->getPath(2) === 'forms') {
       $this->CMSCore->theme->addStyle(['href' => 'styles/page/analytics/forms.css', 'rel' => 'stylesheet']);
@@ -402,56 +498,88 @@ class PageAnalytics implements InterfacePage
 
         $this->assembled = $page->assembled;
       } else {
-        http_response_code(404);
-
-        $pageError = new PageError($this->CMSCore, $this->page, 404);
-        $pageError->assembly();
-        
-        $this->assembled = $pageError->assembled;
+        $this->assemblyError(404);
+        return;
       }
     } else {
-      $metrics = new Metrics($this->CMSCore);
-      $metricsEntries = $metrics->getEntriesViewsByTimestamp(time());
-      $metricsPages = $metrics->getPagesViewsByTimestamp(time());
+      // ==========================================
+      // 1. ПОЛУЧАЕМ ДАТУ ИЗ URL ИЛИ ИСПОЛЬЗУЕМ ТЕКУЩУЮ
+      // ==========================================
+      $timestamp = $this->getTimestampFromURL($CMSURLP) ?: time();
+      
+      // ==========================================
+      // 2. ПОЛУЧАЕМ ДАННЫЕ МЕТРИК
+      // ==========================================
+      try {
+        $metrics = new Metrics($this->CMSCore);
+        
+        // Получаем просмотры записей за день
+        $metricsEntries = $metrics->getEntriesViewsByTimestamp($timestamp);
+        
+        // Получаем просмотры страниц за день
+        $metricsPages = $metrics->getPagesViewsByTimestamp($timestamp);
+        
+        // ==========================================
+        // 3. ДОПОЛНИТЕЛЬНАЯ СТАТИСТИКА
+        // ==========================================
+        // Получаем общую статистику за период (если нужно)
+        $stats = [];
+        if (isset($_GET['timeStart']) && isset($_GET['timeEnd'])) {
+          $timeStart = (int) $_GET['timeStart'];
+          $timeEnd = (int) $_GET['timeEnd'];
+          $stats = $metrics->getStatsByTimestampRange($timeStart, $timeEnd);
+        }
+        
+      } catch (Exception $e) {
+        // Логируем ошибку
+        error_log('[Analytics] Ошибка получения метрик: ' . $e->getMessage());
+        
+        $metricsEntries = [];
+        $metricsPages = [];
+        $stats = [];
+      }
 
+      // ==========================================
+      // 4. СОРТИРОВКА (если нужна, но в Metrics уже есть)
+      // ==========================================
+      // Для безопасности: сортируем, даже если уже отсортировано
       if (!empty($metricsEntries)) {
-        usort($metricsEntries, function ($a, $b)
-        {
-          if ($a->getViewsCount() !== $b->getViewsCount()) {
-            return $a->getViewsCount() < $b->getViewsCount() ? 1 : -1;
-          }
-
-          return 0;
+        usort($metricsEntries, function ($a, $b) {
+          return $b->getViewsCount() - $a->getViewsCount();
         });
-  
-        $entriesTableAssembled = $this->assemblyEntriesTable($metricsEntries);
-      } else {
-        $entriesTableAssembled = '';
       }
 
       if (!empty($metricsPages)) {
-        usort($metricsPages, function ($a, $b)
-        {
-          if ($a->getViewsCount() !== $b->getViewsCount()) {
-            return $a->getViewsCount() < $b->getViewsCount() ? 1 : -1;
-          }
-
-          return 0;
+        usort($metricsPages, function ($a, $b) {
+          return $b->getViewsCount() - $a->getViewsCount();
         });
-  
-        $pagesTableAssembled = $this->assemblyPagesTable($metricsPages);
-      } else {
-        $pagesTableAssembled = '';
       }
 
-      /** @var string $site_page Содержимое шаблона страницы */
+      // ==========================================
+      // 5. СБОРКА ТАБЛИЦ
+      // ==========================================
+      $entriesTableAssembled = !empty($metricsEntries) 
+        ? $this->assemblyEntriesTable($metricsEntries) 
+        : $this->assemblyEmptyTable($localeData['PAGE_ANALYTICS_NO_ENTRIES_DATA'] ?? 'Нет данных по записям');
+
+      $pagesTableAssembled = !empty($metricsPages) 
+        ? $this->assemblyPagesTable($metricsPages) 
+        : $this->assemblyEmptyTable($localeData['PAGE_ANALYTICS_NO_PAGES_DATA'] ?? 'Нет данных по страницам');
+
+      // ==========================================
+      // 6. СБОРКА ШАБЛОНА
+      // ==========================================
       $this->assembled = ThemeCollector::assemblyFileContent(
         $CMSTheme,
         'templates/page/analytics.tpl',
         [
           'ADMIN_PANEL_PAGE_NAME' => 'analytics',
           'ENTRIES_LIST_ITEMS' => $entriesTableAssembled,
-          'PAGES_LIST_ITEMS' => $pagesTableAssembled
+          'PAGES_LIST_ITEMS' => $pagesTableAssembled,
+          'STATS_TOTAL_VIEWS' => $stats['totalViews'] ?? 0,
+          'STATS_UNIQUE_VISITORS' => $stats['uniqueVisitorsCount'] ?? 0,
+          'STATS_NEW_VISITORS' => $stats['newVisitorsCount'] ?? 0,
+          'STATS_DAYS' => $stats['days'] ?? 0
         ]
       );
     }
@@ -467,8 +595,8 @@ class PageAnalytics implements InterfacePage
    */
   private function getPageStaticObjectByID(CoreInterface $CMSCore, int $id) : ?EntityTypeContent
   {
-    return Form::existsByID($CMSCore, $id)
-      ? new Form($CMSCore, $id)
+    return PageStatic::existsByID($CMSCore, $id)
+      ? new PageStatic($CMSCore, $id)
       : null;
   }
 
@@ -515,5 +643,54 @@ class PageAnalytics implements InterfacePage
     return is_numeric($CMSURLP->getPath(3))
       ? (int) $CMSURLP->getPath(3)
       : 0;
+  }
+
+  /**
+   * Получить временную отметку из URL
+   * 
+   * @param CMSURLP $CMSURLP
+   * @return int|null
+   */
+  private function getTimestampFromURL(CMSURLP $CMSURLP): ?int
+  {
+    // Проверяем параметр date в URL: /admin/analytics?date=2026-09-03
+    $dateParam = $_GET['date'] ?? null;
+    if ($dateParam) {
+      $timestamp = strtotime($dateParam);
+      if ($timestamp !== false) {
+        return $timestamp;
+      }
+    }
+    
+    // Проверяем параметры диапазона
+    if (isset($_GET['timeStart']) && isset($_GET['timeEnd'])) {
+      // Вернём start как основную дату
+      return (int) $_GET['timeStart'];
+    }
+    
+    // Проверяем path: /admin/analytics/2026-09-03
+    $datePath = $CMSURLP->getPath(2);
+    if ($datePath && preg_match('/^\d{4}-\d{2}-\d{2}$/', $datePath)) {
+      $timestamp = strtotime($datePath);
+      if ($timestamp !== false) {
+        return $timestamp;
+      }
+    }
+    
+    return null;
+  }
+
+  /**
+   * Собрать пустую таблицу
+   * 
+   * @param string $message
+   * @return string
+   */
+  private function assemblyEmptyTable(string $message): string
+  {
+    return sprintf(
+      '<div class="analytics-empty">%s</div>',
+      htmlspecialchars($message)
+    );
   }
 }

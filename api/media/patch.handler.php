@@ -13,71 +13,92 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
+
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_MEDIA_FILES_MANAGEMENT)) {
-    $fileFullname = trim($_PATCH['file_fullname']);
-    $description = trim($_PATCH['file_description']) ?? '';
-    $additionalDescription = trim($_PATCH['file_additional_description']) ?? '';
-    $fileExtension = trim($_PATCH['file_extension']) ?? '';
-    $fileLicense = trim($_PATCH['file_license']) ?? '';
-    $fileGEOLocation = trim($_PATCH['file_geo_location']) ?? '';
+    $fileFullname = trim($_PATCH['file_fullname'] ?? '');
+    $description = trim($_PATCH['file_description'] ?? '');
+    $additionalDescription = trim($_PATCH['file_additional_description'] ?? '');
+    $fileExtension = trim($_PATCH['file_extension'] ?? '');
+    $fileLicense = trim($_PATCH['file_license'] ?? '');
+    $fileGEOLocation = trim($_PATCH['file_geo_location'] ?? '');
 
-    if (isset($_PATCH['file_fullname'])) {
+    if (isset($_PATCH['file_fullname']) && !empty($fileFullname)) {
       $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
-      $filePath =  $fileDirectoryPath . '/' . $fileFullname . '.' . $fileExtension;
+      $filePath = $fileDirectoryPath . '/' . $fileFullname;
 
       if (file_exists($filePath)) {
         $jsonFilePath = $fileDirectoryPath . '/metadata.json';
         $imagesData = [];
+        $oldData = [];
 
+        // Загружаем существующие метаданные
         if (file_exists($jsonFilePath)) {
           $jsonContent = file_get_contents($jsonFilePath);
           $imagesData = json_decode($jsonContent, true) ?? [];
+          
+          if (isset($imagesData[$fileFullname])) {
+            $oldData = $imagesData[$fileFullname];
+          }
         }
 
-        $imagesData[$fileFullname . '.' . $fileExtension] = [
-          'filename' => $fileFullname . '.' . $fileExtension,
+        // Определяем, какие поля изменились
+        $changedFields = [];
+        if (isset($oldData['description']) && $oldData['description'] !== $description) {
+          $changedFields[] = 'description';
+        }
+        if (isset($oldData['additionalDescription']) && $oldData['additionalDescription'] !== $additionalDescription) {
+          $changedFields[] = 'additionalDescription';
+        }
+        if (isset($oldData['license']) && $oldData['license'] !== $fileLicense) {
+          $changedFields[] = 'license';
+        }
+        if (isset($oldData['GEOLocation']) && $oldData['GEOLocation'] !== $fileGEOLocation) {
+          $changedFields[] = 'geoLocation';
+        }
+
+        // Обновляем метаданные
+        $imagesData[$fileFullname] = [
+          'filename' => $fileFullname,
           'extension' => $fileExtension,
           'description' => $description,
           'additionalDescription' => $additionalDescription,
           'license' => $fileLicense,
           'GEOLocation' => $fileGEOLocation,
-          'updatedAt' => date('Y-m-d H:i:s')
+          'updatedAt' => date('Y-m-d H:i:s'),
+          'createdAt' => $oldData['createdAt'] ?? date('Y-m-d H:i:s', filemtime($filePath))
         ];
 
-        $allFiles = scandir($fileDirectoryPath);
-        foreach ($allFiles as $file) {
-          if ($file === '.' || $file === '..' || $file === 'metadata.json') {
-            continue;
-          }
-          
-          $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-          $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'avif', 'webp', 'bmp'];
-          
-          if (in_array($extension, $imageExtensions)) {
-            if (!isset($imagesData[$file])) {
-              $imagesData[$file] = [
-                'filename' => $file,
-                'extension' => $extension,
-                'description' => '',
-                'additionalDescription' => '',
-                'license' => '',
-                'GEOLocation' => '',
-                'createdAt' => date('Y-m-d H:i:s', filemtime($fileDirectoryPath . '/' . $file))
-              ];
-            }
-          }
-        }
+        // Сохраняем метаданные в JSON
+        $jsonResult = json_encode($imagesData, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $jsonWriteResult = file_put_contents($jsonFilePath, $jsonResult);
 
-        $jsonResult = json_encode($imagesData, JSON_UNESCAPED_UNICODE);
-        file_put_contents($jsonFilePath, $jsonResult);
+        if ($jsonWriteResult !== false) {
+          // ============================================================
+          // ЛОГИРОВАНИЕ ОБНОВЛЕНИЯ МЕТАДАННЫХ МЕДИА-ФАЙЛА (152-ФЗ)
+          // ============================================================
+          if (!empty($changedFields)) {
+            CMSReport::create(
+              $CMSCore,
+              CMSReport::REPORT_TYPE_ID_AP_MEDIA_UPLOADED,
+              [
+                'fileName' => $fileFullname,
+                'fileExtension' => $fileExtension,
+                'action' => 'metadata_update',
+                'changedFields' => $changedFields,
+                'updatedByID' => $clientUser->getID(),
+                'updatedByLogin' => $clientUser->getLogin(),
+                'ip' => $CMSCore->client->getIPAddress()
+              ]
+            );
+          }
 
-        if (file_exists($jsonFilePath)) {
           $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {

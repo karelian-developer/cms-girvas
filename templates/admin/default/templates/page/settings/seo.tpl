@@ -1,4 +1,5 @@
 <form class="form page__form" data-element="main-form">
+  <input type="hidden" name="_settings_locale" value="{SETTINGS_ADMIN_LOCALE}">
   <div class="grid-table page__grid-table">
     <!-- Поле: Код для верификации в сервисе «Яндекс: Вебмастер» -->
     <div class="cell grid-table__cell grid-table__cell_text">
@@ -11,6 +12,18 @@
     </div>
     <div class="cell grid-table__cell grid-table__cell_data">
       <input class="input form__input form__input_text" name="setting_{SETTINGS_NAME}_code_yandex_webmaster" placeholder="b0dbc8c312c05273" value="{SETTING_CODE_YANDEX_WEBMASTER_VALUE}">
+    </div>
+    <!-- Поле: Код счётчика Яндекс.Метрики -->
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">
+        {LANG:PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_METRIKA_TITLE}
+      </div>
+      <div class="cell__description">
+        {LANG:PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_METRIKA_DESCRIPTION}
+      </div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <input class="input form__input form__input_text" name="setting_{SETTINGS_NAME}_code_yandex_metrika" placeholder="94682915" value="{SETTING_CODE_YANDEX_METRIKA_VALUE}">
     </div>
     <!-- Поле: Принудительная переадресация на поддомен WWW -->
     <div class="cell grid-table__cell grid-table__cell_text">
@@ -38,7 +51,7 @@
       </div>
     </div>
     <div class="cell grid-table__cell grid-table__cell_data">
-      <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_site_description" cols="30" rows="10" placeholder="{LANG:PAGE_SETTINGS_SETTING_SEO_SITE_DESCRIPTION_TITLE}">{SETTING_SITE_DESCRIPTION_VALUE}</textarea>
+      <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_site_description" cols="30" rows="10" placeholder="{LANG:PAGE_SETTINGS_SETTING_SEO_SITE_DESCRIPTION_TITLE}" data-element="input-seo-description">{SETTING_SITE_DESCRIPTION_VALUE}</textarea>
     </div>
     <!-- Поле: Ключевые слова -->
     <div class="cell grid-table__cell grid-table__cell_text">
@@ -50,7 +63,7 @@
       </div>
     </div>
     <div class="cell grid-table__cell grid-table__cell_data">
-      <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_site_keywords" cols="30" rows="10" placeholder="{LANG:PAGE_SETTINGS_SETTING_SEO_INPUT_KEYWORDS_PLACEHOLDER}">{SETTING_SITE_KEYWORDS_VALUE}</textarea>
+      <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_site_keywords" cols="30" rows="10" placeholder="{LANG:PAGE_SETTINGS_SETTING_SEO_INPUT_KEYWORDS_PLACEHOLDER}" data-element="input-seo-keywords">{SETTING_SITE_KEYWORDS_VALUE}</textarea>
     </div>
     <!-- Поле: Содержимое файла robots.txt -->
     <div class="cell grid-table__cell grid-table__cell_text">
@@ -63,6 +76,18 @@
     </div>
     <div class="cell grid-table__cell grid-table__cell_data">
       <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_robots_txt" cols="30" rows="10">{SETTING_SITE_ROBOTS_TXT_VALUE}</textarea>
+    </div>
+    <!-- Поле: Содержимое файла llms.txt -->
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">
+        {LANG:PAGE_SETTINGS_SETTING_SEO_LLMS_TXT_TITLE}
+      </div>
+      <div class="cell__description">
+        {LANG:PAGE_SETTINGS_SETTING_SEO_LLMS_TXT_DESCRIPTION}
+      </div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <textarea class="textarea form__textarea" name="setting_{SETTINGS_NAME}_llms_txt" cols="30" rows="10">{SETTING_SITE_LLMS_TXT_VALUE}</textarea>
     </div>
     <!-- Панель формы -->
     <div class="cell grid-table__cell grid-table__cell_panel" data-element="panel"></div>

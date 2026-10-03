@@ -10,7 +10,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -20,8 +20,9 @@
  */
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\Database\QueryBuilder\Dialect\Factory as DialectFactory;
 use \core\PHPLibrary\Database\IndexType as DatabaseIndexType;
+use \core\PHPLibrary\ContentBlock as ContentBlock;
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryCategory as EntryCategory;
 use \core\PHPLibrary\EntriesSample as EntriesSample;
@@ -39,8 +40,6 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
-  $JSONDataTypeDMS = 'json';
-
   $installationStepIndex = $CMSCore->urlp->getParam('stepIndex');
   $installationStepIndex = $installationStepIndex ?? 1;
   $installationStepIndex = is_numeric($installationStepIndex) ? (int) $installationStepIndex : 1;
@@ -220,9 +219,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     $document = new DOMDocument();
 
     $tableData = [
-      ['./backups/', '755', file_exists(CMS_ROOT_DIRECTORY . '/backups') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/backups')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./backups/', '770', file_exists(CMS_ROOT_DIRECTORY . '/backups') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/backups')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./cache/', '755', file_exists(CMS_ROOT_DIRECTORY . '/cache') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/cache')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./core/', '755', file_exists(CMS_ROOT_DIRECTORY . '/core') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/core')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
+      ['./cron/', '770', file_exists(CMS_ROOT_DIRECTORY . '/cron') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/cron')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./locales/', '755', file_exists(CMS_ROOT_DIRECTORY . '/locales') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/locales')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./logs/', '750', file_exists(CMS_ROOT_DIRECTORY . '/logs') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/logs')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
       ['./modules/', '755', file_exists(CMS_ROOT_DIRECTORY . '/modules') ? substr(sprintf('%o', fileperms(CMS_ROOT_DIRECTORY . '/modules')), -3) : $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_DIRECTORY_NOT_FOUND_LABEL')],
@@ -231,14 +231,15 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     ];
 
     $tableCellsFontColor = [
-      !file_exists(CMS_ROOT_DIRECTORY . '/backups') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/backups') & 0777) >= 755 ? '#209A20' : '#9A2020'),
-      !file_exists(CMS_ROOT_DIRECTORY . '/cache') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/cache') & 0777) >= 755 ? '#209A20' : '#9A2020'),
-      !file_exists(CMS_ROOT_DIRECTORY . '/core') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/core') & 0777) >= 755 ? '#209A20' : '#9A2020'),
-      !file_exists(CMS_ROOT_DIRECTORY . '/locales') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/locales') & 0777) >= 755 ? '#209A20' : '#9A2020'),
-      !file_exists(CMS_ROOT_DIRECTORY . '/logs') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/logs') & 0777) >= 750 ? '#209A20' : '#9A2020'),
-      !file_exists(CMS_ROOT_DIRECTORY . '/modules') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/modules') & 0777) >= 755 ? '#209A20' : '#9A2020'),
-      !file_exists(CMS_ROOT_DIRECTORY . '/templates') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/templates') & 0777) >= 755 ? '#209A20' : '#9A2020'),
-      !file_exists(CMS_ROOT_DIRECTORY . '/uploads') ? '#9A2020' : (decoct(fileperms(CMS_ROOT_DIRECTORY . '/uploads') & 0777) >= 755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/backups') ? '#9A2020' : ((fileperms(CMS_ROOT_DIRECTORY . '/backups') & 0777) === 0770 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/cache') ? '#9A2020' : ((fileperms(CMS_ROOT_DIRECTORY . '/cache') & 0777) === 0755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/core') ? '#9A2020' : ((fileperms(CMS_ROOT_DIRECTORY . '/core') & 0777) === 0755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/cron') ? '#9A2020' : ((fileperms(CMS_ROOT_DIRECTORY . '/cron') & 0777) === 0770 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/locales') ? '#9A2020' : ((fileperms(CMS_ROOT_DIRECTORY . '/locales') & 0777) === 0755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/logs') ? '#9A2020' : ((fileperms(CMS_ROOT_DIRECTORY . '/logs') & 0777) === 0750 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/modules') ? '#9A2020' : ((fileperms(CMS_ROOT_DIRECTORY . '/modules') & 0777) === 0755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/templates') ? '#9A2020' : ((fileperms(CMS_ROOT_DIRECTORY . '/templates') & 0777) === 0755 ? '#209A20' : '#9A2020'),
+      !file_exists(CMS_ROOT_DIRECTORY . '/uploads') ? '#9A2020' : ((fileperms(CMS_ROOT_DIRECTORY . '/uploads') & 0777) === 0755 ? '#209A20' : '#9A2020'),
     ];
 
     $tableElement = $document->createElement('table');
@@ -446,12 +447,14 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       fwrite($file, '  \'sessionExpires\' => 86400,' . PHP_EOL);
       fwrite($file, '  \'sessionAdminExpires\' => 86400,' . PHP_EOL);
       fwrite($file, '  \'SSLCSP\' => [' . PHP_EOL);
-      fwrite($file, '    \'default-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
+      fwrite($file, '    \'default-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai vk.com vk.ru rutube.ru\',' . PHP_EOL);
       fwrite($file, '    \'style-src \\\'unsafe-inline\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
       fwrite($file, '    \'script-src \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
       fwrite($file, '    \'script-src-elem \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
       fwrite($file, '    \'manifest-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
-      fwrite($file, '    \'img-src \\\'self\\\' data: *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\'' . PHP_EOL);
+      fwrite($file, '    \'img-src \\\'self\\\' data: *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
+      fwrite($file, '    \'img-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai vk.com vk.ru\',' . PHP_EOL);
+      fwrite($file, '    \'img-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai stats.vk-portal.net\'' . PHP_EOL);
       fwrite($file, '  ],' . PHP_EOL);
       fwrite($file, '  \'SSLPermRedirect\' => false,' . PHP_EOL);
       fwrite($file, '  \'SSLHSTSMaxAge\' => 63072000,' . PHP_EOL);
@@ -469,11 +472,6 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       fclose($file);
       chmod($fileCMSConfigurationPath, 0664);
     }
-
-    $JSONDataTypeDMS = match (strval($_GET['database_dms'])) {
-      'DMS::PostgreSQL' => 'jsonb',
-      default => 'json'
-    };
 
     if (file_exists($fileCMSConfigurationPath)) {
       $tipBlockElement->setAttribute('class', 'tip tip_green');
@@ -494,11 +492,6 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     $CMSDatabaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
     $CMSConfigDatabase = $CMSCore->configurator->get('database');
 
-    switch ($CMSConfigDatabase['dms']->getString()) {
-      case 'PostgreSQL': $JSONDataTypeDMS = 'jsonb'; break;
-      default: $JSONDataTypeDMS = 'json';
-    }
-
     $document = new DOMDocument();
     $tipBlockElement = $document->createElement('div');
 
@@ -516,10 +509,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('configurations');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'string:255', 'NOT NULL');
       $queryBuilder->statement->addColumn('value', 'text');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('texts', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -537,10 +530,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('content_blocks');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'string:255', 'NOT NULL');
+      $queryBuilder->statement->addColumn('texts', 'json');
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -558,12 +551,12 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'string:255', 'NOT NULL');
       $queryBuilder->statement->addColumn('categoryID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('authorID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('texts', 'json');
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -581,11 +574,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries_categories');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'string:255', 'NOT NULL');
       $queryBuilder->statement->addColumn('parentID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('texts', 'json');
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -603,11 +596,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries_comments');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('entryID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('authorID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('content', 'text');
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -625,10 +618,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('entries_samples');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'string:255', 'NOT NULL');
+      $queryBuilder->statement->addColumn('texts', 'json');
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -646,11 +639,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('forms');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('elements', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'string:255', 'NOT NULL');
+      $queryBuilder->statement->addColumn('elements', 'json');
+      $queryBuilder->statement->addColumn('texts', 'json');
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -668,9 +661,9 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('forms_data');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('formID', 'integer', 'NOT NULL');
-      $queryBuilder->statement->addColumn('data', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('data', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -688,11 +681,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('pages_static');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'string:255', 'NOT NULL');
+      $queryBuilder->statement->addColumn('texts', 'json');
       $queryBuilder->statement->addColumn('authorID', 'bigint');
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -703,6 +696,29 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $execute = $databaseQuery->execute();
 
       // =======================
+      // ТАБЛИЦА ВЕРСИЙ СТАТИЧЕСКИХ СТРАНИЦ
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('pages_static_versions');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('pageStaticID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('version', 'string:64', 'NOT NULL');
+      $queryBuilder->statement->addColumn('locale', 'string:16', 'NOT NULL');
+      $queryBuilder->statement->addColumn('texts', 'json', 'NOT NULL');
+      $queryBuilder->statement->addColumn('effectiveFrom', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('createdByID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('isCurrent', 'boolean', 'NOT NULL DEFAULT false');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $execute = $databaseQuery->execute();
+
+      // =======================
       // ТАБЛИЦА ОТЧЕТОВ
       // =======================
 
@@ -710,15 +726,62 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('reports');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->addColumn('variables', $JSONDataTypeDMS);
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('variables', 'json');
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $CMSDatabaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
 
+      $execute = $databaseQuery->execute();
+
+      // =======================
+      // ТАБЛИЦА АРХИВА ОТЧЕТОВ
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('reports_archive');
+      $queryBuilder->statement->addColumn('id', 'bigint', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('variables', 'json');
+      $queryBuilder->statement->addColumn('metadata', 'json');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('archivedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $execute = $databaseQuery->execute();
+
+      // =======================
+      // ТАБЛИЦА СОГЛАСИЙ ПОЛЬЗОВАТЕЛЕЙ (152-ФЗ)
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('users_consents');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('formID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('formReportID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('pageStaticID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('documentVersion', 'string:64', 'NOT NULL');
+      $queryBuilder->statement->addColumn('locale', 'string:16', 'NOT NULL');
+      $queryBuilder->statement->addColumn('ip', 'string:64', 'NOT NULL');
+      $queryBuilder->statement->addColumn('userAgent', 'string:512');
+      $queryBuilder->statement->addColumn('source', 'string:64', 'NOT NULL DEFAULT \'form\'');
+      $queryBuilder->statement->addColumn('consentedAt', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('revokedAt', 'bigint');
+      $queryBuilder->statement->addColumn('revokeReason', 'text');
+      $queryBuilder->statement->addColumn('revokedByID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       $execute = $databaseQuery->execute();
 
       // =======================
@@ -729,12 +792,12 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('users');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->addColumn('login', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('email', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('login', 'string:255', 'NOT NULL');
+      $queryBuilder->statement->addColumn('email', 'string:255', 'NOT NULL');
       $queryBuilder->statement->addColumn('passwordHash', 'text', 'NOT NULL');
       $queryBuilder->statement->addColumn('securityHash', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('emailIsSubmitted', 'boolean', 'NOT NULL DEFAULT false');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
@@ -753,11 +816,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('users_groups');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'string:255', 'NOT NULL');
+      $queryBuilder->statement->addColumn('texts', 'json');
       $queryBuilder->statement->addColumn('permissions', 'integer', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->addColumn('metadata', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('metadata', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -775,10 +838,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('users_registration_submits');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->addColumn('submitToken', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('refusalToken', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('submitToken', 'string:255', 'NOT NULL');
+      $queryBuilder->statement->addColumn('refusalToken', 'string:255', 'NOT NULL');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
@@ -795,10 +858,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('users_sessions');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
-      $queryBuilder->statement->addColumn('token', 'text', 'NOT NULL');
-      $queryBuilder->statement->addColumn('userIP', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('token', 'string:255', 'NOT NULL');
+      $queryBuilder->statement->addColumn('userIP', 'string:64', 'NOT NULL');
       $queryBuilder->statement->addColumn('typeID', 'integer', 'NOT NULL DEFAULT 1');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
@@ -817,11 +880,11 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('web_channels');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
-      $queryBuilder->statement->addColumn('name', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('name', 'string:255', 'NOT NULL');
       $queryBuilder->statement->addColumn('entriesCategoryID', 'bigint', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('typeID', 'integer', 'NOT NULL DEFAULT 1');
-      $queryBuilder->statement->addColumn('texts', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('texts', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
@@ -839,11 +902,96 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->setStatementCreateTable();
       $queryBuilder->statement->setCheckExists(true);
       $queryBuilder->statement->setTableName('metrics');
-      $queryBuilder->statement->addColumn('id', 'serial', 'NOT NULL PRIMARY KEY');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
       $queryBuilder->statement->addColumn('date', 'integer', 'NOT NULL');
-      $queryBuilder->statement->addColumn('data', $JSONDataTypeDMS);
+      $queryBuilder->statement->addColumn('data', 'json');
       $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      $execute = $databaseQuery->execute();
+
+      // =======================
+      // ТАБЛИЦА OAUTH-КЛИЕНТОВ
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('oauth_clients');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('clientID', 'string:255', 'NOT NULL');
+      $queryBuilder->statement->addColumn('clientSecret', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('name', 'string:255', 'NOT NULL');
+      $queryBuilder->statement->addColumn('description', 'text');
+      $queryBuilder->statement->addColumn('redirectURI', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('grantTypes', 'string:255', 'NOT NULL DEFAULT \'authorization_code refresh_token\'');
+      $queryBuilder->statement->addColumn('scopes', 'string:255', 'NOT NULL DEFAULT \'profile email read\'');
+      $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('isActive', 'boolean', 'NOT NULL DEFAULT true');
+      $queryBuilder->statement->addColumn('isVerified', 'boolean', 'NOT NULL DEFAULT false');
+      $queryBuilder->statement->addColumn('verifiedAt', 'bigint');
+      $queryBuilder->statement->addColumn('verifiedBy', 'bigint');
+      $queryBuilder->statement->addColumn('ownerEmail', 'string:255', 'NOT NULL DEFAULT \'\'');
+      $queryBuilder->statement->addColumn('maxTokens', 'integer', 'NOT NULL DEFAULT 100');
+      $queryBuilder->statement->addColumn('tokenTTL', 'integer', 'NOT NULL DEFAULT 3600');
+      $queryBuilder->statement->addColumn('allowedIPs', 'text');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('updatedUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      $execute = $databaseQuery->execute();
+
+      // =======================
+      // ТАБЛИЦА OAUTH-КОДОВ АВТОРИЗАЦИИ
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('oauth_auth_codes');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('code', 'string:255', 'NOT NULL');
+      $queryBuilder->statement->addColumn('clientID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('scopes', 'string:255', 'NOT NULL DEFAULT \'\'');
+      $queryBuilder->statement->addColumn('redirectURI', 'text', 'NOT NULL');
+      $queryBuilder->statement->addColumn('codeChallenge', 'text');
+      $queryBuilder->statement->addColumn('codeChallengeMethod', 'string:16', 'NOT NULL DEFAULT \'S256\'');
+      $queryBuilder->statement->addColumn('expiresAt', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('isRevoked', 'boolean', 'NOT NULL DEFAULT false');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->assembly();
+
+      $databaseConnection = $CMSDatabaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      $execute = $databaseQuery->execute();
+
+      // =======================
+      // ТАБЛИЦА OAUTH-ТОКЕНОВ ДОСТУПА
+      // =======================
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateTable();
+      $queryBuilder->statement->setCheckExists(true);
+      $queryBuilder->statement->setTableName('oauth_access_tokens');
+      $queryBuilder->statement->addColumn('id', 'id', 'PRIMARY KEY');
+      $queryBuilder->statement->addColumn('accessToken', 'string:255', 'NOT NULL');
+      $queryBuilder->statement->addColumn('refreshToken', 'string:255');
+      $queryBuilder->statement->addColumn('clientID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('userID', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('scopes', 'string:255', 'NOT NULL DEFAULT \'\'');
+      $queryBuilder->statement->addColumn('expiresAt', 'bigint', 'NOT NULL DEFAULT 0');
+      $queryBuilder->statement->addColumn('isRevoked', 'boolean', 'NOT NULL DEFAULT false');
+      $queryBuilder->statement->addColumn('revokedAt', 'bigint');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp', 'integer', 'NOT NULL DEFAULT 0');
       $queryBuilder->statement->assembly();
 
       $databaseConnection = $CMSDatabaseConnector->database->connection;
@@ -870,6 +1018,27 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     // СОЗДАНИЕ ИНДЕКСОВ ДЛЯ ОПТИМИЗАЦИИ ПРОИЗВОДИТЕЛЬНОСТИ
     // =======================
 
+    /**
+     * Безопасное создание индекса.
+     *
+     * Логирует ошибку, но не прерывает установку остальных индексов.
+     *
+     * @param  DatabaseQueryBuilder  $queryBuilder
+     * @param  PDO                   $databaseConnection
+     * @return bool
+     */
+    function createIndexSafe(DatabaseQueryBuilder $queryBuilder, \PDO $databaseConnection): bool
+    {
+      try {
+        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+        return $databaseQuery->execute();
+      } catch (PDOException $exception) {
+        error_log('Index creation warning: ' . $exception->getMessage());
+        error_log('Failed SQL: ' . $queryBuilder->statement->assembled);
+        return false;
+      }
+    }
+
     try {
       // Индексы для таблицы entries
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -881,8 +1050,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->assembly();
       
       $databaseConnection = $CMSDatabaseConnector->database->connection;
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -892,8 +1060,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -903,8 +1070,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -914,8 +1080,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // Уникальный индекс на name записи
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -927,11 +1092,12 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
+
+      $dialect = DialectFactory::create($CMSConfigDatabase['dms']);
       
       // GIN индекс для JSONB поля texts (только PostgreSQL)
-      if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+      if ($dialect->supportsIndexType(DatabaseIndexType::GIN)) {
         $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
         $queryBuilder->setStatementCreateIndex();
         $queryBuilder->statement->setIndexName('idx_entries_texts_gin');
@@ -941,8 +1107,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         $queryBuilder->statement->setIfNotExists(true);
         $queryBuilder->statement->assembly();
         
-        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-        $databaseQuery->execute();
+        createIndexSafe($queryBuilder, $databaseConnection);
         
         // GIN индекс для JSONB поля metadata
         $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -954,8 +1119,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         $queryBuilder->statement->setIfNotExists(true);
         $queryBuilder->statement->assembly();
         
-        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-        $databaseQuery->execute();
+        createIndexSafe($queryBuilder, $databaseConnection);
         
         // Частичный индекс для опубликованных записей
         $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -967,8 +1131,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         $queryBuilder->statement->setIfNotExists(true);
         $queryBuilder->statement->assembly();
         
-        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-        $databaseQuery->execute();
+        createIndexSafe($queryBuilder, $databaseConnection);
       }
       
       // Индексы для таблицы entries_categories
@@ -980,8 +1143,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -992,8 +1154,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // Индексы для таблицы entries_comments
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1004,8 +1165,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1015,8 +1175,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1026,8 +1185,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       // Индексы для таблицы pages_static
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1039,8 +1197,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1050,8 +1207,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1061,11 +1217,12 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
 
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
 
+      $dialect = DialectFactory::create($CMSConfigDatabase['dms']);
+      
       // GIN индекс для JSONB (только PostgreSQL)
-      if ($CMSConfigDatabase['dms'] === CMSDMS::PostgreSQL) {
+      if ($dialect->supportsIndexType(DatabaseIndexType::GIN)) {
         $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
         $queryBuilder->setStatementCreateIndex();
         $queryBuilder->statement->setIndexName('idx_pages_static_texts_gin');
@@ -1075,8 +1232,48 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         $queryBuilder->statement->setIfNotExists(true);
         $queryBuilder->statement->assembly();
         
-        $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-        $databaseQuery->execute();
+        createIndexSafe($queryBuilder, $databaseConnection);
+      }
+
+      // Индексы для таблицы pages_static_versions
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_pages_static_versions_unique');
+      $queryBuilder->statement->setTableName('pages_static_versions');
+      $queryBuilder->statement->addColumn('pageStaticID');
+      $queryBuilder->statement->addColumn('version');
+      $queryBuilder->statement->addColumn('locale');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      createIndexSafe($queryBuilder, $databaseConnection);
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_pages_static_versions_current');
+      $queryBuilder->statement->setTableName('pages_static_versions');
+      $queryBuilder->statement->addColumn('pageStaticID');
+      $queryBuilder->statement->addColumn('locale');
+      $queryBuilder->statement->addColumn('isCurrent');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      createIndexSafe($queryBuilder, $databaseConnection);
+
+      $dialect = DialectFactory::create($CMSConfigDatabase['dms']);
+
+      if ($dialect->supportsIndexType(DatabaseIndexType::GIN)) {
+        $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+        $queryBuilder->setStatementCreateIndex();
+        $queryBuilder->statement->setIndexName('idx_pages_static_versions_texts_gin');
+        $queryBuilder->statement->setTableName('pages_static_versions');
+        $queryBuilder->statement->setExpression('texts');
+        $queryBuilder->statement->setIndexType(DatabaseIndexType::GIN);
+        $queryBuilder->statement->setIfNotExists(true);
+        $queryBuilder->statement->assembly();
+
+        createIndexSafe($queryBuilder, $databaseConnection);
       }
       
       // Индексы для таблицы users
@@ -1089,8 +1286,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1101,8 +1297,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // Индексы для таблицы users_sessions
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1113,8 +1308,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1124,8 +1318,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // Индексы для таблицы forms_data
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1136,8 +1329,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementCreateIndex();
@@ -1147,8 +1339,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // Индексы для таблицы web_channels
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1160,8 +1351,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
       
       // Индексы для таблицы metrics
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
@@ -1172,11 +1362,215 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $queryBuilder->statement->setIfNotExists(true);
       $queryBuilder->statement->assembly();
       
-      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      $databaseQuery->execute();
+      createIndexSafe($queryBuilder, $databaseConnection);
+
+      // Индексы для таблицы oauth_clients
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_clients_client_id');
+      $queryBuilder->statement->setTableName('oauth_clients');
+      $queryBuilder->statement->addColumn('clientID');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      createIndexSafe($queryBuilder, $databaseConnection);
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_clients_user_id');
+      $queryBuilder->statement->setTableName('oauth_clients');
+      $queryBuilder->statement->addColumn('userID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      createIndexSafe($queryBuilder, $databaseConnection);
+      
+      // Индексы для таблицы oauth_auth_codes
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_auth_codes_code');
+      $queryBuilder->statement->setTableName('oauth_auth_codes');
+      $queryBuilder->statement->addColumn('code');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      createIndexSafe($queryBuilder, $databaseConnection);
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_auth_codes_client_id');
+      $queryBuilder->statement->setTableName('oauth_auth_codes');
+      $queryBuilder->statement->addColumn('clientID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      createIndexSafe($queryBuilder, $databaseConnection);
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_auth_codes_expires_at');
+      $queryBuilder->statement->setTableName('oauth_auth_codes');
+      $queryBuilder->statement->addColumn('expiresAt');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      createIndexSafe($queryBuilder, $databaseConnection);
+      
+      // Индексы для таблицы oauth_access_tokens
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_access_tokens_access_token');
+      $queryBuilder->statement->setTableName('oauth_access_tokens');
+      $queryBuilder->statement->addColumn('accessToken');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      createIndexSafe($queryBuilder, $databaseConnection);
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_access_tokens_refresh_token');
+      $queryBuilder->statement->setTableName('oauth_access_tokens');
+      $queryBuilder->statement->addColumn('refreshToken');
+      $queryBuilder->statement->setUnique(true);
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      createIndexSafe($queryBuilder, $databaseConnection);
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_access_tokens_user_id');
+      $queryBuilder->statement->setTableName('oauth_access_tokens');
+      $queryBuilder->statement->addColumn('userID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      createIndexSafe($queryBuilder, $databaseConnection);
+      
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_oauth_access_tokens_client_id');
+      $queryBuilder->statement->setTableName('oauth_access_tokens');
+      $queryBuilder->statement->addColumn('clientID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      createIndexSafe($queryBuilder, $databaseConnection);
+
+      // Индекс для ротации отчётов
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_reports_created');
+      $queryBuilder->statement->setTableName('reports');
+      $queryBuilder->statement->addColumn('createdUnixTimestamp');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      createIndexSafe($queryBuilder, $databaseConnection);
+
+      // Индексы для users_consents
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_consents_user');
+      $queryBuilder->statement->setTableName('users_consents');
+      $queryBuilder->statement->addColumn('userID');
+      $queryBuilder->statement->addColumn('pageStaticID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      createIndexSafe($queryBuilder, $databaseConnection);
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_consents_recent');
+      $queryBuilder->statement->setTableName('users_consents');
+      $queryBuilder->statement->addColumn('userID');
+      $queryBuilder->statement->addColumn('pageStaticID');
+      $queryBuilder->statement->addColumn('consentedAt');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      createIndexSafe($queryBuilder, $databaseConnection);
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_consents_active');
+      $queryBuilder->statement->setTableName('users_consents');
+      $queryBuilder->statement->addColumn('userID');
+      $queryBuilder->statement->setWhereCondition('"revokedAt" IS NULL');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+      
+      createIndexSafe($queryBuilder, $databaseConnection);
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_consents_document');
+      $queryBuilder->statement->setTableName('users_consents');
+      $queryBuilder->statement->addColumn('pageStaticID');
+      $queryBuilder->statement->addColumn('documentVersion');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      createIndexSafe($queryBuilder, $databaseConnection);
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_consents_form');
+      $queryBuilder->statement->setTableName('users_consents');
+      $queryBuilder->statement->addColumn('formID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      createIndexSafe($queryBuilder, $databaseConnection);
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_consents_revoked_by');
+      $queryBuilder->statement->setTableName('users_consents');
+      $queryBuilder->statement->addColumn('revokedByID');
+      $queryBuilder->statement->setWhereCondition('"revokedByID" > 0');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      createIndexSafe($queryBuilder, $databaseConnection);
+
+      // Индексы для users_registration_submits
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_registration_submits_user');
+      $queryBuilder->statement->setTableName('users_registration_submits');
+      $queryBuilder->statement->addColumn('userID');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      createIndexSafe($queryBuilder, $databaseConnection);
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_registration_submits_submit_token');
+      $queryBuilder->statement->setTableName('users_registration_submits');
+      $queryBuilder->statement->addColumn('submitToken');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      createIndexSafe($queryBuilder, $databaseConnection);
+
+      $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+      $queryBuilder->setStatementCreateIndex();
+      $queryBuilder->statement->setIndexName('idx_users_registration_submits_refusal_token');
+      $queryBuilder->statement->setTableName('users_registration_submits');
+      $queryBuilder->statement->addColumn('refusalToken');
+      $queryBuilder->statement->setIfNotExists(true);
+      $queryBuilder->statement->assembly();
+
+      createIndexSafe($queryBuilder, $databaseConnection);
       
     } catch (PDOException $exception) {
-      // Логируем ошибку, но не прерываем установку
       error_log('Index creation warning: ' . $exception->getMessage());
     }
 
@@ -1402,9 +1796,9 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       'ru_RU' => ['title' => 'Пользователь']
     ];
 
-    $usersGroupAdministrator = UserGroup::create($CMSCore, 'admin', $usersGroupAdministratorTexts, 786431);
-    $usersGroupModerator = UserGroup::create($CMSCore, 'moder', $usersGroupModeratorTexts, 115585);
-    $usersGroupEditor = UserGroup::create($CMSCore, 'editor', $usersGroupEditorTexts, 130049);
+    $usersGroupAdministrator = UserGroup::create($CMSCore, 'admin', $usersGroupAdministratorTexts, 16515071);
+    $usersGroupModerator = UserGroup::create($CMSCore, 'moder', $usersGroupModeratorTexts, 115587);
+    $usersGroupEditor = UserGroup::create($CMSCore, 'editor', $usersGroupEditorTexts, 3406849);
     $usersGroupUser = UserGroup::create($CMSCore, 'user', $usersGroupUserTexts, 114688);
     
     $formFeedbackTexts = [
@@ -1541,6 +1935,47 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     ];
 
     $formFeedback = Form::create($CMSCore, 'feedback', $formFeedbackTexts, $formFeedbackElements, $formFeedbackMetadata);
+
+    $demoBlockTexts = [
+      'en_US' => [
+        'title' => 'Demo Block',
+        'description' => 'About CMS GIRVAS',
+        'content' => "CMS **GIRVAS** is a free, open-source content management system developed in the Republic of Karelia, Russia. It is listed in the Russian Software Registry (No. 25012, November 27, 2024).\r\n\r\nBuilt on **PHP 8.2+** with support for **PostgreSQL** and **MySQL**, GIRVAS offers:\r\n\r\n- Multilingual content support\r\n- Markdown parsing (NadvoParse)\r\n- Modular architecture\r\n- Built-in analytics\r\n\r\n> This block can be edited in the admin panel: **Content > Content Blocks**."
+      ],
+      'ru_RU' => [
+        'title' => 'Демонстрационный блок',
+        'description' => 'О системе CMS «ГИРВАС»',
+        'content' => "**CMS «ГИРВАС»** — это бесплатная система управления содержимым с открытым исходным кодом, разработанная в Республике Карелия. Внесена в Реестр российского ПО (запись №25012 от 27.11.2024).\r\n\r\nРаботает на **PHP 8.2+** с поддержкой **PostgreSQL** и **MySQL**. Основные возможности:\r\n\r\n- Мультиязычный контент\r\n- Поддержка разметки Markdown (NadvoParse)\r\n- Модульная архитектура\r\n- Встроенная аналитика\r\n\r\n> Этот блок можно отредактировать в административной панели: **Контент > Контент-блоки**."
+      ]
+    ];
+
+    $demoBlockMetadata = [
+      'typeID' => 4,
+      'sectionIntegrationName' => 'rightSidebar'
+    ];
+
+    $demoBlock = ContentBlock::create($CMSCore, 'demo', $demoBlockTexts, $demoBlockMetadata);
+
+    $lastNewsBlockTexts = [
+      'en_US' => [
+        'title' => 'Latest News',
+        'description' => 'Latest news from the site',
+        'content' => "{ENTRIES_SAMPLE_LAST_NEWS}"
+      ],
+      'ru_RU' => [
+        'title' => 'Последние новости',
+        'description' => 'Последние новости на сайте',
+        'content' => "{ENTRIES_SAMPLE_LAST_NEWS}"
+      ]
+    ];
+
+    $lastNewsBlockMetadata = [
+      'typeID' => 1,
+      'sectionIntegrationName' => 'rightSidebar',
+      'URLRule' => '#^/$#u'
+    ];
+
+    $lastNewsBlock = ContentBlock::create($CMSCore, 'lastNews', $lastNewsBlockTexts, $lastNewsBlockMetadata);
     
     $CMSCore->configurator->insertDatabaseEntryValue('base_template', 'default');
     $CMSCore->configurator->insertDatabaseEntryValue('base_site_title', 'CMS «ГИРВАС»');

@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -25,26 +25,10 @@ export class PageProfile {
   }
 
   init() {
-    let locales;
-
     this.clientUserPermissions = {};
     this.clientUserData = {};
 
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-
-      return (response.ok) ? response.json() : Promise.reject(response);
-    
-    }).then((data) => {
-
-      locales = data.outputData.locales;
-
-      return window.CMSCore.locales.base.getData();
-
-    }, (rejectionReason) => {
-
-      this.page.showPopupNotification(rejectionReason, 0);
-
-    }).then((localeData) => {
+    this.page.core.locales.base.getData().then((localeData) => {
 
       this.localeBaseData = localeData;
       
@@ -256,5 +240,90 @@ export class PageProfile {
       this.page.showPopupNotification(rejectionReason, 0);
 
     });
+
+    this.setupConsentsRevokeListeners();
+  }
+
+  /**
+   * Навесить обработчики на кнопки «Отозвать согласие»
+   */
+  setupConsentsRevokeListeners() {
+    const revokeButtons = document.querySelectorAll('[data-consent-action="revoke"]');
+    revokeButtons.forEach((button) => {
+      button.addEventListener('click', (event) => {
+        event.preventDefault();
+        const consentID = button.getAttribute('data-consent-id');
+        this.handleConsentRevoke(consentID, button);
+      });
+    });
+  }
+
+  /**
+   * Открыть модалку подтверждения и отправить запрос на отзыв
+   *
+   * @param {string} consentID
+   * @param {HTMLElement} button
+   */
+  handleConsentRevoke(consentID, button) {
+    if (!consentID) return;
+
+    const modal = new Interactive('modal', {
+      title: this.localeBaseData.MODAL_CONSENT_REVOKE_TITLE,
+      content: this.localeBaseData.MODAL_CONSENT_REVOKE_DESCRIPTION
+    });
+
+    const reasonTextarea = document.createElement('textarea');
+    reasonTextarea.classList.add('form__textarea');
+    reasonTextarea.setAttribute('name', 'consent_revoke_reason');
+    reasonTextarea.setAttribute(
+      'placeholder',
+      this.localeBaseData.PROFILE_CONSENTS_REVOKE_REASON_PLACEHOLDER
+      || 'Причина отзыва (необязательно)'
+    );
+
+    // Перезаписываем content как DOM-элемент (textarea)
+    modal.target.content = reasonTextarea;
+
+    modal.target.addButton(this.localeBaseData.BUTTON_CONSENT_REVOKE_SUBMIT, () => {
+      const formData = new FormData();
+      formData.append('user_id', this.clientUserData.id);
+      formData.append('consent_event', 'revoke');
+      formData.append('consent_id', consentID);
+      formData.append('consent_revoke_reason', reasonTextarea.value);   // ← ЧИТАЕМ ЗНАЧЕНИЕ
+
+      const request = new Interactive('request', {
+        method: 'PATCH',
+        url: '/handler/user?localeMessage=' + window.CMSCore.locales.base.name
+      });
+
+      request.target.data = formData;
+
+      request.target.send().then((data) => {
+        if (data.statusCode === 1) {
+          const row = button.closest('tr');
+          if (row !== null) {
+            row.remove();
+
+            // Если это было последнее согласие — показать сообщение
+            const itemsContainer = document.querySelector('.consents__items');
+            if (itemsContainer !== null && itemsContainer.querySelectorAll('[data-consent-id]').length === 0) {
+              const emptyRow = document.createElement('tr');
+              emptyRow.classList.add('table__row');
+              emptyRow.innerHTML = '<td class="table__cell" colspan="2">'
+                + (this.localeBaseData.PROFILE_CONSENTS_EMPTY || 'У вас нет активных согласий.')
+                + '</td>';
+              itemsContainer.append(emptyRow);
+            }
+          }
+        }
+        modal.target.close();
+      });
+    });
+
+    modal.target.addButton(this.localeBaseData.BUTTON_CANCEL_LABEL, () => modal.target.close());
+
+    modal.assembly();
+    document.body.appendChild(modal.target.element);
+    modal.target.show();
   }
 }

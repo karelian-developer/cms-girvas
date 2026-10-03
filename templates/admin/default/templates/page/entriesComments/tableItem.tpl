@@ -26,11 +26,8 @@
   </div>
   <div class="grid-table__cell grid-table__cell_panel" data-element="panel">
     <ul class="grid-table__panel-list">
-      <li class="grid-table__panel-item grid-table__panel-item_edit" data-event="show">
-        <a href="#" class="grid-table__panel-link">Опубликовать</a>
-      </li>
-      <li class="grid-table__panel-item grid-table__panel-item_edit" data-event="hide">
-        <a href="#" class="grid-table__panel-link">Снять с публикации</a>
+      <li class="grid-table__panel-item grid-table__panel-item_edit" data-event="{COMMENT_TOGGLE_EVENT}">
+        <a href="#" class="grid-table__panel-link">{COMMENT_TOGGLE_LABEL}</a>
       </li>
       <li class="grid-table__panel-item grid-table__panel-item_remove" data-event="remove">
         <a href="#" class="grid-table__panel-link grid-table__panel-link_red">Удалить</a>

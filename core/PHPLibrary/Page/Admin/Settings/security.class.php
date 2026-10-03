@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -20,6 +20,7 @@
 
 namespace core\PHPLibrary\Page\Admin\Settings;
 
+use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\Template as Template;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
@@ -67,14 +68,104 @@ class SettingsSecurity implements SettingsPageInterface
 
   public function assembly(array $templateValues = []) : void
   {
+    /** @var string Текущая локаль админки */
+    $adminLocaleName = $this->CMSCore->locale->getName();
+
     $formTemplatePath = self::FORM_PATH . '/' . $this->name . '.tpl';
-    
-    $settingAllowedUsersRegistrationStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_users_registration_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_users_registration_status') : '';
-    $settingAllowedEmailsStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_emails_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_emails_status') : '';
-    $settingAllowedIPAdminStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_admin_ip_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_admin_ip_status') : '';
-    $settingPremoderationCreateStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_create_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_create_status') : '';
-    $settingPremoderationLinksFilterStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_links_filter_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_links_filter_status') : '';
-    $settingPremoderationWordsFilterStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_words_filter_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_words_filter_status') : '';
+
+    // ============================================================
+    // РОТАЦИЯ ОТЧЁТОВ (152-ФЗ)
+    // ============================================================
+    $settingReportsRotationStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_reports_rotation_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_reports_rotation_status')
+      : 'off';
+    $settingReportsRetentionDaysValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_reports_retention_days')
+      ? (int)$this->CMSCore->configurator->getDatabaseEntryValue('security_reports_retention_days')
+      : 365;
+    $settingAllowedUsersRegistrationStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_users_registration_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_users_registration_status')
+      : '';
+    $settingAllowedEmailsStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_emails_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_emails_status')
+      : '';
+    $settingAllowedIPAdminStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_allowed_admin_ip_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_allowed_admin_ip_status')
+      : '';
+    $settingPremoderationCreateStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_create_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_create_status')
+      : '';
+    $settingPremoderationLinksFilterStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_links_filter_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_links_filter_status')
+      : '';
+    $settingPremoderationWordsFilterStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_words_filter_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_words_filter_status')
+      : '';
+    // ============================================================
+    // COOKIE-БАННЕР (152-ФЗ)
+    // ============================================================
+    $settingCookieBannerStatusValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_cookie_banner_status')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_cookie_banner_status')
+      : 'off';
+
+    $settingCookieBannerDocumentValue = $this->CMSCore->configurator->existsDatabaseEntryValue('security_cookie_banner_document')
+      ? $this->CMSCore->configurator->getDatabaseEntryValue('security_cookie_banner_document')
+      : '';
+
+    // Список юр. документов
+    $legalDocumentsForCookie = PageStatic::getAllLegalDocuments($this->CMSCore, $adminLocaleName);
+
+    $cookieDocumentItems = [];
+    foreach ($legalDocumentsForCookie as $document) {
+      $cookieDocumentItems[] = [
+        'name'  => $document['name'],
+        'title' => $document['title'],
+      ];
+    }
+
+    $cookieDocumentItemsJSON = json_encode($cookieDocumentItems, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+    /** @var array Все статические страницы с isLegalDocument = true */
+    $legalDocuments = PageStatic::getAllLegalDocuments($this->CMSCore, $adminLocaleName);
+
+    /** @var array Текущее значение настройки (JSON → массив) */
+    $currentLegalDocuments = [];
+    if ($this->CMSCore->configurator->existsDatabaseEntryValue('security_legal_documents')) {
+      $rawValue = $this->CMSCore->configurator->getDatabaseEntryValue('security_legal_documents');
+      $currentLegalDocuments = json_decode($rawValue, true) ?? [];
+    }
+
+    /** @var string HTML-чекбоксы юридических документов */
+    $legalDocumentsElements = [];
+
+    // ============================================================
+    // ЮРИДИЧЕСКИЕ ДОКУМЕНТЫ (152-ФЗ)
+    // ============================================================
+    foreach ($legalDocuments as $document) {
+      $settingName = 'security_legal_documents_' . $document['id'] . '_status';
+      $settingValue = $this->CMSCore->configurator->existsDatabaseEntryValue($settingName)
+        ? $this->CMSCore->configurator->getDatabaseEntryValue($settingName)
+        : 'off';
+
+      $legalDocumentsElements[] = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/settings/security/legalDocumentItem.tpl',
+        [
+          'DOCUMENT_ID' => $document['id'],
+          'DOCUMENT_KEY' => htmlspecialchars($document['name']),
+          'DOCUMENT_TITLE' => htmlspecialchars($document['title']),
+          'HIDDEN_INPUT_ID' => 'I' . random_int(1000000000, 9999999999),
+          'CHECKBOX_INPUT_ID' => 'I' . random_int(1000000000, 9999999999),
+          'STATUS_VALUE' => $settingValue === 'on' ? 'on' : 'off',
+          'CHECKED' => $settingValue === 'on' ? 'checked' : ''
+        ]
+      );
+    }
+
+    $legalDocumentsHTML = !empty($legalDocumentsElements)
+      ? implode("\n", $legalDocumentsElements)
+      : '<div class="cell grid-table__cell grid-table__cell_data">' 
+        . htmlspecialchars($this->CMSCore->locale->getSingleValueByKey('PAGE_SETTINGS_SETTING_SECURITY_LEGAL_DOCUMENTS_EMPTY') ?? '')
+        . '</div>';
 
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
       'SETTINGS_NAME' => $this->name,
@@ -96,6 +187,14 @@ class SettingsSecurity implements SettingsPageInterface
       'SETTING_PREMODERATION_WORDS_FILTER_LIST_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_words_filter_list') ? implode(', ', json_decode($this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_words_filter_list'), true)) : '',
       'SETTING_PREMODERATION_WORDS_FILTER_STATUS_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('security_premoderation_words_filter_status') ? $this->CMSCore->configurator->getDatabaseEntryValue('security_premoderation_words_filter_status') : 'off',
       'SETTING_PREMODERATION_WORDS_FILTER_CHECKED_VALUE' => $settingPremoderationWordsFilterStatusValue === 'on' ? 'checked' : '',
+      'SETTING_LEGAL_DOCUMENTS_ELEMENTS' => $legalDocumentsHTML,
+      'SETTING_COOKIE_BANNER_STATUS_VALUE' => $settingCookieBannerStatusValue,
+      'SETTING_COOKIE_BANNER_CHECKED_VALUE' => $settingCookieBannerStatusValue === 'on' ? 'checked' : '',
+      'SETTING_COOKIE_BANNER_DOCUMENT_VALUE' => htmlspecialchars($settingCookieBannerDocumentValue),
+      'SETTING_COOKIE_BANNER_DOCUMENT_ITEMS' => htmlspecialchars($cookieDocumentItemsJSON, ENT_QUOTES),
+      'SETTING_REPORTS_ROTATION_STATUS_VALUE' => $settingReportsRotationStatusValue,
+      'SETTING_REPORTS_ROTATION_CHECKED_VALUE' => $settingReportsRotationStatusValue === 'on' ? 'checked' : '',
+      'SETTING_REPORTS_RETENTION_DAYS_VALUE' => $settingReportsRetentionDaysValue,
     ]);
   }
 }

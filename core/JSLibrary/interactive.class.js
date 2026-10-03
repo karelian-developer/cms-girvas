@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -25,16 +25,29 @@ import {Request} from './interactive/request.class.js';
 import {Notification} from './interactive/notification.class.js';
 import {Slider} from './interactive/slider.class.js';
 import {DataSearcher} from './interactive/dataSearcher.class.js';
+import {Tabs} from './interactive/tabs.class.js';
+import {Gallery} from './interactive/gallery.class.js';
 
 export class Interactive {
   constructor(interactiveName, interactiveParams = {}) {
     this.id = this.generateUniqueID();
+    this.name = '';
 
     let data = {};
 
     if (interactiveName == 'schedule') {
       data.canvasElement = (Object.hasOwn(interactiveParams, 'canvasElement')) ? interactiveParams.canvasElement : null;
       data.type = (Object.hasOwn(interactiveParams, 'type')) ? interactiveParams.type : 'linear';
+      data.zoomable = (Object.hasOwn(interactiveParams, 'zoomable')) ? interactiveParams.zoomable : false;
+      data.minZoom = (Object.hasOwn(interactiveParams, 'minZoom')) ? interactiveParams.minZoom : 0.5;
+      data.maxZoom = (Object.hasOwn(interactiveParams, 'maxZoom')) ? interactiveParams.maxZoom : 5;
+      data.zoomStep = (Object.hasOwn(interactiveParams, 'zoomStep')) ? interactiveParams.zoomStep : 0.1;
+      data.showNavigator = (Object.hasOwn(interactiveParams, 'showNavigator')) ? interactiveParams.showNavigator : true;
+      data.padding = (Object.hasOwn(interactiveParams, 'padding')) ? interactiveParams.padding : { top: 30, right: 30, bottom: 40, left: 50 };
+      data.height = (Object.hasOwn(interactiveParams, 'height')) ? interactiveParams.height : 'auto';
+      data.minHeight = (Object.hasOwn(interactiveParams, 'minHeight')) ? interactiveParams.minHeight : 200;
+      data.maxHeight = (Object.hasOwn(interactiveParams, 'maxHeight')) ? interactiveParams.maxHeight : 600;
+      data.aspectRatio = (Object.hasOwn(interactiveParams, 'aspectRatio')) ? interactiveParams.aspectRatio : null;
     }
 
     if (interactiveName == 'modal') {
@@ -54,22 +67,87 @@ export class Interactive {
       data.isDisclosed = (Object.hasOwn(interactiveParams, 'isDisclosed')) ? interactiveParams.isDisclosed : false;
     }
 
+    if (interactiveName == 'tabs') {
+      data.type = (Object.hasOwn(interactiveParams, 'type')) ? interactiveParams.type : 'pills';
+      data.orientation = (Object.hasOwn(interactiveParams, 'orientation')) ? interactiveParams.orientation : 'horizontal';
+      data.isMultiple = (Object.hasOwn(interactiveParams, 'isMultiple')) ? interactiveParams.isMultiple : false;
+      data.width = (Object.hasOwn(interactiveParams, 'width')) ? interactiveParams.width : 'auto';
+    }
+
     switch (interactiveName) {
-      case 'button': this.target = new Button(this); break;
-      case 'input': this.target = new Input(this); break;
-      case 'choices': this.target = new Choices(this, data.isDisclosed); break;
-      case 'schedule': this.target = new Schedule(this, data.canvasElement, data.type); break;
-      case 'form': this.target = new Form(this); break;
-      case 'modal': this.target = new Modal(this, data.title, data.content, data.description, data.width); break;
-      case 'request': this.target = new Request(this, data.method, data.url, data.data); break;
-      case 'notification': this.target = new Notification(this); break;
-      case 'slider': this.target = new Slider(this); break;
-      case 'dataSearcher': this.target = new DataSearcher(this); break;
+      case 'button':
+        this.target = new Button(this);
+        break;
+      case 'input':
+        this.target = new Input(this);
+        break;
+      case 'choices':
+        this.target = new Choices(this, data.isDisclosed);
+        break;
+      case 'schedule':
+        this.target = new Schedule(
+          this,
+          data.canvasElement,
+          data.type,
+          {
+            zoomable: data.zoomable,
+            minZoom: data.minZoom,
+            maxZoom: data.maxZoom,
+            zoomStep: data.zoomStep,
+            showNavigator: data.showNavigator,
+            padding: data.padding,
+            height: data.height,
+            minHeight: data.minHeight,
+            maxHeight: data.maxHeight,
+            aspectRatio: data.aspectRatio
+          }
+        );
+        break;
+      case 'form':
+        this.target = new Form(this);
+        break;
+      case 'modal':
+        this.target = new Modal(this, data.title, data.content, data.description, data.width);
+        break;
+      case 'request':
+        this.target = new Request(this, data.method, data.url, data.data);
+        break;
+      case 'notification':
+        this.target = new Notification(this);
+        break;
+      case 'slider':
+        this.target = new Slider(this);
+        break;
+      case 'dataSearcher':
+        this.target = new DataSearcher(this);
+        break;
+      case 'gallery':
+        this.target = new Gallery(this);
+        break;
+      case 'tabs': 
+        this.target = new Tabs(
+          this, 
+          {
+            type: data.type || 'pills',
+            orientation: data.orientation || 'horizontal',
+            isMultiple: data.isMultiple || false,
+            width: data.width || 'auto'
+          }
+        ); 
+        break;
     }
 
     if (typeof(window.CMSCore) != 'undefined') {
       window.CMSCore.debugLog(2, 'CMSInteractive', `Element "${interactiveName}" (ID: ${this.id}) created!`, true);
     }
+  }
+
+  setName(value) {
+    this.name = value;
+  }
+
+  getName() {
+    return this.name;
   }
 
   generateRandomInt(min, max) {
@@ -84,7 +162,7 @@ export class Interactive {
 
     let interactiveRepetitiveElement = document.querySelector(`[cmsg-interactive-uid="${randomNumber.toString(16)}"]`);
     if (interactiveRepetitiveElement != null) {
-      return interactiveRepetitiveElement.generateUniqueID();
+      return this.generateUniqueID();
     } else {
       resultID = randomNumber;
     }
@@ -95,6 +173,10 @@ export class Interactive {
   assembly() {
     this.target.assembly();
     this.target.element.setAttribute('cmsg-interactive-uid', this.id);
+
+    if (this.name !== '') {
+      this.target.element.setAttribute('cmsg-interactive-name', this.name);
+    }
     
     this.target.element.classList.add(`interactive`);
 

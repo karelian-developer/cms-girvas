@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -21,7 +21,6 @@
 namespace core\PHPLibrary\SystemCore;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \PDOException as PDOException;
@@ -29,52 +28,195 @@ use \PDOException as PDOException;
 #[\AllowDynamicProperties]
 final class Report
 {
+  // ЗАПИСИ
   public const REPORT_TYPE_ID_AP_ENTRY_CREATED = 11000000;
   public const REPORT_TYPE_ID_AP_ENTRY_EDITED = 11000001;
   public const REPORT_TYPE_ID_AP_ENTRY_DELETED = 11000002;
 
+  // СТАТИЧЕСКИЕ СТРАНИЦЫ
   public const REPORT_TYPE_ID_AP_PAGE_CREATED = 11000003;
   public const REPORT_TYPE_ID_AP_PAGE_EDITED = 11000004;
   public const REPORT_TYPE_ID_AP_PAGE_DELETED = 11000005;
 
+  // МЕДИА-ФАЙЛЫ
   public const REPORT_TYPE_ID_AP_MEDIA_UPLOADED = 11000006;
   public const REPORT_TYPE_ID_AP_MEDIA_DELETED = 11000007;
 
+  // ПОЛЬЗОВАТЕЛИ (АДМИНКА)
   public const REPORT_TYPE_ID_AP_USER_CREATED = 11000008;
   public const REPORT_TYPE_ID_AP_USER_EDITED = 11000009;
   public const REPORT_TYPE_ID_AP_USER_DELETED = 11000010;
 
+  // КАТЕГОРИИ ЗАПИСЕЙ
   public const REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_CREATED = 11000011;
   public const REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_EDITED = 11000012;
   public const REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_DELETED = 11000013;
 
+  // ВЫБОРКИ
   public const REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_CREATED = 11000014;
   public const REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_EDITED = 11000015;
   public const REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_DELETED = 11000016;
 
+  // ФОРМЫ
   public const REPORT_TYPE_ID_AP_FORM_CREATED = 11000017;
   public const REPORT_TYPE_ID_AP_FORM_EDITED = 11000018;
   public const REPORT_TYPE_ID_AP_FORM_DELETED = 11000019;
 
+  // КОНТЕНТ-БЛОКИ
   public const REPORT_TYPE_ID_AP_CONTENT_BLOCK_CREATED = 11000020;
   public const REPORT_TYPE_ID_AP_CONTENT_BLOCK_EDITED = 11000021;
   public const REPORT_TYPE_ID_AP_CONTENT_BLOCK_DELETED = 11000022;
 
+  // КОММЕНТАРИИ
   public const REPORT_TYPE_ID_AP_ENTRIES_COMMENT_CREATED = 11000023;
   public const REPORT_TYPE_ID_AP_ENTRIES_COMMENT_EDITED = 11000024;
   public const REPORT_TYPE_ID_AP_ENTRIES_COMMENT_DELETED = 11000025;
 
+  // ГРУППЫ ПОЛЬЗОВАТЕЛЕЙ
+  public const REPORT_TYPE_ID_AP_USERS_GROUP_CREATED = 11000026;
+  public const REPORT_TYPE_ID_AP_USERS_GROUP_EDITED = 11000027;
+  public const REPORT_TYPE_ID_AP_USERS_GROUP_DELETED = 11000028;
+
+  // ФИДЫ
+  public const REPORT_TYPE_ID_AP_FEED_CREATED = 11000029;
+  public const REPORT_TYPE_ID_AP_FEED_EDITED = 11000030;
+  public const REPORT_TYPE_ID_AP_FEED_DELETED = 11000031;
+
+  // НАСТРОЙКИ CMS
+  public const REPORT_TYPE_ID_AP_SETTINGS_EDITED = 11000033;
+
+  // Ротация отчетов
+  public const REPORT_TYPE_ID_AP_REPORTS_ROTATED = 11100011;
+
+  // ВЕРСИОНИРОВАНИЕ ДОКУМЕНТОВ (152-ФЗ)
+  public const REPORT_TYPE_ID_AP_DOCUMENT_VERSION_CREATED   = 11000034;
+  public const REPORT_TYPE_ID_AP_DOCUMENT_VERSION_PUBLISHED = 11000035;
+  public const REPORT_TYPE_ID_AP_DOCUMENT_VERSION_ARCHIVED  = 11000036;
+
+  // СОГЛАСИЯ (152-ФЗ)
+  public const REPORT_TYPE_ID_BASE_CONSENT_GIVEN   = 11100007;
+  public const REPORT_TYPE_ID_BASE_CONSENT_REVOKED = 11100008;
+  
+  // ЭКСПОРТ ДАННЫХ СУБЪЕКТА (152-ФЗ)
+  public const REPORT_TYPE_ID_BASE_SUBJECT_DATA_EXPORTED = 11100009;
+
+  // ОБЕЗЛИЧИВАНИЕ ПДн (152-ФЗ)
+  public const REPORT_TYPE_ID_AP_USER_ANONYMIZED = 11100010;
+
+  // АВТОРИЗАЦИЯ (АДМИНКА)
   public const REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL = 10000001;
   public const REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS = 10000002;
+
+  // АВТОРИЗАЦИЯ (САЙТ)
   public const REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL = 20000001;
   public const REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS = 20000002;
 
+  // ПОЛЬЗОВАТЕЛИ (САЙТ)
   public const REPORT_TYPE_ID_BASE_USER_CREATED = 11100001;
-  public const REPORT_TYPE_ID_BASE_USER_EDITED = 11100001;
-  public const REPORT_TYPE_ID_BASE_USER_DELETED = 11100002;
-  public const REPORT_TYPE_ID_BASE_USER_BANNED = 11100003;
-  public const REPORT_TYPE_ID_BASE_USER_UNBANNED = 11100004;
-  public const REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED = 11100005;
+  public const REPORT_TYPE_ID_BASE_USER_EDITED = 11100002;
+  public const REPORT_TYPE_ID_BASE_USER_DELETED = 11100003;
+  public const REPORT_TYPE_ID_BASE_USER_BANNED = 11100004;
+  public const REPORT_TYPE_ID_BASE_USER_UNBANNED = 11100005;
+  public const REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED = 11100006;
+
+  // ПРОСМОТР ЛОГОВ
+  public const REPORT_TYPE_ID_AP_VIEWING_LOGS = 11000032;
+
+  // ============================================================
+  // КАТЕГОРИИ ОТЧЁТОВ
+  // ============================================================
+
+  /** Общая сводка (fallback для всего, что не попало в другие категории) */
+  public const CATEGORY_GENERAL = 0;
+  /** Контент: записи, страницы, медиа, категории, выборки, формы, блоки, комментарии, фиды */
+  public const CATEGORY_CONTENT = 1;
+  /** Безопасность: авторизация, пользователи, группы, доступ к ПДн, просмотр логов */
+  public const CATEGORY_SECURITY = 2;
+
+  /**
+   * @var array<int,int> Карта: typeID => categoryID
+   * Единый источник истины для распределения отчётов по вкладкам.
+   */
+  private const TYPE_TO_CATEGORY = [
+    // ------------------------------------------------------------
+    // КОНТЕНТ
+    // ------------------------------------------------------------
+    self::REPORT_TYPE_ID_AP_ENTRY_CREATED              => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_ENTRY_EDITED               => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_ENTRY_DELETED              => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_PAGE_CREATED               => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_PAGE_EDITED                => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_PAGE_DELETED               => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_MEDIA_UPLOADED             => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_MEDIA_DELETED              => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_CREATED   => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_EDITED    => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_ENTRIES_CATEGORY_DELETED   => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_CREATED     => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_EDITED      => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_DELETED     => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_FORM_CREATED               => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_FORM_EDITED                => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_FORM_DELETED               => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_CONTENT_BLOCK_CREATED      => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_CONTENT_BLOCK_EDITED       => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_CONTENT_BLOCK_DELETED      => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_ENTRIES_COMMENT_CREATED    => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_ENTRIES_COMMENT_EDITED     => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_ENTRIES_COMMENT_DELETED    => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_FEED_CREATED               => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_FEED_EDITED                => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_FEED_DELETED               => self::CATEGORY_CONTENT,
+
+    // ------------------------------------------------------------
+    // БЕЗОПАСНОСТЬ
+    // ------------------------------------------------------------
+    // Настройки CMS
+    self::REPORT_TYPE_ID_AP_SETTINGS_EDITED            => self::CATEGORY_SECURITY,
+
+    self::REPORT_TYPE_ID_AP_REPORTS_ROTATED            => self::CATEGORY_SECURITY,
+
+    // Авторизация
+    self::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS      => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL         => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS    => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL       => self::CATEGORY_SECURITY,
+
+    // Просмотр логов
+    self::REPORT_TYPE_ID_AP_VIEWING_LOGS               => self::CATEGORY_SECURITY,
+
+    // Пользователи (админка)
+    self::REPORT_TYPE_ID_AP_USER_CREATED               => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_AP_USER_EDITED                => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_AP_USER_DELETED               => self::CATEGORY_SECURITY,
+
+    // Группы пользователей
+    self::REPORT_TYPE_ID_AP_USERS_GROUP_CREATED        => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_AP_USERS_GROUP_EDITED         => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_AP_USERS_GROUP_DELETED        => self::CATEGORY_SECURITY,
+
+    // Пользователи (сайт)
+    self::REPORT_TYPE_ID_BASE_USER_CREATED             => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_BASE_USER_EDITED              => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_BASE_USER_DELETED             => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_BASE_USER_BANNED              => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_BASE_USER_UNBANNED            => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED => self::CATEGORY_SECURITY,
+
+    // ------------------------------------------------------------
+    // ДОКУМЕНТЫ И СОГЛАСИЯ (152-ФЗ)
+    // ------------------------------------------------------------
+    self::REPORT_TYPE_ID_AP_DOCUMENT_VERSION_CREATED   => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_DOCUMENT_VERSION_PUBLISHED => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_AP_DOCUMENT_VERSION_ARCHIVED  => self::CATEGORY_CONTENT,
+    self::REPORT_TYPE_ID_BASE_CONSENT_GIVEN            => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_BASE_CONSENT_REVOKED          => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_BASE_SUBJECT_DATA_EXPORTED    => self::CATEGORY_SECURITY,
+    self::REPORT_TYPE_ID_AP_USER_ANONYMIZED            => self::CATEGORY_SECURITY,
+  ];
+
+  /** @var string Ключ шифрования для ПДн в логах */
+  private static ?string $encryptionKey = null;
 
   /**
    * __construct
@@ -87,7 +229,6 @@ final class Report
     public CoreInterface $CMSCore,
     private int $id
   ) {}
-  
   /**
    * Инициализация данных из БД
    *
@@ -113,7 +254,7 @@ final class Report
   {
     $this->id = $value;
   }
-  
+
   /**
    * Получить идентификатор
    * 
@@ -144,27 +285,29 @@ final class Report
     return 0;
   }
 
-  /**
-   * Получить идентификационный номер категории отчета
-   *
-   * @return int
-   */
-  public function getCategoryID() : int
-  {
-    if (property_exists($this, 'metadata')) {
-      $metadata = json_decode($this->metadata, true);
-      if (isset($metadata['typeID'])) {
-        if (in_array($metadata['typeID'], [
-          self::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL,
-          self::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS
-        ])) {
-          return 2;
-        }
-      }
+    /**
+     * Получить идентификатор категории отчёта
+     *
+     * @return int
+     */
+    public function getCategoryID() : int
+    {
+      return self::TYPE_TO_CATEGORY[$this->getTypeID()] ?? self::CATEGORY_GENERAL;
     }
 
-    return 0;
-  }
+    /**
+     * Получить список идентификаторов типов отчётов по категории
+     *
+     * @param int $categoryID
+     * @return int[]
+     */
+    public static function getTypeIDsByCategory(int $categoryID) : array
+    {
+      return array_keys(array_filter(
+        self::TYPE_TO_CATEGORY,
+        static fn(int $category) : bool => $category === $categoryID
+      ));
+    }
 
   /**
    * Получить метадату отчета
@@ -183,12 +326,20 @@ final class Report
   /**
    * Получить переменные отчета
    *
+   * @param User|null $viewer Пользователь, просматривающий логи (для расшифровки ПДн)
    * @return array
    */
-  public function getVariables() : array
+  public function getVariables(?User $viewer = null) : array
   {
     if (property_exists($this, 'variables')) {
-      return json_decode($this->variables, true);
+      $variables = json_decode($this->variables, true);
+      
+      // Если есть просматривающий — расшифровываем ПДн
+      if ($viewer !== null) {
+        return $this->decryptVariables($variables, $viewer);
+      }
+      
+      return $variables;
     }
 
     return [];
@@ -212,7 +363,6 @@ final class Report
 
     return '';
   }
-  
   /**
    * Получить время создания в UNIX-формате
    *
@@ -222,7 +372,6 @@ final class Report
   {
     return $this->createdUnixTimestamp ?? 0;
   }
-  
   /**
    * Получить время обновления в UNIX-формате
    *
@@ -232,7 +381,6 @@ final class Report
   {
     return $this->updatedUnixTimestamp ?? 0;
   }
-  
   /**
    * Добавить переменную и ее значение
    *
@@ -244,7 +392,6 @@ final class Report
   {
     $this->variables[$name] = $value;
   }
-  
   /**
    * Создание записи в базе данных
    *
@@ -258,7 +405,10 @@ final class Report
   {
     $CMSConfigurator = $CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
-    
+
+    // Очищаем переменные от ПДн (с шифрованием)
+    $variables = self::sanitizeVariables($CMSCore, $variables);
+
     $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementInsert();
     $queryBuilder->statement->setTable('reports');
@@ -288,11 +438,10 @@ final class Report
         'message' => $exception->getMessage(),
         'statusCode' => 0,
         'outputData' => []
-      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+    if (!$queryBuilder->dialect->supportsInsertReturning()) {
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
@@ -300,7 +449,9 @@ final class Report
       $queryBuilder->statement->clauseFrom->addTable('reports');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->getLastInsertedIDCondition('id')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
@@ -313,7 +464,6 @@ final class Report
           'message' => $exception->getMessage(),
           'statusCode' => 0,
           'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
     }
@@ -325,7 +475,123 @@ final class Report
 
     return null;
   }
-  
+
+  /**
+   * Очистка переменных от ПДн перед сохранением (с шифрованием)
+   * 
+   * @param CoreInterface $CMSCore
+   * @param array $variables
+   * @return array
+   */
+  private static function sanitizeVariables(CoreInterface $CMSCore, array $variables): array
+  {
+    $forbiddenKeys = [
+      'email', 'password', 'passwordHash', 'securityHash',
+      'phone', 'phoneNumber', 'name', 'surname', 'patronymic',
+      'birthdate', 'birthdateUnixTimestamp', 'passport',
+      'snils', 'inn', 'address', 'registrationIP', 'token',
+      'user_login', 'user_email', 'user_password', 'user_name',
+      'user_surname', 'user_patronymic', 'user_birthdate',
+      'user_password_repeat', 'user_password_old', 'user_group_id',
+      'user_id', 'user_is_block'
+    ];
+
+    foreach ($variables as $key => $value) {
+      $keyLower = strtolower($key);
+      if (in_array($keyLower, $forbiddenKeys) && !empty($value) && !is_array($value)) {
+        $variables[$key] = self::encryptValue($CMSCore, (string)$value);
+      }
+      if (is_array($value)) {
+        $variables[$key] = self::sanitizeVariables($CMSCore, $value);
+      }
+    }
+
+    return $variables;
+  }
+
+  /**
+   * Шифрование значения для хранения в логах
+   * 
+   * @param CoreInterface $CMSCore
+   * @param string $value
+   * @return string
+   */
+  private static function encryptValue(CoreInterface $CMSCore, string $value): string
+  {
+    $salt = $CMSCore->configurator->get('salt');
+    $method = 'AES-256-CBC';
+    $ivLength = openssl_cipher_iv_length($method);
+    $iv = openssl_random_pseudo_bytes($ivLength);
+    $encrypted = openssl_encrypt($value, $method, $salt, 0, $iv);
+    return '[ENCRYPTED:' . base64_encode($iv . $encrypted) . ']';
+  }
+
+  /**
+   * Проверка, зашифровано ли значение
+   * 
+   * @param mixed $value
+   * @return bool
+   */
+  public static function isEncrypted($value): bool
+  {
+    if (!is_string($value)) {
+      return false;
+    }
+    return strpos($value, '[ENCRYPTED:') === 0;
+  }
+
+  /**
+   * Расшифровка переменных (только для уполномоченных пользователей)
+   * 
+   * @param array $variables
+   * @param User $viewer
+   * @return array
+   */
+  public function decryptVariables(array $variables, User $viewer): array
+  {
+    // Проверка прав доступа к ПДн в логах
+    $viewerGroup = $viewer->getGroup();
+    $hasAccess = $viewer->isSuperAdmin() || 
+                 ($viewerGroup && $viewerGroup->hasPermissionAdminViewingLogs());
+
+    if (!$hasAccess) {
+      return $variables;
+    }
+
+    foreach ($variables as $key => $value) {
+      if (is_array($value)) {
+        $variables[$key] = $this->decryptVariables($value, $viewer);
+      } elseif (self::isEncrypted($value)) {
+        $variables[$key] = self::decryptValue($this->CMSCore, $value);
+      }
+    }
+
+    return $variables;
+  }
+
+  /**
+   * Расшифровка одного значения
+   * 
+   * @param CoreInterface $CMSCore
+   * @param string $encrypted
+   * @return string
+   */
+  private static function decryptValue(CoreInterface $CMSCore, string $encrypted): string
+  {
+    if (preg_match('/\[ENCRYPTED:([^\]]+)\]/', $encrypted, $matches)) {
+      $salt = $CMSCore->configurator->get('salt');
+      $method = 'AES-256-CBC';
+      $data = base64_decode($matches[1]);
+      $ivLength = openssl_cipher_iv_length($method);
+      $iv = substr($data, 0, $ivLength);
+      $encryptedData = substr($data, $ivLength);
+      $decrypted = openssl_decrypt($encryptedData, $method, $salt, 0, $iv);
+      return $decrypted ?: '[DECRYPTION_FAILED]';
+    }
+
+    return $encrypted;
+  }
+
   /**
    * Получить данные колонок записи в базе данных
    *
@@ -344,10 +610,12 @@ final class Report
     $queryBuilder->statement->clauseFrom->addTable('reports');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('"id" = :id');
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
-    
+
     /** @var int Идентификационный номер записи */
     $id = $this->getID();
 
@@ -361,7 +629,6 @@ final class Report
         'message' => $exception->getMessage(),
         'statusCode' => 0,
         'outputData' => []
-      // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 

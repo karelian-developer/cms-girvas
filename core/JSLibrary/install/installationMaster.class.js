@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -85,6 +85,10 @@ export class InstallationMaster {
             let localeIconURL = locale.iconURL;
             let localeName = locale.name;
             let localeISO639_2 = locale.iso639_2;
+
+            if (!['ru_RU', 'en_US'].includes(localeName)) {
+              return;
+            }
     
             let localeIconImageElement = document.createElement('img');
             localeIconImageElement.setAttribute('src', localeIconURL);

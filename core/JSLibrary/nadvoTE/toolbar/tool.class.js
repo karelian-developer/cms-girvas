@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -25,19 +25,22 @@ export class Tool {
     this.setType(data.type);
     this.setIconPath(data.iconPath);
     this.setElement(data.element);
-    this.setElementIcon(data.iconPath);
+
+    if (data.type === 'button') {
+      this.setElementIcon(data.iconPath);
+    }
 
     console.log(`[NADVO TE] Tool ${data.name} created.`);
   }
-  
+
   setType(value) {
     this.type = value;
   }
-  
+
   setName(value) {
     this.name = value;
   }
-  
+
   setIconPath(value) {
     this.iconPath = value;
   }
@@ -47,7 +50,7 @@ export class Tool {
   }
 
   setElementIcon(path) {
-    fetch(path,  {
+    fetch(path, {
       method: 'GET',
       headers: {
         'Content-Type': 'image/svg+xml'
@@ -78,6 +81,53 @@ export class Tool {
       event.preventDefault();
 
       callback();
+    });
+  }
+
+  addChangeEvent(callback) {
+    const selectElement = this.element.querySelector('select');
+
+    selectElement.addEventListener('change', (event) => {
+      event.preventDefault();
+
+      callback();
+    });
+  }
+
+  /**
+   * Привязка горячей клавиши
+   *
+   * @param {string} hotkey Например: 'Ctrl+B'
+   */
+  bindHotkey(hotkey) {
+    document.addEventListener('keydown', (event) => {
+      const hotkeyParts = hotkey.toLowerCase().split('+');
+      const hotkeyKey = hotkeyParts.pop();
+
+      const needsCtrl = hotkeyParts.includes('ctrl');
+      const needsShift = hotkeyParts.includes('shift');
+      const needsAlt = hotkeyParts.includes('alt');
+
+      const ctrlOk = needsCtrl ? (event.ctrlKey || event.metaKey) : true;
+      const shiftOk = needsShift ? event.shiftKey : true;
+      const altOk = needsAlt ? event.altKey : true;
+
+      const keyMap = {
+        'b': 'KeyB',
+        'i': 'KeyI',
+        'u': 'KeyU',
+        'k': 'KeyK',
+        'z': 'KeyZ',
+        'y': 'KeyY',
+        'c': 'KeyC'
+      };
+
+      const expectedCode = keyMap[hotkeyKey] || hotkeyKey.toUpperCase();
+
+      if (ctrlOk && shiftOk && altOk && event.code === expectedCode) {
+        event.preventDefault();
+        this.element.click();
+      }
     });
   }
 }

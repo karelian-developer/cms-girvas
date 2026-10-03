@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -17,14 +17,20 @@
 
 import {Interactive} from '../interactive.class.js';
 import {ToolBold} from './toolbar/toolBold.class.js';
+import {ToolGallery} from './toolbar/toolGallery.class.js';
 import {ToolItalic} from './toolbar/toolItalic.class.js';
 import {ToolUnderline} from './toolbar/toolUnderline.class.js';
 import {ToolHeader} from './toolbar/toolHeader.class.js';
+import {ToolHeaders} from './toolbar/toolHeaders.class.js';
 import {ToolQuote} from './toolbar/toolQuote.class.js';
 import {ToolPreview} from './toolbar/toolPreview.class.js';
 import {ToolSource} from './toolbar/toolSource.class.js';
 import {ToolLink} from './toolbar/toolLink.class.js';
 import {ToolImage} from './toolbar/toolImage.class.js';
+import {ToolCode} from './toolbar/toolCode.class.js';
+import {ToolEmoji} from './toolbar/toolEmoji.class.js';
+import {ToolUndo} from './toolbar/toolUndo.class.js';
+import {ToolRedo} from './toolbar/toolRedo.class.js';
 
 export class Toolbar {
   constructor(editor, options = []) {
@@ -37,45 +43,137 @@ export class Toolbar {
   }
 
   init() {
-    let toolbarElement = this.editor.createElementUl();
+    const toolbarElement = this.editor.createElementUl();
     toolbarElement.classList.add('nadvo-te__toolbar-list');
 
     if (typeof(this.options) != 'undefined') {
       for (let optionItem of this.options) {
-        let optionItemElement = this.editor.createElementLi();
+        const optionItemElement = this.editor.createElementLi();
         optionItemElement.classList.add('nadvo-te__toolbar-item');
         optionItemElement.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
         
         let optionItemInteractiveElement;
         if (optionItem.type == 'button') {
-          let buttonTest = new Interactive('button');
-          buttonTest.target.setLabel('Включить');
-          buttonTest.target.setCallback(() => {});
-          buttonTest.assembly();
+          const toolButton = new Interactive('button');
+          toolButton.target.setLabel('Включить');
+          toolButton.target.setCallback(() => {});
+          toolButton.assembly();
 
-          optionItemInteractiveElement = buttonTest.target.element;
+          optionItemInteractiveElement = toolButton.target.element;
           optionItemInteractiveElement.firstChild.classList.add('nadvo-te__toolbar-button');
         }
 
-        if (optionItem.name === 'preview') {
-          optionItemElement.style.marginLeft = 'auto';
+        if (optionItem.type == 'choices') {
+          const toolChoices = new Interactive('choices');
+
+          let labelEmptyElement = document.createElement('span');
+          labelEmptyElement.innerText = this.editor.localeData.NTE_TOOL_HEADER_SELECT_LABEL;
+          labelEmptyElement.style.fontSize = '14px';
+          toolChoices.target.addItem(labelEmptyElement.outerHTML, 0);
+
+          if (optionItem.name === 'headers') {
+            [1, 2, 3, 4, 5, 6].forEach((headerLevelID, headerLevelIndex) => {
+              let labelElement = document.createElement('span');
+              labelElement.innerText = this.editor.localeData.NTE_TOOL_HEADER_COMMON_LABEL + ' ' + headerLevelID;
+              labelElement.style.fontSize = 18 - headerLevelIndex + 'px';
+              toolChoices.target.addItem(labelElement.outerHTML, headerLevelID);
+            });
+          }
+
+          toolChoices.assembly();
+
+          toolChoices.target.element.classList.add('nadvo-te__toolbar-item');
+          toolChoices.target.element.classList.add('nadvo-te__toolbar-item_' + optionItem.name);
+          
+          optionItemInteractiveElement = toolChoices.target.element;
+          optionItemInteractiveElement.firstChild.classList.add('nadvo-te__toolbar-choices');
+
+          const selectElement = toolChoices.target.element.querySelector('select');
+          selectElement.addEventListener('change', (event) => {
+            toolChoices.target.setItemSelectedIndex(0);
+          });
         }
         
         switch (optionItem.name) {
-          case 'bold': this.tools.bold = new ToolBold(this.editor, optionItemInteractiveElement); break;
-          case 'italic': this.tools.italic = new ToolItalic(this.editor, optionItemInteractiveElement); break;
-          case 'underline': this.tools.underline = new ToolUnderline(this.editor, optionItemInteractiveElement); break;
-          case 'header1': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 1); break;
-          case 'header2': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 2); break;
-          case 'header3': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 3); break;
-          case 'header4': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 4); break;
-          case 'header5': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 5); break;
-          case 'header6': this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 6); break;
-          case 'quote': this.tools.header = new ToolQuote(this.editor, optionItemInteractiveElement); break;
-          case 'preview': this.tools.preview = new ToolPreview(this.editor, optionItemInteractiveElement); break;
-          case 'source': this.tools.source = new ToolSource(this.editor, optionItemInteractiveElement); break;
-          case 'link': this.tools.link = new ToolLink(this.editor, optionItemInteractiveElement); break;
-          case 'image': this.tools.image = new ToolImage(this.editor, optionItemInteractiveElement); break;
+          case 'bold':
+            this.tools.bold = new ToolBold(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'italic':
+            this.tools.italic = new ToolItalic(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'underline':
+            this.tools.underline = new ToolUnderline(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'headers':
+            this.tools.headers = new ToolHeaders(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'header1':
+            this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 1);
+            break;
+            
+          case 'header2':
+            this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 2);
+            break;
+            
+          case 'header3':
+            this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 3);
+            break;
+            
+          case 'header4':
+            this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 4);
+            break;
+            
+          case 'header5':
+            this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 5);
+            break;
+            
+          case 'header6':
+            this.tools.header = new ToolHeader(this.editor, optionItemInteractiveElement, 6);
+            break;
+            
+          case 'quote':
+            this.tools.quote = new ToolQuote(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'code':
+            this.tools.code = new ToolCode(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'preview':
+            this.tools.preview = new ToolPreview(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'source':
+            this.tools.source = new ToolSource(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'link':
+            this.tools.link = new ToolLink(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'image':
+            this.tools.image = new ToolImage(this.editor, optionItemInteractiveElement);
+            break;
+
+          case 'gallery':
+            this.tools.gallery = new ToolGallery(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'emoji':
+            this.tools.emoji = new ToolEmoji(this.editor, optionItemInteractiveElement);
+            break;
+            
+          case 'undo':
+            this.tools.undo = new ToolUndo(this.editor, optionItemInteractiveElement);
+            break;
+
+          case 'redo':
+            this.tools.redo = new ToolRedo(this.editor, optionItemInteractiveElement);
+            break;
         }
 
         toolbarElement.appendChild(optionItemElement);

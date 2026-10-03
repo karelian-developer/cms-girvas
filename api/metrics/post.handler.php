@@ -40,6 +40,7 @@ if (array_key_exists('Metrics-Token', $handlerHeaders)) {
     $metricsDataSort = $metricsSession->getData();
 
     if (isset($metricsDataSort['metrics']['views'][$metricsToken])) {
+      // Добавляем переход, если это не тот же URL
       if ($metricsReferrerURL !== $metricsCurrentURL) {
         array_push($metricsDataSort['metrics']['views'][$metricsToken]['URLTransfers'], [
           $metricsCurrentURL => [
@@ -80,8 +81,42 @@ if (array_key_exists('Metrics-Token', $handlerHeaders)) {
       ];
     }
 
-    $metricsData['data'] = $metricsDataSort;
+    // ==========================================
+    // ПЕРЕСЧЁТ visits0 И visits1
+    // ==========================================
+    $visits0 = [];
+    $visits1 = [];
 
+    foreach ($metricsDataSort['metrics']['views'] as $token => $viewData) {
+      // Проверяем переходы
+      if (isset($viewData['URLTransfers']) && !empty($viewData['URLTransfers'])) {
+        foreach ($viewData['URLTransfers'] as $transfer) {
+          foreach ($transfer as $url => $data) {
+            $referral = $data['referral'] ?? '';
+            
+            // visits0: уникальные токены с переходами (не прямые заходы)
+            if (!empty($referral) && $referral !== $url) {
+              if (!in_array($token, $visits0)) {
+                $visits0[] = $token;
+              }
+            }
+            
+            // visits1: новые посещения (isVisitedNew = true)
+            if (isset($data['isVisitedNew']) && $data['isVisitedNew'] === true) {
+              if (!in_array($token, $visits1)) {
+                $visits1[] = $token;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Сохраняем пересчитанные значения
+    $metricsDataSort['metrics']['visits0'] = $visits0;
+    $metricsDataSort['metrics']['visits1'] = $visits1;
+
+    $metricsData['data'] = $metricsDataSort;
     $metricsSession->update($metricsData);
   }
 }

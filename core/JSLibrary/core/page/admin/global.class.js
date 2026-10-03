@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -40,32 +40,17 @@ export class PageGlobal {
    * Инициализация
    */
   init() {
-    let searchParams = new URLParser(), locales;
     let globalButtonsContainerElement = document.querySelector('#SYSTEM_E3724126421');
     
-    let navigationBurgerElement = document.querySelector('[role="mainNavigationBurger"]');
+    let navigationBurgerElement = document.querySelector('[data-role="mainNavigationBurger"]');
     if (navigationBurgerElement != null) {
       navigationBurgerElement.addEventListener('click', (event) => {
         navigationBurgerElement.classList.toggle('burger_is-active');
       });
     }
 
-    // Подгрузка локализаций
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      let interactiveNotification = new Interactive('notification');
-      interactiveNotification.target.isPopup = true;
-      interactiveNotification.target.setStatusCode(0);
-      interactiveNotification.target.setContent(rejectionReason);
-      interactiveNotification.target.assembly();
-
-      interactiveNotification.target.show();
-    }).then((localeData) => {
-      let mainNavigationItemExitElement = document.querySelector('[role="mainNavigationExit"]');
+    this.page.core.locales.admin.getData().then((localeData) => {
+      let mainNavigationItemExitElement = document.querySelector('[data-role="mainNavigationExit"]');
       if (mainNavigationItemExitElement != null) {
         mainNavigationItemExitElement.addEventListener('click', (event) => {
           event.preventDefault();
@@ -97,7 +82,7 @@ export class PageGlobal {
         this.buttons.siteDeveloper.target.setLabel(localeData.BUTTON_SITE_DEVELOPER);
         this.buttons.siteDeveloper.target.setCallback((event) => {
           event.preventDefault();
-          window.open('https://www.garbalo.com', '_blank');
+          window.open('https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai/', '_blank');
         });
 
         // Кнопка "Проверить обновления"

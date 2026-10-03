@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -21,7 +21,6 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\Factories\Content as FactoryContent;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
@@ -291,7 +290,8 @@ class Entry implements EntityTypeContent
         $CMSLocale->initPathes();
         $locales[$localeName] = [
           'title' => $CMSLocale->getTitle(),
-          'iconURL' => $CMSLocale->getIconURL()
+          'iconURL' => $CMSLocale->getIconURL(),
+          'name' => $localeName
         ];
       }
 
@@ -614,10 +614,9 @@ class Entry implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -685,16 +684,21 @@ class Entry implements EntityTypeContent
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $dialect = $queryBuilder->dialect;
+
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('entries');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` < :id AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
-      'postgresql' => '"id" < :id AND (metadata::jsonb->>\'isPublished\')::boolean = true'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s < :id AND %s',
+        $dialect->quoteIdentifier('id'),
+        $dialect->jsonExtractBoolean('metadata', 'isPublished')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseOrderBy();
     $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
@@ -731,16 +735,21 @@ class Entry implements EntityTypeContent
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $dialect = $queryBuilder->dialect;
+
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('entries');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` > :id AND JSON_EXTRACT(`metadata`, \'$.isPublished\') = 1',
-      'postgresql' => '"id" > :id AND (metadata::jsonb->>\'isPublished\')::boolean = true'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s > :id AND %s',
+        $dialect->quoteIdentifier('id'),
+        $dialect->jsonExtractBoolean('metadata', 'isPublished')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -783,10 +792,9 @@ class Entry implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`name` = :name',
-      'postgresql' => '"name" = :name'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :name', $queryBuilder->dialect->quoteIdentifier('name'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -829,10 +837,9 @@ class Entry implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`name` = :name',
-      'postgresql' => '"name" = :name'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :name', $queryBuilder->dialect->quoteIdentifier('name'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -874,10 +881,9 @@ class Entry implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -915,10 +921,9 @@ class Entry implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -999,7 +1004,9 @@ class Entry implements EntityTypeContent
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+    $dialect = $queryBuilder->dialect;
+
+    if (!$dialect->supportsInsertReturning()) {
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
@@ -1007,7 +1014,9 @@ class Entry implements EntityTypeContent
       $queryBuilder->statement->clauseFrom->addTable('entries');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $dialect->getLastInsertedIDCondition('id')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
@@ -1048,6 +1057,8 @@ class Entry implements EntityTypeContent
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $dialect = $queryBuilder->dialect;
+    
     $queryBuilder->setStatementUpdate();
     $queryBuilder->statement->setTable('entries');
     $queryBuilder->statement->setClauseSet();
@@ -1059,35 +1070,24 @@ class Entry implements EntityTypeContent
     }
 
     foreach (['texts', 'metadata'] as $columnName) {
-      $fieldsJSON = [];
-      
-      if (!isset($data[$columnName])) {
+      if (empty($data[$columnName])) {
         continue;
       }
 
-      foreach ($data[$columnName] as $name => $value) {
-        $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $fieldsJSON[] = match ($queryBuilder->DMS) {
-          CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
-          CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
-        };
-      }
-
-      if (!empty($data[$columnName])) {
-        $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-          'mysql' => 'JSON_MERGE_PATCH(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
-          'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
-        ]);
-      }
+      $jsonObject = json_encode($data[$columnName], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      
+      $queryBuilder->statement->clauseSet->addColumn(
+        $columnName,
+        $dialect->jsonMergePatch($columnName, $dialect->quoteLiteral($jsonObject))
+      );
     }
 
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 

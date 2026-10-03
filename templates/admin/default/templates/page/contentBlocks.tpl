@@ -1,4 +1,7 @@
-<article class="main__page page page_content-blocks">
+<article class="main__page page page_content-blocks"
+         data-element="content-blocks-page"
+         data-search-value="{CONTENT_BLOCKS_SEARCH_VALUE}"
+         data-sort-value="{CONTENT_BLOCKS_SORT_VALUE}">
   <nav id="SYSTEM_AP_SUBNAVIGATION" class="page__navigation navigation"></nav>
   <div class="page__title-container">
     <h1 class="page__title">{LANG:PAGE_CONTENT_BLOCKS_TITLE}</h1>

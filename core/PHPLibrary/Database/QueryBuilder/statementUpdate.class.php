@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -37,7 +37,7 @@ final class StatementUpdate implements InterfaceStatement
   /**
    * __construct
    *
-   * @param  mixed $queryBuilder
+   * @param  QueryBuilder $queryBuilder
    * @return void
    */
   public function __construct(QueryBuilder $queryBuilder)
@@ -85,9 +85,11 @@ final class StatementUpdate implements InterfaceStatement
    */
   public function getTable() : string
   {
+    $dialect = $this->queryBuilder->dialect;
     $databaseConfigurations = $this->queryBuilder->CMSCore->configurator->get('database');
-    
+
     $tableFullname = '';
+
     if ($databaseConfigurations !== null) {
       if ($databaseConfigurations['scheme'] !== '') {
         $tableFullname .= $databaseConfigurations['scheme'] . '.';
@@ -101,7 +103,13 @@ final class StatementUpdate implements InterfaceStatement
 
     $tableFullname .= $this->tableName;
 
-    return $tableFullname;
+    $segments = explode('.', $tableFullname);
+    $quotedSegments = array_map(
+      fn(string $segment) => $dialect->quoteIdentifier($segment),
+      $segments
+    );
+
+    return implode('.', $quotedSegments);
   }
 
   /**

@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -16,62 +16,141 @@
 'use strict';
 
 import {Interactive} from "../../../interactive.class.js";
-import {URLParser} from "../../../urlParser.class.js";
 
 export class PagePages {
   constructor(page, params = {}) {
     this.page = page;
+    this.localeData = null;
+    this.searchInput = null;
   }
 
   init() {
-    let locales;
+    this.page.core.locales.admin.getData().then((localeData) => {
+      this.localeData = localeData;
 
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
+      const pageElement = document.querySelector('[data-element="pages-page"]');
+      const container = document.querySelector('#E8548530785');
 
-      let interactiveCreatePageButton = new Interactive('button');
-      interactiveCreatePageButton.target.setLabel(localeData.BUTTON_NEW_PAGE_LABEL);
-      interactiveCreatePageButton.target.setCallback(() => {
-        window.location.href = `./page`;
+      if (container === null) return;
+
+      const currentSort = pageElement?.getAttribute('data-sort-value') || 'by_createdtimestamp_decrease';
+      const currentSearch = pageElement?.getAttribute('data-search-value') || '';
+
+      // ----- 1. Сортировка -----
+      const sortChoices = new Interactive('choices');
+      sortChoices.target.setWidth('280px');
+      sortChoices.target.addItem(localeData.SORT_BY_CREATEDTIMESTAMP_INCREASE, 'by_createdtimestamp_increase');
+      sortChoices.target.addItem(localeData.SORT_BY_CREATEDTIMESTAMP_DECREASE, 'by_createdtimestamp_decrease');
+      sortChoices.target.addItem(localeData.SORT_BY_UPDATEDTIMESTAMP_INCREASE, 'by_updatedtimestamp_increase');
+      sortChoices.target.addItem(localeData.SORT_BY_UPDATEDTIMESTAMP_DECREASE, 'by_updatedtimestamp_decrease');
+      sortChoices.target.addItem(localeData.SORT_BY_ALPHABET_INCREASE,        'by_alphabet_increase');
+      sortChoices.target.addItem(localeData.SORT_BY_ALPHABET_DECREASE,        'by_alphabet_decrease');
+
+      const sortIndexMap = {
+        'by_createdtimestamp_increase': 0,
+        'by_createdtimestamp_decrease': 1,
+        'by_updatedtimestamp_increase': 2,
+        'by_updatedtimestamp_decrease': 3,
+        'by_alphabet_increase':         4,
+        'by_alphabet_decrease':         5,
+      };
+      sortChoices.target.setItemSelectedIndex(sortIndexMap[currentSort] ?? 1);
+      sortChoices.assembly();
+
+      sortChoices.target.elementSelect.addEventListener('change', () => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('sort', sortChoices.target.getValue());
+        url.searchParams.delete('pageNumber');
+        window.location.href = url.toString();
       });
-      interactiveCreatePageButton.assembly();
-    
-      const interactiveContainerElement = document.querySelector('#E8548530785');
-      interactiveContainerElement.append(interactiveCreatePageButton.target.element);
 
+      // ----- 2. Поле поиска -----
+      const searchInput = new Interactive('input');
+      searchInput.target.setType('search');
+      searchInput.target.setPlaceholder(
+        localeData.PAGE_PAGES_SEARCH_PLACEHOLDER || 'Поиск по имени страницы'
+      );
+      searchInput.target.setValue(currentSearch);
+      searchInput.assembly();
+      this.searchInput = searchInput;
+
+      const searchInputElement = searchInput.target.element.querySelector('input');
+      if (searchInputElement !== null) {
+        searchInputElement.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            this.applySearch();
+          }
+        });
+      }
+
+      // ----- 3. Кнопка поиска -----
+      const searchButton = new Interactive('button');
+      searchButton.target.setLabel(localeData.BUTTON_SEARCH_LABEL || 'Найти');
+      searchButton.target.setStyle('default');
+      searchButton.target.setCallback((event) => {
+        event.preventDefault();
+        this.applySearch();
+      });
+      searchButton.assembly();
+
+      // ----- 4. Кнопка «Новая страница» -----
+      const createButton = new Interactive('button');
+      createButton.target.setLabel(localeData.BUTTON_NEW_PAGE_LABEL);
+      createButton.target.setCallback((event) => {
+        event.preventDefault();
+        window.location.href = './page';
+      });
+      createButton.assembly();
+
+      // ----- Сборка панели -----
+      container.append(sortChoices.target.element);
+      container.append(searchInput.target.element);
+      container.append(searchButton.target.element);
+      container.append(createButton.target.element);
+
+      // ----- Сохранение value/sort в ссылках пагинации -----
+      const paginationLinks = document.querySelectorAll('.page__pagination a');
+      paginationLinks.forEach((link) => {
+        const href = link.getAttribute('href');
+        if (!href) return;
+
+        const url = new URL(href, window.location.origin);
+        if (currentSearch !== '') {
+          url.searchParams.set('value', currentSearch);
+        }
+        url.searchParams.set('sort', currentSort);
+        link.setAttribute('href', url.pathname + url.search);
+      });
+
+      // ----- Удаление страницы -----
       const tableItems = document.querySelectorAll('[data-element="page"]');
-      for (let tableItem of tableItems) {
+      for (const tableItem of tableItems) {
         const pageStaticID = tableItem.getAttribute('data-id');
         const panelElement = tableItem.querySelector('[data-element="panel"]');
-        const panelEventElements = panelElement.querySelectorAll('[data-event]');
+        if (panelElement === null) continue;
 
-        for (let eventElement of panelEventElements) {
+        const panelEventElements = panelElement.querySelectorAll('[data-event]');
+        for (const eventElement of panelEventElements) {
           eventElement.addEventListener('click', (event) => {
             event.preventDefault();
 
             if (eventElement.getAttribute('data-event') === 'remove') {
-              let interactiveModal = new Interactive('modal', {
+              const interactiveModal = new Interactive('modal', {
                 title: localeData.MODAL_PAGE_DELETE_TITLE,
                 content: localeData.MODAL_PAGE_DELETE_DESCRIPTION
               });
-              
+
               interactiveModal.target.addButton(localeData.BUTTON_DELETE_LABEL, () => {
-                let formData = new FormData();
+                const formData = new FormData();
                 formData.append('page_static_id', pageStaticID);
 
-                let request = new Interactive('request', {
+                const request = new Interactive('request', {
                   method: 'DELETE',
                   url: '/handler/pageStatic/' + pageStaticID + '?localeMessage=' + window.CMSCore.locales.admin.name
                 });
-      
+
                 request.target.data = formData;
-      
                 request.target.send().then((data) => {
                   if (data.statusCode === 1) {
                     window.location.href = '/admin/pages';
@@ -93,5 +172,27 @@ export class PagePages {
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     });
+  }
+
+  /**
+   * Применить поиск: перейти на тот же раздел с ?value=...&sort=...
+   */
+  applySearch() {
+    if (this.searchInput === null) return;
+
+    const value = (this.searchInput.target.getValue() || '').trim();
+    const currentSort = document.querySelector('[data-element="pages-page"]')
+      ?.getAttribute('data-sort-value') || 'by_createdtimestamp_decrease';
+
+    const url = new URL(window.location.href);
+    if (value === '') {
+      url.searchParams.delete('value');
+    } else {
+      url.searchParams.set('value', value);
+    }
+    url.searchParams.set('sort', currentSort);
+    url.searchParams.delete('pageNumber');
+
+    window.location.href = url.toString();
   }
 }

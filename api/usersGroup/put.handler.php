@@ -8,7 +8,7 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
- if (!defined('IS_NOT_HACKED')) {
+if (!defined('IS_NOT_HACKED')) {
   http_response_code(503);
   die('An attempted hacker attack has been detected.');
 }
@@ -16,10 +16,11 @@
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
@@ -39,6 +40,8 @@ if ($CMSCore->client->isLogged(2)) {
                   'admin_panel_auth' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_PANEL_AUTH,
                   'admin_users_management' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT,
                   'admin_users_groups_management' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_USERS_GROUPS_MANAGEMENT,
+                  'admin_users_consents_management' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT,
+                  'admin_users_data_export' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_USERS_DATA_EXPORT,
                   'admin_modules_management' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT,
                   'admin_templates_management' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT,
                   'admin_settings_management' => $usersGroupPermissions | UserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT,
@@ -84,6 +87,30 @@ if ($CMSCore->client->isLogged(2)) {
 
             $userGroup = UserGroup::create($CMSCore, $userGroupName, $texts, $usersGroupPermissions);
             if ($userGroup !== null) {
+              // ============================================================
+              // ЛОГИРОВАНИЕ СОЗДАНИЯ ГРУППЫ ПОЛЬЗОВАТЕЛЕЙ (152-ФЗ)
+              // ============================================================
+              $userGroup->initData(['name', 'texts']);
+
+              $groupTitles = [];
+              $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+              foreach ($CMSLocalesNames as $localeName) {
+                $groupTitles[$localeName] = $userGroup->getTitle($localeName);
+              }
+
+              CMSReport::create(
+                $CMSCore,
+                CMSReport::REPORT_TYPE_ID_AP_USERS_GROUP_CREATED,
+                [
+                  'groupID' => $userGroup->getID(),
+                  'groupName' => $userGroup->getName(),
+                  'groupTitles' => $groupTitles,
+                  'createdByID' => $clientUser->getID(),
+                  'createdByLogin' => $clientUser->getLogin(),
+                  'ip' => $CMSCore->client->getIPAddress()
+                ]
+              );
+
               $handlerOutputData['usersGroup'] = [];
               $handlerOutputData['usersGroup']['id'] = $userGroup->getID();
 
@@ -105,6 +132,9 @@ if ($CMSCore->client->isLogged(2)) {
         $handlerMessage = $handlerMessage ?? 'API ERROR: ' .$CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
+    } else {
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' .$CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
     $handlerMessage = 'API ERROR: ' .$CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');

@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -58,6 +58,25 @@ final class Configurator implements ConfiguratorInterface
     }
   }
 
+use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
+use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\SystemCore as CMSCore;
+use \core\PHPLibrary\CoreInterface as CMSCoreInterface;
+use \PDOException as PDOException;
+use \PDO as PDO;
+
+/**
+ * Class Configurator
+ */
+final class Configurator implements ConfiguratorInterface
+{
+  const FILE_PATH = 'core/configuration.php';
+
+  public string $metaTitle = '';
+  public string $metaDescription = '';
+  public array $metaKeywords = [];
+  private array $data = [];
+  
   /**
    * Назначить заголовок для веб-сайта
    * 
@@ -163,7 +182,15 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getSiteTitle() : string
   {
-    return $this->existsDatabaseEntryValue('base_site_title') ? $this->getDatabaseEntryValue('base_site_title') : $this->CMSCore->getCMSTitle();
+    $value = $this->getLocalizedDatabaseValue('base_site_title', $this->resolveCurrentLocaleName());
+
+    if (is_array($value)) {
+      $value = implode(', ', $value);
+    }
+
+    return is_string($value) && $value !== ''
+      ? $value
+      : $this->CMSCore->getCMSTitle();
   }
 
   /**
@@ -173,7 +200,15 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getSiteDescription() : string
   {
-    return $this->existsDatabaseEntryValue('seo_site_description') ? $this->getDatabaseEntryValue('seo_site_description') : sprintf('%s %s developed by www.garbalo.com', $this->CMSCore->getCMSTitle(), $this->CMSCore->getCMSVersion());
+    $value = $this->getLocalizedDatabaseValue('seo_site_description', $this->resolveCurrentLocaleName());
+
+    if (is_array($value)) {
+      $value = implode(', ', $value);
+    }
+
+    return is_string($value) && $value !== ''
+      ? $value
+      : sprintf('%s %s developed by karelian-developer.ru', $this->CMSCore->getCMSTitle(), $this->CMSCore->getCMSVersion());
   }
 
   /**
@@ -183,7 +218,17 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getSiteKeywords() : string
   {
-    return $this->existsDatabaseEntryValue('seo_site_keywords') ? implode(', ', json_decode($this->getDatabaseEntryValue('seo_site_keywords'), true)) : implode(', ', ['cms girvas', 'empty site', 'karelian developer']);
+    $value = $this->getLocalizedDatabaseValue('seo_site_keywords', $this->resolveCurrentLocaleName());
+
+    if (is_array($value)) {
+      return implode(', ', $value);
+    }
+
+    if (is_string($value) && $value !== '') {
+      return $value;
+    }
+
+    return implode(', ', ['cms girvas', 'empty site', 'karelian developer', 'karelian cms']);
   }
 
   /**
@@ -445,7 +490,13 @@ final class Configurator implements ConfiguratorInterface
    */
   public function getEngineeringWorksText() : string
   {
-    return $this->existsDatabaseEntryValue('base_engineering_works_text') ? (string) $this->getDatabaseEntryValue('base_engineering_works_text') : '';
+    $value = $this->getLocalizedDatabaseValue('base_engineering_works_text');
+
+    if (is_array($value)) {
+      $value = implode(', ', $value);
+    }
+
+    return is_string($value) ? $value : '';
   }
 
   /**
@@ -798,10 +849,9 @@ final class Configurator implements ConfiguratorInterface
     $queryBuilderStatement->setClauseWhere();
 
     $queryBuilderStatementClauseWhere = $queryBuilderStatement->clauseWhere;
-    $queryBuilderStatementClauseWhere->addConditionAdaptive([
-      'mysql' => '`name` = :name',
-      'postgresql' => '"name" = :name'
-    ]);
+    $queryBuilderStatementClauseWhere->addCondition(
+      sprintf('%s = :name', $queryBuilder->dialect->quoteIdentifier('name'))
+    );
     $queryBuilderStatementClauseWhere->assembly();
     $queryBuilderStatement->assembly();
 
@@ -858,10 +908,9 @@ final class Configurator implements ConfiguratorInterface
     $queryBuilderStatement->setClauseWhere();
 
     $queryBuilderStatementClauseWhere = $queryBuilderStatement->clauseWhere;
-    $queryBuilderStatementClauseWhere->addConditionAdaptive([
-      'mysql' => '`name` = :name',
-      'postgresql' => '"name" = :name'
-    ]);
+    $queryBuilderStatementClauseWhere->addCondition(
+      sprintf('%s = :name', $queryBuilder->dialect->quoteIdentifier('name'))
+    );
     $queryBuilderStatementClauseWhere->assembly();
     $queryBuilderStatement->setClauseLimit(1);
     $queryBuilderStatement->assembly();
@@ -935,6 +984,27 @@ final class Configurator implements ConfiguratorInterface
   }
 
   /**
+   * Имя локали, в контексте которой рендерится текущая страница
+   * 
+   * @return ?string
+   */
+  private function resolveCurrentLocaleName() : ?string
+  {
+    if ($this->CMSCore->locale !== null) {
+      return $this->CMSCore->locale->getName();
+    }
+
+    $isAdmin = $this->CMSCore->urlp !== null
+      && $this->CMSCore->urlp->getPath(0) === 'admin';
+
+    $localeConfigKey = $isAdmin ? 'base_admin_locale' : 'base_locale';
+
+    return $this->existsDatabaseEntryValue($localeConfigKey)
+      ? (string) $this->getDatabaseEntryValue($localeConfigKey)
+      : null;
+  }
+
+  /**
    * Обновить запись конфигураций CMS в базе данных
    * 
    * @param string $name
@@ -954,7 +1024,9 @@ final class Configurator implements ConfiguratorInterface
     $queryBuilder->statement->clauseSet->addColumn('value');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addCondition('name = :name');
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :name', $queryBuilder->dialect->quoteIdentifier('name'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -979,6 +1051,52 @@ final class Configurator implements ConfiguratorInterface
     }
 
     return false;
+  }
+
+  /**
+   * Получить локализованное значение настройки из БД
+   *
+   * @param string $settingName
+   * @param ?string $localeName
+   *
+   * @return mixed
+   */
+  private function getLocalizedDatabaseValue(string $settingName, ?string $localeName = null): mixed
+  {
+    if (!$this->existsDatabaseEntryValue($settingName)) {
+      return null;
+    }
+
+    $raw = $this->getDatabaseEntryValue($settingName);
+
+    if (!is_string($raw) || $raw === '') {
+      return $raw;
+    }
+
+    $decoded = json_decode($raw, true);
+
+    // JSON-объект по локалям
+    if (is_array($decoded) && !array_is_list($decoded)) {
+      if ($localeName !== null && isset($decoded[$localeName])) {
+        return $decoded[$localeName];
+      }
+
+      // Fallback: первое непустое значение
+      foreach ($decoded as $value) {
+        if (is_string($value) && $value !== '') return $value;
+        if (is_array($value) && !empty($value)) return $value;
+      }
+
+      return null;
+    }
+
+    // Плоский список (старый seo_site_keywords)
+    if (is_array($decoded) && array_is_list($decoded)) {
+      return $decoded;
+    }
+
+    // Плоская строка
+    return $raw;
   }
   
   /**

@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -21,7 +21,6 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\SystemCore as CMSCore;
@@ -312,14 +311,12 @@ class Feed
     $queryBuilder->statement->clauseFrom->addTable('web_channels');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
-    /** @var int $userGroupID Идентификационный номер записи */
     $userGroupID = $this->getID();
 
     try {
@@ -360,10 +357,9 @@ class Feed
     $queryBuilder->statement->clauseFrom->addTable('web_channels');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => 'LOWER(`name`) = :name',
-      'postgresql' => 'LOWER("name") = :name'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('LOWER(%s) = :name', $queryBuilder->dialect->quoteIdentifier('name'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -409,10 +405,9 @@ class Feed
     $queryBuilder->statement->clauseFrom->addTable('web_channels');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => 'LOWER(`name`) = :name',
-      'postgresql' => 'LOWER("name") = :name'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('LOWER(%s) = :name', $queryBuilder->dialect->quoteIdentifier('name'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -456,10 +451,9 @@ class Feed
     $queryBuilder->statement->clauseFrom->addTable('web_channels');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -497,10 +491,9 @@ class Feed
     $queryBuilder->statement->clauseFrom->addTable('web_channels');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -537,6 +530,8 @@ class Feed
     $queryBuilder->statement->setTable('web_channels');
     $queryBuilder->statement->setClauseSet();
 
+    $dialect = $queryBuilder->dialect;
+
     foreach ($data as $name => $value) {
       if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'texts'])) {
         $queryBuilder->statement->clauseSet->addColumn($name);
@@ -544,42 +539,28 @@ class Feed
     }
 
     foreach (['texts'] as $columnName) {
-      $fieldsJSON = [];
-      
-      if (!isset($data[$columnName])) {
+      if (empty($data[$columnName])) {
         continue;
       }
 
-      foreach ($data[$columnName] as $name => $value) {
-        $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $fieldsJSON[] = match ($queryBuilder->DMS) {
-          CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
-          CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
-        };
-      }
-
-      if (!empty($data[$columnName])) {
-        $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-          'mysql' => 'JSON_MERGE_PATCH(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
-          'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
-        ]);
-      }
+      $jsonObject = json_encode($data[$columnName], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      
+      $queryBuilder->statement->clauseSet->addColumn(
+        $columnName,
+        $dialect->jsonMergePatch($columnName, $dialect->quoteLiteral($jsonObject))
+      );
     }
 
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :id', $queryBuilder->dialect->quoteIdentifier('id'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
-    /** @var int $updatedUnixTimestamp Текущее время в UNIX-формате */
     $updatedUnixTimestamp = time();
-
-    error_log($queryBuilder->statement->assembled);
 
     try {
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
@@ -656,7 +637,9 @@ class Feed
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+    $dialect = $queryBuilder->dialect;
+
+    if (!$dialect->supportsInsertReturning()) {
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
@@ -664,11 +647,11 @@ class Feed
       $queryBuilder->statement->clauseFrom->addTable('web_channels');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $dialect->getLastInsertedIDCondition('id')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
-
-      error_log('SQL: ' . $queryBuilder->statement->assembled);
 
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;
@@ -679,7 +662,6 @@ class Feed
           'message' => $exception->getMessage(),
           'statusCode' => 0,
           'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
     }

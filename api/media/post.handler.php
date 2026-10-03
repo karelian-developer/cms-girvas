@@ -15,11 +15,12 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\SystemCore\File\Converter as FileConverter;
 use \core\PHPLibrary\SystemCore\File\EnumFormat as EnumFileFormat;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \GdImage as GdImage;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
@@ -34,7 +35,7 @@ if ($CMSCore->client->isLogged(2)) {
       $fileUploadedExtension = pathinfo($_FILES['mediaFile']['name'], PATHINFO_EXTENSION);
       
       /** @var array Массив разрешенных расширений передаваемых файлов */
-      $fileExtensionsAllowed = ['png', 'gif', 'jpg', 'jpeg', 'webp', 'gif', 'pdf'];
+      $fileExtensionsAllowed = ['png', 'gif', 'jpg', 'jpeg', 'jfif', 'pjpeg', 'jpe', 'jif', 'webp', 'avif', 'pdf'];
 
       /** @var string Путь до загружаемых файлов */
       $filesDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
@@ -63,6 +64,8 @@ if ($CMSCore->client->isLogged(2)) {
             if ($CMSCore->configurator->getUploadFileWeightMax() >= filesize($_FILES['mediaFile']['tmp_name']) / 1024 || $CMSCore->configurator->getUploadFileWeightMax() == 0) {
               $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
               $fileMIMEType = mime_content_type($_FILES['mediaFile']['tmp_name']);
+              $fileSize = filesize($_FILES['mediaFile']['tmp_name']);
+              $originalFileName = $_FILES['mediaFile']['name'];
 
               if (preg_match('/^image\//', $fileMIMEType)) {
                 preg_match('/^image\/([a-z]+)/', $fileMIMEType, $matches);
@@ -70,10 +73,13 @@ if ($CMSCore->client->isLogged(2)) {
                 
                 $fileExtensionEnum = match ($fileExtension) {
                   'jpeg' => EnumFileFormat::JPG,
+                  'jpg' => EnumFileFormat::JPG,
+                  'jfif' => EnumFileFormat::JPG,
                   'png' => EnumFileFormat::PNG,
                   'webp' => EnumFileFormat::WEBP,
                   'avif' => EnumFileFormat::AVIF,
-                  'gif' => EnumFileFormat::GIF
+                  'gif' => EnumFileFormat::GIF,
+                  default => EnumFileFormat::JPG
                 };
 
                 $image = match ($fileExtensionEnum) {
@@ -84,68 +90,97 @@ if ($CMSCore->client->isLogged(2)) {
                   EnumFileFormat::GIF => imagecreatefromgif($_FILES['mediaFile']['tmp_name'])
                 };
 
-                /** @var int Ширина изображения */
-                $imageWidth = imagesx($image);
-                /** @var int Высота изображения */
-                $imageHeight = imagesy($image);
+                if ($image === false) {
+                  $imageData = file_get_contents($_FILES['mediaFile']['tmp_name']);
+                  if ($imageData !== false) {
+                    $image = @imagecreatefromstring($imageData);
+                  }
+                }
+                
+                if ($image === false) {
+                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+                  $handlerStatusCode = $handlerStatusCode ?? 0;
+                } else {
+                  /** @var int Ширина изображения */
+                  $imageWidth = imagesx($image);
+                  /** @var int Высота изображения */
+                  $imageHeight = imagesy($image);
 
-                // Уничтожаем изображение
-                imagedestroy($image);
+                  // Уничтожаем изображение
+                  imagedestroy($image);
 
-                // Проверка ширины изображения на соответствие ограничениям
-                if ($imageWidth <= $CMSCore->configurator->getUploadFileImageWidthMax() || $CMSCore->configurator->getUploadFileImageWidthMax() === 0) {
-                  // Проверка высоты изображения на соответствие ограничениям
-                  if ($imageHeight <= $CMSCore->configurator->getUploadFileImageHeightMax() || $CMSCore->configurator->getUploadFileImageHeightMax() === 0) {
-                    // Проверка включения автоматической конвертации изображений
-                    if ($CMSCore->configurator->getAutoConvertFileImageStatus(true)) {
-                      if ($fileExtensionEnum === EnumFileFormat::GIF) {
-                        $fileExtensionConvertedEnum = $fileExtensionEnum;
+                  // Проверка ширины изображения на соответствие ограничениям
+                  if ($imageWidth <= $CMSCore->configurator->getUploadFileImageWidthMax() || $CMSCore->configurator->getUploadFileImageWidthMax() === 0) {
+                    // Проверка высоты изображения на соответствие ограничениям
+                    if ($imageHeight <= $CMSCore->configurator->getUploadFileImageHeightMax() || $CMSCore->configurator->getUploadFileImageHeightMax() === 0) {
+                      // Проверка включения автоматической конвертации изображений
+                      if ($CMSCore->configurator->getAutoConvertFileImageStatus(true)) {
+                        if ($fileExtensionEnum === EnumFileFormat::GIF) {
+                          $fileExtensionConvertedEnum = $fileExtensionEnum;
+                        } else {
+                          $fileExtensionConvertedEnum = match ($CMSCore->configurator->getAutoConvertFileImageExtension()) {
+                            'webp' => EnumFileFormat::WEBP,
+                            'avif' => EnumFileFormat::AVIF
+                          };
+                        }
                       } else {
-                        $fileExtensionConvertedEnum = match ($CMSCore->configurator->getAutoConvertFileImageExtension()) {
-                          'webp' => EnumFileFormat::WEBP,
-                          'avif' => EnumFileFormat::AVIF
-                        };
+                        $fileExtensionConvertedEnum = $fileExtensionEnum;
+                      }
+
+                      $qualityPercent = 100 - $CMSCore->configurator->getUploadImageCompression();
+                      if ($qualityPercent <= 0) {
+                        $quality = -1;
+                      } else {
+                        $quality = min(9, max(0, (int) round(($qualityPercent / 100) * 9)));
+                      }
+                      
+                      /** @var FileConverter Объект-конвектор файлов */
+                      $fileConverter = new FileConverter($CMSCore);
+                      /** @var array|bool Конвертированный файл */
+                      $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true);
+
+                      if (is_array($fileConverted) && isset($fileConverted['fileName'], $fileConverted['extensionNew'])) {
+                        $fileData = [];
+                        $fileData['URL'] = '/uploads/media/' . $fileConverted['fileName'];
+                        $fileData['isDirectory'] = is_dir(CMS_ROOT_DIRECTORY . $fileData['URL']);
+                        $fileData['fullname'] = $fileConverted['fileName'];
+                        $fileData['extension'] = $fileConverted['extensionNew'];
+                        
+                        // ============================================================
+                        // ЛОГИРОВАНИЕ ЗАГРУЗКИ МЕДИА-ФАЙЛА (152-ФЗ)
+                        // ============================================================
+                        CMSReport::create(
+                          $CMSCore,
+                          CMSReport::REPORT_TYPE_ID_AP_MEDIA_UPLOADED,
+                          [
+                            'fileName' => $fileConverted['fileName'],
+                            'originalFileName' => $originalFileName,
+                            'fileExtension' => $fileConverted['extensionNew'],
+                            'fileSize' => $fileSize,
+                            'fileMimeType' => $fileMIMEType,
+                            'imageWidth' => $imageWidth,
+                            'imageHeight' => $imageHeight,
+                            'uploadedByID' => $clientUser->getID(),
+                            'uploadedByLogin' => $clientUser->getLogin(),
+                            'ip' => $CMSCore->client->getIPAddress()
+                          ]
+                        );
+                        
+                        $handlerOutputData['file'] = $fileData;
+                        $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_POST_FILES_SUCCESS');
+                        $handlerStatusCode = $handlerStatusCode ?? 1;
+                      } else {
+                        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+                        $handlerStatusCode = $handlerStatusCode ?? 0;
                       }
                     } else {
-                      $fileExtensionConvertedEnum = $fileExtensionEnum;
-                    }
-
-                    $qualityPercent = 100 - $CMSCore->configurator->getUploadImageCompression();
-                    if ($qualityPercent <= 0) {
-                      $quality = -1;
-                    } else {
-                      $quality = min(9, max(0, (int) round(($qualityPercent / 100) * 9)));
-                    }
-                    
-                    /** @var FileConverter Объект-конвектор файлов */
-                    $fileConverter = new FileConverter($CMSCore);
-                    /** @var array Конвертированный файл */
-                    $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true, 4658, $quality);
-
-                    /** @var array Данные конвертированного файла */
-                    $fileData = [];
-
-                    $fileData['URL'] = '/uploads/media/' . $fileConverted['fileName'];
-                    $fileData['isDirectory'] = is_dir(CMS_ROOT_DIRECTORY . $fileData['URL']);
-                    $fileData['fullname'] = $fileConverted['fileName'];
-                    $fileData['extension'] = $fileConverted['extensionNew'];
-                    
-                    $handlerOutputData['file'] = $fileData;
-
-                    if (is_array($fileConverted)) {
-                      $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_POST_FILES_SUCCESS');
-                      $handlerStatusCode = $handlerStatusCode ?? 1;
-                    } else {
-                      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+                      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_TOO_HEIGHT_IMAGE'), $CMSCore->configurator->getUploadFileImageHeightMax());
                       $handlerStatusCode = $handlerStatusCode ?? 0;
                     }
                   } else {
-                    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_TOO_HEIGHT_IMAGE'), $CMSCore->configurator->getUploadFileImageHeightMax());
+                    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_TOO_WIDTH_IMAGE'), $CMSCore->configurator->getUploadFileImageWidthMax());
                     $handlerStatusCode = $handlerStatusCode ?? 0;
                   }
-                } else {
-                  $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_FILE_ERROR_TOO_WIDTH_IMAGE'), $CMSCore->configurator->getUploadFileImageWidthMax());
-                  $handlerStatusCode = $handlerStatusCode ?? 0;
                 }
               } else if (preg_match('/^application\//', $fileMIMEType)) {
                 preg_match('/^application\/([a-z]+)/', $fileMIMEType, $matches);
@@ -159,20 +194,35 @@ if ($CMSCore->client->isLogged(2)) {
 
                 /** @var FileConverter Объект-конвектор файлов */
                 $fileConverter = new FileConverter($CMSCore);
-                /** @var array Конвертированный файл */
-                $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true);
+                /** @var array|bool Конвертированный файл */
+                $fileConverted = $fileConverter->convert($_FILES['mediaFile'], $fileDirectoryPath, $fileExtensionConvertedEnum, true, 4658, $quality ?? 0);
 
-                /** @var array Данные конвертированного файла */
-                $fileData = [];
-
-                $fileData['URL'] = '/uploads/media/' . $fileConverted['fileName'];
-                $fileData['isDirectory'] = is_dir(CMS_ROOT_DIRECTORY . $fileData['URL']);
-                $fileData['fullname'] = $fileConverted['fileName'];
-                $fileData['extension'] = $fileConverted['extensionNew'];
-                
-                $handlerOutputData['file'] = $fileData;
-
-                if (is_array($fileConverted)) {
+                if (is_array($fileConverted) && isset($fileConverted['fileName'], $fileConverted['extensionNew'])) {
+                  $fileData = [];
+                  $fileData['URL'] = '/uploads/media/' . $fileConverted['fileName'];
+                  $fileData['isDirectory'] = is_dir(CMS_ROOT_DIRECTORY . $fileData['URL']);
+                  $fileData['fullname'] = $fileConverted['fileName'];
+                  $fileData['extension'] = $fileConverted['extensionNew'];
+                  
+                  // ============================================================
+                  // ЛОГИРОВАНИЕ ЗАГРУЗКИ МЕДИА-ФАЙЛА (152-ФЗ)
+                  // ============================================================
+                  CMSReport::create(
+                    $CMSCore,
+                    CMSReport::REPORT_TYPE_ID_AP_MEDIA_UPLOADED,
+                    [
+                      'fileName' => $fileConverted['fileName'],
+                      'originalFileName' => $originalFileName,
+                      'fileExtension' => $fileConverted['extensionNew'],
+                      'fileSize' => $fileSize,
+                      'fileMimeType' => $fileMIMEType,
+                      'uploadedByID' => $clientUser->getID(),
+                      'uploadedByLogin' => $clientUser->getLogin(),
+                      'ip' => $CMSCore->client->getIPAddress()
+                    ]
+                  );
+                  
+                  $handlerOutputData['file'] = $fileData;
                   $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_POST_FILES_SUCCESS');
                   $handlerStatusCode = $handlerStatusCode ?? 1;
                 } else {

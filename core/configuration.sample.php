@@ -31,6 +31,7 @@ $configuration = [
   'domainAliases' => ['127.0.0.1', 'localhost'],
   'domainEmail' => 'example.ru',
   'domainCookies' => 'example.ru',
+  'trustedProxies' => ["127.0.0.1/32", "::1/128", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],
   'SSLIsEnabled' => false,
   'database' => ['host' => '', 'user' => '', 'password' => '', 'name' => '', 'scheme' => '', 'prefix' => ''],
   // Системная соль (необходима для хеширования некоторых данных)

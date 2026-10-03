@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -22,6 +22,8 @@ namespace core\PHPLibrary\Page\Admin;
 
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\Form as Form;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
@@ -42,7 +44,8 @@ class PageForm implements InterfacePage
       'iconName' => 'back',
       'link' => '/forms',
       'permanent' => true,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => 'hasPermissionAdminFormsManagement',
     ],
   ];
 
@@ -52,16 +55,83 @@ class PageForm implements InterfacePage
   }
 
   /**
+   * Получить группу текущего авторизованного пользователя админки
+   * 
+   * @return UserGroup|null
+   */
+  private function getCurrentUserGroup() : ?UserGroup
+  {
+    /** @var User|null $user */
+    $user = $this->CMSCore->client->getUser(2);
+    if ($user === null) {
+      return null;
+    }
+
+    $user->initData(['metadata']);
+
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $user->getGroup();
+    if ($userGroup === null) {
+      return null;
+    }
+
+    $userGroup->initData(['permissions']);
+
+    return $userGroup;
+  }
+
+  /**
+   * Проверить, есть ли у текущего пользователя право управления формами
+   * 
+   * @return bool
+   */
+  private function currentUserCanManageForms() : bool
+  {
+    $userGroup = $this->getCurrentUserGroup();
+
+    return $userGroup !== null
+      && method_exists($userGroup, 'hasPermissionAdminFormsManagement')
+      && $userGroup->hasPermissionAdminFormsManagement();
+  }
+
+  /**
+   * Собрать страницу ошибки и подменить итоговую сборку
+   * 
+   * @param int $httpCode
+   * 
+   * @return void
+   */
+  private function assemblyError(int $httpCode) : void
+  {
+    http_response_code($httpCode);
+
+    $pageError = new PageError($this->CMSCore, $this->page, $httpCode);
+    $pageError->assembly();
+    $this->assembled = $pageError->assembled;
+  }
+
+  /**
    * Инициализация подразделов
    * 
    * @return void
    */
   public function initSubnavigation() : void {
+    // Если нет прав на управление формами — подразделы не собираем
+    if (!$this->currentUserCanManageForms()) {
+      return;
+    }
+
     $themeSource =& $this->CMSCore->theme->core->source;
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
   public function assembly() : void {
+    // Защита от прямого захода по URL без прав
+    if (!$this->currentUserCanManageForms()) {
+      $this->assemblyError(403);
+      return;
+    }
+
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/form.css', 'rel' => 'stylesheet']);
     
     $localeData = $this->CMSCore->locale->getData();

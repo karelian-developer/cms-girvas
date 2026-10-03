@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -32,6 +32,7 @@ use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \DateTime as DateTime;
 use \DateTimeZone as DateTimeZone;
+use \DOMDocument as DOMDocument;
 
 class PageEntry implements InterfacePage
 {
@@ -179,6 +180,44 @@ class PageEntry implements InterfacePage
   {
     return $this->targetObject;
   }
+
+  /**
+   * Сборка списка локализаций для записи
+   * 
+   * @param array $localesData
+   * 
+   * @return string
+   */
+  private function assemblyLocalesItems(array $localesData) : string
+  {
+    $document = new DOMDocument('1.0', 'UTF-8');
+    $ulElement = $document->createElement('ul');
+    $ulElement->setAttribute('class', 'entry-locales');
+
+    foreach ($localesData as $localeData) {
+      $itemElement = $document->createElement('li');
+      $itemElement->setAttribute('class', 'entry-locales__item');
+
+      $aElement = $document->createElement('a', $localeData['title']);
+      $aElement->setAttribute('class', 'entry-locales__link');
+      $aElement->setAttribute('href', $this->targetObject->getURL() . '?locale=' . $localeData['name']);
+
+      $itemElement->appendChild($aElement);
+
+      if (!empty($localeData['iconURL'])) {
+        $iconElement = $document->createElement('img');
+        $iconElement->setAttribute('class', 'entry-locales__locale-icon');
+        $iconElement->setAttribute('src', $localeData['iconURL']);
+        $itemElement->prepend($iconElement);
+      }
+
+      $ulElement->appendChild($itemElement);
+    }
+
+    $document->appendChild($ulElement);
+
+    return $document->saveHTML();
+  }
   
   /**
    * Сборка шаблона страницы
@@ -320,6 +359,12 @@ class PageEntry implements InterfacePage
         $updatedDateTimestamp = $entry->getUpdatedUnixTimestamp();
 
         $author = $entry->getAuthor();
+        if ($author !== null) {
+          $author->initData(['login']);
+        }
+
+        $completedLocalesData = $entry->getCompletedLocalesData($this->CMSCore);
+        $completedLocales = $this->assemblyLocalesItems($completedLocalesData);
 
         $entryPrevious = $entry->getPreviousEntry();
         $entryNext = $entry->getNextEntry();
@@ -514,6 +559,14 @@ class PageEntry implements InterfacePage
               ThemeCollector::SAFE_SYMBOLS,
               htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
             )
+          );
+        }
+
+        if (ThemeCollector::existsTemplateVariable($templateContent, 'ENTRY_LOCALES_LIST')) {
+          ThemeCollector::addTemplateVariable(
+            $templatesAssembled,
+            'ENTRY_LOCALES_LIST',
+            $completedLocales
           );
         }
 

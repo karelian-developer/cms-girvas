@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -27,23 +27,16 @@ export class PageUsersGroup {
   }
 
   init() {
-    let searchParams = new URLParser(), locales;
+    let searchParams = new URLParser();
     const elementForm = document.querySelector('[data-element="main-form"]');
 
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
+    this.page.core.locales.admin.getData().then((localeData) => {
       const interactiveChoicesLocales = new Interactive('choices');
 
       const urlInputElement = document.querySelector('[data-element="input-name"]');
       const usersGroupTitleInputElement = document.querySelector('[data-element="input-title"]');
 
-      locales.forEach((locale, localeIndex) => {
+      this.page.core.locales.list.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
         let localeIconURL = locale.iconURL;
         let localeName = locale.name;
@@ -135,7 +128,7 @@ export class PageUsersGroup {
 
       let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
-        locales.forEach((locale, localeIndex) => {
+        this.page.core.locales.list.forEach((locale, localeIndex) => {
           if (locale.name === event.target.value) {
             usersGroupTitleInputElement.setAttribute('name', 'user_group_title_' + locale.iso639_2);
 

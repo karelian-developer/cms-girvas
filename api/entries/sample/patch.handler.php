@@ -18,19 +18,40 @@ use \core\PHPLibrary\EntriesSample as EntriesSample;
 use \core\PHPLibrary\EntriesSamples as EntriesSamples;
 use \core\PHPLibrary\SystemCore\Locale as Locale;
 use \core\PHPLibrary\EntriesSample\EnumSortTypeID as EnumSortTypeID;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_ENTRIES_CATEGORIES_EDIT)) {
     $dataUpdated = [];
+    $changedFields = [];
     
     /** @var int ID выборки */
     $sampleID = $CMSCore->urlp->getPath(3) ?? 0;
     $sampleID = is_numeric($sampleID) ? (int) $sampleID : 0;
+    
+    if (!EntriesSample::existsByID($CMSCore, $sampleID)) {
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRIES_SAMPLE_ERROR_NOT_FOUND');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
+      return;
+    }
+
+    $sample = new EntriesSample($CMSCore, $sampleID);
+    $sample->initData(['name', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
+    
+    // Сохраняем старые значения для сравнения
+    $oldValues = [
+      'name' => $sample->getName(),
+      'title' => $sample->getTitle($CMSCore->locale->getName()),
+      'description' => $sample->getDescription($CMSCore->locale->getName()),
+      'limitCount' => $sample->getLimitCount(),
+      'sortTypeID' => $sample->getSortTypeID(),
+      'categoriesIDs' => $sample->getCategoriesIDs(),
+    ];
     
     /** @var string Техническое наименование выборки */
     $sampleName = $_PATCH['entries_sample_name'] ?? '';
@@ -113,15 +134,45 @@ if ($CMSCore->client->isLogged(2)) {
 
     if (preg_match('/\S/', $sampleName)) {
       if (EntriesSample::existsByID($CMSCore, $sampleID)) {
-        $sample = new EntriesSample($CMSCore, $sampleID);
-        $sample->initData(['name', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
-
         if (!EntriesSample::existsByName($CMSCore, $sampleName) || $sampleName === $sample->getName()) {
           $dataUpdated['name'] = $sampleName;
 
           $isUpdated = $sample->update($dataUpdated);
 
+          // ============================================================
+          // ЛОГИРОВАНИЕ ОБНОВЛЕНИЯ ВЫБОРКИ (152-ФЗ)
+          // ============================================================
           if ($isUpdated) {
+            // Определяем, какие поля изменились
+            $newValues = [
+              'name' => $sample->getName(),
+              'title' => $sample->getTitle($CMSCore->locale->getName()),
+              'description' => $sample->getDescription($CMSCore->locale->getName()),
+              'limitCount' => $sample->getLimitCount(),
+              'sortTypeID' => $sample->getSortTypeID(),
+              'categoriesIDs' => $sample->getCategoriesIDs(),
+            ];
+            
+            foreach ($newValues as $key => $value) {
+              if (isset($oldValues[$key]) && $oldValues[$key] != $value) {
+                $changedFields[] = $key;
+              }
+            }
+            
+            CMSReport::create(
+              $CMSCore,
+              CMSReport::REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_EDITED,
+              [
+                'sampleID' => $sample->getID(),
+                'sampleName' => $sample->getName(),
+                'sampleTitle' => $sample->getTitle($CMSCore->locale->getName()),
+                'updatedByID' => $clientUser->getID(),
+                'updatedByLogin' => $clientUser->getLogin(),
+                'changedFields' => $changedFields,
+                'ip' => $CMSCore->client->getIPAddress()
+              ]
+            );
+
             $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
             $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {

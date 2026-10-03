@@ -93,3 +93,24 @@
 .interactive .interactive__select-imitation .select-imitation__selected-item img {
   margin-right: 10px;
 }
+
+.interactive .interactive__input {
+  background-color: var(--common-main-color-1);
+  border: 1px solid var(--common-main-color-2);
+  width: 100%;
+}
+
+.interactive .interactive__input:hover {
+  background-color: var(--common-main-color-2);
+  border: 1px solid var(--common-main-color-3);
+}
+
+.interactive .interactive__input:focus {
+  background-color: var(--common-secondary-color-1);
+  border: 1px solid var(--common-secondary-color-2);
+}
+
+.interactive .interactive__input:active {
+  background-color: var(--common-secondary-color-2);
+  border: 1px solid var(--common-main-color-1);
+}

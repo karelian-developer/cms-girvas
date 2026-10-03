@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -53,7 +53,7 @@ final class ClauseSet implements InterfaceClause
    */
   public function addColumn(string $name, mixed $value = null) : void
   {
-    array_push($this->columns, $name);
+    $this->columns[] = $name;
 
     if ($value !== null) {
       $this->values[$name] = $value;
@@ -70,15 +70,15 @@ final class ClauseSet implements InterfaceClause
    */
   public function addColumnAdaptive(string $name, array $values = []) : void
   {
-    $queryBuilder = $this->statement->queryBuilder;
-    
-    if (isset($values[strtolower($queryBuilder->DMS->name)])) {
-      $this->columns[] = $name;
+    $dialect = $this->statement->queryBuilder->dialect;
+    $value = $dialect->resolveAdaptiveValue($values);
 
-      if (!empty($values[strtolower($queryBuilder->DMS->name)])) {
-        $this->values[$name] = $values[strtolower($queryBuilder->DMS->name)];
-      }
+    if ($value === null) {
+      return;
     }
+
+    $this->columns[] = $name;
+    $this->values[$name] = $value;
   }
   
   /**
@@ -88,17 +88,28 @@ final class ClauseSet implements InterfaceClause
    */
   public function assembly() : void
   {
+    $dialect = $this->statement->queryBuilder->dialect;
     $queryArray = [];
 
     foreach ($this->columns as $name) {
       $value = $this->values[$name] ?? ':' . $name;
 
-      $queryArray[] = match ($this->statement->queryBuilder->DMS) {
-        DMS::MySQL => sprintf('`%s` = %s', $name, $value),
-        DMS::PostgreSQL => sprintf('"%s" = %s', $name, $value),
-      };
+      // Защита от массивов/объектов — только скалярные значения
+      if (!is_scalar($value) && !is_null($value)) {
+        throw new \InvalidArgumentException(
+          sprintf('Value for column "%s" must be scalar, %s given', $name, gettype($value))
+        );
+      }
+
+      $queryArray[] = sprintf(
+        '%s = %s',
+        $dialect->quoteIdentifier($name),
+        $value
+      );
     }
 
-    $this->assembled = count($queryArray) > 0 ? 'SET ' . implode(', ', $queryArray) : '';
+    $this->assembled = count($queryArray) > 0
+      ? 'SET ' . implode(', ', $queryArray)
+      : '';
   }
 }

@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -20,7 +20,6 @@
 
 namespace core\PHPLibrary\Database\QueryBuilder\StatementDelete;
 
-use \core\PHPLibrary\Database\DatabaseManagementSystem as DMS;
 use \core\PHPLibrary\Database\QueryBuilder\StatementDelete\InterfaceClause as InterfaceClause;
 use \core\PHPLibrary\Database\QueryBuilder\StatementDelete as StatementDelete;
 
@@ -61,16 +60,9 @@ final class ClauseWhere implements InterfaceClause
    */
   public function addConditionAdaptive(array $conditions) : void
   {
-    $CMSConfigurator = $this->statement->queryBuilder->CMSCore->configurator;
-    $CMSConfigDatabase = $CMSConfigurator->get('database');
-
-    $condition = match ($CMSConfigDatabase['dms']) {
-      DMS::MySQL => $conditions['mysql'] ?? '',
-      DMS::PostgreSQL => $conditions['postgresql'] ?? '',
-      default => ''
-    };
-    $this->condition = $condition;
-  } 
+    $dialect = $this->statement->queryBuilder->dialect;
+    $this->condition = $dialect->resolveAdaptiveCondition($conditions);
+  }
   
   /**
    * assembly
@@ -79,7 +71,8 @@ final class ClauseWhere implements InterfaceClause
    */
   public function assembly() : void
   {
-    $this->assembled = !empty(trim($this->condition)) ? sprintf('WHERE %s', $this->condition) : '';
+    $this->assembled = trim($this->condition) !== ''
+      ? sprintf('WHERE %s', $this->condition)
+      : '';
   }
-
 }

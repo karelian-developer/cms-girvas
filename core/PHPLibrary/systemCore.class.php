@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -62,8 +62,8 @@ final class SystemCore implements CoreInterface
   public const CMS_CORE_TS_LIBRARY_PATH = 'core/TSLibrary';
   public const CMS_MODULES_PATH = 'modules';
   public const CMS_TITLE = 'CMS «GIRVAS»';
-  public const CMS_VERSION = '0.3.0';
-  public const CMS_STAGE_DEVELOPING = 'shuya';
+  public const CMS_VERSION = '0.4.0';
+  public const CMS_STAGE_DEVELOPING = 'segezha';
   public const CMS_DEVELOPER_TITLE = 'Карельский разработчик';
   public const CMS_DEVELOPER_SITE_LINK = 'https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai';
   public const CMS_PRODUCT_SITE_LINK = 'https://cms-girvas.ru';
@@ -117,6 +117,10 @@ final class SystemCore implements CoreInterface
    * @var array Объект текущей страницы
    */
   public mixed $page = null;
+  /**
+   * @var bool Является ли текущий запуск CLI
+   */
+  public bool $isCLI = false;
   
   /**
    * __construct
@@ -375,6 +379,9 @@ final class SystemCore implements CoreInterface
    */
   private function init()
   {
+    // Определение CLI-режима
+    $this->isCLI = (PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg');
+
     // Принудительное подключение класса файлового подключателя
     require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/File/connector.interface.php';
     require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/SystemCore/File/connector.class.php';
@@ -427,7 +434,7 @@ final class SystemCore implements CoreInterface
     $this->configurator = new CMSConfigurator($this);
     $CMSConfigurator = $this->configurator;
 
-    if (!isset($_COOKIE['_grv_csrf'])) {
+    if (!isset($_COOKIE['_grv_csrf']) && PHP_SAPI !== 'cli') {
       $CSRFToken = self::generateCSRFToken();
 
       setcookie('_grv_csrf', $CSRFToken, [
@@ -453,7 +460,7 @@ final class SystemCore implements CoreInterface
 
       // Ядро перенаправляет клиент на HTTPS-протокол, в случае, если в CMS включена принудительная
       // переадресация на этот порт.
-      if (!self::isHTTPS() && $CMSConfigurator->get('SSLPermRedirect')) {
+      if (!self::isHTTPS() && $CMSConfigurator->get('SSLPermRedirect') && !$this->isCLI) {
         /* 
         * Ядро перенаправляет клиент на поддомен WWW в случае, если данная опция включена
         * в настройках CMS.
@@ -482,6 +489,7 @@ final class SystemCore implements CoreInterface
       if (
         $CMSConfigurator->getPermanentRedirectToWWWStatus()
         && !preg_match('/^www\./', $serverHTTPHost)
+        && !$this->isCLI
       ) {
         /** @var string Адрес для переадресации по HTTP-протоколу (поддомен www) */
         $HTTPRedirect = 'http://www.' . $serverHTTPHost . $serverRequestURI;
@@ -660,7 +668,7 @@ final class SystemCore implements CoreInterface
       $this->locale->setTypeName($CMSCoreThemeCategoryName);
       $this->locale->initPathes();
       
-      if ($CMSURLP->getPath(0) !== 'sql-execute-forced') {
+      if (!$this->isCLI && $CMSURLP->getPath(0) !== 'sql-execute-forced') {
         // Устанавливаем объект шаблона для системного ядра
         $this->setTheme(new Theme($this, $CMSCoreThemeName, $CMSCoreThemeCategoryName));
 

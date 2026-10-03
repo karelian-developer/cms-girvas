@@ -22,6 +22,10 @@ if (!isset($CMSCore)) {
 }
 
 if (defined('IS_NOT_HACKED')) {
+  header_remove('X-Powered-By');
+  header('X-Powered-By: CMS GIRVAS');
+  header('X-GIRVAS-CMS: 1');
+
   $CMSURLP = $CMSCore->urlp;
   $CMSClient = $CMSCore->client;
   $CMSConfigurator = $CMSCore->configurator;
@@ -35,10 +39,12 @@ if (defined('IS_NOT_HACKED')) {
   $PHPInputContent = file_get_contents('php://input');
 
   if (isset($_SERVER['REQUEST_METHOD'])) {
+    $contentType = $_SERVER['CONTENT_TYPE'] ?? 'application/x-www-form-urlencoded';
+
     switch ($_SERVER['REQUEST_METHOD']) {
-      case 'PATCH': $_PATCH = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
-      case 'PUT': $_PUT = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
-      case 'DELETE': $_DELETE = $CMSCore::parseRawHTTPRequest($PHPInputContent, $_SERVER['CONTENT_TYPE']); break;
+      case 'PATCH': $_PATCH = $CMSCore::parseRawHTTPRequest($PHPInputContent, $contentType); break;
+      case 'PUT': $_PUT = $CMSCore::parseRawHTTPRequest($PHPInputContent, $contentType); break;
+      case 'DELETE': $_DELETE = $CMSCore::parseRawHTTPRequest($PHPInputContent, $contentType); break;
     }
   } else {
     http_response_code(405);
@@ -50,7 +56,6 @@ if (defined('IS_NOT_HACKED')) {
       'message' => $handlerMessage,
       'statusCode' => $handlerStatusCode,
       'outputData' => []
-    // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
   }
 
@@ -59,11 +64,12 @@ if (defined('IS_NOT_HACKED')) {
     'PUT' => $_PUT['APISecret'] ?? null,
     'DELETE' => $_DELETE['APISecret'] ?? null,
     'POST' => $_POST['APISecret'] ?? null,
-    'GET' => $_GET['APISecret'] ?? null
+    'GET' => $_GET['APISecret'] ?? null,
+    default => null,
   };
 
   if ($APISecretInput !== API_SECRET || empty(API_SECRET)) {
-    if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $CMSURLP->getPath(1) !== 'install') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET' && $CMSURLP->getPath(1) !== 'install' && $CMSURLP->getPath(1) !== 'oauth') {
       $cookieToken = $_COOKIE['_grv_csrf'] ?? null;
       $headerToken = $normalizedHeaders['x-csrf-token'] ?? null;
 
@@ -75,7 +81,6 @@ if (defined('IS_NOT_HACKED')) {
           'message' => $handlerMessage,
           'statusCode' => $handlerStatusCode,
           'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
         exit;
@@ -345,6 +350,22 @@ if (defined('IS_NOT_HACKED')) {
         'iso639_2' => $CMSLocale->getISO639(2),
       ];
     }
+
+    // Локализация административной панели
+    if ($CMSURLPathes[2] === 'nadvoTE') {
+      $CMSLocaleSetted = $CMSConfigurator->getDatabaseEntryValue('base_admin_locale') ?? 'en_US';
+      $CMSLocale = new CMSLocale($CMSCore, $CMSLocaleSetted);
+      $CMSLocale->setTypeName('handler');
+      $CMSLocale->initPathes();
+
+      $handlerOutputData['locale'] = [
+        'title' => $CMSLocale->getTitle(),
+        'iconURL' => $CMSLocale->getIconURL(),
+        'name' => $CMSLocale->getName(),
+        'iso639_1' => $CMSLocale->getISO639(1),
+        'iso639_2' => $CMSLocale->getISO639(2),
+      ];
+    }
   
   // Получить перечень доступных локализаций
   } else if ($_SERVER['REQUEST_METHOD'] === 'GET' && $CMSURLPathes[1] === 'locales') {
@@ -428,13 +449,27 @@ if (defined('IS_NOT_HACKED')) {
 
   /** @var array $handlerOutputData Выходные данные обработчика */
   $handlerOutputData = $handlerOutputData ?? [];
+  
+  $sensitiveKeys = ['client_secret', 'code_verifier', 'access_token', 'refresh_token', 'password', 'user_password', 'APISecret'];
+
+  $maskSensitiveData = function(array $data) use ($sensitiveKeys, &$maskSensitiveData) : array {
+    foreach ($data as $key => $value) {
+      if (in_array($key, $sensitiveKeys, true)) {
+        $data[$key] = '***REDACTED***';
+      } elseif (is_array($value)) {
+        $data[$key] = $maskSensitiveData($value);
+      }
+    }
+    return $data;
+  };
+
   $handlerOutputData['debug']['method'] = $_SERVER['REQUEST_METHOD'];
   $handlerOutputData['debug']['clientIP'] = $_SERVER['REMOTE_ADDR'];
-  $handlerOutputData['debug']['postData'] = $_POST ?? null;
-  $handlerOutputData['debug']['getData'] = $_GET ?? null;
-  $handlerOutputData['debug']['patchData'] = $_PATCH ?? null;
-  $handlerOutputData['debug']['putData'] = $_PUT ?? null;
-  $handlerOutputData['debug']['deleteData'] = $_DELETE ?? null;
+  $handlerOutputData['debug']['postData'] = $maskSensitiveData($_POST ?? []);
+  $handlerOutputData['debug']['getData'] = $maskSensitiveData($_GET ?? []);
+  $handlerOutputData['debug']['patchData'] = $maskSensitiveData($_PATCH ?? []);
+  $handlerOutputData['debug']['putData'] = $maskSensitiveData($_PUT ?? []);
+  $handlerOutputData['debug']['deleteData'] = $maskSensitiveData($_DELETE ?? []);
 
   $loadTime = microtime(true) - $startTime; // Конечное время
   header('X-Load-Time: ' . round($loadTime, 3) . 's');

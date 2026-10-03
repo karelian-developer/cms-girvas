@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -138,7 +138,11 @@ final class URLParser
         preg_match('/([a-z0-9_-]+)=([a-z0-9_\-+.,%\/]*)/i', $param, $regexMatches);
 
         if (array_key_exists(1, $regexMatches) && array_key_exists(2, $regexMatches)) {
-          $value = is_numeric($regexMatches[2]) ? (int) $regexMatches[2] : $regexMatches[2];
+          $rawValue = $regexMatches[2];
+          // Не приводим к int, если есть точка (например, '3.0', '1.0.1')
+          $value = (is_numeric($rawValue) && strpos($rawValue, '.') === false)
+            ? (int) $rawValue
+            : $rawValue;
           $result[$regexMatches[1]] = $value;
         }
       }

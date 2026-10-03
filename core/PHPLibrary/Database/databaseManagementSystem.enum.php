@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -29,6 +29,14 @@ enum DatabaseManagementSystem : string
     return match ($this) {
       self::MySQL => 'MySQL',
       self::PostgreSQL => 'PostgreSQL',
+    };
+  }
+
+  public function adaptiveKey() : string
+  {
+    return match ($this) {
+      self::MySQL => 'mysql',
+      self::PostgreSQL => 'postgresql',
     };
   }
 }

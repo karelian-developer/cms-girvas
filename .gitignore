@@ -1,3 +1,7 @@
+oauth_test.php
+oauth_setup.php
+oauth_http_test.sh
+oauth_create_session.php
 INSTALLED
 sqlExecute.php
 /cron/database.config.php
@@ -9,7 +13,6 @@ sqlExecute.php
 /modules/*
 **/.git/
 !/modules/README.md
-/OLD/
 /api/logoped.api.php
 /api/logoped/*
 /api/rowney
@@ -29,10 +32,20 @@ sqlExecute.php
 /core/PHPLibrary/service.class.php
 /core/PHPLibrary/Page/Admin/concerts.class.php
 /core/PHPLibrary/Page/Admin/mediabox.class.php
+
 /core/configuration.php
-/locales/fi_FI
+/core/configuration.*.php
+!/core/configuration.*.sample.php
+
+# Игнорируем все в locales
+/locales/*
+# Но исключаем ru_RU и en_US
+!/locales/ru_RU
+!/locales/en_US
+# Игнорируем game и .git внутри всех папок (кроме исключённых)
 /locales/*/game
 /locales/*/.git
+
 /templates/*
 !/templates/default
 !/templates/admin

@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -20,7 +20,7 @@
 
 namespace core\PHPLibrary\Database\QueryBuilder\Expression;
 
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
+use \core\PHPLibrary\Database\QueryBuilder\Dialect as Dialect;
 
 final class CaseExpression
 {
@@ -28,16 +28,16 @@ final class CaseExpression
   private array $whenResults = [];
   private mixed $elseResult = null;
   private ?string $alias = null;
-  private CMSDMS $DMS;
+  private Dialect $dialect;
   
   /**
    * __construct
    *
    * @param CMSDMS $DMS Тип СУБД
    */
-  public function __construct(CMSDMS $DMS)
+  public function __construct(Dialect $dialect)
   {
-    $this->DMS = $DMS;
+    $this->dialect = $dialect;
   }
   
   /**
@@ -59,63 +59,42 @@ final class CaseExpression
   /**
    * Добавить условие WHEN с JSON-полем и ILIKE/LIKE
    *
-   * @param string $jsonPath Путь в JSON (например: texts->'ru_RU'->>'title')
-   * @param string $paramName Имя параметра
-   * @param int $weight Вес (результат)
-   * @param bool $caseInsensitive Регистронезависимый поиск
-   * @return self
+   * @param string $column    Имя JSON-колонки (например, 'texts')
+   * @param string $locale    Локаль (например, 'ru_RU')
+   * @param string $field     Поле (например, 'title')
+   * @param string $paramName Имя плейсхолдера
+   * @param int    $weight    Вес (результат)
    */
   public function whenJsonLike(
-    string $jsonPath, 
-    string $paramName, 
-    int $weight, 
-    bool $caseInsensitive = true
+    string $column,
+    string $locale,
+    string $field,
+    string $paramName,
+    int $weight
   ) : self
   {
-    $condition = match ($this->DMS) {
-      CMSDMS::PostgreSQL => sprintf(
-        "%s %s '%%' || :%s || '%%'",
-        $jsonPath,
-        $caseInsensitive ? 'ILIKE' : 'LIKE',
-        $paramName
-      ),
-      CMSDMS::MySQL => sprintf(
-        "JSON_UNQUOTE(JSON_EXTRACT(%s)) LIKE CONCAT('%%', :%s, '%%')",
-        $this->convertJsonPathToMySQL($jsonPath),
-        $paramName
-      )
-    };
-    
+    $condition = $this->dialect->jsonLike($column, $locale, $field, $paramName);
     return $this->when($condition, $weight);
   }
   
   /**
    * Добавить условие WHEN с EXISTS для JSON-массива
    *
-   * @param string $jsonArrayPath Путь к JSON-массиву
-   * @param string $paramName Имя параметра
-   * @param int $weight Вес
-   * @return self
+   * @param string $column    Имя JSON-колонки
+   * @param string $locale    Локаль
+   * @param string $field     Поле-массив (например, 'keywords')
+   * @param string $paramName Имя плейсхолдера
+   * @param int    $weight    Вес
    */
   public function whenJsonArrayContains(
-    string $jsonArrayPath,
+    string $column,
+    string $locale,
+    string $field,
     string $paramName,
     int $weight
   ) : self
   {
-    $condition = match ($this->DMS) {
-      CMSDMS::PostgreSQL => sprintf(
-        "EXISTS (SELECT 1 FROM jsonb_array_elements_text(%s) AS elem WHERE elem ILIKE '%%' || :%s || '%%')",
-        $jsonArrayPath,
-        $paramName
-      ),
-      CMSDMS::MySQL => sprintf(
-        "JSON_SEARCH(%s, 'one', :%s, NULL) IS NOT NULL",
-        $this->convertJsonPathToMySQL($jsonArrayPath),
-        $paramName
-      )
-    };
-    
+    $condition = $this->dialect->jsonArrayContainsLike($column, $locale, $field, $paramName);
     return $this->when($condition, $weight);
   }
   
@@ -230,25 +209,6 @@ final class CaseExpression
     $sql .= ' END';
     
     return $sql;
-  }
-  
-  /**
-   * Конвертировать PostgreSQL JSON-путь в MySQL формат
-   *
-   * @param string $pgPath
-   * @return string
-   */
-  private function convertJsonPathToMySQL(string $pgPath) : string
-  {
-    if (preg_match("/^(\w+)->'(\w+)'->>'(\w+)'$/", $pgPath, $matches)) {
-      return sprintf("%s, '$.%s.%s'", $matches[1], $matches[2], $matches[3]);
-    }
-    
-    if (preg_match("/^(\w+)->'(\w+)'->'(\w+)'$/", $pgPath, $matches)) {
-      return sprintf("%s, '$.%s.%s[*]'", $matches[1], $matches[2], $matches[3]);
-    }
-    
-    return $pgPath;
   }
   
   public function __toString() : string

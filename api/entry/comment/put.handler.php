@@ -8,17 +8,18 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
- if (!defined('IS_NOT_HACKED')) {
+if (!defined('IS_NOT_HACKED')) {
   http_response_code(503);
   die('An attempted hacker attack has been detected.');
 }
 
 use \core\PHPLibrary\Entry as Entry;
 use \core\PHPLibrary\EntryComment as EntryComment;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
 if ($CMSCore->client->isLogged(1)) {
   $clientUser = $CMSCore->client->getUser(1);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
@@ -42,6 +43,16 @@ if ($CMSCore->client->isLogged(1)) {
             $comment = EntryComment::create($CMSCore, $commentEntryID, $clientUser->getID(), $commentContent);
             
             if (!is_null($comment)) {
+              // Получаем заголовок записи для лога
+              $entryTitle = '';
+              try {
+                $entry = new Entry($CMSCore, $commentEntryID);
+                $entry->initData(['texts']);
+                $entryTitle = $entry->getTitle($CMSCore->locale->getName());
+              } catch (\Exception $e) {
+                $entryTitle = 'unknown';
+              }
+
               // Система премодерации не будет проигнорирована, если пользователь является первичным
               // или его группа не является административной или модеративной
               if (!in_array($clientUserGroup->getID(), [1, 2]) && $clientUser->getID() !== 1) {
@@ -75,8 +86,8 @@ if ($CMSCore->client->isLogged(1)) {
                   }
                 }
         
-                $setting_security_premoderation_links_filter_status = $CMSCore->configurator->getDatabaseEntryValue('security_premoderation_links_filter_status');
-                if ($setting_security_premoderation_links_filter_status === 'on' && $settingSecurityPremoderationCreateStatus !== 'on') {
+                $settingSecurityPremoderationLinksFilterStatus = $CMSCore->configurator->getDatabaseEntryValue('security_premoderation_links_filter_status');
+                if ($settingSecurityPremoderationLinksFilterStatus === 'on' && $settingSecurityPremoderationCreateStatus !== 'on') {
                   $comment->initData(['content']);
                   $commentContent = $comment->getContent();
 
@@ -112,6 +123,31 @@ if ($CMSCore->client->isLogged(1)) {
                   $comment->update($commentData);
                 }
               }
+
+              // ============================================================
+              // ЛОГИРОВАНИЕ СОЗДАНИЯ КОММЕНТАРИЯ (152-ФЗ)
+              // ============================================================
+              $comment->initData(['content']);
+              
+              // Получаем все языковые версии заголовка записи
+              $entryTitles = [];
+              $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+              foreach ($CMSLocalesNames as $localeName) {
+                $entryTitles[$localeName] = $entry->getTitle($localeName);
+              }
+
+              CMSReport::create(
+                $CMSCore,
+                CMSReport::REPORT_TYPE_ID_AP_ENTRIES_COMMENT_CREATED,
+                [
+                  'commentID' => $comment->getID(),
+                  'entryID' => $commentEntryID,
+                  'entryTitles' => $entryTitles,
+                  'authorID' => $clientUser->getID(),
+                  'authorLogin' => $clientUser->getLogin(),
+                  'ip' => $CMSCore->client->getIPAddress()
+                ]
+              );
 
               $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PUT_DATA_SUCCESS');
               $handlerStatusCode = $handlerStatusCode ?? 1;

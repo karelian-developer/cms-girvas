@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -24,7 +24,10 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 use \core\PHPLibrary\Form as Form;
+use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\SystemCore\Notifier as CMSNotifier;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
+use \core\PHPLibrary\User\Consent as UserConsent;
 
 $formName = $CMSCore->urlp->getPath(2);
 
@@ -56,6 +59,111 @@ if (Form::existsByName($CMSCore, $formName)) {
 
   if ($result) {
 
+    // ============================================================
+    // ЛОГИРОВАНИЕ ОТПРАВКИ ФОРМЫ (152-ФЗ)
+    // Фиксируем факт получения ПДн через форму.
+    // ВАЖНО: создаём ДО согласий, чтобы получить $formReportID.
+    // ============================================================
+    $formTitle = $form->getTitle($formLocale);
+    $formID = $form->getID();
+
+    // Собираем названия полей (без значений ПДн!)
+    $fieldNames = [];
+    foreach ($formData as $fieldName => $value) {
+      $fieldNames[] = $fieldName;
+    }
+
+    $formReport = CMSReport::create(
+      $CMSCore,
+      CMSReport::REPORT_TYPE_ID_AP_FORM_CREATED,
+      [
+        'formID' => $formID,
+        'formName' => $formName,
+        'formTitle' => $formTitle,
+        'fields' => $fieldNames,
+        'ip' => $formSendedAuthorIP
+      ]
+    );
+
+    $formReportID = $formReport !== null ? $formReport->getID() : 0;
+
+    // ============================================================
+    // СОГЛАСИЯ (152-ФЗ)
+    // Фиксируем факты согласия по каждому consent-элементу.
+    // ============================================================
+    $consentElements = [];
+    foreach ($form->getElements() as $element) {
+      if (($element['type'] ?? '') === 'consent') {
+        $consentElements[] = $element;
+      }
+    }
+
+    foreach ($consentElements as $element) {
+      // Имя поля в $formData — camelCase (как формируется выше в парсере $_POST)
+      $fieldName = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $element['name']))));
+
+      // Согласие фиксируем только если чекбокс отмечен
+      if (empty($formData[$fieldName])) {
+        continue;
+      }
+
+      $documentKey = $element['documentKey'] ?? '';
+      if (empty($documentKey)) {
+        continue;
+      }
+
+      $document = PageStatic::getByName($CMSCore, $documentKey);
+      if ($document === null) {
+        continue;
+      }
+
+      $document->initData(['id', 'name', 'texts', 'metadata']);
+      if (!$document->isLegalDocument()) {
+        continue;
+      }
+
+      $currentVersion = $document->getCurrentVersion($formLocale);
+      if ($currentVersion === null) {
+        continue;
+      }
+
+      UserConsent::give(
+        $CMSCore,
+        0,
+        $form->getID(),
+        $formReportID,
+        $document->getID(),
+        $currentVersion->getVersion(),
+        $formLocale,
+        $formSendedAuthorIP,
+        $_SERVER['HTTP_USER_AGENT'] ?? '',
+        'form'
+      );
+
+      $documentTitles = [];
+      foreach ($CMSCore->getArrayLocalesNames() as $localeName) {
+        $documentTitles[$localeName] = $document->getTitle($localeName);
+      }
+
+      CMSReport::create(
+        $CMSCore,
+        CMSReport::REPORT_TYPE_ID_BASE_CONSENT_GIVEN,
+        [
+          'formID' => $form->getID(),
+          'formReportID' => $formReportID,
+          'pageStaticID' => $document->getID(),
+          'documentKey' => $documentKey,
+          'documentTitles' => $documentTitles,
+          'documentVersion' => $currentVersion->getVersion(),
+          'locale' => $formLocale,
+          'ip' => $formSendedAuthorIP
+        ]
+      );
+    }
+
+    // ============================================================
+    // УВЕДОМЛЕНИЯ (Telegram, Max)
+    // ============================================================
     $notifierTelegramChatsIDs = $form->getTelegramChatsIDs();
     $notifierTelegramThreatsIDs = $form->getTelegramThreatsIDs();
     $notifierTelegramChannelsIDs = $form->getTelegramChannelsIDs();
@@ -80,7 +188,7 @@ if (Form::existsByName($CMSCore, $formName)) {
         
         $formDataFormated = [];
         $formElements = $form->getElements();
-        $formData = $form->getData();
+        $formDataFromDb = $form->getData();
         $formTitle = $form->getTitle($formLocale);
 
         foreach($_POST as $POSTDataKey => $POSTData) {
@@ -97,7 +205,6 @@ if (Form::existsByName($CMSCore, $formName)) {
                 $selectedLabel = '';
                 foreach ($elementData['options'] as $option) {
                   if ($option['value'] === $POSTData) {
-                    // Получаем label для текущей локали
                     $selectedLabel = isset($option['texts'][$formLocale]['label']) 
                       ? $option['texts'][$formLocale]['label'] 
                       : $option['value'];
@@ -141,7 +248,7 @@ if (Form::existsByName($CMSCore, $formName)) {
         
         $formDataFormated = [];
         $formElements = $form->getElements();
-        $formData = $form->getData();
+        $formDataFromDb = $form->getData();
         $formTitle = $form->getTitle($formLocale);
 
         foreach($_POST as $POSTDataKey => $POSTData) {
@@ -158,7 +265,6 @@ if (Form::existsByName($CMSCore, $formName)) {
                 $selectedLabel = '';
                 foreach ($elementData['options'] as $option) {
                   if ($option['value'] === $POSTData) {
-                    // Получаем label для текущей локали
                     $selectedLabel = isset($option['texts'][$formLocale]['label']) 
                       ? $option['texts'][$formLocale]['label'] 
                       : $option['value'];

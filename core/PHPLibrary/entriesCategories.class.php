@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -25,6 +25,20 @@ use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 final class EntriesCategories
 {
   /**
+   * Допустимые правила сортировки
+   */
+  private const SORT_RULES = [
+    'by_createdtimestamp_increase' => ['column' => 'createdUnixTimestamp', 'direction' => 'ASC'],
+    'by_createdtimestamp_decrease' => ['column' => 'createdUnixTimestamp', 'direction' => 'DESC'],
+    'by_updatedtimestamp_increase' => ['column' => 'updatedUnixTimestamp', 'direction' => 'ASC'],
+    'by_updatedtimestamp_decrease' => ['column' => 'updatedUnixTimestamp', 'direction' => 'DESC'],
+    'by_alphabet_increase'         => ['column' => 'name',                 'direction' => 'ASC'],
+    'by_alphabet_decrease'         => ['column' => 'name',                 'direction' => 'DESC'],
+  ];
+
+  public const DEFAULT_SORT_RULE = 'by_createdtimestamp_decrease';
+
+  /**
    * __construct
    *
    * @param CoreInterface $CMSCore
@@ -38,11 +52,17 @@ final class EntriesCategories
   /**
    * Получить массив объектов всех категорий
    * 
-   * @param array $params
+   * @param array   $params
+   * @param string  $searchValue — подстрока для поиска по name
+   * @param string  $sortRule    — одно из SORT_RULES
    * 
    * @return array
    */
-  public function getAll(array $params = []) : array
+  public function getAll(
+    array $params = [],
+    string $searchValue = '',
+    string $sortRule = self::DEFAULT_SORT_RULE
+  ) : array
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -53,9 +73,24 @@ final class EntriesCategories
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('entries_categories');
     $queryBuilder->statement->clauseFrom->assembly();
+
+    // Поиск по name
+    $hasSearch = $searchValue !== '';
+    if ($hasSearch) {
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->stringLike('name', 'search', true)
+      );
+      $queryBuilder->statement->clauseWhere->assembly();
+    }
+
+    // Сортировка
+    $sortConfig = self::SORT_RULES[$sortRule] ?? self::SORT_RULES[self::DEFAULT_SORT_RULE];
+
     $queryBuilder->statement->setClauseOrderBy();
-    $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
-    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    $queryBuilder->statement->clauseOrderBy->setColumn($sortConfig['column']);
+    $queryBuilder->statement->clauseOrderBy->setSortType($sortConfig['direction']);
+
     if (array_key_exists('limit', $params)) {
       if (is_array($params['limit'])) {
         $limit = is_integer($params['limit'][0]) ? $params['limit'][0] : 0;
@@ -67,6 +102,11 @@ final class EntriesCategories
 
     $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
     $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+    if ($hasSearch) {
+      $databaseQuery->bindValue(':search', '%' . $searchValue . '%', \PDO::PARAM_STR);
+    }
+
     $databaseQuery->execute();
 
     $array = [];
@@ -81,11 +121,12 @@ final class EntriesCategories
   }
       
   /**
-   * Получить общее количество
+   * Получить общее количество (с учётом поиска)
    *
+   * @param string $searchValue
    * @return int
    */
-  public function getCountTotal() : int
+  public function getCountTotal(string $searchValue = '') : int
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -96,13 +137,28 @@ final class EntriesCategories
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('entries_categories');
     $queryBuilder->statement->clauseFrom->assembly();
+
+    $hasSearch = $searchValue !== '';
+    if ($hasSearch) {
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->stringLike('name', 'search', true)
+      );
+      $queryBuilder->statement->clauseWhere->assembly();
+    }
+
     $queryBuilder->statement->assembly();
 
     $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
     $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+    if ($hasSearch) {
+      $databaseQuery->bindValue(':search', '%' . $searchValue . '%', \PDO::PARAM_STR);
+    }
+
     $databaseQuery->execute();
 
     $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-    return $result ? $result['count'] : 0;
+    return $result ? (int) $result['count'] : 0;
   }
 }

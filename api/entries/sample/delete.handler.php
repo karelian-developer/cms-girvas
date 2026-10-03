@@ -14,10 +14,13 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 use \core\PHPLibrary\EntriesSample as EntriesSample;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
@@ -28,6 +31,29 @@ if ($CMSCore->client->isLogged(2)) {
 
     if (EntriesSample::existsByID($CMSCore, $sampleID)) {
       $sample = new EntriesSample($CMSCore, $sampleID);
+      
+      // Получаем данные выборки перед удалением
+      $localeName = $CMSCore->locale->getName();
+      $sample->initData(['name', 'texts', 'metadata']);
+      $sampleTitle = $sample->getTitle($localeName);
+      $sampleName = $sample->getName();
+      
+      // ============================================================
+      // ЛОГИРОВАНИЕ УДАЛЕНИЯ ВЫБОРКИ (152-ФЗ)
+      // ============================================================
+      CMSReport::create(
+        $CMSCore,
+        CMSReport::REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_DELETED,
+        [
+          'sampleID' => $sample->getID(),
+          'sampleName' => $sampleName,
+          'sampleTitle' => $sampleTitle,
+          'deletedByID' => $clientUser->getID(),
+          'deletedByLogin' => $clientUser->getLogin(),
+          'ip' => $CMSCore->client->getIPAddress()
+        ]
+      );
+
       $isDeleted = $sample->delete();
 
       if ($isDeleted) {

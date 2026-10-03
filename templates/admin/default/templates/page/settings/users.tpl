@@ -110,7 +110,7 @@
       </div>
     </div>
     <div class="cell grid-table__cell grid-table__cell_data">
-      <input name="setting_{SETTINGS_NAME}_password_length_min" type="number" class="input form__input form__input_number" value="{SETTING_PASSWORD_LENGTH_MAX_VALUE}" placeholder="6" min="6" data-element="input-password-length-min">
+      <input name="setting_{SETTINGS_NAME}_password_length_min" type="number" class="input form__input form__input_number" value="{SETTING_PASSWORD_LENGTH_MIN_VALUE}" placeholder="6" min="6" data-element="input-password-length-min">
     </div>
     <!-- Поле: Специальные символы в пароле -->
     <div class="cell grid-table__cell grid-table__cell_text">

@@ -1,10 +1,12 @@
+// core/JSLibrary/core/page/global.class.js
+
 /**
  * CMS «ГИРВАС»
  * 
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -16,6 +18,7 @@
 'use strict';
 
 import {Interactive} from "../../interactive.class.js";
+import {Client} from "../client.class.js";
 
 export class PageGlobal {
   constructor(page, params = {}) {
@@ -32,6 +35,10 @@ export class PageGlobal {
    */
   init() {
     let locales;
+    
+    this.initCodeCopy();
+    this.initGalleries();
+    this.initCookieBanner();
 
     /** @var {HTMLElement} */
     let navigationBurgerElement = document.querySelector('[role="navagation-burger"]');
@@ -77,7 +84,7 @@ export class PageGlobal {
         footerLocalesListContainerElement.append(footerLocalesListElement);
       }
 
-      return window.CMSCore.locales.base.getData();
+      return this.page.core.locales.base.getData();
     }, (rejectionReason) => {
       let interactiveNotification = new Interactive('notification');
       interactiveNotification.target.isPopup = true;
@@ -138,7 +145,7 @@ export class PageGlobal {
             let authForm = new Interactive('form');
             authForm.target.init({
               method: 'POST',
-              action: '/handler/utils/authorization?method=base&localeMessage=' + window.CMSCore.locales.base.name
+              action: '/handler/utils/authorization?method=base&localeMessage=' + this.page.core.locales.base.name
             });
 
             /** @type {ElementInput} */
@@ -210,7 +217,7 @@ export class PageGlobal {
               let requestForm = new Interactive('form');
               requestForm.target.init({
                 method: 'POST',
-                action: '/handler/user/reset?localeMessage=' + window.CMSCore.locales.base.name
+                action: '/handler/user/reset?localeMessage=' + this.page.core.locales.base.name
               });
               
               /** Модальное окно для создания запроса на восстановление пароля
@@ -276,5 +283,389 @@ export class PageGlobal {
 
       interactiveNotification.target.show();
     });
+  }
+
+  initGalleries() {
+    console.log('[PageGlobal] initGalleries');
+    console.log(document.querySelectorAll('.nadvo-gallery'));
+
+    const galleryElements = document.querySelectorAll('.nadvo-gallery');
+
+    galleryElements.forEach((galleryElement) => {
+      const interactiveGallery = new Interactive('gallery');
+      console.log(galleryElement.innerHTML);
+
+      const images = galleryElement.querySelectorAll('img');
+
+      console.log(images);
+
+      images.forEach((image) => {
+        interactiveGallery.target.addItem(
+          image.getAttribute('src'),
+          image.getAttribute('alt') || ''
+        );
+      });
+
+      interactiveGallery.assembly();
+
+      galleryElement.innerHTML = '';
+      galleryElement.appendChild(interactiveGallery.target.element);
+    });
+
+    console.log('[PageGlobal] content inserted', document.querySelectorAll('.nadvo-gallery'));
+  }
+
+  /**
+   * Инициализация cookie-баннера (152-ФЗ)
+   *
+   * Проверяет настройку `security_cookie_banner_status` через API,
+   * показывает модалку при первом заходе, фиксирует согласие.
+   */
+  async initCookieBanner() {
+    if (Client.existsCookie('allowCookies')) {
+      return;
+    }
+
+    const settings = await this.page.core.getSettings([
+      'security_cookie_banner_status',
+      'security_cookie_banner_document_id'
+    ]);
+
+    if (settings.security_cookie_banner_status !== true) {
+      return;
+    }
+
+    const cookieDocumentID = parseInt(settings.security_cookie_banner_document_id, 10) || 0;
+
+    if (cookieDocumentID <= 0) {
+      return;
+    }
+
+    let cookieDocument = null;
+
+    try {
+      const response = await fetch(
+        '/handler/pageStatic/' + cookieDocumentID +
+        '?locale=' + this.page.core.locales.base.name +
+        '&localeMessage=' + this.page.core.locales.base.name,
+        { method: 'GET', credentials: 'same-origin' }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.statusCode === 1 && data.outputData && data.outputData.pageStatic) {
+          cookieDocument = data.outputData.pageStatic;
+        }
+      }
+    } catch (e) {
+      this.page.core.debugError(1, 'CookieBanner', 'Failed to fetch document: ' + e);
+      return;
+    }
+
+    if (!cookieDocument || !cookieDocument.id) {
+      return;
+    }
+
+    const localeData = this.page.core.localeData;
+    const contentElement = document.createElement('div');
+    contentElement.classList.add('cookie-banner');
+    contentElement.innerHTML = localeData.MODAL_COOKIE_SITE_USING_DESCRIPTION || '';
+
+    if (cookieDocument && cookieDocument.name) {
+      const linkElement = document.createElement('a');
+      linkElement.href = '/page/' + cookieDocument.name;
+      linkElement.target = '_blank';
+      linkElement.rel = 'noopener';
+      linkElement.textContent = localeData.MODAL_COOKIE_SITE_USING_LINK_LABEL || 'Подробнее';
+      linkElement.classList.add('cookie-banner__link');
+
+      contentElement.appendChild(document.createElement('br'));
+      contentElement.appendChild(linkElement);
+    }
+
+    const modal = new Interactive('modal', {
+      title: localeData.MODAL_COOKIE_SITE_USING_TITLE || 'Использование cookie',
+      content: contentElement
+    });
+
+    modal.target.addButton(localeData.BUTTON_SUBMIT_LABEL || 'Принять', () => {
+      this.submitCookieConsent(cookieDocument, true);
+      modal.target.close();
+    });
+
+    modal.target.addButton(localeData.BUTTON_DECLINE_LABEL || 'Отказаться', () => {
+      this.submitCookieConsent(cookieDocument, false);
+      modal.target.close();
+    });
+
+    modal.assembly();
+    document.body.appendChild(modal.target.element);
+    modal.target.show();
+  }
+
+  /**
+   * Отправить согласие/отказ на cookie
+   *
+   * @param {Object|null} cookieDocument — объект документа (id, version)
+   * @param {boolean} accepted
+   */
+  submitCookieConsent(cookieDocument, accepted) {
+    Client.setCookie('allowCookies', accepted ? 'true' : 'false', 366);
+
+    if (!accepted) {
+      return;
+    }
+
+    const documentVersion = cookieDocument ? cookieDocument.currentVersion : '';
+
+    if (!cookieDocument || !cookieDocument.id || !documentVersion) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('pageStaticID', cookieDocument.id);
+    formData.append('documentVersion', documentVersion);
+    formData.append('locale', this.page.core.locales.base.name);
+
+    const request = new Interactive('request', {
+      method: 'POST',
+      url: '/handler/client/consent-cookie?localeMessage=' + this.page.core.locales.base.name
+    });
+
+    request.target.data = formData;
+    request.target.send();
+  }
+
+  /**
+   * Инициализация копирования кода
+   * 
+   * Находит все <code> и <pre> на странице и добавляет кнопку копирования
+   */
+  initCodeCopy() {
+    // Обрабатываем <pre> блоки
+    const preBlocks = document.querySelectorAll('pre');
+    preBlocks.forEach((preBlock) => {
+      this.addCopyButtonToPre(preBlock);
+    });
+
+    // Обрабатываем <code> элементы, которые не внутри <pre>
+    const codeElements = document.querySelectorAll('code');
+    codeElements.forEach((codeElement) => {
+      // Пропускаем code внутри pre (уже обработаны)
+      if (!codeElement.closest('pre')) {
+        this.addCopyButtonToCode(codeElement);
+      }
+    });
+  }
+
+  /**
+   * Добавление кнопки копирования к <pre> блоку
+   */
+  addCopyButtonToPre(preBlock) {
+    // Пропускаем, если кнопка уже добавлена
+    if (preBlock.querySelector('.code-copy-button')) {
+      return;
+    }
+
+    // Создаем обертку, если нужно
+    let wrapper = preBlock.parentElement;
+    if (!wrapper.classList.contains('code-block-wrapper')) {
+      wrapper = document.createElement('div');
+      wrapper.classList.add('code-block-wrapper');
+      preBlock.parentNode.insertBefore(wrapper, preBlock);
+      wrapper.appendChild(preBlock);
+    }
+
+    // Создаем кнопку копирования
+    const copyButton = this.createCopyButton();
+    
+    // Добавляем кнопку в обертку
+    wrapper.appendChild(copyButton);
+
+    // Обработчик клика
+    copyButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      const codeText = preBlock.textContent;
+      this.copyTextToClipboard(codeText, copyButton);
+    });
+
+    // Показываем кнопку при наведении
+    wrapper.addEventListener('mouseenter', () => {
+      copyButton.classList.add('code-copy-button_visible');
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+      copyButton.classList.remove('code-copy-button_visible');
+    });
+  }
+
+  /**
+   * Добавление кнопки копирования к <code> элементу (инлайн)
+   */
+  addCopyButtonToCode(codeElement) {
+    // Пропускаем, если кнопка уже добавлена
+    if (codeElement.querySelector('.code-copy-button')) {
+      return;
+    }
+
+    // Создаем обертку
+    const wrapper = document.createElement('span');
+    wrapper.classList.add('inline-code-wrapper');
+    codeElement.parentNode.insertBefore(wrapper, codeElement);
+    wrapper.appendChild(codeElement);
+
+    // Создаем кнопку копирования
+    const copyButton = this.createCopyButton(true);
+    
+    // Добавляем кнопку в обертку
+    wrapper.appendChild(copyButton);
+
+    // Обработчик клика
+    copyButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      const codeText = codeElement.textContent;
+      this.copyTextToClipboard(codeText, copyButton);
+    });
+
+    // Показываем кнопку при наведении
+    wrapper.addEventListener('mouseenter', () => {
+      copyButton.classList.add('code-copy-button_visible');
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+      copyButton.classList.remove('code-copy-button_visible');
+    });
+  }
+
+  /**
+   * Создание кнопки копирования
+   */
+  createCopyButton(isInline = false) {
+    const button = document.createElement('button');
+    button.setAttribute('type', 'button');
+    button.setAttribute('aria-label', 'Копировать код');
+    button.classList.add('code-copy-button');
+    
+    if (isInline) {
+      button.classList.add('code-copy-button_inline');
+    }
+
+    // SVG иконка копирования
+    button.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+      </svg>
+      <span>Копировать</span>
+    `;
+
+    return button;
+  }
+
+  /**
+   * Копирование текста в буфер обмена
+   */
+  async copyTextToClipboard(text, button) {
+    try {
+      // Пытаемся использовать современный API
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        this.showCopySuccess(button);
+      } else {
+        // Fallback для старых браузеров
+        this.copyTextToClipboardFallback(text, button);
+      }
+    } catch (error) {
+      console.error('Failed to copy:', error);
+      this.copyTextToClipboardFallback(text, button);
+    }
+  }
+
+  /**
+   * Fallback метод копирования для старых браузеров
+   */
+  copyTextToClipboardFallback(text, button) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.top = '0';
+    textarea.style.left = '0';
+    textarea.style.opacity = '0';
+    textarea.style.pointerEvents = 'none';
+
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        this.showCopySuccess(button);
+      } else {
+        this.showCopyError(button);
+      }
+    } catch (error) {
+      console.error('Fallback failed:', error);
+      this.showCopyError(button);
+    } finally {
+      document.body.removeChild(textarea);
+    }
+  }
+
+  /**
+   * Показ успешного копирования
+   */
+  showCopySuccess(button) {
+    const label = button.querySelector('span');
+    
+    if (label) {
+      label.textContent = 'Скопировано!';
+    }
+    
+    button.classList.add('code-copy-button_success');
+    
+    // Меняем иконку на галочку
+    const svg = button.querySelector('svg');
+    if (svg) {
+      svg.innerHTML = '<polyline points="20 6 9 17 4 12"></polyline>';
+    }
+
+    // Возвращаем исходное состояние через 2 секунды
+    setTimeout(() => {
+      if (label) {
+        label.textContent = 'Копировать';
+      }
+      
+      button.classList.remove('code-copy-button_success');
+      
+      if (svg) {
+        svg.innerHTML = '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+      }
+    }, 2000);
+  }
+
+  /**
+   * Показ ошибки копирования
+   */
+  showCopyError(button) {
+    const label = button.querySelector('span');
+    
+    if (label) {
+      label.textContent = 'Ошибка!';
+    }
+    
+    button.classList.add('code-copy-button_error');
+
+    setTimeout(() => {
+      if (label) {
+        label.textContent = 'Копировать';
+      }
+      
+      button.classList.remove('code-copy-button_error');
+    }, 2000);
   }
 }

@@ -1,4 +1,7 @@
-<article class="main__page page page_{ADMIN_PANEL_PAGE_NAME}">
+<article class="main__page page page_{ADMIN_PANEL_PAGE_NAME}"
+         data-element="users-groups-page"
+         data-search-value="{USERS_GROUPS_SEARCH_VALUE}"
+         data-sort-value="{USERS_GROUPS_SORT_VALUE}">
   <nav id="SYSTEM_AP_SUBNAVIGATION" class="page__navigation navigation"></nav>
   <div class="page__title-container">
     <h1 class="page__title">{LANG:PAGE_USERS_GROUPS_TITLE}</h1>

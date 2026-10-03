@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -33,7 +33,7 @@ export class Core {
   constructor() {
     this.searchParams = new URLParser();
     this.pages = {default: {}, admin: {}, install: {}};
-    this.locales = {base: {}, admin: {}, install: {}};
+    this.locales = {base: {}, admin: {}, install: {}, nadvoTE: {}};
     this.client = new Client(this);
     this.metrics = new Metrics(this);
     this.debugLevel = 1;
@@ -48,6 +48,17 @@ export class Core {
     if (this.callbacks.hasOwnProperty(event)) {
       this.callbacks[event].push(callback);
     }
+  }
+
+  /**
+   * Инициализация клиента
+   * 
+   * @returns
+   */
+  async initClient() {
+    return this.client.checkLogged().then((result) => {
+      this.client.isLogged = result;
+    });
   }
 
   /**
@@ -83,6 +94,12 @@ export class Core {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
       this.locales.admin = new Locale(data.outputData.locale.name, 'admin');
+
+      return fetch('/handler/locale/nadvoTE', {method: 'GET'});
+    }).then((response) => {
+      return (response.ok) ? response.json() : Promise.reject(response);
+    }).then((data) => {
+      this.locales.nadvoTE = new Locale(data.outputData.locale.name, 'nadvoTE');
     }, (rejectionReason) => {
       let interactiveNotification = new Interactive('notification');
       interactiveNotification.target.isPopup = true;
@@ -102,13 +119,13 @@ export class Core {
   async initPages() {
     let locale;
 
-    return this.client.isLogged().then((clientIsLogged) => {
+    return this.client.checkLogged().then((clientIsLogged) => {
       if (this.searchParams.getPathPart(1) === 'entry') this.pages.default.entry = new Page(this, 'default', 'entry');
       if (this.searchParams.getPathPart(1) === 'profile') this.pages.default.profile = new Page(this, 'default', 'profile');
     
       if (this.searchParams.getPathPart(1) === 'admin') {
         if (clientIsLogged) {
-          if (this.searchParams.getPathPart(2) === 'analytics') this.pages.admin.entry = new Page(this, 'admin', 'analytics');
+          if (this.searchParams.getPathPart(2) === 'analytics') this.pages.admin.analytics = new Page(this, 'admin', 'analytics');
           if (this.searchParams.getPathPart(2) === 'entry') this.pages.admin.entry = new Page(this, 'admin', 'entry');
           if (this.searchParams.getPathPart(2) === 'entries') this.pages.admin.entries = new Page(this, 'admin', 'entries');
           if (this.searchParams.getPathPart(2) === 'entriesCategory') this.pages.admin.entriesCategory = new Page(this, 'admin', 'entriesCategory');
@@ -128,6 +145,7 @@ export class Core {
           if (this.searchParams.getPathPart(2) === 'users') this.pages.admin.users = new Page(this, 'admin', 'users');
           if (this.searchParams.getPathPart(2) === 'userGroup') this.pages.admin.usersGroup = new Page(this, 'admin', 'usersGroup');
           if (this.searchParams.getPathPart(2) === 'usersGroups') this.pages.admin.usersGroups = new Page(this, 'admin', 'usersGroups');
+          if (this.searchParams.getPathPart(2) === 'usersConsents') this.pages.admin.usersConsents = new Page(this, 'admin', 'usersConsents');
           if (this.searchParams.getPathPart(2) === 'feed') this.pages.admin.feed = new Page(this, 'admin', 'feed');
           if (this.searchParams.getPathPart(2) === 'feeds') this.pages.admin.feeds = new Page(this, 'admin', 'feeds');
           if (this.searchParams.getPathPart(2) === 'form') this.pages.admin.form = new Page(this, 'admin', 'form');
@@ -342,13 +360,46 @@ export class Core {
     await Promise.all(promises);
     return icons;
   }
+
+  /**
+   * Получить настройки CMS через API
+   *
+   * @param {string[]} keys
+   * 
+   * @returns {Promise<Object>} 
+   */
+  async getSettings(keys = []) {
+    const keysParam = Array.isArray(keys) && keys.length > 0
+      ? '?keys=' + encodeURIComponent(keys.join(','))
+      : '';
+
+    return fetch('/handler/settings' + keysParam, {
+      method: 'GET',
+      credentials: 'same-origin'
+    }).then((response) => {
+      return (response.ok) ? response.json() : Promise.reject(response);
+    }).then((data) => {
+      if (data.statusCode === 1 && data.outputData && data.outputData.settings) {
+        return data.outputData.settings;
+      }
+      return {};
+    }).catch((error) => {
+      if (window.CMSCore && window.CMSCore.debugError) {
+        window.CMSCore.debugError(1, 'CMSCore', 'Failed to fetch settings: ' + error);
+      }
+      return {};
+    });
+  }
 }
 
 window.CMSCore = new Core();
 
 // Инициализация клиентского ядра CMS
 document.addEventListener('DOMContentLoaded', async () => {
-  await window.CMSCore.initLocales().then(() => {
+  await window.CMSCore.initClient().then(() => {
+    window.CMSCore.debugLog(1, 'CMSCore', 'Client initied!', true);
+    return window.CMSCore.initLocales();
+  }).then(() => {
     window.CMSCore.debugLog(1, 'CMSCore', 'Locales initied!', true);
     return window.CMSCore.initPages();
   }).then(() => {

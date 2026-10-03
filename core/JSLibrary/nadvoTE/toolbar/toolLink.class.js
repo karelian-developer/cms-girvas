@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -28,12 +28,18 @@ export class ToolLink extends Tool {
     });
 
     this.initClickEvent();
+    this.bindHotkey('Ctrl+K');
   }
 
   initClickEvent() {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
-      let stringSelection = this.editor.getSelectionString();
+
+      const selection = this.editor.getSelectionString() || '';
+
+      if (selection) {
+        this.editor.clearSelection();
+      }
 
       let inputLinkLabelElement = document.createElement('input');
       inputLinkLabelElement.setAttribute('placeholder', 'Название ссылки');
@@ -41,7 +47,7 @@ export class ToolLink extends Tool {
       inputLinkLabelElement.classList.add('form__input');
       inputLinkLabelElement.style.width = '100%';
       inputLinkLabelElement.style.marginBottom = '10px';
-      inputLinkLabelElement.value = stringSelection;
+      inputLinkLabelElement.value = selection;
       
       let inputLinkElement = document.createElement('input');
       inputLinkElement.classList.add('form__input');
@@ -62,7 +68,7 @@ export class ToolLink extends Tool {
         let inputLinkLabelElement = interactiveModal.target.element.querySelector('[name="link_label"]');
         let inputLinkElement = interactiveModal.target.element.querySelector('[name="link"]');
         
-        let linkLabel = (inputLinkLabelElement.value.trim().length == 0) ? stringSelection : inputLinkLabelElement.value;
+        let linkLabel = (inputLinkLabelElement.value.trim().length == 0) ? selection : inputLinkLabelElement.value;
         let link = inputLinkElement.value;
         
         this.editor.textarea.replaceStringSelection(

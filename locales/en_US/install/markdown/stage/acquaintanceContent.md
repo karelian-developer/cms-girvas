@@ -1,5 +1,7 @@
-**The GIRVAS Content Management System** is a multi-functional, free, open-source content and website management system from Karelian Developer (https://xn----7sbbafuqffehcie7cvgcl5a9h7d.xn--p1ai/). GIRVAS is **a universal** and **professional tool** for managing websites of any complexity and scope.
+**GIRVAS Content Management System** — a domestic multi-purpose **free** content and website management system with **open source**, developed by the company **[“Karelian Developer”](https://карельский-разработчик.рф){"target":"_blank"}**.
 
-Please note that following the installation wizard's recommendations will ensure the system is installed correctly. If you encounter any technical issues during system installation, please [create an issue](https://gitflic.ru/project/garbalo/cms-girvas/issue) on the official content management system repository page or send an email to [support@karelian-developer.ru](mailto:support@karelian-developer.ru) with a description of the issue, screenshots, and system performance reports.
+**CMS “GIRVAS”** — a universal and professional tool for working with websites of any complexity and focus. The system is included in the Register of Domestic Software of the Ministry of Digital Development (registry entry [No. 25012](https://reestr.digital.gov.ru/reestr/2840045/){"target":"_blank"} dated 11/27/2024).
 
-We also recommend reviewing the current [installation guide](https://doc.garbalo.com/projects/cms-girvas/installation.pdf).
+Please note that **by following the recommendations** of the installation wizard, the system will be installed correctly. If technical problems occur during system installation, we ask you to [create an incident](https://gitflic.ru/project/garbalo/cms-girvas/issue){"target":"_blank"} on the page of the official repository of the content management system, or by sending an email to [support@karelian-developer.ru](mailto:support@karelian-developer.ru) with a description of the problem, screenshots, and system reports.
+
+We also suggest reviewing the current [installation guide](https://cms-girvas.ru/documentation/introduction/installation){"target":"_blank"}.

@@ -8,12 +8,13 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
- if (!defined('IS_NOT_HACKED')) {
+if (!defined('IS_NOT_HACKED')) {
   http_response_code(503);
   die('An attempted hacker attack has been detected.');
 }
 
 use \core\PHPLibrary\PageStatic as PageStatic;
+use \core\PHPLibrary\PageStatic\Version as PageStaticVersion;
 use \core\PHPLibrary\SystemCore\File\Converter as FileConverter;
 use \core\PHPLibrary\SystemCore\File\EnumFormat as FileConverterEnumFileFormat;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
@@ -21,7 +22,7 @@ use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
@@ -32,9 +33,84 @@ if ($CMSCore->client->isLogged(2)) {
       $pageStaticID = is_numeric($pageStaticID) ? (int) $pageStaticID : 0;
 
       if (PageStatic::existsByID($CMSCore, $pageStaticID)) {
+                // ============================================================
+        // СОБЫТИЕ: ВЫПУСК ВЕРСИИ ДОКУМЕНТА (152-ФЗ)
+        // ============================================================
+        if (($_PATCH['page_static_event'] ?? '') === 'publishVersion') {
+          $pageStatic = new PageStatic($CMSCore, $pageStaticID);
+          $pageStatic->initData(['id', 'name', 'texts', 'metadata']);
+
+          if ($pageStatic->isLegalDocument()) {
+            $CMSBaseLocaleName = $CMSCore->getCMSLocale()->getName();
+            $versionInput = trim((string)($_PATCH['page_static_version'] ?? ''));
+
+            if (empty($versionInput)) {
+              $versionInput = PageStaticVersion::getDefaultVersion($CMSCore, $pageStaticID, $CMSBaseLocaleName);
+            } else {
+              $versionInput = PageStaticVersion::getNextVersion($CMSCore, $pageStaticID, $versionInput, $CMSBaseLocaleName);
+            }
+
+            // Пересоздаём объект — чтобы texts были актуальны
+            $pageStatic = new PageStatic($CMSCore, $pageStaticID);
+            $pageStatic->initData(['id', 'name', 'texts', 'metadata']);
+
+            $versions = $pageStatic->publishVersionBatch($versionInput, $clientUser->getID());
+
+            $publishedVersions = [];
+            foreach ($versions as $locale => $version) {
+              $publishedVersions[$locale] = $versionInput;
+            }
+
+            if (!empty($publishedVersions)) {
+              $pageTitles = [];
+              foreach ($CMSCore->getArrayLocalesNames() as $locale) {
+                $pageTitles[$locale] = $pageStatic->getTitle($locale);
+              }
+
+              CMSReport::create(
+                $CMSCore,
+                CMSReport::REPORT_TYPE_ID_AP_DOCUMENT_VERSION_PUBLISHED,
+                [
+                  'pageStaticID' => $pageStaticID,
+                  'pageName' => $pageStatic->getName(),
+                  'pageTitles' => $pageTitles,
+                  'versions' => $publishedVersions,
+                  'userID' => $clientUser->getID(),
+                  'userLogin' => $clientUser->getLogin(),
+                  'ip' => $CMSCore->client->getIPAddress()
+                ]
+              );
+
+              $handlerOutputData['version'] = $versionInput;
+              $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
+              $handlerStatusCode = $handlerStatusCode ?? 1;
+            } else {
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+              $handlerStatusCode = $handlerStatusCode ?? 0;
+            }
+          } else {
+            $handlerMessage = $handlerMessage ?? 'API ERROR: Страница не является юридическим документом.';
+            $handlerStatusCode = $handlerStatusCode ?? 0;
+          }
+
+          // Прерываем дальнейшую обработку
+          return;
+        }
+
         $pageStatic = new PageStatic($CMSCore, $pageStaticID);
-        $pageStatic->initData(['name']);
+        $pageStatic->initData(['name', 'texts', 'metadata']);
+        
+        // Сохраняем старые значения для сравнения
+        $oldValues = [
+          'name' => $pageStatic->getName(),
+          'title' => $pageStatic->getTitle($CMSCore->locale->getName()),
+          'description' => $pageStatic->getDescription($CMSCore->locale->getName()),
+          'content' => $pageStatic->getContent($CMSCore->locale->getName()),
+          'isPublished' => $pageStatic->isPublished(),
+        ];
+        
         $pageStaticData = [];
+        $changedFields = [];
 
         if (!PageStatic::existsByName($CMSCore, $pageStaticName) || $pageStaticName === $pageStatic->getName()) {
           $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
@@ -57,6 +133,7 @@ if ($CMSCore->client->isLogged(2)) {
               if (isset($_PATCH['page_static_is_published'])) {
                 $pageStaticData['metadata']['publishedUnixTimestamp'] = time();
                 $pageStaticData['metadata']['isPublished'] = 1;
+                if ($oldValues['isPublished'] != 1) $changedFields[] = 'is_published';
               }
 
               if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH) || array_key_exists($textareaContentName, $_PATCH)) {
@@ -66,49 +143,53 @@ if ($CMSCore->client->isLogged(2)) {
                 if (array_key_exists($inputTitleName, $_PATCH)) {
                   $inputValue = $_PATCH[$inputTitleName];
                   $inputValue = str_replace('\'', '"', $inputValue);
-                  
                   $pageStaticData['texts'][$CMSLocaleName]['title'] = $inputValue;
+                  if ($oldValues['title'] !== $inputValue) $changedFields[] = 'title';
                 }
 
                 if (array_key_exists($inputSEOTitleName, $_PATCH)) {
                   $inputValue = $_PATCH[$inputSEOTitleName];
                   $inputValue = str_replace('\'', '"', $inputValue);
-      
                   $pageStaticData['texts'][$CMSLocaleName]['SEOTitle'] = $inputValue;
+                  $changedFields[] = 'seo_title';
                 }
 
                 if (array_key_exists($textareaDescriptionName, $_PATCH)) {
                   $textareaValue = $_PATCH[$textareaDescriptionName];
                   $textareaValue = str_replace('\'', '"', $textareaValue);
-
                   $pageStaticData['texts'][$CMSLocaleName]['description'] = $textareaValue;
+                  if ($oldValues['description'] !== $textareaValue) $changedFields[] = 'description';
                 }
       
                 if (array_key_exists($textareaSEODescriptionName, $_PATCH)) {
                   $textareaValue = $_PATCH[$textareaSEODescriptionName];
                   $textareaValue = str_replace('\'', '"', $textareaValue);
-      
                   $pageStaticData['texts'][$CMSLocaleName]['SEODescription'] = $textareaValue;
+                  $changedFields[] = 'seo_description';
                 }
 
                 if (array_key_exists($textareaContentName, $_PATCH)) {
                   $textareaValue = $_PATCH[$textareaContentName];
                   $textareaValue = str_replace('\'', '"', $textareaValue);
-
                   $pageStaticData['texts'][$CMSLocaleName]['content'] = $textareaValue;
+                  if ($oldValues['content'] !== $textareaValue) $changedFields[] = 'content';
                 }
 
                 if (array_key_exists($textareaKeywordsName, $_PATCH)) {
                   $textareaValue = $_PATCH[$textareaKeywordsName];
                   $textareaValue = str_replace('\'', '"', $textareaValue);
-                  
                   $pageStaticData['texts'][$CMSLocaleName]['keywords'] = preg_split('/\h*[\,]+\h*/', $textareaValue, -1, PREG_SPLIT_NO_EMPTY);
+                  $changedFields[] = 'keywords';
                 }
               }
             }
           }
 
-          if (isset($_PATCH['page_static_name'])) $pageStaticData['name'] = urlencode(htmlentities($_PATCH['page_static_name']));
+          if (isset($_PATCH['page_static_name'])) {
+            $pageStaticData['name'] = urlencode(htmlentities($_PATCH['page_static_name']));
+            if ($oldValues['name'] !== $pageStaticData['name']) $changedFields[] = 'name';
+          }
+          
           if (isset($_PATCH['page_static_preview'])) {
             $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
             $fileConverter = new FileConverter($CMSCore);
@@ -117,6 +198,7 @@ if ($CMSCore->client->isLogged(2)) {
             if (is_array($fileConverted)) {
               if (!array_key_exists('metadata', $pageStaticData)) $pageStaticData['metadata'] = [];
               $pageStaticData['metadata']['previewURL'] = '/uploads/media/' . $fileConverted['fileName'];
+              $changedFields[] = 'preview';
             }
           }
 
@@ -133,10 +215,12 @@ if ($CMSCore->client->isLogged(2)) {
               }
 
               $pageStaticData['metadata']['additionalFields'][$fieldNameTransformed] = htmlspecialchars(str_replace('\'', '"', $value));
+              $changedFields[] = 'additional_field_' . $fieldNameTransformed;
             }
 
             if ($name === 'page_static_template_path') {
               $pageStaticData['metadata']['personalTemplatePath'] = htmlspecialchars(str_replace('\'', '"', trim($value)));
+              $changedFields[] = 'template_path';
             }
           }
 
@@ -144,55 +228,70 @@ if ($CMSCore->client->isLogged(2)) {
 
           if (isset($_PATCH['page_static_published_timestamp'])) {
             $pageStaticData['metadata']['publishedUnixTimestamp'] = strtotime(str_replace('T', ' ', $_PATCH['page_static_published_timestamp']));
+            $changedFields[] = 'published_timestamp';
           }
 
+          // ============================================================
+          // ФЛАГ ЮРИДИЧЕСКОГО ДОКУМЕНТА (152-ФЗ)
+          // ============================================================
+          $pageStaticIsLegalDocument = ($_PATCH['page_static_is_legal_document_status'] ?? 'off') === 'on';
+          
+          if (!array_key_exists('metadata', $pageStaticData)) $pageStaticData['metadata'] = [];
+          $pageStaticData['metadata']['isLegalDocument'] = $pageStaticIsLegalDocument;
+
           // Если происходит публикация страницы, то необходимо удостовериться, что
-          // в странице присутствует стандартная локализация, в противном случае
-          // система не даст сохранить ее.
+          // в странице присутствует стандартная локализация
           if ($pageStaticIsPublished) {
             $CMSBaseLocale = $CMSCore->getCMSLocale();
             $CMSBaseLocaleName = $CMSBaseLocale->getName();
 
             $pageStatic->initData(['texts', 'metadata']);
 
-            /** @var string Заголовок записи */
             $pageStaticTitle = $pageStatic->getTitle($CMSBaseLocaleName);
-            /** @var string описание записи */
             $pageStaticDescription = $pageStatic->getDescription($CMSBaseLocaleName);
-            /** @var string содержимое записи */
             $pageStaticContent = $pageStatic->getContent($CMSBaseLocaleName);
-            /** @var int дата обновления страницы в формате UNIX */
             $pageStaticData['metadata']['publishedUnixTimestamp'] = time();
 
-            // Если заголовок, описание или содержимое стандартной локализации не задано, то
-            // запись не будет обновлена.
             if (empty($pageStaticTitle) || empty($pageStaticDescription) || empty($pageStaticContent)) {
               $handlerMessage = $handlerMessage ?? 'API ERROR: ' . sprintf($CMSCore->locale->getSingleValueByKey('API_PAGE_STATIC_EMPTY_LOCALE_DEFAULT_PUBLISHED_ERROR'), $CMSBaseLocaleName);
               $handlerStatusCode = $handlerStatusCode ?? 0;
             } else {
-              /** @var bool Обновление записи */
               $pageStaticIsUpdated = $pageStatic->update($pageStaticData);
             }
           } else {
-            /** @var bool Обновление записи */
             $pageStaticIsUpdated = $pageStatic->update($pageStaticData);
           }
 
-          /** @var bool Костыль */
           $pageStaticIsUpdated = $pageStaticIsUpdated ?? false;
 
           if ($pageStaticIsUpdated) {
-            /** @var CMSReport Новый отчет */
-            $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_PAGE_EDITED, [
-              'clientIP' => $CMSCore->client->getIPAddress(),
-              'pageID' => $pageStaticID
-            ]);
+            // ============================================================
+            // ЛОГИРОВАНИЕ ОБНОВЛЕНИЯ СТАТИЧЕСКОЙ СТРАНИЦЫ (152-ФЗ)
+            // ============================================================
+            $pageStatic->initData(['name', 'texts']);
+            $pageTitle = $pageStatic->getTitle($CMSCore->locale->getName());
+            
+            CMSReport::create(
+              $CMSCore,
+              CMSReport::REPORT_TYPE_ID_AP_PAGE_EDITED,
+              [
+                'pageID' => $pageStaticID,
+                'pageName' => $pageStatic->getName(),
+                'pageTitle' => $pageTitle,
+                'updatedByID' => $clientUser->getID(),
+                'updatedByLogin' => $clientUser->getLogin(),
+                'changedFields' => $changedFields,
+                'ip' => $CMSCore->client->getIPAddress()
+              ]
+            );
 
             $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
             $handlerStatusCode = $handlerStatusCode ?? 1;
           } else {
-            $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
-            $handlerStatusCode = $handlerStatusCode ?? 0;
+            if (empty($handlerMessage)) {
+              $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+              $handlerStatusCode = $handlerStatusCode ?? 0;
+            }
           }
         } else {
           $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_PAGE_STATIC_NAME_ALREADY_EXISTS');
@@ -202,6 +301,9 @@ if ($CMSCore->client->isLogged(2)) {
         $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_STATIC_PAGE_ERROR_NOT_FOUND');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
+    } else {
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
     $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');

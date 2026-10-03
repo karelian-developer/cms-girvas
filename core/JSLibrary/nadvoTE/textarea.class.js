@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -63,10 +63,63 @@ export class Textarea {
     });
   }
 
+  insertStringAtCursor(string) {
+    const start = this.element.selectionStart;
+    const end = this.element.selectionEnd;
+
+    this.element.value = this.element.value.substring(0, start)
+      + string
+      + this.element.value.substring(end);
+
+    const cursorPos = start + string.length;
+
+    this.element.focus();
+    this.element.setSelectionRange(cursorPos, cursorPos);
+
+    return true;
+  }
+
   replaceStringSelection(string) {
-    if (this.element.selectionStart || this.element.selectionStart == '0') {
-      let start = this.element.selectionStart, end = this.element.selectionEnd;
-      this.element.value = this.element.value.substring(0, start) + string + this.element.value.substring(end, this.element.value.length);
+    const start = this.element.selectionStart;
+    const end = this.element.selectionEnd;
+
+    if (start === end) {
+      return false;
     }
+
+    this.element.value = this.element.value.substring(0, start)
+      + string
+      + this.element.value.substring(end, this.element.value.length);
+
+    this.element.setSelectionRange(
+      start,
+      start + string.length
+    );
+
+    this.element.focus();
+
+    return true;
+  }
+
+  insertStringAtLastCursor(string) {
+    const position = this.editor.lastCursorPosition;
+
+    if (!position) {
+      return false;
+    }
+
+    const start = position.start;
+    const end = position.end;
+
+    this.element.value = this.element.value.substring(0, start)
+      + string
+      + this.element.value.substring(end);
+
+    const cursorPos = start + string.length;
+
+    this.element.focus();
+    this.element.setSelectionRange(cursorPos, cursorPos);
+
+    return true;
   }
 }

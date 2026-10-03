@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -30,18 +30,10 @@ export class PageEntriesCategory {
     let searchParams = new URLParser();
     let elementForm = document.querySelector('[data-element="main-form"]');
 
-    let locales;
     const interactiveLocaleChoices = new Interactive('choices');
     const interactiveParentChoices = new Interactive('choices');
 
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
+    this.page.core.locales.admin.getData().then((localeData) => {
       const urlInputElement = document.querySelector('[data-element="input-url"]');
       const titleInputElement = document.querySelector('[data-element="input-title"]');
       const SEOTitleInputElement = document.querySelector('[data-element="input-seo-title"]');
@@ -49,7 +41,7 @@ export class PageEntriesCategory {
       const SEODescriptionTextareaElement = document.querySelector('[data-element="input-seo-description"]');
       const keywordsTextareaElement = document.querySelector('[data-element="input-keywords"]');
 
-      locales.forEach((locale, localeIndex) => {
+      this.page.core.locales.list.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
         let localeIconURL = locale.iconURL;
         let localeName = locale.name;
@@ -69,7 +61,7 @@ export class PageEntriesCategory {
         interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, localeName);
       });
 
-      locales.forEach((locale, localeIndex) => {
+      this.page.core.locales.list.forEach((locale, localeIndex) => {
         if (locale.name === window.CMSCore.locales.admin.name) {
           interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
         }
@@ -156,7 +148,7 @@ export class PageEntriesCategory {
         const SEODescriptionTextareaElement = document.querySelector('[data-element="input-seo-description"]');
         const keywordsTextareaElement = document.querySelector('[data-element="input-keywords"]');
         
-        locales.forEach((locale, localeIndex) => {
+        this.page.core.locales.list.forEach((locale, localeIndex) => {
           if (locale.name === event.target.value) {
             titleInputElement.setAttribute('name', 'entries_category_title_' + locale.iso639_2);
             SEOTitleInputElement.setAttribute('name', 'entries_category_seo_title_' + locale.iso639_2);
@@ -283,6 +275,8 @@ export class PageEntriesCategory {
             method: 'DELETE',
             url: '/handler/entry/category/' + searchParams.getPathPart(3) + '?localeMessage=' + window.CMSCore.locales.admin.name
           });
+
+          request.target.data = formData;
 
           request.target.send().then((data) => {
             if (data.statusCode === 1) {

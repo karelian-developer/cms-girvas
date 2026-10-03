@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -23,10 +23,13 @@ namespace core\PHPLibrary\Page;
 use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\Page as Page;
+use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\Parsedown as Parsedown;
 use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\User\Consent as UserConsent;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
+use \core\PHPLibrary\SystemCore\Report as Report;
 
 class PageProfile implements InterfacePage
 {
@@ -63,6 +66,82 @@ class PageProfile implements InterfacePage
       );
     }
   }
+
+  /**
+   * Собрать HTML-блок «Мои согласия» для владельца профиля
+   *
+   * @param User $profileUser
+   * @return string
+   */
+  private function buildConsentsBlock(User $profileUser) : string
+  {
+    $localeName = $this->CMSCore->locale->getName();
+    $localeData = $this->CMSCore->locale->getData();
+
+    $activeConsents = UserConsent::getActiveByUser($this->CMSCore, $profileUser->getID());
+
+    if (empty($activeConsents)) {
+      $itemsHTML = '<tr class="table__row"><td class="table__cell" colspan="2">'
+        . htmlspecialchars($localeData['PROFILE_CONSENTS_EMPTY'] ?? 'У вас нет активных согласий.')
+        . '</td></tr>';
+    } else {
+      $items = [];
+
+      foreach ($activeConsents as $consent) {
+        $consent->initData();
+
+        // Заголовок документа из PageStatic
+        $documentTitle = '';
+        if ($consent->getPageStaticID() > 0) {
+          $pageStatic = new PageStatic($this->CMSCore, $consent->getPageStaticID());
+          if ($pageStatic !== null) {
+            $pageStatic->initData(['name', 'texts']);
+            $documentTitle = $pageStatic->getTitle($localeName);
+            if (empty($documentTitle)) {
+              $documentTitle = $pageStatic->getName();
+            }
+          }
+        }
+
+        if (empty($documentTitle)) {
+          $documentTitle = '—';
+        }
+
+        // Источник
+        $source = $consent->getSource();
+        $sourceLabel = match ($source) {
+          'form' => $localeData['PROFILE_CONSENTS_SOURCE_FORM'] ?? 'Форма',
+          'registration' => $localeData['PROFILE_CONSENTS_SOURCE_REGISTRATION'] ?? 'Регистрация',
+          default => $source
+        };
+
+        $items[] = ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme,
+          'templates/page/profile/consentItem.tpl',
+          [
+            'CONSENT_ID' => $consent->getID(),
+            'CONSENT_DOCUMENT_TITLE' => htmlspecialchars($documentTitle),
+            'CONSENT_VERSION' => htmlspecialchars($consent->getDocumentVersion()),
+            'CONSENT_DATE' => date('d.m.Y H:i', $consent->getConsentedAt()),
+            'CONSENT_SOURCE_LABEL' => htmlspecialchars($sourceLabel),
+            'CONSENT_LOCALE' => htmlspecialchars($consent->getLocale())
+          ]
+        );
+      }
+
+      $itemsHTML = implode("\n", $items);
+    }
+
+    return ThemeCollector::assemblyFileContent(
+      $this->CMSCore->theme,
+      'templates/page/profile/consentsBlock.tpl',
+      [
+        'PROFILE_CONSENTS_BLOCK_TITLE' => $localeData['PROFILE_CONSENTS_BLOCK_TITLE'] ?? 'Мои согласия',
+        'PROFILE_CONSENTS_BLOCK_DESCRIPTION' => $localeData['PROFILE_CONSENTS_BLOCK_DESCRIPTION'] ?? '',
+        'PROFILE_CONSENTS_ITEMS' => $itemsHTML
+      ]
+    );
+  }
   
   /**
    * Сборка шаблона страницы
@@ -96,6 +175,21 @@ class PageProfile implements InterfacePage
 
         $userGroup = $user->getGroup();
         $userGroup->initData(['permissions']);
+
+        // ============================================================
+        // ЛОГИРОВАНИЕ ПРОСМОТРА ПРОФИЛЯ (если смотрит не сам себя)
+        // ============================================================
+        if ($this->CMSCore->urlp->getParam('event') !== 'edit' && $user->getID() !== $profileUser->getID()) {
+          Report::create(
+            $this->CMSCore,
+            Report::REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED,
+            [
+              'targetUserID' => $profileUser->getID(),
+              'viewedByID' => $user->getID(),
+              'ip' => $this->CMSCore->client->getIPAddress()
+            ]
+          );
+        }
 
         $fieldsTypes = $CMSConfigurator->existsDatabaseEntryValue('users_additional_field_type')
           ? json_decode($this->CMSCore->configurator->getDatabaseEntryValue('users_additional_field_type'), true)
@@ -187,6 +281,11 @@ class PageProfile implements InterfacePage
             ]);
           }
 
+          $consentsBlock = '';
+          if ($user->getID() === $profileUser->getID()) {
+            $consentsBlock = $this->buildConsentsBlock($profileUser);
+          }
+
           $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page.tpl', [
             'PAGE_NAME' => 'profile',
             'PAGE_CONTENT' => ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/profile.tpl', [
@@ -200,7 +299,8 @@ class PageProfile implements InterfacePage
               'USER_BIRTHDATE' => date('d.m.Y', $profileUser->getBirthdateUnixTimestamp()),
               'USER_BIRTHDATE_MINIMUM' => date('Y-m-d', time() - 3155760000),
               'USER_BIRTHDATE_MAXIMUM' => date('Y-m-d', time() - 441763200),
-              'PROFILE_ADDITIONAL_FIELDS' => implode($additionalFieldsElements)
+              'PROFILE_ADDITIONAL_FIELDS' => implode($additionalFieldsElements),
+              'PROFILE_CONSENTS_BLOCK' => $consentsBlock
             ])
           ]);
         }

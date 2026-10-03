@@ -11,6 +11,7 @@
 use \core\PHPLibrary\SystemCore\Database\Connector as CMSDatabaseConnector;
 use \core\PHPLibrary\Client as Client;
 use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \DOMDocument as DOMDocument;
 
 if (!defined('IS_NOT_HACKED')) {
@@ -69,26 +70,40 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     $siteKeywords = strip_tags($siteKeywords);
     $siteKeywords = str_replace('\'', '"', $siteKeywords);
     $siteKeywords = preg_split('/\s*\,\s*/', $siteKeywords);
-    
+
     if (!empty($siteTitle) && !empty($siteDescription)) {
       $CMSCore->databaseConnector = new CMSDatabaseConnector($CMSCore, $CMSCore->configurator);
 
+      // Определяем локаль сайта, выбранную на шаге set-locales-and-timezone
+      $siteLocaleName = $CMSCore->configurator->existsDatabaseEntryValue('base_locale')
+        ? (string) $CMSCore->configurator->getDatabaseEntryValue('base_locale')
+        : 'ru_RU';
+
+      // Значения для JSON-объектов по локалям
+      $siteTitleValues = [$siteLocaleName => $siteTitle];
+      $siteDescriptionValues = [$siteLocaleName => $siteDescription];
+      $siteKeywordsValues = [$siteLocaleName => $siteKeywords];
+
+      $siteTitleJSON = json_encode($siteTitleValues, JSON_UNESCAPED_UNICODE);
+      $siteDescriptionJSON = json_encode($siteDescriptionValues, JSON_UNESCAPED_UNICODE);
+      $siteKeywordsJSON = json_encode($siteKeywordsValues, JSON_UNESCAPED_UNICODE);
+
       if ($CMSCore->configurator->existsDatabaseEntryValue('base_site_title')) {
-        $CMSCore->configurator->updateDatabaseEntryValue('base_site_title', $siteTitle);
+        $CMSCore->configurator->updateDatabaseEntryValue('base_site_title', $siteTitleJSON);
       } else {
-        $CMSCore->configurator->insertDatabaseEntryValue('base_site_title', $siteTitle);
+        $CMSCore->configurator->insertDatabaseEntryValue('base_site_title', $siteTitleJSON);
       }
 
       if ($CMSCore->configurator->existsDatabaseEntryValue('seo_site_description')) {
-        $CMSCore->configurator->updateDatabaseEntryValue('seo_site_description', $siteDescription);
+        $CMSCore->configurator->updateDatabaseEntryValue('seo_site_description', $siteDescriptionJSON);
       } else {
-        $CMSCore->configurator->insertDatabaseEntryValue('seo_site_description', $siteDescription);
+        $CMSCore->configurator->insertDatabaseEntryValue('seo_site_description', $siteDescriptionJSON);
       }
 
       if ($CMSCore->configurator->existsDatabaseEntryValue('seo_site_keywords')) {
-        $CMSCore->configurator->updateDatabaseEntryValue('seo_site_keywords', json_encode($siteKeywords));
+        $CMSCore->configurator->updateDatabaseEntryValue('seo_site_keywords', $siteKeywordsJSON);
       } else {
-        $CMSCore->configurator->insertDatabaseEntryValue('seo_site_keywords', json_encode($siteKeywords));
+        $CMSCore->configurator->insertDatabaseEntryValue('seo_site_keywords', $siteKeywordsJSON);
       }
 
       $tipBlockElement->setAttribute('class', 'tip tip_green');
@@ -130,6 +145,24 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
 
                 if (!is_null($admin)) {
                   $admin->update(['emailIsSubmitted' => true, 'metadata' => ['groupID' => 1]]);
+
+                  // ============================================================
+                  // ЛОГИРОВАНИЕ СОЗДАНИЯ АДМИНИСТРАТОРА (152-ФЗ)
+                  // ============================================================
+                  $admin->initData(['login']);
+                  $clientIP = Client::getRealIPAddress($CMSCore);
+                  
+                  CMSReport::create(
+                    $CMSCore,
+                    CMSReport::REPORT_TYPE_ID_AP_USER_CREATED,
+                    [
+                      'userID' => $admin->getID(),
+                      'userLogin' => $admin->getLogin(),
+                      'createdByID' => 0,
+                      'createdByLogin' => 'system',
+                      'ip' => $clientIP
+                    ]
+                  );
 
                   $tipBlockElement->setAttribute('class', 'tip tip_green');
                   $tipBlockElement->nodeValue = $CMSCore->locale->getSingleValueByKey('API_POST_DATA_SUCCESS');
@@ -214,7 +247,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
   if ($CMSCore->urlp->getPath(2) === 'finish') {
     $fileInstalledPath = sprintf('%s/INSTALLED', CMS_ROOT_DIRECTORY);
 
-    $clientIP = Client::getRealIPAddress();
+    $clientIP = Client::getRealIPAddress($CMSCore);
 
     $externalIP = @file_get_contents('https://api.ipify.org');
     if ($externalIP === false) {

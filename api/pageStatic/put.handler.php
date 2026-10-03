@@ -14,17 +14,24 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 use \core\PHPLibrary\PageStatic as PageStatic;
+use \core\PHPLibrary\PageStatic\Version as PageStaticVersion;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
   if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_PAGES_STATIC_EDIT)) {
     $pageStaticName = isset($_PUT['page_static_name']) ? urlencode(htmlentities($_PUT['page_static_name'])) : '';
+
+    if (empty($pageStaticName)) {
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_PAGE_STATIC_ERROR_NAME_EMPTY');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
+      return;
+    }
 
     if (!PageStatic::existsByName($CMSCore, $pageStaticName)) {
       $pageStaticCreationAllowed = true;
@@ -140,11 +147,33 @@ if ($CMSCore->client->isLogged(2)) {
             $pageStatic->update($pageStaticData);
           }
 
-          /** @var CMSReport Новый отчет */
-          $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_PAGE_CREATED, [
-            'clientIP' => $CMSCore->client->getIPAddress(),
-            'pageID' => $pageStatic->getID()
-          ]);
+          // ============================================================
+          // ФЛАГ ЮРИДИЧЕСКОГО ДОКУМЕНТА (152-ФЗ)
+          // ============================================================
+          $pageStaticIsLegalDocument = ($_PUT['page_static_is_legal_document_status'] ?? 'off') === 'on';
+
+          if ($pageStaticIsLegalDocument) {
+            $pageStatic->update(['metadata' => ['isLegalDocument' => true]]);
+          }
+
+          // ============================================================
+          // ЛОГИРОВАНИЕ СОЗДАНИЯ СТАТИЧЕСКОЙ СТРАНИЦЫ (152-ФЗ)
+          // ============================================================
+          $pageStatic->initData(['name', 'texts']);
+          $pageTitle = $pageStatic->getTitle($CMSCore->locale->getName());
+          
+          CMSReport::create(
+            $CMSCore,
+            CMSReport::REPORT_TYPE_ID_AP_PAGE_CREATED,
+            [
+              'pageID' => $pageStatic->getID(),
+              'pageName' => $pageStatic->getName(),
+              'pageTitle' => $pageTitle,
+              'createdByID' => $clientUser->getID(),
+              'createdByLogin' => $clientUser->getLogin(),
+              'ip' => $CMSCore->client->getIPAddress()
+            ]
+          );
 
           $handlerOutputData['pageStatic'] = [];
           $handlerOutputData['pageStatic']['id'] = $pageStatic->getID();

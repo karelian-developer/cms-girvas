@@ -8,20 +8,23 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
- if (!defined('IS_NOT_HACKED')) {
+if (!defined('IS_NOT_HACKED')) {
   http_response_code(503);
   die('An attempted hacker attack has been detected.');
 }
 
 use \core\PHPLibrary\EntryComment as EntryComment;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
+use \core\PHPLibrary\Entry as Entry;
 
 if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(1);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
   $commentData = [];
+  $changedFields = [];
 
   if (isset($_PATCH['comment_id'])) {
     $commentID = $_PATCH['comment_id'] ?? 0;
@@ -32,7 +35,27 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
 
     if (EntryComment::existsByID($CMSCore, $commentID)) {
       $comment = new EntryComment($CMSCore, $commentID);
-      $comment->initData(['metadata', 'authorID']);
+      $comment->initData(['metadata', 'authorID', 'content', 'entryID']);
+      
+      // Сохраняем старые значения для сравнения
+      $oldValues = [
+        'content' => $comment->getContent(),
+        'isHidden' => $comment->isHidden(),
+        'rating' => $comment->getRating(),
+      ];
+      
+      // Получаем данные для логирования
+      $entryID = $comment->getEntryID();
+      $entryTitle = '';
+      if ($entryID > 0) {
+        try {
+          $entry = new Entry($CMSCore, $entryID);
+          $entry->initData(['texts']);
+          $entryTitle = $entry->getTitle($CMSCore->locale->getName());
+        } catch (\Exception $e) {
+          $entryTitle = 'unknown';
+        }
+      }
 
       $commentPatchingIsAllowed = false;
 
@@ -105,16 +128,18 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               if (!empty($commentRiskFactorsDetected)) {
                 $commentData['metadata']['isHidden'] = true;
                 $commentData['metadata']['hiddenReason'] = sprintf('{LANG:COMMENT_DETECTED_FROM_PREMODERATION_FILTER} (%s).', implode(', ', $commentRiskFactorsDetected));
+                $changedFields[] = 'is_hidden';
+                $changedFields[] = 'hidden_reason';
               }
             }
 
             if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_BASE_ENTRY_COMMENT_CHANGE) && $comment->getAuthorID() === $clientUser->getID()) {
               $commentData['content'] = $commentContent;
-              //$commentData['metadata']['parentID'] = $commentParentID;
+              if ($oldValues['content'] !== $commentContent) $changedFields[] = 'content';
               $commentPatchingIsAllowed = true;
             } elseif ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT)) {
               $commentData['content'] = $commentContent;
-              //$commentData['metadata']['parentID'] = $commentParentID;
+              if ($oldValues['content'] !== $commentContent) $changedFields[] = 'content';
               $commentPatchingIsAllowed = true;
             }
           } else {
@@ -135,6 +160,8 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
         if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT)) {
           $commentData['metadata']['isHidden'] = $commentIsHidden === 'on' ? true : false;
           $commentData['metadata']['hiddenReason'] = $commentHiddenReason;
+          if ($oldValues['isHidden'] != $commentData['metadata']['isHidden']) $changedFields[] = 'is_hidden';
+          if ($oldValues['hiddenReason'] !== $commentHiddenReason) $changedFields[] = 'hidden_reason';
           $commentPatchingIsAllowed = true;
         }
       }
@@ -166,6 +193,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               'voterID' => $clientUserID,
               'vote' => $commentRatingVote
             ];
+            $changedFields[] = 'rating';
           }
 
           if ($allowVoting) {
@@ -178,6 +206,33 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
         $isUpdated = !empty($commentData) ? $comment->update($commentData) : false;
 
         if ($isUpdated) {
+          // ============================================================
+          // ЛОГИРОВАНИЕ ОБНОВЛЕНИЯ КОММЕНТАРИЯ (152-ФЗ)
+          // ============================================================
+          $comment->initData(['content', 'metadata']);
+          
+          // Получаем все языковые версии заголовка записи
+          $entryTitles = [];
+          $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+          foreach ($CMSLocalesNames as $localeName) {
+            $entryTitles[$localeName] = $entry->getTitle($localeName);
+          }
+
+          CMSReport::create(
+            $CMSCore,
+            CMSReport::REPORT_TYPE_ID_AP_ENTRIES_COMMENT_EDITED,
+            [
+              'commentID' => $commentID,
+              'entryID' => $entryID,
+              'entryTitles' => $entryTitles,
+              'authorID' => $comment->getAuthorID(),
+              'updatedByID' => $clientUser->getID(),
+              'updatedByLogin' => $clientUser->getLogin(),
+              'changedFields' => $changedFields,
+              'ip' => $CMSCore->client->getIPAddress()
+            ]
+          );
+
           $comment = new EntryComment($CMSCore, $commentID);
 
           $commentInitData = ['metadata'];
@@ -196,13 +251,18 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
-        $handlerStatusCode = $handlerStatusCode ?? 0;
+        if (empty($handlerMessage)) {
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
+          $handlerStatusCode = $handlerStatusCode ?? 0;
+        }
       }
     } else {
       $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ENTRY_COMMENT_ERROR_NOT_FOUND');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
+  } else {
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
   $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');

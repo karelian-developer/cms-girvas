@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -121,16 +121,8 @@ final class Core implements ThemeInterfaceCore
     $this->theme->CMSCore->initPage($this->theme->CMSCore->urlp->getPathString());
     $sitePage = $this->theme->CMSCore->getInitedPage();
     $sitePage->assembly();
-
-    $localeData = $this->theme->locale->getData();
     
-    $themeVars['SITE_PAGE'] = ThemeCollector::assembly($sitePage->assembled, [
-      'SIDEBAR_BLOCK_DEMO' => $this->assemblySidebarBlock('default', [
-        'BLOCK_TITLE' => $localeData['THEME_IDEBAR_BLOCK_DEMO_TITLE'],
-        'BLOCK_CONTENT' => $localeData['THEME_SIDEBAR_BLOCK_DEMO_CONTENT']
-      ]),
-      'SIDEBAR_BLOCK_LAST_NEWS' => $this->assemblySidebarBlock('lastNews', []),
-    ]);
+    $themeVars['SITE_PAGE'] = ThemeCollector::assembly($sitePage->assembled, []);
 
     return ThemeCollector::assemblyFileContent($this->theme, 'templates/main.tpl', $themeVars);
   }

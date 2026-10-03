@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -115,10 +115,18 @@ final class Reports
     $queryBuilder->statement->clauseFrom->addTable('reports');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`createdUnixTimestamp` BETWEEN :startPeriodUnix AND :endPeriodUnix AND JSON_UNQUOTE(JSON_EXTRACT(metadata, \'$.typeID\')) IS NOT NULL AND CAST(JSON_UNQUOTE(JSON_EXTRACT(metadata, \'$.typeID\')) AS UNSIGNED) = :typeID',
-      'postgresql' => '"createdUnixTimestamp" BETWEEN :startPeriodUnix AND :endPeriodUnix AND (metadata::jsonb->>\'typeID\') IS NOT NULL AND (metadata::jsonb->>\'typeID\')::integer = :typeID'
-    ]);
+
+    $dialect = $queryBuilder->dialect;
+
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s BETWEEN :startPeriodUnix AND :endPeriodUnix AND %s IS NOT NULL AND %s = :typeID',
+        $dialect->quoteIdentifier('createdUnixTimestamp'),
+        $dialect->jsonExtractInt('metadata', 'typeID'),
+        $dialect->jsonExtractInt('metadata', 'typeID')
+      )
+    );
+
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -170,10 +178,12 @@ final class Reports
     $queryBuilder->statement->clauseFrom->addTable('reports');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`createdUnixTimestamp` BETWEEN :startPeriodUnix AND :endPeriodUnix',
-      'postgresql' => '"createdUnixTimestamp" BETWEEN :startPeriodUnix AND :endPeriodUnix'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s BETWEEN :startPeriodUnix AND :endPeriodUnix',
+        $queryBuilder->dialect->quoteIdentifier('createdUnixTimestamp')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -207,6 +217,77 @@ final class Reports
   }
 
   /**
+   * Получить отчёты, связанные с пользователем (как субъектом ПДн)
+   *
+   * @param CoreInterface $CMSCore
+   * @param int $userID
+   * @param int $limit
+   * @param int $offset
+   * @return array
+   */
+  public static function getAllByUser(
+    CoreInterface $CMSCore,
+    int $userID,
+    int $limit = 10000,
+    int $offset = 0
+  ) : array {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('reports');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+
+    $dialect = $queryBuilder->dialect;
+    $jsonColumns = ['targetUserID', 'userID', 'subjectUserID', 'viewedByID'];
+    $parts = [];
+    $bindings = [];
+    
+    foreach ($jsonColumns as $i => $key) {
+      $param = ':userID_' . $i;
+      $parts[] = sprintf('%s = %s', $dialect->jsonExtractInt('variables', $key), $param);
+      $bindings[$param] = $userID;
+    }
+
+    $queryBuilder->statement->clauseWhere->addCondition('(' . implode(' OR ', $parts) . ')');
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
+    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    $queryBuilder->statement->setClauseLimit($limit, $offset);
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      foreach ($bindings as $param => $value) {
+        $databaseQuery->bindValue($param, $value, \PDO::PARAM_INT);
+      }
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $reports = [];
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    if ($results) {
+      foreach ($results as $data) {
+        $reports[] = new Report($CMSCore, (int) $data['id']);
+      }
+    }
+
+    return $reports;
+  }
+
+  /**
    * Получить объекты отчетов определенного типа
    *
    * @param  int $typeID
@@ -218,18 +299,20 @@ final class Reports
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     
     $conditionTypeIDs = [];
     foreach ($typeIDs as $typeID) {
-      $conditionTypeIDs[] = match ($CMSConfigDatabase['dms']) {
-        DMS::PostgreSQL => '(metadata::jsonb->>\'typeID\')::int = ' . $typeID,
-        DMS::MySQL => 'JSON_EXTRACT(`metadata`, \'$.typeID\') = ' . $typeID,
-      };
+      $conditionTypeIDs[] = sprintf(
+        '%s = %d',
+        $queryBuilder->dialect->jsonExtractInt('metadata', 'typeID'),
+        (int) $typeID
+      );
     }
 
     $conditionTypeIDsImploded = implode(' OR ', $conditionTypeIDs);
 
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $queryBuilder->setStatementSelect();
     $queryBuilder->statement->addSelections(['id']);
     $queryBuilder->statement->setClauseFrom();

@@ -14,10 +14,11 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 use \core\PHPLibrary\Mail\SMTPClient as SMTPClient;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata', 'email']);
+  $clientUser->initData(['login','metadata','email']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
@@ -53,6 +54,20 @@ if ($CMSCore->client->isLogged(2)) {
           );
 
           $SMTPClient->disconnect();
+
+          // ============================================================
+          // ЛОГИРОВАНИЕ SMTP
+          // ============================================================
+          CMSReport::create(
+            $CMSCore,
+            CMSReport::REPORT_TYPE_ID_AP_SETTINGS_EDITED,
+            [
+              'changedFields' => array_keys($_POST),
+              'userID' => $clientUser->getID(),
+              'userLogin' => $clientUser->getLogin(),
+              'ip' => $CMSCore->client->getIPAddress()
+            ]
+          );
         } catch (Exception $exception) {
           $handlerMessage = 'API ERROR: ' . $exception;
           $handlerStatusCode = 0;

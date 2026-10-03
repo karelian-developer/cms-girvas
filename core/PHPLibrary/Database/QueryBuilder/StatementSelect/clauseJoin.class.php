@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -64,8 +64,16 @@ final class ClauseJoin implements InterfaceClause
     string $tablePrefix = '',
     string $alias = ''
   ) : void {
+    $type = strtoupper($type);
+
+    if (!in_array($type, [self::JOIN_TYPE_INNER, self::JOIN_TYPE_LEFT, self::JOIN_TYPE_RIGHT, self::JOIN_TYPE_FULL], true)) {
+      throw new \InvalidArgumentException(
+        sprintf('Invalid JOIN type "%s". Allowed: INNER, LEFT, RIGHT, FULL', $type)
+      );
+    }
+
     $this->joins[] = [
-      'type' => strtoupper($type),
+      'type' => $type,
       'table' => new Table($tableName, $tablePrefix),
       'condition' => $condition,
       'alias' => $alias
@@ -147,14 +155,8 @@ final class ClauseJoin implements InterfaceClause
     string $tablePrefix = '',
     string $alias = ''
   ) : void {
-    $CMSConfigurator = $this->statement->queryBuilder->CMSCore->configurator;
-    $CMSConfigDatabase = $CMSConfigurator->get('database');
-
-    $condition = match ($CMSConfigDatabase['dms']) {
-      \core\PHPLibrary\Database\DatabaseManagementSystem::MySQL => $conditions['mysql'] ?? '',
-      \core\PHPLibrary\Database\DatabaseManagementSystem::PostgreSQL => $conditions['postgresql'] ?? '',
-      default => ''
-    };
+    $dialect = $this->statement->queryBuilder->dialect;
+    $condition = $dialect->resolveAdaptiveCondition($conditions);
 
     $this->addJoin($type, $tableName, $condition, $tablePrefix, $alias);
   }
@@ -171,6 +173,7 @@ final class ClauseJoin implements InterfaceClause
       return;
     }
 
+    $dialect = $this->statement->queryBuilder->dialect;
     $databaseConfigurations = $this->statement->queryBuilder->CMSCore->configurator->get('database');
     $joinStrings = [];
 
@@ -191,14 +194,21 @@ final class ClauseJoin implements InterfaceClause
 
       $tableFullname .= $table->getName();
 
+      $segments = explode('.', $tableFullname);
+      $quotedSegments = array_map(
+        fn(string $segment) => $dialect->quoteIdentifier($segment),
+        $segments
+      );
+      $quotedTableFullname = implode('.', $quotedSegments);
+
       if (!empty($join['alias'])) {
-        $tableFullname .= ' AS ' . $join['alias'];
+        $quotedTableFullname .= ' AS ' . $dialect->quoteIdentifier($join['alias']);
       }
 
       $joinStrings[] = sprintf(
         '%s JOIN %s ON %s',
         $join['type'],
-        $tableFullname,
+        $quotedTableFullname,
         $join['condition']
       );
     }

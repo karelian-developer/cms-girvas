@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -25,24 +25,31 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\Form as Form;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
-  if ($clientUserGroup->permissionCheck(
-    $clientUserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT
-  )) {
+  if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_FORMS_MANAGEMENT)) {
     $formID = isset($_PATCH['form_id']) ? $_PATCH['form_id'] : 0;
     $formID = is_numeric($formID) ? (int)$formID : 0;
 
     if (Form::existsByID($CMSCore, $formID)) {
       $form = new Form($CMSCore, $formID);
-      $form->initData(['elements']);
+      $form->initData(['name', 'texts', 'elements', 'metadata']);
+      
+      // Сохраняем старые значения для сравнения
+      $oldValues = [
+        'name' => $form->getName(),
+        'title' => $form->getTitle($CMSCore->locale->getName()),
+        'elements' => $form->getElements(),
+      ];
 
       $formData = [];
+      $changedFields = [];
       $formElements = $form->getElements();
 
       $formElements = array_filter($formElements, function($element) use ($_PATCH) {
@@ -62,10 +69,7 @@ if ($CMSCore->client->isLogged(2)) {
           $inputTitleName = 'form_title_' . $CMSLocale->getISO639(2);
           $textareaDescriptionName = 'form_description_' . $CMSLocale->getISO639(2);
 
-          if (
-            array_key_exists($inputTitleName, $_PATCH) ||
-            array_key_exists($textareaDescriptionName, $_PATCH)
-          ) {
+          if (array_key_exists($inputTitleName, $_PATCH) || array_key_exists($textareaDescriptionName, $_PATCH)) {
             if (!array_key_exists('texts', $formData)) {
               $formData['texts'] = [];
             }
@@ -76,10 +80,14 @@ if ($CMSCore->client->isLogged(2)) {
 
             if (array_key_exists($inputTitleName, $_PATCH)) {
               $formData['texts'][$CMSLocaleName]['title'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$inputTitleName]));
+              if ($oldValues['title'] !== $formData['texts'][$CMSLocaleName]['title']) {
+                $changedFields[] = 'title';
+              }
             }
 
             if (array_key_exists($textareaDescriptionName, $_PATCH)) {
               $formData['texts'][$CMSLocaleName]['description'] = htmlspecialchars(str_replace('\'', '"', $_PATCH[$textareaDescriptionName]));
+              $changedFields[] = 'description';
             }
           }
 
@@ -112,7 +120,6 @@ if ($CMSCore->client->isLogged(2)) {
             : [];
 
           if (count($formElementTitles) > 0) {
-
             for ($i = 0; $i < count($formElementTitles); $i++) {
               $elements = $form;
 
@@ -132,9 +139,17 @@ if ($CMSCore->client->isLogged(2)) {
                   $formElements[$i]['options'] = [];
                 }
               }
+
+              if ($formElements[$i]['type'] === 'consent') {
+                $documentKey = $_PATCH['form_element_document_key'][$i] ?? '';
+                $documentKey = trim((string)$documentKey);
+
+                if (!empty($documentKey) && preg_match('/^[a-z0-9_\-]+$/', $documentKey)) {
+                  $formElements[$i]['documentKey'] = $documentKey;
+                }
+              }
               
               if ($CMSLocaleName === $commonLocale) {
-                
                 $formElementTitlesTrimmed = trim($formElementTitles[$i]);
                 $formElementDescriptionsTrimmed = trim($formElementDescriptions[$i]);
                 $formElementPlaceholdersTrimmed = trim($formElementPlaceholders[$i]);
@@ -149,7 +164,6 @@ if ($CMSCore->client->isLogged(2)) {
               if (isset($formElements[$i]['options'])) {
                 $elementName = $formElements[$i]['name'];
                 
-                // Проверяем, существуют ли данные для этого элемента в $_PATCH
                 $optionLabelsKey = 'form_element_select_' . $elementName . '_option_label';
                 $optionValuesKey = 'form_element_select_' . $elementName . '_option_value';
                 
@@ -177,59 +191,85 @@ if ($CMSCore->client->isLogged(2)) {
                 }
               }
             }
+            
+            $changedFields[] = 'elements';
           }
         }
       }
 
       if (isset($_PATCH['form_name'])) {
         $formData['name'] = urlencode(htmlentities($_PATCH['form_name']));
+        if ($oldValues['name'] !== $formData['name']) $changedFields[] = 'name';
       }
 
       if (isset($_PATCH['form_method_id'])) {
         $formData['metadata']['methodID'] = $_PATCH['form_method_id'];
+        $changedFields[] = 'method_id';
       }
 
       if (isset($_PATCH['form_action'])) {
         $formData['metadata']['action'] = $_PATCH['form_action'];
+        $changedFields[] = 'action';
       }
 
       if (isset($_PATCH['form_notification_telegram_chats_ids'])) {
-
         $formTelegramChatsIDs = explode(',', $_PATCH['form_notification_telegram_chats_ids']);
         
         foreach ($formTelegramChatsIDs as $index => $id) {
-
           if (!is_numeric($id)) {
             unset($formTelegramChatsIDs[$index]);
             continue;
           }
-
           $formTelegramChatsIDs[$index] = trim($id);
         }
+        $formData['metadata']['telegramChatsIDs'] = $formTelegramChatsIDs;
+        $changedFields[] = 'telegram_chats';
       }
 
       if (isset($_PATCH['form_notification_max_chats_ids'])) {
-
         $formMaxChatsIDs = explode(',', $_PATCH['form_notification_max_chats_ids']);
         
         foreach ($formMaxChatsIDs as $index => $id) {
-
           if (!is_numeric($id)) {
             unset($formMaxChatsIDs[$index]);
             continue;
           }
-
           $formMaxChatsIDs[$index] = trim($id);
         }
+        $formData['metadata']['maxChatsIDs'] = $formMaxChatsIDs;
+        $changedFields[] = 'max_chats';
       }
-
-      $formData['metadata']['telegramChatsIDs'] = $formTelegramChatsIDs ?? [];
-      $formData['metadata']['maxChatsIDs'] = $formMaxChatsIDs ?? [];
 
       $formData['elements'] = $formElements;
       $isUpdated = $form->update($formData);
 
       if ($isUpdated) {
+        // ============================================================
+        // ЛОГИРОВАНИЕ ОБНОВЛЕНИЯ ФОРМЫ (152-ФЗ)
+        // ============================================================
+        $form->initData(['name', 'texts']);
+
+        // Получаем все языковые версии заголовка
+        $formTitles = [];
+        $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+        foreach ($CMSLocalesNames as $localeName) {
+          $formTitles[$localeName] = $form->getTitle($localeName);
+        }
+
+        CMSReport::create(
+          $CMSCore,
+          CMSReport::REPORT_TYPE_ID_AP_FORM_EDITED,
+          [
+            'formID' => $form->getID(),
+            'formName' => $form->getName(),
+            'formTitles' => $formTitles,
+            'updatedByID' => $clientUser->getID(),
+            'updatedByLogin' => $clientUser->getLogin(),
+            'changedFields' => $changedFields,
+            'ip' => $CMSCore->client->getIPAddress()
+          ]
+        );
+
         $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');
         $handlerStatusCode = $handlerStatusCode ?? 1;
       } else {

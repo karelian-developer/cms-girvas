@@ -55,7 +55,7 @@ if (isset($_GET['time'])) {
 
     $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;
-  } {
+  } else {
     $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }

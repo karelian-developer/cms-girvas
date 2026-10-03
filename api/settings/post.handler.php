@@ -13,9 +13,11 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
+
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
@@ -93,6 +95,18 @@ if ($CMSCore->client->isLogged(2)) {
       if (!$errorIsDetected) {
         $SMTPConfugration = [];
 
+        // ============================================================
+        // СОХРАНЕНИЕ СТАРЫХ ЗНАЧЕНИЙ ДЛЯ ЛОГА (152-ФЗ)
+        // ============================================================
+        $oldSettingsValues = [];
+        foreach ($_POST as $key => $value) {
+          if (!preg_match('/^setting_([a-z0-9_]+)$/', $key, $matches)) continue;
+          $bareKey = $matches[1];
+          $oldSettingsValues[$bareKey] = $CMSCore->configurator->existsDatabaseEntryValue($bareKey)
+            ? $CMSCore->configurator->getDatabaseEntryValue($bareKey)
+            : null;
+        }
+
         foreach ($_POST as $settingName => $settingValue) {
           if (preg_match('/^setting_([a-z0-9_]+)$/', $settingName, $matches, PREG_OFFSET_CAPTURE)) {
             $settingName = $matches[1][0];
@@ -112,6 +126,28 @@ if ($CMSCore->client->isLogged(2)) {
                 chmod($fileRobotsTXTPath, 0664);
               } catch (Exception $exception) {
                 $exceptionMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_ROBOTS_TXT_PERMISSION_DENIED');
+                $handlerMessage = $handlerMessage ?? $exceptionMessage;
+                $handlerStatusCode = $handlerStatusCode ?? 0;
+              }
+
+              continue;
+            }
+
+            if ($settingName == 'seo_llms_txt') {
+              $fileLLMSTXTPath = CMS_ROOT_DIRECTORY . '/llms.txt';
+
+              try {
+                $fileLLMSTXT = @fopen($fileLLMSTXTPath, 'w+');
+                if ($fileLLMSTXT === false) {
+                  $exceptionMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_LLMS_TXT_PERMISSION_DENIED');
+                  throw new Exception($exceptionMessage);
+                }
+
+                fwrite($fileLLMSTXT, $settingValue);
+                fclose($fileLLMSTXT);
+                chmod($fileLLMSTXTPath, 0664);
+              } catch (Exception $exception) {
+                $exceptionMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_SETTINGS_LLMS_TXT_PERMISSION_DENIED');
                 $handlerMessage = $handlerMessage ?? $exceptionMessage;
                 $handlerStatusCode = $handlerStatusCode ?? 0;
               }
@@ -268,6 +304,38 @@ if ($CMSCore->client->isLogged(2)) {
               }
             }
 
+            // ============================================================
+            // МУЛЬТИЯЗЫЧНЫЕ НАСТРОЙКИ: base_site_title, seo_site_description, seo_site_keywords
+            // ============================================================
+            $localizableSettings = ['base_site_title', 'seo_site_description', 'seo_site_keywords'];
+
+            if (in_array($settingName, $localizableSettings, true) && isset($_POST['_settings_locale'])) {
+              $localeName = (string) $_POST['_settings_locale'];
+
+              $values = $CMSCore->configurator->existsDatabaseEntryValue($settingName)
+                ? json_decode($CMSCore->configurator->getDatabaseEntryValue($settingName), true)
+                : [];
+
+              if (!is_array($values)) {
+                // Миграция старого плоского значения в админскую локаль
+                $adminLocale = $CMSCore->configurator->existsDatabaseEntryValue('base_admin_locale')
+                  ? (string) $CMSCore->configurator->getDatabaseEntryValue('base_admin_locale')
+                  : 'ru_RU';
+
+                $values = [$adminLocale => $values];
+              }
+
+              if ($settingName === 'seo_site_keywords') {
+                $values[$localeName] = !empty($settingValue)
+                  ? preg_split('/\s*,\s*/', $settingValue)
+                  : [];
+              } else {
+                $values[$localeName] = htmlspecialchars(str_replace('\'', '"', (string) $settingValue));
+              }
+
+              $settingValue = json_encode($values, JSON_UNESCAPED_UNICODE);
+            }
+
             if ($settingName === 'setting_static_pages_additional_field_category_id') {
 
               foreach ($settingValue as $key => $value) {
@@ -296,9 +364,18 @@ if ($CMSCore->client->isLogged(2)) {
               $settingValue = $formChatsIDs;
             }
 
-            if (is_array($settingValue)) $settingValue = json_encode($settingValue);
+            if ($settingName === 'seo_code_yandex_metrika') {
+              $settingValue = preg_replace('/\D/', '', (string) $settingValue);
+            }
+
+            if (is_array($settingValue) && $settingName !== 'security_legal_documents') {
+              $settingValue = json_encode($settingValue);
+            }
 
             $settingValue = match ($settingName) {
+              'base_site_title',
+              'seo_site_description',
+              'seo_site_keywords' => $settingValue,
               'security_notification_telegram_chats_ids' => !empty($settingValue) ? $settingValue : json_encode([]),
               'security_notification_max_chats_ids' => !empty($settingValue) ? $settingValue : json_encode([]),
               'security_allowed_admin_ip' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
@@ -378,6 +455,144 @@ if ($CMSCore->client->isLogged(2)) {
               $CMSCore->configurator->updateDatabaseEntryValue($name, json_encode([]));
             }
           }
+        }
+
+        // ============================================================
+        // ЛОГИРОВАНИЕ ИЗМЕНЕНИЯ НАСТРОЕК CMS (152-ФЗ)
+        // ============================================================
+
+        /**
+         * @var array Паттерны имён настроек, значения которых НЕ логируются.
+         * Проверка идёт по подстроке в имени поля (без префикса setting_).
+         */
+        $sensitivePatterns = [
+          'password', 'token', 'secret', 'hash', 'salt',
+          'smtp_password', 'smtp_username',
+          'allowed_admin_ip', 'allowed_emails',
+          'notification_telegram_chats_ids', 'notification_max_chats_ids',
+          'logins_blacklist',
+          'premoderation_words_filter_list',
+          'additional_field',
+        ];
+
+        /**
+         * @var array Точные имена полей, которые НЕ sensitive (исключения).
+         * Используется для переопределения паттернов — если поле подпадает под паттерн,
+         * но по смыслу безопасно (длина, флаг, домен SMTP).
+         */
+        $sensitiveExceptions = [
+          'users_password_length_min',
+          'users_password_length_max',
+          'email_smtp_host',
+          'email_smtp_port',
+          'email_smtp_domain',
+        ];
+
+        /**
+         * Рекурсивно отсортировать ключи массива (для стабильного сравнения)
+         */
+        $recursiveKsort = function(array $array) use (&$recursiveKsort): array {
+          ksort($array);
+          foreach ($array as $k => $v) {
+            if (is_array($v)) {
+              $array[$k] = $recursiveKsort($v);
+            }
+          }
+          return $array;
+        };
+
+        /**
+         * Нормализовать значение настройки для сравнения.
+         * Массивы и JSON-строки приводятся к канонической форме.
+         */
+        $normalizeSettingValue = function(mixed $value) use ($recursiveKsort): string {
+          if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            if (json_last_error() === JSON_ERROR_NONE && (is_array($decoded) || is_object($decoded))) {
+              $value = $decoded;
+            } else {
+              return $value;
+            }
+          }
+
+          if (is_array($value)) {
+            $value = $recursiveKsort($value);
+            return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+          }
+
+          if (is_bool($value)) return $value ? '1' : '0';
+          if (is_null($value)) return '';
+
+          return (string)$value;
+        };
+
+        /** @var array Изменения значений безопасных полей */
+        $changedValues = [];
+        /** @var array Имена изменившихся чувствительных полей (без значений) */
+        $sensitiveChanged = [];
+        /** @var array Полный список изменившихся полей (с префиксом setting_) */
+        $changedFields = [];
+
+        foreach ($_POST as $key => $value) {
+          if (!preg_match('/^setting_([a-z0-9_]+)$/', $key, $matches)) continue;
+
+          $bareKey = $matches[1];
+          $oldValue = $oldSettingsValues[$bareKey] ?? null;
+
+          $oldNormalized = $normalizeSettingValue($oldValue);
+          $newNormalized = $normalizeSettingValue($value);
+
+          if ($oldNormalized === $newNormalized) continue;
+
+          $changedFields[] = $key;
+
+          if (stripos($bareKey, 'additional_field') !== false) {
+            continue;
+          }
+
+          // Определяем sensitive
+          $isSensitive = false;
+
+          // 1. Исключения — точные имена
+          if (in_array($bareKey, $sensitiveExceptions, true)) {
+            $isSensitive = false;
+          // 2. Флаги _status — не sensitive
+          } elseif (str_ends_with($bareKey, '_status')) {
+            $isSensitive = false;
+          // 3. Паттерны
+          } else {
+            foreach ($sensitivePatterns as $pattern) {
+              if (stripos($bareKey, $pattern) !== false) {
+                $isSensitive = true;
+                break;
+              }
+            }
+          }
+
+          if ($isSensitive) {
+            $sensitiveChanged[] = $key;
+          } else {
+            $changedValues[$key] = [
+              'old' => mb_substr((string)$oldValue, 0, 500),
+              'new' => mb_substr((string)$value, 0, 500),
+            ];
+          }
+        }
+
+        // Логируем только если что-то реально изменилось
+        if (!empty($changedFields)) {
+          CMSReport::create(
+            $CMSCore,
+            CMSReport::REPORT_TYPE_ID_AP_SETTINGS_EDITED,
+            [
+              'changedFields'    => $changedFields,
+              'changedValues'    => $changedValues,
+              'sensitiveChanged' => $sensitiveChanged,
+              'userID'           => $clientUser->getID(),
+              'userLogin'        => $clientUser->getLogin(),
+              'ip'               => $CMSCore->client->getIPAddress()
+            ]
+          );
         }
 
         $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PATCH_DATA_SUCCESS');

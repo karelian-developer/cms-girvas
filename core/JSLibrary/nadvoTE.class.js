@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -23,23 +23,206 @@ export class NadvoTE {
   constructor(element, options = {}) {
     this.element = element;
     this.options = options;
+    this.localeData = {};
+    this.selection = '';
+
+    this.history = [];
+    this.historyIndex = -1;
+    this.maxHistory = 100;
+    this.isRestoring = false;
+
+    this.lastCursorPosition = {
+      start: 0,
+      end: 0
+    };
+
     console.log(`[NADVO TE] Object created.`);
   }
 
   init() {
     this.element.classList.add('nadvo-te');
     this.initEditorTextarea();
-    this.initEditorToolbar();
     this.initEditorTextareaVisual();
 
-    this.element.appendChild(this.toolbar.element);
     this.element.appendChild(this.textarea.element);
     this.element.appendChild(this.textareaVisual.element);
 
-    const copyright = this.createElementDiv();
-    copyright.classList.add('nadvo-te__copyright');
-    copyright.innerHTML = 'Визуальный редактор &laquo;NadvoTE&raquo; разработан компанией &laquo;Карельский разработчик&raquo; специально для CMS &laquo;ГИРВАС&raquo;.';
-    this.element.appendChild(copyright);
+    this.options.locale.getData().then((localeData) => {
+      this.localeData = localeData;
+
+      this.initEditorToolbar();
+
+      this.element.prepend(this.toolbar.element);
+
+      this.initTextareaEvents();
+      this.saveHistory(true);
+
+      this.history = [];
+      this.historyIndex = -1;
+      this.saveHistory(true);
+
+      const copyright = this.createElementDiv();
+      copyright.classList.add('nadvo-te__copyright');
+      copyright.innerText = this.localeData.NTE_COPYRIGHT;
+      this.element.appendChild(copyright);
+    });
+
+    window.nadvoDebug = this;
+  }
+
+  saveCursorPosition() {
+    const textarea = this.textarea?.element;
+
+    if (!textarea) {
+      return;
+    }
+
+    this.lastCursorPosition = {
+      start: textarea.selectionStart,
+      end: textarea.selectionEnd
+    };
+  }
+
+  initTextareaEvents() {
+    const textarea = this.textarea.element;
+
+    textarea.addEventListener('mouseup', () => {
+      this.saveTextareaSelection();
+      this.saveCursorPosition();
+      this.saveHistory();
+    });
+
+    textarea.addEventListener('mousedown', () => {
+      this.saveCursorPosition();
+    });
+
+    textarea.addEventListener('keyup', (e) => {
+      this.saveCursorPosition();
+
+      if (e.shiftKey || e.key.startsWith('Arrow')) {
+        this.saveTextareaSelection();
+      }
+
+      this.saveHistory();
+    });
+
+    textarea.addEventListener('click', () => {
+      this.saveCursorPosition();
+
+      if (textarea.selectionStart === textarea.selectionEnd) {
+        this.clearSelection();
+      }
+    });
+
+    textarea.addEventListener('input', () => {
+      this.saveCursorPosition();
+      this.saveHistory();
+    });
+  }
+
+  saveTextareaSelection() {
+    const textarea = this.textarea.element;
+
+    if (document.activeElement === textarea) {
+      const selectedText = textarea.value.substring(
+        textarea.selectionStart,
+        textarea.selectionEnd
+      );
+
+      if (selectedText) {
+        this.selection = selectedText;
+        console.log('[NADVO TE] Selection saved:', this.selection);
+      }
+    }
+  }
+
+  clearSelection() {
+    this.selection = '';
+    console.log('[NADVO TE] Selection cleared');
+  }
+
+  getSelectionString() {
+    const textarea = this.textarea?.element;
+
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+
+      if (start !== end) {
+        this.selection = textarea.value.substring(start, end);
+      } else {
+        this.selection = '';
+      }
+    }
+
+    return this.selection;
+  }
+
+  saveHistory(force = false) {
+    if (this.isRestoring) {
+      return;
+    }
+
+    const value = this.textarea?.element?.value;
+
+    if (value === undefined) {
+      return;
+    }
+
+    const lastValue = this.history[this.historyIndex];
+
+    if (!force && lastValue === value) {
+      return;
+    }
+
+    this.history = this.history.slice(0, this.historyIndex + 1);
+    this.history.push(value);
+
+    if (this.history.length > this.maxHistory) {
+      this.history.shift();
+    } else {
+      this.historyIndex++;
+    }
+  }
+
+  undo() {
+    if (this.historyIndex <= 0) {
+      return false;
+    }
+
+    this.historyIndex--;
+    this.restoreHistory();
+
+    return true;
+  }
+
+  redo() {
+    if (this.historyIndex >= this.history.length - 1) {
+      return false;
+    }
+
+    this.historyIndex++;
+    this.restoreHistory();
+
+    return true;
+  }
+
+  restoreHistory() {
+    if (this.historyIndex < 0 || this.historyIndex >= this.history.length) {
+      return;
+    }
+
+    const value = this.history[this.historyIndex];
+
+    this.isRestoring = true;
+
+    this.textarea.element.value = value;
+
+    const cursorPos = value.length;
+    this.textarea.element.setSelectionRange(cursorPos, cursorPos);
+
+    this.isRestoring = false;
+    this.clearSelection();
   }
 
   initEditorToolbar() {
@@ -80,12 +263,11 @@ export class NadvoTE {
   createElementButton(content) {
     let element = document.createElement('button');
     element.innerHTML = content;
-
     return element;
   }
-  
-  getSelectionString() {
-    return window.getSelection().toString();
+
+  async fetchJSON(url, data) {
+    return fetch(url, data).then(response => response.ok ? response.json() : Promise.reject(response));
   }
 
   async fetchJSON(url, data) {

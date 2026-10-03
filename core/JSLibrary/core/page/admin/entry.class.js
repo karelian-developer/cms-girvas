@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -15,6 +15,7 @@
 
 'use strict';
 
+import {NadvoTE} from '/core/JSLibrary/nadvoTE.class.js';
 import {Interactive} from "../../../interactive.class.js";
 import {URLParser} from "../../../urlParser.class.js";
 import {Utils} from "../../../utils.class.js";
@@ -26,6 +27,45 @@ export class PageEntry {
     this.analyzer = null;
     this.page = page;
     this.statusCode = this.page.getPageStatusCode();
+  }
+
+  initNadvoTE() {
+    this.createEditor();
+  }
+
+  createEditor() {
+    const editorContent = document.querySelector('#E3473967486_CONTENT');
+    const editorLocale = window.CMSCore?.locales.nadvoTE;
+    if (!editorContent) return;
+
+    const nadvoTE = new NadvoTE(document.querySelector('#E3473967486'), {
+      'locale': editorLocale,
+      'handler': '/handler/utils/nadvoparse',
+      'toolbar': [
+        {'name': 'undo', 'type': 'button'},
+        {'name': 'redo', 'type': 'button'},
+        {'name': 'bold', 'type': 'button'},
+        {'name': 'italic', 'type': 'button'},
+        {'name': 'underline', 'type': 'button'},
+        {'name': 'headers', 'type': 'choices'},
+        {'name': 'link', 'type': 'button'},
+        {'name': 'image', 'type': 'button'},
+        {'name': 'gallery', 'type': 'button'},
+        {'name': 'quote', 'type': 'button'},
+        {'name': 'code', 'type': 'button'},
+        {'name': 'preview', 'type': 'button'},
+        {'name': 'source', 'type': 'button'},
+        {'name': 'emoji', 'type': 'button'},
+      ]
+    });
+    nadvoTE.init();
+    nadvoTE.textarea.element.classList.add('textarea');
+    nadvoTE.textarea.element.classList.add('form__textarea');
+    nadvoTE.textarea.element.value = editorContent.innerHTML;
+    nadvoTE.textarea.element.setAttribute('name', 'entry_content_rus');
+    nadvoTE.textarea.element.setAttribute('data-element', 'input-content');
+
+    editorContent.remove();
   }
 
   SEOAnalyze(data) {
@@ -211,21 +251,15 @@ export class PageEntry {
   }
 
   init() {
+    this.initNadvoTE();
+
     const searchParams = new URLParser();
     const elementForm = document.querySelector('[data-element="main-form"]');
 
-    let locales;
     const interactiveLocaleChoices = new Interactive('choices');
     const interactiveCategoriesChoices = new Interactive('choices');
-    
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
+
+    this.page.core.locales.admin.getData().then((localeData) => {
       this.analyzer = new SEOAnalyzer(localeData);
 
       const contentTextareaElement = document.querySelector('[data-element="input-content"]');
@@ -236,7 +270,9 @@ export class PageEntry {
       const keywordsInputElement = document.querySelector('[data-element="input-keywords"]');
       const urlInputElement = document.querySelector('[data-element="input-url"]');
 
-      locales.forEach((locale, localeIndex) => {
+      console.log(contentTextareaElement);
+
+      this.page.core.locales.list.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
         let localeIconURL = locale.iconURL;
         let localeName = locale.name;
@@ -256,12 +292,12 @@ export class PageEntry {
         interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, localeName);
       });
 
-      locales.forEach((locale, localeIndex) => {
-        if (locale.name === window.CMSCore.locales.admin.name) {
+      this.page.core.locales.list.forEach((locale, localeIndex) => {
+        if (locale.name === this.page.core.locales.admin.name) {
           interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
         }
 
-        if (locale.name === window.CMSCore.locales.admin.name) {
+        if (locale.name === this.page.core.locales.admin.name) {
           contentTextareaElement.setAttribute('name', 'entry_content_' + locale.iso639_2);
           descriptionTextareaElement.setAttribute('name', 'entry_description_' + locale.iso639_2);
           SEODescriptionTextareaElement.setAttribute('name', 'entry_seo_description_' + locale.iso639_2);
@@ -340,7 +376,7 @@ export class PageEntry {
 
       let interactiveChoicesSelectElement = interactiveHeaderContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
-        locales.forEach((locale, localeIndex) => {
+        this.page.core.locales.list.forEach((locale, localeIndex) => {
           if (locale.name === event.target.value) {
             contentTextareaElement.setAttribute('name', 'entry_content_' + locale.iso639_2);
             descriptionTextareaElement.setAttribute('name', 'entry_description_' + locale.iso639_2);
@@ -432,8 +468,8 @@ export class PageEntry {
 
           const additionalDataContainerElement = document.querySelector('[data-element="additional-data"]');
           if (additionalDataContainerElement !== null) {
-            const additionalDataInputs = additionalDataContainerElement.querySelectorAll('input');
-            additionalDataInputs.forEach(element => {
+            const additionalDataFields = additionalDataContainerElement.querySelectorAll('input,textarea');
+            additionalDataFields.forEach(element => {
               formData.append(element.name, element.value);
             });
           }
@@ -442,11 +478,11 @@ export class PageEntry {
             method: searchParams.getPathPart(3) === null || this.statusCode === 404
               ? 'PUT'
               : 'PATCH',
-            url: '/handler/entry?localeMessage=' + window.CMSCore.locales.admin.name
+            url: '/handler/entry?localeMessage=' + this.page.core.locales.admin.name
           });
-  
+
           request.target.data = formData;
-  
+
           request.target.send().then((data) => {
             if (data.statusCode === 1 && searchParams.getPathPart(3) === null) {
               if (data.outputData.hasOwnProperty('entry')) {
@@ -474,7 +510,7 @@ export class PageEntry {
 
           let request = new Interactive('request', {
             method: 'DELETE',
-            url: '/handler/entry/' + searchParams.getPathPart(3) + '?localeMessage=' + window.CMSCore.locales.admin.name,
+            url: '/handler/entry/' + searchParams.getPathPart(3) + '?localeMessage=' + this.page.core.locales.admin.name,
           });
 
           request.target.data = formData;
@@ -504,7 +540,7 @@ export class PageEntry {
 
         let request = new Interactive('request', {
           method: 'PATCH',
-          url: '/handler/entry/' + searchParams.getPathPart(3) + '?localeMessage=' + window.CMSCore.locales.admin.name,
+          url: '/handler/entry/' + searchParams.getPathPart(3) + '?localeMessage=' + this.page.core.locales.admin.name,
         });
 
         request.target.data = formData;
@@ -526,7 +562,7 @@ export class PageEntry {
 
         let request = new Interactive('request', {
           method: 'PATCH',
-          url: '/handler/entry/' + searchParams.getPathPart(3) + '?localeMessage=' + window.CMSCore.locales.admin.name,
+          url: '/handler/entry/' + searchParams.getPathPart(3) + '?localeMessage=' + this.page.core.locales.admin.name,
         });
 
         request.target.data = formData;
@@ -549,7 +585,7 @@ export class PageEntry {
       if (searchParams.getPathPart(3) === null) {
         let request = new Interactive('request', {
           method: 'GET',
-          url: '/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name,
+          url: '/handler/entry/categories' + '?locale=' + this.page.core.locales.admin.name + '&localeMessage=' + this.page.core.locales.admin.name,
         });
 
         request.target.showingNotification = false;
@@ -570,7 +606,7 @@ export class PageEntry {
 
             let interactiveCategoriesChoicesSelectElement = interactiveCategoriesChoices.target.element.querySelector('select');
             interactiveCategoriesChoicesSelectElement.addEventListener('change', (event) => {
-              fetch('/handler/entries/additional-fields?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
+              fetch('/handler/entries/additional-fields?locale=' + this.page.core.locales.admin.name + '&localeMessage=' + this.page.core.locales.admin.name, {method: 'GET'}).then((response) => {
                 return (response.ok) ? response.json() : Promise.reject(response);
               }).then((responseEntryAdditionalFields) => {
                 let fields = responseEntryAdditionalFields.outputData.additionalFields;
@@ -594,7 +630,7 @@ export class PageEntry {
               });
             });
 
-            fetch('/handler/entries/additional-fields?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
+            fetch('/handler/entries/additional-fields?locale=' + this.page.core.locales.admin.name + '&localeMessage=' + this.page.core.locales.admin.name, {method: 'GET'}).then((response) => {
               return (response.ok) ? response.json() : Promise.reject(response);
             }).then((responseEntryAdditionalFields) => {
               let fields = responseEntryAdditionalFields.outputData.additionalFields;
@@ -671,7 +707,7 @@ export class PageEntry {
 
             let request = new Interactive('request', {
               method: 'PATCH',
-              url: '/handler/entry?localeMessage=' + window.CMSCore.locales.admin.name
+              url: '/handler/entry?localeMessage=' + this.page.core.locales.admin.name
             });
     
             request.target.data = formData;
@@ -697,7 +733,7 @@ export class PageEntry {
 
         let entryData;
 
-        fetch('/handler/entry/' + searchParams.getPathPart(3) + '?localeMessage=' + window.CMSCore.locales.admin.name, {
+        fetch('/handler/entry/' + searchParams.getPathPart(3) + '?localeMessage=' + this.page.core.locales.admin.name, {
           method: 'GET'
         }).then((response) => {
           return (response.ok) ? response.json() : Promise.reject(response);
@@ -734,7 +770,7 @@ export class PageEntry {
             this.buttons.SEOAnalyze.target.element.style.display = 'flex';
           }
           
-          return fetch('/handler/entry/categories' + '?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'});
+          return fetch('/handler/entry/categories' + '?locale=' + this.page.core.locales.admin.name + '&localeMessage=' + this.page.core.locales.admin.name, {method: 'GET'});
         }, (rejectionReason) => {
           this.page.showPopupNotification(rejectionReason, 0);
         }).then((response) => {
@@ -764,7 +800,7 @@ export class PageEntry {
 
             const interactiveCategoriesChoicesSelectElement = interactiveCategoriesChoices.target.element.querySelector('select');
             interactiveCategoriesChoicesSelectElement.addEventListener('change', (event) => {
-              fetch('/handler/entries/additional-fields?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
+              fetch('/handler/entries/additional-fields?locale=' + this.page.core.locales.admin.name + '&localeMessage=' + this.page.core.locales.admin.name, {method: 'GET'}).then((response) => {
                 return (response.ok) ? response.json() : Promise.reject(response);
               }).then((responseEntryAdditionalFields) => {
                 let fields = responseEntryAdditionalFields.outputData.additionalFields;
@@ -788,7 +824,7 @@ export class PageEntry {
               });
             });
 
-            fetch('/handler/entries/additional-fields?locale=' + window.CMSCore.locales.admin.name + '&localeMessage=' + window.CMSCore.locales.admin.name, {method: 'GET'}).then((response) => {
+            fetch('/handler/entries/additional-fields?locale=' + this.page.core.locales.admin.name + '&localeMessage=' + this.page.core.locales.admin.name, {method: 'GET'}).then((response) => {
               return (response.ok) ? response.json() : Promise.reject(response);
             }).then((responseEntryAdditionalFields) => {
               let fields = responseEntryAdditionalFields.outputData.additionalFields;

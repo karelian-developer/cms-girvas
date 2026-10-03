@@ -8,7 +8,7 @@
     <div id="analytic-app" class="analytic">
       <div class="analytic__block block block_attendance">
         <h2 class="block__title">{LANG:PAGE_ANALYTICS_BLOCK_ENTRY_VISITS_TITLE}</h2>
-        <div class="block__content" role="attendance-schedule"></div>
+        <div class="block__content" data-role="attendance-schedule"></div>
       </div>
     </div>
   </div>

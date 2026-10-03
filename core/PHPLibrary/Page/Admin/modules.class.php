@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -24,6 +24,8 @@ use \core\PHPLibrary\InterfacePage as InterfacePage;
 use \core\PHPLibrary\SystemCore as SystemCore;
 use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\Module as Module;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
@@ -44,21 +46,24 @@ class PageModules implements InterfacePage
       'iconName' => 'index',
       'link' => '/',
       'permanent' => true,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => null,
     ],
     'local' => [
       'name' => 'local',
       'iconName' => 'local',
       'link' => '/modules/local',
       'permanent' => true,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => 'hasPermissionAdminModulesManagement',
     ],
     'repository' => [
       'name' => 'repository',
       'iconName' => 'repository',
       'link' => '/modules/repository',
       'permanent' => true,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => 'hasPermissionAdminModulesManagement',
     ]
   ];
 
@@ -69,18 +74,85 @@ class PageModules implements InterfacePage
   }
 
   /**
+   * Получить группу текущего авторизованного пользователя админки
+   * 
+   * @return UserGroup|null
+   */
+  private function getCurrentUserGroup() : ?UserGroup
+  {
+    /** @var User|null $user */
+    $user = $this->CMSCore->client->getUser(2);
+    if ($user === null) {
+      return null;
+    }
+
+    $user->initData(['metadata']);
+
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $user->getGroup();
+    if ($userGroup === null) {
+      return null;
+    }
+
+    $userGroup->initData(['permissions']);
+
+    return $userGroup;
+  }
+
+  /**
+   * Проверить, есть ли у текущего пользователя право управления модулями
+   * 
+   * @return bool
+   */
+  private function currentUserCanManageModules() : bool
+  {
+    $userGroup = $this->getCurrentUserGroup();
+
+    return $userGroup !== null
+      && method_exists($userGroup, 'hasPermissionAdminModulesManagement')
+      && $userGroup->hasPermissionAdminModulesManagement();
+  }
+
+  /**
+   * Собрать страницу ошибки и подменить итоговую сборку
+   * 
+   * @param int $httpCode
+   * 
+   * @return void
+   */
+  private function assemblyError(int $httpCode) : void
+  {
+    http_response_code($httpCode);
+
+    $pageError = new PageError($this->CMSCore, $this->page, $httpCode);
+    $pageError->assembly();
+    $this->assembled = $pageError->assembled;
+  }
+
+  /**
    * Инициализация подразделов
    * 
    * @return void
    */
   public function initSubnavigation() : void
   {
+    // Если нет прав на управление модулями — подразделы не собираем
+    if (!$this->currentUserCanManageModules()) {
+      return;
+    }
+
     $themeSource =& $this->CMSCore->theme->core->source;
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
 
   public function assembly() : void
   {
+    // Защита от прямого захода по URL без прав
+    if (!$this->currentUserCanManageModules()) {
+      $this->assemblyError(403);
+      return;
+    }
+
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/modules.css', 'rel' => 'stylesheet']);
     
     $localeData = $this->CMSCore->locale->getData();

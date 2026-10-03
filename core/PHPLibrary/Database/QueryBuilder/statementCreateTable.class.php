@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -21,7 +21,6 @@
 namespace core\PHPLibrary\Database\QueryBuilder;
 
 use \core\PHPLibrary\Database\QueryBuilder as QueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Database\QueryBuilder\InterfaceStatement as InterfaceStatement;
 
 final class StatementCreateTable implements InterfaceStatement
@@ -35,7 +34,7 @@ final class StatementCreateTable implements InterfaceStatement
   /**
    * __construct
    *
-   * @param  mixed $queryBuilder
+   * @param  QueryBuilder $queryBuilder
    * @return void
    */
   public function __construct(QueryBuilder $queryBuilder)
@@ -61,21 +60,40 @@ final class StatementCreateTable implements InterfaceStatement
    */
   public function getTableName() : string
   {
+    $dialect = $this->queryBuilder->dialect;
     $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
-    $CMSConfigDatabaseScheme = trim($CMSConfigDatabase['scheme']);
-    $CMSConfigDatabasePrefix = trim($CMSConfigDatabase['prefix']);
+
+    $prefix = trim($CMSConfigDatabase['prefix']);
+    $scheme = trim($CMSConfigDatabase['scheme']);
 
     $tableFullname = '';
-    if ($CMSConfigDatabase !== null) {
-      if ($CMSConfigDatabasePrefix !== '') {
-        $tableFullname .= $CMSConfigDatabasePrefix . '_';
-      }
+
+    if ($scheme !== '') {
+      $tableFullname .= $scheme . '.';
+    }
+
+    if ($prefix !== '') {
+      $tableFullname .= $prefix . '_';
     }
 
     $tableFullname .= $this->tableName;
-    return $tableFullname;
+
+    // Экранируем каждый сегмент отдельно
+    $segments = explode('.', $tableFullname);
+    $quotedSegments = array_map(
+      fn(string $segment) => $dialect->quoteIdentifier($segment),
+      $segments
+    );
+
+    return implode('.', $quotedSegments);
   }
 
+  /**
+   * Проверять наличие базы данных
+   *
+   * @param  bool $value
+   * @return void
+   */
   public function setCheckExists(bool $value) : void
   {
     $this->checkExists = $value;
@@ -84,25 +102,32 @@ final class StatementCreateTable implements InterfaceStatement
   /**
    * Добавить колонку
    *
-   * @param  mixed $selection
+   * @param  string $name        Имя колонки (логическое или физическое)
+   * @param  string $type        Логический или физический тип
+   * @param  string $constraint  Ограничения (NOT NULL, DEFAULT, PRIMARY KEY...)
    * @return void
    */
   public function addColumn(string $name, string $type, string $constraint = '') : void
   {
-    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+    $dialect = $this->queryBuilder->dialect;
 
-    $array = [];
-    $array[] = match ($CMSConfigDatabase['dms']) {
-      CMSDMS::MySQL => '`' . $name . '`',
-      CMSDMS::PostgreSQL => '"' . $name . '"'
-    };
+    $physicalType = $dialect->isLogicalType($type)
+      ? $dialect->resolve($type)
+      : $type;
 
-    $array[] = $type;
-    $array[] = $constraint;
-    
-    $this->columns[] = implode(' ', $array);
+    if ($dialect->isLogicalType($type) && $dialect->constraintHasDefault($constraint)) {
+      if (!$dialect->supportsDefault($type)) {
+        throw new \LogicException(sprintf(
+          'DEFAULT is not allowed for logical type "%s" on %s',
+          $type,
+          $dialect->getDMS()->getString()
+        ));
+      }
+    }
 
-    unset($array);
+    $quotedName = $dialect->quoteIdentifier($name);
+
+    $this->columns[] = trim(sprintf('%s %s %s', $quotedName, $physicalType, $constraint));
   }
   
   /**
@@ -110,14 +135,15 @@ final class StatementCreateTable implements InterfaceStatement
    *
    * @return void
    */
-  public function assembly() : void {
-    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
-    $CMSConfigDatabaseScheme = trim($CMSConfigDatabase['scheme']);
+  public function assembly() : void
+  {
     $ifNotExists = $this->checkExists ? 'IF NOT EXISTS' : '';
 
-    $this->assembled = match ($CMSConfigDatabase['dms']) {
-      CMSDMS::MySQL => sprintf('CREATE TABLE %s `%s` (%s);', $ifNotExists, $this->getTableName(), implode(', ', $this->columns)),
-      CMSDMS::PostgreSQL => sprintf('CREATE TABLE %s %s."%s" (%s);', $ifNotExists, $CMSConfigDatabaseScheme, $this->getTableName(), implode(', ', $this->columns))
-    };
+    $this->assembled = sprintf(
+      'CREATE TABLE %s %s (%s);',
+      $ifNotExists,
+      $this->getTableName(),
+      implode(', ', $this->columns)
+    );
   }
 }

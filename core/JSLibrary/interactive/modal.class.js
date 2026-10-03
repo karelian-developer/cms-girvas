@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -28,6 +28,14 @@ export class Modal {
     this.element = null;
     this.buttons = [];
     this.onCloseCallbackFunction = () => {};
+  }
+
+  setWidth(value, units = 'px') {
+    this.width = value + units;
+  }
+
+  setContentElement(element) {
+    this.content = element;
   }
 
   show() {
@@ -156,7 +164,7 @@ export class Modal {
 
     let modalElement = document.createElement('div');
     modalElement.classList.add('interactive__modal');
-    modalElement.style.width = this.width + 'px';
+    modalElement.style.width = this.width;
 
     modalElement.appendChild(childrenElements.header);
 

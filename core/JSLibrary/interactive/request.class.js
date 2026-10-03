@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -29,12 +29,21 @@ export class Request {
    */
   constructor(interactiveObject, method, url, data = undefined) {
     this.interactiveObject = interactiveObject;
-
     this.setMethod(method);
     this.setURL(url);
     
     this.element = data;
-    this.data = (data === undefined || data === null) ? undefined : new FormData(this.element);
+    
+    if (data instanceof FormData) {
+      this.data = data;
+    } else if (data instanceof HTMLFormElement) {
+      this.data = new FormData(data);
+    } else if (data !== undefined && data !== null) {
+      this.data = data;
+    } else {
+      this.data = undefined;
+    }
+    
     this.headers = {};
     this.showingNotification = true;
   }
@@ -146,8 +155,9 @@ export class Request {
     }
 
     if (window.CMSCore !== undefined) {
-      if (window.CMSCore.client.CSRFToken !== '') {
-        this.headers['X-CSRF-Token'] = window.CMSCore.client.CSRFToken;
+      const freshToken = window.CMSCore.client.getCSRFToken();
+      if (freshToken !== '') {
+        this.headers['X-CSRF-Token'] = freshToken;
       }
     }
 

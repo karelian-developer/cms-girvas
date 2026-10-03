@@ -1,3 +1,3 @@
-**Congratulations! The GIRVAS content and site management system has been successfully installed!**
+**Congratulations! The “GIRVAS” content and website management system has been installed successfully!**
 
-Now you can go to [site](/) or to [administrative panel](/admin). In order to avoid re-installation, the system has generated an empty file named **"INSTALLED"** in the root of the system - do not delete it under any circumstances, otherwise it will be possible to re-install the CMS, which can lead to bad consequences.
+Now you can go to the [website](/), or to the [administrative panel](/admin) to configure it. To avoid reinstallation, the system has generated an empty file named **“INSTALLED”** in the root of the system — under no circumstances should you delete it, otherwise reinstallation of the CMS will become possible, which may lead to undesirable consequences.

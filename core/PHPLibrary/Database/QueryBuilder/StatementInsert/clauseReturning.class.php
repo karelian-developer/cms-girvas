@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -43,12 +43,12 @@ final class ClauseReturning implements InterfaceClause
   /**
    * Добавить колонку значения
    *
-   * @param  mixed $name
+   * @param  string $name
    * @return void
    */
   public function addColumn(string $name) : void
   {
-    array_push($this->columns, '"' . $name . '"');
+    $this->columns[] = $this->statement->getDialect()->quoteIdentifier($name);
   }
   
   /**

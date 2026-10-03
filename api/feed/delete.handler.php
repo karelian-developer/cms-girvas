@@ -14,10 +14,11 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 use \core\PHPLibrary\Feed as Feed;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
@@ -28,6 +29,36 @@ if ($CMSCore->client->isLogged(2)) {
     if ($feedID != 0) {
       if (Feed::existsByID($CMSCore, $feedID)) {
         $feed = new Feed($CMSCore, $feedID);
+        
+        // Получаем данные фида перед удалением
+        $feed->initData(['name', 'texts']);
+        $feedName = $feed->getName();
+        $feedTypeID = $feed->getTypeID();
+        $feedCategoryID = $feed->getEntriesCategoryID();
+
+        $feedTitles = [];
+        $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+        foreach ($CMSLocalesNames as $localeName) {
+          $feedTitles[$localeName] = $feed->getTitle($localeName);
+        }
+
+        // ============================================================
+        // ЛОГИРОВАНИЕ УДАЛЕНИЯ ВЕБ-КАНАЛА (152-ФЗ)
+        // ============================================================
+        CMSReport::create(
+          $CMSCore,
+          CMSReport::REPORT_TYPE_ID_AP_FEED_DELETED,
+          [
+            'feedID' => $feedID,
+            'feedName' => $feedName,
+            'feedTitles' => $feedTitles,
+            'feedTypeID' => $feedTypeID,
+            'feedCategoryID' => $feedCategoryID,
+            'deletedByID' => $clientUser->getID(),
+            'deletedByLogin' => $clientUser->getLogin(),
+            'ip' => $CMSCore->client->getIPAddress()
+          ]
+        );
 
         $feedIsDeleted = $feed->delete();
         if ($feedIsDeleted) {

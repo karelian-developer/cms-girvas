@@ -15,10 +15,11 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\Users as Users;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
@@ -32,6 +33,32 @@ if ($CMSCore->client->isLogged(2)) {
 
         if ($users->getCountByGroupID($userGroupID) === 0) {
           if ($userGroupID > 4) {
+            // Получаем данные группы перед удалением
+            $userGroup->initData(['name', 'texts']);
+            $groupName = $userGroup->getName();
+
+            $groupTitles = [];
+            $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+            foreach ($CMSLocalesNames as $localeName) {
+              $groupTitles[$localeName] = $userGroup->getTitle($localeName);
+            }
+
+            // ============================================================
+            // ЛОГИРОВАНИЕ УДАЛЕНИЯ ГРУППЫ ПОЛЬЗОВАТЕЛЕЙ (152-ФЗ)
+            // ============================================================
+            CMSReport::create(
+              $CMSCore,
+              CMSReport::REPORT_TYPE_ID_AP_USERS_GROUP_DELETED,
+              [
+                'groupID' => $userGroupID,
+                'groupName' => $groupName,
+                'groupTitles' => $groupTitles,
+                'deletedByID' => $clientUser->getID(),
+                'deletedByLogin' => $clientUser->getLogin(),
+                'ip' => $CMSCore->client->getIPAddress()
+              ]
+            );
+            
             $userGroupIsDeleted = $userGroup->delete();
             if ($userGroupIsDeleted) {
               $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_DELETE_DATA_SUCCESS');
@@ -52,6 +79,9 @@ if ($CMSCore->client->isLogged(2)) {
         $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_USERS_GROUP_ERROR_NOT_FOUND');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
+    } else {
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
     $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');

@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -34,14 +34,92 @@ export class PageSettings {
     let elementForm = document.querySelector('[data-element="main-form"]');
     let interactiveLocaleChoices = new Interactive('choices');
     
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
+    this.page.core.locales.admin.getData().then((localeData) => {
+      // ============================================================
+      // Мультиязычные настройки: base_site_title / seo_site_description / seo_site_keywords
+      // ============================================================
+      const localizableSelectors = {
+        base_site_title:      '[data-element="input-title"]',
+        seo_site_description: '[data-element="input-seo-description"]',
+        seo_site_keywords:    '[data-element="input-seo-keywords"]',
+      };
+
+      const existingLocalizable = Object.entries(localizableSelectors)
+        .filter(([, sel]) => document.querySelector(sel) !== null);
+
+      if (existingLocalizable.length > 0) {
+        const interactiveLocaleChoices = new Interactive('choices');
+
+        this.page.core.locales.list.forEach((locale, localeIndex) => {
+          const localeIconImageElement = document.createElement('img');
+          localeIconImageElement.setAttribute('src', locale.iconURL);
+          localeIconImageElement.setAttribute('alt', locale.title);
+
+          const localeLabelElement = document.createElement('span');
+          localeLabelElement.innerText = locale.title;
+
+          const localeTemplate = document.createElement('template');
+          localeTemplate.innerHTML += localeIconImageElement.outerHTML;
+          localeTemplate.innerHTML += localeLabelElement.outerHTML;
+
+          interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, locale.name);
+
+          if (locale.name === this.page.core.locales.admin.name) {
+            interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
+          }
+        });
+
+        interactiveLocaleChoices.assembly();
+
+        const interactiveHeaderContainerElement = document.querySelector('[data-element="header-interactive"]');
+        if (interactiveHeaderContainerElement !== null) {
+          interactiveHeaderContainerElement.append(interactiveLocaleChoices.target.element);
+        }
+
+        const localeSelectElement = interactiveLocaleChoices.target.element.querySelector('select');
+        const settingsLocaleHiddenInput = document.querySelector('input[name="_settings_locale"]');
+
+        const applySettingsToFields = (settings, localeName) => {
+          existingLocalizable.forEach(([settingName, selector]) => {
+            const fieldElement = document.querySelector(selector);
+            if (fieldElement === null) return;
+
+            const rawValue = settings[settingName];
+            let value = '';
+
+            if (rawValue !== undefined && rawValue !== null) {
+              if (rawValue && typeof rawValue === 'object' && !Array.isArray(rawValue)) {
+                // Новый формат: { "ru_RU": "...", "en_US": "..." }
+                const localized = rawValue[localeName];
+                value = Array.isArray(localized) ? localized.join(', ') : (localized ?? '');
+              } else if (Array.isArray(rawValue)) {
+                value = rawValue.join(', ');
+              } else {
+                // Старое плоское значение (fallback)
+                value = rawValue ?? '';
+              }
+            }
+
+            fieldElement.value = value;
+          });
+        };
+
+        localeSelectElement.addEventListener('change', (event) => {
+          const selectedLocaleName = event.target.value;
+
+          if (settingsLocaleHiddenInput !== null) {
+            settingsLocaleHiddenInput.value = selectedLocaleName;
+          }
+
+          this.page.core.getSettings(existingLocalizable.map(([name]) => name))
+            .then((settings) => applySettingsToFields(settings, selectedLocaleName));
+        });
+
+        if (settingsLocaleHiddenInput !== null) {
+          settingsLocaleHiddenInput.value = this.page.core.locales.admin.name;
+        }
+      }
+
       let checkboxesInputsElements = document.querySelectorAll('[type="checkbox"]');
       if (checkboxesInputsElements.length > 0) {
         checkboxesInputsElements.forEach((element, elementIndex) => {
@@ -142,7 +220,7 @@ export class PageSettings {
           let engineeringWorksHiddenInput = document.getElementById('I1474308110');
           engineeringWorksHiddenInput.value = engineeringWorksStatus;
 
-          locales.forEach((locale, localeIndex) => {
+          this.page.core.locales.list.forEach((locale, localeIndex) => {
             let localeTitle = locale.title;
             let localeIconURL = locale.iconURL;
             let localeName = locale.name;
@@ -162,7 +240,7 @@ export class PageSettings {
             interactiveChoicesSettingsBaseLocale.target.addItem(localeTemplate.innerHTML, localeName);
           });
 
-          locales.forEach((locale, localeIndex) => {
+          this.page.core.locales.list.forEach((locale, localeIndex) => {
             if (locale.name === window.CMSCore.locales.base.name) {
               interactiveChoicesSettingsBaseLocale.target.setItemSelectedIndex(localeIndex);
             }
@@ -171,7 +249,7 @@ export class PageSettings {
           interactiveChoicesSettingsBaseLocale.target.setName('setting_base_locale')
           interactiveChoicesSettingsBaseLocale.assembly();
 
-          locales.forEach((locale, localeIndex) => {
+          this.page.core.locales.list.forEach((locale, localeIndex) => {
             let localeTitle = locale.title;
             let localeIconURL = locale.iconURL;
             let localeName = locale.name;
@@ -191,7 +269,7 @@ export class PageSettings {
             interactiveChoicesSettingsAdminLocale.target.addItem(localeTemplate.innerHTML, localeName);
           });
 
-          locales.forEach((locale, localeIndex) => {
+          this.page.core.locales.list.forEach((locale, localeIndex) => {
             if (locale.name === window.CMSCore.locales.admin.name) {
               interactiveChoicesSettingsAdminLocale.target.setItemSelectedIndex(localeIndex);
             }
@@ -249,7 +327,7 @@ export class PageSettings {
         });
         buttons.addField.assembly();
 
-        locales.forEach((locale, localeIndex) => {
+        this.page.core.locales.list.forEach((locale, localeIndex) => {
           let localeIconImageElement = document.createElement('img');
           let localeLabelElement = document.createElement('span');
           let localeTemplate = document.createElement('template');
@@ -331,7 +409,7 @@ export class PageSettings {
         });
         buttons.addField.assembly();
 
-        locales.forEach((locale, localeIndex) => {
+        this.page.core.locales.list.forEach((locale, localeIndex) => {
           let localeIconImageElement = document.createElement('img');
           let localeLabelElement = document.createElement('span');
           let localeTemplate = document.createElement('template');
@@ -415,7 +493,7 @@ export class PageSettings {
         });
         buttons.addField.assembly();
 
-        locales.forEach((locale, localeIndex) => {
+        this.page.core.locales.list.forEach((locale, localeIndex) => {
           let localeIconImageElement = document.createElement('img');
           let localeLabelElement = document.createElement('span');
           let localeTemplate = document.createElement('template');
@@ -477,6 +555,111 @@ export class PageSettings {
         });
 
         tableAdditionalFieldsButtonContainer.append(buttons.addField.target.element);
+      }
+
+      if (searchParams.getPathPart(3) === 'security') {
+        // ============================================================
+        // Cookie-баннер (152-ФЗ): селект документа
+        // ============================================================
+        const cookieBannerDocumentContainer = document.querySelector('[data-element="choice"][data-choice="cookie-banner-document"]');
+
+        if (cookieBannerDocumentContainer !== null) {
+          const itemsJSON = cookieBannerDocumentContainer.getAttribute('data-items') || '[]';
+          const currentValue = cookieBannerDocumentContainer.getAttribute('data-value') || '';
+
+          let items = [];
+          try {
+            items = JSON.parse(itemsJSON);
+          } catch (e) {
+            window.CMSCore.debugError(1, 'CookieBanner', 'Failed to parse items: ' + e);
+          }
+
+          const interactiveChoicesCookieDocument = new Interactive('choices');
+
+          // Плейсхолдер «— не выбрано —»
+          interactiveChoicesCookieDocument.target.addItem(
+            localeData.PAGE_SETTINGS_SETTING_SECURITY_COOKIE_BANNER_DOCUMENT_PLACEHOLDER || '— не выбрано —',
+            ''
+          );
+
+          // Документы
+          let selectedIndex = 0;
+          items.forEach((item, index) => {
+            interactiveChoicesCookieDocument.target.addItem(item.title, item.name);
+
+            if (item.name === currentValue) {
+              selectedIndex = index + 1; // +1 из-за плейсхолдера
+            }
+          });
+
+          interactiveChoicesCookieDocument.target.setItemSelectedIndex(selectedIndex);
+          interactiveChoicesCookieDocument.target.setName('setting_security_cookie_banner_document');
+          interactiveChoicesCookieDocument.target.setWidth('100%');
+          interactiveChoicesCookieDocument.assembly();
+
+          cookieBannerDocumentContainer.append(interactiveChoicesCookieDocument.target.element);
+
+          // ============================================================
+          // Показ/скрытие блока документа по чекбоксу
+          // (data-logic-block через disabled не работает для div)
+          // ============================================================
+          const cookieBannerCheckbox = document.getElementById('I_cookie_banner_checkbox');
+          const cookieBannerDocumentWrapper = document.getElementById('I_cookie_banner_document_wrapper');
+          const cookieBannerDocumentData = document.getElementById('I_cookie_banner_document_data');
+
+          if (cookieBannerCheckbox && cookieBannerDocumentWrapper && cookieBannerDocumentData) {
+            const toggleCookieDocumentVisibility = () => {
+              const isChecked = cookieBannerCheckbox.checked;
+              cookieBannerDocumentWrapper.style.display = isChecked ? '' : 'none';
+              cookieBannerDocumentData.style.display = isChecked ? '' : 'none';
+            };
+
+            // Начальное состояние
+            toggleCookieDocumentVisibility();
+
+            // Реакция на изменение
+            cookieBannerCheckbox.addEventListener('change', toggleCookieDocumentVisibility);
+          }
+        }
+
+        // ============================================================
+        // Ротация отчётов (152-ФЗ): кнопка запуска
+        // ============================================================
+        const rotateReportsButtonContainer = document.querySelector('[data-element="rotate-reports-button"]');
+
+        if (rotateReportsButtonContainer !== null) {
+          const rotateReportsButton = new Interactive('button');
+          rotateReportsButton.target.setLabel(localeData.PAGE_SETTINGS_SETTING_SECURITY_REPORTS_ROTATION_BUTTON || 'Запустить ротацию сейчас');
+          rotateReportsButton.target.setStyle('red');
+          rotateReportsButton.target.setCallback((event) => {
+            event.preventDefault();
+            this.handleRotateReports(localeData);
+          });
+          rotateReportsButton.assembly();
+          rotateReportsButtonContainer.append(rotateReportsButton.target.element);
+        }
+
+        // ============================================================
+        // Показ/скрытие блока документа cookie-баннера
+        // (data-logic-block через disabled не работает для div)
+        // ============================================================
+        const cookieBannerCheckbox = document.getElementById('I_cookie_banner_checkbox');
+        const cookieBannerDocumentWrapper = document.getElementById('I_cookie_banner_document_wrapper');
+        const cookieBannerDocumentData = document.getElementById('I_cookie_banner_document_data');
+
+        if (cookieBannerCheckbox && cookieBannerDocumentWrapper && cookieBannerDocumentData) {
+          const toggleCookieDocumentVisibility = () => {
+            const isChecked = cookieBannerCheckbox.checked;
+            cookieBannerDocumentWrapper.style.display = isChecked ? '' : 'none';
+            cookieBannerDocumentData.style.display = isChecked ? '' : 'none';
+          };
+
+          // Начальное состояние
+          toggleCookieDocumentVisibility();
+
+          // Реакция на изменение
+          cookieBannerCheckbox.addEventListener('change', toggleCookieDocumentVisibility);
+        }
       }
 
       if (searchParams.getPathPart(3) === 'email') {
@@ -1095,5 +1278,49 @@ export class PageSettings {
     additionalFieldInputDescription.value = data.description !== undefined
       ? data.description
       : '';
+  }
+
+  /**
+   * Запустить ротацию отчётов вручную
+   *
+   * @param {object} localeData
+   */
+  handleRotateReports(localeData) {
+    const retentionInput = document.querySelector('[data-element="input-reports-retention-days"]');
+    const days = retentionInput ? retentionInput.value : '365';
+
+    const modal = new Interactive('modal', {
+      title: localeData.MODAL_REPORTS_ROTATION_TITLE || 'Запуск ротации отчётов',
+      content: (localeData.MODAL_REPORTS_ROTATION_DESCRIPTION || 'Вы собираетесь запустить ротацию: все отчёты старше {DAYS} дней будут перемещены в архив. Продолжить?').replace('{DAYS}', days)
+    });
+
+    modal.target.addButton(localeData.BUTTON_REPORTS_ROTATION_SUBMIT || 'Запустить', () => {
+      const freshToken = this.page.core.client.getCSRFToken();
+
+      fetch('/handler/settings/rotateReports?localeMessage=' + this.page.core.locales.admin.name, {
+        method: 'POST',
+        headers: { 'X-CSRF-Token': freshToken },
+        credentials: 'same-origin'
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.statusCode === 1) {
+            this.page.showPopupNotification(data.message, 1);
+          } else {
+            this.page.showPopupNotification(data.message, 0);
+          }
+        })
+        .catch(error => {
+          this.page.showPopupNotification('Ошибка сети: ' + error, 0);
+        });
+
+      modal.target.close();
+    });
+
+    modal.target.addButton(localeData.BUTTON_CANCEL_LABEL, () => modal.target.close());
+
+    modal.assembly();
+    document.body.appendChild(modal.target.element);
+    modal.target.show();
   }
 }

@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -112,15 +112,18 @@ final class Converter implements InterfaceConverter
 
       $convertedResult = false;
       if ($fileSourcePath !== '' && file_exists($fileSourcePath)) {
-        if (($fileExtension === 'jpeg' || $fileExtension === 'jpg') && $convertToExtension === 'png') {
+        // Все варианты JPEG расширений
+        $jpegExtensions = ['jpeg', 'jpg', 'jfif', 'pjpeg', 'jpe', 'jif'];
+        
+        if (in_array($fileExtension, $jpegExtensions) && $convertToExtension === 'png') {
           $convertedResult = $this->convertJPEGToPNG($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
 
-        if (($fileExtension === 'jpeg' || $fileExtension === 'jpg') && $convertToExtension === 'webp') {
+        if (in_array($fileExtension, $jpegExtensions) && $convertToExtension === 'webp') {
           $convertedResult = $this->convertJPEGToWEBP($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
 
-        if (($fileExtension === 'jpeg' || $fileExtension === 'jpg') && $convertToExtension === 'avif') {
+        if (in_array($fileExtension, $jpegExtensions) && $convertToExtension === 'avif') {
           $convertedResult = $this->convertJPEGToAVIF($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
@@ -136,7 +139,7 @@ final class Converter implements InterfaceConverter
           $convertedResult = $this->convertPNGToAVIF($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
-        if ($fileExtension === 'webp' && ($convertToExtension === 'jpeg' || $convertToExtension === 'jpg')) {
+        if ($fileExtension === 'webp' && in_array($convertToExtension, $jpegExtensions)) {
           $convertedResult = $this->convertWEBPToJPEG($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
@@ -148,7 +151,7 @@ final class Converter implements InterfaceConverter
           $convertedResult = $this->convertWEBPToAVIF($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
-        if ($fileExtension === 'avif' && ($convertToExtension === 'jpeg' || $convertToExtension === 'jpg')) {
+        if ($fileExtension === 'avif' && in_array($convertToExtension, $jpegExtensions)) {
           $convertedResult = $this->convertAVIFToJPEG($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
         
@@ -160,18 +163,20 @@ final class Converter implements InterfaceConverter
           $convertedResult = $this->convertAVIFToWEBP($fileSourcePath, $fileOutputPath, $deleteOldFile, $quality);
         }
 
-        if (($fileExtension === $convertToExtension)) {
+        $isSourceJPEG = in_array($fileExtension, $jpegExtensions);
+        $isTargetJPEG = in_array($convertToExtension, $jpegExtensions);
+
+        if ($fileExtension === $convertToExtension || ($isSourceJPEG && $isTargetJPEG)) {
           if (file_exists($fileSourcePath)) {
             if ($fileExtension === 'gif') {
               $convertedResult = $this->sanitizeGIF($fileSourcePath, $fileOutputPath, $deleteOldFile);
             } else {
               $fileRenamed = rename($fileSourcePath, $fileOutputPath);
-
               if ($fileRenamed) {
                 $convertedResult = true;
               }
             }
-          };
+          }
         }
       }
 
@@ -201,9 +206,38 @@ final class Converter implements InterfaceConverter
    */
   private function convertJPEGToPNG(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
-    $imageSource = imagecreatefromjpeg($fileSourcePath);
-    if ($imageSource === false) {
+    if (!file_exists($fileSourcePath)) {
       return false;
+    }
+
+    $imageInfo = @getimagesize($fileSourcePath);
+    if ($imageInfo === false) {
+      return false;
+    }
+
+    $jpegTypes = [IMAGETYPE_JPEG, IMAGETYPE_JPEG2000];
+    if (!in_array($imageInfo[2], $jpegTypes)) {
+      $finfo = finfo_open(FILEINFO_MIME_TYPE);
+      $mimeType = finfo_file($finfo, $fileSourcePath);
+      finfo_close($finfo);
+      
+      if (!in_array($mimeType, ['image/jpeg', 'image/jfif', 'image/pjpeg'])) {
+        return false;
+      }
+    }
+
+    $imageSource = @imagecreatefromjpeg($fileSourcePath);
+    
+    if ($imageSource === false) {
+      $imageData = file_get_contents($fileSourcePath);
+      if ($imageData === false) {
+        return false;
+      }
+      
+      $imageSource = @imagecreatefromstring($imageData);
+      if ($imageSource === false) {
+        return false;
+      }
     }
 
     $imageSourceWidth = imagesx($imageSource);
@@ -211,14 +245,23 @@ final class Converter implements InterfaceConverter
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
     if ($imageConverted === false) {
+      imagedestroy($imageSource);
       return false;
     }
 
+    imagealphablending($imageConverted, false);
+    imagesavealpha($imageConverted, true);
+
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imagepng($imageConverted, $fileOutputPath, $quality);
+    
+    $result = imagepng($imageConverted, $fileOutputPath, $quality);
     
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
+
+    if (!$result) {
+      return false;
+    }
 
     if ($deleteOldFile && file_exists($fileSourcePath)) {
       unlink($fileSourcePath);
@@ -239,9 +282,31 @@ final class Converter implements InterfaceConverter
    */
   private function convertJPEGToWEBP(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
-    $imageSource = imagecreatefromjpeg($fileSourcePath);
-    if ($imageSource === false) {
+    if (!file_exists($fileSourcePath)) {
       return false;
+    }
+
+    if (!function_exists('imagewebp')) {
+      return false;
+    }
+
+    $imageSource = @imagecreatefromjpeg($fileSourcePath);
+    
+    if ($imageSource === false) {
+      $imageData = @file_get_contents($fileSourcePath);
+      if ($imageData === false) {
+        return false;
+      }
+      
+      $startPos = strpos($imageData, "\xFF\xD8");
+      if ($startPos !== false && $startPos > 0) {
+        $imageData = substr($imageData, $startPos);
+      }
+      
+      $imageSource = @imagecreatefromstring($imageData);
+      if ($imageSource === false) {
+        return false;
+      }
     }
 
     $imageSourceWidth = imagesx($imageSource);
@@ -249,14 +314,23 @@ final class Converter implements InterfaceConverter
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
     if ($imageConverted === false) {
+      imagedestroy($imageSource);
       return false;
     }
-    
+
+    imagealphablending($imageConverted, false);
+    imagesavealpha($imageConverted, true);
+
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imagewebp($imageConverted, $fileOutputPath, $quality);
+    
+    $result = imagewebp($imageConverted, $fileOutputPath, $quality);
 
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
+
+    if (!$result) {
+      return false;
+    }
 
     if ($deleteOldFile && file_exists($fileSourcePath)) {
       unlink($fileSourcePath);
@@ -276,9 +350,31 @@ final class Converter implements InterfaceConverter
    */
   private function convertJPEGToAVIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false, int $quality = -1) : bool
   {
-    $imageSource = imagecreatefromjpeg($fileSourcePath);
-    if ($imageSource === false) {
+    if (!file_exists($fileSourcePath)) {
       return false;
+    }
+
+    if (!function_exists('imageavif')) {
+      return false;
+    }
+
+    $imageSource = @imagecreatefromjpeg($fileSourcePath);
+    
+    if ($imageSource === false) {
+      $imageData = @file_get_contents($fileSourcePath);
+      if ($imageData === false) {
+        return false;
+      }
+      
+      $startPos = strpos($imageData, "\xFF\xD8");
+      if ($startPos !== false && $startPos > 0) {
+        $imageData = substr($imageData, $startPos);
+      }
+      
+      $imageSource = @imagecreatefromstring($imageData);
+      if ($imageSource === false) {
+        return false;
+      }
     }
 
     $imageSourceWidth = imagesx($imageSource);
@@ -286,14 +382,23 @@ final class Converter implements InterfaceConverter
 
     $imageConverted = imagecreatetruecolor($imageSourceWidth, $imageSourceHeight);
     if ($imageConverted === false) {
+      imagedestroy($imageSource);
       return false;
     }
-    
+
+    imagealphablending($imageConverted, false);
+    imagesavealpha($imageConverted, true);
+
     imagecopy($imageConverted, $imageSource, 0, 0, 0, 0, $imageSourceWidth, $imageSourceHeight);
-    imageavif($imageConverted, $fileOutputPath, $quality);
+    
+    $result = imageavif($imageConverted, $fileOutputPath, $quality);
 
     imagedestroy($imageSource);
     imagedestroy($imageConverted);
+
+    if (!$result) {
+      return false;
+    }
 
     if ($deleteOldFile && file_exists($fileSourcePath)) {
       unlink($fileSourcePath);
@@ -681,12 +786,10 @@ final class Converter implements InterfaceConverter
   private function sanitizeGIF(string $fileSourcePath, string $fileOutputPath, bool $deleteOldFile = false) : bool
   {
     if (!file_exists($fileSourcePath)) {
-      error_log("File does not exist: " . $fileSourcePath);
       return false;
     }
 
     if (filesize($fileSourcePath) === 0) {
-      error_log("File is empty: " . $fileSourcePath);
       return false;
     }
     
@@ -695,13 +798,11 @@ final class Converter implements InterfaceConverter
     finfo_close($finfo);
     
     if ($mimeType !== 'image/gif') {
-      error_log("Invalid MIME type: " . $mimeType . " for file: " . $fileSourcePath);
       return false;
     }
     
     $handle = fopen($fileSourcePath, 'rb');
     if (!$handle) {
-      error_log("Cannot open file for reading: " . $fileSourcePath);
       return false;
     }
     
@@ -709,7 +810,6 @@ final class Converter implements InterfaceConverter
     fclose($handle);
     
     if (!in_array($header, ['GIF87a', 'GIF89a'])) {
-      error_log("Invalid GIF header: " . bin2hex($header));
       return false;
     }
     
@@ -723,7 +823,6 @@ final class Converter implements InterfaceConverter
       $contentToCheck = $start . $end;
       
       if (preg_match('/<\?php|<\?=|<\?|<\s*\%|<\s*script\s*language\s*=\s*["\']?\s*php/i', $contentToCheck)) {
-        error_log("Potential PHP code detected in GIF: " . $fileSourcePath);
         return false;
       }
     }
@@ -740,17 +839,14 @@ final class Converter implements InterfaceConverter
     imagedestroy($imageSource);
     
     if ($width <= 0 || $height <= 0 || $width > 5000 || $height > 5000) {
-      error_log("Suspicious GIF dimensions: {$width}x{$height}");
       return false;
     }
     
     if (!copy($fileSourcePath, $fileOutputPath)) {
-      error_log("Failed to copy file to: " . $fileOutputPath);
       return false;
     }
     
     if (!file_exists($fileOutputPath) || filesize($fileOutputPath) === 0) {
-      error_log("Copied file is missing or empty");
       return false;
     }
     

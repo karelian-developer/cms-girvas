@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -101,10 +101,13 @@ export class PageMedia {
       event.preventDefault();
 
       const filePath = fileURL.split('/').slice(0, -1).join('/');
+      const fileNameWithoutExtension = fileName.replace(/\.[^.]+$/, '');
 
       const requestMetadata = new Interactive('request', {
         method: 'GET',
-        url: '/handler/media/metadata?directory=' + filePath + '&fileName=' + fileName + '.' + fileExtension + '&localeMessage=' + window.CMSCore.locales.admin.name
+        url: '/handler/media/metadata?directory=' + filePath
+          + '&fileName=' + fileNameWithoutExtension + '.' + fileExtension
+          + '&localeMessage=' + window.CMSCore.locales.admin.name
       });
 
       requestMetadata.target.send().then((data) => {
@@ -198,11 +201,11 @@ export class PageMedia {
         if (data.statusCode === 1) {
           const metadata = data?.outputData?.metadata;
 
-          if (metadata !== undefined) {
-            inputDescriptionElement.value = metadata.description;
-            inputAdditionalDescriptionElement.value = metadata.additionalDescription;
-            inputLicenseElement.value = metadata.license;
-            inputGEOLocationElement.value = metadata.GEOLocation;
+          if (metadata && typeof metadata === 'object') {
+            inputDescriptionElement.value = metadata.description || '';
+            inputAdditionalDescriptionElement.value = metadata.additionalDescription || '';
+            inputLicenseElement.value = metadata.license || '';
+            inputGEOLocationElement.value = metadata.GEOLocation || '';
           }
         }
       });
@@ -370,7 +373,6 @@ export class PageMedia {
   }
 
   init() {
-    let locales;
     const interactiveSortChoices = new Interactive('choices');
     const interactiveContainerPagePanelElement = document.querySelector('#E8548530785');
 
@@ -378,14 +380,7 @@ export class PageMedia {
     if (mediaUploaderInput !== null) {
       mediaUploaderInput.setAttribute('accept', 'image/png, image/jpeg, image/gif, image/webp, image/avif, application/pdf, .pdf');
 
-      fetch('/handler/locales', {method: 'GET'}).then((response) => {
-        return response.ok ? response.json() : Promise.reject(response);
-      }).then((data) => {
-        locales = data.outputData.locales;
-        return window.CMSCore.locales.admin.getData();
-      }, (rejectionReason) => {
-        this.page.showPopupNotification(rejectionReason, 0);
-      }).then((localeData) => {
+      this.page.core.locales.admin.getData().then((localeData) => {
         this.localeData = localeData;
 
         return this.page.core.loadIcons('/images/admin/icons/buttons').then((icons) => {

@@ -12,3 +12,7 @@
 <FilesMatch "\.(gitignore|log|ini)$">
 	Require all denied
 </FilesMatch>
+
+<Files "llms.txt">
+	Header set Content-Type "text/plain; charset=utf-8"
+</Files>

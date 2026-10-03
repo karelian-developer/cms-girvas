@@ -19,7 +19,9 @@ use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Mail\SMTPClient as SMTPClient;
+use \core\PHPLibrary\PageStatic as PageStatic;
 use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\User\Consent as UserConsent;
 use \core\PHPLibrary\SystemCore\Notifier as CMSNotifier;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 use \core\PHPLibrary\SystemCore\Reports as CMSReports;
@@ -199,6 +201,118 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                         $theme = new Theme($CMSCore, $themeBaseName);
                         $registrationSubmit = $user->createRegistrationSubmit();
 
+                        $userCreatedReport = CMSReport::create(
+                          $CMSCore,
+                          CMSReport::REPORT_TYPE_ID_BASE_USER_CREATED,
+                          [
+                            'userID' => $user->getID(),
+                            'ip' => $CMSCore->client::getRealIPAddress($CMSCore)
+                          ]
+                        );
+                        $userReportID = $userCreatedReport !== null ? $userCreatedReport->getID() : 0;
+
+                        // ============================================================
+                        // СОГЛАСИЯ (152-ФЗ) — при регистрации
+                        // Фиксируем согласие на все документы из security_legal_documents
+                        // ============================================================
+                        $registrationLocale = $CMSCore->locale->getName();
+                        $registrationIP = $CMSCore->client::getRealIPAddress($CMSCore);
+                        $registrationUserAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+                        // ============================================================
+                        // Собираем документы, у которых _status = 'on' (152-ФЗ)
+                        // ============================================================
+                        $legalDocuments = [];
+                        $allLegalDocuments = PageStatic::getAllLegalDocuments($CMSCore, $registrationLocale ?? $CMSCore->locale->getName());
+
+                        foreach ($allLegalDocuments as $document) {
+                          $settingName = 'security_legal_documents_' . $document['id'] . '_status';
+                          
+                          if (!$CMSCore->configurator->existsDatabaseEntryValue($settingName)) {
+                            continue;
+                          }
+                          
+                          if ($CMSCore->configurator->getDatabaseEntryValue($settingName) !== 'on') {
+                            continue;
+                          }
+                          
+                          $legalDocuments[] = $document['name'];
+                        }
+
+                        // Собираем данные по документам для batch-сохранения
+                        $consentsToGive = [];
+
+                        foreach ($legalDocuments as $documentKey) {
+                          $documentKey = trim((string)$documentKey);
+                          if (empty($documentKey)) {
+                            continue;
+                          }
+
+                          $document = PageStatic::getByName($CMSCore, $documentKey);
+                          if ($document === null) {
+                            continue;
+                          }
+
+                          $document->initData(['id', 'name', 'texts', 'metadata']);
+                          if (!$document->isLegalDocument()) {
+                            continue;
+                          }
+
+                          $currentVersion = $document->getCurrentVersion($registrationLocale);
+                          if ($currentVersion === null) {
+                            continue;
+                          }
+
+                          $consentsToGive[] = [
+                            'pageStaticID' => $document->getID(),
+                            'documentVersion' => $currentVersion->getVersion(),
+                            'documentKey' => $documentKey,
+                            'documentTitles' => (function() use ($document, $CMSCore) {
+                              $titles = [];
+                              foreach ($CMSCore->getArrayLocalesNames() as $localeName) {
+                                $titles[$localeName] = $document->getTitle($localeName);
+                              }
+                              return $titles;
+                            })()
+                          ];
+                        }
+
+                        if (!empty($consentsToGive)) {
+                          $givenConsents = UserConsent::giveBatch(
+                            $CMSCore,
+                            array_map(fn($c) => [
+                              'pageStaticID' => $c['pageStaticID'],
+                              'documentVersion' => $c['documentVersion']
+                            ], $consentsToGive),
+                            $user->getID(),
+                            0,
+                            $userReportID,
+                            $registrationLocale,
+                            $registrationIP,
+                            $registrationUserAgent,
+                            'registration'
+                          );
+
+                          // Логируем факты согласия
+                          foreach ($consentsToGive as $consentData) {
+                            CMSReport::create(
+                              $CMSCore,
+                              CMSReport::REPORT_TYPE_ID_BASE_CONSENT_GIVEN,
+                              [
+                                'userID' => $user->getID(),
+                                'userReportID' => $userReportID,
+                                'pageStaticID' => $consentData['pageStaticID'],
+                                'documentKey' => $consentData['documentKey'],
+                                'documentTitles' => $consentData['documentTitles'],
+                                'documentVersion' => $consentData['documentVersion'],
+                                'locale' => $registrationLocale,
+                                'ip' => $registrationIP,
+                                'source' => 'registration'
+                              ]
+                            );
+                          }
+                        }
+
                         if (is_array($registrationSubmit)) {
                           $siteTitle = empty($CMSCore->configurator->getMetaTitle())
                             ? $CMSCore->configurator->getSiteTitle()
@@ -293,7 +407,7 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
 }
 
 if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('method') === 'base') {
-  $clientIP = $CMSCore->client->getRealIPAddress();
+  $clientIP = $CMSCore->client::getRealIPAddress($CMSCore);
   
   if (!$CMSCore->client->isLogged(1)) {
     $userLogin = trim($_POST['user_login']) ?? null;
@@ -357,10 +471,14 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
               $handlerOutputData['reload'] = true;
 
-              CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS, [
-                'clientIP' => $CMSCore->client->getRealIPAddress(),
-                'userTargetID' => $user->getID()
-              ]);
+              CMSReport::create(
+                $CMSCore,
+                CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_SUCCESS,
+                [
+                  'userID' => $user->getID(),
+                  'ip' => $clientIP
+                ]
+              );
 
               $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_SUCCESS');
               $handlerStatusCode = $handlerStatusCode ?? 1;
@@ -370,19 +488,29 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             }
 
           } else {
-            CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL, [
-              'clientIP' => $CMSCore->client->getRealIPAddress(),
-              'userTargetID' => $user->getID()
-            ]);
+            CMSReport::create(
+              $CMSCore,
+              CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL,
+              [
+                'userID' => $user !== null ? $user->getID() : 0,
+                'ip' => $clientIP,
+                'login' => $userLogin
+              ]
+            );
 
             $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
-          CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL, [
-            'clientIP' => $CMSCore->client->getRealIPAddress(),
-            'userTargetID' => 0
-          ]);
+          CMSReport::create(
+            $CMSCore,
+            CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL,
+            [
+              'userID' => $user !== null ? $user->getID() : 0,
+              'ip' => $clientIP,
+              'login' => $userLogin
+            ]
+          );
 
           $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_AUTHORIZATION_ERROR_USER_NOT_FOUND');
           $handlerStatusCode = $handlerStatusCode ?? 0;
@@ -404,7 +532,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('method') === 'admin') {
   $CMSTelegramNotifier = CMSNotifier::create($CMSCore, 'telegram');
   $CMSMaxNotifier = CMSNotifier::create($CMSCore, 'max');
-  $clientIP = $CMSCore->client->getRealIPAddress();
+  $clientIP = $CMSCore->client::getRealIPAddress($CMSCore);
   
   if (!$CMSCore->client->isLogged(2)) {
     $userLogin = trim($_POST['user_login']) ?? null;
@@ -500,10 +628,14 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
                 $CMSCore->client::createCookie($CMSCore, '_grv_atoken', $userSessionAdmin, $userRememberMe ? $userSessionAdminExpires : 0);
 
-                CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS, [
-                  'clientIP' => $clientIP,
-                  'userTargetID' => $user->getID()
-                ]);
+                CMSReport::create(
+                  $CMSCore,
+                  CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_SUCCESS,
+                  [
+                    'userID' => $user->getID(),
+                    'ip' => $clientIP
+                  ]
+                );
 
                 $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
                 $CMSMaxNotifierKey = $CMSCore->configurator->getNotifierKey('max');
@@ -517,7 +649,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                 if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
                   $eventDatetime = date('Y-m-d H:i', time());
-                  $userIP = $CMSCore->client->getRealIPAddress();
+                  $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
                   $userLoginRec = str_replace(['_'], ['\_'], $userLogin);
 
                   $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
@@ -541,7 +673,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
                 if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
 
                   $eventDatetime = date('Y-m-d H:i', time());
-                  $userIP = $CMSCore->client->getRealIPAddress();
+                  $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
                   $userLoginRec = $userLogin;
 
                   $CMSMaxNotifierMessage = "\xF0\x9F\x94\x93 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "\n\n";
@@ -574,10 +706,15 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
               }
 
             } else {
-              $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
-                'clientIP' => $clientIP,
-                'userTargetID' => $user->getID()
-              ]);
+              CMSReport::create(
+                $CMSCore,
+                CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL,
+                [
+                  'userID' => $user !== null ? $user->getID() : 0,
+                  'ip' => $clientIP,
+                  'login' => $userLogin
+                ]
+              );
 
               $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
               $CMSMaxNotifierKey = $CMSCore->configurator->getNotifierKey('max');
@@ -591,7 +728,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
               if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
                 $eventDatetime = date('Y-m-d H:i', time());
-                $userIP = $CMSCore->client->getRealIPAddress();
+                $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
                 $userLoginRec = str_replace(['_'], ['\_'], $userLogin);
                 
                 $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
@@ -615,7 +752,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
               if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
 
                 $eventDatetime = date('Y-m-d H:i', time());
-                $userIP = $CMSCore->client->getRealIPAddress();
+                $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
                 $userLoginRec = $userLogin;
                 
                 $CMSMaxNotifierMessage = "\xF0\x9F\x94\x93 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "\n\n";
@@ -641,10 +778,15 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
               $handlerStatusCode = $handlerStatusCode ?? 0;
             }
           } else {
-            $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
-              'clientIP' => $clientIP,
-              'userTargetID' => $user->getID()
-            ]);
+            CMSReport::create(
+              $CMSCore,
+              CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL,
+              [
+                'userID' => $user !== null ? $user->getID() : 0,
+                'ip' => $clientIP,
+                'login' => $userLogin
+              ]
+            );
 
             $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
             $CMSMaxNotifierKey = $CMSCore->configurator->getNotifierKey('max');
@@ -658,7 +800,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
               $eventDatetime = date('Y-m-d H:i', time());
-              $userIP = $CMSCore->client->getRealIPAddress();
+              $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
               $userLoginRec = str_replace(['_'], ['\_'], $userLogin);
               
               $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
@@ -682,7 +824,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
 
               $eventDatetime = date('Y-m-d H:i', time());
-              $userIP = $CMSCore->client->getRealIPAddress();
+              $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
               $userLoginRec = $userLogin;
               
               $CMSMaxNotifierMessage = "\xF0\x9F\x94\x93 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "\n\n";
@@ -695,7 +837,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
 
               $CMSMaxNotifier->setMessage($CMSMaxNotifierMessage);
 
-              foreach ($CMSMaxNotifierChatsIDsCount as $index => $id) {
+              foreach ($CMSMaxNotifierChatsIDs as $index => $id) {
                 
                 $CMSMaxNotifier->setChatID($id);
                 $CMSMaxNotifier->send($CMSMaxNotifierKey);
@@ -707,10 +849,15 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
             $handlerStatusCode = $handlerStatusCode ?? 0;
           }
         } else {
-          $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, [
-            'clientIP' => $CMSCore->client->getIPAddress(),
-            'userTargetID' => 0
-          ]);
+          CMSReport::create(
+            $CMSCore,
+            CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL,
+            [
+              'userID' => $user !== null ? $user->getID() : 0,
+              'ip' => $clientIP,
+              'login' => $userLogin
+            ]
+          );
 
           $CMSTelegramNotifierKey = $CMSCore->configurator->getNotifierKey('telegram');
           $CMSMaxNotifierKey = $CMSCore->configurator->getNotifierKey('max');
@@ -724,7 +871,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
           if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
             $eventDatetime = date('Y-m-d H:i', time());
-            $userIP = $CMSCore->client->getRealIPAddress();
+            $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
             $userLoginRec = str_replace(['_'], ['\_'], $userLogin);
             
             $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x93 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "*\n\n";
@@ -747,7 +894,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
           if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
 
             $eventDatetime = date('Y-m-d H:i', time());
-            $userIP = $CMSCore->client->getRealIPAddress();
+            $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
             $userLoginRec = $userLogin;
             
             $CMSMaxNotifierMessage = "\xF0\x9F\x94\x93 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_TITLE') . "\n\n";
@@ -783,7 +930,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
         if ($CMSTelegramNotifierChatsIDsCount > 0 && $CMSTelegramNotifierKey !== '') {
 
           $eventDatetime = date('Y-m-d H:i', time());
-          $userIP = $CMSCore->client->getRealIPAddress();
+          $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
           $userLoginRec = str_replace(['_'], ['\_'], $userLogin);
           
           $CMSTelegramNotifierMessage = "\xF0\x9F\x94\x94 *" . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_LIMIT_TITLE') . "*\n\n";
@@ -807,7 +954,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
         if ($CMSMaxNotifierChatsIDsCount > 0 && $CMSMaxNotifierKey !== '') {
 
           $eventDatetime = date('Y-m-d H:i', time());
-          $userIP = $CMSCore->client->getRealIPAddress();
+          $userIP = $CMSCore->client::getRealIPAddress($CMSCore);
           $userLoginRec = $userLogin;
           
           $CMSMaxNotifierMessage = "\xF0\x9F\x94\x94 " . $CMSCore->locale->getSingleValueByKey('API_NOTIFIER_SECURITY_ADMIN_AUTHORIZATION_LIMIT_TITLE') . "\n\n";

@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -21,8 +21,8 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
+use \core\PHPLibrary\PageStatic\Version as PageStaticVersion;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \PDOException as PDOException;
 
@@ -297,7 +297,8 @@ class PageStatic implements EntityTypeContent
         $CMSLocale->initPathes();
         $locales[$localeName] = [
           'title' => $CMSLocale->getTitle(),
-          'iconURL' => $CMSLocale->getIconURL()
+          'iconURL' => $CMSLocale->getIconURL(),
+          'name' => $localeName
         ];
       }
 
@@ -406,6 +407,142 @@ class PageStatic implements EntityTypeContent
   }
 
   /**
+   * Получить актуальную версию документа
+   *
+   * @param string $localeName
+   * @return ?PageStaticVersion
+   */
+  public function getCurrentVersion(string $localeName) : ?PageStaticVersion
+  {
+    return PageStaticVersion::getCurrent($this->CMSCore, $this->getID(), $localeName);
+  }
+
+  /**
+   * Получить конкретную версию документа
+   *
+   * @param string $version
+   * @param string $localeName
+   * @return ?PageStaticVersion
+   */
+  public function getVersion(string $version, string $localeName) : ?PageStaticVersion
+  {
+    return PageStaticVersion::getByVersion($this->CMSCore, $this->getID(), $version, $localeName);
+  }
+
+  /**
+   * Получить все версии документа
+   *
+   * @param ?string $localeName
+   * @return PageStaticVersion[]
+   */
+  public function getAllVersions(?string $localeName = null) : array
+  {
+    $CMSConfigurator = $this->CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('pages_static_versions');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+
+    $condition = 'pageStaticID = :pageStaticID';
+    if ($localeName !== null) {
+      $condition .= ' AND locale = :locale';
+    }
+
+    $queryBuilder->statement->clauseWhere->addCondition($condition);
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('createdUnixTimestamp');
+    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->bindParam(':pageStaticID', $this->id, \PDO::PARAM_INT);
+      if ($localeName !== null) {
+        $databaseQuery->bindParam(':locale', $localeName, \PDO::PARAM_STR);
+      }
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $result = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    $versions = [];
+    foreach ($result as $row) {
+      $versions[] = new PageStaticVersion($this->CMSCore, (int)$row['id']);
+    }
+
+    return $versions;
+  }
+
+  /**
+   * Опубликовать новую версию
+   *
+   * @param string $version
+   * @param string $localeName
+   * @param int $createdByID
+   * @return ?PageStaticVersion
+   */
+  public function publishVersion(string $version, string $localeName, int $createdByID = 0) : ?PageStaticVersion
+  {
+    return PageStaticVersion::publish(
+      $this->CMSCore,
+      $this->getID(),
+      $version,
+      $localeName,
+      $this->getTexts(),
+      $createdByID
+    );
+  }
+
+  /**
+   * Опубликовать версию для всех локалей (batch)
+   *
+   * @param string $version
+   * @param int $createdByID
+   * @return array Массив ['ru_RU' => Version, 'en_US' => Version, ...]
+   */
+  public function publishVersionBatch(string $version, int $createdByID = 0) : array
+  {
+    return PageStaticVersion::publishBatch(
+      $this->CMSCore,
+      $this->getID(),
+      $version,
+      $this->CMSCore->getArrayLocalesNames(),
+      $this->getTexts(),
+      $createdByID
+    );
+  }
+
+  /**
+   * Получить статус статической страницы в роли юридического документа
+   *
+   * @return bool
+   */
+  public function isLegalDocument() : bool
+  {
+    if (property_exists($this, 'metadata')) {
+      $metadata = json_decode($this->metadata, true);
+
+      if (isset($metadata['isLegalDocument'])) {
+        return $metadata['isLegalDocument'];
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * Получить статус публикации страницы
    *
    * @return bool
@@ -441,6 +578,63 @@ class PageStatic implements EntityTypeContent
     }
 
     return 0;
+  }
+
+  /**
+   * Получить все статические страницы с флагом isLegalDocument = true
+   *
+   * @param SystemCore $CMSCore
+   * @param string $localeName
+   * @return array Массив ['name' => ..., 'title' => ...]
+   */
+  public static function getAllLegalDocuments(SystemCore $CMSCore, string $localeName = 'en_US') : array
+  {
+    $CMSConfigurator = $CMSCore->configurator;
+    $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+    $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
+    $queryBuilder->setStatementSelect();
+    $queryBuilder->statement->addSelections(['id', 'name', 'texts', 'metadata']);
+    $queryBuilder->statement->setClauseFrom();
+    $queryBuilder->statement->clauseFrom->addTable('pages_static');
+    $queryBuilder->statement->clauseFrom->assembly();
+    $queryBuilder->statement->setClauseWhere();
+    $queryBuilder->statement->clauseWhere->addCondition(
+      $queryBuilder->dialect->jsonExtractBoolean('metadata', 'isLegalDocument')
+    );
+    $queryBuilder->statement->clauseWhere->assembly();
+    $queryBuilder->statement->setClauseOrderBy();
+    $queryBuilder->statement->clauseOrderBy->setColumn('name');
+    $queryBuilder->statement->clauseOrderBy->setSortType('ASC');
+    $queryBuilder->statement->assembly();
+
+    try {
+      $databaseConnection = $CMSCore->databaseConnector->database->connection;
+      $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+      $databaseQuery->execute();
+    } catch (PDOException $exception) {
+      die(json_encode([
+        'message' => $exception->getMessage(),
+        'statusCode' => 0,
+        'outputData' => []
+      ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
+
+    $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
+    $documents = [];
+
+    foreach ($results as $row) {
+      $texts = json_decode($row['texts'], true);
+      $title = $texts[$localeName]['title'] ?? '';
+
+      $documents[] = [
+        'id' => (int) $row['id'],
+        'name' => $row['name'],
+        'title' => $title !== '' ? $title : $row['name']
+      ];
+    }
+
+    return $documents;
   }
 
   /**
@@ -564,10 +758,12 @@ class PageStatic implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('pages_static');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -612,10 +808,12 @@ class PageStatic implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('pages_static');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`name` = :name',
-      'postgresql' => '"name" = :name'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :name',
+        $queryBuilder->dialect->quoteIdentifier('name')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -658,10 +856,12 @@ class PageStatic implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('pages_static');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`name` = :name',
-      'postgresql' => '"name" = :name'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :name',
+        $queryBuilder->dialect->quoteIdentifier('name')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -703,10 +903,12 @@ class PageStatic implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('pages_static');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -744,10 +946,12 @@ class PageStatic implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('pages_static');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -822,7 +1026,9 @@ class PageStatic implements EntityTypeContent
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+    $dialect = $queryBuilder->dialect;
+
+    if (!$dialect->supportsInsertReturning()) {
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
@@ -830,11 +1036,11 @@ class PageStatic implements EntityTypeContent
       $queryBuilder->statement->clauseFrom->addTable('pages_static');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $dialect->getLastInsertedIDCondition('id')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
-
-      error_log('SQL: ' . $queryBuilder->statement->assembled);
 
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;
@@ -845,7 +1051,6 @@ class PageStatic implements EntityTypeContent
           'message' => $exception->getMessage(),
           'statusCode' => 0,
           'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
     }
@@ -881,36 +1086,30 @@ class PageStatic implements EntityTypeContent
       }
     }
 
+    $dialect = $queryBuilder->dialect;
+
     foreach (['texts', 'metadata'] as $columnName) {
-      $fieldsJSON = [];
-      
-      if (!isset($data[$columnName])) {
+      if (empty($data[$columnName])) {
         continue;
       }
 
-      foreach ($data[$columnName] as $name => $value) {
-        $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $fieldsJSON[] = match ($queryBuilder->DMS) {
-          CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
-          CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
-        };
-      }
-
-      if (!empty($data[$columnName])) {
-        $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-          'mysql' => 'JSON_MERGE_PATCH(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
-          'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
-        ]);
-      }
+      $jsonObject = json_encode($data[$columnName], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      
+      $queryBuilder->statement->clauseSet->addColumn(
+        $columnName,
+        $dialect->jsonMergePatch($columnName, $dialect->quoteLiteral($jsonObject))
+      );
     }
 
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 

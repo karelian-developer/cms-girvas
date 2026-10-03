@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -25,8 +25,8 @@ use \core\PHPLibrary\Database\QueryBuilder\StatementSelect as StatementSelect;
 
 final class ClauseOrderBy implements InterfaceClause
 {
-  const SORT_TYPE_DESC = 'DESC';
-  const SORT_TYPE_ASC = 'ASC';
+  public const SORT_TYPE_DESC = 'DESC';
+  public const SORT_TYPE_ASC = 'ASC';
 
   private StatementSelect $statement;
   public string $column = '';
@@ -52,6 +52,14 @@ final class ClauseOrderBy implements InterfaceClause
    */
   public function setSortType(string $value) : void
   {
+    $value = strtoupper($value);
+
+    if (!in_array($value, [self::SORT_TYPE_ASC, self::SORT_TYPE_DESC], true)) {
+      throw new \InvalidArgumentException(
+        sprintf('Invalid sort type "%s". Allowed: ASC, DESC', $value)
+      );
+    }
+
     $this->sortType = $value;
   }
   
@@ -73,7 +81,17 @@ final class ClauseOrderBy implements InterfaceClause
    */
   public function assembly() : void
   {
-    $this->assembled = sprintf('ORDER BY "%s" %s', $this->column, $this->sortType);
-  }
+    if ($this->column === '' || $this->sortType === '') {
+      $this->assembled = '';
+      return;
+    }
 
+    $dialect = $this->statement->queryBuilder->dialect;
+
+    $this->assembled = sprintf(
+      'ORDER BY %s %s',
+      $dialect->quoteIdentifier($this->column),
+      $this->sortType
+    );
+  }
 }

@@ -176,6 +176,7 @@
 }
 
 .sidebar__block-content {
+  display: grid;
   box-sizing: border-box;
   flex-grow: 1;
   background-color: var(--primary-color-4);
@@ -184,6 +185,57 @@
   border-bottom-right-radius: 8px;
   padding: 11px 13px 13px 15px;
   width: 100%;
+  row-gap: 8px;
+}
+
+.sidebar__block-content > * {
+  margin-bottom: 0 !important;
+}
+
+.sidebar__block-content ul,
+.sidebar__block-content ol {
+  list-style-type: unset;
+  padding-left: 24px;
+}
+
+.sidebar__block-content ul li,
+.sidebar__block-content ol li {
+  list-style-type: unset;
+}
+
+/* =====================
+ *     КАТЕГОРИИ
+ * =================== */
+
+.sidebar__block_categories .categories-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar__block_categories .categories-list__item {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar__block_categories .categories-list__link {
+  font-size: 14px;
+  color: var(--common-secondary-color-3);
+  padding: 4px 8px;
+  transition: color .2s;
+}
+
+.sidebar__block_categories .categories-list__link:hover,
+.sidebar__block_categories .categories-list__link:focus,
+.sidebar__block_categories .categories-list__link:active {
+  color: var(--primary-color-2);
+}
+
+.sidebar__block_categories .categories-list--nested {
+  padding-left: 8px;
+}
+
+.sidebar__block_categories .categories-list > .categories-list__item:has(ul) > .categories-list__link {
+  font-weight: 500;
 }
 
 /* =====================

@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -15,6 +15,7 @@
 
 'use strict';
 
+import {NadvoTE} from '/core/JSLibrary/nadvoTE.class.js';
 import {Interactive} from "../../../interactive.class.js";
 import {URLParser} from "../../../urlParser.class.js";
 import {Utils} from "../../../utils.class.js";
@@ -25,6 +26,45 @@ export class PagePageStatic {
     this.buttons = {save: null, delete: null, publish: null, unpublish: null, SEOAnalyze: null};
     this.analyzer = null;
     this.page = page;
+  }
+
+  initNadvoTE() {
+    this.createEditor();
+  }
+
+  createEditor() {
+    const editorContent = document.querySelector('#E3473967486_CONTENT');
+    const editorLocale = window.CMSCore?.locales.nadvoTE;
+    if (!editorContent) return;
+
+    const nadvoTE = new NadvoTE(document.querySelector('#E3473967486'), {
+      'locale': editorLocale,
+      'handler': '/handler/utils/nadvoparse',
+      'toolbar': [
+        {'name': 'undo', 'type': 'button'},
+        {'name': 'redo', 'type': 'button'},
+        {'name': 'bold', 'type': 'button'},
+        {'name': 'italic', 'type': 'button'},
+        {'name': 'underline', 'type': 'button'},
+        {'name': 'headers', 'type': 'choices'},
+        {'name': 'link', 'type': 'button'},
+        {'name': 'image', 'type': 'button'},
+        {'name': 'gallery', 'type': 'button'},
+        {'name': 'quote', 'type': 'button'},
+        {'name': 'code', 'type': 'button'},
+        {'name': 'preview', 'type': 'button'},
+        {'name': 'source', 'type': 'button'},
+        {'name': 'emoji', 'type': 'button'},
+      ]
+    });
+    nadvoTE.init();
+    nadvoTE.textarea.element.classList.add('textarea');
+    nadvoTE.textarea.element.classList.add('form__textarea');
+    nadvoTE.textarea.element.value = editorContent.innerHTML;
+    nadvoTE.textarea.element.setAttribute('name', 'entry_content_rus');
+    nadvoTE.textarea.element.setAttribute('data-element', 'input-content');
+
+    editorContent.remove();
   }
 
   SEOAnalyze(data) {
@@ -210,19 +250,47 @@ export class PagePageStatic {
   }
 
   init() {
+    this.initNadvoTE();
+
     let searchParams = new URLParser(), locales;
 
     const elementForm = document.querySelector('[data-element="main-form"]');
     const interactiveLocaleChoices = new Interactive('choices');
+
+    // ============================================================
+    // ОБРАБОТКА ЧЕКБОКСОВ С ЛОГИЧЕСКИМИ БЛОКАМИ
+    // ============================================================
+    const checkboxesInputsElements = document.querySelectorAll('[type="checkbox"]');
+    if (checkboxesInputsElements.length > 0) {
+      checkboxesInputsElements.forEach((element, elementIndex) => {
+        let logicBlockTargetElement;
+
+        if (element.hasAttribute('data-logic-block')) {
+          let logicBlock = element.getAttribute('data-logic-block');
+          logicBlockTargetElement = document.getElementById(logicBlock);
+
+          if (!element.checked) {
+            logicBlockTargetElement.setAttribute('disabled', 'disabled');
+          }
+        }
+
+        let statusBlock = element.getAttribute('data-status-block');
+        let statusBlockTargetElement = document.getElementById(statusBlock);
+        element.addEventListener('change', (event) => {
+          statusBlockTargetElement.value = (!element.checked) ? 'off' : 'on';
+
+          if (element.hasAttribute('data-logic-block')) {
+            if (logicBlockTargetElement.hasAttribute('disabled')) {
+              logicBlockTargetElement.removeAttribute('disabled');
+            } else {
+              logicBlockTargetElement.setAttribute('disabled', 'disabled');
+            }
+          }
+        });
+      });
+    }
     
-    fetch('/handler/locales', {method: 'GET'}).then((response) => {
-      return (response.ok) ? response.json() : Promise.reject(response);
-    }).then((data) => {
-      locales = data.outputData.locales;
-      return window.CMSCore.locales.admin.getData();
-    }, (rejectionReason) => {
-      this.page.showPopupNotification(rejectionReason, 0);
-    }).then((localeData) => {
+    this.page.core.locales.admin.getData().then((localeData) => {
       this.analyzer = new SEOAnalyzer(localeData);
 
       const urlInputElement = document.querySelector('[data-element="input-url"]');
@@ -233,7 +301,7 @@ export class PagePageStatic {
       const keywordsInputElement = document.querySelector('[data-element="input-keywords"]');
       const contentTextareaElement = document.querySelector('[data-element="input-content"]');
 
-      locales.forEach((locale, localeIndex) => {
+      this.page.core.locales.list.forEach((locale, localeIndex) => {
         let localeTitle = locale.title;
         let localeIconURL = locale.iconURL;
         let localeName = locale.name;
@@ -253,7 +321,7 @@ export class PagePageStatic {
         interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, localeName);
       });
 
-      locales.forEach((locale, localeIndex) => {
+      this.page.core.locales.list.forEach((locale, localeIndex) => {
         if (locale.name === window.CMSCore.locales.admin.name) {
           interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
         }
@@ -282,6 +350,11 @@ export class PagePageStatic {
                 titleInputElement.value = data.outputData.pageStatic.title;
                 SEOTitleInputElement.value = data.outputData.pageStatic.SEOTitle;
                 keywordsInputElement.value = data.outputData.pageStatic.keywords.join(', ');
+
+                const versionInputElement = document.querySelector('[name="page_static_version"]');
+                if (versionInputElement !== null && data.outputData.pageStatic.hasOwnProperty('currentVersion')) {
+                  versionInputElement.value = data.outputData.pageStatic.currentVersion;
+                }
               }
             });
           }
@@ -337,7 +410,7 @@ export class PagePageStatic {
 
       let interactiveChoicesSelectElement = interactiveContainerElement.querySelector('select');
       interactiveChoicesSelectElement.addEventListener('change', (event) => {
-        locales.forEach((locale, localeIndex) => {
+        this.page.core.locales.list.forEach((locale, localeIndex) => {
           if (locale.name === event.target.value) {
             contentTextareaElement.setAttribute('name', 'page_static_content_' + locale.iso639_2);
             descriptionTextareaElement.setAttribute('name', 'page_static_description_' + locale.iso639_2);
@@ -362,6 +435,11 @@ export class PagePageStatic {
                   titleInputElement.value = data.outputData.pageStatic.title;
                   SEOTitleInputElement.value = data.outputData.pageStatic.SEOTitle;
                   keywordsInputElement.value = data.outputData.pageStatic.keywords.join(', ');
+
+                  const versionInputElement = document.querySelector('[name="page_static_version"]');
+                  if (versionInputElement !== null && data.outputData.pageStatic.hasOwnProperty('currentVersion')) {
+                    versionInputElement.value = data.outputData.pageStatic.currentVersion;
+                  }
                 }
               });
             }
@@ -375,12 +453,14 @@ export class PagePageStatic {
       this.buttons.publish = new Interactive('button');
       this.buttons.unpublish = new Interactive('button');
       this.buttons.SEOAnalyze = new Interactive('button');
+      this.buttons.publishVersion = new Interactive('button');
 
       this.buttons.viewOnSite.target.setLabel(localeData.BUTTON_VIEW_ON_SITE_LABEL);
       this.buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
       this.buttons.publish.target.setLabel(localeData.BUTTON_PUBLISH_LABEL);
       this.buttons.unpublish.target.setLabel(localeData.BUTTON_UNPUBLISH_LABEL);
       this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
+      this.buttons.publishVersion.target.setLabel(localeData.PAGE_STATIC_PAGE_BUTTON_PUBLISH_VERSION_LABEL);
       this.buttons.SEOAnalyze.target.setLabel(localeData.BUTTON_SEO_ANALYZE_LABEL);
 
       this.buttons.viewOnSite.target.setStyle('default');
@@ -389,6 +469,7 @@ export class PagePageStatic {
       this.buttons.delete.target.setStyle('red');
       this.buttons.save.target.setStyle('green');
       this.buttons.SEOAnalyze.target.setStyle('default');
+      this.buttons.publishVersion.target.setStyle('green');
 
       this.buttons.viewOnSite.target.setCallback((event) => {
         event.preventDefault();
@@ -415,6 +496,47 @@ export class PagePageStatic {
         this.renderSEOResults(SEOAnalyze);
       });
 
+      this.buttons.publishVersion.target.setCallback((event) => {
+        event.preventDefault();
+
+        const versionInputElement = document.querySelector('[name="page_static_version"]');
+        const versionValue = versionInputElement !== null ? versionInputElement.value : '';
+
+        let interactiveModal = new Interactive('modal', {
+          title: localeData.PAGE_STATIC_PAGE_MODAL_PUBLISH_VERSION_TITLE,
+          content: localeData.PAGE_STATIC_PAGE_MODAL_PUBLISH_VERSION_DESCRIPTION
+            .replace('%version%', versionValue || '1.0')
+        });
+
+        interactiveModal.target.addButton(localeData.BUTTON_PUBLISH_LABEL, () => {
+          let formData = new FormData();
+          formData.append('page_static_id', searchParams.getPathPart(3));
+          formData.append('page_static_event', 'publishVersion');
+          formData.append('page_static_version', versionValue);
+
+          let request = new Interactive('request', {
+            method: 'PATCH',
+            url: '/handler/pageStatic?localeMessage=' + window.CMSCore.locales.admin.name
+          });
+
+          request.target.data = formData;
+          request.target.send().then((data) => {
+            if (data.statusCode === 1) {
+              interactiveModal.target.close();
+              window.location.reload();
+            }
+          });
+        });
+
+        interactiveModal.target.addButton(localeData.BUTTON_CANCEL_LABEL, () => {
+          interactiveModal.target.close();
+        });
+
+        interactiveModal.assembly();
+        document.body.appendChild(interactiveModal.target.element);
+        interactiveModal.target.show();
+      });
+
       this.buttons.save.target.setCallback((event) => {
         event.preventDefault();
         
@@ -434,10 +556,20 @@ export class PagePageStatic {
             formData.append(inputPersonalTemplatePath.name, inputPersonalTemplatePath.value);
           }
 
+          let inputIsLegalDocumentStatus = document.querySelector('[name="page_static_is_legal_document_status"][type="hidden"]');
+          if (inputIsLegalDocumentStatus !== null) {
+            formData.set('page_static_is_legal_document_status', inputIsLegalDocumentStatus.value);
+          }
+
+          let inputVersion = document.querySelector('[name="page_static_version"]');
+          if (inputVersion !== null && !inputVersion.disabled) {
+            formData.append('page_static_version', inputVersion.value);
+          }
+
           const additionalDataContainerElement = document.querySelector('[data-element="additional-data"]');
           if (additionalDataContainerElement !== null) {
-            const additionalDataInputs = additionalDataContainerElement.querySelectorAll('input');
-            additionalDataInputs.forEach(element => {
+            const additionalDataFields = additionalDataContainerElement.querySelectorAll('input,textarea');
+            additionalDataFields.forEach(element => {
               formData.append(element.name, element.value);
             });
           }
@@ -547,6 +679,7 @@ export class PagePageStatic {
       this.buttons.publish.assembly();
       this.buttons.unpublish.assembly();
       this.buttons.SEOAnalyze.assembly();
+      this.buttons.publishVersion.assembly();
 
       if (searchParams.getPathPart(3) === null) {
         this.buttons.viewOnSite.target.element.style.display = 'none';
@@ -661,6 +794,13 @@ export class PagePageStatic {
             this.buttons.SEOAnalyze.target.element.style.display = 'flex';
 
             interactiveContainerElement.append(this.buttons.viewOnSite.target.element);
+            
+            if (pageData.isLegalDocument) {
+              const versionPanel = document.querySelector('[data-element="version-panel"]');
+              if (versionPanel !== null) {
+                versionPanel.appendChild(this.buttons.publishVersion.target.element);
+              }
+            }
           } else {
             this.buttons.viewOnSite.target.element.style.display = 'none';
             this.buttons.unpublish.target.element.style.display = 'none';

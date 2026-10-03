@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -27,7 +27,7 @@ use \core\PHPLibrary\Database\QueryBuilder\StatementDelete\ClauseFrom\Table as T
 final class ClauseFrom implements InterfaceClause
 {
   private StatementDelete $statement;
-  public array $tables;
+  public array $tables = [];
   public string $assembled = '';
   
   /**
@@ -59,15 +59,16 @@ final class ClauseFrom implements InterfaceClause
    */
   public function assembly() : void
   {
-    $queryArray = [];
-
+    $dialect = $this->statement->queryBuilder->dialect;
     $databaseConfigurations = $this->statement->queryBuilder->CMSCore->configurator->get('database');
+
+    $queryArray = [];
 
     foreach ($this->tables as $table) {
       $tableFullname = '';
-      
+
       if (!is_null($databaseConfigurations)) {
-        if ($databaseConfigurations['scheme'] != '') {
+        if ($databaseConfigurations['scheme'] !== '') {
           $tableFullname .= $databaseConfigurations['scheme'] . '.';
         }
 
@@ -78,10 +79,18 @@ final class ClauseFrom implements InterfaceClause
       }
 
       $tableFullname .= $table->getName();
-      array_push($queryArray, $tableFullname);
+
+      $segments = explode('.', $tableFullname);
+      $quotedSegments = array_map(
+        fn(string $segment) => $dialect->quoteIdentifier($segment),
+        $segments
+      );
+
+      $queryArray[] = implode('.', $quotedSegments);
     }
 
-    $this->assembled = count($this->tables) > 0 ? 'FROM ' . implode(', ', $queryArray) : '';
+    $this->assembled = count($this->tables) > 0
+      ? 'FROM ' . implode(', ', $queryArray)
+      : '';
   }
-
 }

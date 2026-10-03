@@ -9,10 +9,99 @@
  */
 
 use \core\PHPLibrary\Client\Session as ClientSession;
+use \core\PHPLibrary\User\Consent as UserConsent;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
 if (!defined('IS_NOT_HACKED')) {
   http_response_code(503);
   die('An attempted hacker attack has been detected.');
+}
+
+if ($CMSCore->urlp->getPath(2) === 'consent-cookie') {
+  $pageStaticID = (int) ($_POST['pageStaticID'] ?? 0);
+  $documentVersion = trim((string) ($_POST['documentVersion'] ?? ''));
+  $locale = trim((string) ($_POST['locale'] ?? $CMSCore->locale->getName()));
+
+  if ($pageStaticID <= 0 || empty($documentVersion)) {
+    http_response_code(400);
+    $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
+    $handlerStatusCode = 0;
+    return;
+  }
+
+  $clientIP = $CMSCore->client::getRealIPAddress($CMSCore);
+  $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+  $userAgent = mb_substr($userAgent, 0, 512);
+
+  // Определяем userID: авторизован или аноним
+  $userID = 0;
+  $userLogin = '';
+
+  if ($CMSCore->client->isLogged(1)) {
+    $user = $CMSCore->client->getUser(1);
+    $user->initData(['login', 'metadata']);
+    $userID = $user->getID();
+    $userLogin = $user->getLogin();
+  }
+
+  // ============================================================
+  // Защита от дубликатов: если такое же согласие есть за последние 5 минут
+  // — возвращаем его, не создаём новое
+  // ============================================================
+  $existingConsent = UserConsent::findRecent(
+    $CMSCore,
+    $userID,
+    $clientIP,
+    $userAgent,
+    $pageStaticID,
+    $documentVersion,
+    'cookie_banner',
+    300
+  );
+
+  if ($existingConsent !== null) {
+    $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_CONSENT_COOKIE_ALREADY_RECORDED');
+    $handlerStatusCode = 1;
+    return;
+  }
+
+  // Фиксируем согласие
+  $consent = UserConsent::give(
+    $CMSCore,
+    $userID,
+    0,
+    0,
+    $pageStaticID,
+    $documentVersion,
+    $locale,
+    $clientIP,
+    $userAgent,
+    'cookie_banner'
+  );
+
+  if ($consent !== null) {
+    CMSReport::create(
+      $CMSCore,
+      CMSReport::REPORT_TYPE_ID_BASE_CONSENT_GIVEN,
+      [
+        'userID' => $userID,
+        'userLogin' => $userLogin,
+        'consentID' => $consent->getID(),
+        'pageStaticID' => $pageStaticID,
+        'documentVersion' => $documentVersion,
+        'locale' => $locale,
+        'ip' => $clientIP,
+        'source' => 'cookie_banner',
+        'isAnonymous' => $userID === 0
+      ]
+    );
+
+    $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_CONSENT_COOKIE_SUCCESS');
+    $handlerStatusCode = 1;
+  } else {
+    $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+    $handlerStatusCode = 0;
+  }
 }
 
 if ($CMSCore->urlp->getPath(2) === 'session-end') {
@@ -22,9 +111,40 @@ if ($CMSCore->urlp->getPath(2) === 'session-end') {
   $sessionUserID = $session->getUserID();
 
   if ($session !== null && $sessionLevel !== 0) {
+    // Получаем данные пользователя до удаления сессии
+    $user = null;
+    if ($sessionUserID > 0) {
+      $user = new \core\PHPLibrary\User($CMSCore, $sessionUserID);
+      $user->initData(['login']);
+    }
+
+    $clientIP = $CMSCore->client->getIPAddress();
+
+    // ============================================================
+    // ЛОГИРОВАНИЕ ВЫХОДА ИЗ СИСТЕМЫ (152-ФЗ)
+    // ============================================================
+    if ($user !== null) {
+      $reportType = $sessionLevel === 2
+        ? CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL
+        : CMSReport::REPORT_TYPE_ID_BASE_AUTHORIZATION_FAIL;
+
+      CMSReport::create(
+        $CMSCore,
+        $reportType,
+        [
+          'userID' => $user->getID(),
+          'ip' => $clientIP,
+          'typeID' => $sessionLevel,
+          'action' => 'logout'
+        ]
+      );
+    }
+
+    // Удаляем сессию
     $session->delete();
 
-    if (!ClientSession::existsByIPAndUserID($CMSCore, $CMSCore->client->getIPAddress(), $sessionUserID, $sessionLevel)) {
+    // Проверяем, что сессия удалена
+    if (!ClientSession::existsByIPAndUserID($CMSCore, $clientIP, $sessionUserID, $sessionLevel)) {
       $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_POST_DATA_SUCCESS');
       $handlerStatusCode = $handlerStatusCode ?? 1;
 

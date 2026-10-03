@@ -1,10 +1,10 @@
 /**
  * CMS «ГИРВАС»
- * 
+ *
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
- * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ *
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -20,33 +20,39 @@ export class Input {
     this.interactiveObject = interactiveObject;
 
     this.element = null;
-    this.value = null;
-    this.type = null;
+    this.value = '';
+    this.type = 'text';
+    this.placeholder = null;
     this.callback = (event) => {
       event.preventDefault();
     };
     this.disabled = false;
     this.assembled = null;
-
-    this.setType('text');
   }
 
   show() {
-    this.assembled.style.display = 'block';
+    if (this.assembled != null) {
+      this.assembled.style.display = 'block';
+    } else if (this.element != null) {
+      this.element.style.display = 'block';
+    }
   }
 
   hide() {
-    this.assembled.style.display = 'none';
+    if (this.assembled != null) {
+      this.assembled.style.display = 'none';
+    } else if (this.element != null) {
+      this.element.style.display = 'none';
+    }
   }
 
   enable() {
     this.disabled = false;
 
     if (this.element != null) {
-      let button = this.element.querySelector('input');
-
-      if (button != null) {
-        button.removeAttribute('disabled');
+      const inputElement = this.element.querySelector('input');
+      if (inputElement != null) {
+        inputElement.removeAttribute('disabled');
       }
     }
   }
@@ -55,10 +61,9 @@ export class Input {
     this.disabled = true;
 
     if (this.element != null) {
-      let button = this.element.querySelector('input');
-
-      if (button != null) {
-        button.setAttribute('disabled', 'disabled');
+      const inputElement = this.element.querySelector('input');
+      if (inputElement != null) {
+        inputElement.setAttribute('disabled', 'disabled');
       }
     }
   }
@@ -75,29 +80,24 @@ export class Input {
     this.value = value;
 
     if (this.element != null) {
-      let inputElement = this.element.querySelector('input');
+      const inputElement = this.element.querySelector('input');
       if (inputElement != null) {
         inputElement.value = value;
       }
     }
   }
 
+  getValue() {
+    return this.value;
+  }
+
   setType(value) {
     this.type = value;
 
     if (this.element != null) {
-      let inputElement = this.element.querySelector('input');
+      const inputElement = this.element.querySelector('input');
       if (inputElement != null) {
         inputElement.setAttribute('type', value);
-      }
-    }
-  }
-
-  setPlaceholder(value) {
-    if (this.element != null) {
-      let inputElement = this.element.querySelector('input');
-      if (inputElement != null) {
-        inputElement.setAttribute('placeholder', value);
       }
     }
   }
@@ -106,16 +106,36 @@ export class Input {
     return this.type;
   }
 
-  getValue() {
-    return this.value;
+  setPlaceholder(value) {
+    this.placeholder = value;
+
+    if (this.element != null) {
+      const inputElement = this.element.querySelector('input');
+      if (inputElement != null) {
+        inputElement.setAttribute('placeholder', value);
+      }
+    }
+  }
+
+  getPlaceholder() {
+    return this.placeholder;
   }
 
   assembly() {
-    let element = document.createElement('div');
+    const element = document.createElement('div');
+    const inputElement = document.createElement('input');
 
-    let inputElement = document.createElement('input');
     inputElement.classList.add('interactive__input');
-    inputElement.addEventListener('click', this.callback);
+
+    inputElement.setAttribute('type', this.type);
+
+    if (this.placeholder !== null && this.placeholder !== '') {
+      inputElement.setAttribute('placeholder', this.placeholder);
+    }
+
+    if (this.value !== null && this.value !== '') {
+      inputElement.value = this.value;
+    }
 
     if (this.isDisabled()) {
       inputElement.setAttribute('disabled', 'disabled');
@@ -123,11 +143,11 @@ export class Input {
 
     inputElement.addEventListener('input', (event) => {
       this.value = event.target.value;
-    })
+    });
 
-    inputElement.value = this.value;
+    inputElement.addEventListener('click', this.callback);
+
     element.append(inputElement);
-    
     this.element = element;
   }
 }

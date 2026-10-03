@@ -15,10 +15,11 @@ if (!defined('IS_NOT_HACKED')) {
 
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\UserGroup as UserGroup;
+use \core\PHPLibrary\SystemCore\Report as Report;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
@@ -46,7 +47,6 @@ if ($CMSCore->client->isLogged(2)) {
     $userGroupID = isset($_PUT['user_group_id']) ? (int) $_PUT['user_group_id'] : 4;
     $userPassword = isset($_PUT['user_password']) ? str_replace('\'', '"', $_PUT['user_password']) : '';
     $userPasswordRepeat = isset($_PUT['user_password_repeat']) ? str_replace('\'', '"', $_PUT['user_password_repeat']) : '';
-    
     if (isset($_PUT['user_login'])) {
       if ($CMSCore->configurator->getUsersLoginsBlacklistStatus(true)) {
         $loginsBlacklist = $CMSCore->configurator->getUsersLoginsBlacklist(true);
@@ -180,7 +180,6 @@ if ($CMSCore->client->isLogged(2)) {
 
     if (isset($userBirthdate)) {
       $userBirthdate = is_numeric($userBirthdate) ? $userBirthdate : strtotime($userBirthdate);
-      
       if ($userBirthdate <= time()) {
         $userData['metadata']['birthdateUnixTimestamp'] = $userBirthdate;
       } else {
@@ -213,7 +212,6 @@ if ($CMSCore->client->isLogged(2)) {
         if (!isset($userData)) $userData = [];
         if (!isset($userData['metadata'])) $userData['metadata'] = [];
         if (!isset($userData['metadata']['additionalFields'])) $userData['metadata']['additionalFields'] = [];
-        
         $valueNameParts = explode('_', $key_matches[1][0]);
         foreach ($valueNameParts as $index => $part) {
           if ($index > 0) {
@@ -229,7 +227,7 @@ if ($CMSCore->client->isLogged(2)) {
 
     if ($userCreationAllowed) {
       $user = User::create($CMSCore, $userLogin, $userEmail, $userPassword);
-      
+
       if (!is_null($user)) {
         $user->initData(['*']);
         // Подтверждение E-Mail у пользователя
@@ -238,6 +236,16 @@ if ($CMSCore->client->isLogged(2)) {
         if (isset($userData)) {
           $user->update($userData);
         }
+
+        Report::create(
+          $CMSCore,
+          Report::REPORT_TYPE_ID_AP_USER_CREATED,
+          [
+            'userID' => $user->getID(),
+            'createdByID' => $clientUser->getID(),
+            'ip' => $CMSCore->client->getIPAddress()
+          ]
+        );
 
         $handlerOutputData['user'] = [];
         $handlerOutputData['user']['id'] = $user->getID();

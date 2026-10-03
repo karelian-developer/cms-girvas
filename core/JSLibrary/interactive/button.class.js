@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -93,6 +93,7 @@ export class Button {
     const buttonLabelElement = document.createElement('span');
 
     buttonElement.classList.add('interactive__button');
+    buttonElement.setAttribute('type', 'button');
     buttonElement.addEventListener('click', this.callback);
 
     if (this.style !== null || this.style !== '') {
@@ -105,7 +106,7 @@ export class Button {
 
     if (this.iconUrl != null) {
       buttonIconElement.classList.add('interactive__button-icon');
-      buttonIconElement.setAttribute('scr', this.iconUrl);
+      buttonIconElement.setAttribute('src', this.iconUrl);
       buttonElement.append(buttonIconElement);
     }
 

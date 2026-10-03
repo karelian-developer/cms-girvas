@@ -4,7 +4,7 @@
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
  * 
- * @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+ * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  * @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -27,14 +27,24 @@ export class ToolUnderline extends Tool {
     });
 
     this.initClickEvent();
+    this.bindHotkey('Ctrl+U');
   }
 
   initClickEvent() {
     super.addClickEvent(() => {
       console.log(`[NADVO TE] Tool ${this.name} clicked!`);
-      this.editor.textarea.replaceStringSelection(
-        '<u>' + this.editor.getSelectionString() + '</u>'
-      );
+      
+      const selection = this.editor.getSelectionString();
+
+      if (selection) {
+        const inserted = this.editor.textarea.replaceStringSelection(
+          '~~' + selection + '~~'
+        );
+
+        if (inserted) {
+          this.editor.clearSelection();
+        }
+      }
     });
   }
 }

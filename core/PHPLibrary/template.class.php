@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -21,6 +21,7 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\ContentBlocks as ContentBlocks;
+use \core\PHPLibrary\EntriesCategories as EntriesCategories;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \core\PHPLibrary\Factories\Content as CMSContent;
 use \core\PHPLibrary\SystemCore as SystemCore;
@@ -671,6 +672,7 @@ final class Template implements ThemeInterface
 
               if ($contentBlockIsShowed) {
                 $contentBlockType = $contentBlock->getType();
+                $contentBlockName = $contentBlock->getName();
                 $contentBlockTypeName = $contentBlockType->getTechnicalName();
                 $contentBlockContent = $contentBlock->getContent($localeName);
                 $contentBlockContentParsed = $nadvoParse->parse(htmlspecialchars($contentBlockContent, ENT_QUOTES, 'UTF-8'));
@@ -679,6 +681,133 @@ final class Template implements ThemeInterface
                   'BLOCK_TITLE' => $contentBlock->getTitle($localeName),
                   'BLOCK_CONTENT' => $contentBlockContentParsed
                 ];
+
+                if ($contentBlockTypeName === 'custom') {
+                  $parts = preg_split('/[-_\s]+/', $contentBlockName);
+                  $parts = array_map('ucfirst', $parts);
+                  $parts[0] = lcfirst($parts[0]);
+                  $contentBlockTPLName = implode('', $parts);
+                }
+
+                if ($contentBlockTypeName === 'empty') {
+                  $contentBlockTPLName = 'default';
+                }
+
+                if ($contentBlockTypeName === 'categories') {
+                  $contentBlockTPLName = 'categories';
+
+                  // Получаем все категории записей
+                  $categoriesArray = (new EntriesCategories($this->CMSCore))->getAll();
+
+                  // Карта категорий по ID и индекс дочерних категорий по parentID
+                  $categoriesMap = [];
+                  $childrenByParent = [];
+
+                  foreach ($categoriesArray as $category) {
+                    $category->initData(['name', 'texts', 'metadata', 'parentID']);
+
+                    $categoryID = $category->getID();
+                    $parentID = $category->getParentID();
+
+                    $categoriesMap[$categoryID] = $category;
+                    $childrenByParent[$parentID][] = $category;
+                  }
+
+                  // Корневые категории — те, у которых parentID = 0 или родитель отсутствует
+                  $rootCategories = [];
+                  foreach ($categoriesMap as $categoryID => $category) {
+                    $parentID = $category->getParentID();
+
+                    if ($parentID === 0 || !isset($categoriesMap[$parentID])) {
+                      $rootCategories[] = $category;
+                    }
+                  }
+
+                  // Рекурсивная сборка DOM-списка категорий с учётом вложенности
+                  $buildCategoriesList = function (
+                    array $categories,
+                    array $childrenByParent,
+                    \DOMDocument $document,
+                    string $localeName,
+                    array &$visitedIDs,
+                    int $depth = 0
+                  ) use (&$buildCategoriesList): \DOMElement {
+                    $listElement = $document->createElement('ul');
+                    $listElement->setAttribute(
+                      'class',
+                      $depth > 0
+                        ? 'categories-list categories-list--nested'
+                        : 'categories-list'
+                    );
+
+                    foreach ($categories as $category) {
+                      $categoryID = $category->getID();
+
+                      // Защита от циклических ссылок в дереве категорий
+                      if (in_array($categoryID, $visitedIDs, true)) {
+                        continue;
+                      }
+
+                      $visitedIDs[] = $categoryID;
+
+                      $categoryName = $category->getName();
+                      $categoryTitle = $category->getTitle($localeName);
+                      $categoryURL = $category->getURL();
+
+                      $children = $childrenByParent[$categoryID] ?? [];
+                      $hasChildren = !empty($children);
+
+                      $itemElement = $document->createElement('li');
+                      $itemElement->setAttribute(
+                        'class',
+                        $hasChildren
+                          ? 'categories-list__item categories-list__item--has-children'
+                          : 'categories-list__item'
+                      );
+                      $itemElement->setAttribute('data-category-id', (string) $categoryID);
+                      $itemElement->setAttribute('data-category-name', $categoryName);
+
+                      $linkElement = $document->createElement('a');
+                      $linkElement->setAttribute('class', 'categories-list__link');
+                      $linkElement->setAttribute('href', $categoryURL);
+                      $linkElement->setAttribute('title', $categoryTitle);
+                      $linkElement->appendChild($document->createTextNode($categoryTitle));
+
+                      $itemElement->appendChild($linkElement);
+
+                      if ($hasChildren) {
+                        $childrenListElement = $buildCategoriesList(
+                          $children,
+                          $childrenByParent,
+                          $document,
+                          $localeName,
+                          $visitedIDs,
+                          $depth + 1
+                        );
+
+                        $itemElement->appendChild($childrenListElement);
+                      }
+
+                      $listElement->appendChild($itemElement);
+                    }
+
+                    return $listElement;
+                  };
+
+                  $categoriesDocument = new \DOMDocument('1.0', 'UTF-8');
+                  $visitedIDs = [];
+
+                  $categoriesListElement = $buildCategoriesList(
+                    $rootCategories,
+                    $childrenByParent,
+                    $categoriesDocument,
+                    $localeName,
+                    $visitedIDs
+                  );
+
+                  $categoriesDocument->appendChild($categoriesListElement);
+                  $templateContentBlockVars['BLOCK_CONTENT'] = $categoriesDocument->saveHTML($categoriesListElement);
+                }
 
                 if ($contentBlockTypeName === 'cabinet') {
                   $CMSClient = $this->CMSCore->client;
@@ -699,9 +828,11 @@ final class Template implements ThemeInterface
                   $templateContentBlockVars['BLOCK_CABINET'] = $CMSClientIsLogged
                     ? ThemeCollector::assemblyFileContent($this, 'templates/contentBlock/cabinet/user.tpl', $cabinetVars)
                     : ThemeCollector::assemblyFileContent($this, 'templates/contentBlock/cabinet/auth.tpl', $cabinetVars);
+                  
+                  $contentBlockTPLName = 'cabinet';
                 }
                 
-                $contentBlocksAssembled[] = ThemeCollector::assemblyFileContent($this, 'templates/contentBlock/' . $contentBlockTypeName . '.tpl', $templateContentBlockVars);
+                $contentBlocksAssembled[] = ThemeCollector::assemblyFileContent($this, 'templates/contentBlock/' . $contentBlockTPLName . '.tpl', $templateContentBlockVars);
               }
             }
 
@@ -779,6 +910,23 @@ final class Template implements ThemeInterface
             $templatesAssembled = [];
 
             $entryCategory = $entry->getCategory();
+            $entryAdditionalFieldsData = $entry->getAdditionalFieldsData();
+            
+            if (count($entryAdditionalFieldsData) > 0) {
+              foreach ($entryAdditionalFieldsData as $name => $data) {
+                $nameTransformed = preg_split('/(?=[A-Z])/', $name);
+                $nameTransformed = implode('_', $nameTransformed);
+                $variableName = 'ENTRY_ADDITIONAL_DATA_' . strtoupper($nameTransformed);
+
+                if (ThemeCollector::existsTemplateVariable($entriesSampleTemplateContent, $variableName)) {
+                  ThemeCollector::addTemplateVariable(
+                    $templatesAssembled,
+                    $variableName,
+                    $data
+                  );
+                }
+              }
+            }
             
             if (ThemeCollector::existsTemplateVariable($entriesSampleTemplateContent, 'ENTRY_CATEGORY_TITLE')) {
               ThemeCollector::addTemplateVariable(

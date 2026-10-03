@@ -19,7 +19,7 @@ use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
@@ -30,19 +30,30 @@ if ($CMSCore->client->isLogged(2)) {
       if (ContentBlock::existsByID($CMSCore, $contentBlockID)) {
         $contentBlock = CMSContent::create($CMSCore, 'contentBlock', ['id' => $contentBlockID]);
 
-        $contentBlock->initData(['texts']);
-        $contentBlockTitle = $contentBlock->getTitle();
+        $contentBlock->initData(['name', 'texts']);
+        $blockName = $contentBlock->getName();
+        $blockTitle = $contentBlock->getTitle($CMSCore->locale->getName());
+
+        // ============================================================
+        // ЛОГИРОВАНИЕ УДАЛЕНИЯ КОНТЕНТ-БЛОКА (152-ФЗ)
+        // ============================================================
+        CMSReport::create(
+          $CMSCore,
+          CMSReport::REPORT_TYPE_ID_AP_CONTENT_BLOCK_DELETED,
+          [
+            'blockID' => $contentBlockID,
+            'blockName' => $blockName,
+            'blockTitle' => $blockTitle,
+            'deletedByID' => $clientUser->getID(),
+            'deletedByLogin' => $clientUser->getLogin(),
+            'ip' => $CMSCore->client->getIPAddress()
+          ]
+        );
 
         $isDeleted = $contentBlock->delete();
 
         if ($isDeleted) {
-          /** @var CMSReport Новый отчет */
-          $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_CONTENT_BLOCK_DELETED, [
-            'clientIP' => $CMSCore->client->getIPAddress(),
-            'contentBlockID' => $contentBlockID
-          ]);
-
-          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_DELETE_DATA_SUCCESS');
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_DELETE_DATA_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {
           $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
@@ -53,8 +64,11 @@ if ($CMSCore->client->isLogged(2)) {
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
 
-      $handler_output_data['modalClose'] = true;
-      $handler_output_data['reload'] = true;
+      $handlerOutputData['modalClose'] = true;
+      $handlerOutputData['reload'] = true;
+    } else {
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
     $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');

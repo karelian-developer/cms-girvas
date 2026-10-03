@@ -1,3 +1,9 @@
-The installation wizard **analyzed** your system and displayed the following results in the table.
+The installation wizard **analyzed** your system and produced the following result in the table.
 
-**We recommend** that you set **755** rights for the directories (including nested ones) **"./templates"**, **"./uploads"**, **"./modules"**, and **644** rights for files nested in the **"./modules"** and **"./templates"** directories. We also recommend setting **770** rights for the "./backups" directory, and **660** rights for files.
+**We recommend** setting:
+- for the directories (including nested ones) `./templates`, `./uploads`, `./modules` — **permissions 755**;
+- for files nested in the `./modules` and `./templates` directories — **permissions 644**.
+
+Separately, we recommend setting:
+- **permissions 770** for the `./backups`, `./cron`, and `./logs` directories;
+- for files — **permissions 660**.

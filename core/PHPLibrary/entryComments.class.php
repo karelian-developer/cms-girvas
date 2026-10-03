@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -21,11 +21,22 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \PDOException as PDOException;
 
 final class EntryComments
 {
+  /**
+   * Допустимые правила сортировки
+   */
+  private const SORT_RULES = [
+    'by_createdtimestamp_increase' => ['column' => 'createdUnixTimestamp', 'direction' => 'ASC'],
+    'by_createdtimestamp_decrease' => ['column' => 'createdUnixTimestamp', 'direction' => 'DESC'],
+    'by_updatedtimestamp_increase' => ['column' => 'updatedUnixTimestamp', 'direction' => 'ASC'],
+    'by_updatedtimestamp_decrease' => ['column' => 'updatedUnixTimestamp', 'direction' => 'DESC'],
+  ];
+
+  public const DEFAULT_SORT_RULE = 'by_createdtimestamp_decrease';
+
   /**
    * __construct
    *
@@ -40,10 +51,16 @@ final class EntryComments
   /**
    * Получить все объекты комментариев
    *
-   * @param  array $params
+   * @param  array  $params
+   * @param  string $searchValue — поиск по content
+   * @param  string $sortRule    — одно из SORT_RULES
    * @return array
    */
-  public function getAll(array $params = []) : array
+  public function getAll(
+    array $params = [],
+    string $searchValue = '',
+    string $sortRule = self::DEFAULT_SORT_RULE
+  ) : array
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -54,9 +71,24 @@ final class EntryComments
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
+
+    // Поиск по content
+    $hasSearch = $searchValue !== '';
+    if ($hasSearch) {
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->stringLike('content', 'search', true)
+      );
+      $queryBuilder->statement->clauseWhere->assembly();
+    }
+
+    // Сортировка
+    $sortConfig = self::SORT_RULES[$sortRule] ?? self::SORT_RULES[self::DEFAULT_SORT_RULE];
+
     $queryBuilder->statement->setClauseOrderBy();
-    $queryBuilder->statement->clauseOrderBy->setColumn('id');
-    $queryBuilder->statement->clauseOrderBy->setSortType('DESC');
+    $queryBuilder->statement->clauseOrderBy->setColumn($sortConfig['column']);
+    $queryBuilder->statement->clauseOrderBy->setSortType($sortConfig['direction']);
+
     if (array_key_exists('limit', $params)) {
       if (is_array($params['limit'])) {
         $limit = is_integer($params['limit'][0]) ? $params['limit'][0] : 0;
@@ -69,6 +101,11 @@ final class EntryComments
     try {
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      if ($hasSearch) {
+        $databaseQuery->bindValue(':search', '%' . $searchValue . '%', \PDO::PARAM_STR);
+      }
+
       $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
@@ -109,15 +146,14 @@ final class EntryComments
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`entryID` = :entryID',
-      'postgresql' => '"entryID" = :entryID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :entryID', $queryBuilder->dialect->quoteIdentifier('entryID'))
+    );
     if (array_key_exists('parentID', $params)) {
-      $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-        'mysql' => sprintf('AND JSON_EXTRACT(`metadata`, \'$.parentID\') = %d', $params['parentID']),
-        'postgresql' => sprintf('AND (metadata::jsonb->\'parentID\')::int = %d', $params['parentID'])
-      ]);
+      $queryBuilder->statement->clauseWhere->addCondition(
+        sprintf('%s = :parentID', $queryBuilder->dialect->jsonExtractInt('metadata', 'parentID')),
+        'AND'
+      );
     }
 
     $queryBuilder->statement->clauseWhere->assembly();
@@ -144,6 +180,11 @@ final class EntryComments
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
       $databaseQuery->bindParam(':entryID', $entryID, \PDO::PARAM_INT);
+
+      if (array_key_exists('parentID', $params)) {
+        $databaseQuery->bindParam(':parentID', $params['parentID'], \PDO::PARAM_INT);
+      }
+
       $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
@@ -183,10 +224,9 @@ final class EntryComments
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`entryID` = :entryID',
-      'postgresql' => '"entryID" = :entryID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf('%s = :entryID', $queryBuilder->dialect->quoteIdentifier('entryID'))
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -209,11 +249,12 @@ final class EntryComments
   }
       
   /**
-   * Получить общее количество комментариев
+   * Получить общее количество комментариев (с учётом поиска по content)
    *
+   * @param  string $searchValue
    * @return int
    */
-  public function getCountTotal() : int
+  public function getCountTotal(string $searchValue = '') : int
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -224,11 +265,26 @@ final class EntryComments
     $queryBuilder->statement->setClauseFrom();
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
+
+    $hasSearch = $searchValue !== '';
+    if ($hasSearch) {
+      $queryBuilder->statement->setClauseWhere();
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $queryBuilder->dialect->stringLike('content', 'search', true)
+      );
+      $queryBuilder->statement->clauseWhere->assembly();
+    }
+
     $queryBuilder->statement->assembly();
 
     try {
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+      if ($hasSearch) {
+        $databaseQuery->bindValue(':search', '%' . $searchValue . '%', \PDO::PARAM_STR);
+      }
+
       $databaseQuery->execute();
     } catch (PDOException $exception) {
       die(json_encode([
@@ -240,8 +296,6 @@ final class EntryComments
     }
 
     $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
-    return $result ? $result['count'] : 0;
+    return $result ? (int) $result['count'] : 0;
   }
-
-
 }

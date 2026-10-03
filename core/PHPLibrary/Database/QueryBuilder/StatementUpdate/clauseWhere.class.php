@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -28,6 +28,7 @@ final class ClauseWhere implements InterfaceClause
 {
   private StatementUpdate $statement;
   public string $condition = '';
+  private array $conditions = [];
   public string $assembled = '';
   
   /**
@@ -44,12 +45,16 @@ final class ClauseWhere implements InterfaceClause
   /**
    * addCondition
    *
-   * @param  mixed $condition
+   * @param string $condition
+   * @param string $conjunction
    * @return void
    */
-  public function addCondition(string $condition) : void
+  public function addCondition(string $condition, string $conjunction = 'AND') : void
   {
-    $this->condition = $condition;
+    $this->conditions[] = [
+      'condition' => $condition,
+      'conjunction' => $conjunction,
+    ];
   }
   
   /**
@@ -59,18 +64,17 @@ final class ClauseWhere implements InterfaceClause
    * 
    * @return void
    */
-  public function addConditionAdaptive(array $conditions) : void
+  public function addConditionAdaptive(array $conditions, string $conjunction = 'AND') : void
   {
-    $CMSConfigurator = $this->statement->queryBuilder->CMSCore->configurator;
-    $CMSConfigDatabase = $CMSConfigurator->get('database');
+    $dialect = $this->statement->queryBuilder->dialect;
+    $condition = $dialect->resolveAdaptiveCondition($conditions);
 
-    $condition = match ($CMSConfigDatabase['dms']) {
-      DMS::MySQL => $conditions['mysql'] ?? '',
-      DMS::PostgreSQL => $conditions['postgresql'] ?? '',
-      default => ''
-    };
-    $this->condition = $condition;
-  } 
+    if ($condition === '') {
+      return;
+    }
+
+    $this->addCondition($condition, $conjunction);
+  }
   
   /**
    * assembly
@@ -79,6 +83,18 @@ final class ClauseWhere implements InterfaceClause
    */
   public function assembly() : void
   {
-    $this->assembled = $this->condition !== '' ? sprintf('WHERE %s', $this->condition) : '';
+    if (empty($this->conditions)) {
+      $this->assembled = '';
+      return;
+    }
+
+    $parts = [];
+    foreach ($this->conditions as $index => $item) {
+      $parts[] = $index === 0
+        ? $item['condition']
+        : $item['conjunction'] . ' ' . $item['condition'];
+    }
+
+    $this->assembled = 'WHERE ' . implode(' ', $parts);
   }
 }

@@ -14,12 +14,24 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 use \core\PHPLibrary\PageStatic as PageStatic;
+use \core\PHPLibrary\PageStatic\Version as PageStaticVersion;
 
-if ($CMSCore->client->isLogged(2)) {
-  $pageStaticID = $CMSCore->urlp->getPath(2) ?? 0;
-  $pageStaticID = is_numeric($pageStaticID) ? (int) $pageStaticID : 0;
+$pageStaticID = $CMSCore->urlp->getPath(2) ?? 0;
+$pageStaticID = is_numeric($pageStaticID) ? (int) $pageStaticID : 0;
 
-  if (PageStatic::existsByID($CMSCore, $pageStaticID)) {
+$pageStaticExists = $pageStaticID > 0 && PageStatic::existsByID($CMSCore, $pageStaticID);
+$pageStaticIsLegalDocument = false;
+
+if ($pageStaticExists) {
+  $pageStaticTemp = new PageStatic($CMSCore, $pageStaticID);
+  $pageStaticTemp->initData(['metadata']);
+  $pageStaticIsLegalDocument = $pageStaticTemp->isLegalDocument();
+}
+
+$hasAccess = $CMSCore->client->isLogged(2) || $pageStaticIsLegalDocument;
+
+if ($hasAccess) {
+  if ($pageStaticExists) {
     $pageStatic = new PageStatic($CMSCore, $pageStaticID);
     $pageStatic->initData(['name', 'authorID', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
     $pageStaticLocale = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
@@ -38,6 +50,16 @@ if ($CMSCore->client->isLogged(2)) {
     $handlerOutputData['pageStatic']['isPublished'] = $pageStatic->isPublished();
     $handlerOutputData['pageStatic']['createdUnixTimestamp'] = $pageStatic->getCreatedUnixTimestamp();
     $handlerOutputData['pageStatic']['updatedUnixTimestamp'] = $pageStatic->getUpdatedUnixTimestamp();
+    $handlerOutputData['pageStatic']['isLegalDocument'] = $pageStatic->isLegalDocument();
+    $handlerOutputData['pageStatic']['currentVersion'] = '';
+
+    if ($pageStatic->isLegalDocument()) {
+      $currentVersion = $pageStatic->getCurrentVersion($pageStaticLocale);
+      if ($currentVersion !== null) {
+        $currentVersion->initData(['version']);
+        $handlerOutputData['pageStatic']['currentVersion'] = $currentVersion->getVersion();
+      }
+    }
 
     $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
     $handlerStatusCode = $handlerStatusCode ?? 1;

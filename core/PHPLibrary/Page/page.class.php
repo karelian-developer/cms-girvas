@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -26,12 +26,14 @@ use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\CoreInterface as CoreInterface;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\PageStatic as PageStatic;
+use \core\PHPLibrary\PageStatic\Version as PageStaticVersion;
 use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\User as User;
 use \DateTime as DateTime;
 use \DateTimeZone as DateTimeZone;
+use \DOMDocument as DOMDocument;
 
 class PagePage implements InterfacePage
 {
@@ -142,6 +144,62 @@ class PagePage implements InterfacePage
   {
     return $this->targetObject;
   }
+
+  /**
+   * Сборка списка локализаций для записи
+   * 
+   * @param array $localesData
+   * 
+   * @return string
+   */
+  private function assemblyLocalesItems(array $localesData) : string
+  {
+    $document = new DOMDocument('1.0', 'UTF-8');
+    $ulElement = $document->createElement('ul');
+    $ulElement->setAttribute('class', 'page-locales');
+
+    foreach ($localesData as $localeData) {
+      $itemElement = $document->createElement('li');
+      $itemElement->setAttribute('class', 'page-locales__item');
+
+      $aElement = $document->createElement('a', $localeData['title']);
+      $aElement->setAttribute('class', 'page-locales__link');
+      $aElement->setAttribute('href', $this->targetObject->getURL() . '?locale=' . $localeData['name']);
+
+      $itemElement->appendChild($aElement);
+
+      if (!empty($localeData['iconURL'])) {
+        $iconElement = $document->createElement('img');
+        $iconElement->setAttribute('class', 'page-locales__locale-icon');
+        $iconElement->setAttribute('src', $localeData['iconURL']);
+        $itemElement->prepend($iconElement);
+      }
+      
+      $ulElement->appendChild($itemElement);
+    }
+
+    $document->appendChild($ulElement);
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Получить текстовое значение: из версии (если указана) или из страницы
+   *
+   * @param ?PageStaticVersion $versionObject
+   * @param PageStatic $pageStatic
+   * @param string $method
+   * @param string $localeName
+   * @return mixed
+   */
+  private function getTextValue(?PageStaticVersion $versionObject, PageStatic $pageStatic, string $method, string $localeName) : mixed
+  {
+    if ($versionObject !== null) {
+      return $versionObject->{$method}($localeName);
+    }
+
+    return $pageStatic->{$method}($localeName);
+  }
   
   /**
    * Сборка шаблона страницы
@@ -162,6 +220,27 @@ class PagePage implements InterfacePage
         $pageStatic = PageStatic::getByName($this->CMSCore, $pageStaticName);
         $pageStatic->initData(['id', 'texts', 'name', 'authorID', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata']);
 
+        // ============================================================
+        // ПРОСМОТР КОНКРЕТНОЙ ВЕРСИИ ДОКУМЕНТА (152-ФЗ)
+        // ============================================================
+        $versionParam = $this->CMSCore->urlp->getParam('version');
+        $versionObject = null;
+
+        if ($versionParam !== null && $pageStatic->isLegalDocument()) {
+          $versionObject = $pageStatic->getVersion((string)$versionParam, $localeName);
+
+          if ($versionObject === null) {
+            http_response_code(404);
+
+            $pageError = new PageError($this->CMSCore, $this->page, 404);
+            $pageError->assembly();
+            $this->assembled = $pageError->assembled;
+            return;
+          }
+
+          $versionObject->initData(['texts']);
+        }
+
         if ($this->CMSCore->urlp->getParam('locale') === $localeName) {
           $this->CMSCore->theme->addLinkCanonical('/page/' . $pageStatic->getName());
         }
@@ -178,21 +257,25 @@ class PagePage implements InterfacePage
         if ($this->isVisible($isPublished, $clientUser)) {
           http_response_code(200);
 
-          $pageStaticTitle = strip_tags($pageStatic->getTitle($localeName));
-          $pageStaticSEOTitle = strip_tags($pageStatic->getSEOTitle($localeName));
+          $pageStaticTitle = strip_tags($this->getTextValue($versionObject, $pageStatic, 'getTitle', $localeName));
+          $pageStaticSEOTitle = strip_tags($this->getTextValue($versionObject, $pageStatic, 'getSEOTitle', $localeName));
           $pageStaticSEOTitle = $pageStaticSEOTitle !== ''
             ? $pageStaticSEOTitle
             : $pageStaticTitle;
 
-          $pageStaticDescription = strip_tags($pageStatic->getTitle($localeName));
-          $pageStaticSEODescription = strip_tags($pageStatic->getSEOTitle($localeName));
+          $pageStaticDescription = strip_tags($this->getTextValue($versionObject, $pageStatic, 'getDescription', $localeName));
+          $pageStaticSEODescription = strip_tags($this->getTextValue($versionObject, $pageStatic, 'getSEODescription', $localeName));
           $pageStaticSEODescription = $pageStaticSEODescription !== ''
             ? $pageStaticSEODescription
             : $pageStaticDescription;
           $pageStaticSEODescription = str_replace('"', '&quot;', $pageStaticSEODescription);
 
-          $pageStaticKeywords = $pageStatic->getKeywords($localeName);
-          $pageStaticKeywords = str_replace('"', '&quot;', $pageStaticKeywords);
+          $pageStaticKeywordsRaw = $this->getTextValue($versionObject, $pageStatic, 'getKeywords', $localeName);
+          $pageStaticKeywords = is_array($pageStaticKeywordsRaw)
+            ? array_map(fn($k) => str_replace('"', '&quot;', (string)$k), $pageStaticKeywordsRaw)
+            : [str_replace('"', '&quot;', (string)$pageStaticKeywordsRaw)];
+          
+          $pageStaticContent = $this->getTextValue($versionObject, $pageStatic, 'getContent', $localeName);
 
           $this->page->breadcrumbs->add($localeData['PAGE_STATIC_PAGE_BREADCRUMPS_INDEX_LABEL'], '/');
           $this->page->breadcrumbs->add($pageStaticTitle, $pageStatic->getName());
@@ -203,11 +286,6 @@ class PagePage implements InterfacePage
           $this->CMSCore->configurator->setMetaKeywords($pageStaticKeywords);
 
           $nadvoParse = new NadvoParse();
-
-          /**
-           * @var string Содержание статической страницы
-           */
-          $pageStaticContent = $pageStatic->getContent($localeName);
 
           $siteTimezone = $this->CMSCore->configurator->getSiteTimezone();
 
@@ -253,6 +331,9 @@ class PagePage implements InterfacePage
           $authorSurname = $author->getSurname();
           $authorPatronymic = $author->getPatronymic();
 
+          $completedLocalesData = $pageStatic->getCompletedLocalesData($this->CMSCore);
+          $completedLocales = $this->assemblyLocalesItems($completedLocalesData);
+
           $pageTemplateVariables = [
             'PAGE_ID' => $pageStatic->getID(),
             'PAGE_BREADCRUMPS' => $this->page->breadcrumbs->assembled,
@@ -263,6 +344,7 @@ class PagePage implements InterfacePage
             'PAGE_AUTHOR_NAME' => $authorName,
             'PAGE_AUTHOR_SURNAME' => $authorSurname,
             'PAGE_AUTHOR_PATRONYMIC' => $authorPatronymic,
+            'PAGE_LOCALES_LIST' => $completedLocales,
             'PAGE_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
             'PAGE_PUBLISHED_DATE_TIMESTAMP' => $pageStatic->getPublishedUnixTimestamp() > 0 ? $publishedDateTimestamp : date('d.m.Y H:i:s', 0),
             'PAGE_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp,

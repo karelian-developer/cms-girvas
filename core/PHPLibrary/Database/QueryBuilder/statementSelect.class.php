@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -21,7 +21,6 @@
 namespace core\PHPLibrary\Database\QueryBuilder;
 
 use \core\PHPLibrary\Database\QueryBuilder as QueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseFrom as ClauseFrom;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseWhere as ClauseWhere;
 use \core\PHPLibrary\Database\QueryBuilder\StatementSelect\ClauseOrderBy as ClauseOrderBy;
@@ -43,7 +42,7 @@ final class StatementSelect implements InterfaceStatement
   /**
    * __construct
    *
-   * @param  mixed $queryBuilder
+   * @param  QueryBuilder $queryBuilder
    * @return void
    */
   public function __construct(QueryBuilder $queryBuilder)
@@ -54,33 +53,31 @@ final class StatementSelect implements InterfaceStatement
   /**
    * Установить выборку для SELECT
    *
-   * @param  mixed $selection
+   * @param  array $selection
    * @return void
    */
   public function addSelections(array $selections) : void
   {
-    $CMSConfigDatabase = $this->queryBuilder->CMSCore->configurator->get('database');
+    $dialect = $this->queryBuilder->dialect;
 
-    foreach ($selections as $index => $selection) {
-      // Не экранируем выражения с CASE, функциями или алиасами
-      if (preg_match('/^\s*\(/', $selection) || 
-        stripos($selection, 'CASE') !== false || 
-        stripos($selection, ' AS ') !== false) {
+    foreach ($selections as $selection) {
+      if (preg_match('/^["`].+["`]$/', $selection)) {
         $this->selections[] = $selection;
         continue;
       }
-      
-      if (!preg_match('/\"[a-z0-9_]+\"/i', $selection) && 
-        !preg_match('/[a-z]+\([a-z0-9_]*[*]*\)/i', $selection) && 
-        !is_numeric($selection) && 
-        $selection !== '*') {
-        $selection = match ($CMSConfigDatabase['dms']) {
-          CMSDMS::MySQL => '`' . $selection . '`',
-          CMSDMS::PostgreSQL => '"' . $selection . '"',
-        };
+
+      if (
+        preg_match('/^\s*\(/', $selection) ||
+        stripos($selection, ' AS ') !== false ||
+        preg_match('/[a-z_]+\([^)]*\)/i', $selection) ||
+        is_numeric($selection) ||
+        $selection === '*'
+      ) {
+        $this->selections[] = $selection;
+        continue;
       }
-      
-      $this->selections[] = $selection;
+
+      $this->selections[] = $dialect->quoteIdentifier($selection);
     }
   }
   
@@ -117,7 +114,8 @@ final class StatementSelect implements InterfaceStatement
   /**
    * Установить предложение LIMIT
    *
-   * @param  mixed $clauseLimit
+   * @param  int $limit
+   * @param  int $offset
    * @return void
    */
   public function setClauseLimit(int $limit, int $offset = 0) : void

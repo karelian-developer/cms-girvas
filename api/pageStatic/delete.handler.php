@@ -18,7 +18,7 @@ use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
@@ -29,15 +29,33 @@ if ($CMSCore->client->isLogged(2)) {
 
       if (PageStatic::existsByID($CMSCore, $pageStaticID)) {
         $pageStatic = new PageStatic($CMSCore, $pageStaticID);
+        $pageStatic->initData(['name', 'texts']);
+
+        // Получаем все языковые версии заголовка
+        $pageTitles = [];
+        $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+        foreach ($CMSLocalesNames as $localeName) {
+          $pageTitles[$localeName] = $pageStatic->getTitle($localeName);
+        }
+        $pageName = $pageStatic->getName();
+
+        // Логируем удаление страницы (152-ФЗ)
+        CMSReport::create(
+          $CMSCore,
+          CMSReport::REPORT_TYPE_ID_AP_PAGE_DELETED,
+          [
+            'pageID' => $pageStaticID,
+            'pageName' => $pageName,
+            'pageTitles' => $pageTitles,
+            'deletedByID' => $clientUser->getID(),
+            'deletedByLogin' => $clientUser->getLogin(),
+            'ip' => $CMSCore->client->getIPAddress()
+          ]
+        );
+        
         $pageStaticIsDeleted = $pageStatic->delete();
 
         if ($pageStaticIsDeleted) {
-          /** @var CMSReport Новый отчет */
-          $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_PAGE_DELETED, [
-            'clientIP' => $CMSCore->client->getIPAddress(),
-            'pageID' => $pageStaticID
-          ]);
-
           $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_DELETE_DATA_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
         } else {
@@ -51,6 +69,9 @@ if ($CMSCore->client->isLogged(2)) {
 
       $handlerOutputData['modalClose'] = true;
       $handlerOutputData['reload'] = true;
+    } else {
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
     $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');

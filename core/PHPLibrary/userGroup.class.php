@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -21,7 +21,6 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \PDOException as PDOException;
 
@@ -47,6 +46,8 @@ class UserGroup
   public const PERMISSION_ADMIN_FORMS_MANAGEMENT              = 1 << 19;
   public const PERMISSION_ADMIN_CONTENT_BLOCKS_MANAGEMENT     = 1 << 20;
   public const PERMISSION_ADMIN_SUPERUSER                     = 1 << 18;
+  public const PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT     = 1 << 22;
+  public const PERMISSION_ADMIN_USERS_DATA_EXPORT             = 1 << 23;
   // Права модерации
   public const PERMISSION_MODER_USERS_BAN                     = 1 << 7;
   public const PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT   = 1 << 8;
@@ -157,10 +158,12 @@ class UserGroup
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => 'JSON_EXTRACT(`metadata`, \'$.groupID\') = :groupID',
-      'postgresql' => '(metadata::jsonb->>\'groupID\')::int = :groupID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :groupID',
+        $queryBuilder->dialect->jsonExtractInt('metadata', 'groupID')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -207,10 +210,12 @@ class UserGroup
     $queryBuilder->statement->clauseFrom->addTable('users');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => 'JSON_EXTRACT(`metadata`, \'$.groupID\') = :groupID',
-      'postgresql' => '(metadata::jsonb->>\'groupID\')::int = :groupID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :groupID',
+        $queryBuilder->dialect->jsonExtractInt('metadata', 'groupID')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -386,6 +391,16 @@ class UserGroup
   }
 
   /**
+   * Проверить наличие права экспорта данных субъекта
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminUsersDataExport() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_USERS_DATA_EXPORT);
+  }
+
+  /**
    * Проверить наличие права управления пользователями
    * 
    * @return bool
@@ -426,6 +441,49 @@ class UserGroup
   }
 
   /**
+   * Проверить наличие права управления согласиями пользователей (152-ФЗ)
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminUsersConsentsManagement() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT);
+  }
+
+  /**
+   * Проверить наличие любого права редактора
+   * 
+   * Используется для агрегированной проверки доступа к контент-разделу:
+   * если у пользователя есть хотя бы одно из прав редактора, ему доступен
+   * раздел «Контент» в главной навигации.
+   * 
+   * @return bool
+   */
+  public function hasAnyEditorPermission() : bool
+  {
+    return $this->hasPermissionEditorEntriesEdit()
+      || $this->hasPermissionEditorEntriesCategoriesEdit()
+      || $this->hasPermissionEditorPagesStaticEdit()
+      || $this->hasPermissionEditorContentBlocksEdit()
+      || $this->hasPermissionEditorMediaFilesManagement();
+  }
+
+  /**
+   * Проверить наличие доступа к разделу отчётов
+   * 
+   * Отчёты содержат чувствительные данные (логи, ПДн, согласия),
+   * поэтому доступ даётся тем, у кого есть хотя бы одно из «смежных» прав.
+   * 
+   * @return bool
+   */
+  public function hasReportsAccess() : bool
+  {
+    return $this->hasPermissionAdminViewingLogs()
+      || $this->hasPermissionAdminUsersDataExport()
+      || $this->hasPermissionAdminUsersConsentsManagement();
+  }
+
+  /**
    * Проверить наличие права просмотра логов
    * 
    * @return bool
@@ -443,6 +501,26 @@ class UserGroup
   public function hasPermissionAdminFeedsManagement() : bool
   {
     return $this->permissionCheck(self::PERMISSION_ADMIN_FEEDS_MANAGEMENT);
+  }
+
+  /**
+   * Проверить наличие права управления модулями
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminModulesManagement() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_MODULES_MANAGEMENT);
+  }
+
+  /**
+   * Проверить наличие права управления контент-блоками
+   * 
+   * @return bool
+   */
+  public function hasPermissionAdminContentBlocksManagement() : bool
+  {
+    return $this->permissionCheck(self::PERMISSION_ADMIN_CONTENT_BLOCKS_MANAGEMENT);
   }
 
   /**
@@ -594,10 +672,12 @@ class UserGroup
     $queryBuilder->statement->clauseFrom->addTable('users_groups');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -641,10 +721,12 @@ class UserGroup
     $queryBuilder->statement->clauseFrom->addTable('users_groups');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => 'LOWER(`name`) = :name',
-      'postgresql' => 'LOWER("name") = :name'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        'LOWER(%s) = :name',
+        $queryBuilder->dialect->quoteIdentifier('name')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -689,10 +771,12 @@ class UserGroup
     $queryBuilder->statement->clauseFrom->addTable('users_groups');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => 'LOWER(`name`) = :name',
-      'postgresql' => 'LOWER("name") = :name'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        'LOWER(%s) = :name',
+        $queryBuilder->dialect->quoteIdentifier('name')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -735,10 +819,12 @@ class UserGroup
     $queryBuilder->statement->clauseFrom->addTable('users_groups');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -776,10 +862,12 @@ class UserGroup
     $queryBuilder->statement->clauseFrom->addTable('users_groups');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -852,7 +940,9 @@ class UserGroup
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+    $dialect = $queryBuilder->dialect;
+
+    if (!$dialect->supportsInsertReturning()) {
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
@@ -860,11 +950,11 @@ class UserGroup
       $queryBuilder->statement->clauseFrom->addTable('users_groups');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $dialect->getLastInsertedIDCondition('id')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
-
-      error_log('SQL: ' . $queryBuilder->statement->assembled);
 
       try {
         $databaseConnection = $CMSCore->databaseConnector->database->connection;
@@ -875,7 +965,6 @@ class UserGroup
           'message' => $exception->getMessage(),
           'statusCode' => 0,
           'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
     }
@@ -911,36 +1000,30 @@ class UserGroup
       }
     }
 
+    $dialect = $queryBuilder->dialect;
+
     foreach (['texts', 'metadata'] as $columnName) {
-      $fieldsJSON = [];
-      
-      if (!isset($data[$columnName])) {
+      if (empty($data[$columnName])) {
         continue;
       }
 
-      foreach ($data[$columnName] as $name => $value) {
-        $valueJSON = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-        $fieldsJSON[] = match ($queryBuilder->DMS) {
-          CMSDMS::MySQL => sprintf('"%s": %s', $name, $valueJSON),
-          CMSDMS::PostgreSQL => sprintf('\'{"%s": %s}\'::jsonb', $name, $valueJSON)
-        };
-      }
-
-      if (!empty($data[$columnName])) {
-        $queryBuilder->statement->clauseSet->addColumnAdaptive($columnName, [
-          'mysql' => 'JSON_MERGE_PATCH(COALESCE(' . $columnName . ', \'{}\'), CAST(\'{' . implode(', ', $fieldsJSON) . '}\' AS JSON))',
-          'postgresql' => $columnName . '::jsonb || ' . implode(' || ', $fieldsJSON)
-        ]);
-      }
+      $jsonObject = json_encode($data[$columnName], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      
+      $queryBuilder->statement->clauseSet->addColumn(
+        $columnName,
+        $dialect->jsonMergePatch($columnName, $dialect->quoteLiteral($jsonObject))
+      );
     }
 
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 

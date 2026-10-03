@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -30,6 +30,8 @@ use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
 use \core\PHPLibrary\TraitPage as TraitPage;
+use \core\PHPLibrary\User as User;
+use \core\PHPLibrary\UserGroup as UserGroup;
 use \DOMDocument as DOMDocument;
 
 class PageTemplate implements InterfacePage
@@ -70,7 +72,8 @@ class PageTemplate implements InterfacePage
       'iconName' => 'back',
       'link' => '/templates',
       'permanent' => true,
-      'isActive' => false
+      'isActive' => false,
+      'permission' => 'hasPermissionAdminThemesManagement',
     ],
   ];
 
@@ -86,12 +89,73 @@ class PageTemplate implements InterfacePage
   }
 
   /**
+   * Получить группу текущего авторизованного пользователя админки
+   * 
+   * @return UserGroup|null
+   */
+  private function getCurrentUserGroup() : ?UserGroup
+  {
+    /** @var User|null $user */
+    $user = $this->CMSCore->client->getUser(2);
+    if ($user === null) {
+      return null;
+    }
+
+    $user->initData(['metadata']);
+
+    /** @var UserGroup|null $userGroup */
+    $userGroup = $user->getGroup();
+    if ($userGroup === null) {
+      return null;
+    }
+
+    $userGroup->initData(['permissions']);
+
+    return $userGroup;
+  }
+
+  /**
+   * Проверить, есть ли у текущего пользователя право управления шаблонами
+   * 
+   * @return bool
+   */
+  private function currentUserCanManageTemplates() : bool
+  {
+    $userGroup = $this->getCurrentUserGroup();
+
+    return $userGroup !== null
+      && method_exists($userGroup, 'hasPermissionAdminThemesManagement')
+      && $userGroup->hasPermissionAdminThemesManagement();
+  }
+
+  /**
+   * Собрать страницу ошибки и подменить итоговую сборку
+   * 
+   * @param int $httpCode
+   * 
+   * @return void
+   */
+  private function assemblyError(int $httpCode) : void
+  {
+    http_response_code($httpCode);
+
+    $pageError = new PageError($this->CMSCore, $this->page, $httpCode);
+    $pageError->assembly();
+    $this->assembled = $pageError->assembled;
+  }
+
+  /**
    * Инициализация подразделов
    * 
    * @return void
    */
   public function initSubnavigation() : void
   {
+    // Если нет прав на управление шаблонами — подразделы не собираем
+    if (!$this->currentUserCanManageTemplates()) {
+      return;
+    }
+
     $themeSource =& $this->CMSCore->theme->core->source;
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
   }
@@ -103,6 +167,12 @@ class PageTemplate implements InterfacePage
    */
   public function assembly() : void
   {
+    // Защита от прямого захода по URL без прав
+    if (!$this->currentUserCanManageTemplates()) {
+      $this->assemblyError(403);
+      return;
+    }
+
     $this->CMSCore->theme->addStyle(['href' => 'styles/page/theme.css', 'rel' => 'stylesheet']);
 
     $themeVariables = [];
@@ -116,6 +186,7 @@ class PageTemplate implements InterfacePage
     $themeMetadataItemsTransformed = [];
 
     $isExists = false;
+    $isExistsFileMetadata = false;
 
     if ($this->CMSCore->urlp->getPath(2) === 'repository') {
       $themeRepositoryURL = 'https://repository.cms-girvas.ru/templates/' . $themeName;
@@ -124,7 +195,7 @@ class PageTemplate implements InterfacePage
       $CURLExucuteResult = json_decode(curl_exec($ch), true);
       curl_close($ch);
 
-      $themeData = $CURLExucuteResult['outputData'];
+      $themeData = $CURLExucuteResult['outputData'] ?? [];
       $isExists = isset($themeData['metadata']);
 
       if ($isExists) {
@@ -363,11 +434,7 @@ class PageTemplate implements InterfacePage
         $themeVariables
       );
     } else {
-      http_response_code(404);
-
-      $pageError = new PageError($this->CMSCore, $this->page, 404);
-      $pageError->assembly();
-      $this->assembled = $pageError->assembled;
+      $this->assemblyError(404);
     }
   }
 }

@@ -82,6 +82,22 @@
         <div class="cell grid-table__cell grid-table__cell_data">
           <textarea name="page_static_keywords_rus" class="textarea form__textarea" placeholder="{LANG:PAGE_STATIC_PAGE_INPUT_KEYWORDS_PLACEHOLDER}" data-element="input-keywords">{PAGE_STATIC_KEYWORDS}</textarea>
         </div>
+        <!-- Поле: Юридический документ -->
+        <div class="cell grid-table__cell grid-table__cell_text">
+          <div class="cell__title">
+            {LANG:PAGE_STATIC_PAGE_INPUT_IS_LEGAL_DOCUMENT_LABEL}
+          </div>
+          <div class="cell__description">
+            {LANG:PAGE_STATIC_PAGE_INPUT_IS_LEGAL_DOCUMENT_DESCRIPTION}
+          </div>
+        </div>
+        <div class="cell grid-table__cell grid-table__cell_data">
+          <div class="form__checkbox-container checkbox-container">
+            <input type="hidden" name="page_static_is_legal_document_status" id="I1474309100" value="{PAGE_STATIC_IS_LEGAL_DOCUMENT_STATUS_VALUE}">
+            <input class="checkbox-container__input form__input form__input_checkbox" id="I1474309101" name="page_static_is_legal_document_status" type="checkbox" {PAGE_STATIC_IS_LEGAL_DOCUMENT_CHECKED_VALUE} data-logic-block="I1474309110" data-status-block="I1474309100">
+            <label class="checkbox-container__label form__label" for="I1474309101"></label>
+          </div>
+        </div>
         <!-- Редактор -->
         <div class="cell grid-table__cell grid-table__cell_editor" data-element="editor">
           {PAGE_STATIC_EDITOR}
@@ -132,6 +148,18 @@
         <input class="block__input input input_date" type="datetime-local" name="page_static_published_timestamp" value="{PAGE_STATIC_PUBLISHED_TIMESTAMP}" data-element="published-date-input">
       </div>
     </div>
+  </div>
+  <div class="page-aside__block block">
+    <h2 class="page-aside__block-title">
+      {LANG:PAGE_STATIC_PAGE_SIDEBAR_BLOCK_DOCUMENT_VERSION_TITLE}
+    </h2>
+    <div class="page-aside__block-content block-content">
+      <div class="block__input-container input-container">
+        {LANG:MD:PAGE_PAGE_STATIC_SIDEBAR_BLOCK_DOCUMENT_VERSION_TIP}
+        <input id="I1474309110" class="block__input input input_text" type="text" name="page_static_version" placeholder="1.0" value="{PAGE_STATIC_VERSION}" pattern="^[0-9]+(\.[0-9]+)*$" data-element="input-version">
+      </div>
+    </div>
+    <div class="page-aside__block-panel block-panel" data-element="version-panel"></div>
   </div>
   <div class="page-aside__block block">
     <h2 class="page-aside__block-title">

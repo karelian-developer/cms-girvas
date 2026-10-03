@@ -4,7 +4,7 @@
 => Включена в Реестр российского программного обеспечения Минцифры РФ.
 => Реестровый номер: №25012 от 27.11.2024
 => 
-=> @copyright Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик».
+=> @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
 =>             Все права защищены.
 => @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
 => @see       https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
@@ -29,6 +29,7 @@
 .interactive .interactive__select-imitation .select-imitation__selected-item-container {
   box-sizing: border-box;
   flex-grow: 1;
+  margin-bottom: 0 !important;
   height: 32px;
 }
 
@@ -58,6 +59,7 @@
   box-sizing: border-box;
   position: absolute;
   border: 1px solid #EAEAEA;
+  margin-bottom: 0px;
   max-height: 128px;
   height: 0;
   width: calc(100% + 2px);
@@ -89,6 +91,7 @@
   align-items: center;
   font-size: 14px;
   padding: 10px;
+  margin-bottom: 0;
   cursor: pointer;
 }
 
@@ -118,6 +121,40 @@
   margin-right: 10px;
 }
 
+.interactive .interactive__input {
+  box-sizing: border-box;
+  font-size: 14px;
+  border-radius: 8px;
+  border-width: 1px;
+  border-style: solid;
+  outline: 0;
+  padding: 10px;
+  transition: background-color .2s, border-color .2s;
+}
+
+.interactive .interactive__input {
+  background-color: var(--primary-color-4);
+  border-color: var(--primary-color-2);
+}
+
+.interactive .interactive__input:hover {
+  border-color: var(--primary-color-1);
+}
+
+.interactive .interactive__input:focus {
+  border-color: var(--primary-color-1);
+}
+
+.interactive .interactive__input:active {
+  border-color: var(--primary-color-1);
+}
+
+.interactive .interactive__input:invalid,
+.interactive .interactive__input:invalid {
+  background-color: var(--common-secondary-color-5);
+  border-color: var(--common-secondary-color-6);
+}
+
 .interactive .interactive__data-searcher {
   position: relative;
   width: fit-content;
@@ -133,7 +170,7 @@
   transition: background-color .2s, border-color .2s;
 }
 
-.interactive .interactive__data-searcher .data-searcher__inputt {
+.interactive .interactive__data-searcher .data-searcher__input {
   background-color: var(--primary-color-4);
   border-color: var(--primary-color-2);
 }
@@ -388,19 +425,13 @@
   margin-bottom: 10px;
 }
 
-.interactive .interactive__modal .modal__body-container form input,
-.interactive .interactive__modal .modal__body-container form textarea,
-.interactive .interactive__modal .modal__body-container form select {
+.interactive .interactive__modal .modal__body-container input,
+.interactive .interactive__modal .modal__body-container textarea,
+.interactive .interactive__modal .modal__body-container select {
   width: 100%;
 }
 
-.interactive .interactive__modal .modal__body-container form input:not(:last-child),
-.interactive .interactive__modal .modal__body-container form textarea:not(:last-child),
-.interactive .interactive__modal .modal__body-container form select:not(:last-child) {
-  margin-bottom: 10px;
-}
-
-.interactive .interactive__modal .modal__body-container form textarea {
+.interactive .interactive__modal .modal__body-container textarea {
   resize: none;
 }
 
@@ -439,7 +470,13 @@
 }
 
 .file-manager {
+  display: flex;
+  flex-direction: column;
   height: calc(100vh - 200px);
+}
+
+.file-manager__files-container {
+  overflow-y: auto;
 }
 
 .file-manager__media-list {
@@ -541,6 +578,7 @@
   border-radius: 8px;
   transition: filter .2s, outline .2s;
   cursor: pointer;
+  overflow: hidden;
 
   &:not(:first-child) {
     &:hover, &:focus {
@@ -548,6 +586,15 @@
       filter: brightness(120%);
     }
   }
+}
+
+.file-manager .media-list__item.media-list__item_is-selected {
+  outline: 2px solid var(--secondary-color-3);
+  filter: brightness(1.05);
+}
+
+.file-manager .media-list__item.media-list__item_is-selected .media-list__item-preview {
+  filter: brightness(0.85);
 }
 
 .file-manager .media-list__item > .media-list__item-controllers {
@@ -679,4 +726,745 @@
   display: inline-block;
   width: 100%;
   height: 100%;
+}
+
+/* ==========================================================================================
+=> Tabs (Переключатели)
+============================================================================================= */
+
+.interactive .interactive__tabs {
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+}
+
+/* Ориентация */
+.interactive .interactive__tabs.tabs_orientation-horizontal {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.interactive .interactive__tabs.tabs_orientation-vertical {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* ==========================================================================================
+=> Тип: Pills (пилюли)
+============================================================================================= */
+
+.interactive .interactive__tabs.tabs_type-pills {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.interactive .interactive__tabs.tabs_type-pills .tabs__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  background-color: var(--primary-color-4);
+  color: var(--primary-color-1);
+  border: 1px solid var(--primary-color-3);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .2s, border-color .2s, color .2s;
+}
+
+.interactive .interactive__tabs.tabs_type-pills .tabs__item:hover {
+  background-color: var(--primary-color-3);
+  border-color: var(--primary-color-2);
+}
+
+.interactive .interactive__tabs.tabs_type-pills .tabs__item:focus {
+  background-color: var(--primary-color-3);
+  border-color: var(--primary-color-2);
+  outline: none;
+}
+
+.interactive .interactive__tabs.tabs_type-pills .tabs__item:active {
+  background-color: var(--secondary-color-2);
+  border-color: var(--secondary-color-3);
+}
+
+.interactive .interactive__tabs.tabs_type-pills .tabs__item.tabs__item_is-selected {
+  background-color: var(--secondary-color-2);
+  border-color: var(--secondary-color-3);
+  color: var(--secondary-color-3);
+  font-weight: 700;
+}
+
+/* ==========================================================================================
+=> Тип: Tabs (вкладки)
+============================================================================================= */
+
+.interactive .interactive__tabs.tabs_type-tabs {
+  gap: 0;
+  padding: 0;
+  border-bottom: 2px solid var(--primary-color-3);
+}
+
+.interactive .interactive__tabs.tabs_type-tabs .tabs__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  background: none;
+  color: var(--primary-color-1);
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .2s, border-color .2s, color .2s;
+}
+
+.interactive .interactive__tabs.tabs_type-tabs .tabs__item:hover {
+  background-color: var(--primary-color-3);
+}
+
+.interactive .interactive__tabs.tabs_type-tabs .tabs__item:focus {
+  background-color: var(--primary-color-3);
+  outline: none;
+}
+
+.interactive .interactive__tabs.tabs_type-tabs .tabs__item:active {
+  background-color: var(--secondary-color-2);
+}
+
+.interactive .interactive__tabs.tabs_type-tabs .tabs__item.tabs__item_is-selected {
+  border-bottom-color: var(--secondary-color-3);
+  color: var(--secondary-color-3);
+  font-weight: 700;
+}
+
+/* ==========================================================================================
+=> Тип: Buttons (кнопки)
+============================================================================================= */
+
+.interactive .interactive__tabs.tabs_type-buttons {
+  gap: 4px;
+  padding: 4px;
+  background-color: var(--primary-color-3);
+  border-radius: 8px;
+}
+
+.interactive .interactive__tabs.tabs_type-buttons .tabs__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  background: none;
+  color: var(--primary-color-1);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .2s, box-shadow .2s, color .2s;
+}
+
+.interactive .interactive__tabs.tabs_type-buttons .tabs__item:hover {
+  background-color: var(--primary-color-4--opacity-0-4);
+}
+
+.interactive .interactive__tabs.tabs_type-buttons .tabs__item:focus {
+  background-color: var(--primary-color-4--opacity-0-4);
+  outline: none;
+}
+
+.interactive .interactive__tabs.tabs_type-buttons .tabs__item:active {
+  background-color: var(--primary-color-4--opacity-0-8);
+}
+
+.interactive .interactive__tabs.tabs_type-buttons .tabs__item.tabs__item_is-selected {
+  background-color: var(--primary-color-4);
+  box-shadow: 0 2px 4px var(--primary-color-1--opacity-0-2);
+  color: var(--secondary-color-3);
+  font-weight: 700;
+}
+
+/* ==========================================================================================
+=> Тип: Segmented (сегментированный)
+============================================================================================= */
+
+.interactive .interactive__tabs.tabs_type-segmented {
+  gap: 0;
+  padding: 0;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  background-color: var(--primary-color-4);
+  color: var(--primary-color-1);
+  border: 1px solid var(--primary-color-3);
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .2s, border-color .2s, color .2s;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item:not(:first-child) {
+  margin-left: -1px;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item:hover {
+  background-color: var(--primary-color-3);
+  border-color: var(--primary-color-2);
+  z-index: 1;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item:focus {
+  background-color: var(--primary-color-3);
+  border-color: var(--primary-color-2);
+  outline: none;
+  z-index: 1;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item:active {
+  background-color: var(--secondary-color-2);
+  border-color: var(--secondary-color-3);
+  z-index: 1;
+}
+
+.interactive .interactive__tabs.tabs_type-segmented .tabs__item.tabs__item_is-selected {
+  background-color: var(--secondary-color-2);
+  border-color: var(--secondary-color-3);
+  color: var(--secondary-color-3);
+  font-weight: 700;
+  z-index: 2;
+}
+
+/* ==========================================================================================
+=> Общие элементы внутри табов
+============================================================================================= */
+
+.interactive .interactive__tabs .tabs__item-icon {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.interactive .interactive__tabs .tabs__item-icon img,
+.interactive .interactive__tabs .tabs__item-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.interactive .interactive__tabs .tabs__item-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background-color: var(--secondary-color-5);
+  color: var(--secondary-color-6);
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  line-height: 1;
+}
+
+/* Состояние disabled */
+.interactive .interactive__tabs .tabs__item.tabs__item_disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Вертикальная ориентация */
+.interactive .interactive__tabs.tabs_orientation-vertical.tabs_type-pills {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.interactive .interactive__tabs.tabs_orientation-vertical.tabs_type-tabs {
+  flex-direction: column;
+  border-bottom: none;
+  border-right: 2px solid var(--primary-color-3);
+}
+
+.interactive .interactive__tabs.tabs_orientation-vertical.tabs_type-tabs .tabs__item {
+  border-bottom: none;
+  border-right: 2px solid transparent;
+  margin-bottom: 0;
+  margin-right: -2px;
+}
+
+.interactive .interactive__tabs.tabs_orientation-vertical.tabs_type-tabs .tabs__item.tabs__item_is-selected {
+  border-right-color: var(--secondary-color-3);
+}
+
+/* ==========================================================================================
+=> Schedule (График)
+============================================================================================= */
+
+/* Основной контейнер графика */
+.interactive.interactive_schedule {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.interactive.interactive_schedule canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--primary-color-4);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px var(--primary-color-1--opacity-0-2);
+}
+
+/* ==========================================================================================
+=> Навигатор (Zoom control)
+============================================================================================= */
+
+.schedule-navigator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0 4px 0;
+  user-select: none;
+  flex-wrap: wrap;
+}
+
+/* Кнопки навигатора */
+.schedule-navigator button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background: var(--primary-color-4);
+  color: var(--primary-color-2);
+  border: 1px solid var(--primary-color-3);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.schedule-navigator button:hover {
+  background: var(--primary-color-3);
+  border-color: var(--primary-color-2--opacity-0-4);
+}
+
+.schedule-navigator button:active {
+  background: var(--secondary-color-2);
+  border-color: var(--secondary-color-3);
+  transform: scale(0.95);
+}
+
+.schedule-navigator button:focus {
+  outline: 2px solid var(--secondary-color-3);
+  outline-offset: 2px;
+}
+
+.schedule-navigator .nav-btn-reset {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* Canvas навигатора */
+.schedule-navigator canvas {
+  flex: 1;
+  min-height: 50px;
+  height: 50px;
+  max-height: 60px;
+  border: 1px solid var(--primary-color-3);
+  border-radius: 6px;
+  background: var(--primary-color-4);
+  cursor: grab;
+  transition: border-color 0.2s ease;
+}
+
+.schedule-navigator canvas:hover {
+  border-color: var(--primary-color-2--opacity-0-4);
+}
+
+.schedule-navigator canvas:active {
+  cursor: grabbing;
+  border-color: var(--secondary-color-3);
+}
+
+/* ==========================================================================================
+=> Легенда
+============================================================================================= */
+
+.schedule-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 8px 0;
+  justify-content: center;
+}
+
+.schedule-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--primary-color-2);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.schedule-legend__item:hover {
+  opacity: 0.7;
+}
+
+.schedule-legend__color {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  border: 1px solid var(--primary-color-3);
+}
+
+.schedule-legend__label {
+  font-weight: 500;
+}
+
+/* ==========================================================================================
+=> Тулыпип при наведении на точку
+============================================================================================= */
+
+.schedule-tooltip {
+  position: absolute;
+  background: var(--primary-color-2);
+  color: var(--primary-color-4);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 20;
+  box-shadow: 0 2px 8px var(--primary-color-1--opacity-0-2);
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+}
+
+.schedule-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid var(--primary-color-2);
+}
+
+/* ==========================================================================================
+=> Состояния
+============================================================================================= */
+
+/* Загрузка */
+.schedule-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--primary-color-2--opacity-0-4);
+  font-size: 14px;
+  gap: 12px;
+}
+
+.schedule-loading__spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--primary-color-3);
+  border-top-color: var(--secondary-color-3);
+  border-radius: 50%;
+  animation: schedule-spin 0.8s linear infinite;
+}
+
+@keyframes schedule-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Пустое состояние */
+.schedule-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--primary-color-2--opacity-0-4);
+  font-size: 14px;
+  gap: 8px;
+}
+
+.schedule-empty__icon {
+  font-size: 32px;
+  opacity: 0.5;
+}
+
+/* Ошибка */
+.schedule-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: var(--secondary-color-6);
+  font-size: 14px;
+  gap: 8px;
+  text-align: center;
+}
+
+.schedule-error__details {
+  font-size: 12px;
+  color: var(--primary-color-2--opacity-0-4);
+}
+
+/* ==========================================================================================
+=> Адаптивность
+============================================================================================= */
+
+@media (max-width: 768px) {
+  .schedule-navigator {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .schedule-navigator button {
+    padding: 4px 10px;
+    font-size: 13px;
+    min-height: 28px;
+  }
+
+  .schedule-navigator canvas {
+    min-height: 40px;
+    height: 40px;
+  }
+
+  .schedule-legend {
+    gap: 10px;
+    font-size: 12px;
+  }
+
+  .schedule-tooltip {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .schedule-navigator button {
+    padding: 3px 8px;
+    font-size: 12px;
+    min-height: 24px;
+    min-width: 28px;
+  }
+
+  .schedule-navigator canvas {
+    min-height: 32px;
+    height: 32px;
+  }
+
+  .schedule-legend {
+    gap: 6px;
+    font-size: 11px;
+  }
+
+  .schedule-legend__color {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+/* ==========================================================================================
+=> Gallery (Галерея)
+============================================================================================= */
+
+.interactive.interactive_gallery {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.interactive.interactive_gallery .gallery__items {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  overflow: hidden;
+  border-radius: 8px;
+  min-height: 320px;
+}
+
+.interactive.interactive_gallery .gallery__item {
+  display: none;
+  margin: 0;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.interactive.interactive_gallery .gallery__item.gallery__item_is-active {
+  display: flex;
+  flex-direction: column;
+}
+
+.interactive.interactive_gallery .gallery__image {
+  display: block;
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  cursor: zoom-in;
+  transition: transform .2s, filter .2s;
+}
+
+.interactive.interactive_gallery .gallery__image:hover {
+  filter: brightness(1.03);
+}
+
+.interactive.interactive_gallery .gallery__caption {
+  box-sizing: border-box;
+  background-color: var(--primary-color-2);
+  color: var(--primary-color-4);
+  font-size: 14px;
+  padding: 10px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Контроллеры */
+.interactive.interactive_gallery .gallery__controllers {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.interactive.interactive_gallery .controller__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 40px;
+  height: 40px;
+  margin: 0 8px;
+  background-color: var(--primary-color-4--opacity-0-8);
+  color: var(--primary-color-2);
+  border: 1px solid var(--primary-color-3);
+  border-radius: 100%;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background-color .2s, transform .2s;
+}
+
+.interactive.interactive_gallery .controller__button:hover {
+  background-color: var(--primary-color-4);
+  transform: scale(1.05);
+}
+
+.interactive.interactive_gallery .controller__button:active {
+  transform: scale(0.95);
+}
+
+.interactive.interactive_gallery .controller__button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Превью */
+.interactive.interactive_gallery .gallery__preview {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.interactive.interactive_gallery .gallery__preview-item {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  width: 64px;
+  height: 48px;
+  padding: 0;
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color .2s, opacity .2s;
+  opacity: .6;
+}
+
+.interactive.interactive_gallery .gallery__preview-item:hover {
+  opacity: 1;
+}
+
+.interactive.interactive_gallery .gallery__preview-item.gallery__preview-item_is-active {
+  border-color: var(--secondary-color-3);
+  opacity: 1;
+}
+
+.interactive.interactive_gallery .gallery__preview-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Модальное окно */
+.gallery-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gallery-modal .gallery-modal__image {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  margin: 0 auto;
+  border-radius: 8px;
+}
+
+.gallery-modal .gallery-modal__caption {
+  text-align: center;
+  font-size: 14px;
+  color: var(--primary-color-2);
+  padding: 4px 0;
 }

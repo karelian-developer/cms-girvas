@@ -8,7 +8,7 @@
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
  */
 
- if (!defined('IS_NOT_HACKED')) {
+if (!defined('IS_NOT_HACKED')) {
   http_response_code(503);
   die('An attempted hacker attack has been detected.');
 }
@@ -20,13 +20,19 @@ use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
   if ($CMSCore->urlp->getPath(2) === null) {
     if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_EDITOR_CONTENT_BLOCKS_EDIT)) {
       $contentBlockName = isset($_PUT['content_block_name']) ? urlencode(htmlentities($_PUT['content_block_name'])) : '';
+
+      if (empty($contentBlockName)) {
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_CONTENT_BLOCK_ERROR_NAME_EMPTY');
+        $handlerStatusCode = $handlerStatusCode ?? 0;
+        return;
+      }
 
       if (!ContentBlock::existsByName($CMSCore, $contentBlockName)) {
         $contentBlockTypeID = $_PUT['content_block_type_id'] ?? 1;
@@ -85,13 +91,26 @@ if ($CMSCore->client->isLogged(2)) {
 
         $clientSession = $CMSCore->client->getSession(2, ['userID']);
         $contentBlock = ContentBlock::create($CMSCore, $contentBlockName, $texts, $metadata);
+        
         if ($contentBlock !== null) {
-          $contentBlock->initData(['texts']);
-
-          $CMSReport = CMSReport::create($CMSCore, CMSReport::REPORT_TYPE_ID_AP_CONTENT_BLOCK_CREATED, [
-            'clientIP' => $CMSCore->client->getIPAddress(),
-            'contentBlockID' => $contentBlock->getID()
-          ]);
+          // ============================================================
+          // ЛОГИРОВАНИЕ СОЗДАНИЯ КОНТЕНТ-БЛОКА (152-ФЗ)
+          // ============================================================
+          $contentBlock->initData(['name', 'texts']);
+          $blockTitle = $contentBlock->getTitle($CMSCore->locale->getName());
+          
+          CMSReport::create(
+            $CMSCore,
+            CMSReport::REPORT_TYPE_ID_AP_CONTENT_BLOCK_CREATED,
+            [
+              'blockID' => $contentBlock->getID(),
+              'blockName' => $contentBlock->getName(),
+              'blockTitle' => $blockTitle,
+              'createdByID' => $clientUser->getID(),
+              'createdByLogin' => $clientUser->getLogin(),
+              'ip' => $CMSCore->client->getIPAddress()
+            ]
+          );
           
           $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_PUT_DATA_SUCCESS');
           $handlerStatusCode = $handlerStatusCode ?? 1;
@@ -112,6 +131,9 @@ if ($CMSCore->client->isLogged(2)) {
       $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
+  } else {
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 } else {
   $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');

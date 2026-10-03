@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -21,7 +21,6 @@
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
 use \PDOException as PDOException;
 
@@ -188,10 +187,12 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => 'JSON_EXTRACT(`metadata`, \'$.parentID\') = :parentID',
-      'postgresql' => '(metadata::jsonb->>\'parentID\')::int = :parentID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :parentID',
+        $queryBuilder->dialect->jsonExtractInt('metadata', 'parentID')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -230,10 +231,12 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => 'JSON_EXTRACT(`metadata`, \'$.parentID\') = :parentID',
-      'postgresql' => '(metadata::jsonb->>\'parentID\')::int = :parentID'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :parentID',
+        $queryBuilder->dialect->jsonExtractInt('metadata', 'parentID')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -366,10 +369,12 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
     
@@ -413,10 +418,12 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->setClauseLimit(1);
     $queryBuilder->statement->assembly();
@@ -454,10 +461,12 @@ class EntryComment implements EntityTypeContent
     $queryBuilder->statement->clauseFrom->addTable('entries_comments');
     $queryBuilder->statement->clauseFrom->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -534,7 +543,9 @@ class EntryComment implements EntityTypeContent
       ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     }
 
-    if ($CMSConfigDatabase['dms'] === CMSDMS::MySQL) {
+    $dialect = $queryBuilder->dialect;
+
+    if (!$dialect->supportsInsertReturning()) {
       $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
       $queryBuilder->setStatementSelect();
       $queryBuilder->statement->addSelections(['id']);
@@ -542,7 +553,9 @@ class EntryComment implements EntityTypeContent
       $queryBuilder->statement->clauseFrom->addTable('entries_comments');
       $queryBuilder->statement->clauseFrom->assembly();
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition('`id` = LAST_INSERT_ID()');
+      $queryBuilder->statement->clauseWhere->addCondition(
+        $dialect->getLastInsertedIDCondition('id')
+      );
       $queryBuilder->statement->clauseWhere->assembly();
       $queryBuilder->statement->assembly();
 
@@ -555,7 +568,6 @@ class EntryComment implements EntityTypeContent
           'message' => $exception->getMessage(),
           'statusCode' => 0,
           'outputData' => []
-        // Убираем экранирующие слеши из ответа, а также преобразовываем UNICODE в текст
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
       }
     }
@@ -580,6 +592,8 @@ class EntryComment implements EntityTypeContent
     $CMSConfigDatabase = $CMSConfigurator->get('database');
 
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $dialect = $queryBuilder->dialect;
+
     $queryBuilder->setStatementUpdate();
     $queryBuilder->statement->setTable('entries_comments');
     $queryBuilder->statement->setClauseSet();
@@ -590,87 +604,67 @@ class EntryComment implements EntityTypeContent
       }
     }
 
-    if (array_key_exists('metadata', $data)) {
-      if (!empty($data['metadata'])) {
-        $metadataAssignments = [];
-        
-        foreach ($data['metadata'] as $name => $value) {
-          if ($name == 'ratingVote' && $value['vote'] == 'up') {
-            $commentRatingVoters = $this->getRatingVoters();
+    if (array_key_exists('metadata', $data) && !empty($data['metadata'])) {
+      $dialect = $queryBuilder->dialect;
+      $metadataPairs = [];
 
-            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
-              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'ratingVoters\', JSON_MERGE(COALESCE(JSON_EXTRACT(metadata, \'$.ratingVoters\'), \'{}\'), CAST(\'{"%d": "%s"}\' AS JSON))))', $value['voterID'], $value['vote']),
-              CMSDMS::PostgreSQL => sprintf('jsonb_set(metadata::jsonb, \'{ratingVoters}\', (metadata::jsonb->>\'ratingVoters\')::jsonb || \'{"%d": "%s"}\')', $value['voterID'], $value['vote'])
-            };
+      foreach ($data['metadata'] as $name => $value) {
+        if ($name === 'ratingVote' && is_array($value)) {
+          $vote = $value['vote'] ?? '';
+          $voterID = (int) ($value['voterID'] ?? 0);
 
-            if (!isset($commentRatingVoters[$value['voterID']])) {
-              $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
-                CMSDMS::MySQL => 'JSON_OBJECT(\'rating\', JSON_EXTRACT(`metadata`, \'$.rating\') + 1)',
-                CMSDMS::PostgreSQL => 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int + 1)'
-              };
-            } else {
-              if ($commentRatingVoters[$value['voterID']] !== $value['vote']) {
-                $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
-                  CMSDMS::MySQL => 'JSON_OBJECT(\'rating\', JSON_EXTRACT(`metadata`, \'$.rating\') + 2)',
-                  CMSDMS::PostgreSQL => 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int + 2)'
-                };
-              }
-            }
-          } else if ($name === 'ratingVote' && $value['vote'] === 'down') {
-            $commentRatingVoters = $this->getRatingVoters();
-
-            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
-              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'ratingVoters\', JSON_MERGE(COALESCE(JSON_EXTRACT(metadata, \'$.ratingVoters\'), \'{}\'), CAST(\'{"%d": "%s"}\' AS JSON))))', $value['voterID'], $value['vote']),
-              CMSDMS::PostgreSQL => sprintf('jsonb_set(metadata::jsonb, \'{ratingVoters}\', (metadata::jsonb->>\'ratingVoters\')::jsonb || \'{"%d": "%s"}\')', $value['voterID'], $value['vote'])
-            };
-
-            if (!isset($commentRatingVoters[$value['voterID']])) {
-              $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
-                CMSDMS::MySQL => 'JSON_OBJECT(\'rating\', JSON_EXTRACT(`metadata`, \'$.rating\') - 1)',
-                CMSDMS::PostgreSQL => 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int - 1)'
-              };
-            } else {
-              if ($commentRatingVoters[$value['voterID']] !== $value['vote']) {
-                $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
-                  CMSDMS::MySQL => 'JSON_OBJECT(\'rating\', JSON_EXTRACT(`metadata`, \'$.rating\') - 2)',
-                  CMSDMS::PostgreSQL => 'jsonb_build_object(\'rating\', (metadata::jsonb->\'rating\')::int - 2)'
-                };
-              }
-            }
-          } else if ($name === 'isHidden') {
-            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
-              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'isHidden\', %d != 0)', $value),
-              CMSDMS::PostgreSQL => sprintf('jsonb_build_object(\'isHidden\', %d::int::bool)', $value)
-            };
-          } else if ($name === 'hiddenReason') {
-            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
-              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'hiddenReason\', \'%s\')', $value),
-              CMSDMS::PostgreSQL => sprintf('jsonb_build_object(\'hiddenReason\', \'%s\'::text)', $value)
-            };
-          } else if ($name === 'parentID') {
-            $metadataAssignments[] = match ($CMSConfigDatabase['dms']) {
-              CMSDMS::MySQL => sprintf('JSON_OBJECT(\'parentID\', \'%d\')', $value),
-              CMSDMS::PostgreSQL => sprintf('jsonb_build_object(\'parentID\', %d::int)', $value)
-            };
+          if ($voterID <= 0 || !in_array($vote, ['up', 'down'], true)) {
+            continue;
           }
-        }
 
-        if (!empty($metadataAssignments)) {
-          $queryBuilder->statement->clauseSet->addColumnAdaptive('metadata', [
-            'mysql' => 'JSON_MERGE_PRESERVE(COALESCE(`metadata`, \'{}\'), CAST(\'{' . implode(', ', $metadataAssignments) . '}\' AS JSON))',
-            'postgresql' => sprintf('metadata::jsonb || %s', implode(' || ', $metadataAssignments))
-          ]);
+          $commentRatingVoters = $this->getRatingVoters();
+
+          // ratingVoters: сливаем текущий объект с новым фрагментом {"id": "vote"}
+          $voteFragment = sprintf("'{\"%d\": \"%s\"}'", $voterID, $vote);
+          $metadataPairs['ratingVoters'] = $dialect->jsonObjectMergeKey(
+            'metadata',
+            'ratingVoters',
+            $voteFragment
+          );
+
+          // rating: вычисляем дельту
+          $delta = ($vote === 'up') ? 1 : -1;
+          if (isset($commentRatingVoters[$voterID]) && $commentRatingVoters[$voterID] !== $vote) {
+            $delta *= 2;
+          }
+
+          $metadataPairs['rating'] = sprintf(
+            '%s + %d',
+            $dialect->jsonExtractInt('metadata', 'rating'),
+            $delta
+          );
+        } elseif ($name === 'isHidden') {
+          $metadataPairs['isHidden'] = $value ? 'TRUE' : 'FALSE';
+        } elseif ($name === 'hiddenReason') {
+          $metadataPairs['hiddenReason'] = sprintf("'%s'", addslashes((string) $value));
+        } elseif ($name === 'parentID') {
+          $metadataPairs['parentID'] = (string) (int) $value;
         }
+      }
+
+      if (!empty($metadataPairs)) {
+        $metadataPatch = $dialect->jsonBuildObject($metadataPairs);
+        $queryBuilder->statement->clauseSet->addColumn(
+          'metadata',
+          $dialect->jsonMergePatches('metadata', [$metadataPatch])
+        );
       }
     }
 
     $queryBuilder->statement->clauseSet->addColumn('updatedUnixTimestamp');
     $queryBuilder->statement->clauseSet->assembly();
     $queryBuilder->statement->setClauseWhere();
-    $queryBuilder->statement->clauseWhere->addConditionAdaptive([
-      'mysql' => '`id` = :id',
-      'postgresql' => '"id" = :id'
-    ]);
+    $queryBuilder->statement->clauseWhere->addCondition(
+      sprintf(
+        '%s = :id',
+        $queryBuilder->dialect->quoteIdentifier('id')
+      )
+    );
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
@@ -680,7 +674,7 @@ class EntryComment implements EntityTypeContent
     try {
       $databaseConnection = $this->CMSCore->databaseConnector->database->connection;
       $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
-      error_log($queryBuilder->statement->assembled);
+      
       foreach ($data as $name => $value) {
         if (!in_array($name, ['id', 'createdUnixTimestamp', 'updatedUnixTimestamp', 'metadata'])) {
           $valueTypeName = gettype($value);

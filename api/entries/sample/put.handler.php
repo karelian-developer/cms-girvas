@@ -18,10 +18,11 @@ use \core\PHPLibrary\EntriesSample as EntriesSample;
 use \core\PHPLibrary\EntriesSamples as EntriesSamples;
 use \core\PHPLibrary\SystemCore\Locale as Locale;
 use \core\PHPLibrary\EntriesSample\EnumSortTypeID as EnumSortTypeID;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
@@ -109,8 +110,28 @@ if ($CMSCore->client->isLogged(2)) {
         $sample = EntriesSample::create($CMSCore, $sampleName, $sampleTexts, $sampleMetadata);
 
         if (!is_null($sample)) {
-          $handleOutputData['entriesSample'] = [];
-          $handleOutputData['entriesSample']['id'] = $sample->getID();
+          // ============================================================
+          // ЛОГИРОВАНИЕ СОЗДАНИЯ ВЫБОРКИ (152-ФЗ)
+          // ============================================================
+          $sample->initData(['name', 'texts']);
+          $localeName = $CMSCore->locale->getName();
+          $sampleTitle = $sample->getTitle($localeName);
+          
+          CMSReport::create(
+            $CMSCore,
+            CMSReport::REPORT_TYPE_ID_AP_ENTRIES_SAMPLE_CREATED,
+            [
+              'sampleID' => $sample->getID(),
+              'sampleName' => $sample->getName(),
+              'sampleTitle' => $sampleTitle,
+              'createdByID' => $clientUser->getID(),
+              'createdByLogin' => $clientUser->getLogin(),
+              'ip' => $CMSCore->client->getIPAddress()
+            ]
+          );
+
+          $handlerOutputData['entriesSample'] = [];
+          $handlerOutputData['entriesSample']['id'] = $sample->getID();
 
           $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_PUT_DATA_SUCCESS');
           $handlerStatusCode = 1;

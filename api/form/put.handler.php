@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -23,12 +23,13 @@ if (!defined('IS_NOT_HACKED')) {
   die('An attempted hacker attack has been detected.');
 }
 
-use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 use \core\PHPLibrary\Form as Form;
+use \core\PHPLibrary\SystemCore\Report as CMSReport;
+use \core\PHPLibrary\SystemCore\Locale as CMSLocale;
 
 if ($CMSCore->client->isLogged(2)) {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
@@ -97,6 +98,16 @@ if ($CMSCore->client->isLogged(2)) {
 
         if ($elementTypeName === 'select') {
           $elements[$elementIndex]['options'] = [];
+        }
+
+        // Для типа consent — сохраняем documentKey
+        if ($elementTypeName === 'consent') {
+          $documentKey = $_PUT['form_element_document_key'][$elementIndex] ?? '';
+          $documentKey = trim((string)$documentKey);
+
+          if (!empty($documentKey) && preg_match('/^[a-z0-9_\-]+$/', $documentKey)) {
+            $elements[$elementIndex]['documentKey'] = $documentKey;
+          }
         }
 
         if ($elementName !== null) {
@@ -190,6 +201,31 @@ if ($CMSCore->client->isLogged(2)) {
     $form = Form::create($CMSCore, $formName, $texts, $elements, $metadata);
 
     if (!is_null($form)) {
+      // ============================================================
+      // ЛОГИРОВАНИЕ СОЗДАНИЯ ФОРМЫ (152-ФЗ)
+      // ============================================================
+      $form->initData(['name', 'texts']);
+      
+      // Получаем все языковые версии заголовка
+      $formTitles = [];
+      $CMSLocalesNames = $CMSCore->getArrayLocalesNames();
+      foreach ($CMSLocalesNames as $localeName) {
+        $formTitles[$localeName] = $form->getTitle($localeName);
+      }
+      
+      CMSReport::create(
+        $CMSCore,
+        CMSReport::REPORT_TYPE_ID_AP_FORM_CREATED,
+        [
+          'formID' => $form->getID(),
+          'formName' => $form->getName(),
+          'formTitles' => $formTitles,
+          'createdByID' => $clientUser->getID(),
+          'createdByLogin' => $clientUser->getLogin(),
+          'ip' => $CMSCore->client->getIPAddress()
+        ]
+      );
+
       $handlerOutputData['form'] = [];
       $handlerOutputData['form']['id'] = $form->getID();
 

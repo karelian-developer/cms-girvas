@@ -17,6 +17,7 @@ use \core\PHPLibrary\Template as Theme;
 use \core\PHPLibrary\User as User;
 use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\UsersGroups as UsersGroups;
+use \core\PHPLibrary\SystemCore\Report as Report;
 
 if ($CMSCore->urlp->getPath(3) === 'permissions') {
   $user = null;
@@ -32,7 +33,7 @@ if ($CMSCore->urlp->getPath(3) === 'permissions') {
     if (!is_null($user)) {
       $user->initData(['metadata']);
       $userGroup = $user->getGroup();
-      
+
       if (!is_null($userGroup)) {
         $userGroup->initData(['permissions']);
 
@@ -41,6 +42,7 @@ if ($CMSCore->urlp->getPath(3) === 'permissions') {
         $handlerOutputData['user']['permissions']['admin_panel_auth'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_PANEL_AUTH);
         $handlerOutputData['user']['permissions']['admin_users_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_MANAGEMENT);
         $handlerOutputData['user']['permissions']['admin_users_groups_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_GROUPS_MANAGEMENT);
+        $handlerOutputData['user']['permissions']['admin_users_consents_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_USERS_CONSENTS_MANAGEMENT);
         $handlerOutputData['user']['permissions']['admin_modules_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_MODULES_MANAGEMENT);
         $handlerOutputData['user']['permissions']['admin_templates_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT);
         $handlerOutputData['user']['permissions']['admin_settings_management'] = $userGroup->permissionCheck(UserGroup::PERMISSION_ADMIN_SETTINGS_MANAGEMENT);
@@ -73,16 +75,29 @@ if ($CMSCore->urlp->getPath(3) === 'permissions') {
 } else if ($CMSCore->urlp->getPath(3) === null) {
   $user = $CMSCore->urlp->getPath(2) === '@me' ? $CMSCore->client->getUser(1) : (is_numeric($CMSCore->urlp->getPath(2)) ? new User($CMSCore, $CMSCore->urlp->getPath(2)) : User::getByLogin($CMSCore, $CMSCore->urlp->getPath(2)));
   $locale = $CMSCore->urlp->getParam('locale') ?? $CMSCore->configurator->getDatabaseEntryValue('base_locale');
-  
+
   if ($user !== null) {
     $user->initData(['login', 'metadata']);
 
     $userGroup = $user->getGroup();
     $userGroup->initData(['texts']);
-    
+
     $themeName = ($CMSCore->configurator->existsDatabaseEntryValue('base_template')) ? $CMSCore->configurator->getDatabaseEntryValue('base_template') : 'default';
     $theme = new Theme($CMSCore, $themeName);
     $CMSCore->setTheme($theme);
+
+    $clientUser = $CMSCore->client->getUser(1);
+    if ($clientUser !== null && $clientUser->getID() !== $user->getID()) {
+      Report::create(
+        $CMSCore,
+        Report::REPORT_TYPE_ID_BASE_USER_PERSONAL_DATA_VIEWED,
+        [
+          'targetUserID' => $user->getID(),
+          'viewedByID' => $clientUser->getID(),
+          'ip' => $CMSCore->client->getIPAddress()
+        ]
+      );
+    }
 
     $handlerOutputData['user'] = [];
     $handlerOutputData['user']['id'] = $user->getID();
@@ -94,6 +109,7 @@ if ($CMSCore->urlp->getPath(3) === 'permissions') {
       'id' => $userGroup->getID(),
       'title' => $userGroup->getTitle($locale)
     ];
+    $handlerOutputData['user']['isAnonymized'] = $user->isAnonymized();
 
     if ($CMSCore->urlp->getPath(2) === '@me') {
       $handlerOutputData['user']['isLogged'] = $CMSCore->client->isLogged(1);

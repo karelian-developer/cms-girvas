@@ -1,0 +1,77 @@
+<?php
+
+/**
+ * CMS GIRVAS (https://www.cms-girvas.ru/)
+ * 
+ * @link        https://gitflic.ru/project/garbalo/cms-girvas
+ * @copyright   Copyright (c) 2022 - 2026, Andrey Shestakov & Garbalo
+ * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
+ */
+
+if (!defined('IS_NOT_HACKED')) {
+  http_response_code(503);
+  die('An attempted hacker attack has been detected.');
+}
+
+$allowedSettings = [
+  'base_site_title'               => 'json',
+  'base_locale'                   => 'string',
+  'security_cookie_banner_status'   => 'bool',
+  'security_cookie_banner_document' => 'string',
+  'security_allowed_users_registration_status' => 'bool',
+  'seo_site_description' => 'json',
+  'seo_site_keywords' => 'json',
+  'seo_code_yandex_metrika' => 'string',
+];
+
+$keysParam = $_GET['keys'] ?? '';
+$requestedKeys = $keysParam !== ''
+  ? array_filter(array_map('trim', explode(',', $keysParam)))
+  : array_keys($allowedSettings);
+
+$result = [];
+
+foreach ($requestedKeys as $key) {
+  if (!isset($allowedSettings[$key])) {
+    continue;
+  }
+
+  $exists = $CMSCore->configurator->existsDatabaseEntryValue($key);
+  $value = $exists ? $CMSCore->configurator->getDatabaseEntryValue($key) : null;
+
+  $result[$key] = match ($allowedSettings[$key]) {
+    'bool' => $value === 'on' || $value === true || $value === '1' || $value === 1,
+    'int' => (int)$value,
+    'json' => $value !== null ? json_decode($value, true) : null,
+    default => (string)($value ?? '')
+  };
+}
+
+// ============================================================
+// Спец-обработка: вычисляемый ID документа cookie-политики
+// ============================================================
+if (
+  in_array('security_cookie_banner_document_id', $requestedKeys, true)
+  || in_array('security_cookie_banner_document', $requestedKeys, true)
+) {
+  $cookieDocumentName = $result['security_cookie_banner_document'] ?? '';
+
+  if (empty($cookieDocumentName) && $CMSCore->configurator->existsDatabaseEntryValue('security_cookie_banner_document')) {
+    $cookieDocumentName = $CMSCore->configurator->getDatabaseEntryValue('security_cookie_banner_document');
+  }
+
+  $cookieDocumentID = 0;
+
+  if (!empty($cookieDocumentName)) {
+    $cookieDocument = \core\PHPLibrary\PageStatic::getByName($CMSCore, $cookieDocumentName);
+    if ($cookieDocument !== null) {
+      $cookieDocumentID = $cookieDocument->getID();
+    }
+  }
+
+  $result['security_cookie_banner_document_id'] = $cookieDocumentID;
+}
+
+$handlerOutputData['settings'] = $result;
+$handlerMessage = $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+$handlerStatusCode = $handlerStatusCode ?? 1;

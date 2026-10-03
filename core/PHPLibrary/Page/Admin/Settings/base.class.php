@@ -9,7 +9,7 @@
  * @link        https://gitflic.ru/project/garbalo/cms-girvas Репозиторий продукта
  * @link        https://cms-girvas.ru Сайт продукта
  * 
- * @copyright   Copyright (c) 2021 - 2026, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
+ * @copyright   Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик» (https://карельский-разработчик.рф/)
  * Все права защищены.
  * 
  * @license     https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -93,6 +93,49 @@ class SettingsBase implements SettingsPageInterface
   }
 
   /**
+   * Имя админской локали.
+   */
+  private function getAdminLocaleName(): string
+  {
+    return $this->CMSCore->configurator->existsDatabaseEntryValue('base_admin_locale')
+      ? (string) $this->CMSCore->configurator->getDatabaseEntryValue('base_admin_locale')
+      : 'ru_RU';
+  }
+
+  /**
+   * Получить мультиязычное значение настройки для указанной локали
+   *
+   * @param string $settingName
+   * @param string $localeName
+   *
+   * @return mixed
+   */
+  private function getLocalizedSettingValue(string $settingName, string $localeName): mixed
+  {
+    if (!$this->CMSCore->configurator->existsDatabaseEntryValue($settingName)) {
+      return null;
+    }
+
+    $raw = $this->CMSCore->configurator->getDatabaseEntryValue($settingName);
+
+    if (!is_string($raw) || $raw === '') {
+      return $raw;
+    }
+
+    $decoded = json_decode($raw, true);
+
+    if (is_array($decoded) && !array_is_list($decoded)) {
+      return $decoded[$localeName] ?? null;
+    }
+
+    if (is_array($decoded) && array_is_list($decoded)) {
+      return $decoded;
+    }
+
+    return $raw;
+  }
+
+  /**
    * Собрать шаблон
    * 
    * @param array $templateValues
@@ -127,9 +170,15 @@ class SettingsBase implements SettingsPageInterface
     /** @var string */
     $settingSectionAnalyticsStatusValue = $this->CMSCore->configurator->getSectionAnalyticsStatus();
 
+    $adminLocaleName = $this->getAdminLocaleName();
+
+    $siteTitleValue = $this->getLocalizedSettingValue('base_site_title', $adminLocaleName);
+    $siteTitleValue = is_string($siteTitleValue) ? $siteTitleValue : '';
+
     $this->assembled = ThemeCollector::assemblyFileContent($this->CMSCore->theme, $formTemplatePath, [
       'SETTINGS_NAME' => $this->name,
-      'SETTING_SITE_TITLE_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('base_site_title') ? $this->CMSCore->configurator->getDatabaseEntryValue('base_site_title') : '',
+      'SETTINGS_ADMIN_LOCALE' => $adminLocaleName,
+      'SETTING_SITE_TITLE_VALUE' => $siteTitleValue,
       'SETTING_ENGINEERING_WORKS_TEXT_VALUE' => $settingEngineeringWorksTextValue,
       'SETTING_ENGINEERING_WORKS_STATUS_VALUE' => $settingEngineeringWorksStatusValue,
       'SETTING_SECTION_ENTRIES_STATUS_VALUE' => $settingSectionEntriesStatusValue,

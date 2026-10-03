@@ -15,7 +15,7 @@ if (!defined('IS_NOT_HACKED')) {
 
 if ($CMSCore->client->isLogged(2) && $CMSCore->urlp->getPath(2) === 'secret-codes') {
   $clientUser = $CMSCore->client->getUser(2);
-  $clientUser->initData(['metadata']);
+  $clientUser->initData(['login','metadata']);
   $clientUserGroup = $clientUser->getGroup();
   $clientUserGroup->initData(['permissions']);
 
