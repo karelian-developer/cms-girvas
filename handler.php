@@ -64,7 +64,8 @@ if (defined('IS_NOT_HACKED')) {
     'PUT' => $_PUT['APISecret'] ?? null,
     'DELETE' => $_DELETE['APISecret'] ?? null,
     'POST' => $_POST['APISecret'] ?? null,
-    'GET' => $_GET['APISecret'] ?? null
+    'GET' => $_GET['APISecret'] ?? null,
+    default => null,
   };
 
   if ($APISecretInput !== API_SECRET || empty(API_SECRET)) {
