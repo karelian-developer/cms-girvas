@@ -40,6 +40,25 @@ final class Configurator implements ConfiguratorInterface
   private array $data = [];
   
   /**
+   * __construct
+   *
+   * @param  mixed $CMSCore
+   * @return void
+   */
+  public function __construct(
+    private CMSCoreInterface $CMSCore,
+    private string $collection = ''
+  ) {
+    $filePath = $this->collection === ''
+      ? CMS_ROOT_DIRECTORY . '/core/configuration.php'
+      : CMS_ROOT_DIRECTORY . '/core/configuration.' . $this->collection . '.php';
+
+    if (file_exists($filePath)) {
+      $this->merge($this->getFileData());
+    }
+  }
+
+  /**
    * Назначить заголовок для веб-сайта
    * 
    * @param string $value
@@ -680,7 +699,7 @@ final class Configurator implements ConfiguratorInterface
     $CSP = str_replace('{SCRIPT_HASH}', $this->CMSCore->CSPScriptsHash, $CSP);
     $CSP = str_replace('{DOMAIN}', idn_to_ascii($domainAddress), $CSP);
     $CSP = str_replace('{DOMAIN_ALIASES}', $domainAliases, $CSP);
-    return str_replace('&quot;', '\'', $CSP);
+    return str_replace('"', '\'', $CSP);
   }
 
   /**
