@@ -120,24 +120,6 @@ final class UsersGroups
 
     return $usersGroups;
   }
-      
-  /**
-   * Получить общее количество
-   *
-   * @return int
-   */
-  public function getCountTotal() : int
-  {
-    $CMSConfigurator = $this->CMSCore->configurator;
-    $CMSConfigDatabase = $CMSConfigurator->get('database');
-    
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
-    $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections(['count(*) AS count']);
-    $queryBuilder->statement->setClauseFrom();
-    $queryBuilder->statement->clauseFrom->addTable('users_groups');
-    $queryBuilder->statement->clauseFrom->assembly();
-    $queryBuilder->statement->assembly();
 
   /**
    * Получить общее количество.
