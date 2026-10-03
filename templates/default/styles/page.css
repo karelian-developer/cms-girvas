@@ -197,6 +197,7 @@
 
 .sidebar__block_categories .categories-list__item {
   display: flex;
+  flex-direction: column;
 }
 
 .sidebar__block_categories .categories-list__link {
