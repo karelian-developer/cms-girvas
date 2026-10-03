@@ -221,6 +221,7 @@ if ($CMSCore->client->isLogged(2)) {
             }
           }
         }
+      }
 
       $entryData = [];
       foreach ($_PUT as $key => $value) {
