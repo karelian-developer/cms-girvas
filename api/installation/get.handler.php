@@ -1940,12 +1940,12 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       'en_US' => [
         'title' => 'Demo Block',
         'description' => 'About CMS GIRVAS',
-        'content' => "CMS **GIRVAS** is a free, open-source content management system developed in the Republic of Karelia, Russia. It is listed in the Russian Software Registry (No. 25012, November 27, 2024).\r\n\r\nBuilt on **PHP 8.2+** with support for **PostgreSQL** and **MySQL**, GIRVAS offers:\r\n\r\n- Multilingual content support\r\n- Markdown parsing (NadvoParse)\r\n- Modular architecture\r\n- Built-in analytics\r\n\r\n> This block can be edited in the admin panel: **Content => Content Blocks**."
+        'content' => "CMS **GIRVAS** is a free, open-source content management system developed in the Republic of Karelia, Russia. It is listed in the Russian Software Registry (No. 25012, November 27, 2024).\r\n\r\nBuilt on **PHP 8.2+** with support for **PostgreSQL** and **MySQL**, GIRVAS offers:\r\n\r\n- Multilingual content support\r\n- Markdown parsing (NadvoParse)\r\n- Modular architecture\r\n- Built-in analytics\r\n\r\n> This block can be edited in the admin panel: **Content > Content Blocks**."
       ],
       'ru_RU' => [
         'title' => 'Демонстрационный блок',
         'description' => 'О системе CMS «ГИРВАС»',
-        'content' => "**CMS «ГИРВАС»** — это бесплатная система управления содержимым с открытым исходным кодом, разработанная в Республике Карелия. Внесена в Реестр российского ПО (запись №25012 от 27.11.2024).\r\n\r\nРаботает на **PHP 8.2+** с поддержкой **PostgreSQL** и **MySQL**. Основные возможности:\r\n\r\n- Мультиязычный контент\r\n- Поддержка разметки Markdown (NadvoParse)\r\n- Модульная архитектура\r\n- Встроенная аналитика\r\n\r\n> Этот блок можно отредактировать в админке: **Контент => Контент-блоки**."
+        'content' => "**CMS «ГИРВАС»** — это бесплатная система управления содержимым с открытым исходным кодом, разработанная в Республике Карелия. Внесена в Реестр российского ПО (запись №25012 от 27.11.2024).\r\n\r\nРаботает на **PHP 8.2+** с поддержкой **PostgreSQL** и **MySQL**. Основные возможности:\r\n\r\n- Мультиязычный контент\r\n- Поддержка разметки Markdown (NadvoParse)\r\n- Модульная архитектура\r\n- Встроенная аналитика\r\n\r\n> Этот блок можно отредактировать в административной панели: **Контент > Контент-блоки**."
       ]
     ];
 
