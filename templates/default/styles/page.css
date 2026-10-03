@@ -194,8 +194,12 @@
 
 .sidebar__block-content ul,
 .sidebar__block-content ol {
-  list-style-type: unset;
   padding-left: 24px;
+}
+
+.sidebar__block-content ul li,
+.sidebar__block-content ol li {
+  list-style-type: unset;
 }
 
 /* =====================
