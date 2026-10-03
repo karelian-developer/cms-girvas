@@ -194,6 +194,7 @@
 
 .sidebar__block-content ul,
 .sidebar__block-content ol {
+  list-style-type: unset;
   padding-left: 24px;
 }
 
