@@ -22,6 +22,9 @@ if (!isset($CMSCore)) {
 }
 
 if (defined('IS_NOT_HACKED')) {
+  header_remove('X-Powered-By');
+  header('X-Powered-By: CMS GIRVAS');
+
   $CMSURLP = $CMSCore->urlp;
   $CMSClient = $CMSCore->client;
   $CMSConfigurator = $CMSCore->configurator;
