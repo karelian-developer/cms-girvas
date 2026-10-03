@@ -140,18 +140,6 @@ final class Users
 
     return $users;
   }
-      
-  /**
-   * Получить количество пользователей для определенной группы
-   *
-   * @param  int $groupID
-   * 
-   * @return int
-   */
-  public function getCountByGroupID(int $groupID) : int
-  {
-    $CMSConfigurator = $this->CMSCore->configurator;
-    $CMSConfigDatabase = $CMSConfigurator->get('database');
 
   /**
    * Получить количество пользователей для определенной группы
