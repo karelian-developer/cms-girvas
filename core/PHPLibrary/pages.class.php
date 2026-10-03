@@ -151,26 +151,6 @@ final class Pages
 
     return $pages;
   }
-      
-  /**
-   * Получить объекты записей для определенной категории
-   *
-   * @param  int $category_id
-   * 
-   * @return array
-   */
-  public function getCountTotal() : int
-  {
-    $CMSConfigurator = $this->CMSCore->configurator;
-    $CMSConfigDatabase = $CMSConfigurator->get('database');
-    
-    $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
-    $queryBuilder->setStatementSelect();
-    $queryBuilder->statement->addSelections(['count(*) AS count']);
-    $queryBuilder->statement->setClauseFrom();
-    $queryBuilder->statement->clauseFrom->addTable('pages_static');
-    $queryBuilder->statement->clauseFrom->assembly();
-    $queryBuilder->statement->assembly();
 
   /**
    * Получить общее количество (с учётом поиска по name)
