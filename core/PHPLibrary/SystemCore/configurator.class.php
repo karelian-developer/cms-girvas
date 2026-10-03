@@ -18,46 +18,6 @@
  * @support     support@karelian-developer.ru
  */
 
-namespace core\PHPLibrary\SystemCore;
-
-use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
-use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
-use \core\PHPLibrary\SystemCore as CMSCore;
-use \core\PHPLibrary\CoreInterface as CMSCoreInterface;
-use \PDOException as PDOException;
-use \PDO as PDO;
-
-/**
- * Class Configurator
- */
-final class Configurator implements ConfiguratorInterface
-{
-  const FILE_PATH = 'core/configuration.php';
-
-  public string $metaTitle = '';
-  public string $metaDescription = '';
-  public array $metaKeywords = [];
-  private array $data = [];
-  
-  /**
-   * __construct
-   *
-   * @param  mixed $CMSCore
-   * @return void
-   */
-  public function __construct(
-    private CMSCoreInterface $CMSCore,
-    private string $collection = ''
-  ) {
-    $filePath = $this->collection === ''
-      ? CMS_ROOT_DIRECTORY . '/core/configuration.php'
-      : CMS_ROOT_DIRECTORY . '/core/configuration.' . $this->collection . '.php';
-
-    if (file_exists($filePath)) {
-      $this->merge($this->getFileData());
-    }
-  }
-
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 use \core\PHPLibrary\Database\DatabaseManagementSystem as CMSDMS;
 use \core\PHPLibrary\SystemCore as CMSCore;
