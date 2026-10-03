@@ -195,14 +195,17 @@
   flex-direction: column;
 }
 
-.sidebar__block_categories .categories-list__item {
-  padding: 4px 8px;
-}
-
 .sidebar__block_categories .categories-list__link {
   font-size: 14px;
   color: var(--common-secondary-color-3);
+  padding: 4px 8px;
   transition: color .2s;
+}
+
+.sidebar__block_categories .categories-list__link:hover,
+.sidebar__block_categories .categories-list__link:focus,
+.sidebar__block_categories .categories-list__link:active {
+  color: var(--primary-color-2);
 }
 
 .sidebar__block_categories .categories-list--nested {
