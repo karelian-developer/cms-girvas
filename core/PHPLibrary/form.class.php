@@ -562,12 +562,28 @@ class Form implements EntityTypeContent
                 $documentLabel = $documentTitle;
               }
 
-              $documentLink = sprintf(
-                '<a href="%s" target="_blank">%s%s</a>',
+              $documentLinkHTML = sprintf(
+                '<a href="%s" target="_blank" rel="noopener">%s%s</a>',
                 htmlspecialchars($documentURL, ENT_QUOTES, 'UTF-8'),
                 htmlspecialchars($documentLabel, ENT_QUOTES, 'UTF-8'),
                 $versionString !== '' ? ' (' . htmlspecialchars($versionString, ENT_QUOTES, 'UTF-8') . ')' : ''
               );
+
+              $consentTemplate = $this->CMSCore->locale->getSingleValueByKey('DEFAULT_CONSENT_LABEL');
+              $consentText = str_replace('{DOCUMENT_LINK}', $documentLinkHTML, $consentTemplate);
+
+              if (empty($documentLinkHTML)) {
+                $consentText = htmlspecialchars($consentTemplate, ENT_QUOTES, 'UTF-8');
+              }
+
+              $DOMElementContainerLabelElement = $document->createElement('div');
+              $DOMElementContainerLabelElement->setAttribute('class', 'input-container__label label');
+
+              $fragment = $document->createDocumentFragment();
+              $fragment->appendXML($consentText);
+              $DOMElementContainerLabelElement->appendChild($fragment);
+
+              $DOMElementContainerElement->appendChild($DOMElementContainerLabelElement);
             }
           }
         }
@@ -1101,7 +1117,7 @@ class Form implements EntityTypeContent
     
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
     $dialect = $queryBuilder->dialect;
-    
+
     $queryBuilder->setStatementInsert();
     $queryBuilder->statement->setTable('forms_data');
     $queryBuilder->statement->addColumn('formID');
