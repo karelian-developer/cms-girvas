@@ -569,7 +569,7 @@ class Form implements EntityTypeContent
                 $versionString !== '' ? ' (' . htmlspecialchars($versionString, ENT_QUOTES, 'UTF-8') . ')' : ''
               );
 
-              $consentTemplate = $this->CMSCore->locale->getSingleValueByKey('DEFAULT_CONSENT_LABEL');
+              $consentTemplate = $this->CMSCore->locale->getSingleValueByKey('DEFAULT_TEXT_CONSENT_LABEL');
               $consentText = str_replace('{DOCUMENT_LINK}', $documentLinkHTML, $consentTemplate);
 
               if (empty($documentLinkHTML)) {

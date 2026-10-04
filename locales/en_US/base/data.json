@@ -23,7 +23,7 @@
   "COMMENT_PREMODERATION_BANNED_WORDS_DETECTED": "Presence of stop words or stop phrases",
   "COMMENT_PREMODERATION_EXTERNAL_LINKS_DETECTED": "Presence of links to external resources",
   "COMMENT_PREMODERATION_MANDATORY_PREMODERATION": "Mandatory pre-moderation",
-  "DEFAULT_CONSENT_LABEL": "I agree to the terms of the document {DOCUMENT_LINK}",
+  "DEFAULT_TEXT_CONSENT_LABEL": "I agree to the terms of the document {DOCUMENT_LINK}",
   "DEFAULT_TEXT_ABOUT": "About us",
   "DEFAULT_TEXT_ARTICLES": "Articles",
   "DEFAULT_TEXT_BACK": "Back",
