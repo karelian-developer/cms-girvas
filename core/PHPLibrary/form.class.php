@@ -587,21 +587,6 @@ class Form implements EntityTypeContent
             }
           }
         }
-
-        // Fallback: если ссылка не сформирована, показываем title
-        if (empty($documentLink)) {
-          $documentLink = htmlspecialchars($documentLabel, ENT_QUOTES, 'UTF-8');
-        }
-
-        $DOMElementContainerLabelElement = $document->createElement('div');
-        $DOMElementContainerLabelElement->setAttribute('class', 'input-container__label label');
-
-        // Вставляем HTML-ссылку через fragment
-        $fragment = $document->createDocumentFragment();
-        $fragment->appendXML($documentLink);
-        $DOMElementContainerLabelElement->appendChild($fragment);
-
-        $DOMElementContainerElement->appendChild($DOMElementContainerLabelElement);
       }
 
       $formElement->appendChild($DOMElementContainerElement);

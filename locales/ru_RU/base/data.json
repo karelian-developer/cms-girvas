@@ -23,7 +23,7 @@
   "COMMENT_PREMODERATION_BANNED_WORDS_DETECTED": "Наличие стоп-слов или стоп-фраз",
   "COMMENT_PREMODERATION_EXTERNAL_LINKS_DETECTED": "Наличие ссылок на внешние ресурсы",
   "COMMENT_PREMODERATION_MANDATORY_PREMODERATION": "Обязательная премодерация",
-  "DEFAULT_TEXT_CONSENT_LABEL": "Я согласен с условиями документа {DOCUMENT_LINK}",
+  "DEFAULT_TEXT_CONSENT_LABEL": "Я согласен с условиями документа «{DOCUMENT_LINK}».",
   "DEFAULT_TEXT_ABOUT": "О нас",
   "DEFAULT_TEXT_ARTICLES": "Статьи",
   "DEFAULT_TEXT_BACK": "Назад",
