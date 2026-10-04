@@ -1100,6 +1100,8 @@ class Form implements EntityTypeContent
     $CMSConfigDatabase = $CMSConfigurator->get('database');
     
     $queryBuilder = new DatabaseQueryBuilder($this->CMSCore, $CMSConfigDatabase['dms']);
+    $dialect = $queryBuilder->dialect;
+    
     $queryBuilder->setStatementInsert();
     $queryBuilder->statement->setTable('forms_data');
     $queryBuilder->statement->addColumn('formID');
