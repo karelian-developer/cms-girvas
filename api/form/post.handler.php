@@ -88,6 +88,20 @@ if (Form::existsByName($CMSCore, $formName)) {
     $formReportID = $formReport !== null ? $formReport->getID() : 0;
 
     // ============================================================
+    // Определяем userID: авторизован или аноним
+    // ============================================================
+    $consentUserID = 0;
+    $consentUser = null;
+ 
+    if ($CMSCore->client->isLogged(1)) {
+      $consentUser = $CMSCore->client->getUser(1);
+
+      if ($consentUser !== null) {
+        $consentUserID = $consentUser->getID();
+      }
+    }
+
+    // ============================================================
     // СОГЛАСИЯ (152-ФЗ)
     // Фиксируем факты согласия по каждому consent-элементу.
     // ============================================================
@@ -129,7 +143,7 @@ if (Form::existsByName($CMSCore, $formName)) {
 
       UserConsent::give(
         $CMSCore,
-        0,
+        $consentUserID,
         $form->getID(),
         $formReportID,
         $document->getID(),
@@ -149,6 +163,8 @@ if (Form::existsByName($CMSCore, $formName)) {
         $CMSCore,
         CMSReport::REPORT_TYPE_ID_BASE_CONSENT_GIVEN,
         [
+          'userID' => $consentUserID,
+          'userLogin' => $consentUser !== null ? $consentUser->getLogin() : '',
           'formID' => $form->getID(),
           'formReportID' => $formReportID,
           'pageStaticID' => $document->getID(),
@@ -157,6 +173,7 @@ if (Form::existsByName($CMSCore, $formName)) {
           'documentVersion' => $currentVersion->getVersion(),
           'locale' => $formLocale,
           'ip' => $formSendedAuthorIP
+          'source' => 'form'
         ]
       );
     }
