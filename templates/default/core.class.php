@@ -204,10 +204,10 @@ final class Core implements ThemeInterfaceCore
     if ($this->theme->CMSCore->configurator->existsDatabaseEntryValue('seo_code_checksite_ru')) {
       $code = $this->theme->CMSCore->configurator->getDatabaseEntryValue('seo_code_checksite_ru');
       
-      $metaCodeYandexWebmasterElement = $document->createElement('meta');
-      $metaCodeYandexWebmasterElement->setAttribute('name', 'checksite-verification');
-      $metaCodeYandexWebmasterElement->setAttribute('content', $code);
-      $headElement->appendChild($metaCodeYandexWebmasterElement);
+      $metaCodeCheckSiteElement = $document->createElement('meta');
+      $metaCodeCheckSiteElement->setAttribute('name', 'checksite-verification');
+      $metaCodeCheckSiteElement->setAttribute('content', $code);
+      $headElement->appendChild($metaCodeCheckSiteElement);
     }
 
     foreach ([256, 192, 180, 167, 152, 128, 120, 96, 64, 48, 32, 16] as $faviconWidth) {
