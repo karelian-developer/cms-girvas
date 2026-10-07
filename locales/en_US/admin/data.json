@@ -701,6 +701,8 @@
   "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_METRIKA_TITLE": "Yandex.Metrika counter ID",
   "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_WEBMASTER_DESCRIPTION": "This code is used to confirm rights to the site in the &laquo;Yandex: Webmaster&raquo; service.",
   "PAGE_SETTINGS_SETTING_SEO_CODE_YANDEX_WEBMASTER_TITLE": "Verification code for &laquo;Yandex: Webmaster&raquo; service",
+  "PAGE_SETTINGS_SETTING_SEO_CODE_CHECKSITE_RU_DESCRIPTION": "This code is used to verify site ownership on the <a href=\"https://checksite.ru/\" target=\"_blank\">&laquo;CheckSite.ru&raquo;</a> service.",
+  "PAGE_SETTINGS_SETTING_SEO_CODE_CHECKSITE_RU_TITLE": "Verification code for the &laquo;CheckSite.ru&raquo; service",
   "PAGE_SETTINGS_SETTING_SEO_INPUT_KEYWORDS_PLACEHOLDER": "Girvas volcano, Republic of Karelia, Fishing in Nadvoitsy village",
   "PAGE_SETTINGS_SETTING_SEO_KEYWORDS_DESCRIPTION": "Keywords should help find the site in search engines. To select keywords, we recommend using services such as &laquo;<a href=\"https://wordstat.yandex.ru/\" target=\"_blank\">Yandex&nbsp;Wordstat</a>&raquo; and &laquo;<a href=\"https://trends.google.com/\" target=\"_blank\">Google&nbsp;Trends</a>&raquo;.",
   "PAGE_SETTINGS_SETTING_SEO_KEYWORDS_TITLE": "Keywords",

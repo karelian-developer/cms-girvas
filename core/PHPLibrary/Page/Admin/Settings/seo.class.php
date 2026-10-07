@@ -145,6 +145,9 @@ class SettingsSeo implements SettingsPageInterface
         'SETTING_CODE_YANDEX_METRIKA_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('seo_code_yandex_metrika')
           ? $this->CMSCore->configurator->getDatabaseEntryValue('seo_code_yandex_metrika')
           : '',
+        'SETTING_CODE_CHECKSITE_RU_VALUE' => $this->CMSCore->configurator->existsDatabaseEntryValue('seo_code_checksite_ru')
+          ? $this->CMSCore->configurator->getDatabaseEntryValue('seo_code_checksite_ru')
+          : '',
         'SETTING_SITE_DESCRIPTION_VALUE' => $siteDescription,
         'SETTING_SITE_KEYWORDS_VALUE'    => $siteKeywords,
         'SETTING_SITE_ROBOTS_TXT_VALUE'  => $fileRobotsTXTContent,

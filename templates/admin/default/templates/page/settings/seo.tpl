@@ -25,6 +25,18 @@
     <div class="cell grid-table__cell grid-table__cell_data">
       <input class="input form__input form__input_text" name="setting_{SETTINGS_NAME}_code_yandex_metrika" placeholder="94682915" value="{SETTING_CODE_YANDEX_METRIKA_VALUE}">
     </div>
+    <!-- Поле: Код для верификации в сервисе «CheckSite.ru» -->
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">
+        {LANG:PAGE_SETTINGS_SETTING_SEO_CODE_CHECKSITE_RU_TITLE}
+      </div>
+      <div class="cell__description">
+        {LANG:PAGE_SETTINGS_SETTING_SEO_CODE_CHECKSITE_RU_DESCRIPTION}
+      </div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <input class="input form__input form__input_text" name="setting_{SETTINGS_NAME}_code_checksite_ru" placeholder="b253a14fd6324d9180ad6df5fdb963c9" value="{SETTING_CODE_CHECKSITE_RU_VALUE}">
+    </div>
     <!-- Поле: Принудительная переадресация на поддомен WWW -->
     <div class="cell grid-table__cell grid-table__cell_text">
       <div class="cell__title">
