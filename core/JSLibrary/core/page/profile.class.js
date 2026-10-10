@@ -272,6 +272,8 @@ export class PageProfile {
       content: this.localeBaseData.MODAL_CONSENT_REVOKE_DESCRIPTION
     });
 
+    modal.setWidth(400, 'px');
+
     const reasonTextarea = document.createElement('textarea');
     reasonTextarea.classList.add('form__textarea');
     reasonTextarea.setAttribute('name', 'consent_revoke_reason');

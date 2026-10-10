@@ -388,6 +388,8 @@ export class PageGlobal {
       content: contentElement
     });
 
+    modal.setWidth(400, 'px');
+
     modal.target.addButton(localeData.BUTTON_SUBMIT_LABEL || 'Принять', () => {
       this.submitCookieConsent(cookieDocument, true);
       modal.target.close();
