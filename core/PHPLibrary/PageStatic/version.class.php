@@ -748,7 +748,7 @@ class Version
           $bindings[':isCurrent_' . $index] = [true, \PDO::PARAM_BOOL];
         }
 
-        $DBPrefix = $CMSConfigDatabase['prefix'] !== null
+        $DBPrefix = !empty($CMSConfigDatabase['prefix'])
           ? $CMSConfigDatabase['prefix'] . '_'
           : '';
 
