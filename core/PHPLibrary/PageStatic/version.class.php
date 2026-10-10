@@ -753,7 +753,7 @@ class Version
           : '';
 
         $sql = sprintf(
-          'INSERT INTO ' . $DBPrefix . '"pages_static_versions" (%s) VALUES %s RETURNING "id", "locale"',
+          'INSERT INTO "' . $DBPrefix . 'pages_static_versions" (%s) VALUES %s RETURNING "id", "locale"',
           implode(', ', $quotedColumns),
           implode(', ', $valuePlaceholders)
         );
@@ -769,7 +769,7 @@ class Version
           $versions[$row['locale']] = new Version($CMSCore, (int)$row['id']);
         }
       } else {
-        $singleInsertSql = 'INSERT INTO ' . $DBPrefix . '`pages_static_versions` '
+        $singleInsertSql = 'INSERT INTO `' . $DBPrefix . 'pages_static_versions` '
           . '(`pageStaticID`, `version`, `locale`, `texts`, `effectiveFrom`, `createdUnixTimestamp`, `createdByID`, `isCurrent`) '
           . 'VALUES (:pageStaticID, :version, :locale, :texts, :effectiveFrom, :createdUnixTimestamp, :createdByID, :isCurrent)';
 
