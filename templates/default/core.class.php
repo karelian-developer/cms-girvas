@@ -201,6 +201,15 @@ final class Core implements ThemeInterfaceCore
       $headElement->appendChild($metaCodeYandexWebmasterElement);
     }
 
+    if ($this->theme->CMSCore->configurator->existsDatabaseEntryValue('seo_code_checksite_ru')) {
+      $code = $this->theme->CMSCore->configurator->getDatabaseEntryValue('seo_code_checksite_ru');
+      
+      $metaCodeCheckSiteElement = $document->createElement('meta');
+      $metaCodeCheckSiteElement->setAttribute('name', 'checksite-verification');
+      $metaCodeCheckSiteElement->setAttribute('content', $code);
+      $headElement->appendChild($metaCodeCheckSiteElement);
+    }
+
     foreach ([256, 192, 180, 167, 152, 128, 120, 96, 64, 48, 32, 16] as $faviconWidth) {
       $linkFaviconElement = $document->createElement('link');
       $faviconSizesLabel = $faviconWidth . 'x' . $faviconWidth;

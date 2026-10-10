@@ -268,12 +268,12 @@ class PagePage implements InterfacePage
           $pageStaticSEODescription = $pageStaticSEODescription !== ''
             ? $pageStaticSEODescription
             : $pageStaticDescription;
-          $pageStaticSEODescription = str_replace('"', '&quot;', $pageStaticSEODescription);
+          $pageStaticSEODescription = str_replace('"', '"', $pageStaticSEODescription);
 
           $pageStaticKeywordsRaw = $this->getTextValue($versionObject, $pageStatic, 'getKeywords', $localeName);
           $pageStaticKeywords = is_array($pageStaticKeywordsRaw)
-            ? array_map(fn($k) => str_replace('"', '&quot;', (string)$k), $pageStaticKeywordsRaw)
-            : [str_replace('"', '&quot;', (string)$pageStaticKeywordsRaw)];
+            ? array_map(fn($k) => str_replace('"', '"', (string)$k), $pageStaticKeywordsRaw)
+            : [str_replace('"', '"', (string)$pageStaticKeywordsRaw)];
           
           $pageStaticContent = $this->getTextValue($versionObject, $pageStatic, 'getContent', $localeName);
 

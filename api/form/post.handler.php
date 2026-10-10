@@ -92,7 +92,7 @@ if (Form::existsByName($CMSCore, $formName)) {
     // ============================================================
     $consentUserID = 0;
     $consentUser = null;
-
+ 
     if ($CMSCore->client->isLogged(1)) {
       $consentUser = $CMSCore->client->getUser(1);
 
@@ -172,7 +172,7 @@ if (Form::existsByName($CMSCore, $formName)) {
           'documentTitles' => $documentTitles,
           'documentVersion' => $currentVersion->getVersion(),
           'locale' => $formLocale,
-          'ip' => $formSendedAuthorIP,
+          'ip' => $formSendedAuthorIP
           'source' => 'form'
         ]
       );

@@ -269,8 +269,4 @@ export class NadvoTE {
   async fetchJSON(url, data) {
     return fetch(url, data).then(response => response.ok ? response.json() : Promise.reject(response));
   }
-
-  async fetchJSON(url, data) {
-    return fetch(url, data).then(response => response.ok ? response.json() : Promise.reject(response));
-  }
 }
