@@ -19,6 +19,7 @@
   "BUTTON_SHOW_LABEL": "Показать",
   "BUTTON_SUBMIT_LABEL": "Подтвердить",
   "BUTTON_YES_LABEL": "Да",
+  "BUTTON_CANCEL_LABEL": "Отменить",
   "COMMENT_DETECTED_FROM_PREMODERATION_FILTER": "Комментарий направлен на проверку",
   "COMMENT_PREMODERATION_BANNED_WORDS_DETECTED": "Наличие стоп-слов или стоп-фраз",
   "COMMENT_PREMODERATION_EXTERNAL_LINKS_DETECTED": "Наличие ссылок на внешние ресурсы",

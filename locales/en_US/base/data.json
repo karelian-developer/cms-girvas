@@ -19,6 +19,7 @@
   "BUTTON_SHOW_LABEL": "Show",
   "BUTTON_SUBMIT_LABEL": "Confirm",
   "BUTTON_YES_LABEL": "Yes",
+  "BUTTON_CANCEL_LABEL": "Cansel",
   "COMMENT_DETECTED_FROM_PREMODERATION_FILTER": "Comment sent for review",
   "COMMENT_PREMODERATION_BANNED_WORDS_DETECTED": "Presence of stop words or stop phrases",
   "COMMENT_PREMODERATION_EXTERNAL_LINKS_DETECTED": "Presence of links to external resources",
