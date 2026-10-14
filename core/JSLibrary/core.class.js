@@ -61,54 +61,61 @@ export class Core {
     });
   }
 
+  /**
+   * Инициализация локализаций
+   * 
+   * @returns
+   */
   async initLocales() {
-    return fetch('/handler/locales', {method: 'GET'})
-      .then((response) => (response.ok ? response.json() : Promise.reject(response)))
-      .then((data) => {
-        this.locales.list = data.outputData.locales;
+    return fetch('/handler/locales', {
+      method: 'GET'
+    }).then((response) => {
+      return (response.ok) ? response.json() : Promise.reject(response);
+    }).then((data) => {
+      this.locales.list = data.outputData.locales;
+      return fetch('/handler/locale/base', {method: 'GET'});
+    }).then((response) => {
+      return (response.ok) ? response.json() : Promise.reject(response);
+        }).then((data) => {
+      let cookieMatches = document.cookie.match(new RegExp('(^| )locale=([^;]+)'));
+      const URLParamLocale = URLParser.getParam('locale');
 
-        this.availableLocales = new Set(
-          this.locales.list.map((el) => String(el.name).trim())
-        );
-
-        return fetch('/handler/locale/base', {method: 'GET'});
-      })
-      .then((response) => (response.ok ? response.json() : Promise.reject(response)))
-      .then((data) => {
-        const cookieMatches = document.cookie.match(/(?:^|;\s*)locale=([^;]+)/);
-        const URLParamLocale = URLParser.getParam('locale');
-
-        const candidates = [URLParamLocale, cookieMatches && cookieMatches[2]];
-
-        const pickLocale = () => {
-          for (const raw of candidates) {
-            if (!raw) continue;
-            const name = decodeURIComponent(raw).trim();
-            if (this.availableLocales.has(name)) return name;
+      if (cookieMatches != null) {
+        this.locales.list.forEach(element => {
+          if (element.name == cookieMatches[2]) {
+            this.locales.base = new Locale(element.name, 'base');
           }
-          return data.outputData.locale.name; // безопасный дефолт
-        };
+        });
+      } else if (URLParamLocale != null) {
+        this.locales.list.forEach(element => {
+          if (element.name == URLParamLocale) {
+            this.locales.base = new Locale(element.name, 'base');
+          }
+        });
+      } else {
+        this.locales.base = new Locale(data.outputData.locale.name, 'base');
+      }
 
-        this.locales.base = new Locale(pickLocale(), 'base');
+      return fetch('/handler/locale/admin', {method: 'GET'});
+    }).then((response) => {
+      return (response.ok) ? response.json() : Promise.reject(response);
+    }).then((data) => {
+      this.locales.admin = new Locale(data.outputData.locale.name, 'admin');
 
-        return fetch('/handler/locale/admin', {method: 'GET'});
-      })
-      .then((response) => (response.ok ? response.json() : Promise.reject(response)))
-      .then((data) => {
-        this.locales.admin = new Locale(data.outputData.locale.name, 'admin');
-        return fetch('/handler/locale/nadvoTE', {method: 'GET'});
-      })
-      .then((response) => (response.ok ? response.json() : Promise.reject(response)))
-      .then((data) => {
-        this.locales.nadvoTE = new Locale(data.outputData.locale.name, 'nadvoTE');
-      }, (rejectionReason) => {
-        const interactiveNotification = new Interactive('notification');
-        interactiveNotification.target.isPopup = true;
-        interactiveNotification.target.setStatusCode(0);
-        interactiveNotification.target.setContent(rejectionReason);
-        interactiveNotification.target.assembly();
-        interactiveNotification.target.show();
-      });
+      return fetch('/handler/locale/nadvoTE', {method: 'GET'});
+    }).then((response) => {
+      return (response.ok) ? response.json() : Promise.reject(response);
+    }).then((data) => {
+      this.locales.nadvoTE = new Locale(data.outputData.locale.name, 'nadvoTE');
+    }, (rejectionReason) => {
+      let interactiveNotification = new Interactive('notification');
+      interactiveNotification.target.isPopup = true;
+      interactiveNotification.target.setStatusCode(0);
+      interactiveNotification.target.setContent(rejectionReason);
+      interactiveNotification.target.assembly();
+
+      interactiveNotification.target.show();
+    });
   }
   
   /**
