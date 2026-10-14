@@ -362,26 +362,24 @@ class EntriesSample implements EntityTypeContent
         if (count($categoryArray) > 0) {
           $limit = $this->getLimitCount();
 
-          foreach ($categoryArray as $entryIndex => $entry) {
-            $entry->initData(['metadata', 'texts']);
-
-            if ($limit <= $entryIndex) {
+          foreach ($categoryArray as $entry) {
+            if ($addedCount >= $limit) {
               break;
             }
 
-            // Страховка на уровне PHP: пропускаем записи без перевода
+            $entry->initData(['metadata', 'texts']);
+
             if ($onlyTranslated && !$entry->hasTranslation($localeName)) {
               continue;
             }
 
-            if ($isPublished) {
-              if ($entry->getPublishedUnixTimestamp() <= time()) {
-                $entries[] = $entry;
-              }
-            } else {
-              $entries[] = $entry;
+            if ($isPublished && $entry->getPublishedUnixTimestamp() > time()) {
+              continue;
             }
-          }
+
+            $entries[] = $entry;
+            $addedCount++;
+        }
         }
       }
 
