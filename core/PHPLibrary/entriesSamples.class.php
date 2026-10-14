@@ -19,6 +19,7 @@
  */
 
 namespace core\PHPLibrary;
+
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
 
 final class EntriesSamples
@@ -47,20 +48,42 @@ final class EntriesSamples
   public function __construct(
     private CoreInterface $CMSCore
   ) {}
-  
+
+  /**
+   * Построить SQL-условие: у выборки есть непустой перевод (title) для указанной локали.
+   *
+   * @param  DatabaseQueryBuilder $queryBuilder
+   * @param  string               $localeName
+   * @return string
+   */
+  private function buildTranslationCondition(DatabaseQueryBuilder $queryBuilder, string $localeName) : string
+  {
+    $titleExpression = $queryBuilder->dialect->jsonExtractString('texts', $localeName . '.title');
+
+    return sprintf(
+      "(%s IS NOT NULL AND %s <> '')",
+      $titleExpression,
+      $titleExpression
+    );
+  }
+
   /**
    * Получить массив объектов всех выборок
    * 
    * @param array   $params
    * @param string  $searchValue
    * @param string  $sortRule
+   * @param string  $localeName
+   * @param bool    $onlyTranslated
    * 
    * @return array
    */
   public function getAll(
     array $params = [],
     string $searchValue = '',
-    string $sortRule = self::DEFAULT_SORT_RULE
+    string $sortRule = self::DEFAULT_SORT_RULE,
+    string $localeName = 'en_US',
+    bool $onlyTranslated = false
   ) : array
   {
     $CMSConfigurator = $this->CMSCore->configurator;
@@ -73,13 +96,28 @@ final class EntriesSamples
     $queryBuilder->statement->clauseFrom->addTable('entries_samples');
     $queryBuilder->statement->clauseFrom->assembly();
 
-    // Поиск по name
     $hasSearch = $searchValue !== '';
-    if ($hasSearch) {
+
+    if ($hasSearch || $onlyTranslated) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition(
-        $queryBuilder->dialect->stringLike('name', 'search', true)
-      );
+      $hasWhere = false;
+
+      if ($hasSearch) {
+        $queryBuilder->statement->clauseWhere->addCondition(
+          $queryBuilder->dialect->stringLike('name', 'search', true),
+          $hasWhere ? 'AND' : ''
+        );
+        $hasWhere = true;
+      }
+
+      if ($onlyTranslated) {
+        $queryBuilder->statement->clauseWhere->addCondition(
+          $this->buildTranslationCondition($queryBuilder, $localeName),
+          $hasWhere ? 'AND' : ''
+        );
+        $hasWhere = true;
+      }
+
       $queryBuilder->statement->clauseWhere->assembly();
     }
 
@@ -126,12 +164,18 @@ final class EntriesSamples
   }
       
   /**
-   * Получить общее количество (с учётом поиска)
+   * Получить общее количество (с учётом поиска и фильтра перевода)
    *
    * @param string $searchValue
+   * @param string $localeName
+   * @param bool   $onlyTranslated
    * @return int
    */
-  public function getCountTotal(string $searchValue = '') : int
+  public function getCountTotal(
+    string $searchValue = '',
+    string $localeName = 'en_US',
+    bool $onlyTranslated = false
+  ) : int
   {
     $CMSConfigurator = $this->CMSCore->configurator;
     $CMSConfigDatabase = $CMSConfigurator->get('database');
@@ -144,11 +188,27 @@ final class EntriesSamples
     $queryBuilder->statement->clauseFrom->assembly();
 
     $hasSearch = $searchValue !== '';
-    if ($hasSearch) {
+
+    if ($hasSearch || $onlyTranslated) {
       $queryBuilder->statement->setClauseWhere();
-      $queryBuilder->statement->clauseWhere->addCondition(
-        $queryBuilder->dialect->stringLike('name', 'search', true)
-      );
+      $hasWhere = false;
+
+      if ($hasSearch) {
+        $queryBuilder->statement->clauseWhere->addCondition(
+          $queryBuilder->dialect->stringLike('name', 'search', true),
+          $hasWhere ? 'AND' : ''
+        );
+        $hasWhere = true;
+      }
+
+      if ($onlyTranslated) {
+        $queryBuilder->statement->clauseWhere->addCondition(
+          $this->buildTranslationCondition($queryBuilder, $localeName),
+          $hasWhere ? 'AND' : ''
+        );
+        $hasWhere = true;
+      }
+
       $queryBuilder->statement->clauseWhere->assembly();
     }
 

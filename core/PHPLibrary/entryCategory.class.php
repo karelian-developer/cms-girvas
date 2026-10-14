@@ -17,6 +17,7 @@
  * 
  * @support     support@karelian-developer.ru
  */
+
 namespace core\PHPLibrary;
 
 use \core\PHPLibrary\Database\QueryBuilder as DatabaseQueryBuilder;
@@ -343,6 +344,27 @@ class EntryCategory implements EntityTypeContent
 
     return [];
   }
+
+  /**
+   * Проверить, есть ли у категории перевод для указанной локали.
+   *
+   * @param  string $localeName
+   * @return bool
+   */
+  public function hasTranslation(string $localeName = 'en_US') : bool
+  {
+    if (!property_exists($this, 'texts')) {
+      return false;
+    }
+
+    $texts = json_decode($this->texts, true);
+
+    if (!isset($texts[$localeName]) || !is_array($texts[$localeName])) {
+      return false;
+    }
+
+    return !empty($texts[$localeName]['title']);
+  }
   
   /**
    * Получить имя
@@ -386,39 +408,79 @@ class EntryCategory implements EntityTypeContent
   /**
    * Получить массив объектов записей
    *
-   * @param  array $params
-   * @param  bool $isPublished
-   * @param bool $includeChildren
+   * @param  array  $params
+   * @param  bool   $isPublished
+   * @param  bool   $includeChildren
+   * @param  string $localeName
+   * @param  bool   $onlyTranslated
+   * 
    * @return array
    */
-  public function getEntries(array $params = [], $isPublished = false, bool $includeChildren = false) : array
+  public function getEntries(
+    array $params = [],
+    $isPublished = false,
+    bool $includeChildren = false,
+    string $localeName = 'en_US',
+    bool $onlyTranslated = false
+  ) : array
   {
     if (!$includeChildren) {
-      return (new Entries($this->CMSCore))->getByCategoryID($this->id, $params, $isPublished);
+      return (new Entries($this->CMSCore))->getByCategoryID(
+        $this->id,
+        $params,
+        $isPublished,
+        $localeName,
+        $onlyTranslated
+      );
     }
     
     $categoryIDs = array_merge([$this->id], $this->getChildCategoriesIDs());
     
-    return (new Entries($this->CMSCore))->getByCategoriesIDs($categoryIDs, $params, $isPublished);
+    return (new Entries($this->CMSCore))->getByCategoriesIDs(
+      $categoryIDs,
+      $params,
+      $isPublished,
+      $localeName,
+      $onlyTranslated
+    );
   }
 
   /**
    * Получить количество объектов записей
    *
-   * @param  array $params
-   * @param  bool $isPublished
-   * @param bool $includeChildren
+   * @param  array  $params
+   * @param  bool   $isPublished
+   * @param  bool   $includeChildren
+   * @param  string $localeName
+   * @param  bool   $onlyTranslated
+   * 
    * @return int
    */
-  public function getEntriesCount(array $params = [], bool $isPublished = false, bool $includeChildren = false) : int
+  public function getEntriesCount(
+    array $params = [],
+    bool $isPublished = false,
+    bool $includeChildren = false,
+    string $localeName = 'en_US',
+    bool $onlyTranslated = false
+  ) : int
   {
     if (!$includeChildren) {
-      return count($this->getEntries($params, $isPublished, false));
+      return (new Entries($this->CMSCore))->getCountByCategoryID(
+        $this->id,
+        $isPublished,
+        $localeName,
+        $onlyTranslated
+      );
     }
     
     $categoryIDs = array_merge([$this->id], $this->getChildCategoriesIDs());
     
-    return (new Entries($this->CMSCore))->getCountByCategoriesIDs($categoryIDs, $isPublished);
+    return (new Entries($this->CMSCore))->getCountByCategoriesIDs(
+      $categoryIDs,
+      $isPublished,
+      $localeName,
+      $onlyTranslated
+    );
   }
 
   /**

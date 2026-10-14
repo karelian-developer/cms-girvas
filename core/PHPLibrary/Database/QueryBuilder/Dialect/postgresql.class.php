@@ -272,6 +272,17 @@ final class PostgreSql extends BaseDialect
     );
   }
 
+  public function jsonExtractString(string $column, string $key) : string
+  {
+    $path = '{' . str_replace('.', ',', $key) . '}';
+
+    return sprintf(
+      '%s #>> %s',
+      $this->quoteIdentifier($column),
+      $this->quoteLiteral($path)
+    );
+  }
+
   /**
    * @param  IndexType $type
    * @return bool

@@ -313,14 +313,42 @@ class EntriesSample implements EntityTypeContent
   }
 
   /**
+   * Проверить, есть ли у выборки перевод для указанной локали.
+   *
+   * @param  string $localeName
+   * @return bool
+   */
+  public function hasTranslation(string $localeName = 'en_US') : bool
+  {
+    if (!property_exists($this, 'texts')) {
+      return false;
+    }
+
+    $texts = json_decode($this->texts, true);
+
+    if (!isset($texts[$localeName]) || !is_array($texts[$localeName])) {
+      return false;
+    }
+
+    return !empty($texts[$localeName]['title']);
+  }
+
+  /**
    * Получить массив объектов записей для выборки
    * 
-   * @param  array $params
-   * @param  bool $isPublished
+   * @param  array  $params
+   * @param  bool   $isPublished
+   * @param  string $localeName
+   * @param  bool   $onlyTranslated
    * 
    * @return array
    */
-  public function getEntries(array $params = [], $isPublished = false) : array
+  public function getEntries(
+    array $params = [],
+    $isPublished = false,
+    string $localeName = 'en_US',
+    bool $onlyTranslated = true
+  ) : array
   {
     $categories = $this->getCategories();
 
@@ -328,16 +356,22 @@ class EntriesSample implements EntityTypeContent
       $entries = [];
 
       foreach ($categories as $category) {
-        $categoryArray = $category->getEntries($params, $isPublished);
-        
+        // Прокидываем локаль и флаг в категорию, чтобы фильтр работал и на уровне SQL
+        $categoryArray = $category->getEntries($params, $isPublished, $localeName, $onlyTranslated);
+
         if (count($categoryArray) > 0) {
           $limit = $this->getLimitCount();
 
           foreach ($categoryArray as $entryIndex => $entry) {
-            $entry->initData(['metadata']);
+            $entry->initData(['metadata', 'texts']);
 
             if ($limit <= $entryIndex) {
               break;
+            }
+
+            // Страховка на уровне PHP: пропускаем записи без перевода
+            if ($onlyTranslated && !$entry->hasTranslation($localeName)) {
+              continue;
             }
 
             if ($isPublished) {
@@ -350,7 +384,7 @@ class EntriesSample implements EntityTypeContent
           }
         }
       }
-      
+
       return $entries;
     }
 
@@ -360,10 +394,14 @@ class EntriesSample implements EntityTypeContent
   /**
    * Получить количество объектов записей для выборки
    * 
+   * @param  string $localeName
+   * @param  bool   $onlyTranslated
+   * 
    * @return int
    */
-  public function getEntriesCount() : int {
-    $entries = $this->getEntries();
+  public function getEntriesCount(string $localeName = 'en_US', bool $onlyTranslated = true) : int
+  {
+    $entries = $this->getEntries([], false, $localeName, $onlyTranslated);
     return count($entries);
   }
   
@@ -502,12 +540,12 @@ class EntriesSample implements EntityTypeContent
   }
   
   /**
-   * Получить объект категории записи по имени
+   * Получить объект выборки по имени
    *
    * @param  SystemCore $CMSCore
    * @param  string $name
    * 
-   * @return EntryCategory
+   * @return EntriesSample|null
    */
   public static function getByName(SystemCore $CMSCore, string $name) : EntriesSample|null
   {
@@ -681,7 +719,7 @@ class EntriesSample implements EntityTypeContent
     $queryBuilder->statement->clauseWhere->assembly();
     $queryBuilder->statement->assembly();
 
-    /** @var int $entry_updated_unix_timestamp Текущее время в UNIX-формате */
+    /** @var int $updatedUnixTimestamp Текущее время в UNIX-формате */
     $updatedUnixTimestamp = time();
 
     try {
