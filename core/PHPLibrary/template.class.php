@@ -854,7 +854,7 @@ final class Template implements ThemeInterface
         }
 
         $entriesSamples = new EntriesSamples($this->CMSCore);
-        $entriesSamplesArray = $entriesSamples->getAll(localeName: $localeName, onlyTranslated: true);
+        $entriesSamplesArray = $entriesSamples->getAll();
 
         foreach ($entriesSamplesArray as $entriesSample) {
           $entriesSample->initData(['name', 'texts', 'metadata']);
@@ -874,7 +874,7 @@ final class Template implements ThemeInterface
           $themeSamplePath = 'templates/samples/' . $themeNameCamelCase($entriesSample->getName());
 
           $entriesAssembled = [];
-          $entriesArray = $entriesSample->getEntries([], true);
+          $entriesArray = $entriesSample->getEntries(isPublished: true, localeName: $localeName, onlyTranslated: true);
           if (count($entriesArray) > 0) {
             foreach ($entriesArray as $entry) {
               $entry->initData(['name', 'texts', 'metadata', 'categoryID', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
