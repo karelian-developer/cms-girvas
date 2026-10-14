@@ -379,7 +379,7 @@ class EntriesSample implements EntityTypeContent
 
             $entries[] = $entry;
             $addedCount++;
-        }
+          }
         }
       }
 
