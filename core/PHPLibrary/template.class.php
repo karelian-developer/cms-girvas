@@ -854,7 +854,7 @@ final class Template implements ThemeInterface
         }
 
         $entriesSamples = new EntriesSamples($this->CMSCore);
-        $entriesSamplesArray = $entriesSamples->getAll();
+        $entriesSamplesArray = $entriesSamples->getAll(localeName: $localeName, onlyTranslated: true);
 
         foreach ($entriesSamplesArray as $entriesSample) {
           $entriesSample->initData(['name', 'texts', 'metadata']);
