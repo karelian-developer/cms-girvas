@@ -78,7 +78,7 @@ export class Core {
       return (response.ok) ? response.json() : Promise.reject(response);
     }).then((data) => {
       let cookieMatches = document.cookie.match(new RegExp('(^| )locale=([^;]+)'));
-      let URLParamLocale = URLParser.getParam('locale');
+      let URLParamLocale = this.searchParams.getParam('locale');
 
       if (cookieMatches != null) {
         this.locales.list.forEach(element => {
