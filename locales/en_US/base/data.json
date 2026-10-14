@@ -1,5 +1,6 @@
 {
   "BUTTON_ANSWER_LABEL": "Reply",
+  "BUTTON_DECLINE_LABEL": "Refuse",
   "BUTTON_AUTHORIZATION_LABEL": "Authorization",
   "BUTTON_CONSENT_REVOKE_SUBMIT": "Revoke consent",
   "BUTTON_DELETE_LABEL": "Delete",
@@ -75,6 +76,7 @@
   "MODAL_CONSENT_REVOKE_TITLE": "Revoke consent",
   "MODAL_COOKIE_SITE_USING_DESCRIPTION": "Attention! Our site uses cookies to improve the site's performance, efficiency, and convenience. By continuing to use the site, you agree to the use of cookies.",
   "MODAL_COOKIE_SITE_USING_TITLE": "Cookie Usage",
+  "MODAL_COOKIE_SITE_USING_LINK_LABEL": "More",
   "MODAL_ENTRY_COMMENT_DELETE_DESCRIPTION": "Are you sure you want to delete the entry comment? This action cannot be undone.",
   "MODAL_ENTRY_COMMENT_DELETE_TITLE": "Delete comment",
   "MODAL_LOCALE_CHANGE_DESCRIPTION": "Dear user, we noticed that you are using a page locale that is not the selected one for this site. We suggest you choose the required language for the entire site.",
