@@ -76,17 +76,17 @@ export class Core {
       return fetch('/handler/locale/base', {method: 'GET'});
     }).then((response) => {
       return (response.ok) ? response.json() : Promise.reject(response);
-        }).then((data) => {
-      let cookieMatches = document.cookie.match(new RegExp('(^| )locale=([^;]+)'));
+    }).then((data) => {
+      const cookieMatches = document.cookie.match(new RegExp('(^| )locale=([^;]+)'));
       const URLParamLocale = URLParser.getParam('locale');
 
-      if (cookieMatches != null) {
+      if (cookieMatches !== null) {
         this.locales.list.forEach(element => {
           if (element.name == cookieMatches[2]) {
             this.locales.base = new Locale(element.name, 'base');
           }
         });
-      } else if (URLParamLocale != null) {
+      } else if (URLParamLocale !== null) {
         this.locales.list.forEach(element => {
           if (element.name == URLParamLocale) {
             this.locales.base = new Locale(element.name, 'base');
