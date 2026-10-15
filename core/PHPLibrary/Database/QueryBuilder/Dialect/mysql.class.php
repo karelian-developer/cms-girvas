@@ -219,6 +219,17 @@ final class MySql extends BaseDialect
     );
   }
 
+  public function jsonExtractString(string $column, string $key) : string
+  {
+    $path = '$.' . str_replace('.', '.', $key);
+
+    return sprintf(
+      'JSON_UNQUOTE(JSON_EXTRACT(%s, %s))',
+      $this->quoteIdentifier($column),
+      $this->quoteLiteral($path)
+    );
+  }
+
   /**
    * @param  int $length
    * @return string

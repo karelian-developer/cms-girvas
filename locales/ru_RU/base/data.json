@@ -1,5 +1,6 @@
 {
   "BUTTON_ANSWER_LABEL": "Ответить",
+  "BUTTON_DECLINE_LABEL": "Отказаться",
   "BUTTON_AUTHORIZATION_LABEL": "Авторизация",
   "BUTTON_CONSENT_REVOKE_SUBMIT": "Отозвать согласие",
   "BUTTON_DELETE_LABEL": "Удалить",
@@ -75,6 +76,7 @@
   "MODAL_CONSENT_REVOKE_TITLE": "Отзыв согласия",
   "MODAL_COOKIE_SITE_USING_DESCRIPTION": "Внимание! Наш сайт использует файлы cookie, чтобы улучшить работу сайта, повысить его эффективность и удобство. Продолжая использовать сайт, вы соглашаетесь на использование файлов cookie.",
   "MODAL_COOKIE_SITE_USING_TITLE": "Использование Cookie",
+  "MODAL_COOKIE_SITE_USING_LINK_LABEL": "Подробнее",
   "MODAL_ENTRY_COMMENT_DELETE_DESCRIPTION": "Вы действительно хотите удалить комментарий к записи? Действие отменить будет нельзя.",
   "MODAL_ENTRY_COMMENT_DELETE_TITLE": "Удаление комментария",
   "MODAL_LOCALE_CHANGE_DESCRIPTION": "Уважаемый пользователь, мы обратили внимание, что Вы используете локализацию страницы, которая не является выбранной для этого сайта. Предлагаем Вам выбрать необходимый язык для всего сайта.",

@@ -172,11 +172,15 @@ class PageEntries implements InterfacePage
         $entriesObjects = $entries->getByCategoriesIDs(
           array_merge([$categoryID], $category->getChildCategoriesIDs()),
           ['limit' => [$entriesCountOnPage, $paginationItemCurrent * $entriesCountOnPage]],
-          $isPublished
+          $isPublished,
+          $localeName,
+          true
         );
         $entriesCount = $entries->getCountByCategoriesIDs(
           array_merge([$categoryID], $category->getChildCategoriesIDs()),
-          $isPublished
+          $isPublished,
+          $localeName,
+          true
         );
       } else {
         $this->page->breadcrumbs->assembly();
@@ -184,13 +188,12 @@ class PageEntries implements InterfacePage
         $this->CMSCore->configurator->setMetaTitle($localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_LABEL'] . ' | ' . $this->CMSCore->configurator->getSiteTitle());
         $this->CMSCore->configurator->setMetaDescription($localeData['PAGE_ENTRIES_BREADCRUMPS_ALL_ENTRIES_DESCRIPTION']);
 
-        /** @var Entries $entries Объект класса Entries */
         $entries = new Entries($this->CMSCore);
         $entriesObjects = $entries->getAll([
           'limit' => [$entriesCountOnPage, $paginationItemCurrent * $entriesCountOnPage]
-        ], $isPublished);
+        ], $isPublished, 'by_createdtimestamp_decrease', $localeName, true);
 
-        $entriesCount = $entries->getCountTotal($isPublished);
+        $entriesCount = $entries->getCountTotal($isPublished, $localeName, true);
       }
 
       unset($entries);

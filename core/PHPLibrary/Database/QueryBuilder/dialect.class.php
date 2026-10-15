@@ -150,6 +150,15 @@ abstract class Dialect
   abstract public function jsonArrayContainsLike(string $column, string $locale, string $field, string $paramName) : string;
 
   /**
+   * Извлечь строковое значение из JSON-колонки.
+   *
+   * @param  string $column Имя колонки
+   * @param  string $key    Ключ в JSON
+   * @return string SQL-выражение, возвращающее строку (или NULL)
+   */
+  abstract public function jsonExtractString(string $column, string $key) : string;
+
+  /**
    * Главный метод: логический тип -> физический.
    *
    * Поддерживает синтаксис string:N для строк заданной длины.

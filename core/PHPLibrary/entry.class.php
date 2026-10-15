@@ -862,6 +862,27 @@ class Entry implements EntityTypeContent
   }
 
   /**
+   * Проверить, есть ли у записи перевод для указанной локали.
+   *
+   * @param  string $localeName
+   * @return bool
+   */
+  public function hasTranslation(string $localeName = 'en_US') : bool
+  {
+    if (!property_exists($this, 'texts')) {
+      return false;
+    }
+
+    $texts = json_decode($this->texts, true);
+
+    if (!isset($texts[$localeName]) || !is_array($texts[$localeName])) {
+      return false;
+    }
+
+    return !empty($texts[$localeName]['title']);
+  }
+
+  /**
    * Проверка наличия записи по идентификационному номеру
    *
    * @param CMSCore $CMSCore

@@ -874,7 +874,7 @@ final class Template implements ThemeInterface
           $themeSamplePath = 'templates/samples/' . $themeNameCamelCase($entriesSample->getName());
 
           $entriesAssembled = [];
-          $entriesArray = $entriesSample->getEntries([], true);
+          $entriesArray = $entriesSample->getEntries(isPublished: true, localeName: $localeName, onlyTranslated: true);
           if (count($entriesArray) > 0) {
             foreach ($entriesArray as $entry) {
               $entry->initData(['name', 'texts', 'metadata', 'categoryID', 'createdUnixTimestamp', 'updatedUnixTimestamp']);

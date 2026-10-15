@@ -172,7 +172,7 @@ if (Form::existsByName($CMSCore, $formName)) {
           'documentTitles' => $documentTitles,
           'documentVersion' => $currentVersion->getVersion(),
           'locale' => $formLocale,
-          'ip' => $formSendedAuthorIP
+          'ip' => $formSendedAuthorIP,
           'source' => 'form'
         ]
       );
