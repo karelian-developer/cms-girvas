@@ -331,7 +331,7 @@ final class SystemCore implements CoreInterface
     for ($indexA = 0; $indexA < count($this->pageDirArray); $indexA++) {
       $currentDirArray = [];
       for ($indexB = 0; $indexB < $indexA + 1; $indexB++) {
-        array_push($currentDirArray, $this->pageDirArray[$indexB]);
+        $currentDirArray[] = $this->pageDirArray[$indexB];
       }
 
       $currentDir = implode('/', $currentDirArray);

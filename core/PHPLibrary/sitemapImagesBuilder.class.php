@@ -71,13 +71,13 @@ final class SitemapImagesBuilder
     ?string $geoLocation = null
   ) : void
   {
-    array_push($this->images, [
+    $this->images[] = [
       'imageURL' => $imageUrl,
       'caption' => $caption,
       'title' => $title,
       'license' => $license,
       'GEOLocation' => $geoLocation
-    ]);
+    ];
   }
 
   /**

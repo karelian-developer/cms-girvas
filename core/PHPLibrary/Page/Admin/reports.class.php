@@ -137,7 +137,7 @@ final class PageReports implements InterfacePage
 
     foreach ($reportsClassesFiles as $file) {
       if (preg_match('/^([a-zA-Z_]+)\.class\.php$/', $file, $matches)) {
-        array_push($reports, $matches[1]);
+        $reports[] = $matches[1];
       }
     }
 

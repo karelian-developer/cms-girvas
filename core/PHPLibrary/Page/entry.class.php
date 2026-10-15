@@ -333,7 +333,7 @@ class PageEntry implements InterfacePage
 
           $entryCommentContent = strip_tags($entryComment->getContent());
 
-          array_push($entryCommentsTransformedArray, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/comment.tpl', [
+          $entryCommentsTransformedArray[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entry/comment.tpl', [
             'COMMENT_ID' => $entryComment->getID(),
             'COMMENT_INDEX' => $entryCommentIndex,
             'COMMENT_CREATED_DATE_TIMESTAMP' => date('d.m.Y H:i:s', $entryComment->getCreatedUnixTimestamp()),
@@ -341,7 +341,7 @@ class PageEntry implements InterfacePage
             'COMMENT_AUTHOR_AVATAR_URL' => $entryCommentAuthor !== null ? $entryCommentAuthor->getAvatarURL(128) : User::getAvatarDefaultURL($this->CMSCore, 64),
             'COMMENT_AUTHOR_GROUP_TITLE' => $entryCommentAuthor !== null ? $entryCommentAuthorGroup->getTitle($localeName) : '',
             'COMMENT_CONTENT' => $entryComment->isHidden() ? $localeData['PAGE_ENTRY_COMMENT_HIDE_LABEL'] . ' ' . strip_tags($entryComment->getHiddenReason()) : $entryCommentContent
-          ]));
+          ]);
 
           $entryCommentIndex++;
         }

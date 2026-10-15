@@ -49,10 +49,10 @@ final class PageBreadcrumbs
   public function add(string $title, string $url) : bool
   {
     $arrayItemsCountStart = count($this->array);
-    $arrayItemsCount = array_push($this->array, [
+    $arrayItemsCount = $this->array[] = [
       'title' => $title,
       'url' => $url
-    ]);
+    ];
 
     return $arrayItemsCount > $arrayItemsCountStart;
   }
@@ -81,11 +81,11 @@ final class PageBreadcrumbs
 
     if (count($this->getArray()) > 0) {
       foreach ($this->getArray() as $index => $data) {
-        array_push($breadcrumbsItemsTransformed, TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/breadcrumps/listItem.tpl', [
+        $breadcrumbsItemsTransformed[] = TemplateCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/breadcrumps/listItem.tpl', [
           'BREADCRUMP_URL' => $data['url'],
           'BREADCRUMP_TITLE' => $data['title'],
           'BREADCRUMP_META_POSITION' => $index + 1
-        ]));
+        ]);
       }
     }
 

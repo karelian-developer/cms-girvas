@@ -186,7 +186,7 @@ class UserGroup
     if ($execute) {
       $result = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
       foreach ($result as $userData) {
-        array_push($users, new User($this->CMSCore, $userData['id']));
+        $users[] = new User($this->CMSCore, $userData['id']);
       }
     }
 

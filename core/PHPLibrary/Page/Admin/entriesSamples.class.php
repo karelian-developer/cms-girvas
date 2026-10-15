@@ -397,25 +397,23 @@ class PageEntriesSamples implements InterfacePage
       $reflectionEnumSortTypeName = $reflectionEnumSortTypeCases[$sortTypeID - 1]->getName();
       $reflectionEnumSortTypeLabel = $localeData['PAGE_ENTRIES_SAMPLE_SORT_TYPE_' . $reflectionEnumSortTypeName . '_LABEL'];
 
-      array_push($entriesSamplesTableItemsAssembled,
-        ThemeCollector::assemblyFileContent(
-          $this->CMSCore->theme,
-          'templates/page/entriesSamples/tableItem.tpl',
-          [
-            'ENTRIES_SAMPLE_INDEX' => $paginationItemCurrent * $paginationItemsOnPage + $index + 1,
-            'ENTRIES_SAMPLE_ID' => $objectID,
-            'ENTRIES_SAMPLE_NAME' => $object->getName(),
-            'ENTRIES_SAMPLE_TITLE' => $entriesSampleTitle,
-            'ENTRIES_SAMPLE_DESCRIPTION' => $entriesSampleDescription,
-            'ENTRIES_SAMPLE_ENTRIES_COUNT' => $entriesSampleEntriesCount,
-            'ENTRIES_SAMPLE_ENTRIES_LIMIT_COUNT' => $entriesSampleEntriesLimitCount,
-            'ENTRIES_SAMPLE_LOCALES_LIST' => $completedLocalesList,
-            'ENTRIES_SAMPLE_CATEGORIES_LIST' => $categoriesList,
-            'ENTRIES_SAMPLE_METHOD_SORT_LABEL' => $reflectionEnumSortTypeLabel,
-            'ENTRIES_SAMPLE_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
-            'ENTRIES_SAMPLE_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
-          ]
-        )
+      $entriesSamplesTableItemsAssembled[] = ThemeCollector::assemblyFileContent(
+        $this->CMSCore->theme,
+        'templates/page/entriesSamples/tableItem.tpl',
+        [
+          'ENTRIES_SAMPLE_INDEX' => $paginationItemCurrent * $paginationItemsOnPage + $index + 1,
+          'ENTRIES_SAMPLE_ID' => $objectID,
+          'ENTRIES_SAMPLE_NAME' => $object->getName(),
+          'ENTRIES_SAMPLE_TITLE' => $entriesSampleTitle,
+          'ENTRIES_SAMPLE_DESCRIPTION' => $entriesSampleDescription,
+          'ENTRIES_SAMPLE_ENTRIES_COUNT' => $entriesSampleEntriesCount,
+          'ENTRIES_SAMPLE_ENTRIES_LIMIT_COUNT' => $entriesSampleEntriesLimitCount,
+          'ENTRIES_SAMPLE_LOCALES_LIST' => $completedLocalesList,
+          'ENTRIES_SAMPLE_CATEGORIES_LIST' => $categoriesList,
+          'ENTRIES_SAMPLE_METHOD_SORT_LABEL' => $reflectionEnumSortTypeLabel,
+          'ENTRIES_SAMPLE_CREATED_DATE_TIMESTAMP' => $createdUnixTimestamp,
+          'ENTRIES_SAMPLE_UPDATED_DATE_TIMESTAMP' => $updatedUnixTimestamp
+        ]
       );
     }
 
