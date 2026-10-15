@@ -401,7 +401,7 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
       $handlerStatusCode = $handlerStatusCode ?? 0;
     }
   } else {
-    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_ERRAPI_UTILS_USER_REGISTRATION_ERROR_AUTHORIZATION_ALREADYOR_DISABLED');
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_ERROR_AUTHORIZATION_ALREADY');
     $handlerStatusCode = $handlerStatusCode ?? 0;
   }
 }
@@ -549,7 +549,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
         $report->initData(['variables']);
         $reportVariables = $report->getVariables();
 
-        if ($clientIP !== $reportVariables['clientIP']) {
+        if ($clientIP !== $reportVariables['ip']) {
           unset($lastReportsFailAuth[$reportIndex]);
         }
       }
