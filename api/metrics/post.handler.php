@@ -40,15 +40,14 @@ if (array_key_exists('Metrics-Token', $handlerHeaders)) {
     $metricsDataSort = $metricsSession->getData();
 
     if (isset($metricsDataSort['metrics']['views'][$metricsToken])) {
-      // Добавляем переход, если это не тот же URL
       if ($metricsReferrerURL !== $metricsCurrentURL) {
-        array_push($metricsDataSort['metrics']['views'][$metricsToken]['URLTransfers'], [
+        $metricsDataSort['metrics']['views'][$metricsToken]['URLTransfers'][] = [
           $metricsCurrentURL => [
             'referral' => $metricsReferrerURL,
             'isVisitedNew' => $metricsIsNewVisit,
             'time' => time()
           ]
-        ]);
+        ];
       }
       
       $metricsDataSort['metrics']['time'] = $metricsTimestamp;

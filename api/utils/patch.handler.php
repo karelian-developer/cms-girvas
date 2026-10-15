@@ -25,7 +25,7 @@ if ($CMSCore->client->isLogged(2) && $CMSCore->urlp->getPath(2) === 'secret-code
     for ($codeIndex = 0; $codeIndex < 4; $codeIndex++) {
       $codeChars = [];
       for ($charIndex = 0; $charIndex < 4; $charIndex++) {
-        array_push($codeChars, $chars[rand(0, strlen($chars) - 1)]);
+        $codeChars[] = $chars[rand(0, strlen($chars) - 1)];
       }
 
       switch ($codeIndex) {

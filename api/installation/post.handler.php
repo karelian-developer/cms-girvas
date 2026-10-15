@@ -215,7 +215,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $codeChars = [];
 
       for ($char_index = 0; $char_index < 4; $char_index++) {
-        array_push($codeChars, $chars[rand(0, strlen($chars) - 1)]);
+        $codeChars[] = $chars[rand(0, strlen($chars) - 1)];
       }
 
       switch ($codeIndex) {
@@ -226,7 +226,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       }
 
       $codeFinal = implode($codeChars);
-      array_push($codes, $codeFinal);
+      $codes[] = $codeFinal;
 
       if ($CMSCore->configurator->existsDatabaseEntryValue('security_admin_code_' . $codeChar)) {
         $CMSCore->configurator->updateDatabaseEntryValue('security_admin_code_' . $codeChar, password_hash($codeFinal, PASSWORD_ARGON2ID));

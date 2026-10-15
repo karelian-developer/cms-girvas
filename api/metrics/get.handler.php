@@ -50,7 +50,7 @@ if (isset($_GET['time'])) {
     foreach ($metricsSessions as $session) {
       $session->initData(['data']);
 
-      array_push($handlerOutputData['data'], $session->getData());
+      $handlerOutputData['data'][] = $session->getData();
     }
 
     $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');

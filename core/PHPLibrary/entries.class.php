@@ -137,7 +137,7 @@ final class Entries
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        array_push($entries, new Entry($this->CMSCore, $data['id']));
+        $entries[] = new Entry($this->CMSCore, $data['id']);
       }
     }
 
@@ -868,7 +868,7 @@ final class Entries
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        array_push($entries, new Entry($this->CMSCore, $data['id']));
+        $entries[] = new Entry($this->CMSCore, $data['id']);
       }
     }
 
