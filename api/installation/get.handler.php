@@ -417,7 +417,7 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       $databaseScheme = (isset($_GET['database_scheme'])) ? addslashes($_GET['database_scheme']) : '';
       $databaseHost = (isset($_GET['database_host'])) ? addslashes($_GET['database_host']) : '';
       $databaseUser = (isset($_GET['database_user'])) ? addslashes($_GET['database_user']) : '';
-      $databasePassword = (isset($_GET['database_dms'])) ? addslashes($_GET['database_pass']) : '';
+      $databasePassword = (isset($_GET['database_pass'])) ? addslashes($_GET['database_pass']) : '';
       $databaseName = (isset($_GET['database_name'])) ? addslashes($_GET['database_name']) : '';
       
       $CMSSalt = bin2hex(openssl_random_pseudo_bytes(10));
