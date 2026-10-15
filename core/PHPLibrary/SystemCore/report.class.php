@@ -392,7 +392,11 @@ final class Report
   {
     $this->variables[$name] = $value;
   }
+
+  /**
+   * Создание записи в базе данных
    *
+   * @param  mixed $CoreInterface
    * @param  int $typeID
    * @param  array $variables
    * 
