@@ -309,10 +309,10 @@ if (defined('IS_NOT_HACKED')) {
     foreach ($timezoneNames as $name) {
       $timezoneUTC = new DateTimeImmutable('now', new DateTimeZone($name));
 
-      array_push($timezones, [
+      $timezones[] = [
         'name' => $name,
         'utc' => $timezoneUTC->format('P')
-      ]);
+      ];
     }
 
     $handlerOutputData['timezones'] = $timezones;
@@ -379,13 +379,13 @@ if (defined('IS_NOT_HACKED')) {
         $CMSLocale->initPathes();
 
         if ($CMSLocale->existsFileMetadataJSON()) {
-          array_push($handlerOutputData['locales'], [
+          $handlerOutputData['locales'][] = [
             'title' => $CMSLocale->getTitle(),
             'iconURL' => $CMSLocale->getIconURL(),
             'name' => $CMSLocale->getName(),
             'iso639_1' => $CMSLocale->getISO639(1),
             'iso639_2' => $CMSLocale->getISO639(2),
-          ]);
+          ];
         }
       }
 

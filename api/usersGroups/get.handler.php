@@ -25,13 +25,13 @@ if (count($usersGroups) > 0) {
   foreach ($usersGroups as $usersGroup) {
     $usersGroup->initData(['id', 'texts', 'metadata', 'createdUnixTimestamp', 'updatedUnixTimestamp']);
 
-    array_push($handlerOutputData['usersGroups'], [
+    $handlerOutputData['usersGroups'][] = [
       'id' => $usersGroup->getID(),
       'name' => $usersGroup->getName(),
       'title' => $usersGroup->getTitle($usersGroupsLocale),
       'createdUnixTimestamp' => $usersGroup->getCreatedUnixTimestamp(),
       'updatedUnixTimestamp' => $usersGroup->getUpdatedUnixTimestamp()
-    ]);
+    ];
   }
 
   $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');

@@ -143,7 +143,7 @@ class EmailSender
    */
   public function addHeader(string $value) : void
   {
-    array_push($this->headers, $value);
+    $this->headers[] = $value;
   }
   
   /**

@@ -94,7 +94,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
                     $wordRegexPattern = '/' . $word . '/ui';
 
                     if (preg_match($wordRegexPattern, $commentContent)) {
-                      array_push($commentRiskFactorsDetected, $commentRiskFactors[0]);
+                      $commentRiskFactorsDetected[] = $commentRiskFactors[0];
                       break;
                     }
                   }
@@ -114,7 +114,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
                     $domainRegexPattern = '/' . $CMSConfigDomain . '/ui';
 
                     if (!preg_match($domainRegexPattern, $regexMatch[0])) {
-                      array_push($commentRiskFactorsDetected, $commentRiskFactors[1]);
+                      $commentRiskFactorsDetected[] = $commentRiskFactors[1];
                       break;
                     }
                   }
@@ -122,7 +122,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
               }
 
               if ($settingSecurityPremoderationCreateStatus == 'on') {
-                array_push($commentRiskFactorsDetected, $commentRiskFactors[2]);
+                $commentRiskFactorsDetected[] = $commentRiskFactors[2];
               }
 
               if (!empty($commentRiskFactorsDetected)) {
@@ -236,8 +236,10 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
           $comment = new EntryComment($CMSCore, $commentID);
 
           $commentInitData = ['metadata'];
-          
-          if (isset($_PATCH['comment_content'])) array_push($commentInitData, 'content');
+
+          if (isset($_PATCH['comment_content'])) {
+            $commentInitData[] = 'content';
+          }
 
           $comment->initData($commentInitData);
           $handlerOutputData['comment']['id'] = $comment->getID();

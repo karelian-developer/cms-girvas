@@ -100,7 +100,7 @@ if ($CMSCore->client->isLogged(2)) {
 
       foreach ($sampleCategoriesIDs as $id) {
         if (EntryCategory::existsByID($CMSCore, $id)) {
-          array_push($sampleMetadata['categoriesIDs'], $id);
+          $sampleMetadata['categoriesIDs'][] = $id;
         }
       }
     }

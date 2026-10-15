@@ -79,7 +79,7 @@ if ($CMSCore->client->isLogged(1)) {
                       $wordRegexPattern = '/' . $word . '/ui';
 
                       if (preg_match($wordRegexPattern, $commentContent)) {
-                        array_push($commentRiskFactorsDetected, $commentRiskFactors[0]);
+                        $commentRiskFactorsDetected[] = $commentRiskFactors[0];
                         break;
                       }
                     }
@@ -99,7 +99,7 @@ if ($CMSCore->client->isLogged(1)) {
                       $domainRegexPattern = '/' . $CMSConfigDomain . '/ui';
 
                       if (!preg_match($domainRegexPattern, $regexMatch[0])) {
-                        array_push($commentRiskFactorsDetected, $commentRiskFactors[1]);
+                        $commentRiskFactorsDetected[] = $commentRiskFactors[1];
                         break;
                       }
                     }
@@ -107,7 +107,7 @@ if ($CMSCore->client->isLogged(1)) {
                 }
 
                 if ($settingSecurityPremoderationCreateStatus === 'on') {
-                  array_push($commentRiskFactorsDetected, $commentRiskFactors[2]);
+                  $commentRiskFactorsDetected[] = $commentRiskFactors[2];
                 }
 
                 if (!empty($commentRiskFactorsDetected)) {

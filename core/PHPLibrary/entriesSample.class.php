@@ -235,7 +235,7 @@ class EntriesSample implements EntityTypeContent
     foreach ($IDsArray as $id) {
       if (EntryCategory::existsByID($this->CMSCore, $id)) {
         $category = new EntryCategory($this->CMSCore, $id);
-        array_push($categories, $category);
+        $categories[] = $category;
       }
     }
 
@@ -362,6 +362,7 @@ class EntriesSample implements EntityTypeContent
         if (count($categoryArray) > 0) {
           $limit = $this->getLimitCount();
 
+          $addedCount = 0;
           foreach ($categoryArray as $entry) {
             if ($addedCount >= $limit) {
               break;

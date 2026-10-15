@@ -113,7 +113,7 @@ final class EntriesCategories
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        array_push($array, new EntryCategory($this->CMSCore, $data['id']));
+        $array[] = new EntryCategory($this->CMSCore, $data['id']);
       }
     }
 
