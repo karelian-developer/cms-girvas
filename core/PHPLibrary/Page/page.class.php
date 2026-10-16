@@ -169,10 +169,10 @@ class PagePage implements InterfacePage
       $itemElement->appendChild($aElement);
 
       if (!empty($localeData['iconURL'])) {
-          $iconElement = $document->createElement('img');
-          $iconElement->setAttribute('class', 'page-locales__locale-icon');
-          $iconElement->setAttribute('src', $localeData['iconURL']);
-          $itemElement->prepend($iconElement);
+        $iconElement = $document->createElement('img');
+        $iconElement->setAttribute('class', 'page-locales__locale-icon');
+        $iconElement->setAttribute('src', $localeData['iconURL']);
+        $itemElement->prepend($iconElement);
       }
 
       $ulElement->appendChild($itemElement);
