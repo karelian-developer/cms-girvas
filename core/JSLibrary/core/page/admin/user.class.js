@@ -28,7 +28,7 @@ export class PageUser {
   init() {
     let searchParams = new URLParser(), locales, userData, usersGroups;
     let elementForm = document.querySelector('[data-element="main-form"]');
-    
+
     const interactiveChoicesUsersGroups = new Interactive('choices');
 
     fetch('/handler/locales', {method: 'GET'}).then((response) => {
@@ -60,6 +60,8 @@ export class PageUser {
     }, (rejectionReason) => {
       this.page.showPopupNotification(rejectionReason, 0);
     }).then((localeData) => {
+      const user = userData ?? {};
+
       const userPasswordInput = document.querySelector('[data-element="input-password"]');
       const userPasswordRepeatInput = document.querySelector('[data-element="input-password-repeat"]');
 
@@ -97,7 +99,7 @@ export class PageUser {
 
       if (searchParams.getPathPart(3) !== null) {
         usersGroups.forEach((usersGroup, usersGroupIndex) => {
-          if (usersGroup.id === userData.groupID) {
+          if (usersGroup.id === user.groupID) {
             interactiveChoicesUsersGroups.target.setItemSelectedIndex(usersGroupIndex);
           }
         });
@@ -116,7 +118,7 @@ export class PageUser {
       this.buttons.unblock.target.setLabel(localeData.BUTTON_UNBAN_LABEL);
       this.buttons.export.target.setLabel(localeData.PAGE_USER_BUTTON_EXPORT_SUBJECT_DATA);
       this.buttons.anonymize.target.setLabel(localeData.PAGE_USER_BUTTON_ANONYMIZE);
-      
+
       this.buttons.save.target.setStyle('green');
       this.buttons.delete.target.setStyle('red');
       this.buttons.block.target.setStyle('red');
@@ -126,17 +128,17 @@ export class PageUser {
 
       this.buttons.anonymize.target.setCallback((event) => {
         event.preventDefault();
-        this.handleAnonymize(searchParams.getPathPart(3), userData, localeData);
+        this.handleAnonymize(searchParams.getPathPart(3), user, localeData);
       });
 
       this.buttons.export.target.setCallback((event) => {
         event.preventDefault();
-        this.handleExport(searchParams.getPathPart(3), userData, localeData);
+        this.handleExport(searchParams.getPathPart(3), user, localeData);
       });
 
       this.buttons.save.target.setCallback((event) => {
         event.preventDefault();
-        
+
         let form = new Interactive('form');
         form.target.replaceElement(elementForm);
 
@@ -150,8 +152,8 @@ export class PageUser {
           request.target.send().then((data) => {
             if (data.statusCode === 1 && searchParams.getPathPart(3) === null) {
               if (data.outputData.hasOwnProperty('user')) {
-                let userData = data.outputData.user;
-                window.location.href = '/admin/user/' + userData.id;
+                let newUserData = data.outputData.user;
+                window.location.href = '/admin/user/' + newUserData.id;
               }
             }
           });
@@ -162,11 +164,11 @@ export class PageUser {
 
       this.buttons.block.target.setCallback((event) => {
         event.preventDefault();
-        
+
         let formData = new FormData();
         formData.append('user_id', searchParams.getPathPart(3));
         formData.append('user_is_block', 1);
-  
+
         let request = new Interactive('request', {
           method: 'PATCH',
           url: '/handler/user?localeMessage=' + window.CMSCore.locales.admin.name
@@ -184,11 +186,11 @@ export class PageUser {
 
       this.buttons.unblock.target.setCallback((event) => {
         event.preventDefault();
-        
+
         let formData = new FormData();
         formData.append('user_id', searchParams.getPathPart(3));
         formData.append('user_is_block', 0);
-  
+
         let request = new Interactive('request', {
           method: 'PATCH',
           url: '/handler/user?localeMessage=' + window.CMSCore.locales.admin.name
@@ -206,16 +208,16 @@ export class PageUser {
 
       this.buttons.delete.target.setCallback((event) => {
         event.preventDefault();
-  
+
         let interactiveModal = new Interactive('modal', {
           title: localeData.MODAL_USER_DELETE_TITLE,
           content: localeData.MODAL_USER_DELETE_DESCRIPTION
         });
-        
+
         interactiveModal.target.addButton(localeData.BUTTON_DELETE_LABEL, () => {
           let formData = new FormData();
           formData.append('user_id', searchParams.getPathPart(3));
-  
+
           let request = new Interactive('request', {
             method: 'DELETE',
             url: '/handler/user?localeMessage=' + window.CMSCore.locales.admin.name
@@ -229,11 +231,11 @@ export class PageUser {
             }
           });
         });
-  
+
         interactiveModal.target.addButton(localeData.BUTTON_CANCEL_LABEL, () => {
           interactiveModal.target.close();
         });
-  
+
         interactiveModal.assembly();
         document.body.appendChild(interactiveModal.target.element);
         interactiveModal.target.show();
@@ -246,32 +248,32 @@ export class PageUser {
       this.buttons.block.assembly();
       this.buttons.unblock.assembly();
 
-      if (userData.isAnonymized) {
+      if (user.isAnonymized) {
         this.buttons.anonymize.target.element.style.display = 'none';
       }
-  
+
       if (searchParams.getPathPart(3) === null) {
         this.buttons.unblock.target.element.style.display = 'none';
         this.buttons.block.target.element.style.display = 'none';
         this.buttons.delete.target.element.style.display = 'none';
         this.buttons.save.target.element.style.display = 'flex';
       } else {
-        this.buttons.unblock.target.element.style.display = (userData.isBlocked) ? 'flex' : 'none';
-        this.buttons.block.target.element.style.display = (userData.isBlocked) ? 'none' : 'flex';
+        this.buttons.unblock.target.element.style.display = user.isBlocked ? 'flex' : 'none';
+        this.buttons.block.target.element.style.display = user.isBlocked ? 'none' : 'flex';
         this.buttons.delete.target.element.style.display = 'flex';
         this.buttons.save.target.element.style.display = 'flex';
       }
 
       interactiveChoicesUsersGroups.assembly();
-  
+
       const interactiveFormPanelContainer = document.querySelector('[data-element="panel"]');
       const interactiveChoicesUsersGroupsContainer = document.querySelector('[data-element="choice"][data-choice="group"]');
 
       if (interactiveFormPanelContainer !== null) {
         if (searchParams.getPathPart(3) !== null) {
           interactiveFormPanelContainer.append(this.buttons.export.target.element);
-          
-          if (!userData.isAnonymized) {
+
+          if (!user.isAnonymized) {
             interactiveFormPanelContainer.append(this.buttons.anonymize.target.element);
           }
         }
