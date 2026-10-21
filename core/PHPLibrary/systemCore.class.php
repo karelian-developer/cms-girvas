@@ -898,6 +898,10 @@ final class SystemCore implements CoreInterface
    */
   private function initURLParser() : void
   {
+    if (!class_exists(URLParser::class)) {
+      require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/URLParser.class.php';
+    }
+
     $this->urlp = new URLParser();
   }
 
@@ -1093,7 +1097,9 @@ final class SystemCore implements CoreInterface
       if (file_exists($cacheFile)) {
         $cachedData = json_decode(file_get_contents($cacheFile), true);
 
-        if (time() >= $cachedData['expires']) {
+        if (!is_array($cachedData) || !isset($cachedData['expires'])) {
+          @unlink($cacheFile);
+        } elseif (time() >= $cachedData['expires']) {
           unlink($cacheFile);
         }
       };
@@ -1112,7 +1118,11 @@ final class SystemCore implements CoreInterface
       if (file_exists($cacheFile)) {
         $cachedData = json_decode(file_get_contents($cacheFile), true);
 
-        if (time() < $cachedData['expires']) {
+        if (!is_array($cachedData) || !isset($cachedData['files']) || !is_array($cachedData['files'])) {
+          continue;
+        }
+
+        if (!isset($cachedData['expires']) || time() < $cachedData['expires']) {
           usort($cachedData['files'], function($a, $b) {
             $depthA = substr_count($a, '/');
             $depthB = substr_count($b, '/');

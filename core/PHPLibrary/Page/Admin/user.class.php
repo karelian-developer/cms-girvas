@@ -201,6 +201,8 @@ class PageUser implements InterfacePage
           : '';
       }
 
+      $fieldValue = $fieldValue ?? '';
+
       if ($type === 'textarea') {
         $inputElement = $document->createElement('textarea');
         $textNode = $document->createTextNode($fieldValue);
