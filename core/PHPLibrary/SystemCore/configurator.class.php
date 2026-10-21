@@ -103,7 +103,7 @@ final class Configurator implements ConfiguratorInterface
    */
   public function addMetaKeyword(mixed $value) : void
   {
-    array_push($this->metaKeywords, $value);
+    $this->metaKeywords[] = $value;
   }
 
   /**

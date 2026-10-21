@@ -153,7 +153,7 @@ class PageSettings implements InterfacePage
 
     foreach ($settingsClassesFiles as $file) {
       if (preg_match('/^([a-zA-Z_]+)\.class\.php$/', $file, $matches)) {
-        array_push($settings, $matches[1]);
+        $settings[] = $matches[1];
       }
     }
 

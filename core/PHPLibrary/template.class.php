@@ -557,10 +557,10 @@ final class Template implements ThemeInterface
    */
   public function addLinkCanonical(string $href) : void
   {
-    array_push($this->headLinks, [
+    $this->headLinks[] = [
       'rel' => 'canonical',
       'href' => $href
-    ]);
+    ];
   }
 
   /**

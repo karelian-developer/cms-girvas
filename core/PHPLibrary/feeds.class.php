@@ -76,7 +76,7 @@ final class Feeds
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        array_push($feeds, new Feed($this->CMSCore, $data['id']));
+        $feeds[] = new Feed($this->CMSCore, $data['id']);
       }
     }
 

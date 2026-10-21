@@ -145,7 +145,7 @@ final class Pages
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        array_push($pages, new PageStatic($this->CMSCore, $data['id']));
+        $pages[] = new PageStatic($this->CMSCore, $data['id']);
       }
     }
 

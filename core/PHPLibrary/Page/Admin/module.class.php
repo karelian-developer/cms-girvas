@@ -302,10 +302,10 @@ class PageModule implements InterfacePage
             default => '<li class="module__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> {METADATA_VALUE}</li>',
           };
 
-          array_push($moduleMetadataItemsTransformed, ThemeCollector::assembly($metadataValueTemplate, [
+          $moduleMetadataItemsTransformed[] = ThemeCollector::assembly($metadataValueTemplate, [
             'METADATA_TITLE' => $metadataTitle,
             'METADATA_VALUE' => $getMetadataValue($module, $moduleMetadata, $enumMetadata)
-          ]));
+          ]);
         }
       }
 

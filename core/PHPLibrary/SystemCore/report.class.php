@@ -394,9 +394,9 @@ final class Report
   }
 
   /**
-   * Создание записи в базе данных
+   * Создание записи в базе данных
    *
-   * @param  mixed $CoreInterface
+   * @param  mixed $CoreInterface
    * @param  int $typeID
    * @param  array $variables
    * 

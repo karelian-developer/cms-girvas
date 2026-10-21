@@ -258,7 +258,7 @@ class EntryComment implements EntityTypeContent
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        array_push($objects, new EntryComment($this->CMSCore, $data['id']));
+        $objects[] = new EntryComment($this->CMSCore, $data['id']);
       }
     }
 

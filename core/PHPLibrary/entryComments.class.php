@@ -120,7 +120,7 @@ final class EntryComments
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        array_push($entriesComments, new EntryComment($this->CMSCore, $data['id']));
+        $entriesComments[] = new EntryComment($this->CMSCore, $data['id']);
       }
     }
 
@@ -199,7 +199,7 @@ final class EntryComments
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        array_push($entriesComments, new EntryComment($this->CMSCore, $data['id']));
+        $entriesComments[] = new EntryComment($this->CMSCore, $data['id']);
       }
     }
 

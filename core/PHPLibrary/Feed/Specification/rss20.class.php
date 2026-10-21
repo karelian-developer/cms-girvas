@@ -66,12 +66,12 @@ class RSS2_0 implements InterfaceSpecification
 
   public function addItem(array $data) : void
   {
-    array_push($this->items, [
+    $this->items[] = [
       'title' => $data['title'],
       'description' => $data['description'],
       'link' => $data['link'],
       'pubdate' => date('D, d M Y H:i:s O', $data['pubdate'])
-    ]);
+    ];
   }
 
   public function getTitle() : string

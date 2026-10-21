@@ -350,7 +350,7 @@ class PageEntriesCategories implements InterfacePage
 
       $objectParentTitle = $objectParent !== null ? $objectParent->getTitle($entriesCategoriesLocaleName) : 'Нет родителя';
 
-      array_push($entriesCategoriesTableItemsAssembled, ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesCategories/tableItem.tpl', [
+      $entriesCategoriesTableItemsAssembled[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/entriesCategories/tableItem.tpl', [
         'ENTRIES_CATEGORY_ID' => $object->getID(),
         'ENTRIES_CATEGORY_INDEX' => $index + 1,
         'ENTRIES_CATEGORY_TITLE' => !empty($entriesCategoryTitle) ? $entriesCategoryTitle : sprintf('[ TITLE NOT FOUND IN LOCALE %s ]', $entriesCategoriesLocaleName),
@@ -361,7 +361,7 @@ class PageEntriesCategories implements InterfacePage
         'ENTRIES_CATEGORY_PARENT_TITLE' => $objectParentTitle,
         'ENTRIES_CATEGORY_CREATED_DATE_TIMESTAMP' => $createdDateTimestamp,
         'ENTRIES_CATEGORY_UPDATED_DATE_TIMESTAMP' => $updatedDateTimestamp
-      ]));
+      ]);
     }
 
     /** @var string $site_page Содержимое шаблона страницы */

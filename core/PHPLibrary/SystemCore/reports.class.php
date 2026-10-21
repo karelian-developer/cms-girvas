@@ -86,7 +86,7 @@ final class Reports
     $results = $databaseQuery->fetchAll(\PDO::FETCH_ASSOC);
     if ($results) {
       foreach ($results as $data) {
-        array_push($resultArray, new Report($this->CMSCore, $data['id']));
+        $resultArray[] = new Report($this->CMSCore, $data['id']);
       }
     }
 

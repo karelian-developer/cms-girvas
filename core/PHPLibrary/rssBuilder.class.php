@@ -83,12 +83,12 @@ final class FeedBuilder
    */
   public function addItem(string $title, string $description, string $link, int $updatedUnixTimestamp) : void
   {
-    array_push($this->items, [
+    $this->items[] = [
       'title' => $title,
       'description' => $description,
       'link' => $link,
       'pubdate' => date('D, d M Y H:i:s T', $updatedUnixTimestamp)
-    ]);
+    ];
   }
   
   /**
