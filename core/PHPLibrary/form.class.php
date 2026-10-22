@@ -198,7 +198,7 @@ class Form implements EntityTypeContent
       }
     }
 
-    return 'POST';
+    return 2;
   }
   
   /**
@@ -421,7 +421,8 @@ class Form implements EntityTypeContent
       2 => 'POST',
       3 => 'PUT',
       4 => 'DELETE',
-      5 => 'PATCH'
+      5 => 'PATCH',
+      default => 'POST',
     });
 
     $formElement->setAttribute('class', 'form form_' . $formName);

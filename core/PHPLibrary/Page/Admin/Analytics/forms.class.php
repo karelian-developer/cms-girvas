@@ -163,6 +163,7 @@ class PageForms implements InterfacePage
         3 => 'PUT',
         4 => 'DELETE',
         5 => 'PATCH',
+        default => 'POST',
       };
 
       $formsTableItemsAssembled[] = ThemeCollector::assemblyFileContent(
