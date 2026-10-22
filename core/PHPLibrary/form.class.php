@@ -517,7 +517,7 @@ class Form implements EntityTypeContent
       }
       
       if ($DOMElementType === 'checkbox') {
-        $DOMElementDescription = mb_convert_encoding($DOMElementDescription, [0x80, 0x10FFFF, 0, 0x1FFFFF], 'UTF-8');
+        $DOMElementDescription = mb_encode_numericentity($DOMElementDescription, [0x80, 0x10FFFF, 0, 0x1FFFFF], 'UTF-8');
 
         if (!empty(trim($DOMElementDescription))) {
           $documentFragment = new DOMDocument('1.0', 'UTF-8');
