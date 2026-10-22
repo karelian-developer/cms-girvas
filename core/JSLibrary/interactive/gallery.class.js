@@ -81,38 +81,32 @@ export class Gallery {
     const elementItems = document.createElement('div');
     elementItems.classList.add('gallery__items');
 
-    this.items.forEach((item, itemIndex) => {
-      const elementPicture = document.createElement('figure');
-      elementPicture.classList.add('gallery__item');
+    const item = this.items[this.currentIndex];
 
-      if (itemIndex === this.currentIndex) {
-        elementPicture.classList.add('gallery__item_is-active');
-      }
+    const elementPicture = document.createElement('figure');
+    elementPicture.classList.add('gallery__item', 'gallery__item_is-active');
 
-      const elementImage = document.createElement('img');
-      elementImage.classList.add('gallery__image');
-      elementImage.setAttribute('src', item.url);
-      elementImage.setAttribute('alt', item.caption);
-      elementImage.setAttribute('loading', 'lazy');
+    const elementImage = document.createElement('img');
+    elementImage.classList.add('gallery__image');
+    elementImage.setAttribute('src', item.url);
+    elementImage.setAttribute('alt', item.caption);
+    elementImage.setAttribute('loading', 'lazy');
 
-      elementImage.addEventListener('click', (event) => {
-        event.preventDefault();
-
-        this.openModal(itemIndex);
-      });
-
-      elementPicture.appendChild(elementImage);
-
-      if (item.caption !== '') {
-        const elementCaption = document.createElement('figcaption');
-        elementCaption.classList.add('gallery__caption');
-        elementCaption.textContent = item.caption;
-
-        elementPicture.appendChild(elementCaption);
-      }
-
-      elementItems.appendChild(elementPicture);
+    elementImage.addEventListener('click', (event) => {
+      event.preventDefault();
+      this.openModal(this.currentIndex);
     });
+
+    elementPicture.appendChild(elementImage);
+
+    if (item.caption !== '') {
+      const elementCaption = document.createElement('figcaption');
+      elementCaption.classList.add('gallery__caption');
+      elementCaption.textContent = item.caption;
+      elementPicture.appendChild(elementCaption);
+    }
+
+    elementItems.appendChild(elementPicture);
 
     return elementItems;
   }
@@ -171,23 +165,13 @@ export class Gallery {
   }
 
   updateActiveItem() {
-    const items = this.element.querySelectorAll('.gallery__item');
+    const oldItems = this.element.querySelector('.gallery__items');
+    const newItems = this.assemblyItems();
+    oldItems.replaceWith(newItems);
+
     const previewItems = this.element.querySelectorAll('.gallery__preview-item');
-
-    items.forEach((item, itemIndex) => {
-      if (itemIndex === this.currentIndex) {
-        item.classList.add('gallery__item_is-active');
-      } else {
-        item.classList.remove('gallery__item_is-active');
-      }
-    });
-
     previewItems.forEach((previewItem, previewIndex) => {
-      if (previewIndex === this.currentIndex) {
-        previewItem.classList.add('gallery__preview-item_is-active');
-      } else {
-        previewItem.classList.remove('gallery__preview-item_is-active');
-      }
+      previewItem.classList.toggle('gallery__preview-item_is-active', previewIndex === this.currentIndex);
     });
   }
 
