@@ -21,6 +21,7 @@
 namespace core\PHPLibrary\Template;
 
 use \core\PHPLibrary\Entities\Types\Content as EntityTypeContent;
+use \core\PHPLibrary\SystemCore as CMSCore;
 use \core\PHPLibrary\SystemCore\Locale as SystemCoreLocale;
 use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\LocaleInterface as LocaleInterface;
@@ -39,8 +40,10 @@ final class Collector
   private const TEMPLATE_TAG_LANG_PATTERN = '/\{LANG\:([a-zA-Z0-9_]+)\}/';
   private const TEMPLATE_TAG_LANG_MARKDOWN_PATTERN = '/\{LANG\:MD\:([a-zA-Z0-9_]+)\}/';
   private const TEMPLATE_TAG_PROPERTY_PATTERN = '/\{PROP\:([a-zA-Z0-9_]+)\}/';
-  private const TEMPLATE_LOGIC_IF_PATTERN = '/\{\?IF\:([a-zA-Z0-9_]+)([=<>!]+)([a-zA-Z0-9_]+)\?\}(.*)\{\?ENDIF\?\}/is';
-  private const TEMPLATE_LOGIC_IF_ELSE_PATTERN = '/\{\?IF\:([a-zA-Z0-9_]+)([=<>!]+)([a-zA-Z0-9_]+)\?\}(.*){\?ELSE\?\}(.*)\{\?ENDIF\?\}/is';
+  private const TEMPLATE_LOGIC_IF_PATTERN = '/\{\?IF:([!]?)([A-Z0-9_]+)(?::([=<>!]+)([A-Za-z0-9_\-\x{0400}-\x{04FF}]+))?\?\}(.*?)\{\?ENDIF\?\}/isu';
+  private const TEMPLATE_LOGIC_IF_ELSE_PATTERN = '/\{\?IF:([!]?)([A-Z0-9_]+)(?::([=<>!]+)([A-Za-z0-9_\-\x{0400}-\x{04FF}]+))?\?\}(.*?)\{\?ELSE\?\}(.*?)\{\?ENDIF\?\}/isu';
+  private const TEMPLATE_LOGIC_IFNOT_PATTERN = '/\{\?IFNOT:([A-Z0-9_]+)\?\}(.*?)\{\?ENDIF\?\}/isu';
+  private const TEMPLATE_LOGIC_IFNOT_ELSE_PATTERN = '/\{\?IFNOT:([A-Z0-9_]+)\?\}(.*?)\{\?ELSE\?\}(.*?)\{\?ENDIF\?\}/isu';
   private Theme $theme;
   
   /**
@@ -280,43 +283,135 @@ final class Collector
     return $template;
   }
 
-  public static function assemblyLogic(SystemCore $CMSCore, string $themeString) : string
+    /**
+   * Сборка условных блоков шаблона
+   *
+   * Поддерживаемый синтаксис:
+   *   {?IF:VAR?}...{?ENDIF?}
+   *   {?IF:VAR?}...{?ELSE?}...{?ENDIF?}
+   *   {?IF:!VAR?}...{?ENDIF?}
+   *   {?IF:VAR==VAL?}...{?ENDIF?}
+   *   {?IFNOT:VAR?}...{?ENDIF?}
+   *   {?IFNOT:VAR?}...{?ELSE?}...{?ENDIF?}
+   *
+   * @param SystemCore $CMSCore
+   * @param string $themeString
+   *
+   * @return string
+   */
+  public static function assemblyLogic(CMSCore $CMSCore, string $themeString) : string
   {
-    $themeTransformed = $themeString;
+    if ($themeString === '') {
+      return '';
+    }
 
-    $defineFunction = function(string $functionName) : mixed {
-      switch ($functionName) {
-        case 'CLIENT_IS_LOGGED': return $CMSCore->client->isLogged(1);
-      }
-
-      return null;
+    $resolveVariable = function (string $name) use ($CMSCore) : mixed {
+      return match ($name) {
+        'CLIENT_IS_LOGGED'  => $CMSCore->client?->isLogged(1) ?? false,
+        'ADMIN_IS_LOGGED'   => $CMSCore->client?->isLogged(2) ?? false,
+        'INSTALLER_MODE'    => $CMSCore->isInstallerModeActive(),
+        'IS_ADMIN_LOCATION' => $CMSCore->isLocationAdministrativePanelActive(),
+        'IS_CLI'            => $CMSCore->isCLI,
+        default             => null,
+      };
     };
 
-    //       1  2  3     4            5
-    // {?IF:CONDITION?} ... {?ELSE?} ... {?ENDIF?}
-    if (preg_match(self::TEMPLATE_LOGIC_IF_ELSE_PATTERN, $themeTransformed, $matches)) {
-      //
-    }
-
-    //       1  2  3     4
-    // {?IF:CONDITION?} ... {?ENDIF?}
-    if (preg_match(self::TEMPLATE_LOGIC_IF_PATTERN, $themeTransformed, $matches)) {
-      $defineFunctionReturned = false;
-      if ($matches[2] == '==') $defineFunctionReturned = $defineFunction($matches[1]) == $matches[3];
-      if ($matches[2] == '!=') $defineFunctionReturned = $defineFunction($matches[1]) != $matches[3];
-      if ($matches[2] == '>=') $defineFunctionReturned = $defineFunction($matches[1]) >= $matches[3];
-      if ($matches[2] == '<=') $defineFunctionReturned = $defineFunction($matches[1]) <= $matches[3];
-      if ($matches[2] == '>') $defineFunctionReturned = $defineFunction($matches[1]) > $matches[3];
-      if ($matches[2] == '<') $defineFunctionReturned = $defineFunction($matches[1]) < $matches[3];
-
-      if ($defineFunctionReturned) {
-        $themeTransformed = str_replace($matches[0], self::assemblyLogic($matches[4]), $themeTransformed);
+    $compare = function (mixed $left, string $operator, string $rightRaw) : bool {
+      if (is_bool($left)) {
+        $right = filter_var($rightRaw, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        $right = $right ?? (bool) $rightRaw;
+      } elseif (is_int($left) || is_float($left)) {
+        $right = is_numeric($rightRaw) ? $rightRaw + 0 : 0;
       } else {
-        $themeTransformed = '';
+        $right = $rightRaw;
+      }
+
+      return match ($operator) {
+        '==', '===' => $left == $right,
+        '!=', '!==' => $left != $right,
+        '>'         => $left >  $right,
+        '<'         => $left <  $right,
+        '>='        => $left >= $right,
+        '<='        => $left <= $right,
+        default     => false,
+      };
+    };
+
+    $maxIterations = 50;
+
+    while ($maxIterations-- > 0) {
+      $previous = $themeString;
+
+      // 1. IF ... ELSE ... ENDIF
+      $themeString = preg_replace_callback(
+        self::TEMPLATE_LOGIC_IF_ELSE_PATTERN,
+        function ($m) use ($resolveVariable, $compare) {
+          $negate = $m[1] === '!';
+          $value  = $resolveVariable($m[2]);
+
+          if (($m[3] ?? '') !== '') {
+            $result = $compare($value, $m[3], $m[4]);
+          } else {
+            $result = (bool) $value;
+          }
+
+          if ($negate) {
+            $result = !$result;
+          }
+
+          return $result ? $m[5] : $m[6];
+        },
+        $themeString
+      );
+
+      // 2. IF ... ENDIF (без ELSE)
+      $themeString = preg_replace_callback(
+        self::TEMPLATE_LOGIC_IF_PATTERN,
+        function ($m) use ($resolveVariable, $compare) {
+          $negate = $m[1] === '!';
+          $value  = $resolveVariable($m[2]);
+
+          if (($m[3] ?? '') !== '') {
+            $result = $compare($value, $m[3], $m[4]);
+          } else {
+            $result = (bool) $value;
+          }
+
+          if ($negate) {
+            $result = !$result;
+          }
+
+          return $result ? $m[5] : '';
+        },
+        $themeString
+      );
+
+      // 3. IFNOT ... ELSE ... ENDIF
+      $themeString = preg_replace_callback(
+        self::TEMPLATE_LOGIC_IFNOT_ELSE_PATTERN,
+        function ($m) use ($resolveVariable) {
+          $value = (bool) $resolveVariable($m[1]);
+          return $value ? $m[3] : $m[2];
+        },
+        $themeString
+      );
+
+      // 4. IFNOT ... ENDIF
+      $themeString = preg_replace_callback(
+        self::TEMPLATE_LOGIC_IFNOT_PATTERN,
+        function ($m) use ($resolveVariable) {
+          $value = (bool) $resolveVariable($m[1]);
+          return $value ? '' : $m[2];
+        },
+        $themeString
+      );
+
+      if ($themeString === $previous) {
+        break;
       }
     }
 
-    return $themeTransformed;
+    return $themeString;
   }
   
   /**
@@ -328,25 +423,28 @@ final class Collector
    * 
    * @return string
    */
-  public static function assemblyFileContent(Theme $theme, string $filePath, array $themeVariables) : string
-  {
-    /** @var string $filePath Полный путь до шаблона */
-    $filePath = $theme->getPath() . '/' . $filePath;
+    public static function assemblyFileContent(Theme $theme, string $filePath, array $themeVariables) : string
+    {
+      /** @var string $filePath Полный путь до шаблона */
+      $filePath = $theme->getPath() . '/' . $filePath;
 
-    if (file_exists($filePath)) {
-      $fileContent = file_get_contents($filePath);
-      return self::assembly($fileContent, $themeVariables);
+      if (file_exists($filePath)) {
+        $fileContent = file_get_contents($filePath);
+        $fileContent = self::assemblyLogic($theme->CMSCore, $fileContent);
+
+        return self::assembly($fileContent, $themeVariables);
+      }
+
+      $document = new DOMDocument();
+      $containerElement = $document->createElement('div');
+      $containerElement->setAttribute('style', 'background-color: pink; border: 1px solid red; color: red; padding: 10px 20px; font-size: 14px;');
+
+      $spanElement = $document->createElement('span', 'Template is not exists: ' . $filePath);
+      $containerElement->appendChild($spanElement);
+      $document->appendChild($containerElement);
+
+      return $document->saveHTML();
     }
-
-    $document = new DOMDocument();
-    $containerElement = $document->createElement('div');
-    $containerElement->setAttribute('style', 'background-color: pink; border: 1px solid red; color: red; padding: 10px 20px; font-size: 14px;');
-    
-    $spanElement = $document->createElement('span', 'Template is not exists: ' . $filePath);
-    $containerElement->appendChild($spanElement);
-    $document->appendChild($containerElement);
-    return $document->saveHTML();
-  }
 
   /**
    * Получить содержимое файла шаблона

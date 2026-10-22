@@ -1200,6 +1200,9 @@ final class Template implements ThemeInterface
       // Внедрение значений свойств темы
       $this->core->assembled = ThemeCollector::assemblyPropertiesValues($this->core->assembled, $this->getFilePropertiesData());
 
+      // Обработка условных блоков шаблона (до подстановки переменных)
+      $this->core->assembled = ThemeCollector::assemblyLogic($this->CMSCore, $this->core->assembled);
+
       // Внедрение значений глобальных шаблонных переменных
       $this->core->assembled = ThemeCollector::assembly($this->core->assembled, $themeVariablesArray);
 
