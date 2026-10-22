@@ -198,7 +198,7 @@ class Form implements EntityTypeContent
       }
     }
 
-    return 'POST';
+    return 2;
   }
   
   /**
@@ -421,7 +421,8 @@ class Form implements EntityTypeContent
       2 => 'POST',
       3 => 'PUT',
       4 => 'DELETE',
-      5 => 'PATCH'
+      5 => 'PATCH',
+      default => 'POST',
     });
 
     $formElement->setAttribute('class', 'form form_' . $formName);
@@ -516,7 +517,7 @@ class Form implements EntityTypeContent
       }
       
       if ($DOMElementType === 'checkbox') {
-        $DOMElementDescription = mb_convert_encoding($DOMElementDescription, 'HTML-ENTITIES', 'UTF-8');
+        $DOMElementDescription = mb_encode_numericentity($DOMElementDescription, [0x80, 0x10FFFF, 0, 0x1FFFFF], 'UTF-8');
 
         if (!empty(trim($DOMElementDescription))) {
           $documentFragment = new DOMDocument('1.0', 'UTF-8');
