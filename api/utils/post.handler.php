@@ -538,9 +538,11 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
     $userLogin = trim($_POST['user_login']) ?? null;
     $userPassword = trim($_POST['user_password']) ?? null;
     $userRememberMe = isset($_POST['user_remember_me']);
-    $adminAccessCodes = $_POST['admin_access-code'] ?? [];
 
-    if ($userLogin !== null && !$userPassword !== null && !empty($adminAccessCodes)) {
+    $adminAccessCodes = $_POST['admin_access-code'] ?? [];
+    $adminAccessCodes = is_array($adminAccessCodes) ? array_values($adminAccessCodes) : [];
+
+    if ($userLogin !== null && $userPassword !== null && count($adminAccessCodes) === 4) {
       $currentUnixTime = time();
       $targetCheckingUnixTime = $currentUnixTime - 300;
       $lastReportsFailAuth = CMSReports::getByPeriod($CMSCore, CMSReport::REPORT_TYPE_ID_AP_AUTHORIZATION_FAIL, $targetCheckingUnixTime, $currentUnixTime);
@@ -565,16 +567,13 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
           
           if ($userGroup->permissionCheck($userGroup::PERMISSION_ADMIN_PANEL_AUTH)) {
             $adminAccessCodesIsValid = true;
-            foreach ($adminAccessCodes as $index => $code) {
-              switch ($index) {
-                case 0: $codeChar = 'a'; break;
-                case 1: $codeChar = 'b'; break;
-                case 2: $codeChar = 'c'; break;
-                case 3: $codeChar = 'd'; break;
-              }
+            foreach (['a', 'b', 'c', 'd'] as $index => $codeChar) {
+              $code = $adminAccessCodes[$index] ?? '';
+              $codeHash = (string) $CMSCore->configurator->getDatabaseEntryValue('security_admin_code_' . $codeChar);
 
-              if (!password_verify($code, $CMSCore->configurator->getDatabaseEntryValue('security_admin_code_' . $codeChar))) {
-                $adminAccessCodesIsValid = false; break;
+              if (!is_string($code) || $codeHash === '' || !password_verify($code, $codeHash)) {
+                $adminAccessCodesIsValid = false;
+                break;
               }
             }
 

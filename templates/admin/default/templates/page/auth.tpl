@@ -71,65 +71,63 @@
   </div>
 </main>
 <script>
-  document.addEventListener('DOMContentLoaded', (event) => {
-    let adminAccessCodeInputs = document.querySelectorAll('[name="admin_access-code[]"]');
-    for (let inputIndex = 0; inputIndex < adminAccessCodeInputs.length; inputIndex++) {
-      let input = adminAccessCodeInputs[inputIndex];
+  document.addEventListener('DOMContentLoaded', () => {
+    const inputs = Array.from(document.querySelectorAll('[name="admin_access-code[]"]'));
+    if (inputs.length === 0) return;
+
+    const partLength = 4;
+    const separators = /[\s\-\u2010-\u2015_.]/g;
+    const hasSeparator = /[\s\-\u2010-\u2015_.]/;
+
+    const distribute = (text, startIndex) => {
+      const chars = text.replace(separators, '');
+      if (chars.length === 0) return;
+
+      let index = chars.length >= partLength * inputs.length ? 0 : startIndex;
+
+      for (let offset = 0; offset < chars.length && index < inputs.length; offset += partLength, index++) {
+        inputs[index].value = chars.slice(offset, offset + partLength);
+      }
+
+      const firstEmpty = inputs.findIndex((el) => el.value.length < partLength);
+      (firstEmpty !== -1 ? inputs[firstEmpty] : inputs[inputs.length - 1]).focus();
+    };
+
+    inputs.forEach((input, index) => {
+      input.addEventListener('beforeinput', (event) => {
+        const text = event.data
+          ?? event.dataTransfer?.getData('text/plain')
+          ?? '';
+
+        if (text === '') return;
+
+        const chars = text.replace(separators, '');
+
+        if (text.length > 1 && (chars.length > partLength - input.value.length || hasSeparator.test(text))) {
+          event.preventDefault();
+          distribute(text, index);
+        }
+      });
 
       input.addEventListener('paste', (event) => {
-        let clipboardData = event.clipboardData || window.clipboardData;
-        let pastedData = clipboardData.getData('Text');
+        const text = (event.clipboardData || window.clipboardData)?.getData('text') ?? '';
+        if (text !== '') {
+          event.preventDefault();
+          distribute(text, index);
+        }
+      });
 
-        let codes = pastedData.split('-');
-
-        adminAccessCodeInputs.forEach((element, elementIndex) => {
-          if (typeof(codes[elementIndex]) != 'undefined') {
-            element.value = codes[elementIndex];
-          }
-        });
+      input.addEventListener('input', () => {
+        if (input.value.length >= partLength && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
       });
 
       input.addEventListener('keydown', (event) => {
-        let isBreak = true;
-
-        switch (event.keyCode) {       
-          case 8: // Backspace        
-          case 13: // Enter
-          case 16: // Shift
-          case 17: // Ctrl
-          case 18: // Alt
-          case 19: // Pause/Break
-          case 20: // Caps Lock
-          case 27: // Escape
-          case 35: // End
-          case 36: // Home
-          case 37: // Left
-          case 38: // Up
-          case 39: // Right
-          case 40: // Down
-
-          // Mac CMD Key
-          case 91: // Safari, Chrome
-          case 93: // Safari, Chrome
-          case 224: // Firefox
-          break;
-          default:
-            isBreak = false;
-          break;
-        }
-
-        if (isBreak && event.keyCode == 8) {
-          if (input.value.length == 0 && inputIndex > 0) {
-            adminAccessCodeInputs[inputIndex - 1].focus();
-          }
-        }
-
-        if (!isBreak) {
-          if (input.value.length == 4 && inputIndex < 3) {
-            adminAccessCodeInputs[inputIndex + 1].focus();
-          }
+        if (event.key === 'Backspace' && input.value === '' && index > 0) {
+          inputs[index - 1].focus();
         }
       });
-    }
+    });
   });
 </script>
