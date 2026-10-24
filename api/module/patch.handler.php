@@ -40,8 +40,10 @@ if ($CMSCore->client->isLogged(2)) {
           if ($moduleEvent === 'enable') {
             if (!$module->isEnabled()) {
               if (method_exists($moduleCore, 'enable')) {
+                $moduleCore->install();
                 $moduleCore->enable();
               } else {
+                $module->install();
                 $module->enable();
               }
 

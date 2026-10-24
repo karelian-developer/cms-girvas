@@ -65,14 +65,6 @@ if ($CMSCore->client->isLogged(2)) {
                 $moduleCoreNamespace = '\\modules\\' . $moduleName . '\\Core';
                 
                 if (file_exists($moduleCorePath)) {
-                  require_once($moduleCorePath);
-
-                  $moduleCore = new $moduleCoreNamespace($CMSCore, $module);
-
-                  if (method_exists($moduleCore, 'install')) {
-                    $moduleCore->install();
-                  }
-
                   http_response_code(200);
                   $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_MODULE_UPLOADED');
                   $handlerStatusCode = $handlerStatusCode ?? 1;
@@ -102,7 +94,7 @@ if ($CMSCore->client->isLogged(2)) {
           $handlerStatusCode = $handlerStatusCode ?? 0;
         }
       } else {
-        http_response_code(500);
+        http_response_code(409);
         $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_MODULE_ALREADY_UPLOADED');
         $handlerStatusCode = $handlerStatusCode ?? 0;
       }
