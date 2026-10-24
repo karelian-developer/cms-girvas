@@ -445,6 +445,28 @@ final class SystemCore implements CoreInterface
         'httponly' => false,
         'samesite' => 'Strict'
       ]);
+
+      $_COOKIE['_grv_csrf'] = $CSRFToken;
+    }
+
+    if (PHP_SAPI !== 'cli' && $CMSConfigurator !== null) {
+      $restToken = self::generateCoreRESTToken(
+        (string) $CMSConfigurator->get('APISecret'),
+        (string) ($_COOKIE['_grv_csrf'] ?? '')
+      );
+
+      if (($_COOKIE['_grv_rest'] ?? '') !== $restToken) {
+        setcookie('_grv_rest', $restToken, [
+          'expires' => 0,
+          'path' => '/',
+          'domain' => $CMSConfigurator->get('domainCookies'),
+          'secure' => (bool) $CMSConfigurator->get('SSLIsEnabled'),
+          'httponly' => true,
+          'samesite' => 'Strict'
+        ]);
+
+        $_COOKIE['_grv_rest'] = $restToken;
+      }
     }
 
     // Подключение к базе данных
@@ -981,15 +1003,12 @@ final class SystemCore implements CoreInterface
   /**
    * Получение куки REST API ядра
    *
-   * @return int
+   * @return string
    */
-  public static function getCoreRESTCookie() : int
+  public static function getCoreRESTCookie() : string
   {
-    if (isset($_COOKIE['_grv_rest'])) {
-      return is_numeric($_COOKIE['_grv_rest']) ? (int) $_COOKIE['_grv_rest'] : 0;
-    }
-
-    return 0;
+    $value = $_COOKIE['_grv_rest'] ?? '';
+    return is_string($value) ? $value : '';
   }
 
   /**
@@ -999,7 +1018,19 @@ final class SystemCore implements CoreInterface
    */
   public static function coreRESTCookieExists() : bool
   {
-    return isset($_COOKIE['_grv_rest']);
+    return isset($_COOKIE['_grv_rest']) && $_COOKIE['_grv_rest'] !== '';
+  }
+
+  /**
+   * Генерация REST-токена
+   * 
+   * @return string
+   */
+  public static function generateCoreRESTToken(string $secret, string $CSRFToken, int $dayOffset = 0) : string
+  {
+    $day = date('Y-m-d', strtotime('-' . $dayOffset . ' day'));
+    $key = $secret !== '' ? $secret : hash('sha256', __FILE__);
+    return hash_hmac('sha256', 'grv-rest|' . $day . '|' . $CSRFToken, $key);
   }
 
   /**
@@ -1010,12 +1041,14 @@ final class SystemCore implements CoreInterface
    * 
    * @return bool
    */
-  public static function coreRESTCookieIsValid(int $value, string $ip) : bool
+  public static function coreRESTCookieIsValid(string $value, string $ip = '') : bool
   {
-    $ip = str_replace('.', '', $ip);
+    $secret = defined('API_SECRET') ? (string) API_SECRET : '';
+    $CSRFToken = (string) ($_COOKIE['_grv_csrf'] ?? '');
+    if ($value === '' || $CSRFToken === '') return false;
 
-    if ($value === (int) (((int) $ip * (round(asin(1) * strlen($ip)) << 3)) . strtotime(date('Y/m/d 00:00:00.0')))) {
-      return true;
+    foreach ([0, 1] as $dayOffset) {
+      if (hash_equals(self::generateCoreRESTToken($secret, $CSRFToken, $dayOffset), $value)) return true;
     }
 
     return false;

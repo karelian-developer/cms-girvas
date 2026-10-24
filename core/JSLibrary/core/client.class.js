@@ -57,18 +57,7 @@ export class Client {
     return match ? decodeURIComponent(match[1]) : this.CSRFToken;
   }
 
-  setRestHash() {
-    this.getIPAddress().then((ipAddress) => {
-      let date = new Date();
-      date.setHours(0);
-      date.setMinutes(0);
-      date.setSeconds(0);
-      date.setMilliseconds(0);
-
-      let address = ipAddress.replaceAll('.', '');
-      document.cookie = `_grv_rest=${Number(address) * (Math.round(Math.asin(1) * address.length) << 3)}${date.getTime() / 1000};path=/`;
-    });
-  }
+  setRestHash() {}
 
   static setCookie(name, value, days = 30) {
     let date = new Date();
