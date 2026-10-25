@@ -419,7 +419,7 @@ class PageTemplate implements InterfacePage
 
             if ($enumMetadata === ThemeEnumMetadata::CMS_MODULES_DEPENDENCY) {
               $installedModules = Modules::getInstalledModulesArray();
-              $modulesDependencies = $this->getDependencies($installedModules, $moduleMetadata[$metadataName]);
+              $modulesDependencies = $this->getDependencies($installedModules, $themeMetadata[$metadataName]);
 
               $dependencyItems = [];
 
