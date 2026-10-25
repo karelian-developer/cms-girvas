@@ -455,8 +455,8 @@ class PageTemplate implements InterfacePage
             ThemeEnumMetadata::DATETIME_CREATED_UNIX => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_DATETIME_CREATED_UNIX_LABEL'),
             ThemeEnumMetadata::DATETIME_UPDATED_UNIX => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_DATETIME_UPDATED_UNIX_LABEL'),
             ThemeEnumMetadata::VERSION => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_VERSION_LABEL'),
-            ThemeEnumMetadata::CMS_VERSION => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_CMS_VERSION_LABEL'),
-            ThemeEnumMetadata::CMS_MODULES_DEPENDENCY => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_CMS_MODULES_DEPENDENCY_LABEL')
+            ThemeEnumMetadata::CMS_VERSION => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_CMS_VERSION_LABEL'),
+            ThemeEnumMetadata::CMS_MODULES_DEPENDENCY => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_CMS_MODULES_DEPENDENCY_LABEL')
           };
 
           $metadataValueTemplate = match ($enumMetadata) {
