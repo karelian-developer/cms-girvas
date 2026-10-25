@@ -65,10 +65,8 @@ final class MySql extends BaseDialect
    */
   public function jsonExtractBoolean(string $column, string $key) : string
   {
-    // MySQL: JSON_EXTRACT возвращает JSON-значение.
-    // Оператор ->> возвращает текст. Сравниваем с 'true'.
     return sprintf(
-      '%s->>\'$.%s\' = \'true\'',
+      "JSON_UNQUOTE(%s->'$.%s') IN ('true', '1')",
       $this->quoteIdentifier($column),
       $key
     );
