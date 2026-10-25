@@ -586,7 +586,10 @@ final class Template implements ThemeInterface
       ThemeEnumMetadata::WEIGHT => 'size',
       ThemeEnumMetadata::DATETIME_CREATED_UNIX => 'datetimeCreatedUnix',
       ThemeEnumMetadata::DATETIME_UPDATED_UNIX => 'datetimeUpdatedUnix',
-      ThemeEnumMetadata::VERSION => 'version'
+      ThemeEnumMetadata::VERSION => 'version',
+      ThemeEnumMetadata::CMS_VERSION => 'CMSVersion',
+      ThemeEnumMetadata::CMS_MODULES_DEPENDENCY => 'CMSModulesDependency',
+      default => 'undefined'
     };
   }
 
