@@ -27,6 +27,7 @@ use \core\PHPLibrary\UserGroup as UserGroup;
 use \core\PHPLibrary\Module as Module;
 use \core\PHPLibrary\Module\EnumMetadata as ModuleEnumMetadata;
 use \core\PHPLibrary\Module\EnumWeight as ModuleEnumWeight;
+use \core\PHPLibrary\Modules as Modules;
 use \core\PHPLibrary\NadvoParse as NadvoParse;
 use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\Page as Page;
@@ -56,11 +57,15 @@ class PageModule implements InterfacePage
     ModuleEnumMetadata::AUTHOR_SITE_LINK,
     ModuleEnumMetadata::AUTHOR_SOCIAL_VK_LINK,
     ModuleEnumMetadata::AUTHOR_SOCIAL_OK_LINK,
+    ModuleEnumMetadata::AUTHOR_SOCIAL_MAX_LINK,
+    ModuleEnumMetadata::AUTHOR_SOCIAL_TELEGRAM_LINK,
     ModuleEnumMetadata::CATEGORY_NAME,
     ModuleEnumMetadata::WEIGHT,
     ModuleEnumMetadata::DATETIME_CREATED_UNIX,
     ModuleEnumMetadata::DATETIME_UPDATED_UNIX,
-    ModuleEnumMetadata::VERSION
+    ModuleEnumMetadata::VERSION,
+    ModuleEnumMetadata::CMS_VERSION,
+    ModuleEnumMetadata::CMS_MODULES_DEPENDENCY
   ];
 
   /** @property string Итоговая сборка шаблона в виде строки */
@@ -157,6 +162,52 @@ class PageModule implements InterfacePage
 
     $themeSource =& $this->CMSCore->theme->core->source;
     $this->initAdminPanelSubnavigation($this->CMSCore, $themeSource);
+  }
+
+  /**
+   * Проверяет, все ли модули-зависимости установлены.
+   *
+   * @param array $installed  Массив имён установленных модулей.
+   * @param array $dependencies Массив имён требуемых модулей.
+   * 
+   * @return bool
+   */
+  function checkDependencies(array $installed, array $dependencies): bool
+  {
+    foreach ($dependencies as $dep) {
+      if (!in_array($dep, $installed, true)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Разделяет зависимости на присутствующие и отсутствующие.
+   *
+   * @param array $installed  Массив имён установленных модулей.
+   * @param array $dependencies Массив имён требуемых модулей.
+   * 
+   * @return array
+   */
+  function getDependencies(array $installed, array $dependencies): array
+  {
+    $present = [];
+    $missing = [];
+
+    foreach ($dependencies as $dep) {
+      if (in_array($dep, $installed, true)) {
+        $present[] = $dep;
+      } else {
+        $missing[] = $dep;
+      }
+    }
+
+    return [
+      'present' => $present,
+      'missing' => $missing,
+    ];
   }
 
   /**
@@ -274,6 +325,23 @@ class PageModule implements InterfacePage
               return date('d.m.Y', $moduleMetadata[$metadataName]);
             }
 
+            if ($enumMetadata === ModuleEnumMetadata::CMS_MODULES_DEPENDENCY) {
+              $installedModules = Modules::getInstalledModulesArray();
+              $modulesDependencies = $this->getDependencies($installedModules, $moduleMetadata[$metadataName]);
+
+              $dependencyItems = [];
+
+              foreach ($modulesDependencies['present'] as $dependencyName) {
+                $dependencyItems[] = '<span style="color: green;">' . $dependencyName . '</span>';
+              }
+
+              foreach ($modulesDependencies['missing'] as $dependencyName) {
+                $dependencyItems[] = '<span style="color: red;">' . $dependencyName . '</span>';
+              }
+
+              return implode(', ', $dependencyItems);
+            }
+
             return $moduleMetadata[$metadataName] ?? '[???]';
           };
 
@@ -288,17 +356,23 @@ class PageModule implements InterfacePage
             ModuleEnumMetadata::AUTHOR_SITE_LINK => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_AUTHOR_SITE_LINK_LABEL'),
             ModuleEnumMetadata::AUTHOR_SOCIAL_VK_LINK => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_AUTHOR_SOCIAL_VK_LINK_LABEL'),
             ModuleEnumMetadata::AUTHOR_SOCIAL_OK_LINK => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_AUTHOR_SOCIAL_OK_LINK_LABEL'),
+            ModuleEnumMetadata::AUTHOR_SOCIAL_MAX_LINK => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_AUTHOR_SOCIAL_MAX_LINK_LABEL'),
+            ModuleEnumMetadata::AUTHOR_SOCIAL_TELEGRAM_LINK => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_AUTHOR_SOCIAL_TELEGRAM_LINK_LABEL'),
             ModuleEnumMetadata::CATEGORY_NAME => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_CATEGORY_NAME_LABEL'),
             ModuleEnumMetadata::WEIGHT => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_SIZE_LABEL'),
             ModuleEnumMetadata::DATETIME_CREATED_UNIX => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_DATETIME_CREATED_UNIX_LABEL'),
             ModuleEnumMetadata::DATETIME_UPDATED_UNIX => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_DATETIME_UPDATED_UNIX_LABEL'),
-            ModuleEnumMetadata::VERSION => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_VERSION_LABEL')
+            ModuleEnumMetadata::VERSION => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_VERSION_LABEL'),
+            ModuleEnumMetadata::CMS_VERSION => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_CMS_VERSION_LABEL'),
+            ModuleEnumMetadata::CMS_MODULES_DEPENDENCY => $module->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_CMS_MODULES_DEPENDENCY_LABEL')
           };
 
           $metadataValueTemplate = match ($enumMetadata) {
             ModuleEnumMetadata::AUTHOR_SITE_LINK => '<li class="module__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> <a class="module__metadata-link metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>',
             ModuleEnumMetadata::AUTHOR_SOCIAL_VK_LINK => '<li class="module__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> <a class="module__metadata-link metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>',
             ModuleEnumMetadata::AUTHOR_SOCIAL_OK_LINK => '<li class="module__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> <a class="module__metadata-link metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>',
+            ModuleEnumMetadata::AUTHOR_SOCIAL_MAX_LINK => '<li class="module__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> <a class="module__metadata-link metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>',
+            ModuleEnumMetadata::AUTHOR_SOCIAL_TELEGRAM_LINK => '<li class="module__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> <a class="module__metadata-link metadata-link" href="{METADATA_VALUE}" target="_blank">{METADATA_VALUE}</a></li>',
             default => '<li class="module__metadata-item metadata-item"><b>{METADATA_TITLE}:</b> {METADATA_VALUE}</li>',
           };
 

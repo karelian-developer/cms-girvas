@@ -266,11 +266,16 @@ final class Module implements ModuleInterface
       ModuleEnumMetadata::AUTHOR_SITE_LINK => 'authorSiteLink',
       ModuleEnumMetadata::AUTHOR_SOCIAL_VK_LINK => 'authorSocialVKLink',
       ModuleEnumMetadata::AUTHOR_SOCIAL_OK_LINK => 'authorSocialOKLink',
+      ModuleEnumMetadata::AUTHOR_SOCIAL_MAX_LINK => 'authorSocialMAXLink',
+      ModuleEnumMetadata::AUTHOR_SOCIAL_TELEGRAM_LINK => 'authorSocialTelegramLink',
       ModuleEnumMetadata::CATEGORY_NAME => 'categoryName',
       ModuleEnumMetadata::WEIGHT => 'size',
       ModuleEnumMetadata::DATETIME_CREATED_UNIX => 'datetimeCreatedUnix',
       ModuleEnumMetadata::DATETIME_UPDATED_UNIX => 'datetimeUpdatedUnix',
-      ModuleEnumMetadata::VERSION => 'version'
+      ModuleEnumMetadata::VERSION => 'version',
+      ModuleEnumMetadata::CMS_VERSION => 'CMSVersion',
+      ModuleEnumMetadata::CMS_MODULES_DEPENDENCY => 'CMSModulesDependency',
+      default => 'undefined'
     };
   }
   
