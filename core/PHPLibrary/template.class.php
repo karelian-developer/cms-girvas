@@ -582,6 +582,8 @@ final class Template implements ThemeInterface
       ThemeEnumMetadata::AUTHOR_SITE_LINK => 'authorSiteLink',
       ThemeEnumMetadata::AUTHOR_SOCIAL_VK_LINK => 'authorSocialVKLink',
       ThemeEnumMetadata::AUTHOR_SOCIAL_OK_LINK => 'authorSocialOKLink',
+      ThemeEnumMetadata::AUTHOR_SOCIAL_MAX_LINK => 'authorSocialMAXLink',
+      ThemeEnumMetadata::AUTHOR_SOCIAL_TELEGRAM_LINK => 'authorSocialTelegramLink',
       ThemeEnumMetadata::CATEGORY_NAME => 'categoryName',
       ThemeEnumMetadata::WEIGHT => 'size',
       ThemeEnumMetadata::DATETIME_CREATED_UNIX => 'datetimeCreatedUnix',
