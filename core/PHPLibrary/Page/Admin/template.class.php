@@ -417,7 +417,7 @@ class PageTemplate implements InterfacePage
               return date('d.m.Y', $themeMetadata[$metadataName]);
             }
 
-            if ($enumMetadata === ModuleEnumMetadata::CMS_MODULES_DEPENDENCY) {
+            if ($enumMetadata === ThemeEnumMetadata::CMS_MODULES_DEPENDENCY) {
               $installedModules = Modules::getInstalledModulesArray();
               $modulesDependencies = $this->getDependencies($installedModules, $moduleMetadata[$metadataName]);
 
