@@ -39,4 +39,5 @@ enum EnumMetadata
   case DATETIME_UPDATED_UNIX;
   case VERSION;
   case CMS_MINIMAL_VERSION;
+  case CMS_MODULES_DEPENDENCY;
 }
