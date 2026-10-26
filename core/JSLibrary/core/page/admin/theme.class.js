@@ -239,101 +239,99 @@ export class PageTheme {
         // иначе первый вызов колбэка ловит ReferenceError (TDZ).
         const themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
 
-        if (templateInstalledStatus === 'installed') {
-          buttons.saveProperties = new Interactive('button');
-          buttons.saveProperties.target.setLabel(localeData.BUTTON_SAVE_LABEL);
-          buttons.saveProperties.target.setCallback(() => {
-            if (themePropertiesContainerElement !== null && !buttons.saveProperties.target.isDisabled()) {
-              let formData = new FormData();
+        buttons.saveProperties = new Interactive('button');
+        buttons.saveProperties.target.setLabel(localeData.BUTTON_SAVE_LABEL);
+        buttons.saveProperties.target.setCallback(() => {
+          if (themePropertiesContainerElement !== null && !buttons.saveProperties.target.isDisabled()) {
+            let formData = new FormData();
 
-              formData.append('template_name', templateName);
-              formData.append('template_category', 'base');
+            formData.append('template_name', templateName);
+            formData.append('template_category', 'base');
 
-              // Активная локаль — из селектора языка (если он есть)
-              if (localeSelectElement !== null) {
-                formData.append('template_locale', localeSelectElement.value);
-              }
-
-              let propertiesValues = themePropertiesContainerElement.querySelectorAll('input');
-              propertiesValues.forEach((property) => {
-                if (property.hasAttribute('disabled')) {
-                  return;
-                }
-
-                let propertyName = property.name;
-                if (propertyName === '') {
-                  return;
-                }
-
-                let propertyValue = property.hasAttribute('data-file')
-                  ? property.getAttribute('data-file')
-                  : property.value;
-
-                formData.append(propertyName, propertyValue);
-              });
-
-              let request = new Interactive('request', {
-                method: 'PATCH',
-                url: '/handler/template?localeMessage=' + window.CMSCore.locales.admin.name
-              });
-
-              request.target.data = formData;
-
-              request.target.send();
+            // Активная локаль — из селектора языка (если он есть)
+            if (localeSelectElement !== null) {
+              formData.append('template_locale', localeSelectElement.value);
             }
-          });
 
-          let propertiesFilesValues = themePropertiesContainerElement.querySelectorAll('input[type="file"]');
-          propertiesFilesValues.forEach((property) => {
-            let buttonTrigger = new Interactive('button');
-            buttonTrigger.target.setLabel(localeData.BUTTON_DOWNLOAD_LABEL);
-            buttonTrigger.target.setCallback(() => {
-              property.click();
-            });
-
-            buttonTrigger.assembly();
-
-            property.after(buttonTrigger.target.element);
-
-            property.addEventListener('change', (event) => {
-              buttons.saveProperties.target.disable();
-
-              event.preventDefault();
-
-              property.setAttribute('disabled', 'disabled');
-
-              let file = event.target.files[0], fileReader = new FileReader();
-
-              if (!fileReader) {
-                console.error(`[CMSCore] ${localeData.REPORT_JS_CMSCORE_ERROR_FILEREADER_IS_NOT_SUPPORTED}.`);
+            let propertiesValues = themePropertiesContainerElement.querySelectorAll('input');
+            propertiesValues.forEach((property) => {
+              if (property.hasAttribute('disabled')) {
                 return;
               }
 
-              if (event.target.files.length === 0) {
-                console.error(`[CMSCore] ${localeData.REPORT_JS_CMSCORE_ERROR_IMAGES_WHERE_NOT_LOADED}.`);
+              let propertyName = property.name;
+              if (propertyName === '') {
                 return;
               }
 
-              fileReader.onload = (event) => {
-                buttons.saveProperties.target.enable();
-                property.removeAttribute('disabled');
-                property.setAttribute('data-file', fileReader.result);
-              };
+              let propertyValue = property.hasAttribute('data-file')
+                ? property.getAttribute('data-file')
+                : property.value;
 
-              fileReader.onerror = (event) => {
-                buttons.saveProperties.target.enable();
-                console.error(fileReader.result);
-              };
-
-              fileReader.readAsDataURL(file);
+              formData.append(propertyName, propertyValue);
             });
+
+            let request = new Interactive('request', {
+              method: 'PATCH',
+              url: '/handler/template?localeMessage=' + window.CMSCore.locales.admin.name
+            });
+
+            request.target.data = formData;
+
+            request.target.send();
+          }
+        });
+
+        let propertiesFilesValues = themePropertiesContainerElement.querySelectorAll('input[type="file"]');
+        propertiesFilesValues.forEach((property) => {
+          let buttonTrigger = new Interactive('button');
+          buttonTrigger.target.setLabel(localeData.BUTTON_DOWNLOAD_LABEL);
+          buttonTrigger.target.setCallback(() => {
+            property.click();
           });
 
-          buttons.saveProperties.assembly();
+          buttonTrigger.assembly();
 
-          buttons.saveProperties.target.element.style.display = templateInstalledStatus === 'installed' ? 'flex' : 'none';
-          themePropertiesContainerElement.after(buttons.saveProperties.target.element);
-        }
+          property.after(buttonTrigger.target.element);
+
+          property.addEventListener('change', (event) => {
+            buttons.saveProperties.target.disable();
+
+            event.preventDefault();
+
+            property.setAttribute('disabled', 'disabled');
+
+            let file = event.target.files[0], fileReader = new FileReader();
+
+            if (!fileReader) {
+              console.error(`[CMSCore] ${localeData.REPORT_JS_CMSCORE_ERROR_FILEREADER_IS_NOT_SUPPORTED}.`);
+              return;
+            }
+
+            if (event.target.files.length === 0) {
+              console.error(`[CMSCore] ${localeData.REPORT_JS_CMSCORE_ERROR_IMAGES_WHERE_NOT_LOADED}.`);
+              return;
+            }
+
+            fileReader.onload = (event) => {
+              buttons.saveProperties.target.enable();
+              property.removeAttribute('disabled');
+              property.setAttribute('data-file', fileReader.result);
+            };
+
+            fileReader.onerror = (event) => {
+              buttons.saveProperties.target.enable();
+              console.error(fileReader.result);
+            };
+
+            fileReader.readAsDataURL(file);
+          });
+        });
+
+        buttons.saveProperties.assembly();
+
+        buttons.saveProperties.target.element.style.display = templateInstalledStatus === 'installed' ? 'flex' : 'none';
+        themePropertiesContainerElement.after(buttons.saveProperties.target.element);
 
         buttons.delete.assembly();
         buttons.install.assembly();
