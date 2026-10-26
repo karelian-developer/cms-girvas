@@ -330,7 +330,7 @@ export class PageTheme {
 
         buttons.saveProperties.assembly();
 
-        buttons.saveProperties.target.element.style.display = templateInstalledStatus === 'installed' ? 'flex' : 'none';
+        buttons.saveProperties.target.element.style.display = 'flex';
         themePropertiesContainerElement.after(buttons.saveProperties.target.element);
 
         buttons.delete.assembly();
