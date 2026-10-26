@@ -52,6 +52,99 @@ export class PageTheme {
     galleryContainer.replaceChildren(gallery.target.element);
   }
 
+  /**
+   * Инициализация селектора языка для текстовых свойств шаблона
+   *
+   * @param {HTMLElement} containerElement Контейнер #E8548530785
+   * @param {HTMLTemplateElement} templateBlock Блок .template
+   *
+   * @returns {HTMLSelectElement|null} Скрытый select селектора (для чтения активной локали)
+   */
+  initLocaleSelector(containerElement, templateBlock) {
+    const interactiveLocaleChoices = new Interactive('choices');
+    const adminLocaleName = this.page.core.locales.admin.name;
+
+    this.page.core.locales.list.forEach((locale, localeIndex) => {
+      const icon = document.createElement('img');
+      icon.setAttribute('src', locale.iconURL);
+      icon.setAttribute('alt', locale.title);
+
+      const label = document.createElement('span');
+      label.innerText = locale.title;
+
+      const tpl = document.createElement('template');
+      tpl.innerHTML += icon.outerHTML;
+      tpl.innerHTML += label.outerHTML;
+
+      interactiveLocaleChoices.target.addItem(tpl.innerHTML, locale.name);
+
+      if (locale.name === adminLocaleName) {
+        interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
+      }
+    });
+
+    // Это управляющий элемент, а не поле формы — setName не вызываем.
+    interactiveLocaleChoices.assembly();
+    containerElement.append(interactiveLocaleChoices.target.element);
+
+    const localeSelectElement = interactiveLocaleChoices.target.element.querySelector('select');
+    if (localeSelectElement === null) {
+      return null;
+    }
+
+    localeSelectElement.addEventListener('change', async (event) => {
+      const activeLocale = event.target.value;
+      const themeName = templateBlock.getAttribute('data-template-name');
+
+      const url = '/handler/template/properties'
+        + '?templateName=' + encodeURIComponent(themeName)
+        + '&templateCategory=base'
+        + '&locale=' + encodeURIComponent(activeLocale)
+        + '&localeMessage=' + encodeURIComponent(this.page.core.locales.admin.name);
+
+      let response;
+      try {
+        response = await fetch(url, {method: 'GET', credentials: 'same-origin'});
+      } catch (error) {
+        console.error('[CMSCore] Locale properties request failed:', error);
+        return;
+      }
+
+      if (!response.ok) {
+        console.error('[CMSCore] Locale properties request returned HTTP', response.status);
+        return;
+      }
+
+      const data = await response.json();
+      if (data.statusCode !== 1) {
+        console.error('[CMSCore] Locale properties request returned statusCode', data.statusCode, data.message ?? '');
+        return;
+      }
+
+      const properties = data.outputData.properties ?? {};
+      const propertiesContainer = document.querySelector('#THEME_PROPERTIES');
+      if (propertiesContainer === null) return;
+
+      propertiesContainer.querySelectorAll('[data-property-name]').forEach((input) => {
+        const propertyName = input.getAttribute('data-property-name');
+        if (!Object.prototype.hasOwnProperty.call(properties, propertyName)) {
+          return;
+        }
+
+        // Для file-свойств подменять value нельзя — там путь к файлу,
+        // а сам файл выбирается через input[type="file"]. Пропускаем.
+        if (input.getAttribute('type') === 'file') {
+          return;
+        }
+
+        input.value = properties[propertyName];
+        input.removeAttribute('data-file');
+      });
+    });
+
+    return localeSelectElement;
+  }
+
   init() {
     let searchParams = new URLParser(), locales;
     let buttons = {install: null, download: null, delete: null, saveProperties: null};
@@ -64,60 +157,11 @@ export class PageTheme {
 
     this.page.core.locales.admin.getData().then((localeData) => {
       if (searchParams.getPathPart(2) !== null) {
-        const interactiveLocaleChoices = new Interactive('choices');
-        const adminLocaleName = this.page.core.locales.admin.name;
-
-        this.page.core.locales.list.forEach((locale, localeIndex) => {
-          const icon = document.createElement('img');
-          icon.setAttribute('src', locale.iconURL);
-          icon.setAttribute('alt', locale.title);
-
-          const label = document.createElement('span');
-          label.innerText = locale.title;
-
-          const tpl = document.createElement('template');
-          tpl.innerHTML += icon.outerHTML;
-          tpl.innerHTML += label.outerHTML;
-
-          interactiveLocaleChoices.target.addItem(tpl.innerHTML, locale.name);
-
-          if (locale.name === adminLocaleName) {
-            interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
-          }
-        });
-
-        interactiveLocaleChoices.assembly();
-        interactiveContainerElement.append(interactiveLocaleChoices.target.element);
-
-        const localeSelectElement = interactiveLocaleChoices.target.element.querySelector('select');
-        localeSelectElement.addEventListener('change', async (event) => {
-          const activeLocale = event.target.value;
-          const themeName = templateBlock.getAttribute('data-template-name');
-
-          const response = await fetch(
-            `/handler/template?name=${encodeURIComponent(themeName)}&locale=${encodeURIComponent(activeLocale)}`,
-            { method: 'GET', credentials: 'same-origin' }
-          );
-
-          if (!response.ok) return;
-          const data = await response.json();
-          if (data.statusCode !== 1) return;
-
-          const properties = data.outputData.properties ?? {};
-          const container = document.querySelector('#THEME_PROPERTIES');
-          if (!container) return;
-
-          container.querySelectorAll('input[data-property-name]').forEach((input) => {
-            const propName = input.getAttribute('data-property-name');
-            if (Object.prototype.hasOwnProperty.call(properties, propName)) {
-              input.value = properties[propName];
-              
-              if (input.hasAttribute('data-file')) {
-                input.removeAttribute('data-file');
-              }
-            }
-          });
-        });
+        // Селектор языка — только для установленного шаблона (есть что переключать)
+        let localeSelectElement = null;
+        if (templateInstalledStatus === 'installed') {
+          localeSelectElement = this.initLocaleSelector(interactiveContainerElement, templateBlock);
+        }
 
         let pageGalleryElement = templateBlock.querySelector('[class*="__gallery-container"]');
         if (pageGalleryElement !== null) {
@@ -213,14 +257,27 @@ export class PageTheme {
               formData.append('template_name', templateName);
               formData.append('template_category', 'base');
 
-              let propertiesValues = themePropertiesContainerElement.querySelectorAll('input, select');
-              propertiesValues.forEach((property) => {
-                if (!property.hasAttribute('disabled')) {
-                  let propertyName = property.name;
-                  let propertyValue = (!property.hasAttribute('data-file')) ? property.value : property.getAttribute('data-file');
+              // Активная локаль — из селектора языка (если он есть)
+              if (localeSelectElement !== null) {
+                formData.append('template_locale', localeSelectElement.value);
+              }
 
-                  formData.append(propertyName, propertyValue);
+              let propertiesValues = themePropertiesContainerElement.querySelectorAll('input');
+              propertiesValues.forEach((property) => {
+                if (property.hasAttribute('disabled')) {
+                  return;
                 }
+
+                let propertyName = property.name;
+                if (propertyName === '') {
+                  return;
+                }
+
+                let propertyValue = property.hasAttribute('data-file')
+                  ? property.getAttribute('data-file')
+                  : property.value;
+
+                formData.append(propertyName, propertyValue);
               });
 
               let request = new Interactive('request', {
