@@ -33,20 +33,20 @@ if ($CMSCore->client->isLogged(2)) {
       if ($theme->existsFileProperties()) {
         $propertiesData = $theme->getFilePropertiesData();
 
+        /** @var string Локаль, для которой сохраняются текстовые свойства */
+        $themeLocale = $_PATCH['template_locale'] ?? $CMSCore->locale->getName();
+
         foreach ($_PATCH as $name => $data) {
-          if (!preg_match('/^theme_property_(.+)$/', $name, $nameMatches)) {
+          if ($name === 'template_locale') {
             continue;
           }
 
-          $rawPropertyName = $nameMatches[1];
-          $localeName = null;
-
-          if (preg_match('/^(.+)__(.+)$/', $rawPropertyName, $parts)) {
-            $propertyName = strtoupper($parts[1]);
-            $localeName = $parts[2];
-          } else {
-            $propertyName = strtoupper($rawPropertyName);
+          if (!preg_match('/^theme_property_/', $name)) {
+            continue;
           }
+
+          $propertyName = strtr($name, ['theme_property_' => '']);
+          $propertyName = strtoupper($propertyName);
 
           if (!isset($propertiesData[$propertyName])) {
             continue;
@@ -54,59 +54,61 @@ if ($CMSCore->client->isLogged(2)) {
 
           $property = &$propertiesData[$propertyName];
 
+          // --- Файлы: только без локализации, как раньше ---
           if ($property['type'] === 'file') {
-            if ($localeName !== null) {
-              continue;
-            }
-
             if (!empty($data)) {
               preg_match('/data:(\w+)\/([\w.]+);base64,/', $data, $matches);
-              $fileExtension = $matches[2];
+              $fileExtension = $matches[2] ?? '';
 
               $enumFileFormat = match ($fileExtension) {
                 'jpeg' => FileFormat::JPG,
                 'png'  => FileFormat::PNG,
                 'webp' => FileFormat::WEBP,
-                'avif' => FileFormat::AVIF
+                'avif' => FileFormat::AVIF,
+                default => null
               };
 
-              $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
-              $fileConverter = new FileConverter($CMSCore);
-              $fileConverted = $fileConverter->convert(
-                $data,
-                $fileDirectoryPath,
-                $enumFileFormat,
-                true,
-                $name
-              );
+              if ($enumFileFormat !== null) {
+                $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
+                $fileConverter = new FileConverter($CMSCore);
+                $fileConverted = $fileConverter->convert(
+                  $data,
+                  $fileDirectoryPath,
+                  $enumFileFormat,
+                  true,
+                  $name
+                );
 
-              if (is_array($fileConverted)) {
-                $property['value'] = '/uploads/media/' . $fileConverted['fileName'];
+                if (is_array($fileConverted)) {
+                  $property['value'] = '/uploads/media/' . $fileConverted['fileName'];
+                }
               }
             }
+            unset($property);
             continue;
           }
 
+          // --- Цветовая схема: общая, без локализации ---
           if ($property['type'] === 'colorScheme') {
-            if ($localeName !== null) {
-              continue;
-            }
             $property['value'] = $data;
+            unset($property);
             continue;
           }
 
+          // --- Текстовые свойства: локализуем ---
           if ($property['type'] === 'text') {
-            if ($localeName !== null) {
-              if (!is_array($property['value'])) {
-                $property['value'] = [];
-              }
-              $property['value'][$localeName] = $data;
-            } else {
-              $property['value'] = $data;
+            // Миграция старого строкового value → объект по локалям
+            if (!is_array($property['value'])) {
+              $property['value'] = [];
             }
+
+            // Пустая строка сохраняется (возможность очистить перевод)
+            $property['value'][$themeLocale] = $data;
+
+            unset($property);
+            continue;
           }
         }
-        unset($property);
 
         $themeFilePropertiesPath = $theme->getFilePropertiesPath();
         $directoryPath = dirname($themeFilePropertiesPath);

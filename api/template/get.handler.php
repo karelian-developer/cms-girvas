@@ -77,6 +77,62 @@ if ($CMSCore->urlp->getPath(2) === 'assembly') {
 }
 
 /**
+ * Получение свойств шаблона для конкретной локали
+ */
+if ($CMSCore->urlp->getPath(2) === 'properties') {
+  if ($CMSCore->client->isLogged(2)) {
+    $clientUser = $CMSCore->client->getUser(2);
+    $clientUser->initData(['metadata']);
+    $clientUserGroup = $clientUser->getGroup();
+    $clientUserGroup->initData(['permissions']);
+
+    if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_ADMIN_TEMPLATES_MANAGEMENT)) {
+      $themeName = $CMSCore->urlp->getParam('templateName');
+      $themeCategory = $CMSCore->urlp->getParam('templateCategory') ?? 'base';
+      $themeLocale = $CMSCore->urlp->getParam('locale') ?? $CMSCore->locale->getName();
+
+      if ($themeName !== null) {
+        $theme = new Theme($CMSCore, $themeName, $themeCategory);
+
+        if ($theme->existsCoreFile() && $theme->existsFileProperties()) {
+          $propertiesData = $theme->getFilePropertiesData();
+          $propertiesResult = [];
+
+          foreach ($propertiesData as $propertyName => $property) {
+            if ($property['type'] === 'text') {
+              // text: объект → по локали; строка (старый формат) → как есть
+              $propertiesResult[$propertyName] = is_array($property['value'])
+                ? ($property['value'][$themeLocale] ?? '')
+                : $property['value'];
+            } else {
+              // file / colorScheme — общие, отдаём как есть
+              $propertiesResult[$propertyName] = $property['value'];
+            }
+          }
+
+          $handlerOutputData['properties'] = $propertiesResult;
+
+          $handlerMessage = $handlerMessage ?? $CMSCore->locale->getSingleValueByKey('API_GET_DATA_SUCCESS');
+          $handlerStatusCode = $handlerStatusCode ?? 1;
+        } else {
+          $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_NOT_FOUND');
+          $handlerStatusCode = $handlerStatusCode ?? 0;
+        }
+      } else {
+        $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_BAD_REQUEST');
+        $handlerStatusCode = $handlerStatusCode ?? 0;
+      }
+    } else {
+      $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_DONT_HAVE_PERMISSIONS');
+      $handlerStatusCode = $handlerStatusCode ?? 0;
+    }
+  } else {
+    $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_AUTHORIZATION');
+    $handlerStatusCode = $handlerStatusCode ?? 0;
+  }
+}
+
+/**
  * Получение данных о текущем шаблоне для конкретной категории
  */
 if ($CMSCore->urlp->getPath(2) === null && $CMSCore->urlp->getParam('categoryName') !== null) {

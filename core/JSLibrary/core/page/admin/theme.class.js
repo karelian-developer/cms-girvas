@@ -68,18 +68,18 @@ export class PageTheme {
         const adminLocaleName = this.page.core.locales.admin.name;
 
         this.page.core.locales.list.forEach((locale, localeIndex) => {
-          const localeIconImageElement = document.createElement('img');
-          localeIconImageElement.setAttribute('src', locale.iconURL);
-          localeIconImageElement.setAttribute('alt', locale.title);
+          const icon = document.createElement('img');
+          icon.setAttribute('src', locale.iconURL);
+          icon.setAttribute('alt', locale.title);
 
-          const localeLabelElement = document.createElement('span');
-          localeLabelElement.innerText = locale.title;
+          const label = document.createElement('span');
+          label.innerText = locale.title;
 
-          const localeTemplate = document.createElement('template');
-          localeTemplate.innerHTML += localeIconImageElement.outerHTML;
-          localeTemplate.innerHTML += localeLabelElement.outerHTML;
+          const tpl = document.createElement('template');
+          tpl.innerHTML += icon.outerHTML;
+          tpl.innerHTML += label.outerHTML;
 
-          interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, locale.name);
+          interactiveLocaleChoices.target.addItem(tpl.innerHTML, locale.name);
 
           if (locale.name === adminLocaleName) {
             interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
@@ -87,21 +87,36 @@ export class PageTheme {
         });
 
         interactiveLocaleChoices.assembly();
-
         interactiveContainerElement.append(interactiveLocaleChoices.target.element);
 
-        const interactiveLocaleSelectElement = interactiveLocaleChoices.target.element.querySelector('select');
-        interactiveLocaleSelectElement.addEventListener('change', (event) => {
+        const localeSelectElement = interactiveLocaleChoices.target.element.querySelector('select');
+        localeSelectElement.addEventListener('change', async (event) => {
           const activeLocale = event.target.value;
-          const themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
-          if (themePropertiesContainerElement === null) return;
+          const themeName = templateBlock.getAttribute('data-template-name');
 
-          themePropertiesContainerElement
-            .querySelectorAll('[data-property-locale]')
-            .forEach((input) => {
-              const inputLocale = input.getAttribute('data-property-locale');
-              input.style.display = (inputLocale === activeLocale) ? '' : 'none';
-            });
+          const response = await fetch(
+            `/handler/template?name=${encodeURIComponent(themeName)}&locale=${encodeURIComponent(activeLocale)}`,
+            { method: 'GET', credentials: 'same-origin' }
+          );
+
+          if (!response.ok) return;
+          const data = await response.json();
+          if (data.statusCode !== 1) return;
+
+          const properties = data.outputData.properties ?? {};
+          const container = document.querySelector('#THEME_PROPERTIES');
+          if (!container) return;
+
+          container.querySelectorAll('input[data-property-name]').forEach((input) => {
+            const propName = input.getAttribute('data-property-name');
+            if (Object.prototype.hasOwnProperty.call(properties, propName)) {
+              input.value = properties[propName];
+              
+              if (input.hasAttribute('data-file')) {
+                input.removeAttribute('data-file');
+              }
+            }
+          });
         });
 
         let pageGalleryElement = templateBlock.querySelector('[class*="__gallery-container"]');
