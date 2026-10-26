@@ -104,8 +104,8 @@ if ($CMSCore->urlp->getPath(2) === 'properties') {
               $propertiesResult[$propertyName] = is_array($property['value'])
                 ? ($property['value'][$themeLocale] ?? '')
                 : $property['value'];
-            } else {
-              // file / colorScheme — общие, отдаём как есть
+            } elseif (in_array($property['type'], ['file', 'colorScheme', 'link'], true)) {
+              // file / colorScheme / link — общие, отдаём как есть
               $propertiesResult[$propertyName] = $property['value'];
             }
           }

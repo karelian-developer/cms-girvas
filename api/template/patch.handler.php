@@ -54,7 +54,7 @@ if ($CMSCore->client->isLogged(2)) {
 
           $property = &$propertiesData[$propertyName];
 
-          // --- Файлы: только без локализации, как раньше ---
+          // --- file: только без локализации, как раньше ---
           if ($property['type'] === 'file') {
             if (!empty($data)) {
               preg_match('/data:(\w+)\/([\w.]+);base64,/', $data, $matches);
@@ -88,14 +88,14 @@ if ($CMSCore->client->isLogged(2)) {
             continue;
           }
 
-          // --- Цветовая схема: общая, без локализации ---
-          if ($property['type'] === 'colorScheme') {
+          // --- colorScheme / link: общие, без локализации ---
+          if ($property['type'] === 'colorScheme' || $property['type'] === 'link') {
             $property['value'] = $data;
             unset($property);
             continue;
           }
 
-          // --- Текстовые свойства: локализуем ---
+          // --- text: локализуем ---
           if ($property['type'] === 'text') {
             // Миграция старого строкового value → объект по локалям
             if (!is_array($property['value'])) {
@@ -104,7 +104,6 @@ if ($CMSCore->client->isLogged(2)) {
 
             // Пустая строка сохраняется (возможность очистить перевод)
             $property['value'][$themeLocale] = $data;
-
             unset($property);
             continue;
           }

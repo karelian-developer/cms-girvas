@@ -87,7 +87,7 @@
   },
   "LINK_DOCUMENT_LICENSE_AGREEMENT": {
     "value": "#",
-    "type": "text",
+    "type": "link",
     "locale": {
       "title": {
         "en_US": "Link to the license agreement document",
@@ -101,7 +101,7 @@
   },
   "LINK_DOCUMENT_TERMS_OF_USE": {
     "value": "#",
-    "type": "text",
+    "type": "link",
     "locale": {
       "title": {
         "en_US": "Link to the terms of use document",
@@ -115,7 +115,7 @@
   },
   "LINK_DOCUMENT_COOKIE_ABOUT": {
     "value": "#",
-    "type": "text",
+    "type": "link",
     "locale": {
       "title": {
         "en_US": "Link to the cookie about document",

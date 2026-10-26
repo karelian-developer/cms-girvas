@@ -308,6 +308,27 @@ class PageTemplate implements InterfacePage
                 $propertyContainerElement->appendChild($inputElement);
               }
 
+              if ($data['type'] === 'link') {
+                $propertyContainerElement->setAttribute('class', 'properties__item item item_text');
+
+                $inputLabel = isset($data['locale']['title'][$localeName])
+                  ? $data['locale']['title'][$localeName]
+                  : 'Property anonymouse';
+
+                $labelElement = $document->createElement('div', $inputLabel);
+                $labelElement->setAttribute('class', 'item__label label');
+
+                $inputName = 'theme_property_' . strtolower($name);
+                $inputElement = $document->createElement('input');
+                $inputElement->setAttribute('name', $inputName);
+                $inputElement->setAttribute('type', 'text');
+                $inputElement->setAttribute('class', 'item__input input input_text');
+                $inputElement->setAttribute('value', $data['value']);
+                
+                $propertyContainerElement->appendChild($labelElement);
+                $propertyContainerElement->appendChild($inputElement);
+              }
+
               if ($data['type'] === 'colorScheme') {
                 $propertyContainerElement->setAttribute('class', 'properties__item item item_text');
                 
