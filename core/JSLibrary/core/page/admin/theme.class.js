@@ -177,7 +177,7 @@ export class PageTheme {
     // Репозиторий: шаблон не загружен локально — нет properties.json,
     // нечего переключать и некуда сохранять.
     // Загруженный шаблон (установлен или нет) — свойства редактируемы.
-    const isRepositoryView = searchParams.getPathPart(2) === 'repository';
+    const isRepositoryView = window.location.pathname.startsWith('/admin/templates/repository/');
 
     this.page.core.locales.admin.getData().then((localeData) => {
       if (searchParams.getPathPart(2) !== null) {
