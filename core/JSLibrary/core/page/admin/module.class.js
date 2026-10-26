@@ -1,9 +1,9 @@
 /**
  * CMS «ГИРВАС»
- * 
+ *
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
- * 
+ *
  * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -23,44 +23,34 @@ export class PageModule {
     this.page = page;
   }
 
-  initGallery(galleryElement) {
-    let controllerElement = galleryElement.querySelector('[role="controller"]');
-    let slidesListElement = galleryElement.querySelector('ul');
-    if (controllerElement != null && slidesListElement != null) {
-      let slidesListItemsElements = slidesListElement.querySelectorAll('li');
-      let controllerButtonElements = controllerElement.querySelectorAll('button');
-      if (controllerButtonElements.length > 0) {
-        controllerButtonElements.forEach((element) => {
-          element.addEventListener('click', (event) => {
-            event.preventDefault();
-
-            let computedStyle = window.getComputedStyle(slidesListItemsElements[0]);
-            let computedStyleMarginLeft = Number(computedStyle.getPropertyValue('margin-left').replace(/px/, ''));
-            let computedStyleWidth = Number(computedStyle.getPropertyValue('width').replace(/px/, ''));
-
-            if (element.getAttribute('role') === 'controller-left') {
-              if (computedStyleMarginLeft < 0) {
-                computedStyleMarginLeft += computedStyleWidth;
-              } else {
-                computedStyleMarginLeft = (computedStyleWidth * (slidesListItemsElements.length - 1)) * -1;
-              }
-
-              slidesListItemsElements[0].style.marginLeft = `${computedStyleMarginLeft}px`;
-            }
-
-            if (element.getAttribute('role') === 'controller-right') {
-              if ((computedStyleMarginLeft * -1) >= computedStyleWidth * (slidesListItemsElements.length - 1)) {
-                computedStyleMarginLeft = 0;
-              } else {
-                computedStyleMarginLeft -= computedStyleWidth;
-              }
-
-              slidesListItemsElements[0].style.marginLeft = `${computedStyleMarginLeft}px`;
-            }
-          });
-        });
-      }
+  /**
+   * Инициализация галереи
+   */
+  initGallery(galleryContainer) {
+    // Защита от повторного вызова (например, при повторном init()).
+    if (galleryContainer.querySelector('.interactive_gallery') !== null) {
+      return;
     }
+
+    let imageElements = galleryContainer.querySelectorAll('ul > li > img');
+
+    if (imageElements.length === 0) {
+      imageElements = Array.from(galleryContainer.querySelectorAll('img'))
+        .filter((img) => !img.closest('[role="controller"], .gallery__controllers-list'));
+    }
+
+    const items = Array.from(imageElements).map((img) => ({
+      url: img.getAttribute('src') ?? '',
+      caption: img.getAttribute('alt') ?? ''
+    }));
+
+    if (items.length === 0) return;
+
+    const gallery = new Interactive('gallery');
+    items.forEach(({url, caption}) => gallery.target.addItem(url, caption));
+    gallery.assembly();
+
+    galleryContainer.replaceChildren(gallery.target.element);
   }
 
   init() {
@@ -84,15 +74,15 @@ export class PageModule {
         buttons.disable.target.setLabel(localeData.BUTTON_DISABLE_LABEL);
         buttons.install.target.setLabel(localeData.BUTTON_INSTALL_LABEL);
         buttons.delete.target.setLabel(localeData.BUTTON_DELETE_LABEL);
-        
+
         buttons.enable.target.setStyle('green');
         buttons.disable.target.setStyle('red');
         buttons.install.target.setStyle('default');
         buttons.delete.target.setStyle('red');
 
-        let pageGalleryElement = moduleBlock.querySelector('[role="gallery"]');
+        let pageGalleryElement = moduleBlock.querySelector('[class*="__gallery-container"]');
         if (pageGalleryElement !== null) {
-          this.initGallery(pageGalleryElement); 
+          this.initGallery(pageGalleryElement);
         }
 
         buttons.enable.target.setCallback(() => {
@@ -111,7 +101,7 @@ export class PageModule {
             if (data.statusCode === 1) {
               buttons.enable.target.element.style.display = 'none';
               buttons.disable.target.element.style.display = 'flex';
-    
+
               moduleBlock.setAttribute('data-enabled-status', 'enabled');
             }
           });
@@ -133,7 +123,7 @@ export class PageModule {
             if (data.statusCode === 1) {
               buttons.enable.target.element.style.display = 'flex';
               buttons.disable.target.element.style.display = 'none';
-    
+
               moduleBlock.setAttribute('data-enabled-status', 'disabled');
             }
           });
@@ -157,7 +147,7 @@ export class PageModule {
               buttons.delete.target.element.style.display = 'flex';
               buttons.enable.target.element.style.display = 'flex';
               buttons.disable.target.element.style.display = 'none';
-    
+
               moduleBlock.setAttribute('data-enabled-status', 'disabled');
               moduleBlock.setAttribute('data-installed-status', 'installed');
 
@@ -190,7 +180,7 @@ export class PageModule {
               buttons.delete.target.element.style.display = 'none';
               buttons.enable.target.element.style.display = 'none';
               buttons.disable.target.element.style.display = 'none';
-    
+
               moduleBlock.setAttribute('data-enabled-status', 'disabled');
               moduleBlock.setAttribute('data-installed-status', 'not-installed');
 
@@ -205,29 +195,29 @@ export class PageModule {
         buttons.disable.assembly();
         buttons.install.assembly();
         buttons.delete.assembly();
-    
+
         if (moduleEnabledStatus === 'enabled') {
           buttons.enable.target.element.style.display = 'none';
           buttons.disable.target.element.style.display = 'flex';
         }
-  
+
         if (moduleEnabledStatus === 'disabled') {
           buttons.enable.target.element.style.display = moduleInstalledStatus === 'installed'
             ? 'flex'
             : 'none';
           buttons.disable.target.element.style.display = 'none';
         }
-        
+
         if (moduleInstalledStatus === 'installed') {
           buttons.install.target.element.style.display = 'none';
           buttons.delete.target.element.style.display = 'flex';
         }
-        
+
         if (moduleInstalledStatus === 'not-installed') {
           buttons.install.target.element.style.display = 'flex';
           buttons.delete.target.element.style.display = 'none';
         }
-    
+
         interactiveContainerElement.append(buttons.enable.target.element);
         interactiveContainerElement.append(buttons.disable.target.element);
         interactiveContainerElement.append(buttons.install.target.element);

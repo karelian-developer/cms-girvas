@@ -259,8 +259,8 @@ class PageTemplate implements InterfacePage
 
         if (count($themeData['screenshots']) > 0) {
           foreach ($themeData['screenshots'] as $screenshotURL) {
-            $themeScreenshotsListItems[] = ThemeCollector::assembly('<li class="gallery__item"><img class="gallery__item-image item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
-              'TEMPLATE_SCREENSHOT_URL' => $screenshotURL
+            $themeScreenshotsListItems[] = ThemeCollector::assembly('<li class="gallery__item"><img class="gallery__item-image item-image" src="{THEME_SCREENSHOT_URL}"></li>', [
+              'THEME_SCREENSHOT_URL' => $screenshotURL
             ]);
           }
         }
@@ -268,7 +268,7 @@ class PageTemplate implements InterfacePage
         $isExistsFileMetadata = true;
       }
 
-      $themeVariables['TEMPLATE_PROPERTIES'] = $localeData['PAGE_THEME_CHANGING_PROPERTIES_FOR_INSTALLED_THEMES'];
+      $themeVariables['THEME_PROPERTIES'] = $localeData['PAGE_THEME_CHANGING_PROPERTIES_FOR_INSTALLED_THEMES'];
     } else {
       $isExistsFileMetadata = $theme->existsFileMetadataJSON();
       $isExistsFileProperties = $theme->existsFileProperties();
@@ -358,7 +358,7 @@ class PageTemplate implements InterfacePage
           $propertiesElements = $document->saveHTML();
         }
 
-        $themeVariables['TEMPLATE_PROPERTIES'] = isset($propertiesElements)
+        $themeVariables['THEME_PROPERTIES'] = isset($propertiesElements)
           ? $propertiesElements
           : 'Properties.json is not exists.';
       }
@@ -376,8 +376,8 @@ class PageTemplate implements InterfacePage
           $themeScreenshotsURL = $theme->getScreenshotsURL();
 
           foreach ($themeScreenshotsFiles as $file) {
-            $themeScreenshotsListItems[] = ThemeCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{TEMPLATE_SCREENSHOT_URL}"></li>', [
-              'TEMPLATE_SCREENSHOT_URL' => $themeScreenshotsURL . '/' . $file
+            $themeScreenshotsListItems[] = ThemeCollector::assembly('<li class="gallery__item item"><img class="gallery__item-image item-image" src="{THEME_SCREENSHOT_URL}"></li>', [
+              'THEME_SCREENSHOT_URL' => $themeScreenshotsURL . '/' . $file
             ]);
           }
         }
@@ -476,8 +476,8 @@ class PageTemplate implements InterfacePage
       }
 
       if (count($themeScreenshotsListItems) > 0) {
-        $themeGalleryList = ThemeCollector::assembly('<ul class="gallery__list list list-reset">{TEMPLATE_GALLARY_LIST_ITEMS}</ul>', [
-          'TEMPLATE_GALLARY_LIST_ITEMS' => implode($themeScreenshotsListItems)
+        $themeGalleryList = ThemeCollector::assembly('<ul class="gallery__list list list-reset">{THEME_GALLERY_LIST_ITEMS}</ul>', [
+          'THEME_GALLERY_LIST_ITEMS' => implode($themeScreenshotsListItems)
         ]);
       } else {
         $themeGalleryList = '';
@@ -492,13 +492,13 @@ class PageTemplate implements InterfacePage
       }
 
       $themeVariables['ADMIN_PANEL_PAGE_NAME'] = 'template';
-      $themeVariables['TEMPLATE_NAME'] = $themeName;
-      $themeVariables['TEMPLATE_TITLE'] = $themeTitle;
-      $themeVariables['TEMPLATE_DESCRIPTION'] = $themeDescription;
-      $themeVariables['TEMPLATE_GALLARY_LIST'] = $themeGalleryList;
-      $themeVariables['TEMPLATE_METADATA_LIST'] = $themeMetadataListTransformed;
-      $themeVariables['TEMPLATE_DOWNLOADED_STATUS'] = $theme->existsFileMetadataJSON() ? 'downloaded' : 'not-downloaded';
-      $themeVariables['TEMPLATE_INSTALLED_STATUS'] = $theme->getName() === $this->CMSCore->configurator->getDatabaseEntryValue('base_template') ? 'installed' : 'not-installed';
+      $themeVariables['THEME_NAME'] = $themeName;
+      $themeVariables['THEME_TITLE'] = $themeTitle;
+      $themeVariables['THEME_DESCRIPTION'] = $themeDescription;
+      $themeVariables['THEME_GALLERY_LIST'] = $themeGalleryList;
+      $themeVariables['THEME_METADATA_LIST'] = $themeMetadataListTransformed;
+      $themeVariables['THEME_DOWNLOADED_STATUS'] = $theme->existsFileMetadataJSON() ? 'downloaded' : 'not-downloaded';
+      $themeVariables['THEME_INSTALLED_STATUS'] = $theme->getName() === $this->CMSCore->configurator->getDatabaseEntryValue('base_template') ? 'installed' : 'not-installed';
 
       $this->assembled = ThemeCollector::assemblyFileContent(
         $this->CMSCore->theme,

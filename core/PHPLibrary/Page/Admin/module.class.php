@@ -384,8 +384,8 @@ class PageModule implements InterfacePage
       }
 
       if (count($moduleScreenshotsListItems) > 0) {
-        $moduleGalleryList = ThemeCollector::assembly('<ul class="gallery__list list list-reset">{MODULE_GALLARY_LIST_ITEMS}</ul>', [
-          'MODULE_GALLARY_LIST_ITEMS' => implode($moduleScreenshotsListItems)
+        $moduleGalleryList = ThemeCollector::assembly('<ul class="gallery__list list list-reset">{MODULE_GALLERY_LIST_ITEMS}</ul>', [
+          'MODULE_GALLERY_LIST_ITEMS' => implode($moduleScreenshotsListItems)
         ]);
       } else {
         $moduleGalleryList = '';
@@ -406,7 +406,7 @@ class PageModule implements InterfacePage
         'MODULE_NAME' => $moduleName,
         'MODULE_TITLE' => $moduleTitle,
         'MODULE_DESCRIPTION' => $moduleDescription,
-        'MODULE_GALLARY_LIST' => $moduleGalleryList,
+        'MODULE_GALLERY_LIST' => $moduleGalleryList,
         'MODULE_METADATA_LIST' => $metadataListTransformed,
         'MODULE_ENABLED_STATUS' => $module->isEnabled() ? 'enabled' : 'disabled',
         'MODULE_INSTALLED_STATUS' => $module->isInstalled() ? 'installed' : 'not-installed'

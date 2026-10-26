@@ -1,9 +1,9 @@
 /**
  * CMS «ГИРВАС»
- * 
+ *
  * Включена в Реестр российского программного обеспечения Минцифры РФ.
  * Реестровый номер: №25012 от 27.11.2024
- * 
+ *
  * @copyright Copyright (c) 2021 - 2027, ИП Шестаков А.Р., «Карельский разработчик».
  *             Все права защищены.
  * @license   https://gitflic.ru/project/garbalo/cms-girvas/LICENSE.md
@@ -23,44 +23,34 @@ export class PageTheme {
     this.page = page;
   }
 
-  initGallery(galleryElement) {
-    let controllerElement = galleryElement.querySelector('[role="controller"]');
-    let slidesListElement = galleryElement.querySelector('ul');
-    if (controllerElement != null && slidesListElement != null) {
-      let slidesListItemsElements = slidesListElement.querySelectorAll('li');
-      let controllerButtonElements = controllerElement.querySelectorAll('button');
-      if (controllerButtonElements.length > 0) {
-        controllerButtonElements.forEach((element) => {
-          element.addEventListener('click', (event) => {
-            event.preventDefault();
-
-            let computedStyle = window.getComputedStyle(slidesListItemsElements[0]);
-            let computedStyleMarginLeft = Number(computedStyle.getPropertyValue('margin-left').replace(/px/, ''));
-            let computedStyleWidth = Number(computedStyle.getPropertyValue('width').replace(/px/, ''));
-
-            if (element.getAttribute('role') === 'controller-left') {
-              if (computedStyleMarginLeft < 0) {
-                computedStyleMarginLeft += computedStyleWidth;
-              } else {
-                computedStyleMarginLeft = (computedStyleWidth * (slidesListItemsElements.length - 1)) * -1;
-              }
-
-              slidesListItemsElements[0].style.marginLeft = `${computedStyleMarginLeft}px`;
-            }
-
-            if (element.getAttribute('role') === 'controller-right') {
-              if ((computedStyleMarginLeft * -1) >= computedStyleWidth * (slidesListItemsElements.length - 1)) {
-                computedStyleMarginLeft = 0;
-              } else {
-                computedStyleMarginLeft -= computedStyleWidth;
-              }
-
-              slidesListItemsElements[0].style.marginLeft = `${computedStyleMarginLeft}px`;
-            }
-          });
-        });
-      }
+  /**
+   * Инициализация галереи
+   */
+  initGallery(galleryContainer) {
+    // Защита от повторного вызова (например, при повторном init()).
+    if (galleryContainer.querySelector('.interactive_gallery') !== null) {
+      return;
     }
+
+    let imageElements = galleryContainer.querySelectorAll('ul > li > img');
+
+    if (imageElements.length === 0) {
+      imageElements = Array.from(galleryContainer.querySelectorAll('img'))
+        .filter((img) => !img.closest('[role="controller"], .gallery__controllers-list'));
+    }
+
+    const items = Array.from(imageElements).map((img) => ({
+      url: img.getAttribute('src') ?? '',
+      caption: img.getAttribute('alt') ?? ''
+    }));
+
+    if (items.length === 0) return;
+
+    const gallery = new Interactive('gallery');
+    items.forEach(({url, caption}) => gallery.target.addItem(url, caption));
+    gallery.assembly();
+
+    galleryContainer.replaceChildren(gallery.target.element);
   }
 
   init() {
@@ -72,12 +62,12 @@ export class PageTheme {
     let templateDownloadedStatus = templateBlock.getAttribute('data-template-dowloaded-status');
     let templateInstalledStatus = templateBlock.getAttribute('data-template-installed-status');
     let interactiveContainerElement = document.querySelector('#E8548530785');
-    
+
     this.page.core.locales.admin.getData().then((localeData) => {
       if (searchParams.getPathPart(2) !== null) {
-        let pageGalleryElement = templateBlock.querySelector('[role="gallery"]');
-        if (pageGalleryElement != null) {
-          this.initGallery(pageGalleryElement); 
+        let pageGalleryElement = templateBlock.querySelector('[class*="__gallery-container"]');
+        if (pageGalleryElement !== null) {
+          this.initGallery(pageGalleryElement);
         }
 
         buttons.install = new Interactive('button');
@@ -155,6 +145,10 @@ export class PageTheme {
           });
         });
 
+        // Контейнер свойств объявляем ДО колбэка saveProperties,
+        // иначе первый вызов колбэка ловит ReferenceError (TDZ).
+        const themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
+
         if (templateInstalledStatus === 'installed') {
           buttons.saveProperties = new Interactive('button');
           buttons.saveProperties.target.setLabel(localeData.BUTTON_SAVE_LABEL);
@@ -186,7 +180,6 @@ export class PageTheme {
             }
           });
 
-          let themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
           let propertiesFilesValues = themePropertiesContainerElement.querySelectorAll('input[type="file"]');
           propertiesFilesValues.forEach((property) => {
             let buttonTrigger = new Interactive('button');
@@ -242,7 +235,7 @@ export class PageTheme {
         buttons.delete.assembly();
         buttons.install.assembly();
         buttons.download.assembly();
-    
+
         if (templateInstalledStatus === 'installed') {
           buttons.download.target.element.style.display = 'none';
           buttons.delete.target.element.style.display = 'none';
@@ -252,7 +245,7 @@ export class PageTheme {
           buttons.delete.target.element.style.display = templateDownloadedStatus === 'downloaded' ? 'flex' : 'none';
           buttons.install.target.element.style.display = templateDownloadedStatus === 'downloaded' ? 'flex' : 'none';
         }
-    
+
         interactiveContainerElement.append(buttons.download.target.element);
         interactiveContainerElement.append(buttons.install.target.element);
         interactiveContainerElement.append(buttons.delete.target.element);
