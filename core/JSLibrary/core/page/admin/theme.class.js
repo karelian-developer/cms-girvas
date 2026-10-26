@@ -118,9 +118,10 @@ export class PageTheme {
         const properties = data.outputData.properties ?? {};
         const propertiesContainer = document.querySelector('#THEME_PROPERTIES');
         if (propertiesContainer === null) return;
-
+        
         propertiesContainer.querySelectorAll('[data-property-name]').forEach((input) => {
           const propertyName = input.getAttribute('data-property-name');
+          console.log('[change]', propertyName, '->', properties[propertyName], '| input.value now =', input.value);
           if (!Object.prototype.hasOwnProperty.call(properties, propertyName)) {
             return;
           }
