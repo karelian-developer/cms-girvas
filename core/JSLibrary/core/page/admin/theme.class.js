@@ -158,10 +158,7 @@ export class PageTheme {
     this.page.core.locales.admin.getData().then((localeData) => {
       if (searchParams.getPathPart(2) !== null) {
         // Селектор языка — только для установленного шаблона (есть что переключать)
-        let localeSelectElement = null;
-        if (templateInstalledStatus === 'installed') {
-          localeSelectElement = this.initLocaleSelector(interactiveContainerElement, templateBlock);
-        }
+        const localeSelectElement = this.initLocaleSelector(interactiveContainerElement, templateBlock);
 
         let pageGalleryElement = templateBlock.querySelector('[class*="__gallery-container"]');
         if (pageGalleryElement !== null) {
