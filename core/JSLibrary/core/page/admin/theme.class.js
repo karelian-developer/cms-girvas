@@ -64,6 +64,46 @@ export class PageTheme {
 
     this.page.core.locales.admin.getData().then((localeData) => {
       if (searchParams.getPathPart(2) !== null) {
+        const interactiveLocaleChoices = new Interactive('choices');
+        const adminLocaleName = this.page.core.locales.admin.name;
+
+        this.page.core.locales.list.forEach((locale, localeIndex) => {
+          const localeIconImageElement = document.createElement('img');
+          localeIconImageElement.setAttribute('src', locale.iconURL);
+          localeIconImageElement.setAttribute('alt', locale.title);
+
+          const localeLabelElement = document.createElement('span');
+          localeLabelElement.innerText = locale.title;
+
+          const localeTemplate = document.createElement('template');
+          localeTemplate.innerHTML += localeIconImageElement.outerHTML;
+          localeTemplate.innerHTML += localeLabelElement.outerHTML;
+
+          interactiveLocaleChoices.target.addItem(localeTemplate.innerHTML, locale.name);
+
+          if (locale.name === adminLocaleName) {
+            interactiveLocaleChoices.target.setItemSelectedIndex(localeIndex);
+          }
+        });
+
+        interactiveLocaleChoices.assembly();
+
+        interactiveContainerElement.append(interactiveLocaleChoices.target.element);
+
+        const interactiveLocaleSelectElement = interactiveLocaleChoices.target.element.querySelector('select');
+        interactiveLocaleSelectElement.addEventListener('change', (event) => {
+          const activeLocale = event.target.value;
+          const themePropertiesContainerElement = document.querySelector('#THEME_PROPERTIES');
+          if (themePropertiesContainerElement === null) return;
+
+          themePropertiesContainerElement
+            .querySelectorAll('[data-property-locale]')
+            .forEach((input) => {
+              const inputLocale = input.getAttribute('data-property-locale');
+              input.style.display = (inputLocale === activeLocale) ? '' : 'none';
+            });
+        });
+
         let pageGalleryElement = templateBlock.querySelector('[class*="__gallery-container"]');
         if (pageGalleryElement !== null) {
           this.initGallery(pageGalleryElement);

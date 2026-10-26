@@ -34,41 +34,79 @@ if ($CMSCore->client->isLogged(2)) {
         $propertiesData = $theme->getFilePropertiesData();
 
         foreach ($_PATCH as $name => $data) {
-          $propertyName = strtr($name, ['theme_property_' => '']);
-          $propertyName = strtoupper($propertyName);
+          if (!preg_match('/^theme_property_(.+)$/', $name, $nameMatches)) {
+            continue;
+          }
 
-          if (preg_match('/^theme_property_/', $name) && isset($propertiesData[$propertyName])) {
+          $rawPropertyName = $nameMatches[1];
+          $localeName = null;
+
+          if (preg_match('/^(.+)__(.+)$/', $rawPropertyName, $parts)) {
+            $propertyName = strtoupper($parts[1]);
+            $localeName = $parts[2];
+          } else {
+            $propertyName = strtoupper($rawPropertyName);
+          }
+
+          if (!isset($propertiesData[$propertyName])) {
+            continue;
+          }
+
+          $property = &$propertiesData[$propertyName];
+
+          if ($property['type'] === 'file') {
+            if ($localeName !== null) {
+              continue;
+            }
+
             if (!empty($data)) {
-              if ($propertiesData[$propertyName]['type'] === 'file') {
-                preg_match('/data:(\w+)\/([\w.]+);base64,/', $data, $matches);
-                $fileExtension = $matches[2];
+              preg_match('/data:(\w+)\/([\w.]+);base64,/', $data, $matches);
+              $fileExtension = $matches[2];
 
-                $enumFileFormat = match ($fileExtension) {
-                  'jpeg' => FileFormat::JPG,
-                  'png' => FileFormat::PNG,
-                  'webp' => FileFormat::WEBP,
-                  'avif' => FileFormat::AVIF
-                };
+              $enumFileFormat = match ($fileExtension) {
+                'jpeg' => FileFormat::JPG,
+                'png'  => FileFormat::PNG,
+                'webp' => FileFormat::WEBP,
+                'avif' => FileFormat::AVIF
+              };
 
-                $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
-                $fileConverter = new FileConverter($CMSCore);
-                $fileConverted = $fileConverter->convert(
-                  $data,
-                  $fileDirectoryPath,
-                  $enumFileFormat,
-                  true,
-                  $name
-                );
-                
-                if (is_array($fileConverted)) {
-                  $propertiesData[$propertyName]['value'] = '/uploads/media/' . $fileConverted['fileName'];
-                }
-              } else {
-                $propertiesData[$propertyName]['value'] = $data;
+              $fileDirectoryPath = CMS_ROOT_DIRECTORY . '/uploads/media';
+              $fileConverter = new FileConverter($CMSCore);
+              $fileConverted = $fileConverter->convert(
+                $data,
+                $fileDirectoryPath,
+                $enumFileFormat,
+                true,
+                $name
+              );
+
+              if (is_array($fileConverted)) {
+                $property['value'] = '/uploads/media/' . $fileConverted['fileName'];
               }
+            }
+            continue;
+          }
+
+          if ($property['type'] === 'colorScheme') {
+            if ($localeName !== null) {
+              continue;
+            }
+            $property['value'] = $data;
+            continue;
+          }
+
+          if ($property['type'] === 'text') {
+            if ($localeName !== null) {
+              if (!is_array($property['value'])) {
+                $property['value'] = [];
+              }
+              $property['value'][$localeName] = $data;
+            } else {
+              $property['value'] = $data;
             }
           }
         }
+        unset($property);
 
         $themeFilePropertiesPath = $theme->getFilePropertiesPath();
         $directoryPath = dirname($themeFilePropertiesPath);

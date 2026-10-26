@@ -286,23 +286,45 @@ class PageTemplate implements InterfacePage
 
               if ($data['type'] === 'text') {
                 $propertyContainerElement->setAttribute('class', 'properties__item item item_text');
-                
+                $propertyContainerElement->setAttribute('data-property-item', $name);
+
                 $inputLabel = isset($data['locale']['title'][$localeName])
                   ? $data['locale']['title'][$localeName]
                   : 'Property anonymouse';
 
                 $labelElement = $document->createElement('div', $inputLabel);
                 $labelElement->setAttribute('class', 'item__label label');
-
-                $inputName = 'theme_property_' . strtolower($name);
-                $inputElement = $document->createElement('input');
-                $inputElement->setAttribute('name', $inputName);
-                $inputElement->setAttribute('type', 'text');
-                $inputElement->setAttribute('class', 'item__input input input_text');
-                $inputElement->setAttribute('value', $data['value']);
-
                 $propertyContainerElement->appendChild($labelElement);
-                $propertyContainerElement->appendChild($inputElement);
+
+                $valueByLocale = is_array($data['value'])
+                  ? $data['value']
+                  : [];
+
+                $cmsLocales = $this->CMSCore->locale->getList();
+
+                foreach ($cmsLocales as $cmsLocale) {
+                  $cmsLocaleName = $cmsLocale->getName();
+                  $cmsLocaleISO  = $cmsLocale->getISO639_2();
+
+                  $inputElement = $document->createElement('input');
+                  $inputElement->setAttribute('name', 'theme_property_' . $name . '__' . $cmsLocaleName);
+                  $inputElement->setAttribute('type', 'text');
+                  $inputElement->setAttribute('class', 'item__input input input_text');
+                  $inputElement->setAttribute(
+                    'value',
+                    is_array($data['value'])
+                      ? ($valueByLocale[$cmsLocaleName] ?? '')
+                      : $data['value']
+                  );
+                  $inputElement->setAttribute('data-property-locale', $cmsLocaleName);
+                  $inputElement->setAttribute('data-property-name', $name);
+
+                  if ($cmsLocaleName !== $localeName) {
+                    $inputElement->setAttribute('style', 'display: none;');
+                  }
+
+                  $propertyContainerElement->appendChild($inputElement);
+                }
               }
 
               if ($data['type'] === 'colorScheme') {
