@@ -27,8 +27,7 @@ export class PageTheme {
    * Инициализация галереи
    */
   initGallery(galleryContainer) {
-    // Защита от повторного вызова (например, при повторном init()).
-    if (galleryContainer.querySelector('.interactive_gallery') !== null) {
+    if (element.closest('.gallery')) {
       return;
     }
 
