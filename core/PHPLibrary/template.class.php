@@ -1202,6 +1202,20 @@ final class Template implements ThemeInterface
         }
       }
 
+      $propertiesData = $this->getFilePropertiesData();
+      $localeName = $this->CMSCore->locale->getName();
+
+      foreach ($propertiesData as $name => &$property) {
+        if (isset($property['value']) && is_array($property['value'])) {
+          $property['value'] = $property['value'][$localeName]
+            ?? $property['value'][array_key_first($property['value'])]
+            ?? '';
+        }
+      }
+      unset($property);
+
+      $this->core->assembled = ThemeCollector::assemblyPropertiesValues($this->core->assembled, $propertiesData);
+
       // Внедрение значений свойств темы
       $this->core->assembled = ThemeCollector::assemblyPropertiesValues($this->core->assembled, $this->getFilePropertiesData());
 
