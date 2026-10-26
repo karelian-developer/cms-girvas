@@ -14,7 +14,10 @@
     }
   },
   "SITE_SLOGAN": {
-    "value": "{LANG:DEFAULT_SLOGAN}",
+    "value": {
+      "en_US": "{LANG:DEFAULT_SLOGAN}",
+      "ru_RU": "{LANG:DEFAULT_SLOGAN}"
+    },
     "type": "text",
     "locale": {
       "title": {
@@ -43,7 +46,10 @@
     }
   },
   "IMAGE_HEADER_LOGOTYPE_ALT": {
-    "value": "{CMS_TITLE}",
+    "value": {
+      "en_US": "{CMS_TITLE}",
+      "ru_RU": "{CMS_TITLE}"
+    },
     "type": "text",
     "locale": {
       "title": {
@@ -72,7 +78,10 @@
     }
   },
   "IMAGE_FOOTER_LOGOTYPE_ALT": {
-    "value": "{CMS_TITLE}",
+    "value": {
+      "en_US": "{CMS_TITLE}",
+      "ru_RU": "{CMS_TITLE}"
+    },
     "type": "text",
     "locale": {
       "title": {
