@@ -92,53 +92,47 @@ export class PageTheme {
       return null;
     }
 
-    localeSelectElement.addEventListener('change', async (event) => {
+    localeSelectElement.addEventListener('change', (event) => {
       const activeLocale = event.target.value;
       const themeName = templateBlock.getAttribute('data-template-name');
 
-      const url = '/handler/template/properties'
+      const requestURL = '/handler/template/properties'
         + '?templateName=' + encodeURIComponent(themeName)
         + '&templateCategory=base'
         + '&locale=' + encodeURIComponent(activeLocale)
-        + '&localeMessage=' + encodeURIComponent(this.page.core.locales.admin.name);
+        + '&localeMessage=' + encodeURIComponent(adminLocaleName);
 
-      let response;
-      try {
-        response = await fetch(url, {method: 'GET', credentials: 'same-origin'});
-      } catch (error) {
-        console.error('[CMSCore] Locale properties request failed:', error);
-        return;
-      }
+      let request = new Interactive('request', {
+        method: 'GET',
+        url: requestURL
+      });
 
-      if (!response.ok) {
-        console.error('[CMSCore] Locale properties request returned HTTP', response.status);
-        return;
-      }
+      request.target.showingNotification = false;
 
-      const data = await response.json();
-      if (data.statusCode !== 1) {
-        console.error('[CMSCore] Locale properties request returned statusCode', data.statusCode, data.message ?? '');
-        return;
-      }
-
-      const properties = data.outputData.properties ?? {};
-      const propertiesContainer = document.querySelector('#THEME_PROPERTIES');
-      if (propertiesContainer === null) return;
-
-      propertiesContainer.querySelectorAll('[data-property-name]').forEach((input) => {
-        const propertyName = input.getAttribute('data-property-name');
-        if (!Object.prototype.hasOwnProperty.call(properties, propertyName)) {
+      request.target.send().then((data) => {
+        if (data.statusCode !== 1) {
+          console.error('[CMSCore] Locale properties request returned statusCode', data.statusCode, data.message ?? '');
           return;
         }
 
-        // Для file-свойств подменять value нельзя — там путь к файлу,
-        // а сам файл выбирается через input[type="file"]. Пропускаем.
-        if (input.getAttribute('type') === 'file') {
-          return;
-        }
+        const properties = data.outputData.properties ?? {};
+        const propertiesContainer = document.querySelector('#THEME_PROPERTIES');
+        if (propertiesContainer === null) return;
 
-        input.value = properties[propertyName];
-        input.removeAttribute('data-file');
+        propertiesContainer.querySelectorAll('[data-property-name]').forEach((input) => {
+          const propertyName = input.getAttribute('data-property-name');
+          if (!Object.prototype.hasOwnProperty.call(properties, propertyName)) {
+            return;
+          }
+
+          // file-свойства не локализуются — путь к файлу не подменяем
+          if (input.getAttribute('type') === 'file') {
+            return;
+          }
+
+          input.value = properties[propertyName];
+          input.removeAttribute('data-file');
+        });
       });
     });
 
