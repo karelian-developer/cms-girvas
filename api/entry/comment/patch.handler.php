@@ -153,15 +153,38 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
       }
 
       if (isset($_PATCH['comment_is_hidden']) || isset($_PATCH['comment_hidden_reason'])) {
-        $commentIsHidden = $_PATCH['comment_is_hidden'];
-        $commentHiddenReason = $_PATCH['comment_hidden_reason'] ?? '';
-        $commentHiddenReason = htmlspecialchars(strip_tags($commentHiddenReason));
-
         if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT)) {
-          $commentData['metadata']['isHidden'] = $commentIsHidden === 'on' ? true : false;
-          $commentData['metadata']['hiddenReason'] = $commentHiddenReason;
-          if ($oldValues['isHidden'] != $commentData['metadata']['isHidden']) $changedFields[] = 'is_hidden';
-          if ($oldValues['hiddenReason'] !== $commentHiddenReason) $changedFields[] = 'hidden_reason';
+          if (isset($_PATCH['comment_is_hidden'])) {
+            $commentIsHidden = $_PATCH['comment_is_hidden'];
+            
+            if (is_array($commentIsHidden)) {
+              $commentIsHidden = $commentIsHidden ? reset($commentIsHidden) : '';
+            }
+            $commentData['metadata']['isHidden'] = in_array(
+              $commentIsHidden,
+              ['on', '1', 1, true, 'true'],
+              true
+            );
+            if ($oldValues['isHidden'] != $commentData['metadata']['isHidden']) {
+              $changedFields[] = 'is_hidden';
+            }
+          }
+
+          if (isset($_PATCH['comment_hidden_reason'])) {
+            $commentHiddenReason = $_PATCH['comment_hidden_reason'];
+            if (is_array($commentHiddenReason)) {
+              $commentHiddenReason = $commentHiddenReason ? (string) reset($commentHiddenReason) : '';
+            }
+            
+            $commentHiddenReason = (string) $commentHiddenReason;
+            $commentHiddenReason = htmlspecialchars(strip_tags($commentHiddenReason));
+
+            $commentData['metadata']['hiddenReason'] = $commentHiddenReason;
+            if ($oldValues['hiddenReason'] !== $commentHiddenReason) {
+              $changedFields[] = 'hidden_reason';
+            }
+          }
+
           $commentPatchingIsAllowed = true;
         }
       }
