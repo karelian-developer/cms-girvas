@@ -639,6 +639,10 @@ class EntryComment implements EntityTypeContent
             $delta
           );
         } elseif ($name === 'isHidden') {
+          if (is_array($value)) {
+            $value = $value ? reset($value) : false;
+          }
+          
           $metadataPairs['isHidden'] = $value ? 'TRUE' : 'FALSE';
         } elseif ($name === 'hiddenReason') {
           $metadataPairs['hiddenReason'] = sprintf("'%s'", addslashes((string) $value));
