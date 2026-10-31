@@ -642,7 +642,7 @@ class EntryComment implements EntityTypeContent
           if (is_array($value)) {
             $value = $value ? reset($value) : false;
           }
-          
+
           $metadataPairs['isHidden'] = $value ? 'TRUE' : 'FALSE';
         } elseif ($name === 'hiddenReason') {
           $metadataPairs['hiddenReason'] = sprintf("'%s'", addslashes((string) $value));
@@ -652,6 +652,8 @@ class EntryComment implements EntityTypeContent
       }
 
       if (!empty($metadataPairs)) {
+        error_log('METADATA PAIRS: ' . print_r($metadataPairs, true));
+
         $metadataPatch = $dialect->jsonBuildObject($metadataPairs);
         $queryBuilder->statement->clauseSet->addColumn(
           'metadata',

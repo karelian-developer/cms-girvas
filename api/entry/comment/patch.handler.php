@@ -152,6 +152,8 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
         }
       }
 
+      error_log('PATCH RAW: ' . print_r($_PATCH, true));
+
       if (isset($_PATCH['comment_is_hidden']) || isset($_PATCH['comment_hidden_reason'])) {
         if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT)) {
           if (isset($_PATCH['comment_is_hidden'])) {
@@ -175,7 +177,7 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
             if (is_array($commentHiddenReason)) {
               $commentHiddenReason = $commentHiddenReason ? (string) reset($commentHiddenReason) : '';
             }
-            
+
             $commentHiddenReason = (string) $commentHiddenReason;
             $commentHiddenReason = htmlspecialchars(strip_tags($commentHiddenReason));
 
