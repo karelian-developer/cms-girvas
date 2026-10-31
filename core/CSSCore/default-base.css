@@ -47,7 +47,7 @@ pre > code::before {
   background-color: var(--primary-color-3);
   text-transform: uppercase;
   color: var(--primary-color-2);
-  content: 'code';
+  content: attr(data-lang);
   padding: 5px 10px;
   margin-bottom: 10px;
 }
