@@ -44,6 +44,7 @@ final class Collector
   private const TEMPLATE_LOGIC_IF_ELSE_PATTERN = '/\{\?IF:([!]?)([A-Z0-9_]+)(?::([=<>!]+)([A-Za-z0-9_\-\x{0400}-\x{04FF}]+))?\?\}(.*?)\{\?ELSE\?\}(.*?)\{\?ENDIF\?\}/isu';
   private const TEMPLATE_LOGIC_IFNOT_PATTERN = '/\{\?IFNOT:([A-Z0-9_]+)\?\}(.*?)\{\?ENDIF\?\}/isu';
   private const TEMPLATE_LOGIC_IFNOT_ELSE_PATTERN = '/\{\?IFNOT:([A-Z0-9_]+)\?\}(.*?)\{\?ELSE\?\}(.*?)\{\?ENDIF\?\}/isu';
+  private const TEMPLATE_TAG_TPL_INCLUDE_PATTERN = '/\{TPL\:([a-zA-Z0-9_\-\/\.]+)\}/';
   private Theme $theme;
   
   /**
@@ -423,28 +424,104 @@ final class Collector
    * 
    * @return string
    */
-    public static function assemblyFileContent(Theme $theme, string $filePath, array $themeVariables) : string
-    {
-      /** @var string $filePath Полный путь до шаблона */
-      $filePath = $theme->getPath() . '/' . $filePath;
+  public static function assemblyFileContent(Theme $theme, string $filePath, array $themeVariables) : string
+  {
+    /** @var string $filePath Полный путь до шаблона */
+    $filePath = $theme->getPath() . '/' . $filePath;
 
-      if (file_exists($filePath)) {
-        $fileContent = file_get_contents($filePath);
-        $fileContent = self::assemblyLogic($theme->CMSCore, $fileContent);
+    if (file_exists($filePath)) {
+      $fileContent = file_get_contents($filePath);
+      $fileContent = self::assemblyLogic($theme->CMSCore, $fileContent);
 
-        return self::assembly($fileContent, $themeVariables);
-      }
-
-      $document = new DOMDocument();
-      $containerElement = $document->createElement('div');
-      $containerElement->setAttribute('style', 'background-color: pink; border: 1px solid red; color: red; padding: 10px 20px; font-size: 14px;');
-
-      $spanElement = $document->createElement('span', 'Template is not exists: ' . $filePath);
-      $containerElement->appendChild($spanElement);
-      $document->appendChild($containerElement);
-
-      return $document->saveHTML();
+      return self::assembly($fileContent, $themeVariables);
     }
+
+    $document = new DOMDocument();
+    $containerElement = $document->createElement('div');
+    $containerElement->setAttribute('style', 'background-color: pink; border: 1px solid red; color: red; padding: 10px 20px; font-size: 14px;');
+
+    $spanElement = $document->createElement('span', 'Template is not exists: ' . $filePath);
+    $containerElement->appendChild($spanElement);
+    $document->appendChild($containerElement);
+
+    return $document->saveHTML();
+  }
+
+  /**
+   * Сборка шаблона на основе встроенных TPL-файлов
+   *
+   * Поддерживаемый синтаксис:
+   *   {TPL:templates/partials/header.tpl}
+   *
+   * Путь указывается относительно корневой директории шаблона.
+   *
+   * @param Theme $theme
+   * @param string $themeString
+   * @param array $variables
+   * @param array $visited
+   * @param int $depth
+   *
+   * @return string
+   */
+  public static function assemblyTemplatesIncludes(
+    Theme $theme,
+    string $themeString,
+    array $variables = [],
+    array $visited = [],
+    int $depth = 0
+  ) : string {
+    if ($themeString === '') {
+      return '';
+    }
+
+    if ($depth > 10) {
+      return $themeString;
+    }
+
+    return preg_replace_callback(
+      self::TEMPLATE_TAG_TPL_INCLUDE_PATTERN,
+      function ($m) use ($theme, $variables, $visited, $depth) {
+        $relativePath = $m[1];
+
+        $normalizedPath = str_replace(['\\', '..'], ['/', ''], $relativePath);
+        $normalizedPath = ltrim($normalizedPath, '/');
+
+        $fullPath = $theme->getPath() . '/' . $normalizedPath;
+
+        if (in_array($fullPath, $visited, true)) {
+          return '';
+        }
+
+        if (!file_exists($fullPath)) {
+          $document = new DOMDocument();
+          $containerElement = $document->createElement('div');
+          $containerElement->setAttribute(
+            'style',
+            'background-color: pink; border: 1px solid red; color: red; padding: 10px 20px; font-size: 14px;'
+          );
+          $containerElement->appendChild(
+            $document->createElement('span', 'Template include is not exists: ' . $normalizedPath)
+          );
+          $document->appendChild($containerElement);
+          return $document->saveHTML();
+        }
+
+        $fileContent = file_get_contents($fullPath);
+        $fileContent = self::assemblyLogic($theme->CMSCore, $fileContent);
+        $fileContent = self::assembly($fileContent, $variables);
+        $fileContent = self::assemblyTemplatesIncludes(
+          $theme,
+          $fileContent,
+          $variables,
+          array_merge($visited, [$fullPath]),
+          $depth + 1
+        );
+
+        return $fileContent;
+      },
+      $themeString
+    );
+  }
 
   /**
    * Получить содержимое файла шаблона

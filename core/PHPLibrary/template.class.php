@@ -1214,6 +1214,13 @@ final class Template implements ThemeInterface
       }
       unset($property);
 
+      // Внедрение TPL-шаблонов
+      $this->core->assembled = ThemeCollector::assemblyTemplatesIncludes(
+        $this,
+        $this->core->assembled,
+        $themeVariablesArray
+      );
+
       $this->core->assembled = ThemeCollector::assemblyPropertiesValues($this->core->assembled, $propertiesData);
 
       // Внедрение значений свойств темы
