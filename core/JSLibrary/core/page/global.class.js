@@ -507,37 +507,28 @@ export class PageGlobal {
    * Добавление кнопки копирования к <code> элементу (инлайн)
    */
   addCopyButtonToCode(codeElement) {
-    // Пропускаем, если кнопка уже добавлена
     if (codeElement.querySelector('.code-copy-button')) {
       return;
     }
 
-    // Создаем обертку
     const wrapper = document.createElement('span');
     wrapper.classList.add('inline-code-wrapper');
+    // wrapper должен быть inline-flex, чтобы кнопка шла сразу за кодом
     codeElement.parentNode.insertBefore(wrapper, codeElement);
     wrapper.appendChild(codeElement);
 
-    // Создаем кнопку копирования
     const copyButton = this.createCopyButton(true);
-    
-    // Добавляем кнопку в обертку
     wrapper.appendChild(copyButton);
 
-    // Обработчик клика
     copyButton.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
-      
-      const codeText = codeElement.textContent;
-      this.copyTextToClipboard(codeText, copyButton);
+      this.copyTextToClipboard(codeElement.textContent, copyButton);
     });
 
-    // Показываем кнопку при наведении
     wrapper.addEventListener('mouseenter', () => {
       copyButton.classList.add('code-copy-button_visible');
     });
-
     wrapper.addEventListener('mouseleave', () => {
       copyButton.classList.remove('code-copy-button_visible');
     });
