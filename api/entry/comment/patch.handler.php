@@ -37,16 +37,16 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
       $comment = new EntryComment($CMSCore, $commentID);
       $comment->initData(['metadata', 'authorID', 'content', 'entryID']);
       
-      // Сохраняем старые значения для сравнения
       $oldValues = [
         'content' => $comment->getContent(),
         'isHidden' => $comment->isHidden(),
+        'hiddenReason' => $comment->getHiddenReason(),
         'rating' => $comment->getRating(),
       ];
       
-      // Получаем данные для логирования
       $entryID = $comment->getEntryID();
       $entryTitle = '';
+
       if ($entryID > 0) {
         try {
           $entry = new Entry($CMSCore, $entryID);
@@ -152,20 +152,15 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
         }
       }
 
-      error_log('PATCH RAW: ' . print_r($_PATCH, true));
-
       if (isset($_PATCH['comment_is_hidden']) || isset($_PATCH['comment_hidden_reason'])) {
         if ($clientUserGroup->permissionCheck($clientUserGroup::PERMISSION_MODER_ENTRIES_COMMENTS_MANAGEMENT)) {
           if (isset($_PATCH['comment_is_hidden'])) {
             $commentIsHidden = $_PATCH['comment_is_hidden'];
-            
-            if (is_array($commentIsHidden)) {
+            while (is_array($commentIsHidden)) {
               $commentIsHidden = $commentIsHidden ? reset($commentIsHidden) : '';
             }
             $commentData['metadata']['isHidden'] = in_array(
-              $commentIsHidden,
-              ['on', '1', 1, true, 'true'],
-              true
+              $commentIsHidden, ['on', '1', 1, true, 'true'], true
             );
             if ($oldValues['isHidden'] != $commentData['metadata']['isHidden']) {
               $changedFields[] = 'is_hidden';
@@ -174,13 +169,10 @@ if ($CMSCore->client->isLogged(1) || $CMSCore->client->isLogged(2)) {
 
           if (isset($_PATCH['comment_hidden_reason'])) {
             $commentHiddenReason = $_PATCH['comment_hidden_reason'];
-            if (is_array($commentHiddenReason)) {
-              $commentHiddenReason = $commentHiddenReason ? (string) reset($commentHiddenReason) : '';
+            while (is_array($commentHiddenReason)) {
+              $commentHiddenReason = $commentHiddenReason ? reset($commentHiddenReason) : '';
             }
-
-            $commentHiddenReason = (string) $commentHiddenReason;
-            $commentHiddenReason = htmlspecialchars(strip_tags($commentHiddenReason));
-
+            $commentHiddenReason = htmlspecialchars(strip_tags((string) $commentHiddenReason));
             $commentData['metadata']['hiddenReason'] = $commentHiddenReason;
             if ($oldValues['hiddenReason'] !== $commentHiddenReason) {
               $changedFields[] = 'hidden_reason';

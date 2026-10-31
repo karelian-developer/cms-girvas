@@ -143,12 +143,17 @@ class EntryComment implements EntityTypeContent
   {
     if (property_exists($this, 'metadata')) {
       $metadata = json_decode($this->metadata, true);
-
+      
       if (isset($metadata['isHidden'])) {
-        return (bool) $metadata['isHidden'];
+        $value = $metadata['isHidden'];
+
+        while (is_array($value)) {
+          $value = $value ? reset($value) : false;
+        }
+
+        return (bool) $value;
       }
     }
-
     return false;
   }
 
@@ -163,10 +168,15 @@ class EntryComment implements EntityTypeContent
       $metadata = json_decode($this->metadata, true);
 
       if (isset($metadata['hiddenReason'])) {
-        return $metadata['hiddenReason'];
+        $reason = $metadata['hiddenReason'];
+
+        while (is_array($reason)) {
+          $reason = $reason ? reset($reason) : '';
+        }
+
+        return (string) $reason;
       }
     }
-
     return '';
   }
 
@@ -619,7 +629,6 @@ class EntryComment implements EntityTypeContent
 
           $commentRatingVoters = $this->getRatingVoters();
 
-          // ratingVoters: сливаем текущий объект с новым фрагментом {"id": "vote"}
           $voteFragment = sprintf("'{\"%d\": \"%s\"}'", $voterID, $vote);
           $metadataPairs['ratingVoters'] = $dialect->jsonObjectMergeKey(
             'metadata',
@@ -627,7 +636,6 @@ class EntryComment implements EntityTypeContent
             $voteFragment
           );
 
-          // rating: вычисляем дельту
           $delta = ($vote === 'up') ? 1 : -1;
           if (isset($commentRatingVoters[$voterID]) && $commentRatingVoters[$voterID] !== $vote) {
             $delta *= 2;
@@ -639,21 +647,31 @@ class EntryComment implements EntityTypeContent
             $delta
           );
         } elseif ($name === 'isHidden') {
-          if (is_array($value)) {
+          while (is_array($value)) {
             $value = $value ? reset($value) : false;
+          }
+
+          if (is_string($value)) {
+            $value = in_array(strtolower($value), ['on', '1', 'true', 'yes'], true);
           }
 
           $metadataPairs['isHidden'] = $value ? 'TRUE' : 'FALSE';
         } elseif ($name === 'hiddenReason') {
-          $metadataPairs['hiddenReason'] = sprintf("'%s'", addslashes((string) $value));
+            while (is_array($value)) {
+              $value = $value ? reset($value) : '';
+            }
+
+            $metadataPairs['hiddenReason'] = sprintf("'%s'", addslashes((string) $value));
         } elseif ($name === 'parentID') {
-          $metadataPairs['parentID'] = (string) (int) $value;
+            while (is_array($value)) {
+              $value = $value ? reset($value) : 0;
+            }
+
+            $metadataPairs['parentID'] = (string) (int) $value;
         }
       }
 
       if (!empty($metadataPairs)) {
-        error_log('METADATA PAIRS: ' . print_r($metadataPairs, true));
-
         $metadataPatch = $dialect->jsonBuildObject($metadataPairs);
         $queryBuilder->statement->clauseSet->addColumn(
           'metadata',
