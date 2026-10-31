@@ -96,7 +96,7 @@ blockquote {
   position: relative;
   display: inline-flex;
   align-items: center;
-  max-width: 100%;
+  gap: 2px;
   vertical-align: baseline;
 }
 
@@ -122,16 +122,12 @@ blockquote {
   z-index: 10;
 }
 
-/* Кнопка для инлайн-кода */
 .code-copy-button_inline {
-  position: absolute;
-  top: 50%;
-  left: 100%;
-  right: auto;
-  transform: translateY(-50%);
-  margin-left: 2px;
+  position: static;
+  transform: none;
   padding: 2px;
   font-size: 10px;
+  flex: 0 0 auto;
 }
 
 /* Текст внутри инлайн-кнопки скрываем */
