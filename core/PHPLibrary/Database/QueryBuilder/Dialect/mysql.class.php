@@ -133,7 +133,7 @@ final class MySql extends BaseDialect
     }
 
     return sprintf(
-      'JSON_MERGE_PRESERVE(COALESCE(%s, JSON_OBJECT()), %s)',
+      'JSON_MERGE_PATCH(COALESCE(%s, JSON_OBJECT()), %s)',
       $this->quoteIdentifier($column),
       implode(', ', $patches)
     );
