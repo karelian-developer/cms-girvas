@@ -152,7 +152,7 @@
   <article class="page-aside__block page-aside__block_donate">
     <h2 class="page-aside__block-title">{LANG:PAGE_INDEX_SIDEBAR_BLOCK_DONATE_TITLE}</h2>
     <div class="page-aside__block-content">
-      {PAGE_INDEX_SIDEBAR_BLOCK_DONATE_DESCRIPTION}
+      {LANG:PAGE_INDEX_SIDEBAR_BLOCK_DONATE_DESCRIPTION}
       <hr>
       <script type="text/javascript" src="https://auth.robokassa.ru/Merchant/PaymentForm/FormFLS.js?EncodedInvoiceId=MOAk4w4ZnUuZ453hgRT4xA&DefaultSum=50"></script>
     </div>
