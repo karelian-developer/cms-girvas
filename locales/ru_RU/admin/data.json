@@ -399,6 +399,8 @@
   "PAGE_INDEX_SIDEBAR_BLOCK_FEED_ENTRIES_NOT_FOUND_LABEL": "Записи не были получены.",
   "PAGE_INDEX_SIDEBAR_BLOCK_LATEST_NEWS_TITLE": "Последние новости",
   "PAGE_INDEX_SIDEBAR_BLOCK_LATEST_RELEASES_TITLE": "Последние выпуски",
+  "PAGE_INDEX_SIDEBAR_BLOCK_DONATE_TITLE": "Поддержка разработки",
+  "PAGE_INDEX_SIDEBAR_BLOCK_DONATE_DESCRIPTION": "Компания &laquo;Карельский разработчик&raquo; делает все возможное для развития CMS &laquo;ГИРВАС&raquo;. Если хотите поддержать разработку финансово любой суммой, то можно воспользоваться формой ниже. Платежи обрабатываются через сервис партнера «Robokassa».",
   "PAGE_INDEX_STEP_ANALYTIC_DESCRIPTION": "Компания &raquo;Карельский разработчик&raquo; подготовила инструмент для аналитики данных по сайту и контенту. Следите за показателями прямо в административной панели!",
   "PAGE_INDEX_STEP_ANALYTIC_TITLE": "Аналитика каждому!",
   "PAGE_INDEX_STEP_CHANGE_TEMPLATE_DESCRIPTION": "Выберите подходящий шаблон дизайна для Вашего сайта. Наша команда подготовила как платные, так и бесплатные варианты оформления.",

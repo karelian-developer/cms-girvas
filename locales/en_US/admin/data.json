@@ -399,6 +399,8 @@
   "PAGE_INDEX_SIDEBAR_BLOCK_FEED_ENTRIES_NOT_FOUND_LABEL": "No entries were received.",
   "PAGE_INDEX_SIDEBAR_BLOCK_LATEST_NEWS_TITLE": "Latest news",
   "PAGE_INDEX_SIDEBAR_BLOCK_LATEST_RELEASES_TITLE": "Latest releases",
+  "PAGE_INDEX_SIDEBAR_BLOCK_DONATE_TITLE": "Support Development",
+  "PAGE_INDEX_SIDEBAR_BLOCK_DONATE_DESCRIPTION": "The company 'Karelian Developer' is doing everything possible to advance the 'GIRVAS' CMS. If you would like to provide financial support for its development—in any amount—you can use the form below. Payments are processed via our partner service, 'Robokassa'.",
   "PAGE_INDEX_STEP_ANALYTIC_DESCRIPTION": "The company &raquo;Karelian Developer&raquo; has prepared a tool for analyzing data on the site and content. Monitor indicators directly in the administrative panel!",
   "PAGE_INDEX_STEP_ANALYTIC_TITLE": "Analytics for everyone!",
   "PAGE_INDEX_STEP_CHANGE_TEMPLATE_DESCRIPTION": "Choose a suitable design template for your site. Our team has prepared both paid and free design options.",
