@@ -149,7 +149,7 @@
       {FEED_LATEST_RELEASES_LIST}
     </div>
   </article>
-  <article class="page-aside__block">
+  <article class="page-aside__block page-aside__block_donate">
     <h2 class="page-aside__block-title">{LANG:PAGE_INDEX_SIDEBAR_BLOCK_DONATE_TITLE}</h2>
     <div class="page-aside__block-content">
       {PAGE_INDEX_SIDEBAR_BLOCK_DONATE_DESCRIPTION}
