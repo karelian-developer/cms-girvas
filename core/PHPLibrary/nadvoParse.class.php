@@ -459,25 +459,65 @@ class NadvoParse
   {
     $this->codeBlockPlaceholders = [];
     
-    $markdown = preg_replace_callback(
-      self::PATTERNS['code_block'],
-      function($matches) {
-        $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
-        $language = trim($matches[1]);
-        $code = $matches[2];
-        
-        $code = htmlspecialchars($code, ENT_NOQUOTES, 'UTF-8', false);
-        
-        $this->codeBlockPlaceholders[$placeholder] = [
-          'language' => $language,
-          'code' => $code
-        ];
-        
-        return $placeholder;
-      },
-      $markdown
-    );
+    $lines = explode("\n", $markdown);
+    $result = [];
+    $i = 0;
+    $count = count($lines);
     
+    while ($i < $count) {
+      $line = $lines[$i];
+      
+      // Ищем открывающий бэктик (3 и более штук) в начале строки
+      // Разрешаем опциональный язык после него (например, ```php)
+      if (preg_match('/^(`{3,})[a-zA-Z0-9_+\-]*[ \t]*\r?$/', $line, $m)) {
+        $fence = $m[1];
+        $fenceLen = strlen($fence); // Длина открывающего бэктика (3, 4 и т.д.)
+        
+        $codeLines = [];
+        $j = $i + 1;
+        $closed = false;
+        
+        // Ищем закрывающий бэктик ТОЧНО ТАКОЙ ЖЕ длины (или больше)
+        // и чтобы после него были только пробелы/переносы
+        $closePattern = '/^`{' . $fenceLen . ',}[ \t]*\r?$/';
+        
+        while ($j < $count) {
+          if (preg_match($closePattern, $lines[$j])) {
+            $closed = true;
+            break;
+          }
+          $codeLines[] = $lines[$j];
+          $j++;
+        }
+        
+        if ($closed) {
+          // Блок успешно закрыт
+          $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
+          $code = implode("\n", $codeLines);
+          $language = trim(preg_replace('/^`{3,}/', '', $line));
+          
+          // Экранируем
+          $code = htmlspecialchars($code, ENT_NOQUOTES, 'UTF-8', false);
+          
+          $this->codeBlockPlaceholders[$placeholder] = [
+            'language' => $language,
+            'code' => $code
+          ];
+          
+          $result[] = $placeholder;
+          $i = $j + 1; // Перепрыгиваем через весь блок
+          continue;
+        }
+      }
+      
+      // Если это не открывающий бэктик или блок не закрыт — оставляем как есть
+      $result[] = $line;
+      $i++;
+    }
+    
+    $markdown = implode("\n", $result);
+    
+    // Также защищаем инлайн-код (одинарные бэктики)
     $markdown = preg_replace_callback(
       self::PATTERNS['inline_code'],
       function($matches) {
