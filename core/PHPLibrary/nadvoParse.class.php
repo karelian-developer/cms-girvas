@@ -461,21 +461,19 @@ class NadvoParse
   private function protectCodeBlocks(string $markdown) : string
   {
     $this->codeBlockPlaceholders = [];
-    error_log('INPUT: ' . json_encode($markdown));
-    error_log('MATCH: ' . preg_match(self::PATTERNS['code_block'], $markdown));
     
     $markdown = preg_replace_callback(
       self::PATTERNS['code_block'],
       function($matches) {
         $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
         $language = trim($matches[2]);
-        $code     = trim($matches[3]);
-
+        $code = trim($matches[3]);
+        
         $this->codeBlockPlaceholders[$placeholder] = [
           'language' => $language,
-          'code'     => $code
+          'code' => $code
         ];
-
+        
         return $placeholder;
       },
       $markdown
@@ -514,16 +512,18 @@ class NadvoParse
       if (isset($data['inline']) && $data['inline']) {
         $replacement = '<code>' . $data['code'] . '</code>';
       } else {
+        $lang = htmlspecialchars($data['language'], ENT_QUOTES, 'UTF-8');
+
         if ($data['language']) {
-          $replacement = '<pre><code class="language-' . $data['language'] . '" data-lang="' . $data['language'] . '">' . $data['code'] . '</code></pre>';
+          $replacement = '<pre><code class="language-' . $lang . '" data-lang="' . $lang . '">' . $data['code'] . '</code></pre>';
         } else {
           $replacement = '<pre><code>' . $data['code'] . '</code></pre>';
         }
       }
-      
+
       $html = str_replace($placeholder, $replacement, $html);
     }
-    
+
     return $html;
   }
 
