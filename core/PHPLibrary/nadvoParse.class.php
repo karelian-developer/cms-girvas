@@ -461,6 +461,8 @@ class NadvoParse
   private function protectCodeBlocks(string $markdown) : string
   {
     $this->codeBlockPlaceholders = [];
+    error_log('INPUT: ' . json_encode($markdown));
+    error_log('MATCH: ' . preg_match(self::PATTERNS['code_block'], $markdown));
     
     $markdown = preg_replace_callback(
       self::PATTERNS['code_block'],
