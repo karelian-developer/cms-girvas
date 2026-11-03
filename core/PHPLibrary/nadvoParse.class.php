@@ -219,7 +219,7 @@ class NadvoParse
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(\>+)\s?(.*)$/m',
-    'code_block' => '/\`\`\`([a-z]*)\R([\s\S]*?)\R\`\`\`/',
+    'code_block' => '/^(`{3,})([a-zA-Z0-9_+-]*)[ \t]*\R([\s\S]*?)^\1`*[ \t]*$/m',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s',
     'ul_item' => '/^([*+-])\s+(.+)/',
@@ -466,14 +466,16 @@ class NadvoParse
       self::PATTERNS['code_block'],
       function($matches) {
         $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
-        $language = trim($matches[1]);
-        $code = trim($matches[2]);
-        
+        $fence     = $matches[1];
+        $language  = trim($matches[2]);
+        $code      = trim($matches[3]);
+
         $this->codeBlockPlaceholders[$placeholder] = [
           'language' => $language,
-          'code' => $code
+          'code'     => $code,
+          'fence'    => $fence,
         ];
-        
+
         return $placeholder;
       },
       $markdown
