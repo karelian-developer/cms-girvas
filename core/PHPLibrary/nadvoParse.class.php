@@ -219,7 +219,7 @@ class NadvoParse
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(\>+)\s?(.*)$/m',
-    'code_block' => '/^\`\`\`([a-z0-9_+-]*)[ \t]*\R([\s\S]*?)^\`\`\`[ \t]*$/m',
+    'code_block_open' => '/^(`{3,}|~{3,})([a-zA-Z0-9_+\-]*)[ \t]*\r?$/',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s',
     'ul_item' => '/^([*+-])\s+(.+)/',
@@ -391,13 +391,11 @@ class NadvoParse
   {
     $this->usedHeaderIds = [];
     
-    $markdown = $this->sanitizeInput($markdown);
-
-    // Защищаем шаблонные переменные ДО всего остального
+    $markdown = $this->protectCodeBlocks($markdown);
+    
     $markdown = $this->protectTemplateVariables($markdown);
     
-    // Сначала защищаем блоки кода
-    $markdown = $this->protectCodeBlocks($markdown);
+    $markdown = $this->sanitizeInput($markdown);
     
     $markdown = $this->parseHr($markdown);
     $markdown = $this->parseAutoLinks($markdown);
@@ -407,13 +405,10 @@ class NadvoParse
     $markdown = $this->parseGallery($markdown);
     $markdown = $this->parseInlineElements($markdown);
     $markdown = $this->parseFootnotes($markdown);
-    $markdown = $this->parseEmoji($markdown); // Добавляем обработку эмодзи
+    $markdown = $this->parseEmoji($markdown);
     $markdown = $this->parseBlocks($markdown);
     
-    // Возвращаем блоки кода на место
     $markdown = $this->restoreCodeBlocks($markdown);
-
-    // Восстанавливаем шаблонные переменные
     $markdown = $this->restoreTemplateVariables($markdown);
     
     return $markdown;
@@ -462,34 +457,70 @@ class NadvoParse
   {
     $this->codeBlockPlaceholders = [];
     
-    $markdown = preg_replace_callback(
-      self::PATTERNS['code_block'],
-      function($matches) {
-        $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
-        $language = trim($matches[1]);
-        $code = trim($matches[2]);
-        
-        $this->codeBlockPlaceholders[$placeholder] = [
-          'language' => $language,
-          'code' => $code
-        ];
-        
-        return $placeholder;
-      },
-      $markdown
-    );
+    $lines = explode("\n", $markdown);
+    $result = [];
+    $i = 0;
+    $count = count($lines);
     
-    // Также защищаем инлайн-код
+    while ($i < $count) {
+      $line = $lines[$i];
+      
+      if (preg_match(self::PATTERNS['code_block_open'], $line, $m)) {
+        $fence = $m[1];
+        $fenceChar = $fence[0];
+        $fenceLen = strlen($fence);
+        $language = trim($m[2]);
+        
+        $codeLines = [];
+        $j = $i + 1;
+        $closed = false;
+        
+        $closePattern = '/^' . preg_quote($fenceChar, '/') . '{' . $fenceLen . ',}[ \t]*\r?$/';
+        
+        while ($j < $count) {
+          if (preg_match($closePattern, $lines[$j])) {
+            $closed = true;
+            break;
+          }
+          $codeLines[] = $lines[$j];
+          $j++;
+        }
+        
+        if ($closed) {
+          $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
+          $code = implode("\n", $codeLines);
+          
+          $this->codeBlockPlaceholders[$placeholder] = [
+              'language' => $language,
+              'code' => htmlspecialchars($code, ENT_QUOTES, 'UTF-8'),
+          ];
+          
+          $result[] = $placeholder;
+          $i = $j + 1;
+          continue;
+        }
+        
+        $result[] = $line;
+        $i++;
+        continue;
+      }
+      
+      $result[] = $line;
+      $i++;
+    }
+    
+    $markdown = implode("\n", $result);
+    
     $markdown = preg_replace_callback(
       self::PATTERNS['inline_code'],
       function($matches) {
         $placeholder = '%%INLINE_CODE_' . count($this->codeBlockPlaceholders) . '%%';
-        $code = trim($matches[1]);
+        $code = $matches[1];
         
         $this->codeBlockPlaceholders[$placeholder] = [
           'language' => '',
-          'code' => $code,
-          'inline' => true
+          'code' => htmlspecialchars($code, ENT_QUOTES, 'UTF-8'),
+          'inline' => true,
         ];
         
         return $placeholder;
