@@ -219,7 +219,7 @@ class NadvoParse
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(\>+)\s?(.*)$/m',
-    'code_block' => '/^(`{3,})([a-zA-Z0-9_+-]*)[ \t]*\R([\s\S]*?)^\1`*[ \t]*$/m',
+    'code_block' => '/^(`{3,})([a-zA-Z0-9_+-]*)[ \t]*\R([\s\S]*?)\R^\1[ \t]*$/m',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s',
     'ul_item' => '/^([*+-])\s+(.+)/',
@@ -461,50 +461,43 @@ class NadvoParse
   private function protectCodeBlocks(string $markdown) : string
   {
     $this->codeBlockPlaceholders = [];
+    
+    $markdown = preg_replace_callback(
+      self::PATTERNS['code_block'],
+      function($matches) {
+        $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
+        $language = trim($matches[2]);
+        $code     = trim($matches[3]);
 
-    $lines = explode("\n", $markdown);
-    $result = [];
-    $inside = false;
-    $fence = '';
-    $language = '';
-    $buffer = [];
+        $this->codeBlockPlaceholders[$placeholder] = [
+          'language' => $language,
+          'code'     => $code
+        ];
 
-    foreach ($lines as $line) {
-      if (!$inside) {
-        if (preg_match('/^(`{3,})([a-zA-Z0-9_+-]*)[ \t]*$/', $line, $m)) {
-          $inside = true;
-          $fence = $m[1];
-          $language = $m[2];
-          $buffer = [];
-          continue;
-        }
-        $result[] = $line;
-      } else {
-        if (preg_match('/^(`{3,})[ \t]*$/', $line, $m) && strlen($m[1]) >= strlen($fence)) {
-          $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
-          $this->codeBlockPlaceholders[$placeholder] = [
-            'language' => $language,
-            'code'     => implode("\n", $buffer),
-            'fence'    => $fence,
-          ];
-          $result[] = $placeholder;
-          $inside = false;
-          $fence = '';
-          $language = '';
-          $buffer = [];
-          continue;
-        }
+        return $placeholder;
+      },
+      $markdown
+    );
+    
+    // Также защищаем инлайн-код
+    $markdown = preg_replace_callback(
+      self::PATTERNS['inline_code'],
+      function($matches) {
+        $placeholder = '%%INLINE_CODE_' . count($this->codeBlockPlaceholders) . '%%';
+        $code = trim($matches[1]);
         
-        $buffer[] = $line;
-      }
-    }
-
-    if ($inside) {
-      $result[] = $fence . $language;
-      foreach ($buffer as $b) $result[] = $b;
-    }
-
-    return implode("\n", $result);
+        $this->codeBlockPlaceholders[$placeholder] = [
+          'language' => '',
+          'code' => $code,
+          'inline' => true
+        ];
+        
+        return $placeholder;
+      },
+      $markdown
+    );
+    
+    return $markdown;
   }
 
   /**
