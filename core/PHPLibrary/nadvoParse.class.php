@@ -219,8 +219,10 @@ class NadvoParse
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(\>+)\s?(.*)$/m',
-    'code_block' => '/\`\`\`([a-z]*)\R([\s\S]*?)\R\`\`\`/',
-    'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
+    // Блок кода: ограждение из 3+ обратных кавычек в начале строки, закрывающее — такое же, на отдельной строке
+    'code_block' => '/^[ \t]*(`{3,})[ \t]*([a-z0-9_+-]*)[^`\n]*\R(?:([\s\S]*?)\R)?[ \t]*\1[ \t]*$/mi',
+    // Инлайн-код: любое число обратных кавычек, закрывающих столько же, в пределах одной строки
+    'inline_code' => '/(?<!`)(`+)(?!`)(.+?)(?<!`)\1(?!`)/',
     'text' => '/[^\*_!\[\]]+/s',
     'ul_item' => '/^([*+-])\s+(.+)/',
     'ol_item' => '/^(\d+)\.\s+(.+)/',
@@ -466,8 +468,8 @@ class NadvoParse
       self::PATTERNS['code_block'],
       function($matches) {
         $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
-        $language = trim($matches[1]);
-        $code = trim($matches[2]);
+        $language = strtolower(trim($matches[2]));
+        $code = trim($matches[3] ?? '', "\r\n");
         
         $this->codeBlockPlaceholders[$placeholder] = [
           'language' => $language,
@@ -484,7 +486,7 @@ class NadvoParse
       self::PATTERNS['inline_code'],
       function($matches) {
         $placeholder = '%%INLINE_CODE_' . count($this->codeBlockPlaceholders) . '%%';
-        $code = trim($matches[1]);
+        $code = trim($matches[2]);
         
         $this->codeBlockPlaceholders[$placeholder] = [
           'language' => '',
@@ -513,7 +515,7 @@ class NadvoParse
         $replacement = '<code>' . $data['code'] . '</code>';
       } else {
         if ($data['language']) {
-          $replacement = '<pre><code class="language-' . $data['language'] . '" data-lang="' . $data['language'] . '">' . $data['code'] . '</code></pre>';
+          $replacement = '<pre><code class="language-' . $data['language'] . '">' . $data['code'] . '</code></pre>';
         } else {
           $replacement = '<pre><code>' . $data['code'] . '</code></pre>';
         }
@@ -867,7 +869,7 @@ class NadvoParse
       
       // Проверяем, является ли строка плейсхолдером блока кода
       $isCodePlaceholder = false;
-      if (preg_match('/^%%(CODE_BLOCK|INLINE_CODE|TEMPLATE_VAR)_\d+%%$/', $trimmedLine)) {
+      if (preg_match('/^%%(CODE_BLOCK|TEMPLATE_VAR)_\d+%%$/', $trimmedLine)) {
         $isCodePlaceholder = true;
       }
       
