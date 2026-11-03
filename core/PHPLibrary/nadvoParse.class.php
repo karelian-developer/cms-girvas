@@ -219,7 +219,7 @@ class NadvoParse
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(\>+)\s?(.*)$/m',
-    'code_block_open' => '/^(`{3,}|~{3,})([a-zA-Z0-9_+\-]*)[ \t]*\r?$/',
+    'code_block' => '/\`\`\`([a-z]*)\R([\s\S]*?)\R\`\`\`/',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s',
     'ul_item' => '/^([*+-])\s+(.+)/',
@@ -457,78 +457,60 @@ class NadvoParse
   {
     $this->codeBlockPlaceholders = [];
     
-    $lines = explode("\n", $markdown);
-    $result = [];
-    $i = 0;
-    $count = count($lines);
-    
-    while ($i < $count) {
-      $line = $lines[$i];
-      
-      if (preg_match(self::PATTERNS['code_block_open'], $line, $m)) {
-        $fence = $m[1];
-        $fenceChar = $fence[0];
-        $fenceLen = strlen($fence);
-        $language = trim($m[2]);
-        
-        $codeLines = [];
-        $j = $i + 1;
-        $closed = false;
-        
-        $closePattern = '/^' . preg_quote($fenceChar, '/') . '{' . $fenceLen . ',}[ \t]*\r?$/';
-        
-        while ($j < $count) {
-          if (preg_match($closePattern, $lines[$j])) {
-            $closed = true;
-            break;
-          }
-          $codeLines[] = $lines[$j];
-          $j++;
-        }
-        
-        if ($closed) {
+    $markdown = preg_replace_callback(
+        self::PATTERNS['code_block'],
+        function($matches) {
           $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
-          $code = implode("\n", $codeLines);
+          $language = trim($matches[1]);
+          $code = $matches[2];
+          
+          $encoded = '';
+          $len = mb_strlen($code, 'UTF-8');
+          for ($i = 0; $i < $len; $i++) {
+            $char = mb_substr($code, $i, 1, 'UTF-8');
+            if ($char === "\n") {
+              $encoded .= "\n";
+            } else {
+              $encoded .= '&#' . mb_ord($char, 'UTF-8') . ';';
+            }
+          }
           
           $this->codeBlockPlaceholders[$placeholder] = [
-              'language' => $language,
-              'code' => htmlspecialchars($code, ENT_QUOTES, 'UTF-8'),
+            'language' => $language,
+            'code' => $encoded,
           ];
           
-          $result[] = $placeholder;
-          $i = $j + 1;
-          continue;
-        }
-        
-        $result[] = $line;
-        $i++;
-        continue;
-      }
+          return $placeholder;
+        },
+        $markdown
+      );
       
-      $result[] = $line;
-      $i++;
-    }
-    
-    $markdown = implode("\n", $result);
-    
-    $markdown = preg_replace_callback(
-      self::PATTERNS['inline_code'],
-      function($matches) {
-        $placeholder = '%%INLINE_CODE_' . count($this->codeBlockPlaceholders) . '%%';
-        $code = $matches[1];
-        
-        $this->codeBlockPlaceholders[$placeholder] = [
-          'language' => '',
-          'code' => htmlspecialchars($code, ENT_QUOTES, 'UTF-8'),
-          'inline' => true,
-        ];
-        
-        return $placeholder;
-      },
-      $markdown
-    );
-    
-    return $markdown;
+      // Инлайн-код — аналогично
+      $markdown = preg_replace_callback(
+          self::PATTERNS['inline_code'],
+          function($matches) {
+              $placeholder = '%%INLINE_CODE_' . count($this->codeBlockPlaceholders) . '%%';
+              $code = $matches[1];
+              
+              $encoded = '';
+              $len = mb_strlen($code, 'UTF-8');
+              for ($i = 0; $i < $len; $i++) {
+                  $char = mb_substr($code, $i, 1, 'UTF-8');
+                  $encoded .= '&#' . mb_ord($char, 'UTF-8') . ';';
+              }
+              
+              $this->codeBlockPlaceholders[$placeholder] = [
+                  'language' => '',
+                  'code' => $encoded,
+                  'inline' => true,
+              ];
+              
+              return $placeholder;
+          },
+          $markdown
+      );
+      
+      return $markdown;
   }
 
   /**
