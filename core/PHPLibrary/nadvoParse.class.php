@@ -387,34 +387,37 @@ class NadvoParse
   /**
    * Обновленный метод parse
    */
-    public function parse(string $markdown) : string
-    {
-      $this->usedHeaderIds = [];
-      
-      // 1. СНАЧАЛА вырезаем блоки кода и инлайн-код (до любой санитизации!)
-      $markdown = $this->protectCodeBlocks($markdown);
-      
-      $markdown = $this->sanitizeInput($markdown);
+  public function parse(string $markdown) : string
+  {
+    $this->usedHeaderIds = [];
+    
+    $markdown = $this->sanitizeInput($markdown);
 
-      $markdown = $this->protectTemplateVariables($markdown);
-      
-      $markdown = $this->parseHr($markdown);
-      $markdown = $this->parseAutoLinks($markdown);
-      $markdown = $this->parseQuotes($markdown);
-      $markdown = $this->parseLists($markdown);
-      $markdown = $this->parseTables($markdown);
-      $markdown = $this->parseGallery($markdown);
-      $markdown = $this->parseInlineElements($markdown);
-      $markdown = $this->parseFootnotes($markdown);
-      $markdown = $this->parseEmoji($markdown);
-      $markdown = $this->parseBlocks($markdown);
-      
-      $markdown = $this->restoreCodeBlocks($markdown);
+    // Защищаем шаблонные переменные ДО всего остального
+    $markdown = $this->protectTemplateVariables($markdown);
+    
+    // Сначала защищаем блоки кода
+    $markdown = $this->protectCodeBlocks($markdown);
+    
+    $markdown = $this->parseHr($markdown);
+    $markdown = $this->parseAutoLinks($markdown);
+    $markdown = $this->parseQuotes($markdown);
+    $markdown = $this->parseLists($markdown);
+    $markdown = $this->parseTables($markdown);
+    $markdown = $this->parseGallery($markdown);
+    $markdown = $this->parseInlineElements($markdown);
+    $markdown = $this->parseFootnotes($markdown);
+    $markdown = $this->parseEmoji($markdown); // Добавляем обработку эмодзи
+    $markdown = $this->parseBlocks($markdown);
+    
+    // Возвращаем блоки кода на место
+    $markdown = $this->restoreCodeBlocks($markdown);
 
-      $markdown = $this->restoreTemplateVariables($markdown);
-      
-      return $markdown;
-    }
+    // Восстанавливаем шаблонные переменные
+    $markdown = $this->restoreTemplateVariables($markdown);
+    
+    return $markdown;
+  }
 
   /**
    * Обработка горизонтальных линий
@@ -457,98 +460,44 @@ class NadvoParse
    */
   private function protectCodeBlocks(string $markdown) : string
   {
-      $this->codeBlockPlaceholders = [];
-      
-      $lines = explode("\n", $markdown);
-      $result = [];
-      $i = 0;
-      $count = count($lines);
-      
-      while ($i < $count) {
-          $line = $lines[$i];
-          
-          // Открывающий fence: ` ``` ` с опциональным info-string в начале строки
-          if (preg_match('/^(`{3,})([a-zA-Z0-9_+\-]*)[ \t]*\r?$/', $line, $m)) {
-              $fence = $m[1];
-              $fenceLen = strlen($fence);
-              $language = trim($m[2]);
-              
-              $codeLines = [];
-              $j = $i + 1;
-              $closed = false;
-              
-              // Закрывающий fence: та же длина или больше, БЕЗ info-string
-              $closePattern = '/^`{' . $fenceLen . ',}[ \t]*\r?$/';
-              
-              while ($j < $count) {
-                  if (preg_match($closePattern, $lines[$j])) {
-                      $closed = true;
-                      break;
-                  }
-                  $codeLines[] = $lines[$j];
-                  $j++;
-              }
-              
-              if ($closed) {
-                  $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
-                  $code = implode("\n", $codeLines);
-                  
-                  $this->codeBlockPlaceholders[$placeholder] = [
-                      'language' => $language,
-                      'code' => htmlspecialchars($code, ENT_NOQUOTES, 'UTF-8', false),
-                  ];
-                  
-                  $result[] = $placeholder;
-                  $i = $j + 1;
-                  continue;
-              }
-          }
-          
-          $result[] = $line;
-          $i++;
-      }
-      
-      $markdown = implode("\n", $result);
-      
-      // Инлайн-код
-      $markdown = preg_replace_callback(
-          self::PATTERNS['inline_code'],
-          function($matches) {
-              $placeholder = '%%INLINE_CODE_' . count($this->codeBlockPlaceholders) . '%%';
-              $code = $matches[1];
-              
-              $this->codeBlockPlaceholders[$placeholder] = [
-                  'language' => '',
-                  'code' => htmlspecialchars($code, ENT_NOQUOTES, 'UTF-8', false),
-                  'inline' => true,
-              ];
-              
-              return $placeholder;
-          },
-          $markdown
-      );
-      
-      return $markdown;
-  }
-
-  private function protectInlineCode(string $markdown) : string
-  {
-    return preg_replace_callback(
-      self::PATTERNS['inline_code'],
+    $this->codeBlockPlaceholders = [];
+    
+    $markdown = preg_replace_callback(
+      self::PATTERNS['code_block'],
       function($matches) {
-        $placeholder = '%%INLINE_CODE_' . count($this->codeBlockPlaceholders) . '%%';
-        $code = $matches[1];
+        $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
+        $language = trim($matches[1]);
+        $code = trim($matches[2]);
         
         $this->codeBlockPlaceholders[$placeholder] = [
-          'language' => '',
-          'code' => htmlspecialchars($code, ENT_NOQUOTES, 'UTF-8', false),
-          'inline' => true,
+          'language' => $language,
+          'code' => $code
         ];
         
         return $placeholder;
       },
       $markdown
     );
+    
+    // Также защищаем инлайн-код
+    $markdown = preg_replace_callback(
+      self::PATTERNS['inline_code'],
+      function($matches) {
+        $placeholder = '%%INLINE_CODE_' . count($this->codeBlockPlaceholders) . '%%';
+        $code = trim($matches[1]);
+        
+        $this->codeBlockPlaceholders[$placeholder] = [
+          'language' => '',
+          'code' => $code,
+          'inline' => true
+        ];
+        
+        return $placeholder;
+      },
+      $markdown
+    );
+    
+    return $markdown;
   }
 
   /**
