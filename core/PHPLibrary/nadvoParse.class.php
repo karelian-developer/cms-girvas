@@ -219,7 +219,7 @@ class NadvoParse
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(\>+)\s?(.*)$/m',
-    'code_block' => '/^(`{3,})([a-zA-Z0-9_+-]*)[ \t]*\R([\s\S]*?)\R^\1[ \t]*$/m',
+    'code_block' => '/\`\`\`([a-z]*)\R([\s\S]*?)\R\`\`\`/',
     'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s',
     'ul_item' => '/^([*+-])\s+(.+)/',
@@ -466,8 +466,8 @@ class NadvoParse
       self::PATTERNS['code_block'],
       function($matches) {
         $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
-        $language = trim($matches[2]);
-        $code = trim($matches[3]);
+        $language = trim($matches[1]);
+        $code = trim($matches[2]);
         
         $this->codeBlockPlaceholders[$placeholder] = [
           'language' => $language,
@@ -512,18 +512,16 @@ class NadvoParse
       if (isset($data['inline']) && $data['inline']) {
         $replacement = '<code>' . $data['code'] . '</code>';
       } else {
-        $lang = htmlspecialchars($data['language'], ENT_QUOTES, 'UTF-8');
-
         if ($data['language']) {
-          $replacement = '<pre><code class="language-' . $lang . '" data-lang="' . $lang . '">' . $data['code'] . '</code></pre>';
+          $replacement = '<pre><code class="language-' . $data['language'] . '" data-lang="' . $data['language'] . '">' . $data['code'] . '</code></pre>';
         } else {
           $replacement = '<pre><code>' . $data['code'] . '</code></pre>';
         }
       }
-
+      
       $html = str_replace($placeholder, $replacement, $html);
     }
-
+    
     return $html;
   }
 
