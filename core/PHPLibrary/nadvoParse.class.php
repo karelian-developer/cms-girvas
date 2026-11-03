@@ -457,48 +457,78 @@ class NadvoParse
    */
   private function protectCodeBlocks(string $markdown) : string
   {
-    $this->codeBlockPlaceholders = [];
-    
-    // Ищем первый открывающий fence
-    $openPos = strpos($markdown, '```');
-    
-    if ($openPos === false) {
-      // Нет блоков кода вообще — только инлайн
-      return $this->protectInlineCode($markdown);
-    }
-    
-    // Ищем ПОСЛЕДНИЙ закрывающий fence в тексте
-    $closePos = strrpos($markdown, '```');
-    
-    // Если открывающий и закрывающий — это один и тот же fence,
-    // значит, блока нет (только инлайн-код или незакрытый блок)
-    if ($closePos === false || $closePos <= $openPos) {
-      return $this->protectInlineCode($markdown);
-    }
-    
-    // Извлекаем «всё, что между»
-    $before = substr($markdown, 0, $openPos);
-    $block = substr($markdown, $openPos, $closePos - $openPos + 3);
-    $after = substr($markdown, $closePos + 3);
-    
-    // Из блока извлекаем язык и содержимое
-    if (preg_match('/^```([a-zA-Z0-9_+\-]*)\R([\s\S]*)\R```$/', $block, $m)) {
-      $language = trim($m[1]);
-      $code = $m[2];
+      $this->codeBlockPlaceholders = [];
       
-      $placeholder = '%%CODE_BLOCK_0%%';
+      $lines = explode("\n", $markdown);
+      $result = [];
+      $i = 0;
+      $count = count($lines);
       
-      $this->codeBlockPlaceholders[$placeholder] = [
-        'language' => $language,
-        'code' => htmlspecialchars($code, ENT_NOQUOTES, 'UTF-8', false),
-      ];
+      while ($i < $count) {
+          $line = $lines[$i];
+          
+          // Открывающий fence: ` ``` ` с опциональным info-string в начале строки
+          if (preg_match('/^(`{3,})([a-zA-Z0-9_+\-]*)[ \t]*\r?$/', $line, $m)) {
+              $fence = $m[1];
+              $fenceLen = strlen($fence);
+              $language = trim($m[2]);
+              
+              $codeLines = [];
+              $j = $i + 1;
+              $closed = false;
+              
+              // Закрывающий fence: та же длина или больше, БЕЗ info-string
+              $closePattern = '/^`{' . $fenceLen . ',}[ \t]*\r?$/';
+              
+              while ($j < $count) {
+                  if (preg_match($closePattern, $lines[$j])) {
+                      $closed = true;
+                      break;
+                  }
+                  $codeLines[] = $lines[$j];
+                  $j++;
+              }
+              
+              if ($closed) {
+                  $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
+                  $code = implode("\n", $codeLines);
+                  
+                  $this->codeBlockPlaceholders[$placeholder] = [
+                      'language' => $language,
+                      'code' => htmlspecialchars($code, ENT_NOQUOTES, 'UTF-8', false),
+                  ];
+                  
+                  $result[] = $placeholder;
+                  $i = $j + 1;
+                  continue;
+              }
+          }
+          
+          $result[] = $line;
+          $i++;
+      }
       
-      // Возвращаем: до + плейсхолдер + после (после тоже обрабатываем на инлайн)
-      return $before . $placeholder . $this->protectInlineCode($after);
-    }
-    
-    // Если не удалось распарсить — оставляем как есть
-    return $this->protectInlineCode($markdown);
+      $markdown = implode("\n", $result);
+      
+      // Инлайн-код
+      $markdown = preg_replace_callback(
+          self::PATTERNS['inline_code'],
+          function($matches) {
+              $placeholder = '%%INLINE_CODE_' . count($this->codeBlockPlaceholders) . '%%';
+              $code = $matches[1];
+              
+              $this->codeBlockPlaceholders[$placeholder] = [
+                  'language' => '',
+                  'code' => htmlspecialchars($code, ENT_NOQUOTES, 'UTF-8', false),
+                  'inline' => true,
+              ];
+              
+              return $placeholder;
+          },
+          $markdown
+      );
+      
+      return $markdown;
   }
 
   private function protectInlineCode(string $markdown) : string
