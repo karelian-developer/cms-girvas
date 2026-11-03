@@ -570,7 +570,7 @@ class NadvoParse
         $replacement = '<code>' . $data['code'] . '</code>';
       } else {
         if ($data['language']) {
-          $replacement = '<pre><code class="language-' . $data['language'] . '">' . $data['code'] . '</code></pre>';
+          $replacement = '<pre><code class="language-' . $data['language'] . '" data-lang="' . $data['language'] . '">' . $data['code'] . '</code></pre>';
         } else {
           $replacement = '<pre><code>' . $data['code'] . '</code></pre>';
         }
