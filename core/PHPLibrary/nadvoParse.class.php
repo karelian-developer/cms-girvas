@@ -459,85 +459,66 @@ class NadvoParse
   {
     $this->codeBlockPlaceholders = [];
     
-    $lines = explode("\n", $markdown);
-    $result = [];
-    $i = 0;
-    $count = count($lines);
+    // Ищем первый открывающий fence
+    $openPos = strpos($markdown, '```');
     
-    while ($i < $count) {
-      $line = $lines[$i];
-      
-      // Ищем открывающий бэктик (3 и более штук) в начале строки
-      // Разрешаем опциональный язык после него (например, ```php)
-      if (preg_match('/^(`{3,})[a-zA-Z0-9_+\-]*[ \t]*\r?$/', $line, $m)) {
-        $fence = $m[1];
-        $fenceLen = strlen($fence); // Длина открывающего бэктика (3, 4 и т.д.)
-        
-        $codeLines = [];
-        $j = $i + 1;
-        $closed = false;
-        
-        // Ищем закрывающий бэктик ТОЧНО ТАКОЙ ЖЕ длины (или больше)
-        // и чтобы после него были только пробелы/переносы
-        $closePattern = '/^`{' . $fenceLen . ',}[ \t]*\r?$/';
-        
-        while ($j < $count) {
-          if (preg_match($closePattern, $lines[$j])) {
-            $closed = true;
-            break;
-          }
-          $codeLines[] = $lines[$j];
-          $j++;
-        }
-        
-        if ($closed) {
-          // Блок успешно закрыт
-          $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
-          $code = implode("\n", $codeLines);
-          $language = trim(preg_replace('/^`{3,}/', '', $line));
-          
-          // Экранируем
-          $code = htmlspecialchars($code, ENT_NOQUOTES, 'UTF-8', false);
-          
-          $this->codeBlockPlaceholders[$placeholder] = [
-            'language' => $language,
-            'code' => $code
-          ];
-          
-          $result[] = $placeholder;
-          $i = $j + 1; // Перепрыгиваем через весь блок
-          continue;
-        }
-      }
-      
-      // Если это не открывающий бэктик или блок не закрыт — оставляем как есть
-      $result[] = $line;
-      $i++;
+    if ($openPos === false) {
+      // Нет блоков кода вообще — только инлайн
+      return $this->protectInlineCode($markdown);
     }
     
-    $markdown = implode("\n", $result);
+    // Ищем ПОСЛЕДНИЙ закрывающий fence в тексте
+    $closePos = strrpos($markdown, '```');
     
-    // Также защищаем инлайн-код (одинарные бэктики)
-    $markdown = preg_replace_callback(
+    // Если открывающий и закрывающий — это один и тот же fence,
+    // значит, блока нет (только инлайн-код или незакрытый блок)
+    if ($closePos === false || $closePos <= $openPos) {
+      return $this->protectInlineCode($markdown);
+    }
+    
+    // Извлекаем «всё, что между»
+    $before = substr($markdown, 0, $openPos);
+    $block = substr($markdown, $openPos, $closePos - $openPos + 3);
+    $after = substr($markdown, $closePos + 3);
+    
+    // Из блока извлекаем язык и содержимое
+    if (preg_match('/^```([a-zA-Z0-9_+\-]*)\R([\s\S]*)\R```$/', $block, $m)) {
+      $language = trim($m[1]);
+      $code = $m[2];
+      
+      $placeholder = '%%CODE_BLOCK_0%%';
+      
+      $this->codeBlockPlaceholders[$placeholder] = [
+        'language' => $language,
+        'code' => htmlspecialchars($code, ENT_NOQUOTES, 'UTF-8', false),
+      ];
+      
+      // Возвращаем: до + плейсхолдер + после (после тоже обрабатываем на инлайн)
+      return $before . $placeholder . $this->protectInlineCode($after);
+    }
+    
+    // Если не удалось распарсить — оставляем как есть
+    return $this->protectInlineCode($markdown);
+  }
+
+  private function protectInlineCode(string $markdown) : string
+  {
+    return preg_replace_callback(
       self::PATTERNS['inline_code'],
       function($matches) {
         $placeholder = '%%INLINE_CODE_' . count($this->codeBlockPlaceholders) . '%%';
         $code = $matches[1];
         
-        $code = htmlspecialchars($code, ENT_NOQUOTES, 'UTF-8', false);
-        
         $this->codeBlockPlaceholders[$placeholder] = [
           'language' => '',
-          'code' => $code,
-          'inline' => true
+          'code' => htmlspecialchars($code, ENT_NOQUOTES, 'UTF-8', false),
+          'inline' => true,
         ];
         
         return $placeholder;
       },
       $markdown
     );
-    
-    return $markdown;
   }
 
   /**
