@@ -219,10 +219,8 @@ class NadvoParse
     'audio' => '/!\[audio\]\((.+?)\)/',
     'table' => '/(\|.+)+\|/m',
     'quote' => '/^(\>+)\s?(.*)$/m',
-    // Строка-ограждение блока кода: 3+ обратных кавычки и, по желанию, язык — больше в строке ничего
-    'code_fence' => '/^[ \t]*(`{3,})[ \t]*([a-z0-9_+-]*)[ \t]*$/i',
-    // Инлайн-код: любое число обратных кавычек, закрывающих столько же, в пределах одной строки
-    'inline_code' => '/(?<!`)(`+)(?!`)(.+?)(?<!`)\1(?!`)/',
+    'code_block' => '/\`\`\`([a-z]*)\R([\s\S]*?)\R\`\`\`/',
+    'inline_code' => '/(?<!`)`([^`]+)`(?!`)/',
     'text' => '/[^\*_!\[\]]+/s',
     'ul_item' => '/^([*+-])\s+(.+)/',
     'ol_item' => '/^(\d+)\.\s+(.+)/',
@@ -389,40 +387,39 @@ class NadvoParse
   /**
    * Обновленный метод parse
    */
-  public function parse(string $markdown) : string
-  {
-    $this->usedHeaderIds = [];
+    public function parse(string $markdown) : string
+    {
+      $this->usedHeaderIds = [];
+      
+      // 1. СНАЧАЛА вырезаем все блоки кода
+      $markdown = $this->protectCodeBlocks($markdown);
+      
+      // 2. Затем шаблонные переменные
+      $markdown = $this->protectTemplateVariables($markdown);
+      
+      // 3. Санитизация остального текста
+      $markdown = $this->sanitizeInput($markdown);
+      
+      // 4. Остальные парсеры
+      $markdown = $this->parseHr($markdown);
+      $markdown = $this->parseAutoLinks($markdown);
+      $markdown = $this->parseQuotes($markdown);
+      $markdown = $this->parseLists($markdown);
+      $markdown = $this->parseTables($markdown);
+      $markdown = $this->parseGallery($markdown);
+      $markdown = $this->parseInlineElements($markdown);
+      $markdown = $this->parseFootnotes($markdown);
+      $markdown = $this->parseEmoji($markdown);
+      $markdown = $this->parseBlocks($markdown);
+      
+      // 5. Возвращаем блоки кода на место
+      $markdown = $this->restoreCodeBlocks($markdown);
 
-    // Браузер отправляет textarea с переносами \r\n: приводим к \n, иначе якоря строк ($) не срабатывают
-    $markdown = str_replace(["\r\n", "\r"], "\n", $markdown);
-
-    $markdown = $this->sanitizeInput($markdown);
-
-    // Защищаем шаблонные переменные ДО всего остального
-    $markdown = $this->protectTemplateVariables($markdown);
-    
-    // Сначала защищаем блоки кода
-    $markdown = $this->protectCodeBlocks($markdown);
-    
-    $markdown = $this->parseHr($markdown);
-    $markdown = $this->parseAutoLinks($markdown);
-    $markdown = $this->parseQuotes($markdown);
-    $markdown = $this->parseLists($markdown);
-    $markdown = $this->parseTables($markdown);
-    $markdown = $this->parseGallery($markdown);
-    $markdown = $this->parseInlineElements($markdown);
-    $markdown = $this->parseFootnotes($markdown);
-    $markdown = $this->parseEmoji($markdown); // Добавляем обработку эмодзи
-    $markdown = $this->parseBlocks($markdown);
-    
-    // Возвращаем блоки кода на место
-    $markdown = $this->restoreCodeBlocks($markdown);
-
-    // Восстанавливаем шаблонные переменные
-    $markdown = $this->restoreTemplateVariables($markdown);
-    
-    return $markdown;
-  }
+      // 6. Восстанавливаем шаблонные переменные
+      $markdown = $this->restoreTemplateVariables($markdown);
+      
+      return $markdown;
+    }
 
   /**
    * Обработка горизонтальных линий
@@ -458,83 +455,6 @@ class NadvoParse
   }
 
   /**
-   * Замена блоков кода в ограждениях ``` на плейсхолдеры (построчный разбор).
-   *
-   * Правила:
-   * - блок открывает строка из 3+ обратных кавычек, после которых может стоять язык;
-   * - закрывает строка из стольких же (или больше) кавычек без языка;
-   * - строка-ограждение с языком внутри открытого блока открывает новый блок: прежний блок
-   *   с языком при этом закрывается, а прежний блок без языка (непарный ```) остаётся текстом;
-   *   чтобы показать такое ограждение внутри кода, внешний блок открывают более длинным (````);
-   * - незакрытый блок остаётся обычным текстом и не поглощает остаток документа;
-   * - ограждение в середине строки (```{TAG}```) блоком не считается — это инлайн-код.
-   *
-   * @param string $markdown Текст с переносами \n.
-   * @return string Текст с плейсхолдерами %%CODE_BLOCK_N%%.
-   */
-  private function protectFencedBlocks(string $markdown) : string
-  {
-    $result = [];
-    $open = null;
-
-    $store = function(array $block) : string {
-      $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
-
-      $this->codeBlockPlaceholders[$placeholder] = [
-        'language' => $block['language'],
-        'code' => trim(implode("\n", $block['lines']), "\n"),
-      ];
-
-      return $placeholder;
-    };
-
-    foreach (explode("\n", $markdown) as $line) {
-      $isFence = preg_match(self::PATTERNS['code_fence'], $line, $fence) === 1;
-
-      if ($open === null) {
-        if ($isFence) {
-          $open = ['length' => strlen($fence[1]), 'language' => strtolower($fence[2]), 'start' => $line, 'lines' => []];
-        } else {
-          $result[] = $line;
-        }
-
-        continue;
-      }
-
-      if ($isFence && strlen($fence[1]) >= $open['length']) {
-        if ($fence[2] === '') {
-          $result[] = $store($open);
-          $open = null;
-
-          continue;
-        }
-
-        // Новое ограждение с языком: блок с языком считаем закрытым, а блок без языка —
-        // случайным непарным ```, который остаётся текстом и не поглощает документ
-        if ($open['language'] !== '') {
-          $result[] = $store($open);
-        } else {
-          $result[] = $open['start'];
-          array_push($result, ...$open['lines']);
-        }
-
-        $open = ['length' => strlen($fence[1]), 'language' => strtolower($fence[2]), 'start' => $line, 'lines' => []];
-
-        continue;
-      }
-
-      $open['lines'][] = $line;
-    }
-
-    if ($open !== null) {
-      $result[] = $open['start'];
-      array_push($result, ...$open['lines']);
-    }
-
-    return implode("\n", $result);
-  }
-
-  /**
    * Защита блоков кода от обработки Markdown
    * 
    * @param string $markdown
@@ -544,14 +464,73 @@ class NadvoParse
   {
     $this->codeBlockPlaceholders = [];
     
-    $markdown = $this->protectFencedBlocks($markdown);
-
-    // Также защищаем инлайн-код
+    $lines = explode("\n", $markdown);
+    $result = [];
+    $i = 0;
+    $count = count($lines);
+    
+    while ($i < $count) {
+      $line = $lines[$i];
+      
+      // Ищем открывающий бэктик (3 и более штук)
+      if (preg_match('/^(`{3,})([a-zA-Z0-9_+\-]*)[ \t]*\r?$/', $line, $m)) {
+        $fence = $m[1];
+        $fenceLen = strlen($fence);
+        $language = trim($m[2]);
+        
+        $codeLines = [];
+        $j = $i + 1;
+        $closed = false;
+        
+        // Ищем закрывающий бэктик ТОЧНО ТАКОЙ ЖЕ длины
+        // и чтобы после него на строке не было текста (кроме пробелов)
+        $closePattern = '/^`{' . $fenceLen . ',}[ \t]*\r?$/';
+        
+        while ($j < $count) {
+          // Если нашли правильный закрывающий бэктик — останавливаемся
+          if (preg_match($closePattern, $lines[$j])) {
+            $closed = true;
+            break;
+          }
+          
+          // Иначе добавляем строку в код
+          $codeLines[] = $lines[$j];
+          $j++;
+        }
+        
+        if ($closed) {
+          $placeholder = '%%CODE_BLOCK_' . count($this->codeBlockPlaceholders) . '%%';
+          $code = implode("\n", $codeLines);
+          
+          // Экранируем HTML-теги внутри кода
+          $code = htmlspecialchars($code, ENT_NOQUOTES, 'UTF-8', false);
+          
+          $this->codeBlockPlaceholders[$placeholder] = [
+            'language' => $language,
+            'code' => $code
+          ];
+          
+          $result[] = $placeholder;
+          $i = $j + 1; // Перепрыгиваем через весь блок
+          continue;
+        }
+      }
+      
+      // Если это не открывающий бэктик или блок не закрыт — оставляем как есть
+      $result[] = $line;
+      $i++;
+    }
+    
+    $markdown = implode("\n", $result);
+    
+    // Также защищаем инлайн-код (одинарные бэктики)
     $markdown = preg_replace_callback(
       self::PATTERNS['inline_code'],
       function($matches) {
         $placeholder = '%%INLINE_CODE_' . count($this->codeBlockPlaceholders) . '%%';
-        $code = trim($matches[2]);
+        $code = $matches[1];
+        
+        $code = htmlspecialchars($code, ENT_NOQUOTES, 'UTF-8', false);
         
         $this->codeBlockPlaceholders[$placeholder] = [
           'language' => '',
@@ -580,7 +559,7 @@ class NadvoParse
         $replacement = '<code>' . $data['code'] . '</code>';
       } else {
         if ($data['language']) {
-          $replacement = '<pre><code class="language-' . $data['language'] . '">' . $data['code'] . '</code></pre>';
+          $replacement = '<pre><code class="language-' . $data['language'] . '" data-lang="' . $data['language'] . '">' . $data['code'] . '</code></pre>';
         } else {
           $replacement = '<pre><code>' . $data['code'] . '</code></pre>';
         }
@@ -934,7 +913,7 @@ class NadvoParse
       
       // Проверяем, является ли строка плейсхолдером блока кода
       $isCodePlaceholder = false;
-      if (preg_match('/^%%(CODE_BLOCK|TEMPLATE_VAR)_\d+%%$/', $trimmedLine)) {
+      if (preg_match('/^%%(CODE_BLOCK|INLINE_CODE|TEMPLATE_VAR)_\d+%%$/', $trimmedLine)) {
         $isCodePlaceholder = true;
       }
       
