@@ -392,7 +392,10 @@ class NadvoParse
   public function parse(string $markdown) : string
   {
     $this->usedHeaderIds = [];
-    
+
+    // Браузер отправляет textarea с переносами \r\n: приводим к \n, иначе якоря строк ($) не срабатывают
+    $markdown = str_replace(["\r\n", "\r"], "\n", $markdown);
+
     $markdown = $this->sanitizeInput($markdown);
 
     // Защищаем шаблонные переменные ДО всего остального
