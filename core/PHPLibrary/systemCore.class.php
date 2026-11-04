@@ -121,6 +121,8 @@ final class SystemCore implements CoreInterface
    * @var bool Является ли текущий запуск CLI
    */
   public bool $isCLI = false;
+
+  public array $metaOpenGraphAllowed = [];
   
   /**
    * __construct
@@ -759,6 +761,26 @@ final class SystemCore implements CoreInterface
 
             $headElement->appendChild($metaElement);
           }
+        }
+      }
+
+      if (!empty($this->metaOpenGraphAllowed)) {
+        $headElement = $document->getElementsByTagName('head')->item(0);
+        
+        foreach ($this->metaOpenGraphAllowed as $metaname => $metadata) {
+          if ($this->page !== null) {
+            if (property_exists($this->page, 'metaOpenGraphAllowed')) {
+              if (isset($this->page->metaOpenGraphAllowed[$metaname])) {
+                continue;
+              }
+            }
+          }
+
+          $metaElement = $document->createElement('meta');
+          $metaElement->setAttribute('property', 'og:' . $metaname);
+          $metaElement->setAttribute('content', $metadata);
+
+          $headElement->appendChild($metaElement);
         }
       }
 

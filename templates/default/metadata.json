@@ -7,6 +7,5 @@
   "authorSocialVKLink": "https://vk.ru/karelian_developer",
   "authorSocialOKLink": "https://ok.ru/kareliandeveloper",
   "version": "2.0.0",
-  "CMSVersion": "0.4.0",
-  "CMSModulesDependency": ["helloWorld", "scrollTop"]
+  "CMSVersion": "0.4.0"
 }
