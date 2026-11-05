@@ -750,39 +750,9 @@ final class SystemCore implements CoreInterface
       $document = new DOMDocument();
       @$document->loadHTML($theme->core->assembled);
 
-      if ($this->page !== null) {
-        if (property_exists($this->page, 'metaOpenGraphAllowed')) {
-          $headElement = $document->getElementsByTagName('head')->item(0);
-          
-          foreach ($this->page->metaOpenGraphAllowed as $metaname => $metadata) {
-            $metaElement = $document->createElement('meta');
-            $metaElement->setAttribute('property', 'og:' . $metaname);
-            $metaElement->setAttribute('content', $metadata);
-
-            $headElement->appendChild($metaElement);
-          }
-        }
-      }
-
-      if (!empty($this->metaOpenGraphAllowed)) {
-        $headElement = $document->getElementsByTagName('head')->item(0);
-        
-        foreach ($this->metaOpenGraphAllowed as $metaname => $metadata) {
-          if ($this->page !== null) {
-            if (property_exists($this->page, 'metaOpenGraphAllowed')) {
-              if (isset($this->page->metaOpenGraphAllowed[$metaname])) {
-                continue;
-              }
-            }
-          }
-
-          $metaElement = $document->createElement('meta');
-          $metaElement->setAttribute('property', 'og:' . $metaname);
-          $metaElement->setAttribute('content', $metadata);
-
-          $headElement->appendChild($metaElement);
-        }
-      }
+      $this->initSEOMetaTags($document);
+      $this->initOpenGraphMetaTags($document);
+      $this->initYandexMetrika($document);
 
       $scriptElements = $document->getElementsByTagName('script');
       foreach ($scriptElements as $scriptElement) {
@@ -1195,6 +1165,161 @@ final class SystemCore implements CoreInterface
         }
       }
     }
+  }
+
+  /**
+   * Добавить SEO-мета-теги (верификации) в <head>
+   *
+   * @param DOMDocument $document
+   * @return void
+   */
+  public function initSEOMetaTags(DOMDocument $document): void
+  {
+    $CMSConfigurator = $this->configurator;
+    if ($CMSConfigurator === null) {
+      return;
+    }
+
+    $headElement = $document->getElementsByTagName('head')->item(0);
+    if ($headElement === null) {
+      return;
+    }
+
+    /** @var array<string,string> Карта: значение в БД => name мета-тега */
+    $verificationMap = [
+      'seo_code_yandex_webmaster' => 'yandex-verification',
+      'seo_code_checksite_ru'     => 'checksite-verification',
+    ];
+
+    foreach ($verificationMap as $dbEntry => $metaName) {
+      if (!$CMSConfigurator->existsDatabaseEntryValue($dbEntry)) {
+        continue;
+      }
+
+      $code = (string) $CMSConfigurator->getDatabaseEntryValue($dbEntry);
+      if ($code === '') {
+        continue;
+      }
+
+      $metaElement = $document->createElement('meta');
+      $metaElement->setAttribute('name', $metaName);
+      $metaElement->setAttribute('content', $code);
+      $headElement->appendChild($metaElement);
+    }
+  }
+
+  /**
+   * Добавить OpenGraph-мета-теги в <head>
+   *
+   * @param DOMDocument $document
+   * @return void
+   */
+  public function initOpenGraphMetaTags(DOMDocument $document): void
+  {
+    $headElement = $document->getElementsByTagName('head')->item(0);
+    if ($headElement === null) {
+      return;
+    }
+
+    $sources = [];
+
+    if ($this->page !== null) {
+      $pageMeta = null;
+      
+      if (property_exists($this->page, 'metaOpenGraphAllowed')) {
+        $pageMeta = $this->page->metaOpenGraphAllowed;
+      } elseif (property_exists($this, 'page') && is_object($this->page)
+        && isset($this->page->metaOpenGraphAllowed)) {
+          $pageMeta = $this->page->metaOpenGraphAllowed;
+      }
+
+      if (is_array($pageMeta)) {
+        $sources[] = $pageMeta;
+      }
+    }
+
+    $sources[] = $this->metaOpenGraphAllowed;
+
+    /** @var array<string,true> Уже добавленные ключи (защита от дублей) */
+    $added = [];
+
+    foreach ($sources as $source) {
+      foreach ($source as $metaname => $metadata) {
+        if (isset($added[$metaname])) {
+          continue;
+        }
+        $added[$metaname] = true;
+
+        $metaElement = $document->createElement('meta');
+        $metaElement->setAttribute('property', 'og:' . $metaname);
+        $metaElement->setAttribute('content', (string) $metadata);
+        $headElement->appendChild($metaElement);
+      }
+    }
+  }
+
+  /**
+   * Добавить счётчик Яндекс.Метрики в <body>
+   *
+   * Читает номер счётчика из БД (seo_code_yandex_metrika) и вставляет
+   * стандартный фрагмент кода Метрики (script + noscript-пиксель).
+   *
+   * ВАЖНО: должен вызываться ДО цикла простановки CSP-nonce по <script>,
+   * иначе инлайн-скрипт будет заблокирован Content-Security-Policy.
+   *
+   * @param DOMDocument $document
+   * @return void
+   */
+  public function initYandexMetrika(DOMDocument $document): void
+  {
+    $CMSConfigurator = $this->configurator;
+    if ($CMSConfigurator === null) {
+      return;
+    }
+
+    if (!$CMSConfigurator->existsDatabaseEntryValue('seo_code_yandex_metrika')) {
+      return;
+    }
+
+    $counterID = trim((string) $CMSConfigurator->getDatabaseEntryValue('seo_code_yandex_metrika'));
+    // Номер счётчика — только цифры
+    if ($counterID === '' || !ctype_digit($counterID)) {
+      return;
+    }
+
+    $bodyElement = $document->getElementsByTagName('body')->item(0);
+    if ($bodyElement === null) {
+      return;
+    }
+
+    // --- <script> с инициализацией Метрики ---
+    $scriptElement = $document->createElement('script');
+    $scriptElement->setAttribute('type', 'text/javascript');
+    // nonce проставится позже в общем цикле по <script>
+    $scriptElement->appendChild($document->createTextNode(
+      '(function(m,e,t,r,i,k,a){'
+      . 'm[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};'
+      . 'm[i].l=1*new Date();'
+      . 'for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}'
+      . 'k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)'
+      . '})(window, document,\'script\',\'https://mc.yandex.ru/metrika/tag.js\', \'ym\');'
+      . 'ym(' . $counterID . ', \'init\', {clickmap:true, referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});'
+    ));
+    $bodyElement->appendChild($scriptElement);
+
+    // --- <noscript> с пикселем ---
+    $noscriptElement = $document->createElement('noscript');
+
+    $divElement = $document->createElement('div');
+
+    $imgElement = $document->createElement('img');
+    $imgElement->setAttribute('src', 'https://mc.yandex.ru/watch/' . $counterID);
+    $imgElement->setAttribute('style', 'position:absolute; left:-9999px;');
+    $imgElement->setAttribute('alt', '');
+
+    $divElement->appendChild($imgElement);
+    $noscriptElement->appendChild($divElement);
+    $bodyElement->appendChild($noscriptElement);
   }
 
   /**
