@@ -237,10 +237,7 @@ class PageModules implements InterfacePage
 
       $uploadedModulesNames = array_values(array_filter(
         $this->CMSCore->getArrayUploadedModulesNames(),
-        static function (string $name) use ($this->CMSCore) : bool {
-          $module = new Module($this->CMSCore, $name);
-          return $module->existsFileMetadataJSON();
-        }
+        fn (string $name) : bool => (new Module($this->CMSCore, $name))->existsFileMetadataJSON()
       ));
 
       $modulesCount = count($uploadedModulesNames);

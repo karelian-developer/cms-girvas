@@ -226,9 +226,7 @@ class PageTemplates implements InterfacePage
 
       $uploadedThemesNames = array_values(array_filter(
         $uploadedThemesNames,
-        static function (string $name) use ($this->CMSCore) : bool {
-          return (new Template($this->CMSCore, $name))->existsFileMetadataJSON();
-        }
+        fn (string $name) : bool => (new Template($this->CMSCore, $name))->existsFileMetadataJSON()
       ));
 
       $themesCount = count($uploadedThemesNames);
