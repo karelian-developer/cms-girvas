@@ -187,7 +187,12 @@ class PageTemplates implements InterfacePage
       if (isset($CURLExecuteResult['outputData'])) {
         if (count($CURLExecuteResult['outputData']) > 0) {
           $themesCount = count($CURLExecuteResult['outputData']);
-          $CURLExecuteResult['outputData'] = array_slice($CURLExecuteResult['outputData'], $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
+          $CURLExecuteResult['outputData'] = array_slice(
+            $CURLExecuteResult['outputData'],
+            $paginationItemCurrent * $paginationItemsOnPage,
+            $paginationItemsOnPage,
+            true
+          );
 
           foreach ($CURLExecuteResult['outputData'] as $name => $data) {
             $theme = new Template($this->CMSCore, $name);
@@ -214,33 +219,44 @@ class PageTemplates implements InterfacePage
         }
       }
     } elseif ($this->CMSCore->urlp->getPath(2) === 'local' || $this->CMSCore->urlp->getPath(2) === null) {
-      $uploadedThemesNames = $this->CMSCore->getArrayUploadedTemplatesNames();
-      $uploadedThemesNames = array_diff($uploadedThemesNames, ['admin', 'install']);
+      $uploadedThemesNames = array_values(array_diff(
+        $this->CMSCore->getArrayUploadedTemplatesNames(),
+        ['admin', 'install']
+      ));
 
-      if (count($uploadedThemesNames) > 0) {
-        $themesCount = count($uploadedThemesNames);
-        $uploadedThemesNames = array_slice($uploadedThemesNames, $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
-
-        foreach ($uploadedThemesNames as $name) {
-          $theme = new Template($this->CMSCore, $name);
-          $themeInstalledStatus = $theme->existsFileMetadataJSON() ? 'installed' : 'not-installed';
-          
-          if ($theme->existsFileMetadataJSON()) {
-            $themesListItemsTransformed[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/themes/listItem.tpl', [
-              'THEME_NAME' => $theme->getName(),
-              'THEME_TITLE' => $theme->getTitle(),
-              'THEME_DESCRIPTION' => $nadvoParse->parse($theme->getDescription()),
-              'THEME_CREATED_TIMESTAMP' => date('d.m.Y', $theme->getCoreCreatedUnixTimestamp()),
-              'THEME_AUTHOR' => $theme->getAuthorName(),
-              'THEME_PREVIEW_URL' => $theme->getPreviewURL(),
-              'THEME_LINK' => '/admin/template/' . $theme->getName(),
-              'THEME_INSTALLED_STATUS' => $themeInstalledStatus,
-              'THEME_CATEGORY_NAME' => $theme->getCategoryName(),
-            ]);
-          }
-
-          unset($theme);
+      $uploadedThemesNames = array_values(array_filter(
+        $uploadedThemesNames,
+        static function (string $name) use ($this->CMSCore) : bool {
+          return (new Template($this->CMSCore, $name))->existsFileMetadataJSON();
         }
+      ));
+
+      $themesCount = count($uploadedThemesNames);
+
+      $uploadedThemesNames = array_slice(
+        $uploadedThemesNames,
+        $paginationItemCurrent * $paginationItemsOnPage,
+        $paginationItemsOnPage
+      );
+
+      foreach ($uploadedThemesNames as $name) {
+        $theme = new Template($this->CMSCore, $name);
+        $themesListItemsTransformed[] = ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme,
+          'templates/page/themes/listItem.tpl',
+          [
+            'THEME_NAME'        => $theme->getName(),
+            'THEME_TITLE'       => $theme->getTitle(),
+            'THEME_DESCRIPTION' => $nadvoParse->parse($theme->getDescription()),
+            'THEME_CREATED_TIMESTAMP' => date('d.m.Y', $theme->getCoreCreatedUnixTimestamp()),
+            'THEME_AUTHOR'      => $theme->getAuthorName(),
+            'THEME_PREVIEW_URL' => $theme->getPreviewURL(),
+            'THEME_LINK'        => '/admin/template/' . $theme->getName(),
+            'THEME_INSTALLED_STATUS' => 'installed',
+            'THEME_CATEGORY_NAME'    => $theme->getCategoryName(),
+          ]
+        );
+        unset($theme);
       }
     }
 
@@ -262,14 +278,19 @@ class PageTemplates implements InterfacePage
         $this->CMSCore->theme, 'templates/page/themes.tpl',
         [
           'PAGE_THEMES_PAGINATION' => $pagination->assembled,
-          'THEMES_LIST' => ThemeCollector::assemblyFileContent(
-            $this->CMSCore->theme,
-            'templates/page/themes/list.tpl',
-            [
-              'THEMES_PLACE_NAME' => $locationPlaceName,
-              'THEMES_LIST_ITEMS' => implode('', $themesListItemsTransformed)
-            ]
-          )
+          'THEMES_LIST' => !empty($themesListItemsTransformed)
+            ? ThemeCollector::assemblyFileContent(
+              $this->CMSCore->theme,
+              'templates/page/themes/list.tpl',
+              [
+                'THEMES_PLACE_NAME' => $locationPlaceName,
+                'THEMES_LIST_ITEMS' => implode('', $themesListItemsTransformed)
+              ]
+            )
+            : sprintf(
+                '<p class="page__content-phar">%s</p>',
+                $localeData['PAGE_THEMES_THEMES_UPLoADED_NOT_FOUND_TITLE']
+              )
         ]
       );
     }

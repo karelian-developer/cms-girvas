@@ -190,7 +190,12 @@ class PageModules implements InterfacePage
 
         if (count($CURLExucuteResult['outputData']) > 0) {
           $modulesCount = count($CURLExucuteResult['outputData']);
-          $CURLExucuteResult['outputData'] = array_slice($CURLExucuteResult['outputData'], $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
+          $CURLExucuteResult['outputData'] = array_slice(
+            $CURLExucuteResult['outputData'],
+            $paginationItemCurrent * $paginationItemsOnPage,
+            $paginationItemsOnPage,
+            true
+          );
 
           foreach ($CURLExucuteResult['outputData'] as $name => $data) {
             $module = new Module($this->CMSCore, $name);
@@ -229,36 +234,41 @@ class PageModules implements InterfacePage
       || $this->CMSCore->urlp->getPath(2) === null
     ) {
       $modulesListItemsTransformed = [];
-      $uploadedModulesNames = $this->CMSCore->getArrayUploadedModulesNames();
-      if (count($uploadedModulesNames) > 0) {
-        $modulesCount = count($uploadedModulesNames);
-        $uploadedModulesNames = array_slice($uploadedModulesNames, $paginationItemCurrent * $paginationItemsOnPage, $paginationItemsOnPage);
 
-        foreach ($uploadedModulesNames as $name) {
+      $uploadedModulesNames = array_values(array_filter(
+        $this->CMSCore->getArrayUploadedModulesNames(),
+        static function (string $name) use ($this->CMSCore) : bool {
           $module = new Module($this->CMSCore, $name);
-          $moduleInstalledStatus = $module->existsFileMetadataJSON() ? 'installed' : 'not-installed';
-          $moduleEnabledStatus = $module->isEnabled() ? 'enabled' : 'disabled';
-
-          if ($module->existsFileMetadataJSON()) {
-            $modulesListItemsTransformed[] =  ThemeCollector::assemblyFileContent(
-              $this->CMSCore->theme,
-              'templates/page/modules/listItem.tpl',
-              [
-                'MODULE_NAME' => $module->getName(),
-                'MODULE_TITLE' => $module->getTitle(),
-                'MODULE_DESCRIPTION' => $nadvoParse->parse($module->getDescription()),
-                'MODULE_CREATED_TIMESTAMP' => date('d.m.Y', $module->getCoreCreatedUnixTimestamp()),
-                'MODULE_AUTHOR' => $module->getAuthorName(),
-                'MODULE_PREVIEW_URL' => $module->getPreviewURL(),
-                'MODULE_LINK' => '/admin/module/' . $module->getName(),
-                'MODULE_INSTALLED_STATUS' => $moduleInstalledStatus,
-                'MODULE_ENABLED_STATUS' => $moduleEnabledStatus
-              ]
-            );
-          }
-
-          unset($module);
+          return $module->existsFileMetadataJSON();
         }
+      ));
+
+      $modulesCount = count($uploadedModulesNames);
+
+      $uploadedModulesNames = array_slice(
+        $uploadedModulesNames,
+        $paginationItemCurrent * $paginationItemsOnPage,
+        $paginationItemsOnPage
+      );
+
+      foreach ($uploadedModulesNames as $name) {
+        $module = new Module($this->CMSCore, $name);
+        $modulesListItemsTransformed[] = ThemeCollector::assemblyFileContent(
+          $this->CMSCore->theme,
+          'templates/page/modules/listItem.tpl',
+          [
+            'MODULE_NAME' => $module->getName(),
+            'MODULE_TITLE' => $module->getTitle(),
+            'MODULE_DESCRIPTION' => $nadvoParse->parse($module->getDescription()),
+            'MODULE_CREATED_TIMESTAMP' => date('d.m.Y', $module->getCoreCreatedUnixTimestamp()),
+            'MODULE_AUTHOR' => $module->getAuthorName(),
+            'MODULE_PREVIEW_URL' => $module->getPreviewURL(),
+            'MODULE_LINK' => '/admin/module/' . $module->getName(),
+            'MODULE_INSTALLED_STATUS' => 'installed',
+            'MODULE_ENABLED_STATUS' => $module->isEnabled() ? 'enabled' : 'disabled',
+          ]
+        );
+        unset($module);
       }
     }
 

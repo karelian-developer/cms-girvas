@@ -836,6 +836,7 @@
   "PAGE_THEME_VERSION_LABEL": "Версия",
   "PAGE_THEME_CMS_VERSION_LABEL": "Версия CMS",
   "PAGE_THEME_CMS_MODULES_DEPENDENCY_LABEL": "Зависимость от модулей",
+  "PAGE_THEMES_THEMES_UPLoADED_NOT_FOUND_TITLE": "Загруженных тем в системе не обнаружено.",
   "PAGE_THEMES_NAVIGATION_INDEX_LABEL": "Дашборд",
   "PAGE_THEMES_NAVIGATION_LOCAL_LABEL": "Загруженные",
   "PAGE_THEMES_NAVIGATION_REPOSITORY_LABEL": "Репозиторий",
