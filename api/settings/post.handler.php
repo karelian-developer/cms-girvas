@@ -340,8 +340,6 @@ if ($CMSCore->client->isLogged(2)) {
               } else {
                 $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
                 $handlerStatusCode = $handlerStatusCode ?? 0;
-
-                continue;
               }
             }
 
