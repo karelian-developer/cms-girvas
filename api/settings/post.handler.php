@@ -305,6 +305,8 @@ if ($CMSCore->client->isLogged(2)) {
             }
 
             if ($settingName === 'smtp_email_texts') {
+              error_log('[settings] smtp_email_texts branch reached, type=' . gettype($settingValue));
+              
               $decodedEmailTexts = is_string($settingValue)
                 ? json_decode($settingValue, true)
                 : null;
@@ -340,6 +342,8 @@ if ($CMSCore->client->isLogged(2)) {
               } else {
                 $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
                 $handlerStatusCode = $handlerStatusCode ?? 0;
+
+                continue;
               }
             }
 
@@ -442,6 +446,17 @@ if ($CMSCore->client->isLogged(2)) {
             if ($CMSCore->configurator->existsDatabaseEntryValue($settingName)) {
               $CMSCore->configurator->updateDatabaseEntryValue($settingName, $settingValue);
             } else {
+              error_log('[settings] before save: name=' . $settingName . ', value_type=' . gettype($settingValue) . ', value_len=' . (is_string($settingValue) ? strlen($settingValue) : -1));
+              error_log('[settings] exists=' . ($CMSCore->configurator->existsDatabaseEntryValue($settingName) ? 'yes' : 'no'));
+
+              if ($CMSCore->configurator->existsDatabaseEntryValue($settingName)) {
+                $result = $CMSCore->configurator->updateDatabaseEntryValue($settingName, $settingValue);
+                error_log('[settings] update result=' . var_export($result, true));
+              } else {
+                $result = $CMSCore->configurator->insertDatabaseEntryValue($settingName, $settingValue);
+                error_log('[settings] insert result=' . var_export($result, true));
+              }
+
               $CMSCore->configurator->insertDatabaseEntryValue($settingName, $settingValue);
             }
           }
