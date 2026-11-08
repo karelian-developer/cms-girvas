@@ -447,14 +447,12 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
       fwrite($file, '  \'sessionExpires\' => 86400,' . PHP_EOL);
       fwrite($file, '  \'sessionAdminExpires\' => 86400,' . PHP_EOL);
       fwrite($file, '  \'SSLCSP\' => [' . PHP_EOL);
-      fwrite($file, '    \'default-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai vk.com vk.ru rutube.ru auth.robokassa.ru\',' . PHP_EOL);
+      fwrite($file, '    \'default-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai vk.com vk.ru rutube.ru auth.robokassa.ru mc.yandex.ru\',' . PHP_EOL);
       fwrite($file, '    \'style-src \\\'unsafe-inline\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
       fwrite($file, '    \'script-src \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
-      fwrite($file, '    \'script-src-elem \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai auth.robokassa.ru\',' . PHP_EOL);
+      fwrite($file, '    \'script-src-elem \\\'unsafe-inline\\\' \\\'unsafe-eval\\\' {DOMAIN} {DOMAIN_ALIASES} *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai auth.robokassa.ru mc.yandex.ru yastatic.net\',' . PHP_EOL);
       fwrite($file, '    \'manifest-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
-      fwrite($file, '    \'img-src \\\'self\\\' data: *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai\',' . PHP_EOL);
-      fwrite($file, '    \'img-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai vk.com vk.ru\',' . PHP_EOL);
-      fwrite($file, '    \'img-src \\\'self\\\' *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai stats.vk-portal.net\'' . PHP_EOL);
+      fwrite($file, '    \'img-src \\\'self\\\' data: *.cms-girvas.ru cms-girvas.ru *.xn--80afbjh2aegfdbd2a2a2a.xn--p1ai xn--80afbjh2aegfdbd2a2a2a.xn--p1ai vk.com vk.ru stats.vk-portal.net yastatic.net\'' . PHP_EOL);
       fwrite($file, '  ],' . PHP_EOL);
       fwrite($file, '  \'SSLPermRedirect\' => false,' . PHP_EOL);
       fwrite($file, '  \'SSLHSTSMaxAge\' => 63072000,' . PHP_EOL);
