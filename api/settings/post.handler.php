@@ -304,6 +304,47 @@ if ($CMSCore->client->isLogged(2)) {
               }
             }
 
+            if ($settingName === 'smtp_email_texts') {
+              $decodedEmailTexts = is_string($settingValue)
+                ? json_decode($settingValue, true)
+                : null;
+
+              if (is_array($decodedEmailTexts)) {
+                $sanitizedEmailTexts = [];
+
+                foreach ($decodedEmailTexts as $localeName => $localeTexts) {
+                  if (!is_array($localeTexts)) {
+                    continue;
+                  }
+
+                  $sanitizedLocaleTexts = [];
+
+                  foreach ($localeTexts as $key => $value) {
+                    if (!is_string($value)) {
+                      continue;
+                    }
+
+                    // Title / Copyright — режем теги; Content — оставляем как есть (Markdown → NadvoParse при рендере)
+                    $sanitizedLocaleTexts[$key] = str_ends_with($key, 'Content')
+                      ? $value
+                      : strip_tags($value);
+                  }
+
+                  $sanitizedEmailTexts[$localeName] = $sanitizedLocaleTexts;
+                }
+
+                $settingValue = json_encode(
+                  $sanitizedEmailTexts,
+                  JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                );
+              } else {
+                $handlerMessage = $handlerMessage ?? 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_INVALID_INPUT_DATA_SET');
+                $handlerStatusCode = $handlerStatusCode ?? 0;
+
+                continue;
+              }
+            }
+
             // ============================================================
             // МУЛЬТИЯЗЫЧНЫЕ НАСТРОЙКИ: base_site_title, seo_site_description, seo_site_keywords
             // ============================================================
@@ -382,6 +423,7 @@ if ($CMSCore->client->isLogged(2)) {
               'security_allowed_emails' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
               'seo_site_keywords' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
               'security_premoderation_words_filter_list' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
+              'smtp_email_texts' => $settingValue,
               'users_logins_blacklist' => !empty($settingValue) ? json_encode(preg_split('/\s*\,\s*/', $settingValue)) : json_encode([]),
               'users_additional_field_title' => $settingValue,
               'users_additional_field_description' => $settingValue,
@@ -467,7 +509,7 @@ if ($CMSCore->client->isLogged(2)) {
          */
         $sensitivePatterns = [
           'password', 'token', 'secret', 'hash', 'salt',
-          'smtp_password', 'smtp_username',
+          'smtp_password', 'smtp_username', 'smtp_email_texts',
           'allowed_admin_ip', 'allowed_emails',
           'notification_telegram_chats_ids', 'notification_max_chats_ids',
           'logins_blacklist',

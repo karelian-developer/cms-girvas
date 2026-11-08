@@ -320,40 +320,98 @@ if ($CMSCore->urlp->getPath(2) === 'registration') {
                           $SMTPConfiguration = $CMSCore->configurator->getOtherCollection('smtp');
 
                           if (!empty($SMTPConfiguration)) {
-                            $CMSEmail = 'no-reply@' . $SMTPConfiguration['domain'];
+                            $CMSEmail = null;
 
                             try {
-                              $SMTPClient = new SMTPClient(
-                                $SMTPConfiguration['host'],
-                                $SMTPConfiguration['port'],
-                                $SMTPConfiguration['username'],
-                                $SMTPConfiguration['password']
+                              $CMSEmail = SMTPClient::resolveFromEmail(
+                                $SMTPConfiguration,
+                                $CMSCore->configurator->get('domainCookies') ?? null
                               );
-
-                              $SMTPClient->connect();
-                              $SMTPClient->login();
-
-                              $mailTitle = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_TITLE');
-                              $mailContentText = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_CONTENT');
-                              $mailContent = ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
-                                'EMAIL_TITLE' => $mailTitle,
-                                'EMAIL_CONTENT' => sprintf(
-                                  $mailContentText,
-                                  $userLogin,
-                                  $CMSCore->getSiteURL() . '/registration?submit=' . $registrationSubmit['submitToken'],
-                                  $CMSCore->getSiteURL() . '/registration?refusal=' . $registrationSubmit['refusalToken']
-                                ),
-                                'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')
-                              ]);
-
-                              $SMTPClient->sendEmail($CMSEmail, $userEmail, $mailTitle, $mailContent, true);
-                              $SMTPClient->disconnect();
-
-                              $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_SENDED_SUCCESS');
-                              $handlerStatusCode = $handlerStatusCode ?? 1;
                             } catch (Exception $exception) {
-                              $handlerMessage = 'API ERROR: ' . $exception;
+                              error_log('[registration] resolveFromEmail failed: ' . $exception->getMessage());
+                              $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
                               $handlerStatusCode = $handlerStatusCode ?? 0;
+                            }
+
+                            if ($CMSEmail !== null) {
+                              try {
+                                $SMTPClient = new SMTPClient(
+                                  $SMTPConfiguration['host'],
+                                  $SMTPConfiguration['port'],
+                                  $SMTPConfiguration['username'],
+                                  $SMTPConfiguration['password']
+                                );
+
+                                $SMTPClient->connect();
+                                $SMTPClient->login();
+
+                                // ============================================================
+                                // Тексты письма: smtp_email_texts с fallback на локали CMS
+                                // ============================================================
+                                $emailTextsRaw = $CMSCore->configurator->getDatabaseEntryValue('smtp_email_texts');
+                                $emailTexts = [];
+
+                                if (is_array($emailTextsRaw)) {
+                                  $emailTexts = $emailTextsRaw;
+                                } elseif (is_string($emailTextsRaw) && trim($emailTextsRaw) !== '') {
+                                  $decoded = json_decode($emailTextsRaw, true);
+                                  if (is_array($decoded)) $emailTexts = $decoded;
+                                }
+
+                                $localeEmailTexts = SMTPClient::pickLocaleTexts(
+                                  $emailTexts,
+                                  $registrationLocale,
+                                  $CMSCore->getCMSLocale()->getName()
+                                );
+
+                                $mailTitleTemplate     = $localeEmailTexts['registrationTitle'] ?? '';
+                                $mailContentTemplate   = $localeEmailTexts['registrationContent'] ?? '';
+                                $mailCopyrightTemplate = $localeEmailTexts['registrationCopyright'] ?? '';
+
+                                if (trim($mailContentTemplate) === '') {
+                                  // Полный fallback на старый sprintf-путь
+                                  $mailTitle = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_TITLE');
+                                  $mailContentHtml = sprintf(
+                                    $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_EMAIL_CONTENT'),
+                                    $userLogin,
+                                    $CMSCore->getSiteURL() . '/registration?submit=' . $registrationSubmit['submitToken'],
+                                    $CMSCore->getSiteURL() . '/registration?refusal=' . $registrationSubmit['refusalToken']
+                                  );
+                                  $mailCopyright = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT');
+                                } else {
+                                  $replacements = [
+                                    'LOGIN'       => $userLogin,
+                                    'USER_EMAIL'  => $userEmail,
+                                    'SITE_URL'    => $CMSCore->getSiteURL(),
+                                    'SITE_TITLE'  => $siteTitle,
+                                    'SUBMIT_URL'  => $CMSCore->getSiteURL() . '/registration?submit=' . $registrationSubmit['submitToken'],
+                                    'REFUSAL_URL' => $CMSCore->getSiteURL() . '/registration?refusal=' . $registrationSubmit['refusalToken'],
+                                    'YEAR'        => date('Y'),
+                                  ];
+
+                                  $mailTitle = SMTPClient::renderTemplate($mailTitleTemplate, $replacements);
+                                  $mailContentHtml = SMTPClient::renderMarkdown(
+                                    SMTPClient::renderTemplate($mailContentTemplate, $replacements)
+                                  );
+                                  $mailCopyright = SMTPClient::renderTemplate($mailCopyrightTemplate, $replacements);
+                                }
+
+                                $mailContent = ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
+                                  'EMAIL_TITLE'     => $mailTitle,
+                                  'EMAIL_CONTENT'   => $mailContentHtml,
+                                  'EMAIL_COPYRIGHT' => $mailCopyright,
+                                ]);
+
+                                $SMTPClient->sendEmail($CMSEmail, $userEmail, $mailTitle, $mailContent, true);
+                                $SMTPClient->disconnect();
+
+                                $handlerMessage = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_REGISTRATION_SENDED_SUCCESS');
+                                $handlerStatusCode = $handlerStatusCode ?? 1;
+                              } catch (Exception $exception) {
+                                error_log('[registration] SMTP send failed: ' . $exception->getMessage());
+                                $handlerMessage = 'API ERROR: ' . $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+                                $handlerStatusCode = $handlerStatusCode ?? 0;
+                              }
                             }
                           }
                         } else {

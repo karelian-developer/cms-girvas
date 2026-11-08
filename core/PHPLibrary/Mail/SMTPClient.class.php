@@ -148,6 +148,10 @@ class SMTPClient
    */
   public function login() : void
   {
+    if ($this->username === null || $this->password === null) {
+      throw new Exception('SMTPClient: для авторизации не заданы username/password.');
+    }
+
     $this->sendCommand('EHLO localhost', '250');
     $this->sendCommand('AUTH LOGIN', '334');
     $this->sendCommand(base64_encode($this->username), '334');
@@ -170,19 +174,18 @@ class SMTPClient
     $this->sendCommand("RCPT TO: <{$to}>", '250');
     $this->sendCommand('DATA', '354');
 
-    $headers = "From: {$from}\r\n";
-    $headers .= "To: {$to}\r\n";
-    $headers .= "Subject: {$subject}\r\n";
-    $headers .= (!$isHTML)
-      ? "Content-Type: text/plain; charset=utf-8\r\n"
-      : "Content-type: text/html; charset=UTF-8\r\n";
-    $headers .= "Date: " . date('r') . "\r\n";
+    $encodedSubject = mb_encode_mimeheader($subject, 'UTF-8', 'B');
 
-    if ($isHTML) {
-      $headers .= "X-Mailer: PHP/" . phpversion();
-      $headers .= "\r\nMIME-Version: 1.0";
-      $headers .= "\r\n";
-    }
+    $headers  = "From: {$from}\r\n";
+    $headers .= "To: {$to}\r\n";
+    $headers .= "Subject: {$encodedSubject}\r\n";
+    $headers .= "MIME-Version: 1.0\r\n";
+    $headers .= "X-Mailer: CMS GIRVAS\r\n";
+    $headers .= $isHTML
+      ? "Content-Type: text/html; charset=UTF-8\r\n"
+      : "Content-Type: text/plain; charset=UTF-8\r\n";
+    $headers .= "Content-Transfer-Encoding: 8bit\r\n";
+    $headers .= "Date: " . date('r') . "\r\n";
 
     fwrite($this->socket, $headers . "\r\n" . $message . "\r\n.\r\n");
 
@@ -212,5 +215,111 @@ class SMTPClient
   {
     $this->sendCommand('STARTTLS', '220');
     stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+  }
+
+  /**
+   * Определяет адрес отправителя на основании конфигурации SMTP.
+   *
+   * @param array<string, mixed> $smtpConfiguration
+   * @param string|null $fallbackDomain Домен для fallback (если в конфиге пусто)
+   * @return string
+   */
+  public static function resolveFromEmail(array $smtpConfiguration, ?string $fallbackDomain = null) : string
+  {
+    $username = trim((string)($smtpConfiguration['username'] ?? ''));
+    $domain   = trim((string)($smtpConfiguration['domain'] ?? ''));
+
+    if ($domain === '' && $fallbackDomain !== null) {
+      $domain = ltrim(trim($fallbackDomain), '.');
+    }
+
+    if ($username === '') {
+      $candidate = $domain !== '' ? 'no-reply@' . $domain : '';
+    } elseif (filter_var($username, FILTER_VALIDATE_EMAIL)) {
+      $candidate = $username;
+    } else {
+      $candidate = $domain !== '' ? $username . '@' . $domain : '';
+    }
+
+    if ($candidate === '' || !filter_var($candidate, FILTER_VALIDATE_EMAIL)) {
+      error_log(sprintf(
+        '[SMTPClient] Невалидный адрес отправителя "%s" (username="%s", domain="%s"). Использован fallback.',
+        $candidate,
+        $username,
+        $domain
+      ));
+
+      if ($domain !== '' && filter_var('no-reply@' . $domain, FILTER_VALIDATE_EMAIL)) {
+        return 'no-reply@' . $domain;
+      }
+
+      throw new Exception('SMTPClient: не удалось определить валидный адрес отправителя.');
+    }
+
+    return $candidate;
+  }
+
+  /**
+   * Возвращает локализованный набор текстов письма
+   *
+   * @param array<string, mixed> $emailTexts
+   * @param string $requestedLocale  Например, "ru_RU"
+   * @param string $baseLocale       Например, "ru_RU"
+   * @return array<string, string>
+   */
+  public static function pickLocaleTexts(array $emailTexts, string $requestedLocale, string $baseLocale) : array
+  {
+    $candidates = array_unique([$requestedLocale, $baseLocale]);
+
+    foreach ($candidates as $localeName) {
+      if (isset($emailTexts[$localeName]) && is_array($emailTexts[$localeName]) && !empty($emailTexts[$localeName])) {
+        return $emailTexts[$localeName];
+      }
+    }
+
+    foreach ($emailTexts as $localeName => $texts) {
+      if (is_array($texts) && !empty($texts)) {
+        return $texts;
+      }
+    }
+
+    return [];
+  }
+
+  /**
+   * Разворачивает именованные плейсхолдеры вида {KEY} в шаблоне.
+   *
+   * @param string $template
+   * @param array<string, string> $replacements
+   * @return string
+   */
+  public static function renderTemplate(string $template, array $replacements) : string
+  {
+    if ($template === '' || empty($replacements)) {
+      return $template;
+    }
+
+    $pairs = [];
+    foreach ($replacements as $key => $value) {
+      $pairs['{' . $key . '}'] = (string) $value;
+    }
+
+    return strtr($template, $pairs);
+  }
+
+  /**
+   * Рендерит Markdown-контент в HTML через NadvoParse.
+   *
+   * @param string $markdown
+   * @return string
+   */
+  public static function renderMarkdown(string $markdown) : string
+  {
+    if (trim($markdown) === '') {
+      return '';
+    }
+
+    $parser = new \core\PHPLibrary\NadvoParse();
+    return $parser->parse($markdown);
   }
 }

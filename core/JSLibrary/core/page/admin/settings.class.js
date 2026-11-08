@@ -663,32 +663,113 @@ export class PageSettings {
       }
 
       if (searchParams.getPathPart(3) === 'email') {
-        this.buttons.sendTestEmail = new Interactive('button');
-        this.buttons.sendTestEmail.target.setLabel(localeData.BUTTON_SEND_TEST_EMAIL);
-        this.buttons.sendTestEmail.target.setCallback((event) => {
-          event.preventDefault();
+        const emailTextsHiddenInput = document.querySelector('[data-element="smtp-email-texts-hidden"]');
+        const emailTextInputs = document.querySelectorAll('[data-element="smtp-email-text-input"]');
 
-          let formData = new FormData();
-          formData.append('event', 'testSend');
+        this.emailTextsStore = {};
+        this.currentEmailLocale = null;
 
-          let request = new Interactive('request', {
-            method: 'POST',
-            url: '/handler/settings/email?localeMessage=' + window.CMSCore.locales.admin.name
+        const applyEmailTextsToFields = (localeName) => {
+          const localeTexts = this.emailTextsStore[localeName] || {};
+          emailTextInputs.forEach((input) => {
+            const key = input.getAttribute('data-email-key');
+            if (!key) return;
+            input.value = localeTexts[key] ?? '';
           });
+        };
 
-          request.target.data = formData;
-          request.target.send();
-        });
-        
-        this.buttons.sendTestEmail.assembly();
+        this.collectEmailTextsFromFields = (localeName) => {
+          if (!this.emailTextsStore[localeName]) {
+            this.emailTextsStore[localeName] = {};
+          }
+          emailTextInputs.forEach((input) => {
+            const key = input.getAttribute('data-email-key');
+            if (!key) return;
+            this.emailTextsStore[localeName][key] = input.value;
+          });
+        };
+
+        if (emailTextsHiddenInput !== null && emailTextInputs.length > 0) {
+          this.page.core.getSettings(['smtp_email_texts'])
+            .then((settings) => {
+              const raw = settings.smtp_email_texts;
+
+              if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+                this.emailTextsStore = raw;
+              } else if (typeof raw === 'string' && raw.trim() !== '') {
+                try {
+                  this.emailTextsStore = JSON.parse(raw) || {};
+                } catch (e) {
+                  window.CMSCore.debugError(1, 'Settings', 'Failed to parse smtp_email_texts: ' + e);
+                  this.emailTextsStore = {};
+                }
+              } else {
+                this.emailTextsStore = {};
+              }
+
+              const interactiveLocaleChoicesEmail = new Interactive('choices');
+
+              this.page.core.locales.list.forEach((locale, localeIndex) => {
+                const localeIconImageElement = document.createElement('img');
+                localeIconImageElement.setAttribute('src', locale.iconURL);
+                localeIconImageElement.setAttribute('alt', locale.title);
+
+                const localeLabelElement = document.createElement('span');
+                localeLabelElement.innerText = locale.title;
+
+                const localeTemplate = document.createElement('template');
+                localeTemplate.innerHTML += localeIconImageElement.outerHTML;
+                localeTemplate.innerHTML += localeLabelElement.outerHTML;
+
+                interactiveLocaleChoicesEmail.target.addItem(localeTemplate.innerHTML, locale.name);
+
+                if (locale.name === this.page.core.locales.admin.name) {
+                  interactiveLocaleChoicesEmail.target.setItemSelectedIndex(localeIndex);
+                  this.currentEmailLocale = locale.name;
+                }
+              });
+
+              interactiveLocaleChoicesEmail.assembly();
+
+              const interactiveHeaderContainerElement = document.querySelector('[data-element="header-interactive"]');
+              if (interactiveHeaderContainerElement !== null) {
+                interactiveHeaderContainerElement.append(interactiveLocaleChoicesEmail.target.element);
+              }
+
+              const localeSelectElement = interactiveLocaleChoicesEmail.target.element.querySelector('select');
+
+              applyEmailTextsToFields(this.currentEmailLocale);
+
+              localeSelectElement.addEventListener('change', (event) => {
+                if (this.currentEmailLocale !== null) {
+                  this.collectEmailTextsFromFields(this.currentEmailLocale);
+                }
+                this.currentEmailLocale = event.target.value;
+                applyEmailTextsToFields(this.currentEmailLocale);
+              });
+            })
+            .catch((rejectionReason) => {
+              this.page.showPopupNotification(rejectionReason, 0);
+            });
+        }
       }
 
       this.buttons.save = new Interactive('button');
       this.buttons.save.target.setLabel(localeData.BUTTON_SAVE_LABEL);
       this.buttons.save.target.setCallback((event) => {
         event.preventDefault();
-        
+
         let elementForm = document.querySelector('[data-element="main-form"]');
+
+        if (searchParams.getPathPart(3) === 'email' && this.currentEmailLocale !== null) {
+          this.collectEmailTextsFromFields(this.currentEmailLocale);
+
+          const emailTextsHiddenInput = document.querySelector('[data-element="smtp-email-texts-hidden"]');
+          if (emailTextsHiddenInput !== null) {
+            emailTextsHiddenInput.value = JSON.stringify(this.emailTextsStore);
+          }
+        }
+
         let form = new Interactive('form');
         form.target.replaceElement(elementForm);
 

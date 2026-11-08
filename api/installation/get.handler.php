@@ -1982,7 +1982,47 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
     $CMSCore->configurator->insertDatabaseEntryValue('seo_site_description', 'CMS GIRVAS - a multidisciplinary free contents control system from the Karelian Developer company.');
     $CMSCore->configurator->insertDatabaseEntryValue('seo_site_keywords', '["CMS GIRVAS","Free Content Management System","Free CMS","Karelian Developer"]');
     $CMSCore->configurator->insertDatabaseEntryValue('base_site_title', 'CMS GIRVAS');
+    
+    // ============================================================
+    // Предустановка smtp_email_texts (ru_RU / en_US)
+    // Ключи локалей — как есть; ключи внутри локали — camelCase.
+    // ============================================================
+    $defaultSmtpEmailTexts = [
+      'ru_RU' => [
+        'registrationTitle'     => 'Подтверждение регистрации',
+        'registrationContent'   => "Здравствуйте, {LOGIN}!\n\nДля подтверждения регистрации на сайте {SITE_TITLE} перейдите по ссылке:\n\n{SUBMIT_URL}\n\nЕсли вы не регистрировались — проигнорируйте это письмо или откажитесь от регистрации:\n\n{REFUSAL_URL}",
+        'registrationCopyright' => '© {YEAR} {SITE_TITLE}',
 
+        'passwordResetTitle'     => 'Сброс пароля',
+        'passwordResetContent'   => "Здравствуйте, {LOGIN}!\n\nДля сброса пароля перейдите по ссылке:\n\n{RESET_URL}\n\nЕсли вы не запрашивали сброс — проигнорируйте это письмо.",
+        'passwordResetCopyright' => '© {YEAR} {SITE_TITLE}',
+
+        'testTitle'     => 'Тестовое письмо',
+        'testContent'   => "Это тестовое письмо, отправленное с сайта {SITE_URL}.\n\nЕсли вы его получили — настройки SMTP работают корректно.",
+        'testCopyright' => '© {YEAR} {SITE_TITLE}',
+      ],
+      'en_US' => [
+        'registrationTitle'     => 'Registration confirmation',
+        'registrationContent'   => "Hello, {LOGIN}!\n\nTo confirm your registration on {SITE_TITLE}, follow the link:\n\n{SUBMIT_URL}\n\nIf you didn't register — ignore this email or refuse registration:\n\n{REFUSAL_URL}",
+        'registrationCopyright' => '© {YEAR} {SITE_TITLE}',
+
+        'passwordResetTitle'     => 'Password reset',
+        'passwordResetContent'   => "Hello, {LOGIN}!\n\nTo reset your password, follow the link:\n\n{RESET_URL}\n\nIf you didn't request a reset — ignore this email.",
+        'passwordResetCopyright' => '© {YEAR} {SITE_TITLE}',
+
+        'testTitle'     => 'Test email',
+        'testContent'   => "This is a test email sent from {SITE_URL}.\n\nIf you received it — SMTP settings work correctly.",
+        'testCopyright' => '© {YEAR} {SITE_TITLE}',
+      ],
+    ];
+
+    if (!$CMSCore->configurator->existsDatabaseEntryValue('smtp_email_texts')) {
+      $CMSCore->configurator->insertDatabaseEntryValue(
+        'smtp_email_texts',
+        json_encode($defaultSmtpEmailTexts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+      );
+    }
+    
     $tipBlockElement->setAttribute('class', 'tip tip_green');
     $tipBlockElement->nodeValue = $CMSCore->locale->getSingleValueByKey('API_INSTALLATION_TABLES_GENERATED');
 
