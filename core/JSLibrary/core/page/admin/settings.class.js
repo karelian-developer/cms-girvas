@@ -752,6 +752,25 @@ export class PageSettings {
               this.page.showPopupNotification(rejectionReason, 0);
             });
         }
+
+        this.buttons.sendTestEmail = new Interactive('button');
+        this.buttons.sendTestEmail.target.setLabel(localeData.BUTTON_SEND_TEST_EMAIL);
+        this.buttons.sendTestEmail.target.setCallback((event) => {
+          event.preventDefault();
+
+          let formData = new FormData();
+          formData.append('event', 'testSend');
+
+          let request = new Interactive('request', {
+            method: 'POST',
+            url: '/handler/settings/email?localeMessage=' + window.CMSCore.locales.admin.name
+          });
+
+          request.target.data = formData;
+          request.target.send();
+        });
+
+        this.buttons.sendTestEmail.assembly();
       }
 
       this.buttons.save = new Interactive('button');
@@ -789,63 +808,10 @@ export class PageSettings {
       });
       this.buttons.save.assembly();
 
-      let interactiveFormPanelContainer = document.querySelector('[data-element="panel"]');
-
-      if (searchParams.getPathPart(3) === 'email') {
-        const emailTextsHiddenInput = document.querySelector('[data-element="smtp-email-texts-hidden"]');
-        const emailTextInputs = document.querySelectorAll('[data-element="smtp-email-text-input"]');
-
-        this.emailTextsStore = {};
-        this.currentEmailLocale = null;
-
-        const applyEmailTextsToFields = (localeName) => {
-          const localeTexts = this.emailTextsStore[localeName] || {};
-          emailTextInputs.forEach((input) => {
-            const key = input.getAttribute('data-email-key');
-            if (!key) return;
-            input.value = localeTexts[key] ?? '';
-          });
-        };
-
-        this.collectEmailTextsFromFields = (localeName) => {
-          if (!this.emailTextsStore[localeName]) {
-            this.emailTextsStore[localeName] = {};
-          }
-          emailTextInputs.forEach((input) => {
-            const key = input.getAttribute('data-email-key');
-            if (!key) return;
-            this.emailTextsStore[localeName][key] = input.value;
-          });
-        };
-
-        if (emailTextsHiddenInput !== null && emailTextInputs.length > 0) {
-          this.page.core.getSettings(['smtp_email_texts'])
-            .then((settings) => {
-              // ... заполнение store и селекта локалей ...
-            })
-            .catch((rejectionReason) => {
-              this.page.showPopupNotification(rejectionReason, 0);
-            });
-        }
-
-        this.buttons.sendTestEmail = new Interactive('button');
-        this.buttons.sendTestEmail.target.setLabel(localeData.BUTTON_SEND_TEST_EMAIL);
-        this.buttons.sendTestEmail.target.setCallback((event) => {
-          event.preventDefault();
-
-          let formData = new FormData();
-          formData.append('event', 'testSend');
-
-          let request = new Interactive('request', {
-            method: 'POST',
-            url: '/handler/settings/email?localeMessage=' + window.CMSCore.locales.admin.name
-          });
-
-          request.target.data = formData;
-          request.target.send();
-        });
-
-        this.buttons.sendTestEmail.assembly();
+      const interactiveFormPanelContainer = document.querySelector('[data-element="panel"]');
+      
+      if (searchParams.getPathPart(3) === 'email' && this.buttons.sendTestEmail !== null) {
+        interactiveFormPanelContainer.append(this.buttons.sendTestEmail.target.element);
       }
 
       interactiveFormPanelContainer.append(this.buttons.save.target.element);
