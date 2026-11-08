@@ -740,12 +740,37 @@ export class PageSettings {
 
               applyEmailTextsToFields(this.currentEmailLocale);
 
-              localeSelectElement.addEventListener('change', (event) => {
+              localeSelectElement.addEventListener('change', async (event) => {
                 if (this.currentEmailLocale !== null) {
                   this.collectEmailTextsFromFields(this.currentEmailLocale);
                 }
-                this.currentEmailLocale = event.target.value;
-                applyEmailTextsToFields(this.currentEmailLocale);
+
+                const nextLocale = event.target.value;
+                this.currentEmailLocale = nextLocale;
+
+                try {
+                  const settings = await this.page.core.getSettings(['smtp_email_texts']);
+                  const raw = settings.smtp_email_texts;
+
+                  let freshStore = {};
+                  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+                    freshStore = raw;
+                  } else if (typeof raw === 'string' && raw.trim() !== '') {
+                    freshStore = JSON.parse(raw) || {};
+                  }
+
+                  Object.keys(this.emailTextsStore).forEach((localeName) => {
+                    if (localeName !== nextLocale && freshStore[localeName] === undefined) {
+                      freshStore[localeName] = this.emailTextsStore[localeName];
+                    }
+                  });
+
+                  this.emailTextsStore = freshStore;
+                  applyEmailTextsToFields(nextLocale);
+                } catch (e) {
+                  window.CMSCore.debugError(1, 'Settings', 'Failed to fetch smtp_email_texts: ' + e);
+                  applyEmailTextsToFields(nextLocale);
+                }
               });
             })
             .catch((rejectionReason) => {
