@@ -75,6 +75,10 @@ if ($CMSCore->client->isLogged(2)) {
           $mailContentTemplate   = $localeEmailTexts['testContent'] ?? '';
           $mailCopyrightTemplate = $localeEmailTexts['testCopyright'] ?? '';
 
+          $siteTitle = empty($CMSCore->configurator->getMetaTitle())
+          ? $CMSCore->configurator->getSiteTitle()
+          : $CMSCore->configurator->getMetaTitle();
+
           if (trim($mailTitleTemplate) === '')   $mailTitleTemplate = 'Test Subject';
           if (trim($mailContentTemplate) === '') $mailContentTemplate = 'This is test message';
 
@@ -82,6 +86,7 @@ if ($CMSCore->client->isLogged(2)) {
             'LOGIN'      => $clientUser->getLogin(),
             'USER_EMAIL' => $clientUser->getEmail(),
             'SITE_URL'   => $CMSCore->getSiteURL(),
+            'SITE_TITLE' => $siteTitle,
             'YEAR'       => date('Y'),
           ];
 
