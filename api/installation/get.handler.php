@@ -1996,6 +1996,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         'passwordResetTitle'     => 'Сброс пароля',
         'passwordResetContent'   => "Здравствуйте, {LOGIN}!\n\nДля сброса пароля перейдите по ссылке:\n\n{RESET_URL}\n\nЕсли вы не запрашивали сброс — проигнорируйте это письмо.",
         'passwordResetCopyright' => '© {YEAR} {SITE_TITLE}',
+        
+        'passwordResetedTitle'     => 'Новый пароль на сайте {SITE_TITLE}',
+        'passwordResetedContent'   => "Здравствуйте, {LOGIN}!\n\nВаш пароль на сайте [{SITE_TITLE}]({SITE_URL}) был сброшен.\n\nНовый пароль: **{NEW_PASSWORD}**\n\nРекомендуем сразу сменить его в личном кабинете на более надёжный.\n\nЕсли вы не запрашивали сброс пароля, свяжитесь с администрацией сайта.\n\nС уважением,\nкоманда {SITE_TITLE}",
+        'passwordResetedCopyright' => '© {YEAR} {SITE_TITLE}. Все права защищены.',
 
         'testTitle'     => 'Тестовое письмо',
         'testContent'   => "Это тестовое письмо, отправленное с сайта {SITE_URL}.\n\nЕсли вы его получили — настройки SMTP работают корректно.",
@@ -2009,6 +2013,10 @@ if (!file_exists(CMS_ROOT_DIRECTORY . '/INSTALLED')) {
         'passwordResetTitle'     => 'Password reset',
         'passwordResetContent'   => "Hello, {LOGIN}!\n\nTo reset your password, follow the link:\n\n{RESET_URL}\n\nIf you didn't request a reset — ignore this email.",
         'passwordResetCopyright' => '© {YEAR} {SITE_TITLE}',
+
+        'passwordResetedTitle'     => 'New password on {SITE_TITLE}',
+        'passwordResetedContent'   => "Hello, {LOGIN}!\n\nYour password on [{SITE_TITLE}]({SITE_URL}) has been reset.\n\nNew password: **{NEW_PASSWORD}**\n\nWe recommend changing it in your profile to a more secure one.\n\nIf you did not request a password reset, please contact the site administration.\n\nBest regards,\nthe {SITE_TITLE} team",
+        'passwordResetedCopyright' => '© {YEAR} {SITE_TITLE}. All rights reserved.',
 
         'testTitle'     => 'Test email',
         'testContent'   => "This is a test email sent from {SITE_URL}.\n\nIf you received it — SMTP settings work correctly.",

@@ -103,6 +103,35 @@
       <input type="text" class="input form__input form__input_text" data-element="smtp-email-text-input" data-email-key="passwordResetCopyright" value="">
     </div>
 
+    <!-- ===== Письмо: Новый пароль после сброса ===== -->
+    <div class="cell grid-table__cell grid-table__cell_header">
+      {LANG:PAGE_SETTINGS_SETTING_EMAIL_PASSWORD_RESETED_TITLE}
+    </div>
+
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">{LANG:PAGE_SETTINGS_SETTING_EMAIL_PASSWORD_RESETED_SUBJECT_TITLE}</div>
+      <div class="cell__description">{LANG:PAGE_SETTINGS_SETTING_EMAIL_PASSWORD_RESETED_SUBJECT_DESCRIPTION}</div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <input type="text" class="input form__input form__input_text" data-element="smtp-email-text-input" data-email-key="passwordResetedTitle" value="">
+    </div>
+
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">{LANG:PAGE_SETTINGS_SETTING_EMAIL_PASSWORD_RESETED_CONTENT_TITLE}</div>
+      <div class="cell__description">{LANG:PAGE_SETTINGS_SETTING_EMAIL_PASSWORD_RESETED_CONTENT_DESCRIPTION}</div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <textarea class="textarea form__textarea" rows="8" data-element="smtp-email-text-input" data-email-key="passwordResetedContent"></textarea>
+    </div>
+
+    <div class="cell grid-table__cell grid-table__cell_text">
+      <div class="cell__title">{LANG:PAGE_SETTINGS_SETTING_EMAIL_PASSWORD_RESETED_COPYRIGHT_TITLE}</div>
+      <div class="cell__description">{LANG:PAGE_SETTINGS_SETTING_EMAIL_PASSWORD_RESETED_COPYRIGHT_DESCRIPTION}</div>
+    </div>
+    <div class="cell grid-table__cell grid-table__cell_data">
+      <input type="text" class="input form__input form__input_text" data-element="smtp-email-text-input" data-email-key="passwordResetedCopyright" value="">
+    </div>
+
     <!-- ===== Письмо: Тестовое ===== -->
     <div class="cell grid-table__cell grid-table__cell_header">
       {LANG:PAGE_SETTINGS_SETTING_EMAIL_TEST_TITLE}

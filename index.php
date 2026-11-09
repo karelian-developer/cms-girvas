@@ -98,11 +98,19 @@ if ($CMSURLPathes[0] === 'handler') {
 
   if ($user !== null) {
     $user->initData(['login', 'email', 'metadata', 'securityHash']);
-    
+
     if ($user->getPasswordResetCreatedUnixTimestamp() + 600 > time()) {
       $userPasswordNew = random_int(10000000, 99999999);
-      $user->update(['passwordHash' => User::passwordHash($CMSCore, $user->getSecurityHash(), $userPasswordNew), 'metadata' => ['passwordResetToken' => '', 'passwordResetTokenCreatedTimestamp' => 0]]);
-      
+      $newPasswordHash = User::passwordHash($CMSCore, $user->getSecurityHash(), $userPasswordNew);
+
+      $user->update([
+        'passwordHash' => $newPasswordHash,
+        'metadata' => [
+          'passwordResetToken' => '',
+          'passwordResetTokenCreatedUnixTimestamp' => 0,
+        ]
+      ]);
+
       $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template')
         ? $CMSCore->configurator->getDatabaseEntryValue('base_template')
         : 'default';
@@ -113,38 +121,96 @@ if ($CMSURLPathes[0] === 'handler') {
         : $CMSCore->configurator->getMetaTitle();
       $SMTPConfiguration = $CMSCore->configurator->getOtherCollection('smtp');
 
-      if (!empty($SMTPConfiguration)) {
-        $CMSEmail = 'no-reply@' . $SMTPConfiguration['domain'];
-
+      if (empty($SMTPConfiguration)) {
+        echo $CMSCore->locale->getSingleValueByKey('API_ERROR_SMTP_NOT_CONFIGRED');
+      } else {
+        $CMSEmail = null;
         try {
-          $SMTPClient = new SMTPClient(
-            $SMTPConfiguration['host'],
-            $SMTPConfiguration['port'],
-            $SMTPConfiguration['username'],
-            $SMTPConfiguration['password']
+          $CMSEmail = SMTPClient::resolveFromEmail(
+            $SMTPConfiguration,
+            $CMSCore->configurator->get('domainCookies') ?? null
+          );
+        } catch (Exception $exception) {
+          error_log('[password-reset] resolveFromEmail failed: ' . $exception->getMessage());
+          echo $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+        }
+
+        if ($CMSEmail !== null) {
+          $requestedLocaleName = $_GET['localeMessage'] ?? $_GET['locale'] ?? null;
+          if ($requestedLocaleName === null || trim((string) $requestedLocaleName) === '') {
+            $requestedLocaleName = $CMSCore->getCMSLocale()->getName();
+          }
+
+          $emailTextsRaw = $CMSCore->configurator->getDatabaseEntryValue('smtp_email_texts');
+          $emailTexts = [];
+
+          if (is_array($emailTextsRaw)) {
+            $emailTexts = $emailTextsRaw;
+          } elseif (is_string($emailTextsRaw) && trim($emailTextsRaw) !== '') {
+            $decoded = json_decode($emailTextsRaw, true);
+            if (is_array($decoded)) $emailTexts = $decoded;
+          }
+
+          $localeEmailTexts = SMTPClient::pickLocaleTexts(
+            $emailTexts,
+            $requestedLocaleName,
+            $CMSCore->getCMSLocale()->getName()
           );
 
-          $SMTPClient->connect();
-          $SMTPClient->login();
+          $mailTitleTemplate     = $localeEmailTexts['passwordResetedTitle'] ?? '';
+          $mailContentTemplate   = $localeEmailTexts['passwordResetedContent'] ?? '';
+          $mailCopyrightTemplate = $localeEmailTexts['passwordResetedCopyright'] ?? '';
 
-          $mailTitle = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_PASSWORD_RESETED_EMAIL_TITLE');
-          $mailContentText = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_PASSWORD_RESETED_EMAIL_CONTENT');
-          $mailContent = ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
-            'EMAIL_TITLE' => $mailTitle,
-            'EMAIL_CONTENT' => sprintf(
-              $mailContentText,
+          if (trim($mailContentTemplate) === '') {
+            $mailTitle = $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_PASSWORD_RESETED_EMAIL_TITLE');
+            $mailContentHtml = sprintf(
+              $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_PASSWORD_RESETED_EMAIL_CONTENT'),
               $user->getLogin(),
               $userPasswordNew
-            ),
-            'EMAIL_COPYRIGHT' => $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT')
-          ]);
+            );
+            $mailCopyright = $CMSCore->locale->getSingleValueByKey('API_USER_REQUEST_PASSWORD_RESET_EMAIL_COPYRIGHT');
+          } else {
+            $replacements = [
+              'LOGIN'         => $user->getLogin(),
+              'USER_EMAIL'    => $user->getEmail(),
+              'SITE_URL'      => $CMSCore->getSiteURL(),
+              'SITE_TITLE'    => $siteTitle,
+              'NEW_PASSWORD'  => $userPasswordNew,
+              'YEAR'          => date('Y'),
+            ];
 
-          $SMTPClient->sendEmail($CMSEmail, $user->getEmail(), $mailTitle, $mailContent, true);
-          $SMTPClient->disconnect();
+            $mailTitle = SMTPClient::renderTemplate($mailTitleTemplate, $replacements);
+            $mailContentHtml = SMTPClient::renderMarkdown(
+              SMTPClient::renderTemplate($mailContentTemplate, $replacements)
+            );
+            $mailCopyright = SMTPClient::renderTemplate($mailCopyrightTemplate, $replacements);
+          }
 
-          echo $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_PASSWORD_RESETED_SUCCESS');
-        } catch (Exception $exception) {
-          echo $CMSCore->locale->getSingleValueByKey('API_ERROR_EXCEPTION') . $exception;
+          try {
+            $SMTPClient = new SMTPClient(
+              $SMTPConfiguration['host'],
+              $SMTPConfiguration['port'],
+              $SMTPConfiguration['username'],
+              $SMTPConfiguration['password']
+            );
+
+            $SMTPClient->connect();
+            $SMTPClient->login();
+
+            $mailContent = ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
+              'EMAIL_TITLE'     => $mailTitle,
+              'EMAIL_CONTENT'   => $mailContentHtml,
+              'EMAIL_COPYRIGHT' => $mailCopyright,
+            ]);
+
+            $SMTPClient->sendEmail($CMSEmail, $user->getEmail(), $mailTitle, $mailContent, true);
+            $SMTPClient->disconnect();
+
+            echo $CMSCore->locale->getSingleValueByKey('API_UTILS_USER_PASSWORD_RESETED_SUCCESS');
+          } catch (Exception $exception) {
+            error_log('[password-reset] SMTP send failed: ' . $exception->getMessage());
+            echo $CMSCore->locale->getSingleValueByKey('API_ERROR_UNKNOWN');
+          }
         }
       }
     } else {
