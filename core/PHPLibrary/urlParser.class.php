@@ -101,22 +101,25 @@ final class URLParser
    *
    * @return array
    */
-  private function getParsedPath() : array
+  private function getParsedPath(): array
   {
     $result = [];
 
-    $parsedURL = parse_url($_SERVER['REQUEST_URI']);
-    if (array_key_exists('path', $parsedURL)) {
-      $pathArray = explode('/', $parsedURL['path']);
+    $parsedURL = parse_url($_SERVER['REQUEST_URI'] ?? '');
 
-      foreach ($pathArray as $pathElement) {
-        if (!empty($pathElement)) {
+    if (!is_array($parsedURL) || !array_key_exists('path', $parsedURL)) {
+      return $result;
+    }
+
+    $pathArray = explode('/', $parsedURL['path']);
+
+    foreach ($pathArray as $pathElement) {
+      if (!empty($pathElement)) {
           $pathElement = is_numeric($pathElement) ? (int) $pathElement : $pathElement;
-          $result[] = $pathElement;
-        }
+        $result[] = $pathElement;
       }
     }
-    
+
     return $result;
   }
   
