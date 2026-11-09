@@ -76,7 +76,10 @@ if ($CMSURLPathes[0] === 'handler') {
   $CMSCore->locale->setTypeName('handler');
   $CMSCore->locale->initPathes();
 
-  $queryBuilder = new DatabaseQueryBuilder($CMSCore);
+  $CMSConfigurator = $CMSCore->configurator;
+  $CMSConfigDatabase = $CMSConfigurator->get('database');
+
+  $queryBuilder = new DatabaseQueryBuilder($CMSCore, $CMSConfigDatabase['dms']);
   $queryBuilder->setStatementSelect();
   $queryBuilder->statement->addSelections(['id']);
   $queryBuilder->statement->setClauseFrom();
