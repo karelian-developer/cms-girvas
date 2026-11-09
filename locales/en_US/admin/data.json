@@ -45,6 +45,7 @@
   "BUTTON_UPLOAD_LABEL": "Upload",
   "BUTTON_VIEW_ON_SITE_LABEL": "View on site",
   "BUTTON_YES_LABEL": "Yes",
+  "BUTTON_SEND_TEST_EMAIL": "Test mail send",
   "COMMENT_DETECTED_FROM_PREMODERATION_FILTER": "Comment sent for review",
   "COMMENT_PREMODERATION_BANNED_WORDS_DETECTED": "Presence of stop words or stop phrases",
   "COMMENT_PREMODERATION_EXTERNAL_LINKS_DETECTED": "Presence of links to external resources",
