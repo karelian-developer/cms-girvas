@@ -14,6 +14,8 @@ if (!defined('IS_NOT_HACKED')) {
 }
 
 use \core\PHPLibrary\Mail\SMTPClient as SMTPClient;
+use \core\PHPLibrary\Template as Theme;
+use \core\PHPLibrary\Template\Collector as ThemeCollector;
 use \core\PHPLibrary\SystemCore\Report as CMSReport;
 
 if ($CMSCore->client->isLogged(2)) {
@@ -99,7 +101,18 @@ if ($CMSCore->client->isLogged(2)) {
 
             $SMTPClient->connect();
             $SMTPClient->login();
-            $SMTPClient->sendEmail($CMSEmail, $clientUser->getEmail(), $mailTitle, $mailContentHtml, true);
+            $themeBaseName = $CMSCore->configurator->existsDatabaseEntryValue('base_template')
+              ? $CMSCore->configurator->getDatabaseEntryValue('base_template')
+              : 'default';
+            $theme = new Theme($CMSCore, $themeBaseName);
+
+            $mailContent = ThemeCollector::assemblyFileContent($theme, 'templates/email/default.tpl', [
+              'EMAIL_TITLE'     => $mailTitle,
+              'EMAIL_CONTENT'   => $mailContentHtml,
+              'EMAIL_COPYRIGHT' => $mailCopyright,
+            ]);
+
+            $SMTPClient->sendEmail($CMSEmail, $clientUser->getEmail(), $mailTitle, $mailContent, true);
             $SMTPClient->disconnect();
 
             CMSReport::create(
