@@ -174,7 +174,7 @@ class SMTPClient
     $this->sendCommand("RCPT TO: <{$to}>", '250');
     $this->sendCommand('DATA', '354');
 
-    $encodedSubject = mb_encode_mimeheader($subject, 'UTF-8', 'B');
+    $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
 
     $headers  = "From: {$from}\r\n";
     $headers .= "To: {$to}\r\n";

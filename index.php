@@ -126,9 +126,43 @@ if ($CMSURLPathes[0] === 'handler') {
         : 'default';
       $theme = new Theme($CMSCore, $themeBaseName);
 
-      $siteTitle = empty($CMSCore->configurator->getMetaTitle())
-        ? $CMSCore->configurator->getSiteTitle()
-        : $CMSCore->configurator->getMetaTitle();
+      $siteTitleLocaleName = $_GET['localeMessage'] ?? $_GET['locale'] ?? null;
+      if ($siteTitleLocaleName === null || trim((string) $siteTitleLocaleName) === '') {
+        $siteTitleLocaleName = $CMSCore->getCMSLocale()->getName();
+      }
+
+      $siteTitleRaw = $CMSCore->configurator->existsDatabaseEntryValue('base_site_title')
+        ? $CMSCore->configurator->getDatabaseEntryValue('base_site_title')
+        : '';
+
+      $siteTitle = '';
+      if (is_string($siteTitleRaw) && trim($siteTitleRaw) !== '') {
+        $siteTitleDecoded = json_decode($siteTitleRaw, true);
+        if (is_array($siteTitleDecoded)) {
+          $siteTitle = (string) ($siteTitleDecoded[$siteTitleLocaleName] ?? '');
+          if ($siteTitle === '') {
+            $baseLocaleName = $CMSCore->configurator->existsDatabaseEntryValue('base_locale')
+              ? (string) $CMSCore->configurator->getDatabaseEntryValue('base_locale')
+              : 'ru_RU';
+            $siteTitle = (string) ($siteTitleDecoded[$baseLocaleName] ?? '');
+          }
+          if ($siteTitle === '') {
+            foreach ($siteTitleDecoded as $v) {
+              if (is_string($v) && trim($v) !== '') {
+                $siteTitle = $v;
+                break;
+              }
+            }
+          }
+        } else {
+          $siteTitle = $siteTitleRaw;
+        }
+      }
+
+      if ($siteTitle === '') {
+        $siteTitle = $CMSCore->configurator->getSiteTitle();
+      }
+
       $SMTPConfiguration = $CMSCore->configurator->getOtherCollection('smtp');
 
       if (empty($SMTPConfiguration)) {
