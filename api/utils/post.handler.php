@@ -481,7 +481,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
         $report->initData(['variables']);
         $reportVariables = $report->getVariables();
 
-        if ($clientIP !== $reportVariables['clientIP']) {
+        if (($reportVariables['ip'] ?? $reportVariables['clientIP'] ?? null) !== $clientIP) {
           unset($lastReportsFailAuth[$reportIndex]);
         }
       }
@@ -609,7 +609,7 @@ if ($CMSCore->urlp->getPath(2) === 'authorization' && $CMSCore->urlp->getParam('
         $report->initData(['variables']);
         $reportVariables = $report->getVariables();
 
-        if ($clientIP !== $reportVariables['ip']) {
+        if (($reportVariables['ip'] ?? null) !== $clientIP) {
           unset($lastReportsFailAuth[$reportIndex]);
         }
       }
