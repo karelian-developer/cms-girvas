@@ -83,13 +83,20 @@ if ($CMSURLPathes[0] === 'handler') {
   $queryBuilder->statement->clauseFrom->addTable('users');
   $queryBuilder->statement->clauseFrom->assembly();
   $queryBuilder->statement->setClauseWhere();
-  $queryBuilder->statement->clauseWhere->addCondition(sprintf('metadata::jsonb->>\'passwordResetToken\' = \'%s\'', $CMSURLP->getParam('token')));
+  $queryBuilder->statement->clauseWhere->addCondition(sprintf(
+    '%s = :passwordResetToken',
+    $queryBuilder->dialect->jsonExtractString('metadata', 'passwordResetToken')
+  ));
   $queryBuilder->statement->clauseWhere->assembly();
   $queryBuilder->statement->setClauseLimit(1);
   $queryBuilder->statement->assembly();
 
   $databaseConnection = $CMSCore->databaseConnector->database->connection;
   $databaseQuery = $databaseConnection->prepare($queryBuilder->statement->assembled);
+
+  $passwordResetToken = (string) $CMSURLP->getParam('token');
+  $databaseQuery->bindParam(':passwordResetToken', $passwordResetToken, \PDO::PARAM_STR);
+
   $databaseQuery->execute();
 
   $result = $databaseQuery->fetch(\PDO::FETCH_ASSOC);
