@@ -1,4 +1,6 @@
 {
+  "categoryName": "base",
+  "typeName": "blog",
   "title": "Default",
   "description": "Первичная тема для **CMS «ГИРВАС»**, хорошо подходящая для блога и небольшого новостного сайта на любую тематику.",
   "authorDesignerName": "Андрей Шестаков",
