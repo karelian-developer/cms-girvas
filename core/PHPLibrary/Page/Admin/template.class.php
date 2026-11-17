@@ -459,6 +459,10 @@ class PageTemplate implements InterfacePage
               return implode(', ', $dependencyItems);
             }
 
+            if ($enumMetadata === ThemeEnumMetadata::TYPE_NAME) {
+              return $theme->getTypeTitle();
+            }
+
             return $themeMetadata[$metadataName] ?? '[???]';
           };
 
