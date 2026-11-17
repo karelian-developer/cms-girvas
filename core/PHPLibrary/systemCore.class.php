@@ -532,6 +532,7 @@ final class SystemCore implements CoreInterface
       header('Referrer-Policy: strict-origin-when-cross-origin');
       header('X-Content-Type-Options: nosniff');
       header('Permissions-Policy: browsing-topics=()');
+      header('X-Frame-Options: SAMEORIGIN');
       
       if ($CMSConfigurator->get('SSLIsEnabled')) {
         $HSTSVars = [];
