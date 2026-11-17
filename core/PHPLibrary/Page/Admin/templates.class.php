@@ -202,7 +202,9 @@ class PageTemplates implements InterfacePage
             $metadataDescription = isset($data['metadata']['description']) ? $data['metadata']['description'] : 'Without description.';
             $metadataDatetimeCreatedUnix = isset($data['metadata']['createdUnixTimestamp']) ? $data['metadata']['createdUnixTimestamp'] : 0;
             $metadataAuthorName = isset($data['metadata']['authorName']) ? $data['metadata']['authorName'] : 'Anonymous';
-            $metadataCategoryName = isset($data['metadata']['categoryName']) ? $data['metadata']['categoryName'] : 'default';
+            $metadataCategoryName = isset($data['metadata']['categoryName']) ? $data['metadata']['categoryName'] : 'base';
+            $metadataTypeName = isset($data['metadata']['typeName']) ? $data['metadata']['typeName'] : 'undefined';
+            $metadataTypeTitleTemplate = '{LANG:THEME_TYPE_' . strtoupper($metadataTypeName) . '_LABEL}';
 
             $themesListItemsTransformed[] = ThemeCollector::assemblyFileContent($this->CMSCore->theme, 'templates/page/themes/listItem.tpl', [
               'THEME_NAME' => $name,
@@ -213,7 +215,9 @@ class PageTemplates implements InterfacePage
               'THEME_LINK' => '/admin/templates/repository/' . $theme->getName(),
               'THEME_PREVIEW_URL' => $data['preview'],
               'THEME_INSTALLED_STATUS' => $themeInstalledStatus,
-              'THEME_CATEGORY_NAME' => $metadataCategoryName
+              'THEME_CATEGORY_NAME' => $metadataCategoryName,
+              'THEME_TYPE_NAME' => $metadataTypeName,
+              'THEME_TYPE_TITLE' => $metadataTypeTitleTemplate
             ]);
           }
         }
@@ -252,6 +256,8 @@ class PageTemplates implements InterfacePage
             'THEME_LINK'        => '/admin/template/' . $theme->getName(),
             'THEME_INSTALLED_STATUS' => 'installed',
             'THEME_CATEGORY_NAME'    => $theme->getCategoryName(),
+            'THEME_TYPE_NAME' => $theme->getTypeName(),
+            'THEME_TYPE_TITLE' => $theme->getTypeTitle()
           ]
         );
         unset($theme);

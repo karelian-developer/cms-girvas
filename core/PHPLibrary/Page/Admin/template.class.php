@@ -475,6 +475,7 @@ class PageTemplate implements InterfacePage
             ThemeEnumMetadata::AUTHOR_SOCIAL_MAX_LINK => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_AUTHOR_SOCIAL_MAX_LINK_LABEL'),
             ThemeEnumMetadata::AUTHOR_SOCIAL_TELEGRAM_LINK => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_MODULE_AUTHOR_SOCIAL_TELEGRAM_LINK_LABEL'),
             ThemeEnumMetadata::CATEGORY_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_CATEGORY_NAME_LABEL'),
+            ThemeEnumMetadata::TYPE_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_TYPE_NAME_LABEL'),
             ThemeEnumMetadata::WEIGHT => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_SIZE_LABEL'),
             ThemeEnumMetadata::DATETIME_CREATED_UNIX => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_DATETIME_CREATED_UNIX_LABEL'),
             ThemeEnumMetadata::DATETIME_UPDATED_UNIX => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_DATETIME_UPDATED_UNIX_LABEL'),

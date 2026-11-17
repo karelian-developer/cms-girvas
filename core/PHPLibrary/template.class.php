@@ -207,7 +207,7 @@ final class Template implements ThemeInterface
   }
 
   /**
-   * Получить имя категории шаблона
+   * Получить имя категории темы
    *
    * @return string
    */
@@ -215,6 +215,31 @@ final class Template implements ThemeInterface
   {
     $metadata = $this->getMetadata();
     return $metadata['categoryName'] ?? 'base';
+  }
+
+  /**
+   * Получить имя типа темы
+   *
+   * @return string
+   */
+  public function getTypeName() : string
+  {
+    $metadata = $this->getMetadata();
+    return $metadata['typeName'] ?? 'undefined';
+  }
+
+  /**
+   * Получить заголовок типа темы
+   *
+   * @return string
+   */
+  public function getTypeTitle() : string
+  {
+    $CMSLocale = $this->CMSCore->locale;
+    $localeData = $CMSLocale->getData();
+
+    $typeName = $this->getTypeName();
+    return $localeData['THEME_TYPE_' . strtoupper($typeName) . '_LABEL'] ?? '[???]';
   }
 
   /**
@@ -585,6 +610,7 @@ final class Template implements ThemeInterface
       ThemeEnumMetadata::AUTHOR_SOCIAL_MAX_LINK => 'authorSocialMAXLink',
       ThemeEnumMetadata::AUTHOR_SOCIAL_TELEGRAM_LINK => 'authorSocialTelegramLink',
       ThemeEnumMetadata::CATEGORY_NAME => 'categoryName',
+      ThemeEnumMetadata::TYPE_NAME => 'typeName',
       ThemeEnumMetadata::WEIGHT => 'size',
       ThemeEnumMetadata::DATETIME_CREATED_UNIX => 'datetimeCreatedUnix',
       ThemeEnumMetadata::DATETIME_UPDATED_UNIX => 'datetimeUpdatedUnix',
