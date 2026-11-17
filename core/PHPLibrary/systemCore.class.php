@@ -1281,6 +1281,10 @@ final class SystemCore implements CoreInterface
       return;
     }
 
+    if (!isset($_COOKIE['allowCookies']) || $_COOKIE['allowCookies'] !== 'true') {
+      return;
+    }
+
     $counterID = trim((string) $CMSConfigurator->getDatabaseEntryValue('seo_code_yandex_metrika'));
     // Номер счётчика — только цифры
     if ($counterID === '' || !ctype_digit($counterID)) {
