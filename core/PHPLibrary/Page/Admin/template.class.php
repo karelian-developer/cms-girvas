@@ -466,6 +466,12 @@ class PageTemplate implements InterfacePage
             return $themeMetadata[$metadataName] ?? '[???]';
           };
 
+          $metadataValue = $getMetadataValue($theme, $themeMetadata, $enumMetadata);
+
+          if (empty($metadataValue) && $metadataValue !== 0 && $metadataValue !== '0') {
+            continue;
+          }
+
           /** @var string Заголовок ячейки метаданных */
           $metadataTitle = match ($enumMetadata) {
             ThemeEnumMetadata::AUTHOR_NAME => $theme->CMSCore->locale::getDataValue($localeData, 'PAGE_THEME_AUTHOR_NAME_LABEL'),
@@ -500,7 +506,7 @@ class PageTemplate implements InterfacePage
 
           $themeMetadataItemsTransformed[] = ThemeCollector::assembly($metadataValueTemplate, [
             'METADATA_TITLE' => $metadataTitle,
-            'METADATA_VALUE' => $getMetadataValue($theme, $themeMetadata, $enumMetadata)
+            'METADATA_VALUE' => $metadataValue
           ]);
         }
       }
