@@ -59,6 +59,7 @@ class PageTemplate implements InterfacePage
     ThemeEnumMetadata::AUTHOR_SOCIAL_VK_LINK,
     ThemeEnumMetadata::AUTHOR_SOCIAL_OK_LINK,
     ThemeEnumMetadata::CATEGORY_NAME,
+    ThemeEnumMetadata::TYPE_NAME,
     ThemeEnumMetadata::WEIGHT,
     ThemeEnumMetadata::DATETIME_CREATED_UNIX,
     ThemeEnumMetadata::DATETIME_UPDATED_UNIX,
