@@ -80,7 +80,7 @@ final class Importer
 
   private function setFeedLink(string $link) : void
   {
-    /if (filter_var($link, FILTER_VALIDATE_URL)) {
+    if (filter_var($link, FILTER_VALIDATE_URL)) {
       $this->feedLink = $link;
     } else {
       $this->feedLink = '';
