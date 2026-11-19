@@ -914,7 +914,7 @@ final class SystemCore implements CoreInterface
   private function initURLParser() : void
   {
     if (!class_exists(URLParser::class)) {
-      require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/URLParser.class.php';
+      require_once CMS_ROOT_DIRECTORY . '/' . self::CMS_CORE_PHP_LIBRARY_PATH . '/urlParser.class.php';
     }
 
     $this->urlp = new URLParser();
@@ -1117,54 +1117,127 @@ final class SystemCore implements CoreInterface
 
     foreach ($filesTypes as $type) {
       $fileNamePattern = '/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/';
-      $cacheKey = md5($fileNamePattern . $salt);
-      $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
+      $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . md5($fileNamePattern . $salt) . '.cache';
+      $files = $this->readComponentsCache($cacheFile);
 
-      if (file_exists($cacheFile)) {
-        $cachedData = json_decode(file_get_contents($cacheFile), true);
+      if ($files === null) {
+        $files = $this->collectComponentFiles($filesPath, $fileNamePattern);
+        $this->writeComponentsCache($cacheFile, $files);
+      }
 
-        if (!is_array($cachedData) || !isset($cachedData['expires'])) {
-          @unlink($cacheFile);
-        } elseif (time() >= $cachedData['expires']) {
-          unlink($cacheFile);
-        }
-      };
-
-      if (!file_exists($cacheFile)) {
-        $CMSFileConnector->generateCachePathesFiles('/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/', $salt);
-        $CMSFileConnector->resetCurrentDirectory();
+      foreach ($this->sortComponentFiles($files) as $file) {
+        $CMSFileConnector->connectFile(strtr(CMS_ROOT_DIRECTORY . '/' . $file, ['\\' => '']));
       }
     }
+  }
 
-    foreach ($filesTypes as $type) {
-      $fileNamePattern = '/^([a-zA-Z_0-9]+)\.' . $type . '\.php$/';
-      $cacheKey = md5($fileNamePattern . $salt);
-      $cacheFile = CMS_ROOT_DIRECTORY . '/cache/' . $cacheKey . '.cache';
+  /**
+   * Прочитать список файлов компонентов из кеша
+   *
+   * @param string $cacheFile Путь к файлу кеша
+   *
+   * @return array<int,string>|null Список; null, если кеша нет, он устарел или повреждён
+   */
+  private function readComponentsCache(string $cacheFile) : ?array
+  {
+    if (!is_file($cacheFile)) {
+      return null;
+    }
 
-      if (file_exists($cacheFile)) {
-        $cachedData = json_decode(file_get_contents($cacheFile), true);
+    $cachedData = json_decode((string) @file_get_contents($cacheFile), true);
 
-        if (!is_array($cachedData) || !isset($cachedData['files']) || !is_array($cachedData['files'])) {
+    if (!is_array($cachedData) || !isset($cachedData['expires'], $cachedData['files']) || !is_array($cachedData['files'])) {
+      return null;
+    }
+
+    if (time() >= (int) $cachedData['expires']) {
+      return null;
+    }
+
+    return array_values(array_filter($cachedData['files'], 'is_string'));
+  }
+
+  /**
+   * Собрать файлы компонентов в каталоге и его подкаталогах
+   *
+   * @param string $directory Каталог (относительно корня CMS)
+   * @param string $fileNamePattern Регулярное выражение имени файла
+   *
+   * @return array<int,string> Пути к файлам
+   */
+  private function collectComponentFiles(string $directory, string $fileNamePattern) : array
+  {
+    $files = [];
+    $directories = [$directory];
+
+    while ($directories !== []) {
+      $current = array_shift($directories);
+      $names = @scandir($current);
+
+      if ($names === false) {
+        continue;
+      }
+
+      foreach ($names as $name) {
+        if ($name === '.' || $name === '..') {
           continue;
         }
 
-        if (!isset($cachedData['expires']) || time() < $cachedData['expires']) {
-          usort($cachedData['files'], function($a, $b) {
-            $depthA = substr_count($a, '/');
-            $depthB = substr_count($b, '/');
+        $path = $current . '/' . $name;
 
-            if ($depthA !== $depthB) {
-              return $depthA <=> $depthB;
-            }
-
-            return strcmp($a, $b);
-          });
-
-          foreach ($cachedData['files'] as $file) {
-            $CMSFileConnector->connectFile(strtr(CMS_ROOT_DIRECTORY . '/' . $file, ['\\' => '']));
-          }
+        if (preg_match($fileNamePattern, $name)) {
+          $files[] = $path;
+        } elseif (is_dir($path)) {
+          $directories[] = $path;
         }
       }
+    }
+
+    return $files;
+  }
+
+  /**
+   * Порядок подключения: сначала файлы ближе к корню каталога, внутри уровня — по алфавиту
+   *
+   * @param array<int,string> $files Пути к файлам
+   *
+   * @return array<int,string> Упорядоченные пути
+   */
+  private function sortComponentFiles(array $files) : array
+  {
+    usort($files, function($a, $b) {
+      $depthA = substr_count($a, '/');
+      $depthB = substr_count($b, '/');
+
+      if ($depthA !== $depthB) {
+        return $depthA <=> $depthB;
+      }
+
+      return strcmp($a, $b);
+    });
+
+    return $files;
+  }
+
+  /**
+   * Записать список файлов компонентов в кеш (временный файл и rename())
+   *
+   * @param string $cacheFile Путь к файлу кеша
+   * @param array<int,string> $files Список файлов
+   *
+   * @return void
+   */
+  private function writeComponentsCache(string $cacheFile, array $files) : void
+  {
+    $temporary = $cacheFile . '.' . bin2hex(random_bytes(4)) . '.tmp';
+    $data = json_encode(['expires' => time() + 300, 'files' => $files]);
+
+    if ($data === false || @file_put_contents($temporary, $data, LOCK_EX) === false) {
+      return;
+    }
+
+    if (!@rename($temporary, $cacheFile)) {
+      @unlink($temporary);
     }
   }
 
