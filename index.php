@@ -25,6 +25,9 @@ ini_set('error_log', CMS_ROOT_DIRECTORY . '/logs/girvas-error.log');
 // ‿︵‿ヽ(°□° )ノ︵‿︵
 define('IS_NOT_HACKED', true);
 
+header('X-Powered-By: CMS GIRVAS');
+header('X-GIRVAS-CMS: 1');
+
 if (PHP_VERSION_ID < 80200) {
   die(sprintf('PHP version is too old (you have %s). CMS "GIRVAS" works on PHP version 8.2.0 and higher.', phpversion()));
 }
